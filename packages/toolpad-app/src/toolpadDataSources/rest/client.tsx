@@ -268,13 +268,11 @@ function QueryEditor({
   );
 
   const env = React.useMemo(() => introspection?.data?.env, [introspection]);
-  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env!), [env]);
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
-      const newValue = evaluateBindableAttrLArray(jsServerRuntime, newParams, env!);
-      setInput((existing) => ({ ...existing, params: newValue }));
+      setInput((existing) => ({ ...existing, params: newParams }));
     },
-    [setInput, env, jsServerRuntime],
+    [setInput],
   );
 
   const handleUrlChange = React.useCallback(
@@ -336,6 +334,7 @@ function QueryEditor({
   );
 
   const paramsEntries = input.params || EMPTY_PARAMS;
+  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env ?? {}), [env]);
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
     jsRuntime: jsServerRuntime,

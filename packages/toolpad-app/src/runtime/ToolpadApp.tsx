@@ -119,7 +119,7 @@ const internalComponents: ToolpadComponents = Object.fromEntries(
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
   // eslint-disable-next-line import/extensions
-  import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
+  import('@tanstack/react-query-devtools/build/modern/production.js').then((d) => ({
     default: d.ReactQueryDevtools,
   })),
 );
@@ -1283,18 +1283,16 @@ function MutationNode({ node, page }: MutationNodeProps) {
   );
 
   const {
-    isLoading,
+    isPending,
     data: responseData = EMPTY_OBJECT,
     error: fetchError,
     mutateAsync,
-  } = useMutation(
-    async (overrides: any = {}) => {
+  } = useMutation({
+    mutationKey: [node.name, params],
+    mutationFn: async (overrides: any = {}) => {
       return api.methods.execQuery(page.name, node.name, { ...params, ...overrides });
     },
-    {
-      mutationKey: [node.name, params],
-    },
-  );
+  });
 
   const { data, error: apiError } = responseData || EMPTY_OBJECT;
 
@@ -1306,8 +1304,8 @@ function MutationNode({ node, page }: MutationNodeProps) {
       await mutateAsync(overrides);
     };
     return {
-      isLoading,
-      isFetching: isLoading,
+      isLoading: isPending,
+      isFetching: isPending,
       error,
       data,
       rows: Array.isArray(data) ? data : EMPTY_ARRAY,
@@ -1317,7 +1315,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
         throw new Error(`refetch is not supported in manual queries`);
       },
     };
-  }, [isLoading, error, data, mutateAsync]);
+  }, [isPending, error, data, mutateAsync]);
 
   React.useEffect(() => {
     for (const [key, value] of Object.entries(mutationResult)) {

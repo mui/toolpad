@@ -24,7 +24,7 @@ function TabCloseIcon({
   unsaved,
   queryId,
 }: {
-  queryIndex?: number;
+  queryIndex: number;
   unsaved?: boolean;
   queryId?: NodeId;
 }) {
@@ -33,7 +33,7 @@ function TabCloseIcon({
   const [notHovered, setNotHovered] = React.useState(true);
 
   const onClose = React.useCallback(() => {
-    if (queryIndex === undefined || queryId === undefined) {
+    if (queryId === undefined) {
       return;
     }
     appStateApi.closeQueryTab(queryId, queryIndex);
@@ -45,6 +45,7 @@ function TabCloseIcon({
   });
   return unsaved && notHovered ? (
     <CircleIcon
+      aria-label={`Unsaved changes ${queryIndex + 1}`}
       sx={{
         color: (theme) =>
           theme.palette.mode === 'dark'
@@ -66,6 +67,8 @@ function TabCloseIcon({
         event.stopPropagation();
         handleCloseTab();
       }}
+      role="button"
+      aria-label={`Close query tab ${queryIndex + 1}`}
       sx={{
         color: (theme) =>
           theme.palette.mode === 'dark' ? theme.palette.primaryDark[400] : theme.palette.grey[500],

@@ -29,9 +29,7 @@ test('can control component prop values in properties control panel', async ({ p
   const firstInputLocator = canvasInputLocator.first();
   await clickCenter(page, firstInputLocator);
 
-  await editorModel.componentEditor
-    .locator('h6:has-text("Text Field")')
-    .waitFor({ state: 'visible' });
+  await editorModel.componentEditor.getByText('textField1').waitFor({ state: 'visible' });
 
   const labelControlInput = editorModel.componentEditor.getByLabel('label', { exact: true });
 
@@ -70,9 +68,7 @@ test('can toggle boolean prop that is true by default', async ({ page }) => {
 
   await clickCenter(page, autocomplete);
 
-  await editorModel.componentEditor
-    .locator('h6:has-text("Autocomplete")')
-    .waitFor({ state: 'visible' });
+  await editorModel.componentEditor.getByText('autocomplete').waitFor({ state: 'visible' });
 
   const fullWidthControlInput = editorModel.componentEditor.getByLabel('fullWidth', {
     exact: true,

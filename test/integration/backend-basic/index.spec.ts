@@ -84,15 +84,15 @@ test('function editor parameters update', async ({ page, localApp, argosScreensh
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
-  await editorModel.pageEditor.getByRole('button', { name: 'withParams' }).click();
+  await editorModel.queriesExplorer.getByText('withParams').click();
 
-  const queryEditor = page.getByRole('dialog', { name: 'withParams' });
-  await expect(queryEditor).toBeVisible();
-  await expect(queryEditor.getByLabel('foo', { exact: true })).toBeVisible();
-  await expect(queryEditor.getByLabel('bar', { exact: true })).not.toBeVisible();
+  const queryEditorTab = page.getByRole('tabpanel', { name: 'withParams' });
+  await expect(queryEditorTab).toBeVisible();
+  await expect(queryEditorTab.getByLabel('foo', { exact: true })).toBeVisible();
+  await expect(queryEditorTab.getByLabel('bar', { exact: true })).not.toBeVisible();
 
   await argosScreenshot('function-editor', {
-    clip: (await queryEditor.boundingBox()) || undefined,
+    clip: (await queryEditorTab.boundingBox()) || undefined,
   });
 
   await setPageHidden(page, true); // simulate page hidden
@@ -105,7 +105,7 @@ test('function editor parameters update', async ({ page, localApp, argosScreensh
 
   await setPageHidden(page, false); // simulate page restored
 
-  await expect(queryEditor.getByLabel('bar', { exact: true })).toBeVisible();
+  await expect(queryEditorTab.getByLabel('bar', { exact: true })).toBeVisible();
 });
 
 test('bound parameters are preserved on manual call', async ({ page }) => {
@@ -164,24 +164,33 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(EXTRACTED_TYPES_PAGE_ID);
 
-  await editorModel.pageEditor.getByRole('button', { name: 'bareWithParams' }).click();
-  const queryEditor = page.getByRole('dialog', { name: 'bareWithParams' });
+  await editorModel.queriesExplorer.getByText('bareWithParams').click();
 
-  await queryEditor.getByRole('button', { name: 'Preview', exact: true }).click();
-  await queryEditor
+  await editorModel.queryEditorPanel.getByRole('button', { name: 'Preview', exact: true }).click();
+  await editorModel.queryEditorPanel
     .getByTestId('query-preview')
     .getByText(
       'bare function with parameters: foo: bar; typeof bar: number; quux: true; baz.hello: 5',
     );
 
-  await expect(queryEditor).toBeVisible();
-  await expect(queryEditor.getByRole('checkbox', { name: 'quux', exact: true })).toBeVisible();
-  await expect(queryEditor.getByRole('textbox', { name: 'foo', exact: true })).toBeVisible();
-  await expect(queryEditor.getByRole('textbox', { name: 'foo', exact: true })).toBeVisible();
-  await expect(queryEditor.getByRole('button', { name: 'baz', exact: true })).toBeVisible();
-  await expect(queryEditor.getByRole('spinbutton', { name: 'bar', exact: true })).toBeVisible();
+  await expect(editorModel.queryEditorPanel).toBeVisible();
+  await expect(
+    editorModel.queryEditorPanel.getByRole('checkbox', { name: 'quux', exact: true }),
+  ).toBeVisible();
+  await expect(
+    editorModel.queryEditorPanel.getByRole('textbox', { name: 'foo', exact: true }),
+  ).toBeVisible();
+  await expect(
+    editorModel.queryEditorPanel.getByRole('button', { name: 'baz', exact: true }),
+  ).toBeVisible();
+  await expect(
+    editorModel.queryEditorPanel.getByRole('spinbutton', { name: 'bar', exact: true }),
+  ).toBeVisible();
 
-  const fizzCombobox = queryEditor.getByRole('combobox', { name: 'fizz', exact: true });
+  const fizzCombobox = editorModel.queryEditorPanel.getByRole('combobox', {
+    name: 'fizz',
+    exact: true,
+  });
   await expect(fizzCombobox).toBeVisible();
 
   await fizzCombobox.click();
@@ -189,7 +198,9 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
   await expect(page.getByRole('option', { name: 'world', exact: true })).toBeVisible();
   await page.keyboard.press('Escape');
 
-  await expect(queryEditor.getByRole('textbox', { name: 'buzz', exact: true })).not.toBeVisible();
+  await expect(
+    editorModel.queryEditorPanel.getByRole('textbox', { name: 'buzz', exact: true }),
+  ).not.toBeVisible();
 
   await setPageHidden(page, true); // simulate page hidden
 
@@ -201,7 +212,9 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
 
   await setPageHidden(page, false); // simulate page restored
 
-  await expect(queryEditor.getByRole('textbox', { name: 'buzz', exact: true })).toBeVisible();
+  await expect(
+    editorModel.queryEditorPanel.getByRole('textbox', { name: 'buzz', exact: true }),
+  ).toBeVisible();
 });
 
 test('data providers', async ({ page }) => {

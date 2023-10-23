@@ -26,14 +26,15 @@ import DoneIcon from '@mui/icons-material/Done';
 import { useQuery } from '@tanstack/react-query';
 import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import TabPanel from '../../components/TabPanel';
-import { ClientDataSource, QueryEditorProps } from '../../types';
+import { ClientDataSource, QueryEditorProps, QueryEditorToolsTabType } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
 import {
   useEvaluateLiveBindingEntries,
   useEvaluateLiveBindings,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
-import { useAppStateApi } from '../../toolpad/AppState';
+import { useAppState, useAppStateApi } from '../../toolpad/AppState';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import JsonView from '../../components/JsonView';
 import OpenCodeEditorButton from '../../toolpad/OpenCodeEditor';
@@ -43,7 +44,6 @@ import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl, usePropControlsContext } from '../../toolpad/propertyControls';
 import { parseLegacyFunctionId, serializeFunctionId, transformLegacyFunctionId } from './shared';
 import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
-import QueryToolsContext from '../../toolpad/AppEditor/PageEditor/QueryEditor/QueryToolsContext';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -183,7 +183,7 @@ function FunctionAutocomplete({
   }, [selectedFunctionId]);
 
   const selectedFunctionLabel = React.useMemo(() => {
-    if (selectedFileName) {
+    if (selectedFunctionName) {
       return `${selectedFileName} > ${selectedFunctionName}`;
     }
     return 'Select function';
@@ -411,6 +411,7 @@ function QueryEditor({
   execApi,
 }: QueryEditorProps<LocalConnectionParams, LocalQuery, LocalPrivateApi>) {
   const appStateApi = useAppStateApi();
+  const { currentView } = useAppState();
   const introspection = useQuery({
     queryKey: ['introspection'],
     queryFn: () => execApi('introspection', []),
@@ -418,7 +419,7 @@ function QueryEditor({
   });
 
   const updateProp = React.useCallback(
-    (prop: string, value: any) => {
+    function updateProp<K extends keyof LocalQuery>(prop: K, value: LocalQuery[K]) {
       appStateApi.updateQueryDraft((draft) => ({
         ...draft,
         attributes: {
@@ -433,6 +434,17 @@ function QueryEditor({
     [appStateApi],
   );
 
+  const currentTab = React.useMemo(() => {
+    if (
+      currentView.kind === 'page' &&
+      currentView.view?.kind === 'query' &&
+      currentView.queryPanel?.currentTabIndex !== undefined
+    ) {
+      return currentView.queryPanel?.queryTabs?.[currentView.queryPanel?.currentTabIndex];
+    }
+    return null;
+  }, [currentView]);
+
   const propTypeControls = usePropControlsContext();
 
   const { file: selectedFile = undefined, handler: selectedFunction = undefined } = input.attributes
@@ -446,9 +458,15 @@ function QueryEditor({
       ?.handlers.find((handler) => handler.name === selectedFunction);
   }, [introspection.data?.files, selectedFile, selectedFunction]);
 
-  const parameterDefs = Object.fromEntries(selectedOption?.parameters || []);
+  const parameterDefs = React.useMemo(
+    () => Object.fromEntries(selectedOption?.parameters || []),
+    [selectedOption?.parameters],
+  );
 
-  const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
+  const paramsEntries = React.useMemo(
+    () => input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS,
+    [input.params, parameterDefs],
+  );
 
   const paramsObject = Object.fromEntries(paramsEntries);
 
@@ -465,6 +483,16 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
+  const handleToolsTabTypeChange = React.useCallback(
+    (value: QueryEditorToolsTabType) => {
+      appStateApi.updateQueryTab((tab) => ({
+        ...tab,
+        toolsTabType: value,
+      }));
+    },
+    [appStateApi],
+  );
+
   const fetchServerPreview = React.useCallback(
     async (query: LocalQuery, params: Record<string, string>) => {
       return execApi('debugExec', [query, params]);
@@ -472,33 +500,23 @@ function QueryEditor({
     [execApi],
   );
 
-  const {
-    toolsTabType,
-    handleToolsTabTypeChange,
-    isPreviewLoading,
-    setIsPreviewLoading,
-    setHandleRunPreview,
-  } = React.useContext(QueryToolsContext);
-
-  const { preview, runPreview } = useQueryPreview(
+  const { preview, runPreview, isLoading } = useQueryPreview(
     fetchServerPreview,
     input.attributes.query,
     previewParams as Record<string, string>,
-    {
-      onPreview() {
-        setIsPreviewLoading(false);
-      },
-    },
   );
 
   const handleRunPreview = React.useCallback(() => {
-    setIsPreviewLoading(true);
     runPreview();
-  }, [setIsPreviewLoading, runPreview]);
+  }, [runPreview]);
 
   React.useEffect(() => {
-    setHandleRunPreview(() => handleRunPreview);
-  }, [setHandleRunPreview, handleRunPreview]);
+    appStateApi.updateQueryTab((tab) => ({
+      ...tab,
+      previewHandler: handleRunPreview,
+      isPreviewLoading: isLoading,
+    }));
+  }, [handleRunPreview, appStateApi, isLoading]);
 
   const liveBindings = useEvaluateLiveBindings({
     jsRuntime: jsBrowserRuntime,
@@ -534,7 +552,7 @@ function QueryEditor({
     }
   }, [execApi, introspection, proposedFileName]);
 
-  return (
+  return currentTab ? (
     <PanelGroup direction="horizontal">
       <Panel defaultSize={50} minSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
         <Stack direction="column" gap={0}>
@@ -611,69 +629,73 @@ function QueryEditor({
                 Parameters
               </Typography>
               <Divider sx={{ mb: 1 }} />
-
-              {Object.entries(parameterDefs).map(([name, definiton]) => {
-                const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
-                return Control ? (
-                  <BindableEditor
-                    key={name}
-                    liveBinding={liveBindings[name]}
-                    globalScope={globalScope}
-                    globalScopeMeta={globalScopeMeta}
-                    label={name}
-                    propType={definiton}
-                    jsRuntime={jsBrowserRuntime}
-                    renderControl={(renderControlParams) => (
-                      <Control {...renderControlParams} propType={definiton} />
-                    )}
-                    value={paramsObject[name]}
-                    onChange={(newValue) => {
-                      const paramKeys = Object.keys(parameterDefs);
-                      const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
-                        const paramValue = key === name ? newValue : paramsObject[key];
-                        return paramValue ? [[key, paramValue]] : [];
-                      });
-                      appStateApi.updateQueryDraft((draft) => ({
-                        ...draft,
-                        params: newParams,
-                      }));
-                    }}
-                  />
-                ) : null;
-              })}
+              <Grid2 display="grid" gridTemplateColumns={'1fr 1fr 1fr'} gap={2}>
+                {Object.entries(parameterDefs).map(([name, definiton]) => {
+                  const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
+                  return Control ? (
+                    <BindableEditor
+                      key={name}
+                      liveBinding={liveBindings[name]}
+                      globalScope={globalScope}
+                      globalScopeMeta={globalScopeMeta}
+                      label={name}
+                      propType={definiton}
+                      jsRuntime={jsBrowserRuntime}
+                      renderControl={(renderControlParams) => (
+                        <Control {...renderControlParams} propType={definiton} />
+                      )}
+                      value={paramsObject[name]}
+                      onChange={(newValue) => {
+                        const paramKeys = Object.keys(parameterDefs);
+                        const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
+                          const paramValue = key === name ? newValue : paramsObject[key];
+                          return paramValue ? [[key, paramValue]] : [];
+                        });
+                        appStateApi.updateQueryDraft((draft) => ({
+                          ...draft,
+                          params: newParams,
+                        }));
+                      }}
+                    />
+                  ) : null;
+                })}
+              </Grid2>
             </Box>
           </Panel>
           <PanelResizeHandle />
-          {toolsTabType ? (
-            <Panel defaultSize={60} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
-              <TabContext value={toolsTabType}>
-                <Box
-                  sx={{
-                    borderBottom: 1,
-                    borderColor: 'divider',
-                    display: 'flex',
-                    height: 32,
-                  }}
+
+          <Panel defaultSize={60} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+            <TabContext value={currentTab.toolsTabType}>
+              <Box
+                sx={{
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                  display: 'flex',
+                  height: 32,
+                }}
+              >
+                <TabList
+                  sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                  onChange={(event, value) => handleToolsTabTypeChange(value)}
+                  aria-label="Query tools active tab"
                 >
-                  <TabList
-                    sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
-                    onChange={handleToolsTabTypeChange}
-                    aria-label="Query tools active tab"
-                  >
-                    <Tab label="Preview" value="preview" />
-                  </TabList>
-                </Box>
-                <TabPanel value="preview" disableGutters>
-                  <QueryPreview isLoading={isPreviewLoading} error={preview?.error}>
-                    <ResolvedPreview preview={preview} />
-                  </QueryPreview>
-                </TabPanel>
-              </TabContext>
-            </Panel>
-          ) : null}
+                  <Tab label="Preview" value="preview" />
+                </TabList>
+              </Box>
+              <TabPanel value="preview" disableGutters>
+                <QueryPreview isLoading={currentTab.isPreviewLoading} error={preview?.error}>
+                  <ResolvedPreview preview={preview} />
+                </QueryPreview>
+              </TabPanel>
+            </TabContext>
+          </Panel>
         </PanelGroup>
       </Panel>
     </PanelGroup>
+  ) : (
+    <Alert severity="error">
+      An error occurred while rendering this tab. Please refresh and try again.
+    </Alert>
   );
 }
 

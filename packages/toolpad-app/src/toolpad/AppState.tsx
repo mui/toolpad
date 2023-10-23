@@ -14,7 +14,7 @@ import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
 import { NodeHashes, ClientDataSource } from '../types';
 import { hasFieldFocus } from '../utils/fields';
-import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
+import { DomView, getViewFromPathname, PageViewTab, QueryTab } from '../utils/domView';
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));
@@ -71,9 +71,13 @@ export type AppStateAction =
     }
   | {
       type: 'CLOSE_QUERY_TAB';
-      queryIndex: number;
       queryId: NodeId;
+      queryIndex?: number;
       deleteQuery?: boolean;
+    }
+  | {
+      type: 'UPDATE_QUERY_TAB';
+      updater: (tab: QueryTab) => QueryTab;
     }
   | {
       type: 'CLOSE_QUERY_PANEL';
@@ -420,6 +424,8 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
               },
               saved: createdNode,
               draft: createdNode,
+              toolsTabType: 'preview',
+              isPreviewLoading: false,
             },
           ],
           currentTabIndex: state.currentView.queryPanel.queryTabs.length,
@@ -439,6 +445,8 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
               },
               saved: createdNode,
               draft: createdNode,
+              isPreviewLoading: false,
+              toolsTabType: 'preview',
             },
           ],
           currentTabIndex: 0,
@@ -498,7 +506,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
           if (queries.length) {
             const selectedQuery = queries?.find((query) => query?.id === action.queryId);
 
-            const newTab = {
+            const newTab: QueryTab = {
               meta: {
                 id: action.queryId,
                 name: selectedQuery?.name,
@@ -506,6 +514,8 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
               },
               saved: selectedQuery,
               draft: selectedQuery,
+              toolsTabType: 'preview',
+              isPreviewLoading: false,
             };
 
             /**
@@ -539,10 +549,31 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       }
       return state;
     }
+    case 'UPDATE_QUERY_TAB': {
+      if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
+        return state;
+      }
+
+      return update(state, {
+        currentView: {
+          ...state.currentView,
+          queryPanel: {
+            ...state.currentView.queryPanel,
+            queryTabs: state.currentView.queryPanel?.queryTabs?.map((tab, index) => {
+              if (index === state.currentView.queryPanel?.currentTabIndex) {
+                return action.updater ? action.updater(tab) : tab;
+              }
+              return tab;
+            }),
+          },
+        },
+      });
+    }
     case 'CLOSE_QUERY_TAB': {
       if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
         return state;
       }
+
       const tabs = state.currentView.queryPanel?.queryTabs;
       const newView = { ...state.currentView };
       const newTabs = tabs?.filter((tab) => tab.meta.id !== action.queryId);
@@ -561,31 +592,28 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
           };
         }
       }
-      /*
-       * if the query being closed is not the one open,
-       * decrement the current tab index if it is greater than the index of the tab being closed
-       */
+
       const currentTabIndex = state.currentView.queryPanel?.currentTabIndex;
 
-      if (
-        currentTabIndex !== undefined &&
-        action.queryId &&
-        action.queryIndex !== undefined &&
-        action.queryIndex !== currentTabIndex
-      ) {
-        const newTabIndex =
-          currentTabIndex > action.queryIndex ? currentTabIndex - 1 : currentTabIndex;
-        newView.queryPanel = {
-          queryTabs: newTabs,
-          currentTabIndex: newTabIndex,
-        };
-      }
-      // if there are multiple tabs open, and
-      // the query being closed is the one open,
-      // select the previous tab, or the next tab if there is no previous tab
-      else {
-        const queryIds = tabs?.map((tab) => tab.meta.id);
-        if (currentTabIndex !== undefined) {
+      if (currentTabIndex !== undefined && action.queryId && action.queryIndex !== undefined) {
+        /*
+         * if the query being closed is not the one open,
+         * decrement the current tab index if it is greater than the index of the tab being closed
+         */
+        if (action.queryIndex !== currentTabIndex) {
+          const newTabIndex =
+            currentTabIndex > action.queryIndex ? currentTabIndex - 1 : currentTabIndex;
+          newView.queryPanel = {
+            queryTabs: newTabs,
+            currentTabIndex: newTabIndex,
+          };
+        }
+        // if there are multiple tabs open, and
+        // the query being closed is the one open,
+        // select the previous tab, or the next tab if there is no previous tab
+        else {
+          const queryIds = tabs?.map((tab) => tab.meta.id);
+
           const replacementQueryId =
             queryIds?.[action.queryIndex === 0 ? currentTabIndex + 1 : currentTabIndex - 1];
           const replacementTabIndex =
@@ -599,6 +627,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
           }
         }
       }
+
       // If a delete action is also involved, remove the query from the dom
       if (action.deleteQuery) {
         newDom = appDom.removeNode(state.dom, action.queryId);
@@ -728,11 +757,17 @@ function createAppStateApi(
         mode,
       });
     },
-    closeQueryTab(queryIndex: number, queryId: NodeId, deleteQuery?: boolean) {
+    updateQueryTab(updater: (tab: QueryTab) => QueryTab) {
+      dispatch({
+        type: 'UPDATE_QUERY_TAB',
+        updater,
+      });
+    },
+    closeQueryTab(queryId: NodeId, queryIndex?: number, deleteQuery?: boolean) {
       dispatch({
         type: 'CLOSE_QUERY_TAB',
-        queryIndex,
         queryId,
+        queryIndex,
         deleteQuery,
       });
     },

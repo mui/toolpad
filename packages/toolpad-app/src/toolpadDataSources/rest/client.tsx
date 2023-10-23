@@ -19,7 +19,12 @@ import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
-import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
+import {
+  ClientDataSource,
+  ConnectionEditorProps,
+  QueryEditorProps,
+  QueryEditorToolsTabType,
+} from '../../types';
 import {
   FetchPrivateQuery,
   FetchQuery,
@@ -41,7 +46,7 @@ import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
-import { useAppStateApi } from '../../toolpad/AppState';
+import { useAppState, useAppStateApi } from '../../toolpad/AppState';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import BodyEditor from './BodyEditor';
 import TabPanel from '../../components/TabPanel';
@@ -53,7 +58,6 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import useFetchPrivate from '../useFetchPrivate';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
-import QueryToolsContext from '../../toolpad/AppEditor/PageEditor/QueryEditor/QueryToolsContext';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'];
 
@@ -263,6 +267,7 @@ function QueryEditor({
   runtimeConfig,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const appStateApi = useAppStateApi();
+  const { currentView } = useAppState();
   const isBrowserSide = input.attributes.query.browser;
 
   const connectionParams = isBrowserSide ? null : rawConnectionParams;
@@ -270,14 +275,6 @@ function QueryEditor({
   // input.attributes.query.url will be reset when it's empty
   const urlValue: BindableAttrValue<string> =
     input.attributes.query.url ?? getDefaultUrl(runtimeConfig, connectionParams);
-
-  const {
-    toolsTabType,
-    handleToolsTabTypeChange,
-    isPreviewLoading,
-    setIsPreviewLoading,
-    setHandleRunPreview,
-  } = React.useContext(QueryToolsContext);
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {
@@ -287,21 +284,8 @@ function QueryEditor({
   );
   const envVarNames = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
 
-  const updateAttribute = React.useCallback(
-    (attribute: string, value: any) => {
-      appStateApi.updateQueryDraft((draft) => ({
-        ...draft,
-        attributes: {
-          ...draft.attributes,
-          [attribute]: value,
-        },
-      }));
-    },
-    [appStateApi],
-  );
-
   const updateProp = React.useCallback(
-    (prop: string, value: any) => {
+    function updateProp<K extends keyof FetchQuery>(prop: K, value: FetchQuery[K]) {
       appStateApi.updateQueryDraft((draft) => ({
         ...draft,
         attributes: {
@@ -328,7 +312,7 @@ function QueryEditor({
 
   const handleUrlChange = React.useCallback(
     (newUrl: BindableAttrValue<string> | null) => {
-      updateProp('url', newUrl);
+      updateProp('url', newUrl ?? '');
     },
     [updateProp],
   );
@@ -342,16 +326,16 @@ function QueryEditor({
 
   const handleTransformEnabledChange = React.useCallback(
     (transformEnabled: boolean) => {
-      updateAttribute('transformEnabled', transformEnabled);
+      updateProp('transformEnabled', transformEnabled);
     },
-    [updateAttribute],
+    [updateProp],
   );
 
   const handleTransformChange = React.useCallback(
     (transform: string) => {
-      updateAttribute('transform', transform);
+      updateProp('transform', transform);
     },
-    [updateAttribute],
+    [updateProp],
   );
 
   const handleBodyChange = React.useCallback(
@@ -427,6 +411,27 @@ function QueryEditor({
 
   const [configTab, setConfigTab] = React.useState('urlQuery');
 
+  const currentTab = React.useMemo(() => {
+    if (
+      currentView.kind === 'page' &&
+      currentView.view?.kind === 'query' &&
+      currentView.queryPanel?.currentTabIndex !== undefined
+    ) {
+      return currentView.queryPanel?.queryTabs?.[currentView.queryPanel?.currentTabIndex];
+    }
+    return null;
+  }, [currentView]);
+
+  const handleToolsTabTypeChange = React.useCallback(
+    (value: QueryEditorToolsTabType) => {
+      appStateApi.updateQueryTab((tab) => ({
+        ...tab,
+        toolsTabType: value,
+      }));
+    },
+    [appStateApi],
+  );
+
   const fetchPrivate = useFetchPrivate<FetchPrivateQuery, FetchResult>();
   const fetchPreview = React.useCallback(
     (query: FetchQuery, params: Record<string, string>) =>
@@ -435,28 +440,30 @@ function QueryEditor({
   );
 
   const [previewHar, setPreviewHar] = React.useState(() => createHarLog());
-  const { preview, runPreview } = useQueryPreview(
+  const { preview, runPreview, isLoading } = useQueryPreview(
     fetchPreview,
     input.attributes.query,
     previewParams as Record<string, string>,
     {
-      onPreview(result) {
-        setIsPreviewLoading(false);
+      onPreview: React.useCallback((result: FetchResult) => {
         setPreviewHar((existing) =>
           result.har ? mergeHar(createHarLog(), existing, result.har) : existing,
         );
-      },
+      }, []),
     },
   );
 
   const handleRunPreview = React.useCallback(() => {
-    setIsPreviewLoading(true);
     runPreview();
-  }, [setIsPreviewLoading, runPreview]);
+  }, [runPreview]);
 
   React.useEffect(() => {
-    setHandleRunPreview(() => handleRunPreview);
-  }, [handleRunPreview, setHandleRunPreview]);
+    appStateApi.updateQueryTab((tab) => ({
+      ...tab,
+      previewHandler: handleRunPreview,
+      isPreviewLoading: isLoading,
+    }));
+  }, [handleRunPreview, appStateApi, isLoading]);
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
@@ -465,7 +472,7 @@ function QueryEditor({
     [],
   );
 
-  return (
+  return currentTab ? (
     <PanelGroup direction="horizontal">
       <Panel defaultSize={50} minSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
         <Stack direction="column" gap={0}>
@@ -642,47 +649,45 @@ function QueryEditor({
             </Box>
           </Panel>
           <PanelResizeHandle />
-          {toolsTabType ? (
-            <Panel defaultSize={60} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
-              <TabContext value={toolsTabType}>
-                <Box
-                  sx={{
-                    borderBottom: 1,
-                    borderColor: 'divider',
-                    display: 'flex',
-                    height: 32,
-                  }}
+          <Panel defaultSize={60} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+            <TabContext value={currentTab.toolsTabType}>
+              <Box
+                sx={{
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                  display: 'flex',
+                  height: 32,
+                }}
+              >
+                <TabList
+                  sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                  onChange={(event, value) => handleToolsTabTypeChange(value)}
+                  aria-label="Query tools active tab"
                 >
-                  <TabList
-                    sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
-                    onChange={handleToolsTabTypeChange}
-                    aria-label="Query tools active tab"
-                  >
-                    <Tab label="Preview" value="preview" />
-                    <Tab label="Dev Tools" value="devtools" />
-                  </TabList>
-                </Box>
-                <TabPanel value="preview" disableGutters>
-                  <QueryPreview isLoading={isPreviewLoading} error={preview?.error}>
-                    <ResolvedPreview
-                      preview={preview}
-                      onShowTransform={() => setConfigTab('transform')}
-                    />
-                  </QueryPreview>
-                </TabPanel>
-                <TabPanel value="devtools" disableGutters>
-                  <Devtools
-                    sx={{ overflow: 'auto' }}
-                    har={previewHar}
-                    onHarClear={handleHarClear}
+                  <Tab label="Preview" value="preview" />
+                  <Tab label="Dev Tools" value="devTools" />
+                </TabList>
+              </Box>
+              <TabPanel value="preview" disableGutters>
+                <QueryPreview isLoading={currentTab.isPreviewLoading} error={preview?.error}>
+                  <ResolvedPreview
+                    preview={preview}
+                    onShowTransform={() => setConfigTab('transform')}
                   />
-                </TabPanel>
-              </TabContext>
-            </Panel>
-          ) : null}
+                </QueryPreview>
+              </TabPanel>
+              <TabPanel value="devTools" disableGutters>
+                <Devtools sx={{ overflow: 'auto' }} har={previewHar} onHarClear={handleHarClear} />
+              </TabPanel>
+            </TabContext>
+          </Panel>
         </PanelGroup>
       </Panel>
     </PanelGroup>
+  ) : (
+    <Alert severity="error">
+      An error occurred while rendering this tab. Please refresh and try again.
+    </Alert>
   );
 }
 

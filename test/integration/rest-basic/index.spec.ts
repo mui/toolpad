@@ -71,7 +71,7 @@ test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) 
   await editorModel.goto();
   await editorModel.waitForOverlay();
 
-  await editorModel.pageEditor.getByRole('button', { name: 'Add query' }).click();
+  await editorModel.pageEditor.getByLabel('Create new query').click();
   await page.getByRole('button', { name: 'HTTP request' }).click();
 
   const newQueryEditor = page.getByRole('dialog', { name: 'query' });

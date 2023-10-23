@@ -12,8 +12,7 @@ import QueryIcon from '../../QueryIcon';
 import QueryEditorPanel from './QueryEditorPanel';
 import useShortcut from '../../../../utils/useShortcut';
 import { isMac } from '../../../../utils/platform';
-import QueryToolsContext, { QueryToolsContextProps } from './QueryToolsContext';
-import { QueryEditorToolsTabType } from '../../../../types';
+
 import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 
 function SaveShortcutIndicator() {
@@ -37,7 +36,7 @@ function TabCloseIcon({
     if (queryIndex === undefined || queryId === undefined) {
       return;
     }
-    appStateApi.closeQueryTab(queryIndex, queryId);
+    appStateApi.closeQueryTab(queryId, queryIndex);
   }, [appStateApi, queryIndex, queryId]);
 
   const { handleCloseWithUnsavedChanges: handleCloseTab } = useUnsavedChangesConfirm({
@@ -107,40 +106,15 @@ export default function QueryEditor() {
     return '';
   }, [currentView]);
 
-  const [toolsTabType, setToolsTabType] = React.useState<QueryEditorToolsTabType>('preview');
-
-  const handleToolsTabTypeChange = React.useCallback(
-    (event: React.SyntheticEvent, newValue: QueryEditorToolsTabType) => setToolsTabType(newValue),
-    [],
-  );
-
-  const [isPreviewLoading, setIsPreviewLoading] = React.useState(false);
-
-  const [handleRunPreview, setHandleRunPreview] = React.useState(() => () => {});
-
-  const queryToolsContext = React.useMemo<QueryToolsContextProps>(
-    () => ({
-      toolsTabType,
-      handleToolsTabTypeChange,
-      isPreviewLoading,
-      setIsPreviewLoading,
-      handleRunPreview,
-      setHandleRunPreview,
-    }),
-    [
-      toolsTabType,
-      handleToolsTabTypeChange,
-      isPreviewLoading,
-      setIsPreviewLoading,
-      handleRunPreview,
-      setHandleRunPreview,
-    ],
-  );
-
-  const refreshQueryToolsContext = React.useCallback(() => {
-    setToolsTabType('preview');
-    setIsPreviewLoading(false);
-  }, []);
+  const isPreviewLoading = React.useMemo(() => {
+    if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
+      return (
+        currentView.queryPanel?.queryTabs?.[parseInt(currentTabIndex, 10)]?.isPreviewLoading ||
+        false
+      );
+    }
+    return false;
+  }, [currentView, currentTabIndex]);
 
   const handleTabChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string) => {
@@ -158,11 +132,21 @@ export default function QueryEditor() {
             },
           });
         }
-        refreshQueryToolsContext();
       }
     },
-    [appStateApi, currentView, refreshQueryToolsContext],
+    [appStateApi, currentView],
   );
+
+  const handleRunPreview = React.useCallback(() => {
+    if (currentView.kind === 'page') {
+      if (
+        currentView.queryPanel?.queryTabs &&
+        currentView.queryPanel?.currentTabIndex !== undefined
+      ) {
+        currentView.queryPanel.queryTabs[parseInt(currentTabIndex, 10)].previewHandler?.();
+      }
+    }
+  }, [currentView, currentTabIndex]);
 
   const hasUnsavedChanges = React.useCallback(
     (queryIndex: number) => {
@@ -237,132 +221,133 @@ export default function QueryEditor() {
     <Stack
       direction="column"
       sx={{ height: '100%', overflow: 'hidden', borderBottom: 5, borderColor: 'divider' }}
+      aria-label="Query editor panel"
+      role="tabpanel"
     >
       <TabContext value={currentTabIndex}>
-        <QueryToolsContext.Provider value={queryToolsContext}>
-          <Stack direction="column">
-            <Stack
-              direction={'row'}
-              justifyContent={'space-between'}
-              sx={{ maxHeight: 40, borderBottom: 1, borderColor: 'divider' }}
-            >
-              <TabList onChange={handleTabChange} aria-label="Query editor panel">
-                {currentView.queryPanel?.queryTabs?.map((query, index) => (
-                  <Tab
-                    key={query?.meta?.name}
-                    label={
-                      <Chip
-                        label={query?.meta?.name}
-                        size="small"
-                        variant="outlined"
-                        sx={{
-                          color: 'inherit',
-                          border: 0,
-                          ml: -1,
-                          '&:hover': { color: 'inherit' },
-                        }}
-                        deleteIcon={
-                          <TabCloseIcon
-                            queryIndex={index}
-                            unsaved={hasUnsavedChanges(index)}
-                            queryId={query?.meta?.id}
-                          />
-                        }
-                        // Need to pass onDelete to allow the delete icon to be rendered
-                        onDelete={() => {}}
-                      />
-                    }
-                    value={index.toString()}
-                    icon={
-                      <QueryIcon
-                        id={query?.meta?.dataSource || 'default'}
-                        sx={{ fontSize: 24, mt: 0.2 }}
-                      />
-                    }
-                    iconPosition="start"
-                  />
-                ))}
-              </TabList>
-              <IconButton size="small" disableRipple onClick={handleClosePanel}>
-                <CancelPresentationIcon
-                  sx={{
-                    mr: 1,
-                    alignSelf: 'center',
-                    color: (theme) => theme.palette.grey[500],
-                    transition: (theme) =>
-                      theme.transitions.create('color', {
-                        duration: theme.transitions.duration.shortest,
-                      }),
-                    '&:hover, &:focus': {
-                      color: (theme) =>
-                        theme.palette.mode === 'dark'
-                          ? theme.palette.primaryDark[300]
-                          : theme.palette.primary.main,
-                    },
-                    fontSize: 16,
-                  }}
+        <Stack direction="column">
+          <Stack
+            direction={'row'}
+            justifyContent={'space-between'}
+            sx={{ maxHeight: 40, borderBottom: 1, borderColor: 'divider' }}
+          >
+            <TabList onChange={handleTabChange} aria-label="Query editor panel">
+              {currentView.queryPanel?.queryTabs?.map((query, index) => (
+                <Tab
+                  key={query?.meta?.name}
+                  label={
+                    <Chip
+                      label={query?.meta?.name}
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        color: 'inherit',
+                        border: 0,
+                        ml: -1,
+                        '&:hover': { color: 'inherit' },
+                      }}
+                      deleteIcon={
+                        <TabCloseIcon
+                          queryIndex={index}
+                          unsaved={hasUnsavedChanges(index)}
+                          queryId={query?.meta?.id}
+                        />
+                      }
+                      // Need to pass onDelete to allow the delete icon to be rendered
+                      onDelete={() => {}}
+                    />
+                  }
+                  value={index.toString()}
+                  icon={
+                    <QueryIcon
+                      id={query?.meta?.dataSource || 'default'}
+                      sx={{ fontSize: 24, mt: 0.2 }}
+                    />
+                  }
+                  iconPosition="start"
                 />
-              </IconButton>
-            </Stack>
-            <Box
+              ))}
+            </TabList>
+            <IconButton size="small" disableRipple onClick={handleClosePanel}>
+              <CancelPresentationIcon
+                sx={{
+                  mr: 1,
+                  alignSelf: 'center',
+                  color: (theme) => theme.palette.grey[500],
+                  transition: (theme) =>
+                    theme.transitions.create('color', {
+                      duration: theme.transitions.duration.shortest,
+                    }),
+                  '&:hover, &:focus': {
+                    color: (theme) =>
+                      theme.palette.mode === 'dark'
+                        ? theme.palette.primaryDark[300]
+                        : theme.palette.primary.main,
+                  },
+                  fontSize: 16,
+                }}
+              />
+            </IconButton>
+          </Stack>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 1,
+              minHeight: 60,
+              borderBottom: 1,
+              borderColor: 'divider',
+            }}
+          >
+            <LoadingButton
+              disabled={isPreviewLoading}
+              loading={isPreviewLoading}
+              variant="outlined"
+              color="primary"
+              onClick={handleRunPreview}
+              endIcon={<PlayArrow />}
               sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: 1,
-                minHeight: 60,
-                borderBottom: 1,
-                borderColor: 'divider',
+                width: 'fit-content',
+                height: 32,
+                mr: 1,
+                my: 'auto',
+                alignSelf: 'center',
               }}
             >
-              <LoadingButton
-                disabled={isPreviewLoading}
-                loading={isPreviewLoading}
-                variant="outlined"
-                color="primary"
-                onClick={handleRunPreview}
-                endIcon={<PlayArrow />}
+              Preview
+            </LoadingButton>
+            <LoadingButton
+              disabled={saveDisabled}
+              onClick={handleSave}
+              variant="contained"
+              color="primary"
+              sx={{ width: 'fit-content', height: 32, my: 'auto', mr: 2 }}
+            >
+              Save <SaveShortcutIndicator />
+            </LoadingButton>
+          </Box>
+        </Stack>
+
+        {currentView.queryPanel?.queryTabs?.map((query, index) => {
+          if (query && query.draft) {
+            return (
+              <TabPanel
+                key={query.meta?.name}
+                value={index.toString()}
+                aria-label={query.meta?.name}
                 sx={{
-                  width: 'fit-content',
-                  height: 32,
-                  mr: 1,
-                  my: 'auto',
-                  alignSelf: 'center',
+                  p: 1,
+                  pb: 0,
+                  height: '100%',
+                  overflow: 'hidden',
                 }}
               >
-                Preview
-              </LoadingButton>
-              <LoadingButton
-                disabled={saveDisabled}
-                onClick={handleSave}
-                variant="contained"
-                color="primary"
-                sx={{ width: 'fit-content', height: 32, my: 'auto', mr: 2 }}
-              >
-                Save <SaveShortcutIndicator />
-              </LoadingButton>
-            </Box>
-          </Stack>
-
-          {currentView.queryPanel?.queryTabs?.map((query, index) => {
-            if (query && query.draft) {
-              return (
-                <TabPanel
-                  key={query.meta?.name}
-                  value={index.toString()}
-                  sx={{
-                    p: 1,
-                    pb: 0,
-                    height: '100%',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <QueryEditorPanel draft={query.draft} saved={query.saved} />
-                </TabPanel>
-              );
-            }
-            return null;
-          })}
-        </QueryToolsContext.Provider>
+                <QueryEditorPanel draft={query.draft} saved={query.saved} />
+              </TabPanel>
+            );
+          }
+          return null;
+        })}
       </TabContext>
     </Stack>
   ) : null;

@@ -57,6 +57,7 @@ function QuerySettingsToggleButton({
 }
 
 interface QuerySettingsTabProps {
+  draft: appDom.QueryNode;
   liveEnabled: LiveBinding;
   pageState: any;
   globalScopeMeta: any;
@@ -64,32 +65,23 @@ interface QuerySettingsTabProps {
 }
 
 function QuerySettingsTab({
+  draft,
   liveEnabled,
   pageState,
   globalScopeMeta,
   jsBrowserRuntime,
 }: QuerySettingsTabProps) {
-  const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
 
-  const draftQuery = React.useMemo(() => {
-    if (
-      currentView.kind === 'page' &&
-      currentView.view?.kind === 'query' &&
-      currentView.queryPanel?.queryTabs &&
-      currentView.queryPanel?.currentTabIndex !== undefined
-    ) {
-      return currentView.queryPanel?.queryTabs[currentView.queryPanel?.currentTabIndex]?.draft;
-    }
-    return null;
-  }, [currentView]);
-
   const updateAttribute = React.useCallback(
-    (attrName: string, attrValue: any) => {
-      appStateApi.updateQueryDraft((draft) => ({
-        ...draft,
+    function updateAttribute<K extends keyof appDom.QueryNode['attributes']>(
+      attrName: K,
+      attrValue: appDom.QueryNode['attributes'][K],
+    ) {
+      appStateApi.updateQueryDraft((node) => ({
+        ...node,
         attributes: {
-          ...draft.attributes,
+          ...node.attributes,
           [attrName]: attrValue,
         },
       }));
@@ -99,7 +91,9 @@ function QuerySettingsTab({
 
   const handleModeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      updateAttribute('mode', event.target.value);
+      if (event.target.value === 'mutation' || event.target.value === 'query') {
+        updateAttribute('mode', event.target.value);
+      }
     },
     [updateAttribute],
   );
@@ -146,7 +140,7 @@ function QuerySettingsTab({
         <TextField
           select
           label="mode"
-          value={draftQuery?.attributes?.mode ?? 'query'}
+          value={draft?.attributes?.mode ?? 'query'}
           onChange={handleModeChange}
           sx={{
             '& .MuiInputLabel-root': { fontSize: 12 },
@@ -171,9 +165,9 @@ function QuerySettingsTab({
           }}
           type="number"
           label="Refetch interval"
-          value={refetchIntervalInSeconds(draftQuery?.attributes?.refetchInterval) ?? ''}
+          value={refetchIntervalInSeconds(draft?.attributes?.refetchInterval) ?? ''}
           onChange={handleRefetchIntervalChange}
-          disabled={draftQuery?.attributes?.mode !== 'query'}
+          disabled={draft?.attributes?.mode !== 'query'}
         />
         <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
           Set query enabled/disabled:
@@ -185,9 +179,9 @@ function QuerySettingsTab({
           jsRuntime={jsBrowserRuntime}
           label="Enabled"
           propType={{ type: 'boolean' }}
-          value={draftQuery?.attributes?.enabled ?? true}
+          value={draft?.attributes?.enabled ?? true}
           onChange={handleEnabledChange}
-          disabled={draftQuery?.attributes?.mode !== 'query'}
+          disabled={draft?.attributes?.mode !== 'query'}
           sx={{ maxWidth: 100 }}
         />
       </Stack>
@@ -263,6 +257,7 @@ export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
             settingsTab={
               <QuerySettingsTab
                 {...{
+                  draft,
                   liveEnabled,
                   pageState,
                   globalScopeMeta,

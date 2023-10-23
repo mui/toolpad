@@ -13,6 +13,9 @@ export type QueryTab = {
   meta: QueryMeta;
   saved?: QueryNode;
   draft?: QueryNode;
+  toolsTabType: 'preview' | 'devTools';
+  isPreviewLoading: boolean;
+  previewHandler?: () => void;
 };
 
 export type QueryPanel = {

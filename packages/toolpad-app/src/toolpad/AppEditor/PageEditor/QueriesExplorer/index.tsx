@@ -225,7 +225,7 @@ function CreatePopover({
   );
 }
 
-export function DataExplorer() {
+export function QueriesExplorer() {
   const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
   const currentPageId = currentView.nodeId;
@@ -302,9 +302,8 @@ export function DataExplorer() {
       const selectedQueryTabIndex = currentView.queryPanel?.queryTabs?.findIndex(
         (tab) => tab.meta?.id === selectedQueryId,
       );
-      if (selectedQueryTabIndex !== undefined) {
-        appStateApi.closeQueryTab(selectedQueryTabIndex, selectedQueryId, true);
-      }
+
+      appStateApi.closeQueryTab(selectedQueryId, selectedQueryTabIndex, true);
     },
     [appStateApi, currentView],
   );
@@ -380,7 +379,10 @@ export function DataExplorer() {
   );
 
   return (
-    <Box sx={{ maxHeight: '100%', overflowY: 'auto', scrollbarGutter: 'stable' }}>
+    <Box
+      sx={{ maxHeight: '100%', overflowY: 'auto', scrollbarGutter: 'stable' }}
+      data-testid="queries-explorer"
+    >
       <ExplorerHeader
         headerText="Queries"
         onCreate={handleCreateQueryClick}
@@ -407,6 +409,7 @@ export function DataExplorer() {
             nodeId={query.id}
             toolpadNodeId={query.id}
             aria-level={1}
+            aria-label={query.name}
             labelText={query.name}
             labelTextSx={{ fontSize: 13 }}
             labelIconId={query.attributes?.dataSource}

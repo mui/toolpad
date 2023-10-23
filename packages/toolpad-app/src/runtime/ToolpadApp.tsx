@@ -118,6 +118,7 @@ const internalComponents: ToolpadComponents = Object.fromEntries(
 );
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
+  // eslint-disable-next-line import/extensions
   import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
     default: d.ReactQueryDevtools,
   })),

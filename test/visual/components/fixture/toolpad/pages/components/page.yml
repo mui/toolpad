@@ -70,10 +70,6 @@ spec:
                       $$jsExpression: |
                         `List Button ${i + 1}`
     - component: Checkbox
-      name: switch
-      props:
-        mode: switch
-    - component: Checkbox
       name: checkbox
     - component: Text
       name: text
@@ -89,10 +85,10 @@ spec:
         value: center-text
     - component: Text
       name: text2
-      props:
-        value: end-text
       layout:
         horizontalAlign: end
+      props:
+        value: end-text
     - component: Text
       name: text3
       props:
@@ -101,11 +97,11 @@ spec:
         loading: false
     - component: Text
       name: text4
+      props:
+        value: center-markdown-text
+        mode: markdown
       layout:
         horizontalAlign: center
-      props:
-        mode: markdown
-        value: center-markdown-text
     - component: Text
       name: text5
       layout:
@@ -113,3 +109,7 @@ spec:
       props:
         mode: markdown
         value: end-markdown-text
+    - component: Checkbox
+      name: switch
+      props:
+        mode: switch

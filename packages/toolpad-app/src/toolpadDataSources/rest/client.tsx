@@ -34,7 +34,6 @@ import BindableEditor, {
 import {
   useEvaluateLiveBinding,
   useEvaluateLiveBindingEntries,
-  evaluateBindableAttrLArray,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
 import { Maybe } from '../../utils/types';

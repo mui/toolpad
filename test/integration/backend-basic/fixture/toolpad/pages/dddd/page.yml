@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: page
+spec:
+  id: yoPDDda
+  title: dddd
+  display: shell
+  queries:
+    - name: query
+      query:
+        kind: rest
+        headers: [{ name: jjj, value: '111' }]
+        method: GET
+        searchParams:
+          - name: ddd
+            value:
+              $$jsExpression: |
+                `cc:${parameters.ccc}`
+      parameters:
+        - name: ccc
+          value:
+            $$env: SECRET_BAR

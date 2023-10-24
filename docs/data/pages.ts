@@ -20,6 +20,10 @@ const pages: MuiPage[] = [
         ],
       },
       { pathname: '/toolpad/getting-started/roadmap' },
+      {
+        pathname: '/toolpad/getting-started/support',
+        title: 'Support',
+      },
     ],
   },
   {
@@ -30,8 +34,8 @@ const pages: MuiPage[] = [
         title: 'Building UI',
       },
       {
-        pathname: '/toolpad/concepts/queries-',
-        title: 'Queries',
+        pathname: '/toolpad/concepts/connecting-to-data',
+        title: 'Connecting to data',
         children: [
           {
             pathname: '/toolpad/concepts/queries',

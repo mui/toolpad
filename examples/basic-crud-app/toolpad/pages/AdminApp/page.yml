@@ -60,12 +60,12 @@ spec:
                   props:
                     size: medium
                     content: Refresh
-                    onClick:
-                      $$jsExpressionAction: getCustomers.refetch()
-                    fullWidth: true
                     color: primary
                     variant: outlined
+                    onClick:
+                      $$jsExpressionAction: getCustomers.refetch()
                     loading: false
+                    fullWidth: true
                 - component: Button
                   name: button
                   layout:

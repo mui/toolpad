@@ -11,6 +11,6 @@
     "@mui/toolpad": "0.1.33"
   },
   "devDependencies": {
-    "assemblyscript": "0.27.13"
+    "assemblyscript": "0.27.14"
   }
 }

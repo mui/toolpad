@@ -137,20 +137,22 @@ async function execBase(
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
   params: Record<string, string>,
+  envParams?: Record<string, string>,
 ): Promise<FetchResult> {
   const har = createHarLog();
   const instrumentedFetch = withHarInstrumentation(fetch, { har });
   const jsRuntime = createServerJsRuntime(process.env);
 
+  const parameter = resolveBindableEntries(jsRuntime, Object.entries(params), envParams!);
+
   const queryScope = {
     // @TODO: remove deprecated query after v1
     query: params,
-    parameters: params,
+    parameters: Object.fromEntries(parameter),
   };
 
   const runtimeConfig = await project.getRuntimeConfig();
   const urlvalue = fetchQuery.url || getDefaultUrl(runtimeConfig, connection);
-
   const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
   const resolvedSearchParams = resolveBindableEntries(
     jsRuntime,
@@ -211,7 +213,6 @@ async function execBase(
   } catch (rawError) {
     error = serializeError(errorFrom(rawError));
   }
-
   return { data, untransformedData, error, har };
 }
 
@@ -224,7 +225,8 @@ export default function createDatasource(
       fetchQuery: FetchQuery,
       params: Record<string, string>,
     ): Promise<ExecFetchResult<any>> {
-      const { data, error } = await execBase(project, connection, fetchQuery, params);
+      const env = await loadEnvFile(project);
+      const { data, error } = await execBase(project, connection, fetchQuery, params, env);
       return { data, error };
     },
 

@@ -5,7 +5,6 @@ import {
   TypographyVariant,
   SxProps,
   inputBaseClasses,
-  // formHelperTextClasses,
   inputClasses,
 } from '@mui/material';
 
@@ -35,7 +34,6 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
       error,
       onChange,
       onClose,
-      // onClick,
       onDoubleClick,
       onSave,
       size,
@@ -120,15 +118,12 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
 
     return (
       <TextField
-        // `disabled` prop overrides `editable` prop
-
         error={error}
         helperText={helperText}
         ref={ref}
         onDoubleClick={onDoubleClick}
         inputRef={appTitleInput}
         inputProps={{
-          // tabIndex: editable ? 0 : -1,
           readOnly,
           'aria-readonly': !editable,
           sx: (theme: Theme) => ({
@@ -155,15 +150,6 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
             {
               borderBottom: editable ? `initial` : 'none',
             },
-          // TextField must not appear disabled if disabled state is controlled by `editable` prop
-          // [`.${inputClasses.root}.${inputBaseClasses.root}.${inputBaseClasses.disabled}, .${inputClasses.input}.${inputBaseClasses.input}.${inputBaseClasses.disabled}, .${formHelperTextClasses.root}.${inputBaseClasses.disabled}`]:
-          //   disabled
-          //     ? null
-          //     : {
-          //         WebkitTextFillColor: 'unset',
-          //         color: 'unset',
-          //       },
-          // TextField must appear disabled if readOnly is true
           [`& .${inputClasses.root}.${inputBaseClasses.root}::after`]: readOnly
             ? {
                 transform: 'scaleX(0)',

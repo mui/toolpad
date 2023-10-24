@@ -22,7 +22,7 @@ There is a predefined padding that can be enabled or disabled. It is a boolean.
 
 A List is an essential component in an application. It had one key property that makes it usable:
 
-### ItemCount
+### itemCount
 
 It is the number of occurences that the list is supposed to render.
 

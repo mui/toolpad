@@ -19,13 +19,7 @@ import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import invariant from 'invariant';
 import useMenu from '../../../../utils/useMenu';
-import {
-  TOOLPAD_TARGET_CLOUD,
-  TOOLPAD_TARGET_CE,
-  TOOLPAD_TARGET_PRO,
-  DOCUMENTATION_URL,
-  VERSION_CHECK_INTERVAL,
-} from '../../../../constants';
+import { DOCUMENTATION_URL, VERSION_CHECK_INTERVAL } from '../../../../constants';
 import { useProjectApi } from '../../../../projectApi';
 import useBoolean from '../../../../utils/useBoolean';
 import type { PackageManager } from '../../../../server/versionInfo';
@@ -33,7 +27,7 @@ import type { PackageManager } from '../../../../server/versionInfo';
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
-
+const SUPPORT_URL = 'https://mui.com/toolpad/support/support';
 interface SnippetProps {
   children: string;
 }
@@ -67,19 +61,6 @@ function FeedbackMenuItemLink({ href, children }: FeedbackMenuItemLinkProps) {
       <OpenInNewIcon fontSize="inherit" sx={{ ml: 3, color: 'text.secondary' }} />
     </MenuItem>
   );
-}
-
-function getReadableTarget(): string {
-  switch (process.env.TOOLPAD_TARGET) {
-    case TOOLPAD_TARGET_CLOUD:
-      return 'Cloud';
-    case TOOLPAD_TARGET_CE:
-      return 'Community Edition';
-    case TOOLPAD_TARGET_PRO:
-      return 'Pro';
-    default:
-      return 'Unknown';
-  }
 }
 
 function getUpgradeMessage(packageManager: PackageManager | null): string {
@@ -142,8 +123,8 @@ function UserFeedback() {
         <FeedbackMenuItemLink href={FEATURE_REQUEST_URL}>
           Request or upvote feature
         </FeedbackMenuItemLink>
+        <FeedbackMenuItemLink href={SUPPORT_URL}>Request support</FeedbackMenuItemLink>
         <Divider />
-        <MenuItem disabled>{getReadableTarget()}</MenuItem>
 
         <MenuItem
           disabled={!updateAvailable}

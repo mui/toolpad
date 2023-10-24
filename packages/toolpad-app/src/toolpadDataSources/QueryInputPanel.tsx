@@ -18,11 +18,7 @@ export default function QueryInputPanel({
 }: QueryInputPanelProps) {
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'row' }}>
-      {/* <Toolbar> */}
-
-      {/* <FlexFill /> */}
       {actions}
-      {/* </Toolbar> */}
       <Box sx={{ flex: 1, overflow: 'hidden' }}>{children}</Box>
       <LoadingButton
         startIcon={<PlayArrowIcon />}

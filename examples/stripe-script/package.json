@@ -9,10 +9,6 @@
   },
   "dependencies": {
     "@mui/toolpad": "^0.1.33",
-    "child_process": "^1.0.2",
-    "fs": "^0.0.1-security",
-    "path": "^0.12.7",
-    "stripe": "^13.11.0",
-    "url": "^0.11.3"
+    "stripe": "^13.11.0"
   }
 }

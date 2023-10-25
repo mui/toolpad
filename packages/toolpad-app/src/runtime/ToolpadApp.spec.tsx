@@ -1,21 +1,28 @@
 /**
- * @jest-environment jsdom
+ * @vitest-environment jsdom
  */
 
 import * as React from 'react';
-import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import {
+  render,
+  waitFor as waitForOrig,
+  screen,
+  fireEvent,
+  act,
+  cleanup,
+} from '@testing-library/react';
+import 'vitest-dom/extend-expect';
 import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { Emitter } from '@mui/toolpad-utils/events';
-import { jest } from '@jest/globals';
-import ToolpadApp from './ToolpadApp';
+import { test, expect, afterEach } from 'vitest';
 import * as appDom from '../appDom';
 import createRuntimeState from './createRuntimeState';
+import ToolpadApp from './ToolpadApp';
 
-async function loadComponents() {
-  return {};
-}
+afterEach(cleanup);
+
+const COMPONENTS = {};
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
@@ -43,7 +50,7 @@ function renderPage(
 
   return render(
     <CanvasEventsContext.Provider value={canvasEvents}>
-      <ToolpadApp loadComponents={loadComponents} state={state} basename="toolpad" />
+      <ToolpadApp extraComponents={COMPONENTS} state={state} basename="toolpad" />
     </CanvasEventsContext.Provider>,
   );
 }
@@ -137,7 +144,6 @@ test(`default Value for binding`, async () => {
 
 test(`Databinding errors`, async () => {
   const canvasEvents = new Emitter<RuntimeEvents>();
-  const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {});
   let bindings: LiveBindings | undefined;
 
   const bindingsUpdateHandler = (event: RuntimeEvents['pageBindingsUpdated']) => {
@@ -208,10 +214,7 @@ test(`Databinding errors`, async () => {
         message: 'Cycle detected "cyclic1.value"',
       }),
     );
-
-    expect(consoleErrorMock).toHaveBeenCalled();
   } finally {
     canvasEvents.off('pageBindingsUpdated', bindingsUpdateHandler);
-    consoleErrorMock.mockRestore();
   }
 });

@@ -1,12 +1,11 @@
 import * as React from 'react';
-import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
+import { Box, BoxProps, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { ArgTypeDefinitions, createComponent, useNode } from '@mui/toolpad-core';
+import { useNode } from '@mui/toolpad-core';
+import { equalProperties } from '@mui/toolpad-utils/collections';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
-// TODO: Remove lodash-es
-// eslint-disable-next-line no-restricted-imports
-import { isEqual } from 'lodash-es';
 import { SX_PROP_HELPER_TEXT } from './constants';
+import createBuiltin, { BuiltinArgTypeDefinitions } from './createBuiltin';
 
 export const FormContext = React.createContext<{
   form: ReturnType<typeof useForm> | null;
@@ -16,7 +15,7 @@ export const FormContext = React.createContext<{
   fieldValues: {},
 });
 
-interface FormProps extends ContainerProps {
+interface FormProps extends BoxProps {
   value: FieldValues;
   onChange: (newValue: FieldValues) => void;
   onSubmit?: (data?: FieldValues) => unknown | Promise<unknown>;
@@ -40,7 +39,6 @@ function Form({
   mode = 'onSubmit',
   hasChrome = true,
   sx,
-  ...rest
 }: FormProps) {
   const form = useForm({ mode });
   const { isSubmitSuccessful } = form.formState;
@@ -80,7 +78,7 @@ function Form({
   return (
     <FormContext.Provider value={formContextValue}>
       {hasChrome ? (
-        <Container disableGutters sx={sx} {...rest}>
+        <Box sx={{ ...sx, width: '100%' }}>
           <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
             {children}
 
@@ -119,7 +117,7 @@ function Form({
               </Stack>
             </Box>
           </form>
-        </Container>
+        </Box>
       ) : (
         children
       )}
@@ -127,9 +125,11 @@ function Form({
   );
 }
 
-export default createComponent(Form, {
+export default createBuiltin(Form, {
+  helperText: 'A form component.',
   argTypes: {
     children: {
+      helperText: 'The form content.',
       type: 'element',
       control: { type: 'layoutSlot' },
     },
@@ -144,6 +144,7 @@ export default createComponent(Form, {
       type: 'event',
     },
     formControlsAlign: {
+      helperText: 'Form controls alignment.',
       type: 'string',
       enum: ['start', 'center', 'end'],
       default: 'end',
@@ -259,7 +260,7 @@ export function useFormInput<V>({
   React.useEffect(() => {
     if (
       form &&
-      !isEqual(validationProps, previousManualValidationPropsRef.current) &&
+      !equalProperties(validationProps, previousManualValidationPropsRef.current) &&
       form.formState.dirtyFields[formInputName]
     ) {
       form.trigger(formInputName);
@@ -343,7 +344,7 @@ export function withComponentForm<P extends Record<string, any>>(
   };
 }
 
-export const FORM_INPUT_ARG_TYPES: ArgTypeDefinitions<
+export const FORM_INPUT_ARG_TYPES: BuiltinArgTypeDefinitions<
   Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>
 > = {
   name: {
@@ -364,7 +365,7 @@ export const FORM_INPUT_ARG_TYPES: ArgTypeDefinitions<
   },
 };
 
-export const FORM_TEXT_INPUT_ARG_TYPES: ArgTypeDefinitions<
+export const FORM_TEXT_INPUT_ARG_TYPES: BuiltinArgTypeDefinitions<
   Pick<FormInputComponentProps, 'minLength' | 'maxLength'>
 > = {
   minLength: {

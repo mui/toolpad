@@ -1,6 +1,14 @@
-import { Stack, Typography, Divider, MenuItem, TextField } from '@mui/material';
+import {
+  Stack,
+  Typography,
+  Divider,
+  Tooltip,
+  Link,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material';
 import * as React from 'react';
-import { useDom, useDomApi } from '../../AppState';
+import { useAppState, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 import QueryEditor from './QueryEditor';
 import UrlQueryEditor from './UrlQueryEditor';
@@ -15,21 +23,15 @@ const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] =
 
 export default function PageOptionsPanel() {
   const { nodeId: pageNodeId } = usePageEditorState();
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const domApi = useDomApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
 
   const handleDisplayModeChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    (event: React.MouseEvent<HTMLElement>, newValue: appDom.PageDisplayMode) => {
       domApi.update((draft) =>
-        appDom.setNodeNamespacedProp(
-          draft,
-          page,
-          'attributes',
-          'display',
-          event.target.value as appDom.PageDisplayMode,
-        ),
+        appDom.setNodeNamespacedProp(draft, page, 'attributes', 'display', newValue),
       );
     },
     [domApi, page],
@@ -40,22 +42,40 @@ export default function PageOptionsPanel() {
       <Typography variant="subtitle1">Page:</Typography>
       <NodeNameEditor node={page} />
       <PageTitleEditor node={page} />
-      <TextField
-        select
-        defaultValue="shell"
-        value={page.attributes.display}
-        onChange={handleDisplayModeChange}
-        label="Display mode"
-        fullWidth
+      <Typography variant="body2">Display mode:</Typography>
+      <Tooltip
+        arrow
+        placement="left-start"
+        title={
+          <Typography variant="inherit">
+            Control how the navigation panel is rendered in the final application. Read more in the{' '}
+            <Link
+              href="https://mui.com/toolpad/concepts/display-mode/"
+              target="_blank"
+              rel="noopener"
+            >
+              docs
+            </Link>
+            .
+          </Typography>
+        }
       >
-        {PAGE_DISPLAY_OPTIONS.map((option) => {
-          return (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          );
-        })}
-      </TextField>
+        <ToggleButtonGroup
+          exclusive
+          value={page.attributes.display ?? 'shell'}
+          onChange={handleDisplayModeChange}
+          aria-label="Display mode"
+          fullWidth
+        >
+          {PAGE_DISPLAY_OPTIONS.map((option) => {
+            return (
+              <ToggleButton key={option.value} value={option.value}>
+                {option.label}
+              </ToggleButton>
+            );
+          })}
+        </ToggleButtonGroup>
+      </Tooltip>
       <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
       <Typography variant="overline">Page State:</Typography>
       <UrlQueryEditor pageNodeId={pageNodeId} />

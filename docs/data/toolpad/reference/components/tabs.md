@@ -4,6 +4,8 @@
 
 <p class="description">API docs for the Toolpad Tabs component.</p>
 
+The Material UI [Tabs](https://mui.com/material-ui/react-tabs/) component.
+
 ## Properties
 
 | Name                                        | Type                                  | Default                                                                                                                                                | Description                              |

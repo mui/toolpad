@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { createComponent } from '@mui/toolpad-core';
-import { Container, ContainerProps, Skeleton } from '@mui/material';
+
+import { Box, BoxProps, Skeleton } from '@mui/material';
+
 import {
   XAxis,
   YAxis,
@@ -15,6 +16,7 @@ import {
   Scatter,
 } from 'recharts';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import createBuiltin from './createBuiltin';
 import ErrorOverlay from './components/ErrorOverlay';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
@@ -35,7 +37,7 @@ function getBarChartDataSeriesNormalizedYKey(dataSeries: ChartDataSeries, index:
   return `${dataSeries.label}-${dataSeries.yKey}-${index}`;
 }
 
-interface ChartProps extends ContainerProps {
+interface ChartProps extends BoxProps {
   data?: ChartData;
   loading?: boolean;
   error?: Error | string;
@@ -92,7 +94,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const isDataVisible = !loading && !displayError;
 
   return (
-    <Container disableGutters sx={{ ...sx, position: 'relative' }} aria-busy={loading}>
+    <Box sx={{ ...sx, position: 'relative', width: '100%' }} aria-busy={loading}>
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart data={barChartData} margin={{ top: 20, right: 80 }}>
           {isDataVisible ? (
@@ -194,11 +196,12 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           height={height}
         />
       ) : null}
-    </Container>
+    </Box>
   );
 }
 
-export default createComponent(Chart, {
+export default createBuiltin(Chart, {
+  helperText: 'A chart component.',
   loadingProp: 'loading',
   loadingPropSource: ['data'],
   errorProp: 'error',
@@ -239,6 +242,7 @@ export default createComponent(Chart, {
       control: { type: 'ChartData', bindable: false },
     },
     height: {
+      helperText: 'The height of the chart.',
       type: 'number',
       default: 300,
       minimum: 100,

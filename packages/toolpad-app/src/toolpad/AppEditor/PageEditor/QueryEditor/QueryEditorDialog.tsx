@@ -16,22 +16,22 @@ import * as React from 'react';
 import { BindableAttrValue } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import invariant from 'invariant';
+import useEventCallback from '@mui/utils/useEventCallback';
 import useLatest from '../../../../utils/useLatest';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import { omit, update } from '../../../../utils/immutability';
 import { useEvaluateLiveBinding } from '../../useEvaluateLiveBinding';
-import { useDom } from '../../../AppState';
+import { useAppState } from '../../../AppState';
 import { ConnectionContextProvider } from '../../../../toolpadDataSources/context';
 import ConnectionSelect, { ConnectionOption } from '../ConnectionSelect';
 import BindableEditor from '../BindableEditor';
 import { ConfirmDialog } from '../../../../components/SystemDialogs';
 import useBoolean from '../../../../utils/useBoolean';
-import { useNodeNameValidation } from '../../HierarchyExplorer/validation';
-import useEvent from '../../../../utils/useEvent';
+import { useNodeNameValidation } from '../../PagesExplorer/validation';
 import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
-import client from '../../../../api';
+import { useProjectApi } from '../../../../projectApi';
 
 interface QueryEditorDialogActionsProps {
   saveDisabled?: boolean;
@@ -107,7 +107,9 @@ export default function QueryNodeEditorDialog<Q>({
   onSave,
   isDraft,
 }: QueryNodeEditorProps<Q>) {
-  const { dom } = useDom();
+  const projectApi = useProjectApi();
+  const { dom } = useAppState();
+  const { data: runtimeConfig } = projectApi.useQuery('getRuntimeConfig', []);
 
   // To keep it around during closing animation
   const node = useLatest(nodeProp);
@@ -117,7 +119,7 @@ export default function QueryNodeEditorDialog<Q>({
     setInput(node);
   }, [node]);
 
-  const reset = useEvent(() => setInput(node));
+  const reset = useEventCallback(() => setInput(node));
 
   React.useEffect(() => {
     if (open) {
@@ -259,14 +261,14 @@ export default function QueryNodeEditorDialog<Q>({
   const execPrivate = React.useCallback(
     (method: string, args: any[]) => {
       invariant(dataSourceId, 'dataSourceId must be set');
-      return client.mutation.dataSourceExecPrivate(dataSourceId, method, args);
+      return projectApi.methods.dataSourceExecPrivate(dataSourceId, method, args);
     },
-    [dataSourceId],
+    [projectApi, dataSourceId],
   );
 
   return (
     <Dialog fullWidth maxWidth="xl" open={open} onClose={handleCloseWithUnsavedChanges}>
-      {dataSourceId && dataSource && queryEditorContext ? (
+      {dataSourceId && dataSource && queryEditorContext && runtimeConfig ? (
         <ConnectionContextProvider value={queryEditorContext}>
           <DialogTitle>
             <Stack direction="row" gap={2}>
@@ -322,6 +324,7 @@ export default function QueryNodeEditorDialog<Q>({
                 globalScope={pageState}
                 globalScopeMeta={globalScopeMeta}
                 execApi={execPrivate}
+                runtimeConfig={runtimeConfig}
               />
             </Box>
             <Stack direction="row" alignItems="center" sx={{ pt: 2, px: 3, gap: 2 }}>

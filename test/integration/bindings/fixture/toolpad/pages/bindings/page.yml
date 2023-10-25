@@ -4,22 +4,20 @@ spec:
   id: 741rda6
   title: Page 1
   content:
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: Text
-          name: text
-          props:
-            value: -test1-
-            sx:
-              $$jsExpression: |
-                { color: "primary.main", p: 2 }
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: Text
-          name: text1
-          props:
-            sx:
-              $$jsExpression: "{"
-            value: -test2-
+    - component: Text
+      name: text
+      layout:
+        columnSize: 1
+      props:
+        value: -test1-
+        sx:
+          $$jsExpression: |
+            { color: "primary.main", p: 2 }
+    - component: Text
+      name: text1
+      layout:
+        columnSize: 1
+      props:
+        sx:
+          $$jsExpression: '{'
+        value: -test2-

@@ -1,6 +1,9 @@
 import * as path from 'path';
+import * as url from 'url';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expect, test } from '../../playwright/localTest';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
@@ -12,8 +15,10 @@ test.use({
 });
 
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
   },
 });
@@ -40,6 +45,9 @@ test('global scope', async ({ page }) => {
   await expect(page.getByText('|test3 ok|')).toBeVisible();
   await expect(page.getByText('|test4 ok|')).toBeVisible();
   await expect(page.getByText('|test5 ok|')).toBeVisible();
+  await expect(page.getByText('|test6 ok|')).toBeVisible();
+  await expect(page.getByText('|test7 ok|')).toBeVisible();
+  await expect(page.getByText('|test8 ok|')).toBeVisible();
 });
 
 test('encoding', async ({ page }) => {

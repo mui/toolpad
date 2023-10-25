@@ -6,9 +6,19 @@ spec:
   display: shell
   content:
     - component: PageRow
-      name: pageRow
+      name: pageRow1
       children:
-        - component: Text
-          name: text
-        - component: Text
-          name: text1
+        [
+          {
+              component: TextField,
+              name: textField,
+              props: { fullWidth: true }
+            },
+          {
+              component: TextField,
+              name: textField1,
+              props: { fullWidth: true }
+            }
+        ]
+      props:
+        justifyContent: start

@@ -1,7 +1,7 @@
 import type * as React from 'react';
 import type { Branded } from '@mui/toolpad-utils/types';
 import type { SerializedError } from '@mui/toolpad-utils/errors';
-import { JSONSchema7 } from 'json-schema';
+import type { JSONSchema7 } from 'json-schema';
 import type { TOOLPAD_COMPONENT } from './constants';
 
 export type NodeId = Branded<string, 'NodeId'>;
@@ -87,6 +87,7 @@ export interface StringValueType extends ValueTypeBase {
    * The different possible values for the property.
    */
   enum?: string[];
+  enumLabels?: Record<string, string>;
   default?: string;
 }
 
@@ -198,7 +199,9 @@ export interface ArgControlSpec {
     | 'event'
     | 'NumberFormat'
     | 'ColorScale'
-    | 'RowIdFieldSelect'; // Row id field specialized select
+    | 'ToggleButtons'
+    | 'RowIdFieldSelect' // Row id field specialized select
+    | 'DataProviderSelector'; // Row id field specialized select
   bindable?: boolean;
   hideLabel?: boolean;
 }
@@ -372,6 +375,11 @@ export type RuntimeEvents = {
     prop: string;
     value: React.SetStateAction<unknown>;
   };
+  editorNodeDataUpdated: {
+    nodeId: NodeId;
+    prop: string;
+    value: any;
+  };
   pageStateUpdated: {
     pageState: Record<string, unknown>;
     globalScopeMeta: ScopeMeta;
@@ -392,7 +400,7 @@ export type RuntimeEvent = {
 export interface ComponentConfig<P extends object = {}> {
   /**
    * A short explanatory text that'll be shown in the editor UI when this component is referenced.
-   * May contain Markdown
+   * May contain Markdown.
    */
   helperText?: string;
   /**
@@ -410,7 +418,7 @@ export interface ComponentConfig<P extends object = {}> {
   loadingPropSource?: (keyof P & string)[];
   /**
    * Designates a property as "the loading property". If Toolpad detects any of the
-   * inputs is still loading it will set this property to `true`
+   * inputs is still loading it will set this property to `true`.
    */
   loadingProp?: keyof P & string;
   /**
@@ -423,7 +431,7 @@ export interface ComponentConfig<P extends object = {}> {
    */
   resizableHeightProp?: keyof P & string;
   /**
-   * Describes the individual properties for this component
+   * Describes the individual properties for this component.
    */
   argTypes?: ArgTypeDefinitions<P>;
 }
@@ -479,4 +487,39 @@ export interface RuntimeScope {
 export interface ApplicationVm {
   scopes: { [id in string]?: RuntimeScope };
   bindingScopes: { [id in string]?: string };
+}
+
+export interface IndexPaginationModel {
+  start: number;
+  pageSize: number;
+}
+
+export interface CursorPaginationModel {
+  cursor: string | null;
+  pageSize: number;
+}
+
+export type PaginationMode = 'index' | 'cursor';
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface GetRecordsParams<R, P extends PaginationMode> {
+  paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
+  // filterModel: FilterModel;
+  // sortModel: SortModel;
+}
+
+export interface GetRecordsResult<R, P extends PaginationMode> {
+  records: R[];
+  hasNextPage?: boolean;
+  totalCount?: number;
+  cursor?: P extends 'cursor' ? string | null : undefined;
+}
+
+export interface ToolpadDataProviderBase<R, P extends PaginationMode = 'index'> {
+  paginationMode?: P;
+  getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
+  // getTotalCount?: () => Promise<number>;
+  // updateRecord?: (id: string, record: R) => Promise<void>;
+  // deleteRecord?: (id: string) => Promise<void>;
+  // createRecord?: (record: R) => Promise<void>;
 }

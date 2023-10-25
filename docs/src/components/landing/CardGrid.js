@@ -86,7 +86,7 @@ export default function CardGrid(props) {
                         {title}
                       </Typography>
                     </Box>
-                    {wip && <IconImage name="time" title="Work in progress" />}
+                    {wip && <IconImage name="pricing/time" title="Work in progress" />}
                   </Box>
                   <Typography variant="body2" color="text.secondary">
                     {description}
@@ -97,8 +97,8 @@ export default function CardGrid(props) {
           ))}
         </Grid>
         <Banner
-          action="Upvote"
-          category="ToolpadLanding"
+          category="toolpad_to_github"
+          action="upvote_click"
           label="Upvote"
           title="Upvote the features you want to get prioritized 👍"
           description="Want to request a feature? Head over to our repo and if not already listed, feel free to open an issue explaining the use case."

@@ -1,10 +1,11 @@
 import * as fs from 'fs/promises';
 import path from 'path';
 import { spawnSync } from 'child_process';
-import type * as esbuild from 'esbuild';
-import { defineConfig } from 'tsup';
+import { defineConfig, Options } from 'tsup';
 
-function cleanFolderOnFailure(folder: string): esbuild.Plugin {
+type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
+
+function cleanFolderOnFailure(folder: string): EsbuildPlugin {
   return {
     name: 'clean-dist-on-failure',
     setup(build) {
@@ -17,7 +18,7 @@ function cleanFolderOnFailure(folder: string): esbuild.Plugin {
   };
 }
 
-export default defineConfig({
+export default defineConfig((options) => ({
   entry: [
     'src/*{.ts,.tsx}',
     'src/hooks/*{.ts,.tsx}',
@@ -26,6 +27,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   dts: false,
   silent: true,
+  clean: !options.watch,
   sourcemap: true,
   esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
   async onSuccess() {
@@ -33,4 +35,4 @@ export default defineConfig({
     console.log('build successful');
     spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
   },
-});
+}));

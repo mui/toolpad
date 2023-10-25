@@ -11,10 +11,10 @@ test('do not find content if you delete page of middle ', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
   editorModel.goto();
 
-  const pageMenuItem = editorModel.getHierarchyItem('pages', 'page');
+  const pageMenuItem = editorModel.getExplorerItem('page');
 
   await pageMenuItem.hover();
-  await pageMenuItem.getByRole('button', { name: 'Open hierarchy menu' }).click();
+  await pageMenuItem.getByRole('button', { name: 'Open page explorer menu' }).click();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page
     .getByRole('dialog', { name: 'Confirm' })

@@ -2,7 +2,7 @@ import * as React from 'react';
 import MarkdownElement from '@mui/monorepo/docs/src/modules/components/MarkdownElement';
 import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDocs';
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
-import { JSONSchema7, JSONSchema7Definition } from 'json-schema';
+import type { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
 import {
   ButtonBase,
@@ -234,9 +234,7 @@ function JsonSchemaItemDisplay({ schema, idPrefix }: JsonSchemaItemDisplayProps)
 
   return (
     <React.Fragment>
-      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
       <JsonDescriptionDisplay schema={schema} />
-      {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
       <JsonSchemaValueDisplay schema={schema} idPrefix={idPrefix} />
     </React.Fragment>
   );
@@ -288,7 +286,6 @@ function JsonSchemaPropertiesDisplay({ schema, idPrefix, open }: JsonSchemaPrope
       {interleave(
         properties.map(([propName, propSchema]) => {
           return (
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
             <JsonSchemaNameValueDisplay
               key={propName}
               name={propName}
@@ -318,7 +315,6 @@ function DefinitionTooltip({ name }: DefinitionTooltipProps) {
   return (
     <TooltipContext.Provider value={EMPTY_OBJECT}>
       <Wrapper>
-        {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
         <JsonSchemaNameValueDisplay name={name} schema={definition} idPrefix={`definition`} />
       </Wrapper>
     </TooltipContext.Provider>

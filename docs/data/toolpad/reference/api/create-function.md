@@ -3,7 +3,7 @@
 <p class="description">Provide backend function that loads data on the page.</p>
 
 :::warning
-The `createFunction` API is deprecated and will be removed from Toolpad `v0.1.23` onwards. You can now use functions directly without needing to wrap them inside `createFunction` - See [custom functions](/toolpad/concepts/custom-functions/) for examples.
+The `createFunction` API is deprecated and will be removed in a future version. You can now use functions directly without needing to wrap them inside `createFunction` - See [custom functions](/toolpad/concepts/custom-functions/) for examples.
 :::
 
 ## Import
@@ -32,7 +32,7 @@ You can define parameters to bind to page state. The actual values for these par
 
 a function that is recognizable by Toolpad
 
-## types
+## Types
 
 ### FunctionConfig
 
@@ -40,9 +40,9 @@ This describes the behavior of the custom function.
 
 **Properties**
 
-| Name          | Type                                      | Description                                                                                                                                |
-| :------------ | :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- |
-| `parameters?` | `{ [name: string]: ParameterDefinition }` | Describes the parameters that will be passed in the `parameters` property of the function. See [ParameterDefinition](#parameterdefinition) |
+| Name          | Type                                      | Description                                                                                                                                 |
+| :------------ | :---------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| `parameters?` | `{ [name: string]: ParameterDefinition }` | Describes the parameters that will be passed in the `parameters` property of the function. See [ParameterDefinition](#parameterdefinition). |
 
 ### ParameterDefinition
 
@@ -56,9 +56,9 @@ this describes the type of the parameter that will be passed to the custom funct
 | `default?`     | `any`                                                      | A default value for the property.                                                                                  |
 | `helperText?`  | `string`                                                   | A short explanatory text that'll be shown in the editor UI when this property is referenced. May contain Markdown. |
 | `description?` | `string`                                                   | A description of the property, to be used to supply extra information to the user.                                 |
-| `enum?`        | `string[]`                                                 | For the `'string'` type only. Defines a set of valid values for the property                                       |
-| `minimum?`     | `number`                                                   | For the `'number'` type only. Defines the minimum allowed value of the property                                    |
-| `maximum?`     | `number`                                                   | For the `'number'` type only. Defines the maximum allowed value of the property                                    |
+| `enum?`        | `string[]`                                                 | For the `'string'` type only. Defines a set of valid values for the property.                                      |
+| `minimum?`     | `number`                                                   | For the `'number'` type only. Defines the minimum allowed value of the property.                                   |
+| `maximum?`     | `number`                                                   | For the `'number'` type only. Defines the maximum allowed value of the property.                                   |
 
 ## Usage
 

@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as url from 'url';
+import * as url from 'node:url';
 import { createRequire } from 'module';
 import { glob } from 'glob';
 

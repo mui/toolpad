@@ -1,12 +1,10 @@
 version: 2.1
-orbs:
-  aws-s3: circleci/aws-s3@4.0.0
 
 defaults: &defaults
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:16.14.2
+    - image: cimg/node:18.17.1
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.
@@ -21,7 +19,7 @@ commands:
     parameters:
       browsers:
         type: boolean
-        default: true
+        default: false
         description: 'Set to true if you intend to use any browser (e.g. with playwright).'
 
     steps:
@@ -121,31 +119,34 @@ jobs:
       - checkout
       - install_js
       - run:
-          name: '`yarn prettier` changes committed?'
-          command: yarn prettier --check
+          name: '`yarn prettier:all` changes committed?'
+          command: |
+            yarn prettier:all
+            yarn check-changes
       - run:
           name: '`yarn jsonSchemas` changes committed?'
           command: |
             yarn jsonSchemas
-            git add -A && git diff --exit-code --staged
+            yarn check-changes
       - run:
           name: '`yarn docs:build:api` changes committed?'
           command: |
             yarn docs:build:api
-            git add -A && git diff --exit-code --staged
+            yarn check-changes
 
   test_unit:
     <<: *defaults
     resource_class: 'large'
     docker:
-      - image: mcr.microsoft.com/playwright:v1.37.0-focal
+      - image: mcr.microsoft.com/playwright:v1.39.0-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
 
     steps:
       - checkout
-      - install_js
+      - install_js:
+          browsers: true
       - run:
           name: 'Build packages'
           command: yarn release:build

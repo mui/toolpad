@@ -38,7 +38,7 @@
     {
       "groupName": "node",
       "matchPackageNames": ["cimg/node", "node"],
-      "allowedVersions": "16.14.2"
+      "allowedVersions": "18.17.1"
     },
     {
       "description": "Ignore nodejs in engines",
@@ -48,24 +48,9 @@
       "enabled": false
     },
     {
-      "groupName": "react-inspector",
-      "matchPackageNames": ["react-inspector"],
-      "allowedVersions": "< 6.0.0",
-      "description": "Breaking changes in the types. https://github.com/storybookjs/react-inspector/issues/162"
-    },
-    {
       "groupName": "node-fetch",
       "matchPackageNames": ["node-fetch"],
       "allowedVersions": "< 3.0.0"
-    },
-    {
-      "groupName": "Next.js",
-      "matchPackageNames": [
-        "next",
-        "@next/eslint-plugin-next",
-        "@next/bundle-analyzer",
-        "eslint-config-next"
-      ]
     },
     {
       "groupName": "core-js",
@@ -78,6 +63,12 @@
       "description": "prettier made breaking changes in v3, pretty-quick needs to catch up before we can upgrade. https://github.com/azz/pretty-quick/issues/164"
     },
     {
+      "groupName": "next",
+      "matchPackageNames": ["next"],
+      "allowedVersions": "<= 13.4.19",
+      "description": "https://github.com/mui/mui-toolpad/pull/2739"
+    },
+    {
       "matchDepTypes": ["action"],
       "pinDigests": true
     },
@@ -86,9 +77,9 @@
       "matchManagers": ["github-actions"]
     },
     {
-      "groupName": "monaco-editor",
-      "matchPackageNames": ["monaco-editor"],
-      "description": "We're having trouble upgading monaco-editor to >0.40."
+      "groupName": "requires-node-18",
+      "matchPackageNames": ["execa"],
+      "description": "Stalling updates until we break compatibility with Node 16"
     },
     {
       "groupName": "Update @mui/toolpad in examples",

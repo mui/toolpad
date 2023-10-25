@@ -2,8 +2,8 @@ import * as React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { createComponent } from '@mui/toolpad-core';
 import dayjs from 'dayjs';
+import createBuiltin from './createBuiltin';
 import {
   FORM_INPUT_ARG_TYPES,
   FormInputComponentProps,
@@ -12,17 +12,12 @@ import {
 } from './Form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-const LOCALE_LOADERS = new Map(
-  // jest is choking on this dynamic import
-  process.env.NODE_ENV === 'test'
-    ? []
-    : [
-        ['en', () => import('dayjs/locale/en')],
-        ['nl', () => import('dayjs/locale/nl')],
-        ['fr', () => import('dayjs/locale/fr')],
-        // TODO...
-      ],
-);
+const LOCALE_LOADERS = new Map([
+  ['en', () => import('dayjs/locale/en')],
+  ['nl', () => import('dayjs/locale/nl')],
+  ['fr', () => import('dayjs/locale/fr')],
+  // TODO...
+]);
 
 interface LoadableLocale {
   locale: string;
@@ -77,6 +72,7 @@ export interface DatePickerProps
     Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'> {
   value?: string;
   onChange: (newValue: string | null) => void;
+  label?: string;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
@@ -96,7 +92,7 @@ function DatePicker({
 }: DatePickerProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     value: valueProp,
     onChange,
     defaultValue: defaultValueProp,
@@ -158,7 +154,7 @@ function DatePicker({
 
 const FormWrappedDatePicker = withComponentForm(DatePicker);
 
-export default createComponent(FormWrappedDatePicker, {
+export default createBuiltin(FormWrappedDatePicker, {
   helperText:
     'The MUI X [Date Picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {

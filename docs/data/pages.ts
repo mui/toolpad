@@ -7,16 +7,23 @@ const pages: MuiPage[] = [
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/installation' },
+      { pathname: '/toolpad/getting-started/why-toolpad', title: 'Why Toolpad?' },
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
       {
-        pathname: '/toolpad/examples',
+        pathname: '/toolpad/examples-group',
+        title: 'Examples',
         children: [
+          { pathname: '/toolpad/examples', title: 'Overview' },
           { pathname: '/toolpad/examples/npm-stats', title: 'npm stats' },
           { pathname: '/toolpad/examples/basic-crud-app', title: 'Basic CRUD application' },
           { pathname: '/toolpad/examples/qr-generator', title: 'QR Code generator' },
         ],
       },
       { pathname: '/toolpad/getting-started/roadmap' },
+      {
+        pathname: '/toolpad/getting-started/support',
+        title: 'Support',
+      },
     ],
   },
   {
@@ -27,8 +34,8 @@ const pages: MuiPage[] = [
         title: 'Building UI',
       },
       {
-        pathname: '/toolpad/concepts/queries-',
-        title: 'Queries',
+        pathname: '/toolpad/concepts/connecting-to-data',
+        title: 'Connecting to data',
         children: [
           {
             pathname: '/toolpad/concepts/queries',
@@ -42,11 +49,19 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/concepts/custom-functions',
             title: 'Custom functions',
           },
+          {
+            pathname: '/toolpad/concepts/data-providers',
+            title: 'Data providers',
+          },
         ],
       },
       {
         pathname: '/toolpad/concepts/managing-state',
         title: 'Managing state',
+      },
+      {
+        pathname: '/toolpad/concepts/file-structure',
+        title: 'File structure',
       },
       {
         pathname: '/toolpad/concepts/deployment',
@@ -86,7 +101,7 @@ const pages: MuiPage[] = [
         children: [
           {
             pathname: '/toolpad/how-to-guides/render-deploy',
-            title: 'Deploy your app to Render',
+            title: 'Deploy to Render',
           },
         ],
       },
@@ -95,8 +110,8 @@ const pages: MuiPage[] = [
         subheader: 'Create custom components',
         children: [
           {
-            pathname: '/toolpad/how-to-guides/number-display',
-            title: 'Number component',
+            pathname: '/toolpad/how-to-guides/map-display',
+            title: 'Map component',
           },
           {
             pathname: '/toolpad/how-to-guides/cube-component',
@@ -104,26 +119,31 @@ const pages: MuiPage[] = [
           },
         ],
       },
-
       {
-        pathname: '/toolpad/how-to-guides/customize-datagrid',
-        title: 'Customize data grids',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/delete-datagrid-row',
-        title: 'Delete a data grid row',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/embed-pages',
-        title: 'Embed a Toolpad page',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/basic-auth',
-        title: 'Enable basic auth',
-      },
-      {
-        pathname: '/toolpad/how-to-guides/editor-path',
-        title: 'Troubleshoot missing editor',
+        pathname: '/toolpad/how-to-guides/misc',
+        subheader: 'Miscellaneous',
+        children: [
+          {
+            pathname: '/toolpad/how-to-guides/customize-datagrid',
+            title: 'Customize data grids',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/delete-datagrid-row',
+            title: 'Delete a data grid row',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/embed-pages',
+            title: 'Embed a Toolpad page',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/basic-auth',
+            title: 'Enable basic auth',
+          },
+          {
+            pathname: '/toolpad/how-to-guides/editor-path',
+            title: 'Troubleshoot missing editor',
+          },
+        ],
       },
     ],
   },
@@ -153,12 +173,20 @@ const pages: MuiPage[] = [
             subheader: 'Functions',
             children: [
               {
+                title: 'createComponent',
+                pathname: '/toolpad/reference/api/create-component',
+              },
+              {
+                title: 'createDataProvider',
+                pathname: '/toolpad/reference/api/create-data-provider',
+              },
+              {
                 title: 'createFunction',
                 pathname: '/toolpad/reference/api/create-function',
               },
               {
-                title: 'createComponent',
-                pathname: '/toolpad/reference/api/create-component',
+                title: 'getContext',
+                pathname: '/toolpad/reference/api/get-context',
               },
             ],
           },

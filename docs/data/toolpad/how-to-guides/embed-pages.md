@@ -4,7 +4,7 @@
 
 ## Using an `iframe`
 
-1. Set the display mode on the page to be embedded to **No shell**
+1. Set the [display mode](/toolpad/concepts/display-mode/) on the page to be embedded to **No shell**
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/embed-page/no-shell.png", "alt": "No shell display mode", "caption": "Set display mode to no shell", "indent": 1 }}
 
@@ -18,10 +18,9 @@
    using
 
    ```html
-   <iframe src="https://tools-public.onrender.com/prod/pages/fn03hvq" loading="lazy">
-   </iframe>
+   <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq"></iframe>
    ```
 
    we can embed a Toolpad page, like so:
 
-    <iframe src="https://tools-public.onrender.com/prod/pages/fn03hvq" loading="lazy" style="display: block; margin: auto"></iframe>
+    <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq?toolpad-display=standalone" loading="lazy" style="display: block; margin: auto"></iframe>

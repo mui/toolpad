@@ -11,6 +11,8 @@ import {
   Popover,
   Stack,
   TextField,
+  TextFieldProps,
+  TextFieldVariants,
   Tooltip,
 } from '@mui/material';
 import * as React from 'react';
@@ -25,10 +27,11 @@ import {
 } from '@mui/toolpad-components';
 import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import { NumberFormatEditor } from '@mui/toolpad-core/numberFormat';
+import { DateFormatEditor } from '@mui/toolpad-core/dateFormat';
 import type { EditorProps } from '../../types';
 import { useToolpadComponents } from '../AppEditor/toolpadComponents';
 import { ToolpadComponentDefinition } from '../../runtime/toolpadComponents';
-import { useDom } from '../AppState';
+import { useAppState } from '../AppState';
 import PropertyControl from '../../components/PropertyControl';
 
 // TODO: this import suggests leaky abstraction
@@ -48,6 +51,214 @@ const COLUMN_TYPES: string[] = [
 ];
 const ALIGNMENTS: GridAlignment[] = ['left', 'right', 'center'];
 
+type ImmediateInputProps<V extends TextFieldVariants = TextFieldVariants> = TextFieldProps<V> & {
+  validate?: (input: string) => string | null;
+};
+
+interface ImmediateInputState {
+  input: string;
+  error: string | null;
+}
+
+function useImmediateTextField<V extends TextFieldVariants = TextFieldVariants>(
+  props: ImmediateInputProps<V>,
+): TextFieldProps<V> {
+  const { value, onChange, error, helperText, required, onBlur, validate } = props;
+  const createInputState = React.useCallback(
+    (rawInput: unknown): ImmediateInputState => {
+      const input = String(rawInput);
+      let inputError = null;
+      if (required && !input) {
+        inputError = 'Input required';
+      } else if (validate) {
+        inputError = validate(input);
+      }
+      return { input, error: inputError };
+    },
+    [validate, required],
+  );
+  const [state, setState] = React.useState<ImmediateInputState>(createInputState(value));
+  React.useEffect(() => {
+    setState(createInputState(value));
+  }, [value, createInputState]);
+
+  return {
+    ...props,
+    value: state.input,
+    error: !!state.error || error,
+    helperText: state.error || helperText,
+    required,
+    onBlur: (event) => {
+      if (state.input !== value) {
+        setState(createInputState(value));
+      }
+      onBlur?.(event);
+    },
+    onChange: (event) => {
+      const newState = createInputState(event.target.value);
+      setState(newState);
+      if (!newState.error) {
+        onChange?.(event);
+      }
+    },
+  };
+}
+
+interface GridColumnEditorProps {
+  value: SerializableGridColumn;
+  onChange: (newValue: SerializableGridColumn) => void;
+  disabled?: boolean;
+}
+
+function GridColumnEditor({
+  disabled,
+  value: editedColumn,
+  onChange: handleColumnChange,
+}: GridColumnEditorProps) {
+  const { dom } = useAppState();
+  const toolpadComponents = useToolpadComponents(dom);
+  const codeComponents: ToolpadComponentDefinition[] = React.useMemo(() => {
+    return Object.values(toolpadComponents)
+      .filter(Boolean)
+      .filter((definition) => !definition.builtIn);
+  }, [toolpadComponents]);
+
+  const fieldInput = useImmediateTextField({
+    label: 'field',
+    disabled,
+    required: true,
+    value: editedColumn.field,
+    onChange: (event) => {
+      handleColumnChange({ ...editedColumn, field: event.target.value });
+    },
+  });
+
+  return (
+    <Stack gap={1} py={1}>
+      <TextField {...fieldInput} />
+
+      <TextField
+        label="header"
+        value={editedColumn.headerName || ''}
+        disabled={disabled}
+        onChange={(event) =>
+          handleColumnChange({
+            ...editedColumn,
+            headerName: event.target.value ? event.target.value : undefined,
+          })
+        }
+      />
+
+      <TextField
+        select
+        fullWidth
+        label="align"
+        value={editedColumn.align ?? ''}
+        disabled={disabled}
+        onChange={(event) =>
+          handleColumnChange({
+            ...editedColumn,
+            align: (event.target.value as GridAlignment) || undefined,
+          })
+        }
+      >
+        {ALIGNMENTS.map((alignment) => (
+          <MenuItem key={alignment} value={alignment}>
+            {alignment}
+          </MenuItem>
+        ))}
+      </TextField>
+
+      <TextField
+        label="width"
+        type="number"
+        value={editedColumn.width}
+        disabled={disabled}
+        onChange={(event) =>
+          handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
+        }
+      />
+
+      <TextField
+        select
+        fullWidth
+        label="type"
+        value={editedColumn.type ?? ''}
+        disabled={disabled}
+        onChange={(event) =>
+          handleColumnChange({
+            ...editedColumn,
+            type: event.target.value,
+            numberFormat: undefined,
+          })
+        }
+      >
+        {COLUMN_TYPES.map((type) => (
+          <MenuItem key={type} value={type}>
+            {type}
+          </MenuItem>
+        ))}
+      </TextField>
+
+      <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
+        {editedColumn.type === 'number' ? (
+          <NumberFormatEditor
+            disabled={disabled}
+            value={editedColumn.numberFormat}
+            onChange={(numberFormat) => handleColumnChange({ ...editedColumn, numberFormat })}
+          />
+        ) : null}
+
+        {editedColumn.type === 'date' ? (
+          <DateFormatEditor
+            disabled={disabled}
+            disableTimeFormat
+            value={editedColumn.dateFormat}
+            onChange={(dateFormat) => {
+              handleColumnChange({ ...editedColumn, dateFormat });
+            }}
+          />
+        ) : null}
+
+        {editedColumn.type === 'dateTime' ? (
+          <DateFormatEditor
+            disabled={disabled}
+            value={editedColumn.dateTimeFormat}
+            onChange={(dateTimeFormat) => {
+              handleColumnChange({ ...editedColumn, dateTimeFormat });
+            }}
+          />
+        ) : null}
+
+        {editedColumn.type === 'codeComponent' ? (
+          <TextField
+            select
+            required
+            fullWidth
+            label="Custom component"
+            value={editedColumn.codeComponent ?? ''}
+            disabled={disabled}
+            error={!editedColumn.codeComponent}
+            helperText={editedColumn.codeComponent ? undefined : 'Please select a component'}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                codeComponent: event.target.value,
+              })
+            }
+          >
+            {codeComponents.map(({ displayName }) => (
+              <MenuItem key={displayName} value={displayName}>
+                {displayName}
+              </MenuItem>
+            ))}
+          </TextField>
+        ) : null}
+      </Box>
+    </Stack>
+  );
+}
+
 function GridColumnsPropEditor({
   propType,
   label,
@@ -56,15 +267,8 @@ function GridColumnsPropEditor({
   onChange,
   disabled,
 }: EditorProps<SerializableGridColumns>) {
-  const { bindings } = usePageEditorState();
+  const { nodeData } = usePageEditorState();
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
-  const { dom } = useDom();
-  const toolpadComponents = useToolpadComponents(dom);
-  const codeComponents: ToolpadComponentDefinition[] = React.useMemo(() => {
-    return Object.values(toolpadComponents)
-      .filter(Boolean)
-      .filter((definition) => !definition.builtIn);
-  }, [toolpadComponents]);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
 
@@ -77,19 +281,17 @@ function GridColumnsPropEditor({
     setMenuAnchorEl(null);
   };
 
-  const rowsValue = nodeId && bindings[`${nodeId}.props.rows`];
-  const definedRows: unknown = rowsValue?.value;
+  const rawRows: unknown = nodeId && nodeData[nodeId]?.rawRows;
 
   const inferredColumns = React.useMemo(
-    () => inferColumns(Array.isArray(definedRows) ? definedRows : []),
-    [definedRows],
+    () => inferColumns(Array.isArray(rawRows) ? rawRows : []),
+    [rawRows],
   );
 
   const columnSuggestions = React.useMemo(() => {
     const existingFields = new Set(value.map(({ field }) => field));
     return inferredColumns.filter((column) => !existingFields.has(column.field));
   }, [inferredColumns, value]);
-  const hasColumnSuggestions = columnSuggestions.length > 0;
 
   const handleCreateColumn = React.useCallback(
     (suggestion: SerializableGridColumn) => () => {
@@ -126,10 +328,10 @@ function GridColumnsPropEditor({
   );
 
   const handleRecreateColumns = React.useCallback(() => {
-    if (hasColumnSuggestions) {
+    if (inferredColumns.length > 0) {
       onChange(inferredColumns);
     }
-  }, [hasColumnSuggestions, inferredColumns, onChange]);
+  }, [inferredColumns, onChange]);
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
@@ -177,115 +379,11 @@ function GridColumnsPropEditor({
               <IconButton aria-label="Back" onClick={() => setEditedIndex(null)}>
                 <ArrowBackIcon />
               </IconButton>
-              <Stack gap={1} py={1}>
-                <TextField
-                  label="field"
-                  value={editedColumn.field}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({ ...editedColumn, field: event.target.value })
-                  }
-                />
-
-                <TextField
-                  label="header"
-                  value={editedColumn.headerName}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({ ...editedColumn, headerName: event.target.value })
-                  }
-                />
-
-                <TextField
-                  select
-                  fullWidth
-                  label="align"
-                  value={editedColumn.align ?? ''}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({
-                      ...editedColumn,
-                      align: (event.target.value as GridAlignment) || undefined,
-                    })
-                  }
-                >
-                  {ALIGNMENTS.map((alignment) => (
-                    <MenuItem key={alignment} value={alignment}>
-                      {alignment}
-                    </MenuItem>
-                  ))}
-                </TextField>
-
-                <TextField
-                  label="width"
-                  type="number"
-                  value={editedColumn.width}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({ ...editedColumn, width: Number(event.target.value) })
-                  }
-                />
-
-                <TextField
-                  select
-                  fullWidth
-                  label="type"
-                  value={editedColumn.type ?? ''}
-                  disabled={disabled}
-                  onChange={(event) =>
-                    handleColumnChange({
-                      ...editedColumn,
-                      type: event.target.value,
-                      numberFormat: undefined,
-                    })
-                  }
-                >
-                  {COLUMN_TYPES.map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {type}
-                    </MenuItem>
-                  ))}
-                </TextField>
-
-                <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
-                  {editedColumn.type === 'number' ? (
-                    <NumberFormatEditor
-                      disabled={disabled}
-                      value={editedColumn.numberFormat}
-                      onChange={(numberFormat) =>
-                        handleColumnChange({ ...editedColumn, numberFormat })
-                      }
-                    />
-                  ) : null}
-
-                  {editedColumn.type === 'codeComponent' ? (
-                    <TextField
-                      select
-                      required
-                      fullWidth
-                      label="Custom component"
-                      value={editedColumn.codeComponent ?? ''}
-                      disabled={disabled}
-                      error={!editedColumn.codeComponent}
-                      helperText={
-                        editedColumn.codeComponent ? undefined : 'Please select a component'
-                      }
-                      onChange={(event) =>
-                        handleColumnChange({
-                          ...editedColumn,
-                          codeComponent: event.target.value,
-                        })
-                      }
-                    >
-                      {codeComponents.map(({ displayName }) => (
-                        <MenuItem key={displayName} value={displayName}>
-                          {displayName}
-                        </MenuItem>
-                      ))}
-                    </TextField>
-                  ) : null}
-                </Box>
-              </Stack>
+              <GridColumnEditor
+                value={editedColumn}
+                onChange={handleColumnChange}
+                disabled={disabled}
+              />
             </React.Fragment>
           ) : (
             <React.Fragment>
@@ -294,7 +392,7 @@ function GridColumnsPropEditor({
                   <IconButton
                     aria-label="Recreate columns"
                     onClick={handleRecreateColumns}
-                    disabled={!hasColumnSuggestions}
+                    disabled={inferredColumns.length <= 0}
                   >
                     <RefreshIcon />
                   </IconButton>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { TextFieldProps, MenuItem, TextField } from '@mui/material';
-import { createComponent } from '@mui/toolpad-core';
+import createBuiltin from './createBuiltin';
 import {
   FORM_INPUT_ARG_TYPES,
   FormInputComponentProps,
@@ -17,6 +17,7 @@ export interface SelectOption {
 export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
+  label?: string;
   defaultValue: string;
   options: (string | SelectOption)[];
 } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
@@ -34,7 +35,7 @@ function Select({
 }: SelectProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     value,
     onChange,
     defaultValue,
@@ -85,8 +86,9 @@ function Select({
 
 const FormWrappedSelect = withComponentForm(Select);
 
-export default createComponent(FormWrappedSelect, {
-  helperText: 'The Select component lets you select a value from a set of options.',
+export default createBuiltin(FormWrappedSelect, {
+  helperText:
+    'The Material UI [Select](https://mui.com/material-ui/react-select/) component lets you select a value from a set of options.',
   layoutDirection: 'both',
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',

@@ -1,4 +1,5 @@
 import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+import { describe, test, expect } from 'vitest';
 
 async function evalExpression(expression: string, globalScope: Record<string, unknown> = {}) {
   const jsServerRuntime = await createServerJsRuntime();

@@ -1,6 +1,6 @@
-import * as ts from 'typescript';
+import ts from 'typescript';
 
-export const tsConfig: ts.CompilerOptions = {
+export const compilerOptions: ts.CompilerOptions = {
   noEmit: true,
   target: ts.ScriptTarget.ESNext,
   lib: ['lib.esnext.d.ts'],

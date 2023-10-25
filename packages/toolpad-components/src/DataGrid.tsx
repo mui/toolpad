@@ -19,13 +19,20 @@ import {
   useGridSelector,
   getGridDefaultColumnTypes,
   GridColTypeDef,
+  GridPaginationModel,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
   Unstable_LicenseInfoProviderProps as LicenseInfoProviderProps,
 } from '@mui/x-license-pro';
 import * as React from 'react';
-import { useNode, createComponent, useComponents } from '@mui/toolpad-core';
+import {
+  useNode,
+  useComponents,
+  UseDataProviderContext,
+  CursorPaginationModel,
+  IndexPaginationModel,
+} from '@mui/toolpad-core';
 import {
   Box,
   debounce,
@@ -41,7 +48,12 @@ import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { NumberFormat, createStringFormatter } from '@mui/toolpad-core/numberFormat';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { useQuery } from '@tanstack/react-query';
+import invariant from 'invariant';
+import { NumberFormat, createFormat as createNumberFormat } from '@mui/toolpad-core/numberFormat';
+import { DateFormat, createFormat as createDateFormat } from '@mui/toolpad-core/dateFormat';
+import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
 
@@ -68,6 +80,54 @@ function mulberry32(a: number): () => number {
 function randomBetween(seed: number, min: number, max: number): () => number {
   const random = mulberry32(seed);
   return () => min + (max - min) * random();
+}
+
+function isNumeric(input: string) {
+  return input ? !Number.isNaN(Number(input)) : false;
+}
+
+/**
+ * RegExp to test a string for a ISO 8601 Date spec
+ * Also accepts a space instead of T to separate date and time as per rfc3339
+ * Does not do any sort of date validation, only checks if the string is according to the ISO 8601 spec.
+ *  YYYY
+ *  YYYY-MM
+ *  YYYY-MM-DD
+ *  YYYY-MM-DDThh:mmTZD
+ *  YYYY-MM-DDThh:mm:ssTZD
+ *  YYYY-MM-DDThh:mm:ss.sTZD
+ * @see: https://www.w3.org/TR/NOTE-datetime
+ */
+const ISO_8601 =
+  /^\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(([+-]\d{2}:\d{2})|Z)?)?)?)?$/i;
+
+/**
+ * RegExp to test a string for a full ISO 8601 Date
+ * Also accepts a space instead of T to separate date and time as per rfc3339
+ * Does not do any sort of date validation, only checks if the string is according to the ISO 8601 spec.
+ *  YYYY-MM-DDThh:mm:ss
+ *  YYYY-MM-DDThh:mm:ssTZD
+ *  YYYY-MM-DDThh:mm:ss.sTZD
+ * @see: https://www.w3.org/TR/NOTE-datetime
+ */
+const ISO_8601_FULL = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2}:\d{2})|Z)?$/i;
+
+function isValidDateTime(input: string) {
+  // The Date constructor is too permissive for validating dates, so we need to use a regex
+  // e.g. `new Date('Foo bar 0')` results in a valid date
+  if (ISO_8601_FULL.test(input) && !Number.isNaN(Date.parse(input))) {
+    return !Number.isNaN(Date.parse(input));
+  }
+  return false;
+}
+
+function isValidDate(input: string) {
+  // The Date constructor is too permissive for validating dates, so we need to use a regex
+  // e.g. `new Date('Foo bar 0')` results in a valid date
+  if (ISO_8601.test(input) && !Number.isNaN(Date.parse(input))) {
+    return !Number.isNaN(Date.parse(input));
+  }
+  return false;
 }
 
 const SkeletonCell = styled(Box)(({ theme }) => ({
@@ -135,6 +195,15 @@ function SkeletonLoadingOverlay() {
   );
 }
 
+// Polyfill for https://developer.mozilla.org/en-US/docs/Web/API/URL/canParse_static
+function urlCanParse(url: string, base?: string): boolean {
+  try {
+    return !!new URL(url, base);
+  } catch {
+    return false;
+  }
+}
+
 function inferColumnType(value: unknown): string {
   if (value instanceof Date) {
     return 'dateTime';
@@ -144,8 +213,8 @@ function inferColumnType(value: unknown): string {
     case 'number':
     case 'boolean':
       return valueType;
-    case 'string':
-      try {
+    case 'string': {
+      if (urlCanParse(value)) {
         const url = new URL(value);
 
         if (hasImageExtension(url.pathname)) {
@@ -153,9 +222,18 @@ function inferColumnType(value: unknown): string {
         }
 
         return 'link';
-      } catch (error) {
-        return valueType;
       }
+      if (isNumeric(value)) {
+        return 'number';
+      }
+      if (isValidDateTime(value)) {
+        return 'dateTime';
+      }
+      if (isValidDate(value)) {
+        return 'date';
+      }
+      return valueType;
+    }
     case 'object':
       return 'json';
     default:
@@ -213,8 +291,30 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
   );
 }
 
-function dateValueGetter({ value }: GridValueGetterParams<any, any>) {
-  return typeof value === 'number' ? new Date(value) : value;
+const INVALID_DATE = new Date(NaN);
+
+function dateValueGetter({ value }: GridValueGetterParams<any, any>): Date | undefined {
+  if (value === null || value === undefined || value === '') {
+    return undefined;
+  }
+
+  if (typeof value === 'number') {
+    return new Date(value);
+  }
+
+  if (typeof value === 'string') {
+    if (isNumeric(value)) {
+      return new Date(Number(value));
+    }
+
+    if (isValidDate(value)) {
+      return new Date(value);
+    }
+  }
+
+  // It's fine if this turns out to be an invalid date, the user wanted a date column, if the data can't be parsed as a date
+  // it should just show as such
+  return INVALID_DATE;
 }
 
 function ComponentErrorFallback({ error }: FallbackProps) {
@@ -258,11 +358,9 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
     valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
   },
   date: {
-    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   dateTime: {
-    extendType: 'date',
     valueGetter: dateValueGetter,
   },
   link: {
@@ -285,6 +383,8 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
 export interface SerializableGridColumn
   extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
   numberFormat?: NumberFormat;
+  dateFormat?: DateFormat;
+  dateTimeFormat?: DateFormat;
   codeComponent?: string;
 }
 
@@ -306,14 +406,46 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map((column) => {
+    const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};
+
     if (column.type === 'number' && column.numberFormat) {
+      const format = createNumberFormat(column.numberFormat);
       return {
+        ...customType,
         ...column,
-        valueFormatter: createStringFormatter(column.numberFormat),
+        valueFormatter: ({ value }) => format.format(value),
       };
     }
 
-    const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};
+    if (column.type === 'date' && column.dateFormat) {
+      const format = createDateFormat(column.dateFormat);
+      return {
+        ...customType,
+        ...column,
+        valueFormatter: ({ value }) => {
+          try {
+            return format.format(value);
+          } catch (err) {
+            return 'Invalid';
+          }
+        },
+      };
+    }
+
+    if (column.type === 'dateTime' && column.dateTimeFormat) {
+      const format = createDateFormat(column.dateTimeFormat);
+      return {
+        ...customType,
+        ...column,
+        valueFormatter: ({ value }) => {
+          try {
+            return format.format(value);
+          } catch {
+            return 'Invalid';
+          }
+        },
+      };
+    }
 
     const type = column.type && column.type in DEFAULT_COLUMN_TYPES ? column.type : undefined;
 
@@ -328,6 +460,8 @@ interface Selection {
 }
 
 interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
+  rowsSource?: 'prop' | 'dataProvider';
+  dataProviderId?: string;
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
   height?: number;
@@ -336,6 +470,107 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
   hideToolbar?: boolean;
+  rawRows?: GridRowsProp;
+  onRawRowsChange?: (rows: GridRowsProp) => void;
+}
+
+interface DataProviderDataGridProps extends Partial<DataGridProProps> {
+  error?: unknown;
+}
+
+function useDataProviderDataGridProps(
+  dataProviderId: string | null | undefined,
+): DataProviderDataGridProps {
+  const useDataProvider = useNonNullableContext(UseDataProviderContext);
+  const { dataProvider } = useDataProvider(dataProviderId || null);
+
+  const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
+    page: 0,
+    pageSize: 100,
+  });
+
+  const { page, pageSize } = paginationModel;
+
+  const mapPageToNextCursor = React.useRef(new Map<number, string>());
+
+  const { data, isFetching, isPreviousData, isLoading, error } = useQuery({
+    enabled: !!dataProvider,
+    queryKey: ['toolpadDataProvider', dataProviderId, page, pageSize],
+    keepPreviousData: true,
+    queryFn: async () => {
+      invariant(dataProvider, 'dataProvider must be defined');
+      let dataProviderPaginationModel: IndexPaginationModel | CursorPaginationModel;
+      if (dataProvider.paginationMode === 'cursor') {
+        // cursor based pagination
+        let cursor: string | null = null;
+        if (page !== 0) {
+          cursor = mapPageToNextCursor.current.get(page - 1) ?? null;
+          if (cursor === null) {
+            throw new Error(`No cursor found for page ${page - 1}`);
+          }
+        }
+        dataProviderPaginationModel = {
+          cursor,
+          pageSize,
+        } satisfies CursorPaginationModel;
+      } else {
+        // index based pagination
+        dataProviderPaginationModel = {
+          start: page * pageSize,
+          pageSize,
+        } satisfies IndexPaginationModel;
+      }
+
+      const result = await dataProvider.getRecords({
+        paginationModel: dataProviderPaginationModel,
+      });
+
+      if (dataProvider.paginationMode === 'cursor') {
+        if (typeof result.cursor === 'undefined') {
+          throw new Error(
+            `No cursor returned for page ${page}. Return \`null\` to signal the end of the data.`,
+          );
+        }
+
+        if (typeof result.cursor === 'string') {
+          mapPageToNextCursor.current.set(page, result.cursor);
+        }
+      }
+
+      return result;
+    },
+  });
+
+  const rowCount =
+    data?.totalCount ??
+    (data?.hasNextPage ? (paginationModel.page + 1) * paginationModel.pageSize + 1 : undefined) ??
+    0;
+
+  if (!dataProvider) {
+    return {};
+  }
+
+  return {
+    loading: isLoading || (isPreviousData && isFetching),
+    paginationMode: 'server',
+    pagination: true,
+    paginationModel,
+    rowCount,
+    onPaginationModelChange(model) {
+      setPaginationModel((prevModel) => {
+        if (prevModel.pageSize !== model.pageSize) {
+          return { ...model, page: 0 };
+        }
+        return model;
+      });
+    },
+    rows: data?.records ?? [],
+    error,
+  };
+}
+
+function dataGridFallbackRender({ error }: FallbackProps) {
+  return <ErrorOverlay error={error} />;
 }
 
 const DataGridComponent = React.forwardRef(function DataGridComponent(
@@ -348,10 +583,17 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     selection,
     onSelectionChange,
     hideToolbar,
+    rowsSource,
+    dataProviderId,
+    onRawRowsChange,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const { rows: dataProviderRowsInput, ...dataProviderProps } = useDataProviderDataGridProps(
+    rowsSource === 'dataProvider' ? dataProviderId : null,
+  );
+
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
   const handleResize = React.useMemo(
@@ -398,7 +640,12 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
   React.useEffect(() => handleColumnOrderChange.clear(), [handleColumnOrderChange]);
 
-  const rowsInput = rowsProp || EMPTY_ROWS;
+  let rowsInput: GridRowsProp;
+  if (rowsSource === 'dataProvider') {
+    rowsInput = dataProviderRowsInput ?? EMPTY_ROWS;
+  } else {
+    rowsInput = rowsProp ?? EMPTY_ROWS;
+  }
 
   const hasExplicitRowId: boolean = React.useMemo(() => {
     const hasRowIdField: boolean = !!(rowIdFieldProp && rowIdFieldProp !== 'id');
@@ -465,7 +712,16 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  const error: Error | null = errorProp ? errorFrom(errorProp) : null;
+  let error: Error | null = null;
+  if (dataProviderProps?.error) {
+    error = errorFrom(dataProviderProps.error);
+  } else if (errorProp) {
+    error = errorFrom(errorProp);
+  }
+
+  React.useEffect(() => {
+    nodeRuntime?.updateEditorNodeData('rawRows', rows);
+  }, [nodeRuntime, rows]);
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
@@ -482,29 +738,32 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             visibility: error ? 'hidden' : 'visible',
           }}
         >
-          <DataGridPro
-            apiRef={apiRef}
-            slots={{
-              toolbar: hideToolbar ? null : GridToolbar,
-              loadingOverlay: SkeletonLoadingOverlay,
-            }}
-            onColumnResize={handleResize}
-            onColumnOrderChange={handleColumnOrderChange}
-            rows={rows}
-            columns={columns}
-            key={gridKey}
-            getRowId={getRowId}
-            onRowSelectionModelChange={onSelectionModelChange}
-            rowSelectionModel={selectionModel}
-            {...props}
-          />
+          <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
+            <DataGridPro
+              apiRef={apiRef}
+              slots={{
+                toolbar: hideToolbar ? null : GridToolbar,
+                loadingOverlay: SkeletonLoadingOverlay,
+              }}
+              onColumnResize={handleResize}
+              onColumnOrderChange={handleColumnOrderChange}
+              rows={rows}
+              columns={columns}
+              key={gridKey}
+              getRowId={getRowId}
+              onRowSelectionModelChange={onSelectionModelChange}
+              rowSelectionModel={selectionModel}
+              {...props}
+              {...dataProviderProps}
+            />
+          </ErrorBoundary>
         </div>
       </div>
     </LicenseInfoProvider>
   );
 });
 
-export default createComponent(DataGridComponent, {
+export default createBuiltin(DataGridComponent, {
   helperText:
     'The MUI X [Data Grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
   errorProp: 'error',
@@ -512,6 +771,18 @@ export default createComponent(DataGridComponent, {
   loadingProp: 'loading',
   resizableHeightProp: 'height',
   argTypes: {
+    rowsSource: {
+      helperText: 'Defines how rows are provided to the grid.',
+      type: 'string',
+      enum: ['prop', 'dataProvider'],
+      enumLabels: {
+        prop: 'Direct',
+        dataProvider: 'Data provider',
+      },
+      default: 'prop',
+      label: 'Rows source',
+      control: { type: 'ToggleButtons', bindable: false },
+    },
     rows: {
       helperText: 'The data to be displayed as rows. Must be an array of objects.',
       type: 'array',
@@ -528,6 +799,13 @@ export default createComponent(DataGridComponent, {
           required: ['id'],
         },
       },
+      visible: ({ rowsSource }: ToolpadDataGridProps) => rowsSource === 'prop',
+    },
+    dataProviderId: {
+      helperText: 'The backend data provider that will supply the rows to this grid',
+      type: 'string',
+      control: { type: 'DataProviderSelector', bindable: false },
+      visible: ({ rowsSource }: ToolpadDataGridProps) => rowsSource === 'dataProvider',
     },
     columns: {
       helperText: 'The columns to be displayed.',
@@ -573,13 +851,14 @@ export default createComponent(DataGridComponent, {
       default: 'compact',
     },
     height: {
+      helperText: 'The height of the data grid.',
       type: 'number',
       default: 350,
       minimum: 100,
     },
     loading: {
       helperText:
-        "Displays a loading animation indicating the datagrid isn't ready to present data yet.",
+        "Displays a loading animation indicating the data grid isn't ready to present data yet.",
       type: 'boolean',
     },
     hideToolbar: {

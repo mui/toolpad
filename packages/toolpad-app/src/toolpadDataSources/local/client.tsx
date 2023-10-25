@@ -15,12 +15,13 @@ import {
 } from '@mui/material';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { TreeItem, TreeView, treeItemClasses } from '@mui/lab';
+import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
 import {
@@ -28,9 +29,8 @@ import {
   useEvaluateLiveBindings,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import * as appDom from '../../appDom';
-import SplitPane from '../../components/SplitPane';
 import JsonView from '../../components/JsonView';
-import OpenCodeEditorButton from '../../components/OpenCodeEditor';
+import OpenCodeEditorButton from '../../toolpad/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
 import QueryInputPanel from '../QueryInputPanel';
 import QueryPreview from '../QueryPreview';
@@ -79,7 +79,7 @@ function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
         <React.Fragment>
           {file.name}
           <FlexFill />
-          <OpenCodeEditorButton iconButton filePath={file.name} fileType="query" />
+          <OpenCodeEditorButton iconButton filePath={file.name} fileType="resource" />
         </React.Fragment>
       }
     >
@@ -192,7 +192,7 @@ function QueryEditor({
     [setSelectedHandler],
   );
 
-  const handlerTreeRef = React.useRef<HTMLDivElement>(null);
+  const handlerTreeRef = React.useRef<HTMLUListElement>(null);
 
   React.useEffect(() => {
     handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
@@ -264,132 +264,136 @@ function QueryEditor({
   ]);
 
   return (
-    <SplitPane split="vertical" size="50%" allowResize>
-      <QueryInputPanel
-        previewDisabled={!selectedOption}
-        onRunPreview={handleRunPreview}
-        actions={<Button onClick={handleOpenCreateNewHandler}>New handler file</Button>}
-      >
-        <Stack direction="row" sx={{ gap: 2, height: '100%', mx: 3 }}>
-          <Box sx={{ position: 'relative', overflow: 'auto', height: '100%', width: '40%' }}>
-            <TreeView
-              ref={handlerTreeRef}
-              selected={selectedNodeId}
-              onNodeSelect={handleSelectFunction}
-              defaultCollapseIcon={<ExpandMoreIcon />}
-              defaultExpandIcon={<ChevronRightIcon />}
-              expanded={expanded}
-              onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
-            >
-              {isCreateNewHandlerOpen ? (
-                <TreeItem
-                  nodeId="::create::"
-                  label={
-                    <React.Fragment>
-                      <InputBase
-                        ref={createNewInputRef}
-                        value={newHandlerInput}
-                        onChange={(event) =>
-                          setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
-                        }
-                        autoFocus
-                        disabled={newHandlerLoading}
-                        endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
-                        onBlur={handleCreateNewCommit}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter') {
-                            handleCreateNewCommit();
-                          } else if (event.key === 'Escape') {
-                            handleCloseCreateNewHandler();
-                            event.stopPropagation();
-                          }
-                        }}
-                      />
-                      <Popover
-                        open={open}
-                        anchorEl={anchorEl}
-                        onClose={() => setAnchorEl(null)}
-                        disableAutoFocus
-                        anchorOrigin={{
-                          vertical: 'bottom',
-                          horizontal: 'left',
-                        }}
-                      >
-                        <Alert severity="error" variant="outlined">
-                          {inputError}
-                        </Alert>
-                      </Popover>
-                    </React.Fragment>
-                  }
-                />
-              ) : null}
-
-              {introspection.data?.files?.map((file) => (
-                <HandlerFileTreeItem key={file.name} file={file} />
-              ))}
-
-              {introspection.isLoading ? (
-                <React.Fragment>
-                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                  <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                </React.Fragment>
-              ) : null}
-            </TreeView>
-            {introspection.error ? (
-              <Box
-                sx={{
-                  position: 'absolute',
-                  inset: '0 0 0 0',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
+    <PanelGroup direction="horizontal">
+      <Panel defaultSize={50} minSize={20}>
+        <QueryInputPanel
+          previewDisabled={!selectedOption}
+          onRunPreview={handleRunPreview}
+          actions={<Button onClick={handleOpenCreateNewHandler}>New handler file</Button>}
+        >
+          <Stack direction="row" sx={{ gap: 2, height: '100%', mx: 3 }}>
+            <Box sx={{ position: 'relative', overflow: 'auto', height: '100%', width: '40%' }}>
+              <TreeView
+                ref={handlerTreeRef}
+                selected={selectedNodeId}
+                onNodeSelect={handleSelectFunction}
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpandIcon={<ChevronRightIcon />}
+                expanded={expanded}
+                onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
               >
-                {errorFrom(introspection.error).message}
-              </Box>
-            ) : null}
-          </Box>
+                {isCreateNewHandlerOpen ? (
+                  <TreeItem
+                    nodeId="::create::"
+                    label={
+                      <React.Fragment>
+                        <InputBase
+                          ref={createNewInputRef}
+                          value={newHandlerInput}
+                          onChange={(event) =>
+                            setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
+                          }
+                          autoFocus
+                          disabled={newHandlerLoading}
+                          endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
+                          onBlur={handleCreateNewCommit}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                              handleCreateNewCommit();
+                            } else if (event.key === 'Escape') {
+                              handleCloseCreateNewHandler();
+                              event.stopPropagation();
+                            }
+                          }}
+                        />
+                        <Popover
+                          open={open}
+                          anchorEl={anchorEl}
+                          onClose={() => setAnchorEl(null)}
+                          disableAutoFocus
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          }}
+                        >
+                          <Alert severity="error" variant="outlined">
+                            {inputError}
+                          </Alert>
+                        </Popover>
+                      </React.Fragment>
+                    }
+                  />
+                ) : null}
 
-          <Stack sx={{ gap: 1, flex: 1, overflow: 'auto' }}>
-            <Typography>Parameters:</Typography>
-            {Object.entries(parameterDefs).map(([name, definiton]) => {
-              const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
-              return Control ? (
-                <BindableEditor
-                  key={name}
-                  liveBinding={liveBindings[name]}
-                  globalScope={globalScope}
-                  globalScopeMeta={globalScopeMeta}
-                  label={name}
-                  propType={definiton}
-                  jsRuntime={jsBrowserRuntime}
-                  renderControl={(renderControlParams) => (
-                    <Control {...renderControlParams} propType={definiton} />
-                  )}
-                  value={paramsObject[name]}
-                  onChange={(newValue) => {
-                    const paramKeys = Object.keys(parameterDefs);
-                    const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
-                      const paramValue = key === name ? newValue : paramsObject[key];
-                      return paramValue ? [[key, paramValue]] : [];
-                    });
-                    setInput((existing) => ({
-                      ...existing,
-                      params: newParams,
-                    }));
+                {introspection.data?.files?.map((file) => (
+                  <HandlerFileTreeItem key={file.name} file={file} />
+                ))}
+
+                {introspection.isLoading ? (
+                  <React.Fragment>
+                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                  </React.Fragment>
+                ) : null}
+              </TreeView>
+              {introspection.error ? (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    inset: '0 0 0 0',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                   }}
-                />
-              ) : null;
-            })}
-          </Stack>
-        </Stack>
-      </QueryInputPanel>
+                >
+                  {errorFrom(introspection.error).message}
+                </Box>
+              ) : null}
+            </Box>
 
-      <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-        <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-      </QueryPreview>
-    </SplitPane>
+            <Stack sx={{ gap: 1, flex: 1, overflow: 'auto' }}>
+              <Typography>Parameters:</Typography>
+              {Object.entries(parameterDefs).map(([name, definiton]) => {
+                const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
+                return Control ? (
+                  <BindableEditor
+                    key={name}
+                    liveBinding={liveBindings[name]}
+                    globalScope={globalScope}
+                    globalScopeMeta={globalScopeMeta}
+                    label={name}
+                    propType={definiton}
+                    jsRuntime={jsBrowserRuntime}
+                    renderControl={(renderControlParams) => (
+                      <Control {...renderControlParams} propType={definiton} />
+                    )}
+                    value={paramsObject[name]}
+                    onChange={(newValue) => {
+                      const paramKeys = Object.keys(parameterDefs);
+                      const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
+                        const paramValue = key === name ? newValue : paramsObject[key];
+                        return paramValue ? [[key, paramValue]] : [];
+                      });
+                      setInput((existing) => ({
+                        ...existing,
+                        params: newParams,
+                      }));
+                    }}
+                  />
+                ) : null;
+              })}
+            </Stack>
+          </Stack>
+        </QueryInputPanel>
+      </Panel>
+      <PanelResizeHandle />
+      <Panel defaultSize={50} minSize={20}>
+        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
+          <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
+        </QueryPreview>
+      </Panel>
+    </PanelGroup>
   );
 }
 

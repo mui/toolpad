@@ -1,10 +1,14 @@
 /// <reference path="./serverModules.d.ts" />
 
-import { AsyncLocalStorage } from 'node:async_hooks';
-import { IncomingMessage } from 'node:http';
-import * as cookie from 'cookie';
 import { TOOLPAD_FUNCTION } from './constants';
-import { InferParameterType, PrimitiveValueType, PropValueType } from './types';
+import {
+  InferParameterType,
+  PaginationMode,
+  PrimitiveValueType,
+  PropValueType,
+  ToolpadDataProviderBase,
+} from './types';
+import { ServerContext, getServerContext } from './serverRuntime';
 
 /**
  * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
@@ -89,27 +93,50 @@ export function createFunction<
  */
 export const createQuery = createFunction;
 
-export interface ServerContext {
-  cookies: Record<string, string>;
-}
+export type { ServerContext };
 
-const asyncLocalStorage = new AsyncLocalStorage<ServerContext>();
-
+/**
+ * Interact with the server context of a Toolpad application.
+ * This function is only callable from within a Toolpad function.
+ *
+ * Demos:
+ *
+ * - [Custom Functions](https://mui.com/toolpad/concepts/custom-functions/#request-context/)
+ *
+ * API:
+ *
+ * - [`getContext` API](https://mui.com/toolpad/reference/api/get-context)
+ *
+ */
 export function getContext(): ServerContext {
-  const ctx = asyncLocalStorage.getStore();
+  const ctx = getServerContext();
   if (!ctx) {
     throw new Error('getContext() must be called from within a Toolpad function.');
   }
   return ctx;
 }
 
-export function createServerContext(req: IncomingMessage): ServerContext {
-  const cookies = cookie.parse(req.headers.cookie || '');
-  return {
-    cookies,
-  };
+export const TOOLPAD_DATA_PROVIDER_MARKER = Symbol.for('TOOLPAD_DATA_PROVIDER_MARKER');
+
+export interface ToolpadDataProvider<R, P extends PaginationMode = 'index'>
+  extends ToolpadDataProviderBase<R, P> {
+  [TOOLPAD_DATA_PROVIDER_MARKER]: true;
 }
 
-export function withContext<R = void>(ctx: ServerContext, doWork: () => Promise<R>): Promise<R> {
-  return asyncLocalStorage.run(ctx, doWork);
+/**
+ * Create a Toolpad data provider. Data providers act as a bridge between Toolpad and your data.
+ *
+ * Demos:
+ *
+ * - [Data Providers](https://mui.com/toolpad/concepts/data-providers/)
+ *
+ * API:
+ *
+ * - [`createDataProvider` API](https://mui.com/toolpad/reference/api/create-data-provider/)
+ *
+ */
+export function createDataProvider<R, P extends PaginationMode = 'index'>(
+  input: ToolpadDataProviderBase<R, P>,
+): ToolpadDataProvider<R, P> {
+  return Object.assign(input, { [TOOLPAD_DATA_PROVIDER_MARKER]: true as const });
 }

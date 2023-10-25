@@ -5,12 +5,14 @@ import {
   DialogContent,
   DialogTitle,
   Typography,
+  Link,
+  Divider,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import * as appDom from '../../../appDom';
-import { useDom, useDomApi, useAppState, useAppStateApi } from '../../AppState';
+import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useBoolean from '../../../utils/useBoolean';
 import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
@@ -19,8 +21,29 @@ export interface UrlQueryEditorProps {
   pageNodeId: NodeId;
 }
 
+interface UrlQueryStringProps {
+  input: [string, string][] | undefined;
+}
+
+function UrlQueryString({ input }: UrlQueryStringProps) {
+  const queryString = React.useMemo(() => {
+    const search = new URLSearchParams(input).toString();
+    return search.length ? search : '';
+  }, [input]);
+
+  return (
+    <React.Fragment>
+      <Divider variant="middle" sx={{ alignSelf: 'stretch', marginTop: '20px' }} />
+      <Typography variant="overline">Usage Preview:</Typography>
+      <Typography>
+        <code>{queryString}</code>
+      </Typography>
+    </React.Fragment>
+  );
+}
+
 export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
 
   const domApi = useDomApi();
@@ -83,10 +106,18 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
         <DialogTitle>Edit page parameters</DialogTitle>
         <DialogContent>
           <Typography>
-            The parameters you define below will be made available in bindings under the{' '}
-            <code>page.parameters</code> global variable. You can set these parameters in the url
-            with query variables (<code>?param=value</code>).
+            Page parameters allow you to pass external data into the Toolpad page state via the URL
+            query. Read more in the{' '}
+            <Link
+              href="https://mui.com/toolpad/concepts/managing-state/#page-parameters"
+              target="_blank"
+              rel="noopener"
+            >
+              docs
+            </Link>
+            .
           </Typography>
+          <UrlQueryString input={input} />
           <MapEntriesEditor
             sx={{ my: 3 }}
             fieldLabel="Parameter"

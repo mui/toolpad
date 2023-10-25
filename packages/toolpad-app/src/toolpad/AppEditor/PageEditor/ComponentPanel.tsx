@@ -1,22 +1,22 @@
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Tab, Box, styled, Typography } from '@mui/material';
+import { Tab, Box, styled, Typography, Link } from '@mui/material';
 import * as React from 'react';
 import PageOptionsPanel from './PageOptionsPanel';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
-import { useAppState, useAppStateApi, useDom } from '../../AppState';
+import { useAppState, useAppStateApi } from '../../AppState';
 import { PageViewTab } from '../../../utils/domView';
 import * as appDom from '../../../appDom';
-
 import { PropControlsContextProvider, PropTypeControls } from '../../propertyControls';
 import string from '../../propertyControls/string';
 import boolean from '../../propertyControls/boolean';
 import number from '../../propertyControls/number';
 import select from '../../propertyControls/select';
 import json from '../../propertyControls/json';
+import event from '../../propertyControls/event';
 import markdown from '../../propertyControls/Markdown';
-import eventControl from '../../propertyControls/event';
 import GridColumns from '../../propertyControls/GridColumns';
+import ToggleButtons from '../../propertyControls/ToggleButtons';
 import SelectOptions from '../../propertyControls/SelectOptions';
 import ChartData from '../../propertyControls/ChartData';
 import RowIdFieldSelect from '../../propertyControls/RowIdFieldSelect';
@@ -24,16 +24,18 @@ import HorizontalAlign from '../../propertyControls/HorizontalAlign';
 import VerticalAlign from '../../propertyControls/VerticalAlign';
 import NumberFormat from '../../propertyControls/NumberFormat';
 import ColorScale from '../../propertyControls/ColorScale';
+import DataProviderSelector from '../../propertyControls/DataProviderSelector';
 
-const propTypeControls: PropTypeControls = {
+export const PROP_TYPE_CONTROLS: PropTypeControls = {
   string,
   boolean,
   number,
   select,
   json,
   markdown,
-  event: eventControl,
+  event,
   GridColumns,
+  ToggleButtons,
   SelectOptions,
   ChartData,
   RowIdFieldSelect,
@@ -41,10 +43,12 @@ const propTypeControls: PropTypeControls = {
   VerticalAlign,
   NumberFormat,
   ColorScale,
+  DataProviderSelector,
 };
 
 const classes = {
   panel: 'Toolpad_Panel',
+  themesDocsLink: 'Toolpad_ThemesDocsLink',
 };
 
 const ComponentPanelRoot = styled('div')(({ theme }) => ({
@@ -56,6 +60,9 @@ const ComponentPanelRoot = styled('div')(({ theme }) => ({
     padding: theme.spacing(2),
     overflow: 'auto',
   },
+  [`& .${classes.themesDocsLink}`]: {
+    marginBottom: theme.spacing(1),
+  },
 }));
 
 export interface ComponentPanelProps {
@@ -63,7 +70,7 @@ export interface ComponentPanelProps {
 }
 
 export default function ComponentPanel({ className }: ComponentPanelProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { currentView } = useAppState();
   const appStateApi = useAppStateApi();
 
@@ -72,11 +79,12 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
   const selectedNodeId = currentView.kind === 'page' ? currentView.selectedNodeId : null;
   const selectedNode = selectedNodeId ? appDom.getMaybeNode(dom, selectedNodeId) : null;
 
-  const handleChange = (event: React.SyntheticEvent, newValue: PageViewTab) =>
+  const handleChange = (_: React.SyntheticEvent, newValue: PageViewTab) => {
     appStateApi.setTab(newValue);
+  };
 
   return (
-    <PropControlsContextProvider value={propTypeControls}>
+    <PropControlsContextProvider value={PROP_TYPE_CONTROLS}>
       <ComponentPanelRoot className={className}>
         <TabContext value={currentTab || 'page'}>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -97,6 +105,13 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
             )}
           </TabPanel>
           <TabPanel value="theme" className={classes.panel}>
+            <Typography className={classes.themesDocsLink} variant="body2">
+              Customize the app with a Material UI theme. Read more about theming in the{' '}
+              <Link href="https://mui.com/toolpad/concepts/theming/" target="_blank" rel="noopener">
+                docs
+              </Link>
+              .
+            </Typography>
             <ThemeEditor />
           </TabPanel>
         </TabContext>

@@ -10,7 +10,8 @@ import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
 import IconImage from 'docs/src/components/icon/IconImage';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import GradientText from 'docs/src/components/typography/GradientText';
-import GetStartedButtons from './GetStartedButtons';
+// import GetStartedButtons from './GetStartedButtons';
+import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 import GithubStars from './GithubStars';
 import CodeBlock from './CodeBlock';
 import ROUTES from '../../route';
@@ -157,7 +158,7 @@ export default function Hero() {
             }),
           ]}
         >
-          <IconImage width={28} height={28} name="product-toolpad" />
+          <IconImage width={28} height={28} loading="eager" name="product-toolpad" />
           <Box component="span" sx={{ ml: 1, mr: 1 }}>
             MUI Toolpad
           </Box>
@@ -195,13 +196,23 @@ export default function Hero() {
           Build scalable and secure internal tools locally. Drag and drop to build UI, then connect
           to data sources with your own code.
         </Typography>
-        <GetStartedButtons
-          primaryLabel={'Get started'}
-          primaryUrl={ROUTES.toolpadQuickstart}
-          secondaryLabel={'Book a demo'}
-          secondaryUrl={ROUTES.toolpadDemoBooking}
-          installation={'npx create-toolpad-app@latest'}
-        />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: { xs: 'center', md: 'flex-start' },
+          }}
+        >
+          <GetStartedButtons
+            primaryLabel={'Get started'}
+            primaryUrl={ROUTES.toolpadQuickstart}
+            secondaryLabel={'Book a demo'}
+            secondaryUrl={ROUTES.toolpadDemoBooking}
+            secondaryUrlTarget="_blank"
+            altInstallation={'npx create-toolpad-app@latest'}
+            sx={{ width: '100%' }}
+          />
+        </Box>
         <Box
           sx={{
             mt: 4,
@@ -259,7 +270,7 @@ export default function Hero() {
                 sm: 'unset',
                 md: `rotateY(${heroAppMode ? '0' : '180'}deg)`,
               },
-              boxShadow: `0 0 16px ${alpha(theme.palette.grey[100], 0.9)}`,
+              boxShadow: `0 4px 8px ${alpha(theme.palette.grey[100], 0.9)}`,
             }),
             (theme) =>
               theme.applyDarkStyles({
@@ -267,7 +278,7 @@ export default function Hero() {
                   (theme.vars || theme).palette.primaryDark[500]
                 } 0%, ${alpha(theme.palette.primaryDark[800], 0.4)} 150%)`,
                 borderColor: `${alpha(theme.palette.primaryDark[300], 0.3)}`,
-                boxShadow: `0 4px 8px ${alpha(theme.palette.primaryDark[600], 0.5)}`,
+                boxShadow: `0 4px 8px ${alpha(theme.palette.common.black, 0.8)}`,
               }),
           ]}
         >

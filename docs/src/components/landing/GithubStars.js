@@ -39,6 +39,9 @@ export default function GithubStars() {
       target="_blank"
       rel="noopener nofollow"
       aria-label="split button"
+      data-ga-event-category="toolpad_to_github"
+      data-ga-event-label="Toolpad GitHub Stars Click"
+      data-ga-event-action="stars_click"
       size="small"
       variant="outlined"
       sx={{
@@ -58,7 +61,7 @@ export default function GithubStars() {
           display: 'flex',
           alignItem: 'center',
           ml: 0.5,
-          color: theme.palette.primary[700],
+          color: theme.palette.primary[500],
           ...theme.applyDarkStyles({
             color: theme.palette.primary[200],
           }),

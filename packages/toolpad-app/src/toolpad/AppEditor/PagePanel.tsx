@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { styled, SxProps, Box, Divider, Typography } from '@mui/material';
-import PagesHierarchyExplorer from './HierarchyExplorer';
-import PageStructureExplorer from './StructureExplorer';
-import SplitPane from '../../components/SplitPane';
-import { useDom } from '../AppState';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
+import PagesExplorer from './PagesExplorer';
+import PageHierarchyExplorer from './HierarchyExplorer';
+import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
-import config from '../../config';
+import { useProject } from '../../project';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
@@ -18,7 +18,8 @@ export interface ComponentPanelProps {
 }
 
 export default function PagePanel({ className, sx }: ComponentPanelProps) {
-  const { dom } = useDom();
+  const project = useProject();
+  const { dom } = useAppState();
 
   return (
     <PagePanelRoot className={className} sx={sx}>
@@ -33,15 +34,21 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
           alignItems: 'center',
         }}
       >
-        <Typography noWrap>{config.projectDir?.split(/[/\\]/).pop()}</Typography>
+        <Typography noWrap>{project.rootDir.split(/[/\\]/).pop()}</Typography>
 
         <AppOptions dom={dom} />
       </Box>
       <Divider />
-      <SplitPane sx={{ flex: 1 }} split="horizontal" defaultSize={200} minSize={100} maxSize={400}>
-        <PagesHierarchyExplorer />
-        <PageStructureExplorer />
-      </SplitPane>
+
+      <PanelGroup autoSaveId="toolpad-page-panel" direction="vertical">
+        <Panel minSize={10} defaultSize={30} maxSize={75}>
+          <PagesExplorer />
+        </Panel>
+        <PanelResizeHandle />
+        <Panel minSize={25} maxSize={90}>
+          <PageHierarchyExplorer />
+        </Panel>
+      </PanelGroup>
     </PagePanelRoot>
   );
 }

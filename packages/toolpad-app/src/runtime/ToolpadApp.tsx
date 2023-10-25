@@ -32,11 +32,12 @@ import {
   RuntimeScope,
   ApplicationVm,
   JsExpressionAttrValue,
+  ComponentConfig,
 } from '@mui/toolpad-core';
 import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
-import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
+import { QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
   Routes,
@@ -45,7 +46,7 @@ import {
   Navigate,
   Location as RouterLocation,
   useNavigate,
-  matchPath,
+  useMatch,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -53,6 +54,7 @@ import {
   NodeErrorProps,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
+  UseDataProviderContext,
 } from '@mui/toolpad-core/runtime';
 import ErrorIcon from '@mui/icons-material/Error';
 import { getBrowserRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
@@ -61,6 +63,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import invariant from 'invariant';
+import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../appDom';
 import { RuntimeState } from '../types';
 import { getBindingType, getBindingValue } from '../bindings';
@@ -79,15 +82,17 @@ import evalJsBindings, {
 } from './evalJsBindings';
 import { HTML_ID_EDITOR_OVERLAY } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
-import { execDataSourceQuery, useDataQuery, UseFetch } from './useDataQuery';
+import { useDataQuery, UseFetch } from './useDataQuery';
 import { NavigateToPage } from './CanvasHooksContext';
-import AppNavigation from './AppNavigation';
 import PreviewHeader from './PreviewHeader';
-import useEvent from '../utils/useEvent';
+import { AppLayout } from './AppLayout';
+import { useDataProvider } from './useDataProvider';
+import api, { queryClient } from './api';
 
 const browserJsRuntime = getBrowserRuntime();
 
 const isPreview = process.env.NODE_ENV !== 'production';
+const isCustomServer = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
 const isRenderedInCanvas =
   typeof window === 'undefined'
     ? false
@@ -98,9 +103,7 @@ const Pre = styled('pre')(({ theme }) => ({
   fontFamily: theme.fontFamilyMonospaced,
 }));
 
-const PREVIEW_PAGE_ROUTE = '/preview/pages/:nodeId';
-
-export const internalComponents: ToolpadComponents = Object.fromEntries(
+const internalComponents: ToolpadComponents = Object.fromEntries(
   [...INTERNAL_COMPONENTS].map(([name]) => {
     let builtIn = (builtIns as any)[name];
 
@@ -262,6 +265,8 @@ const RuntimeScopeContext = React.createContext<RuntimeScope | undefined>(undefi
 const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
 const [useEvaluateScopeExpression, EvaluateScopeExpressionProvider] =
   createProvidedContext<(expr: string) => any>('EvaluateScopeExpression');
+
+export { DomContextProvider, ComponentsContextProvider };
 
 interface SetBindingContextValue {
   setBinding: (id: string, result: BindingEvaluationResult, scopeId?: string) => void;
@@ -427,6 +432,17 @@ function getQueryConfigBindings({ enabled, refetchInterval }: appDom.QueryNode['
   return { enabled, refetchInterval };
 }
 
+function isBindableProp(componentConfig: ComponentConfig<any>, propName: string) {
+  const isResizableHeightProp = propName === componentConfig.resizableHeightProp;
+  const argType = componentConfig.argTypes?.[propName];
+  return (
+    !isResizableHeightProp &&
+    argType?.control?.bindable !== false &&
+    argType?.type !== 'template' &&
+    argType?.type !== 'event'
+  );
+}
+
 function parseBindings(
   dom: appDom.AppDom,
   rootNode: appDom.ElementNode | appDom.PageNode | appDom.ElementNode[],
@@ -444,34 +460,28 @@ function parseBindings(
       const componentId = getComponentId(elm);
       const Component = components[componentId];
 
-      const componentConfig = Component?.[TOOLPAD_COMPONENT];
+      const componentConfig: ComponentConfig<any> = Component?.[TOOLPAD_COMPONENT] ?? {};
 
-      const { argTypes = {} } = componentConfig ?? {};
+      const { argTypes = {} } = componentConfig;
 
       const propsMeta: Record<string, ScopeMetaPropField> = {};
 
       for (const [propName, argType] of Object.entries(argTypes)) {
-        const initializerId = argType?.defaultValueProp
+        invariant(argType, `Missing argType for prop "${propName}"`);
+
+        const initializerId = argType.defaultValueProp
           ? `${elm.id}.props.${argType.defaultValueProp}`
           : undefined;
 
         const propValue: BindableAttrValue<any> = elm.props?.[propName];
 
-        const binding: BindableAttrValue<any> =
-          propValue ?? (argType ? getArgTypeDefaultValue(argType) : undefined);
+        const binding: BindableAttrValue<any> = propValue ?? getArgTypeDefaultValue(argType);
 
         const bindingId = `${elm.id}.props.${propName}`;
 
         let scopePath: string | undefined;
 
-        const isResizableHeightProp =
-          componentConfig?.resizableHeightProp && propName === componentConfig?.resizableHeightProp;
-
-        if (
-          componentId !== PAGE_ROW_COMPONENT_ID &&
-          !isResizableHeightProp &&
-          argType?.control?.bindable !== false
-        ) {
+        if (componentId !== PAGE_ROW_COMPONENT_ID && isBindableProp(componentConfig, propName)) {
           scopePath = `${elm.name}.${propName}`;
         }
 
@@ -630,10 +640,6 @@ function useElmToolpadComponent(elm: appDom.ElementNode): ToolpadComponent {
   return useComponent(componentId);
 }
 
-interface RenderedNodeProps {
-  nodeId: NodeId;
-}
-
 function RenderedNode({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const node = appDom.getNode(dom, nodeId, 'element');
@@ -641,7 +647,6 @@ function RenderedNode({ nodeId }: RenderedNodeProps) {
   const childNodeGroups = appDom.getChildNodes(dom, node);
 
   return (
-    /* eslint-disable-next-line @typescript-eslint/no-use-before-define */
     <RenderedNodeContent node={node} childNodeGroups={childNodeGroups} Component={Component} />
   );
 }
@@ -1105,14 +1110,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const value = hookResult[propName];
 
         let wrappedValue = value;
-        if (argType.control?.type === 'slots') {
-          wrappedValue = <Slots prop={propName}>{value}</Slots>;
-        } else if (argType.control?.type === 'slot' || argType.control?.type === 'layoutSlot') {
+        if (argType.control?.type === 'slots' || argType.control?.type === 'layoutSlot') {
           wrappedValue = (
-            <Placeholder prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
+            <Slots prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
               {value}
-            </Placeholder>
+            </Slots>
           );
+        } else if (argType.control?.type === 'slot') {
+          wrappedValue = <Placeholder prop={propName}>{value}</Placeholder>;
         }
 
         if (isTemplate) {
@@ -1270,7 +1275,6 @@ function MutationNode({ node, page }: MutationNodeProps) {
 
   const { bindings } = useAssertedContext(RuntimeScopeContext);
 
-  const queryId = node.id;
   const { value: params } = resolveBindables(
     bindings,
     `${node.id}.params`,
@@ -1283,37 +1287,36 @@ function MutationNode({ node, page }: MutationNodeProps) {
     error: fetchError,
     mutateAsync,
   } = useMutation(
-    async (overrides: any = {}) =>
-      execDataSourceQuery({
-        pageName: page.name,
-        queryName: node.name,
-        params: { ...params, ...overrides },
-      }),
+    async (overrides: any = {}) => {
+      return api.methods.execQuery(page.name, node.name, { ...params, ...overrides });
+    },
     {
-      mutationKey: [queryId, params],
+      mutationKey: [node.name, params],
     },
   );
 
-  const { data, error: apiError } = responseData;
+  const { data, error: apiError } = responseData || EMPTY_OBJECT;
 
   const error = apiError || fetchError;
 
   // Stabilize the mutation and prepare for inclusion in global scope
-  const mutationResult: UseFetch = React.useMemo(
-    () => ({
+  const mutationResult: UseFetch = React.useMemo(() => {
+    const call = async (overrides: any = {}) => {
+      await mutateAsync(overrides);
+    };
+    return {
       isLoading,
       isFetching: isLoading,
       error,
       data,
       rows: Array.isArray(data) ? data : EMPTY_ARRAY,
-      call: mutateAsync,
-      fetch: mutateAsync,
+      call,
+      fetch: call,
       refetch: () => {
         throw new Error(`refetch is not supported in manual queries`);
       },
-    }),
-    [isLoading, error, mutateAsync, data],
-  );
+    };
+  }, [isLoading, error, data, mutateAsync]);
 
   React.useEffect(() => {
     for (const [key, value] of Object.entries(mutationResult)) {
@@ -1342,7 +1345,11 @@ function FetchNode({ node, page }: FetchNodeProps) {
   }
 }
 
-function RenderedPage({ nodeId }: RenderedNodeProps) {
+export interface RenderedNodeProps {
+  nodeId: NodeId;
+}
+
+export function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
@@ -1359,7 +1366,7 @@ function RenderedPage({ nodeId }: RenderedNodeProps) {
 
   const canvasEvents = React.useContext(CanvasEventsContext);
 
-  const onUpdate = useEvent(({ scope, scopeMeta }) => {
+  const onUpdate = useEventCallback(({ scope, scopeMeta }) => {
     if (canvasEvents) {
       canvasEvents.emit('pageStateUpdated', {
         pageState: scope.values,
@@ -1409,10 +1416,11 @@ function PageNotFound() {
 
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
-  defaultPage: appDom.PageNode;
 }
 
-function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
+function RenderedPages({ pages }: RenderedPagesProps) {
+  const defaultPage = pages[0];
+
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
   return (
     <Routes>
@@ -1470,75 +1478,58 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      staleTime: 60 * 1000,
-    },
-  },
-});
-
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
-  hasShell?: boolean;
 }
 
-function ToolpadAppLayout({ dom, hasShell: hasShellProp = true }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const location = useLocation();
-  const { pathname, search } = location;
-  const urlParams = React.useMemo(() => new URLSearchParams(search), [search]);
+  const pageMatch = useMatch('/pages/:slug');
+  const pageId = pageMatch?.params.slug;
 
-  const pageMatch = matchPath(PREVIEW_PAGE_ROUTE, `/preview${pathname}`);
-  const pageId = pageMatch?.params.nodeId;
+  const showPreviewHeader = isPreview && !isRenderedInCanvas && !isCustomServer;
 
-  const defaultPage = pages[0];
-  const page = pageId ? appDom.getMaybeNode(dom, pageId as NodeId, 'page') : defaultPage;
-
-  const displayMode = urlParams.get('toolpad-display') || page?.attributes.display;
-
-  const hasShell = hasShellProp && displayMode !== 'standalone';
-
-  const showPreviewHeader = isPreview && !isRenderedInCanvas;
+  const navEntries = React.useMemo(
+    () =>
+      pages.map((page) => ({
+        slug: page.id,
+        displayName: page.name,
+        hasShell: page?.attributes.display !== 'standalone',
+      })),
+    [pages],
+  );
 
   return (
     <React.Fragment>
       {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
-      <Box sx={{ flex: 1, display: 'flex' }}>
-        {hasShell && pages.length > 0 ? (
-          <AppNavigation pages={pages} clipped={showPreviewHeader} />
-        ) : null}
-        <RenderedPages pages={pages} defaultPage={defaultPage} />
-      </Box>
+      <AppLayout
+        activePage={pageMatch?.params.slug}
+        pages={navEntries}
+        hasShell={!isRenderedInCanvas}
+        clipped={showPreviewHeader}
+      >
+        <RenderedPages pages={pages} />
+      </AppLayout>
     </React.Fragment>
   );
 }
 
-export interface LoadComponents {
-  (state: RuntimeState): Promise<ToolpadComponents>;
-}
-
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
-  loadComponents: LoadComponents;
-  hasShell?: boolean;
+  extraComponents: ToolpadComponents;
   basename: string;
   state: RuntimeState;
 }
 
-export default function ToolpadApp({
-  rootRef,
-  loadComponents,
-  basename,
-  hasShell = true,
-  state,
-}: ToolpadAppProps) {
+export default function ToolpadApp({ rootRef, extraComponents, basename, state }: ToolpadAppProps) {
   const { dom } = state;
 
-  const [components, setComponents] = React.useState<ToolpadComponents | null>(null);
+  const components = React.useMemo(
+    () => ({ ...internalComponents, ...extraComponents }),
+    [extraComponents],
+  );
 
   const [resetNodeErrorsKey, setResetNodeErrorsKey] = React.useState(0);
 
@@ -1550,17 +1541,11 @@ export default function ToolpadApp({
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  React.useEffect(() => {
-    loadComponents(state).then((codeComponents) =>
-      setComponents({ ...codeComponents, ...internalComponents }),
-    );
-  }, [loadComponents, state]);
-
   return (
-    <AppThemeProvider dom={dom}>
-      <CssBaseline enableColorScheme />
-      <AppRoot ref={rootRef}>
-        {components ? (
+    <UseDataProviderContext.Provider value={useDataProvider}>
+      <AppThemeProvider dom={dom}>
+        <CssBaseline enableColorScheme />
+        <AppRoot ref={rootRef}>
           <ComponentsContextProvider value={components}>
             <DomContextProvider value={dom}>
               <ErrorBoundary FallbackComponent={AppError}>
@@ -1568,7 +1553,7 @@ export default function ToolpadApp({
                   <React.Suspense fallback={<AppLoading />}>
                     <QueryClientProvider client={queryClient}>
                       <BrowserRouter basename={basename}>
-                        <ToolpadAppLayout dom={dom} hasShell={hasShell} />
+                        <ToolpadAppLayout dom={dom} />
                       </BrowserRouter>
                       {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
                     </QueryClientProvider>
@@ -1577,11 +1562,9 @@ export default function ToolpadApp({
               </ErrorBoundary>
             </DomContextProvider>
           </ComponentsContextProvider>
-        ) : (
-          <AppLoading />
-        )}
-        <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-      </AppRoot>
-    </AppThemeProvider>
+          <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+        </AppRoot>
+      </AppThemeProvider>
+    </UseDataProviderContext.Provider>
   );
 }

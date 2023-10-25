@@ -1,4 +1,6 @@
 import * as path from 'path';
+import * as url from 'url';
+import invariant from 'invariant';
 import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
@@ -7,9 +9,13 @@ import { waitForMatch } from '../../utils/streams';
 import { expectBasicPageContent } from './shared';
 import { setPageHidden } from '../../utils/page';
 import { withTemporaryEdits } from '../../utils/fs';
+import clickCenter from '../../utils/clickCenter';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const BASIC_TESTS_PAGE_ID = '5q1xd0t';
 const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
+const DATA_PROVIDERS_PAGE_ID = 'VnOzPpU';
 
 test.use({
   ignoreConsoleErrors: [
@@ -23,8 +29,10 @@ test.use({
 });
 
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
     env: {
       SECRET_BAZ: 'Some baz secret',
@@ -44,6 +52,11 @@ test('functions basics', async ({ page, context }) => {
 });
 
 test('function editor reload', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
@@ -62,7 +75,12 @@ test('function editor reload', async ({ page, localApp }) => {
   });
 });
 
-test('function editor parameters update', async ({ page, localApp }) => {
+test('function editor parameters update', async ({ page, localApp, argosScreenshot }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
@@ -72,6 +90,10 @@ test('function editor parameters update', async ({ page, localApp }) => {
   await expect(queryEditor).toBeVisible();
   await expect(queryEditor.getByLabel('foo', { exact: true })).toBeVisible();
   await expect(queryEditor.getByLabel('bar', { exact: true })).not.toBeVisible();
+
+  await argosScreenshot('function-editor', {
+    clip: (await queryEditor.boundingBox()) || undefined,
+  });
 
   await setPageHidden(page, true); // simulate page hidden
 
@@ -134,6 +156,11 @@ test('Extracted types', async ({ page }) => {
 });
 
 test('function editor extracted parameters', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(EXTRACTED_TYPES_PAGE_ID);
 
@@ -154,7 +181,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
   await expect(queryEditor.getByRole('button', { name: 'baz', exact: true })).toBeVisible();
   await expect(queryEditor.getByRole('spinbutton', { name: 'bar', exact: true })).toBeVisible();
 
-  const fizzCombobox = queryEditor.getByRole('button', { name: 'fizz', exact: true });
+  const fizzCombobox = queryEditor.getByRole('combobox', { name: 'fizz', exact: true });
   await expect(fizzCombobox).toBeVisible();
 
   await fizzCombobox.click();
@@ -175,4 +202,33 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
   await setPageHidden(page, false); // simulate page restored
 
   await expect(queryEditor.getByRole('textbox', { name: 'buzz', exact: true })).toBeVisible();
+});
+
+test('data providers', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPageById(DATA_PROVIDERS_PAGE_ID);
+
+  await editorModel.waitForOverlay();
+
+  const grid1 = editorModel.appCanvas.getByRole('grid').nth(0);
+  const grid2 = editorModel.appCanvas.getByRole('grid').nth(1);
+
+  await expect(grid1.getByText('Index item 0')).toBeVisible();
+  await expect(grid2.getByText('Cursor item 0')).toBeVisible();
+
+  await clickCenter(page, grid1);
+
+  await grid1.getByRole('button', { name: 'Go to next page' }).click();
+  await expect(grid1.getByText('Index item 100')).toBeVisible();
+
+  await clickCenter(page, grid2);
+
+  await grid2.getByRole('button', { name: 'Go to next page' }).click();
+  await expect(grid2.getByText('Cursor item 100')).toBeVisible();
+  await expect(grid2.getByText('Cursor item 0')).not.toBeVisible();
+
+  await grid2.getByRole('combobox', { name: 'Rows per page:' }).click();
+  await editorModel.appCanvas.getByRole('option', { name: '25', exact: true }).click();
+
+  await expect(grid2.getByText('Cursor item 0')).toBeVisible();
 });

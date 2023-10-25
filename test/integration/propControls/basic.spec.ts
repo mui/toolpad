@@ -1,11 +1,16 @@
 import * as path from 'path';
+import * as url from 'url';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import clickCenter from '../../utils/clickCenter';
 
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture-basic'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture-basic'),
     cmd: 'dev',
   },
 });
@@ -76,4 +81,8 @@ test('can toggle boolean prop that is true by default', async ({ page }) => {
   await expect(fullWidthControlInput).toBeChecked();
   await fullWidthControlInput.click();
   await expect(fullWidthControlInput).not.toBeChecked();
+  const labelControlInput = editorModel.componentEditor.getByLabel('label', { exact: true });
+  await labelControlInput.click();
+  await labelControlInput.fill('');
+  await expect(labelControlInput).toHaveValue('');
 });

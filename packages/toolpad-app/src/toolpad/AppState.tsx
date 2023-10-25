@@ -3,22 +3,18 @@ import { NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
-
 import { useLocation } from 'react-router-dom';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
+import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../appDom';
 import { omit, update } from '../utils/immutability';
-import client from '../api';
+import { useProjectApi } from '../projectApi';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
-import useEvent from '../utils/useEvent';
 import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
-import { projectEvents } from '../projectEvents';
-
-projectEvents.on('externalChange', () => client.invalidateQueries('loadDom', []));
 
 export function getNodeHashes(dom: appDom.AppDom): NodeHashes {
   return mapValues(dom.nodes, (node) => insecureHash(JSON.stringify(omit(node, 'id'))));
@@ -96,15 +92,28 @@ export function domReducer(dom: appDom.AppDom, action: AppStateAction): appDom.A
   }
 }
 
-export interface DomLoader {
+export interface AppState {
   dom: appDom.AppDom;
+  appUrl: string;
   savedDom: appDom.AppDom;
   savingDom: boolean;
   unsavedDomChanges: number;
   saveDomError: string | null;
+  currentView: DomView;
+  undoStack: UndoRedoStackEntry[];
+  redoStack: UndoRedoStackEntry[];
+  hasUnsavedChanges: boolean;
 }
 
-export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomLoader {
+export interface UndoRedoStackEntry {
+  dom: appDom.AppDom;
+  view: DomView;
+  timestamp: number;
+}
+
+const UNDO_HISTORY_LIMIT = 100;
+
+export function appStateReducer(state: AppState, action: AppStateAction): AppState {
   if (state.dom) {
     const newDom = domReducer(state.dom, action);
     const hasUnsavedDomChanges = newDom !== state.dom;
@@ -146,33 +155,6 @@ export function domLoaderReducer(state: DomLoader, action: AppStateAction): DomL
 
       return update(state, { dom: action.dom, savedDom: action.dom });
     }
-    default:
-      return state;
-  }
-}
-
-export interface AppState extends DomLoader {
-  currentView: DomView;
-  undoStack: UndoRedoStackEntry[];
-  redoStack: UndoRedoStackEntry[];
-  hasUnsavedChanges: boolean;
-}
-
-export type PublicAppState = Pick<AppState, 'dom' | 'currentView' | 'hasUnsavedChanges'>;
-
-interface UndoRedoStackEntry extends Omit<PublicAppState, 'currentView' | 'hasUnsavedChanges'> {
-  view: DomView;
-  timestamp: number;
-}
-
-const UNDO_HISTORY_LIMIT = 100;
-
-export function appStateReducer(state: AppState, action: AppStateAction): AppState {
-  const domLoaderState = domLoaderReducer(state, action);
-
-  state = { ...state, ...domLoaderState };
-
-  switch (action.type) {
     case 'UPDATE_HISTORY': {
       const updatedUndoStack = [
         ...state.undoStack,
@@ -408,36 +390,10 @@ function createAppStateApi(
   };
 }
 
-const [useAppStateContext, AppStateProvider] = createProvidedContext<AppState>('AppState');
+export const [useAppStateContext, AppStateProvider] = createProvidedContext<AppState>('AppState');
 
-export function useDom(): Pick<AppState, 'dom'> {
-  const { dom } = useAppStateContext();
-
-  if (!dom) {
-    throw new Error("Trying to access the DOM before it's loaded");
-  }
-
-  return { dom };
-}
-
-export function useDomLoader(): DomLoader {
-  const { dom, savedDom, savingDom, unsavedDomChanges, saveDomError } = useAppStateContext();
-
-  if (!dom) {
-    throw new Error("Trying to access the DOM before it's loaded");
-  }
-
-  return { dom, savedDom, savingDom, unsavedDomChanges, saveDomError };
-}
-
-export function useAppState(): PublicAppState {
-  const { dom, currentView, hasUnsavedChanges } = useAppStateContext();
-
-  if (!dom) {
-    throw new Error("Trying to access the DOM before it's loaded");
-  }
-
-  return { dom, currentView, hasUnsavedChanges };
+export function useAppState(): AppState {
+  return useAppStateContext();
 }
 
 const DomApiContext = React.createContext<DomApi>(createDomApi(() => undefined));
@@ -483,11 +439,13 @@ function isCancellableAction(action: AppStateAction): boolean {
 }
 
 export interface DomContextProps {
+  appUrl: string;
   children?: React.ReactNode;
 }
 
-export default function AppProvider({ children }: DomContextProps) {
-  const { data: dom } = client.useQuery('loadDom', [], { suspense: true });
+export default function AppProvider({ appUrl, children }: DomContextProps) {
+  const projectApi = useProjectApi();
+  const { data: dom } = projectApi.useQuery('loadDom', [], { suspense: true });
 
   invariant(dom, 'Suspense should load the dom');
 
@@ -507,6 +465,8 @@ export default function AppProvider({ children }: DomContextProps) {
   const [state, dispatch] = React.useReducer(appStateReducer, {
     // DOM state
     dom,
+    // base path of the running application
+    appUrl,
     // DOM loader state
     savingDom: false,
     unsavedDomChanges: 0,
@@ -540,7 +500,7 @@ export default function AppProvider({ children }: DomContextProps) {
     [],
   );
 
-  const dispatchWithHistory = useEvent((action: AppStateAction) => {
+  const dispatchWithHistory = useEventCallback((action: AppStateAction) => {
     if (state.hasUnsavedChanges && isCancellableAction(action)) {
       // eslint-disable-next-line no-alert
       const ok = window.confirm(
@@ -569,8 +529,6 @@ export default function AppProvider({ children }: DomContextProps) {
     [dispatchWithHistory, scheduleTextInputHistoryUpdate],
   );
 
-  const fingerprint = React.useRef<number | undefined>();
-
   const handleSave = React.useCallback(() => {
     if (!state.dom || state.savingDom || state.savedDom === state.dom) {
       return;
@@ -579,16 +537,15 @@ export default function AppProvider({ children }: DomContextProps) {
     const domToSave = state.dom;
     dispatch({ type: 'DOM_SAVING' });
     const domDiff = appDom.createDiff(state.savedDom, domToSave);
-    client.mutation
+    projectApi.methods
       .applyDomDiff(domDiff)
-      .then(({ fingerprint: newFingerPrint }) => {
-        fingerprint.current = newFingerPrint;
+      .then(() => {
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });
       })
       .catch((err) => {
         dispatch({ type: 'DOM_SAVING_ERROR', error: err.message });
       });
-  }, [state]);
+  }, [projectApi, state]);
 
   const debouncedHandleSave = useDebouncedHandler(handleSave, 100);
 

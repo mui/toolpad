@@ -473,7 +473,7 @@ function QueryEditor({
   );
 
   return currentTab ? (
-    <PanelGroup direction="horizontal">
+    <PanelGroup autoSaveId="toolpad/rest-panel" direction="horizontal">
       <Panel defaultSize={50} minSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
         <Stack direction="column" gap={0}>
           <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -618,7 +618,7 @@ function QueryEditor({
       </Panel>
       <PanelResizeHandle />
       <Panel defaultSize={50} minSize={20}>
-        <PanelGroup direction="vertical">
+        <PanelGroup autoSaveId="toolpad/rest/params-tools-split" direction="vertical">
           <Panel defaultSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box
               display={'flex'}

@@ -42,7 +42,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
 
   return (
     <PageEditorProvider key={node.id} nodeId={node.id}>
-      <PanelGroup direction="vertical">
+      <PanelGroup autoSaveId="toolpad/editor-panel-split" direction="vertical">
         <Panel defaultSize={50} minSize={0} maxSize={100} order={1} id={'editor'}>
           <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
             <Panel defaultSize={75} minSize={50} maxSize={80}>

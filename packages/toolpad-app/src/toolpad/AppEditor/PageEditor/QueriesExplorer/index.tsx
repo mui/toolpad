@@ -379,10 +379,7 @@ export function QueriesExplorer() {
   );
 
   return (
-    <Box
-      sx={{ maxHeight: '100%', overflowY: 'auto', scrollbarGutter: 'stable' }}
-      data-testid="queries-explorer"
-    >
+    <Box sx={{ maxHeight: '100%', overflowY: 'auto' }} data-testid="queries-explorer">
       <ExplorerHeader
         headerText="Queries"
         onCreate={handleCreateQueryClick}

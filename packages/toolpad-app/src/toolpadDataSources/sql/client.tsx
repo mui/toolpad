@@ -233,9 +233,9 @@ export function QueryEditor({
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <PanelGroup autoSaveId="toolpad-sql-panel" direction="horizontal">
+    <PanelGroup autoSaveId="toolpad/sql-panel" direction="horizontal">
       <Panel defaultSize={50}>
-        <PanelGroup direction="vertical">
+        <PanelGroup autoSaveId="toolpad/sql/params-tools-split" direction="vertical">
           <Panel defaultSize={85}>
             <QueryInputPanel onRunPreview={handleRunPreview}>
               <Box sx={{ flex: 1, minHeight: 0 }}>

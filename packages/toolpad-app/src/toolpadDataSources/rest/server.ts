@@ -136,19 +136,17 @@ async function execBase(
   project: IToolpadProject,
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
-  params: Record<string, string>,
-  envParams?: Record<string, string>,
+  params: BindableAttrValue<any>,
 ): Promise<FetchResult> {
   const har = createHarLog();
   const instrumentedFetch = withHarInstrumentation(fetch, { har });
   const jsRuntime = createServerJsRuntime(process.env);
-
-  const parameter = resolveBindableEntries(jsRuntime, Object.entries(params), envParams!);
+  const resolvedParams = resolveBindableEntries(jsRuntime, Object.entries(params), {});
 
   const queryScope = {
     // @TODO: remove deprecated query after v1
     query: params,
-    parameters: Object.fromEntries(parameter),
+    parameters: Object.fromEntries(resolvedParams),
   };
 
   const runtimeConfig = await project.getRuntimeConfig();
@@ -225,8 +223,7 @@ export default function createDatasource(
       fetchQuery: FetchQuery,
       params: Record<string, string>,
     ): Promise<ExecFetchResult<any>> {
-      const env = await loadEnvFile(project);
-      const { data, error } = await execBase(project, connection, fetchQuery, params, env);
+      const { data, error } = await execBase(project, connection, fetchQuery, params);
       return { data, error };
     },
 

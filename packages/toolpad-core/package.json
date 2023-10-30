@@ -40,7 +40,7 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/material": "5.14.14",
+    "@mui/material": "5.14.15",
     "@mui/toolpad-utils": "0.1.34",
     "@tanstack/react-query": "4.36.1",
     "@types/json-schema": "7.0.14",

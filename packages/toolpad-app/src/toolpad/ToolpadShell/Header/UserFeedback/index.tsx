@@ -27,7 +27,7 @@ import type { PackageManager } from '../../../../server/versionInfo';
 const REPORT_BUG_URL =
   'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
-const SUPPORT_URL = 'https://mui.com/toolpad/support/support';
+const SUPPORT_URL = 'https://mui.com/toolpad/getting-started/support';
 interface SnippetProps {
   children: string;
 }

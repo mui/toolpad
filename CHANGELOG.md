@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.1.34
+
+<!-- generated comparing v0.1.33..master -->
+
+_Oct 25, 2023_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Improvements to the Support page, some fixes to the tests.
+
+- &#8203;<!-- 4 -->Update Support URL in Help menu (#2832) @bharatkashyap
+- &#8203;<!-- 3 -->Fix flaky tests (#2812) @apedroferreira
+- &#8203;<!-- 2 -->[core] Monorepo upgrade (#2825) @bharatkashyap
+- &#8203;<!-- 1 -->[docs] A few Support page improvements (#2824) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap
+
 ## 0.1.33
 
 <!-- generated comparing v0.1.32..master -->

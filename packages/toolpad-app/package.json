@@ -148,7 +148,7 @@
     "@types/node-fetch": "2.6.7",
     "@types/pg": "8.10.7",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.31",
+    "@types/react": "18.2.33",
     "@types/react-dom": "18.2.14",
     "@types/react-is": "18.2.3",
     "@types/semver": "7.5.4",
@@ -163,7 +163,7 @@
     "formidable": "3.5.1",
     "get-port": "7.0.0",
     "monaco-editor": "0.44.0",
-    "react-devtools-inline": "4.28.4",
+    "react-devtools-inline": "4.28.5",
     "react-transition-group": "4.4.5",
     "webpack": "5.89.0"
   },

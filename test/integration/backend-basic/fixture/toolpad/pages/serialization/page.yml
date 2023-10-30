@@ -43,19 +43,3 @@ spec:
         value:
           $$jsExpression: |
             `Invalid error: ${invalidError.error?.message}`
-    - component: Text
-      name: markdown
-      props:
-        value: sdsdtext
-        mode: markdown
-    - component: Checkbox
-      name: switch
-      props:
-        label: sdsdd
-        disabled: false
-        defaultChecked: false
-        size: medium
-    - component: Checkbox
-      name: switch1
-      props:
-        mode: switch

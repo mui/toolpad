@@ -52,7 +52,7 @@
     "markdown-to-jsx": "7.3.2",
     "react-error-boundary": "4.0.11",
     "react-hook-form": "7.47.0",
-    "recharts": "2.9.0"
+    "recharts": "2.9.1"
   },
   "devDependencies": {
     "@types/react": "18.2.31",

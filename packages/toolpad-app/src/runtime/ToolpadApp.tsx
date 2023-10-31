@@ -65,8 +65,8 @@ import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../appDom';
-import { RuntimeState } from '../types';
-import { getBindingType, getBindingValue } from '../bindings';
+import { RuntimeState } from './types';
+import { getBindingType, getBindingValue } from './bindings';
 import {
   getElementNodeComponentId,
   INTERNAL_COMPONENTS,

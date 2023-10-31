@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Container, ContainerProps, Skeleton } from '@mui/material';
+import { Box, BoxProps, Skeleton } from '@mui/material';
 
 import {
   XAxis,
@@ -37,7 +37,7 @@ function getBarChartDataSeriesNormalizedYKey(dataSeries: ChartDataSeries, index:
   return `${dataSeries.label}-${dataSeries.yKey}-${index}`;
 }
 
-interface ChartProps extends ContainerProps {
+interface ChartProps extends BoxProps {
   data?: ChartData;
   loading?: boolean;
   error?: Error | string;
@@ -94,7 +94,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const isDataVisible = !loading && !displayError;
 
   return (
-    <Container disableGutters sx={{ ...sx, position: 'relative' }} aria-busy={loading}>
+    <Box sx={{ ...sx, position: 'relative', width: '100%' }} aria-busy={loading}>
       <ResponsiveContainer width="100%" height={height}>
         <ComposedChart data={barChartData} margin={{ top: 20, right: 80 }}>
           {isDataVisible ? (
@@ -196,7 +196,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           height={height}
         />
       ) : null}
-    </Container>
+    </Box>
   );
 }
 

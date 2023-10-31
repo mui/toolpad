@@ -7,6 +7,7 @@ const pages: MuiPage[] = [
     children: [
       { pathname: '/toolpad/getting-started/overview' },
       { pathname: '/toolpad/getting-started/installation' },
+      { pathname: '/toolpad/getting-started/why-toolpad', title: 'Why Toolpad?' },
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
       {
         pathname: '/toolpad/examples-group',
@@ -19,6 +20,10 @@ const pages: MuiPage[] = [
         ],
       },
       { pathname: '/toolpad/getting-started/roadmap' },
+      {
+        pathname: '/toolpad/getting-started/support',
+        title: 'Support',
+      },
     ],
   },
   {
@@ -29,8 +34,8 @@ const pages: MuiPage[] = [
         title: 'Building UI',
       },
       {
-        pathname: '/toolpad/concepts/queries-',
-        title: 'Queries',
+        pathname: '/toolpad/concepts/connecting-to-data',
+        title: 'Connecting to data',
         children: [
           {
             pathname: '/toolpad/concepts/queries',

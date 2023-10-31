@@ -77,8 +77,6 @@ module.exports = {
               './runtime',
               // TODO: move ./src/appDom to ./src/runtime/appDom
               './appDom',
-              // TODO: move relevant types to `@mui/utils/types` or `@mui/toolpad-core`
-              // './types.ts',
             ],
           },
         ],

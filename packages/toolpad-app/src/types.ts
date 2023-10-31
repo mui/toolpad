@@ -8,6 +8,7 @@ import {
   PropValueType,
   ExecFetchResult,
   ScopeMeta,
+  NodeHashes,
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
 import type * as appDom from './appDom';

@@ -167,7 +167,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const firstDataSeries = chartSeries[0];
 
   return (
-    <Box sx={{ ...sx, width: '100%' }} aria-busy={loading}>
+    <Box sx={{ ...sx, position: 'relative', minHeight: height, width: '100%' }} aria-busy={loading}>
       <ErrorOverlay error={displayError} />
       {loading && !error ? (
         <div

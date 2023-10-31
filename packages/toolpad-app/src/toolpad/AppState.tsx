@@ -854,7 +854,7 @@ export interface DomContextProps {
 
 export default function AppProvider({ appUrl, children }: DomContextProps) {
   const projectApi = useProjectApi();
-  const { data: dom } = projectApi.useQuery('loadDom', [], { suspense: true });
+  const { data: dom } = projectApi.useSuspenseQuery('loadDom', []);
 
   invariant(dom, 'Suspense should load the dom');
 

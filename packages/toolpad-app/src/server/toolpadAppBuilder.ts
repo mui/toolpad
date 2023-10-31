@@ -245,7 +245,7 @@ export function createViteConfig({
           '@mui/x-date-pickers/LocalizationProvider',
           '@mui/x-license-pro',
           '@tanstack/react-query',
-          '@tanstack/react-query-devtools/build/lib/index.prod.js',
+          '@tanstack/react-query-devtools/build/modern/production.js',
           'dayjs',
           'dayjs/locale/en',
           'dayjs/locale/fr',

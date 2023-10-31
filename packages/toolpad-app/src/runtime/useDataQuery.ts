@@ -48,14 +48,12 @@ export function useDataQuery(
     error: fetchError,
     data: responseData = EMPTY_OBJECT,
     refetch,
-  } = useQuery(
-    [pageName, queryName, params],
-    () => api.methods.execQuery(pageName, queryName, params),
-    {
-      ...options,
-      enabled: isNodeAvailableOnServer && enabled,
-    },
-  );
+  } = useQuery({
+    queryKey: [pageName, queryName, params],
+    queryFn: () => api.methods.execQuery(pageName, queryName, params),
+    ...options,
+    enabled: isNodeAvailableOnServer && enabled,
+  });
 
   const { data, error: apiError } = responseData;
 

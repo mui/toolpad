@@ -184,7 +184,7 @@ function CreateNewDataProviderDialog({
           <LoadingButton
             type="submit"
             disabled={!newName || !!errorMessage}
-            loading={createProviderMutation.isLoading}
+            loading={createProviderMutation.isPending}
           >
             Create
           </LoadingButton>

@@ -54,26 +54,20 @@ function groupScopeMeta(value: Record<string, unknown>, meta: ScopeMeta): Explor
     structure[group].items.push({
       ...metaField,
       key,
-      value: Object.keys(value?.[key]!).reduce((obj, keyname) => {
-        const o = (value?.[key] as Record<string, unknown>)?.[keyname] as
-          | Record<string, unknown>
-          | undefined;
-        const paramObj = Object.keys(o ?? {});
-        if (paramObj.length > 0) {
-          const m = paramObj.reduce((a, k) => {
-            if ((o?.[k] as Record<string, unknown>)?.$$env) {
-              a[k] = undefined;
-            } else {
-              a[k] = o?.[k];
-            }
-            return a;
-          }, {} as Record<string, unknown>);
-          obj[keyname] = m;
-        } else {
-          obj[keyname] = o;
-        }
-        return obj;
-      }, {} as Record<string, unknown>),
+      value: Object.fromEntries(
+        Object.entries(value?.[key] ?? {}).map(([keyname, o]) => {
+          if (Object.keys(o ?? {}).length > 0) {
+            const filteredObj = Object.fromEntries(
+              Object.entries(o).map(([k, v]) => [
+                k,
+                (v as Record<string, unknown>)?.$$env ? undefined : v,
+              ]),
+            );
+            return [keyname, filteredObj];
+          }
+          return [keyname, o];
+        }),
+      ),
     });
   }
   return structure;

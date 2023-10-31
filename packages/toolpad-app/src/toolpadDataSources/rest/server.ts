@@ -136,7 +136,7 @@ async function execBase(
   project: IToolpadProject,
   connection: Maybe<RestConnectionParams>,
   fetchQuery: FetchQuery,
-  params: BindableAttrValue<any>,
+  params: Record<string, string | BindableAttrValue<any>>,
 ): Promise<FetchResult> {
   const har = createHarLog();
   const instrumentedFetch = withHarInstrumentation(fetch, { har });

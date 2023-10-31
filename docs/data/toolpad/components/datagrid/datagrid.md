@@ -1,18 +1,18 @@
-# DataGrid
+# Data Grid
 
-<p class="description">Learn about a DataGrid component and how to use it in Toolpad.</p>
+<p class="description">Learn about how to use data grids in Toolpad.</p>
 
 ## Demo
 
-The DataGrid presents information in a structured format of rows and columns. The data is displayed in a user-friendly, quick-to-scan and interactive way, enabling users to efficiently identify patterns, edit data, and gather insights. Detailed documentation of the component properties is available in the reference section for [datagrid](/toolpad/reference/components/data-grid/#properties).
+Toolpad builds on top of the [MUI X Data Grid](https://mui.com/x/react-data-grid/) to add faster customisation and integration with your internal tools.
 
 {{"demo": "DataGrid.js", "hideToolbar": true, "bg": "inline"}}
 
 ## Appearance
 
-### Density
+### `density`
 
-Density prop supports three options: Compact, Standard and Comfortable. First two are shown below:
+Takes three options: `compact`, `standard` and `comfortable`. The first two are shown below:
 
 #### Compact
 
@@ -22,11 +22,11 @@ Density prop supports three options: Compact, Standard and Comfortable. First tw
 
 {{"demo": "DataGrid_standard.js", "hideToolbar": true, "bg": "inline"}}
 
-### HideToolbar
+### `hideToolbar`
 
-This prop is used to show/hide the header toolbar from the data grid.
+This prop is used to show – or hide – the toolbar from the data grid. The following Data Grid is rendered along with the toolbar, by setting `hideToolbar` to `true`:
 
-{{"demo": "DataGrid_hidetoolbar.js", "hideToolbar": true, "bg": "inline"}}
+{{"demo": "DataGrid_hidetoolbar.js", "bg": "inline"}}
 
 ## Usage
 

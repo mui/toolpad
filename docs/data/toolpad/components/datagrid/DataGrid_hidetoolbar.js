@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DataGrid } from '@mui/toolpad-components';
+import { DataGridPro } from '@mui/x-data-grid-pro';
 
 const TOOLPAD_PROPS1 = {
   rows: [
@@ -30,5 +30,5 @@ const TOOLPAD_PROPS1 = {
 };
 
 export default function BasicDataGrid() {
-  return <DataGrid {...TOOLPAD_PROPS1} />;
+  return <DataGridPro {...TOOLPAD_PROPS1} />;
 }

@@ -344,7 +344,7 @@ function ChartDataPropEditor({
                 onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'xKey')}
                 renderInput={(params) => {
                   const keyExists =
-                    !!editDataSeries?.xKey &&
+                    !editDataSeries?.xKey ||
                     dataSeriesKeySuggestions[dataSeriesEditIndex].includes(editDataSeries.xKey);
 
                   return (
@@ -364,7 +364,7 @@ function ChartDataPropEditor({
                 onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'yKey')}
                 renderInput={(params) => {
                   const keyExists =
-                    !!editDataSeries?.yKey &&
+                    !editDataSeries?.yKey ||
                     dataSeriesKeySuggestions[dataSeriesEditIndex].includes(editDataSeries.yKey);
 
                   return (

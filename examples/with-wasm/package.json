@@ -8,9 +8,9 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.32"
+    "@mui/toolpad": "0.1.34"
   },
   "devDependencies": {
-    "assemblyscript": "0.27.13"
+    "assemblyscript": "0.27.14"
   }
 }

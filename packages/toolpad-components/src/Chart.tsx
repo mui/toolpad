@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Container, ContainerProps, CircularProgress } from '@mui/material';
+import { CircularProgress, Box, BoxProps } from '@mui/material';
 
 import {
   BarPlot,
@@ -54,7 +54,7 @@ function getChartType(kind: ChartDataSeriesKind): 'line' | 'bar' | 'scatter' {
   }
 }
 
-interface ChartProps extends ContainerProps {
+interface ChartProps extends BoxProps {
   data?: ChartData;
   loading?: boolean;
   error?: Error | string;
@@ -167,11 +167,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const firstDataSeries = chartSeries[0];
 
   return (
-    <Container
-      disableGutters
-      sx={{ ...sx, minHeight: height, position: 'relative' }}
-      aria-busy={loading}
-    >
+    <Box sx={{ ...sx, position: 'relative', width: '100%' }} aria-busy={loading}>
       <ErrorOverlay error={displayError} />
       {loading && !error ? (
         <div
@@ -239,7 +235,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />
         </ResponsiveChartContainer>
       ) : null}
-    </Container>
+    </Box>
   );
 }
 

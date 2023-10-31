@@ -49,7 +49,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { useNonNullableContext } from '@mui/toolpad-utils/react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import invariant from 'invariant';
 import { NumberFormat, createFormat as createNumberFormat } from '@mui/toolpad-core/numberFormat';
 import { DateFormat, createFormat as createDateFormat } from '@mui/toolpad-core/dateFormat';
@@ -493,10 +493,10 @@ function useDataProviderDataGridProps(
 
   const mapPageToNextCursor = React.useRef(new Map<number, string>());
 
-  const { data, isFetching, isPreviousData, isLoading, error } = useQuery({
+  const { data, isFetching, isPlaceholderData, isLoading, error } = useQuery({
     enabled: !!dataProvider,
     queryKey: ['toolpadDataProvider', dataProviderId, page, pageSize],
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     queryFn: async () => {
       invariant(dataProvider, 'dataProvider must be defined');
       let dataProviderPaginationModel: IndexPaginationModel | CursorPaginationModel;
@@ -551,7 +551,7 @@ function useDataProviderDataGridProps(
   }
 
   return {
-    loading: isLoading || (isPreviousData && isFetching),
+    loading: isLoading || (isPlaceholderData && isFetching),
     paginationMode: 'server',
     pagination: true,
     paginationModel,

@@ -41,6 +41,7 @@ export default function PageOptionsPanel() {
     <Stack spacing={1} alignItems="start" data-testid="page-editor">
       <Typography variant="subtitle1">Page:</Typography>
       <NodeNameEditor node={page} />
+      <NodeNameEditor node={page} />
       <PageTitleEditor node={page} />
       <Typography variant="body2">Display mode:</Typography>
       <Tooltip

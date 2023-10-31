@@ -80,7 +80,7 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY } from './constants';
+import { HTML_ID_EDITOR_OVERLAY, IS_PREVIEW, PREVIEW_HEADER_HEIGHT } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { useDataQuery, UseFetch } from './useDataQuery';
 import { NavigateToPage } from './CanvasHooksContext';
@@ -91,12 +91,12 @@ import api, { queryClient } from './api';
 
 const browserJsRuntime = getBrowserRuntime();
 
-const isPreview = process.env.NODE_ENV !== 'production';
-const isCustomServer = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
-const isRenderedInCanvas =
+const IS_RENDERED_IN_CANVAS =
   typeof window === 'undefined'
     ? false
     : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
+
+const SHOW_PREVIEW_HEADER = IS_PREVIEW && !IS_RENDERED_IN_CANVAS;
 
 const Pre = styled('pre')(({ theme }) => ({
   margin: 0,
@@ -179,6 +179,7 @@ const AppRoot = styled('div')({
   minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
+  paddingTop: SHOW_PREVIEW_HEADER ? PREVIEW_HEADER_HEIGHT : 0,
 });
 
 const EditorOverlay = styled('div')({
@@ -1486,9 +1487,7 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
   const pageMatch = useMatch('/pages/:slug');
-  const pageId = pageMatch?.params.slug;
-
-  const showPreviewHeader = isPreview && !isRenderedInCanvas && !isCustomServer;
+  const activePage = pageMatch?.params.slug;
 
   const navEntries = React.useMemo(
     () =>
@@ -1501,17 +1500,14 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   );
 
   return (
-    <React.Fragment>
-      {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
-      <AppLayout
-        activePage={pageMatch?.params.slug}
-        pages={navEntries}
-        hasShell={!isRenderedInCanvas}
-        clipped={showPreviewHeader}
-      >
-        <RenderedPages pages={pages} />
-      </AppLayout>
-    </React.Fragment>
+    <AppLayout
+      activePage={activePage}
+      pages={navEntries}
+      hasShell={!IS_RENDERED_IN_CANVAS}
+      clipped={SHOW_PREVIEW_HEADER}
+    >
+      <RenderedPages pages={pages} />
+    </AppLayout>
   );
 }
 
@@ -1541,29 +1537,32 @@ export default function ToolpadApp({ rootRef, extraComponents, basename, state }
   }, [toggleDevtools]);
 
   return (
-    <UseDataProviderContext.Provider value={useDataProvider}>
-      <AppThemeProvider dom={dom}>
-        <CssBaseline enableColorScheme />
-        <AppRoot ref={rootRef}>
-          <ComponentsContextProvider value={components}>
-            <DomContextProvider value={dom}>
-              <ErrorBoundary FallbackComponent={AppError}>
-                <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                  <React.Suspense fallback={<AppLoading />}>
-                    <QueryClientProvider client={queryClient}>
-                      <BrowserRouter basename={basename}>
+    <BrowserRouter basename={basename}>
+      <UseDataProviderContext.Provider value={useDataProvider}>
+        <AppThemeProvider dom={dom}>
+          <CssBaseline enableColorScheme />
+          {SHOW_PREVIEW_HEADER ? <PreviewHeader /> : null}
+          <AppRoot ref={rootRef}>
+            <ComponentsContextProvider value={components}>
+              <DomContextProvider value={dom}>
+                <ErrorBoundary FallbackComponent={AppError}>
+                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                    <React.Suspense fallback={<AppLoading />}>
+                      <QueryClientProvider client={queryClient}>
                         <ToolpadAppLayout dom={dom} />
-                      </BrowserRouter>
-                      {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
-                    </QueryClientProvider>
-                  </React.Suspense>
-                </ResetNodeErrorsKeyProvider>
-              </ErrorBoundary>
-            </DomContextProvider>
-          </ComponentsContextProvider>
-          <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-        </AppRoot>
-      </AppThemeProvider>
-    </UseDataProviderContext.Provider>
+                        {showDevtools ? (
+                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
+                        ) : null}
+                      </QueryClientProvider>
+                    </React.Suspense>
+                  </ResetNodeErrorsKeyProvider>
+                </ErrorBoundary>
+              </DomContextProvider>
+            </ComponentsContextProvider>
+            <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+          </AppRoot>
+        </AppThemeProvider>
+      </UseDataProviderContext.Provider>
+    </BrowserRouter>
   );
 }

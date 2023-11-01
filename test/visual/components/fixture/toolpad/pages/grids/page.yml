@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: page
+spec:
+  id: Dh9u36B
+  title: grids
+  display: shell
+  content:
+    - component: PageRow
+      name: pageRow
+      props:
+        justifyContent: start
+      children:
+        - component: PageColumn
+          name: pageColumn
+          layout:
+            columnSize: 1
+          children:
+            - component: DataGrid
+              name: dataGrid
+              layout:
+                columnSize: 1
+              props:
+                rows:
+                  - id: one
+                columns:
+                  - field: id
+                    type: string
+            - component: DataGrid
+              name: dataGrid2
+              props:
+                rows:
+                  - id: two
+                columns:
+                  - field: id
+                    type: string
+        - component: DataGrid
+          name: dataGrid1
+          props:
+            rows:
+              - id: three
+            columns:
+              - field: id
+                type: string

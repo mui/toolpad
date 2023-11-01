@@ -1,6 +1,7 @@
 import { setTimeout } from 'timers/promises';
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
+import waitForBoundingBox from '../utils/waitForBoundingBox';
 
 class CreateComponentDialog {
   readonly page: Page;
@@ -137,11 +138,7 @@ export class ToolpadEditor {
 
     await this.componentCatalog.hover();
 
-    let pageRootBoundingBox;
-    await expect(async () => {
-      pageRootBoundingBox = await this.pageRoot.boundingBox();
-      expect(pageRootBoundingBox).toBeTruthy();
-    }).toPass();
+    const pageRootBoundingBox = await waitForBoundingBox(this.pageRoot);
 
     if (!moveTargetX) {
       moveTargetX = pageRootBoundingBox!.x + pageRootBoundingBox!.width / 2;

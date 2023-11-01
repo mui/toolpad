@@ -1,13 +1,8 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
+import waitForBoundingBox from './waitForBoundingBox';
 
 export default async function clickCenter(page: Page, targetLocator: Locator) {
-  let targetBoundingBox;
-  await expect(async () => {
-    targetBoundingBox = await targetLocator.boundingBox();
-    expect(targetBoundingBox).toBeTruthy();
-    expect(targetBoundingBox!.width).toBeGreaterThan(0);
-    expect(targetBoundingBox!.height).toBeGreaterThan(0);
-  }).toPass();
+  const targetBoundingBox = await waitForBoundingBox(targetLocator);
 
   await page.mouse.click(
     targetBoundingBox!.x + targetBoundingBox!.width / 2,

@@ -1200,8 +1200,7 @@
 
 "@mui/monorepo@https://github.com/mui/material-ui.git":
   version "5.14.16"
-  uid b0280bed5bd83cb7b7a6cbe994b0bb6893559998
-  resolved "https://github.com/mui/material-ui.git#b0280bed5bd83cb7b7a6cbe994b0bb6893559998"
+  resolved "https://github.com/mui/material-ui.git#e67ff65299e7d2ddf12cd0883c50d9ec2334c679"
 
 "@mui/private-theming@^5.14.16":
   version "5.14.16"

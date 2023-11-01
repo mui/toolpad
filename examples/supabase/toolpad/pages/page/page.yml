@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: page
+spec:
+  id: BKAYeeK
+  title: Default page
+  queries:
+    - name: query
+      query:
+        function: supabase.ts#default
+        kind: local
+  content:
+    - component: List
+      name: list
+      props:
+        renderItem:
+          $$template:
+            - component: PageRow
+              name: pageRow
+              props:
+                justifyContent: start
+              children:
+                - component: PageColumn
+                  name: pageColumn
+                  layout:
+                    columnSize: 1.2040938643407977
+                  children:
+                    - component: Text
+                      name: text
+                      props:
+                        mode: markdown
+                        value:
+                          $$jsExpression: |
+                            `### ${query.data[i].name}`
+                      layout:
+                        columnSize: 1.400990099009901
+                        verticalAlign: center
+                    - component: Text
+                      name: text2
+                      props:
+                        mode: markdown
+                        value:
+                          $$jsExpression: |
+                            query.data[i].description
+                      layout:
+                        verticalAlign: center
+                    - component: PageRow
+                      name: pageRow1
+                      props:
+                        justifyContent: start
+                      children:
+                        - component: PageColumn
+                          name: pageColumn1
+                          layout:
+                            columnSize: 1
+                          children:
+                            - component: Text
+                              name: text3
+                              layout:
+                                verticalAlign: center
+                              props:
+                                mode: markdown
+                                value:
+                                  $$jsExpression: |
+                                    `Price: $${query.data[i].price}`
+                            - component: Text
+                              name: text1
+                              layout:
+                                columnSize: 1
+                                verticalAlign: center
+                              props:
+                                mode: markdown
+                                value:
+                                  $$jsExpression: |
+                                    `Quantity left: ${query.data[i].quantity}`
+                            - component: Text
+                              name: text4
+                              layout:
+                                columnSize: 1
+                                verticalAlign: center
+                              props:
+                                mode: markdown
+                                value:
+                                  $$jsExpression: |
+                                    `Date added: ${query.data[i].date_added}`
+                            - component: Text
+                              name: text5
+                              layout:
+                                columnSize: 1
+                                verticalAlign: center
+                              props:
+                                mode: markdown
+                                value:
+                                  $$jsExpression: |
+                                    `Average rating: ${query.data[i].rating}`
+                - component: Image
+                  name: image
+                  layout:
+                    horizontalAlign: center
+                    columnSize: 0.7959061356592024
+                  props:
+                    src:
+                      $$jsExpression: |
+                        query.data[i].image
+                    width: 200
+                    height: 200
+        itemCount: 10
+  display: standalone

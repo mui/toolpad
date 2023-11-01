@@ -14,7 +14,7 @@ function PageColumn({ gap, children }: PageColumnProps) {
         gap,
         display: 'grid',
         gridAutoFlow: 'row',
-        gridAutoRows: 'fit-content',
+        gridAutoRows: 'min-content',
         gridAutoColumns: '100%',
       }}
     >

@@ -57,7 +57,6 @@ export function deleteOrphanedLayoutNodes(
       if (
         lastContainerChild.parentProp &&
         parentParent.parentIndex &&
-        moveTargetNodeId !== parentParent.id &&
         moveTargetNodeId !== lastContainerChild.id
       ) {
         if (

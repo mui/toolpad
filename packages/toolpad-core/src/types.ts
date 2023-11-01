@@ -426,10 +426,13 @@ export interface ComponentConfig<P extends object = Record<string, unknown>> {
    */
   layoutDirection?: 'vertical' | 'horizontal' | 'both';
   /**
-   * Designates a property as "the resizable height property". If Toolpad detects any
-   * vertical resizing of the component it will forward it to this property.
+   * Initial height of the component container box.
    */
-  resizableHeightProp?: keyof P & string;
+  defaultLayoutHeight?: number;
+  /**
+   * Minimum height that the component container box can be resized to.
+   */
+  minimumLayoutHeight?: number;
   /**
    * Describes the individual properties for this component.
    */

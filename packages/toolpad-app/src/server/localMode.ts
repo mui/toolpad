@@ -541,6 +541,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       name: node.name,
       layout: undefinedWhenEmpty({
         columnSize: node.layout?.columnSize,
+        height: node.layout?.height,
         horizontalAlign: stringOnly(node.layout?.horizontalAlign),
         verticalAlign: stringOnly(node.layout?.verticalAlign),
       }),

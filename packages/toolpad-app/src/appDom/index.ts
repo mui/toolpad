@@ -102,6 +102,7 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
     readonly horizontalAlign?: BoxProps['justifyContent'];
     readonly verticalAlign?: BoxProps['alignItems'];
     readonly columnSize?: number;
+    readonly height?: number;
   };
 }
 
@@ -823,8 +824,7 @@ export function spreadNode<Child extends AppDomNode>(dom: AppDom, node: Child) {
   let draft = dom;
   if (parent && parentProp && isElement(node)) {
     for (const child of getDescendants(draft, node)) {
-      const parentIndex = getNewParentIndexBeforeNode(draft, node, parentProp);
-      draft = setNodeParent(draft, child, parent.id, parentProp, parentIndex);
+      draft = setNodeParent(draft, child, parent.id, parentProp);
     }
     draft = removeNode(draft, node.id);
   }

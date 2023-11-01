@@ -41,10 +41,9 @@ interface ChartProps extends BoxProps {
   data?: ChartData;
   loading?: boolean;
   error?: Error | string;
-  height?: number;
 }
 
-function Chart({ data = [], loading, error, height, sx }: ChartProps) {
+function Chart({ data = [], loading, error, sx }: ChartProps) {
   const xValues = React.useMemo(
     () =>
       data
@@ -94,8 +93,8 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const isDataVisible = !loading && !displayError;
 
   return (
-    <Box sx={{ ...sx, position: 'relative', width: '100%' }} aria-busy={loading}>
-      <ResponsiveContainer width="100%" height={height}>
+    <Box sx={{ ...sx, position: 'relative', height: '100%', width: '100%' }} aria-busy={loading}>
+      <ResponsiveContainer width="100%" height="100%">
         <ComposedChart data={barChartData} margin={{ top: 20, right: 80 }}>
           {isDataVisible ? (
             <React.Fragment>
@@ -193,7 +192,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
           sx={{ position: 'absolute', inset: '0 0 0 0' }}
           variant="rectangular"
           width="100%"
-          height={height}
+          height="100%"
         />
       ) : null}
     </Box>
@@ -205,7 +204,8 @@ export default createBuiltin(Chart, {
   loadingProp: 'loading',
   loadingPropSource: ['data'],
   errorProp: 'error',
-  resizableHeightProp: 'height',
+  defaultLayoutHeight: 360,
+  minimumLayoutHeight: 100,
   argTypes: {
     data: {
       helperText: 'The data to be displayed.',
@@ -240,12 +240,6 @@ export default createBuiltin(Chart, {
         },
       },
       control: { type: 'ChartData', bindable: false },
-    },
-    height: {
-      helperText: 'The height of the chart.',
-      type: 'number',
-      default: 300,
-      minimum: 100,
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

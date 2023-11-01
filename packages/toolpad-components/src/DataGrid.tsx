@@ -464,7 +464,6 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   dataProviderId?: string;
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
-  height?: number;
   rowIdField?: string;
   error?: Error | string;
   selection?: Selection | null;
@@ -577,7 +576,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
     columns: columnsProp,
     rows: rowsProp,
-    height: heightProp,
     rowIdField: rowIdFieldProp,
     error: errorProp,
     selection,
@@ -726,7 +724,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
-      <Box ref={ref} sx={{ ...sx, width: '100%', minHeight: heightProp, position: 'relative' }}>
+      <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
         <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
           <DataGridPro
             apiRef={apiRef}
@@ -745,8 +743,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
             {...props}
             {...dataProviderProps}
             sx={{
-              height: heightProp,
-              minHeight: '100%',
+              height: '100%',
               visibility: error ? 'hidden' : 'visible',
             }}
           />
@@ -762,7 +759,8 @@ export default createBuiltin(DataGridComponent, {
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
-  resizableHeightProp: 'height',
+  defaultLayoutHeight: 360,
+  minimumLayoutHeight: 100,
   argTypes: {
     rowsSource: {
       helperText: 'Defines how rows are provided to the grid.',
@@ -842,12 +840,6 @@ export default createBuiltin(DataGridComponent, {
       type: 'string',
       enum: ['compact', 'standard', 'comfortable'],
       default: 'compact',
-    },
-    height: {
-      helperText: 'The height of the data grid.',
-      type: 'number',
-      default: 350,
-      minimum: 100,
     },
     loading: {
       helperText:

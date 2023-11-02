@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Fade, styled } from '@mui/material';
-import { NodeId } from '@mui/toolpad-core';
+import { NodeHashes, NodeId } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
@@ -8,12 +8,12 @@ import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
-import { NodeHashes, RuntimeState } from '../../../types';
 import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 import { useProject } from '../../../project';
+import { RuntimeState } from '../../../runtime';
 
 interface OverlayProps {
   children?: React.ReactNode;

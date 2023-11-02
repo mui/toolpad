@@ -1,5 +1,49 @@
 # Changelog
 
+## 0.1.34
+
+<!-- generated comparing v0.1.33..master -->
+
+_Oct 25, 2023_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Improvements to the Support page, some fixes to the tests.
+
+- &#8203;<!-- 4 -->Update Support URL in Help menu (#2832) @bharatkashyap
+- &#8203;<!-- 3 -->Fix flaky tests (#2812) @apedroferreira
+- &#8203;<!-- 2 -->[core] Monorepo upgrade (#2825) @bharatkashyap
+- &#8203;<!-- 1 -->[docs] A few Support page improvements (#2824) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap
+
+## 0.1.33
+
+<!-- generated comparing v0.1.32..master -->
+
+_Oct 19, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+Add a new password option to the TextField component, improvements to the docs and examples, and some core infrastructure updates!
+
+- &#8203;<!-- 14 -->Add support page (#2807) @prakhargupta1
+- &#8203;<!-- 13 -->Link WASM example to overview page and improve crud app (#2726) @prakhargupta1
+- &#8203;<!-- 12 -->Run prettier on project (#2811) @apedroferreira
+- &#8203;<!-- 11 -->Changed MenuItem to ToggleButton (#2776) (#2796) @biplobsd
+- &#8203;<!-- 10 -->Add password option to TextField Component (#2797) @Kirera-Wainaina
+- &#8203;<!-- 09 -->Add tests for custom server (#2798) @Janpot
+- &#8203;<!-- 08 -->Improve release docs wording (#2794) @Janpot
+- &#8203;<!-- 07 -->Isolate project runtime from editor (#2788) @Janpot
+- &#8203;<!-- 06 -->Remove babel-plugin-transform-rename-import (#2786) @Janpot
+- &#8203;<!-- 05 -->Update release process (#2793) @Janpot
+- &#8203;<!-- 04 -->Fix creating new page with blur and default name + scroll only below explorer headers (#2790) @apedroferreira
+- &#8203;<!-- 03 -->Turn integration tests into a yarn workspace (#2783) @Janpot
+- &#8203;<!-- 02 -->[docs] Update Data Providers (#2813) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Add 'Why Toolpad?' (#2632) @prakhargupta1
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @biplobsd, @Janpot, @Kirera-Wainaina, @prakhargupta1
+
 ## 0.1.32
 
 <!-- generated comparing v0.1.31..master -->

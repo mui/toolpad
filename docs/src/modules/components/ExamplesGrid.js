@@ -55,15 +55,9 @@ function layouts() {
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/dog-app',
     },
     {
-      title: 'Data grid columns',
-      description: 'A basic Toolpad app that shows how to add a code component inside a data grid.',
-      src: '/static/toolpad/marketing/datagrid-columns.png',
-      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/datagrid-columns',
-      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/datagrid-columns',
-    },
-    {
-      title: 'Custom data grid',
-      description: 'A basic Toolpad app that shows how to add a code component inside a data grid.',
+      title: 'Customized data grid',
+      description:
+        'A basic Toolpad app that shows how to customize a data grid column using a custom code component.',
       src: '/static/toolpad/marketing/custom-datagrid-column.png',
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/custom-datagrid-column',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/custom-datagrid-column',
@@ -75,6 +69,29 @@ function layouts() {
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/graphql',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/graphql',
     },
+    {
+      title: 'With WASM',
+      description: 'A basic Toolpad application that demonstrates integrating with WASM modules.',
+      src: '/static/toolpad/marketing/with-wasm.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-wasm',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-wasm',
+    },
+    {
+      title: 'Data provider with prisma',
+      description:
+        'A basic Toolpad application that demonstrates how to use data providers with Prisma.',
+      src: '/static/toolpad/marketing/with-prisma-data-provider.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma-data-provider',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma-data-provider',
+    },
+    /* To be added later when this app is ready.  
+      title: 'Stripe invoice downloader',
+      description: 'A Stripe app to fetch and download invoices.',
+      // src: '/static/toolpad/marketing/with-wasm.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/stripe-script',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/stripe-script',
+    }, 
+    */
   ];
 }
 

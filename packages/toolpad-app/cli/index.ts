@@ -100,6 +100,7 @@ export default async function cli(argv: string[]) {
       type: 'number',
       describe: 'Port to run the Toolpad application on',
       demandOption: false,
+      alias: 'p',
     },
     dev: {
       type: 'boolean',

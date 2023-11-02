@@ -9,7 +9,7 @@ import {
   EnvAttrValue,
 } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
-import { getBindingType } from '../../../bindings';
+import { getBindingType } from '../../../runtime/bindings';
 import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
 
 // eslint-disable-next-line import/no-cycle

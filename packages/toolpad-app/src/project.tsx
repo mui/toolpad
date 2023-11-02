@@ -1,5 +1,5 @@
 import { Emitter } from '@mui/toolpad-utils/events';
-import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import * as React from 'react';
 import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
@@ -75,8 +75,9 @@ export interface ProjectProps {
 }
 
 export function ProjectProvider({ url, children }: ProjectProps) {
-  const { data: manifest } = useQuery(['app-dev-manifest', url], () => fetchAppDevManifest(url), {
-    suspense: true,
+  const { data: manifest } = useSuspenseQuery({
+    queryKey: ['app-dev-manifest', url],
+    queryFn: () => fetchAppDevManifest(url),
   });
 
   invariant(manifest, "manifest should be defined, we're using suspense");

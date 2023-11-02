@@ -45,6 +45,11 @@ function* getPreferredPorts(port: number = DEFAULT_PORT): Iterable<number> {
 async function createDevHandler(project: ToolpadProject) {
   const handler = express.Router();
 
+  handler.use((req, res, next) => {
+    res.setHeader('X-Toolpad-Base', project.options.base);
+    next();
+  });
+
   handler.use(cors());
 
   const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.js');
@@ -350,7 +355,20 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
   };
 }
 
+async function fetchAppUrl(appUrl: string): Promise<string> {
+  const res = await fetch(appUrl);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch "${appUrl}": ${res.statusText}`);
+  }
+  const appBase = res.headers.get('X-Toolpad-Base');
+  if (!appBase) {
+    throw new Error(`No Toolpad app running in dev mode found on "${appUrl}"`);
+  }
+  return new URL(appBase, appUrl).toString();
+}
+
 export interface RunEditorOptions {
+  port?: number;
   toolpadDevMode?: boolean;
 }
 
@@ -358,10 +376,12 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
 
+  const appRootUrl = await fetchAppUrl(appUrl);
+
   const app = express();
 
   const editorBasename = '/_toolpad';
-  const { pathname, origin } = new URL(appUrl);
+  const { pathname, origin } = new URL(appRootUrl);
 
   const editorHandler = await createEditorHandler(pathname, options);
 
@@ -376,7 +396,8 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
 
   app.use(editorBasename, editorHandler);
 
-  const server = await listen(app);
+  const port = options.port || (await getPort({ port: getPreferredPorts(DEFAULT_PORT) }));
+  const server = await listen(app, port);
 
   // eslint-disable-next-line no-console
   console.log(

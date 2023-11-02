@@ -53,7 +53,7 @@ import TabPanel from '../../components/TabPanel';
 
 import { useAppState } from '../AppState';
 import * as appDom from '../../appDom';
-import { getBindingType, getBindingValue } from '../../bindings';
+import { getBindingType, getBindingValue } from '../../runtime/bindings';
 
 import { useProjectApi } from '../../projectApi';
 

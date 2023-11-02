@@ -184,7 +184,6 @@ function Chart({ data = [], loading, error, sx }: ChartProps) {
       {isDataVisible ? (
         <ResponsiveChartContainer
           series={chartSeries}
-          height="100%"
           xAxis={[
             {
               id: 'x',

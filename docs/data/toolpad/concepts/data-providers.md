@@ -1,4 +1,4 @@
-# Data Providers
+# Data providers
 
 <p class="description">Bring tabular data to the frontend with server-side pagination and filtering.</p>
 

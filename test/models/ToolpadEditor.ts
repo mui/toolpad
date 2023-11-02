@@ -137,11 +137,9 @@ export class ToolpadEditor {
 
     await this.componentCatalog.hover();
 
-    let pageRootBoundingBox;
-    await expect(async () => {
-      pageRootBoundingBox = await this.pageRoot.boundingBox();
-      expect(pageRootBoundingBox).toBeTruthy();
-    }).toPass();
+    await expect.poll(() => this.pageRoot.boundingBox()).toBeTruthy();
+
+    const pageRootBoundingBox = await this.pageRoot.boundingBox();
 
     if (!moveTargetX) {
       moveTargetX = pageRootBoundingBox!.x + pageRootBoundingBox!.width / 2;

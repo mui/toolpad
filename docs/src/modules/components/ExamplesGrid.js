@@ -86,7 +86,8 @@ function layouts() {
     },
     {
       title: 'With Supabase',
-      description: 'A Toolpad app that fetches data from Supabase and shows in a list component.',
+      description:
+        'A Toolpad app that fetches data from Supabase and shows it in a list component.',
       src: '/static/toolpad/marketing/supabase.png',
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/supabase',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/supabase',

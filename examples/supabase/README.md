@@ -1,6 +1,6 @@
 # Supabase
 
-<p class="description">A Toolpad app that fetches data from Supabase and shows in a list component.</p>
+<p class="description">A Toolpad app that fetches data from Supabase and shows it in a list component.</p>
 
 <a target="_blank">
   <img src="https://mui.com//static/toolpad/marketing/supabase.png" alt="Supabase integration" style="aspect-ratio: 1.8" width="100%">

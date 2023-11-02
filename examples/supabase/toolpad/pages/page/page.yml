@@ -33,16 +33,16 @@ spec:
                             `### ${query.data[i].name}`
                       layout:
                         columnSize: 1.400990099009901
-                        verticalAlign: center
+                        verticalAlign: end
                     - component: Text
                       name: text2
                       props:
                         mode: markdown
                         value:
                           $$jsExpression: |
-                            query.data[i].description
+                            `** ${query.data[i].description} **`
                       layout:
-                        verticalAlign: center
+                        verticalAlign: start
                     - component: Text
                       name: text4
                       props:
@@ -87,7 +87,7 @@ spec:
                                     value:
                                       $$jsExpression: |
                                         `Price: $${query.data[i].price}`
-                                    mode: markdown
+                                    mode: text
                             - component: PageRow
                               name: pageRow2
                               props:

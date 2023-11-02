@@ -7,7 +7,7 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';
 import RuntimeToolpadApp, { ToolpadAppProps } from './ToolpadApp';
-import { RuntimeState } from '../types';
+import { RuntimeState } from './types';
 
 let componentsStore: ToolpadComponents = {};
 const events = new Emitter<{ update: {} }>();
@@ -70,3 +70,5 @@ export function init({ ToolpadApp = RuntimeToolpadApp, initialState, base }: Ini
 export { AppLayout } from './AppLayout';
 
 export { DomContextProvider, ComponentsContextProvider, RenderedPage } from './ToolpadApp';
+
+export type { RuntimeState };

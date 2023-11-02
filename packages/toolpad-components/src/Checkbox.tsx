@@ -63,8 +63,8 @@ function Checkbox({ ...rest }: Props) {
     [onFormInputChange],
   );
 
-  const props = React.useMemo(
-    () => ({
+  const renderedOptions = React.useMemo(() => {
+    const props = {
       onChange: handleChange,
       required: rest.isRequired,
       size: rest.size,
@@ -72,12 +72,8 @@ function Checkbox({ ...rest }: Props) {
       disabled: rest.disabled,
       color: rest.color,
       sx: rest.sx,
-    }),
-    [rest, handleChange],
-  );
-
-  const renderedOptions = React.useMemo(
-    () => (
+    };
+    return (
       <FormControl error={Boolean(formInputError)} fullWidth={rest.fullWidth}>
         <FormGroup>
           <FormControlLabel
@@ -92,9 +88,8 @@ function Checkbox({ ...rest }: Props) {
         </FormGroup>
         <FormHelperText>{formInputError?.message || ''}</FormHelperText>
       </FormControl>
-    ),
-    [rest, formInputError, props],
-  );
+    );
+  }, [rest, formInputError, handleChange]);
 
   return renderFormInput(renderedOptions);
 }

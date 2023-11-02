@@ -109,3 +109,7 @@ spec:
       props:
         mode: markdown
         value: end-markdown-text
+    - component: Checkbox
+      name: switch
+      props:
+        mode: switch

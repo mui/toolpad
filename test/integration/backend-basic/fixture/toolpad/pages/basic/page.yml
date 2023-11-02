@@ -151,10 +151,6 @@ spec:
           $$jsExpressionAction: |-
             await setCustomCookie.call()
             context.refetch()
-    - component: Checkbox
-      name: switch
-      props:
-        mode: switch
   queries:
     - name: hello
       query:

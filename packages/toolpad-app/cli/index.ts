@@ -45,7 +45,6 @@ interface EditorOptions {
 }
 
 async function editorCommand({ dev: toolpadDevMode, ...args }: EditorOptions) {
-  // eslint-disable-next-line no-console
   await runEditor(args.url, { toolpadDevMode, ...args });
 }
 

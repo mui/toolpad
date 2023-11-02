@@ -1,20 +1,9 @@
 import type * as React from 'react';
 import * as express from 'express';
-import {
-  SlotType,
-  RuntimeError,
-  ComponentConfig,
-  NodeId,
-  PropValueType,
-  ExecFetchResult,
-  ScopeMeta,
-  NodeHashes,
-} from '@mui/toolpad-core';
+import { NodeId, PropValueType, ExecFetchResult, ScopeMeta } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
 import type * as appDom from './appDom';
 import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
-import type { Rectangle } from './utils/geometry';
-import type { RuntimeState } from './runtime';
 
 // These are set at runtime and passed to the browser.
 // Do not add secrets
@@ -41,42 +30,7 @@ export interface EditorProps<T> {
   onChange: (newValue: T | undefined) => void;
 }
 
-export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
-
 export type Updates<O extends { id: string }> = Partial<O> & Pick<O, 'id'>;
-
-export interface SlotLocation {
-  parentId: NodeId;
-  parentProp: string;
-  parentIndex?: string;
-}
-
-export interface SlotState {
-  type: SlotType;
-  rect: Rectangle;
-  flowDirection: FlowDirection;
-}
-
-export interface SlotsState {
-  [prop: string]: SlotState | undefined;
-}
-
-export interface NodeInfo {
-  nodeId: NodeId;
-  error?: RuntimeError | null;
-  rect?: Rectangle;
-  slots?: SlotsState;
-  componentConfig?: ComponentConfig;
-  props: { [key: string]: unknown };
-}
-
-export interface NodesInfo {
-  [nodeId: NodeId]: NodeInfo | undefined;
-}
-
-export interface PageViewState {
-  nodes: NodesInfo;
-}
 
 export interface CreateHandlerApi<P = unknown> {
   setConnectionParams: (connectionId: string, props: P) => Promise<void>;
@@ -106,11 +60,6 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}>
 }
 
 export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;
-
-export interface ConnectionStatus {
-  timestamp: number;
-  error?: string;
-}
 
 export interface ExecFetchFn<Q, R extends ExecFetchResult> {
   (fetchQuery: Q, params: Record<string, string>): Promise<R>;
@@ -181,10 +130,6 @@ export interface AppTheme {
   'palette.secondary.main'?: string;
 }
 
-export interface AppCanvasState extends RuntimeState {
-  savedNodes: NodeHashes;
-}
-
 export type ProjectEvents = {
   // a change in the DOM
   change: {};
@@ -208,3 +153,12 @@ export interface ToolpadProjectOptions {
 }
 
 export type CodeEditorFileType = 'resource' | 'component';
+
+// TODO: Replace call sites import and remove this export
+export type {
+  AppCanvasState,
+  PageViewState,
+  NodesInfo,
+  NodeInfo,
+  FlowDirection,
+} from '@mui/toolpad-core';

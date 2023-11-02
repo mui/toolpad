@@ -2,7 +2,9 @@ import type * as React from 'react';
 import type { Branded } from '@mui/toolpad-utils/types';
 import type { SerializedError } from '@mui/toolpad-utils/errors';
 import type { JSONSchema7 } from 'json-schema';
+import type { Rectangle } from '@mui/toolpad-utils/geometry';
 import type { TOOLPAD_COMPONENT } from './constants';
+import type * as appDom from './appDom';
 
 export type NodeId = Branded<string, 'NodeId'>;
 
@@ -391,6 +393,65 @@ export type RuntimeEvents = {
   ready: {};
   pageNavigationRequest: { pageNodeId: NodeId };
   vmUpdated: { vm: ApplicationVm };
+};
+
+/**
+ * Defines all the data needed to render the runtime.
+ * While the dom is optimized for storage and editing. It isn't the ideal format used to render the application
+ * `RuntimeData` will hold all data to render a toolpad app and will contain things like:
+ * - precompile assets, like code component modules
+ * - precompiled expressions
+ * - datastructures optimized for rendering with less processing required
+ * - ...
+ */
+export interface RuntimeState {
+  // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
+  dom: appDom.RenderTree;
+}
+
+export interface AppCanvasState extends RuntimeState {
+  savedNodes: NodeHashes;
+}
+
+export interface SlotLocation {
+  parentId: NodeId;
+  parentProp: string;
+  parentIndex?: string;
+}
+
+export interface SlotState {
+  type: SlotType;
+  rect: Rectangle;
+  flowDirection: FlowDirection;
+}
+
+export interface SlotsState {
+  [prop: string]: SlotState | undefined;
+}
+
+export interface NodeInfo {
+  nodeId: NodeId;
+  error?: RuntimeError | null;
+  rect?: Rectangle;
+  slots?: SlotsState;
+  componentConfig?: ComponentConfig;
+  props: { [key: string]: unknown };
+}
+
+export interface NodesInfo {
+  [nodeId: NodeId]: NodeInfo | undefined;
+}
+
+export interface PageViewState {
+  nodes: NodesInfo;
+}
+
+export type RuntimeCommands = {
+  update(updates: AppCanvasState): void;
+  getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
+  getPageViewState(): PageViewState;
+  isReady(): boolean;
+  invalidateQueries(): void;
 };
 
 export type RuntimeEvent = {

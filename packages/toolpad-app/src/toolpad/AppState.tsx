@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NodeId } from '@mui/toolpad-core';
+import { NodeHashes, NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
@@ -12,7 +12,6 @@ import { omit, update } from '../utils/immutability';
 import { useProjectApi } from '../projectApi';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
-import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 
@@ -445,7 +444,7 @@ export interface DomContextProps {
 
 export default function AppProvider({ appUrl, children }: DomContextProps) {
   const projectApi = useProjectApi();
-  const { data: dom } = projectApi.useQuery('loadDom', [], { suspense: true });
+  const { data: dom } = projectApi.useSuspenseQuery('loadDom', []);
 
   invariant(dom, 'Suspense should load the dom');
 

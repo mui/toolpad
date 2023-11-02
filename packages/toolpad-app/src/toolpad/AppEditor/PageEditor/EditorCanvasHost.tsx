@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Fade, styled } from '@mui/material';
-import { NodeId } from '@mui/toolpad-core';
+import { NodeHashes, NodeId } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
@@ -8,12 +8,12 @@ import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
-import { NodeHashes, RuntimeState } from '../../../types';
 import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
-import { useOnProjectEvent } from '../../../projectEvents';
+import { useProject } from '../../../project';
+import { RuntimeState } from '../../../runtime';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -87,6 +87,7 @@ export default function EditorCanvasHost({
   onConsoleEntry,
   onInit,
 }: EditorCanvasHostProps) {
+  const project = useProject();
   const appStateApi = useAppStateApi();
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
@@ -190,7 +191,9 @@ export default function EditorCanvasHost({
     bridge?.canvasCommands.invalidateQueries();
   });
 
-  useOnProjectEvent('queriesInvalidated', invalidateCanvasQueries);
+  React.useEffect(() => {
+    return project.events.subscribe('queriesInvalidated', invalidateCanvasQueries);
+  }, [project.events, invalidateCanvasQueries]);
 
   return (
     <CanvasRoot className={className}>

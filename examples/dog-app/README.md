@@ -2,6 +2,10 @@
 
 <p class="description">An app that shows dog images based on selected breeds or sub-breeds.</p>
 
+<a target="_blank">
+  <img src="https://mui.com/static/toolpad/docs/getting-started/first-app/step-13.png" alt="An app that shows dog images based on selected breeds or sub-breeds." style="aspect-ratio: 1.8" width="100%">
+</a>
+
 A basic Toolpad app that shows how to call an API and work with data grid and image component.
 
 To build this app step-by-step, visit the [docs](https://mui.com/toolpad/getting-started/first-app/#building-your-first-application).

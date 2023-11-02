@@ -1,11 +1,16 @@
 import * as path from 'path';
+import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect, Locator } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
 
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture-basic'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture-basic'),
     cmd: 'dev',
   },
 });
@@ -21,6 +26,9 @@ test('Column prop updates are not lost on drag interactions', async ({ page }) =
   // Change the "Avatar" column type from "link" to "boolean"
 
   const firstGridLocator = canvasGridLocator.first();
+
+  // Wait for data to load so that datagrid bounding box is stable
+  await expect(editorModel.pageRoot.getByText('Todd Breitenberg')).toBeVisible();
 
   await clickCenter(page, firstGridLocator);
 

@@ -1,4 +1,6 @@
 import * as path from 'path';
+import * as url from 'url';
+import invariant from 'invariant';
 import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
@@ -8,6 +10,8 @@ import { expectBasicPageContent } from './shared';
 import { setPageHidden } from '../../utils/page';
 import { withTemporaryEdits } from '../../utils/fs';
 import clickCenter from '../../utils/clickCenter';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const BASIC_TESTS_PAGE_ID = '5q1xd0t';
 const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
@@ -25,8 +29,10 @@ test.use({
 });
 
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
     env: {
       SECRET_BAZ: 'Some baz secret',
@@ -46,6 +52,11 @@ test('functions basics', async ({ page, context }) => {
 });
 
 test('function editor reload', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
@@ -65,6 +76,11 @@ test('function editor reload', async ({ page, localApp }) => {
 });
 
 test('function editor parameters update', async ({ page, localApp, argosScreenshot }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
 
@@ -140,6 +156,11 @@ test('Extracted types', async ({ page }) => {
 });
 
 test('function editor extracted parameters', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPageById(EXTRACTED_TYPES_PAGE_ID);
 

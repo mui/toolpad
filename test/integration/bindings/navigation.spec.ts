@@ -1,10 +1,15 @@
 import * as path from 'path';
+import * as url from 'url';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expect, test } from '../../playwright/localTest';
 
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture-navigation'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture-navigation'),
     cmd: 'dev',
   },
 });

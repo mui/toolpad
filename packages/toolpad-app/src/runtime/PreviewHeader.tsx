@@ -30,17 +30,17 @@ export default function PreviewHeader() {
             <Button
               color="inherit"
               size="small"
-              endIcon={<EditIcon />}
+              startIcon={<EditIcon />}
               component="a"
               href={activePage ? `/_toolpad/app/pages/${activePage}` : '/_toolpad/app'}
             >
-              Edit
+              Open in editor
             </Button>
           )
         }
       >
         <Typography variant="body2">
-          This is a preview version of the application. It&apos;s not suitable for production.
+          This is a preview version of the application, not suitable for production.
         </Typography>
       </Alert>
     </Box>

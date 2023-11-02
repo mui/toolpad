@@ -1458,6 +1458,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isHovered = hoveredNodeId === node.id;
 
         const isHorizontallyResizable = isPageRowChild || isPageColumnChild;
+        const isVerticallyResizable =
+          appDom.isElement(node) && !isPageRow(node) && !isPageColumn(node);
 
         const isResizing = Boolean(draggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;
@@ -1483,8 +1485,12 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   ...(isHorizontallyResizable
                     ? getNodeDraggableHorizontalEdges(parent && isPageColumnChild ? parent : node)
                     : []),
-                  RECTANGLE_EDGE_BOTTOM as RectangleEdge,
-                  ...(!isFirstChild ? [RECTANGLE_EDGE_TOP as RectangleEdge] : []),
+                  ...(isVerticallyResizable
+                    ? [
+                        RECTANGLE_EDGE_BOTTOM as RectangleEdge,
+                        ...(!isFirstChild ? [RECTANGLE_EDGE_TOP as RectangleEdge] : []),
+                      ]
+                    : []),
                 ]}
                 onEdgeDragStart={isSelected ? handleEdgeDragStart(node) : undefined}
                 onDelete={handleNodeDelete(node.id)}

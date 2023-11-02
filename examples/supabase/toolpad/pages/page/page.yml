@@ -43,6 +43,16 @@ spec:
                             query.data[i].description
                       layout:
                         verticalAlign: center
+                    - component: Text
+                      name: text4
+                      props:
+                        mode: markdown
+                        value:
+                          $$jsExpression: |
+                            `Date added: ${query.data[i].date_added}`
+                      layout:
+                        columnSize: 1
+                        verticalAlign: center
                     - component: PageRow
                       name: pageRow1
                       props:
@@ -53,55 +63,60 @@ spec:
                           layout:
                             columnSize: 1
                           children:
-                            - component: Text
-                              name: text3
-                              layout:
-                                verticalAlign: center
+                            - component: PageRow
+                              name: pageRow3
                               props:
-                                mode: markdown
-                                value:
-                                  $$jsExpression: |
-                                    `Price: $${query.data[i].price}`
-                            - component: Text
-                              name: text1
-                              layout:
-                                columnSize: 1
-                                verticalAlign: center
+                                justifyContent: start
+                              children:
+                                - component: Text
+                                  name: text1
+                                  layout:
+                                    columnSize: 1
+                                    verticalAlign: center
+                                  props:
+                                    mode: markdown
+                                    value:
+                                      $$jsExpression: >
+                                        `Quantity left:
+                                        ${query.data[i].quantity}`
+                                - component: Text
+                                  name: text3
+                                  layout:
+                                    verticalAlign: center
+                                  props:
+                                    value:
+                                      $$jsExpression: |
+                                        `Price: $${query.data[i].price}`
+                                    mode: markdown
+                            - component: PageRow
+                              name: pageRow2
                               props:
-                                mode: markdown
-                                value:
-                                  $$jsExpression: |
-                                    `Quantity left: ${query.data[i].quantity}`
-                            - component: Text
-                              name: text4
-                              layout:
-                                columnSize: 1
-                                verticalAlign: center
-                              props:
-                                mode: markdown
-                                value:
-                                  $$jsExpression: |
-                                    `Date added: ${query.data[i].date_added}`
-                            - component: Text
-                              name: text5
-                              layout:
-                                columnSize: 1
-                                verticalAlign: center
-                              props:
-                                mode: markdown
-                                value:
-                                  $$jsExpression: |
-                                    `Average rating: ${query.data[i].rating}`
+                                justifyContent: start
+                              children:
+                                - component: Text
+                                  name: text5
+                                  layout:
+                                    columnSize: 1
+                                    verticalAlign: center
+                                  props:
+                                    mode: markdown
+                                    value:
+                                      $$jsExpression: >
+                                        `Average rating: ${query.data[i].rating}`
+                                - component: Checkbox
+                                  name: checkbox
+                                  props:
+                                    label: Offer discount?
                 - component: Image
                   name: image
-                  layout:
-                    horizontalAlign: center
-                    columnSize: 0.7959061356592024
                   props:
                     src:
                       $$jsExpression: |
                         query.data[i].image
                     width: 200
                     height: 200
+                  layout:
+                    columnSize: 0.7959061356592024
+                    horizontalAlign: center
         itemCount: 10
   display: standalone

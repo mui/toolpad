@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { Box, BoxProps, Stack } from '@mui/material';
+import { Box, BoxProps, Stack, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNode } from '@mui/toolpad-core';
 import { equalProperties } from '@mui/toolpad-utils/collections';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
+import { ajvResolver } from '@hookform/resolvers/ajv';
+import { JSONSchemaType } from 'ajv';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin, { BuiltinArgTypeDefinitions } from './createBuiltin';
 
@@ -16,6 +18,8 @@ export const FormContext = React.createContext<{
 });
 
 interface FormProps extends BoxProps {
+  definitionSource: 'dragAndDrop' | 'jsonSchema';
+  schema?: JSONSchemaType<FieldValues>;
   value: FieldValues;
   onChange: (newValue: FieldValues) => void;
   onSubmit?: (data?: FieldValues) => unknown | Promise<unknown>;
@@ -28,7 +32,9 @@ interface FormProps extends BoxProps {
 }
 
 function Form({
+  definitionSource,
   children,
+  schema,
   value,
   onChange,
   onSubmit = () => {},
@@ -40,7 +46,7 @@ function Form({
   hasChrome = true,
   sx,
 }: FormProps) {
-  const form = useForm({ mode });
+  const form = useForm({ mode, ...(schema ? { resolver: ajvResolver(schema) } : {}) });
   const { isSubmitSuccessful } = form.formState;
 
   const handleSubmit = React.useCallback(async () => {
@@ -80,8 +86,26 @@ function Form({
       {hasChrome ? (
         <Box sx={{ ...sx, width: '100%' }}>
           <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
-            {children}
+            {definitionSource === 'dragAndDrop' ? (
+              children
+            ) : (
+              <Stack gap={1}>
+                {Object.entries(schema?.properties ?? {}).map(([fieldName, fieldDefinition]) => {
+                  const FieldComponent = TextField;
 
+                  return (
+                    <Controller
+                      key={fieldName}
+                      name={fieldName}
+                      control={form.control}
+                      render={({ field }) => (
+                        <FieldComponent {...field} label={fieldName} size="small" />
+                      )}
+                    />
+                  );
+                })}
+              </Stack>
+            )}
             <Box
               sx={{
                 display: 'flex',
@@ -128,10 +152,28 @@ function Form({
 export default createBuiltin(Form, {
   helperText: 'A form component.',
   argTypes: {
+    definitionSource: {
+      helperText: 'Defines how the form should be built.',
+      type: 'string',
+      enum: ['dragAndDrop', 'jsonSchema'],
+      enumLabels: {
+        prop: 'Direct',
+        dataProvider: 'JSON Schema',
+      },
+      default: 'dragAndDrop',
+      label: 'Definition source',
+      control: { type: 'ToggleButtons', bindable: false },
+    },
     children: {
       helperText: 'The form content.',
       type: 'element',
       control: { type: 'layoutSlot' },
+    },
+    schema: {
+      helperText: 'JSON Schema to be used as form definition.',
+      type: 'object',
+      control: { type: 'object', bindable: false },
+      visible: ({ definitionSource }: FormProps) => definitionSource === 'jsonSchema',
     },
     value: {
       helperText: 'The value that is controlled by this form.',
@@ -333,6 +375,7 @@ export function withComponentForm<P extends Record<string, any>>(
       inputElement
     ) : (
       <Form
+        definitionSource="dragAndDrop"
         value={componentFormValue}
         onChange={setComponentFormValue}
         mode="onBlur"

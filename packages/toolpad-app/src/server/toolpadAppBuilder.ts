@@ -175,6 +175,8 @@ export interface CreateViteConfigResult {
   viteConfig: InlineConfig;
 }
 
+console.log('temp');
+
 export function createViteConfig({
   outDir,
   root,

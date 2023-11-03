@@ -119,10 +119,8 @@ jobs:
       - checkout
       - install_js
       - run:
-          name: '`yarn prettier:all` changes committed?'
-          command: |
-            yarn prettier:all
-            yarn check-changes
+          name: '`yarn prettier` changes committed?'
+          command: yarn prettier --ci --mode=check-changed
       - run:
           name: '`yarn jsonSchemas` changes committed?'
           command: |

@@ -61,7 +61,7 @@ interface LocalServerConfig {
   base?: string;
 }
 
-export async function getTestProjectDir({ template, setup }: ProjectConfig = {}) {
+export async function getTemporaryDir({ template, setup }: ProjectConfig = {}) {
   const tmpTestDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
@@ -307,7 +307,7 @@ const test = baseTest.extend<
   projectConfig: [undefined, { option: true, scope: 'worker' }],
   projectDir: [
     async ({ projectConfig }, use) => {
-      await using(await getTestProjectDir(projectConfig), async (projectDir) => {
+      await using(await getTemporaryDir(projectConfig), async (projectDir) => {
         await use(projectDir);
       });
     },

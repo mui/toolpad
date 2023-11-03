@@ -3,7 +3,7 @@ import * as url from 'url';
 import invariant from 'invariant';
 import { expect, test } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { expectBasicPageContent } from './shared';
+import { expectBasicRuntimeTests } from './shared';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -46,5 +46,5 @@ test('base path basics', async ({ page, context, localApp }) => {
   });
   await runtimeModel.gotoPage('basic');
 
-  await expectBasicPageContent(page);
+  await expectBasicRuntimeTests(page);
 });

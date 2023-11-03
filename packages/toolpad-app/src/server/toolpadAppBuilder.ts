@@ -175,8 +175,6 @@ export interface CreateViteConfigResult {
   viteConfig: InlineConfig;
 }
 
-console.log('temp');
-
 export function createViteConfig({
   outDir,
   root,
@@ -257,6 +255,7 @@ export function createViteConfig({
           'lodash-es',
           'markdown-to-jsx',
           'nanoid/non-secure',
+          'prop-types',
           'react',
           'react-dom/client',
           'react-error-boundary',

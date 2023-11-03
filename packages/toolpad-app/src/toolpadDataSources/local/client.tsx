@@ -574,7 +574,6 @@ function QueryEditor({
               display="flex"
               flexDirection={'row'}
               sx={{
-                borderRight: (theme) => `1px solid ${theme.palette.divider}`,
                 alignItems: 'flex-start',
                 mt: 2,
                 mx: 2,
@@ -587,6 +586,17 @@ function QueryEditor({
                 )}
                 onCreateNew={handleCreateNewCommit}
                 onSelect={handleSelectFunction}
+              />
+              <OpenCodeEditorButton
+                filePath={selectedFile ?? ''}
+                fileType="resource"
+                disableRipple
+                sx={(theme) => ({
+                  marginTop: theme.spacing(1),
+                  marginLeft: theme.spacing(1),
+                  border: '1px solid',
+                  borderColor: theme.palette.divider,
+                })}
               />
               {introspection.error ? (
                 <Box

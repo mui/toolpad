@@ -150,40 +150,41 @@ function QuerySettingsTab({
           <MenuItem value="query">Fetch at any time to always be available on the page</MenuItem>
           <MenuItem value="mutation">Only fetch on manual action</MenuItem>
         </TextField>
-
-        <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
-          Set refetch interval:
-        </Typography>
-        <TextField
-          InputProps={{
-            startAdornment: <InputAdornment position="start">s</InputAdornment>,
-          }}
-          sx={{
-            '& .MuiInputLabel-root': { fontSize: 12 },
-            '& .MuiInputBase-root': { fontSize: 12 },
-            maxWidth: 200,
-          }}
-          type="number"
-          label="Refetch interval"
-          value={refetchIntervalInSeconds(draft?.attributes?.refetchInterval) ?? ''}
-          onChange={handleRefetchIntervalChange}
-          disabled={draft?.attributes?.mode !== 'query'}
-        />
-        <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
-          Set query enabled/disabled:
-        </Typography>
-        <BindableEditor<boolean>
-          liveBinding={liveEnabled}
-          globalScope={pageState}
-          globalScopeMeta={globalScopeMeta}
-          jsRuntime={jsBrowserRuntime}
-          label="Enabled"
-          propType={{ type: 'boolean' }}
-          value={draft?.attributes?.enabled ?? true}
-          onChange={handleEnabledChange}
-          disabled={draft?.attributes?.mode !== 'query'}
-          sx={{ maxWidth: 100 }}
-        />
+        {draft?.attributes?.mode === 'query' ? (
+          <React.Fragment>
+            <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
+              Set refetch interval:
+            </Typography>
+            <TextField
+              InputProps={{
+                startAdornment: <InputAdornment position="start">s</InputAdornment>,
+              }}
+              sx={{
+                '& .MuiInputLabel-root': { fontSize: 12 },
+                '& .MuiInputBase-root': { fontSize: 12 },
+                maxWidth: 200,
+              }}
+              type="number"
+              label="Refetch interval"
+              value={refetchIntervalInSeconds(draft?.attributes?.refetchInterval) ?? ''}
+              onChange={handleRefetchIntervalChange}
+            />
+            <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
+              Set query enabled/disabled:
+            </Typography>
+            <BindableEditor<boolean>
+              liveBinding={liveEnabled}
+              globalScope={pageState}
+              globalScopeMeta={globalScopeMeta}
+              jsRuntime={jsBrowserRuntime}
+              label="Enabled"
+              propType={{ type: 'boolean' }}
+              value={draft?.attributes?.enabled ?? true}
+              onChange={handleEnabledChange}
+              sx={{ maxWidth: 100 }}
+            />
+          </React.Fragment>
+        ) : null}
       </Stack>
     </Box>
   );

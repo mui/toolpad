@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.1.35",
+  "version": "0.1.36",
   "license": "MIT",
   "bin": {
     "toolpad": "./cli.js"
@@ -56,9 +56,9 @@
     "@mui/lab": "5.0.0-alpha.151",
     "@mui/material": "5.14.16",
     "@mui/system": "5.14.16",
-    "@mui/toolpad-components": "0.1.35",
-    "@mui/toolpad-core": "0.1.35",
-    "@mui/toolpad-utils": "0.1.35",
+    "@mui/toolpad-components": "0.1.36",
+    "@mui/toolpad-core": "0.1.36",
+    "@mui/toolpad-utils": "0.1.36",
     "@mui/types": "7.2.8",
     "@mui/utils": "5.14.16",
     "@mui/x-charts": "6.18.0",

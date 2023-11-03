@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.36
+
+<!-- generated comparing v0.1.35..master -->
+
+_Nov 3, 2023_
+
+A big thanks to the 1 contributor who made this release possible. Here are some highlights ✨:
+
+Fix app not loading due to ESM issues in charts.
+
+- &#8203;<!-- 1 -->Fix ESM charts issues in production (#2861) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira
+
 ## 0.1.35
 
 <!-- generated comparing v0.1.34..master -->

@@ -211,11 +211,18 @@ function ResolvedPreview({
 }: ResolvedPreviewProps): React.ReactElement | null {
   if (!preview) {
     return (
-      <Alert severity="info" sx={{ mx: 1, p: 1, fontSize: 11, width: 'fit-content' }}>
-        <Box sx={{ mb: 1 }}>
-          No request has been sent yet. <br />
-          Click <span style={{ fontWeight: 'bold' }}>Preview</span> to preview the response here.
-        </Box>
+      <Alert
+        severity="info"
+        sx={(theme) => ({
+          my: theme.spacing(2),
+          mx: 'auto',
+          p: theme.spacing(1),
+          fontSize: theme.typography.pxToRem(11),
+          width: 'fit-content',
+        })}
+      >
+        No request has been sent yet. <br />
+        Click <span style={{ fontWeight: 'bold' }}>Preview</span> to preview the response here.
       </Alert>
     );
   }

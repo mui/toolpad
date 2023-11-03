@@ -258,6 +258,7 @@ export function createViteConfig({
           'prop-types',
           'react',
           'react-dom',
+          'react-dom/client',
           'react-error-boundary',
           'react-hook-form',
           'react-is',

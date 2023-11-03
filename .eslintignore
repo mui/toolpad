@@ -6,7 +6,7 @@
 /packages/toolpad-app/.next
 /packages/toolpad-app/public
 
-/examples/*/toolpad.yml
+/examples/**/.generated
 
 /test/integration/*/fixture*/
 /test/visual/*/fixture*/

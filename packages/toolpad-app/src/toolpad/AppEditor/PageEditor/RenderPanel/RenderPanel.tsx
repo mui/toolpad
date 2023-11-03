@@ -1,16 +1,16 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { NodeId } from '@mui/toolpad-core';
+import { NodeHashes, NodeId } from '@mui/toolpad-core';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../../../../appDom';
 import EditorCanvasHost from '../EditorCanvasHost';
 import { getNodeHashes, useAppState, useAppStateApi, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
-import { NodeHashes, RuntimeState } from '../../../../types';
 import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
-import { getBindingType } from '../../../../bindings';
+import { getBindingType } from '../../../../runtime/bindings';
 import createRuntimeState from '../../../../runtime/createRuntimeState';
+import { RuntimeState } from '../../../../runtime';
 
 const classes = {
   view: 'Toolpad_View',

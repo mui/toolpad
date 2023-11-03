@@ -6,8 +6,10 @@ import { test, expect } from '../../playwright/localTest';
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture-multiple-pages'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });

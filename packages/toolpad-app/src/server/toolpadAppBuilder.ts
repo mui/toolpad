@@ -257,7 +257,7 @@ export function createViteConfig({
           'nanoid/non-secure',
           'prop-types',
           'react',
-          'react-dom/client',
+          'react-dom',
           'react-error-boundary',
           'react-hook-form',
           'react-is',

@@ -1,7 +1,15 @@
 import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-core';
-import { set as setObjectPath } from 'lodash-es';
 import { mapValues } from '@mui/toolpad-utils/collections';
-import { updatePath } from '../utils/immutability';
+// TODO: remove these lodash-es imports
+// eslint-disable-next-line no-restricted-imports
+import { setWith, clone, set as setObjectPath } from 'lodash-es';
+
+/**
+ * Updates an object's property value for a given path in an immutable way.
+ */
+function updatePath<P extends object, V>(obj: P, path: string, value: V): P {
+  return setWith(clone(obj), path, value, clone);
+}
 
 /**
  * Represents the state of a binding. It both describes which place it takes in the gobal scope

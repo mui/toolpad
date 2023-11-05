@@ -48,7 +48,7 @@
     "@next/eslint-plugin-next": "14.0.0",
     "@playwright/test": "1.39.0",
     "@testing-library/react": "14.0.0",
-    "@types/archiver": "5.3.4",
+    "@types/archiver": "6.0.0",
     "@types/gtag.js": "0.0.17",
     "@types/node": "20.8.9",
     "@types/rimraf": "3.0.2",

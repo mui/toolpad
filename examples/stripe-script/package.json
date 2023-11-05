@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@mui/toolpad": "^0.1.36",
-    "stripe": "^14.1.0"
+    "stripe": "^14.3.0"
   }
 }

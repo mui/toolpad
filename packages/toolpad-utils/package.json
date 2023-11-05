@@ -61,7 +61,7 @@
   "devDependencies": {
     "@types/invariant": "2.2.36",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.33",
+    "@types/react": "18.2.34",
     "@types/react-is": "18.2.3"
   }
 }

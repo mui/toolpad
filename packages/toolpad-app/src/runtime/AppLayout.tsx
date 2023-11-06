@@ -7,9 +7,9 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  Toolbar,
 } from '@mui/material';
 import { Link, useSearchParams } from 'react-router-dom';
+import { PREVIEW_HEADER_HEIGHT } from './constants';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -50,7 +50,7 @@ function AppPagesNavigation({
         [`& .MuiDrawer-paper`]: { width: DRAWER_WIDTH, boxSizing: 'border-box' },
       }}
     >
-      {clipped ? <Toolbar variant="dense" /> : null}
+      {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
       <List
         component="nav"
         subheader={

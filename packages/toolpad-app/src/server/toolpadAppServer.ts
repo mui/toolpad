@@ -10,7 +10,8 @@ import { createRpcServer } from './runtimeRpcServer';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import createRuntimeState from '../runtime/createRuntimeState';
-import type { RuntimeConfig, RuntimeState } from '../types';
+import type { RuntimeConfig } from '../types';
+import type { RuntimeState } from '../runtime';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;

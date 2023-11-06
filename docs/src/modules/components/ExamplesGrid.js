@@ -84,6 +84,14 @@ function layouts() {
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma-data-provider',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma-data-provider',
     },
+    {
+      title: 'With Supabase',
+      description:
+        'A Toolpad app that fetches data from Supabase and shows it in a list component.',
+      src: '/static/toolpad/marketing/supabase.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/supabase',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/supabase',
+    },
     /* To be added later when this app is ready.  
       title: 'Stripe invoice downloader',
       description: 'A Stripe app to fetch and download invoices.',

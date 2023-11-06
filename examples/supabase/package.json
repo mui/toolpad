@@ -1,13 +1,14 @@
 {
-  "name": "npm-stats",
+  "name": "supabase",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "toolpad dev",
     "build": "toolpad build",
-    "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad start"
+    "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.36"
+    "@mui/toolpad": "0.1.36",
+    "@supabase/supabase-js": "2.38.4"
   }
 }

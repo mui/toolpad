@@ -1,5 +1,9 @@
 import { QueryClient } from '@tanstack/react-query';
+// TODO: move this rpc logic to @mui/utils
+// eslint-disable-next-line import/no-restricted-paths
 import { createRpcApi } from '../rpcClient';
+
+// eslint-disable-next-line import/no-restricted-paths
 import type { ServerDefinition } from '../server/runtimeRpcServer';
 
 export const queryClient = new QueryClient({

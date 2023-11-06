@@ -8,11 +8,13 @@ import {
   PropValueType,
   ExecFetchResult,
   ScopeMeta,
+  NodeHashes,
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
 import type * as appDom from './appDom';
 import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
+import type { RuntimeState } from './runtime';
 
 // These are set at runtime and passed to the browser.
 // Do not add secrets
@@ -177,22 +179,6 @@ export interface AppTheme {
   'palette.mode'?: PaletteMode;
   'palette.primary.main'?: string;
   'palette.secondary.main'?: string;
-}
-
-export type NodeHashes = Record<NodeId, number | undefined>;
-
-/**
- * Defines all the data needed to render the runtime.
- * While the dom is optimized for storage and editing. It isn't the ideal format used to render the application
- * `RuntimeData` will hold all data to render a toolpad app and will contain things like:
- * - precompile assets, like code component modules
- * - precompiled expressions
- * - datastructures optimized for rendering with less processing required
- * - ...
- */
-export interface RuntimeState {
-  // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
-  dom: appDom.RenderTree;
 }
 
 export interface AppCanvasState extends RuntimeState {

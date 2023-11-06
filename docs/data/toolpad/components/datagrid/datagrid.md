@@ -8,26 +8,6 @@ Toolpad builds on top of the [MUI X Data Grid](https://mui.com/x/react-data-grid
 
 {{"demo": "DataGrid.js", "hideToolbar": true, "bg": "inline"}}
 
-## Appearance
-
-### `density`
-
-Takes three options: `compact`, `standard` and `comfortable`. The first two are shown below:
-
-#### Compact
-
-{{"demo": "DataGrid.js", "hideToolbar": true, "bg": "inline"}}
-
-#### Standard
-
-{{"demo": "DataGrid_standard.js", "hideToolbar": true, "bg": "inline"}}
-
-### `hideToolbar`
-
-This prop is used to show – or hide – the toolbar from the data grid. The following Data Grid is rendered along with the toolbar, by setting `hideToolbar` to `true`:
-
-{{"demo": "DataGrid_hidetoolbar.js", "bg": "inline"}}
-
 ## Usage
 
 A Data Grid is an essential component in an internal application. Following properties make it usable to work alongside other Toolpad components, queries, data providers.
@@ -72,3 +52,29 @@ Loading property is used to to inform the user when the data is being prepared. 
   <source src="/static/toolpad/docs/components/datagrid/datagrid_loading.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
+
+## Appearance
+
+### `density`
+
+Takes three options: `compact`, `standard` and `comfortable`. The first two are shown below:
+
+#### Compact
+
+{{"demo": "DataGrid.js", "hideToolbar": true, "bg": "inline"}}
+
+#### Standard
+
+{{"demo": "DataGrid_standard.js", "hideToolbar": true, "bg": "inline"}}
+
+### `hideToolbar`
+
+This prop is used to show – or hide – the toolbar from the data grid. The following Data Grid is rendered along with the toolbar, by setting `hideToolbar` to `true`:
+
+{{"demo": "DataGrid_hidetoolbar.js", "bg": "inline"}}
+
+## API
+
+See the documentation below for a complete reference to all props available to the datagrid component in Toolpad.
+
+- [`<datagrid />`](/toolpad/reference/components/datagrid/#properties)

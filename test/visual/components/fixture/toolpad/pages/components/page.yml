@@ -71,6 +71,8 @@ spec:
                         `List Button ${i + 1}`
     - component: Checkbox
       name: checkbox
+      props:
+        label: Checkbox
     - component: Text
       name: text
       layout:

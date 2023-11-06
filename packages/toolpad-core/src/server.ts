@@ -128,7 +128,7 @@ export interface ToolpadDataProvider<R, P extends PaginationMode = 'index'>
  *
  * Demos:
  *
- * - [Data Providers](https://mui.com/toolpad/concepts/data-providers/)
+ * - [Data providers](https://mui.com/toolpad/concepts/data-providers/)
  *
  * API:
  *

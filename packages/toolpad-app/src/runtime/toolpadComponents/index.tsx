@@ -89,7 +89,28 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['Tabs', { displayName: 'Tabs', builtIn: 'Tabs', synonyms: [] }],
   ['Container', { displayName: 'Container', builtIn: 'Container', synonyms: [] }],
   ['Metric', { displayName: 'Metric', builtIn: 'Metric', synonyms: ['value', 'number', 'output'] }],
-  ['Checkbox', { displayName: 'Checkbox', builtIn: 'Checkbox', synonyms: ['switch'] }],
+  [
+    'Checkbox',
+    {
+      displayName: 'Checkbox',
+      initialProps: {
+        mode: 'checkbox',
+      },
+      builtIn: 'Checkbox',
+      synonyms: ['switch'],
+    },
+  ],
+  [
+    'Switch',
+    {
+      displayName: 'Switch',
+      initialProps: {
+        mode: 'switch',
+      },
+      builtIn: 'Checkbox',
+      synonyms: ['switch'],
+    },
+  ],
   [FORM_COMPONENT_ID, { displayName: 'Form', builtIn: 'Form', synonyms: [] }],
   [
     'Password',

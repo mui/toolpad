@@ -1,35 +1,48 @@
 import * as React from 'react';
-import { Stack, Button, Typography } from '@mui/material';
+import { Button, Typography, Box, useTheme, Alert } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import Header from '../toolpad/ToolpadShell/Header';
-import { ThemeProvider } from '../ThemeContext';
+import { useMatch } from 'react-router-dom';
+import { IS_CUSTOM_SERVER, PREVIEW_HEADER_HEIGHT } from './constants';
 
-export interface PreviewHeaderProps {
-  pageId?: string;
-}
+export default function PreviewHeader() {
+  const pageMatch = useMatch('/pages/:slug');
+  const activePage = pageMatch?.params.slug;
 
-export default function PreviewHeader({ pageId }: PreviewHeaderProps) {
+  const theme = useTheme();
+
   return (
-    <ThemeProvider>
-      <Header
-        enableUserFeedback={false}
-        actions={
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography variant="body2" sx={{ color: 'primary.main' }}>
-              This is a preview version of the application.
-            </Typography>
+    <Box
+      sx={{
+        position: 'fixed',
+        width: '100%',
+        height: PREVIEW_HEADER_HEIGHT,
+        zIndex: theme.zIndex.drawer + 1,
+      }}
+    >
+      <Alert
+        severity="warning"
+        // variant="filled"
+        sx={{
+          borderRadius: 0,
+        }}
+        action={
+          IS_CUSTOM_SERVER ? null : (
             <Button
-              variant="outlined"
-              endIcon={<EditIcon />}
-              color="primary"
+              color="inherit"
+              size="small"
+              startIcon={<EditIcon />}
               component="a"
-              href={pageId ? `/_toolpad/app/pages/${pageId}` : '/_toolpad/app'}
+              href={activePage ? `/_toolpad/app/pages/${activePage}` : '/_toolpad/app'}
             >
-              Edit
+              Open in editor
             </Button>
-          </Stack>
+          )
         }
-      />
-    </ThemeProvider>
+      >
+        <Typography variant="body2">
+          This is a preview version of the application, not suitable for production.
+        </Typography>
+      </Alert>
+    </Box>
   );
 }

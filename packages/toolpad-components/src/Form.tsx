@@ -172,7 +172,6 @@ export default createBuiltin(Form, {
     schema: {
       helperText: 'JSON Schema to be used as form definition.',
       type: 'object',
-      control: { type: 'object', bindable: false },
       visible: ({ definitionSource }: FormProps) => definitionSource === 'jsonSchema',
     },
     value: {

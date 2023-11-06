@@ -56,12 +56,9 @@ function groupScopeMeta(value: Record<string, unknown>, meta: ScopeMeta): Explor
       key,
       value: Object.fromEntries(
         Object.entries(value?.[key] ?? {}).map(([keyname, o]) => {
-          if (Object.keys(o ?? {}).length > 0) {
+          if (Object.prototype.toString.call(value) === '[object Object]') {
             const filteredObj = Object.fromEntries(
-              Object.entries(o).map(([k, v]) => [
-                k,
-                (v as Record<string, unknown>)?.$$env ? undefined : v,
-              ]),
+              Object.entries(o).filter(([k, v]) => !(v as Record<string, unknown>)?.$$env),
             );
             return [keyname, filteredObj];
           }

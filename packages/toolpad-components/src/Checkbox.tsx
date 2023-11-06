@@ -72,6 +72,7 @@ function Checkbox({ ...rest }: Props) {
       disabled: rest.disabled,
       color: rest.color,
       sx: rest.sx,
+      checked: rest.checked,
     };
     return (
       <FormControl error={Boolean(formInputError)} fullWidth={rest.fullWidth}>

@@ -122,7 +122,7 @@ export default createComponent(FormWrappedCheckbox, {
     label: {
       helperText: 'A text or an element to be used in an enclosing label element.',
       type: 'string',
-      default: 'Checkbox',
+      default: 'Label',
     },
     checked: {
       helperText: 'If true, the component is checked.',

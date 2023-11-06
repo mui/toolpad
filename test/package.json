@@ -11,6 +11,6 @@
   "type": "module",
   "dependencies": {
     "@mui/toolpad": "0.1.36",
-    "@mui/material": "5.14.16"
+    "@mui/material": "5.14.17"
   }
 }

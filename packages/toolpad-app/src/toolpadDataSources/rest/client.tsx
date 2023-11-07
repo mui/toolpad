@@ -509,7 +509,7 @@ function QueryEditor({
               >
                 <TextField
                   select
-                  inputProps={{ sx: { fontSize: 10 } }}
+                  inputProps={{ sx: { fontSize: 12 } }}
                   value={input.attributes.query.method || 'GET'}
                   size="small"
                   sx={{

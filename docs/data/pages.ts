@@ -75,6 +75,9 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/concepts/display-mode',
       },
+      {
+        pathname: '/toolpad/concepts/custom-server',
+      },
     ],
   },
   {

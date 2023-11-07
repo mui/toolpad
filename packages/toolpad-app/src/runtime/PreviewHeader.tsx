@@ -149,11 +149,14 @@ function CustomServerInstructions({ basename }: CustomServerInstructionsProps) {
           vertical: 'top',
           horizontal: 'right',
         }}
+        sx={{
+          maxWidth: 1000,
+        }}
       >
         <Box sx={{ p: 2 }}>
           <Typography>
             This application is running under a custom server. Run the standalone Toolpad editor to
-            edit this application.
+            make changes to this application.
           </Typography>
           <CodeView>{`npx @mui/toolpad editor ${appUrl}`}</CodeView>
         </Box>

@@ -12,6 +12,7 @@ import {
   Tooltip,
   Snackbar,
   IconButtonProps,
+  popoverClasses,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { useMatch } from 'react-router-dom';
@@ -150,7 +151,9 @@ function CustomServerInstructions({ basename }: CustomServerInstructionsProps) {
           horizontal: 'right',
         }}
         sx={{
-          maxWidth: 1000,
+          [`& .${popoverClasses.paper}`]: {
+            maxWidth: 700,
+          },
         }}
       >
         <Box sx={{ p: 2 }}>

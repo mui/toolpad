@@ -7,7 +7,7 @@ import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
-import { createServer as createViteServer } from 'vite';
+import { ViteDevServer, createServer as createViteServer } from 'vite';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
 // eslint-disable-next-line import/extensions
@@ -212,7 +212,7 @@ interface EditorHandlerParams {
 async function createEditorHandler(
   appUrl: string,
   { toolpadDevMode = false }: EditorHandlerParams,
-) {
+): Promise<AppHandler> {
   const router = express.Router();
 
   const transformIndexHtml = (html: string) => {
@@ -226,11 +226,13 @@ async function createEditorHandler(
     );
   };
 
+  let viteApp: ViteDevServer | undefined;
+
   if (toolpadDevMode) {
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
 
-    const viteApp = await createViteServer({
+    viteApp = await createViteServer({
       configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.ts'),
       root: path.resolve(currentDirectory, '../../src/toolpad'),
       server: { middlewareMode: true },
@@ -256,7 +258,12 @@ async function createEditorHandler(
     );
   }
 
-  return router;
+  return {
+    handler: router,
+    async dispose() {
+      await viteApp?.close();
+    },
+  };
 }
 
 async function createToolpadHandler({
@@ -294,15 +301,20 @@ async function createToolpadHandler({
   const appHandler = await createToolpadAppHandler(project);
   router.use(project.options.base, appHandler.handler);
 
+  let editorHandler: AppHandler | undefined;
   if (dev) {
-    const editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
-    router.use(editorBasename, editorHandler);
+    editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
+    router.use(editorBasename, editorHandler.handler);
   }
 
   return {
     handler: router,
     dispose: async () => {
-      await Promise.allSettled([project.dispose(), appHandler?.dispose?.()]);
+      await Promise.allSettled([
+        project.dispose(),
+        appHandler?.dispose(),
+        editorHandler?.dispose(),
+      ]);
     },
   };
 }

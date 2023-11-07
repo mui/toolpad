@@ -188,6 +188,10 @@ const pages: MuiPage[] = [
                 pathname: '/toolpad/reference/api/create-function',
               },
               {
+                title: 'createHandler',
+                pathname: '/toolpad/reference/api/create-handler',
+              },
+              {
                 title: 'getContext',
                 pathname: '/toolpad/reference/api/get-context',
               },

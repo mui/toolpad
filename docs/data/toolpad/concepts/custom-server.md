@@ -46,3 +46,7 @@ Now you can use the corresponding commands to interact with Toolpad in the custo
 | `yarn start` | Running the Toolpad application in production mode. The application must have been built with `toolpad build`                                           |
 | `yarn build` | Builds the application for production purposes. Note that you must supply the correct base path                                                         |
 | `yarn edit`  | This runs the Toolpad standalone editor and connects it to your custom server. You can now edit the application and the custom server will be modified. |
+
+:::info
+Detailed documentation on the API is available in the reference section for [`createHandler`](/toolpad/reference/api/create-handler/).
+:::

@@ -1,0 +1,54 @@
+# createHandler API
+
+<p class="description">Run Toolpad applications programmatically in a custom server.</p>
+
+## Import
+
+```jsx
+import { createHandler } from '@mui/toolpad';
+```
+
+## Description
+
+```jsx
+const toolpad = createHandler(config);
+```
+
+## Parameters
+
+- `config` the parameters, describing how this handler should behave. See [HandlerConfig](#handlerconfig)
+
+## Returns
+
+A custom handler that can be attached to a node.js server. See [Handler](#handler)
+
+## Types
+
+### HandlerConfig
+
+This describes the behavior of the custom handler.
+
+**Properties**
+
+| Name   | Type      | Description                                                                                                                                                       |
+| :----- | :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base` | `string`  | Base path under which the handler will be hosted.                                                                                                                 |
+| `dev`  | `boolean` | Run the handler in dev mode. Only in this mode can the standalone editor be attached.                                                                             |
+| `dir`  | `string`  | The directory under which the Toolpad application definition will be stored. By default will be the `./toolpad` folder relative to the current working directory. |
+
+### HandlerConfig
+
+This is the return value from the `createHandler` function.
+
+**Properties**
+
+| Name      | Type                                                  | Description                                                                              |
+| :-------- | :---------------------------------------------------- | :--------------------------------------------------------------------------------------- |
+| `handler` | `(req: IncomingMessage, res: ServerResponse) => void` | node.js request handler.                                                                 |
+| `dispose` | `() => Promise<void>`                                 | Call this method to dispose of the custom handler and release all of its used resources. |
+
+## Usage
+
+:::info
+See [custom functions](/toolpad/concepts/custom-server/)
+:::

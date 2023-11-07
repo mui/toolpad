@@ -24,8 +24,6 @@ spec:
         msg: '1'
     - component: DataGrid
       name: dataGrid
-      layout:
-        columnSize: 1
       props:
         rows:
           - id: 1
@@ -35,12 +33,14 @@ spec:
             field: id
           - type: string
             field: foo datagrid column
-    - component: TextField
-      name: textField
       layout:
         columnSize: 1
+    - component: TextField
+      name: textField
       props:
         label: foo textfield
+      layout:
+        columnSize: 1
     - component: Text
       name: typography1
       layout:
@@ -71,12 +71,14 @@ spec:
                         `List Button ${i + 1}`
     - component: Checkbox
       name: checkbox
+      props:
+        label: Checkbox
     - component: Text
       name: text
-      props:
-        value: start-text
       layout:
         horizontalAlign: start
+      props:
+        value: start-text
     - component: Text
       name: text1
       layout:
@@ -92,16 +94,16 @@ spec:
     - component: Text
       name: text3
       props:
+        value: start-markdown-text
         mode: markdown
         loading: false
-        value: start-markdown-text
     - component: Text
       name: text4
-      layout:
-        horizontalAlign: center
       props:
         value: center-markdown-text
         mode: markdown
+      layout:
+        horizontalAlign: center
     - component: Text
       name: text5
       layout:
@@ -109,3 +111,8 @@ spec:
       props:
         mode: markdown
         value: end-markdown-text
+    - component: Checkbox
+      name: switch
+      props:
+        mode: switch
+        label: Switch

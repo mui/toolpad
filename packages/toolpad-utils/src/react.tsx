@@ -110,3 +110,12 @@ export function useTraceUpdates<P extends object>(prefix: string, props: P) {
     prev.current = props;
   });
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function getComponentDisplayName(Component: React.ComponentType<any> | string) {
+  if (typeof Component === 'string') {
+    return Component || 'Unknown';
+  }
+
+  return Component.displayName || Component.name;
+}

@@ -3,7 +3,7 @@ import { mapValues } from '@mui/toolpad-utils/collections';
 // TODO: remove these lodash-es imports
 // eslint-disable-next-line no-restricted-imports
 import { setWith, clone, set as setObjectPath } from 'lodash-es';
-
+import { getBindingType } from './bindings';
 /**
  * Updates an object's property value for a given path in an immutable way.
  */
@@ -116,8 +116,8 @@ export function buildGlobalScope(
 ): Record<string, unknown> {
   const globalScope = { ...base };
   for (const binding of Object.values(bindings)) {
-    if (binding.scopePath) {
-      const value = binding.result?.value;
+    const value = binding.result?.value;
+    if (binding.scopePath && getBindingType(value) === 'const') {
       setObjectPath(globalScope, binding.scopePath, value);
     }
   }

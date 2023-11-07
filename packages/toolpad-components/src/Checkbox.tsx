@@ -6,7 +6,12 @@ import {
   Checkbox as MuiCheckbox,
   FormHelperText,
   FormControl,
+  Typography as MuiTypography,
+  Switch as MuiSwitch,
+  SwitchProps,
 } from '@mui/material';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import ErrorIcon from '@mui/icons-material/Error';
 import type { CheckboxProps as MuiCheckBoxProps } from '@mui/material/Checkbox';
 import type { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import { SX_PROP_HELPER_TEXT } from './constants';
@@ -17,15 +22,31 @@ import {
   FORM_INPUT_ARG_TYPES,
 } from './Form';
 
-export type CheckboxProps = Omit<FormControlLabelProps, 'control' | 'onChange'> &
+interface ErrorDisplayProps {
+  error: unknown;
+}
+
+function ErrorDisplay({ error }: ErrorDisplayProps) {
+  const errMessage = errorFrom(error).message;
+  return (
+    <MuiTypography sx={{ display: 'flex', flexDirection: 'row', gap: 1, alignItems: 'center' }}>
+      <ErrorIcon fontSize="small" color="error" />
+      <span>{errMessage}</span>
+    </MuiTypography>
+  );
+}
+export type Props = Omit<FormControlLabelProps, 'control' | 'onChange'> &
   Omit<MuiCheckBoxProps, 'onChange'> & {
     onChange: (newValue: boolean) => void;
     label?: string;
     defaultValue: string;
+    error?: unknown;
     fullWidth: boolean;
-  } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
+    mode: 'checkBox' | 'switch';
+  } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'> &
+  SwitchProps;
 
-function Checkbox({ ...rest }: CheckboxProps) {
+function Checkbox({ ...rest }: Props) {
   rest.checked = rest.checked ?? false;
   const { onFormInputChange, renderFormInput, formInputError } = useFormInput<boolean>({
     name: rest.name,
@@ -42,8 +63,18 @@ function Checkbox({ ...rest }: CheckboxProps) {
     [onFormInputChange],
   );
 
-  const renderedOptions = React.useMemo(
-    () => (
+  const renderedOptions = React.useMemo(() => {
+    const props = {
+      onChange: handleChange,
+      required: rest.isRequired,
+      size: rest.size,
+      defaultChecked: rest.defaultChecked,
+      disabled: rest.disabled,
+      color: rest.color,
+      sx: rest.sx,
+      checked: rest.checked,
+    };
+    return (
       <FormControl error={Boolean(formInputError)} fullWidth={rest.fullWidth}>
         <FormGroup>
           <FormControlLabel
@@ -52,42 +83,52 @@ function Checkbox({ ...rest }: CheckboxProps) {
             labelPlacement={rest.labelPlacement}
             componentsProps={rest.componentsProps}
             control={
-              <MuiCheckbox
-                required={rest.isRequired}
-                size={rest.size}
-                onChange={handleChange}
-                defaultChecked={rest.defaultChecked}
-                disabled={rest.disabled}
-                color={rest.color}
-                sx={rest.sx}
-              />
+              rest.mode === 'checkBox' ? <MuiCheckbox {...props} /> : <MuiSwitch {...props} />
             }
           />
         </FormGroup>
         <FormHelperText>{formInputError?.message || ''}</FormHelperText>
       </FormControl>
-    ),
-    [rest, handleChange, formInputError],
-  );
+    );
+  }, [rest, formInputError, handleChange]);
 
   return renderFormInput(renderedOptions);
 }
 
-const FormWrappedCheckbox = withComponentForm(Checkbox);
+function Component(props: Props) {
+  if (props.error) {
+    return <ErrorDisplay error={props.error} />;
+  }
+  return <Checkbox {...props} />;
+}
+
+const FormWrappedCheckbox = withComponentForm(Component);
 export default createComponent(FormWrappedCheckbox, {
   layoutDirection: 'both',
   loadingProp: 'checked',
+  errorProp: 'error',
   argTypes: {
+    mode: {
+      helperText: 'Defines how the content is rendered. Either as plain CheckBox, Switch',
+      type: 'string',
+      enum: ['checkBox', 'switch'],
+      enumLabels: {
+        checkBox: 'CheckBox',
+        switch: 'Switch',
+      },
+      default: 'checkBox',
+      label: 'Mode',
+      control: { type: 'ToggleButtons' },
+    },
     label: {
       helperText: 'A text or an element to be used in an enclosing label element.',
       type: 'string',
-      default: 'Checkbox',
+      default: 'Label',
     },
     checked: {
       helperText: 'If true, the component is checked.',
       onChangeProp: 'onChange',
       type: 'boolean',
-      defaultValueProp: 'defaultChecked',
     },
     color: {
       helperText:
@@ -96,17 +137,15 @@ export default createComponent(FormWrappedCheckbox, {
       enum: ['default', 'primary', 'secondary', 'error', 'info', 'success', 'warning'],
       default: 'primary',
     },
-    defaultChecked: {
-      helperText: 'The default checked state. Use when the component is not controlled.',
-      type: 'boolean',
-    },
     disabled: {
       helperText: 'If true, the component is disabled.',
       type: 'boolean',
       default: false,
     },
+
     size: {
-      helperText: 'The size of the component. small is equivalent to the dense checkbox styling.',
+      helperText:
+        'The size of the component. small is equivalent to the dense checkbox, switch styling.',
       type: 'string',
       enum: ['medium', 'small', 'string'],
       default: 'medium',
@@ -122,6 +161,7 @@ export default createComponent(FormWrappedCheckbox, {
     componentsProps: {
       helperText: 'The props used for each slot inside.',
       type: 'object',
+      visible: ({ mode }: Props) => mode === 'checkBox',
     },
     labelPlacement: {
       helperText: 'The position of the label.',

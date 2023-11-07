@@ -244,19 +244,14 @@ spec:
                                     isInvalid: false
                                     fullWidth: true
                                     name: email
-            - component: TextField
-              name: textField
-              props:
-                placeholder: ddwfdfsdf
-                label: fsdfdfdsf
             - component: Text
               name: typography5
-              layout:
-                columnSize: 1
-                horizontalAlign: start
               props:
                 value: Add Customer
                 variant: h4
+              layout:
+                columnSize: 1
+                horizontalAlign: start
             - component: Form
               name: addCustomerForm
               layout:

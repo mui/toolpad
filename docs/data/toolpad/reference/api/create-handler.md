@@ -36,7 +36,7 @@ This describes the behavior of the custom handler.
 | `dev`  | `boolean` | Run the handler in dev mode. Only in this mode can the standalone editor be attached.                                                                             |
 | `dir`  | `string`  | The directory under which the Toolpad application definition will be stored. By default will be the `./toolpad` folder relative to the current working directory. |
 
-### HandlerConfig
+### Handler
 
 This is the return value from the `createHandler` function.
 

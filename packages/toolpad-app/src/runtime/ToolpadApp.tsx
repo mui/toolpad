@@ -378,6 +378,13 @@ function parseBinding(
       result: { value: bindable },
     };
   }
+
+  if (bindingType === 'env') {
+    return {
+      scopePath,
+      result: { value: bindable },
+    };
+  }
   if (bindingType === 'jsExpression') {
     return {
       scopePath,

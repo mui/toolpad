@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { Box, BoxProps, Stack, TextField } from '@mui/material';
+import {
+  Box,
+  BoxProps,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Stack,
+  TextField,
+} from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNode } from '@mui/toolpad-core';
 import { equalProperties } from '@mui/toolpad-utils/collections';
@@ -90,20 +98,48 @@ function Form({
               children
             ) : (
               <Stack gap={1}>
-                {Object.entries(schema?.properties ?? {}).map(([fieldName, fieldDefinition]) => {
-                  const FieldComponent = TextField;
+                {Object.entries(schema?.properties ?? {}).map(([fieldName, fieldDefinition]) => (
+                  <Controller
+                    key={fieldName}
+                    name={fieldName}
+                    control={form.control}
+                    render={({ field, formState: { errors } }) => {
+                      const fieldType = fieldDefinition.type;
+                      const fieldError = errors[fieldName];
 
-                  return (
-                    <Controller
-                      key={fieldName}
-                      name={fieldName}
-                      control={form.control}
-                      render={({ field }) => (
-                        <FieldComponent {...field} label={fieldName} size="small" />
-                      )}
-                    />
-                  );
-                })}
+                      if (fieldType === 'array') {
+                        return (
+                          <FormGroup>
+                            <FormControlLabel control={<Checkbox {...field} />} label={fieldName} />
+                          </FormGroup>
+                        );
+                      }
+
+                      if (fieldType === 'boolean') {
+                        return (
+                          <FormGroup>
+                            <FormControlLabel control={<Checkbox {...field} />} label={fieldName} />
+                          </FormGroup>
+                        );
+                      }
+
+                      return (
+                        <TextField
+                          {...field}
+                          label={fieldName}
+                          size="small"
+                          type={
+                            fieldType === 'number' || fieldType === 'integer' ? 'number' : 'text'
+                          }
+                          {...(fieldError && {
+                            error: Boolean(fieldError),
+                            helperText: fieldError.message || '',
+                          })}
+                        />
+                      );
+                    }}
+                  />
+                ))}
               </Stack>
             )}
             <Box

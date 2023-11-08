@@ -88,3 +88,4 @@ spec:
         transform: return data.movies;
         transformEnabled: true
         searchParams: []
+  display: shell

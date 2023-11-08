@@ -113,7 +113,7 @@ function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParam
         return resolvedComponentsId;
       }
       if (importer === resolvedRuntimeEntryPointId || importer === resolvedComponentsId) {
-        const newId = path.resolve(root, 'toolpad', id);
+        const newId = path.resolve(root, id);
         return this.resolve(newId, importer);
       }
       return null;

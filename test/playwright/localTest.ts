@@ -10,6 +10,7 @@ import invariant from 'invariant';
 import * as archiver from 'archiver';
 import * as url from 'url';
 import getPort from 'get-port';
+import * as execa from 'execa';
 import { unstable_createHandler } from '@mui/toolpad';
 import express from 'express';
 import { PageScreenshotOptions, test as baseTest } from './test';
@@ -129,27 +130,29 @@ export async function runCustomServer(
     await buildApp(projectDir, { base, env });
   }
 
-  const app = express();
+  const port = await getPort();
 
-  const toolpadHandler = await unstable_createHandler({
-    dev,
-    externalUrl: 'http://localhost:3000',
-    dir: projectDir,
-    base,
+  const child = execa.execaNode(path.resolve(projectDir, './server.mjs'), {
+    cwd: projectDir,
+    env: {
+      NODE_ENV: dev ? 'development' : 'production',
+      PORT: String(port),
+      BASE: base,
+    },
   });
 
-  app.use(base, toolpadHandler.handler);
-
-  const port = await getPort();
-  const server = await listen(app, port);
+  invariant(child.stdout && child.stderr, "Childprocess must be started with stdio: 'pipe'");
+  child.stdout.pipe(process.stdout);
+  child.stderr.pipe(process.stderr);
+  await waitForMatch(child.stdout, /Custom server listening/);
 
   return {
-    url: `http://localhost:${server.port}${base}`,
+    url: `http://localhost:${port}${base}`,
     dir: projectDir,
     stdout: process.stdout,
     [asyncDisposeSymbol]: async () => {
       process.env = origEnv;
-      await server.close();
+      await child.kill();
     },
   };
 }

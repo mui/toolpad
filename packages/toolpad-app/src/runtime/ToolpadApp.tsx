@@ -378,6 +378,13 @@ function parseBinding(
       result: { value: bindable },
     };
   }
+
+  if (bindingType === 'env') {
+    return {
+      scopePath,
+      result: { value: bindable },
+    };
+  }
   if (bindingType === 'jsExpression') {
     return {
       scopePath,
@@ -1541,7 +1548,7 @@ export default function ToolpadApp({ rootRef, extraComponents, basename, state }
       <UseDataProviderContext.Provider value={useDataProvider}>
         <AppThemeProvider dom={dom}>
           <CssBaseline enableColorScheme />
-          {SHOW_PREVIEW_HEADER ? <PreviewHeader /> : null}
+          {SHOW_PREVIEW_HEADER ? <PreviewHeader basename={basename} /> : null}
           <AppRoot ref={rootRef}>
             <ComponentsContextProvider value={components}>
               <DomContextProvider value={dom}>

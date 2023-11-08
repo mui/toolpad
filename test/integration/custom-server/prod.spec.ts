@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as url from 'url';
 import invariant from 'invariant';
 import { test } from '../../playwright/localTest';
-import { expectBasicPageContent } from '../backend-basic/shared';
+import { expectBasicRuntimeTests } from '../backend-basic/shared';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -30,5 +30,5 @@ test('custom server production mode', async ({ context, customServer, page }) =>
 
   await page.goto(customServer.url);
 
-  await expectBasicPageContent(page);
+  await expectBasicRuntimeTests(page);
 });

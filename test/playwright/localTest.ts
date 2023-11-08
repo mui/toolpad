@@ -14,6 +14,7 @@ import { createHandler } from '@mui/toolpad';
 import express from 'express';
 import { PageScreenshotOptions, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
+import { asyncDisposeSymbol, using } from '../utils/resources';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -60,10 +61,7 @@ interface LocalServerConfig {
   base?: string;
 }
 
-const asyncDisposeSymbol: typeof Symbol.asyncDispose =
-  Symbol.asyncDispose ?? Symbol('asyncDispose');
-
-async function getTestProjectDir({ template, setup }: ProjectConfig = {}) {
+export async function getTemporaryDir({ template, setup }: ProjectConfig = {}) {
   const tmpTestDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
@@ -120,7 +118,7 @@ async function buildApp(projectDir: string, { base, env = {} }: BuildAppOptions 
   }
 }
 
-async function runCustomServer(
+export async function runCustomServer(
   projectDir: string,
   { dev = false, base = '/foo', env = {} }: LocalServerConfig,
 ) {
@@ -156,7 +154,7 @@ async function runCustomServer(
   };
 }
 
-async function runApp(projectDir: string, options: LocalAppConfig) {
+export async function runApp(projectDir: string, options: LocalAppConfig) {
   const { cmd = 'start', env, base } = options;
 
   if (cmd === 'start') {
@@ -220,15 +218,67 @@ async function runApp(projectDir: string, options: LocalAppConfig) {
   };
 }
 
-async function using<T extends { [asyncDisposeSymbol]: () => void | Promise<void> }>(
-  resource: T,
-  callback: (resource: T) => Promise<void>,
-) {
-  try {
-    await callback(resource);
-  } finally {
-    await resource[asyncDisposeSymbol]();
+export interface EditorConfig {
+  cwd: string;
+  appUrl: string;
+  toolpadDev?: boolean;
+  env?: Record<string, string>;
+}
+
+export async function runEditor(options: EditorConfig) {
+  const { appUrl, cwd, env } = options;
+
+  const args: string[] = [CLI_CMD, 'editor', appUrl];
+
+  if (options.toolpadDev) {
+    args.push('--dev');
   }
+
+  // Run each test on its own port to avoid race conditions when running tests in parallel.
+  args.push('--port', String(await getPort()));
+
+  const child = childProcess.spawn('node', args, {
+    cwd,
+    stdio: 'pipe',
+    shell: !process.env.CI,
+    env: {
+      ...process.env,
+      ...env,
+    },
+  });
+
+  const port = await Promise.race([
+    once(child, 'exit').then(([code]) => {
+      throw new Error(`App process exited unexpectedly${code ? ` with code ${code}` : ''}`);
+    }),
+    (async () => {
+      invariant(child.stdout, "Childprocess must be started with stdio: 'pipe'");
+
+      if (VERBOSE) {
+        child.stdout?.pipe(process.stdout);
+        child.stderr?.pipe(process.stderr);
+      }
+
+      const match = await waitForMatch(child.stdout, /localhost:(\d+)/);
+
+      if (!match) {
+        throw new Error('Failed to start');
+      }
+
+      const detectedPort = Number(match[1]);
+
+      return detectedPort;
+    })(),
+  ]);
+
+  return {
+    url: `http://localhost:${port}`,
+    stdout: child.stdout,
+
+    [asyncDisposeSymbol]: () => {
+      child.kill();
+    },
+  };
 }
 
 const test = baseTest.extend<
@@ -257,7 +307,7 @@ const test = baseTest.extend<
   projectConfig: [undefined, { option: true, scope: 'worker' }],
   projectDir: [
     async ({ projectConfig }, use) => {
-      await using(await getTestProjectDir(projectConfig), async (projectDir) => {
+      await using(await getTemporaryDir(projectConfig), async (projectDir) => {
         await use(projectDir);
       });
     },

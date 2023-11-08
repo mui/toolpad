@@ -1,12 +1,20 @@
 import * as React from 'react';
 import {
+  Autocomplete,
   Box,
   BoxProps,
   Checkbox,
+  FormControl,
   FormControlLabel,
   FormGroup,
+  FormHelperText,
+  FormLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
   Stack,
   TextField,
+  Typography,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNode } from '@mui/toolpad-core';
@@ -98,6 +106,10 @@ function Form({
               children
             ) : (
               <Stack gap={1}>
+                {schema?.title && <Typography variant="h3">{schema.title}</Typography>}
+                {schema?.description && (
+                  <Typography variant="subtitle1">{schema.description}</Typography>
+                )}
                 {Object.entries(schema?.properties ?? {}).map(([fieldName, fieldDefinition]) => (
                   <Controller
                     key={fieldName}
@@ -107,11 +119,89 @@ function Form({
                       const fieldType = fieldDefinition.type;
                       const fieldError = errors[fieldName];
 
-                      if (fieldType === 'array') {
+                      const textFieldErrorProps = fieldError && {
+                        error: Boolean(fieldError),
+                        helperText: fieldError.message || '',
+                      };
+
+                      if (
+                        fieldType === 'string' &&
+                        (fieldDefinition.enum || fieldDefinition.oneOf)
+                      ) {
+                        if (fieldDefinition.options?.autocomplete) {
+                          return (
+                            <Autocomplete
+                              {...field}
+                              options={
+                                fieldDefinition.enum ||
+                                fieldDefinition.oneOf.map((option) => option.const)
+                              }
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label={fieldName}
+                                  size="small"
+                                  {...textFieldErrorProps}
+                                />
+                              )}
+                            />
+                          );
+                        }
+
+                        if (fieldDefinition.options?.format === 'radio') {
+                          const radioOptions = fieldDefinition.enum
+                            ? fieldDefinition.enum.map((option) => (
+                                <FormControlLabel
+                                  key={option}
+                                  value={option}
+                                  control={<Radio />}
+                                  label={option}
+                                />
+                              ))
+                            : fieldDefinition.oneOf.map((option) => (
+                                <FormControlLabel
+                                  key={option.const}
+                                  value={option.const}
+                                  control={<Radio />}
+                                  label={option.title}
+                                />
+                              ));
+
+                          return (
+                            <FormControl error={Boolean(fieldError)}>
+                              <FormLabel>Gender</FormLabel>
+                              <RadioGroup row {...field}>
+                                {radioOptions}
+                              </RadioGroup>
+                              {fieldError ? (
+                                <FormHelperText>{fieldError.message || ''}</FormHelperText>
+                              ) : null}
+                            </FormControl>
+                          );
+                        }
+
+                        const options = fieldDefinition.enum
+                          ? fieldDefinition.enum.map((option) => (
+                              <MenuItem key={option} value={option}>
+                                {option}
+                              </MenuItem>
+                            ))
+                          : fieldDefinition.oneOf.map((option) => (
+                              <MenuItem key={option.const} value={option.const}>
+                                {option.title}
+                              </MenuItem>
+                            ));
+
                         return (
-                          <FormGroup>
-                            <FormControlLabel control={<Checkbox {...field} />} label={fieldName} />
-                          </FormGroup>
+                          <TextField
+                            select
+                            {...field}
+                            label={fieldName}
+                            size="small"
+                            {...textFieldErrorProps}
+                          >
+                            {options}
+                          </TextField>
                         );
                       }
 
@@ -131,10 +221,7 @@ function Form({
                           type={
                             fieldType === 'number' || fieldType === 'integer' ? 'number' : 'text'
                           }
-                          {...(fieldError && {
-                            error: Boolean(fieldError),
-                            helperText: fieldError.message || '',
-                          })}
+                          {...textFieldErrorProps}
                         />
                       );
                     }}

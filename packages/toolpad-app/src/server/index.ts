@@ -406,7 +406,7 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
     }),
   );
 
-  app.use(editorBasename, editorHandler);
+  app.use(editorBasename, editorHandler.handler);
 
   const port = options.port || (await getPort({ port: getPreferredPorts(DEFAULT_PORT) }));
   const server = await listen(app, port);

@@ -71,7 +71,7 @@ spec:
             data:
               $$jsExpression: |
                 query1.data.map((movie) => ({
-                  year: movie.year,
+                  year: Number(movie.year),
                   count_id: query1.data.reduce((acc, currentMovie) => {
                     return currentMovie.year === movie.year ? acc + 1 : acc
                   }, 0),
@@ -80,13 +80,6 @@ spec:
             xKey: year
             yKey: count_id
   queries:
-    - name: query
-      query:
-        kind: rest
-        headers: []
-        method: GET
-        transform: return data.movies;
-        transformEnabled: true
     - name: query1
       query:
         kind: rest
@@ -94,3 +87,4 @@ spec:
         method: GET
         transform: return data.movies;
         transformEnabled: true
+        searchParams: []

@@ -85,7 +85,7 @@ export default async function cli(argv: string[]) {
     dir: {
       type: 'string',
       describe: 'Directory of the Toolpad application',
-      default: '.',
+      default: './toolpad',
     },
     base: {
       type: 'string',

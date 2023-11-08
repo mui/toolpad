@@ -201,7 +201,7 @@ export interface ToolpadHandlerConfig {
 
 export async function createHandler({
   dev = false,
-  dir = '.',
+  dir = './toolpad',
   base = '/prod',
   externalUrl = 'http://localhost:3000',
 }: ToolpadHandlerConfig): Promise<AppHandler> {
@@ -406,7 +406,7 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
     }),
   );
 
-  app.use(editorBasename, editorHandler);
+  app.use(editorBasename, editorHandler.handler);
 
   const port = options.port || (await getPort({ port: getPreferredPorts(DEFAULT_PORT) }));
   const server = await listen(app, port);

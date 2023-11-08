@@ -8,7 +8,7 @@ The following code illustrates how it works:
 
 ```tsx
 // ./server.mjs
-import { unstable_createHandler as createHandler } from '@mui/toolpad';
+import { createHandler } from '@mui/toolpad';
 import express from 'express';
 
 const app = express();

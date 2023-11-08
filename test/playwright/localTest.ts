@@ -10,7 +10,7 @@ import invariant from 'invariant';
 import * as archiver from 'archiver';
 import * as url from 'url';
 import getPort from 'get-port';
-import { unstable_createHandler } from '@mui/toolpad';
+import { createHandler } from '@mui/toolpad';
 import express from 'express';
 import { PageScreenshotOptions, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
@@ -133,7 +133,7 @@ async function runCustomServer(
 
   const app = express();
 
-  const toolpadHandler = await unstable_createHandler({
+  const toolpadHandler = await createHandler({
     dev,
     externalUrl: 'http://localhost:3000',
     dir: projectDir,

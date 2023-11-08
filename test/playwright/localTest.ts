@@ -4,15 +4,12 @@ import childProcess from 'child_process';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
-import { listen } from '@mui/toolpad-utils/http';
 import { once } from 'events';
 import invariant from 'invariant';
 import * as archiver from 'archiver';
 import * as url from 'url';
 import getPort from 'get-port';
 import * as execa from 'execa';
-import { unstable_createHandler } from '@mui/toolpad';
-import express from 'express';
 import { PageScreenshotOptions, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
 import { asyncDisposeSymbol, using } from '../utils/resources';
@@ -54,6 +51,7 @@ interface LocalAppConfig {
   // Extra environment variables when running Toolpad
   env?: Record<string, string>;
   base?: string;
+  create?: boolean;
 }
 
 interface LocalServerConfig {
@@ -158,7 +156,7 @@ export async function runCustomServer(
 }
 
 export async function runApp(projectDir: string, options: LocalAppConfig) {
-  const { cmd = 'start', env, base } = options;
+  const { cmd = 'start', env, base, create } = options;
 
   if (cmd === 'start') {
     await buildApp(projectDir, { base, env });
@@ -167,6 +165,10 @@ export async function runApp(projectDir: string, options: LocalAppConfig) {
   const args: string[] = [CLI_CMD, cmd];
   if (options.toolpadDev) {
     args.push('--dev');
+  }
+
+  if (create) {
+    args.push('--create');
   }
 
   // Run each test on its own port to avoid race conditions when running tests in parallel.

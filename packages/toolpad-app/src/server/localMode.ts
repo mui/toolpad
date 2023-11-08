@@ -20,7 +20,6 @@ import {
   readMaybeDir,
   updateYamlFile,
   fileExists,
-  folderExists,
   readJsonFile,
 } from '@mui/toolpad-utils/fs';
 import { z } from 'zod';
@@ -1241,7 +1240,7 @@ export interface InitProjectOptions extends Partial<ToolpadProjectOptions> {
 }
 
 export async function initProject({ dir: dirInput, ...config }: InitProjectOptions) {
-  const dir = await resolveProjectDir(dirInput);
+  const dir = resolveProjectDir(dirInput);
 
   invariant(
     // eslint-disable-next-line no-underscore-dangle
@@ -1253,14 +1252,7 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   // eslint-disable-next-line no-underscore-dangle
   global.__toolpadProjects.add(dir);
 
-  if (!(await folderExists(dir))) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.blue('info')}  - No Toolpad project found at ${chalk.cyan(
-        `"${dir}"`,
-      )}. Initializing...`,
-    );
-  }
+  await initToolpadFolder(dir);
 
   const resolvedConfig: ToolpadProjectOptions = {
     dev: false,
@@ -1268,8 +1260,6 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
     customServer: false,
     ...config,
   };
-
-  await initToolpadFolder(dir);
 
   const project = new ToolpadProject(dir, resolvedConfig);
 

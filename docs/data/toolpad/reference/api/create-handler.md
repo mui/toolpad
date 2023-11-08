@@ -11,7 +11,7 @@ import { createHandler } from '@mui/toolpad';
 ## Description
 
 ```jsx
-const toolpad = createHandler(config);
+const toolpad = await createHandler(config);
 ```
 
 ## Parameters
@@ -20,7 +20,7 @@ const toolpad = createHandler(config);
 
 ## Returns
 
-A custom handler that can be attached to a node.js server. See [Handler](#handler)
+A `Promise` for a Toolpad application object exposing a handler which you can attach to a node.js http server. See [Handler](#handler)
 
 ## Types
 

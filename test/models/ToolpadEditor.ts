@@ -137,22 +137,23 @@ export class ToolpadEditor {
 
     await this.componentCatalog.hover();
 
-    await expect.poll(() => this.pageRoot.boundingBox()).toBeTruthy();
-
-    const pageRootBoundingBox = (await this.pageRoot.boundingBox())!;
+    let pageRootBoundingBox;
+    await expect(async () => {
+      pageRootBoundingBox = await this.pageRoot.boundingBox();
+      expect(pageRootBoundingBox).toBeTruthy();
+    }).toPass();
 
     if (!moveTargetX) {
-      moveTargetX = pageRootBoundingBox.x + pageRootBoundingBox.width / 2;
+      moveTargetX = pageRootBoundingBox!.x + pageRootBoundingBox!.width / 2;
     }
-
     if (!moveTargetY) {
-      moveTargetY = pageRootBoundingBox.y + pageRootBoundingBox.height / 2;
+      moveTargetY = pageRootBoundingBox!.y + pageRootBoundingBox!.height / 2;
     }
 
     const sourceLocator = this.getComponentCatalogItem(componentName);
     await expect(sourceLocator).toBeVisible();
 
-    await this.dragTo(sourceLocator, moveTargetX, moveTargetY, hasDrop);
+    await this.dragTo(sourceLocator, moveTargetX!, moveTargetY!, hasDrop);
 
     await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }

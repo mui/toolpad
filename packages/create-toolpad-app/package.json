@@ -36,7 +36,6 @@
     "inquirer": "9.2.11",
     "invariant": "2.2.4",
     "semver": "7.5.4",
-    "tar": "6.2.0",
     "yargs": "17.7.2"
   },
   "devDependencies": {
@@ -44,7 +43,6 @@
     "@types/invariant": "2.2.36",
     "@types/node": "20.8.10",
     "@types/semver": "7.5.4",
-    "@types/tar": "6.1.8",
     "@types/yargs": "17.0.29"
   }
 }

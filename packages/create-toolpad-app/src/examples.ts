@@ -12,7 +12,7 @@ import { pipeline } from 'stream/promises';
 import invariant from 'invariant';
 
 async function downloadTar(url: string) {
-  const tempFile = path.join(os.tmpdir(), `next.js-cna-example.temp-${Date.now()}`);
+  const tempFile = path.join(os.tmpdir(), `toolpad-cta-example.temp-${Date.now()}`);
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`HTTP ${response.status} - ${response.statusText}`);

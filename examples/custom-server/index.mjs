@@ -5,7 +5,14 @@ const app = express();
 
 app.get('/', (req, res) => {
   res.set('Content-Type', 'text/html');
-  res.send('<html><body>Go to the <a href="/my-app">Toolpad application</a></body></html>');
+  res.send(`
+    <html>
+      <body>  
+        👋 This is a <a href="https://mui.com/toolpad/concepts/custom-server/">custom server</a>,
+        it hosts to a <a href="/my-app">Toolpad application</a>.
+      </body>
+    </html>
+  `);
 });
 
 // Initialize the Toolpad handler. Make sure to pass the base path

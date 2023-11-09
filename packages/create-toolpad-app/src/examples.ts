@@ -1,6 +1,6 @@
 /**
  * Loosely adapted from
- * https://github.com/vercel/next.js/blob/e2f3059b48a779c2a755c21da26570d251305c01/packages/create-next-app/helpers/examples.ts#L1
+ * https://github.com/vercel/next.js/blob/e2f3059b48a779c2a755c21da26570d251305c01/packages/create-next-app/helpers/examples.ts
  */
 import * as path from 'path';
 import * as os from 'os';

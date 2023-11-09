@@ -1,27 +1,13 @@
 import * as React from 'react';
-import {
-  Autocomplete,
-  Box,
-  BoxProps,
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormHelperText,
-  FormLabel,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, BoxProps, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNode } from '@mui/toolpad-core';
 import { equalProperties } from '@mui/toolpad-utils/collections';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
-import { ajvResolver } from '@hookform/resolvers/ajv';
-import { JSONSchemaType } from 'ajv';
+import { RJSFSchema, UiSchema } from '@rjsf/utils';
+import validator from '@rjsf/validator-ajv8';
+import { withTheme, IChangeEvent } from '@rjsf/core';
+import { Theme as MUIJsonSchemaTheme } from '@rjsf/mui';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin, { BuiltinArgTypeDefinitions } from './createBuiltin';
 
@@ -33,9 +19,12 @@ export const FormContext = React.createContext<{
   fieldValues: {},
 });
 
+const MuiJSONSchemaForm = withTheme(MUIJsonSchemaTheme);
+
 interface FormProps extends BoxProps {
   definitionSource: 'dragAndDrop' | 'jsonSchema';
-  schema?: JSONSchemaType<FieldValues>;
+  schema?: RJSFSchema;
+  uiSchema?: UiSchema;
   value: FieldValues;
   onChange: (newValue: FieldValues) => void;
   onSubmit?: (data?: FieldValues) => unknown | Promise<unknown>;
@@ -50,7 +39,8 @@ interface FormProps extends BoxProps {
 function Form({
   definitionSource,
   children,
-  schema,
+  schema = {},
+  uiSchema = {},
   value,
   onChange,
   onSubmit = () => {},
@@ -62,8 +52,17 @@ function Form({
   hasChrome = true,
   sx,
 }: FormProps) {
-  const form = useForm({ mode, ...(schema ? { resolver: ajvResolver(schema) } : {}) });
+  const form = useForm({ mode });
   const { isSubmitSuccessful } = form.formState;
+
+  const [jsonFormData, setJSONFormData] = React.useState(null);
+  const handleJSONFormChange = React.useCallback(
+    ({ formData }: IChangeEvent) => {
+      setJSONFormData(formData);
+      onChange(formData);
+    },
+    [onChange],
+  );
 
   const handleSubmit = React.useCallback(async () => {
     await onSubmit();
@@ -97,172 +96,63 @@ function Form({
     [form, form.formState, value],
   );
 
+  const formSubmitControls = (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: formControlsAlign,
+        pt: 1,
+      }}
+    >
+      <Stack direction="row" spacing={1} sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}>
+        {hasResetButton ? (
+          <LoadingButton
+            type="reset"
+            color="secondary"
+            variant="contained"
+            sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
+          >
+            Reset
+          </LoadingButton>
+        ) : null}
+        <LoadingButton
+          type="submit"
+          color="primary"
+          variant="contained"
+          loading={form.formState.isSubmitting}
+          sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
+        >
+          {submitButtonText}
+        </LoadingButton>
+      </Stack>
+    </Box>
+  );
+
+  if (definitionSource === 'jsonSchema') {
+    return (
+      <Box sx={{ ...sx, width: '100%' }}>
+        <MuiJSONSchemaForm
+          schema={schema}
+          validator={validator}
+          uiSchema={uiSchema}
+          formData={jsonFormData}
+          onChange={handleJSONFormChange}
+          onSubmit={handleSubmit}
+        >
+          {formSubmitControls}
+        </MuiJSONSchemaForm>
+      </Box>
+    );
+  }
+
   return (
     <FormContext.Provider value={formContextValue}>
       {hasChrome ? (
         <Box sx={{ ...sx, width: '100%' }}>
           <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
-            {definitionSource === 'dragAndDrop' ? (
-              children
-            ) : (
-              <Stack gap={1}>
-                {schema?.title && <Typography variant="h3">{schema.title}</Typography>}
-                {schema?.description && (
-                  <Typography variant="subtitle1">{schema.description}</Typography>
-                )}
-                {Object.entries(schema?.properties ?? {}).map(([fieldName, fieldDefinition]) => (
-                  <Controller
-                    key={fieldName}
-                    name={fieldName}
-                    control={form.control}
-                    render={({ field, formState: { errors } }) => {
-                      const fieldType = fieldDefinition.type;
-                      const fieldError = errors[fieldName];
-
-                      const textFieldErrorProps = fieldError && {
-                        error: Boolean(fieldError),
-                        helperText: fieldError.message || '',
-                      };
-
-                      if (
-                        fieldType === 'string' &&
-                        (fieldDefinition.enum || fieldDefinition.oneOf)
-                      ) {
-                        if (fieldDefinition.options?.autocomplete) {
-                          return (
-                            <Autocomplete
-                              {...field}
-                              options={
-                                fieldDefinition.enum ||
-                                fieldDefinition.oneOf.map((option) => option.const)
-                              }
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  label={fieldName}
-                                  size="small"
-                                  {...textFieldErrorProps}
-                                />
-                              )}
-                            />
-                          );
-                        }
-
-                        if (fieldDefinition.options?.format === 'radio') {
-                          const radioOptions = fieldDefinition.enum
-                            ? fieldDefinition.enum.map((option) => (
-                                <FormControlLabel
-                                  key={option}
-                                  value={option}
-                                  control={<Radio />}
-                                  label={option}
-                                />
-                              ))
-                            : fieldDefinition.oneOf.map((option) => (
-                                <FormControlLabel
-                                  key={option.const}
-                                  value={option.const}
-                                  control={<Radio />}
-                                  label={option.title}
-                                />
-                              ));
-
-                          return (
-                            <FormControl error={Boolean(fieldError)}>
-                              <FormLabel>Gender</FormLabel>
-                              <RadioGroup row {...field}>
-                                {radioOptions}
-                              </RadioGroup>
-                              {fieldError ? (
-                                <FormHelperText>{fieldError.message || ''}</FormHelperText>
-                              ) : null}
-                            </FormControl>
-                          );
-                        }
-
-                        const options = fieldDefinition.enum
-                          ? fieldDefinition.enum.map((option) => (
-                              <MenuItem key={option} value={option}>
-                                {option}
-                              </MenuItem>
-                            ))
-                          : fieldDefinition.oneOf.map((option) => (
-                              <MenuItem key={option.const} value={option.const}>
-                                {option.title}
-                              </MenuItem>
-                            ));
-
-                        return (
-                          <TextField
-                            select
-                            {...field}
-                            label={fieldName}
-                            size="small"
-                            {...textFieldErrorProps}
-                          >
-                            {options}
-                          </TextField>
-                        );
-                      }
-
-                      if (fieldType === 'boolean') {
-                        return (
-                          <FormGroup>
-                            <FormControlLabel control={<Checkbox {...field} />} label={fieldName} />
-                          </FormGroup>
-                        );
-                      }
-
-                      return (
-                        <TextField
-                          {...field}
-                          label={fieldName}
-                          size="small"
-                          type={
-                            fieldType === 'number' || fieldType === 'integer' ? 'number' : 'text'
-                          }
-                          {...textFieldErrorProps}
-                        />
-                      );
-                    }}
-                  />
-                ))}
-              </Stack>
-            )}
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: formControlsAlign,
-                pt: 1,
-              }}
-            >
-              <Stack
-                direction="row"
-                spacing={1}
-                sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
-              >
-                {hasResetButton ? (
-                  <LoadingButton
-                    type="reset"
-                    color="secondary"
-                    variant="contained"
-                    sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
-                  >
-                    Reset
-                  </LoadingButton>
-                ) : null}
-                <LoadingButton
-                  type="submit"
-                  color="primary"
-                  variant="contained"
-                  loading={form.formState.isSubmitting}
-                  sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
-                >
-                  {submitButtonText}
-                </LoadingButton>
-              </Stack>
-            </Box>
+            {children}
+            {formSubmitControls}
           </form>
         </Box>
       ) : (
@@ -294,6 +184,11 @@ export default createBuiltin(Form, {
     },
     schema: {
       helperText: 'JSON Schema to be used as form definition.',
+      type: 'object',
+      visible: ({ definitionSource }: FormProps) => definitionSource === 'jsonSchema',
+    },
+    uiSchema: {
+      helperText: 'UI Schema to be used as form layout definition.',
       type: 'object',
       visible: ({ definitionSource }: FormProps) => definitionSource === 'jsonSchema',
     },

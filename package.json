@@ -54,8 +54,6 @@
     "@types/rimraf": "3.0.2",
     "@typescript-eslint/eslint-plugin": "6.9.1",
     "@typescript-eslint/parser": "6.9.1",
-    "ajv": "8.12.0",
-    "ajv-errors": "3.0.0",
     "chalk": "5.3.0",
     "eslint": "8.53.0",
     "eslint-config-airbnb": "19.0.4",
@@ -88,6 +86,8 @@
     "yarn-deduplicate": "6.0.2"
   },
   "dependencies": {
+    "@emotion/react": "11.11.1",
+    "@emotion/styled": "11.11.0",
     "archiver": "6.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.3.0",

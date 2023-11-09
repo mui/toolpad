@@ -12,18 +12,20 @@
 
 ## How to run
 
-Use `create-toolpad-app` to bootstrap the example:
+Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
+
+<!-- #default-branch-switch -->
 
 ```bash
-npx create-toolpad-app --example npm-stats
+curl https://codeload.github.com/mui/mui-toolpad/tar.gz/master | tar -xz --strip=2  mui-toolpad-master/examples/npm-stats
+cd npm-stats
 ```
 
-```bash
-yarn create toolpad-app --example npm-stats
-```
+Install it and run:
 
 ```bash
-pnpm create toolpad-app --example npm-stats
+npm install
+npm run dev
 ```
 
 or:

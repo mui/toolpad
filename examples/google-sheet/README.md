@@ -7,19 +7,3 @@
 </a>
 
 To build this app step-by-step, visit the [docs](https://mui.com/toolpad/how-to-guides/connect-to-googlesheets/).
-
-## How to run
-
-Use `create-toolpad-app` to bootstrap the example:
-
-```bash
-npx create-toolpad-app --example google-sheet
-```
-
-```bash
-yarn create toolpad-app --example google-sheet
-```
-
-```bash
-pnpm create toolpad-app --example google-sheet
-```

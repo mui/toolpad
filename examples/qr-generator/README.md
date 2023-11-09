@@ -10,20 +10,22 @@
 
 [Open example](https://mui-toolpad-qr-generator-production.up.railway.app/prod/)
 
-## How to run
+## How to use
 
-Use `create-toolpad-app` to bootstrap the example:
+Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
+
+<!-- #default-branch-switch -->
 
 ```bash
-npx create-toolpad-app --example qr-generator
+curl https://codeload.github.com/mui/mui-toolpad/tar.gz/master | tar -xz --strip=2  mui-toolpad-master/examples/qr-generator
+cd qr-generator
 ```
 
-```bash
-yarn create toolpad-app --example qr-generator
-```
+Install it and run:
 
 ```bash
-pnpm create toolpad-app --example qr-generator
+npm install
+npm run dev
 ```
 
 or:

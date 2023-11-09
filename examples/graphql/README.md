@@ -12,22 +12,4 @@ A Toolpad app that shows how to:
 - use data grid, metric and textField components
 - work with secrets in Toolpad
 
-## How to run
-
-Use `create-toolpad-app` to bootstrap the example:
-
-```bash
-npx create-toolpad-app --example graphql
-```
-
-```bash
-yarn create toolpad-app --example graphql
-```
-
-```bash
-pnpm create toolpad-app --example graphql
-```
-
-or:
-
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/graphql)

@@ -8,18 +8,20 @@
 
 ## How to run
 
-Use `create-toolpad-app` to bootstrap the example:
+Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
+
+<!-- #default-branch-switch -->
 
 ```bash
-npx create-toolpad-app --example charts
+curl https://codeload.github.com/mui/mui-toolpad/tar.gz/master | tar -xz --strip=2  mui-toolpad-master/examples/charts
+cd charts
 ```
 
-```bash
-yarn create toolpad-app --example charts
-```
+Install it and run:
 
 ```bash
-pnpm create toolpad-app --example charts
+npm install
+npm run dev
 ```
 
 ## What's inside

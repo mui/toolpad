@@ -8,20 +8,18 @@
 
 ## How to run
 
-Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
-
-<!-- #default-branch-switch -->
+Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-curl https://codeload.github.com/mui/mui-toolpad/tar.gz/master | tar -xz --strip=2  mui-toolpad-master/examples/supabase
-cd supabase
+npx create-toolpad-app --example supabase
 ```
 
-Install it and run:
+```bash
+yarn create toolpad-app --example supabase
+```
 
 ```bash
-npm install
-npm run dev
+pnpm create toolpad-app --example supabase
 ```
 
 ## What's inside

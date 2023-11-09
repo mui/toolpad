@@ -12,20 +12,18 @@
 
 ## How to run
 
-Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
-
-<!-- #default-branch-switch -->
+Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-curl https://codeload.github.com/mui/mui-toolpad/tar.gz/master | tar -xz --strip=2  mui-toolpad-master/examples/basic-crud-app
-cd basic-crud-app
+npx create-toolpad-app --example basic-crud-app
 ```
 
-Install it and run:
+```bash
+yarn create toolpad-app --example basic-crud-app
+```
 
 ```bash
-npm install
-npm run dev
+pnpm create toolpad-app --example basic-crud-app
 ```
 
 or:
@@ -44,3 +42,7 @@ This app demonstrates the following capabilities of Toolpad:
 ## The source
 
 [Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/basic-crud-app)
+
+```
+
+```

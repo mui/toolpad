@@ -4,14 +4,12 @@ import childProcess from 'child_process';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
-import { listen } from '@mui/toolpad-utils/http';
 import { once } from 'events';
 import invariant from 'invariant';
 import * as archiver from 'archiver';
 import * as url from 'url';
 import getPort from 'get-port';
-import { unstable_createHandler } from '@mui/toolpad';
-import express from 'express';
+import * as execa from 'execa';
 import { PageScreenshotOptions, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
 import { asyncDisposeSymbol, using } from '../utils/resources';
@@ -53,6 +51,7 @@ interface LocalAppConfig {
   // Extra environment variables when running Toolpad
   env?: Record<string, string>;
   base?: string;
+  create?: boolean;
 }
 
 interface LocalServerConfig {
@@ -129,33 +128,35 @@ export async function runCustomServer(
     await buildApp(projectDir, { base, env });
   }
 
-  const app = express();
+  const port = await getPort();
 
-  const toolpadHandler = await unstable_createHandler({
-    dev,
-    externalUrl: 'http://localhost:3000',
-    dir: projectDir,
-    base,
+  const child = execa.execaNode(path.resolve(projectDir, './server.mjs'), {
+    cwd: projectDir,
+    env: {
+      NODE_ENV: dev ? 'development' : 'production',
+      PORT: String(port),
+      BASE: base,
+    },
   });
 
-  app.use(base, toolpadHandler.handler);
-
-  const port = await getPort();
-  const server = await listen(app, port);
+  invariant(child.stdout && child.stderr, "Childprocess must be started with stdio: 'pipe'");
+  child.stdout.pipe(process.stdout);
+  child.stderr.pipe(process.stderr);
+  await waitForMatch(child.stdout, /Custom server listening/);
 
   return {
-    url: `http://localhost:${server.port}${base}`,
+    url: `http://localhost:${port}${base}`,
     dir: projectDir,
     stdout: process.stdout,
     [asyncDisposeSymbol]: async () => {
       process.env = origEnv;
-      await server.close();
+      await child.kill();
     },
   };
 }
 
 export async function runApp(projectDir: string, options: LocalAppConfig) {
-  const { cmd = 'start', env, base } = options;
+  const { cmd = 'start', env, base, create } = options;
 
   if (cmd === 'start') {
     await buildApp(projectDir, { base, env });
@@ -164,6 +165,10 @@ export async function runApp(projectDir: string, options: LocalAppConfig) {
   const args: string[] = [CLI_CMD, cmd];
   if (options.toolpadDev) {
     args.push('--dev');
+  }
+
+  if (create) {
+    args.push('--create');
   }
 
   // Run each test on its own port to avoid race conditions when running tests in parallel.

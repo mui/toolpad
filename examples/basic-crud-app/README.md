@@ -42,7 +42,3 @@ This app demonstrates the following capabilities of Toolpad:
 ## The source
 
 [Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/basic-crud-app)
-
-```
-
-```

@@ -201,7 +201,7 @@ export interface ToolpadHandlerConfig {
 
 export async function createHandler({
   dev = false,
-  dir = '.',
+  dir = './toolpad',
   base = '/prod',
   externalUrl = 'http://localhost:3000',
 }: ToolpadHandlerConfig): Promise<AppHandler> {
@@ -425,6 +425,7 @@ export interface RunAppOptions {
   dir?: string;
   base?: string;
   toolpadDevMode?: boolean;
+  createIfNotExists?: boolean;
 }
 
 export async function runApp({
@@ -433,11 +434,16 @@ export async function runApp({
   base = '/prod',
   port = 3000,
   toolpadDevMode = false,
+  createIfNotExists,
 }: RunAppOptions) {
   const projectDir = resolveProjectDir(dir);
 
-  if (!(await folderExists(projectDir))) {
-    console.error(`${chalk.red('error')} - No project found at ${chalk.cyan(`"${projectDir}"`)}`);
+  if (!(await folderExists(projectDir)) && !createIfNotExists) {
+    console.error(
+      `${chalk.red('error')} - No project found at ${chalk.cyan(
+        `"${projectDir}"`,
+      )}. Use the --create option to initialize a new Toolpad project in this folder.`,
+    );
     process.exit(1);
   }
 

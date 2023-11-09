@@ -103,7 +103,6 @@ interface IToolpadProject {
   options: ToolpadProjectOptions;
   events: Emitter<ProjectEvents>;
   getRoot(): string;
-  getToolpadFolder(): string;
   getOutputFolder(): string;
   envManager: EnvManager;
   invalidateQueries(): void;
@@ -127,7 +126,7 @@ export default class FunctionsManager {
   }
 
   private getResourcesFolder(): string {
-    return path.join(this.project.getToolpadFolder(), './resources');
+    return path.join(this.project.getRoot(), './resources');
   }
 
   private getFunctionsFile(): string {
@@ -144,7 +143,7 @@ export default class FunctionsManager {
   }
 
   private async migrateLegacy() {
-    const legacyQueriesFile = path.resolve(this.project.getToolpadFolder(), 'queries.ts');
+    const legacyQueriesFile = path.resolve(this.project.getRoot(), 'queries.ts');
     if (await fileExists(legacyQueriesFile)) {
       const functionsFile = this.getFunctionsFile();
       await fs.mkdir(path.dirname(functionsFile), { recursive: true });

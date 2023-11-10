@@ -11,7 +11,7 @@ const initStripe = () => {
     throw new Error('Missing STRIPE_TOKEN environment variable');
   }
   return new Stripe(process.env.STRIPE_TOKEN, {
-    apiVersion: '2023-08-16',
+    apiVersion: '2023-10-16',
   });
 };
 

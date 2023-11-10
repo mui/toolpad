@@ -196,3 +196,6 @@ workflows:
       - test_unit:
           requires:
             - checkout
+      - test_integration:
+          requires:
+            - checkout

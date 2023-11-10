@@ -9,7 +9,7 @@ Example showcasing custom server integration of Toolpad apps. [The docs](https:/
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app --example custom-server
+npx create-toolpad-app@latest  --example custom-server
 ```
 
 ```bash

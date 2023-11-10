@@ -15,7 +15,7 @@
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app --example basic-crud-app
+npx create-toolpad-app@latest  --example basic-crud-app
 ```
 
 ```bash

@@ -11,7 +11,7 @@
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app --example charts
+npx create-toolpad-app@latest  --example charts
 ```
 
 ```bash

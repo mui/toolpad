@@ -13,7 +13,7 @@ Example showcasing Adding a code component as a data grid column. [The docs](htt
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app --example custom-datagrid-column
+npx create-toolpad-app@latest  --example custom-datagrid-column
 ```
 
 ```bash

@@ -15,7 +15,7 @@
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app --example qr-generator
+npx create-toolpad-app@latest  --example qr-generator
 ```
 
 ```bash

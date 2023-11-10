@@ -15,7 +15,7 @@ To build this app step-by-step, visit the [docs](https://mui.com/toolpad/getting
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app --example dog-app
+npx create-toolpad-app@latest  --example dog-app
 ```
 
 ```bash

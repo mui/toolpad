@@ -15,7 +15,7 @@
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app --example npm-stats
+npx create-toolpad-app@latest  --example npm-stats
 ```
 
 ```bash

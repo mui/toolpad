@@ -13,7 +13,7 @@ To build this app step-by-step, visit the [docs](https://mui.com/toolpad/how-to-
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app --example google-sheet
+npx create-toolpad-app@latest  --example google-sheet
 ```
 
 ```bash

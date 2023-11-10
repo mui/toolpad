@@ -17,7 +17,7 @@ A Toolpad app that shows how to:
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app --example graphql
+npx create-toolpad-app@latest  --example graphql
 ```
 
 ```bash

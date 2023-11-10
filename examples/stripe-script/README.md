@@ -22,7 +22,10 @@ Install it and run:
 ```bash
 npm install
 npm run dev
+
 ```
+
+## Prerequisite
 
 The app depends on a `STRIPE_TOKEN` to fetch invoice data
 
@@ -32,9 +35,9 @@ The app involves the following workflow:
 
 1. List pending invoices from Stripe in a data grid component
 
-2. Connect a script that downloads all invoices as a `.zip` file to Toolpad through a custom function
+2. Use a script that downloads all invoices as a `.zip` file in Toolpad through a custom function
 
-3. Generate the downloaded file link on a Button click
+3. Run the script on Button click to generate and display a download link
 
 ## The source
 

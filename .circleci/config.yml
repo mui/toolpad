@@ -156,7 +156,7 @@ jobs:
   test_integration:
     <<: *defaults
     resource_class: 'large'
-    parallelism: 2
+    parallelism: 1
     docker:
       - image: mcr.microsoft.com/playwright:v1.39.0-focal
         environment:
@@ -177,7 +177,7 @@ jobs:
           name: Upload screenshots to Argos CI
           command: yarn test:argos
       - store_artifacts:
-          path: test-results
+          path: test/test-results
           destination: playwright-test-results
 
 workflows:

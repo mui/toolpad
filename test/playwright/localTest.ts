@@ -6,7 +6,7 @@ import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
 import { once } from 'events';
 import invariant from 'invariant';
-import * as archiver from 'archiver';
+import archiver from 'archiver';
 import * as url from 'url';
 import getPort from 'get-port';
 import * as execa from 'execa';

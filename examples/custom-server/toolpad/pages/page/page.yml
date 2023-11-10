@@ -3,3 +3,15 @@ kind: page
 spec:
   id: HYZmpQV
   title: Default page
+  content:
+    - component: Text
+      name: text
+      props:
+        variant: h2
+        value: 👋 Hello from Toolpad
+    - component: Text
+      name: link
+      props:
+        mode: link
+        value: back
+        href: /

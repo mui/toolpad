@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.1.37
+
+<!-- generated comparing v0.1.36..master -->
+
+_Nov 10, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Allow bootstrapping examples with `create-toolpad-app`, support integrating Toolpad apps programmatically in custom servers. Bind any HTTP query variable to an environment variable. Support a new Switch component.
+
+- &#8203;<!-- 14 -->Support create-toolpad-app --example argument (#2884) @Janpot
+- &#8203;<!-- 13 -->Add custom server documentation (#2879) @Janpot
+- &#8203;<!-- 12 -->Link issues in docs (#2890) @prakhargupta1
+- &#8203;<!-- 11 -->Support running multiple handlers side-by-side in a custom server (#2882) @Janpot
+- &#8203;<!-- 10 -->charts example (#2880) @prakhargupta1
+- &#8203;<!-- 09 -->Fix editor command failing on master (#2881) @Janpot
+- &#8203;<!-- 08 -->Add instructions to start the editor for custom servers (#2878) @Janpot
+- &#8203;<!-- 07 -->Add Toolpad editor command for connecting to custom servers (#2800) @Janpot
+- &#8203;<!-- 06 -->Allow binding query parameters to environment variables (#2777) @JerryWu1234
+- &#8203;<!-- 05 -->Close the editor vite devserver when the program exits (#2877) @Janpot
+- &#8203;<!-- 04 -->Fix a deprecation message in the tests (#2876) @Janpot
+- &#8203;<!-- 03 -->Add Switch component as a variant to Checkbox (#2787) @JerryWu1234
+- &#8203;<!-- 02 -->Remove PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD (#2855) @Janpot
+- &#8203;<!-- 01 -->[docs] Fix images width overflow on Firefox (#2874) @bharatkashyap
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @JerryWu1234, @prakhargupta1
+
 ## 0.1.36
 
 <!-- generated comparing v0.1.35..master -->

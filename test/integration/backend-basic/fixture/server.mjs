@@ -1,4 +1,4 @@
-import { unstable_createHandler as createHandler } from '@mui/toolpad';
+import { createHandler } from '@mui/toolpad';
 import express from 'express';
 import * as path from 'path';
 

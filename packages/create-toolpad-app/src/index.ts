@@ -13,6 +13,7 @@ import { readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
 import { bashResolvePath } from '@mui/toolpad-utils/cli';
 import { PackageJson } from './packageType';
+import { downloadAndExtractExample } from './examples';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
@@ -190,6 +191,12 @@ const run = async () => {
       describe: 'Where to install dependencies',
       default: true,
     })
+    .option('example', {
+      type: 'string',
+      describe:
+        'The name of one of the available examples. See https://github.com/mui/mui-toolpad/tree/master/examples.',
+    })
+
     .help().argv;
 
   const pathArg = args._?.[0] as string;
@@ -223,7 +230,11 @@ const run = async () => {
 
   const absolutePath = bashResolvePath(answers.path || pathArg);
 
-  await scaffoldProject(absolutePath, installFlag);
+  if (args.example) {
+    await downloadAndExtractExample(absolutePath, args.example);
+  } else {
+    await scaffoldProject(absolutePath, installFlag);
+  }
 
   const changeDirectoryInstruction =
     /* `path.relative` is truth-y if the relative path

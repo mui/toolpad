@@ -89,10 +89,6 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
 export type Methods = Record<string, (...args: any[]) => Awaitable<any>>;
 
-export type QueryEditorTabType = 'config' | 'settings';
-
-export type QueryEditorToolsTabType = 'preview' | 'devTools';
-
 export interface QueryEditorProps<C, Q, A extends Methods = {}> {
   connectionParams: Maybe<C>;
   execApi: <K extends keyof A>(
@@ -103,8 +99,6 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}> {
   globalScopeMeta: ScopeMeta;
   value: appDom.QueryNode<Q>;
   onSave?: (newNode: appDom.QueryNode<Q>) => void;
-  tabType?: QueryEditorTabType;
-  settingsToggle?: React.ReactNode;
   settingsTab?: React.ReactNode;
   onChange?: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;

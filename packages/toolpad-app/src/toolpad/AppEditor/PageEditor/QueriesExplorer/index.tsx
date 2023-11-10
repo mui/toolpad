@@ -125,7 +125,7 @@ function DataTreeItem(props: StyledTreeItemProps) {
       labelText={labelText}
       renderLabel={(children) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }} onClick={handleClick}>
-          <QueryIcon id={labelIconId || 'query'} sx={{ fontSize: 24, mr: 1, ...labelIconSx }} />
+          <QueryIcon id={labelIconId || 'query'} sx={{ fontSize: 24, my: 0, ...labelIconSx }} />
           {children}
           {onCreate ? (
             <IconButton
@@ -214,7 +214,7 @@ function CreatePopover({
                 variant="outlined"
                 onClick={handleCreateNode(dataSourceId, createMode)}
               >
-                <QueryIcon id={dataSourceId} sx={{ fontSize: 28, mr: 0.5, mt: 0.1 }} />{' '}
+                <QueryIcon id={dataSourceId} sx={{ fontSize: 28 }} />{' '}
                 {dataSource?.displayName || dataSourceId}
               </Button>
             ) : null;
@@ -381,6 +381,7 @@ export function QueriesExplorer() {
   return (
     <Box sx={{ maxHeight: '100%', overflowY: 'auto' }} data-testid="queries-explorer">
       <ExplorerHeader
+        headerIcon={<QueryIcon mode="query" />}
         headerText="Queries"
         onCreate={handleCreateQueryClick}
         createLabelText="Create new query"
@@ -420,6 +421,7 @@ export function QueriesExplorer() {
       </TreeView>
       <Divider />
       <ExplorerHeader
+        headerIcon={<QueryIcon mode="mutation" />}
         headerText="Actions"
         onCreate={handleCreateActionClick}
         createLabelText="Create new action"

@@ -1,19 +1,25 @@
 import { NodeId } from '@mui/toolpad-core';
 import { matchPath } from 'react-router-dom';
 import { APP_PAGE_ROUTE } from '../routes';
-import { QueryNode } from '../appDom';
+import { QueryNode, FetchMode } from '../appDom';
 
 export type QueryMeta = {
   name?: string;
   id?: NodeId;
   dataSource?: string;
+  mode?: FetchMode;
 };
+
+export type QueryEditorTabType = 'config' | 'settings';
+
+export type QueryEditorToolsTabType = 'preview' | 'devTools';
 
 export type QueryTab = {
   meta: QueryMeta;
   saved?: QueryNode;
   draft?: QueryNode;
-  toolsTabType: 'preview' | 'devTools';
+  tabType?: QueryEditorTabType;
+  toolsTabType: QueryEditorToolsTabType;
   isPreviewLoading: boolean;
   previewHandler?: () => void;
 };

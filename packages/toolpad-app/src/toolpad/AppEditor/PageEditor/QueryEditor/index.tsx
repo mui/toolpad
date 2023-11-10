@@ -232,7 +232,7 @@ export default function QueryEditor() {
           <Stack
             direction={'row'}
             justifyContent={'space-between'}
-            sx={{ maxHeight: 40, borderBottom: 1, borderColor: 'divider' }}
+            sx={{ maxHeight: 36, borderBottom: 1, borderColor: 'divider' }}
           >
             <TabList onChange={handleTabChange} aria-label="Query editor panel">
               {currentView.queryPanel?.queryTabs?.map((query, index) => (
@@ -264,7 +264,8 @@ export default function QueryEditor() {
                   icon={
                     <QueryIcon
                       id={query?.meta?.dataSource || 'default'}
-                      sx={{ fontSize: 24, mt: 0.2 }}
+                      mode={query?.meta?.mode ?? 'query'}
+                      sx={{ mt: 0.2 }}
                     />
                   }
                   iconPosition="start"
@@ -292,7 +293,7 @@ export default function QueryEditor() {
               />
             </IconButton>
           </Stack>
-          <Box
+          {/* <Box
             sx={{
               display: 'flex',
               justifyContent: 'center',
@@ -328,7 +329,7 @@ export default function QueryEditor() {
             >
               Save <SaveShortcutIndicator />
             </LoadingButton>
-          </Box>
+          </Box> */}
         </Stack>
 
         {currentView.queryPanel?.queryTabs?.map((query, index) => {
@@ -339,8 +340,7 @@ export default function QueryEditor() {
                 value={index.toString()}
                 aria-label={query.meta?.name}
                 sx={{
-                  p: 1,
-                  pb: 0,
+                  p: 0,
                   height: '100%',
                   overflow: 'hidden',
                 }}

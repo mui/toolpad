@@ -1,7 +1,5 @@
 import { Box, Stack, TextField, InputAdornment, Alert, MenuItem, Typography } from '@mui/material';
 import * as React from 'react';
-import SettingsIcon from '@mui/icons-material/Settings';
-import DynamicFormIcon from '@mui/icons-material/DynamicForm';
 import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import invariant from 'invariant';
@@ -11,7 +9,6 @@ import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import { useEvaluateLiveBinding } from '../../useEvaluateLiveBinding';
 import { useAppState, useAppStateApi } from '../../../AppState';
-import { QueryEditorTabType } from '../../../../types';
 import { ConnectionContextProvider } from '../../../../toolpadDataSources/context';
 import BindableEditor from '../BindableEditor';
 import { useProjectApi } from '../../../../projectApi';
@@ -27,33 +24,6 @@ function refetchIntervalInSeconds(maybeInterval?: number) {
   }
   const seconds = Math.floor(maybeInterval / 1000);
   return seconds > 0 ? seconds : undefined;
-}
-
-const settingsToggleIconStyles = {
-  p: 0,
-  mr: 1,
-  color: 'primary.main',
-  fontSize: 16,
-  cursor: 'pointer',
-  '&:hover': {
-    color: 'primary.dark',
-  },
-};
-
-interface QuerySettingsToggleButtonProps {
-  tabType: QueryEditorTabType;
-  handleTabTypeChange: () => void;
-}
-
-function QuerySettingsToggleButton({
-  tabType,
-  handleTabTypeChange,
-}: QuerySettingsToggleButtonProps) {
-  return tabType === 'config' ? (
-    <SettingsIcon sx={settingsToggleIconStyles} onClick={handleTabTypeChange} />
-  ) : (
-    <DynamicFormIcon sx={settingsToggleIconStyles} onClick={handleTabTypeChange} />
-  );
 }
 
 interface QuerySettingsTabProps {
@@ -150,7 +120,7 @@ function QuerySettingsTab({
           <MenuItem value="query">Fetch at any time to always be available on the page</MenuItem>
           <MenuItem value="mutation">Only fetch on manual action</MenuItem>
         </TextField>
-        {draft?.attributes?.mode === 'query' ? (
+        {draft?.attributes?.mode !== 'mutation' ? (
           <React.Fragment>
             <Typography fontSize={12} sx={{ alignSelf: 'center' }}>
               Set refetch interval:
@@ -231,12 +201,6 @@ export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
     [projectApi, dataSourceId],
   );
 
-  const [tabType, setTabType] = React.useState<QueryEditorTabType>('config');
-
-  const handleTabTypeChange = React.useCallback(() => {
-    setTabType((prev) => (prev === 'config' ? 'settings' : 'config'));
-  }, []);
-
   return dataSourceId && dataSource && queryEditorContext ? (
     <ConnectionContextProvider value={queryEditorContext}>
       <Box sx={{ height: '100%', p: 0, overflow: 'hidden' }}>
@@ -247,13 +211,6 @@ export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
             globalScope={pageState}
             globalScopeMeta={globalScopeMeta}
             execApi={execPrivate}
-            tabType={tabType}
-            settingsToggle={
-              <QuerySettingsToggleButton
-                tabType={tabType}
-                handleTabTypeChange={handleTabTypeChange}
-              />
-            }
             runtimeConfig={runtimeConfig}
             settingsTab={
               <QuerySettingsTab

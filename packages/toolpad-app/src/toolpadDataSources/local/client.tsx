@@ -13,10 +13,10 @@ import {
   ListSubheader,
   Stack,
   Tab,
-  Typography,
   styled,
   alpha,
 } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
@@ -28,13 +28,14 @@ import Popper from '@mui/material/Popper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
 import TabPanel from '../../components/TabPanel';
-import { ClientDataSource, QueryEditorProps, QueryEditorToolsTabType } from '../../types';
+import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
 import {
   useEvaluateLiveBindingEntries,
   useEvaluateLiveBindings,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import { useAppState, useAppStateApi } from '../../toolpad/AppState';
+import { QueryEditorTabType, QueryEditorToolsTabType } from '../../utils/domView';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import JsonView from '../../components/JsonView';
 import OpenCodeEditorButton from '../../toolpad/OpenCodeEditor';
@@ -398,7 +399,12 @@ function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement 
         })}
       >
         No request has been sent yet. <br />
-        Click <span style={{ fontWeight: 'bold' }}>Preview</span> to preview the response here.
+        Click{' '}
+        <PlayArrowIcon
+          aria-label="Run preview"
+          sx={{ verticalAlign: 'middle', fontSize: '12px', mr: 0.25 }}
+        />
+        to preview the response here.
       </Alert>
     );
   }
@@ -412,9 +418,7 @@ function QueryEditor({
   globalScope,
   globalScopeMeta,
   value: input,
-  settingsToggle,
   settingsTab,
-  tabType,
   execApi,
 }: QueryEditorProps<LocalConnectionParams, LocalQuery, LocalPrivateApi>) {
   const appStateApi = useAppStateApi();
@@ -559,129 +563,137 @@ function QueryEditor({
     }
   }, [execApi, introspection, proposedFileName]);
 
+  const handleTabTypeChange = React.useCallback(
+    (value: QueryEditorTabType) => {
+      appStateApi.updateQueryTab((tab) => ({
+        ...tab,
+        tabType: value,
+      }));
+    },
+    [appStateApi],
+  );
+
   return currentTab ? (
     <PanelGroup autoSaveId="toolpad/local-panel" direction="horizontal">
       <Panel defaultSize={50} minSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
-        <Stack direction="column" gap={0}>
-          <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Typography
-              fontSize={12}
-              sx={{
-                color: (theme) =>
-                  theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
-              }}
-            >
-              {tabType === 'config' ? 'Configuration' : 'Settings'}
-            </Typography>
-            {settingsToggle}
-          </Stack>
-          <Divider />
-          {tabType === 'config' ? (
-            <Stack
-              display="flex"
-              flexDirection={'row'}
-              sx={{
-                alignItems: 'flex-start',
-                mt: 2,
-                mx: 2,
-              }}
-            >
-              <FunctionAutocomplete
-                files={introspection.data?.files || []}
-                selectedFunctionId={transformLegacyFunctionId(
-                  input.attributes.query.function || '',
-                )}
-                onCreateNew={handleCreateNewCommit}
-                onSelect={handleSelectFunction}
-              />
-              <OpenCodeEditorButton
-                filePath={selectedFile ?? ''}
-                fileType="resource"
-                disableRipple
-                sx={(theme) => ({
-                  marginTop: theme.spacing(1),
-                  marginLeft: theme.spacing(1),
-                  border: '1px solid',
-                  borderColor: theme.palette.divider,
-                })}
-              />
-              {introspection.error ? (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    inset: '0 0 0 0',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  {errorFrom(introspection.error).message}
-                </Box>
-              ) : null}
+        <TabContext value={currentTab?.tabType ?? 'config'}>
+          <Stack direction="column" gap={0}>
+            <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <TabList
+                sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                onChange={(event, value) => handleTabTypeChange(value)}
+                aria-label="Query editor active tab type"
+              >
+                <Tab label="Config" value="config" />
+                <Tab label="Settings" value="settings" />
+              </TabList>
             </Stack>
-          ) : (
-            settingsTab
-          )}
-        </Stack>
+
+            <Divider />
+            <TabPanel value="config" disableGutters>
+              <Stack
+                display="flex"
+                flexDirection={'row'}
+                sx={{
+                  alignItems: 'flex-start',
+                  mt: 2,
+                  mx: 2,
+                }}
+              >
+                <FunctionAutocomplete
+                  files={introspection.data?.files || []}
+                  selectedFunctionId={transformLegacyFunctionId(
+                    input.attributes.query.function || '',
+                  )}
+                  onCreateNew={handleCreateNewCommit}
+                  onSelect={handleSelectFunction}
+                />
+                <OpenCodeEditorButton
+                  filePath={selectedFile ?? ''}
+                  fileType="resource"
+                  disableRipple
+                  sx={(theme) => ({
+                    marginTop: theme.spacing(1),
+                    marginLeft: theme.spacing(1),
+                    border: '1px solid',
+                    borderColor: theme.palette.divider,
+                  })}
+                />
+                {introspection.error ? (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: '0 0 0 0',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {errorFrom(introspection.error).message}
+                  </Box>
+                ) : null}
+              </Stack>
+            </TabPanel>
+            <TabPanel value="settings" disableGutters>
+              {settingsTab}
+            </TabPanel>
+          </Stack>
+        </TabContext>
       </Panel>
       <PanelResizeHandle />
       <Panel defaultSize={50} minSize={20}>
         <PanelGroup autoSaveId="toolpad/local/params-tools-split" direction="vertical">
-          <Panel defaultSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
-            <Box
-              display={'flex'}
-              flexDirection={'column'}
-              sx={{
-                px: 1,
-                pt: 0.25,
-              }}
-            >
-              <Typography
-                fontSize={12}
-                sx={{
-                  color: (theme) =>
-                    theme.palette.mode === 'dark' ? theme.palette.grey[500] : 'default',
-                }}
-              >
-                Parameters
-              </Typography>
-              <Divider sx={{ mb: 1 }} />
-              <Grid2 display="grid" gridTemplateColumns={'1fr 1fr 1fr'} gap={2}>
-                {Object.entries(parameterDefs).map(([name, definiton]) => {
-                  const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
-                  return Control ? (
-                    <BindableEditor
-                      key={name}
-                      liveBinding={liveBindings[name]}
-                      globalScope={globalScope}
-                      globalScopeMeta={globalScopeMeta}
-                      label={name}
-                      propType={definiton}
-                      jsRuntime={jsBrowserRuntime}
-                      renderControl={(renderControlParams) => (
-                        <Control {...renderControlParams} propType={definiton} />
-                      )}
-                      value={paramsObject[name]}
-                      onChange={(newValue) => {
-                        const paramKeys = Object.keys(parameterDefs);
-                        const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
-                          const paramValue = key === name ? newValue : paramsObject[key];
-                          return paramValue ? [[key, paramValue]] : [];
-                        });
-                        appStateApi.updateQueryDraft((draft) => ({
-                          ...draft,
-                          params: newParams,
-                        }));
-                      }}
-                    />
-                  ) : null;
-                })}
-              </Grid2>
+          <Panel defaultSize={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+            <Box display={'flex'} flexDirection={'column'}>
+              <TabContext value="parameters">
+                <TabList
+                  sx={{
+                    '& button': { fontSize: 12, fontWeight: 'normal', cursor: 'default' },
+                  }}
+                  aria-label="Query editor parameters"
+                >
+                  <Tab label="Parameters" value="parameters" />
+                </TabList>
+                <Divider sx={{ mb: 1.5 }} />
+                <TabPanel value="parameters" disableGutters sx={{ ml: 1 }}>
+                  <Grid2 display="grid" gridTemplateColumns={'1fr 1fr 1fr'} gap={2}>
+                    {Object.entries(parameterDefs).map(([name, definiton]) => {
+                      const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
+                      return Control ? (
+                        <BindableEditor
+                          key={name}
+                          liveBinding={liveBindings[name]}
+                          globalScope={globalScope}
+                          globalScopeMeta={globalScopeMeta}
+                          label={name}
+                          propType={definiton}
+                          jsRuntime={jsBrowserRuntime}
+                          renderControl={(renderControlParams) => (
+                            <Control {...renderControlParams} propType={definiton} />
+                          )}
+                          value={paramsObject[name]}
+                          onChange={(newValue) => {
+                            const paramKeys = Object.keys(parameterDefs);
+                            const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
+                              const paramValue = key === name ? newValue : paramsObject[key];
+                              return paramValue ? [[key, paramValue]] : [];
+                            });
+                            appStateApi.updateQueryDraft((draft) => ({
+                              ...draft,
+                              params: newParams,
+                            }));
+                          }}
+                        />
+                      ) : null;
+                    })}
+                  </Grid2>
+                </TabPanel>
+              </TabContext>
             </Box>
           </Panel>
           <PanelResizeHandle />
 
-          <Panel defaultSize={60} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+          <Panel defaultSize={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <TabContext value={currentTab.toolsTabType}>
               <Box
                 sx={{

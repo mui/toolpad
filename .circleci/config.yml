@@ -145,7 +145,7 @@ jobs:
     steps:
       - checkout
       - install_js:
-          browsers: true
+          browsers: false
       - run:
           name: 'Build packages'
           command: yarn release:build

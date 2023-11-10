@@ -34,7 +34,11 @@ import {
   JsExpressionAttrValue,
   ComponentConfig,
 } from '@mui/toolpad-core';
-import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
+import {
+  createGlobalState,
+  createProvidedContext,
+  useAssertedContext,
+} from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
 import { QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -97,6 +101,11 @@ const IS_RENDERED_IN_CANVAS =
     : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
 
 const SHOW_PREVIEW_HEADER = IS_PREVIEW && !IS_RENDERED_IN_CANVAS;
+
+export type PageComponents = Partial<Record<string, React.ComponentType>>;
+
+export const componentsStore = createGlobalState<ToolpadComponents>({});
+export const pageComponentsStore = createGlobalState<PageComponents>({});
 
 const Pre = styled('pre')(({ theme }) => ({
   margin: 0,
@@ -1352,13 +1361,22 @@ function FetchNode({ node, page }: FetchNodeProps) {
   }
 }
 
-export interface RenderedNodeProps {
-  nodeId: NodeId;
+interface RenderedProCodePageProps {
+  page: appDom.PageNode;
 }
 
-export function RenderedPage({ nodeId }: RenderedNodeProps) {
+function RenderedProCodePage({ page }: RenderedProCodePageProps) {
+  const pageComponents = pageComponentsStore.useValue();
+  const PageComponent = pageComponents[page.name] ?? PageNotFound;
+  return <PageComponent />;
+}
+
+interface RenderedLowCodePageProps {
+  page: appDom.PageNode;
+}
+
+function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
   const dom = useDomContext();
-  const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
   usePageTitle(page.attributes.title);
@@ -1403,6 +1421,23 @@ export function RenderedPage({ nodeId }: RenderedNodeProps) {
       </RuntimeScoped>
     </ApplicationVmApiContext.Provider>
   );
+}
+
+export interface RenderedNodeProps {
+  nodeId: NodeId;
+}
+
+export function RenderedPage({ nodeId }: RenderedNodeProps) {
+  const dom = useDomContext();
+  const page = appDom.getNode(dom, nodeId, 'page');
+
+  usePageTitle(page.attributes.title);
+
+  if (page.attributes.codeFile) {
+    return <RenderedProCodePage page={page} />;
+  }
+
+  return <RenderedLowCodePage page={page} />;
 }
 
 function PageNotFound() {
@@ -1520,13 +1555,14 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
 
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
-  extraComponents: ToolpadComponents;
   basename: string;
   state: RuntimeState;
 }
 
-export default function ToolpadApp({ rootRef, extraComponents, basename, state }: ToolpadAppProps) {
+export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps) {
   const { dom } = state;
+
+  const extraComponents = componentsStore.useValue();
 
   const components = React.useMemo(
     () => ({ ...internalComponents, ...extraComponents }),

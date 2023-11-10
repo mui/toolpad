@@ -370,11 +370,11 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
 async function fetchAppUrl(appUrl: string): Promise<string> {
   const res = await fetch(appUrl);
   if (!res.ok) {
-    throw new Error(`Failed to fetch "${appUrl}": ${res.statusText}`);
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
   }
   const appBase = res.headers.get('X-Toolpad-Base');
   if (!appBase) {
-    throw new Error(`No Toolpad app running in dev mode found on "${appUrl}"`);
+    throw new Error(`Not a Toolpad app or not running in dev mode`);
   }
   return new URL(appBase, appUrl).toString();
 }
@@ -388,7 +388,19 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
 
-  const appRootUrl = await fetchAppUrl(appUrl);
+  let appRootUrl;
+  try {
+    appRootUrl = await fetchAppUrl(appUrl);
+  } catch (err: any) {
+    console.error(
+      `${chalk.red('error')} - No Toolpad application found running under ${chalk.cyan(appUrl)}\n` +
+        `        Find more information about running a custom server at ${chalk.cyan(
+          'https://mui.com/toolpad/concepts/custom-server/',
+        )}`,
+    );
+
+    process.exit(1);
+  }
 
   const app = express();
 

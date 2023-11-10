@@ -32,7 +32,6 @@ commands:
           name: Restore yarn cache
           keys:
             - v11-yarn-{{ checksum "yarn.lock" }}
-            - v0-next-{{ checksum "yarn.lock" }}
       - run:
           name: Set yarn cache folder
           command: |
@@ -142,6 +141,20 @@ jobs:
 
   test_unit:
     <<: *defaults
+
+    steps:
+      - checkout
+      - install_js:
+          browsers: true
+      - run:
+          name: 'Build packages'
+          command: yarn release:build
+      - run:
+          name: Tests fake browser
+          command: yarn test
+
+  test_integration:
+    <<: *defaults
     resource_class: 'large'
     parallelism: 2
     docker:
@@ -157,14 +170,6 @@ jobs:
       - run:
           name: 'Build packages'
           command: yarn release:build
-      - save_cache:
-          name: Save Next.js cache
-          key: v0-next-{{ checksum "yarn.lock" }}
-          paths:
-            - packages/toolpad-app/.next/cache
-      - run:
-          name: Tests fake browser
-          command: yarn test
       - run:
           name: Tests real browser
           command: SHARD="$((${CIRCLE_NODE_INDEX}+1))"; yarn test:integration --shard=${SHARD}/${CIRCLE_NODE_TOTAL}

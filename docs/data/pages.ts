@@ -75,6 +75,9 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/concepts/display-mode',
       },
+      {
+        pathname: '/toolpad/concepts/custom-server',
+      },
     ],
   },
   {
@@ -183,6 +186,10 @@ const pages: MuiPage[] = [
               {
                 title: 'createFunction',
                 pathname: '/toolpad/reference/api/create-function',
+              },
+              {
+                title: 'createHandler',
+                pathname: '/toolpad/reference/api/create-handler',
               },
               {
                 title: 'getContext',

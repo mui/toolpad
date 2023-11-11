@@ -11,12 +11,11 @@ export interface RunOptions {
   port?: number;
   dev?: boolean;
   base: string;
-  create: boolean;
 }
 
 async function runCommand(
   cmd: 'dev' | 'start',
-  { dir, dev: toolpadDevMode, create: createIfNotExists, ...args }: Omit<RunOptions, 'cmd'>,
+  { dir, dev: toolpadDevMode, ...args }: Omit<RunOptions, 'cmd'>,
 ) {
   const projectDir = path.resolve(process.cwd(), dir);
 
@@ -25,7 +24,6 @@ async function runCommand(
     dir: projectDir,
     dev: cmd !== 'start',
     toolpadDevMode,
-    createIfNotExists,
   });
 
   process.once('SIGINT', () => {
@@ -93,11 +91,6 @@ export default async function cli(argv: string[]) {
       type: 'string',
       describe: 'Public base path of the Toolpad application',
       default: '/prod',
-    },
-    create: {
-      type: 'boolean',
-      describe: "Create the application directory if it doesn't exist",
-      default: false,
     },
   } as const;
 

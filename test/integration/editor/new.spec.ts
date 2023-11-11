@@ -7,7 +7,6 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 test.use({
   localAppConfig: {
     cmd: 'dev',
-    create: true,
   },
 });
 

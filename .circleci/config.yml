@@ -156,7 +156,7 @@ jobs:
   test_integration:
     <<: *defaults
     resource_class: 'large'
-    parallelism: 1
+    parallelism: 2
     docker:
       - image: mcr.microsoft.com/playwright:v1.39.0-focal
         environment:
@@ -172,10 +172,10 @@ jobs:
           command: yarn release:build
       - run:
           name: Tests real browser
-          command: SHARD="$((${CIRCLE_NODE_INDEX}+1))"; yarn test:integration --shard=${SHARD}/${CIRCLE_NODE_TOTAL}
+          command: yarn test:integration
       - run:
           name: Upload screenshots to Argos CI
-          command: yarn test:argos
+          command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} yarn test:argos
       - store_artifacts:
           path: test/test-results
           destination: playwright-test-results

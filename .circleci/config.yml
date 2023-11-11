@@ -173,6 +173,8 @@ jobs:
       - run:
           name: Tests real browser
           command: yarn test:integration
+      - store_test_results:
+          path: test/test-results/junit.xml
       - run:
           name: Upload screenshots to Argos CI
           command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} yarn test:argos

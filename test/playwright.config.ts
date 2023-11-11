@@ -27,6 +27,7 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
 
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000/',
   },
+  reporter: [['list'], ['junit', { outputFile: 'test-results/junit.xml' }]],
   projects: [
     {
       name: 'chromium',

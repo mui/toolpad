@@ -129,7 +129,7 @@
     "typescript": "5.2.2",
     "vite": "4.5.0",
     "vm-browserify": "1.1.2",
-    "whatwg-url": "13.0.0",
+    "whatwg-url": "14.0.0",
     "ws": "8.14.2",
     "yaml": "2.3.4",
     "yaml-diff-patch": "2.0.0",

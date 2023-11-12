@@ -10,7 +10,7 @@ Toolpad builds on top of the [MUI X Data Grid](https://mui.com/x/react-data-grid
 
 ## Usage
 
-A Data Grid is an essential component in an internal application. Following properties make it usable to work alongside other Toolpad components, queries, data providers.
+A Data Grid is an essential component in an internal application. The following properties make it usable to work alongside other Toolpad components, queries, data providers.
 
 ### Rows
 

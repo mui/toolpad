@@ -40,11 +40,11 @@
     "yargs": "17.7.2"
   },
   "devDependencies": {
-    "@types/inquirer": "9.0.6",
-    "@types/invariant": "2.2.36",
-    "@types/node": "20.8.10",
-    "@types/semver": "7.5.4",
-    "@types/tar": "6.1.8",
-    "@types/yargs": "17.0.29"
+    "@types/inquirer": "9.0.7",
+    "@types/invariant": "2.2.37",
+    "@types/node": "20.9.0",
+    "@types/semver": "7.5.5",
+    "@types/tar": "6.1.9",
+    "@types/yargs": "17.0.31"
   }
 }

@@ -51,9 +51,9 @@
     "react-is": "18.2.0"
   },
   "devDependencies": {
-    "@types/cookie": "0.5.3",
-    "@types/react": "18.2.34",
-    "@types/react-is": "18.2.3",
+    "@types/cookie": "0.5.4",
+    "@types/react": "18.2.37",
+    "@types/react-is": "18.2.4",
     "concurrently": "8.2.2"
   },
   "peerDependencies": {

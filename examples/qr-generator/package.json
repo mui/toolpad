@@ -12,6 +12,6 @@
     "qrcode": "^1.5.3"
   },
   "devDependencies": {
-    "@types/qrcode": "^1.5.4"
+    "@types/qrcode": "^1.5.5"
   }
 }

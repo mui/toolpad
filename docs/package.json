@@ -87,11 +87,11 @@
     "webpack-bundle-analyzer": "4.9.1"
   },
   "devDependencies": {
-    "@babel/plugin-transform-react-constant-elements": "7.22.5",
-    "@babel/preset-typescript": "7.23.2",
-    "@types/doctrine": "0.0.8",
-    "@types/json-schema": "7.0.14",
-    "@types/react-is": "18.2.3",
+    "@babel/plugin-transform-react-constant-elements": "7.23.3",
+    "@babel/preset-typescript": "7.23.3",
+    "@types/doctrine": "0.0.9",
+    "@types/json-schema": "7.0.15",
+    "@types/react-is": "18.2.4",
     "cpy-cli": "5.0.0",
     "cross-fetch": "4.0.0",
     "gm": "1.25.0",

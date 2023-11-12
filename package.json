@@ -90,7 +90,7 @@
     "archiver": "6.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.3.0",
-    "inquirer": "9.2.11",
+    "inquirer": "9.2.12",
     "lodash": "4.17.21",
     "semver": "7.5.4",
     "tsup": "7.2.0",

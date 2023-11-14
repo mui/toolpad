@@ -1,1 +1,1 @@
-export { createHandler as unstable_createHandler } from '../server/index';
+export { createHandler } from '../server/index';

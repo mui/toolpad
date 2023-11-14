@@ -17,10 +17,12 @@ export const resolvedComponentsId = `\0${componentsId}`;
 
 export interface GetHtmlContentParams {
   canvas: boolean;
+  base: string;
 }
 
-export function getHtmlContent({ canvas }: GetHtmlContentParams) {
+export function getHtmlContent({ canvas, base }: GetHtmlContentParams) {
   const entryPoint = canvas ? CANVAS_ENTRY : MAIN_ENTRY;
+  const devtoolsSrc = `${base}/__toolpad_dev__/reactDevtools/bootstrap.global.js`;
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -42,7 +44,7 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
                 // Add the data-toolpad-canvas attribute to the canvas iframe element
                 if (window.frameElement?.dataset.toolpadCanvas) {
                   var script = document.createElement('script');
-                  script.src = '/reactDevtools/bootstrap.global.js';
+                  script.src = ${JSON.stringify(devtoolsSrc)};
                   document.write(script.outerHTML);
                 }
               </script>
@@ -111,7 +113,7 @@ function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParam
         return resolvedComponentsId;
       }
       if (importer === resolvedRuntimeEntryPointId || importer === resolvedComponentsId) {
-        const newId = path.resolve(root, 'toolpad', id);
+        const newId = path.resolve(root, id);
         return this.resolve(newId, importer);
       }
       return null;
@@ -120,7 +122,7 @@ function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParam
     async load(id) {
       if (id.endsWith('.html')) {
         // production build only
-        return getHtmlContent({ canvas: false });
+        return getHtmlContent({ canvas: false, base });
       }
       if (id === resolvedRuntimeEntryPointId) {
         return {

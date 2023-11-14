@@ -15,6 +15,13 @@ interface IToolpadProject {
 }
 
 /**
+ * Get file path for the env file.
+ */
+function getEnvFilePath() {
+  return path.resolve(process.cwd(), '.env');
+}
+
+/**
  * Handles loading env files and watches for updates.
  */
 export default class EnvManager {
@@ -54,7 +61,7 @@ export default class EnvManager {
   }
 
   private loadEnvFile() {
-    const envFilePath = this.getEnvFilePath();
+    const envFilePath = getEnvFilePath();
     this.resetEnv();
     const { parsed = {} } = dotenv.config({ path: envFilePath, override: true });
     this.values = parsed;
@@ -67,19 +74,12 @@ export default class EnvManager {
     );
   }
 
-  /**
-   * Get file path for the env file.
-   */
-  getEnvFilePath() {
-    return path.resolve(this.project.getRoot(), '.env');
-  }
-
   private initWatcher() {
     if (!this.project.options.dev) {
       return;
     }
 
-    this.watcher = chokidar.watch([this.getEnvFilePath()], {
+    this.watcher = chokidar.watch([getEnvFilePath()], {
       usePolling: true,
       ignoreInitial: true,
     });

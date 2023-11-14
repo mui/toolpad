@@ -3,7 +3,7 @@ import path from 'path';
 import yargs from 'yargs';
 import chalk from 'chalk';
 import { execaNode } from 'execa';
-import { runApp } from '../src/server';
+import { runApp, runEditor } from '../src/server';
 
 export type Command = 'dev' | 'start' | 'build';
 export interface RunOptions {
@@ -11,11 +11,12 @@ export interface RunOptions {
   port?: number;
   dev?: boolean;
   base: string;
+  create: boolean;
 }
 
 async function runCommand(
   cmd: 'dev' | 'start',
-  { dir, dev: toolpadDevMode, ...args }: Omit<RunOptions, 'cmd'>,
+  { dir, dev: toolpadDevMode, create: createIfNotExists, ...args }: Omit<RunOptions, 'cmd'>,
 ) {
   const projectDir = path.resolve(process.cwd(), dir);
 
@@ -24,6 +25,7 @@ async function runCommand(
     dir: projectDir,
     dev: cmd !== 'start',
     toolpadDevMode,
+    createIfNotExists,
   });
 
   process.once('SIGINT', () => {
@@ -37,6 +39,15 @@ async function devCommand(args: RunOptions) {
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - starting Toolpad application in dev mode...`);
   await runCommand('dev', args);
+}
+
+interface EditorOptions {
+  url: string;
+  dev?: boolean;
+}
+
+async function editorCommand({ dev: toolpadDevMode, ...args }: EditorOptions) {
+  await runEditor(args.url, { toolpadDevMode, ...args });
 }
 
 interface BuildOptions {
@@ -76,12 +87,17 @@ export default async function cli(argv: string[]) {
     dir: {
       type: 'string',
       describe: 'Directory of the Toolpad application',
-      default: '.',
+      default: './toolpad',
     },
     base: {
       type: 'string',
       describe: 'Public base path of the Toolpad application',
       default: '/prod',
+    },
+    create: {
+      type: 'boolean',
+      describe: "Create the application directory if it doesn't exist",
+      default: false,
     },
   } as const;
 
@@ -128,6 +144,25 @@ export default async function cli(argv: string[]) {
         ...sharedOptions,
       },
       (args) => buildCommand(args),
+    )
+    .command(
+      'editor [url]',
+      'Run the Toolpad editor for a custom server',
+      {
+        url: {
+          type: 'string',
+          describe: 'URL of the Toolpad application',
+          demandOption: true,
+        },
+        dev: {
+          type: 'boolean',
+          describe: 'Run the Toolpad editor app in development mode',
+          demandOption: false,
+          default: false,
+          hidden: true,
+        },
+      },
+      (args) => editorCommand(args),
     )
     .command('help', 'Show help', {}, async () => {
       // eslint-disable-next-line no-console

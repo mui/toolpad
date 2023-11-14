@@ -2,9 +2,9 @@ import * as path from 'path';
 import * as url from 'url';
 import * as fs from 'fs/promises';
 import invariant from 'invariant';
+import { folderExists } from '@mui/toolpad-utils/fs';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/localTest';
-import { folderExists } from '../../../packages/toolpad-utils/src/fs';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 

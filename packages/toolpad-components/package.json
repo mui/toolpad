@@ -40,7 +40,7 @@
   "dependencies": {
     "@mui/icons-material": "5.14.18",
     "@mui/lab": "5.0.0-alpha.153",
-    "@mui/material": "5.14.17",
+    "@mui/material": "5.14.18",
     "@mui/toolpad-core": "0.1.37",
     "@mui/toolpad-utils": "0.1.37",
     "@mui/x-charts": "6.18.1",

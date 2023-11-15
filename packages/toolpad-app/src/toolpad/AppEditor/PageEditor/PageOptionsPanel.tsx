@@ -15,6 +15,7 @@ import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
 import PageTitleEditor from '../PageTitleEditor';
+import PageDisplayNameEditor from '../PageDisplayNameEditor';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
   { value: 'shell', label: 'App shell' },
@@ -27,7 +28,6 @@ export default function PageOptionsPanel() {
   const domApi = useDomApi();
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
-
   const handleDisplayModeChange = React.useCallback(
     (event: React.MouseEvent<HTMLElement>, newValue: appDom.PageDisplayMode) => {
       domApi.update((draft) =>
@@ -41,7 +41,7 @@ export default function PageOptionsPanel() {
     <Stack spacing={1} alignItems="start" data-testid="page-editor">
       <Typography variant="subtitle1">Page:</Typography>
       <NodeNameEditor node={page} />
-      <NodeNameEditor node={page} />
+      <PageDisplayNameEditor node={page} />
       <PageTitleEditor node={page} />
       <Typography variant="body2">Display mode:</Typography>
       <Tooltip

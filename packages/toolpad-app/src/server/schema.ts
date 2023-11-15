@@ -259,6 +259,7 @@ elementSchema = baseElementSchema
 export const pageSchema = toolpadObjectSchema(
   'page',
   z.object({
+    displayName: z.string().optional().describe('page name to display in the UI.'),
     id: z.string().describe('Serves as a canonical id of the page.'),
     title: z.string().optional().describe('Title for this page.'),
     parameters: z

@@ -478,6 +478,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       apiVersion: API_VERSION,
       kind: 'page',
       spec: {
+        displayName: node.displayName,
         id: node.id,
         title: node.attributes.title,
         parameters: undefinedWhenEmpty(

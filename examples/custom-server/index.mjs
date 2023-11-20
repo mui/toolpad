@@ -24,4 +24,6 @@ const { handler } = await createHandler({
 // Use the handler in your application
 app.use('/my-app', handler);
 
-app.listen(3001);
+const server = app.listen(3001, () => {
+  console.log(`Listening on http://localhost:${server.address().port}`);
+});

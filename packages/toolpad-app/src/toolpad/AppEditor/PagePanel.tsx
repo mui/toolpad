@@ -41,11 +41,11 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
       <Divider />
 
       <PanelGroup autoSaveId="toolpad-page-panel" direction="vertical">
-        <Panel minSizePixels={10} defaultSizePixels={30} maxSizePixels={75}>
+        <Panel minSizePercentage={10} defaultSizePercentage={30} maxSizePercentage={75}>
           <PagesExplorer />
         </Panel>
         <PanelResizeHandle />
-        <Panel minSizePixels={25} maxSizePixels={90}>
+        <Panel minSizePercentage={25} maxSizePercentage={90}>
           <PageHierarchyExplorer />
         </Panel>
       </PanelGroup>

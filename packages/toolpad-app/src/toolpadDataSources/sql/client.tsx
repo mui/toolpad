@@ -234,9 +234,9 @@ export function QueryEditor({
 
   return (
     <PanelGroup autoSaveId="toolpad-sql-panel" direction="horizontal">
-      <Panel defaultSizePixels={50}>
+      <Panel defaultSizePercentage={50}>
         <PanelGroup direction="vertical">
-          <Panel defaultSizePixels={85}>
+          <Panel defaultSizePercentage={85}>
             <QueryInputPanel onRunPreview={handleRunPreview}>
               <Box sx={{ flex: 1, minHeight: 0 }}>
                 <MonacoEditor
@@ -257,7 +257,7 @@ export function QueryEditor({
               }}
             />
           </PanelResizeHandle>
-          <Panel defaultSizePixels={15}>
+          <Panel defaultSizePercentage={15}>
             <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
               <Typography>Parameters</Typography>
               <ParametersEditor
@@ -272,7 +272,7 @@ export function QueryEditor({
           </Panel>
         </PanelGroup>
       </Panel>
-      <Panel defaultSizePixels={50}>
+      <Panel defaultSizePercentage={50}>
         <Box
           sx={{
             height: '100%',

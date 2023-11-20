@@ -20,7 +20,6 @@ import {
   readMaybeDir,
   updateYamlFile,
   fileExists,
-  folderExists,
   readJsonFile,
 } from '@mui/toolpad-utils/fs';
 import { z } from 'zod';
@@ -68,22 +67,16 @@ invariant(
   'localMode should be used only in the main thread. Use message passing to get data from the main thread.',
 );
 
-function getToolpadFolder(root: string): string {
-  return path.join(root, './toolpad');
-}
-
 function getThemeFile(root: string): string {
-  return path.join(getToolpadFolder(root), './theme.yml');
+  return path.join(root, './theme.yml');
 }
 
 function getComponentsFolder(root: string): string {
-  const toolpadFolder = getToolpadFolder(root);
-  return path.join(toolpadFolder, './components');
+  return path.join(root, './components');
 }
 
 function getPagesFolder(root: string): string {
-  const toolpadFolder = getToolpadFolder(root);
-  return path.join(toolpadFolder, './pages');
+  return path.join(root, './pages');
 }
 
 function getPageFolder(root: string, name: string): string {
@@ -103,19 +96,11 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
 }
 
 function getOutputFolder(root: string) {
-  return path.join(getToolpadFolder(root), '.generated');
+  return path.join(root, '.generated');
 }
 
 function getAppOutputFolder(root: string) {
   return path.join(getOutputFolder(root), 'app');
-}
-
-async function legacyConfigFileExists(root: string): Promise<boolean> {
-  const [yamlFileExists, ymlFileExists] = await Promise.all([
-    fileExists(path.join(root, './toolpad.yaml')),
-    fileExists(path.join(root, './toolpad.yml')),
-  ]);
-  return yamlFileExists || ymlFileExists;
 }
 
 type ComponentsContent = Record<string, { code: string }>;
@@ -276,8 +261,7 @@ type BuildInfo = z.infer<typeof buildInfoSchema>;
 const DEFAULT_GENERATED_GITIGNORE_FILE_CONTENT = '.generated\n';
 
 async function initGitignore(root: string) {
-  const projectFolder = getToolpadFolder(root);
-  const generatedGitignorePath = path.resolve(projectFolder, '.gitignore');
+  const generatedGitignorePath = path.resolve(root, '.gitignore');
   if (!(await fileExists(generatedGitignorePath))) {
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('info')}  - Initializing .gitignore file`);
@@ -502,6 +486,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
         content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
         display: node.attributes.display,
+        unstable_codeFile: node.attributes.codeFile,
       },
     } satisfies Page;
   }
@@ -676,6 +661,7 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
       title: pageFileSpec.title || '',
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
+      codeFile: pageFileSpec.unstable_codeFile || undefined,
     },
   });
 
@@ -908,24 +894,11 @@ export async function loadDomFromDisk(root: string): Promise<appDom.AppDom> {
   return projectFolderToAppDom(projectFolder);
 }
 
-async function migrateLegacyProject(root: string) {
-  const isLegacyProject = await legacyConfigFileExists(root);
-
-  if (isLegacyProject) {
-    console.error(
-      `${chalk.red(
-        'error',
-      )} - This project was created with a deprecated version of Toolpad, please use @mui/toolpad@0.1.17 to migrate this project`,
-    );
-    process.exit(1);
-  }
-}
-
 function getDomFilePatterns(root: string) {
   return [
-    path.resolve(root, './toolpad/pages/*/page.yml'),
-    path.resolve(root, './toolpad/components'),
-    path.resolve(root, './toolpad/components/*.*'),
+    path.resolve(root, './pages/*/page.yml'),
+    path.resolve(root, './components'),
+    path.resolve(root, './components/*.*'),
   ];
 }
 /**
@@ -1065,10 +1038,6 @@ class ToolpadProject {
 
   getRoot() {
     return this.root;
-  }
-
-  getToolpadFolder() {
-    return getToolpadFolder(this.getRoot());
   }
 
   getOutputFolder() {
@@ -1260,7 +1229,7 @@ export type { ToolpadProject };
 
 declare global {
   // eslint-disable-next-line
-  var __toolpadProject: ToolpadProject | undefined;
+  var __toolpadProjects: Set<string> | undefined;
 }
 
 export function resolveProjectDir(dir: string) {
@@ -1273,14 +1242,19 @@ export interface InitProjectOptions extends Partial<ToolpadProjectOptions> {
 }
 
 export async function initProject({ dir: dirInput, ...config }: InitProjectOptions) {
+  const dir = resolveProjectDir(dirInput);
+
+  invariant(
+    // eslint-disable-next-line no-underscore-dangle
+    !global.__toolpadProjects?.has(dir),
+    `A project is already running for "${dir}"`,
+  );
   // eslint-disable-next-line no-underscore-dangle
-  invariant(!global.__toolpadProject, 'A project is already running');
+  global.__toolpadProjects ??= new Set();
+  // eslint-disable-next-line no-underscore-dangle
+  global.__toolpadProjects.add(dir);
 
-  const dir = await resolveProjectDir(dirInput);
-
-  if (!(await folderExists(dir))) {
-    throw new Error(`No Toolpad project found at ${chalk.cyan(`"${dir}"`)}`);
-  }
+  await initToolpadFolder(dir);
 
   const resolvedConfig: ToolpadProjectOptions = {
     dev: false,
@@ -1289,13 +1263,7 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
     ...config,
   };
 
-  await migrateLegacyProject(dir);
-
-  await initToolpadFolder(dir);
-
   const project = new ToolpadProject(dir, resolvedConfig);
-  // eslint-disable-next-line no-underscore-dangle
-  globalThis.__toolpadProject = project;
 
   return project;
 }

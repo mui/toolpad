@@ -37,14 +37,14 @@ function PageEditorContent({ node }: PageEditorContentProps) {
   return (
     <PageEditorProvider key={node.id} nodeId={node.id}>
       <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
-        <Panel defaultSize={75} minSize={50} maxSize={80}>
+        <Panel defaultSizePixels={75} minSizePixels={50} maxSizePixels={80}>
           <PageEditorRoot>
             <ComponentCatalog />
             <RenderPanel className={classes.renderPanel} />
           </PageEditorRoot>
         </Panel>
         <PanelResizeHandle />
-        <Panel defaultSize={25} maxSize={50} minSize={20}>
+        <Panel defaultSizePixels={25} maxSizePixels={50} minSizePixels={20}>
           <ComponentPanel />
         </Panel>
       </PanelGroup>

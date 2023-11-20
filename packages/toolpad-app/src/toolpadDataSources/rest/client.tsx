@@ -407,9 +407,9 @@ function QueryEditor({
 
   return (
     <PanelGroup direction="horizontal">
-      <Panel defaultSize={50} minSize={20}>
+      <Panel defaultSizePixels={50} minSizePixels={20}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={60} minSize={40}>
+          <Panel defaultSizePixels={60} minSizePixels={40}>
             <QueryInputPanel onRunPreview={handleRunPreview}>
               <Stack gap={2} sx={{ px: 3, pt: 1 }}>
                 <Typography>Query</Typography>
@@ -537,9 +537,9 @@ function QueryEditor({
 
       <PanelResizeHandle />
 
-      <Panel defaultSize={50} minSize={20}>
+      <Panel defaultSizePixels={50} minSizePixels={20}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={60}>
+          <Panel defaultSizePixels={60}>
             <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
               <ResolvedPreview
                 preview={preview}

@@ -158,7 +158,7 @@
     "@types/ws": "8.5.9",
     "@types/yargs": "17.0.31",
     "ajv": "8.12.0",
-    "eslint": "8.53.0",
+    "eslint": "8.54.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-import": "2.29.0",
     "formidable": "3.5.1",

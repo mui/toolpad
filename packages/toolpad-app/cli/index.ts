@@ -58,7 +58,7 @@ async function buildCommand({ dir, base }: BuildOptions) {
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - building Toolpad application...`);
 
-  const builderPath = path.resolve(__dirname, './appBuilderWorker.js');
+  const builderPath = path.resolve(__dirname, './appBuilderWorker.mjs');
 
   await execaNode(builderPath, [], {
     stdio: 'inherit',

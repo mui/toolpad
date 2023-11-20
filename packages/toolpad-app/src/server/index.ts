@@ -103,7 +103,7 @@ async function createDevHandler(project: ToolpadProject) {
 
   handler.use(
     '/__toolpad_dev__/reactDevtools',
-    express.static(path.resolve(currentDirectory, '../../dist/editor/reactDevtools')),
+    express.static(path.resolve(currentDirectory, '../../dist/reactDevtools')),
   );
 
   handler.use(

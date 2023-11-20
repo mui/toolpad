@@ -10,4 +10,22 @@ A basic Toolpad app that shows how to call an API and work with data grid and im
 
 To build this app step-by-step, visit the [docs](https://mui.com/toolpad/getting-started/first-app/#building-your-first-application).
 
+## How to run
+
+Use `create-toolpad-app` to bootstrap the example:
+
+```bash
+npx create-toolpad-app@latest  --example dog-app
+```
+
+```bash
+yarn create toolpad-app --example dog-app
+```
+
+```bash
+pnpm create toolpad-app --example dog-app
+```
+
+or:
+
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/dog-app)

@@ -93,6 +93,12 @@ module.exports = {
   },
   overrides: [
     {
+      files: ['examples/**/*'],
+      rules: {
+        'no-console': 'off',
+      },
+    },
+    {
       files: [
         'packages/create-toolpad-app/**/*',
         'packages/toolpad/**/*',

@@ -2,7 +2,17 @@ import { PlaywrightTestConfig, devices } from '@playwright/test';
 
 process.env.BROWSER = 'none';
 
+function getShard() {
+  if (process.env.CIRCLE_NODE_INDEX && process.env.CIRCLE_NODE_TOTAL) {
+    const current = Number(process.env.CIRCLE_NODE_INDEX) + 1;
+    const total = Number(process.env.CIRCLE_NODE_TOTAL);
+    return { current, total };
+  }
+  return undefined;
+}
+
 const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
+  shard: getShard(),
   forbidOnly: !!process.env.CI,
   retries: process.env.TOOLPAD_TEST_RETRIES ? Number(process.env.TOOLPAD_TEST_RETRIES) : 0,
   testMatch: /.*.spec.[jt]sx?$/,
@@ -17,6 +27,7 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
 
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000/',
   },
+  reporter: [['list'], ['junit', { outputFile: 'test-results/junit.xml' }]],
   projects: [
     {
       name: 'chromium',

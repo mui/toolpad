@@ -32,7 +32,6 @@ commands:
           name: Restore yarn cache
           keys:
             - v11-yarn-{{ checksum "yarn.lock" }}
-            - v0-next-{{ checksum "yarn.lock" }}
       - run:
           name: Set yarn cache folder
           command: |
@@ -142,7 +141,22 @@ jobs:
 
   test_unit:
     <<: *defaults
+
+    steps:
+      - checkout
+      - install_js:
+          browsers: false
+      - run:
+          name: 'Build packages'
+          command: yarn release:build
+      - run:
+          name: Tests fake browser
+          command: yarn test
+
+  test_integration:
+    <<: *defaults
     resource_class: 'large'
+    parallelism: 2
     docker:
       - image: mcr.microsoft.com/playwright:v1.39.0-focal
         environment:
@@ -152,26 +166,20 @@ jobs:
     steps:
       - checkout
       - install_js:
-          browsers: true
+          browsers: false
       - run:
           name: 'Build packages'
           command: yarn release:build
-      - save_cache:
-          name: Save Next.js cache
-          key: v0-next-{{ checksum "yarn.lock" }}
-          paths:
-            - packages/toolpad-app/.next/cache
-      - run:
-          name: Tests fake browser
-          command: yarn test
       - run:
           name: Tests real browser
           command: yarn test:integration
+      - store_test_results:
+          path: test/test-results/junit.xml
       - run:
           name: Upload screenshots to Argos CI
-          command: yarn test:argos
+          command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} yarn test:argos
       - store_artifacts:
-          path: test-results
+          path: test/test-results
           destination: playwright-test-results
 
 workflows:
@@ -188,5 +196,8 @@ workflows:
           requires:
             - checkout
       - test_unit:
+          requires:
+            - checkout
+      - test_integration:
           requires:
             - checkout

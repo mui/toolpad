@@ -43,7 +43,7 @@ test(
       cwd: currentDirectory,
     });
     cp.stdout?.pipe(process.stdout);
-    cp.stderr?.pipe(process.stdout);
+    cp.stderr?.pipe(process.stderr);
     const result = await cp;
     expect(result.stdout).toMatch('Run the following to get started');
     const packageJsonContent = await fs.readFile(path.resolve(testDir, './package.json'), {
@@ -77,10 +77,10 @@ test(
         BROWSER: 'none',
       },
     });
-    const { stdout: toolpadDevOutput } = toolpadProcess;
+    toolpadProcess.stdout?.pipe(process.stdout);
+    toolpadProcess.stderr?.pipe(process.stderr);
 
-    expect(toolpadDevOutput).toBeTruthy();
-    const match = await waitForMatch(toolpadDevOutput!, /http:\/\/localhost:(\d+)/);
+    const match = await waitForMatch(toolpadProcess.stdout!, /http:\/\/localhost:(\d+)/);
 
     expect(match).toBeTruthy();
 

@@ -12,7 +12,6 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
 // eslint-disable-next-line import/extensions
 import openBrowser from 'react-dev-utils/openBrowser.js';
-import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import * as url from 'node:url';
@@ -425,7 +424,6 @@ export interface RunAppOptions {
   dir?: string;
   base?: string;
   toolpadDevMode?: boolean;
-  createIfNotExists?: boolean;
 }
 
 export async function runApp({
@@ -434,18 +432,8 @@ export async function runApp({
   base = '/prod',
   port = 3000,
   toolpadDevMode = false,
-  createIfNotExists,
 }: RunAppOptions) {
   const projectDir = resolveProjectDir(dir);
-
-  if (!(await folderExists(projectDir)) && !createIfNotExists) {
-    console.error(
-      `${chalk.red('error')} - No project found at ${chalk.cyan(
-        `"${projectDir}"`,
-      )}. Use the --create option to initialize a new Toolpad project in this folder.`,
-    );
-    process.exit(1);
-  }
 
   if (!port) {
     port = dev ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;

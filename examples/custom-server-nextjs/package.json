@@ -1,0 +1,16 @@
+{
+  "name": "custom-server-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "toolpad build --base /my-app && next build",
+    "start": "next start",
+    "edit": "toolpad editor http://localhost:3001/my-app"
+  },
+  "dependencies": {
+    "@mui/toolpad": "0.1.37",
+    "next": "14.0.2"
+  },
+  "devDependencies": {}
+}

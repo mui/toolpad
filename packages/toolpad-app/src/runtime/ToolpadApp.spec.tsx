@@ -22,8 +22,6 @@ import ToolpadApp from './ToolpadApp';
 
 afterEach(cleanup);
 
-const COMPONENTS = {};
-
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
@@ -50,7 +48,7 @@ function renderPage(
 
   return render(
     <CanvasEventsContext.Provider value={canvasEvents}>
-      <ToolpadApp extraComponents={COMPONENTS} state={state} basename="toolpad" />
+      <ToolpadApp state={state} basename="toolpad" />
     </CanvasEventsContext.Provider>,
   );
 }

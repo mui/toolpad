@@ -70,6 +70,7 @@ async function createDevServer(config: ToolpadAppDevServerParams) {
     dev: true,
     plugins: [devServerPlugin(config)],
     getComponents,
+    loadDom,
   });
   const devServer = await createServer(viteConfig);
 

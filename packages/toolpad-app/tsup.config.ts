@@ -43,13 +43,13 @@ export default defineConfig((options) => [
     entry: ['./reactDevtools/bootstrap.ts'],
     silent: true,
     clean: !options.watch,
-    outDir: 'dist/reactDevtools',
+    outDir: './dist/reactDevtools',
     bundle: true,
     sourcemap: true,
     target: 'es6',
     format: 'iife',
     replaceNodeEnv: true,
-    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './public/reactDevtools'))],
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/reactDevtools'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('reactDevtools: build successful');

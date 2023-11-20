@@ -59,9 +59,9 @@
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
-    "@types/invariant": "2.2.36",
+    "@types/invariant": "2.2.37",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.34",
-    "@types/react-is": "18.2.3"
+    "@types/react": "18.2.37",
+    "@types/react-is": "18.2.4"
   }
 }

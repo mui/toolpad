@@ -53,6 +53,11 @@
       "allowedVersions": "< 3.0.0"
     },
     {
+      "groupName": "tsx",
+      "matchPackageNames": ["tsx"],
+      "description": "Investigating problems with importing X charts under node.js with tsx"
+    },
+    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
@@ -75,11 +80,6 @@
     {
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
-    },
-    {
-      "groupName": "requires-node-18",
-      "matchPackageNames": ["execa"],
-      "description": "Stalling updates until we break compatibility with Node 16"
     },
     {
       "groupName": "Update @mui/toolpad in examples",

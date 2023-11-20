@@ -34,7 +34,7 @@ const MONOREPO_PACKAGES = {
 
 export default withDocsInfra(
   /** @type {import('next').NextConfig  }} */ ({
-    transpilePackages: ['@mui/monorepo'],
+    transpilePackages: ['@mui/monorepo', '@mui/x-charts'],
     // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
     assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
     env: {
@@ -53,6 +53,12 @@ export default withDocsInfra(
             ...config.resolve.alias,
             docs: path.resolve(MONOREPO_PATH, './docs'),
             ...MONOREPO_PACKAGES,
+            '@mui/toolpad-components': path.resolve(
+              currentDirectory,
+              '../packages/toolpad-components/src',
+            ),
+            '@mui/toolpad-core': path.resolve(currentDirectory, '../packages/toolpad-core/src'),
+            '@mui/toolpad-utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
           },
         },
         module: {

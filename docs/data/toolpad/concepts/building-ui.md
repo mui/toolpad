@@ -32,7 +32,7 @@ Below are the step-by-step instructions on adding, moving, deleting and resizing
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-8.png", "alt": "Resize component", "caption": "Resizing components along columns", "zoom": false }}
 
-Binding dynamic values to these properties is explained in the [managing state](/toolpad/concepts/managing-state/) section.
+Binding dynamic values to these properties is explained in the [data binding](/toolpad/concepts/data-binding/) section.
 
 ### Canvas grid
 

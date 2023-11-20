@@ -512,13 +512,17 @@ function useDataProviderDataGridProps(
         dataProviderPaginationModel = {
           cursor,
           pageSize,
-        } satisfies CursorPaginationModel;
+        };
+        // TODO: when docs are on ts>5, replace with
+        //     } satisfies CursorPaginationModel;
       } else {
         // index based pagination
         dataProviderPaginationModel = {
           start: page * pageSize,
           pageSize,
-        } satisfies IndexPaginationModel;
+        };
+        // TODO: when docs are on ts>5, replace with
+        //     } satisfies IndexPaginationModel;
       }
 
       const result = await dataProvider.getRecords({

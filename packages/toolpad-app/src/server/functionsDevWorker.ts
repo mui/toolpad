@@ -177,7 +177,7 @@ if (!isMainThread && parentPort) {
 
 export function createWorker(env: Record<string, any>) {
   const workerRpcChannel = new MessageChannel();
-  const worker = new Worker(path.resolve(currentDirectory, '../cli/functionsDevWorker.js'), {
+  const worker = new Worker(path.resolve(currentDirectory, '../cli/functionsDevWorker.mjs'), {
     env,
     workerData: {
       workerRpcPort: workerRpcChannel.port1,

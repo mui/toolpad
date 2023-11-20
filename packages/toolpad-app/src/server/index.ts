@@ -51,7 +51,7 @@ async function createDevHandler(project: ToolpadProject) {
 
   handler.use(cors());
 
-  const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.js');
+  const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.mjs');
 
   const [wsPort, devPort, runtimeConfig] = await Promise.all([
     getPort(),
@@ -103,7 +103,7 @@ async function createDevHandler(project: ToolpadProject) {
 
   handler.use(
     '/__toolpad_dev__/reactDevtools',
-    express.static(path.resolve(currentDirectory, '../../dist/editor/reactDevtools')),
+    express.static(path.resolve(currentDirectory, '../../dist/reactDevtools')),
   );
 
   handler.use(
@@ -245,7 +245,7 @@ async function createEditorHandler(
     console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
 
     viteApp = await createViteServer({
-      configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.ts'),
+      configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.mts'),
       root: path.resolve(currentDirectory, '../../src/toolpad'),
       server: { middlewareMode: true },
       plugins: [

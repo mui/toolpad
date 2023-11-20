@@ -5,7 +5,12 @@ import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'node:url';
 import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
-import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
+import {
+  ServerContext,
+  getServerContext,
+  initialContextStore,
+  withContext,
+} from '@mui/toolpad-core/serverRuntime';
 import { isWebContainer } from '@webcontainer/env';
 import SuperJSON from 'superjson';
 import { createRpcClient, serveRpc } from '@mui/toolpad-utils/workerRpc';
@@ -29,6 +34,9 @@ const moduleCache = new Map<string, ModuleObject>();
 function loadModule(fullPath: string, content: string) {
   const moduleRequire = createRequire(url.pathToFileURL(fullPath));
   const moduleObject: ModuleObject = { exports: {} };
+
+  const serverRuntime = moduleRequire('@mui/toolpad-core/serverRuntime');
+  serverRuntime.initStore(initialContextStore);
 
   vm.runInThisContext(`((require, exports, module) => {\n${content}\n})`)(
     moduleRequire,

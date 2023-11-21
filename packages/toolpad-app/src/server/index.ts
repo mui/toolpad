@@ -9,6 +9,8 @@ import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
 import { ViteDevServer, createServer as createViteServer } from 'vite';
 import { WebSocket, WebSocketServer } from 'ws';
+import { Auth } from '@auth/core';
+import GoogleProvider from '@auth/core/providers/google';
 import { listen } from '@mui/toolpad-utils/http';
 // eslint-disable-next-line import/extensions
 import openBrowser from 'react-dev-utils/openBrowser.js';
@@ -28,6 +30,7 @@ import { createRpcHandler } from './rpc';
 import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
+import { httpApiAdapters } from './httpApiAdapters';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -133,6 +136,45 @@ async function createDevHandler(project: ToolpadProject) {
         host: 'localhost',
         port: devPort,
       },
+    }),
+  );
+
+  handler.use(
+    '/api/auth',
+    asyncHandler(async (req, res) => {
+      const request = httpApiAdapters.request.fromExpressToFetch(req);
+
+      const response = await Auth(request, {
+        providers: [
+          GoogleProvider({
+            clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
+            clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
+            authorization: {
+              params: {
+                prompt: 'consent',
+                access_type: 'offline',
+                response_type: 'code',
+              },
+            },
+          }),
+        ],
+        callbacks: {
+          async signIn({ account, profile }) {
+            if (account && account.provider === 'google') {
+              return Boolean(
+                process.env.TOOLPAD_GOOGLE_CLIENT_DOMAIN &&
+                  profile &&
+                  profile.email_verified &&
+                  profile.email &&
+                  profile.email.endsWith(process.env.TOOLPAD_GOOGLE_CLIENT_DOMAIN),
+              );
+            }
+            return true; // Do different verification for other providers that don't have `email_verified`
+          },
+        },
+      });
+
+      await httpApiAdapters.response.fromFetchToExpress(response as Response, res);
     }),
   );
 

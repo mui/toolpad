@@ -12,7 +12,6 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
 // eslint-disable-next-line import/extensions
 import openBrowser from 'react-dev-utils/openBrowser.js';
-import { folderExists } from '@mui/toolpad-utils/fs';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import * as url from 'node:url';
@@ -104,7 +103,7 @@ async function createDevHandler(project: ToolpadProject) {
 
   handler.use(
     '/__toolpad_dev__/reactDevtools',
-    express.static(path.resolve(currentDirectory, '../../dist/editor/reactDevtools')),
+    express.static(path.resolve(currentDirectory, '../../dist/reactDevtools')),
   );
 
   handler.use(
@@ -370,11 +369,11 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
 async function fetchAppUrl(appUrl: string): Promise<string> {
   const res = await fetch(appUrl);
   if (!res.ok) {
-    throw new Error(`Failed to fetch "${appUrl}": ${res.statusText}`);
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
   }
   const appBase = res.headers.get('X-Toolpad-Base');
   if (!appBase) {
-    throw new Error(`No Toolpad app running in dev mode found on "${appUrl}"`);
+    throw new Error(`Not a Toolpad app or not running in dev mode`);
   }
   return new URL(appBase, appUrl).toString();
 }
@@ -388,7 +387,19 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
   // eslint-disable-next-line no-console
   console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
 
-  const appRootUrl = await fetchAppUrl(appUrl);
+  let appRootUrl;
+  try {
+    appRootUrl = await fetchAppUrl(appUrl);
+  } catch (err: any) {
+    console.error(
+      `${chalk.red('error')} - No Toolpad application found running under ${chalk.cyan(appUrl)}\n` +
+        `        Find more information about running a custom server at ${chalk.cyan(
+          'https://mui.com/toolpad/concepts/custom-server/',
+        )}`,
+    );
+
+    process.exit(1);
+  }
 
   const app = express();
 
@@ -425,7 +436,6 @@ export interface RunAppOptions {
   dir?: string;
   base?: string;
   toolpadDevMode?: boolean;
-  createIfNotExists?: boolean;
 }
 
 export async function runApp({
@@ -434,18 +444,8 @@ export async function runApp({
   base = '/prod',
   port = 3000,
   toolpadDevMode = false,
-  createIfNotExists,
 }: RunAppOptions) {
   const projectDir = resolveProjectDir(dir);
-
-  if (!(await folderExists(projectDir)) && !createIfNotExists) {
-    console.error(
-      `${chalk.red('error')} - No project found at ${chalk.cyan(
-        `"${projectDir}"`,
-      )}. Use the --create option to initialize a new Toolpad project in this folder.`,
-    );
-    process.exit(1);
-  }
 
   if (!port) {
     port = dev ? await getPort({ port: getPreferredPorts(DEFAULT_PORT) }) : DEFAULT_PORT;

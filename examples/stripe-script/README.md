@@ -6,23 +6,20 @@
 
 https://github.com/mui/mui-toolpad/assets/19550456/bd327963-c061-4a75-906d-22acdd696211
 
-## How to use
+## How to run
 
-Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
-
-<!-- #default-branch-switch -->
+Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-curl https://codeload.github.com/mui/mui-toolpad/tar.gz/master | tar -xz --strip=2  mui-toolpad-master/examples/stripe-script
-cd stripe-script
+npx create-toolpad-app@latest  --example custom-server
 ```
 
-Install it and run:
+```bash
+yarn create toolpad-app --example custom-server
+```
 
 ```bash
-npm install
-npm run dev
-
+pnpm create toolpad-app --example custom-server
 ```
 
 ## Prerequisite

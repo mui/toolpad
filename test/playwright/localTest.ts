@@ -51,7 +51,6 @@ interface LocalAppConfig {
   // Extra environment variables when running Toolpad
   env?: Record<string, string>;
   base?: string;
-  create?: boolean;
 }
 
 interface LocalServerConfig {
@@ -156,7 +155,7 @@ export async function runCustomServer(
 }
 
 export async function runApp(projectDir: string, options: LocalAppConfig) {
-  const { cmd = 'start', env, base, create } = options;
+  const { cmd = 'start', env, base } = options;
 
   if (cmd === 'start') {
     await buildApp(projectDir, { base, env });
@@ -165,10 +164,6 @@ export async function runApp(projectDir: string, options: LocalAppConfig) {
   const args: string[] = [CLI_CMD, cmd];
   if (options.toolpadDev) {
     args.push('--dev');
-  }
-
-  if (create) {
-    args.push('--create');
   }
 
   // Run each test on its own port to avoid race conditions when running tests in parallel.

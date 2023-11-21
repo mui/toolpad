@@ -274,6 +274,10 @@ export const pageSchema = toolpadObjectSchema(
       .array(elementSchema)
       .optional()
       .describe('The content of the page. This defines the UI.'),
+    unstable_codeFile: z
+      .string()
+      .optional()
+      .describe('The content of the page as JSX. Experimental, do not use!.'),
     display: z
       .union([
         z

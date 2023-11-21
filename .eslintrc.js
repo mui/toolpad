@@ -1,10 +1,18 @@
 const baseline = require('@mui/monorepo/.eslintrc');
 const lodash = require('lodash');
+const path = require('path');
 
 const ALLOWED_LODASH_METHODS = new Set(['throttle', 'debounce', 'set']);
 
 module.exports = {
   ...baseline,
+  settings: {
+    'import/resolver': {
+      webpack: {
+        config: path.join(__dirname, './eslintWebpackResolverConfig.js'),
+      },
+    },
+  },
   extends: [
     ...baseline.extends,
     // Motivation: https://github.com/shian15810/eslint-plugin-typescript-enum#motivations
@@ -84,6 +92,12 @@ module.exports = {
     ],
   },
   overrides: [
+    {
+      files: ['examples/**/*'],
+      rules: {
+        'no-console': 'off',
+      },
+    },
     {
       files: [
         'packages/create-toolpad-app/**/*',

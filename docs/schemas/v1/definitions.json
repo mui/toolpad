@@ -19,7 +19,7 @@
           "properties": {
             "displayName": {
               "type": "string",
-              "description": "page name to display in the UI."
+              "description": "Page name to display in the UI."
             },
             "id": {
               "type": "string",

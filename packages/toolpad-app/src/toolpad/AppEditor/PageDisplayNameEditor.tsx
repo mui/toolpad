@@ -3,7 +3,7 @@ import * as React from 'react';
 import { AppDom, PageNode, setNodeProp } from '../../appDom';
 import { useDomApi } from '../AppState';
 
-interface PageTitleEditorProps {
+interface PageDisplayNameEditorProps {
   node: PageNode;
 }
 
@@ -14,13 +14,13 @@ function validateInput(input: string) {
   return null;
 }
 
-export default function PageTitleEditor({ node }: PageTitleEditorProps) {
+export default function PageDisplayNameEditor({ node }: PageDisplayNameEditorProps) {
   const domApi = useDomApi();
   const [pageDisplayNameInput, setPageDisplayNameInput] = React.useState(
     node.displayName ?? node.name,
   );
 
-  const handlePageTitleChange = React.useCallback(
+  const handlePageDisplayNameChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => setPageDisplayNameInput(event.target.value),
     [],
   );
@@ -43,9 +43,9 @@ export default function PageTitleEditor({ node }: PageTitleEditorProps) {
   return (
     <TextField
       fullWidth
-      label="Display name"
+      label="Page display name"
       value={pageDisplayNameInput}
-      onChange={handlePageTitleChange}
+      onChange={handlePageDisplayNameChange}
       onBlur={handleCommit}
       onKeyDown={handleKeyPress}
       error={!pageDisplayNameInput}

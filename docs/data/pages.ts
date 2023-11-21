@@ -56,8 +56,11 @@ const pages: MuiPage[] = [
         ],
       },
       {
-        pathname: '/toolpad/concepts/managing-state',
-        title: 'Managing state',
+        pathname: '/toolpad/concepts/data-binding',
+        title: 'Data binding',
+      },
+      {
+        pathname: '/toolpad/concepts/event-handling',
       },
       {
         pathname: '/toolpad/concepts/file-structure',
@@ -73,7 +76,16 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/concepts/theming',
       },
       {
-        pathname: '/toolpad/concepts/display-mode',
+        pathname: '/toolpad/concepts/page-properties',
+      },
+    ],
+  },
+  {
+    pathname: '/toolpad/components',
+    children: [
+      { pathname: '/toolpad/components/button' },
+      {
+        pathname: '/toolpad/components/datagrid',
       },
       {
         pathname: '/toolpad/concepts/custom-server',

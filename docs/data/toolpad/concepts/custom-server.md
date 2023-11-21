@@ -44,12 +44,12 @@ To run the custom server you'll have to update the scripts in your your package.
 
 Now you can use the corresponding commands to interact with Toolpad in the custom server
 
-| command      | description                                                                                                                                                                                           |
-| :----------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `yarn dev`   | Run the custom server in dev mode. Similar to opening the application preview when running `toolpad dev`                                                                                              |
-| `yarn start` | Running the Toolpad application in production mode. The application must still be built first with `toolpad build`. Make sure to supply the correct base path.                                        |
-| `yarn build` | Builds the application for production purposes. Note that you must supply the correct base path                                                                                                       |
-| `yarn edit`  | This runs the Toolpad standalone editor and connects it to your custom server. You can now edit the application and the changes will be reflected in the Toolpad project folder of the custom server. |
+| command &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                                                                                                                                                                                           |
+| :------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `yarn dev`                                               | Run the custom server in dev mode. Similar to opening the application preview when running `toolpad dev`                                                                                              |
+| `yarn start`                                             | Running the Toolpad application in production mode. The application must still be built first with `toolpad build`. Make sure to supply the correct base path.                                        |
+| `yarn build`                                             | Builds the application for production purposes. Note that you must supply the correct base path                                                                                                       |
+| `yarn edit`                                              | This runs the Toolpad standalone editor and connects it to your custom server. You can now edit the application and the changes will be reflected in the Toolpad project folder of the custom server. |
 
 :::info
 Detailed documentation on the API is available in the reference section for [`createHandler`](/toolpad/reference/api/create-handler/).

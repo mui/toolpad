@@ -139,6 +139,10 @@ export default createBuiltin(FormWrappedAutocomplete, {
       onChangeProp: 'onChange',
       default: '',
     },
+    defaultValue: {
+      helperText: 'The default value. Use when the component is not controlled.',
+      type: 'array',
+    },
     label: {
       helperText: 'The label to display for the autocomplete.',
       type: 'string',

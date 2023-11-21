@@ -6,6 +6,22 @@
   <img src="https://mui.com//static/toolpad/marketing/with-wasm.png" alt="Toolpad example app with WASM modules" style="aspect-ratio: 1.8" width="100%">
 </a>
 
+## How to run
+
+Use `create-toolpad-app` to bootstrap the example:
+
+```bash
+npx create-toolpad-app@latest  --example with-wasm
+```
+
+```bash
+yarn create toolpad-app --example with-wasm
+```
+
+```bash
+pnpm create toolpad-app --example with-wasm
+```
+
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/with-wasm)
 
 ## What's inside

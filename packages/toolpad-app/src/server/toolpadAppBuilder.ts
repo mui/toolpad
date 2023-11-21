@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
 import type { ComponentEntry } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
+import * as appDom from '../appDom';
+import { pathToNodeImportSpecifier } from '../utils/paths';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -13,7 +15,9 @@ const MAIN_ENTRY = '/main.tsx';
 const CANVAS_ENTRY = '/canvas.tsx';
 
 const componentsId = `virtual:toolpad:components.js`;
+const pageComponentsId = `virtual:toolpad:page-components.js`;
 export const resolvedComponentsId = `\0${componentsId}`;
+export const resolvedPageComponentsId = `\0${pageComponentsId}`;
 
 export interface GetHtmlContentParams {
   canvas: boolean;
@@ -63,21 +67,28 @@ export function getHtmlContent({ canvas, base }: GetHtmlContentParams) {
 interface ToolpadVitePluginParams {
   root: string;
   base: string;
+  loadDom: () => Promise<appDom.AppDom>;
   getComponents: () => Promise<ComponentEntry[]>;
 }
 
-function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParams): Plugin {
+function toolpadVitePlugin({
+  root,
+  base,
+  getComponents,
+  loadDom,
+}: ToolpadVitePluginParams): Plugin {
   const resolvedRuntimeEntryPointId = `\0${MAIN_ENTRY}`;
   const resolvedCanvasEntryPointId = `\0${CANVAS_ENTRY}`;
 
   const getEntryPoint = (isCanvas: boolean) => `
     import { init, setComponents } from '@mui/toolpad/runtime';
     import components from ${JSON.stringify(componentsId)};
+    import pageComponents from ${JSON.stringify(pageComponentsId)};
     ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
     
     const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
-    setComponents(components);
+    setComponents(components, pageComponents);
 
     init({
       ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
@@ -87,10 +98,15 @@ function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParam
 
     if (import.meta.hot) {
       // TODO: investigate why this doesn't work, see https://github.com/vitejs/vite/issues/12912
-      import.meta.hot.accept(${JSON.stringify(componentsId)}, (newComponents) => {
+      import.meta.hot.accept(
+        [${JSON.stringify(componentsId)}, ${JSON.stringify(pageComponentsId)}],
+        (newComponents, newPageComponents) => {
         if (newComponents) {
           console.log('hot updating Toolpad components')
-          setComponents(newComponents);
+          setComponents(
+            newComponents ?? components,
+            newPageComponents ?? pageComponents
+          );
         }
       });
     }
@@ -112,7 +128,14 @@ function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParam
       if (id === componentsId) {
         return resolvedComponentsId;
       }
-      if (importer === resolvedRuntimeEntryPointId || importer === resolvedComponentsId) {
+      if (id === pageComponentsId) {
+        return resolvedPageComponentsId;
+      }
+      if (
+        importer === resolvedRuntimeEntryPointId ||
+        importer === resolvedComponentsId ||
+        importer === resolvedPageComponentsId
+      ) {
         const newId = path.resolve(root, id);
         return this.resolve(newId, importer);
       }
@@ -158,6 +181,40 @@ function toolpadVitePlugin({ root, base, getComponents }: ToolpadVitePluginParam
           map: null,
         };
       }
+      if (id === resolvedPageComponentsId) {
+        const dom = await loadDom();
+        const appNode = appDom.getApp(dom);
+        const { pages = [] } = appDom.getChildNodes(dom, appNode);
+
+        const imports = new Map<string, string>();
+
+        for (const page of pages) {
+          const codeFile = page.attributes.codeFile;
+          if (codeFile) {
+            const importPath = path.resolve(root, `./pages/${page.name}`, codeFile);
+            const relativeImportPath = path.relative(root, importPath);
+            const importSpec = pathToNodeImportSpecifier(relativeImportPath);
+            imports.set(page.name, importSpec);
+          }
+        }
+
+        const importLines = Array.from(
+          imports.entries(),
+          ([name, spec]) => `${name}: React.lazy(() => import(${JSON.stringify(spec)}))`,
+        );
+
+        const code = `
+          import * as React from 'react';
+          
+          export default {
+            ${importLines.join(',\n')}
+          }
+        `;
+        return {
+          code,
+          map: null,
+        };
+      }
       return null;
     },
   };
@@ -171,6 +228,7 @@ export interface CreateViteConfigParams {
   customServer?: boolean;
   plugins?: Plugin[];
   getComponents: () => Promise<ComponentEntry[]>;
+  loadDom: () => Promise<appDom.AppDom>;
 }
 
 export interface CreateViteConfigResult {
@@ -185,6 +243,7 @@ export function createViteConfig({
   customServer,
   plugins = [],
   getComponents,
+  loadDom,
 }: CreateViteConfigParams): CreateViteConfigResult {
   const mode = dev ? 'development' : 'production';
 
@@ -281,7 +340,7 @@ export function createViteConfig({
       appType: 'custom',
       logLevel: 'info',
       root,
-      plugins: [react(), toolpadVitePlugin({ root, base, getComponents }), ...plugins],
+      plugins: [react(), toolpadVitePlugin({ root, base, getComponents, loadDom }), ...plugins],
       base,
       define: {
         'process.env.NODE_ENV': `'${mode}'`,
@@ -295,11 +354,25 @@ export function createViteConfig({
 export interface ToolpadBuilderParams {
   outDir: string;
   getComponents: () => Promise<ComponentEntry[]>;
+  loadDom: () => Promise<appDom.AppDom>;
   root: string;
   base: string;
 }
 
-export async function buildApp({ root, base, getComponents, outDir }: ToolpadBuilderParams) {
-  const { viteConfig } = createViteConfig({ dev: false, root, base, outDir, getComponents });
+export async function buildApp({
+  root,
+  base,
+  getComponents,
+  loadDom,
+  outDir,
+}: ToolpadBuilderParams) {
+  const { viteConfig } = createViteConfig({
+    dev: false,
+    root,
+    base,
+    outDir,
+    getComponents,
+    loadDom,
+  });
   await build(viteConfig);
 }

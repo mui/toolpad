@@ -34,6 +34,7 @@ function Autocomplete({
   label,
   onChange,
   value,
+  defaultValue,
   isRequired,
   minLength,
   maxLength,
@@ -91,10 +92,14 @@ function Autocomplete({
     if (!value) {
       setSelectedVal(null);
     }
-  }, [value]);
+    if (defaultValue) {
+      setSelectedVal(defaultValue);
+    }
+  }, [value, defaultValue]);
 
   return renderFormInput(
     <MuiAutocomplete
+      defaultValue={defaultValue}
       onChange={handleChange}
       options={options ?? []}
       isOptionEqualToValue={(option, selectedValue) => getValue(option) === getValue(selectedValue)}
@@ -141,7 +146,7 @@ export default createBuiltin(FormWrappedAutocomplete, {
     },
     defaultValue: {
       helperText: 'The default value. Use when the component is not controlled.',
-      type: 'array',
+      type: 'object',
     },
     label: {
       helperText: 'The label to display for the autocomplete.',

@@ -1102,6 +1102,8 @@ class ToolpadProject {
 
   async dispose() {
     await Promise.all([this.envManager.dispose(), this.functionsManager.dispose()]);
+    // eslint-disable-next-line no-underscore-dangle
+    global.__toolpadProjects?.delete(this.root);
   }
 
   async loadDom() {

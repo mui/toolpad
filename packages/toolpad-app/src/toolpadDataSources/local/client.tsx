@@ -163,7 +163,7 @@ const StyledListSubheader = styled(ListSubheader)(({ theme }) => ({
 interface FunctionAutocompleteProps {
   files: FileIntrospectionResult[];
   selectedFunctionId?: string;
-  onCreateNew: () => void;
+  onCreateNew: () => Promise<string>;
   onSelect: (functionName: string) => void;
 }
 
@@ -213,9 +213,11 @@ function FunctionAutocomplete({
   const open = Boolean(anchorEl);
   const id = open ? 'function-selector' : undefined;
 
-  const handleCreateNew = React.useCallback(() => {
-    onCreateNew();
-  }, [onCreateNew]);
+  const handleCreateNew = React.useCallback(async () => {
+    const functionId = await onCreateNew();
+    // Select the newly created function.
+    onSelect(functionId);
+  }, [onCreateNew, onSelect]);
 
   const handleInput = React.useCallback((event: React.FormEvent<HTMLInputElement>) => {
     setInputValue((event.target as HTMLInputElement).value);
@@ -563,6 +565,7 @@ function QueryEditor({
     } catch (error) {
       console.error(errorFrom(error).message);
     }
+    return serializeFunctionId({ file: proposedFileName, handler: 'default' });
   }, [execApi, introspection, proposedFileName]);
 
   const handleTabTypeChange = React.useCallback(

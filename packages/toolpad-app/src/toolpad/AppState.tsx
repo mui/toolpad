@@ -334,6 +334,19 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         const queryTabs = state.currentView.queryPanel?.queryTabs || [];
         const currentTabIndex = state.currentView.queryPanel?.currentTabIndex;
         if (currentTabIndex !== undefined && queryTabs) {
+          let newDom = state.dom;
+          let nodeName = action.draft.name;
+          // Check if the dom contains this query draft via its id
+          try {
+            appDom.getNode(state.dom, action.draft.id);
+          } catch (err) {
+            if (state.currentView?.nodeId) {
+              const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
+              newDom = appDom.addNode(state.dom, action.draft, pageNode, 'queries');
+              const createdNode = appDom.getNode(newDom, action.draft.id);
+              nodeName = createdNode.name;
+            }
+          }
           return update(state, {
             currentView: {
               ...state.currentView,
@@ -343,6 +356,10 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
                   if (index === currentTabIndex) {
                     return {
                       ...tab,
+                      meta: {
+                        ...tab.meta,
+                        name: nodeName,
+                      },
                       saved: action.draft,
                     };
                   }
@@ -350,6 +367,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
                 }),
               },
             },
+            dom: newDom,
           });
         }
       }
@@ -387,7 +405,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
         return state;
       }
-      const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
+      // const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
       const draftNode = appDom.createNode(state.dom, 'query', {
         name: action.mode === 'mutation' ? 'action' : 'query',
         attributes: {
@@ -398,9 +416,9 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         },
       });
 
-      const newDom = appDom.addNode(state.dom, draftNode, pageNode, 'queries');
+      // const newDom = appDom.addNode(state.dom, draftNode, pageNode, 'queries');
       const newView = { ...state.currentView };
-      const createdNode = newDom.nodes[draftNode.id] as appDom.QueryNode;
+      // const createdNode = newDom.nodes[draftNode.id] as appDom.QueryNode;
 
       /**
        * To make the app state updates atomic, we must also simultaneously
@@ -412,19 +430,19 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
        */
 
       if (state.currentView.queryPanel?.queryTabs) {
-        newView.view = { kind: 'query', nodeId: createdNode.id };
+        newView.view = { kind: 'query', nodeId: draftNode.id };
         newView.queryPanel = {
           queryTabs: [
             ...state.currentView.queryPanel.queryTabs,
             {
               meta: {
-                id: createdNode.id,
-                name: createdNode.name,
+                id: draftNode.id,
+                name: draftNode.name,
                 dataSource: action.dataSourceId,
-                mode: createdNode.attributes?.mode,
+                mode: draftNode.attributes?.mode,
               },
-              saved: createdNode,
-              draft: createdNode,
+              saved: draftNode,
+              draft: draftNode,
               toolsTabType: 'preview',
               isPreviewLoading: false,
             },
@@ -435,18 +453,18 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         /**
          * If no tabs are open, initialise the query panel
          */
-        newView.view = { kind: 'query', nodeId: createdNode.id };
+        newView.view = { kind: 'query', nodeId: draftNode.id };
         newView.queryPanel = {
           queryTabs: [
             {
               meta: {
-                id: createdNode.id,
-                name: createdNode.name,
+                id: draftNode.id,
+                name: draftNode.name,
                 dataSource: action.dataSourceId,
-                mode: createdNode.attributes?.mode,
+                mode: draftNode.attributes?.mode,
               },
-              saved: createdNode,
-              draft: createdNode,
+              saved: draftNode,
+              draft: draftNode,
               isPreviewLoading: false,
               toolsTabType: 'preview',
             },
@@ -456,7 +474,6 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       }
 
       return update(state, {
-        dom: newDom,
         currentView: newView,
       });
     }

@@ -4,15 +4,12 @@ import { Stack, Chip, Tab, IconButton } from '@mui/material';
 import { LoadingButton, TabList, TabContext, TabPanel } from '@mui/lab';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CircleIcon from '@mui/icons-material/Circle';
-
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
-import * as appDom from '../../../../appDom';
-import { useAppState, useAppStateApi, useDomApi } from '../../../AppState';
+import { useAppState, useAppStateApi } from '../../../AppState';
 import QueryIcon from '../../QueryIcon';
 import QueryEditorPanel from './QueryEditorPanel';
 import useShortcut from '../../../../utils/useShortcut';
 import { isMac } from '../../../../utils/platform';
-
 import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 
 function SaveShortcutIndicator() {
@@ -91,8 +88,8 @@ function TabCloseIcon({
 }
 
 export default function QueryEditor() {
-  const { dom, currentView } = useAppState();
-  const domApi = useDomApi();
+  const { currentView } = useAppState();
+
   const appStateApi = useAppStateApi();
 
   const currentQueryId = React.useMemo(() => {
@@ -165,13 +162,7 @@ export default function QueryEditor() {
       return;
     }
     appStateApi.saveQueryDraft(currentQueryDraft);
-    const page = appDom.getNode(dom, currentView.nodeId, 'page');
-    if (appDom.nodeExists(dom, currentTab.meta.id)) {
-      domApi.saveNode(currentQueryDraft);
-    } else {
-      appStateApi.update((draft) => appDom.addNode(draft, currentQueryDraft, page, 'queries'));
-    }
-  }, [dom, domApi, appStateApi, currentView]);
+  }, [currentView, appStateApi]);
 
   const onClosePanel = React.useCallback(() => {
     appStateApi.closeQueryPanel();
@@ -215,7 +206,7 @@ export default function QueryEditor() {
           <TabList onChange={handleTabChange} aria-label="Query editor panel">
             {currentView.queryPanel?.queryTabs?.map((query, index) => (
               <Tab
-                key={query?.meta?.name}
+                key={index}
                 label={
                   <Chip
                     label={query?.meta?.name}
@@ -287,7 +278,7 @@ export default function QueryEditor() {
           if (query && query.draft) {
             return (
               <TabPanel
-                key={query.meta?.name}
+                key={index}
                 value={index.toString()}
                 aria-label={query.meta?.name}
                 sx={{

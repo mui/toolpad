@@ -5,7 +5,7 @@ import PagesExplorer from './PagesExplorer';
 import PageHierarchyExplorer from './HierarchyExplorer';
 import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
-import { QueriesExplorer } from './PageEditor/QueriesExplorer';
+import { QueriesExplorer, ActionsExplorer } from './PageEditor/QueriesExplorer';
 import { PAGE_PANEL_WIDTH } from '../../constants';
 import { useProject } from '../../project';
 
@@ -44,16 +44,20 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
       <Divider />
 
       <PanelGroup autoSaveId="toolpad-page-panel" direction="vertical">
-        <Panel minSize={10} defaultSize={25} maxSize={75}>
+        <Panel minSize={10} defaultSize={20} maxSize={75}>
           <PagesExplorer />
         </Panel>
         <PanelResizeHandle />
-        <Panel minSize={25} defaultSize={40} maxSize={90}>
+        <Panel minSize={25} defaultSize={30} maxSize={90}>
+          <PageHierarchyExplorer />
+        </Panel>
+        <PanelResizeHandle />
+        <Panel minSize={10} defaultSize={25} maxSize={90}>
           <QueriesExplorer />
         </Panel>
         <PanelResizeHandle />
-        <Panel minSize={25} defaultSize={35} maxSize={90}>
-          <PageHierarchyExplorer />
+        <Panel minSize={10} defaultSize={25} maxSize={90}>
+          <ActionsExplorer />
         </Panel>
       </PanelGroup>
     </PagePanelRoot>

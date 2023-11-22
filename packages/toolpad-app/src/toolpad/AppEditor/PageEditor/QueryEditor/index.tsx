@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
-import { Box, Stack, Chip, Tab, IconButton } from '@mui/material';
+import { Stack, Chip, Tab, IconButton } from '@mui/material';
 import { LoadingButton, TabList, TabContext, TabPanel } from '@mui/lab';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CircleIcon from '@mui/icons-material/Circle';
-import PlayArrow from '@mui/icons-material/PlayArrow';
+
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import * as appDom from '../../../../appDom';
 import { useAppState, useAppStateApi, useDomApi } from '../../../AppState';
@@ -109,16 +109,6 @@ export default function QueryEditor() {
     return '';
   }, [currentView]);
 
-  const isPreviewLoading = React.useMemo(() => {
-    if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
-      return (
-        currentView.queryPanel?.queryTabs?.[parseInt(currentTabIndex, 10)]?.isPreviewLoading ||
-        false
-      );
-    }
-    return false;
-  }, [currentView, currentTabIndex]);
-
   const handleTabChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string) => {
       if (currentView.kind === 'page') {
@@ -139,17 +129,6 @@ export default function QueryEditor() {
     },
     [appStateApi, currentView],
   );
-
-  const handleRunPreview = React.useCallback(() => {
-    if (currentView.kind === 'page') {
-      if (
-        currentView.queryPanel?.queryTabs &&
-        currentView.queryPanel?.currentTabIndex !== undefined
-      ) {
-        currentView.queryPanel.queryTabs[parseInt(currentTabIndex, 10)].previewHandler?.();
-      }
-    }
-  }, [currentView, currentTabIndex]);
 
   const hasUnsavedChanges = React.useCallback(
     (queryIndex: number) => {
@@ -228,50 +207,59 @@ export default function QueryEditor() {
       role="tabpanel"
     >
       <TabContext value={currentTabIndex}>
-        <Stack direction="column">
-          <Stack
-            direction={'row'}
-            justifyContent={'space-between'}
-            sx={{ maxHeight: 36, borderBottom: 1, borderColor: 'divider' }}
-          >
-            <TabList onChange={handleTabChange} aria-label="Query editor panel">
-              {currentView.queryPanel?.queryTabs?.map((query, index) => (
-                <Tab
-                  key={query?.meta?.name}
-                  label={
-                    <Chip
-                      label={query?.meta?.name}
-                      size="small"
-                      variant="outlined"
-                      sx={{
-                        color: 'inherit',
-                        border: 0,
-                        ml: -1,
-                        '&:hover': { color: 'inherit' },
-                      }}
-                      deleteIcon={
-                        <TabCloseIcon
-                          queryIndex={index}
-                          unsaved={hasUnsavedChanges(index)}
-                          queryId={query?.meta?.id}
-                        />
-                      }
-                      // Need to pass onDelete to allow the delete icon to be rendered
-                      onDelete={() => {}}
-                    />
-                  }
-                  value={index.toString()}
-                  icon={
-                    <QueryIcon
-                      id={query?.meta?.dataSource || 'default'}
-                      mode={query?.meta?.mode ?? 'query'}
-                      sx={{ mt: 0.2 }}
-                    />
-                  }
-                  iconPosition="start"
-                />
-              ))}
-            </TabList>
+        <Stack
+          direction={'row'}
+          justifyContent={'space-between'}
+          sx={{ maxHeight: 36, borderBottom: 1, borderColor: 'divider' }}
+        >
+          <TabList onChange={handleTabChange} aria-label="Query editor panel">
+            {currentView.queryPanel?.queryTabs?.map((query, index) => (
+              <Tab
+                key={query?.meta?.name}
+                label={
+                  <Chip
+                    label={query?.meta?.name}
+                    size="small"
+                    variant="outlined"
+                    sx={{
+                      color: 'inherit',
+                      border: 0,
+                      ml: -1,
+                      '&:hover': { color: 'inherit' },
+                    }}
+                    deleteIcon={
+                      <TabCloseIcon
+                        queryIndex={index}
+                        unsaved={hasUnsavedChanges(index)}
+                        queryId={query?.meta?.id}
+                      />
+                    }
+                    // Need to pass onDelete to allow the delete icon to be rendered
+                    onDelete={() => {}}
+                  />
+                }
+                value={index.toString()}
+                icon={
+                  <QueryIcon
+                    id={query?.meta?.dataSource || 'default'}
+                    mode={query?.meta?.mode ?? 'query'}
+                    sx={{ mt: 0.2 }}
+                  />
+                }
+                iconPosition="start"
+              />
+            ))}
+          </TabList>
+          <div>
+            <LoadingButton
+              disabled={saveDisabled}
+              onClick={handleSave}
+              variant="contained"
+              color="primary"
+              sx={{ width: 'fit-content', height: 32, my: 'auto', mt: 0.2, mr: 2 }}
+            >
+              Save <SaveShortcutIndicator />
+            </LoadingButton>
             <IconButton size="small" disableRipple onClick={handleClosePanel}>
               <CancelPresentationIcon
                 sx={{
@@ -292,44 +280,7 @@ export default function QueryEditor() {
                 }}
               />
             </IconButton>
-          </Stack>
-          {/* <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: 1,
-              minHeight: 60,
-              borderBottom: 1,
-              borderColor: 'divider',
-            }}
-          >
-            <LoadingButton
-              disabled={isPreviewLoading}
-              loading={isPreviewLoading}
-              variant="outlined"
-              color="primary"
-              onClick={handleRunPreview}
-              endIcon={<PlayArrow />}
-              sx={{
-                width: 'fit-content',
-                height: 32,
-                mr: 1,
-                my: 'auto',
-                alignSelf: 'center',
-              }}
-            >
-              Preview
-            </LoadingButton>
-            <LoadingButton
-              disabled={saveDisabled}
-              onClick={handleSave}
-              variant="contained"
-              color="primary"
-              sx={{ width: 'fit-content', height: 32, my: 'auto', mr: 2 }}
-            >
-              Save <SaveShortcutIndicator />
-            </LoadingButton>
-          </Box> */}
+          </div>
         </Stack>
 
         {currentView.queryPanel?.queryTabs?.map((query, index) => {

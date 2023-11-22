@@ -1,4 +1,5 @@
 import * as React from 'react';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { BindableAttrEntries } from '@mui/toolpad-core';
 import {
   Alert,
@@ -364,6 +365,7 @@ function FunctionAutocomplete({
                   ref={params.InputProps.ref}
                   inputProps={params.inputProps}
                   placeholder="Filter functions"
+                  autoFocus
                 />
               )}
             />
@@ -654,6 +656,7 @@ function QueryEditor({
                 >
                   <Tab label="Parameters" value="parameters" />
                 </TabList>
+
                 <Divider sx={{ mb: 1.5 }} />
                 <TabPanel value="parameters" disableGutters sx={{ ml: 1 }}>
                   <Grid2 display="grid" gridTemplateColumns={'1fr 1fr 1fr'} gap={2}>
@@ -701,6 +704,7 @@ function QueryEditor({
                   borderColor: 'divider',
                   display: 'flex',
                   height: 32,
+                  justifyContent: 'space-between',
                 }}
               >
                 <TabList
@@ -710,6 +714,16 @@ function QueryEditor({
                 >
                   <Tab label="Preview" value="preview" />
                 </TabList>
+                <LoadingButton
+                  variant="text"
+                  size="small"
+                  loading={isLoading}
+                  disabled={isLoading}
+                  onClick={runPreview}
+                  endIcon={<PlayArrowIcon aria-label="Run preview" onClick={runPreview} />}
+                >
+                  Run
+                </LoadingButton>
               </Box>
               <TabPanel value="preview" disableGutters>
                 <QueryPreview isLoading={currentTab.isPreviewLoading} error={preview?.error}>

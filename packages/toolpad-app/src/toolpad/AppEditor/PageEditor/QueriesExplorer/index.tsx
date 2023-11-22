@@ -8,7 +8,6 @@ import {
   Button,
   IconButton,
   Typography,
-  Divider,
   Popover,
   Stack,
   Paper,
@@ -176,7 +175,7 @@ function DataTreeItem(props: StyledTreeItemProps) {
 interface CreatePopoverProps {
   anchorEl: Element | null;
   createPopoverOpen: boolean;
-  handleCreateNode: (dataSourceId: string, createMode?: appDom.FetchMode) => () => void;
+  handleCreateNode: (dataSourceId: string) => () => void;
   handleCreateClose: () => void;
   createMode: appDom.FetchMode | undefined;
 }
@@ -212,7 +211,7 @@ function CreatePopover({
                 key={dataSourceId}
                 sx={{ minHeight: 50, minWidth: 150 }}
                 variant="outlined"
-                onClick={handleCreateNode(dataSourceId, createMode)}
+                onClick={handleCreateNode(dataSourceId)}
               >
                 <QueryIcon id={dataSourceId} sx={{ fontSize: 28 }} />{' '}
                 {dataSource?.displayName || dataSourceId}
@@ -225,35 +224,17 @@ function CreatePopover({
   );
 }
 
-export function QueriesExplorer() {
+interface ExplorerProps {
+  nodes: appDom.QueryNode[];
+  setAnchorEl: (anchorEl: Element | null) => void;
+  headerText: string;
+  nodeName: string;
+}
+
+function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
   const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
   const currentPageId = currentView.nodeId;
-
-  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
-
-  const queryNodes = React.useMemo(() => {
-    if (!currentPageId) {
-      return [];
-    }
-    if (currentPageId) {
-      const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
-      if (currentPageNode) {
-        return appDom.getChildNodes(dom, currentPageNode).queries ?? [];
-      }
-    }
-    return [];
-  }, [currentPageId, dom]);
-
-  const queries = React.useMemo(() => {
-    return queryNodes.filter(
-      (query) => query.attributes?.mode === 'query' || !query.attributes?.mode,
-    );
-  }, [queryNodes]);
-
-  const actions = React.useMemo(() => {
-    return queryNodes.filter((query) => query.attributes?.mode === 'mutation');
-  }, [queryNodes]);
 
   const handleQuerySelect = React.useCallback(
     (selectedQueryId: NodeId) => {
@@ -262,39 +243,12 @@ export function QueriesExplorer() {
     [appStateApi],
   );
 
-  const [createMode, setCreateMode] = React.useState<appDom.FetchMode | undefined>('query');
-
-  const handleCreateQueryClick = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreateMode('query');
-    setAnchorEl(event.currentTarget);
-  }, []);
-
-  const handleCreateActionClick = React.useCallback((event: React.MouseEvent) => {
-    event.stopPropagation();
-    setCreateMode('mutation');
-    setAnchorEl(event.currentTarget);
-  }, []);
-
-  const handleCreateClose = () => {
-    setAnchorEl(null);
-  };
-
-  const createPopoverOpen = Boolean(anchorEl);
-
-  const handleCreateNode = React.useCallback(
-    (dataSourceId: string, mode?: appDom.FetchMode) => () => {
-      const dataSource = dataSources[dataSourceId];
-      invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
-      invariant(
-        currentPageId,
-        'handleCreateNode should only be used for queries, which should always belong to a page',
-      );
-
-      appStateApi.createQueryTab(dataSource, dataSourceId, mode);
-      setAnchorEl(null);
+  const handleCreateClick = React.useCallback(
+    (event: React.MouseEvent) => {
+      event.stopPropagation();
+      setAnchorEl(event.currentTarget);
     },
-    [currentPageId, appStateApi],
+    [setAnchorEl],
   );
 
   const handleDeleteNode = React.useCallback(
@@ -379,16 +333,16 @@ export function QueriesExplorer() {
   );
 
   return (
-    <Box sx={{ maxHeight: '100%', overflowY: 'auto' }} data-testid="queries-explorer">
+    <Stack data-testid={`${nodeName}-explorer`} sx={{ height: '100%', width: '100%' }}>
       <ExplorerHeader
-        headerIcon={<QueryIcon mode="query" />}
-        headerText="Queries"
-        onCreate={handleCreateQueryClick}
-        createLabelText="Create new query"
+        headerIcon={<QueryIcon mode={nodeName} />}
+        headerText={headerText}
+        onCreate={handleCreateClick}
+        createLabelText={`Create new ${nodeName}`}
       />
       <TreeView
-        aria-label="queries explorer"
-        defaultExpanded={[':queries']}
+        aria-label={`${nodeName} explorer`}
+        defaultExpanded={[`:queries`]}
         selected={
           currentView.kind === 'page' && currentView.view?.kind === 'query'
             ? currentView.view.nodeId
@@ -399,18 +353,20 @@ export function QueriesExplorer() {
         sx={{
           flexGrow: 1,
           maxWidth: 400,
+          overflowY: 'auto',
+          scrollbarGutter: 'stable',
         }}
       >
-        {queries.map((query) => (
+        {nodes.map((node) => (
           <DataTreeItem
-            key={query.id}
-            nodeId={query.id}
-            toolpadNodeId={query.id}
+            key={node.id}
+            nodeId={node.id}
+            toolpadNodeId={node.id}
             aria-level={1}
-            aria-label={query.name}
-            labelText={query.name}
+            aria-label={node.name}
+            labelText={node.name}
             labelTextSx={{ fontSize: 13 }}
-            labelIconId={query.attributes?.dataSource}
+            labelIconId={node.attributes?.dataSource}
             onDuplicateNode={handleDuplicateNode}
             onDeleteNode={handleDeleteNode}
             onSelectNode={handleQuerySelect}
@@ -419,52 +375,122 @@ export function QueriesExplorer() {
           />
         ))}
       </TreeView>
-      <Divider />
-      <ExplorerHeader
-        headerIcon={<QueryIcon mode="mutation" />}
-        headerText="Actions"
-        onCreate={handleCreateActionClick}
-        createLabelText="Create new action"
-      />
-      <TreeView
-        aria-label="actions explorer"
-        defaultExpanded={[':actions']}
-        selected={
-          currentView.kind === 'page' && currentView.view?.kind === 'query'
-            ? currentView.view.nodeId
-            : ''
-        }
-        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-        sx={{
-          flexGrow: 1,
-          maxWidth: 400,
-        }}
-      >
-        {actions.map((action) => (
-          <DataTreeItem
-            key={action.id}
-            nodeId={action.id}
-            toolpadNodeId={action.id}
-            aria-level={1}
-            labelText={action.name}
-            labelTextSx={{ fontSize: 13 }}
-            labelIconId={action.attributes?.dataSource}
-            onDuplicateNode={handleDuplicateNode}
-            onDeleteNode={handleDeleteNode}
-            onSelectNode={handleQuerySelect}
-            onRenameNode={handleRenameNode}
-            validateItemName={validateName}
-          />
-        ))}
-      </TreeView>
+    </Stack>
+  );
+}
+
+export function QueriesExplorer() {
+  const { dom, currentView } = useAppState();
+  const appStateApi = useAppStateApi();
+  const currentPageId = currentView.nodeId;
+  const queryNodes = React.useMemo(() => {
+    if (!currentPageId) {
+      return [];
+    }
+    if (currentPageId) {
+      const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
+      if (currentPageNode) {
+        return appDom.getChildNodes(dom, currentPageNode).queries ?? [];
+      }
+    }
+    return [];
+  }, [currentPageId, dom]);
+
+  const queries = React.useMemo(() => {
+    return queryNodes.filter(
+      (query) => query.attributes?.mode === 'query' || !query.attributes?.mode,
+    );
+  }, [queryNodes]);
+
+  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+  const createPopoverOpen = Boolean(anchorEl);
+  const handleCreateClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCreateNode = React.useCallback(
+    (dataSourceId: string) => () => {
+      const dataSource = dataSources[dataSourceId];
+      invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
+      invariant(
+        currentPageId,
+        'handleCreateNode should only be used for queries, which should always belong to a page',
+      );
+
+      appStateApi.createQueryTab(dataSource, dataSourceId, 'query');
+      setAnchorEl(null);
+    },
+    [currentPageId, appStateApi],
+  );
+
+  return (
+    <React.Fragment>
+      <Explorer nodes={queries} setAnchorEl={setAnchorEl} headerText="Queries" nodeName="query" />
       <CreatePopover
         anchorEl={anchorEl}
         createPopoverOpen={createPopoverOpen}
         handleCreateNode={handleCreateNode}
         handleCreateClose={handleCreateClose}
-        createMode={createMode}
+        createMode={'query'}
       />
-    </Box>
+      ;
+    </React.Fragment>
+  );
+}
+
+export function ActionsExplorer() {
+  const { dom, currentView } = useAppState();
+  const appStateApi = useAppStateApi();
+  const currentPageId = currentView.nodeId;
+  const queryNodes = React.useMemo(() => {
+    if (!currentPageId) {
+      return [];
+    }
+    if (currentPageId) {
+      const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
+      if (currentPageNode) {
+        return appDom.getChildNodes(dom, currentPageNode).queries ?? [];
+      }
+    }
+    return [];
+  }, [currentPageId, dom]);
+
+  const actions = React.useMemo(() => {
+    return queryNodes.filter((query) => query.attributes?.mode === 'mutation');
+  }, [queryNodes]);
+
+  const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+  const createPopoverOpen = Boolean(anchorEl);
+  const handleCreateClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleCreateNode = React.useCallback(
+    (dataSourceId: string) => () => {
+      const dataSource = dataSources[dataSourceId];
+      invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
+      invariant(
+        currentPageId,
+        'handleCreateNode should only be used for queries, which should always belong to a page',
+      );
+
+      appStateApi.createQueryTab(dataSource, dataSourceId, 'mutation');
+      setAnchorEl(null);
+    },
+    [currentPageId, appStateApi],
+  );
+
+  return (
+    <React.Fragment>
+      <Explorer nodes={actions} setAnchorEl={setAnchorEl} headerText="Actions" nodeName="action" />
+      <CreatePopover
+        anchorEl={anchorEl}
+        createPopoverOpen={createPopoverOpen}
+        handleCreateNode={handleCreateNode}
+        handleCreateClose={handleCreateClose}
+        createMode={'mutation'}
+      />
+      ;
+    </React.Fragment>
   );
 }

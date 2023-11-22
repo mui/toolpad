@@ -2,7 +2,6 @@ import * as React from 'react';
 import { BindableAttrEntries, BindableAttrValue, ScopeMeta, LiveBinding } from '@mui/toolpad-core';
 import {
   Box,
-  Chip,
   Button,
   InputAdornment,
   MenuItem,
@@ -221,7 +220,7 @@ function ResolvedPreview({
         })}
       >
         No request has been sent yet. <br />
-        Click{' '}
+        Click Run
         <PlayArrowIcon
           aria-label="Run preview"
           sx={{ verticalAlign: 'middle', fontSize: '12px', mr: 0.25 }}
@@ -273,7 +272,6 @@ function QueryEditor({
   connectionParams: rawConnectionParams,
   value: input,
   settingsTab,
-
   runtimeConfig,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const appStateApi = useAppStateApi();
@@ -462,18 +460,6 @@ function QueryEditor({
       }, []),
     },
   );
-
-  // const handleRunPreview = React.useCallback(() => {
-  //   runPreview();
-  // }, [runPreview]);
-
-  // React.useEffect(() => {
-  //   appStateApi.updateQueryTab((tab) => ({
-  //     ...tab,
-  //     previewHandler: handleRunPreview,
-  //     isPreviewLoading: isLoading,
-  //   }));
-  // }, [handleRunPreview, appStateApi, isLoading]);
 
   const handleHarClear = React.useCallback(() => setPreviewHar(createHarLog()), []);
 
@@ -674,6 +660,7 @@ function QueryEditor({
                   borderBottom: 1,
                   borderColor: 'divider',
                   display: 'flex',
+                  justifyContent: 'space-between',
                   height: 34,
                 }}
               >
@@ -682,58 +669,19 @@ function QueryEditor({
                   onChange={(event, value) => handleToolsTabTypeChange(value)}
                   aria-label="Query tools active tab"
                 >
-                  <Tab
-                    sx={{ pt: 0.5 }}
-                    // Prevent a `validateDOMNesting` error where a `<button>` is a descendant of another `<button>`
-                    LinkComponent={'span'}
-                    href="#"
-                    label={
-                      <Chip
-                        variant="outlined"
-                        size="small"
-                        label="Preview"
-                        deleteIcon={
-                          <LoadingButton
-                            variant="text"
-                            size="small"
-                            loading={isLoading}
-                            disabled={isLoading}
-                            sx={{
-                              p: 0,
-                              minWidth: 'fit-content',
-                              transition: 'all 0.1s',
-                              '&:hover': {
-                                filter: 'brightness(1.2)',
-                                transform: 'scale(1.1)',
-                                backgroundColor: 'transparent',
-                              },
-                            }}
-                            endIcon={
-                              <PlayArrowIcon aria-label="Run preview" onClick={runPreview} />
-                            }
-                          />
-                        }
-                        onDelete={() => {}}
-                        sx={{
-                          color: 'inherit',
-                          border: 0,
-                          fontSize: 'inherit',
-                          fontWeight: 'inherit',
-                          '&:hover': { color: 'inherit' },
-                          '& .MuiChip-deleteIcon': {
-                            fontSize: 'inherit',
-                            color: 'inherit',
-                          },
-                          '& .MuiChip-deleteIcon:hover': {
-                            color: 'inherit',
-                          },
-                        }}
-                      />
-                    }
-                    value="preview"
-                  />
-                  <Tab sx={{ pt: 0.5 }} label="Dev Tools" value="devTools" />
+                  <Tab label={'Preview'} value="preview" />
+                  <Tab label="Dev Tools" value="devTools" />
                 </TabList>
+                <LoadingButton
+                  variant="text"
+                  size="small"
+                  loading={isLoading}
+                  disabled={isLoading}
+                  onClick={runPreview}
+                  endIcon={<PlayArrowIcon aria-label="Run preview" onClick={runPreview} />}
+                >
+                  Run
+                </LoadingButton>
               </Box>
               <TabPanel value="preview" disableGutters>
                 <QueryPreview isLoading={currentTab.isPreviewLoading} error={preview?.error}>

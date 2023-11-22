@@ -14,6 +14,7 @@ const dataSourceIconMap = new Map<string, React.ComponentType<SvgIconProps>>([
 
 const modeIconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['query', AutoModeIcon],
+  ['action', AdsClickIcon],
   ['mutation', AdsClickIcon],
 ]);
 

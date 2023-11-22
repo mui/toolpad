@@ -62,6 +62,11 @@ import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
 
+declare global {
+  // eslint-disable-next-line
+  var __toolpadProjects: Set<string> | undefined;
+}
+
 invariant(
   isMainThread,
   'localMode should be used only in the main thread. Use message passing to get data from the main thread.',
@@ -917,23 +922,6 @@ async function calculateDomFingerprint(root: string): Promise<number> {
   return insecureHash(JSON.stringify(mtimes));
 }
 
-async function initToolpadFolder(root: string) {
-  const projectFolder = await readProjectFolder(root);
-  if (Object.keys(projectFolder.pages).length <= 0) {
-    projectFolder.pages.page = {
-      apiVersion: API_VERSION,
-      kind: 'page',
-      spec: {
-        id: appDom.createId(),
-        title: 'Default page',
-      },
-    };
-    await writeProjectFolder(root, projectFolder);
-  }
-
-  await initGitignore(root);
-}
-
 function getCodeComponentsFingerprint(dom: appDom.AppDom) {
   const { codeComponents = [] } = appDom.getChildNodes(dom, appDom.getApp(dom));
   return codeComponents.map(({ name }) => name).join('|');
@@ -967,6 +955,16 @@ class ToolpadProject {
   private pendingVersionCheck: Promise<VersionInfo> | undefined;
 
   constructor(root: string, options: ToolpadProjectOptions) {
+    invariant(
+      // eslint-disable-next-line no-underscore-dangle
+      !global.__toolpadProjects?.has(root),
+      `A project is already running for "${root}"`,
+    );
+    // eslint-disable-next-line no-underscore-dangle
+    global.__toolpadProjects ??= new Set();
+    // eslint-disable-next-line no-underscore-dangle
+    global.__toolpadProjects.add(root);
+
     this.root = root;
     this.options = options;
 
@@ -1127,6 +1125,23 @@ class ToolpadProject {
     this.events.emit('change', { fingerprint: newFingerprint });
   }
 
+  async init() {
+    const projectFolder = await readProjectFolder(this.root);
+    if (Object.keys(projectFolder.pages).length <= 0) {
+      projectFolder.pages.page = {
+        apiVersion: API_VERSION,
+        kind: 'page',
+        spec: {
+          id: appDom.createId(),
+          title: 'Default page',
+        },
+      };
+      await writeProjectFolder(this.root, projectFolder);
+    }
+
+    await initGitignore(this.root);
+  }
+
   async saveDom(newDom: appDom.AppDom) {
     await this.domAndFingerprintLock.use(async () => {
       return this.writeDomToDisk(newDom);
@@ -1229,11 +1244,6 @@ class ToolpadProject {
 
 export type { ToolpadProject };
 
-declare global {
-  // eslint-disable-next-line
-  var __toolpadProjects: Set<string> | undefined;
-}
-
 export function resolveProjectDir(dir: string) {
   const projectDir = path.resolve(process.cwd(), dir);
   return projectDir;
@@ -1246,18 +1256,6 @@ export interface InitProjectOptions extends Partial<ToolpadProjectOptions> {
 export async function initProject({ dir: dirInput, ...config }: InitProjectOptions) {
   const dir = resolveProjectDir(dirInput);
 
-  invariant(
-    // eslint-disable-next-line no-underscore-dangle
-    !global.__toolpadProjects?.has(dir),
-    `A project is already running for "${dir}"`,
-  );
-  // eslint-disable-next-line no-underscore-dangle
-  global.__toolpadProjects ??= new Set();
-  // eslint-disable-next-line no-underscore-dangle
-  global.__toolpadProjects.add(dir);
-
-  await initToolpadFolder(dir);
-
   const resolvedConfig: ToolpadProjectOptions = {
     dev: false,
     base: '/prod',
@@ -1266,6 +1264,8 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   };
 
   const project = new ToolpadProject(dir, resolvedConfig);
+
+  await project.init();
 
   return project;
 }

@@ -9,7 +9,8 @@ import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
 import { ViteDevServer, createServer as createViteServer } from 'vite';
 import { WebSocket, WebSocketServer } from 'ws';
-import { Auth } from '@auth/core';
+import { Auth, skipCSRFCheck } from '@auth/core';
+import GithubProvider from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import { listen } from '@mui/toolpad-utils/http';
 // eslint-disable-next-line import/extensions
@@ -30,7 +31,6 @@ import { createRpcHandler } from './rpc';
 import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
-import { httpApiAdapters } from './httpApiAdapters';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -136,45 +136,6 @@ async function createDevHandler(project: ToolpadProject) {
         host: 'localhost',
         port: devPort,
       },
-    }),
-  );
-
-  handler.use(
-    '/api/auth',
-    asyncHandler(async (req, res) => {
-      const request = httpApiAdapters.request.fromExpressToFetch(req);
-
-      const response = await Auth(request, {
-        providers: [
-          GoogleProvider({
-            clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
-            clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
-            authorization: {
-              params: {
-                prompt: 'consent',
-                access_type: 'offline',
-                response_type: 'code',
-              },
-            },
-          }),
-        ],
-        callbacks: {
-          async signIn({ account, profile }) {
-            if (account && account.provider === 'google') {
-              return Boolean(
-                process.env.TOOLPAD_GOOGLE_CLIENT_DOMAIN &&
-                  profile &&
-                  profile.email_verified &&
-                  profile.email &&
-                  profile.email.endsWith(process.env.TOOLPAD_GOOGLE_CLIENT_DOMAIN),
-              );
-            }
-            return true; // Do different verification for other providers that don't have `email_verified`
-          },
-        },
-      });
-
-      await httpApiAdapters.response.fromFetchToExpress(response as Response, res);
     }),
   );
 
@@ -373,6 +334,92 @@ async function createToolpadHandler({
   };
 }
 
+async function createAuthHandler(): Promise<AppHandler> {
+  const router = express.Router();
+
+  router.use(
+    '/*',
+    asyncHandler(async (req, res) => {
+      // Converting Express req headers to Fetch API's Headers
+      const headers = new Headers();
+      for (const headerName in req.headers) {
+        const headerValue: string = req.headers[headerName]?.toString() ?? '';
+        if (Array.isArray(headerValue)) {
+          for (const value of headerValue) {
+            headers.append(headerName, value);
+          }
+        } else {
+          headers.append(headerName, headerValue);
+        }
+      }
+
+      const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+
+      // Creating Fetch API's Request object from Express' req
+      const request = new Request(url, {
+        method: req.method,
+        headers,
+        body: req.body,
+      });
+
+      // Main Auth.js function
+      const response = await Auth(request, {
+        providers: [
+          GithubProvider({
+            clientId: process.env.TOOLPAD_GITHUB_ID,
+            clientSecret: process.env.TOOLPAD_GITHUB_SECRET,
+          }),
+          GoogleProvider({
+            clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
+            clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
+            authorization: {
+              params: {
+                prompt: 'consent',
+                access_type: 'offline',
+                response_type: 'code',
+              },
+            },
+          }),
+        ],
+        secret: process.env.TOOLPAD_AUTH_SECRET,
+        skipCSRFCheck,
+        trustHost: true,
+        callbacks: {
+          async signIn({ account, profile }) {
+            // @TODO: Validate domain for Github too?
+            if (account && account.provider === 'google') {
+              return Boolean(
+                profile &&
+                  profile.email_verified &&
+                  profile.email &&
+                  (!process.env.TOOLPAD_GOOGLE_CLIENT_DOMAIN ||
+                    profile.email.endsWith(process.env.TOOLPAD_GOOGLE_CLIENT_DOMAIN)),
+              );
+            }
+            return true;
+          },
+        },
+      });
+
+      // Converting Fetch API's Response to Express' res
+      res.status(response.status);
+      res.contentType(response.headers.get('content-type') ?? 'text/plain');
+      response.headers.forEach((value, key) => {
+        if (value) {
+          res.setHeader(key, value);
+        }
+      });
+      const body = await response.text();
+
+      res.send(body);
+    }),
+  );
+
+  return {
+    handler: router,
+    dispose: async () => {},
+  };
+}
 export interface ToolpadServerConfig extends Omit<ToolpadHandlerConfig, 'server'> {
   port: number;
 }
@@ -397,6 +444,9 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
   const toolpadHandler = await createToolpadHandler(config);
 
   app.use(toolpadHandler.handler);
+
+  const authHandler = await createAuthHandler();
+  app.use('/api/auth', authHandler.handler);
 
   const runningServer = await listen(httpServer, port);
 

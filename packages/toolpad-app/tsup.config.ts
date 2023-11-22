@@ -32,6 +32,7 @@ export default defineConfig((options) => [
     silent: true,
     clean: !options.watch,
     noExternal: [
+      '@auth/core',
       'open-editor',
       'execa',
       'fractional-indexing',

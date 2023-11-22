@@ -363,7 +363,7 @@ export type ScopeMetaField = {
       props?: Record<string, ScopeMetaPropField>;
     }
   | {
-      kind: 'query' | 'local';
+      kind: 'query' | 'action' | 'local';
     }
 );
 

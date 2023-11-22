@@ -545,8 +545,12 @@ function parseBindings(
     }
 
     if (appDom.isQuery(elm)) {
+      let kind: 'query' | 'action' = 'query';
+      if (elm.attributes.mode === 'mutation') {
+        kind = 'action';
+      }
       scopeMeta[elm.name] = {
-        kind: 'query',
+        kind,
       };
 
       if (elm.params) {

@@ -61,7 +61,6 @@ function groupScopeMeta(value: Record<string, unknown>, meta: ScopeMeta): Explor
       value: value[key],
     });
   }
-
   return structure;
 }
 

@@ -9,7 +9,7 @@ import {
   EnvAttrValue,
 } from '@mui/toolpad-core';
 import { WithControlledProp } from '../../../utils/types';
-import { getBindingType } from '../../../bindings';
+import { getBindingType } from '../../../runtime/bindings';
 import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
 
 // eslint-disable-next-line import/no-cycle
@@ -31,7 +31,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
   globalScopeMeta: ScopeMeta;
-  envVarNames?: string[];
+  env?: Record<string, string>;
   sx?: SxProps;
 }
 
@@ -47,7 +47,7 @@ export default function BindableEditor<V>({
   liveBinding,
   globalScope = {},
   globalScopeMeta = {},
-  envVarNames,
+  env,
   sx,
 }: BindableEditorProps<V>) {
   const propTypeControls = usePropControlsContext();
@@ -113,7 +113,7 @@ export default function BindableEditor<V>({
           disabled={disabled || !bindable}
           hidden={!bindable}
           liveBinding={liveBinding}
-          envVarNames={envVarNames}
+          env={env}
         />
       </React.Fragment>
     </Stack>

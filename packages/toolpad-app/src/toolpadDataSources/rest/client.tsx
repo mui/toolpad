@@ -18,8 +18,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
-import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -290,7 +289,6 @@ function QueryEditor({
     },
     { retry: false },
   );
-  const envVarNames = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
 
   const updateProp = React.useCallback(
     function updateProp<K extends keyof FetchQuery>(prop: K, value: FetchQuery[K]) {
@@ -308,6 +306,7 @@ function QueryEditor({
     [appStateApi],
   );
 
+  const env = React.useMemo(() => introspection?.data?.env, [introspection]);
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       appStateApi.updateQueryDraft((draft) => ({
@@ -377,12 +376,10 @@ function QueryEditor({
   );
 
   const paramsEntries = input.params || EMPTY_PARAMS;
-
-  const jsBrowserRuntime = useBrowserJsRuntime();
-  const jsServerRuntime = useServerJsRuntime();
+  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env ?? {}), [env]);
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    jsRuntime: jsBrowserRuntime,
+    jsRuntime: jsServerRuntime,
     input: paramsEntries,
     globalScope,
   });
@@ -480,7 +477,7 @@ function QueryEditor({
 
   return currentTab ? (
     <PanelGroup autoSaveId="toolpad/rest-panel" direction="horizontal">
-      <Panel defaultSize={50} minSize={40} style={{ overflow: 'auto' }}>
+      <Panel defaultSizePercentage={50} minSizePercentage={40} style={{ overflow: 'auto' }}>
         <TabContext value={currentTab?.tabType ?? 'config'}>
           <Stack direction="column" gap={0}>
             <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -579,7 +576,7 @@ function QueryEditor({
                         globalScopeMeta={QUERY_SCOPE_META}
                         liveValue={liveHeaders}
                         jsRuntime={jsServerRuntime}
-                        envVarNames={envVarNames}
+                        env={env}
                       />
                     </TabPanel>
                     <TabPanel disableGutters value="response" sx={{ ml: 1 }}>
@@ -625,9 +622,9 @@ function QueryEditor({
         </TabContext>
       </Panel>
       <PanelResizeHandle />
-      <Panel defaultSize={50} minSize={20}>
+      <Panel defaultSizePercentage={50} minSizePercentage={20}>
         <PanelGroup autoSaveId="toolpad/rest/params-tools-split" direction="vertical">
-          <Panel defaultSize={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+          <Panel defaultSizePercentage={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box display={'flex'} flexDirection={'column'}>
               <TabContext value="parameters">
                 <TabList
@@ -646,14 +643,15 @@ function QueryEditor({
                     globalScope={globalScope}
                     globalScopeMeta={globalScopeMeta}
                     liveValue={paramsEditorLiveValue}
-                    jsRuntime={jsBrowserRuntime}
+                    jsRuntime={jsServerRuntime}
+                    env={env}
                   />
                 </TabPanel>
               </TabContext>
             </Box>
           </Panel>
           <PanelResizeHandle />
-          <Panel defaultSize={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+          <Panel defaultSizePercentage={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <TabContext value={currentTab.toolsTabType}>
               <Box
                 sx={{

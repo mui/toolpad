@@ -409,7 +409,7 @@ function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement 
         })}
       >
         No request has been sent yet. <br />
-        Click{' '}
+        Click Run
         <PlayArrowIcon
           aria-label="Run preview"
           sx={{ verticalAlign: 'middle', fontSize: '12px', mr: 0.25 }}
@@ -586,7 +586,11 @@ function QueryEditor({
 
   return currentTab ? (
     <PanelGroup autoSaveId="toolpad/local-panel" direction="horizontal">
-      <Panel defaultSize={50} minSize={40} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+      <Panel
+        defaultSizePercentage={50}
+        minSizePercentage={40}
+        style={{ overflow: 'auto', scrollbarGutter: 'stable' }}
+      >
         <TabContext value={currentTab?.tabType ?? 'config'}>
           <Stack direction="column" gap={0}>
             <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -652,9 +656,9 @@ function QueryEditor({
         </TabContext>
       </Panel>
       <PanelResizeHandle />
-      <Panel defaultSize={50} minSize={20}>
+      <Panel defaultSizePercentage={50} minSizePercentage={20}>
         <PanelGroup autoSaveId="toolpad/local/params-tools-split" direction="vertical">
-          <Panel defaultSize={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+          <Panel defaultSizePercentage={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box display={'flex'} flexDirection={'column'}>
               <TabContext value="parameters">
                 <TabList
@@ -705,7 +709,7 @@ function QueryEditor({
           </Panel>
           <PanelResizeHandle />
 
-          <Panel defaultSize={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+          <Panel defaultSizePercentage={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <TabContext value={currentTab.toolsTabType}>
               <Box
                 sx={{

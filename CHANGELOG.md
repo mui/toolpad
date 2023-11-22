@@ -1,5 +1,68 @@
 # Changelog
 
+## 0.1.37
+
+<!-- generated comparing v0.1.36..master -->
+
+_Nov 10, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Allow bootstrapping examples with `create-toolpad-app`, support integrating Toolpad apps programmatically in custom servers. Bind any HTTP query variable to an environment variable. Support a new Switch component.
+
+- &#8203;<!-- 14 -->Support create-toolpad-app --example argument (#2884) @Janpot
+- &#8203;<!-- 13 -->Add custom server documentation (#2879) @Janpot
+- &#8203;<!-- 12 -->Link issues in docs (#2890) @prakhargupta1
+- &#8203;<!-- 11 -->Support running multiple handlers side-by-side in a custom server (#2882) @Janpot
+- &#8203;<!-- 10 -->charts example (#2880) @prakhargupta1
+- &#8203;<!-- 09 -->Fix editor command failing on master (#2881) @Janpot
+- &#8203;<!-- 08 -->Add instructions to start the editor for custom servers (#2878) @Janpot
+- &#8203;<!-- 07 -->Add Toolpad editor command for connecting to custom servers (#2800) @Janpot
+- &#8203;<!-- 06 -->Allow binding query parameters to environment variables (#2777) @JerryWu1234
+- &#8203;<!-- 05 -->Close the editor vite devserver when the program exits (#2877) @Janpot
+- &#8203;<!-- 04 -->Fix a deprecation message in the tests (#2876) @Janpot
+- &#8203;<!-- 03 -->Add Switch component as a variant to Checkbox (#2787) @JerryWu1234
+- &#8203;<!-- 02 -->Remove PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD (#2855) @Janpot
+- &#8203;<!-- 01 -->[docs] Fix images width overflow on Firefox (#2874) @bharatkashyap
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @JerryWu1234, @prakhargupta1
+
+## 0.1.36
+
+<!-- generated comparing v0.1.35..master -->
+
+_Nov 3, 2023_
+
+A big thanks to the 1 contributor who made this release possible. Here are some highlights ✨:
+
+Fix app not loading due to ESM issues in charts.
+
+- &#8203;<!-- 1 -->Fix ESM charts issues in production (#2861) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira
+
+## 0.1.35
+
+<!-- generated comparing v0.1.34..master -->
+
+_Nov 2, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+Use `@mui/x-charts` in Chart component, better preview header in apps, fix port option alias, add Stripe and Supabase examples.
+
+- &#8203;<!-- 9 -->Add supabase example showcasing list component (#2851) @prakhargupta1
+- &#8203;<!-- 8 -->Migrate Chart component to X charts library (#2500) @apedroferreira
+- &#8203;<!-- 7 -->Fix port option alias (#2847) @Janpot
+- &#8203;<!-- 6 -->Add preview header to custom server (#2845) @Janpot
+- &#8203;<!-- 5 -->Update monorepo (#2852) @apedroferreira
+- &#8203;<!-- 4 -->Lock file maintenance (#2849) @renovate[bot]
+- &#8203;<!-- 3 -->Remove crypto-js (#2843) @Janpot
+- &#8203;<!-- 2 -->[docs] Casing consistency @oliviertassinari
+- &#8203;<!-- 1 -->[docs] Add Stripe script example (#2477) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
 ## 0.1.34
 
 <!-- generated comparing v0.1.33..master -->

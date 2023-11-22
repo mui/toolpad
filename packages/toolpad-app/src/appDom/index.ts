@@ -89,6 +89,7 @@ export interface PageNode extends AppDomNodeBase {
     readonly parameters?: [string, string][];
     readonly module?: string;
     readonly display?: PageDisplayMode;
+    readonly codeFile?: string;
   };
 }
 

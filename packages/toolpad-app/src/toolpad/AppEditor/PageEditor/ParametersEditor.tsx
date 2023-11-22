@@ -16,7 +16,7 @@ export interface StringRecordEntriesEditorProps
   autoFocus?: boolean;
   sx?: SxProps;
   jsRuntime: JsRuntime;
-  envVarNames?: string[];
+  env?: Record<string, string>;
   disabled?: boolean;
 }
 
@@ -33,7 +33,7 @@ export default function ParametersEditor({
   jsRuntime,
   disabled,
   globalScopeMeta,
-  envVarNames,
+  env,
 }: StringRecordEntriesEditorProps) {
   const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -93,7 +93,7 @@ export default function ParametersEditor({
                 onChange(value.map((entry, i) => (i === index ? [entry[0], newBinding] : entry)))
               }
               disabled={disabled}
-              envVarNames={envVarNames}
+              env={env}
             />
 
             <IconButton

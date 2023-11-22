@@ -1,4 +1,4 @@
-# Data Providers
+# Data providers
 
 <p class="description">Bring tabular data to the frontend with server-side pagination and filtering.</p>
 
@@ -77,31 +77,40 @@ export default createDataProvider({
 ## Filtering 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2886](https://github.com/mui/mui-toolpad/issues/2886) if you want to see it land faster.
 :::
 
 ## Sorting 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2539](https://github.com/mui/mui-toolpad/issues/2539) if you want to see it land faster.
 :::
 
 ## Row editing 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2887](https://github.com/mui/mui-toolpad/issues/2887) if you want to see it land faster.
 :::
 
 ## Row creation 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+👍 Upvote [issue #2888](https://github.com/mui/mui-toolpad/issues/2888) if you want to see it land faster.
 :::
 
 ## Deleting rows 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2889](https://github.com/mui/mui-toolpad/issues/2889) if you want to see it land faster.
 :::
 
 ## API

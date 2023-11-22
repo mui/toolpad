@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NodeId } from '@mui/toolpad-core';
+import { NodeHashes, NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
@@ -12,7 +12,7 @@ import { omit, update } from '../utils/immutability';
 import { useProjectApi } from '../projectApi';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
-import { NodeHashes, ClientDataSource } from '../types';
+import { ClientDataSource } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab, QueryTab } from '../utils/domView';
 

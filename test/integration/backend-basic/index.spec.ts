@@ -1,12 +1,12 @@
 import * as path from 'path';
 import * as url from 'url';
 import invariant from 'invariant';
-import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
+import { fileReplace } from '@mui/toolpad-utils/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { waitForMatch } from '../../utils/streams';
-import { expectBasicPageContent } from './shared';
+import { expectBasicRuntimeTests } from './shared';
 import { setPageHidden } from '../../utils/page';
 import { withTemporaryEdits } from '../../utils/fs';
 import clickCenter from '../../utils/clickCenter';
@@ -48,7 +48,7 @@ test('functions basics', async ({ page, context }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('basic');
 
-  await expectBasicPageContent(page);
+  await expectBasicRuntimeTests(page);
 });
 
 test('function editor reload', async ({ page, localApp }) => {

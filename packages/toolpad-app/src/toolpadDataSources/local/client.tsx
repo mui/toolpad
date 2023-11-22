@@ -232,7 +232,13 @@ function FunctionAutocomplete({
         onClick={handleClick}
         label={selectedFunctionLabel}
       />
-      <StyledPopper id={id} open={open} anchorEl={anchorEl} placement="bottom-start">
+      <StyledPopper
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        placement="auto-start"
+        popperOptions={{ modifiers: [{ name: 'flip', enabled: false }] }}
+      >
         <ClickAwayListener onClickAway={handleClose}>
           <div>
             <Box

@@ -109,7 +109,7 @@ test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) 
 
   await expect(queryEditor).toBeVisible();
 
-  await queryEditor.getByRole('button', { name: 'Preview' }).click();
+  await queryEditor.getByRole('button', { name: 'Run' }).click();
   await queryEditor.getByRole('tab', { name: 'Dev Tools' }).click();
   const networkTab = queryEditor.getByRole('tabpanel', { name: 'Dev Tools' });
   await expect(networkTab.getByText('/get?query1_param1=query1_value')).not.toBeEmpty();

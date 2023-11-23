@@ -166,7 +166,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
 
   await editorModel.queriesExplorer.getByText('bareWithParams').click();
 
-  await editorModel.queryEditorPanel.getByRole('button', { name: 'Preview', exact: true }).click();
+  await editorModel.queryEditorPanel.getByRole('button', { name: 'Run' }).click();
   await editorModel.queryEditorPanel
     .getByTestId('query-preview')
     .getByText(

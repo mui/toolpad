@@ -2,14 +2,24 @@ import * as React from 'react';
 import {
   Box,
   Drawer,
+  Stack,
   List,
-  ListSubheader,
   ListItem,
   ListItemButton,
   ListItemText,
+  AppBar,
+  Toolbar,
+  Avatar,
+  Typography,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Button,
 } from '@mui/material';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
+import { SessionContext } from './useSession';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -25,16 +35,18 @@ export interface NavigationEntry {
 const DRAWER_WIDTH = 250; // px
 
 interface AppPagesNavigationProps {
-  activePage?: string;
+  activePageSlug?: string;
   pages: NavigationEntry[];
   clipped?: boolean;
+  hasHeader?: boolean;
   search?: string;
 }
 
 function AppPagesNavigation({
-  activePage,
+  activePageSlug,
   pages,
   clipped = false,
+  hasHeader = true,
   search,
 }: AppPagesNavigationProps) {
   const navListSubheaderId = React.useId();
@@ -51,23 +63,20 @@ function AppPagesNavigation({
       }}
     >
       {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
-      <List
-        component="nav"
-        subheader={
-          <ListSubheader id={navListSubheaderId} sx={{ px: 4 }}>
-            Pages
-          </ListSubheader>
-        }
-        aria-labelledby={navListSubheaderId}
-      >
+      {hasHeader ? <Toolbar /> : null}
+      <List component="nav" aria-labelledby={navListSubheaderId}>
         {pages.map((page) => (
           <ListItem key={page.slug} disablePadding>
             <ListItemButton
               component={Link}
               to={`pages/${page.slug}${search}`}
-              selected={activePage === page.slug}
+              selected={activePageSlug === page.slug}
             >
-              <ListItemText primary={page.displayName} sx={{ ml: 2 }} />
+              <ListItemText
+                primary={page.displayName}
+                primaryTypographyProps={{ fontSize: '14px' }}
+                sx={{ ml: 2 }}
+              />
             </ListItemButton>
           </ListItem>
         ))}
@@ -77,17 +86,19 @@ function AppPagesNavigation({
 }
 
 export interface ToolpadAppLayoutProps {
-  activePage?: string;
+  activePageSlug?: string;
   pages?: NavigationEntry[];
-  hasShell?: boolean;
+  hasNavigation?: boolean;
+  hasHeader?: boolean;
   children?: React.ReactNode;
   clipped?: boolean;
 }
 
 export function AppLayout({
-  activePage,
+  activePageSlug,
   pages = [],
-  hasShell: hasShellProp = true,
+  hasNavigation: hasNavigationProp = true,
+  hasHeader: hasHeaderProp = true,
   children,
   clipped,
 }: ToolpadAppLayoutProps) {
@@ -103,23 +114,100 @@ export function AppLayout({
     return urlParams.size > 0 ? `?${urlParams.toString()}` : '';
   }, [urlParams]);
 
-  const navEntry = pages.find((page) => page.slug === activePage);
+  const navEntry = pages.find((page) => page.slug === activePageSlug);
 
   const displayMode = urlParams.get(TOOLPAD_DISPLAY_MODE_URL_PARAM);
 
-  const hasShell = hasShellProp && navEntry?.hasShell !== false && displayMode !== 'standalone';
+  const hasShell = navEntry?.hasShell !== false && displayMode !== 'standalone';
+
+  const hasNavigation = hasNavigationProp && hasShell;
+  const hasHeader = hasHeaderProp && hasShell;
+
+  const { session, signOut } = React.useContext(SessionContext);
+
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleSignOut = React.useCallback(() => {
+    signOut();
+    handleCloseUserMenu();
+  }, [signOut]);
+
+  const activePageDisplayName = React.useMemo(
+    () => pages.find((page) => page.slug === activePageSlug)?.displayName ?? '',
+    [activePageSlug, pages],
+  );
 
   return (
-    <Box sx={{ flex: 1, display: 'flex' }}>
-      {hasShell ? (
-        <AppPagesNavigation
-          activePage={activePage}
-          pages={pages}
-          clipped={clipped}
-          search={retainedSearch}
-        />
+    <React.Fragment>
+      {hasHeader ? (
+        <AppBar position="static" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+          <Toolbar>
+            <Typography variant="h6" noWrap sx={{ ml: 1 }}>
+              {activePageDisplayName}
+            </Typography>
+            <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
+              {session ? (
+                <React.Fragment>
+                  <Typography variant="body2" sx={{ mr: 2 }}>
+                    {session.user.name}
+                  </Typography>
+                  <Tooltip title="User settings">
+                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                      <Avatar
+                        alt={session.user.name}
+                        src={session.user.image}
+                        sx={{ bgcolor: (theme) => theme.palette.secondary.main }}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    sx={{ mt: '45px' }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    <form action="http://localhost:3000/api/auth/signout" method="POST">
+                      <MenuItem key="signout" onClick={handleSignOut}>
+                        <Typography textAlign="center">Sign out</Typography>
+                      </MenuItem>
+                    </form>
+                  </Menu>
+                </React.Fragment>
+              ) : (
+                <Button color="inherit">Sign In</Button>
+              )}
+            </Stack>
+          </Toolbar>
+        </AppBar>
       ) : null}
-      {children}
-    </Box>
+      <Box sx={{ flex: 1, display: 'flex' }}>
+        {hasNavigation ? (
+          <AppPagesNavigation
+            activePageSlug={activePageSlug}
+            pages={pages}
+            clipped={clipped}
+            hasHeader={hasHeader}
+            search={retainedSearch}
+          />
+        ) : null}
+        {children}
+      </Box>
+    </React.Fragment>
   );
 }

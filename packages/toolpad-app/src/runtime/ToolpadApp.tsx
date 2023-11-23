@@ -92,6 +92,7 @@ import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
+import { SessionContext, useSession } from './useSession';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -1529,7 +1530,7 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
   const pageMatch = useMatch('/pages/:slug');
-  const activePage = pageMatch?.params.slug;
+  const activePageSlug = pageMatch?.params.slug;
 
   const navEntries = React.useMemo(
     () =>
@@ -1543,9 +1544,10 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
 
   return (
     <AppLayout
-      activePage={activePage}
+      activePageSlug={activePageSlug}
       pages={navEntries}
-      hasShell={!IS_RENDERED_IN_CANVAS}
+      hasNavigation={!IS_RENDERED_IN_CANVAS}
+      hasHeader={!IS_RENDERED_IN_CANVAS}
       clipped={SHOW_PREVIEW_HEADER}
     >
       <RenderedPages pages={pages} />
@@ -1579,33 +1581,37 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
+  const sessionContext = useSession();
+
   return (
     <BrowserRouter basename={basename}>
-      <UseDataProviderContext.Provider value={useDataProvider}>
-        <AppThemeProvider dom={dom}>
-          <CssBaseline enableColorScheme />
-          {SHOW_PREVIEW_HEADER ? <PreviewHeader basename={basename} /> : null}
-          <AppRoot ref={rootRef}>
-            <ComponentsContextProvider value={components}>
-              <DomContextProvider value={dom}>
-                <ErrorBoundary FallbackComponent={AppError}>
-                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                    <React.Suspense fallback={<AppLoading />}>
-                      <QueryClientProvider client={queryClient}>
-                        <ToolpadAppLayout dom={dom} />
-                        {showDevtools ? (
-                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
-                        ) : null}
-                      </QueryClientProvider>
-                    </React.Suspense>
-                  </ResetNodeErrorsKeyProvider>
-                </ErrorBoundary>
-              </DomContextProvider>
-            </ComponentsContextProvider>
-            <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-          </AppRoot>
-        </AppThemeProvider>
-      </UseDataProviderContext.Provider>
+      <SessionContext.Provider value={sessionContext}>
+        <UseDataProviderContext.Provider value={useDataProvider}>
+          <AppThemeProvider dom={dom}>
+            <CssBaseline enableColorScheme />
+            {SHOW_PREVIEW_HEADER ? <PreviewHeader basename={basename} /> : null}
+            <AppRoot ref={rootRef}>
+              <ComponentsContextProvider value={components}>
+                <DomContextProvider value={dom}>
+                  <ErrorBoundary FallbackComponent={AppError}>
+                    <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                      <React.Suspense fallback={<AppLoading />}>
+                        <QueryClientProvider client={queryClient}>
+                          <ToolpadAppLayout dom={dom} />
+                          {showDevtools ? (
+                            <ReactQueryDevtoolsProduction initialIsOpen={false} />
+                          ) : null}
+                        </QueryClientProvider>
+                      </React.Suspense>
+                    </ResetNodeErrorsKeyProvider>
+                  </ErrorBoundary>
+                </DomContextProvider>
+              </ComponentsContextProvider>
+              <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+            </AppRoot>
+          </AppThemeProvider>
+        </UseDataProviderContext.Provider>
+      </SessionContext.Provider>
     </BrowserRouter>
   );
 }

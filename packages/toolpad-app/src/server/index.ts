@@ -342,7 +342,7 @@ async function createAuthHandler(): Promise<AppHandler> {
     asyncHandler(async (req, res) => {
       // Converting Express req headers to Fetch API's Headers
       const headers = new Headers();
-      for (const headerName in req.headers) {
+      for (const headerName of Object.keys(req.headers)) {
         const headerValue: string = req.headers[headerName]?.toString() ?? '';
         if (Array.isArray(headerValue)) {
           for (const value of headerValue) {
@@ -353,17 +353,14 @@ async function createAuthHandler(): Promise<AppHandler> {
         }
       }
 
-      const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-
       // Creating Fetch API's Request object from Express' req
-      const request = new Request(url, {
+      const request = new Request(`${req.protocol}://${req.get('host')}${req.originalUrl}`, {
         method: req.method,
         headers,
         body: req.body,
       });
 
-      // Main Auth.js function
-      const response = await Auth(request, {
+      const response = (await Auth(request, {
         providers: [
           GithubProvider({
             clientId: process.env.TOOLPAD_GITHUB_ID,
@@ -399,7 +396,7 @@ async function createAuthHandler(): Promise<AppHandler> {
             return true;
           },
         },
-      });
+      })) as Response;
 
       // Converting Fetch API's Response to Express' res
       res.status(response.status);
@@ -410,7 +407,6 @@ async function createAuthHandler(): Promise<AppHandler> {
         }
       });
       const body = await response.text();
-
       res.send(body);
     }),
   );

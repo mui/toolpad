@@ -16,10 +16,15 @@ import {
   MenuItem,
   Tooltip,
   Button,
+  CircularProgress,
+  ListItemIcon,
+  useTheme,
 } from '@mui/material';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import GoogleIcon from '@mui/icons-material/Google';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
-import { SessionContext } from './useSession';
+import { AuthProvider, SessionContext } from './useSession';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -63,7 +68,7 @@ function AppPagesNavigation({
       }}
     >
       {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
-      {hasHeader ? <Toolbar /> : null}
+      {hasHeader ? <Toolbar variant="dense" /> : null}
       <List component="nav" aria-labelledby={navListSubheaderId}>
         {pages.map((page) => (
           <ListItem key={page.slug} disablePadding>
@@ -102,6 +107,8 @@ export function AppLayout({
   children,
   clipped,
 }: ToolpadAppLayoutProps) {
+  const theme = useTheme();
+
   const [urlParams] = useSearchParams();
 
   const retainedSearch = React.useMemo(() => {
@@ -123,7 +130,20 @@ export function AppLayout({
   const hasNavigation = hasNavigationProp && hasShell;
   const hasHeader = hasHeaderProp && hasShell;
 
-  const { session, signOut } = React.useContext(SessionContext);
+  const {
+    session,
+    signIn,
+    signOut,
+    isLoading: isSessionLoading,
+  } = React.useContext(SessionContext);
+
+  const [anchorElSignIn, setAnchorElSignIn] = React.useState<null | HTMLElement>(null);
+  const handleOpenSignInMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElSignIn(event.currentTarget);
+  };
+  const handleCloseSignInMenu = () => {
+    setAnchorElSignIn(null);
+  };
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -132,6 +152,14 @@ export function AppLayout({
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  const handleSignIn = React.useCallback(
+    (provider: AuthProvider) => () => {
+      signIn(provider);
+      handleCloseSignInMenu();
+    },
+    [signIn],
+  );
 
   const handleSignOut = React.useCallback(() => {
     signOut();
@@ -146,29 +174,33 @@ export function AppLayout({
   return (
     <React.Fragment>
       {hasHeader ? (
-        <AppBar position="static" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-          <Toolbar>
+        <AppBar position="static" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
+          <Toolbar variant="dense">
             <Typography variant="h6" noWrap sx={{ ml: 1 }}>
               {activePageDisplayName}
             </Typography>
             <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
-              {session ? (
+              {session?.user && !isSessionLoading ? (
                 <React.Fragment>
                   <Typography variant="body2" sx={{ mr: 2 }}>
-                    {session.user.name}
+                    {session.user.name || session.user.email}
                   </Typography>
                   <Tooltip title="User settings">
                     <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                       <Avatar
-                        alt={session.user.name}
+                        alt={session.user.name || session.user.email}
                         src={session.user.image}
-                        sx={{ bgcolor: (theme) => theme.palette.secondary.main }}
+                        sx={{
+                          bgcolor: theme.palette.secondary.main,
+                          width: 32,
+                          height: 32,
+                        }}
                       />
                     </IconButton>
                   </Tooltip>
                   <Menu
                     sx={{ mt: '45px' }}
-                    id="menu-appbar"
+                    id="menu-appbar-user"
                     anchorEl={anchorElUser}
                     anchorOrigin={{
                       vertical: 'top',
@@ -182,16 +214,49 @@ export function AppLayout({
                     open={Boolean(anchorElUser)}
                     onClose={handleCloseUserMenu}
                   >
-                    <form action="http://localhost:3000/api/auth/signout" method="POST">
-                      <MenuItem key="signout" onClick={handleSignOut}>
-                        <Typography textAlign="center">Sign out</Typography>
-                      </MenuItem>
-                    </form>
+                    <MenuItem key="signout" onClick={handleSignOut}>
+                      <ListItemText>Sign out</ListItemText>
+                    </MenuItem>
                   </Menu>
                 </React.Fragment>
-              ) : (
-                <Button color="inherit">Sign In</Button>
-              )}
+              ) : null}
+              {!session?.user && !isSessionLoading ? (
+                <React.Fragment>
+                  <Button onClick={handleOpenSignInMenu} color="inherit">
+                    Sign In
+                  </Button>
+                  <Menu
+                    sx={{ mt: '45px' }}
+                    id="menu-appbar-signin"
+                    anchorEl={anchorElSignIn}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={Boolean(anchorElSignIn)}
+                    onClose={handleCloseSignInMenu}
+                  >
+                    <MenuItem key="github" onClick={handleSignIn('github')}>
+                      <ListItemIcon>
+                        <GitHubIcon color="inherit" fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText>Sign in with GitHub</ListItemText>
+                    </MenuItem>
+                    <MenuItem key="google" onClick={handleSignIn('google')}>
+                      <ListItemIcon>
+                        <GoogleIcon color="inherit" fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText>Sign in with Google</ListItemText>
+                    </MenuItem>
+                  </Menu>
+                </React.Fragment>
+              ) : null}
+              {isSessionLoading ? <CircularProgress color="inherit" size={26} /> : null}
             </Stack>
           </Toolbar>
         </AppBar>

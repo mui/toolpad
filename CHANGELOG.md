@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.1.38
+
+<!-- generated comparing v0.1.37..master -->
+
+_Nov 23, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Support custom code files for pages, fixes for the CLI tool, documentation improvements for examples and other behind the scenes work!
+
+- &#8203;<!-- 13 -->Fix reactDevtools build location for dev mode (#2921) @Janpot
+- &#8203;<!-- 12 -->Try out circleci parallelism (#2895) @Janpot
+- &#8203;<!-- 11 -->Update README of examples with new CTA instructions (#2885) @Janpot
+- &#8203;<!-- 10 -->Improve custom server documentation (#2898) @Janpot
+- &#8203;<!-- 09 -->Remove --create option from toolpad CLI (#2899) @Janpot
+- &#8203;<!-- 08 -->Isolate tsx in renovate.json (#2905) @Janpot
+- &#8203;<!-- 07 -->Fix failing CTA test (#2900) @Janpot
+- &#8203;<!-- 06 -->Update instructions for smoke testing the release (#2894) @Janpot
+- &#8203;<!-- 05 -->[core] Upgrade monorepo (#2926) @bharatkashyap
+- &#8203;<!-- 04 -->[core] Rename OpenCollective @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Add button and datagrid component guide, split Managing state doc (#2678) @prakhargupta1
+- &#8203;<!-- 02 -->[docs] Add README to Stripe example (#2892) @bharatkashyap
+- &#8203;<!-- 01 -->[experiment] Support custom code files for pages (#2891) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
 ## 0.1.37
 
 <!-- generated comparing v0.1.36..master -->

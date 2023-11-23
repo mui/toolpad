@@ -10,14 +10,6 @@ List makes it easy to configure a recurring pattern of data. Documentation of th
 Add demo
 -->
 
-## Appearance
-
-The List component acts as a mini canvas for other components. Each component has its own styling. The first occurence decides the appearance for the entire list.
-
-### disablePadding
-
-There is a predefined padding that can be enabled or disabled. It is a boolean.
-
 ## Usage
 
 A List is an essential component in an application. It had one key property that makes it usable:
@@ -30,3 +22,11 @@ It is the number of occurences that the list is supposed to render.
   <source src="/static/toolpad/docs/components/list/list.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
+
+## Appearance
+
+The List component acts as a mini canvas for other components. Each component has its own styling. The first occurence decides the appearance for the entire list.
+
+### disablePadding
+
+There is a predefined padding that can be enabled or disabled. It is a boolean.

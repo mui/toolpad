@@ -8,6 +8,33 @@ DatePicker is an input component. It takes user input and provides the value for
 
 {{"demo": "DatePicker.js", "hideToolbar": true}}
 
+## Usage
+
+Below props makes it usable:
+
+### format
+
+The [format](https://day.js.org/docs/en/display/format) of the date in the UI. The value for the bindings will always be in the YYYY-MM-DD format. Leave empty to let the end-user locale define the format.
+
+{{"demo": "DatePickerFormat.js", "hideToolbar": true}}
+
+### value
+
+The current selected date. It shows the format in which it is being provided to the page: YYYY-MM-DD.
+
+### defaultValue
+
+Allows setting a default value. Example:
+
+<video controls width="100%" height="auto" style="contain" alt="button-onclick-js-expression">
+  <source src="/static/toolpad/docs/components/datepicker/datepicker-defaultValue.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+### name
+
+This is needed when a datepicker is part of a form. Check the video below to see how it is used.
+
 ## Appearance
 
 The DatePicker component has some appearance related props supported in Toolpad. Let's look at each of these below:
@@ -37,33 +64,6 @@ This boolean defines if the component should take the full width of the page.
 Disabled property shows the state of the component so that end user is aware that can't interact with the component.
 
 {{"demo": "DatePickerDisabled.js", "hideToolbar": true}}
-
-## Usage
-
-Below props makes it usable:
-
-### format
-
-The [format](https://day.js.org/docs/en/display/format) of the date in the UI. The value for the bindings will always be in the YYYY-MM-DD format. Leave empty to let the end-user locale define the format.
-
-{{"demo": "DatePickerFormat.js", "hideToolbar": true}}
-
-### value
-
-The current selected date. It shows the format in which it is being provided to the page: YYYY-MM-DD.
-
-### defaultValue
-
-Allows setting a default value. Example:
-
-<video controls width="100%" height="auto" style="contain" alt="button-onclick-js-expression">
-  <source src="/static/toolpad/docs/components/datepicker/datepicker-defaultValue.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
-### name
-
-This is needed when a datepicker is part of a form. Check the video below to see how it is used.
 
 ## Validation
 

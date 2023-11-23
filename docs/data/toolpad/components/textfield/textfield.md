@@ -8,6 +8,31 @@ TextField is a text input component. It takes user input and provides the value 
 
 {{"demo": "TextField.js", "hideToolbar": true}}
 
+## Usage
+
+It is one of the most used input component. The below mentioned function props makes testfield useful to it s full potential.
+
+<video controls width="100%" height="auto" style="contain" alt="textfield">
+  <source src="/static/toolpad/docs/components/textfield/textfield.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+### value
+
+The current value.
+
+### defaultValue
+
+Allows setting a default value. In case user enters nothing, default value is used.
+
+### password
+
+Password prop masks the user input. It is used to hide sensitive data.
+
+### name
+
+Name is needed when a textfield is part of a form component. It is used to show validation errors.
+
 ## Appearance
 
 The TextField component has some appearance related props supported in Toolpad. Let's look at each of these below:
@@ -42,31 +67,6 @@ Disabled property shows the state of the component so that end user is aware tha
 
 {{"demo": "TextFieldDisabled.js", "hideToolbar": true}}
 
-## Usage
-
-It is one of the most used input component. The below mentioned function props makes testfield useful to it s full potential.
-
-<video controls width="100%" height="auto" style="contain" alt="textfield">
-  <source src="/static/toolpad/docs/components/textfield/textfield.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
-### value
-
-The current value.
-
-### defaultValue
-
-Allows setting a default value. In case user enters nothing, default value is used.
-
-### password
-
-Password prop masks the user input. It is used to hide sensitive data.
-
-### name
-
-Name is needed when a textfield is part of a form component. It is used to show validation errors.
-
 ## Validation
 
 ### isRequired
@@ -79,8 +79,8 @@ isRequired is useful when the action can't be perfomed without a user provided t
 
 ### minLength
 
-A validation check on the minimum lenght of the input.
+A validation check on the minimum length of the input.
 
 ### maxLength
 
-A validation check on the maximum lenght of the input.
+A validation check on the maximum length of the input.

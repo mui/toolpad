@@ -4,33 +4,9 @@
 
 ## Demo
 
-Buttons allow users to take actions, make choices with a single tap. Detailed documentation of the component properties is available in the reference section for [button](/toolpad/reference/components/button/#properties).
+Buttons allow users to take actions, make choices with a single tap.
 
 {{"demo": "ButtonBasic.js", "hideToolbar": true}}
-
-## Appearance
-
-The Button component has multiple variations supported in Toolpad. Let's look at each of these below.
-
-### Variant
-
-The variant property supports three different options: contained (default), outlined and text. Contained is a high-emphasis button suited for a primary action. Outlined is for low-emphasis, secondary action. Text is used for less-pronounced actions that ensure user remains focused on the main content.
-{{"demo": "ButtonVariant.js", "hideToolbar": true}}
-
-### Color
-
-The color property has two options: primary (default) and secondary. These take input from the global theme that you set in Toolpad from the theme tab.
-{{"demo": "ButtonColor.js", "hideToolbar": true}}
-
-### Size
-
-The size property supports three options: small (default), medium and large.
-{{"demo": "ButtonSize.js", "hideToolbar": true}}
-
-### State
-
-Button supports states like loading and disabled to share the state of the component so that user can wait/act accoridngly.
-{{"demo": "ButtonState.js", "hideToolbar": true}}
 
 ## Usage
 
@@ -55,3 +31,33 @@ From this tab, you can configure to move from one page to the other in a Toolpad
 :::info
 Form component also has a button whose default action is submitting the form.
 :::
+
+## Appearance
+
+The Button component has multiple variations supported in Toolpad. Let's look at each of these below.
+
+### `variant`
+
+The variant property supports three different options: contained (default), outlined and text. Contained is a high-emphasis button suited for a primary action. Outlined is for low-emphasis, secondary action. Text is used for less-pronounced actions that ensure user remains focused on the main content.
+{{"demo": "ButtonVariant.js", "hideToolbar": true}}
+
+### `color`
+
+The color property has two options: primary (default) and secondary. These take input from the global theme that you set in Toolpad from the theme tab.
+{{"demo": "ButtonColor.js", "hideToolbar": true}}
+
+### `size`
+
+The size property supports three options: small (default), medium and large.
+{{"demo": "ButtonSize.js", "hideToolbar": true}}
+
+### State
+
+Button supports states like loading and disabled to share the state of the component so that user can wait/act accoridngly.
+{{"demo": "ButtonState.js", "hideToolbar": true}}
+
+## API
+
+See the documentation below for a complete reference to all props available to the button component in Toolpad.
+
+- [`<button />`](/toolpad/reference/components/button/#properties)

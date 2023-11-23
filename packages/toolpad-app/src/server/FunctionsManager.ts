@@ -17,6 +17,7 @@ import {
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import * as url from 'node:url';
+import invariant from 'invariant';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
@@ -102,7 +103,6 @@ interface IToolpadProject {
   options: ToolpadProjectOptions;
   events: Emitter<ProjectEvents>;
   getRoot(): string;
-  getToolpadFolder(): string;
   getOutputFolder(): string;
   envManager: EnvManager;
   invalidateQueries(): void;
@@ -113,7 +113,7 @@ export default class FunctionsManager {
 
   private buildErrors: esbuild.Message[] = [];
 
-  private devWorker: ReturnType<typeof createDevWorker>;
+  private devWorker: ReturnType<typeof createDevWorker> | undefined;
 
   private extractedTypes: Awaitable<IntrospectionResult> | undefined;
 
@@ -123,11 +123,10 @@ export default class FunctionsManager {
 
   constructor(project: IToolpadProject) {
     this.project = project;
-    this.devWorker = createDevWorker(process.env);
   }
 
   private getResourcesFolder(): string {
-    return path.join(this.project.getToolpadFolder(), './resources');
+    return path.join(this.project.getRoot(), './resources');
   }
 
   private getFunctionsFile(): string {
@@ -144,7 +143,7 @@ export default class FunctionsManager {
   }
 
   private async migrateLegacy() {
-    const legacyQueriesFile = path.resolve(this.project.getToolpadFolder(), 'queries.ts');
+    const legacyQueriesFile = path.resolve(this.project.getRoot(), 'queries.ts');
     if (await fileExists(legacyQueriesFile)) {
       const functionsFile = this.getFunctionsFile();
       await fs.mkdir(path.dirname(functionsFile), { recursive: true });
@@ -172,7 +171,7 @@ export default class FunctionsManager {
   private async extractTypes() {
     if (!this.extractTypesWorker) {
       this.extractTypesWorker = new Piscina({
-        filename: path.join(currentDirectory, 'functionsTypesWorker.js'),
+        filename: path.resolve(currentDirectory, '../cli/functionsTypesWorker.js'),
       });
     }
 
@@ -252,26 +251,24 @@ export default class FunctionsManager {
     resourcesWatcher.on('unlink', reinitializeWatcher);
   }
 
-  private async createRuntimeWorkerWithEnv() {
+  private async createRuntimeWorker() {
     const oldWorker = this.devWorker;
-    this.devWorker = createDevWorker(process.env);
-
-    await oldWorker.terminate();
-
+    this.devWorker = createDevWorker(this.project.envManager.getEnv());
+    await oldWorker?.terminate();
     this.project.invalidateQueries();
   }
 
   async start() {
+    await this.createRuntimeWorker();
+
     if (this.project.options.dev) {
       await this.migrateLegacy();
 
       await this.startWatchingFunctionFiles();
 
       this.project.events.subscribe('envChanged', async () => {
-        await this.createRuntimeWorkerWithEnv();
+        await this.createRuntimeWorker();
       });
-
-      await this.createRuntimeWorkerWithEnv();
     }
   }
 
@@ -297,7 +294,7 @@ export default class FunctionsManager {
   async dispose() {
     await Promise.all([
       this.disposeBuildcontext(),
-      this.devWorker.terminate(),
+      this.devWorker?.terminate(),
       this.extractTypesWorker?.destroy(),
     ]);
   }
@@ -344,6 +341,7 @@ export default class FunctionsManager {
       ? [{ parameters }]
       : handler.parameters.map(([parameterName]) => parameters[parameterName]);
 
+    invariant(this.devWorker, 'devWorker must be initialized');
     const data = await this.devWorker.execute(outputFilePath, name, executeParams);
 
     return { data };
@@ -388,6 +386,7 @@ export default class FunctionsManager {
     exportName: string = 'default',
   ): Promise<ToolpadDataProviderIntrospection> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
+    invariant(this.devWorker, 'devWorker must be initialized');
     return this.devWorker.introspectDataProvider(fullPath, exportName);
   }
 
@@ -397,6 +396,7 @@ export default class FunctionsManager {
     params: GetRecordsParams<R, P>,
   ): Promise<GetRecordsResult<R, P>> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
+    invariant(this.devWorker, 'devWorker must be initialized');
     return this.devWorker.getDataProviderRecords(fullPath, exportName, params);
   }
 }

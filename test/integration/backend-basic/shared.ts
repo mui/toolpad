@@ -1,6 +1,6 @@
-import { expect, Page } from '../../playwright/localTest';
+import { expect, Locator, Page, FrameLocator } from '../../playwright/localTest';
 
-export async function expectBasicPageContent(page: Page) {
+export async function expectBasicRuntimeContentTests(page: Page | Locator | FrameLocator) {
   await expect(page.getByText('hello, message: hello world', { exact: true })).toBeVisible();
   await expect(page.getByText('throws, error.message: BOOM!', { exact: true })).toBeVisible();
   await expect(page.getByText('throws, data had an error', { exact: true })).toBeVisible();
@@ -20,6 +20,10 @@ export async function expectBasicPageContent(page: Page) {
     page.getByText("Raw text: Hello, I'm raw text! | SELECT NOW()", { exact: true }),
   ).toBeVisible();
   await expect(page.getByText('my custom cookie: foo-bar-baz', { exact: true })).toBeVisible();
+}
+
+export async function expectBasicRuntimeTests(page: Page | Locator | FrameLocator) {
+  await expectBasicRuntimeContentTests(page);
 
   await page.getByRole('button', { name: 'set cookie' }).click();
 

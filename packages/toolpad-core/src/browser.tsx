@@ -1,3 +1,4 @@
+import getComponentDisplayName from '@mui/toolpad-utils/react';
 import { TOOLPAD_COMPONENT } from './constants';
 import { ArgTypeDefinition, ComponentConfig, PropValueType, ToolpadComponent } from './types';
 
@@ -21,7 +22,10 @@ export function createComponent<P extends object>(
     for (const [name, argType] of Object.entries(config.argTypes)) {
       const maybeLegacyArgtype = argType as MaybeLegacyArgTypeDefinition;
       if (maybeLegacyArgtype.typeDef) {
-        console.warn(`Detected deprecated argType definition for "${name}".`);
+        const componentName = getComponentDisplayName(Component);
+        console.warn(
+          `Detected deprecated argType definition for "${name}" in the "${componentName}" component.`,
+        );
         Object.assign(maybeLegacyArgtype, maybeLegacyArgtype.typeDef);
         delete maybeLegacyArgtype.typeDef;
       }

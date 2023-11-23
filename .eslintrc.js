@@ -74,20 +74,30 @@ module.exports = {
       },
     ],
     'import/no-restricted-paths': [
-      // Disabling this rule for now, still need a few more refactors for it to pass
-      'off',
+      'error',
       {
         zones: [
           {
+            // Don't leak the internal runtime abstraction. It's on its way to be moved towards a separate package
             target: './packages/toolpad-app/src/runtime',
             from: './packages/toolpad-app/src/',
-            except: ['./runtime', './appDom', './types.ts'],
+            except: [
+              './runtime',
+              // TODO: move ./src/appDom to ./src/runtime/appDom
+              './appDom',
+            ],
           },
         ],
       },
     ],
   },
   overrides: [
+    {
+      files: ['examples/**/*'],
+      rules: {
+        'no-console': 'off',
+      },
+    },
     {
       files: [
         'packages/create-toolpad-app/**/*',

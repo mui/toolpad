@@ -1,4 +1,4 @@
-# Data Providers
+# Data providers
 
 <p class="description">Bring tabular data to the frontend with server-side pagination and filtering.</p>
 
@@ -6,37 +6,29 @@ Toolpad functions are great to bring some backend state to the page, but they fa
 
 Follow these steps to create a new data provider:
 
-1. Drag a data grid into the canvas
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/data-provider-1.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
-2. Under its **Row Source** property, select the option **Data Provider**.
+A data provider that iterates over a static list could look as follows:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/rows-source.png", "alt": "Select data provider row source", "caption": "Select data provider row source", "zoom": false, "width": 297}}
+```tsx
+import { createDataProvider } from '@mui/toolpad-core/server';
+import DATA from './movies.json';
 
-3. Click the data provider selector and choose **Create new data provider**.
+export default createDataProvider({
+  async getRecords({ paginationModel: { start = 0, pageSize } }) {
+    const records = DATA.slice(start, start + pageSize);
+    return { records, totalCount: DATA.length };
+  },
+});
+```
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/create-data-provider.png", "alt": "Create data provider", "caption": "Create data provider", "zoom": false, "width": 294}}
-
-4. Name the new data provider and click **Create**
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/create-data-provider-dialog.png", "alt": "Create data provider dialog", "caption": "Create data provider dialog", "zoom": false, "width": 490}}
-
-5. Use the code button to open your code editor with the data provider backend.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/open-editor.png", "alt": "Open data provider editor", "caption": "Open data provider editor", "zoom": false, "width": 272}}
-
-6. A data provider that iterates over a static list could look as follows:
-
-   ```tsx
-   import { createDataProvider } from '@mui/toolpad-core/server';
-   import DATA from './movies.json';
-
-   export default createDataProvider({
-     async getRecords({ paginationModel: { start = 0, pageSize } }) {
-       const records = DATA.slice(start, start + pageSize);
-       return { records, totalCount: DATA.length };
-     },
-   });
-   ```
+   <video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/data-provider-2.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Pagination
 
@@ -85,31 +77,40 @@ export default createDataProvider({
 ## Filtering 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2886](https://github.com/mui/mui-toolpad/issues/2886) if you want to see it land faster.
 :::
 
 ## Sorting 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2539](https://github.com/mui/mui-toolpad/issues/2539) if you want to see it land faster.
 :::
 
 ## Row editing 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2887](https://github.com/mui/mui-toolpad/issues/2887) if you want to see it land faster.
 :::
 
 ## Row creation 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+👍 Upvote [issue #2888](https://github.com/mui/mui-toolpad/issues/2888) if you want to see it land faster.
 :::
 
 ## Deleting rows 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2889](https://github.com/mui/mui-toolpad/issues/2889) if you want to see it land faster.
 :::
 
 ## API

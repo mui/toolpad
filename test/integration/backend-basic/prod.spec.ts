@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as url from 'url';
 import { test } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { expectBasicPageContent } from './shared';
+import { expectBasicRuntimeTests } from './shared';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -18,8 +18,10 @@ test.use({
 });
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
+  },
+  localAppConfig: {
     cmd: 'start',
     env: {
       SECRET_BAZ: 'Some baz secret',
@@ -35,5 +37,5 @@ test('functions basics', async ({ page, context }) => {
   const runtimeModel = new ToolpadRuntime(page, { prod: true });
   await runtimeModel.gotoPage('basic');
 
-  await expectBasicPageContent(page);
+  await expectBasicRuntimeTests(page);
 });

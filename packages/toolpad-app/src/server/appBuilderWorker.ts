@@ -25,6 +25,7 @@ async function main() {
     base,
     getComponents: () => project.getComponents(),
     outDir: project.getAppOutputFolder(),
+    loadDom: () => project.loadDom(),
   });
 
   await project.writeBuildInfo();

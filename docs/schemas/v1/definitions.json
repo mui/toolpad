@@ -330,6 +330,10 @@
               },
               "description": "The content of the page. This defines the UI."
             },
+            "unstable_codeFile": {
+              "type": "string",
+              "description": "The content of the page as JSX. Experimental, do not use!."
+            },
             "display": {
               "anyOf": [
                 {

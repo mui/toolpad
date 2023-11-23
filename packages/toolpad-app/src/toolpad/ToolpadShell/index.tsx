@@ -5,6 +5,7 @@ import ToolpadNavigation from './ToolpadNavigation';
 import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../../constants';
 
 export interface ToolpadShellProps {
+  navigation?: React.ReactNode;
   actions?: React.ReactNode;
   status?: React.ReactNode;
   children?: React.ReactNode;

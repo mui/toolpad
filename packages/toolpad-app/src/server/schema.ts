@@ -256,6 +256,31 @@ elementSchema = baseElementSchema
   })
   .describe('The instance of a component. Used to build user interfaces in pages.');
 
+export const applicationSchema = toolpadObjectSchema(
+  'application',
+  z.object({
+    authorization: z
+      .object({
+        roles: z
+          .array(
+            z.union([
+              z.string(),
+              z.object({
+                role: z.string().describe('The name of the role.'),
+                description: z.string().optional().describe('A description of the role.'),
+              }),
+            ]),
+          )
+          .optional()
+          .describe('Available roles for this application. These can be assigned to users.'),
+      })
+      .optional()
+      .describe('Authorization configuration for this application.'),
+  }),
+);
+
+export type Application = z.infer<typeof applicationSchema>;
+
 export const pageSchema = toolpadObjectSchema(
   'page',
   z.object({
@@ -273,6 +298,16 @@ export const pageSchema = toolpadObjectSchema(
       .array(elementSchema)
       .optional()
       .describe('The content of the page. This defines the UI.'),
+    authorization: z
+      .object({
+        allowAll: z.boolean().optional().describe('Allow all users to access this page.'),
+        allowRoles: z
+          .array(z.string())
+          .optional()
+          .describe('Roles that are allowed to access this page.'),
+      })
+      .optional()
+      .describe('Authorization configuration for this page.'),
     unstable_codeFile: z
       .string()
       .optional()
@@ -327,6 +362,7 @@ export type Theme = z.infer<typeof themeSchema>;
 
 export const META = {
   schemas: {
+    Application: applicationSchema,
     Page: pageSchema,
     Theme: themeSchema,
   },

@@ -360,13 +360,12 @@ function mergeApplicationIntoDom(dom: appDom.AppDom, applicationFile: Applicatio
   const applicationFileSpec = applicationFile.spec;
   const app = appDom.getApp(dom);
 
-  dom = appDom.setNodeNamespacedProp(
-    dom,
-    app,
-    'attributes',
-    'authorization',
-    applicationFileSpec.authorization,
-  );
+  dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'authorization', {
+    ...applicationFileSpec.authorization,
+    roles: applicationFileSpec.authorization?.roles?.map((role) =>
+      typeof role === 'string' ? { name: role } : role,
+    ),
+  });
 
   return dom;
 }
@@ -963,6 +962,7 @@ function getDomFilePatterns(root: string) {
     path.resolve(root, './pages/*/page.yml'),
     path.resolve(root, './components'),
     path.resolve(root, './components/*.*'),
+    path.resolve(root, './application.yml'),
   ];
 }
 /**

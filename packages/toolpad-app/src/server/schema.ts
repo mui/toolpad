@@ -266,7 +266,7 @@ export const applicationSchema = toolpadObjectSchema(
             z.union([
               z.string(),
               z.object({
-                role: z.string().describe('The name of the role.'),
+                name: z.string().describe('The name of the role.'),
                 description: z.string().optional().describe('A description of the role.'),
               }),
             ]),

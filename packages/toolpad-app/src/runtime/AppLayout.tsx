@@ -11,20 +11,17 @@ import {
   Toolbar,
   Avatar,
   Typography,
-  IconButton,
   Menu,
   MenuItem,
   Tooltip,
   Button,
   CircularProgress,
-  ListItemIcon,
   useTheme,
 } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import GoogleIcon from '@mui/icons-material/Google';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
-import { AuthProvider, SessionContext } from './useSession';
+import { AuthProvider, AuthSessionContext } from './useAuthSession';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -130,12 +127,7 @@ export function AppLayout({
   const hasNavigation = hasNavigationProp && hasShell;
   const hasHeader = hasHeaderProp && hasShell;
 
-  const {
-    session,
-    signIn,
-    signOut,
-    isLoading: isSessionLoading,
-  } = React.useContext(SessionContext);
+  const { session, signIn, signOut, isSigningIn } = React.useContext(AuthSessionContext);
 
   const [anchorElSignIn, setAnchorElSignIn] = React.useState<null | HTMLElement>(null);
   const handleOpenSignInMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -174,19 +166,20 @@ export function AppLayout({
   return (
     <React.Fragment>
       {hasHeader ? (
-        <AppBar position="static" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
+        <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
+          {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
           <Toolbar variant="dense">
             <Typography variant="h6" noWrap sx={{ ml: 1 }}>
               {activePageDisplayName}
             </Typography>
             <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
-              {session?.user && !isSessionLoading ? (
+              {session?.user && !isSigningIn ? (
                 <React.Fragment>
-                  <Typography variant="body2" sx={{ mr: 2 }}>
-                    {session.user.name || session.user.email}
-                  </Typography>
-                  <Tooltip title="User settings">
-                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Button color="inherit" onClick={handleOpenUserMenu}>
+                    <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
+                      {session.user.name || session.user.email}
+                    </Typography>
+                    <Tooltip title="User settings">
                       <Avatar
                         alt={session.user.name || session.user.email}
                         src={session.user.image}
@@ -196,8 +189,8 @@ export function AppLayout({
                           height: 32,
                         }}
                       />
-                    </IconButton>
-                  </Tooltip>
+                    </Tooltip>
+                  </Button>
                   <Menu
                     sx={{ mt: '45px' }}
                     id="menu-appbar-user"
@@ -214,13 +207,13 @@ export function AppLayout({
                     open={Boolean(anchorElUser)}
                     onClose={handleCloseUserMenu}
                   >
-                    <MenuItem key="signout" onClick={handleSignOut}>
+                    <MenuItem onClick={handleSignOut}>
                       <ListItemText>Sign out</ListItemText>
                     </MenuItem>
                   </Menu>
                 </React.Fragment>
               ) : null}
-              {!session?.user && !isSessionLoading ? (
+              {!session?.user && !isSigningIn ? (
                 <React.Fragment>
                   <Button onClick={handleOpenSignInMenu} color="inherit">
                     Sign In
@@ -241,22 +234,49 @@ export function AppLayout({
                     open={Boolean(anchorElSignIn)}
                     onClose={handleCloseSignInMenu}
                   >
-                    <MenuItem key="github" onClick={handleSignIn('github')}>
-                      <ListItemIcon>
-                        <GitHubIcon color="inherit" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText>Sign in with GitHub</ListItemText>
+                    <MenuItem>
+                      <Button
+                        variant="contained"
+                        onClick={handleSignIn('github')}
+                        startIcon={<GitHubIcon />}
+                        fullWidth
+                        sx={{
+                          backgroundColor: '#24292F',
+                        }}
+                      >
+                        Sign in with GitHub
+                      </Button>
                     </MenuItem>
-                    <MenuItem key="google" onClick={handleSignIn('google')}>
-                      <ListItemIcon>
-                        <GoogleIcon color="inherit" fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText>Sign in with Google</ListItemText>
+                    <MenuItem>
+                      <Button
+                        variant="contained"
+                        onClick={handleSignIn('google')}
+                        startIcon={
+                          <img
+                            alt="Google logo"
+                            loading="lazy"
+                            height="18"
+                            width="18"
+                            src="https://authjs.dev/img/providers/google.svg"
+                            style={{ marginLeft: '2px', marginRight: '2px' }}
+                          />
+                        }
+                        fullWidth
+                        sx={{
+                          backgroundColor: '#fff',
+                          color: '#000',
+                          '&:hover': {
+                            color: theme.palette.primary.contrastText,
+                          },
+                        }}
+                      >
+                        Sign in with Google
+                      </Button>
                     </MenuItem>
                   </Menu>
                 </React.Fragment>
               ) : null}
-              {isSessionLoading ? <CircularProgress color="inherit" size={26} /> : null}
+              {isSigningIn ? <CircularProgress color="inherit" size={26} /> : null}
             </Stack>
           </Toolbar>
         </AppBar>
@@ -271,7 +291,10 @@ export function AppLayout({
             search={retainedSearch}
           />
         ) : null}
-        {children}
+        <Box sx={{ flex: 1 }}>
+          <Toolbar variant="dense" />
+          {children}
+        </Box>
       </Box>
     </React.Fragment>
   );

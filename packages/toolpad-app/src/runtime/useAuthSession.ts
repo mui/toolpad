@@ -6,7 +6,7 @@ const AUTH_SESSION_PATH = `${AUTH_API_PATH}/session`;
 const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
 export type AuthProvider = 'github' | 'google';
-export interface Session {
+export interface AuthSession {
   user: {
     name: string;
     email: string;
@@ -14,23 +14,23 @@ export interface Session {
   };
 }
 
-export interface SessionPayload {
-  session: Session | null;
+export interface AuthSessionPayload {
+  session: AuthSession | null;
   signIn: (provider: AuthProvider) => void | Promise<void>;
   signOut: () => void | Promise<void>;
-  isLoading: boolean;
+  isSigningIn: boolean;
 }
 
-export const SessionContext = React.createContext<SessionPayload>({
+export const AuthSessionContext = React.createContext<AuthSessionPayload>({
   session: null,
   signIn: () => {},
   signOut: () => {},
-  isLoading: false,
+  isSigningIn: false,
 });
 
-export function useSession(): SessionPayload {
-  const [session, setSession] = React.useState<Session | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+export function useAuthSession(): AuthSessionPayload {
+  const [session, setSession] = React.useState<AuthSession | null>(null);
+  const [isSigningIn, setIsSigningIn] = React.useState(true);
 
   const signOut = React.useCallback(async () => {
     try {
@@ -49,24 +49,22 @@ export function useSession(): SessionPayload {
   }, []);
 
   const getSession = React.useCallback(async () => {
-    if (!session) {
-      try {
-        setIsLoading(true);
-        const sessionResponse = await fetch(AUTH_SESSION_PATH);
-        setSession(await sessionResponse.json());
-      } catch (error) {
-        console.error((error as Error).message);
-        signOut();
-      }
-
-      setIsLoading(false);
+    try {
+      setIsSigningIn(true);
+      const sessionResponse = await fetch(AUTH_SESSION_PATH);
+      setSession(await sessionResponse.json());
+    } catch (error) {
+      console.error((error as Error).message);
+      signOut();
     }
-  }, [session, signOut]);
+
+    setIsSigningIn(false);
+  }, [signOut]);
 
   const signIn = React.useCallback(
     async (provider: AuthProvider) => {
       try {
-        setIsLoading(true);
+        setIsSigningIn(true);
 
         const signInResponse = await fetch(`${AUTH_API_PATH}/signin/${provider}`, {
           method: 'POST',
@@ -82,7 +80,7 @@ export function useSession(): SessionPayload {
         console.error((error as Error).message);
         signOut();
 
-        setIsLoading(false);
+        setIsSigningIn(false);
       }
     },
     [signOut],
@@ -96,6 +94,6 @@ export function useSession(): SessionPayload {
     session,
     signIn,
     signOut,
-    isLoading,
+    isSigningIn,
   };
 }

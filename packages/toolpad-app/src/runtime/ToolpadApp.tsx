@@ -92,7 +92,7 @@ import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
-import { SessionContext, useSession } from './useSession';
+import { AuthSessionContext, useAuthSession } from './useAuthSession';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -1581,11 +1581,11 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  const sessionContext = useSession();
+  const authSessionContext = useAuthSession();
 
   return (
     <BrowserRouter basename={basename}>
-      <SessionContext.Provider value={sessionContext}>
+      <AuthSessionContext.Provider value={authSessionContext}>
         <UseDataProviderContext.Provider value={useDataProvider}>
           <AppThemeProvider dom={dom}>
             <CssBaseline enableColorScheme />
@@ -1611,7 +1611,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
             </AppRoot>
           </AppThemeProvider>
         </UseDataProviderContext.Provider>
-      </SessionContext.Provider>
+      </AuthSessionContext.Provider>
     </BrowserRouter>
   );
 }

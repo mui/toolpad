@@ -361,6 +361,12 @@ async function createAuthHandler(): Promise<AppHandler> {
       });
 
       const response = (await Auth(request, {
+        pages: {
+          signIn: '/prod',
+          signOut: '/prod',
+          error: '/prod', // Error code passed in query string as ?error=
+          verifyRequest: '/prod',
+        },
         providers: [
           GithubProvider({
             clientId: process.env.TOOLPAD_GITHUB_ID,
@@ -383,17 +389,19 @@ async function createAuthHandler(): Promise<AppHandler> {
         trustHost: true,
         callbacks: {
           async signIn({ account, profile }) {
-            // @TODO: Validate domain for Github too?
             if (account && account.provider === 'google') {
               return Boolean(
                 profile &&
                   profile.email_verified &&
                   profile.email &&
-                  (!process.env.TOOLPAD_GOOGLE_CLIENT_DOMAIN ||
-                    profile.email.endsWith(process.env.TOOLPAD_GOOGLE_CLIENT_DOMAIN)),
+                  (!process.env.TOOLPAD_GOOGLE_DOMAIN ||
+                    profile.email.endsWith(`@${process.env.TOOLPAD_GOOGLE_DOMAIN}`)),
               );
             }
             return true;
+          },
+          async redirect({ baseUrl }) {
+            return `${baseUrl}/prod`;
           },
         },
       })) as Response;

@@ -20,8 +20,10 @@ import {
 } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { AuthProvider, AuthSessionContext } from './useAuthSession';
+import api from './api';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -107,6 +109,13 @@ export function AppLayout({
   const theme = useTheme();
 
   const [urlParams] = useSearchParams();
+
+  const { data: authProviders = [] } = useQuery({
+    queryKey: ['getAuthProviders'],
+    queryFn: async () => {
+      return api.methods.getAuthProviders();
+    },
+  });
 
   const retainedSearch = React.useMemo(() => {
     for (const name of urlParams.keys()) {
@@ -213,7 +222,7 @@ export function AppLayout({
                   </Menu>
                 </React.Fragment>
               ) : null}
-              {!session?.user && !isSigningIn ? (
+              {!session?.user && !isSigningIn && authProviders.length > 0 ? (
                 <React.Fragment>
                   <Button onClick={handleOpenSignInMenu} color="inherit">
                     Sign In
@@ -234,45 +243,49 @@ export function AppLayout({
                     open={Boolean(anchorElSignIn)}
                     onClose={handleCloseSignInMenu}
                   >
-                    <MenuItem>
-                      <Button
-                        variant="contained"
-                        onClick={handleSignIn('github')}
-                        startIcon={<GitHubIcon />}
-                        fullWidth
-                        sx={{
-                          backgroundColor: '#24292F',
-                        }}
-                      >
-                        Sign in with GitHub
-                      </Button>
-                    </MenuItem>
-                    <MenuItem>
-                      <Button
-                        variant="contained"
-                        onClick={handleSignIn('google')}
-                        startIcon={
-                          <img
-                            alt="Google logo"
-                            loading="lazy"
-                            height="18"
-                            width="18"
-                            src="https://authjs.dev/img/providers/google.svg"
-                            style={{ marginLeft: '2px', marginRight: '2px' }}
-                          />
-                        }
-                        fullWidth
-                        sx={{
-                          backgroundColor: '#fff',
-                          color: '#000',
-                          '&:hover': {
-                            color: theme.palette.primary.contrastText,
-                          },
-                        }}
-                      >
-                        Sign in with Google
-                      </Button>
-                    </MenuItem>
+                    {authProviders.includes('github') ? (
+                      <MenuItem>
+                        <Button
+                          variant="contained"
+                          onClick={handleSignIn('github')}
+                          startIcon={<GitHubIcon />}
+                          fullWidth
+                          sx={{
+                            backgroundColor: '#24292F',
+                          }}
+                        >
+                          Sign in with GitHub
+                        </Button>
+                      </MenuItem>
+                    ) : null}
+                    {authProviders.includes('google') ? (
+                      <MenuItem>
+                        <Button
+                          variant="contained"
+                          onClick={handleSignIn('google')}
+                          startIcon={
+                            <img
+                              alt="Google logo"
+                              loading="lazy"
+                              height="18"
+                              width="18"
+                              src="https://authjs.dev/img/providers/google.svg"
+                              style={{ marginLeft: '2px', marginRight: '2px' }}
+                            />
+                          }
+                          fullWidth
+                          sx={{
+                            backgroundColor: '#fff',
+                            color: '#000',
+                            '&:hover': {
+                              color: theme.palette.primary.contrastText,
+                            },
+                          }}
+                        >
+                          Sign in with Google
+                        </Button>
+                      </MenuItem>
+                    ) : null}
                   </Menu>
                 </React.Fragment>
               ) : null}

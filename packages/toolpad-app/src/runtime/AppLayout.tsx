@@ -34,6 +34,7 @@ export interface NavigationEntry {
   slug: string;
   displayName: string;
   hasShell?: boolean;
+  isProtected?: boolean;
 }
 
 const DRAWER_WIDTH = 250; // px
@@ -167,8 +168,8 @@ export function AppLayout({
     handleCloseUserMenu();
   }, [signOut]);
 
-  const activePageDisplayName = React.useMemo(
-    () => pages.find((page) => page.slug === activePageSlug)?.displayName ?? '',
+  const activePage = React.useMemo(
+    () => pages.find((page) => page.slug === activePageSlug),
     [activePageSlug, pages],
   );
 
@@ -179,10 +180,10 @@ export function AppLayout({
           {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
           <Toolbar variant="dense">
             <Typography variant="h6" noWrap sx={{ ml: 1 }}>
-              {activePageDisplayName}
+              {activePage?.displayName ?? ''}
             </Typography>
             <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
-              {session?.user && !isSigningIn ? (
+              {session?.user && !isSigningIn && activePage?.isProtected ? (
                 <React.Fragment>
                   <Button color="inherit" onClick={handleOpenUserMenu}>
                     <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
@@ -222,7 +223,10 @@ export function AppLayout({
                   </Menu>
                 </React.Fragment>
               ) : null}
-              {!session?.user && !isSigningIn && authProviders.length > 0 ? (
+              {!session?.user &&
+              !isSigningIn &&
+              authProviders.length > 0 &&
+              activePage?.isProtected ? (
                 <React.Fragment>
                   <Button onClick={handleOpenSignInMenu} color="inherit">
                     Sign In
@@ -289,7 +293,9 @@ export function AppLayout({
                   </Menu>
                 </React.Fragment>
               ) : null}
-              {isSigningIn ? <CircularProgress color="inherit" size={26} /> : null}
+              {isSigningIn && activePage?.isProtected ? (
+                <CircularProgress color="inherit" size={26} />
+              ) : null}
             </Stack>
           </Toolbar>
         </AppBar>

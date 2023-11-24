@@ -1,7 +1,4 @@
-/**
- * Handles loading env files and watches for updates.
- */
-export default class EnvManager {
+export default class AuthManager {
   // eslint-disable-next-line class-methods-use-this
   getAuthProviders() {
     return Promise.resolve([

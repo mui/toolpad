@@ -1538,6 +1538,7 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
         slug: page.id,
         displayName: page.name,
         hasShell: page?.attributes.display !== 'standalone',
+        isProtected: page?.attributes.isProtected,
       })),
     [pages],
   );

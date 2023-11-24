@@ -273,6 +273,10 @@ export const pageSchema = toolpadObjectSchema(
       .array(elementSchema)
       .optional()
       .describe('The content of the page. This defines the UI.'),
+    isProtected: z
+      .boolean()
+      .optional()
+      .describe('Whether users must be logged in to access this page.'),
     unstable_codeFile: z
       .string()
       .optional()

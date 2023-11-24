@@ -4,7 +4,7 @@
 
 ## Demo
 
-List makes it easy to configure a recurring pattern of data. Documentation of the component properties is available in the reference section for [list](/toolpad/reference/components/list/#properties).
+List makes it easy to configure a recurring pattern of data.
 
 <!---
 Add demo
@@ -30,3 +30,9 @@ The List component acts as a mini canvas for other components. Each component ha
 ### disablePadding
 
 There is a predefined padding that can be enabled or disabled. It is a boolean.
+
+## API
+
+See the documentation below for a complete reference to all props available to the list component in Toolpad.
+
+- [`<list />`](/toolpad/reference/components/list/#properties)

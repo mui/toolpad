@@ -4,13 +4,13 @@
 
 ## Demo
 
-TextField is a text input component. It takes user input and provides the value for further usage on the page. Documentation of the component properties is available in the reference section for [textfield](/toolpad/reference/components/text-field/#properties).
+TextField is a text input component. It takes user input and provides the value for further usage on the page.
 
 {{"demo": "TextField.js", "hideToolbar": true}}
 
 ## Usage
 
-It is one of the most used input component. The below mentioned function props makes testfield useful to it s full potential.
+It is one of the most used input component. The video below uses some props to demonstrate it's usage.
 
 <video controls width="100%" height="auto" style="contain" alt="textfield">
   <source src="/static/toolpad/docs/components/textfield/textfield.mp4" type="video/mp4">
@@ -31,7 +31,7 @@ Password prop masks the user input. It is used to hide sensitive data.
 
 ### name
 
-Name is needed when a textfield is part of a form component. It is used to show validation errors.
+A name is needed when a textfield is part of a form component. It is used to show validation errors.
 
 ## Appearance
 
@@ -59,11 +59,11 @@ This boolean defines if the component should take the full width of the page.
 
 ### placeholder
 
-As shown in the first demo, in a blank textFile, a placeholder shows up when the user starts typing.
+As shown in the first demo, in a blank text field, a placeholder shows up when the user starts typing.
 
 ### disabled
 
-Disabled property shows the state of the component so that end user is aware that can't interact with the component.
+Disabled property shows the state of the component so that end user is aware that they can't interact with the component.
 
 {{"demo": "TextFieldDisabled.js", "hideToolbar": true}}
 
@@ -84,3 +84,9 @@ A validation check on the minimum length of the input.
 ### maxLength
 
 A validation check on the maximum length of the input.
+
+## API
+
+See the documentation below for a complete reference to all props available to the textfield component in Toolpad.
+
+- [`<textfield />`](/toolpad/reference/components/text-field/#properties)

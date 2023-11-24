@@ -4,7 +4,7 @@
 
 ## Demo
 
-DatePicker is an input component. It takes user input and provides the value for further usage on the page. Documentation of the component properties is available in the reference section for [datepicker](/toolpad/reference/components/datepicker/#properties).
+DatePicker is an input component. It takes user input and provides the value for further usage on the page.
 
 {{"demo": "DatePicker.js", "hideToolbar": true}}
 
@@ -33,7 +33,7 @@ Allows setting a default value. Example:
 
 ### name
 
-This is needed when a datepicker is part of a form. Check the video below to see how it is used.
+A name is needed when a textfield is part of a form component. It is used to show validation errors.
 
 ## Appearance
 
@@ -79,3 +79,9 @@ isRequired is useful when the action can't be perfomed without a user provided d
 ### isInvalid
 
 ???
+
+## API
+
+See the documentation below for a complete reference to all props available to the datepicker component in Toolpad.
+
+- [`<datepicker />`](/toolpad/reference/components/date-picker/#properties)

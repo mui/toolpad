@@ -55,7 +55,7 @@
     "react-hook-form": "7.48.2"
   },
   "devDependencies": {
-    "@types/react": "18.2.37",
+    "@types/react": "18.2.38",
     "react": "18.2.0"
   },
   "peerDependencies": {

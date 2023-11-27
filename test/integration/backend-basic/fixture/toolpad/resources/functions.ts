@@ -137,3 +137,15 @@ export async function setCustomCookie() {
   const context = getContext();
   context.setCookie('MY_TOOLPAD_COOKIE', 'hello everybody!!!');
 }
+
+export interface RowDataPacket {
+  constructor: {
+    name: 'RowDataPacket';
+  };
+  [column: string]: any;
+  [column: number]: any;
+}
+
+export async function mysqlResult(): Promise<RowDataPacket[]> {
+  return [];
+}

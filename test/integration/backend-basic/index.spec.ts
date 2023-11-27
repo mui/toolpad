@@ -136,6 +136,10 @@ test('Query serialization', async ({ page }) => {
   await expect(page.getByText('Circular property: hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Invalid error: undefined', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Some Date object: 2023-11-27T14:35:35.511Z', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText('Some RegExp: "foo" i', { exact: true })).toBeVisible();
 });
 
 test('Extracted types', async ({ page }) => {

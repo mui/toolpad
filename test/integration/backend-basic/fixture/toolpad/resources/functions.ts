@@ -138,3 +138,10 @@ export async function setCustomCookie() {
   const context = getContext();
   context.setCookie('MY_TOOLPAD_COOKIE', 'hello everybody!!!');
 }
+
+export async function someNonJson() {
+  return {
+    date: new Date(1701095735511),
+    regexp: /foo/i,
+  };
+}

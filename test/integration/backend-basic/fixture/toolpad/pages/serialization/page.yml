@@ -17,6 +17,10 @@ spec:
       query:
         function: invalidError
         kind: local
+    - name: someNonJson
+      query:
+        function: functions.ts#someNonJson
+        kind: local
   content:
     - component: Text
       name: text
@@ -43,3 +47,16 @@ spec:
         value:
           $$jsExpression: |
             `Invalid error: ${invalidError.error?.message}`
+    - component: Text
+      name: text3
+      props:
+        value:
+          $$jsExpression: |
+            `Some Date object: ${someNonJson.data.date.toISOString()}`
+    - component: Text
+      name: text4
+      props:
+        value:
+          $$jsExpression: >
+            `Some RegExp: "${someNonJson.data.regexp.source}"
+            ${someNonJson.data.regexp.flags}`

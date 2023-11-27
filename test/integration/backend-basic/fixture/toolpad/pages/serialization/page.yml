@@ -25,7 +25,7 @@ spec:
       props:
         value:
           $$jsExpression: |
-            `Circlular property: ${circularData.data.a}`
+            `Circular property: ${circularData.data.a.a.a.msg}`
     - component: Text
       name: text1
       layout:

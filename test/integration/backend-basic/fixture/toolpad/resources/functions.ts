@@ -81,10 +81,11 @@ export async function getGlobal() {
 
 interface Circular {
   a?: Circular;
+  msg: string;
 }
 
 export async function circularData() {
-  const a: Circular = {};
+  const a: Circular = { msg: 'hello' };
   a.a = a;
   return a;
 }

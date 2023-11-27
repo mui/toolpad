@@ -133,7 +133,7 @@ test('Query serialization', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('serialization');
 
-  await expect(page.getByText('Circlular property: [Circular]', { exact: true })).toBeVisible();
+  await expect(page.getByText('Circular property: hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Invalid error: undefined', { exact: true })).toBeVisible();
 });

@@ -16,6 +16,7 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 const BASIC_TESTS_PAGE_ID = '5q1xd0t';
 const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
 const DATA_PROVIDERS_PAGE_ID = 'VnOzPpU';
+const SERIALIZATION_TESTS_PAGE_ID = 'Tysc6w5';
 
 test.use({
   ignoreConsoleErrors: [
@@ -140,6 +141,20 @@ test('Query serialization', async ({ page }) => {
     page.getByText('Some Date object: 2023-11-27T14:35:35.511Z', { exact: true }),
   ).toBeVisible();
   await expect(page.getByText('Some RegExp: "foo" i', { exact: true })).toBeVisible();
+});
+
+test('Circular scope value, binding editor', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPageById(SERIALIZATION_TESTS_PAGE_ID);
+
+  await editorModel.waitForOverlay();
+  await clickCenter(
+    page,
+    editorModel.appCanvas.getByText('Circular property: hello', { exact: true }),
+  );
+  await editorModel.componentEditor.waitFor();
+  await page.getByLabel('Bind property "Value"').click();
+  await expect(page.getByRole('dialog', { name: 'Bind property "Value' })).toBeVisible();
 });
 
 test('Extracted types', async ({ page }) => {

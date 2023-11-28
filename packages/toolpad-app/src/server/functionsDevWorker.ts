@@ -4,7 +4,6 @@ import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'node:url';
-import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
 import {
   ServerContext,
   getServerContext,
@@ -12,7 +11,7 @@ import {
   withContext,
 } from '@mui/toolpad-core/serverRuntime';
 import { isWebContainer } from '@webcontainer/env';
-import SuperJSON from 'superjson';
+import * as superjson from 'superjson';
 import { createRpcClient, serveRpc } from '@mui/toolpad-utils/workerRpc';
 import { workerData } from 'node:worker_threads';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
@@ -113,8 +112,7 @@ async function execute(msg: ExecuteParams): Promise<ExecuteResult> {
       ? await fn(...msg.parameters)
       : await withContext(ctx, async () => fn(...msg.parameters));
 
-    const withoutCircularRefs = replaceRecursive(rawResult, getCircularReplacer());
-    const serializedResult = SuperJSON.stringify(withoutCircularRefs);
+    const serializedResult = superjson.stringify(rawResult);
 
     return { result: serializedResult, newCookies: Array.from(newCookies.entries()) };
   } finally {
@@ -216,7 +214,7 @@ export function createWorker(env: Record<string, any>) {
         }
       }
 
-      const result = SuperJSON.parse(serializedResult);
+      const result = superjson.parse(serializedResult);
 
       return result;
     },

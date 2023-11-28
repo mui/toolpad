@@ -253,8 +253,16 @@ export default function evalJsBindings(
     let nestedBindingsLoading: boolean | undefined;
     let nestedBindingsError: Error | undefined;
 
+    const seen = new Set();
+
     const mergeNestedBindings = (value: unknown, parentBindingId: string) => {
       if (value && typeof value === 'object') {
+        if (seen.has(value)) {
+          return;
+        }
+
+        seen.add(value);
+
         for (const nestedPropName of Object.keys(value)) {
           const nestedBindingId = `${parentBindingId}${
             Array.isArray(value) ? `[${nestedPropName}]` : `.${nestedPropName}`

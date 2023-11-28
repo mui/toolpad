@@ -1,6 +1,6 @@
 import { parentPort, workerData, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
-import { createServer, Plugin } from 'vite';
+import type { Plugin } from 'vite';
 import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
 import { getHtmlContent, createViteConfig, resolvedComponentsId } from './toolpadAppBuilder';
 import type { RuntimeConfig } from '../types';
@@ -72,7 +72,8 @@ async function createDevServer(config: ToolpadAppDevServerParams) {
     getComponents,
     loadDom,
   });
-  const devServer = await createServer(viteConfig);
+  const vite = await import('vite');
+  const devServer = await vite.createServer(viteConfig);
 
   return { devServer };
 }

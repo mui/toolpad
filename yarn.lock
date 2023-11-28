@@ -11759,10 +11759,10 @@ sucrase@^3.20.3, sucrase@^3.21.0:
     pirates "^4.0.1"
     ts-interface-checker "^0.1.9"
 
-superjson@2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/superjson/-/superjson-2.2.1.tgz#9377a7fa80fedb10c851c9dbffd942d4bcf79733"
-  integrity sha512-8iGv75BYOa0xRJHK5vRLEjE2H/i4lulTjzpUXic3Eg8akftYjkmQDa8JARQ42rlczXyFR3IeRoeFCc7RxHsYZA==
+superjson@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/superjson/-/superjson-2.0.0.tgz#7abcbe6c1badc2e689ea62c375ca257666a68282"
+  integrity sha512-W3n+NJ7TFjaLle8ihIIvsr/bbuKpnxeatsyjmhy7iSkom+/cshaHziCQAWXrHGWJVQSQFDOuES6C3nSEvcbrQg==
   dependencies:
     copy-anything "^3.0.2"
 

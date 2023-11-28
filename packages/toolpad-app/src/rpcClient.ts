@@ -1,4 +1,4 @@
-import { parse as superjsonParse } from 'superjson';
+import * as superjson from 'superjson';
 import invariant from 'invariant';
 import {
   QueryClient,
@@ -41,7 +41,7 @@ function createRpcClient<D extends MethodResolvers>(endpoint: string | URL): Met
             }
             throw toolpadError;
           }
-          return superjsonParse(response.result);
+          return superjson.parse(response.result);
         }
 
         throw new Error(`HTTP ${res.status}`);

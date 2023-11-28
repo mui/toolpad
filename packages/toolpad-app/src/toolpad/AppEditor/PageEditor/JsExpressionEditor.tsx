@@ -2,6 +2,7 @@ import * as React from 'react';
 import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
 import { ScopeMeta } from '@mui/toolpad-core';
+import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
 import { WithControlledProp } from '../../../utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
 import ElementContext from '../ElementContext';
@@ -46,7 +47,8 @@ export function JsExpressionEditor({
   const nodeName = element?.name;
 
   const extraLibs = React.useMemo(() => {
-    const generatedTypes = jsonToTs(globalScope);
+    const withoutCircularRefs = replaceRecursive(globalScope, getCircularReplacer());
+    const generatedTypes = jsonToTs(withoutCircularRefs);
 
     const globalDeclarations = Object.keys(globalScope).map((key) => {
       const metaData = globalScopeMeta[key];

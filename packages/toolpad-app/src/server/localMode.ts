@@ -478,7 +478,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       apiVersion: API_VERSION,
       kind: 'page',
       spec: {
-        id: node.id,
+        alias: node.alias,
         title: node.attributes.title,
         parameters: undefinedWhenEmpty(
           node.attributes.parameters?.map(([name, value]) => ({ name, value })) ?? [],
@@ -654,10 +654,12 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
 }
 
 function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.AppDom {
-  const pageFileSpec = pageFile.spec;
+  const pageFileSpec = pageFile.spec ?? {};
   let fragment = appDom.createFragmentInternal(pageFileSpec.id as NodeId, 'page', {
     name: pageName,
     attributes: {
+      // Convert deprecated id to alias
+      alias: pageFileSpec.id ? [pageFileSpec.id] : pageFileSpec.alias,
       title: pageFileSpec.title,
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
@@ -748,7 +750,7 @@ function optimizePage(page: Page): Page {
     ...page,
     spec: {
       ...page.spec,
-      content: page.spec.content?.map(optimizePageElement),
+      content: page.spec?.content?.map(optimizePageElement),
     },
   };
 }
@@ -923,10 +925,6 @@ async function initToolpadFolder(root: string) {
     projectFolder.pages.page = {
       apiVersion: API_VERSION,
       kind: 'page',
-      spec: {
-        id: appDom.createId(),
-        title: 'Default page',
-      },
     };
     await writeProjectFolder(root, projectFolder);
   }

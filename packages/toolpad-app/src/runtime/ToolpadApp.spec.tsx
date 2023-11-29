@@ -42,7 +42,7 @@ function renderPage(
 
   dom = initPage(dom, page);
 
-  window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
+  window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.name}`);
 
   const state = createRuntimeState({ dom });
 

@@ -258,7 +258,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       let newView = action.view;
       if (action.view.kind === 'page') {
         if (typeof action.view.selectedNodeId === 'undefined') {
-          const isSameNode = action.view.nodeId === state.currentView.nodeId;
+          const isSameNode = action.view.name === state.currentView.name;
 
           newView = {
             ...action.view,

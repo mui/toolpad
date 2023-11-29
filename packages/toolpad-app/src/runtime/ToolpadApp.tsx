@@ -153,14 +153,14 @@ function usePageNavigator(): NavigateToPage {
   const canvasEvents = React.useContext(CanvasEventsContext);
 
   const navigateToPage: NavigateToPage = React.useCallback(
-    (pageNodeId, pageParameters) => {
+    (pageName, pageParameters) => {
       const urlParams = pageParameters && new URLSearchParams(pageParameters);
 
       if (canvasEvents) {
-        canvasEvents.emit('pageNavigationRequest', { pageNodeId });
+        canvasEvents.emit('pageNavigationRequest', { pageName });
       } else {
         navigate({
-          pathname: `/pages/${pageNodeId}`,
+          pathname: `/pages/${pageName}`,
           ...(urlParams
             ? {
                 search: urlParams.toString(),

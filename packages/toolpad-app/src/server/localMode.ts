@@ -329,7 +329,7 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   dom = appDom.addNode(
     dom,
     appDom.createNode(dom, 'theme', {
-      theme: themeFileSpec.options,
+      theme: themeFileSpec?.options,
       attributes: {},
     }),
     app,
@@ -478,7 +478,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       apiVersion: API_VERSION,
       kind: 'page',
       spec: {
-        alias: node.alias,
+        alias: node.attributes.alias,
         title: node.attributes.title,
         parameters: undefinedWhenEmpty(
           node.attributes.parameters?.map(([name, value]) => ({ name, value })) ?? [],

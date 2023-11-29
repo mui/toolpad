@@ -5,7 +5,7 @@ import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import { BindableAttrValue, NodeId, PropBindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrValue, PropBindableAttrValue } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';

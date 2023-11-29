@@ -31,7 +31,6 @@ import {
   PropValueType,
   BindableAttrValue,
   NavigationAction,
-  NodeId,
   EnvAttrValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
@@ -374,7 +373,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 
       onChange({
         $$navigationAction: {
-          page: pageId,
+          page: pageName,
           parameters: defaultActionParameters,
         },
       });

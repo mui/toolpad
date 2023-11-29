@@ -1379,7 +1379,7 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
   const dom = useDomContext();
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
-  usePageTitle(page.attributes.title);
+  usePageTitle(appDom.getPageTitle(page));
 
   const location = useLocation();
   const components = useComponents();
@@ -1431,7 +1431,7 @@ export function RenderedPage({ nodeId }: RenderedNodeProps) {
   const dom = useDomContext();
   const page = appDom.getNode(dom, nodeId, 'page');
 
-  usePageTitle(page.attributes.title);
+  usePageTitle(appDom.getPageTitle(page));
 
   if (page.attributes.codeFile) {
     return <RenderedProCodePage page={page} />;

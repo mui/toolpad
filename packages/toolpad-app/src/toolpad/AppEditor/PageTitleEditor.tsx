@@ -16,7 +16,7 @@ function validateInput(input: string) {
 
 export default function PageTitleEditor({ node }: PageTitleEditorProps) {
   const domApi = useDomApi();
-  const [pageTitleInput, setPageTitleInput] = React.useState(node.attributes.title);
+  const [pageTitleInput, setPageTitleInput] = React.useState(node.attributes.title || node.name);
 
   const handlePageTitleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => setPageTitleInput(event.target.value),

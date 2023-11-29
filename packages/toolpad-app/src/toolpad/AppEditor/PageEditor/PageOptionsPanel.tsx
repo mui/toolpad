@@ -47,12 +47,12 @@ export default function PageOptionsPanel() {
     return new Map(appNode.attributes?.authorization?.roles?.map((role) => [role.name, role]));
   }, [appNode]);
 
-  const handleAllowRolesChange = React.useCallback(
+  const handleallowedRolesChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string[]) => {
       domApi.update((draft) =>
         appDom.setNodeNamespacedProp(draft, page, 'attributes', 'authorization', {
           ...page.attributes.authorization,
-          allowRoles: newValue,
+          allowedRoles: newValue,
         }),
       );
     },
@@ -60,12 +60,15 @@ export default function PageOptionsPanel() {
   );
 
   const handleAllowAllChange = React.useCallback(
-    (event: React.SyntheticEvent, newValue: boolean) => {
+    (event: React.SyntheticEvent, isAllowed: boolean) => {
       domApi.update((draft) =>
-        appDom.setNodeNamespacedProp(draft, page, 'attributes', 'authorization', {
-          ...page.attributes.authorization,
-          allowAll: newValue,
-        }),
+        appDom.setNodeNamespacedProp(
+          draft,
+          page,
+          'attributes',
+          'authorization',
+          isAllowed ? undefined : { allowedRoles: [] },
+        ),
       );
     },
     [domApi, page],
@@ -119,19 +122,16 @@ export default function PageOptionsPanel() {
         <Typography variant="body2">Authorization:</Typography>
         <FormControlLabel
           control={
-            <Checkbox
-              checked={!!page.attributes.authorization?.allowAll}
-              onChange={handleAllowAllChange}
-            />
+            <Checkbox checked={!page.attributes.authorization} onChange={handleAllowAllChange} />
           }
           label="Allow access to all roles"
         />
         <Autocomplete
           multiple
           options={Array.from(availableRoles.keys())}
-          value={page.attributes.authorization?.allowRoles ?? []}
-          onChange={handleAllowRolesChange}
-          disabled={!!page.attributes.authorization?.allowAll}
+          value={page.attributes.authorization?.allowedRoles ?? []}
+          onChange={handleallowedRolesChange}
+          disabled={!page.attributes.authorization}
           fullWidth
           noOptionsText="No roles defined"
           renderInput={(params) => (

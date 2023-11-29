@@ -100,7 +100,7 @@ export interface PageNode extends AppDomNodeBase {
     readonly codeFile?: string;
     readonly authorization?: {
       readonly allowAll?: boolean;
-      readonly allowRoles?: string[];
+      readonly allowedRoles?: string[];
     };
   };
 }

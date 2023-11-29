@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { Button, Dialog, DialogContent, DialogTitle, Tooltip, Typography } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import {
@@ -119,7 +127,7 @@ export default function AppAuthorizationEditor() {
         ...role,
         id: role.name,
         pages: pages
-          .filter((page) => page.attributes.authorization?.allowRoles?.includes(role.name))
+          .filter((page) => page.attributes.authorization?.allowedRoles?.includes(role.name))
           .map((page) => page.name),
       })) ?? [];
 
@@ -241,6 +249,7 @@ export default function AppAuthorizationEditor() {
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
+      style={{ height: 350, width: '100%' }}
       onKeyDown={(event) => {
         if (Object.keys(rowModesModel).length > 0) {
           // Avoid the escape key from closing a dialog this grid is rendered in
@@ -272,6 +281,7 @@ export default function AppAuthorizationEditor() {
             addNewRoleDisabled: !!draftRow,
           },
         }}
+        autoHeight
       />
     </div>
   );
@@ -287,9 +297,17 @@ export function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialog
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Authorization</DialogTitle>
       <DialogContent>
-        <Typography>Define the available roles for your application.</Typography>
+        <Typography>
+          Define the roles for your application. You can configure your pages to be accessible to
+          specific roles only.
+        </Typography>
         <AppAuthorizationEditor />
       </DialogContent>
+      <DialogActions>
+        <Button color="inherit" variant="text" onClick={onClose}>
+          Close
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 }

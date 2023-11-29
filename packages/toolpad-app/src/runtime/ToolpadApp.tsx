@@ -92,6 +92,7 @@ import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
+import { AuthenticationProvider, RequireAuthorization, User } from './auth';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -1456,6 +1457,13 @@ function PageNotFound() {
   );
 }
 
+/**
+ * Returns whether authentication has been configured for this application.
+ */
+function useAppHasAuthentication() {
+  return true;
+}
+
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
 }
@@ -1464,23 +1472,35 @@ function RenderedPages({ pages }: RenderedPagesProps) {
   const defaultPage = pages[0];
 
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
+
+  const appAuthenticationEnabled = useAppHasAuthentication();
+
   return (
     <Routes>
-      {pages.map((page) => (
-        <React.Fragment key={page.id}>
-          <Route
-            path={`/pages/${page.id}`}
-            element={
-              <RenderedPage
-                nodeId={page.id}
-                // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
-                // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-                key={page.id}
-              />
-            }
+      {pages.map((page) => {
+        let pageContent = (
+          <RenderedPage
+            nodeId={page.id}
+            // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
+            // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+            key={page.id}
           />
-        </React.Fragment>
-      ))}
+        );
+
+        if (!IS_RENDERED_IN_CANVAS && appAuthenticationEnabled && page.attributes.authorization) {
+          pageContent = (
+            <RequireAuthorization allowedRole={page.attributes.authorization.allowedRoles}>
+              {pageContent}
+            </RequireAuthorization>
+          );
+        }
+
+        return (
+          <React.Fragment key={page.id}>
+            <Route path={`/pages/${page.id}`} element={pageContent} />
+          </React.Fragment>
+        );
+      })}
       {pages.map((page) => (
         <React.Fragment key={page.id}>
           <Route
@@ -1579,6 +1599,8 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
+  const currentUser: User | null = null;
+
   return (
     <BrowserRouter basename={basename}>
       <UseDataProviderContext.Provider value={useDataProvider}>
@@ -1592,7 +1614,9 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
                       <QueryClientProvider client={queryClient}>
-                        <ToolpadAppLayout dom={dom} />
+                        <AuthenticationProvider user={currentUser}>
+                          <ToolpadAppLayout dom={dom} />
+                        </AuthenticationProvider>
                         {showDevtools ? (
                           <ReactQueryDevtoolsProduction initialIsOpen={false} />
                         ) : null}

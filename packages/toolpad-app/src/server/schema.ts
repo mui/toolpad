@@ -301,7 +301,7 @@ export const pageSchema = toolpadObjectSchema(
     authorization: z
       .object({
         allowAll: z.boolean().optional().describe('Allow all users to access this page.'),
-        allowRoles: z
+        allowedRoles: z
           .array(z.string())
           .optional()
           .describe('Roles that are allowed to access this page.'),

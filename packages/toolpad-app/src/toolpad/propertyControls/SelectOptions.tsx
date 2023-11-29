@@ -51,7 +51,7 @@ function SelectOptionsPropEditor({
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'Enter') {
         const inputText = (event.target as HTMLInputElement).value;
-
+        debugger;
         onChange([...value, inputText]);
         if (optionInputRef.current) {
           optionInputRef.current.value = '';
@@ -204,6 +204,7 @@ function SelectOptionsPropEditor({
               <TextField
                 fullWidth
                 sx={{ my: 1 }}
+                error
                 variant="outlined"
                 inputRef={optionInputRef}
                 onKeyUp={handleOptionTextInput}

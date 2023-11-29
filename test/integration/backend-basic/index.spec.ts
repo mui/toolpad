@@ -42,7 +42,7 @@ test('functions basics', async ({ page, context }) => {
   ]);
 
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await expectBasicRuntimeTests(page);
 });
@@ -106,7 +106,7 @@ test('function editor parameters update', async ({ page, localApp, argosScreensh
 
 test('bound parameters are preserved on manual call', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await page.getByRole('button', { name: 'Run Manual Query' }).click();
 
@@ -115,7 +115,7 @@ test('bound parameters are preserved on manual call', async ({ page }) => {
 
 test('global variables are retained in function runtime', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await expect(page.getByText('global value: 1', { exact: true })).toBeVisible();
   await expect(page.getByText('global value: 2', { exact: true })).not.toBeVisible();
@@ -127,7 +127,7 @@ test('global variables are retained in function runtime', async ({ page }) => {
 
 test('Query serialization', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('serialization');
+  await runtimeModel.goToPage('serialization');
 
   await expect(page.getByText('Circular property: hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
@@ -154,7 +154,7 @@ test('Circular scope value, binding editor', async ({ page }) => {
 
 test('Extracted types', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('extractedTypes');
+  await runtimeModel.goToPage('extractedTypes');
 
   await expect(
     page.getByText(

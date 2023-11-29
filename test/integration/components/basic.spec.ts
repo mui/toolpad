@@ -51,7 +51,7 @@ test.use({
 
 test('rendering components in the app runtime', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('components');
+  await runtimeModel.goToPage('components');
 
   await waitForComponents(page);
 });
@@ -65,7 +65,7 @@ test('rendering components in the app editor', async ({ page }) => {
 
 test('select component behavior', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('select');
+  await runtimeModel.goToPage('select');
 
   const optionsSelect = page.getByRole('combobox', { name: /select with options/ });
   await optionsSelect.scrollIntoViewIfNeeded();

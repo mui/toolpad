@@ -442,7 +442,7 @@ export async function runApp({
   dev = false,
   dir = '.',
   base = '/prod',
-  port = 3000,
+  port,
   toolpadDevMode = false,
 }: RunAppOptions) {
   const projectDir = resolveProjectDir(dir);

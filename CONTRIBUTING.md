@@ -30,7 +30,7 @@ This will use the local version of Toolpad as built in the monorepo. This is rec
 1. Run Toolpad
 
    ```bash
-   yarn toolpad dev test/integration/backend-basic/fixture --dev
+   yarn toolpad dev test/integration/backend-basic/fixture/toolpad --dev
    ```
 
    **Note:** It's important to note the difference between `yarn toolpad dev` and the `--dev` parameter. The first instruction runs Toolpad in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.

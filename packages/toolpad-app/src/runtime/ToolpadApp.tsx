@@ -1465,6 +1465,7 @@ function RenderedPages({ pages }: RenderedPagesProps) {
   const defaultPage = pages[0];
 
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}`} replace />;
+  const { search } = useLocation();
   return (
     <Routes>
       {pages.map((page) => (
@@ -1486,7 +1487,7 @@ function RenderedPages({ pages }: RenderedPagesProps) {
           <Route
             key={`${page.name}-${alias}`}
             path={`/pages/${alias}`}
-            element={<Navigate to={`/pages/${page.name}`} replace />}
+            element={<Navigate to={`/pages/${page.name}${search}`} replace />}
           />
         )),
       )}

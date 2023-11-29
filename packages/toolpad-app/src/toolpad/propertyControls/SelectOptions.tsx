@@ -203,6 +203,7 @@ function SelectOptionsPropEditor({
               ) : null}
               <TextField
                 fullWidth
+                error
                 sx={{ my: 1 }}
                 variant="outlined"
                 inputRef={optionInputRef}

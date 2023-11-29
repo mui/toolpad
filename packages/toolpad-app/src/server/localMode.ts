@@ -144,37 +144,62 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
     entries.map(async (entry): Promise<[string, Page] | null> => {
       if (entry.isDirectory()) {
         const pageName = entry.name;
-        const filePath = path.resolve(pagesFolder, pageName, './page.yml');
-        const content = await readMaybeFile(filePath);
-        if (!content) {
-          return null;
+
+        const pageDirEntries = new Set(await fs.readdir(path.resolve(pagesFolder, pageName)));
+
+        if (pageDirEntries.has('page.yml')) {
+          const ymlFilePath = path.resolve(pagesFolder, pageName, './page.yml');
+          const ymlContent = await readMaybeFile(ymlFilePath);
+
+          if (ymlContent) {
+            let parsedFile: Page | undefined;
+            try {
+              parsedFile = yaml.parse(ymlContent);
+            } catch (rawError) {
+              const error = errorFrom(rawError);
+
+              console.error(
+                `${chalk.red('error')} - Failed to read page ${chalk.cyan(pageName)}. ${
+                  error.message
+                }`,
+              );
+
+              return null;
+            }
+
+            const result = pageSchema.safeParse(parsedFile);
+
+            if (result.success) {
+              return [pageName, result.data];
+            }
+
+            console.error(
+              `${chalk.red('error')} - Failed to read page ${chalk.cyan(pageName)}. ${fromZodError(
+                result.error,
+              )}`,
+            );
+          }
         }
-        let parsedFile: Page | undefined;
-        try {
-          parsedFile = yaml.parse(content);
-        } catch (rawError) {
-          const error = errorFrom(rawError);
 
-          console.error(
-            `${chalk.red('error')} - Failed to read page ${chalk.cyan(pageName)}. ${error.message}`,
-          );
+        const extensions = ['.tsx', '.jsx'];
 
-          return null;
+        for (const extension of extensions) {
+          if (pageDirEntries.has(`page${extension}`)) {
+            const codeFileName = `./page${extension}`;
+
+            return [
+              pageName,
+              {
+                apiVersion: API_VERSION,
+                kind: 'page',
+                spec: {
+                  id: pageName,
+                  unstable_codeFile: codeFileName,
+                },
+              } satisfies Page,
+            ];
+          }
         }
-
-        const result = pageSchema.safeParse(parsedFile);
-
-        if (result.success) {
-          return [pageName, result.data];
-        }
-
-        console.error(
-          `${chalk.red('error')} - Failed to read page ${chalk.cyan(pageName)}. ${fromZodError(
-            result.error,
-          )}`,
-        );
-
-        return null;
       }
 
       return null;

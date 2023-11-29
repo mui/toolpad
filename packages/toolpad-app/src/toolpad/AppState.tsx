@@ -454,9 +454,9 @@ export default function AppProvider({ appUrl, children }: DomContextProps) {
   const { pages = [] } = appDom.getChildNodes(dom, app);
   const firstPage = pages.length > 0 ? pages[0] : null;
 
-  const initialView = getViewFromPathname(location.pathname) || {
+  const initialView: DomView = getViewFromPathname(location.pathname) || {
     kind: 'page',
-    nodeId: firstPage?.id,
+    name: firstPage?.name,
     selectedNodeId: null,
     tab: 'page',
   };

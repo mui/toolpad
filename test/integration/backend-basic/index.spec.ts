@@ -13,11 +13,6 @@ import clickCenter from '../../utils/clickCenter';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
-const BASIC_TESTS_PAGE_ID = '5q1xd0t';
-const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
-const DATA_PROVIDERS_PAGE_ID = 'VnOzPpU';
-const SERIALIZATION_TESTS_PAGE_ID = 'Tysc6w5';
-
 test.use({
   ignoreConsoleErrors: [
     // Chrome:
@@ -59,7 +54,7 @@ test('function editor reload', async ({ page, localApp }) => {
   );
 
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
+  await editorModel.goToPage('basic');
 
   const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
   await withTemporaryEdits(functionsFilePath, async () => {
@@ -83,7 +78,7 @@ test('function editor parameters update', async ({ page, localApp, argosScreensh
   );
 
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
+  await editorModel.goToPage('basic');
 
   await editorModel.pageEditor.getByRole('button', { name: 'withParams' }).click();
 
@@ -145,7 +140,7 @@ test('Query serialization', async ({ page }) => {
 
 test('Circular scope value, binding editor', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(SERIALIZATION_TESTS_PAGE_ID);
+  await editorModel.goToPage('serialization');
 
   await editorModel.waitForOverlay();
   await clickCenter(
@@ -181,7 +176,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
   );
 
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(EXTRACTED_TYPES_PAGE_ID);
+  await editorModel.goToPage('extractedTypes');
 
   await editorModel.pageEditor.getByRole('button', { name: 'bareWithParams' }).click();
   const queryEditor = page.getByRole('dialog', { name: 'bareWithParams' });
@@ -225,7 +220,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
 
 test('data providers', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(DATA_PROVIDERS_PAGE_ID);
+  await editorModel.goToPage('dataProviders');
 
   await editorModel.waitForOverlay();
 

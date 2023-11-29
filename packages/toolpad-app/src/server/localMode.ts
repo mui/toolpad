@@ -655,7 +655,8 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
 
 function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.AppDom {
   const pageFileSpec = pageFile.spec ?? {};
-  let fragment = appDom.createFragmentInternal(pageFileSpec.id as NodeId, 'page', {
+
+  let fragment = appDom.createFragment('page', {
     name: pageName,
     attributes: {
       // Convert deprecated id to alias

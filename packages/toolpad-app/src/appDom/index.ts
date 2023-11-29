@@ -502,7 +502,7 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
-export function createFragmentInternal<T extends AppDomNodeType>(
+function createFragmentInternal<T extends AppDomNodeType>(
   id: NodeId,
   type: T,
   init: AppDomNodeInitOfType<T> & { name: string },

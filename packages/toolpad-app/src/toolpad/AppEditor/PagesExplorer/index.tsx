@@ -289,6 +289,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
   const handleRenameNode = React.useCallback(
     (nodeId: NodeId, updatedName: string) => {
       domApi.setNodeName(nodeId, updatedName);
+      appStateApi.setView({ kind: 'page', name: updatedName });
 
       const oldNameNode = dom.nodes[nodeId];
       if (oldNameNode.type === 'page' && updatedName !== oldNameNode.name) {
@@ -297,7 +298,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         }, 300);
       }
     },
-    [projectApi, dom.nodes, domApi],
+    [projectApi, dom.nodes, domApi, appStateApi],
   );
 
   const handleDuplicateNode = React.useCallback(

@@ -663,7 +663,7 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
   let fragment = appDom.createFragmentInternal(pageFileSpec.id as NodeId, 'page', {
     name: pageName,
     attributes: {
-      title: pageFileSpec.title || '',
+      title: pageFileSpec.title,
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
       codeFile: pageFileSpec.unstable_codeFile || undefined,

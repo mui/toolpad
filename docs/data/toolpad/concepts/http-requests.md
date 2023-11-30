@@ -61,12 +61,15 @@ You can define these in the interface available in the HTTP Request query editor
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/url-bound-parameter.png", "alt": "Server-side values", "caption": "Using the parameter in the query URL", "indent": 1 }}
 
-## Secrets handling
+### Secrets
 
-Toolpad has access to the environment variables defined in the `.env` file at the root of the project.
+As Toolpad HTTP requests are running server-side, they can make use of the available secrets that are stored in environment variables. The mechanism works similar by defining a parameter and instead of binding it to a UI value, bind it to an environment variable. Whenever the request executes, Toolpad will feed the value of the environment variable to the parameter.
 
-You can connect to environment variables inside HTTP request queries. For example, you can define an `Authorization` header and bind it to a value from your environment variables:
+<video controls width="auto" height="100%" style="contain" alt="custom-function">
+  <source src="/static/toolpad/docs/concepts/connecting-to-data/secrets.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/secrets-http-query.png", "alt": "Secret in HTTP request query", "caption": "Using an environment variable in the request header", "indent": 1 }}
+The parameter can then be used anywhere inside of the HTTP request definition the same way as regular UI bound parameters.
 
-In case, the key cannot be directly used in the request header and needs to be composed in a format like: Authorization: `Bearer ${process.env.GITHUB_TOKEN}` then you can use parameters. A parameter can be linked to an .env variable which can be composed in the above format using JS expression binding option in headers.
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/bound-secret.png", "alt": "Server-side values", "caption": "Using the parameter in the query URL", "indent": 1 }}

@@ -68,3 +68,5 @@ Toolpad has access to the environment variables defined in the `.env` file at th
 You can connect to environment variables inside HTTP request queries. For example, you can define an `Authorization` header and bind it to a value from your environment variables:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/secrets-http-query.png", "alt": "Secret in HTTP request query", "caption": "Using an environment variable in the request header", "indent": 1 }}
+
+In case, the key cannot be directly used in the request header and needs to be composed in a format like: Authorization: `Bearer ${process.env.GITHUB_TOKEN}` then you can use parameters. A parameter can be linked to an .env variable which can be composed in the above format using JS expression binding option in headers.

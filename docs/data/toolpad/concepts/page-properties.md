@@ -56,7 +56,7 @@ Pages are routed by their name. e.g. the page named **employees** will be access
 
 <!-- TODO(https://github.com/mui/material-ui/pull/40044) ```yml -->
 
-```
+```sh
 # /pages/employees/page.yml
 apiVersion: v1
 kind: page

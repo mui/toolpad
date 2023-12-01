@@ -33,6 +33,18 @@
 
 1. Open a PR to the `master` branch with the proposed changes. Add the "release" label.
 
+1. Smoke test the release with the [CodeSandbox CI](https://ci.codesandbox.io/status/mui/mui-toolpad) package of the PR branch:
+
+   1. Run
+
+   ```bash
+   npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app
+   cd test-app
+   yarn dev
+   ```
+
+   And verify the editor works
+
 1. Merge the PR changes, then check out the `master` branch and pull the last commit.
 
 1. Publish the package to `npm`
@@ -54,18 +66,6 @@
       ```bash
       yarn release:publish-canary
       ```
-
-1. Smoke test the release:
-
-   1. Run
-
-   ```bash
-   yarn create toolpad-app test-app
-   cd test-app
-   yarn dev
-   ```
-
-   And verify the editor works
 
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.
 

@@ -84,14 +84,35 @@ function layouts() {
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma-data-provider',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma-data-provider',
     },
-    /* To be added later when this app is ready.  
+    {
+      title: 'With Supabase',
+      description:
+        'A Toolpad app that fetches data from Supabase and shows it in a list component.',
+      src: '/static/toolpad/marketing/supabase.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/supabase',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/supabase',
+    },
+    {
       title: 'Stripe invoice downloader',
       description: 'A Stripe app to fetch and download invoices.',
-      // src: '/static/toolpad/marketing/with-wasm.png',
+      src: '/static/toolpad/marketing/stripe-script.png',
       href: 'https://github.com/mui/mui-toolpad/tree/master/examples/stripe-script',
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/stripe-script',
-    }, 
-    */
+    },
+    {
+      title: 'Charts',
+      description: 'A basic Toolpad application that demonstrates how to use chart component.',
+      src: '/static/toolpad/marketing/charts.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/charts',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/charts',
+    },
+    {
+      title: 'Custom server',
+      description: 'An app that shows how to use Toolpad with a custom server.',
+      src: '/static/toolpad/marketing/custom-server.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/custom-server',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/custom-server',
+    },
   ];
 }
 

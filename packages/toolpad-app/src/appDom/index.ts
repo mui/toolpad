@@ -85,10 +85,11 @@ export type PageDisplayMode = 'standalone' | 'shell';
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
-    readonly title: string;
+    readonly title?: string;
     readonly parameters?: [string, string][];
     readonly module?: string;
     readonly display?: PageDisplayMode;
+    readonly codeFile?: string;
   };
 }
 
@@ -1205,4 +1206,8 @@ export function getRequiredEnvVars(dom: AppDom): Set<string> {
     .map((binding) => binding.$$env);
 
   return new Set(allVars);
+}
+
+export function getPageTitle(node: PageNode): string {
+  return node.attributes.title || node.name;
 }

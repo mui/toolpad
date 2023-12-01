@@ -1,12 +1,12 @@
 import * as path from 'path';
 import * as url from 'url';
 import invariant from 'invariant';
-import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
+import { fileReplace } from '@mui/toolpad-utils/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { waitForMatch } from '../../utils/streams';
-import { expectBasicPageContent } from './shared';
+import { expectBasicRuntimeTests } from './shared';
 import { setPageHidden } from '../../utils/page';
 import { withTemporaryEdits } from '../../utils/fs';
 import clickCenter from '../../utils/clickCenter';
@@ -16,6 +16,7 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 const BASIC_TESTS_PAGE_ID = '5q1xd0t';
 const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
 const DATA_PROVIDERS_PAGE_ID = 'VnOzPpU';
+const SERIALIZATION_TESTS_PAGE_ID = 'Tysc6w5';
 
 test.use({
   ignoreConsoleErrors: [
@@ -48,7 +49,7 @@ test('functions basics', async ({ page, context }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('basic');
 
-  await expectBasicPageContent(page);
+  await expectBasicRuntimeTests(page);
 });
 
 test('function editor reload', async ({ page, localApp }) => {
@@ -133,9 +134,27 @@ test('Query serialization', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
   await runtimeModel.gotoPage('serialization');
 
-  await expect(page.getByText('Circlular property: [Circular]', { exact: true })).toBeVisible();
+  await expect(page.getByText('Circular property: hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Invalid error: undefined', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Some Date object: 2023-11-27T14:35:35.511Z', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText('Some RegExp: "foo" i', { exact: true })).toBeVisible();
+});
+
+test('Circular scope value, binding editor', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPageById(SERIALIZATION_TESTS_PAGE_ID);
+
+  await editorModel.waitForOverlay();
+  await clickCenter(
+    page,
+    editorModel.appCanvas.getByText('Circular property: hello', { exact: true }),
+  );
+  await editorModel.componentEditor.waitFor();
+  await page.getByLabel('Bind property "Value"').click();
+  await expect(page.getByRole('dialog', { name: 'Bind property "Value' })).toBeVisible();
 });
 
 test('Extracted types', async ({ page }) => {

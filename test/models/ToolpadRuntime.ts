@@ -28,7 +28,7 @@ export class ToolpadRuntime {
     await gotoIfNotCurrent(this.page, `${this.options.base}/pages/${pageName}`);
   }
 
-  async gotoPageById(appId: string, pageId: string) {
+  async gotoPageById(pageId: string) {
     await this.page.goto(`${this.options.base}/pages/${pageId}`);
   }
 

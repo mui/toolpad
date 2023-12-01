@@ -28,21 +28,10 @@ export default defineConfig((options) => [
       functionsDevWorker: './src/server/functionsDevWorker.ts',
       functionsTypesWorker: './src/server/functionsTypesWorker.ts',
     },
+    format: ['esm'],
     outDir: 'dist/cli',
     silent: true,
     clean: !options.watch,
-    noExternal: [
-      'open-editor',
-      'execa',
-      'fractional-indexing',
-      'lodash-es',
-      'chalk',
-      'get-port',
-      'pretty-bytes',
-      'latest-version',
-      'nanoid',
-      'superjson',
-    ],
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/cli'))],
     async onSuccess() {
@@ -54,13 +43,13 @@ export default defineConfig((options) => [
     entry: ['./reactDevtools/bootstrap.ts'],
     silent: true,
     clean: !options.watch,
-    outDir: './public/reactDevtools',
+    outDir: './dist/reactDevtools',
     bundle: true,
     sourcemap: true,
     target: 'es6',
     format: 'iife',
     replaceNodeEnv: true,
-    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './public/reactDevtools'))],
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/reactDevtools'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('reactDevtools: build successful');

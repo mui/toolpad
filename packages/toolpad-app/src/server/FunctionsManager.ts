@@ -323,7 +323,6 @@ export default class FunctionsManager {
     name: string,
     parameters: Record<string, unknown>,
   ): Promise<ExecFetchResult<unknown>> {
-    const outputFilePath = await this.getBuiltOutputFilePath(fileName);
     const extractedTypes = await this.introspect();
 
     if (extractedTypes.error) {
@@ -342,7 +341,20 @@ export default class FunctionsManager {
       : handler.parameters.map(([parameterName]) => parameters[parameterName]);
 
     invariant(this.devWorker, 'devWorker must be initialized');
-    const data = await this.devWorker.execute(outputFilePath, name, executeParams);
+    const data = await this.execFunction(fileName, name, executeParams);
+
+    return { data };
+  }
+
+  async execFunction(
+    fileName: string,
+    name: string,
+    parameters: unknown[],
+  ): Promise<ExecFetchResult<unknown>> {
+    const outputFilePath = await this.getBuiltOutputFilePath(fileName);
+
+    invariant(this.devWorker, 'devWorker must be initialized');
+    const data = await this.devWorker.execute(outputFilePath, name, parameters);
 
     return { data };
   }

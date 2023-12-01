@@ -42,7 +42,7 @@ test('rest runtime basics', async ({ page, localApp }) => {
   );
 
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.goToPage('page1');
   await expect(page.locator('text="query1: query1_value"')).toBeVisible();
   await expect(page.locator('text="query2: undefined"')).toBeVisible();
   await page.locator('button:has-text("fetch query2")').click();

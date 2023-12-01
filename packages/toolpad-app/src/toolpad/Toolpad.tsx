@@ -88,10 +88,10 @@ function EditorShell({ children }: EditorShellProps) {
     const currentView = getViewFromPathname(location.pathname);
 
     if (currentView) {
-      const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
+      const currentPageName = currentView?.kind === 'page' ? currentView.name : null;
 
-      const previewPath = currentPageId
-        ? `${appState.appUrl}/pages/${currentPageId}`
+      const previewPath = currentPageName
+        ? `${appState.appUrl}/pages/${currentPageName}`
         : appState.appUrl;
 
       return {

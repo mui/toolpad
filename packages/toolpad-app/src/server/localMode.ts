@@ -5,7 +5,7 @@ import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import { BindableAttrValue, NodeId, PropBindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrValue, PropBindableAttrValue } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
@@ -359,7 +359,7 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   dom = appDom.addNode(
     dom,
     appDom.createNode(dom, 'theme', {
-      theme: themeFileSpec.options,
+      theme: themeFileSpec?.options,
       attributes: {},
     }),
     app,
@@ -508,7 +508,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       apiVersion: API_VERSION,
       kind: 'page',
       spec: {
-        id: node.id,
+        alias: node.attributes.alias,
         title: node.attributes.title,
         parameters: undefinedWhenEmpty(
           node.attributes.parameters?.map(([name, value]) => ({ name, value })) ?? [],
@@ -684,10 +684,13 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
 }
 
 function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.AppDom {
-  const pageFileSpec = pageFile.spec;
-  let fragment = appDom.createFragmentInternal(pageFileSpec.id as NodeId, 'page', {
+  const pageFileSpec = pageFile.spec ?? {};
+
+  let fragment = appDom.createFragment('page', {
     name: pageName,
     attributes: {
+      // Convert deprecated id to alias
+      alias: pageFileSpec.id ? [pageFileSpec.id] : pageFileSpec.alias,
       title: pageFileSpec.title,
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
@@ -778,7 +781,7 @@ function optimizePage(page: Page): Page {
     ...page,
     spec: {
       ...page.spec,
-      content: page.spec.content?.map(optimizePageElement),
+      content: page.spec?.content?.map(optimizePageElement),
     },
   };
 }

@@ -19,11 +19,11 @@ test.use({
 test('rendering components in the app runtime', async ({ page, argosScreenshot }) => {
   const runtimeModel = new ToolpadRuntime(page);
 
-  await runtimeModel.gotoPage('components');
+  await runtimeModel.goToPage('components');
   await runtimeModel.waitForPageReady();
   await argosScreenshot('components', { fullPage: true });
 
-  await runtimeModel.gotoPage('text');
+  await runtimeModel.goToPage('text');
   await runtimeModel.waitForPageReady();
   await argosScreenshot('text', { fullPage: true });
 });
@@ -44,7 +44,7 @@ test('rendering components in the app editor', async ({ page, argosScreenshot })
 
 test('showing grid while resizing elements', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById('5YDOftB');
+  await editorModel.goToPage('rows');
 
   await editorModel.waitForOverlay();
 
@@ -73,7 +73,7 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
 
 test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById('8ixPqyI');
+  await editorModel.goToPage('dragdrop');
 
   await editorModel.waitForOverlay();
 

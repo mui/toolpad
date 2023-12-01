@@ -25,7 +25,7 @@ test.use({
 
 test('bindings', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('bindings');
+  await runtimeModel.goToPage('bindings');
 
   const test1 = page.getByText('-test1-');
   await expect(test1).toBeVisible();
@@ -38,7 +38,7 @@ test('bindings', async ({ page }) => {
 
 test('global scope', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('globalScope');
+  await runtimeModel.goToPage('globalScope');
 
   await expect(page.getByText('|test1 ok|')).toBeVisible();
   await expect(page.getByText('|test2 ok|')).toBeVisible();
@@ -52,7 +52,7 @@ test('global scope', async ({ page }) => {
 
 test('encoding', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('encoding');
+  await runtimeModel.goToPage('encoding');
 
   const test1 = page.getByText('Can pass utf-8: "€"');
   await expect(test1).toBeVisible();

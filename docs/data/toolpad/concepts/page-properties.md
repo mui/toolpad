@@ -54,9 +54,7 @@ For example: if you define a page parameter `foo` and access the page with `?foo
 
 Pages are routed by their name. e.g. the page named **employees** will be accessible under the url **/pages/employees**. In order to allow maintaining backwards compatibility when a page is renamed, one can define an alias for the page. This can be done in its **page.yml** file. Add a `alias` property to the file with an array of strings that you would like to use as aliases for the page. e.g.
 
-<!-- TODO(https://github.com/mui/material-ui/pull/40044) ```yml -->
-
-```bash
+```yaml
 # /pages/employees/page.yml
 apiVersion: v1
 kind: page

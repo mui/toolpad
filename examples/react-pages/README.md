@@ -1,13 +1,13 @@
 # QR Code generator
 
-An example showcasing the use of React based pages
+An example showcasing the use of React based pages.
 
 ## How to run
 
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app@latest  --example react-pages
+npx create-toolpad-app@latest --example react-pages
 ```
 
 ```bash

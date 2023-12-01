@@ -1,6 +1,5 @@
 {
   "name": "@mui/toolpad-tests",
-  "version": "0.1.39",
   "private": true,
   "devDependencies": {
     "@mui/toolpad": "workspace:*",

@@ -3,7 +3,7 @@
 <p class="description">A basic Toolpad application that demonstrates how to use data providers with Prisma.</p>
 
 <a target="_blank">
-  <img src="https://mui.com//static/toolpad/marketing/with-prisma-data-provider.png" alt="Data provider example with Prisma ORM" style="aspect-ratio: 1.8" width="100%">
+  <img src="https://mui.com/static/toolpad/marketing/with-prisma-data-provider.png" alt="Data provider example with Prisma ORM" style="aspect-ratio: 25/13;" width="1435">
 </a>
 
 ## How to run
@@ -11,7 +11,7 @@
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app@latest  --example with-prisma-data-provider
+npx create-toolpad-app@latest --example with-prisma-data-provider
 ```
 
 ```bash

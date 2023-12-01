@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: page
 spec:
-  id: tffH0lV
-  title: Default page
+  title: Charts
   content:
     - component: PageRow
       name: pageRow

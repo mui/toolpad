@@ -1,6 +1,6 @@
 # Custom server with Next.js
 
-<p class="description">A demonstration of how to integrate Toolpad applications into your servers programmatically.</p>
+<p class="description">A demonstration of how to integrate Toolpad applications with a Next.js application in a custom server.</p>
 
 Example showcasing custom server integration of Toolpad apps. [The docs](https://mui.com/toolpad/concepts/custom-server/).
 

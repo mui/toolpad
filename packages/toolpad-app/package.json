@@ -3,12 +3,12 @@
   "version": "0.1.38",
   "license": "MIT",
   "bin": {
-    "toolpad": "./cli.js"
+    "toolpad": "./cli.mjs"
   },
   "scripts": {
     "build": "concurrently \"yarn:build:*\"",
     "dev": "concurrently \"yarn:dev:*\"",
-    "cli": "./cli.js",
+    "cli": "./cli.mjs",
     "lint": "prettier --check .",
     "fix": "prettier --write .",
     "build:cli": "tsup",
@@ -24,7 +24,7 @@
     "public",
     "scripts",
     "dist",
-    "cli.js",
+    "cli.mjs",
     "browser",
     "server",
     "runtime"

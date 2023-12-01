@@ -340,10 +340,7 @@ export default class FunctionsManager {
       ? [{ parameters }]
       : handler.parameters.map(([parameterName]) => parameters[parameterName]);
 
-    invariant(this.devWorker, 'devWorker must be initialized');
-    const data = await this.execFunction(fileName, name, executeParams);
-
-    return { data };
+    return this.execFunction(fileName, name, executeParams);
   }
 
   async execFunction(

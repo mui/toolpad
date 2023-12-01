@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
+import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../../components/resizablePanels';
 import RenderPanel from './RenderPanel';
 import ComponentPanel from './ComponentPanel';
@@ -9,7 +10,6 @@ import { useAppState } from '../../AppState';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
-import usePageTitle from '../../../utils/usePageTitle';
 import useUndoRedo from '../../hooks/useUndoRedo';
 
 const classes = {
@@ -32,7 +32,7 @@ interface PageEditorContentProps {
 }
 
 function PageEditorContent({ node }: PageEditorContentProps) {
-  usePageTitle(`${node.attributes.title} | Toolpad editor`);
+  usePageTitle(`${appDom.getPageTitle(node)} | Toolpad editor`);
 
   return (
     <PageEditorProvider key={node.id} nodeId={node.id}>

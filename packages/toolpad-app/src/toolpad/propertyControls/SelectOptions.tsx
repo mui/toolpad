@@ -29,6 +29,7 @@ function SelectOptionsPropEditor({
   value = [],
   onChange,
 }: EditorProps<(string | SelectOption)[]>) {
+  const [addOptionState, setAddOptionState] = React.useState(false);
   const [editOptionsDialogOpen, setEditOptionsDialogOpen] = React.useState(false);
   const optionInputRef = React.useRef<HTMLInputElement | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
@@ -47,18 +48,38 @@ function SelectOptionsPropEditor({
     return null;
   }, [editingIndex, value]);
 
+  const watchInputValue = React.useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      const inputText = (event.target as HTMLInputElement).value;
+      if (
+        value.some((item) =>
+          (item as SelectOption)?.value
+            ? (item as SelectOption).value === inputText
+            : item === inputText,
+        )
+      ) {
+        setAddOptionState(true);
+      } else {
+        setAddOptionState(false);
+      }
+    },
+    [value],
+  );
+
   const handleOptionTextInput = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'Enter') {
         const inputText = (event.target as HTMLInputElement).value;
-
+        if (addOptionState) {
+          return;
+        }
         onChange([...value, inputText]);
         if (optionInputRef.current) {
           optionInputRef.current.value = '';
         }
       }
     },
-    [onChange, value],
+    [onChange, value, addOptionState],
   );
 
   const handleOptionDelete = React.useCallback(
@@ -203,16 +224,23 @@ function SelectOptionsPropEditor({
               ) : null}
               <TextField
                 fullWidth
-                error
+                error={addOptionState}
                 sx={{ my: 1 }}
                 variant="outlined"
+                onInput={watchInputValue}
                 inputRef={optionInputRef}
                 onKeyUp={handleOptionTextInput}
                 label={'Add option'}
                 helperText={
-                  <span>
-                    Press <kbd>Enter</kbd> or <kbd>Return</kbd> to add
-                  </span>
+                  addOptionState ? (
+                    <span>
+                      Do not input <kbd>same</kbd> value
+                    </span>
+                  ) : (
+                    <span>
+                      Press <kbd>Enter</kbd> or <kbd>Return</kbd> to add
+                    </span>
+                  )
                 }
               />
             </DialogContent>

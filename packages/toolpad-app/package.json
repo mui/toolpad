@@ -93,7 +93,7 @@
     "fractional-indexing": "3.2.0",
     "get-port": "7.0.0",
     "glob": "10.3.10",
-    "google-auth-library": "9.2.0",
+    "google-auth-library": "9.0.0",
     "http-proxy-middleware": "2.0.6",
     "invariant": "2.2.4",
     "json-to-ts": "1.7.0",

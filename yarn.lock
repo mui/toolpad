@@ -1320,7 +1320,6 @@
 
 "@mui/monorepo@https://github.com/mui/material-ui.git":
   version "5.14.19"
-  uid "441acde83aeb0b2ab380c8f622361bca22df2460"
   resolved "https://github.com/mui/material-ui.git#441acde83aeb0b2ab380c8f622361bca22df2460"
 
 "@mui/private-theming@^5.14.19":
@@ -6851,10 +6850,10 @@ gm@1.25.0:
     cross-spawn "^4.0.0"
     debug "^3.1.0"
 
-google-auth-library@9.2.0:
-  version "9.2.0"
-  resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-9.2.0.tgz#16c14a775b3a9a1be53b7428ddbd9d2c3599836b"
-  integrity sha512-1oV3p0JhNEhVbj26eF3FAJcv9MXXQt4S0wcvKZaDbl4oHq5V3UJoSbsGZGQNcjoCdhW4kDSwOs11wLlHog3fgQ==
+google-auth-library@9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-9.0.0.tgz#b159d22464c679a6a25cb46d48a4ac97f9f426a2"
+  integrity sha512-IQGjgQoVUAfOk6khqTVMLvWx26R+yPw9uLyb1MNyMQpdKiKt0Fd9sp4NWoINjyGHR8S3iw12hMTYK7O8J07c6Q==
   dependencies:
     base64-js "^1.3.0"
     ecdsa-sig-formatter "^1.0.11"
@@ -6862,6 +6861,7 @@ google-auth-library@9.2.0:
     gcp-metadata "^6.0.0"
     gtoken "^7.0.0"
     jws "^4.0.0"
+    lru-cache "^6.0.0"
 
 google-auth-library@^9.0.0:
   version "9.4.1"

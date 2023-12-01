@@ -1,4 +1,4 @@
-# Embed a Toolpad page
+# Embedding Toolpad pages
 
 <p class="description">Toolpad pages can be embedded anywhere you want to use them.</p>
 

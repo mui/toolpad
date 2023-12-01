@@ -1212,3 +1212,7 @@ export function getRequiredEnvVars(dom: AppDom): Set<string> {
 export function getPageTitle(node: PageNode): string {
   return node.attributes.title || node.name;
 }
+
+export function isCodePage(node: PageNode): boolean {
+  return !!node.attributes.codeFile;
+}

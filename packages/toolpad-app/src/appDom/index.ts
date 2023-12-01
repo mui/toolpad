@@ -86,6 +86,7 @@ export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
     readonly title?: string;
+    readonly alias?: string[];
     readonly parameters?: [string, string][];
     readonly module?: string;
     readonly display?: PageDisplayMode;
@@ -501,7 +502,7 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
-export function createFragmentInternal<T extends AppDomNodeType>(
+function createFragmentInternal<T extends AppDomNodeType>(
   id: NodeId,
   type: T,
   init: AppDomNodeInitOfType<T> & { name: string },

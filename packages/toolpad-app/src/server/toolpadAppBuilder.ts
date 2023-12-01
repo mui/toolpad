@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as url from 'node:url';
-import { InlineConfig, Plugin, build } from 'vite';
+import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
 import type { ComponentEntry } from './localMode';
@@ -408,5 +408,6 @@ export async function buildApp({
     getComponents,
     loadDom,
   });
-  await build(viteConfig);
+  const vite = await import('vite');
+  await vite.build(viteConfig);
 }

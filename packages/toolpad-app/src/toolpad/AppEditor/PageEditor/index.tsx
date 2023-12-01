@@ -53,11 +53,12 @@ function PageEditorContent({ node }: PageEditorContentProps) {
 }
 
 interface PageEditorProps {
-  nodeId?: NodeId;
+  name: string;
 }
 
-export default function PageEditor({ nodeId }: PageEditorProps) {
+export default function PageEditor({ name }: PageEditorProps) {
   const { dom } = useAppState();
+  const nodeId = React.useMemo(() => appDom.getNodeIdByName(dom, name), [dom, name]);
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
   useUndoRedo();

@@ -26,6 +26,7 @@ interface AutocompleteProps
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
   label?: string;
+  defaultValue: string;
   options: AutocompleteOption[];
 }
 
@@ -42,7 +43,18 @@ function Autocomplete({
   sx,
   ...rest
 }: AutocompleteProps) {
-  const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
+  const getDefaultValue = React.useMemo(() => {
+    return (
+      options?.find((option) => {
+        if (typeof option === 'string') {
+          return option === defaultValue;
+        }
+        return option.value === defaultValue;
+      }) ?? null
+    );
+  }, [options, defaultValue]);
+
+  const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(getDefaultValue);
 
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
@@ -50,6 +62,7 @@ function Autocomplete({
     value,
     onChange,
     emptyValue: null,
+    defaultValue,
     validationProps: { isRequired, minLength, maxLength, isInvalid },
   });
 
@@ -92,14 +105,14 @@ function Autocomplete({
     if (!value) {
       setSelectedVal(null);
     }
-    if (defaultValue) {
-      setSelectedVal(defaultValue);
+
+    if (value !== defaultValue) {
+      setSelectedVal(getDefaultValue);
     }
-  }, [value, defaultValue]);
+  }, [value, defaultValue, getDefaultValue]);
 
   return renderFormInput(
     <MuiAutocomplete
-      defaultValue={defaultValue}
       onChange={handleChange}
       options={options ?? []}
       isOptionEqualToValue={(option, selectedValue) => getValue(option) === getValue(selectedValue)}
@@ -143,10 +156,12 @@ export default createBuiltin(FormWrappedAutocomplete, {
       type: 'string',
       onChangeProp: 'onChange',
       default: '',
+      defaultValueProp: 'defaultValue',
     },
     defaultValue: {
-      helperText: 'The default value. Use when the component is not controlled.',
-      type: 'object',
+      helperText: 'A default value.',
+      type: 'string',
+      default: '',
     },
     label: {
       helperText: 'The label to display for the autocomplete.',

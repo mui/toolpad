@@ -60,7 +60,7 @@ import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager'
 import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
-import AuthManager from './AuthManager';
+import AuthenticationManager from './AuthenticationManager';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
 
 invariant(
@@ -959,7 +959,7 @@ class ToolpadProject {
 
   dataManager: DataManager;
 
-  authManager: AuthManager;
+  authenticationManager: AuthenticationManager;
 
   invalidateQueries: () => void;
 
@@ -976,7 +976,7 @@ class ToolpadProject {
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
     this.dataManager = new DataManager(this);
-    this.authManager = new AuthManager();
+    this.authenticationManager = new AuthenticationManager();
 
     this.invalidateQueries = throttle(
       () => {

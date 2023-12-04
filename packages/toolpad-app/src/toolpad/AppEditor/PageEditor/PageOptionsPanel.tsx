@@ -6,8 +6,6 @@ import {
   Link,
   ToggleButtonGroup,
   ToggleButton,
-  Checkbox,
-  FormControlLabel,
 } from '@mui/material';
 import * as React from 'react';
 import { useAppState, useDomApi } from '../../AppState';
@@ -34,15 +32,6 @@ export default function PageOptionsPanel() {
     (event: React.MouseEvent<HTMLElement>, newValue: appDom.PageDisplayMode) => {
       domApi.update((draft) =>
         appDom.setNodeNamespacedProp(draft, page, 'attributes', 'display', newValue),
-      );
-    },
-    [domApi, page],
-  );
-
-  const handleIsProtectedChange = React.useCallback(
-    (event: React.SyntheticEvent, newValue: boolean) => {
-      domApi.update((draft) =>
-        appDom.setNodeNamespacedProp(draft, page, 'attributes', 'isProtected', newValue),
       );
     },
     [domApi, page],
@@ -91,15 +80,6 @@ export default function PageOptionsPanel() {
             })}
           </ToggleButtonGroup>
         </Tooltip>
-      </div>
-      <div>
-        <Typography variant="body2">Authorization:</Typography>
-        <FormControlLabel
-          control={
-            <Checkbox checked={!!page.attributes.isProtected} onChange={handleIsProtectedChange} />
-          }
-          label="Protected page"
-        />
       </div>
       <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
       <Typography variant="overline">Page State:</Typography>

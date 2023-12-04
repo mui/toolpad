@@ -17,9 +17,11 @@ export function createRpcServer(project: ToolpadProject) {
     execQuery: createMethod<typeof project.dataManager.execQuery>(({ params }) => {
       return project.dataManager.execQuery(...params);
     }),
-    getAuthProviders: createMethod<typeof project.authManager.getAuthProviders>(({ params }) => {
-      return project.authManager.getAuthProviders(...params);
-    }),
+    getAuthProvider: createMethod<typeof project.authenticationManager.getAuthProvider>(
+      ({ params }) => {
+        return project.authenticationManager.getAuthProvider(...params);
+      },
+    ),
   } satisfies MethodResolvers;
 }
 

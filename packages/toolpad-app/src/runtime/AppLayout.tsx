@@ -34,7 +34,6 @@ export interface NavigationEntry {
   slug: string;
   displayName: string;
   hasShell?: boolean;
-  isProtected?: boolean;
 }
 
 const DRAWER_WIDTH = 250; // px
@@ -111,10 +110,10 @@ export function AppLayout({
 
   const [urlParams] = useSearchParams();
 
-  const { data: authProviders = [] } = useQuery({
-    queryKey: ['getAuthProviders'],
+  const { data: authProvider } = useQuery({
+    queryKey: ['getAuthProvider'],
     queryFn: async () => {
-      return api.methods.getAuthProviders();
+      return api.methods.getAuthProvider();
     },
   });
 
@@ -183,7 +182,7 @@ export function AppLayout({
               {activePage?.displayName ?? ''}
             </Typography>
             <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
-              {session?.user && !isSigningIn && activePage?.isProtected ? (
+              {session?.user && !isSigningIn ? (
                 <React.Fragment>
                   <Button color="inherit" onClick={handleOpenUserMenu}>
                     <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
@@ -223,10 +222,7 @@ export function AppLayout({
                   </Menu>
                 </React.Fragment>
               ) : null}
-              {!session?.user &&
-              !isSigningIn &&
-              authProviders.length > 0 &&
-              activePage?.isProtected ? (
+              {!session?.user && !isSigningIn && authProvider ? (
                 <React.Fragment>
                   <Button onClick={handleOpenSignInMenu} color="inherit">
                     Sign In
@@ -247,7 +243,7 @@ export function AppLayout({
                     open={Boolean(anchorElSignIn)}
                     onClose={handleCloseSignInMenu}
                   >
-                    {authProviders.includes('github') ? (
+                    {authProvider === 'github' ? (
                       <MenuItem>
                         <Button
                           variant="contained"
@@ -262,7 +258,7 @@ export function AppLayout({
                         </Button>
                       </MenuItem>
                     ) : null}
-                    {authProviders.includes('google') ? (
+                    {authProvider === 'google' ? (
                       <MenuItem>
                         <Button
                           variant="contained"
@@ -293,9 +289,7 @@ export function AppLayout({
                   </Menu>
                 </React.Fragment>
               ) : null}
-              {isSigningIn && activePage?.isProtected ? (
-                <CircularProgress color="inherit" size={26} />
-              ) : null}
+              {isSigningIn ? <CircularProgress color="inherit" size={26} /> : null}
             </Stack>
           </Toolbar>
         </AppBar>

@@ -35,7 +35,7 @@ test('functions basics', async ({ page, context }) => {
   ]);
 
   const runtimeModel = new ToolpadRuntime(page, { prod: true });
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await expectBasicRuntimeTests(page);
 });

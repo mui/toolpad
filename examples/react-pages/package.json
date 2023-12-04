@@ -1,0 +1,17 @@
+{
+  "name": "react-pages",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad dev",
+    "build": "toolpad build",
+    "start": "toolpad start"
+  },
+  "dependencies": {
+    "@mui/material": "5.14.19",
+    "@mui/toolpad": "0.1.39",
+    "@mui/x-data-grid": "6.18.3",
+    "@tanstack/react-query": "5.12.2"
+  },
+  "devDependencies": {}
+}

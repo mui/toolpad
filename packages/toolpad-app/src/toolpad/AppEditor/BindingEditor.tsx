@@ -31,7 +31,6 @@ import {
   PropValueType,
   BindableAttrValue,
   NavigationAction,
-  NodeId,
   EnvAttrValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
@@ -365,14 +364,16 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const pageId = event.target.value as NodeId;
-      const page = appDom.getNode(dom, pageId);
+      const pageName = event.target.value;
+      const pageId = appDom.getNodeIdByName(dom, pageName);
+      const page = pageId ? appDom.getNode(dom, pageId) : null;
 
-      const defaultActionParameters = appDom.isPage(page) ? getDefaultActionParameters(page) : {};
+      const defaultActionParameters =
+        page && appDom.isPage(page) ? getDefaultActionParameters(page) : {};
 
       onChange({
         $$navigationAction: {
-          page: pageId,
+          page: pageName,
           parameters: defaultActionParameters,
         },
       });
@@ -380,20 +381,24 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
     [dom, getDefaultActionParameters, onChange],
   );
 
-  const actionPageId = value?.$$navigationAction?.page || null;
+  const actionPageAliasOrName = value?.$$navigationAction?.page || null;
   const actionParameters = React.useMemo(
     () => value?.$$navigationAction.parameters || {},
     [value?.$$navigationAction.parameters],
   );
 
-  const actionPage = pages.find((availablePage) => availablePage.id === actionPageId);
+  const actionPage =
+    pages.find((availablePage) => availablePage.name === actionPageAliasOrName) ||
+    pages.find((availablePage) =>
+      availablePage.attributes.alias?.some((alias) => alias === actionPageAliasOrName),
+    );
 
   const handleActionParameterChange = React.useCallback(
     (actionParameterName: string) => (newValue: BindableAttrValue<string> | null) => {
-      if (actionPageId) {
+      if (actionPageAliasOrName) {
         onChange({
           $$navigationAction: {
-            page: actionPageId,
+            page: actionPageAliasOrName,
             parameters: {
               ...actionParameters,
               ...(newValue ? { [actionParameterName]: newValue } : {}),
@@ -402,7 +407,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         });
       }
     },
-    [actionPageId, actionParameters, onChange],
+    [actionPageAliasOrName, actionParameters, onChange],
   );
 
   const hasPagesAvailable = pages.length > 0;
@@ -419,13 +424,13 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         sx={{ my: 3 }}
         label="Select a page"
         select
-        value={actionPageId || ''}
+        value={actionPageAliasOrName || ''}
         onChange={handlePageChange}
         disabled={!hasPagesAvailable}
         helperText={hasPagesAvailable ? null : 'No other pages available'}
       >
         {pages.map((page) => (
-          <MenuItem key={page.id} value={page.id}>
+          <MenuItem key={page.name} value={page.name}>
             {page.name}
           </MenuItem>
         ))}

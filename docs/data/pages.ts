@@ -86,10 +86,9 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/components/button' },
       {
         pathname: '/toolpad/components/datagrid',
+        title: 'Data Grid',
       },
-      {
-        pathname: '/toolpad/concepts/custom-server',
-      },
+      { pathname: '/toolpad/concepts/custom-server' },
     ],
   },
   {
@@ -148,7 +147,7 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/how-to-guides/embed-pages',
-            title: 'Embed a Toolpad page',
+            title: 'Embedding Toolpad pages',
           },
           {
             pathname: '/toolpad/how-to-guides/basic-auth',

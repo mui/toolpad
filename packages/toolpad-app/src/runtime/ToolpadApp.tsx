@@ -154,14 +154,14 @@ function usePageNavigator(): NavigateToPage {
   const canvasEvents = React.useContext(CanvasEventsContext);
 
   const navigateToPage: NavigateToPage = React.useCallback(
-    (pageNodeId, pageParameters) => {
+    (pageName, pageParameters) => {
       const urlParams = pageParameters && new URLSearchParams(pageParameters);
 
       if (canvasEvents) {
-        canvasEvents.emit('pageNavigationRequest', { pageNodeId });
+        canvasEvents.emit('pageNavigationRequest', { pageName });
       } else {
         navigate({
-          pathname: `/pages/${pageNodeId}`,
+          pathname: `/pages/${pageName}`,
           ...(urlParams
             ? {
                 search: urlParams.toString(),
@@ -1380,7 +1380,7 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
   const dom = useDomContext();
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
-  usePageTitle(page.attributes.title);
+  usePageTitle(appDom.getPageTitle(page));
 
   const location = useLocation();
   const components = useComponents();
@@ -1428,11 +1428,12 @@ export interface RenderedNodeProps {
   nodeId: NodeId;
 }
 
-export function RenderedPage({ nodeId }: RenderedNodeProps) {
-  const dom = useDomContext();
-  const page = appDom.getNode(dom, nodeId, 'page');
+export interface RenderedPageProps {
+  page: appDom.PageNode;
+}
 
-  usePageTitle(page.attributes.title);
+export function RenderedPage({ page }: RenderedPageProps) {
+  usePageTitle(appDom.getPageTitle(page));
 
   if (page.attributes.codeFile) {
     return <RenderedProCodePage page={page} />;
@@ -1464,32 +1465,33 @@ interface RenderedPagesProps {
 function RenderedPages({ pages }: RenderedPagesProps) {
   const defaultPage = pages[0];
 
-  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
+  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}`} replace />;
+  const { search } = useLocation();
   return (
     <Routes>
       {pages.map((page) => (
-        <React.Fragment key={page.id}>
-          <Route
-            path={`/pages/${page.id}`}
-            element={
-              <RenderedPage
-                nodeId={page.id}
-                // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
-                // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-                key={page.id}
-              />
-            }
-          />
-        </React.Fragment>
+        <Route
+          key={page.name}
+          path={`/pages/${page.name}`}
+          element={
+            <RenderedPage
+              page={page}
+              // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
+              // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+              key={page.name}
+            />
+          }
+        />
       ))}
-      {pages.map((page) => (
-        <React.Fragment key={page.id}>
+      {pages.flatMap((page) =>
+        page.attributes.alias?.map((alias) => (
           <Route
-            path={`/pages/${page.name}`}
-            element={<Navigate to={`/pages/${page.id}`} replace />}
+            key={`${page.name}-${alias}`}
+            path={`/pages/${alias}`}
+            element={<Navigate to={`/pages/${page.name}${search}`} replace />}
           />
-        </React.Fragment>
-      ))}
+        )),
+      )}
       <Route path="/pages" element={defaultPageNavigation} />
       <Route path="/" element={defaultPageNavigation} />
       <Route path="*" element={<PageNotFound />} />
@@ -1535,7 +1537,7 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const navEntries = React.useMemo(
     () =>
       pages.map((page) => ({
-        slug: page.id,
+        slug: page.name,
         displayName: page.name,
         hasShell: page?.attributes.display !== 'standalone',
       })),

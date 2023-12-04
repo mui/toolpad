@@ -40,51 +40,50 @@ export default function PageOptionsPanel() {
   return (
     <Stack spacing={2} alignItems="stretch" data-testid="page-editor">
       <Typography variant="subtitle1">Page:</Typography>
-      <div>
-        <NodeNameEditor node={page} />
-        <PageTitleEditor node={page} />
-      </div>
-      <div>
-        <Typography variant="body2">Display mode:</Typography>
-        <Tooltip
-          arrow
-          placement="left-start"
-          title={
-            <Typography variant="inherit">
-              Control how the navigation panel is rendered in the final application. Read more in
-              the{' '}
-              <Link
-                href="https://mui.com/toolpad/concepts/display-mode/"
-                target="_blank"
-                rel="noopener"
-              >
-                docs
-              </Link>
-              .
-            </Typography>
-          }
+      <NodeNameEditor node={page} />
+      <PageTitleEditor node={page} />
+      <Typography variant="body2">Display mode:</Typography>
+      <Tooltip
+        arrow
+        placement="left-start"
+        title={
+          <Typography variant="inherit">
+            Control how the navigation panel is rendered in the final application. Read more in the{' '}
+            <Link
+              href="https://mui.com/toolpad/concepts/page-properties/#display-mode"
+              target="_blank"
+              rel="noopener"
+            >
+              docs
+            </Link>
+            .
+          </Typography>
+        }
+      >
+        <ToggleButtonGroup
+          exclusive
+          value={page.attributes.display ?? 'shell'}
+          onChange={handleDisplayModeChange}
+          aria-label="Display mode"
+          fullWidth
         >
-          <ToggleButtonGroup
-            exclusive
-            value={page.attributes.display ?? 'shell'}
-            onChange={handleDisplayModeChange}
-            aria-label="Display mode"
-            fullWidth
-          >
-            {PAGE_DISPLAY_OPTIONS.map((option) => {
-              return (
-                <ToggleButton key={option.value} value={option.value}>
-                  {option.label}
-                </ToggleButton>
-              );
-            })}
-          </ToggleButtonGroup>
-        </Tooltip>
-      </div>
-      <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
-      <Typography variant="overline">Page State:</Typography>
-      <UrlQueryEditor pageNodeId={pageNodeId} />
-      <QueryEditor />
+          {PAGE_DISPLAY_OPTIONS.map((option) => {
+            return (
+              <ToggleButton key={option.value} value={option.value}>
+                {option.label}
+              </ToggleButton>
+            );
+          })}
+        </ToggleButtonGroup>
+      </Tooltip>
+      {appDom.isCodePage(page) ? null : (
+        <React.Fragment>
+          <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
+          <Typography variant="overline">Page State:</Typography>
+          <UrlQueryEditor pageNodeId={pageNodeId} />
+          <QueryEditor />
+        </React.Fragment>
+      )}
     </Stack>
   );
 }

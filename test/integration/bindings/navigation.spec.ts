@@ -16,7 +16,7 @@ test.use({
 
 test('navigation action', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.goToPage('page1');
 
   const getPageUrlSearch = (): string => new URL(page.url()).search;
 

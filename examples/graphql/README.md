@@ -3,7 +3,7 @@
 <p class="description">An app that shows latest 100 stargezers' info for any GitHub repository.</p>
 
 <a target="_blank">
-  <img src="https://mui.com//static/toolpad/marketing/graphql.png" alt="Toolpad example app using graphQL API" style="aspect-ratio: 1.8" width="100%">
+  <img src="https://mui.com/static/toolpad/marketing/graphql.png" alt="Toolpad example app using graphQL API" style="aspect-ratio: 687/376;" width="1434">
 </a>
 
 A Toolpad app that shows how to:
@@ -17,7 +17,7 @@ A Toolpad app that shows how to:
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app@latest  --example graphql
+npx create-toolpad-app@latest --example graphql
 ```
 
 ```bash

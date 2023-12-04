@@ -43,19 +43,6 @@ function Autocomplete({
   sx,
   ...rest
 }: AutocompleteProps) {
-  const getDefaultValue = React.useMemo(() => {
-    return (
-      options?.find((option) => {
-        if (typeof option === 'string') {
-          return option === defaultValue;
-        }
-        return option.value === defaultValue;
-      }) ?? null
-    );
-  }, [options, defaultValue]);
-
-  const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(getDefaultValue);
-
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
     label,
@@ -96,20 +83,9 @@ function Autocomplete({
     (event: React.SyntheticEvent<Element>, selection: AutocompleteOption | null) => {
       const newValue: AutocompleteValue = getValue(selection);
       onFormInputChange(newValue);
-      setSelectedVal(selection);
     },
     [getValue, onFormInputChange],
   );
-
-  React.useEffect(() => {
-    if (!value) {
-      setSelectedVal(null);
-    }
-
-    if (value !== defaultValue) {
-      setSelectedVal(getDefaultValue);
-    }
-  }, [value, defaultValue, getDefaultValue]);
 
   return renderFormInput(
     <MuiAutocomplete
@@ -117,7 +93,7 @@ function Autocomplete({
       options={options ?? []}
       isOptionEqualToValue={(option, selectedValue) => getValue(option) === getValue(selectedValue)}
       getOptionLabel={getOptionLabel}
-      value={selectedVal}
+      value={value}
       renderInput={(params) => (
         <TextField
           {...params}

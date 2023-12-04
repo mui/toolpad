@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { asArray } from '@mui/toolpad-utils/collections';
+import { Box } from '@mui/material';
 
 export interface User {
   roles?: string[];
@@ -34,10 +35,22 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
   } else if (!user.roles || user.roles.length <= 0) {
     reason = 'User has no roles defined.';
   } else if (!user.roles.some((role) => allowedRolesSet.has(role))) {
-    reason = `User with role(s) ${user?.roles
-      ?.map((role) => JSON.stringify(role))
-      .join(', ')} is not authorized to access this resource.`;
+    const rolesList = user?.roles?.map((role) => JSON.stringify(role)).join(', ');
+    reason = `User with role(s) ${rolesList} is not allowed access to this resource.`;
   }
 
-  return reason ? <div>Unauthorized. {reason}</div> : children;
+  return reason ? (
+    <Box
+      sx={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      Unauthorized. {reason}
+    </Box>
+  ) : (
+    children
+  );
 }

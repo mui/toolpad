@@ -139,10 +139,14 @@ export default function PageOptionsPanel() {
           )}
         />
       </div>
-      <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
-      <Typography variant="overline">Page State:</Typography>
-      <UrlQueryEditor pageNodeId={pageNodeId} />
-      <QueryEditor />
+      {appDom.isCodePage(page) ? null : (
+        <div>
+          <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
+          <Typography variant="overline">Page State:</Typography>
+          <UrlQueryEditor pageNodeId={pageNodeId} />
+          <QueryEditor />
+        </div>
+      )}
     </Stack>
   );
 }

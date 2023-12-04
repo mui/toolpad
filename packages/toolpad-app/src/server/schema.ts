@@ -11,7 +11,7 @@ function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spe
         `Defines the version of this object. Used in determining compatibility between Toolpad "${kind}" objects.`,
       ),
     kind: z.literal(kind).describe(`Describes the nature of this Toolpad "${kind}" object.`),
-    spec: spec.describe(`Defines the shape of this "${kind}" object`),
+    spec: spec.optional().describe(`Defines the shape of this "${kind}" object`),
   });
 }
 
@@ -284,7 +284,11 @@ export type Application = z.infer<typeof applicationSchema>;
 export const pageSchema = toolpadObjectSchema(
   'page',
   z.object({
-    id: z.string().describe('Serves as a canonical id of the page.'),
+    id: z
+      .string()
+      .optional()
+      .describe('Serves as a canonical id of the page. Deprecated: use an alias instead.'),
+    alias: z.array(z.string()).optional().describe('Page name aliases.'),
     title: z.string().optional().describe('Title for this page.'),
     parameters: z
       .array(nameStringValuePairSchema)

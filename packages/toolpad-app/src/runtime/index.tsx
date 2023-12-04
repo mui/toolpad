@@ -5,6 +5,8 @@ import { ToolpadComponents } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import api from './api';
 import RuntimeToolpadApp, {
   ToolpadAppProps,
   componentsStore,
@@ -67,3 +69,13 @@ export { AppLayout } from './AppLayout';
 export { DomContextProvider, ComponentsContextProvider, RenderedPage } from './ToolpadApp';
 
 export type { RuntimeState };
+
+export function createRemoteFunction(functionFile: string, functionName: string) {
+  return async function remote(...params: any[]) {
+    const { data, error } = await api.methods.execFunction(functionFile, functionName, params);
+    if (error) {
+      throw errorFrom(error);
+    }
+    return data;
+  };
+}

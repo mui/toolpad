@@ -68,14 +68,14 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   const handleButtonClick = React.useCallback(() => {
     appStateApi.setView({
       kind: 'page',
-      nodeId: pageNodeId,
+      name: page.name,
       view: { kind: 'pageParameters' },
     });
-  }, [appStateApi, pageNodeId]);
+  }, [appStateApi, page.name]);
 
   const handleDialogClose = React.useCallback(() => {
-    appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
-  }, [appStateApi, pageNodeId]);
+    appStateApi.setView({ kind: 'page', name: page.name });
+  }, [appStateApi, page.name]);
 
   const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
     hasUnsavedChanges,

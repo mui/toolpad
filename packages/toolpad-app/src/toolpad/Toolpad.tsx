@@ -91,9 +91,8 @@ function EditorShell({ children }: EditorShellProps) {
     if (!currentView) {
       return null;
     }
-    const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
-
-    return currentPageId ? `${appState.appUrl}/pages/${currentPageId}` : appState.appUrl;
+    const currentPageName = currentView?.kind === 'page' ? currentView.name : null;
+    return currentPageName ? `${appState.appUrl}/pages/${currentPageName}` : appState.appUrl;
   }, [appState.appUrl, location.pathname]);
 
   const {

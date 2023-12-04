@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: page
 spec:
-  id: mDJP5kU
-  title: Default page
+  title: Google sheets
   queries:
     - name: fetchSheet
       query:

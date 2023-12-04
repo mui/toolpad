@@ -15,12 +15,12 @@ import {
   MenuItem,
   Tooltip,
   Button,
-  CircularProgress,
   useTheme,
 } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { LoadingButton } from '@mui/lab';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { AuthProvider, AuthSessionContext } from './useAuthSession';
 import api from './api';
@@ -138,14 +138,6 @@ export function AppLayout({
 
   const { session, signIn, signOut, isSigningIn } = React.useContext(AuthSessionContext);
 
-  const [anchorElSignIn, setAnchorElSignIn] = React.useState<null | HTMLElement>(null);
-  const handleOpenSignInMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElSignIn(event.currentTarget);
-  };
-  const handleCloseSignInMenu = () => {
-    setAnchorElSignIn(null);
-  };
-
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -157,7 +149,6 @@ export function AppLayout({
   const handleSignIn = React.useCallback(
     (provider: AuthProvider) => () => {
       signIn(provider);
-      handleCloseSignInMenu();
     },
     [signIn],
   );
@@ -177,7 +168,7 @@ export function AppLayout({
       {hasHeader ? (
         <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
           {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
-          <Toolbar variant="dense">
+          <Toolbar variant="dense" sx={{ mt: '-4px' }}>
             <Typography variant="h6" noWrap sx={{ ml: 1 }}>
               {activePage?.displayName ?? ''}
             </Typography>
@@ -222,74 +213,51 @@ export function AppLayout({
                   </Menu>
                 </React.Fragment>
               ) : null}
-              {!session?.user && !isSigningIn && authProvider ? (
+              {!session?.user && authProvider ? (
                 <React.Fragment>
-                  <Button onClick={handleOpenSignInMenu} color="inherit">
-                    Sign In
-                  </Button>
-                  <Menu
-                    sx={{ mt: '45px' }}
-                    id="menu-appbar-signin"
-                    anchorEl={anchorElSignIn}
-                    anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    open={Boolean(anchorElSignIn)}
-                    onClose={handleCloseSignInMenu}
-                  >
-                    {authProvider === 'github' ? (
-                      <MenuItem>
-                        <Button
-                          variant="contained"
-                          onClick={handleSignIn('github')}
-                          startIcon={<GitHubIcon />}
-                          fullWidth
-                          sx={{
-                            backgroundColor: '#24292F',
-                          }}
-                        >
-                          Sign in with GitHub
-                        </Button>
-                      </MenuItem>
-                    ) : null}
-                    {authProvider === 'google' ? (
-                      <MenuItem>
-                        <Button
-                          variant="contained"
-                          onClick={handleSignIn('google')}
-                          startIcon={
-                            <img
-                              alt="Google logo"
-                              loading="lazy"
-                              height="18"
-                              width="18"
-                              src="https://authjs.dev/img/providers/google.svg"
-                              style={{ marginLeft: '2px', marginRight: '2px' }}
-                            />
-                          }
-                          fullWidth
-                          sx={{
-                            backgroundColor: '#fff',
-                            color: '#000',
-                            '&:hover': {
-                              color: theme.palette.primary.contrastText,
-                            },
-                          }}
-                        >
-                          Sign in with Google
-                        </Button>
-                      </MenuItem>
-                    ) : null}
-                  </Menu>
+                  {authProvider === 'github' ? (
+                    <LoadingButton
+                      variant="contained"
+                      onClick={handleSignIn('github')}
+                      startIcon={<GitHubIcon />}
+                      loading={isSigningIn}
+                      loadingPosition="start"
+                      sx={{
+                        backgroundColor: '#24292F',
+                      }}
+                    >
+                      Sign in with GitHub
+                    </LoadingButton>
+                  ) : null}
+                  {authProvider === 'google' ? (
+                    <LoadingButton
+                      variant="contained"
+                      onClick={handleSignIn('google')}
+                      startIcon={
+                        <img
+                          alt="Google logo"
+                          loading="lazy"
+                          height="18"
+                          width="18"
+                          src="https://authjs.dev/img/providers/google.svg"
+                          style={{ marginLeft: '2px', marginRight: '2px' }}
+                        />
+                      }
+                      loading={isSigningIn}
+                      loadingPosition="start"
+                      sx={{
+                        backgroundColor: '#fff',
+                        color: '#000',
+                        '&:hover': {
+                          color: theme.palette.primary.contrastText,
+                        },
+                      }}
+                    >
+                      Sign in with Google
+                    </LoadingButton>
+                  ) : null}
                 </React.Fragment>
               ) : null}
-              {isSigningIn ? <CircularProgress color="inherit" size={26} /> : null}
             </Stack>
           </Toolbar>
         </AppBar>
@@ -305,7 +273,7 @@ export function AppLayout({
           />
         ) : null}
         <Box sx={{ flex: 1 }}>
-          <Toolbar variant="dense" />
+          {hasHeader ? <Toolbar variant="dense" /> : null}
           {children}
         </Box>
       </Box>

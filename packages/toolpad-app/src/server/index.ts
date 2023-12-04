@@ -369,21 +369,29 @@ async function createAuthHandler(): Promise<AppHandler> {
           verifyRequest: '/prod',
         },
         providers: [
-          GithubProvider({
-            clientId: process.env.TOOLPAD_GITHUB_ID,
-            clientSecret: process.env.TOOLPAD_GITHUB_SECRET,
-          }),
-          GoogleProvider({
-            clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
-            clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
-            authorization: {
-              params: {
-                prompt: 'consent',
-                access_type: 'offline',
-                response_type: 'code',
-              },
-            },
-          }),
+          ...(process.env.TOOLPAD_GITHUB_ID && process.env.TOOLPAD_GITHUB_SECRET
+            ? [
+                GithubProvider({
+                  clientId: process.env.TOOLPAD_GITHUB_ID,
+                  clientSecret: process.env.TOOLPAD_GITHUB_SECRET,
+                }),
+              ]
+            : []),
+          ...(process.env.TOOLPAD_GOOGLE_CLIENT_ID && process.env.TOOLPAD_GOOGLE_CLIENT_SECRET
+            ? [
+                GoogleProvider({
+                  clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
+                  clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
+                  authorization: {
+                    params: {
+                      prompt: 'consent',
+                      access_type: 'offline',
+                      response_type: 'code',
+                    },
+                  },
+                }),
+              ]
+            : []),
         ],
         secret: process.env.TOOLPAD_AUTH_SECRET,
         skipCSRFCheck,

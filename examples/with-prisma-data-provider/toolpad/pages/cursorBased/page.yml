@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: page
 spec:
-  id: -vzMDF1
-  title: Default page
+  title: Prisma data source example with cursor
   content:
     - component: Text
       name: text

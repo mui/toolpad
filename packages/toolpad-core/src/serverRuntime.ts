@@ -13,7 +13,13 @@ export interface ServerContext {
   setCookie: (name: string, value: string) => void;
 }
 
-const contextStore = new AsyncLocalStorage<ServerContext>();
+let contextStore = new AsyncLocalStorage<ServerContext>();
+
+export const initialContextStore = contextStore;
+
+export function initStore(store: AsyncLocalStorage<ServerContext>) {
+  contextStore = store;
+}
 
 export function getServerContext(): ServerContext | undefined {
   return contextStore.getStore();

@@ -17,6 +17,9 @@ export function createRpcServer(project: ToolpadProject) {
     execQuery: createMethod<typeof project.dataManager.execQuery>(({ params }) => {
       return project.dataManager.execQuery(...params);
     }),
+    execFunction: createMethod<typeof project.functionsManager.execFunction>(({ params }) => {
+      return project.functionsManager.execFunction(...params);
+    }),
   } satisfies MethodResolvers;
 }
 

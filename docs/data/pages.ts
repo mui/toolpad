@@ -147,7 +147,7 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/how-to-guides/embed-pages',
-            title: 'Embed a Toolpad page',
+            title: 'Embedding Toolpad pages',
           },
           {
             pathname: '/toolpad/how-to-guides/basic-auth',

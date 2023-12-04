@@ -1,6 +1,6 @@
 ---
 productId: toolpad
-title: Toolpad examples
+title: Examples
 ---
 
 # Overview

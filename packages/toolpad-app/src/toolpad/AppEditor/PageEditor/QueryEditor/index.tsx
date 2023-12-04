@@ -134,9 +134,9 @@ export default function QueryEditor() {
     if (isDraft) {
       setDialogState(null);
     } else {
-      appStateApi.setView({ kind: 'page', nodeId: page.id });
+      appStateApi.setView({ kind: 'page', name: page.name });
     }
-  }, [appStateApi, isDraft, page.id]);
+  }, [appStateApi, isDraft, page.name]);
 
   const handleCreated = React.useCallback((node: appDom.QueryNode) => {
     setDialogState({ node, isDraft: true });
@@ -157,10 +157,10 @@ export default function QueryEditor() {
     (nodeId: NodeId) => {
       appStateApi.update((draft) => appDom.removeNode(draft, nodeId), {
         kind: 'page',
-        nodeId: page.id,
+        name: page.name,
       });
     },
-    [appStateApi, page.id],
+    [appStateApi, page.name],
   );
 
   const handleRemove = React.useCallback(
@@ -263,7 +263,7 @@ export default function QueryEditor() {
               onClick={() => {
                 appStateApi.setView({
                   kind: 'page',
-                  nodeId: page.id,
+                  name: page.name,
                   view: { kind: 'query', nodeId: queryNode.id },
                 });
               }}

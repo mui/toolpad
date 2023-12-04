@@ -44,7 +44,7 @@ test('base path basics', async ({ page, context, localApp }) => {
   const runtimeModel = new ToolpadRuntime(page, {
     base: '/foo',
   });
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await expectBasicRuntimeTests(page);
 });

@@ -1,6 +1,6 @@
 import * as path from 'path';
 import invariant from 'invariant';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { glob } from 'glob';
 import chalk from 'chalk';
 import type { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';

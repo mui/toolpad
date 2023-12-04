@@ -11,7 +11,7 @@ https://github.com/mui/mui-toolpad/assets/19550456/bd327963-c061-4a75-906d-22acd
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app@latest  --example custom-server
+npx create-toolpad-app@latest --example custom-server
 ```
 
 ```bash

@@ -13,11 +13,6 @@ import clickCenter from '../../utils/clickCenter';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
-const BASIC_TESTS_PAGE_ID = '5q1xd0t';
-const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
-const DATA_PROVIDERS_PAGE_ID = 'VnOzPpU';
-const SERIALIZATION_TESTS_PAGE_ID = 'Tysc6w5';
-
 test.use({
   ignoreConsoleErrors: [
     // Chrome:
@@ -47,7 +42,7 @@ test('functions basics', async ({ page, context }) => {
   ]);
 
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await expectBasicRuntimeTests(page);
 });
@@ -59,7 +54,7 @@ test('function editor reload', async ({ page, localApp }) => {
   );
 
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
+  await editorModel.goToPage('basic');
 
   const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
   await withTemporaryEdits(functionsFilePath, async () => {
@@ -83,7 +78,7 @@ test('function editor parameters update', async ({ page, localApp, argosScreensh
   );
 
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
+  await editorModel.goToPage('basic');
 
   await editorModel.pageEditor.getByRole('button', { name: 'withParams' }).click();
 
@@ -111,7 +106,7 @@ test('function editor parameters update', async ({ page, localApp, argosScreensh
 
 test('bound parameters are preserved on manual call', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await page.getByRole('button', { name: 'Run Manual Query' }).click();
 
@@ -120,7 +115,7 @@ test('bound parameters are preserved on manual call', async ({ page }) => {
 
 test('global variables are retained in function runtime', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await expect(page.getByText('global value: 1', { exact: true })).toBeVisible();
   await expect(page.getByText('global value: 2', { exact: true })).not.toBeVisible();
@@ -132,7 +127,7 @@ test('global variables are retained in function runtime', async ({ page }) => {
 
 test('Query serialization', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('serialization');
+  await runtimeModel.goToPage('serialization');
 
   await expect(page.getByText('Circular property: hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
@@ -145,7 +140,7 @@ test('Query serialization', async ({ page }) => {
 
 test('Circular scope value, binding editor', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(SERIALIZATION_TESTS_PAGE_ID);
+  await editorModel.goToPage('serialization');
 
   await editorModel.waitForOverlay();
   await clickCenter(
@@ -159,7 +154,7 @@ test('Circular scope value, binding editor', async ({ page }) => {
 
 test('Extracted types', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('extractedTypes');
+  await runtimeModel.goToPage('extractedTypes');
 
   await expect(
     page.getByText(
@@ -181,7 +176,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
   );
 
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(EXTRACTED_TYPES_PAGE_ID);
+  await editorModel.goToPage('extractedTypes');
 
   await editorModel.pageEditor.getByRole('button', { name: 'bareWithParams' }).click();
   const queryEditor = page.getByRole('dialog', { name: 'bareWithParams' });
@@ -225,7 +220,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
 
 test('data providers', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(DATA_PROVIDERS_PAGE_ID);
+  await editorModel.goToPage('dataProviders');
 
   await editorModel.waitForOverlay();
 

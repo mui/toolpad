@@ -19,6 +19,7 @@ import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
 import PageTitleEditor from '../PageTitleEditor';
+import { FEATURE_FLAG_AUTHORIZATION } from '../../../constants';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
   { value: 'shell', label: 'App shell' },
@@ -118,27 +119,29 @@ export default function PageOptionsPanel() {
           </ToggleButtonGroup>
         </Tooltip>
       </div>
-      <div>
-        <Typography variant="body2">Authorization:</Typography>
-        <FormControlLabel
-          control={
-            <Checkbox checked={!page.attributes.authorization} onChange={handleAllowAllChange} />
-          }
-          label="Allow access to all roles"
-        />
-        <Autocomplete
-          multiple
-          options={Array.from(availableRoles.keys())}
-          value={page.attributes.authorization?.allowedRoles ?? []}
-          onChange={handleallowedRolesChange}
-          disabled={!page.attributes.authorization}
-          fullWidth
-          noOptionsText="No roles defined"
-          renderInput={(params) => (
-            <TextField {...params} label="Allowed roles" placeholder="Roles" />
-          )}
-        />
-      </div>
+      {FEATURE_FLAG_AUTHORIZATION ? (
+        <div>
+          <Typography variant="body2">Authorization:</Typography>
+          <FormControlLabel
+            control={
+              <Checkbox checked={!page.attributes.authorization} onChange={handleAllowAllChange} />
+            }
+            label="Allow access to all roles"
+          />
+          <Autocomplete
+            multiple
+            options={Array.from(availableRoles.keys())}
+            value={page.attributes.authorization?.allowedRoles ?? []}
+            onChange={handleallowedRolesChange}
+            disabled={!page.attributes.authorization}
+            fullWidth
+            noOptionsText="No roles defined"
+            renderInput={(params) => (
+              <TextField {...params} label="Allowed roles" placeholder="Roles" />
+            )}
+          />
+        </div>
+      ) : null}
       {appDom.isCodePage(page) ? null : (
         <div>
           <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />

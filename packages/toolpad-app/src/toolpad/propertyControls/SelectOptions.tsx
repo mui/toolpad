@@ -51,7 +51,6 @@ function SelectOptionsPropEditor({
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'Enter') {
         const inputText = (event.target as HTMLInputElement).value;
-
         onChange([...value, inputText]);
         if (optionInputRef.current) {
           optionInputRef.current.value = '';

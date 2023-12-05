@@ -77,10 +77,14 @@ export default function PageOptionsPanel() {
           })}
         </ToggleButtonGroup>
       </Tooltip>
-      <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
-      <Typography variant="overline">Page State:</Typography>
-      <UrlQueryEditor pageNodeId={pageNodeId} />
-      <QueryEditor />
+      {appDom.isCodePage(page) ? null : (
+        <React.Fragment>
+          <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
+          <Typography variant="overline">Page State:</Typography>
+          <UrlQueryEditor pageNodeId={pageNodeId} />
+          <QueryEditor />
+        </React.Fragment>
+      )}
     </Stack>
   );
 }

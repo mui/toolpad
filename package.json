@@ -37,7 +37,7 @@
     "test:argos": "node ./scripts/pushArgos.mjs",
     "test": "lerna run test",
     "check-types": "lerna run check-types",
-    "toolpad": "node --enable-source-maps packages/toolpad-app/cli.js",
+    "toolpad": "node --enable-source-maps packages/toolpad-app/cli.mjs",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
     "check-changes": "git add -A && git diff --exit-code --staged",
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
@@ -45,21 +45,21 @@
   "devDependencies": {
     "@argos-ci/core": "1.3.0",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
-    "@mui/x-charts": "6.18.2",
+    "@mui/x-charts": "6.18.3",
     "@next/eslint-plugin-next": "14.0.3",
     "@playwright/test": "1.39.0",
     "@testing-library/react": "14.1.2",
     "@types/archiver": "6.0.2",
     "@types/gtag.js": "0.0.18",
-    "@types/node": "20.10.0",
+    "@types/node": "20.10.2",
     "@types/rimraf": "3.0.2",
-    "@typescript-eslint/eslint-plugin": "6.12.0",
-    "@typescript-eslint/parser": "6.12.0",
+    "@typescript-eslint/eslint-plugin": "6.13.1",
+    "@typescript-eslint/parser": "6.13.1",
     "chalk": "5.3.0",
-    "eslint": "8.54.0",
+    "eslint": "8.55.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "17.1.0",
-    "eslint-config-prettier": "9.0.0",
+    "eslint-config-prettier": "9.1.0",
     "eslint-import-resolver-webpack": "0.13.8",
     "eslint-plugin-filenames": "1.3.2",
     "eslint-plugin-import": "2.29.0",
@@ -78,7 +78,7 @@
     "prettier": "2.8.8",
     "pretty-quick": "3.1.3",
     "react-inspector": "6.0.2",
-    "recharts": "2.10.1",
+    "recharts": "2.10.3",
     "regenerator-runtime": "0.14.0",
     "rimraf": "5.0.5",
     "typescript": "5.3.2",
@@ -98,10 +98,13 @@
     "vitest": "0.34.6",
     "yargs": "17.7.2",
     "zod": "3.22.4",
-    "zod-to-json-schema": "3.22.0"
+    "zod-to-json-schema": "3.22.1"
   },
   "engines": {
     "npm": "please-use-yarn",
     "node": ">=18"
+  },
+  "resolutions": {
+    "google-auth-library": "*"
   }
 }

@@ -39,7 +39,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
       <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
         <Panel defaultSizePercentage={75} minSizePercentage={50} maxSizePercentage={80}>
           <PageEditorRoot>
-            <ComponentCatalog />
+            {appDom.isCodePage(node) ? null : <ComponentCatalog />}
             <RenderPanel className={classes.renderPanel} />
           </PageEditorRoot>
         </Panel>
@@ -53,11 +53,12 @@ function PageEditorContent({ node }: PageEditorContentProps) {
 }
 
 interface PageEditorProps {
-  nodeId?: NodeId;
+  name: string;
 }
 
-export default function PageEditor({ nodeId }: PageEditorProps) {
+export default function PageEditor({ name }: PageEditorProps) {
   const { dom } = useAppState();
+  const nodeId = React.useMemo(() => appDom.getNodeIdByName(dom, name), [dom, name]);
   const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
 
   useUndoRedo();

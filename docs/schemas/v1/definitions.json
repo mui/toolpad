@@ -23,7 +23,14 @@
             },
             "id": {
               "type": "string",
-              "description": "Serves as a canonical id of the page."
+              "description": "Serves as a canonical id of the page. Deprecated: use an alias instead."
+            },
+            "alias": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Page name aliases."
             },
             "title": {
               "type": "string",
@@ -354,17 +361,13 @@
               "description": "Display mode of the page. This can also be set at runtime with the toolpad-display query parameter"
             }
           },
-          "required": [
-            "id"
-          ],
           "additionalProperties": false,
           "description": "Defines the shape of this \"page\" object"
         }
       },
       "required": [
         "apiVersion",
-        "kind",
-        "spec"
+        "kind"
       ],
       "additionalProperties": false
     },
@@ -417,8 +420,7 @@
       },
       "required": [
         "apiVersion",
-        "kind",
-        "spec"
+        "kind"
       ],
       "additionalProperties": false
     }

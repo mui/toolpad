@@ -258,7 +258,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       let newView = action.view;
       if (action.view.kind === 'page') {
         if (typeof action.view.selectedNodeId === 'undefined') {
-          const isSameNode = action.view.nodeId === state.currentView.nodeId;
+          const isSameNode = action.view.name === state.currentView.name;
 
           newView = {
             ...action.view,
@@ -454,9 +454,9 @@ export default function AppProvider({ appUrl, children }: DomContextProps) {
   const { pages = [] } = appDom.getChildNodes(dom, app);
   const firstPage = pages.length > 0 ? pages[0] : null;
 
-  const initialView = getViewFromPathname(location.pathname) || {
+  const initialView: DomView = getViewFromPathname(location.pathname) || {
     kind: 'page',
-    nodeId: firstPage?.id,
+    name: firstPage?.name,
     selectedNodeId: null,
     tab: 'page',
   };

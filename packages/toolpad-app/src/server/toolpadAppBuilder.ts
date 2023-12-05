@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as url from 'node:url';
-import { InlineConfig, Plugin, build } from 'vite';
+import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
 import type { ComponentEntry } from './localMode';
@@ -81,6 +81,55 @@ function toolpadVitePlugin({ base }: ToolpadVitePluginParams): Plugin {
         return getHtmlContent({ canvas: false, base });
       }
       return null;
+    },
+
+    transform(code, id) {
+      if (/\/resources\//.test(id)) {
+        const codeFile = path.basename(id);
+
+        const functionExports = [];
+
+        const lines = code.split('\n');
+        for (let i = 0; i < lines.length; i += 1) {
+          const line = lines[i];
+          const lineNr = i + 1;
+          if (/\s*export\b/.test(line)) {
+            const match = line.match(/\s*export\s+async\s+function\s+([a-zA-Z0-9]+)\b/);
+
+            if (match) {
+              const functionName = match[1];
+              functionExports.push(functionName);
+            } else {
+              console.warn(
+                `Unsupported export at "${id}:${lineNr}". Only exports of the form "export async function foo(...) {" are supported.`,
+              );
+            }
+          }
+        }
+
+        return `
+          import { createRemoteFunction } from '@mui/toolpad/runtime';
+
+          const functionFile = ${JSON.stringify(codeFile)};
+
+          ${functionExports
+            .map(
+              (functionName) =>
+                `const __${functionName} = createRemoteFunction(functionFile, ${JSON.stringify(
+                  functionName,
+                )})`,
+            )
+            .join('\n')}
+
+          export {
+            ${functionExports
+              .map((functionName) => `__${functionName} as ${functionName}`)
+              .join(',\n')}
+          }
+        `;
+      }
+
+      return code;
     },
   };
 }
@@ -359,5 +408,6 @@ export async function buildApp({
     getComponents,
     loadDom,
   });
-  await build(viteConfig);
+  const vite = await import('vite');
+  await vite.build(viteConfig);
 }

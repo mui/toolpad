@@ -14,7 +14,7 @@ import { APP_FUNCTIONS_ROUTE } from '../routes';
 import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
-import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
+import { FEATURE_FLAG_AUTHORIZATION, FEATURE_FLAG_GLOBAL_FUNCTIONS } from '../constants';
 import { ProjectProvider } from '../project';
 import { AppAuthorizationDialog } from './AppEditor/AppAuthorizationEditor';
 import useBoolean from '../utils/useBoolean';
@@ -103,7 +103,11 @@ function EditorShell({ children }: EditorShellProps) {
 
   return (
     <ToolpadShell
-      navigation={<Button onClick={handleAuthorizationDialogOpen}>Authorization</Button>}
+      navigation={
+        FEATURE_FLAG_AUTHORIZATION ? (
+          <Button onClick={handleAuthorizationDialogOpen}>Authorization</Button>
+        ) : null
+      }
       actions={
         previewPath ? (
           <Stack direction="row" gap={1} alignItems="center">
@@ -162,7 +166,7 @@ export default function Toolpad({ appUrl, basename }: ToolpadProps) {
                   <AppProvider appUrl={appUrl}>
                     <EditorShell>
                       <Routes>
-                        {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
+                        {FEATURE_FLAG_GLOBAL_FUNCTIONS ? (
                           <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
                         ) : null}
                         <Route path="/*" element={<AppEditor />} />

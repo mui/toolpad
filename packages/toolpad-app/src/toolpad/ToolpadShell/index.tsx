@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Stack, styled } from '@mui/material';
 import Header from './Header';
 import ToolpadNavigation from './ToolpadNavigation';
-import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../../constants';
+import { FEATURE_FLAG_GLOBAL_FUNCTIONS } from '../../constants';
 
 export interface ToolpadShellProps {
   navigation?: React.ReactNode;
@@ -29,7 +29,7 @@ export default function ToolpadShell({ children, ...props }: ToolpadShellProps) 
     <ToolpadShellRoot>
       <Header {...props} />
       <Stack direction="row" sx={{ flex: 1 }}>
-        {GLOBAL_FUNCTIONS_FEATURE_FLAG ? <ToolpadNavigation /> : null}
+        {FEATURE_FLAG_GLOBAL_FUNCTIONS ? <ToolpadNavigation /> : null}
         <ViewPort>{children}</ViewPort>
       </Stack>
     </ToolpadShellRoot>

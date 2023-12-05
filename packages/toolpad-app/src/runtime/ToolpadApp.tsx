@@ -1462,7 +1462,8 @@ function PageNotFound() {
  * Returns whether authentication has been configured for this application.
  */
 function useAppHasAuthentication() {
-  return true;
+  // TODO: read from authentication
+  return false;
 }
 
 interface RenderedPagesProps {

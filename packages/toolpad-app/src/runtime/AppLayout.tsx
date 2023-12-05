@@ -306,9 +306,11 @@ export function AppLayout({
         autoHideDuration={6000}
         onClose={handleErrorSnackbarClose}
       >
-        <Alert onClose={handleErrorSnackbarClose} severity="error">
-          {errorSnackbarMessage}
-        </Alert>
+        {errorSnackbarMessage ? (
+          <Alert onClose={handleErrorSnackbarClose} severity="error">
+            {errorSnackbarMessage}
+          </Alert>
+        ) : undefined}
       </Snackbar>
     </React.Fragment>
   );

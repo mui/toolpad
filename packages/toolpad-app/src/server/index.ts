@@ -394,7 +394,7 @@ async function createAuthHandler(base: string): Promise<AppHandler> {
             : []),
         ],
         secret: process.env.TOOLPAD_AUTH_SECRET,
-        // skipCSRFCheck,
+        skipCSRFCheck,
         trustHost: true,
         callbacks: {
           async signIn({ account, profile }) {

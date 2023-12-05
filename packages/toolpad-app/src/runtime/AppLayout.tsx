@@ -192,7 +192,7 @@ export function AppLayout({
       {hasHeader ? (
         <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
           {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
-          <Toolbar variant="dense" sx={{ mt: '-4px' }}>
+          <Toolbar variant="dense" sx={{ mt: clipped ? '-4px' : 0 }}>
             <Typography variant="h6" noWrap sx={{ ml: 1 }}>
               {activePage?.displayName ?? ''}
             </Typography>

@@ -335,7 +335,7 @@ async function createToolpadHandler({
   };
 }
 
-async function createAuthHandler(): Promise<AppHandler> {
+async function createAuthHandler(base: string): Promise<AppHandler> {
   const router = express.Router();
 
   router.use(
@@ -363,10 +363,10 @@ async function createAuthHandler(): Promise<AppHandler> {
 
       const response = (await Auth(request, {
         pages: {
-          signIn: '/prod',
-          signOut: '/prod',
-          error: '/prod', // Error code passed in query string as ?error=
-          verifyRequest: '/prod',
+          signIn: base,
+          signOut: base,
+          error: base, // Error code passed in query string as ?error=
+          verifyRequest: base,
         },
         providers: [
           ...(process.env.TOOLPAD_GITHUB_ID && process.env.TOOLPAD_GITHUB_SECRET
@@ -395,7 +395,7 @@ async function createAuthHandler(): Promise<AppHandler> {
         ],
         secret: process.env.TOOLPAD_AUTH_SECRET,
         // skipCSRFCheck,
-        // trustHost: true,
+        trustHost: true,
         callbacks: {
           async signIn({ account, profile }) {
             const isEmailDomainValid = Boolean(
@@ -458,7 +458,7 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
 
   app.use(toolpadHandler.handler);
 
-  const authHandler = await createAuthHandler();
+  const authHandler = await createAuthHandler(config.base);
   app.use('/api/auth', authHandler.handler);
 
   const runningServer = await listen(httpServer, port);

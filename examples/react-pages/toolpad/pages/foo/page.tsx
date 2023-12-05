@@ -22,7 +22,7 @@ export default function MyPage() {
   });
 
   return (
-    <Box sx={{ width: '100%', height: 400, m: 2 }}>
+    <Box sx={{ width: '100%', height: 400, p: 2 }}>
       <DataGrid
         rows={rows}
         columns={COLUMNS}

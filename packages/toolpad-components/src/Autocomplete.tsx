@@ -26,6 +26,7 @@ interface AutocompleteProps
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
   label?: string;
+  defaultValue: string;
   options: AutocompleteOption[];
 }
 
@@ -34,6 +35,7 @@ function Autocomplete({
   label,
   onChange,
   value,
+  defaultValue,
   isRequired,
   minLength,
   maxLength,
@@ -41,14 +43,13 @@ function Autocomplete({
   sx,
   ...rest
 }: AutocompleteProps) {
-  const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
-
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
     label,
     value,
     onChange,
     emptyValue: null,
+    defaultValue,
     validationProps: { isRequired, minLength, maxLength, isInvalid },
   });
 
@@ -82,16 +83,9 @@ function Autocomplete({
     (event: React.SyntheticEvent<Element>, selection: AutocompleteOption | null) => {
       const newValue: AutocompleteValue = getValue(selection);
       onFormInputChange(newValue);
-      setSelectedVal(selection);
     },
     [getValue, onFormInputChange],
   );
-
-  React.useEffect(() => {
-    if (!value) {
-      setSelectedVal(null);
-    }
-  }, [value]);
 
   return renderFormInput(
     <MuiAutocomplete
@@ -99,7 +93,7 @@ function Autocomplete({
       options={options ?? []}
       isOptionEqualToValue={(option, selectedValue) => getValue(option) === getValue(selectedValue)}
       getOptionLabel={getOptionLabel}
-      value={selectedVal}
+      value={value}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -137,6 +131,12 @@ export default createBuiltin(FormWrappedAutocomplete, {
       helperText: 'The value of the autocomplete.',
       type: 'string',
       onChangeProp: 'onChange',
+      default: '',
+      defaultValueProp: 'defaultValue',
+    },
+    defaultValue: {
+      helperText: 'A default value.',
+      type: 'string',
       default: '',
     },
     label: {

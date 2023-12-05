@@ -63,6 +63,7 @@ import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
+import packageInfo from '../packageInfo';
 
 declare global {
   // eslint-disable-next-line
@@ -391,8 +392,8 @@ function mergeApplicationIntoDom(dom: appDom.AppDom, applicationFile: Applicatio
   const app = appDom.getApp(dom);
 
   dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'authorization', {
-    ...applicationFileSpec.authorization,
-    roles: applicationFileSpec.authorization?.roles?.map((role) =>
+    ...applicationFileSpec?.authorization,
+    roles: applicationFileSpec?.authorization?.roles?.map((role) =>
       typeof role === 'string' ? { name: role } : role,
     ),
   });
@@ -876,11 +877,17 @@ function extractApplicationFromDom(dom: appDom.AppDom): Application | null {
   };
 }
 
+function getSchemaUrl(obj: string) {
+  return `https://raw.githubusercontent.com/mui/mui-toolpad/v${packageInfo.version}/docs/schemas/v1/definitions.json#properties/${obj}`;
+}
+
 async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
       const pageFileName = getPageFile(root, name);
-      await updateYamlFile(pageFileName, optimizePage(page));
+      await updateYamlFile(pageFileName, optimizePage(page), {
+        schemaUrl: getSchemaUrl('Page'),
+      });
     }),
   );
 }
@@ -888,7 +895,9 @@ async function writePagesToFiles(root: string, pages: PagesContent) {
 async function writeThemeFile(root: string, theme: Theme | null) {
   const themeFilePath = getThemeFile(root);
   if (theme) {
-    await updateYamlFile(themeFilePath, theme);
+    await updateYamlFile(themeFilePath, theme, {
+      schemaUrl: getSchemaUrl('Theme'),
+    });
   } else {
     await fs.rm(themeFilePath, { recursive: true, force: true });
   }

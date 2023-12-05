@@ -24,3 +24,8 @@ spec:
         height: 244
         rowsSource: dataProvider
   display: shell
+  queries:
+    - name: dataProviders
+      query:
+        function: hello
+        kind: local

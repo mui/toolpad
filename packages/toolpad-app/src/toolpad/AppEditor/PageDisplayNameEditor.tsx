@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material';
 import * as React from 'react';
-import { AppDom, PageNode, setNodeProp } from '../../appDom';
+import { AppDom, PageNode, setNodeNamespacedProp } from '../../appDom';
 import { useDomApi } from '../AppState';
 
 interface PageDisplayNameEditorProps {
@@ -17,7 +17,7 @@ function validateInput(input: string) {
 export default function PageDisplayNameEditor({ node }: PageDisplayNameEditorProps) {
   const domApi = useDomApi();
   const [pageDisplayNameInput, setPageDisplayNameInput] = React.useState(
-    node.displayName ?? node.name,
+    node.attributes.displayName ?? node.name,
   );
 
   const handlePageDisplayNameChange = React.useCallback(
@@ -26,8 +26,8 @@ export default function PageDisplayNameEditor({ node }: PageDisplayNameEditorPro
   );
 
   const handleCommit = React.useCallback(() => {
-    domApi.update((appDom: AppDom) =>
-      setNodeProp(appDom, node, 'displayName', pageDisplayNameInput),
+    domApi.update((dom: AppDom) =>
+      setNodeNamespacedProp(dom, node, 'attributes', 'displayName', pageDisplayNameInput),
     );
   }, [node, pageDisplayNameInput, domApi]);
 

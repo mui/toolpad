@@ -509,7 +509,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       apiVersion: API_VERSION,
       kind: 'page',
       spec: {
-        displayName: node.displayName,
+        displayName: node.attributes.displayName,
         alias: node.attributes.alias,
         title: node.attributes.title,
         parameters: undefinedWhenEmpty(

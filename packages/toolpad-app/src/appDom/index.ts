@@ -55,7 +55,6 @@ export interface AppDomNodeBase {
   readonly id: NodeId;
   readonly type: AppDomNodeType;
   readonly name: string;
-  readonly displayName?: string;
   readonly parentId: NodeId | null;
   readonly parentProp: string | null;
   readonly parentIndex: string | null;
@@ -92,6 +91,7 @@ export interface PageNode extends AppDomNodeBase {
     readonly module?: string;
     readonly display?: PageDisplayMode;
     readonly codeFile?: string;
+    readonly displayName?: string;
   };
 }
 

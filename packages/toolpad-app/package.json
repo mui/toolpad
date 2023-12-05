@@ -164,7 +164,7 @@
     "formidable": "3.5.1",
     "get-port": "7.0.0",
     "monaco-editor": "0.44.0",
-    "react-devtools-inline": "4.28.5",
+    "react-devtools-inline": "5.0.0",
     "react-transition-group": "4.4.5",
     "webpack": "5.89.0"
   },

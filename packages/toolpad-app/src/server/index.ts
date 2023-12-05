@@ -394,8 +394,8 @@ async function createAuthHandler(): Promise<AppHandler> {
             : []),
         ],
         secret: process.env.TOOLPAD_AUTH_SECRET,
-        skipCSRFCheck,
-        trustHost: true,
+        // skipCSRFCheck,
+        // trustHost: true,
         callbacks: {
           async signIn({ account, profile }) {
             const isEmailDomainValid = Boolean(

@@ -410,7 +410,7 @@ async function createAuthHandler(base: string): Promise<AppHandler> {
             return isEmailDomainValid;
           },
           async redirect({ baseUrl }) {
-            return `${baseUrl}/prod`;
+            return `${baseUrl}${base}`;
           },
         },
       })) as Response;

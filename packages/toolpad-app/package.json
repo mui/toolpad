@@ -101,7 +101,7 @@
     "latest-version": "7.0.0",
     "lodash-es": "4.17.21",
     "markdown-to-jsx": "7.3.2",
-    "mime": "3.0.0",
+    "mime": "4.0.0",
     "mysql2": "3.6.5",
     "nanoid": "5.0.4",
     "node-fetch": "2.7.0",

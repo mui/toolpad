@@ -1463,10 +1463,12 @@ interface RenderedPagesProps {
 }
 
 function RenderedPages({ pages }: RenderedPagesProps) {
+  const { search } = useLocation();
+
   const defaultPage = pages[0];
 
-  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}`} replace />;
-  const { search } = useLocation();
+  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
+
   return (
     <Routes>
       {pages.map((page) => (

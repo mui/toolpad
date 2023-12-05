@@ -399,14 +399,13 @@ async function createAuthHandler(): Promise<AppHandler> {
         callbacks: {
           async signIn({ account, profile }) {
             const isEmailDomainValid = Boolean(
-              profile &&
-                profile.email &&
+              profile?.email &&
                 (!process.env.TOOLPAD_AUTH_DOMAIN ||
                   profile.email.endsWith(`@${process.env.TOOLPAD_AUTH_DOMAIN}`)),
             );
 
-            if (profile && account && account.provider === 'google') {
-              return Boolean(profile.email_verified) && isEmailDomainValid;
+            if (account?.provider === 'google') {
+              return Boolean(profile?.email_verified) && isEmailDomainValid;
             }
             return isEmailDomainValid;
           },

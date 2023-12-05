@@ -16,6 +16,8 @@ import {
   Tooltip,
   Button,
   useTheme,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -27,8 +29,10 @@ import api from './api';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
+const AUTH_ERROR_URL_PARAM = 'error';
+
 // Url params that will be carried over to the next page
-const RETAINED_URL_PARAMS = new Set([TOOLPAD_DISPLAY_MODE_URL_PARAM]);
+const RETAINED_URL_PARAMS = new Set([TOOLPAD_DISPLAY_MODE_URL_PARAM, AUTH_ERROR_URL_PARAM]);
 
 export interface NavigationEntry {
   slug: string;
@@ -163,6 +167,26 @@ export function AppLayout({
     [activePageSlug, pages],
   );
 
+  const [errorSnackbarMessage, setErrorSnackbarMessage] = React.useState<string>('');
+
+  React.useEffect(() => {
+    const authError = urlParams.get(AUTH_ERROR_URL_PARAM);
+
+    if (authError === 'AuthorizedCallbackError') {
+      setErrorSnackbarMessage('Access unauthorized.');
+    } else if (authError === 'CallbackRouteError') {
+      setErrorSnackbarMessage(
+        'There was an error with your authentication provider configuration.',
+      );
+    } else if (authError) {
+      setErrorSnackbarMessage('An authentication error occurred.');
+    }
+  }, [urlParams]);
+
+  const handleErrorSnackbarClose = React.useCallback(() => {
+    setErrorSnackbarMessage('');
+  }, []);
+
   return (
     <React.Fragment>
       {hasHeader ? (
@@ -277,6 +301,15 @@ export function AppLayout({
           {children}
         </Box>
       </Box>
+      <Snackbar
+        open={!!errorSnackbarMessage}
+        autoHideDuration={6000}
+        onClose={handleErrorSnackbarClose}
+      >
+        <Alert onClose={handleErrorSnackbarClose} severity="error">
+          {errorSnackbarMessage}
+        </Alert>
+      </Snackbar>
     </React.Fragment>
   );
 }

@@ -759,7 +759,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     nodeRuntime?.updateEditorNodeData('rawRows', rows);
   }, [nodeRuntime, rows]);
 
-  const renderedColumns = React.useMemo(() => {
+  const renderedColumns = React.useMemo<GridColDef[]>(() => {
     if (getProviderActions) {
       return [
         ...columns,
@@ -771,7 +771,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           align: 'right',
           getActions: getProviderActions,
         },
-      ] satisfies GridColDef[];
+      ];
     }
 
     return columns;

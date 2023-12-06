@@ -171,7 +171,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
     [':pages'],
   );
 
-  const activeNodeId = currentView.name ? appDom.getNodeIdByName(dom, currentView.name) : null;
+  const activePage = currentView.name ? appDom.getPageByName(dom, currentView.name) : null;
 
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setExpanded(nodeIds as NodeId[]);
@@ -270,7 +270,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       const deletedNode = appDom.getNode(dom, nodeId);
 
       let domViewAfterDelete: DomView | undefined;
-      if (nodeId === activeNodeId) {
+      if (nodeId === activePage?.id) {
         const siblings = appDom.getSiblings(dom, deletedNode);
         const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
         domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
@@ -283,7 +283,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         domViewAfterDelete || { kind: 'page' },
       );
     },
-    [projectApi, activeNodeId, appStateApi, dom],
+    [projectApi, activePage?.id, appStateApi, dom],
   );
 
   const handleRenameNode = React.useCallback(
@@ -338,7 +338,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       <TreeView
         ref={pagesTreeRef}
         aria-label="Pages explorer"
-        selected={activeNodeId ? [activeNodeId] : []}
+        selected={activePage ? [activePage.id] : []}
         onNodeSelect={handleSelect}
         expanded={expanded}
         onNodeToggle={handleToggle}

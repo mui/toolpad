@@ -21,6 +21,7 @@ import {
   GridColTypeDef,
   GridPaginationModel,
   GridActionsColDef,
+  GridRowId,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -33,6 +34,8 @@ import {
   UseDataProviderContext,
   CursorPaginationModel,
   IndexPaginationModel,
+  ToolpadDataProviderBase,
+  PaginationMode,
 } from '@mui/toolpad-core';
 import {
   Box,
@@ -45,6 +48,7 @@ import {
   Tooltip,
   Popover,
   IconButton,
+  CircularProgress,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
@@ -477,6 +481,33 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   onRawRowsChange?: (rows: GridRowsProp) => void;
 }
 
+interface DeleteActionProps {
+  id: GridRowId;
+  dataProvider: ToolpadDataProviderBase<unknown, PaginationMode>;
+  refetch: () => unknown;
+}
+
+function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
+  const [loading, setLoading] = React.useState(false);
+
+  const handleDeleteClick = React.useCallback(async () => {
+    invariant(dataProvider.deleteRecord, 'dataProvider must be defined');
+    setLoading(true);
+    try {
+      await dataProvider.deleteRecord(id);
+      await refetch();
+    } finally {
+      setLoading(false);
+    }
+  }, [dataProvider, id, refetch]);
+
+  return (
+    <IconButton onClick={handleDeleteClick} size="small">
+      {loading ? <CircularProgress size={16} /> : <DeleteIcon fontSize="inherit" />}
+    </IconButton>
+  );
+}
+
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
   error?: unknown;
   getActions?: GridActionsColDef['getActions'];
@@ -563,16 +594,8 @@ function useDataProviderDataGridProps(
       const result = [];
 
       if (dataProvider?.deleteRecord) {
-        const handleDeleteClick = async () => {
-          invariant(dataProvider?.deleteRecord, 'dataProvider must be defined');
-          await dataProvider.deleteRecord(id);
-          await refetch();
-        };
-
         result.push(
-          <IconButton key="delete" onClick={handleDeleteClick} size="small">
-            <DeleteIcon fontSize="inherit" />
-          </IconButton>,
+          <DeleteAction key="delete" id={id} dataProvider={dataProvider} refetch={refetch} />,
         );
       }
       return result;

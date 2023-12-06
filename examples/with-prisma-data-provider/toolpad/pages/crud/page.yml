@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: page
 spec:
-  title: Prisma data source example
+  title: Prisma data source CRUD example
   content:
     - component: Text
       name: text
@@ -32,4 +32,4 @@ spec:
             width: 335
         height: 474
         rowsSource: dataProvider
-        dataProviderId: usersByIndex.ts:default
+        dataProviderId: crud.ts:default

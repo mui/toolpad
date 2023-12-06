@@ -13,6 +13,7 @@ const prisma: PrismaClient = (globalThis as any).__prisma;
 
 export default createDataProvider({
   paginationMode: 'cursor',
+
   async getRecords({ paginationModel: { cursor, pageSize } }) {
     const userRecords = await prisma.user.findMany({
       cursor: cursor

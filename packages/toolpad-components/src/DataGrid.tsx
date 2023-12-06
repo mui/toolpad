@@ -20,6 +20,7 @@ import {
   getGridDefaultColumnTypes,
   GridColTypeDef,
   GridPaginationModel,
+  GridActionsColDef,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -43,7 +44,9 @@ import {
   Typography,
   Tooltip,
   Popover,
+  IconButton,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
@@ -476,6 +479,7 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
 
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
   error?: unknown;
+  getActions?: GridActionsColDef['getActions'];
 }
 
 function useDataProviderDataGridProps(
@@ -493,7 +497,7 @@ function useDataProviderDataGridProps(
 
   const mapPageToNextCursor = React.useRef(new Map<number, string>());
 
-  const { data, isFetching, isPlaceholderData, isLoading, error } = useQuery({
+  const { data, isFetching, isPlaceholderData, isLoading, error, refetch } = useQuery({
     enabled: !!dataProvider,
     queryKey: ['toolpadDataProvider', dataProviderId, page, pageSize],
     placeholderData: keepPreviousData,
@@ -550,6 +554,31 @@ function useDataProviderDataGridProps(
     (data?.hasNextPage ? (paginationModel.page + 1) * paginationModel.pageSize + 1 : undefined) ??
     0;
 
+  const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
+    if (!dataProvider?.deleteRecord) {
+      return undefined;
+    }
+
+    return ({ id }) => {
+      const result = [];
+
+      if (dataProvider?.deleteRecord) {
+        const handleDeleteClick = async () => {
+          invariant(dataProvider?.deleteRecord, 'dataProvider must be defined');
+          await dataProvider.deleteRecord(id);
+          await refetch();
+        };
+
+        result.push(
+          <IconButton key="delete" onClick={handleDeleteClick} size="small">
+            <DeleteIcon fontSize="inherit" />
+          </IconButton>,
+        );
+      }
+      return result;
+    };
+  }, [dataProvider, refetch]);
+
   if (!dataProvider) {
     return {};
   }
@@ -570,6 +599,7 @@ function useDataProviderDataGridProps(
     },
     rows: data?.records ?? [],
     error,
+    getActions,
   };
 }
 
@@ -594,9 +624,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { rows: dataProviderRowsInput, ...dataProviderProps } = useDataProviderDataGridProps(
-    rowsSource === 'dataProvider' ? dataProviderId : null,
-  );
+  const {
+    rows: dataProviderRowsInput,
+    getActions: getProviderActions,
+    ...dataProviderProps
+  } = useDataProviderDataGridProps(rowsSource === 'dataProvider' ? dataProviderId : null);
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
@@ -727,6 +759,24 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     nodeRuntime?.updateEditorNodeData('rawRows', rows);
   }, [nodeRuntime, rows]);
 
+  const renderedColumns = React.useMemo(() => {
+    if (getProviderActions) {
+      return [
+        ...columns,
+        {
+          field: '___actions',
+          type: 'actions',
+          headerName: '',
+          flex: 1,
+          align: 'right',
+          getActions: getProviderActions,
+        },
+      ] satisfies GridColDef[];
+    }
+
+    return columns;
+  }, [columns, getProviderActions]);
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <div
@@ -752,7 +802,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               onColumnResize={handleResize}
               onColumnOrderChange={handleColumnOrderChange}
               rows={rows}
-              columns={columns}
+              columns={renderedColumns}
               key={gridKey}
               getRowId={getRowId}
               onRowSelectionModelChange={onSelectionModelChange}

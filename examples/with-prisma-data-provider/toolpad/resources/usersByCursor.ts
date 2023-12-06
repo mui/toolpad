@@ -1,15 +1,10 @@
-/* eslint-disable no-underscore-dangle */
 /**
  * Toolpad data provider file.
  * See: https://mui.com/toolpad/concepts/data-providers/
  */
 
 import { createDataProvider } from '@mui/toolpad/server';
-import { PrismaClient } from '@prisma/client';
-
-// Reuse existing PrismaClient instance during development
-(globalThis as any).__prisma ??= new PrismaClient();
-const prisma: PrismaClient = (globalThis as any).__prisma;
+import prisma from '../prisma';
 
 export default createDataProvider({
   paginationMode: 'cursor',

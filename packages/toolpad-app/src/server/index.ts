@@ -9,7 +9,7 @@ import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
 import type { ViteDevServer } from 'vite';
 import { WebSocket, WebSocketServer } from 'ws';
-import { Auth, skipCSRFCheck } from '@auth/core';
+import { Auth } from '@auth/core';
 import GithubProvider from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import { listen } from '@mui/toolpad-utils/http';
@@ -31,6 +31,7 @@ import { createRpcHandler } from './rpc';
 import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
+import { encodeRequestBody } from './httpApiAdapters';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -358,7 +359,7 @@ async function createAuthHandler(base: string): Promise<AppHandler> {
       const request = new Request(`${req.protocol}://${req.get('host')}${req.originalUrl}`, {
         method: req.method,
         headers,
-        body: req.body,
+        body: /GET|HEAD/.test(req.method) ? undefined : encodeRequestBody(req),
       });
 
       const response = (await Auth(request, {
@@ -394,7 +395,6 @@ async function createAuthHandler(base: string): Promise<AppHandler> {
             : []),
         ],
         secret: process.env.TOOLPAD_AUTH_SECRET,
-        skipCSRFCheck,
         trustHost: true,
         callbacks: {
           async signIn({ account, profile }) {
@@ -459,7 +459,7 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
   app.use(toolpadHandler.handler);
 
   const authHandler = await createAuthHandler(config.base);
-  app.use('/api/auth', authHandler.handler);
+  app.use('/api/auth', express.urlencoded({ extended: true }), authHandler.handler);
 
   const runningServer = await listen(httpServer, port);
 

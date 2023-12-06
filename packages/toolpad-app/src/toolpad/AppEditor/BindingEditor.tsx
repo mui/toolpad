@@ -365,8 +365,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const pageName = event.target.value;
-      const pageId = appDom.getNodeIdByName(dom, pageName);
-      const page = pageId ? appDom.getNode(dom, pageId) : null;
+      const page = appDom.getPageByName(dom, pageName);
 
       const defaultActionParameters =
         page && appDom.isPage(page) ? getDefaultActionParameters(page) : {};

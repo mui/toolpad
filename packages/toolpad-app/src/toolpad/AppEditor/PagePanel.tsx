@@ -6,6 +6,7 @@ import PageHierarchyExplorer from './HierarchyExplorer';
 import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
 import { useProject } from '../../project';
+import * as appDom from '../../appDom';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
@@ -19,7 +20,10 @@ export interface ComponentPanelProps {
 
 export default function PagePanel({ className, sx }: ComponentPanelProps) {
   const project = useProject();
-  const { dom } = useAppState();
+  const { dom, currentView } = useAppState();
+
+  const currentPageId = currentView?.name ? appDom.getNodeIdByName(dom, currentView?.name) : null;
+  const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
 
   return (
     <PagePanelRoot className={className} sx={sx}>
@@ -44,10 +48,14 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
         <Panel minSizePercentage={10} defaultSizePercentage={30} maxSizePercentage={75}>
           <PagesExplorer />
         </Panel>
-        <PanelResizeHandle />
-        <Panel minSizePercentage={25} maxSizePercentage={90}>
-          <PageHierarchyExplorer />
-        </Panel>
+        {currentPageNode && !appDom.isCodePage(currentPageNode) ? (
+          <React.Fragment>
+            <PanelResizeHandle />
+            <Panel minSizePercentage={25} maxSizePercentage={90}>
+              <PageHierarchyExplorer />
+            </Panel>
+          </React.Fragment>
+        ) : null}
       </PanelGroup>
     </PagePanelRoot>
   );

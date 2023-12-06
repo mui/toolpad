@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.1.39
+
+<!-- generated comparing v0.1.38..master -->
+
+_Dec 1, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Pages are now routed to by their name. Bug fixes.
+
+- &#8203;<!-- 16 -->Make routing page name based (#2949) @Janpot
+- &#8203;<!-- 14 -->Update monorepo (#2955) @Janpot
+- &#8203;<!-- 13 -->Tweak titles to improve SERP results (#2954) @Janpot
+- &#8203;<!-- 12 -->Allow omitting page.yml for code pages (#2947) @Janpot
+- &#8203;<!-- 11 -->Use ESM for CLI (#2920) @Janpot
+- &#8203;<!-- 10 -->Update documentation for HTTP requests secret handling (#2951) @prakhargupta1
+- &#8203;<!-- 09 -->Refactor virtual files implementation (#2946) @Janpot
+- &#8203;<!-- 08 -->Make page title optional in the yml files (#2948) @Janpot
+- &#8203;<!-- 07 -->Update CONTRIBUTING.md (#2940) @Janpot
+- &#8203;<!-- 06 -->Fix Toolpad not picking a free port (#2943) @Janpot
+- &#8203;<!-- 05 -->Fix crash when function result type contains a constructor property (#2941) @Janpot
+- &#8203;<!-- 04 -->Fix Date serialization in serverless functions (#2942) @Janpot
+- &#8203;<!-- 03 -->Link the latest 3 examples to the overview page (#2933) @prakhargupta1
+- &#8203;<!-- 02 -->[docs] Fix 404 regressions in the docs (#2939) @oliviertassinari
+- &#8203;<!-- 01 -->[Example] Run Next.js and Toolpad together (#2918) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
 ## v0.1.38
 
 <!-- generated comparing v0.1.37..master -->

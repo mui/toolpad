@@ -1,8 +1,8 @@
-import { NodeHashes, NodeId } from '@mui/toolpad-core';
+import { NodeHashes } from '@mui/toolpad-core';
 import * as React from 'react';
 
 export interface NavigateToPage {
-  (pageNodeId: NodeId, pageParameters?: Record<string, string>): void;
+  (name: string, pageParameters?: Record<string, string>): void;
 }
 
 /**

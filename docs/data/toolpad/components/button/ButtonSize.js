@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button } from '@mui/toolpad-components';
-import { Stack } from '@mui/material';
+import Stack from '@mui/material/Stack';
 
 const TOOLPAD_PROPS1 = {
   size: 'small',

@@ -1,6 +1,6 @@
 # Event Handling
 
-<p class="description">User actions create events which are handled in two ways in Toolpad</p>
+<p class="description">User actions create events that are handled in two ways in Toolpad.</p>
 
 ## JS expression actions
 

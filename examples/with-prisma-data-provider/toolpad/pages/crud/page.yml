@@ -30,6 +30,6 @@ spec:
           - field: email
             type: string
             width: 335
-        height: 474
+        height: 336
         rowsSource: dataProvider
         dataProviderId: crud.ts:default

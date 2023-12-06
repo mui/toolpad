@@ -409,8 +409,8 @@ async function createAuthHandler(base: string): Promise<AppHandler> {
             }
             return isEmailDomainValid;
           },
-          async redirect() {
-            return `${req.protocol}://${req.headers.host}${base}`;
+          async redirect({ baseUrl }) {
+            return `${baseUrl}${base}`;
           },
         },
       })) as Response;

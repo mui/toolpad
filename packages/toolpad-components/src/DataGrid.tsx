@@ -817,8 +817,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const lastActionError = useLatest(actionError);
 
   React.useEffect(() => {
-    // Log error to console as well for full stacktrace
-    console.error(actionError);
+    if (actionError) {
+      // Log error to console as well for full stacktrace
+      console.error(actionError);
+    }
   }, [actionError]);
 
   return (

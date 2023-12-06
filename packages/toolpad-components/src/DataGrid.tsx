@@ -49,8 +49,11 @@ import {
   Popover,
   IconButton,
   CircularProgress,
+  Alert,
+  Collapse,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
@@ -60,6 +63,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import invariant from 'invariant';
 import { NumberFormat, createFormat as createNumberFormat } from '@mui/toolpad-core/numberFormat';
 import { DateFormat, createFormat as createDateFormat } from '@mui/toolpad-core/dateFormat';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
@@ -71,6 +75,8 @@ const LICENSE_INFO: MuiLicenseInfo = {
 };
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
+
+const SetActionErrorContext = React.createContext<((error: Error) => void) | undefined>(undefined);
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -490,16 +496,21 @@ interface DeleteActionProps {
 function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
   const [loading, setLoading] = React.useState(false);
 
+  const setActionError = React.useContext(SetActionErrorContext);
+  invariant(setActionError, 'setActionError must be defined');
+
   const handleDeleteClick = React.useCallback(async () => {
     invariant(dataProvider.deleteRecord, 'dataProvider must be defined');
     setLoading(true);
     try {
       await dataProvider.deleteRecord(id);
       await refetch();
+    } catch (error) {
+      setActionError(errorFrom(error));
     } finally {
       setLoading(false);
     }
-  }, [dataProvider, id, refetch]);
+  }, [dataProvider, id, refetch, setActionError]);
 
   return (
     <IconButton onClick={handleDeleteClick} size="small">
@@ -800,6 +811,16 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     return columns;
   }, [columns, getProviderActions]);
 
+  const [actionError, setActionError] = React.useState<Error | null>();
+
+  const open = !!actionError;
+  const lastActionError = useLatest(actionError);
+
+  React.useEffect(() => {
+    // Log error to console as well for full stacktrace
+    console.error(actionError);
+  }, [actionError]);
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <div
@@ -816,25 +837,49 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           }}
         >
           <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
-            <DataGridPro
-              apiRef={apiRef}
-              slots={{
-                toolbar: hideToolbar ? null : GridToolbar,
-                loadingOverlay: SkeletonLoadingOverlay,
-              }}
-              onColumnResize={handleResize}
-              onColumnOrderChange={handleColumnOrderChange}
-              rows={rows}
-              columns={renderedColumns}
-              key={gridKey}
-              getRowId={getRowId}
-              onRowSelectionModelChange={onSelectionModelChange}
-              rowSelectionModel={selectionModel}
-              {...props}
-              {...dataProviderProps}
-            />
+            <SetActionErrorContext.Provider value={setActionError}>
+              <DataGridPro
+                apiRef={apiRef}
+                slots={{
+                  toolbar: hideToolbar ? null : GridToolbar,
+                  loadingOverlay: SkeletonLoadingOverlay,
+                }}
+                onColumnResize={handleResize}
+                onColumnOrderChange={handleColumnOrderChange}
+                rows={rows}
+                columns={renderedColumns}
+                key={gridKey}
+                getRowId={getRowId}
+                onRowSelectionModelChange={onSelectionModelChange}
+                rowSelectionModel={selectionModel}
+                {...props}
+                {...dataProviderProps}
+              />
+            </SetActionErrorContext.Provider>
           </ErrorBoundary>
         </div>
+
+        <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
+          <Collapse in={!!open}>
+            <Alert
+              severity="error"
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                    setActionError(null);
+                  }}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              {lastActionError?.message}
+            </Alert>
+          </Collapse>
+        </Box>
       </div>
     </LicenseInfoProvider>
   );

@@ -39,8 +39,8 @@
   },
   "dependencies": {
     "@mui/icons-material": "5.14.19",
-    "@mui/lab": "5.0.0-alpha.154",
-    "@mui/material": "5.14.19",
+    "@mui/lab": "5.0.0-alpha.155",
+    "@mui/material": "5.14.20",
     "@mui/toolpad-core": "0.1.39",
     "@mui/toolpad-utils": "0.1.39",
     "@mui/x-charts": "6.18.3",

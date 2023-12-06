@@ -409,8 +409,8 @@ async function createAuthHandler(base: string): Promise<AppHandler> {
             }
             return isEmailDomainValid;
           },
-          async redirect({ url: callbackUrl }) {
-            return `${callbackUrl}${base}`;
+          async redirect() {
+            return `${req.protocol}://${req.headers.host}${base}`;
           },
         },
       })) as Response;

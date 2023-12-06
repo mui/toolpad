@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: page
 spec:
-  id: BKAYeeK
-  title: Default page
+  title: Supabase example
   queries:
     - name: query
       query:

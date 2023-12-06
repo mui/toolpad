@@ -50,7 +50,7 @@ export default function PageOptionsPanel() {
           <Typography variant="inherit">
             Control how the navigation panel is rendered in the final application. Read more in the{' '}
             <Link
-              href="https://mui.com/toolpad/concepts/display-mode/"
+              href="https://mui.com/toolpad/concepts/page-properties/#display-mode"
               target="_blank"
               rel="noopener"
             >
@@ -76,9 +76,13 @@ export default function PageOptionsPanel() {
           })}
         </ToggleButtonGroup>
       </Tooltip>
-      <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
-      <Typography variant="overline">Page State:</Typography>
-      <UrlQueryEditor pageNodeId={pageNodeId} />
+      {appDom.isCodePage(page) ? null : (
+        <React.Fragment>
+          <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
+          <Typography variant="overline">Page State:</Typography>
+          <UrlQueryEditor pageNodeId={pageNodeId} />
+        </React.Fragment>
+      )}
     </Stack>
   );
 }

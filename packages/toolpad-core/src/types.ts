@@ -389,7 +389,7 @@ export type RuntimeEvents = {
   };
   screenUpdate: {};
   ready: {};
-  pageNavigationRequest: { pageNodeId: NodeId };
+  pageNavigationRequest: { pageName: string };
   vmUpdated: { vm: ApplicationVm };
 };
 

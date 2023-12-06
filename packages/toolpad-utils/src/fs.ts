@@ -62,10 +62,25 @@ export async function writeFileRecursive(
   await fs.writeFile(filePath, content, options);
 }
 
-export async function updateYamlFile(filePath: string, content: object) {
+export interface UpdateYamlOptions {
+  schemaUrl?: string;
+}
+
+export async function updateYamlFile(
+  filePath: string,
+  content: object,
+  options?: UpdateYamlOptions,
+) {
   const oldContent = await readMaybeFile(filePath);
 
   let newContent = oldContent ? yamlOverwrite(oldContent, content) : yaml.stringify(content);
+
+  if (options?.schemaUrl) {
+    const yamlDoc = yaml.parseDocument(newContent);
+    yamlDoc.commentBefore = ` yaml-language-server: $schema=${options.schemaUrl}`;
+    newContent = yamlDoc.toString();
+  }
+
   newContent = await formatYaml(newContent, filePath);
   if (newContent !== oldContent) {
     await writeFileRecursive(filePath, newContent);

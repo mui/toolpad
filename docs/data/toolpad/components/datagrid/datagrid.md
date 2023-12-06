@@ -77,4 +77,4 @@ This prop is used to show – or hide – the toolbar from the data grid. The fo
 
 See the documentation below for a complete reference to all props available to the datagrid component in Toolpad.
 
-- [`<datagrid />`](/toolpad/reference/components/datagrid/#properties)
+- [`<datagrid />`](/toolpad/reference/components/data-grid/)

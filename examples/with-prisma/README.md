@@ -3,7 +3,7 @@
 <p class="description">A basic Toolpad application that demonstrates how to integrate with Prisma.</p>
 
 <a target="_blank">
-  <img src="https://mui.com//static/toolpad/marketing/with-prisma.png" alt="Toolpad example app with Prisma ORM" style="aspect-ratio: 1.8" width="100%">
+  <img src="https://mui.com/static/toolpad/marketing/with-prisma.png" alt="Toolpad example app with Prisma ORM" style="aspect-ratio: 575/317;" width="1439">
 </a>
 
 ## How to run
@@ -11,7 +11,7 @@
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app@latest  --example with-prisma
+npx create-toolpad-app@latest --example with-prisma
 ```
 
 ```bash

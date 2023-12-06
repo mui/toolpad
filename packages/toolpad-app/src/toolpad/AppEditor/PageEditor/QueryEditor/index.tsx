@@ -6,6 +6,8 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CircleIcon from '@mui/icons-material/Circle';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import { useAppState, useAppStateApi } from '../../../AppState';
+import { usePageEditorState } from '../PageEditorProvider';
+import * as appDom from '../../../../appDom';
 import QueryIcon from '../../QueryIcon';
 import QueryEditorPanel from './QueryEditorPanel';
 import useShortcut from '../../../../utils/useShortcut';
@@ -88,9 +90,12 @@ function TabCloseIcon({
 }
 
 export default function QueryEditor() {
-  const { currentView } = useAppState();
+  const { currentView, dom } = useAppState();
 
   const appStateApi = useAppStateApi();
+  const state = usePageEditorState();
+
+  const page = appDom.getNode(dom, state.nodeId, 'page');
 
   const currentQueryId = React.useMemo(() => {
     if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
@@ -114,7 +119,7 @@ export default function QueryEditor() {
         if (queryId) {
           appStateApi.setView({
             kind: 'page',
-            nodeId: currentView.nodeId,
+            name: page.name,
             view: { kind: 'query', nodeId: queryId },
             queryPanel: {
               ...currentView.queryPanel,
@@ -124,14 +129,14 @@ export default function QueryEditor() {
         }
       }
     },
-    [appStateApi, currentView],
+    [appStateApi, currentView, page.name],
   );
 
   const hasUnsavedChanges = React.useCallback(
     (queryIndex: number) => {
       if (
         currentView.kind !== 'page' ||
-        !currentView.nodeId ||
+        !currentView.name ||
         !currentView.queryPanel?.queryTabs ||
         queryIndex === undefined
       ) {
@@ -150,7 +155,7 @@ export default function QueryEditor() {
   const handleSave = React.useCallback(() => {
     if (
       currentView.kind !== 'page' ||
-      !currentView.nodeId ||
+      !currentView.name ||
       !currentView.queryPanel?.queryTabs ||
       currentView.queryPanel?.currentTabIndex === undefined
     ) {

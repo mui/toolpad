@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { NodeId } from '@mui/toolpad-core';
+import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../../components/resizablePanels';
 import RenderPanel from './RenderPanel';
 import { PageEditorProvider } from './PageEditorProvider';
@@ -9,7 +9,6 @@ import { useAppState } from '../../AppState';
 import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
-import usePageTitle from '../../../utils/usePageTitle';
 import useUndoRedo from '../../hooks/useUndoRedo';
 import QueryEditor from './QueryEditor';
 
@@ -33,7 +32,7 @@ interface PageEditorContentProps {
 }
 
 function PageEditorContent({ node }: PageEditorContentProps) {
-  usePageTitle(`${node.attributes.title} | Toolpad editor`);
+  usePageTitle(`${appDom.getPageTitle(node)} | Toolpad editor`);
   const { currentView } = useAppState();
   const showQuery =
     currentView.kind === 'page' &&
@@ -53,7 +52,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
           <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
             <Panel defaultSizePercentage={75} minSizePercentage={50} maxSizePercentage={80}>
               <PageEditorRoot>
-                <ComponentCatalog />
+                {appDom.isCodePage(node) ? null : <ComponentCatalog />}
                 <RenderPanel className={classes.renderPanel} />
               </PageEditorRoot>
             </Panel>
@@ -81,18 +80,18 @@ function PageEditorContent({ node }: PageEditorContentProps) {
 }
 
 interface PageEditorProps {
-  nodeId?: NodeId;
+  name: string;
 }
 
-export default function PageEditor({ nodeId }: PageEditorProps) {
+export default function PageEditor({ name }: PageEditorProps) {
   const { dom } = useAppState();
-  const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
+  const pageNode = React.useMemo(() => appDom.getPageByName(dom, name), [dom, name]);
 
   useUndoRedo();
 
   return pageNode ? (
     <PageEditorContent node={pageNode} />
   ) : (
-    <NotFoundEditor message={`Non-existing Page "${nodeId}"`} />
+    <NotFoundEditor message={`Non-existing Page "${name}"`} />
   );
 }

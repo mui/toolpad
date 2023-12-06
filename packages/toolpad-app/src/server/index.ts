@@ -7,7 +7,7 @@ import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@mui/toolpad-utils/collections';
 import prettyBytes from 'pretty-bytes';
-import { ViteDevServer, createServer as createViteServer } from 'vite';
+import type { ViteDevServer } from 'vite';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
 // eslint-disable-next-line import/extensions
@@ -51,7 +51,7 @@ async function createDevHandler(project: ToolpadProject) {
 
   handler.use(cors());
 
-  const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.js');
+  const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.mjs');
 
   const [wsPort, devPort, runtimeConfig] = await Promise.all([
     getPort(),
@@ -244,8 +244,9 @@ async function createEditorHandler(
     // eslint-disable-next-line no-console
     console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
 
-    viteApp = await createViteServer({
-      configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.ts'),
+    const vite = await import('vite');
+    viteApp = await vite.createServer({
+      configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.mts'),
       root: path.resolve(currentDirectory, '../../src/toolpad'),
       server: { middlewareMode: true },
       plugins: [
@@ -442,7 +443,7 @@ export async function runApp({
   dev = false,
   dir = '.',
   base = '/prod',
-  port = 3000,
+  port,
   toolpadDevMode = false,
 }: RunAppOptions) {
   const projectDir = resolveProjectDir(dir);

@@ -32,8 +32,7 @@ export interface ComponentPanelProps {
 }
 
 export default function ComponentPanel({ className }: ComponentPanelProps) {
-  const { dom } = useAppState();
-  const { currentView } = useAppState();
+  const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
 
   const currentTab = currentView.kind === 'page' ? currentView.pageViewTab : null;

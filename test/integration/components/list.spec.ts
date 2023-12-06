@@ -16,7 +16,7 @@ test.use({
 
 test('list component behavior', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('list');
+  await runtimeModel.goToPage('list');
 
   const firstInput = page.getByLabel('textField0');
   const secondInput = page.getByLabel('textField1');

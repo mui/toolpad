@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: page
 spec:
-  id: evZC-gp
-  title: Default page
+  title: Npm stats
   queries:
     - name: versionLastWeek
       query:

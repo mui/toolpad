@@ -8,6 +8,7 @@ import AppOptions from '../AppOptions';
 import { QueriesExplorer, ActionsExplorer } from './PageEditor/QueriesExplorer';
 import { PAGE_PANEL_WIDTH } from '../../constants';
 import { useProject } from '../../project';
+import * as appDom from '../../appDom';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
@@ -22,7 +23,9 @@ export interface ComponentPanelProps {
 
 export default function PagePanel({ className, sx }: ComponentPanelProps) {
   const project = useProject();
-  const { dom } = useAppState();
+  const { dom, currentView } = useAppState();
+
+  const currentPageNode = currentView?.name ? appDom.getPageByName(dom, currentView.name) : null;
 
   return (
     <PagePanelRoot className={className} sx={sx}>
@@ -47,18 +50,22 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
         <Panel minSizePercentage={10} defaultSizePercentage={20} maxSizePercentage={75}>
           <PagesExplorer />
         </Panel>
-        <PanelResizeHandle />
-        <Panel minSizePercentage={25} defaultSizePercentage={30} maxSizePercentage={90}>
-          <PageHierarchyExplorer />
-        </Panel>
-        <PanelResizeHandle />
-        <Panel minSizePercentage={10} defaultSizePercentage={25} maxSizePercentage={90}>
-          <QueriesExplorer />
-        </Panel>
-        <PanelResizeHandle />
-        <Panel minSizePercentage={10} defaultSizePercentage={25} maxSizePercentage={90}>
-          <ActionsExplorer />
-        </Panel>
+        {currentPageNode && !appDom.isCodePage(currentPageNode) ? (
+          <React.Fragment>
+            <PanelResizeHandle />
+            <Panel minSizePercentage={25} defaultSizePercentage={30} maxSizePercentage={90}>
+              <PageHierarchyExplorer />
+            </Panel>
+            <PanelResizeHandle />
+            <Panel minSizePercentage={10} defaultSizePercentage={25} maxSizePercentage={90}>
+              <QueriesExplorer />
+            </Panel>
+            <PanelResizeHandle />
+            <Panel minSizePercentage={10} defaultSizePercentage={25} maxSizePercentage={90}>
+              <ActionsExplorer />
+            </Panel>
+          </React.Fragment>
+        ) : null}
       </PanelGroup>
     </PagePanelRoot>
   );

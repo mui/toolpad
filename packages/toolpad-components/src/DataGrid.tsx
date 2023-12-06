@@ -513,7 +513,7 @@ function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
   }, [dataProvider, id, refetch, setActionError]);
 
   return (
-    <IconButton onClick={handleDeleteClick} size="small">
+    <IconButton onClick={handleDeleteClick} size="small" aria-label={`Delete row with id "${id}"`}>
       {loading ? <CircularProgress size={16} /> : <DeleteIcon fontSize="inherit" />}
     </IconButton>
   );

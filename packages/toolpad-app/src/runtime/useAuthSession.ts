@@ -55,7 +55,7 @@ export function useAuthSession(): AuthSessionPayload {
           'Content-Type': 'application/x-www-form-urlencoded',
           'X-Auth-Return-Redirect': '1',
         },
-        body: new URLSearchParams({ csrfToken }),
+        body: new URLSearchParams({ csrfToken, callbackUrl: window.location.href }),
       });
     } catch (error) {
       console.error((error as Error).message);
@@ -90,7 +90,7 @@ export function useAuthSession(): AuthSessionPayload {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Auth-Return-Redirect': '1',
           },
-          body: new URLSearchParams({ csrfToken }),
+          body: new URLSearchParams({ csrfToken, callbackUrl: window.location.href }),
         });
         const { url: signInUrl } = await signInResponse.json();
 

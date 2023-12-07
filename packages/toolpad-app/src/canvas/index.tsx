@@ -8,7 +8,7 @@ import { AppCanvasState } from '../types';
 import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
-import { bridge, setCommandHandler } from './ToolpadBridge';
+import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
 
 const handleScreenUpdate = throttle(
   () => {
@@ -25,6 +25,7 @@ export interface AppCanvasProps {
 
 export default function AppCanvas({ basename, state: initialState }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState>(initialState);
+  const [readyBridge, setReadyBridge] = React.useState<ToolpadBridge>();
 
   const appRootRef = React.useRef<HTMLDivElement>();
   const appRootCleanupRef = React.useRef<() => void>();
@@ -114,6 +115,7 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
     });
 
     bridge.canvasEvents.emit('ready', {});
+    setReadyBridge(bridge);
   }, []);
 
   const savedNodes = state?.savedNodes;
@@ -125,9 +127,11 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
 
   return (
     <CanvasHooksContext.Provider value={editorHooks}>
-      <CanvasEventsContext.Provider value={bridge?.canvasEvents || null}>
-        <ToolpadApp rootRef={onAppRoot} basename={basename} state={state} />
-      </CanvasEventsContext.Provider>
+      {readyBridge ? (
+        <CanvasEventsContext.Provider value={readyBridge.canvasEvents}>
+          <ToolpadApp rootRef={onAppRoot} basename={basename} state={state} />
+        </CanvasEventsContext.Provider>
+      ) : null}
     </CanvasHooksContext.Provider>
   );
 }

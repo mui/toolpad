@@ -806,8 +806,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }
 
   React.useEffect(() => {
-    nodeRuntime?.updateEditorNodeData('rawColumns', columns);
-  }, [nodeRuntime, columns]);
+    nodeRuntime?.updateEditorNodeData('hasDataProvider', !!dataProviderId);
+  }, [nodeRuntime, dataProviderId]);
 
   React.useEffect(() => {
     nodeRuntime?.updateEditorNodeData('rawRows', rows);

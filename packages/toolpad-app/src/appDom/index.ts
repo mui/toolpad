@@ -64,6 +64,14 @@ export interface AppDomNodeBase {
 export interface AppNode extends AppDomNodeBase {
   readonly type: 'app';
   readonly parentId: null;
+  readonly attributes: {
+    readonly authorization?: {
+      readonly roles?: {
+        readonly name: string;
+        readonly description?: string;
+      }[];
+    };
+  };
 }
 
 export interface ThemeNode extends AppDomNodeBase {
@@ -91,6 +99,10 @@ export interface PageNode extends AppDomNodeBase {
     readonly module?: string;
     readonly display?: PageDisplayMode;
     readonly codeFile?: string;
+    readonly authorization?: {
+      readonly allowAll?: boolean;
+      readonly allowedRoles?: string[];
+    };
   };
 }
 
@@ -875,21 +887,6 @@ export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P>
     }
   });
   return result;
-}
-
-const nodeByNameCache = new WeakMap<AppDom, Map<string, NodeId>>();
-function getNodeIdByNameIndex(dom: AppDom): Map<string, NodeId> {
-  let cached = nodeByNameCache.get(dom);
-  if (!cached) {
-    cached = new Map(Array.from(Object.values(dom.nodes), (node) => [node.name, node.id]));
-    nodeByNameCache.set(dom, cached);
-  }
-  return cached;
-}
-
-export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
-  const index = getNodeIdByNameIndex(dom);
-  return index.get(name) ?? null;
 }
 
 export function getNodeFirstChild(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {

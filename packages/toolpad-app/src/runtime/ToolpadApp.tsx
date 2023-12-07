@@ -93,6 +93,7 @@ import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
 import { AuthSessionContext, useAuthSession } from './useAuthSession';
+import { RequireAuthorization } from './auth';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -1458,6 +1459,14 @@ function PageNotFound() {
   );
 }
 
+/**
+ * Returns whether authentication has been configured for this application.
+ */
+function useAppHasAuthentication() {
+  // TODO: read from authentication
+  return false;
+}
+
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
 }
@@ -1469,22 +1478,30 @@ function RenderedPages({ pages }: RenderedPagesProps) {
 
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
 
+  const appAuthenticationEnabled = useAppHasAuthentication();
+
   return (
     <Routes>
-      {pages.map((page) => (
-        <Route
-          key={page.name}
-          path={`/pages/${page.name}`}
-          element={
-            <RenderedPage
-              page={page}
-              // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
-              // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-              key={page.name}
-            />
-          }
-        />
-      ))}
+      {pages.map((page) => {
+        let pageContent = (
+          <RenderedPage
+            page={page}
+            // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
+            // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+            key={page.name}
+          />
+        );
+
+        if (!IS_RENDERED_IN_CANVAS && appAuthenticationEnabled && page.attributes.authorization) {
+          pageContent = (
+            <RequireAuthorization allowedRole={page.attributes.authorization.allowedRoles}>
+              {pageContent}
+            </RequireAuthorization>
+          );
+        }
+
+        return <Route key={page.name} path={`/pages/${page.name}`} element={pageContent} />;
+      })}
       {pages.flatMap((page) =>
         page.attributes.alias?.map((alias) => (
           <Route
@@ -1494,6 +1511,7 @@ function RenderedPages({ pages }: RenderedPagesProps) {
           />
         )),
       )}
+
       <Route path="/pages" element={defaultPageNavigation} />
       <Route path="/" element={defaultPageNavigation} />
       <Route path="*" element={<PageNotFound />} />

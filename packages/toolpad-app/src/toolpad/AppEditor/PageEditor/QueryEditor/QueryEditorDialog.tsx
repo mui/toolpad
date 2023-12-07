@@ -17,7 +17,7 @@ import { BindableAttrValue } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
-import useLatest from '../../../../utils/useLatest';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';

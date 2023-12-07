@@ -296,7 +296,7 @@ export function AppLayout({
             search={retainedSearch}
           />
         ) : null}
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ minWidth: 0, flex: 1, position: 'relative' }}>
           {hasHeader ? <Toolbar variant="dense" /> : null}
           {children}
         </Box>

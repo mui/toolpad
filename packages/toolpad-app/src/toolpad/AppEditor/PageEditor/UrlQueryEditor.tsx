@@ -98,7 +98,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [closeDialog, currentView, openDialog]);
 
   return (
-    <React.Fragment>
+    <div>
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleButtonClick}>
         Add page parameters
       </Button>
@@ -135,6 +135,6 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           </Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
+    </div>
   );
 }

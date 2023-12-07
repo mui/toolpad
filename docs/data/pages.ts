@@ -78,6 +78,7 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/concepts/page-properties',
       },
+      { pathname: '/toolpad/concepts/custom-server' },
     ],
   },
   {
@@ -88,7 +89,6 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/components/datagrid',
         title: 'Data Grid',
       },
-      { pathname: '/toolpad/concepts/custom-server' },
     ],
   },
   {

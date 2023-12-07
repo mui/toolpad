@@ -18,6 +18,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import * as url from 'node:url';
 import invariant from 'invariant';
+import { GridRowId } from '@mui/x-data-grid';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
@@ -407,5 +408,15 @@ export default class FunctionsManager {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
     invariant(this.devWorker, 'devWorker must be initialized');
     return this.devWorker.getDataProviderRecords(fullPath, exportName, params);
+  }
+
+  async deleteDataProviderRecord(
+    fileName: string,
+    exportName: string,
+    id: GridRowId,
+  ): Promise<void> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    invariant(this.devWorker, 'devWorker must be initialized');
+    return this.devWorker.deleteDataProviderRecord(fullPath, exportName, id);
   }
 }

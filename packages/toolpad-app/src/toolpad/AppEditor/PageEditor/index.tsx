@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { NodeId } from '@mui/toolpad-core';
 import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../../components/resizablePanels';
 import RenderPanel from './RenderPanel';
@@ -58,14 +57,13 @@ interface PageEditorProps {
 
 export default function PageEditor({ name }: PageEditorProps) {
   const { dom } = useAppState();
-  const nodeId = React.useMemo(() => appDom.getNodeIdByName(dom, name), [dom, name]);
-  const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
+  const pageNode = React.useMemo(() => appDom.getPageByName(dom, name), [dom, name]);
 
   useUndoRedo();
 
   return pageNode ? (
     <PageEditorContent node={pageNode} />
   ) : (
-    <NotFoundEditor message={`Non-existing Page "${nodeId}"`} />
+    <NotFoundEditor message={`Non-existing Page "${name}"`} />
   );
 }

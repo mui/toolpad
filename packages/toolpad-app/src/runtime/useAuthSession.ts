@@ -13,6 +13,7 @@ export interface AuthSession {
     name: string;
     email: string;
     image: string;
+    roles: string[];
   };
 }
 

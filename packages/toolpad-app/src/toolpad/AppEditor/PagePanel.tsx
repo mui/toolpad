@@ -22,8 +22,7 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
   const project = useProject();
   const { dom, currentView } = useAppState();
 
-  const currentPageId = currentView?.name ? appDom.getNodeIdByName(dom, currentView?.name) : null;
-  const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
+  const currentPageNode = currentView?.name ? appDom.getPageByName(dom, currentView.name) : null;
 
   return (
     <PagePanelRoot className={className} sx={sx}>

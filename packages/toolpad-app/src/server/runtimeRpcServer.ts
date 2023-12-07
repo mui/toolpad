@@ -14,6 +14,11 @@ export function createRpcServer(project: ToolpadProject) {
         return project.functionsManager.getDataProviderRecords(...params);
       },
     ),
+    deleteDataProviderRecord: createMethod<
+      typeof project.functionsManager.deleteDataProviderRecord
+    >(({ params }) => {
+      return project.functionsManager.deleteDataProviderRecord(...params);
+    }),
     execQuery: createMethod<typeof project.dataManager.execQuery>(({ params }) => {
       return project.dataManager.execQuery(...params);
     }),

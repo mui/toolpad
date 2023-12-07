@@ -119,7 +119,7 @@ export function AppLayout({
           search={retainedSearch}
         />
       ) : null}
-      {children}
+      <Box sx={{ minWidth: 0, flex: 1, position: 'relative' }}>{children}</Box>
     </Box>
   );
 }

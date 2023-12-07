@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.1.39",
+  "version": "0.1.40",
   "license": "MIT",
   "bin": {
     "toolpad": "./cli.mjs"
@@ -56,9 +56,9 @@
     "@mui/lab": "5.0.0-alpha.155",
     "@mui/material": "5.14.20",
     "@mui/system": "5.14.20",
-    "@mui/toolpad-components": "0.1.39",
-    "@mui/toolpad-core": "0.1.39",
-    "@mui/toolpad-utils": "0.1.39",
+    "@mui/toolpad-components": "0.1.40",
+    "@mui/toolpad-core": "0.1.40",
+    "@mui/toolpad-utils": "0.1.40",
     "@mui/types": "7.2.10",
     "@mui/utils": "5.14.20",
     "@mui/x-charts": "6.18.3",
@@ -101,7 +101,7 @@
     "latest-version": "7.0.0",
     "lodash-es": "4.17.21",
     "markdown-to-jsx": "7.3.2",
-    "mime": "3.0.0",
+    "mime": "4.0.0",
     "mysql2": "3.6.5",
     "nanoid": "5.0.4",
     "node-fetch": "2.7.0",
@@ -127,7 +127,7 @@
     "serialize-javascript": "6.0.1",
     "superjson": "2.0.0",
     "typescript": "5.3.2",
-    "vite": "5.0.4",
+    "vite": "5.0.5",
     "vm-browserify": "1.1.2",
     "whatwg-url": "14.0.0",
     "ws": "8.14.2",
@@ -164,7 +164,7 @@
     "formidable": "3.5.1",
     "get-port": "7.0.0",
     "monaco-editor": "0.44.0",
-    "react-devtools-inline": "4.28.5",
+    "react-devtools-inline": "5.0.0",
     "react-transition-group": "4.4.5",
     "webpack": "5.89.0"
   },

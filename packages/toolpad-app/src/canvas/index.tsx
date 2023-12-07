@@ -2,7 +2,7 @@ import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
-import ToolpadApp from '../runtime/ToolpadApp';
+import ToolpadApp, { IS_RENDERED_IN_CANVAS } from '../runtime/ToolpadApp';
 import { queryClient } from '../runtime/api';
 import { AppCanvasState } from '../types';
 import getPageViewState from './getPageViewState';
@@ -125,13 +125,15 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
     };
   }, [savedNodes]);
 
-  return (
-    <CanvasHooksContext.Provider value={editorHooks}>
-      {readyBridge ? (
+  if (IS_RENDERED_IN_CANVAS) {
+    return readyBridge ? (
+      <CanvasHooksContext.Provider value={editorHooks}>
         <CanvasEventsContext.Provider value={readyBridge.canvasEvents}>
           <ToolpadApp rootRef={onAppRoot} basename={basename} state={state} />
         </CanvasEventsContext.Provider>
-      ) : null}
-    </CanvasHooksContext.Provider>
-  );
+      </CanvasHooksContext.Provider>
+    ) : null;
+  }
+
+  return <ToolpadApp basename={basename} state={state} />;
 }

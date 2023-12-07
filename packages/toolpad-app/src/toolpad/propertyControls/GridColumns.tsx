@@ -281,7 +281,9 @@ function GridColumnsPropEditor({
     setMenuAnchorEl(null);
   };
 
-  const rawRows: unknown = nodeId && nodeData[nodeId]?.rawRows;
+  const gridNodeData = nodeId && nodeData[nodeId];
+
+  const rawRows: unknown = gridNodeData && gridNodeData.rawRows;
 
   const inferredColumns = React.useMemo(
     () => inferColumns(Array.isArray(rawRows) ? rawRows : []),

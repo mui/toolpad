@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.1.40
+
+<!-- generated comparing v0.1.39..master -->
+
+_Dec 7, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Some important fixes, code pages UI improvements, preparation for new features and docs improvements!
+
+- &#8203;<!-- 12 -->Fix sizing of page container (#2974) @Janpot
+- &#8203;<!-- 11 -->Fix crash when a query name is the same as a page name (#2975) @Janpot
+- &#8203;<!-- 10 -->Move custom server documentation to concepts section (#2972) @prakhargupta1
+- &#8203;<!-- 09 -->Add json-schema url to yaml files (#2970) @Janpot
+- &#8203;<!-- 08 -->Add a new feature as default Value (#2922) @JerryWu1234
+- &#8203;<!-- 07 -->Unclutter UI for code pages (#2961) @Janpot
+- &#8203;<!-- 06 -->Update release instructions smoke test (#2958) @Janpot
+- &#8203;<!-- 05 -->Remove id from examples (#2959) @Janpot
+- &#8203;<!-- 04 -->[core] Upgrade monorepo (#2979) @bharatkashyap
+- &#8203;<!-- 03 -->[docs] Why Toolpad? iteration (#2854) @oliviertassinari
+- &#8203;<!-- 02 -->[examples] Polish examples (#2962) @oliviertassinari
+- &#8203;<!-- 01 -->[WIP] Allow importing server functions in custom pages (#2953) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1
+
 ## 0.1.39
 
 <!-- generated comparing v0.1.38..master -->

@@ -13,12 +13,12 @@ import * as React from 'react';
 import invariant from 'invariant';
 import CloseIcon from '@mui/icons-material/Close';
 import useEventCallback from '@mui/utils/useEventCallback';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
 import * as appDom from '../../../appDom';
 import { useAppState } from '../../AppState';
 import DialogForm from '../../../components/DialogForm';
 import { useNodeNameValidation } from './validation';
 import { useProjectApi } from '../../../projectApi';
-import useLatest from '../../../utils/useLatest';
 import OpenCodeEditorButton from '../../OpenCodeEditor';
 
 function handleInputFocus(event: React.FocusEvent<HTMLInputElement>) {

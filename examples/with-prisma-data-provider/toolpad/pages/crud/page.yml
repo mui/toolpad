@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: page
 spec:
-  title: Prisma data source example
+  title: Prisma data source CRUD example
   content:
     - component: Text
       name: text
@@ -30,6 +30,6 @@ spec:
           - field: email
             type: string
             width: 335
-        height: 474
+        height: 336
         rowsSource: dataProvider
-        dataProviderId: usersByIndex.ts:default
+        dataProviderId: crud.ts:default

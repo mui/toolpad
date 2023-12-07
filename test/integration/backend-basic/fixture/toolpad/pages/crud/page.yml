@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: page
+spec:
+  title: page
+  content:
+    - component: DataGrid
+      name: dataGrid
+      props:
+        dataProviderId: myCrudData.ts:default
+        columns:
+          - field: name
+            width: 133
+        height: 500
+        rowsSource: dataProvider

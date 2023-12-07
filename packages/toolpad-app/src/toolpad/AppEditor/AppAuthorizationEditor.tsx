@@ -156,7 +156,11 @@ export default function AppAuthorizationEditor() {
           const preview = `${value.slice(0, previewLength).join(', ')}${
             value.length > previewLength ? '...' : ''
           }`;
-          return <Tooltip title={preview}>{value.length}</Tooltip>;
+          return (
+            <Tooltip title={preview}>
+              <span>{value.length}</span>
+            </Tooltip>
+          );
         },
       },
       {
@@ -183,7 +187,7 @@ export default function AppAuthorizationEditor() {
             isBlockedByPages ? (
               <Tooltip
                 key="delete"
-                title="This role can't be deleted because it is associated with existing pages."
+                title="This role can't be deleted because it is still associated with existing pages."
               >
                 <span>{deleteButton}</span>
               </Tooltip>

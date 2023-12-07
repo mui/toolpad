@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Link,
   MenuItem,
   Stack,
   TextField,
@@ -345,7 +346,7 @@ export function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialog
             helperText="If set, only allow users with email addresses in this domain."
           />
         </Stack>
-        <Stack direction="row" alignItems="center" mb={1}>
+        <Stack direction="row" alignItems="center">
           <Stack direction="row" alignItems="center" flex={1}>
             <TextField disabled label="Client ID" fullWidth />
             <BindingEditor
@@ -375,7 +376,10 @@ export function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialog
             />
           </Stack>
         </Stack>
-        <Typography variant="subtitle1" mb={1}>
+        <Link href="/" variant="caption">
+          How to set up a Github OAuth provider?
+        </Link>
+        <Typography variant="subtitle1" mt={1} mb={1}>
           Roles
         </Typography>
         <Typography variant="body2">

@@ -64,6 +64,14 @@ export interface AppDomNodeBase {
 export interface AppNode extends AppDomNodeBase {
   readonly type: 'app';
   readonly parentId: null;
+  readonly attributes: {
+    readonly authorization?: {
+      readonly roles?: {
+        readonly name: string;
+        readonly description?: string;
+      }[];
+    };
+  };
 }
 
 export interface ThemeNode extends AppDomNodeBase {
@@ -91,6 +99,10 @@ export interface PageNode extends AppDomNodeBase {
     readonly module?: string;
     readonly display?: PageDisplayMode;
     readonly codeFile?: string;
+    readonly authorization?: {
+      readonly allowAll?: boolean;
+      readonly allowedRoles?: string[];
+    };
   };
 }
 

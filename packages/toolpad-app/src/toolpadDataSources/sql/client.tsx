@@ -234,7 +234,7 @@ export function QueryEditor({
 
   return (
     <PanelGroup autoSaveId="toolpad/sql-panel" direction="horizontal">
-      <Panel defaultSizePercentage={50}>
+      <Panel id={'sql-query-left'} defaultSizePercentage={50}>
         <PanelGroup autoSaveId="toolpad/sql/params-tools-split" direction="vertical">
           <Panel defaultSizePercentage={85}>
             <QueryInputPanel onRunPreview={handleRunPreview}>
@@ -272,7 +272,7 @@ export function QueryEditor({
           </Panel>
         </PanelGroup>
       </Panel>
-      <Panel defaultSizePercentage={50}>
+      <Panel id={'sql-query-right'} defaultSizePercentage={50}>
         <Box
           sx={{
             height: '100%',

@@ -234,7 +234,7 @@ interface ExplorerProps {
 function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
   const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
-  const currentPageId = currentView.nodeId;
+  const currentPageName = currentView.name;
 
   const handleQuerySelect = React.useCallback(
     (selectedQueryId: NodeId) => {
@@ -263,31 +263,37 @@ function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
   );
 
   const existingNames = React.useMemo(() => {
-    if (!currentPageId) {
+    if (!currentPageName) {
       return undefined;
     }
-    const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
+    const currentPageNode = appDom.getPageByName(dom, currentPageName);
+    if (!currentPageNode) {
+      return undefined;
+    }
     return appDom.getExistingNamesForChildren(dom, currentPageNode);
-  }, [currentPageId, dom]);
+  }, [currentPageName, dom]);
 
   const handleDuplicateNode = React.useCallback(
     (nodeId: NodeId) => {
       const node = appDom.getNode(dom, nodeId, 'query');
       invariant(
-        currentPageId,
+        currentPageName,
         'handleDuplicateNode should only be used for queries, which should always belong to a page',
       );
-      const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
+      const currentPageNode = appDom.getPageByName(dom, currentPageName);
 
       const newName = appDom.proposeName(node.name, existingNames);
       const copy = appDom.createNode(dom, 'query', { ...node, name: newName });
+      if (!currentPageNode) {
+        return;
+      }
       appStateApi.update((draft) => appDom.addNode(draft, copy, currentPageNode, 'queries'), {
         kind: 'page',
-        nodeId: currentPageId,
+        name: currentPageName,
         view: { kind: 'query', nodeId: copy.id },
       });
     },
-    [dom, currentPageId, existingNames, appStateApi],
+    [dom, currentPageName, existingNames, appStateApi],
   );
 
   const validateName = React.useCallback(
@@ -382,19 +388,19 @@ function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
 export function QueriesExplorer() {
   const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
-  const currentPageId = currentView.nodeId;
+  const currentPageName = currentView.name;
   const queryNodes = React.useMemo(() => {
-    if (!currentPageId) {
+    if (!currentPageName) {
       return [];
     }
-    if (currentPageId) {
-      const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
+    if (currentPageName) {
+      const currentPageNode = appDom.getPageByName(dom, currentPageName);
       if (currentPageNode) {
         return appDom.getChildNodes(dom, currentPageNode).queries ?? [];
       }
     }
     return [];
-  }, [currentPageId, dom]);
+  }, [currentPageName, dom]);
 
   const queries = React.useMemo(() => {
     return queryNodes.filter(
@@ -413,14 +419,14 @@ export function QueriesExplorer() {
       const dataSource = dataSources[dataSourceId];
       invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
       invariant(
-        currentPageId,
+        currentPageName,
         'handleCreateNode should only be used for queries, which should always belong to a page',
       );
 
       appStateApi.createQueryTab(dataSource, dataSourceId, 'query');
       setAnchorEl(null);
     },
-    [currentPageId, appStateApi],
+    [currentPageName, appStateApi],
   );
 
   return (
@@ -441,19 +447,19 @@ export function QueriesExplorer() {
 export function ActionsExplorer() {
   const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
-  const currentPageId = currentView.nodeId;
+  const currentPageName = currentView.name;
   const queryNodes = React.useMemo(() => {
-    if (!currentPageId) {
+    if (!currentPageName) {
       return [];
     }
-    if (currentPageId) {
-      const currentPageNode = appDom.getNode(dom, currentPageId, 'page');
+    if (currentPageName) {
+      const currentPageNode = appDom.getPageByName(dom, currentPageName);
       if (currentPageNode) {
         return appDom.getChildNodes(dom, currentPageNode).queries ?? [];
       }
     }
     return [];
-  }, [currentPageId, dom]);
+  }, [currentPageName, dom]);
 
   const actions = React.useMemo(() => {
     return queryNodes.filter((query) => query.attributes?.mode === 'mutation');
@@ -470,14 +476,14 @@ export function ActionsExplorer() {
       const dataSource = dataSources[dataSourceId];
       invariant(dataSource, `Selected non-existing dataSource "${dataSourceId}"`);
       invariant(
-        currentPageId,
+        currentPageName,
         'handleCreateNode should only be used for queries, which should always belong to a page',
       );
 
       appStateApi.createQueryTab(dataSource, dataSourceId, 'mutation');
       setAnchorEl(null);
     },
-    [currentPageId, appStateApi],
+    [currentPageName, appStateApi],
   );
 
   return (

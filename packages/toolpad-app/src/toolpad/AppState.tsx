@@ -340,11 +340,14 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
           try {
             appDom.getNode(state.dom, action.draft.id);
           } catch (err) {
-            if (state.currentView?.nodeId) {
-              const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
-              newDom = appDom.addNode(state.dom, action.draft, pageNode, 'queries');
-              const createdNode = appDom.getNode(newDom, action.draft.id);
-              nodeName = createdNode.name;
+            if (state.currentView?.name) {
+              // const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
+              const pageNode = appDom.getPageByName(state.dom, state.currentView.name);
+              if (pageNode) {
+                newDom = appDom.addNode(state.dom, action.draft, pageNode, 'queries');
+                const createdNode = appDom.getNode(newDom, action.draft.id);
+                nodeName = createdNode.name;
+              }
             }
           }
           return update(state, {
@@ -402,7 +405,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       return state;
     }
     case 'CREATE_QUERY_TAB': {
-      if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
+      if (state.currentView.kind !== 'page' || !state.currentView.name) {
         return state;
       }
       // const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
@@ -478,10 +481,10 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       });
     }
     case 'OPEN_QUERY_TAB': {
-      if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
+      if (state.currentView.kind !== 'page' || !state.currentView.name) {
         return state;
       }
-      if (state.currentView.nodeId) {
+      if (state.currentView.name) {
         /**
          * Selected query is already open, do nothing
          */
@@ -519,7 +522,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
 
         let newTabIndex;
         let newTabs;
-        const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
+        const pageNode = appDom.getPageByName(state.dom, state.currentView.name);
         if (pageNode) {
           const queries = appDom.getChildNodes(state.dom, pageNode).queries ?? [];
           if (queries.length) {
@@ -570,7 +573,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       return state;
     }
     case 'UPDATE_QUERY_TAB': {
-      if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
+      if (state.currentView.kind !== 'page' || !state.currentView.name) {
         return state;
       }
 
@@ -590,7 +593,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       });
     }
     case 'CLOSE_QUERY_TAB': {
-      if (state.currentView.kind !== 'page' || !state.currentView.nodeId) {
+      if (state.currentView.kind !== 'page' || !state.currentView.name) {
         return state;
       }
 

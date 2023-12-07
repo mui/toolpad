@@ -43,21 +43,31 @@ function PageEditorContent({ node }: PageEditorContentProps) {
     <PageEditorProvider key={node.id} nodeId={node.id}>
       <PanelGroup autoSaveId="toolpad/editor-panel-split" direction="vertical">
         <Panel
-          defaultSizePercentage={65}
+          defaultSizePercentage={100}
           minSizePercentage={0}
           maxSizePercentage={100}
           order={1}
           id={'editor'}
         >
           <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
-            <Panel defaultSizePercentage={75} minSizePercentage={50} maxSizePercentage={80}>
+            <Panel
+              id={'page-editor'}
+              defaultSizePercentage={75}
+              minSizePercentage={50}
+              maxSizePercentage={80}
+            >
               <PageEditorRoot>
                 {appDom.isCodePage(node) ? null : <ComponentCatalog />}
                 <RenderPanel className={classes.renderPanel} />
               </PageEditorRoot>
             </Panel>
             <PanelResizeHandle />
-            <Panel defaultSizePercentage={25} maxSizePercentage={50} minSizePercentage={20}>
+            <Panel
+              id={'component-panel'}
+              defaultSizePercentage={25}
+              maxSizePercentage={50}
+              minSizePercentage={20}
+            >
               <ComponentPanel />
             </Panel>
           </PanelGroup>

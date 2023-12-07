@@ -14,8 +14,10 @@ import { APP_FUNCTIONS_ROUTE } from '../routes';
 import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
-import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
+import { FEATURE_FLAG_AUTHORIZATION, FEATURE_FLAG_GLOBAL_FUNCTIONS } from '../constants';
 import { ProjectProvider } from '../project';
+import { AppAuthorizationDialog } from './AppEditor/AppAuthorizationEditor';
+import useBoolean from '../utils/useBoolean';
 
 const Centered = styled('div')({
   height: '100%',
@@ -49,7 +51,7 @@ function ErrorFallback({ error }: FallbackProps) {
   return <FullPageError error={error} />;
 }
 
-function getAppSaveState(appState: AppState): React.ReactNode {
+function renderAppSaveState(appState: AppState): React.ReactNode {
   if (appState.saveDomError) {
     return (
       <Tooltip title="Error while saving">
@@ -84,18 +86,30 @@ function EditorShell({ children }: EditorShellProps) {
 
   const location = useLocation();
 
-  const shellProps = React.useMemo(() => {
+  const previewPath: string | null = React.useMemo(() => {
     const currentView = getViewFromPathname(location.pathname);
+    if (!currentView) {
+      return null;
+    }
+    const currentPageName = currentView?.kind === 'page' ? currentView.name : null;
+    return currentPageName ? `${appState.appUrl}/pages/${currentPageName}` : appState.appUrl;
+  }, [appState.appUrl, location.pathname]);
 
-    if (currentView) {
-      const currentPageName = currentView?.kind === 'page' ? currentView.name : null;
+  const {
+    value: authorizationDialogOpen,
+    setTrue: handleAuthorizationDialogOpen,
+    setFalse: handleAuthorizationDialogClose,
+  } = useBoolean(false);
 
-      const previewPath = currentPageName
-        ? `${appState.appUrl}/pages/${currentPageName}`
-        : appState.appUrl;
-
-      return {
-        actions: (
+  return (
+    <ToolpadShell
+      navigation={
+        FEATURE_FLAG_AUTHORIZATION ? (
+          <Button onClick={handleAuthorizationDialogOpen}>Authorization</Button>
+        ) : null
+      }
+      actions={
+        previewPath ? (
           <Stack direction="row" gap={1} alignItems="center">
             <Button
               variant="outlined"
@@ -108,15 +122,17 @@ function EditorShell({ children }: EditorShellProps) {
               Preview
             </Button>
           </Stack>
-        ),
-        status: getAppSaveState(appState),
-      };
-    }
-
-    return {};
-  }, [appState, location.pathname]);
-
-  return <ToolpadShell {...shellProps}>{children}</ToolpadShell>;
+        ) : null
+      }
+      status={renderAppSaveState(appState)}
+    >
+      {children}
+      <AppAuthorizationDialog
+        open={authorizationDialogOpen}
+        onClose={handleAuthorizationDialogClose}
+      />
+    </ToolpadShell>
+  );
 }
 
 const queryClient = new QueryClient({
@@ -150,7 +166,7 @@ export default function Toolpad({ appUrl, basename }: ToolpadProps) {
                   <AppProvider appUrl={appUrl}>
                     <EditorShell>
                       <Routes>
-                        {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
+                        {FEATURE_FLAG_GLOBAL_FUNCTIONS ? (
                           <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
                         ) : null}
                         <Route path="/*" element={<AppEditor />} />

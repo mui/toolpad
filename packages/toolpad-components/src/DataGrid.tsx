@@ -20,6 +20,8 @@ import {
   getGridDefaultColumnTypes,
   GridColTypeDef,
   GridPaginationModel,
+  GridActionsColDef,
+  GridRowId,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -32,6 +34,8 @@ import {
   UseDataProviderContext,
   CursorPaginationModel,
   IndexPaginationModel,
+  ToolpadDataProviderBase,
+  PaginationMode,
 } from '@mui/toolpad-core';
 import {
   Box,
@@ -43,7 +47,13 @@ import {
   Typography,
   Tooltip,
   Popover,
+  IconButton,
+  CircularProgress,
+  Alert,
+  Collapse,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
@@ -53,6 +63,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import invariant from 'invariant';
 import { NumberFormat, createFormat as createNumberFormat } from '@mui/toolpad-core/numberFormat';
 import { DateFormat, createFormat as createDateFormat } from '@mui/toolpad-core/dateFormat';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
@@ -64,6 +75,8 @@ const LICENSE_INFO: MuiLicenseInfo = {
 };
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
+
+const SetActionErrorContext = React.createContext<((error: Error) => void) | undefined>(undefined);
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -474,8 +487,41 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   onRawRowsChange?: (rows: GridRowsProp) => void;
 }
 
+interface DeleteActionProps {
+  id: GridRowId;
+  dataProvider: ToolpadDataProviderBase<unknown, PaginationMode>;
+  refetch: () => unknown;
+}
+
+function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
+  const [loading, setLoading] = React.useState(false);
+
+  const setActionError = React.useContext(SetActionErrorContext);
+  invariant(setActionError, 'setActionError must be defined');
+
+  const handleDeleteClick = React.useCallback(async () => {
+    invariant(dataProvider.deleteRecord, 'dataProvider must be defined');
+    setLoading(true);
+    try {
+      await dataProvider.deleteRecord(id);
+      await refetch();
+    } catch (error) {
+      setActionError(errorFrom(error));
+    } finally {
+      setLoading(false);
+    }
+  }, [dataProvider, id, refetch, setActionError]);
+
+  return (
+    <IconButton onClick={handleDeleteClick} size="small" aria-label={`Delete row with id "${id}"`}>
+      {loading ? <CircularProgress size={16} /> : <DeleteIcon fontSize="inherit" />}
+    </IconButton>
+  );
+}
+
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
   error?: unknown;
+  getActions?: GridActionsColDef['getActions'];
 }
 
 function useDataProviderDataGridProps(
@@ -493,7 +539,7 @@ function useDataProviderDataGridProps(
 
   const mapPageToNextCursor = React.useRef(new Map<number, string>());
 
-  const { data, isFetching, isPlaceholderData, isLoading, error } = useQuery({
+  const { data, isFetching, isPlaceholderData, isLoading, error, refetch } = useQuery({
     enabled: !!dataProvider,
     queryKey: ['toolpadDataProvider', dataProviderId, page, pageSize],
     placeholderData: keepPreviousData,
@@ -550,6 +596,23 @@ function useDataProviderDataGridProps(
     (data?.hasNextPage ? (paginationModel.page + 1) * paginationModel.pageSize + 1 : undefined) ??
     0;
 
+  const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
+    if (!dataProvider?.deleteRecord) {
+      return undefined;
+    }
+
+    return ({ id }) => {
+      const result = [];
+
+      if (dataProvider?.deleteRecord) {
+        result.push(
+          <DeleteAction key="delete" id={id} dataProvider={dataProvider} refetch={refetch} />,
+        );
+      }
+      return result;
+    };
+  }, [dataProvider, refetch]);
+
   if (!dataProvider) {
     return {};
   }
@@ -570,6 +633,7 @@ function useDataProviderDataGridProps(
     },
     rows: data?.records ?? [],
     error,
+    getActions,
   };
 }
 
@@ -594,9 +658,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { rows: dataProviderRowsInput, ...dataProviderProps } = useDataProviderDataGridProps(
-    rowsSource === 'dataProvider' ? dataProviderId : null,
-  );
+  const {
+    rows: dataProviderRowsInput,
+    getActions: getProviderActions,
+    ...dataProviderProps
+  } = useDataProviderDataGridProps(rowsSource === 'dataProvider' ? dataProviderId : null);
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
@@ -727,6 +793,36 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     nodeRuntime?.updateEditorNodeData('rawRows', rows);
   }, [nodeRuntime, rows]);
 
+  const renderedColumns = React.useMemo<GridColDef[]>(() => {
+    if (getProviderActions) {
+      return [
+        ...columns,
+        {
+          field: '___actions',
+          type: 'actions',
+          headerName: '',
+          flex: 1,
+          align: 'right',
+          getActions: getProviderActions,
+        },
+      ];
+    }
+
+    return columns;
+  }, [columns, getProviderActions]);
+
+  const [actionError, setActionError] = React.useState<Error | null>();
+
+  const open = !!actionError;
+  const lastActionError = useLatest(actionError);
+
+  React.useEffect(() => {
+    if (actionError) {
+      // Log error to console as well for full stacktrace
+      console.error(actionError);
+    }
+  }, [actionError]);
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <div
@@ -743,25 +839,49 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           }}
         >
           <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
-            <DataGridPro
-              apiRef={apiRef}
-              slots={{
-                toolbar: hideToolbar ? null : GridToolbar,
-                loadingOverlay: SkeletonLoadingOverlay,
-              }}
-              onColumnResize={handleResize}
-              onColumnOrderChange={handleColumnOrderChange}
-              rows={rows}
-              columns={columns}
-              key={gridKey}
-              getRowId={getRowId}
-              onRowSelectionModelChange={onSelectionModelChange}
-              rowSelectionModel={selectionModel}
-              {...props}
-              {...dataProviderProps}
-            />
+            <SetActionErrorContext.Provider value={setActionError}>
+              <DataGridPro
+                apiRef={apiRef}
+                slots={{
+                  toolbar: hideToolbar ? null : GridToolbar,
+                  loadingOverlay: SkeletonLoadingOverlay,
+                }}
+                onColumnResize={handleResize}
+                onColumnOrderChange={handleColumnOrderChange}
+                rows={rows}
+                columns={renderedColumns}
+                key={gridKey}
+                getRowId={getRowId}
+                onRowSelectionModelChange={onSelectionModelChange}
+                rowSelectionModel={selectionModel}
+                {...props}
+                {...dataProviderProps}
+              />
+            </SetActionErrorContext.Provider>
           </ErrorBoundary>
         </div>
+
+        <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
+          <Collapse in={!!open}>
+            <Alert
+              severity="error"
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                    setActionError(null);
+                  }}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              {lastActionError?.message}
+            </Alert>
+          </Collapse>
+        </Box>
       </div>
     </LicenseInfoProvider>
   );

@@ -295,6 +295,7 @@ export function useComponent(id: string) {
 
 export interface ToolpadDataProviderIntrospection {
   paginationMode: PaginationMode;
+  hasDeleteRecord: boolean;
 }
 
 export interface UseDataProviderHookResult<R, P extends PaginationMode> {

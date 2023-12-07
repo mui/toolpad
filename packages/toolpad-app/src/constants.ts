@@ -19,5 +19,7 @@ export const TOOLPAD_BRIDGE_GLOBAL = '__TOOLPAD_BRIDGE__';
 export const VERSION_CHECK_INTERVAL = 1000 * 60 * 10;
 
 export const PAGE_PANEL_WIDTH = 250;
-// @TODO: Remove once global functions UI is ready
-export const GLOBAL_FUNCTIONS_FEATURE_FLAG = false;
+
+// TODO: Remove once global functions UI is ready
+export const FEATURE_FLAG_GLOBAL_FUNCTIONS = false;
+export const FEATURE_FLAG_AUTHORIZATION = false;

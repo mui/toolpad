@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 /**
- * Returns the latest non-null, non-undefiend value that has been passed to it.
+ * Returns the latest non-null, non-undefined value that has been passed to it.
  */
 function useLatest<T>(value: T): T;
 function useLatest<T>(value: T | null | undefined): T | null | undefined;

@@ -259,3 +259,20 @@ test('data providers', async ({ page }) => {
 
   await expect(grid2.getByText('Cursor item 0')).toBeVisible();
 });
+
+test('data providers crud', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPage('crud');
+
+  await editorModel.waitForOverlay();
+
+  const grid = editorModel.appCanvas.getByRole('grid');
+
+  await expect(grid.getByText('Index item 5')).toBeVisible();
+
+  await clickCenter(page, grid);
+
+  await grid.getByRole('button', { name: 'Delete row with id "5"', exact: true }).click();
+
+  await expect(grid.getByText('Index item 5')).not.toBeVisible();
+});

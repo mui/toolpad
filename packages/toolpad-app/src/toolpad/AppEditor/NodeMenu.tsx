@@ -4,9 +4,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { NodeId } from '@mui/toolpad-core';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
 import * as appDom from '../../appDom';
 import { useAppState } from '../AppState';
-import useLatest from '../../utils/useLatest';
 import { ConfirmDialog } from '../../components/SystemDialogs';
 import useMenu from '../../utils/useMenu';
 

@@ -96,6 +96,7 @@ module.exports = {
       files: ['examples/**/*'],
       rules: {
         'no-console': 'off',
+        'no-underscore-dangle': 'off',
       },
     },
     {

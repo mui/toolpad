@@ -106,13 +106,25 @@ This feature isn't implemented yet.
 👍 Upvote [issue #2888](https://github.com/mui/mui-toolpad/issues/2888) if you want to see it land faster.
 :::
 
-## Deleting rows 🚧
+## Deleting rows
 
-:::warning
-This feature isn't implemented yet.
+The data provider can be extended to automatically support row deletion. To enable this, you'll have to add a `deleteRecord` method to the data provider interface that accepts the `id` of the row that is to be deleted.
 
-👍 Upvote [issue #2889](https://github.com/mui/mui-toolpad/issues/2889) if you want to see it land faster.
-:::
+```tsx
+export default createDataProvider({
+  async getRecords({ paginationModel: { start = 0, pageSize } }) {
+    return db.query(`SELECT * FROM users`);
+  },
+
+  async deleteRecord(id) {
+    await db.query(`DELETE FROM users WHERE id = ?`, [id]);
+  },
+});
+```
+
+When a data provider contains a `deleteRecord` method, each row will have a delete button. When the user clicks that delete button, the delete method will be called with the id of that row and after successful deletion, the data will be reloaded.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/data-providers-delete.png", "alt": "Data provider delete", "caption": "Delete action in data provider" }}
 
 ## API
 

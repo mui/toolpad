@@ -101,7 +101,7 @@ export default class EnvManager {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  getEnv() {
+  async getEnv() {
     return process.env;
   }
 }

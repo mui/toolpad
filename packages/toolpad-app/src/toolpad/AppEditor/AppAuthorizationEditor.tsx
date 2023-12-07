@@ -5,6 +5,9 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  MenuItem,
+  Stack,
+  TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -19,8 +22,13 @@ import {
   GridRowModesModel,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import GoogleIcon from '@mui/icons-material/Google';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
+import { useProjectApi } from '../../projectApi';
+import { BindingEditor } from './BindingEditor';
 
 interface EditToolbarProps {
   addNewRoleDisabled: boolean;
@@ -297,11 +305,80 @@ export interface AppAuthorizationDialogProps {
 }
 
 export function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialogProps) {
+  const projectApi = useProjectApi();
+  const { data: env } = projectApi.useQuery('getEnvDeclaredValues', []);
+
+  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env ?? {}), [env]);
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Authorization</DialogTitle>
       <DialogContent>
-        <Typography>
+        <Typography variant="subtitle1" mb={1}>
+          Authentication
+        </Typography>
+        <Stack direction="row" gap={1}>
+          <TextField
+            select
+            label="Authentication provider"
+            onChange={() => {}}
+            fullWidth
+            helperText="If set, only authenticated users can view pages."
+          >
+            <MenuItem value="github">
+              <Stack direction="row" alignItems="center">
+                <GitHubIcon fontSize="small" />
+                <Typography ml={1}>Github</Typography>
+              </Stack>
+            </MenuItem>
+            <MenuItem value="google">
+              <Stack direction="row" alignItems="center">
+                <GoogleIcon fontSize="small" />
+                <Typography ml={1}>Google</Typography>
+              </Stack>
+            </MenuItem>
+          </TextField>
+          <TextField
+            label="Restricted domain"
+            fullWidth
+            placeholder="example.com"
+            helperText="If set, only allow users with email addresses in this domain."
+          />
+        </Stack>
+        <Stack direction="row" alignItems="center" mb={1}>
+          <Stack direction="row" alignItems="center" flex={1}>
+            <TextField disabled label="Client ID" fullWidth />
+            <BindingEditor
+              globalScope={{}}
+              globalScopeMeta={{}}
+              value={null}
+              onChange={() => {}}
+              jsRuntime={jsServerRuntime}
+              label="Client ID"
+              propType={{ type: 'string' }}
+              env={env}
+              hasEnvOnly
+            />
+          </Stack>
+          <Stack direction="row" alignItems="center" flex={1}>
+            <TextField disabled label="Client secret" fullWidth sx={{ ml: '6px' }} />
+            <BindingEditor
+              globalScope={{}}
+              globalScopeMeta={{}}
+              value={null}
+              onChange={() => {}}
+              jsRuntime={jsServerRuntime}
+              label="Client secret"
+              propType={{ type: 'string' }}
+              env={env}
+              hasEnvOnly
+            />
+          </Stack>
+        </Stack>
+        <Typography variant="subtitle1" mb={1}>
+          Roles
+        </Typography>
+        <Typography variant="body2">
           Define the roles for your application. You can configure your pages to be accessible to
           specific roles only.
         </Typography>

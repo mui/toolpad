@@ -48,7 +48,7 @@ export default function PageOptionsPanel() {
     return new Map(appNode.attributes?.authorization?.roles?.map((role) => [role.name, role]));
   }, [appNode]);
 
-  const handleallowedRolesChange = React.useCallback(
+  const handleAllowedRolesChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string[]) => {
       domApi.update((draft) =>
         appDom.setNodeNamespacedProp(draft, page, 'attributes', 'authorization', {
@@ -132,7 +132,7 @@ export default function PageOptionsPanel() {
             multiple
             options={Array.from(availableRoles.keys())}
             value={page.attributes.authorization?.allowedRoles ?? []}
-            onChange={handleallowedRolesChange}
+            onChange={handleAllowedRolesChange}
             disabled={!page.attributes.authorization}
             fullWidth
             noOptionsText="No roles defined"

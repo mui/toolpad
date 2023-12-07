@@ -65,9 +65,10 @@ export interface AppNode extends AppDomNodeBase {
   readonly type: 'app';
   readonly parentId: null;
   readonly attributes: {
-    readonly provider?: 'github' | 'google';
-    readonly domain?: string;
     readonly authorization?: {
+      readonly provider?: 'github' | 'google';
+      readonly providerConfig?: Record<string, unknown>;
+      readonly domain?: string;
       readonly roles?: {
         readonly name: string;
         readonly description?: string;

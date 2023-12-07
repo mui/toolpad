@@ -26,10 +26,17 @@ import {
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+import { BindableAttrValue, EnvAttrValue } from '@mui/toolpad-core';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
 import { useProjectApi } from '../../projectApi';
 import { BindingEditor } from './BindingEditor';
+import { getBindingType } from '../../runtime/bindings';
+
+const AUTH_PROVIDERS = new Map([
+  ['github', { name: 'GitHub', Icon: GitHubIcon }],
+  ['google', { name: 'Google', Icon: GoogleIcon }],
+]);
 
 interface EditToolbarProps {
   addNewRoleDisabled: boolean;
@@ -300,17 +307,204 @@ export default function AppAuthorizationEditor() {
   );
 }
 
+export function AppAuthenticationEditor() {
+  const { dom } = useAppState();
+  const appState = useAppStateApi();
+
+  const projectApi = useProjectApi();
+  const { data: env } = projectApi.useQuery('getEnvDeclaredValues', []);
+
+  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env ?? {}), [env]);
+
+  const handleAuthProviderChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const {
+        target: { value: provider },
+      } = event;
+
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
+          ...app.attributes?.authorization,
+          provider: (provider as 'github' | 'google') || undefined,
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const handleAuthDomainChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const {
+        target: { value: domain },
+      } = event;
+
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
+          ...app.attributes?.authorization,
+          domain: domain || undefined,
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const handleClientIDChange = React.useCallback(
+    (newValue: BindableAttrValue<string> | null) => {
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
+          ...app.attributes?.authorization,
+          providerConfig: {
+            ...app.attributes?.authorization?.providerConfig,
+            clientId: newValue || undefined,
+          },
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const handleClientSecretChange = React.useCallback(
+    (newValue: BindableAttrValue<string> | null) => {
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
+          ...app.attributes?.authorization,
+          providerConfig: {
+            ...app.attributes?.authorization?.providerConfig,
+            clientSecret: newValue || undefined,
+          },
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const appNode = appDom.getApp(dom);
+  const authorization = appNode.attributes.authorization;
+
+  const currentProviderData = React.useMemo(
+    () => (authorization?.provider ? AUTH_PROVIDERS.get(authorization?.provider) : null),
+    [authorization?.provider],
+  );
+
+  const getProviderConfigValue = React.useCallback((value: BindableAttrValue<string> | null) => {
+    const valueBindingType = value && getBindingType(value);
+
+    if (valueBindingType && valueBindingType === 'env') {
+      return (value as EnvAttrValue).$$env;
+    }
+
+    return value;
+  }, []);
+
+  return (
+    <React.Fragment>
+      <Stack direction="row" gap={1}>
+        <TextField
+          select
+          label="Authentication provider"
+          value={authorization?.provider || ''}
+          onChange={handleAuthProviderChange}
+          fullWidth
+          helperText="If set, only authenticated users can view pages."
+          defaultValue=""
+        >
+          <MenuItem value="">
+            <Typography ml={1}>No authentication</Typography>
+          </MenuItem>
+          {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
+            <MenuItem key={value} value={value}>
+              <Stack direction="row" alignItems="center">
+                <Icon fontSize="small" />
+                <Typography ml={1}>{name}</Typography>
+              </Stack>
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          label="Restricted domain"
+          value={authorization?.domain}
+          onChange={handleAuthDomainChange}
+          fullWidth
+          placeholder="example.com"
+          helperText="If set, only allow users with email addresses in this domain."
+        />
+      </Stack>
+      {authorization?.provider ? (
+        <React.Fragment>
+          <Stack direction="row" alignItems="center">
+            <Stack direction="row" alignItems="center" flex={1}>
+              <TextField
+                disabled
+                label="Client ID"
+                value={getProviderConfigValue(authorization?.providerConfig?.clientId ?? null)}
+                fullWidth
+              />
+              <BindingEditor
+                globalScope={{}}
+                globalScopeMeta={{}}
+                value={authorization?.providerConfig?.clientId ?? null}
+                onChange={handleClientIDChange}
+                jsRuntime={jsServerRuntime}
+                label="Client ID"
+                propType={{ type: 'string' }}
+                env={env}
+                hasEnvOnly
+              />
+            </Stack>
+            <Stack direction="row" alignItems="center" flex={1}>
+              <TextField
+                disabled
+                label="Client secret"
+                value={getProviderConfigValue(authorization?.providerConfig?.clientSecret ?? null)}
+                fullWidth
+                sx={{ ml: '6px' }}
+              />
+              <BindingEditor
+                globalScope={{}}
+                globalScopeMeta={{}}
+                value={authorization?.providerConfig?.clientSecret ?? null}
+                onChange={handleClientSecretChange}
+                jsRuntime={jsServerRuntime}
+                label="Client secret"
+                propType={{ type: 'string' }}
+                env={env}
+                hasEnvOnly
+              />
+            </Stack>
+          </Stack>
+          {currentProviderData ? (
+            <Link href="/" variant="caption">
+              How to set up a {currentProviderData.name} OAuth provider?
+            </Link>
+          ) : null}
+        </React.Fragment>
+      ) : null}
+    </React.Fragment>
+  );
+}
+
 export interface AppAuthorizationDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
 export function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialogProps) {
-  const projectApi = useProjectApi();
-  const { data: env } = projectApi.useQuery('getEnvDeclaredValues', []);
-
-  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env ?? {}), [env]);
-
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Authorization</DialogTitle>
@@ -318,67 +512,7 @@ export function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialog
         <Typography variant="subtitle1" mb={1}>
           Authentication
         </Typography>
-        <Stack direction="row" gap={1}>
-          <TextField
-            select
-            label="Authentication provider"
-            onChange={() => {}}
-            fullWidth
-            helperText="If set, only authenticated users can view pages."
-          >
-            <MenuItem value="github">
-              <Stack direction="row" alignItems="center">
-                <GitHubIcon fontSize="small" />
-                <Typography ml={1}>Github</Typography>
-              </Stack>
-            </MenuItem>
-            <MenuItem value="google">
-              <Stack direction="row" alignItems="center">
-                <GoogleIcon fontSize="small" />
-                <Typography ml={1}>Google</Typography>
-              </Stack>
-            </MenuItem>
-          </TextField>
-          <TextField
-            label="Restricted domain"
-            fullWidth
-            placeholder="example.com"
-            helperText="If set, only allow users with email addresses in this domain."
-          />
-        </Stack>
-        <Stack direction="row" alignItems="center">
-          <Stack direction="row" alignItems="center" flex={1}>
-            <TextField disabled label="Client ID" fullWidth />
-            <BindingEditor
-              globalScope={{}}
-              globalScopeMeta={{}}
-              value={null}
-              onChange={() => {}}
-              jsRuntime={jsServerRuntime}
-              label="Client ID"
-              propType={{ type: 'string' }}
-              env={env}
-              hasEnvOnly
-            />
-          </Stack>
-          <Stack direction="row" alignItems="center" flex={1}>
-            <TextField disabled label="Client secret" fullWidth sx={{ ml: '6px' }} />
-            <BindingEditor
-              globalScope={{}}
-              globalScopeMeta={{}}
-              value={null}
-              onChange={() => {}}
-              jsRuntime={jsServerRuntime}
-              label="Client secret"
-              propType={{ type: 'string' }}
-              env={env}
-              hasEnvOnly
-            />
-          </Stack>
-        </Stack>
-        <Link href="/" variant="caption">
-          How to set up a Github OAuth provider?
-        </Link>
+        <AppAuthenticationEditor />
         <Typography variant="subtitle1" mt={1} mb={1}>
           Roles
         </Typography>

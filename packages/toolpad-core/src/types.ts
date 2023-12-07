@@ -499,12 +499,23 @@ export interface CursorPaginationModel {
   pageSize: number;
 }
 
+export interface FilterModelItem {
+  field: string;
+  operator: string;
+  value: any;
+}
+
+export interface FilterModel {
+  items: FilterModelItem[];
+  logicOperator: 'and' | 'or';
+}
+
 export type PaginationMode = 'index' | 'cursor';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface GetRecordsParams<R, P extends PaginationMode> {
   paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
-  // filterModel: FilterModel;
+  filterModel: FilterModel;
   // sortModel: SortModel;
 }
 

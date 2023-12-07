@@ -22,6 +22,7 @@ import {
   GridPaginationModel,
   GridActionsColDef,
   GridRowId,
+  GridFilterModel,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -36,6 +37,7 @@ import {
   IndexPaginationModel,
   ToolpadDataProviderBase,
   PaginationMode,
+  FilterModel,
 } from '@mui/toolpad-core';
 import {
   Box,
@@ -483,8 +485,6 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
   hideToolbar?: boolean;
-  rawRows?: GridRowsProp;
-  onRawRowsChange?: (rows: GridRowsProp) => void;
 }
 
 interface DeleteActionProps {
@@ -535,6 +535,18 @@ function useDataProviderDataGridProps(
     pageSize: 100,
   });
 
+  const [rawFilterModel, setRawFilterModel] = React.useState<GridFilterModel>();
+
+  const filterModel = React.useMemo<FilterModel>(
+    () => ({
+      items:
+        rawFilterModel?.items.map(({ field, operator, value }) => ({ field, operator, value })) ??
+        [],
+      logicOperator: rawFilterModel?.logicOperator ?? 'and',
+    }),
+    [rawFilterModel],
+  );
+
   const { page, pageSize } = paginationModel;
 
   const mapPageToNextCursor = React.useRef(new Map<number, string>());
@@ -573,6 +585,7 @@ function useDataProviderDataGridProps(
 
       const result = await dataProvider.getRecords({
         paginationModel: dataProviderPaginationModel,
+        filterModel,
       });
 
       if (dataProvider.paginationMode === 'cursor') {
@@ -620,9 +633,11 @@ function useDataProviderDataGridProps(
   return {
     loading: isLoading || (isPlaceholderData && isFetching),
     paginationMode: 'server',
+    filterMode: 'server',
+    sortingMode: 'server',
     pagination: true,
-    paginationModel,
     rowCount,
+    paginationModel,
     onPaginationModelChange(model) {
       setPaginationModel((prevModel) => {
         if (prevModel.pageSize !== model.pageSize) {
@@ -631,6 +646,8 @@ function useDataProviderDataGridProps(
         return model;
       });
     },
+    filterModel: rawFilterModel,
+    onFilterModelChange: setRawFilterModel,
     rows: data?.records ?? [],
     error,
     getActions,
@@ -653,7 +670,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     hideToolbar,
     rowsSource,
     dataProviderId,
-    onRawRowsChange,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -788,6 +804,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   } else if (errorProp) {
     error = errorFrom(errorProp);
   }
+
+  React.useEffect(() => {
+    nodeRuntime?.updateEditorNodeData('rawColumns', columns);
+  }, [nodeRuntime, columns]);
 
   React.useEffect(() => {
     nodeRuntime?.updateEditorNodeData('rawRows', rows);

@@ -11,11 +11,17 @@ import * as appDom from '../../../../appDom';
 import QueryIcon from '../../QueryIcon';
 import QueryEditorPanel from './QueryEditorPanel';
 import useShortcut from '../../../../utils/useShortcut';
-import { isMac } from '../../../../utils/platform';
+import { getModifierKey } from '../../../../utils/platform';
 import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 
 function SaveShortcutIndicator() {
-  return <span style={{ opacity: 0.55, marginLeft: 6 }}>{isMac() ? '⌘' : <kbd>Ctrl</kbd>}S</span>;
+  return (
+    <span
+      style={{ opacity: 0.55, marginLeft: 6 }}
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: getModifierKey() }}
+    />
+  );
 }
 
 function TabCloseIcon({

@@ -17,10 +17,7 @@ import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 function SaveShortcutIndicator() {
   return (
     <span>
-      &nbsp;
-      <kbd>{getModifierKey()}</kbd>
-      <kbd>+</kbd>
-      <kbd>S</kbd>
+      <kbd>{getModifierKey()}</kbd>+<kbd>S</kbd>
     </span>
   );
 }

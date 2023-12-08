@@ -12142,14 +12142,13 @@ tsutils@^3.21.0:
   dependencies:
     tslib "^1.8.1"
 
-tsx@3.14.0:
-  version "3.14.0"
-  resolved "https://registry.yarnpkg.com/tsx/-/tsx-3.14.0.tgz#be6e2176b6f210fe8f48124fb6e22e0f075e927b"
-  integrity sha512-xHtFaKtHxM9LOklMmJdI3BEnQq/D5F73Of2E1GDrITi9sgoVkvIsrQUTY1G8FlmGtA+awCI4EBlTRRYxkL2sRg==
+tsx@4.6.2:
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/tsx/-/tsx-4.6.2.tgz#8e9c1456ad4f1102c5c42c5be7fd428259b7d39b"
+  integrity sha512-QPpBdJo+ZDtqZgAnq86iY/PD2KYCUPSUGIunHdGwyII99GKH+f3z3FZ8XNFLSGQIA4I365ui8wnQpl8OKLqcsg==
   dependencies:
     esbuild "~0.18.20"
     get-tsconfig "^4.7.2"
-    source-map-support "^0.5.21"
   optionalDependencies:
     fsevents "~2.3.3"
 

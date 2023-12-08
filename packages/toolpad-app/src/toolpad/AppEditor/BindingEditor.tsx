@@ -71,7 +71,6 @@ interface BindingEditorContext {
   propType?: PropValueType;
   liveBinding?: LiveBinding;
   env?: Record<string, string>;
-  hasEnvOnly?: boolean;
 }
 
 const [useBindingEditorContext, BindingEditorContextProvider] =
@@ -196,7 +195,6 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
     jsRuntime,
     propType,
     env,
-    hasEnvOnly,
   } = useBindingEditorContext();
 
   const hasEnv = Boolean(env);
@@ -263,10 +261,6 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
 
   if (!hasEnv) {
     return jsExpressionBindingEditor;
-  }
-
-  if (hasEnvOnly) {
-    return envBindingEditor;
   }
 
   return (
@@ -633,7 +627,6 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
   propType?: PropValueType;
   liveBinding?: LiveBinding;
   env?: Record<string, string>;
-  hasEnvOnly?: boolean;
 }
 
 export function BindingEditor<V>({
@@ -648,7 +641,6 @@ export function BindingEditor<V>({
   onChange,
   liveBinding,
   env,
-  hasEnvOnly = false,
 }: BindingEditorProps<V>) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = React.useCallback(() => setOpen(true), []);
@@ -706,9 +698,8 @@ export function BindingEditor<V>({
       propType,
       liveBinding,
       env,
-      hasEnvOnly,
     }),
-    [disabled, env, globalScope, hasEnvOnly, jsRuntime, label, liveBinding, propType, resolvedMeta],
+    [disabled, env, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
   );
 
   return (

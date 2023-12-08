@@ -20,19 +20,10 @@
             "authorization": {
               "type": "object",
               "properties": {
-                "secret": {
-                  "$ref": "#/definitions/EnvBinding",
-                  "description": "A random string used to hash tokens, sign/encrypt cookies and generate cryptographic keys."
-                },
                 "provider": {
                   "type": "string",
                   "enum": ["github", "google"],
                   "description": "The name of the authentication provider to use."
-                },
-                "providerConfig": {
-                  "type": "object",
-                  "description": "Authentication provider specific configuration.",
-                  "additionalProperties": true
                 },
                 "roles": {
                   "type": "array",

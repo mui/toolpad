@@ -34,6 +34,7 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        mt: 2,
       }}
     >
       Unauthorized. {reason}

@@ -360,7 +360,7 @@ export function AppAuthenticationEditor() {
       {currentProviderData ? (
         <Link href="/" target="_blank">
           <Typography variant="subtitle1" sx={{ mt: 1, mb: 1, fontSize: 14 }}>
-            Learn how to set up {currentProviderData.name} as authentication provider.
+            Learn how to set up {currentProviderData.name} as an authentication provider.
           </Typography>
         </Link>
       ) : null}

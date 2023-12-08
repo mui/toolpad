@@ -10,6 +10,7 @@ import {
   Container,
   Tooltip,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import {
   ToolpadComponent,
@@ -41,7 +42,7 @@ import {
 } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
-import { QueryClientProvider, useMutation } from '@tanstack/react-query';
+import { QueryClientProvider, useQuery, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
   Routes,
@@ -1459,14 +1460,6 @@ function PageNotFound() {
   );
 }
 
-/**
- * Returns whether authentication has been configured for this application.
- */
-function useAppHasAuthentication() {
-  // TODO: read from authentication
-  return false;
-}
-
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
 }
@@ -1478,7 +1471,14 @@ function RenderedPages({ pages }: RenderedPagesProps) {
 
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
 
-  const appAuthenticationEnabled = useAppHasAuthentication();
+  const { data: authProvider, isLoading: isLoadingAuthProvider } = useQuery({
+    queryKey: ['getAuthProvider'],
+    queryFn: async () => {
+      return api.methods.getAuthProvider();
+    },
+  });
+
+  const hasAuthentication = !isLoadingAuthProvider && !!authProvider;
 
   return (
     <Routes>
@@ -1492,7 +1492,15 @@ function RenderedPages({ pages }: RenderedPagesProps) {
           />
         );
 
-        if (!IS_RENDERED_IN_CANVAS && appAuthenticationEnabled && page.attributes.authorization) {
+        if (isLoadingAuthProvider) {
+          pageContent = (
+            <Stack direction="column" alignItems="center" mt={2}>
+              <CircularProgress color="primary" size={56} />
+            </Stack>
+          );
+        }
+
+        if (!IS_RENDERED_IN_CANVAS && hasAuthentication && page.attributes.authorization) {
           pageContent = (
             <RequireAuthorization allowedRole={page.attributes.authorization.allowedRoles}>
               {pageContent}

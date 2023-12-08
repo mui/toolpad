@@ -69,7 +69,7 @@ import { DateFormat, createFormat as createDateFormat } from '@mui/toolpad-core/
 import useLatest from '@mui/toolpad-utils/hooks/useLatest';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import ErrorOverlay from './components/ErrorOverlay';
+import ErrorOverlay, { ErrorContent } from './components/ErrorOverlay';
 
 type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
@@ -684,11 +684,7 @@ interface NoRowsOverlayProps {
 }
 
 function NoRowsOverlay({ error }: NoRowsOverlayProps) {
-  return (
-    <Box sx={{ position: 'relative', height: '100%' }}>
-      <ErrorOverlay error={error} />
-    </Box>
-  );
+  return <ErrorContent sx={{ height: '100%' }} error={error} />;
 }
 
 function dataGridFallbackRender({ error }: FallbackProps) {

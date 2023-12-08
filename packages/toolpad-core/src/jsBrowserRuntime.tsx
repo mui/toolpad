@@ -51,7 +51,7 @@ function createBrowserRuntime(): JsRuntime {
       })()
     `);
 
-    if (typeof result.then === 'function') {
+    if (typeof result?.then === 'function') {
       return Promise.resolve(result).then((value) => window.structuredClone(value));
     }
 

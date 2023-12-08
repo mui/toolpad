@@ -524,7 +524,7 @@ function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
 }
 
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
-  error?: unknown;
+  rowLoadingError?: unknown;
   getActions?: GridActionsColDef['getActions'];
 }
 
@@ -589,7 +589,14 @@ function useDataProviderDataGridProps(
     [rawSortModel],
   );
 
-  const { data, isFetching, isPlaceholderData, isLoading, error, refetch } = useQuery({
+  const {
+    data,
+    isFetching,
+    isPlaceholderData,
+    isLoading,
+    error: rowLoadingError,
+    refetch,
+  } = useQuery({
     enabled: !!dataProvider,
     queryKey: ['toolpadDataProvider', dataProviderId, paginationModel, filterModel, sortModel],
     placeholderData: keepPreviousData,
@@ -667,9 +674,21 @@ function useDataProviderDataGridProps(
     sortModel: rawSortModel,
     onSortModelChange: setRawSortModel,
     rows: data?.records ?? [],
-    error,
+    rowLoadingError,
     getActions,
   };
+}
+
+interface NoRowsOverlayProps {
+  error: Error;
+}
+
+function NoRowsOverlay({ error }: NoRowsOverlayProps) {
+  return (
+    <Box sx={{ position: 'relative', height: '100%' }}>
+      <ErrorOverlay error={error} />
+    </Box>
+  );
 }
 
 function dataGridFallbackRender({ error }: FallbackProps) {
@@ -816,11 +835,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  let error: Error | null = null;
-  if (dataProviderProps?.error) {
-    error = errorFrom(dataProviderProps.error);
+  let rowLoadingError: Error | null = null;
+  if (dataProviderProps?.rowLoadingError) {
+    rowLoadingError = errorFrom(dataProviderProps.rowLoadingError);
   } else if (errorProp) {
-    error = errorFrom(errorProp);
+    rowLoadingError = errorFrom(errorProp);
   }
 
   React.useEffect(() => {
@@ -863,13 +882,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         ref={ref}
         style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
       >
-        <ErrorOverlay error={error} />
-
         <div
           style={{
             position: 'absolute',
             inset: '0 0 0 0',
-            visibility: error ? 'hidden' : 'visible',
           }}
         >
           <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
@@ -879,6 +895,12 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 slots={{
                   toolbar: hideToolbar ? null : GridToolbar,
                   loadingOverlay: SkeletonLoadingOverlay,
+                  noRowsOverlay: NoRowsOverlay,
+                }}
+                slotProps={{
+                  noRowsOverlay: {
+                    error: rowLoadingError,
+                  } as any,
                 }}
                 onColumnResize={handleResize}
                 onColumnOrderChange={handleColumnOrderChange}

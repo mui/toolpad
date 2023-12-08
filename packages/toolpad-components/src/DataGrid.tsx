@@ -23,6 +23,7 @@ import {
   GridActionsColDef,
   GridRowId,
   GridFilterModel,
+  GridSortModel,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -38,6 +39,7 @@ import {
   ToolpadDataProviderBase,
   PaginationMode,
   FilterModel,
+  SortModel,
 } from '@mui/toolpad-core';
 import {
   Box,
@@ -547,6 +549,13 @@ function useDataProviderDataGridProps(
     [rawFilterModel],
   );
 
+  const [rawSortModel, setRawSortModel] = React.useState<GridSortModel>();
+
+  const sortModel = React.useMemo<SortModel>(
+    () => rawSortModel?.map(({ field, sort }) => ({ field, sort: sort ?? 'asc' })) ?? [],
+    [rawSortModel],
+  );
+
   const { page, pageSize } = paginationModel;
 
   const mapPageToNextCursor = React.useRef(new Map<number, string>());
@@ -586,6 +595,7 @@ function useDataProviderDataGridProps(
       const result = await dataProvider.getRecords({
         paginationModel: dataProviderPaginationModel,
         filterModel,
+        sortModel,
       });
 
       if (dataProvider.paginationMode === 'cursor') {
@@ -648,6 +658,8 @@ function useDataProviderDataGridProps(
     },
     filterModel: rawFilterModel,
     onFilterModelChange: setRawFilterModel,
+    sortModel: rawSortModel,
+    onSortModelChange: setRawSortModel,
     rows: data?.records ?? [],
     error,
     getActions,

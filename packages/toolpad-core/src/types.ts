@@ -505,10 +505,21 @@ export interface FilterModelItem {
   value: any;
 }
 
+export type LogicOperator = 'and' | 'or';
+
 export interface FilterModel {
   items: FilterModelItem[];
-  logicOperator: 'and' | 'or';
+  logicOperator: LogicOperator;
 }
+
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortItem {
+  field: string;
+  sort: SortDirection;
+}
+
+export type SortModel = SortItem[];
 
 export type PaginationMode = 'index' | 'cursor';
 
@@ -516,7 +527,7 @@ export type PaginationMode = 'index' | 'cursor';
 export interface GetRecordsParams<R, P extends PaginationMode> {
   paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
   filterModel: FilterModel;
-  // sortModel: SortModel;
+  sortModel: SortModel;
 }
 
 export interface GetRecordsResult<R, P extends PaginationMode> {

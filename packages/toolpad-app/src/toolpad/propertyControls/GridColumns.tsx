@@ -290,6 +290,11 @@ function GridColumnsPropEditor({
     [rawRows],
   );
 
+  const hasDataProvider: boolean | undefined =
+    gridNodeData && (gridNodeData.hasDataProvider as boolean | undefined);
+
+  console.log(hasDataProvider);
+
   const columnSuggestions = React.useMemo(() => {
     const existingFields = new Set(value.map(({ field }) => field));
     return inferredColumns.filter((column) => !existingFields.has(column.field));

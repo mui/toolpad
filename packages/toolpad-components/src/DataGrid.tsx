@@ -34,12 +34,11 @@ import {
   useNode,
   useComponents,
   UseDataProviderContext,
-  CursorPaginationModel,
-  IndexPaginationModel,
   ToolpadDataProviderBase,
   PaginationMode,
   FilterModel,
   SortModel,
+  PaginationModel,
 } from '@mui/toolpad-core';
 import {
   Box,
@@ -532,10 +531,41 @@ function useDataProviderDataGridProps(
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
   const { dataProvider } = useDataProvider(dataProviderId || null);
 
-  const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
+  const [rawPaginationModel, setRawPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
     pageSize: 100,
   });
+
+  const mapPageToNextCursor = React.useRef(new Map<number, string>());
+
+  const paginationModel = React.useMemo<PaginationModel>(() => {
+    const page = rawPaginationModel.page;
+    const pageSize = rawPaginationModel.pageSize;
+    if (dataProvider?.paginationMode === 'cursor') {
+      // cursor based pagination
+      let cursor: string | null = null;
+      if (page !== 0) {
+        cursor = mapPageToNextCursor.current.get(page - 1) ?? null;
+        if (cursor === null) {
+          throw new Error(`No cursor found for page ${page - 1}`);
+        }
+      }
+      return {
+        cursor,
+        pageSize,
+      };
+      // TODO: when docs are on ts>5, replace with
+      //     } satisfies CursorPaginationModel;
+    }
+
+    // index based pagination
+    return {
+      start: page * pageSize,
+      pageSize,
+    };
+    // TODO: when docs are on ts>5, replace with
+    //     } satisfies IndexPaginationModel;
+  }, [dataProvider?.paginationMode, rawPaginationModel.page, rawPaginationModel.pageSize]);
 
   const [rawFilterModel, setRawFilterModel] = React.useState<GridFilterModel>();
 
@@ -556,44 +586,15 @@ function useDataProviderDataGridProps(
     [rawSortModel],
   );
 
-  const { page, pageSize } = paginationModel;
-
-  const mapPageToNextCursor = React.useRef(new Map<number, string>());
-
   const { data, isFetching, isPlaceholderData, isLoading, error, refetch } = useQuery({
     enabled: !!dataProvider,
-    queryKey: ['toolpadDataProvider', dataProviderId, page, pageSize],
+    queryKey: ['toolpadDataProvider', dataProviderId, paginationModel, filterModel, sortModel],
     placeholderData: keepPreviousData,
     queryFn: async () => {
       invariant(dataProvider, 'dataProvider must be defined');
-      let dataProviderPaginationModel: IndexPaginationModel | CursorPaginationModel;
-      if (dataProvider.paginationMode === 'cursor') {
-        // cursor based pagination
-        let cursor: string | null = null;
-        if (page !== 0) {
-          cursor = mapPageToNextCursor.current.get(page - 1) ?? null;
-          if (cursor === null) {
-            throw new Error(`No cursor found for page ${page - 1}`);
-          }
-        }
-        dataProviderPaginationModel = {
-          cursor,
-          pageSize,
-        };
-        // TODO: when docs are on ts>5, replace with
-        //     } satisfies CursorPaginationModel;
-      } else {
-        // index based pagination
-        dataProviderPaginationModel = {
-          start: page * pageSize,
-          pageSize,
-        };
-        // TODO: when docs are on ts>5, replace with
-        //     } satisfies IndexPaginationModel;
-      }
 
       const result = await dataProvider.getRecords({
-        paginationModel: dataProviderPaginationModel,
+        paginationModel,
         filterModel,
         sortModel,
       });
@@ -601,12 +602,12 @@ function useDataProviderDataGridProps(
       if (dataProvider.paginationMode === 'cursor') {
         if (typeof result.cursor === 'undefined') {
           throw new Error(
-            `No cursor returned for page ${page}. Return \`null\` to signal the end of the data.`,
+            `No cursor returned for page ${rawPaginationModel.page}. Return \`null\` to signal the end of the data.`,
           );
         }
 
         if (typeof result.cursor === 'string') {
-          mapPageToNextCursor.current.set(page, result.cursor);
+          mapPageToNextCursor.current.set(rawPaginationModel.page, result.cursor);
         }
       }
 
@@ -616,7 +617,9 @@ function useDataProviderDataGridProps(
 
   const rowCount =
     data?.totalCount ??
-    (data?.hasNextPage ? (paginationModel.page + 1) * paginationModel.pageSize + 1 : undefined) ??
+    (data?.hasNextPage
+      ? (rawPaginationModel.page + 1) * rawPaginationModel.pageSize + 1
+      : undefined) ??
     0;
 
   const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
@@ -647,9 +650,9 @@ function useDataProviderDataGridProps(
     sortingMode: 'server',
     pagination: true,
     rowCount,
-    paginationModel,
+    paginationModel: rawPaginationModel,
     onPaginationModelChange(model) {
-      setPaginationModel((prevModel) => {
+      setRawPaginationModel((prevModel) => {
         if (prevModel.pageSize !== model.pageSize) {
           return { ...model, page: 0 };
         }

@@ -502,7 +502,7 @@ export interface CursorPaginationModel {
 export interface FilterModelItem {
   field: string;
   operator: string;
-  value: any;
+  value: unknown;
 }
 
 export type LogicOperator = 'and' | 'or';
@@ -523,9 +523,13 @@ export type SortModel = SortItem[];
 
 export type PaginationMode = 'index' | 'cursor';
 
+export type PaginationModel<M extends PaginationMode = PaginationMode> = M extends 'cursor'
+  ? CursorPaginationModel
+  : IndexPaginationModel;
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface GetRecordsParams<R, P extends PaginationMode> {
-  paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
+  paginationModel: PaginationModel<P>;
   filterModel: FilterModel;
   sortModel: SortModel;
 }

@@ -74,21 +74,55 @@ export default createDataProvider({
 });
 ```
 
-## Filtering 🚧
+## Filtering
 
-:::warning
-This feature isn't implemented yet.
+Toolpad data sources support server-side filtering. You can implement a server-side filter by reading the `filterModel` property that is passed to the `getRecords` function. This model contains an `items` property and a `logicOperator`. By combining them you can achieve complex serverside filters.
 
-👍 Upvote [issue #2886](https://github.com/mui/mui-toolpad/issues/2886) if you want to see it land faster.
-:::
+```tsx
+export default createDataProvider({
+  async getRecords({ filterModel }) {
+    console.log(filterModel);
+  },
+});
+```
 
-## Sorting 🚧
+For example this could print the following if the corresponding column filters were applied in the data grid:
 
-:::warning
-This feature isn't implemented yet.
+```tsx
+{
+  logicOperator: 'and',
+  items: [
+    { field: 'first_name', operator: 'startsWith', value: 'L' },
+    { field: 'last_name', operator: 'equals', value: 'Skywalker' },
+  ]
+}
+```
 
-👍 Upvote [issue #2539](https://github.com/mui/mui-toolpad/issues/2539) if you want to see it land faster.
-:::
+Uncheck the column option "filterable" if you want to disable filtering for a certain column:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-filterable.png", "alt": "Disable filterable", "caption": "Disable filterable", "zoom": false, "width": 320 }}
+
+## Sorting
+
+Toolpad data sources support server-side sorting. To achieve this you'll have to consume the `sortModel` property that is passed to the `getRecords` method:
+
+```tsx
+export default createDataProvider({
+  async getRecords({ sortModel }) {
+    console.log(sortModel);
+  },
+});
+```
+
+Depending on which column has been set to sort by, this will result in:
+
+```tsx
+[{ field: 'name', sort: 'asc' }];
+```
+
+Uncheck the column option "sortable" if you want to disable filtering for a certain column:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-sortable.png", "alt": "Disable sortable", "caption": "Disable sortable", "zoom": false, "width": 325 }}
 
 ## Row editing 🚧
 

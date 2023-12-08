@@ -4,5 +4,5 @@ function isMac(): boolean {
 }
 
 export function getModifierKey(): string {
-  return isMac() ? '⌘S' : '<kbd>Ctrl </kbd>S';
+  return isMac() ? '⌘' : 'Ctrl';
 }

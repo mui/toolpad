@@ -16,11 +16,12 @@ import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 
 function SaveShortcutIndicator() {
   return (
-    <span
-      style={{ opacity: 0.55, marginLeft: 6 }}
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: getModifierKey() }}
-    />
+    <span>
+      &nbsp;
+      <kbd>{getModifierKey()}</kbd>
+      <kbd>+</kbd>
+      <kbd>S</kbd>
+    </span>
   );
 }
 

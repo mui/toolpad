@@ -35,6 +35,9 @@ function parseOperator(operator: string) {
 }
 
 function parseValue(typeName: string, value: unknown) {
+  if (value === undefined || value === null) {
+    return null;
+  }
   switch (typeName) {
     case 'Boolean':
       return Boolean(value);
@@ -50,10 +53,11 @@ function parseValue(typeName: string, value: unknown) {
   }
 }
 
+const model: typeof prisma.user | typeof prisma.post = prisma.user;
 export default createDataProvider({
   async getRecords({ paginationModel: { start, pageSize }, sortModel, filterModel }) {
     const [userRecords, totalCount] = await Promise.all([
-      prisma.user.findMany({
+      model.findMany({
         skip: start,
         take: pageSize,
 
@@ -70,7 +74,7 @@ export default createDataProvider({
                       case 'isNotEmpty':
                         return { [field]: { not: null } };
                       default: {
-                        const typeName = (prisma.user.fields as any)[field]?.typeName;
+                        const typeName = (model.fields as any)[field]?.typeName;
                         if (operator === 'in') {
                           value = (value as unknown[]).map((val) => parseValue(typeName, val));
                         } else {
@@ -87,7 +91,7 @@ export default createDataProvider({
           [field]: sort,
         })),
       }),
-      prisma.user.count(),
+      model.count(),
     ]);
     return {
       records: userRecords,
@@ -96,7 +100,7 @@ export default createDataProvider({
   },
 
   async deleteRecord(id) {
-    await prisma.user.delete({
+    await model.delete({
       where: { id: Number(id) },
     });
   },

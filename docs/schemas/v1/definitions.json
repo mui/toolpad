@@ -20,6 +20,10 @@
             "authorization": {
               "type": "object",
               "properties": {
+                "secret": {
+                  "$ref": "#/definitions/EnvBinding",
+                  "description": "A random string used to hash tokens, sign/encrypt cookies and generate cryptographic keys."
+                },
                 "provider": {
                   "type": "string",
                   "enum": ["github", "google"],
@@ -29,10 +33,6 @@
                   "type": "object",
                   "description": "Authentication provider specific configuration.",
                   "additionalProperties": true
-                },
-                "domain": {
-                  "type": "string",
-                  "description": "Restricted domain for all authorized user email addresses."
                 },
                 "roles": {
                   "type": "array",

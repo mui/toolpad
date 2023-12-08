@@ -1,12 +1,15 @@
 import * as React from 'react';
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
   Link,
   MenuItem,
+  Snackbar,
   Stack,
   TextField,
   Tooltip,
@@ -25,6 +28,7 @@ import {
 } from '@mui/x-data-grid';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { BindableAttrValue, EnvAttrValue } from '@mui/toolpad-core';
 import { useAppState, useAppStateApi } from '../AppState';
@@ -328,6 +332,23 @@ export function AppAuthenticationEditor() {
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
           ...app.attributes?.authorization,
           provider: (provider as 'github' | 'google') || undefined,
+          providerConfig: {},
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const handleAuthSecretChange = React.useCallback(
+    (newValue: BindableAttrValue<string> | null) => {
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
+          ...app.attributes?.authorization,
+          secret: (newValue as EnvAttrValue) || undefined,
         });
 
         return draft;
@@ -347,7 +368,10 @@ export function AppAuthenticationEditor() {
 
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
           ...app.attributes?.authorization,
-          domain: domain || undefined,
+          providerConfig: {
+            ...app.attributes?.authorization?.providerConfig,
+            domain: domain || undefined,
+          },
         });
 
         return draft;
@@ -402,7 +426,7 @@ export function AppAuthenticationEditor() {
     [authorization?.provider],
   );
 
-  const getProviderConfigValue = React.useCallback((value: BindableAttrValue<string> | null) => {
+  const getBindingDisplayValue = React.useCallback((value: BindableAttrValue<string> | null) => {
     const valueBindingType = value && getBindingType(value);
 
     if (valueBindingType && valueBindingType === 'env') {
@@ -412,6 +436,15 @@ export function AppAuthenticationEditor() {
     return value;
   }, []);
 
+  const [clipboardSnackbarOpen, setClipboardSnackbarOpen] = React.useState(false);
+  const handleAuthSecretClipboardClick = React.useCallback(() => {
+    window.navigator.clipboard.writeText('openssl rand -base64 32');
+    setClipboardSnackbarOpen(true);
+  }, []);
+  const handleClipboardSnackbarClose = React.useCallback(() => setClipboardSnackbarOpen(false), []);
+
+  const authProviderConfig = authorization?.providerConfig ?? {};
+
   return (
     <React.Fragment>
       <Stack direction="row" gap={1}>
@@ -420,9 +453,9 @@ export function AppAuthenticationEditor() {
           label="Authentication provider"
           value={authorization?.provider || ''}
           onChange={handleAuthProviderChange}
-          fullWidth
           helperText="If set, only authenticated users can view pages."
           defaultValue=""
+          sx={{ flex: 1 }}
         >
           <MenuItem value="">
             <Typography ml={1}>No authentication</Typography>
@@ -436,56 +469,120 @@ export function AppAuthenticationEditor() {
             </MenuItem>
           ))}
         </TextField>
+        <Stack direction="row" alignItems="start" flex={1}>
+          <TextField
+            disabled
+            label="Authentication secret*"
+            value={getBindingDisplayValue(
+              (authorization?.secret as BindableAttrValue<string>) ?? '',
+            )}
+            fullWidth
+            error={!!authorization?.provider && !authorization.secret}
+            helperText={
+              !authorization?.secret ? (
+                <React.Fragment>
+                  A random string used to hash tokens, sign/encrypt cookies and generate
+                  cryptographic keys. You can create a good value on the command line with
+                  <br />
+                  <Tooltip title="Copy to clipboard">
+                    <em>
+                      <Typography noWrap component="code" fontSize={13}>
+                        openssl rand -base64 32{' '}
+                        <IconButton onClick={handleAuthSecretClipboardClick}>
+                          <ContentCopyIcon fontSize="inherit" />
+                        </IconButton>
+                      </Typography>
+                    </em>
+                  </Tooltip>
+                  <Snackbar
+                    open={clipboardSnackbarOpen}
+                    autoHideDuration={3000}
+                    onClose={handleClipboardSnackbarClose}
+                    message="Copied to clipboard"
+                  />
+                </React.Fragment>
+              ) : null
+            }
+            sx={{ ml: '6px' }}
+          />
+          <Box sx={{ mt: 1 }}>
+            <BindingEditor
+              globalScope={{}}
+              globalScopeMeta={{}}
+              value={(authorization?.secret as BindableAttrValue<string>) ?? ''}
+              onChange={handleAuthSecretChange}
+              jsRuntime={jsServerRuntime}
+              label="Authentication secret"
+              propType={{ type: 'string' }}
+              env={env}
+              hasEnvOnly
+            />
+          </Box>
+        </Stack>
+      </Stack>
+      {authorization?.provider === 'google' ? (
         <TextField
           label="Restricted domain"
-          value={authorization?.domain}
+          value={getBindingDisplayValue(
+            (authProviderConfig.domain as BindableAttrValue<string>) || '',
+          )}
           onChange={handleAuthDomainChange}
           fullWidth
           placeholder="example.com"
           helperText="If set, only allow users with email addresses in this domain."
         />
-      </Stack>
+      ) : null}
       {authorization?.provider ? (
         <React.Fragment>
           <Stack direction="row" alignItems="center">
-            <Stack direction="row" alignItems="center" flex={1}>
+            <Stack direction="row" alignItems="start" flex={1}>
               <TextField
                 disabled
-                label="Client ID"
-                value={getProviderConfigValue(authorization?.providerConfig?.clientId ?? null)}
+                label="Client ID*"
+                value={getBindingDisplayValue(
+                  (authProviderConfig.clientId as BindableAttrValue<string>) ?? '',
+                )}
                 fullWidth
+                error={!authProviderConfig.clientId}
               />
-              <BindingEditor
-                globalScope={{}}
-                globalScopeMeta={{}}
-                value={authorization?.providerConfig?.clientId ?? null}
-                onChange={handleClientIDChange}
-                jsRuntime={jsServerRuntime}
-                label="Client ID"
-                propType={{ type: 'string' }}
-                env={env}
-                hasEnvOnly
-              />
+              <Box sx={{ mt: 1 }}>
+                <BindingEditor
+                  globalScope={{}}
+                  globalScopeMeta={{}}
+                  value={(authProviderConfig.clientId as BindableAttrValue<string>) ?? ''}
+                  onChange={handleClientIDChange}
+                  jsRuntime={jsServerRuntime}
+                  label="Client ID"
+                  propType={{ type: 'string' }}
+                  env={env}
+                  hasEnvOnly
+                />
+              </Box>
             </Stack>
-            <Stack direction="row" alignItems="center" flex={1}>
+            <Stack direction="row" alignItems="start" flex={1}>
               <TextField
                 disabled
-                label="Client secret"
-                value={getProviderConfigValue(authorization?.providerConfig?.clientSecret ?? null)}
+                label="Client secret*"
+                value={getBindingDisplayValue(
+                  (authProviderConfig.clientSecret as BindableAttrValue<string>) ?? '',
+                )}
                 fullWidth
-                sx={{ ml: '6px' }}
+                error={!authProviderConfig.clientSecret}
+                sx={{ ml: '12px' }}
               />
-              <BindingEditor
-                globalScope={{}}
-                globalScopeMeta={{}}
-                value={authorization?.providerConfig?.clientSecret ?? null}
-                onChange={handleClientSecretChange}
-                jsRuntime={jsServerRuntime}
-                label="Client secret"
-                propType={{ type: 'string' }}
-                env={env}
-                hasEnvOnly
-              />
+              <Box sx={{ mt: 1 }}>
+                <BindingEditor
+                  globalScope={{}}
+                  globalScopeMeta={{}}
+                  value={(authProviderConfig.clientSecret as BindableAttrValue<string>) ?? ''}
+                  onChange={handleClientSecretChange}
+                  jsRuntime={jsServerRuntime}
+                  label="Client secret"
+                  propType={{ type: 'string' }}
+                  env={env}
+                  hasEnvOnly
+                />
+              </Box>
             </Stack>
           </Stack>
           {currentProviderData ? (

@@ -1,15 +1,24 @@
-export default class AuthManager {
-  // eslint-disable-next-line class-methods-use-this
-  getAuthProvider() {
-    return new Promise((resolve) => {
-      if (process.env.TOOLPAD_GITHUB_ID && process.env.TOOLPAD_GITHUB_SECRET) {
-        resolve('github');
-      }
-      if (process.env.TOOLPAD_GOOGLE_CLIENT_ID && process.env.TOOLPAD_GOOGLE_CLIENT_SECRET) {
-        resolve('google');
-      }
+import * as appDom from '../appDom';
+import { ToolpadProjectOptions } from '../types';
 
-      resolve(null);
-    });
+interface IToolpadProject {
+  options: ToolpadProjectOptions;
+  loadDom(): Promise<appDom.AppDom>;
+}
+
+export default class AuthManager {
+  private project: IToolpadProject;
+
+  constructor(project: IToolpadProject) {
+    this.project = project;
+  }
+
+  async getAuthProvider() {
+    const dom = await this.project.loadDom();
+
+    const app = appDom.getApp(dom);
+    const authorization = app.attributes.authorization;
+
+    return authorization?.provider ?? null;
   }
 }

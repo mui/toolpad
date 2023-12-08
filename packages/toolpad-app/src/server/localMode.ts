@@ -1075,7 +1075,7 @@ class ToolpadProject {
     this.envManager = new EnvManager(this);
     this.functionsManager = new FunctionsManager(this);
     this.dataManager = new DataManager(this);
-    this.authManager = new AuthManager();
+    this.authManager = new AuthManager(this);
 
     this.invalidateQueries = throttle(
       () => {

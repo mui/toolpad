@@ -398,16 +398,15 @@ async function createAuthHandler(base: string): Promise<AppHandler> {
         trustHost: true,
         callbacks: {
           async signIn({ account, profile }) {
-            const isEmailDomainValid = Boolean(
-              profile?.email &&
-                (!process.env.TOOLPAD_AUTH_DOMAIN ||
-                  profile.email.endsWith(`@${process.env.TOOLPAD_AUTH_DOMAIN}`)),
-            );
-
             if (account?.provider === 'google') {
-              return Boolean(profile?.email_verified) && isEmailDomainValid;
+              return Boolean(
+                profile?.email_verified &&
+                  profile?.email &&
+                  (!process.env.TOOLPAD_AUTH_DOMAIN ||
+                    profile.email.endsWith(`@${process.env.TOOLPAD_AUTH_DOMAIN}`)),
+              );
             }
-            return isEmailDomainValid;
+            return true;
           },
           async redirect({ baseUrl }) {
             return `${baseUrl}${base}`;

@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Checkbox,
+  FormControlLabel,
   IconButton,
   List,
   ListItem,
@@ -200,6 +202,38 @@ function GridColumnEditor({
         ))}
       </TextField>
 
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.sortable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                sortable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Sortable"
+      />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.filterable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                filterable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Filterable"
+      />
+
       <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
         {editedColumn.type === 'number' ? (
           <NumberFormatEditor
@@ -289,11 +323,6 @@ function GridColumnsPropEditor({
     () => inferColumns(Array.isArray(rawRows) ? rawRows : []),
     [rawRows],
   );
-
-  const hasDataProvider: boolean | undefined =
-    gridNodeData && (gridNodeData.hasDataProvider as boolean | undefined);
-
-  console.log(hasDataProvider);
 
   const columnSuggestions = React.useMemo(() => {
     const existingFields = new Set(value.map(({ field }) => field));

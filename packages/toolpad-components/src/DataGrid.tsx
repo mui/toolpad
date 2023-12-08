@@ -397,7 +397,10 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
 };
 
 export interface SerializableGridColumn
-  extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
+  extends Pick<
+    GridColDef,
+    'field' | 'type' | 'align' | 'width' | 'headerName' | 'sortable' | 'filterable'
+  > {
   numberFormat?: NumberFormat;
   dateFormat?: DateFormat;
   dateTimeFormat?: DateFormat;
@@ -819,10 +822,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   } else if (errorProp) {
     error = errorFrom(errorProp);
   }
-
-  React.useEffect(() => {
-    nodeRuntime?.updateEditorNodeData('hasDataProvider', !!dataProviderId);
-  }, [nodeRuntime, dataProviderId]);
 
   React.useEffect(() => {
     nodeRuntime?.updateEditorNodeData('rawRows', rows);

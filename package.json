@@ -95,7 +95,7 @@
     "semver": "7.5.4",
     "tsup": "8.0.1",
     "tsx": "4.6.2",
-    "vitest": "1.0.1",
+    "vitest": "1.0.4",
     "yargs": "17.7.2",
     "zod": "3.22.4",
     "zod-to-json-schema": "3.22.1"

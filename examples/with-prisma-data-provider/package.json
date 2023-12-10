@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@mui/toolpad": "0.1.40",
-    "@prisma/client": "5.6.0",
+    "@prisma/client": "5.7.0",
     "qrcode": "^1.5.3"
   },
   "devDependencies": {

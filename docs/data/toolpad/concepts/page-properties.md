@@ -65,3 +65,15 @@ spec:
 ```
 
 Now the urls **/pages/workers** and **/pages/colleagues** will both redirect to the url **/pages/employees**.
+
+## Page display name
+
+names of Toolpad objects must be valid javascript identifiers because they will create global variables in binding scripts. so can't use special characters in names. To display a different name for a page in the navigation sidebar, you can use the `displayName` property in the page's **page.yml** file. e.g.
+
+```yaml
+# /pages/employees/page.yml
+apiVersion: v1
+kind: page
+spec:
+  displayName: 'displayName'
+```

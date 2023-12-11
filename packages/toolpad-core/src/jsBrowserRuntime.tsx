@@ -16,7 +16,7 @@ function createBrowserRuntime(): JsRuntime {
     (iframe.contentWindow as any).__SCOPE = globalScope;
     (iframe.contentWindow as any).console = window.console;
 
-    return (iframe.contentWindow as any).eval(`
+    const result = (iframe.contentWindow as any).eval(`
       (() => {
         // See https://tc39.es/ecma262/multipage/global-object.html#sec-global-object
         const ecmaGlobals = new Set([ 'globalThis', 'Infinity', 'NaN', 'undefined', 'eval', 'isFinite', 'isNaN', 'parseFloat', 'parseInt', 'decodeURI', 'decodeURIComponent', 'encodeURI', 'encodeURIComponent', 'AggregateError', 'Array', 'ArrayBuffer', 'BigInt', 'BigInt64Array', 'BigUint64Array', 'Boolean', 'DataView', 'Date', 'Error', 'EvalError', 'FinalizationRegistry', 'Float32Array', 'Float64Array', 'Function', 'Int8Array', 'Int16Array', 'Int32Array', 'Map', 'Number', 'Object', 'Promise', 'Proxy', 'RangeError', 'ReferenceError', 'RegExp', 'Set', 'SharedArrayBuffer', 'String', 'Symbol', 'SyntaxError', 'TypeError', 'Uint8Array', 'Uint8ClampedArray', 'Uint16Array', 'Uint32Array', 'URIError', 'WeakMap', 'WeakRef', 'WeakSet', 'Atomics', 'JSON', 'Math', 'Reflect' ]);
@@ -50,6 +50,12 @@ function createBrowserRuntime(): JsRuntime {
         }
       })()
     `);
+
+    if (typeof result?.then === 'function') {
+      return Promise.resolve(result).then((value) => window.structuredClone(value));
+    }
+
+    return window.structuredClone(result);
   }
 
   function evaluateExpression(

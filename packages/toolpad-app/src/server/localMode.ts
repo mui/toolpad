@@ -724,6 +724,7 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
   let fragment = appDom.createFragment('page', {
     name: pageName,
     attributes: {
+      displayName: pageFileSpec.displayName,
       // Convert deprecated id to alias
       alias: pageFileSpec.id ? [pageFileSpec.id] : pageFileSpec.alias,
       title: pageFileSpec.title,

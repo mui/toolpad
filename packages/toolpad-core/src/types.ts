@@ -518,9 +518,8 @@ export interface GetRecordsResult<R, P extends PaginationMode> {
 export interface ToolpadDataProviderBase<R, P extends PaginationMode = 'index'> {
   paginationMode?: P;
   getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
-  // getTotalCount?: () => Promise<number>;
-  // updateRecord?: (id: string, record: R) => Promise<void>;
-  // deleteRecord?: (id: string) => Promise<void>;
+  deleteRecord?: (id: string | number) => Promise<void>;
+  // updateRecord?: (id: string | number, record: R) => Promise<void>;
   // createRecord?: (record: R) => Promise<void>;
 }
 

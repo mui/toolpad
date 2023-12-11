@@ -20,4 +20,10 @@ export default createDataProvider({
       totalCount,
     };
   },
+
+  async deleteRecord(id) {
+    await prisma.user.delete({
+      where: { id: Number(id) },
+    });
+  },
 });

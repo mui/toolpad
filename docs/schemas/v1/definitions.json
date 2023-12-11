@@ -1,6 +1,68 @@
 {
   "type": "object",
   "properties": {
+    "Application": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "v1",
+          "description": "Defines the version of this object. Used in determining compatibility between Toolpad \"application\" objects."
+        },
+        "kind": {
+          "type": "string",
+          "const": "application",
+          "description": "Describes the nature of this Toolpad \"application\" object."
+        },
+        "spec": {
+          "type": "object",
+          "properties": {
+            "authorization": {
+              "type": "object",
+              "properties": {
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the role."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "A description of the role."
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "description": "Available roles for this application. These can be assigned to users."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Authorization configuration for this application."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Defines the shape of this \"application\" object"
+        }
+      },
+      "required": [
+        "apiVersion",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
     "Page": {
       "type": "object",
       "properties": {
@@ -341,6 +403,24 @@
               },
               "description": "The content of the page. This defines the UI."
             },
+            "authorization": {
+              "type": "object",
+              "properties": {
+                "allowAll": {
+                  "type": "boolean",
+                  "description": "Allow all users to access this page."
+                },
+                "allowedRoles": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Roles that are allowed to access this page."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Authorization configuration for this page."
+            },
             "unstable_codeFile": {
               "type": "string",
               "description": "The content of the page as JSX. Experimental, do not use!."
@@ -426,6 +506,7 @@
     }
   },
   "required": [
+    "Application",
     "Page",
     "Theme"
   ],

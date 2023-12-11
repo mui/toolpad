@@ -136,8 +136,7 @@ export default function HierarchyExplorer() {
   const appStateApi = useAppStateApi();
   const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
 
-  const currentPageId = currentView?.name ? appDom.getNodeIdByName(dom, currentView?.name) : null;
-  const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
+  const currentPageNode = currentView?.name ? appDom.getPageByName(dom, currentView.name) : null;
   const selectedDomNodeId = currentView?.selectedNodeId;
 
   const selectedNodeAncestorIds = React.useMemo(() => {

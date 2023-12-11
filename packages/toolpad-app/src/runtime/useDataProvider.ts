@@ -3,6 +3,7 @@ import { UseDataProviderHook } from '@mui/toolpad-core/runtime';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
 import { ToolpadDataProviderBase } from '@mui/toolpad-core';
+import { GridRowId } from '@mui/x-data-grid';
 import api from './api';
 
 export const useDataProvider: UseDataProviderHook = (id) => {
@@ -31,6 +32,13 @@ export const useDataProvider: UseDataProviderHook = (id) => {
         const [filePath, name] = id.split(':');
         return api.methods.getDataProviderRecords(filePath, name, ...args);
       },
+      deleteRecord: introspection.hasDeleteRecord
+        ? async (recordId: GridRowId) => {
+            invariant(id, 'id is required');
+            const [filePath, name] = id.split(':');
+            return api.methods.deleteDataProviderRecord(filePath, name, recordId);
+          }
+        : undefined,
     };
   }, [id, introspection]);
 

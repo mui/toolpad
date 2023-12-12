@@ -19,6 +19,6 @@ export default class AuthManager {
     const app = appDom.getApp(dom);
     const authorization = app.attributes.authorization;
 
-    return authorization?.provider ?? null;
+    return authorization?.providers ?? [];
   }
 }

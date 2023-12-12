@@ -1,14 +1,18 @@
 import * as React from 'react';
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
   Link,
   MenuItem,
+  Select,
+  SelectChangeEvent,
   Stack,
-  TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -27,6 +31,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
+import { AuthProvider } from '../../types';
 
 const AUTH_PROVIDERS = new Map([
   ['github', { name: 'GitHub', Icon: GitHubIcon }],
@@ -306,10 +311,10 @@ export function AppAuthenticationEditor() {
   const { dom } = useAppState();
   const appState = useAppStateApi();
 
-  const handleAuthProviderChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAuthProvidersChange = React.useCallback(
+    (event: SelectChangeEvent<AuthProvider[]>) => {
       const {
-        target: { value: provider },
+        target: { value: providers },
       } = event;
 
       appState.update((draft) => {
@@ -317,7 +322,9 @@ export function AppAuthenticationEditor() {
 
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
           ...app.attributes?.authorization,
-          provider: (provider as 'github' | 'google') || undefined,
+          providers: (typeof providers === 'string'
+            ? providers.split(',')
+            : providers) as AuthProvider[],
         });
 
         return draft;
@@ -329,38 +336,52 @@ export function AppAuthenticationEditor() {
   const appNode = appDom.getApp(dom);
   const authorization = appNode.attributes.authorization;
 
-  const currentProviderData = React.useMemo(
-    () => (authorization?.provider ? AUTH_PROVIDERS.get(authorization?.provider) : null),
-    [authorization?.provider],
+  const authProviders = React.useMemo(
+    () => authorization?.providers ?? [],
+    [authorization?.providers],
+  );
+
+  const currentProvidersData = React.useMemo(
+    () => authProviders.map((provider) => AUTH_PROVIDERS.get(provider)),
+    [authProviders],
   );
 
   return (
     <Stack direction="column">
-      <TextField
-        select
-        label="Authentication provider"
-        value={authorization?.provider || ''}
-        onChange={handleAuthProviderChange}
-        helperText="If set, only authenticated users can view pages."
-        defaultValue=""
-        sx={{ flex: 1 }}
-      >
-        <MenuItem value="">
-          <Typography ml={1}>No authentication</Typography>
-        </MenuItem>
-        {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
-          <MenuItem key={value} value={value}>
-            <Stack direction="row" alignItems="center">
-              <Icon fontSize="small" />
-              <Typography ml={1}>{name}</Typography>
-            </Stack>
-          </MenuItem>
-        ))}
-      </TextField>
-      {currentProviderData ? (
+      <FormControl>
+        <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
+        <Select<AuthProvider[]>
+          labelId="auth-providers-label"
+          label="Authentication providers"
+          id="auth-providers"
+          multiple
+          value={authProviders}
+          onChange={handleAuthProvidersChange}
+          fullWidth
+          renderValue={(selected) =>
+            selected
+              .map((selectedValue) => AUTH_PROVIDERS.get(selectedValue)?.name ?? '')
+              .join(', ')
+          }
+          inputProps={{
+            helperText: 'If set, only authenticated users can view pages.',
+          }}
+        >
+          {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
+            <MenuItem key={value} value={value}>
+              <Stack direction="row" alignItems="center">
+                <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
+                <Icon fontSize="small" />
+                <Typography ml={1}>{name}</Typography>
+              </Stack>
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      {currentProvidersData ? (
         <Link href="/" target="_blank">
           <Typography variant="subtitle1" sx={{ mt: 1, mb: 1, fontSize: 14 }}>
-            Learn how to set up {currentProviderData.name} as an authentication provider.
+            Learn how to set up authentication providers.
           </Typography>
         </Link>
       ) : null}

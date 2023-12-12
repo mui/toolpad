@@ -120,7 +120,7 @@ Depending on which column has been set to sort by, this will result in:
 [{ field: 'name', sort: 'asc' }];
 ```
 
-Uncheck the column option "sortable" if you want to disable filtering for a certain column:
+Uncheck the column option "sortable" if you want to disable sorting for a certain column:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-sortable.png", "alt": "Disable sortable", "caption": "Disable sortable", "zoom": false, "width": 325 }}
 

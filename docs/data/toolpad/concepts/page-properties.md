@@ -12,6 +12,8 @@ The possible options for the the display mode are:
 
 - **App shell**: Pages with their display mode set to this value will render within the navigation sidebar on the left, allowing for easy navigation between all pages:
 
+To display a different name for a page in the sidebar, the page `display name` property can be used.
+
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/page-properties/app-shell.png", "alt": "App shell display mode ", "caption": "Page with display mode set to App shell", "indent": 1 }}
 
 - **No shell**: Pages with their display mode set to this value will render without the navigation sidebar
@@ -65,15 +67,3 @@ spec:
 ```
 
 Now the urls **/pages/workers** and **/pages/colleagues** will both redirect to the url **/pages/employees**.
-
-## Page display name
-
-names of Toolpad objects must be valid javascript identifiers because they will create global variables in binding scripts. so can't use special characters in names. To display a different name for a page in the navigation sidebar, you can use the `displayName` property in the page's **page.yml** file. e.g.
-
-```yaml
-# /pages/employees/page.yml
-apiVersion: v1
-kind: page
-spec:
-  displayName: 'displayName'
-```

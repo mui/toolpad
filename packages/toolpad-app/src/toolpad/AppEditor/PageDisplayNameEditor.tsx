@@ -43,7 +43,7 @@ export default function PageDisplayNameEditor({ node }: PageDisplayNameEditorPro
   return (
     <TextField
       fullWidth
-      label="Page display name"
+      label="Display name"
       value={pageDisplayNameInput}
       onChange={handlePageDisplayNameChange}
       onBlur={handleCommit}

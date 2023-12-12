@@ -17,7 +17,7 @@ import useUnsavedChangesConfirm from '../../../hooks/useUnsavedChangesConfirm';
 function SaveShortcutIndicator() {
   return (
     <span>
-      <kbd>{getModifierKey()}</kbd>+<kbd>S</kbd>
+      {getModifierKey()}+<kbd>S</kbd>
     </span>
   );
 }
@@ -258,7 +258,8 @@ export default function QueryEditor() {
               color="primary"
               sx={{ width: 'fit-content', height: 32, my: 'auto', mt: 0.2, mr: 2 }}
             >
-              Save <SaveShortcutIndicator />
+              Save &nbsp;
+              <SaveShortcutIndicator />
             </LoadingButton>
             <IconButton size="small" disableRipple onClick={handleClosePanel}>
               <CancelPresentationIcon

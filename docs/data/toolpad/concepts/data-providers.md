@@ -86,7 +86,7 @@ export default createDataProvider({
 });
 ```
 
-For example this could print the following if the corresponding column filters were applied in the data grid:
+For example, this could print the following if the corresponding column filters were applied in the data grid:
 
 ```tsx
 {

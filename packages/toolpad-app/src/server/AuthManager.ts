@@ -13,7 +13,7 @@ export default class AuthManager {
     this.project = project;
   }
 
-  async getAuthProvider() {
+  async getAuthProviders() {
     const dom = await this.project.loadDom();
 
     const app = appDom.getApp(dom);

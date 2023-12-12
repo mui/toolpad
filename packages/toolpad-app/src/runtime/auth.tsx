@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { asArray } from '@mui/toolpad-utils/collections';
-import { Box } from '@mui/material';
+import { Box, CircularProgress, Stack } from '@mui/material';
 import { AuthSessionContext } from './useAuthSession';
 
 export interface RequireAuthorizationProps {
@@ -9,7 +9,7 @@ export interface RequireAuthorizationProps {
 }
 
 export function RequireAuthorization({ children, allowedRole }: RequireAuthorizationProps) {
-  const { session } = React.useContext(AuthSessionContext);
+  const { session, isSigningIn } = React.useContext(AuthSessionContext);
   const user = session?.user ?? null;
 
   const allowedRolesSet = React.useMemo<Set<string>>(
@@ -19,8 +19,17 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
 
   let reason = null;
   if (!user) {
-    reason = 'User is not authenticated.';
-  } else if (!user.roles || user.roles.length <= 0) {
+    if (!isSigningIn) {
+      window.location.replace('/api/auth/signin');
+    }
+
+    return (
+      <Stack direction="column" alignItems="center" mt={2}>
+        <CircularProgress color="primary" size={56} />
+      </Stack>
+    );
+  }
+  if (!user.roles || user.roles.length <= 0) {
     reason = 'User has no roles defined.';
   } else if (!user.roles.some((role) => allowedRolesSet.has(role))) {
     const rolesList = user?.roles?.map((role) => JSON.stringify(role)).join(', ');

@@ -1462,23 +1462,15 @@ function PageNotFound() {
 
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
+  hasAuthentication?: boolean;
 }
 
-function RenderedPages({ pages }: RenderedPagesProps) {
+function RenderedPages({ pages, hasAuthentication = false }: RenderedPagesProps) {
   const { search } = useLocation();
 
   const defaultPage = pages[0];
 
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
-
-  const { data: authProvider, isLoading: isLoadingAuthProvider } = useQuery({
-    queryKey: ['getAuthProvider'],
-    queryFn: async () => {
-      return api.methods.getAuthProvider();
-    },
-  });
-
-  const hasAuthentication = !isLoadingAuthProvider && !!authProvider;
 
   return (
     <Routes>
@@ -1491,14 +1483,6 @@ function RenderedPages({ pages }: RenderedPagesProps) {
             key={page.name}
           />
         );
-
-        if (isLoadingAuthProvider) {
-          pageContent = (
-            <Stack direction="column" alignItems="center" mt={2}>
-              <CircularProgress color="primary" size={56} />
-            </Stack>
-          );
-        }
 
         if (!IS_RENDERED_IN_CANVAS && hasAuthentication && page.attributes.authorization) {
           pageContent = (
@@ -1559,6 +1543,15 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
+  const { data: authProvider, isLoading: isLoadingAuthProvider } = useQuery({
+    queryKey: ['getAuthProviders'],
+    queryFn: async () => {
+      return api.methods.getAuthProviders();
+    },
+  });
+
+  const hasAuthentication = !isLoadingAuthProvider && !!authProvider;
+
   const pageMatch = useMatch('/pages/:slug');
   const activePageSlug = pageMatch?.params.slug;
 
@@ -1572,15 +1565,23 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
     [pages],
   );
 
+  if (isLoadingAuthProvider) {
+    return (
+      <Stack direction="column" alignItems="center" mt={2}>
+        <CircularProgress color="primary" size={56} />
+      </Stack>
+    );
+  }
+
   return (
     <AppLayout
       activePageSlug={activePageSlug}
       pages={navEntries}
       hasNavigation={!IS_RENDERED_IN_CANVAS}
-      hasHeader={!IS_RENDERED_IN_CANVAS}
+      hasHeader={hasAuthentication && !IS_RENDERED_IN_CANVAS}
       clipped={SHOW_PREVIEW_HEADER}
     >
-      <RenderedPages pages={pages} />
+      <RenderedPages pages={pages} hasAuthentication={hasAuthentication} />
     </AppLayout>
   );
 }
@@ -1627,7 +1628,10 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                     <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                       <React.Suspense fallback={<AppLoading />}>
                         <QueryClientProvider client={queryClient}>
-                          <ToolpadAppLayout dom={dom} />
+                          <Routes>
+                            {/* <Route path="/signin" element={<div>hello there</div>} /> */}
+                            <Route path="*" element={<ToolpadAppLayout dom={dom} />} />
+                          </Routes>
                           {showDevtools ? (
                             <ReactQueryDevtoolsProduction initialIsOpen={false} />
                           ) : null}

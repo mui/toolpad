@@ -18,14 +18,11 @@ import {
   useTheme,
   Snackbar,
   Alert,
+  Link as MuiLink,
 } from '@mui/material';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import { Link, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { LoadingButton } from '@mui/lab';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
-import { AuthProvider, AuthSessionContext } from './useAuthSession';
-import api from './api';
+import { AuthSessionContext } from './useAuthSession';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -46,7 +43,6 @@ interface AppPagesNavigationProps {
   activePageSlug?: string;
   pages: NavigationEntry[];
   clipped?: boolean;
-  hasHeader?: boolean;
   search?: string;
 }
 
@@ -54,10 +50,17 @@ function AppPagesNavigation({
   activePageSlug,
   pages,
   clipped = false,
-  hasHeader = true,
   search,
 }: AppPagesNavigationProps) {
   const navListSubheaderId = React.useId();
+
+  const theme = useTheme();
+
+  const productIconSrc = `${window.location.origin}/${
+    theme.palette.mode === 'dark' ? 'product-icon-dark.svg' : 'product-icon-light.svg'
+  }`;
+
+  const initialPageSlug = pages[0].slug;
 
   return (
     <Drawer
@@ -71,7 +74,36 @@ function AppPagesNavigation({
       }}
     >
       {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
-      {hasHeader ? <Toolbar variant="dense" /> : null}
+      <MuiLink
+        color="inherit"
+        aria-label="Go to home page"
+        href={initialPageSlug}
+        underline="none"
+        sx={{
+          ml: 3,
+          mt: 1,
+          mb: '4px',
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 1,
+        }}
+      >
+        <img src={productIconSrc} alt="Toolpad logo" width={35} height={35} />
+        <Box
+          data-testid="brand"
+          sx={{
+            color: 'primary.main',
+            lineHeight: '21px',
+            fontSize: '16px',
+            fontWeight: 700,
+            letterSpacing: 0,
+            fontFamily: theme.typography.fontFamily,
+          }}
+        >
+          MUI Toolpad
+        </Box>
+      </MuiLink>
       <List component="nav" aria-labelledby={navListSubheaderId}>
         {pages.map((page) => (
           <ListItem key={page.slug} disablePadding>
@@ -106,20 +138,13 @@ export function AppLayout({
   activePageSlug,
   pages = [],
   hasNavigation: hasNavigationProp = true,
-  hasHeader: hasHeaderProp = true,
+  hasHeader = false,
   children,
   clipped,
 }: ToolpadAppLayoutProps) {
   const theme = useTheme();
 
   const [urlParams] = useSearchParams();
-
-  const { data: authProvider } = useQuery({
-    queryKey: ['getAuthProvider'],
-    queryFn: async () => {
-      return api.methods.getAuthProvider();
-    },
-  });
 
   const retainedSearch = React.useMemo(() => {
     for (const name of urlParams.keys()) {
@@ -138,9 +163,8 @@ export function AppLayout({
   const hasShell = navEntry?.hasShell !== false && displayMode !== 'standalone';
 
   const hasNavigation = hasNavigationProp && hasShell;
-  const hasHeader = hasHeaderProp && hasShell;
 
-  const { session, signIn, signOut, isSigningIn } = React.useContext(AuthSessionContext);
+  const { session, signOut, isSigningIn } = React.useContext(AuthSessionContext);
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -150,22 +174,10 @@ export function AppLayout({
     setAnchorElUser(null);
   };
 
-  const handleSignIn = React.useCallback(
-    (provider: AuthProvider) => () => {
-      signIn(provider);
-    },
-    [signIn],
-  );
-
   const handleSignOut = React.useCallback(() => {
     signOut();
     handleCloseUserMenu();
   }, [signOut]);
-
-  const activePage = React.useMemo(
-    () => pages.find((page) => page.slug === activePageSlug),
-    [activePageSlug, pages],
-  );
 
   const [errorSnackbarMessage, setErrorSnackbarMessage] = React.useState<string>('');
 
@@ -189,115 +201,70 @@ export function AppLayout({
 
   return (
     <React.Fragment>
-      {hasHeader ? (
-        <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
-          {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
-          <Toolbar variant="dense" sx={{ mt: clipped ? '-4px' : 0 }}>
-            <Typography variant="h6" noWrap sx={{ ml: 1 }}>
-              {activePage?.displayName ?? ''}
-            </Typography>
-            <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
-              {session?.user && !isSigningIn ? (
-                <React.Fragment>
-                  <Button color="inherit" onClick={handleOpenUserMenu}>
-                    <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
-                      {session.user.name || session.user.email}
-                    </Typography>
-                    <Tooltip title="User settings">
-                      <Avatar
-                        alt={session.user.name || session.user.email}
-                        src={session.user.image}
-                        sx={{
-                          bgcolor: theme.palette.secondary.main,
-                          width: 32,
-                          height: 32,
-                        }}
-                      />
-                    </Tooltip>
-                  </Button>
-                  <Menu
-                    sx={{ mt: '45px' }}
-                    id="menu-appbar-user"
-                    anchorEl={anchorElUser}
-                    anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    open={Boolean(anchorElUser)}
-                    onClose={handleCloseUserMenu}
-                  >
-                    <MenuItem onClick={handleSignOut}>
-                      <ListItemText>Sign out</ListItemText>
-                    </MenuItem>
-                  </Menu>
-                </React.Fragment>
-              ) : null}
-              {!session?.user && authProvider ? (
-                <React.Fragment>
-                  {authProvider === 'github' ? (
-                    <LoadingButton
-                      variant="contained"
-                      onClick={handleSignIn('github')}
-                      startIcon={<GitHubIcon />}
-                      loading={isSigningIn}
-                      loadingPosition="start"
-                      sx={{
-                        backgroundColor: '#24292F',
-                      }}
-                    >
-                      Sign in with GitHub
-                    </LoadingButton>
-                  ) : null}
-                  {authProvider === 'google' ? (
-                    <LoadingButton
-                      variant="contained"
-                      onClick={handleSignIn('google')}
-                      startIcon={
-                        <img
-                          alt="Google logo"
-                          loading="lazy"
-                          height="18"
-                          width="18"
-                          src="https://authjs.dev/img/providers/google.svg"
-                          style={{ marginLeft: '2px', marginRight: '2px' }}
-                        />
-                      }
-                      loading={isSigningIn}
-                      loadingPosition="start"
-                      sx={{
-                        backgroundColor: '#fff',
-                        color: '#000',
-                        '&:hover': {
-                          color: theme.palette.primary.contrastText,
-                        },
-                      }}
-                    >
-                      Sign in with Google
-                    </LoadingButton>
-                  ) : null}
-                </React.Fragment>
-              ) : null}
-            </Stack>
-          </Toolbar>
-        </AppBar>
-      ) : null}
       <Box sx={{ flex: 1, display: 'flex' }}>
         {hasNavigation ? (
           <AppPagesNavigation
             activePageSlug={activePageSlug}
             pages={pages}
             clipped={clipped}
-            hasHeader={hasHeader}
             search={retainedSearch}
           />
         ) : null}
-        <Box sx={{ minWidth: 0, flex: 1, position: 'relative' }}>
-          {hasHeader ? <Toolbar variant="dense" /> : null}
+        <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>
+          {hasHeader ? (
+            <AppBar
+              position="static"
+              color="transparent"
+              sx={{
+                boxShadow: 'none',
+              }}
+            >
+              <Toolbar variant="dense">
+                <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
+                  {session?.user && !isSigningIn ? (
+                    <React.Fragment>
+                      <Button color="inherit" onClick={handleOpenUserMenu}>
+                        <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
+                          {session.user.name || session.user.email}
+                        </Typography>
+                        <Tooltip title="User settings">
+                          <Avatar
+                            alt={session.user.name || session.user.email}
+                            src={session.user.image}
+                            sx={{
+                              bgcolor: theme.palette.secondary.main,
+                              width: 32,
+                              height: 32,
+                            }}
+                          />
+                        </Tooltip>
+                      </Button>
+                      <Menu
+                        sx={{ mt: '45px' }}
+                        id="menu-appbar-user"
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                        }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
+                      >
+                        <MenuItem onClick={handleSignOut}>
+                          <ListItemText>Sign out</ListItemText>
+                        </MenuItem>
+                      </Menu>
+                    </React.Fragment>
+                  ) : null}
+                </Stack>
+              </Toolbar>
+            </AppBar>
+          ) : null}
           {children}
         </Box>
       </Box>

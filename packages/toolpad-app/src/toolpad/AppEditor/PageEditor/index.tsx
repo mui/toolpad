@@ -73,9 +73,12 @@ function PageEditorContent({ node }: PageEditorContentProps) {
           </PanelGroup>
         </Panel>
         <PanelResizeHandle />
-        <Panel minSizePercentage={35} maxSizePercentage={100} order={2} id={'query-panel'}>
-          {showQuery ? <QueryEditor /> : null}
-        </Panel>
+
+        {showQuery ? (
+          <Panel minSizePercentage={35} maxSizePercentage={100} order={2} id={'query-panel'}>
+            <QueryEditor />
+          </Panel>
+        ) : null}
       </PanelGroup>
     </PageEditorProvider>
   );

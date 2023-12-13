@@ -24,6 +24,7 @@ import {
   GridRowId,
   GridFilterModel,
   GridSortModel,
+  GridNoRowsOverlay,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -679,12 +680,16 @@ function useDataProviderDataGridProps(
   };
 }
 
-interface NoRowsOverlayProps {
+interface NoRowsOverlayProps extends React.ComponentProps<typeof GridNoRowsOverlay> {
   error: Error;
 }
 
-function NoRowsOverlay({ error }: NoRowsOverlayProps) {
-  return <ErrorContent sx={{ height: '100%' }} error={error} />;
+function NoRowsOverlay(props: NoRowsOverlayProps) {
+  if (props.error) {
+    return <ErrorContent sx={{ height: '100%' }} error={props.error} />;
+  }
+
+  return <GridNoRowsOverlay {...props} />;
 }
 
 function dataGridFallbackRender({ error }: FallbackProps) {

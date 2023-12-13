@@ -18,7 +18,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import * as url from 'node:url';
 import invariant from 'invariant';
-import { GridRowId } from '@mui/x-data-grid';
+import type { GridRowId } from '@mui/x-data-grid';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';

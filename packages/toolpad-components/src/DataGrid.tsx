@@ -315,6 +315,10 @@ function dateValueGetter({ value }: GridValueGetterParams<any, any>): Date | und
     return undefined;
   }
 
+  if (value instanceof Date) {
+    return value;
+  }
+
   if (typeof value === 'number') {
     return new Date(value);
   }
@@ -437,7 +441,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
       };
     }
 
-    if (column.type === 'date' && column.dateFormat) {
+    if (column.type === 'date') {
       const format = createDateFormat(column.dateFormat);
       return {
         ...customType,
@@ -445,14 +449,14 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
         valueFormatter: ({ value }) => {
           try {
             return format.format(value);
-          } catch (err) {
-            return 'Invalid';
+          } catch {
+            return 'Invalid Date';
           }
         },
       };
     }
 
-    if (column.type === 'dateTime' && column.dateTimeFormat) {
+    if (column.type === 'dateTime') {
       const format = createDateFormat(column.dateTimeFormat);
       return {
         ...customType,
@@ -461,7 +465,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
           try {
             return format.format(value);
           } catch {
-            return 'Invalid';
+            return 'Invalid Date';
           }
         },
       };

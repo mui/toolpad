@@ -168,7 +168,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
 
   return (
     <Box sx={{ ...sx, position: 'relative', minHeight: height, width: '100%' }} aria-busy={loading}>
-      <ErrorOverlay error={displayError} />
+      {displayError ? <ErrorOverlay error={displayError} /> : null}
       {loading && !error ? (
         <div
           style={{

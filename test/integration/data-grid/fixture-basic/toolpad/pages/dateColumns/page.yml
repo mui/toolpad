@@ -1,7 +1,8 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.40/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  id: h0FFFmL
   title: columns
   content:
     - component: DataGrid
@@ -21,10 +22,20 @@ spec:
             width: 129
           - field: date5
             type: date
+          - field: date6
+            type: date
         rows:
-          - date1: 2023-04-01
-            date2: 1234567
-            date3: not a date
-            date4: foo 1900
-            date5: '1234567'
+          $$jsExpression: |
+            [
+              {
+                date1: '2023-04-01',
+                date2: 1234567,
+                date3: 'not a date',
+                date4: 'foo 1900',
+                date5: '1234567',
+                date6: new Date(1234567),
+              },
+            ]
   display: shell
+  alias:
+    - h0FFFmL

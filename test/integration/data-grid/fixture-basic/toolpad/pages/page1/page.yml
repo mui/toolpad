@@ -1,7 +1,8 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.40/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  id: 331kqzd
   title: Page 1
   content:
     - component: PageRow
@@ -60,3 +61,5 @@ spec:
       query:
         function: getUsers
         kind: local
+  alias:
+    - 331kqzd

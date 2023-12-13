@@ -30,7 +30,7 @@ export type QueryPanel = {
 
 const APP_PAGE_ROUTE = '/app/pages/:pageName';
 
-export type PageView = { kind: 'query'; nodeId: NodeId } | { kind: 'pageParameters' };
+export type PageView = { kind: 'query'; nodeId: NodeId };
 
 export type PageViewTab = 'page' | 'component' | 'theme';
 
@@ -42,6 +42,7 @@ export type DomView = {
   hoveredNodeId?: NodeId | null;
   pageViewTab?: PageViewTab;
   queryPanel?: QueryPanel;
+  pageParametersDialogOpen?: boolean;
 };
 
 export function getPathnameFromView(view: DomView): string {

@@ -449,8 +449,10 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
 
   app.use(toolpadHandler.handler);
 
-  const authHandler = await createAuthHandler(config.base);
-  app.use('/api/auth', express.urlencoded({ extended: true }), authHandler.handler);
+  if (process.env.TOOLPAD_AUTH_SECRET) {
+    const authHandler = await createAuthHandler(config.base);
+    app.use('/api/auth', express.urlencoded({ extended: true }), authHandler.handler);
+  }
 
   const runningServer = await listen(httpServer, port);
 

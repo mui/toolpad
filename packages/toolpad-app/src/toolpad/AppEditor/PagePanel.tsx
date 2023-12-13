@@ -47,21 +47,41 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
       <Divider />
 
       <PanelGroup autoSaveId="toolpad-page-panel" direction="vertical">
-        <Panel minSizePercentage={10} defaultSizePercentage={20} maxSizePercentage={75}>
+        <Panel
+          id={'pages-explorer'}
+          minSizePercentage={10}
+          defaultSizePercentage={20}
+          maxSizePercentage={75}
+        >
           <PagesExplorer />
         </Panel>
         {currentPageNode && !appDom.isCodePage(currentPageNode) ? (
           <React.Fragment>
             <PanelResizeHandle />
-            <Panel minSizePercentage={25} defaultSizePercentage={30} maxSizePercentage={90}>
+            <Panel
+              id={'hierarchy-explorer'}
+              minSizePercentage={25}
+              defaultSizePercentage={30}
+              maxSizePercentage={90}
+            >
               <PageHierarchyExplorer />
             </Panel>
             <PanelResizeHandle />
-            <Panel minSizePercentage={10} defaultSizePercentage={25} maxSizePercentage={90}>
+            <Panel
+              id={'queries-explorer'}
+              minSizePercentage={10}
+              defaultSizePercentage={25}
+              maxSizePercentage={90}
+            >
               <QueriesExplorer />
             </Panel>
             <PanelResizeHandle />
-            <Panel minSizePercentage={10} defaultSizePercentage={25} maxSizePercentage={90}>
+            <Panel
+              id={'actions-explorer'}
+              minSizePercentage={10}
+              defaultSizePercentage={25}
+              maxSizePercentage={90}
+            >
               <ActionsExplorer />
             </Panel>
           </React.Fragment>

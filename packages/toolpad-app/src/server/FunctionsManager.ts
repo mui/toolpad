@@ -419,4 +419,25 @@ export default class FunctionsManager {
     invariant(this.devWorker, 'devWorker must be initialized');
     return this.devWorker.deleteDataProviderRecord(fullPath, exportName, id);
   }
+
+  async updateDataProviderRecord(
+    fileName: string,
+    exportName: string,
+    id: GridRowId,
+    values: Record<string, unknown>,
+  ): Promise<void> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    invariant(this.devWorker, 'devWorker must be initialized');
+    return this.devWorker.updateDataProviderRecord(fullPath, exportName, id, values);
+  }
+
+  async createDataProviderRecord(
+    fileName: string,
+    exportName: string,
+    values: Record<string, unknown>,
+  ): Promise<void> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    invariant(this.devWorker, 'devWorker must be initialized');
+    return this.devWorker.createDataProviderRecord(fullPath, exportName, values);
+  }
 }

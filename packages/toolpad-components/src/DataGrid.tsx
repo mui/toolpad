@@ -498,7 +498,7 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
 
 interface DeleteActionProps {
   id: GridRowId;
-  dataProvider: ToolpadDataProviderBase<unknown, PaginationMode>;
+  dataProvider: ToolpadDataProviderBase<Record<string, unknown>, PaginationMode>;
   refetch: () => unknown;
 }
 
@@ -650,6 +650,7 @@ function useDataProviderDataGridProps(
           <DeleteAction key="delete" id={id} dataProvider={dataProvider} refetch={refetch} />,
         );
       }
+
       return result;
     };
   }, [dataProvider, refetch]);

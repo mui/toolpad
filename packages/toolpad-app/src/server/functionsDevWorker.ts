@@ -23,7 +23,10 @@ import invariant from 'invariant';
 import { GridRowId } from '@mui/x-data-grid';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
-const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
+export function getWorkerPath() {
+  return url.fileURLToPath(import.meta.url);
+}
 
 interface ModuleObject {
   exports: Record<string, unknown>;
@@ -160,6 +163,8 @@ async function introspectDataProvider(
   return {
     paginationMode: dataProvider.paginationMode,
     hasDeleteRecord: !!dataProvider.deleteRecord,
+    hasUpdateRecord: !!dataProvider.updateRecord,
+    hasCreateRecord: !!dataProvider.createRecord,
   };
 }
 
@@ -183,11 +188,34 @@ async function deleteDataProviderRecord(
   return dataProvider.deleteRecord(id);
 }
 
+async function updateDataProviderRecord(
+  filePath: string,
+  name: string,
+  id: GridRowId,
+  values: Record<string, unknown>,
+): Promise<void> {
+  const dataProvider = await loadDataProvider(filePath, name);
+  invariant(dataProvider.updateRecord, 'DataProvider does not support updateRecord');
+  return dataProvider.updateRecord(id, values);
+}
+
+async function createDataProviderRecord(
+  filePath: string,
+  name: string,
+  values: Record<string, unknown>,
+): Promise<void> {
+  const dataProvider = await loadDataProvider(filePath, name);
+  invariant(dataProvider.createRecord, 'DataProvider does not support createRecord');
+  return dataProvider.createRecord(values);
+}
+
 type WorkerRpcServer = {
   execute: typeof execute;
   introspectDataProvider: typeof introspectDataProvider;
   getDataProviderRecords: typeof getDataProviderRecords;
   deleteDataProviderRecord: typeof deleteDataProviderRecord;
+  updateDataProviderRecord: typeof updateDataProviderRecord;
+  createDataProviderRecord: typeof createDataProviderRecord;
 };
 
 if (!isMainThread && parentPort) {
@@ -196,12 +224,14 @@ if (!isMainThread && parentPort) {
     introspectDataProvider,
     getDataProviderRecords,
     deleteDataProviderRecord,
+    updateDataProviderRecord,
+    createDataProviderRecord,
   });
 }
 
 export function createWorker(env: Record<string, any>) {
   const workerRpcChannel = new MessageChannel();
-  const worker = new Worker(path.resolve(currentDirectory, '../cli/functionsDevWorker.mjs'), {
+  const worker = new Worker(getWorkerPath(), {
     env,
     workerData: {
       workerRpcPort: workerRpcChannel.port1,
@@ -237,24 +267,11 @@ export function createWorker(env: Record<string, any>) {
       return result;
     },
 
-    async introspectDataProvider(
-      filePath: string,
-      name: string,
-    ): Promise<ToolpadDataProviderIntrospection> {
-      return client.introspectDataProvider(filePath, name);
-    },
-
-    async getDataProviderRecords<R, P extends PaginationMode>(
-      filePath: string,
-      name: string,
-      params: GetRecordsParams<R, P>,
-    ): Promise<GetRecordsResult<R, P>> {
-      return client.getDataProviderRecords(filePath, name, params);
-    },
-
-    async deleteDataProviderRecord(filePath: string, name: string, id: GridRowId): Promise<void> {
-      return client.deleteDataProviderRecord(filePath, name, id);
-    },
+    introspectDataProvider: client.introspectDataProvider.bind(client),
+    getDataProviderRecords: client.getDataProviderRecords.bind(client),
+    deleteDataProviderRecord: client.deleteDataProviderRecord.bind(client),
+    updateDataProviderRecord: client.updateDataProviderRecord.bind(client),
+    createDataProviderRecord: client.createDataProviderRecord.bind(client),
   };
 }
 

@@ -99,7 +99,7 @@ import SignInPage from './SignInPage';
 
 const browserJsRuntime = getBrowserRuntime();
 
-const IS_RENDERED_IN_CANVAS =
+export const IS_RENDERED_IN_CANVAS =
   typeof window === 'undefined'
     ? false
     : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;

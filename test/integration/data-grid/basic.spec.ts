@@ -75,4 +75,5 @@ test('Date columns', async ({ page }) => {
   await expect(cellLocator(canvasGridLocator, 2, 3)).toHaveText('Invalid Date');
   await expect(cellLocator(canvasGridLocator, 2, 4)).toHaveText('Invalid Date');
   await expect(cellLocator(canvasGridLocator, 2, 5)).toHaveText('1/1/1970');
+  await expect(cellLocator(canvasGridLocator, 2, 6)).toHaveText('1/1/1970');
 });

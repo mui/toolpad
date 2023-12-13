@@ -65,7 +65,7 @@ function Image({
   const error = errorProp || imgError;
   return (
     <Box sx={{ maxWidth: '100%', position: 'relative', ...sx }}>
-      <ErrorOverlay error={error} />
+      {error ? <ErrorOverlay error={error} /> : null}
       {loading && !error ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
       <Img
         src={src}

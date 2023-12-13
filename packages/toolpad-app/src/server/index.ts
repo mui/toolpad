@@ -394,8 +394,8 @@ async function createAuthHandler(base: string): Promise<AppHandler> {
               return Boolean(
                 profile?.email_verified &&
                   profile?.email &&
-                  (!process.env.TOOLPAD_AUTH_DOMAIN ||
-                    profile.email.endsWith(`@${process.env.TOOLPAD_AUTH_DOMAIN}`)),
+                  (!process.env.TOOLPAD_GOOGLE_AUTH_DOMAIN ||
+                    profile.email.endsWith(`@${process.env.TOOLPAD_GOOGLE_AUTH_DOMAIN}`)),
               );
             }
             return true;

@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.41
+
+<!-- generated comparing v0.1.40..master -->
+
+_Dec 13, 2023_
+
+Support server-side sorting and filtering, support delete in data providers.
+
+TODO INSERT HIGHLIGHTS
+
+- &#8203;<!-- 9 -->improve vite omptimizeDeps after recent dataSource updates (#2990) @Janpot
+- &#8203;<!-- 8 -->Support serverside sorting/filtering (#2982) @Janpot
+- &#8203;<!-- 7 -->Fix formatting for Date objects in the grid (#2984) @Janpot
+- &#8203;<!-- 6 -->Open links in the same tab unless configured otherwise (#2983) @Janpot
+- &#8203;<!-- 5 -->Support delete in data providers (#2978) @Janpot
+- &#8203;<!-- 4 -->Initial authorization implementation (#2931) @Janpot
+- &#8203;<!-- 3 -->Update custom server nextjs README.md (#2977) @prakhargupta1
+- &#8203;<!-- 2 -->[core] Update workflows and issue templates to reflect the updated label (#2992) @MBilalShafi
+- &#8203;<!-- 1 -->[core] Update `no-response` workflow (#2989) @MBilalShafi
+
+All contributors of this release in alphabetical order: @Janpot, @MBilalShafi, @prakhargupta1
+
 ## 0.1.40
 
 <!-- generated comparing v0.1.39..master -->

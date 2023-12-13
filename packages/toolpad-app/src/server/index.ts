@@ -366,7 +366,7 @@ async function createAuthHandler(base: string): Promise<AppHandler> {
         pages: {
           signIn: `${base}/signin`,
           signOut: base,
-          error: base, // Error code passed in query string as ?error=
+          error: `${base}/signin`, // Error code passed in query string as ?error=
           verifyRequest: base,
         },
         providers: [

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { asArray } from '@mui/toolpad-utils/collections';
-import { Box, CircularProgress, Stack } from '@mui/material';
+import { Box, CircularProgress, Container } from '@mui/material';
 import { AuthSessionContext } from './useAuthSession';
 
 export interface RequireAuthorizationProps {
@@ -24,9 +24,17 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
     }
 
     return (
-      <Stack direction="column" alignItems="center" justifyContent="center" flex={1}>
+      <Container
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          mt: 4,
+        }}
+      >
         <CircularProgress color="primary" size={56} />
-      </Stack>
+      </Container>
     );
   }
   if (!user.roles || user.roles.length <= 0) {
@@ -38,7 +46,7 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
 
   // @TODO: Once we have roles we can add back this check.
   const skipReason = true;
-  return skipReason || reason ? (
+  return !skipReason && reason ? (
     <Box
       sx={{
         flex: 1,

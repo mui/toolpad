@@ -22,6 +22,7 @@ export interface AuthSessionPayload {
   signIn: (provider: AuthProvider) => void | Promise<void>;
   signOut: () => void | Promise<void>;
   isSigningIn: boolean;
+  isSigningOut: boolean;
 }
 
 export const AuthSessionContext = React.createContext<AuthSessionPayload>({
@@ -29,11 +30,13 @@ export const AuthSessionContext = React.createContext<AuthSessionPayload>({
   signIn: () => {},
   signOut: () => {},
   isSigningIn: false,
+  isSigningOut: false,
 });
 
 export function useAuthSession(): AuthSessionPayload {
   const [session, setSession] = React.useState<AuthSession | null>(null);
   const [isSigningIn, setIsSigningIn] = React.useState(true);
+  const [isSigningOut, setIsSigningOut] = React.useState(true);
 
   const getCsrfToken = React.useCallback(async () => {
     const csrfResponse = await fetch(AUTH_CSRF_PATH, {
@@ -48,6 +51,8 @@ export function useAuthSession(): AuthSessionPayload {
 
   const signOut = React.useCallback(async () => {
     try {
+      setIsSigningOut(true);
+
       const csrfToken = await getCsrfToken();
 
       await fetch(AUTH_SIGNOUT_PATH, {
@@ -63,6 +68,7 @@ export function useAuthSession(): AuthSessionPayload {
     }
 
     setSession(null);
+    setIsSigningOut(false);
   }, [getCsrfToken]);
 
   const getSession = React.useCallback(async () => {
@@ -115,5 +121,6 @@ export function useAuthSession(): AuthSessionPayload {
     signIn,
     signOut,
     isSigningIn,
+    isSigningOut,
   };
 }

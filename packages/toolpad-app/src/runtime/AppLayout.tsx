@@ -16,8 +16,6 @@ import {
   Tooltip,
   Button,
   useTheme,
-  Snackbar,
-  Alert,
   Link as MuiLink,
 } from '@mui/material';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -26,10 +24,8 @@ import { AuthSessionContext } from './useAuthSession';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
-const AUTH_ERROR_URL_PARAM = 'error';
-
 // Url params that will be carried over to the next page
-const RETAINED_URL_PARAMS = new Set([TOOLPAD_DISPLAY_MODE_URL_PARAM, AUTH_ERROR_URL_PARAM]);
+const RETAINED_URL_PARAMS = new Set([TOOLPAD_DISPLAY_MODE_URL_PARAM]);
 
 export interface NavigationEntry {
   slug: string;
@@ -179,107 +175,74 @@ export function AppLayout({
     handleCloseUserMenu();
   }, [signOut]);
 
-  const [errorSnackbarMessage, setErrorSnackbarMessage] = React.useState<string>('');
-
-  React.useEffect(() => {
-    const authError = urlParams.get(AUTH_ERROR_URL_PARAM);
-
-    if (authError === 'AuthorizedCallbackError') {
-      setErrorSnackbarMessage('Access unauthorized.');
-    } else if (authError === 'CallbackRouteError') {
-      setErrorSnackbarMessage(
-        'There was an error with your authentication provider configuration.',
-      );
-    } else if (authError) {
-      setErrorSnackbarMessage('An authentication error occurred.');
-    }
-  }, [urlParams]);
-
-  const handleErrorSnackbarClose = React.useCallback(() => {
-    setErrorSnackbarMessage('');
-  }, []);
-
   return (
-    <React.Fragment>
-      <Box sx={{ flex: 1, display: 'flex' }}>
-        {hasNavigation ? (
-          <AppPagesNavigation
-            activePageSlug={activePageSlug}
-            pages={pages}
-            clipped={clipped}
-            search={retainedSearch}
-          />
+    <Box sx={{ flex: 1, display: 'flex' }}>
+      {hasNavigation ? (
+        <AppPagesNavigation
+          activePageSlug={activePageSlug}
+          pages={pages}
+          clipped={clipped}
+          search={retainedSearch}
+        />
+      ) : null}
+      <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>
+        {hasHeader ? (
+          <AppBar
+            position="fixed"
+            color="transparent"
+            sx={{
+              boxShadow: 'none',
+            }}
+          >
+            {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
+            <Toolbar variant="dense">
+              <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
+                {session?.user && !isSigningIn ? (
+                  <React.Fragment>
+                    <Button color="inherit" onClick={handleOpenUserMenu}>
+                      <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
+                        {session.user.name || session.user.email}
+                      </Typography>
+                      <Tooltip title="User settings">
+                        <Avatar
+                          alt={session.user.name || session.user.email}
+                          src={session.user.image}
+                          sx={{
+                            bgcolor: theme.palette.secondary.main,
+                            width: 32,
+                            height: 32,
+                          }}
+                        />
+                      </Tooltip>
+                    </Button>
+                    <Menu
+                      sx={{ mt: '45px' }}
+                      id="menu-appbar-user"
+                      anchorEl={anchorElUser}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      open={Boolean(anchorElUser)}
+                      onClose={handleCloseUserMenu}
+                    >
+                      <MenuItem onClick={handleSignOut}>
+                        <ListItemText>Sign out</ListItemText>
+                      </MenuItem>
+                    </Menu>
+                  </React.Fragment>
+                ) : null}
+              </Stack>
+            </Toolbar>
+          </AppBar>
         ) : null}
-        <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>
-          {hasHeader ? (
-            <AppBar
-              position="fixed"
-              color="transparent"
-              sx={{
-                boxShadow: 'none',
-              }}
-            >
-              {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
-              <Toolbar variant="dense">
-                <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
-                  {session?.user && !isSigningIn ? (
-                    <React.Fragment>
-                      <Button color="inherit" onClick={handleOpenUserMenu}>
-                        <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
-                          {session.user.name || session.user.email}
-                        </Typography>
-                        <Tooltip title="User settings">
-                          <Avatar
-                            alt={session.user.name || session.user.email}
-                            src={session.user.image}
-                            sx={{
-                              bgcolor: theme.palette.secondary.main,
-                              width: 32,
-                              height: 32,
-                            }}
-                          />
-                        </Tooltip>
-                      </Button>
-                      <Menu
-                        sx={{ mt: '45px' }}
-                        id="menu-appbar-user"
-                        anchorEl={anchorElUser}
-                        anchorOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
-                        }}
-                        keepMounted
-                        transformOrigin={{
-                          vertical: 'top',
-                          horizontal: 'right',
-                        }}
-                        open={Boolean(anchorElUser)}
-                        onClose={handleCloseUserMenu}
-                      >
-                        <MenuItem onClick={handleSignOut}>
-                          <ListItemText>Sign out</ListItemText>
-                        </MenuItem>
-                      </Menu>
-                    </React.Fragment>
-                  ) : null}
-                </Stack>
-              </Toolbar>
-            </AppBar>
-          ) : null}
-          {children}
-        </Box>
+        {children}
       </Box>
-      <Snackbar
-        open={!!errorSnackbarMessage}
-        autoHideDuration={6000}
-        onClose={handleErrorSnackbarClose}
-      >
-        {errorSnackbarMessage ? (
-          <Alert onClose={handleErrorSnackbarClose} severity="error">
-            {errorSnackbarMessage}
-          </Alert>
-        ) : undefined}
-      </Snackbar>
-    </React.Fragment>
+    </Box>
   );
 }

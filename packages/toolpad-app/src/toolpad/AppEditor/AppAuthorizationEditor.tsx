@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  Alert,
   Button,
   Checkbox,
   Dialog,
@@ -342,11 +343,6 @@ export function AppAuthenticationEditor() {
     [authorization?.providers],
   );
 
-  const currentProvidersData = React.useMemo(
-    () => authProviders.map((provider) => AUTH_PROVIDERS.get(provider)),
-    [authProviders],
-  );
-
   return (
     <Stack direction="column">
       <FormControl>
@@ -379,12 +375,14 @@ export function AppAuthenticationEditor() {
           If set, only authenticated users can use the app.
         </FormHelperText>
       </FormControl>
-      {currentProvidersData ? (
-        <Link href="/" target="_blank">
-          <Typography variant="subtitle1" sx={{ mt: 1, mb: 1, fontSize: 14 }}>
-            Learn how to set up authentication providers.
-          </Typography>
-        </Link>
+      {authProviders.length > 0 ? (
+        <Alert severity="info" sx={{ mt: 1 }}>
+          Certain environment variables must be set for authentication providers to work.{' '}
+          <Link href="/" target="_blank">
+            Learn how
+          </Link>
+          .
+        </Alert>
       ) : null}
     </Stack>
   );

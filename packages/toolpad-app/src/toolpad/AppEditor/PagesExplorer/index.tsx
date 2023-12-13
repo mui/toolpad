@@ -365,7 +365,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             key={page.id}
             nodeId={page.id}
             toolpadNodeId={page.id}
-            labelText={page.name}
+            labelText={page.attributes.displayName ?? page.name}
             onRenameNode={handleRenameNode}
             onDuplicateNode={handleDuplicateNode}
             onDeleteNode={handleDeletePage}

@@ -6,9 +6,9 @@
 
 _Dec 13, 2023_
 
-Support server-side sorting and filtering, support delete in data providers.
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
 
-TODO INSERT HIGHLIGHTS
+Support server-side sorting and filtering, support delete in data providers.
 
 - &#8203;<!-- 9 -->improve vite omptimizeDeps after recent dataSource updates (#2990) @Janpot
 - &#8203;<!-- 8 -->Support serverside sorting/filtering (#2982) @Janpot

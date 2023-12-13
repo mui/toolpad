@@ -379,7 +379,7 @@ export function AppAuthenticationEditor() {
         <Alert severity="info" sx={{ mt: 1 }}>
           Certain environment variables must be set for authentication providers to work.{' '}
           <Link href="/" target="_blank">
-            Learn how
+            Learn how to set up authentication
           </Link>
           .
         </Alert>

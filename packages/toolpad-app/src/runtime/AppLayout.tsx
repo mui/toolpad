@@ -20,7 +20,7 @@ import {
   Alert,
   Link as MuiLink,
 } from '@mui/material';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { AuthSessionContext } from './useAuthSession';
 
@@ -213,12 +213,13 @@ export function AppLayout({
         <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>
           {hasHeader ? (
             <AppBar
-              position="static"
+              position="fixed"
               color="transparent"
               sx={{
                 boxShadow: 'none',
               }}
             >
+              {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
               <Toolbar variant="dense">
                 <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
                   {session?.user && !isSigningIn ? (

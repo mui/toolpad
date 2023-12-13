@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormHelperText,
   InputLabel,
   Link,
   MenuItem,
@@ -363,9 +364,6 @@ export function AppAuthenticationEditor() {
               .map((selectedValue) => AUTH_PROVIDERS.get(selectedValue)?.name ?? '')
               .join(', ')
           }
-          inputProps={{
-            helperText: 'If set, only authenticated users can view pages.',
-          }}
         >
           {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
             <MenuItem key={value} value={value}>
@@ -377,6 +375,9 @@ export function AppAuthenticationEditor() {
             </MenuItem>
           ))}
         </Select>
+        <FormHelperText id="auth-providers-helper-text">
+          If set, only authenticated users can use the app.
+        </FormHelperText>
       </FormControl>
       {currentProvidersData ? (
         <Link href="/" target="_blank">

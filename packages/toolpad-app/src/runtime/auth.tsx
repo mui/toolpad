@@ -24,7 +24,7 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
     }
 
     return (
-      <Stack direction="column" alignItems="center" mt={2}>
+      <Stack direction="column" alignItems="center" justifyContent="center" flex={1}>
         <CircularProgress color="primary" size={56} />
       </Stack>
     );
@@ -36,7 +36,9 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
     reason = `User with role(s) ${rolesList} is not allowed access to this resource.`;
   }
 
-  return reason ? (
+  // @TODO: Once we have roles we can add back this check.
+  const skipReason = true;
+  return skipReason || reason ? (
     <Box
       sx={{
         flex: 1,

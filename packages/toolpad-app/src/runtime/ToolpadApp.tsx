@@ -95,6 +95,7 @@ import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
 import { AuthSessionContext, useAuthSession } from './useAuthSession';
 import { RequireAuthorization } from './auth';
+import SignInPage from './SignInPage';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -1543,14 +1544,15 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const { data: authProvider, isLoading: isLoadingAuthProvider } = useQuery({
+  const { data: authProviders = [], isLoading: isLoadingAuthProviders } = useQuery({
     queryKey: ['getAuthProviders'],
     queryFn: async () => {
       return api.methods.getAuthProviders();
     },
+    enabled: !IS_RENDERED_IN_CANVAS,
   });
 
-  const hasAuthentication = !isLoadingAuthProvider && !!authProvider;
+  const hasAuthentication = !isLoadingAuthProviders && authProviders.length > 0;
 
   const pageMatch = useMatch('/pages/:slug');
   const activePageSlug = pageMatch?.params.slug;
@@ -1565,9 +1567,9 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
     [pages],
   );
 
-  if (isLoadingAuthProvider) {
+  if (isLoadingAuthProviders) {
     return (
-      <Stack direction="column" alignItems="center" mt={2}>
+      <Stack direction="column" alignItems="center" justifyContent="center" flex={1}>
         <CircularProgress color="primary" size={56} />
       </Stack>
     );
@@ -1629,7 +1631,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                       <React.Suspense fallback={<AppLoading />}>
                         <QueryClientProvider client={queryClient}>
                           <Routes>
-                            {/* <Route path="/signin" element={<div>hello there</div>} /> */}
+                            <Route path="/signin" element={<SignInPage />} />
                             <Route path="*" element={<ToolpadAppLayout dom={dom} />} />
                           </Routes>
                           {showDevtools ? (

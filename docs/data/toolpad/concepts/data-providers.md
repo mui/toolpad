@@ -98,6 +98,13 @@ For example, this could print the following if the corresponding column filters 
 }
 ```
 
+Now the data grid filter UI will be hooked up to your backend function in the data provider.
+
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/filtering.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 Uncheck the column option "filterable" if you want to disable filtering for a certain column:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-filterable.png", "alt": "Disable filterable", "caption": "Disable filterable", "zoom": false, "width": 320 }}
@@ -119,6 +126,13 @@ Depending on which column has been set to sort by, this will result in:
 ```tsx
 [{ field: 'name', sort: 'asc' }];
 ```
+
+Now the data grid sorting UI will be hooked up to your backend function in the data provider.
+
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/sorting.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 Uncheck the column option "sortable" if you want to disable sorting for a certain column:
 

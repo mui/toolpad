@@ -125,7 +125,7 @@ export default function NodeMenu({
         onClose={handleDeleteNodeDialogClose}
         okButton="Delete"
       >
-        Delete {isAction ? 'action' : latestDeletedNode?.type} &quot;{latestDeletedNode?.name}
+        Delete {isAction ? 'action' : 'query'} &quot;{latestDeletedNode?.name}
         &quot;?
       </ConfirmDialog>
     </React.Fragment>

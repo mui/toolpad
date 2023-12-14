@@ -13,6 +13,8 @@ import {
   Alert,
   styled,
   Divider,
+  inputLabelClasses,
+  inputBaseClasses,
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -589,8 +591,8 @@ function QueryEditor({
                         select
                         label="response type"
                         sx={{
-                          '& .MuiInputLabel-root': { fontSize: 12 },
-                          ' & .MuiInputBase-root': { fontSize: 12 },
+                          [`& .${inputLabelClasses.root}`]: { fontSize: 12 },
+                          [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
                           width: 200,
                         }}
                         value={input.attributes.query.response?.kind || 'json'}
@@ -719,7 +721,6 @@ function getInitialQueryValue(): FetchQuery {
 
 const dataSource: ClientDataSource<RestConnectionParams, FetchQuery> = {
   displayName: 'REST API',
-  isEnabled: true,
   ConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,

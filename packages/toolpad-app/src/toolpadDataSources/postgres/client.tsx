@@ -12,7 +12,6 @@ function PostgreSQLConnectionParamsInput({
 
 const dataSource: ClientDataSource<SqlConnectionParams, SqlQuery> = {
   displayName: 'PostgreSQL',
-  isEnabled: false,
   ConnectionParamsInput: PostgreSQLConnectionParamsInput,
   QueryEditor,
   getInitialQueryValue,

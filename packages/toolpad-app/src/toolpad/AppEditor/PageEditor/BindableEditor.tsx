@@ -1,4 +1,10 @@
-import { Stack, SxProps } from '@mui/material';
+import {
+  Stack,
+  SxProps,
+  inputBaseClasses,
+  formLabelClasses,
+  typographyClasses,
+} from '@mui/material';
 import * as React from 'react';
 import {
   BindableAttrValue,
@@ -88,9 +94,9 @@ export default function BindableEditor<V>({
       alignItems="center"
       justifyContent="space-between"
       sx={{
-        '& .MuiInputBase-root': { fontSize: 12 },
-        '& .MuiFormLabel-root': { fontSize: 12 },
-        '& .MuiTypography-root': { fontSize: 12 },
+        [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
+        [`& .${formLabelClasses.root}`]: { fontSize: 12 },
+        [`& .${typographyClasses.root}`]: { fontSize: 12 },
         ...sx,
       }}
     >

@@ -1,4 +1,4 @@
-import { Box, TextField, IconButton, SxProps } from '@mui/material';
+import { Box, TextField, IconButton, SxProps, inputLabelClasses } from '@mui/material';
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { BindableAttrValue, ScopeMeta, JsRuntime, LiveBinding } from '@mui/toolpad-core';
@@ -76,7 +76,7 @@ export default function ParametersEditor({
                   value.map((entry, i) => (i === index ? [event.target.value, entry[1]] : entry)),
                 )
               }
-              sx={{ '& .MuiInputLabel-root': { fontSize: 12 } }}
+              sx={{ [`& .${inputLabelClasses.root}`]: { fontSize: 12 } }}
               inputProps={{ sx: { fontSize: 12 } }}
               error={!isValidFieldName[index]}
               disabled={disabled}
@@ -115,7 +115,7 @@ export default function ParametersEditor({
           onChange={(event) => {
             onChange([...value, [event.target.value, null]]);
           }}
-          sx={{ '& .MuiInputLabel-root': { fontSize: 12 } }}
+          sx={{ [`& .${inputLabelClasses.root}`]: { fontSize: 12 } }}
           inputProps={{ sx: { fontSize: 12 } }}
           autoFocus={autoFocus}
           disabled={disabled}

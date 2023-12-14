@@ -124,7 +124,6 @@ export interface ExecClientFetchFn<Q, R extends ExecFetchResult> {
 
 export interface ClientDataSource<C = {}, Q = {}, A extends Methods = {}> {
   displayName: string;
-  isEnabled: boolean;
   ConnectionParamsInput?: ConnectionParamsEditor<C>;
   transformQueryBeforeCommit?: (query: Q) => Q;
   QueryEditor: QueryEditor<C, Q, A>;

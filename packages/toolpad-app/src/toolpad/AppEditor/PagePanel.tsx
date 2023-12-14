@@ -6,9 +6,10 @@ import PageHierarchyExplorer from './HierarchyExplorer';
 import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
 import { QueriesExplorer, ActionsExplorer } from './PageEditor/QueriesExplorer';
-import { PAGE_PANEL_WIDTH } from '../../constants';
 import { useProject } from '../../project';
 import * as appDom from '../../appDom';
+
+const PAGE_PANEL_WIDTH = 250;
 
 const PagePanelRoot = styled('div')({
   display: 'flex',

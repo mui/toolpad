@@ -206,7 +206,7 @@ function CreatePopover({
         <Stack direction="row" gap={1} display={'grid'} gridTemplateColumns={'1fr 1fr'}>
           {Object.keys(dataSources).map((dataSourceId) => {
             const dataSource = dataSources[dataSourceId];
-            return dataSource?.isEnabled ? (
+            return (
               <Button
                 key={dataSourceId}
                 sx={{ minHeight: 50, minWidth: 150 }}
@@ -216,7 +216,7 @@ function CreatePopover({
                 <QueryIcon id={dataSourceId} sx={{ fontSize: 28 }} />{' '}
                 {dataSource?.displayName || dataSourceId}
               </Button>
-            ) : null;
+            );
           })}
         </Stack>
       </Paper>

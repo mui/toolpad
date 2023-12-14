@@ -10,6 +10,8 @@ import {
   Toolbar,
   ToolbarProps,
   Typography,
+  inputLabelClasses,
+  inputBaseClasses,
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
 import { BindableAttrValue, LiveBinding, ScopeMeta } from '@mui/toolpad-core';
@@ -123,8 +125,8 @@ function RawBodyEditor({
             select
             label="content-type"
             sx={{
-              '& .MuiInputLabel-root': { fontSize: 12 },
-              '& .MuiInputBase-root': { fontSize: 12 },
+              [`& .${inputLabelClasses.root}`]: { fontSize: 12 },
+              [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
               width: 200,
             }}
             value={value?.contentType}
@@ -251,8 +253,8 @@ export default function BodyEditor({
           onChange={handleTabChange}
           disabled={disabled}
           sx={{
-            '& .MuiInputLabel-root': { fontSize: 12 },
-            ' & .MuiInputBase-root': { fontSize: 12 },
+            [`& .${inputLabelClasses.root}`]: { fontSize: 12 },
+            [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
             width: 200,
           }}
           inputProps={{ sx: { fontSize: 12 } }}

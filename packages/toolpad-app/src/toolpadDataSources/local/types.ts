@@ -1,8 +1,6 @@
 import { BindableAttrValue, ExecFetchResult, PrimitiveValueType } from '@mui/toolpad-core';
 import type { IntrospectionResult } from '../../server/functionsTypesWorker';
 
-export type FileTypes = 'query' | 'component' | 'page' | 'theme';
-
 export interface LocalConnectionParams {}
 export interface LocalQuery {
   /**

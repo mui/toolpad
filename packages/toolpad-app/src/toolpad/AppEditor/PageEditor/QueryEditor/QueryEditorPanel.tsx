@@ -1,9 +1,18 @@
-import { Box, Stack, TextField, InputAdornment, Alert, MenuItem, Typography } from '@mui/material';
+import {
+  Box,
+  Stack,
+  TextField,
+  InputAdornment,
+  Alert,
+  MenuItem,
+  Typography,
+  inputLabelClasses,
+  inputBaseClasses,
+} from '@mui/material';
 import * as React from 'react';
 import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import invariant from 'invariant';
-
 import { usePageEditorState } from '../PageEditorProvider';
 import * as appDom from '../../../../appDom';
 import dataSources from '../../../../toolpadDataSources/client';
@@ -99,7 +108,7 @@ function QuerySettingsTab({
       }}
     >
       <Stack
-        display={'grid'}
+        display="grid"
         gridTemplateRows="1fr 1fr 1fr"
         gridTemplateColumns={'0.45fr 1fr'}
         rowGap={0.5}
@@ -113,8 +122,8 @@ function QuerySettingsTab({
           value={draft?.attributes?.mode ?? 'query'}
           onChange={handleModeChange}
           sx={{
-            '& .MuiInputLabel-root': { fontSize: 12 },
-            '& .MuiInputBase-root': { fontSize: 12 },
+            [`& .${inputLabelClasses.root}`]: { fontSize: 12 },
+            [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
           }}
         >
           <MenuItem value="query">Fetch at any time to always be available on the page</MenuItem>
@@ -130,8 +139,8 @@ function QuerySettingsTab({
                 startAdornment: <InputAdornment position="start">s</InputAdornment>,
               }}
               sx={{
-                '& .MuiInputLabel-root': { fontSize: 12 },
-                '& .MuiInputBase-root': { fontSize: 12 },
+                [`& .${inputLabelClasses.root}`]: { fontSize: 12 },
+                [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
                 maxWidth: 200,
               }}
               type="number"

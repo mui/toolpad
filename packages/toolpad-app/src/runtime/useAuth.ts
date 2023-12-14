@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import api from './api';
+import * as appDom from '../appDom';
 
 const AUTH_API_PATH = `${window.location.origin}/api/auth`;
 
@@ -26,7 +25,6 @@ export interface AuthPayload {
   isSigningIn: boolean;
   isSigningOut: boolean;
   authProviders: AuthProvider[];
-  isLoadingAuthProviders: boolean;
   hasAuthentication: boolean;
 }
 
@@ -37,19 +35,15 @@ export const AuthContext = React.createContext<AuthPayload>({
   isSigningIn: false,
   isSigningOut: false,
   authProviders: [],
-  isLoadingAuthProviders: false,
   hasAuthentication: false,
 });
 
-export function useAuth(): AuthPayload {
-  const { data: authProviders = [], isLoading: isLoadingAuthProviders } = useQuery({
-    queryKey: ['getAuthProviders'],
-    queryFn: async () => {
-      return api.methods.getAuthProviders();
-    },
-  });
+export function useAuth({ dom }: { dom: appDom.RenderTree }): AuthPayload {
+  const app = appDom.getApp(dom);
 
-  const hasAuthentication = !isLoadingAuthProviders && authProviders.length > 0;
+  const authProviders = app.attributes.authorization?.providers ?? [];
+
+  const hasAuthentication = authProviders.length > 0;
 
   const [session, setSession] = React.useState<AuthSession | null>(null);
   const [isSigningIn, setIsSigningIn] = React.useState(true);
@@ -142,7 +136,6 @@ export function useAuth(): AuthPayload {
     isSigningIn,
     isSigningOut,
     authProviders,
-    isLoadingAuthProviders,
     hasAuthentication,
   };
 }

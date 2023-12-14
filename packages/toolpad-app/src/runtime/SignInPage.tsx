@@ -18,7 +18,7 @@ export default function SignInPage() {
     null,
   );
 
-  const { authProviders, isLoadingAuthProviders } = React.useContext(AuthContext);
+  const { authProviders } = React.useContext(AuthContext);
 
   const handleSignIn = React.useCallback(
     (provider: AuthProvider) => () => {
@@ -60,62 +60,56 @@ export default function SignInPage() {
         gap={2}
         sx={{ backgroundColor: theme.palette.background.default }}
       >
-        {isLoadingAuthProviders ? (
-          <CircularProgress color="primary" size={56} />
-        ) : (
-          <React.Fragment>
-            <img src={productIconSrc} alt="Toolpad logo" width={56} height={56} />
-            <Typography variant="h1">Sign In</Typography>
-            <Typography variant="subtitle1" mb={1}>
-              You must be authenticated to use this app.
-            </Typography>
-            {authProviders.includes('github') ? (
-              <LoadingButton
-                variant="contained"
-                onClick={handleSignIn('github')}
-                startIcon={<GitHubIcon />}
-                loading={isSigningIn && latestSelectedProvider === 'github'}
-                disabled={isSigningIn}
-                loadingPosition="start"
-                size="large"
-                sx={{
-                  backgroundColor: '#24292F',
-                }}
-              >
-                Sign in with GitHub
-              </LoadingButton>
-            ) : null}
-            {authProviders.includes('google') ? (
-              <LoadingButton
-                variant="contained"
-                onClick={handleSignIn('google')}
-                startIcon={
-                  <img
-                    alt="Google logo"
-                    loading="lazy"
-                    height="18"
-                    width="18"
-                    src="https://authjs.dev/img/providers/google.svg"
-                    style={{ marginLeft: '2px', marginRight: '2px' }}
-                  />
-                }
-                loading={isSigningIn && latestSelectedProvider === 'google'}
-                disabled={isSigningIn}
-                loadingPosition="start"
-                size="large"
-                sx={{
-                  backgroundColor: '#fff',
-                  color: '#000',
-                  '&:hover': {
-                    color: theme.palette.primary.contrastText,
-                  },
-                }}
-              >
-                Sign in with Google
-              </LoadingButton>
-            ) : null}
-          </React.Fragment>
-        )}
+        <img src={productIconSrc} alt="Toolpad logo" width={56} height={56} />
+        <Typography variant="h1">Sign In</Typography>
+        <Typography variant="subtitle1" mb={1}>
+          You must be authenticated to use this app.
+        </Typography>
+        {authProviders.includes('github') ? (
+          <LoadingButton
+            variant="contained"
+            onClick={handleSignIn('github')}
+            startIcon={<GitHubIcon />}
+            loading={isSigningIn && latestSelectedProvider === 'github'}
+            disabled={isSigningIn}
+            loadingPosition="start"
+            size="large"
+            sx={{
+              backgroundColor: '#24292F',
+            }}
+          >
+            Sign in with GitHub
+          </LoadingButton>
+        ) : null}
+        {authProviders.includes('google') ? (
+          <LoadingButton
+            variant="contained"
+            onClick={handleSignIn('google')}
+            startIcon={
+              <img
+                alt="Google logo"
+                loading="lazy"
+                height="18"
+                width="18"
+                src="https://authjs.dev/img/providers/google.svg"
+                style={{ marginLeft: '2px', marginRight: '2px' }}
+              />
+            }
+            loading={isSigningIn && latestSelectedProvider === 'google'}
+            disabled={isSigningIn}
+            loadingPosition="start"
+            size="large"
+            sx={{
+              backgroundColor: '#fff',
+              color: '#000',
+              '&:hover': {
+                color: theme.palette.primary.contrastText,
+              },
+            }}
+          >
+            Sign in with Google
+          </LoadingButton>
+        ) : null}
       </Stack>
       <Snackbar
         open={!!errorSnackbarMessage}

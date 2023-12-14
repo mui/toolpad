@@ -10,7 +10,6 @@ import {
   Container,
   Tooltip,
   Typography,
-  CircularProgress,
 } from '@mui/material';
 import {
   ToolpadComponent,
@@ -1544,7 +1543,7 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const { hasAuthentication, isLoadingAuthProviders } = React.useContext(AuthContext);
+  const { hasAuthentication } = React.useContext(AuthContext);
 
   const pageMatch = useMatch('/pages/:slug');
   const activePageSlug = pageMatch?.params.slug;
@@ -1559,14 +1558,6 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
     [pages],
   );
 
-  if (isLoadingAuthProviders) {
-    return (
-      <Stack direction="column" alignItems="center" justifyContent="center" flex={1}>
-        <CircularProgress color="primary" size={56} />
-      </Stack>
-    );
-  }
-
   return (
     <AppLayout
       activePageSlug={activePageSlug}
@@ -1577,6 +1568,19 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
     >
       <RenderedPages pages={pages} hasAuthentication={hasAuthentication} />
     </AppLayout>
+  );
+}
+
+export function ToolpadAppRoutes({ dom }: { dom: appDom.RenderTree }) {
+  const authContext = useAuth({ dom });
+
+  return (
+    <AuthContext.Provider value={authContext}>
+      <Routes>
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="*" element={<ToolpadAppLayout dom={dom} />} />
+      </Routes>
+    </AuthContext.Provider>
   );
 }
 
@@ -1606,40 +1610,33 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  const authContext = useAuth();
-
   return (
     <BrowserRouter basename={basename}>
-      <AuthContext.Provider value={authContext}>
-        <UseDataProviderContext.Provider value={useDataProvider}>
-          <AppThemeProvider dom={dom}>
-            <CssBaseline enableColorScheme />
-            {SHOW_PREVIEW_HEADER ? <PreviewHeader basename={basename} /> : null}
-            <AppRoot ref={rootRef}>
-              <ComponentsContextProvider value={components}>
-                <DomContextProvider value={dom}>
-                  <ErrorBoundary FallbackComponent={AppError}>
-                    <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                      <React.Suspense fallback={<AppLoading />}>
-                        <QueryClientProvider client={queryClient}>
-                          <Routes>
-                            <Route path="/signin" element={<SignInPage />} />
-                            <Route path="*" element={<ToolpadAppLayout dom={dom} />} />
-                          </Routes>
-                          {showDevtools ? (
-                            <ReactQueryDevtoolsProduction initialIsOpen={false} />
-                          ) : null}
-                        </QueryClientProvider>
-                      </React.Suspense>
-                    </ResetNodeErrorsKeyProvider>
-                  </ErrorBoundary>
-                </DomContextProvider>
-              </ComponentsContextProvider>
-              <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-            </AppRoot>
-          </AppThemeProvider>
-        </UseDataProviderContext.Provider>
-      </AuthContext.Provider>
+      <UseDataProviderContext.Provider value={useDataProvider}>
+        <AppThemeProvider dom={dom}>
+          <CssBaseline enableColorScheme />
+          {SHOW_PREVIEW_HEADER ? <PreviewHeader basename={basename} /> : null}
+          <AppRoot ref={rootRef}>
+            <ComponentsContextProvider value={components}>
+              <DomContextProvider value={dom}>
+                <ErrorBoundary FallbackComponent={AppError}>
+                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                    <React.Suspense fallback={<AppLoading />}>
+                      <QueryClientProvider client={queryClient}>
+                        <ToolpadAppRoutes dom={dom} />
+                        {showDevtools ? (
+                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
+                        ) : null}
+                      </QueryClientProvider>
+                    </React.Suspense>
+                  </ResetNodeErrorsKeyProvider>
+                </ErrorBoundary>
+              </DomContextProvider>
+            </ComponentsContextProvider>
+            <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+          </AppRoot>
+        </AppThemeProvider>
+      </UseDataProviderContext.Provider>
     </BrowserRouter>
   );
 }

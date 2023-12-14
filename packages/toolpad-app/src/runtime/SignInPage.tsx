@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, CircularProgress, Snackbar, Stack, Typography, useTheme } from '@mui/material';
+import { Alert, Snackbar, Stack, Typography, useTheme } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { LoadingButton } from '@mui/lab';
 import { useSearchParams } from 'react-router-dom';

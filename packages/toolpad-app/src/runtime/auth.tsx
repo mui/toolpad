@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { Box, CircularProgress, Container } from '@mui/material';
-import { AuthContext } from './useAuth';
+import { AUTH_SIGNIN_PATH, AuthContext } from './useAuth';
 
 export interface RequireAuthorizationProps {
   children?: React.ReactNode;
@@ -20,7 +20,7 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
   let reason = null;
   if (!user) {
     if (!isSigningIn) {
-      window.location.replace(`${window.location.origin}/api/auth/signin`);
+      window.location.replace(AUTH_SIGNIN_PATH);
     }
 
     return (

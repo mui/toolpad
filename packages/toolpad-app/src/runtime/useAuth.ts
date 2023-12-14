@@ -4,10 +4,10 @@ import api from './api';
 
 const AUTH_API_PATH = `${window.location.origin}/api/auth`;
 
-const AUTH_SESSION_PATH = `${AUTH_API_PATH}/session`;
-const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
-const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
-const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
+export const AUTH_SESSION_PATH = `${AUTH_API_PATH}/session`;
+export const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
+export const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
+export const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
 export type AuthProvider = 'github' | 'google';
 export interface AuthSession {

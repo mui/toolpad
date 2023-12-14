@@ -7,6 +7,7 @@ import {
   inputBaseClasses,
   inputClasses,
 } from '@mui/material';
+import invariant from 'invariant';
 
 interface EditableTextProps {
   defaultValue?: string;
@@ -75,9 +76,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
 
     const handleChange = React.useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (readOnly) {
-          return;
-        }
+        invariant(!readOnly, 'Readonly input should be disabled');
         if (onChange) {
           onChange(event.target.value);
         }

@@ -41,7 +41,7 @@ export default function QueryIcon({ id: iconId, mode, sx }: QueryIconProps) {
   const ModeIcon = modeIconMap.get(mode ?? '');
 
   return (
-    <div style={{ display: 'flex', gap: DataSourceIcon ? 0.5 : 0 }}>
+    <div style={{ display: 'flex', gap: 0.5 }}>
       {ModeIcon ? (
         <ModeIcon
           sx={{

@@ -86,9 +86,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
 
     const handleInput = React.useCallback(
       (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (readOnly) {
-          return;
-        }
+        invariant(!readOnly, 'Readonly input should be disabled');
         const inputElement = appTitleInput.current;
         if (inputElement) {
           if (event.key === 'Escape') {

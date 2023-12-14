@@ -20,7 +20,7 @@ import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { GetRecordsParams, GetRecordsResult, PaginationMode } from '@mui/toolpad-core';
 import invariant from 'invariant';
-import { GridRowId } from '@mui/x-data-grid';
+import type { GridRowId } from '@mui/x-data-grid';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));

@@ -50,13 +50,11 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 ### Fetch data
 
-1. Click anywhere inside the canvas (except on the components that you just added) to deselect all components.
+1. Locate the create new button in the queries explorer. Press it and choose **REST API**.
+   00
+   {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-2.png", "alt":"Choose REST API", "caption":"The Add query menu", "zoom": false  }}
 
-1. Locate the **Add query** button inside the inspector. Press it and choose **HTTP request**.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-2.png", "alt":"Choose HTTP request", "caption":"The Add query menu", "zoom": false  }}
-
-3. We'll be using the [dog API](https://dog.ceo/dog-api/) for this tutorial. First give the query a unique name: `dogQuery`. Then, set `https://dog.ceo/api/breeds/list/all` as the **URL**. Click the **Preview** button to inspect the result of this request, and expand the `message` object in the response. If all went well, it will look like this:
+2. We'll be using the [dog API](https://dog.ceo/dog-api/) for this tutorial. Set `https://dog.ceo/api/breeds/list/all` as the **URL**. Click the **Run** button to inspect the result of this request, and expand the `message` object in the response. If all went well, it will look like this:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-3.png", "alt": "Fetch URL", "caption": "The dog API response", "indent": 1  }}
 
@@ -66,9 +64,13 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
    return Object.entries(data.message);
    ```
 
-   in the editor. Click **Preview** again to verify the result.
+   in the editor. Click **Run** again to verify the result.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-4.png", "alt": "Transform response", "caption": "The dog API response transformed", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-4a.png", "alt": "Transform response", "caption": "The dog API response transformed", "indent": 1  }}
+
+5. Click on **Save** to save the query, and then rename it to `dogQuery` via the extended options menu visible on hovering over the saved query in the explorer.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-4b.png", "alt": "Transform response", "caption": "The dog API response transformed", "indent": 1  }}
 
 ### Bind data to UI
 
@@ -96,7 +98,9 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 ### Make the app interactive
 
-1. Now, we can make this app interactive by displaying a random image of the selected breed. We'll create another query which reacts to the selection inside the Data Grid component. Deselect all components and click on **Add query** &rarr; **HTTP request**. Name it "imageQuery" and add a `breed` parameter in the **Parameters** section on the bottom:
+1. Now, we can make this app interactive by displaying a random image of the selected breed. We'll create another query which reacts to the selection inside the Data Grid component.
+
+2. Create another query of the **REST API** type and add a `breed` parameter in the **Parameters** section on the right:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-8.png", "alt": "Breed parameter", "caption": "Editing imageQuery", "indent": 1  }}
 

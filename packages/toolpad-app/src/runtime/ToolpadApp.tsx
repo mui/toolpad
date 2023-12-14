@@ -1463,9 +1463,10 @@ function PageNotFound() {
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
   hasAuthentication?: boolean;
+  basename: string;
 }
 
-function RenderedPages({ pages, hasAuthentication = false }: RenderedPagesProps) {
+function RenderedPages({ pages, hasAuthentication = false, basename }: RenderedPagesProps) {
   const { search } = useLocation();
 
   const defaultPage = pages[0];
@@ -1486,7 +1487,10 @@ function RenderedPages({ pages, hasAuthentication = false }: RenderedPagesProps)
 
         if (!IS_RENDERED_IN_CANVAS && hasAuthentication && page.attributes.authorization) {
           pageContent = (
-            <RequireAuthorization allowedRole={page.attributes.authorization.allowedRoles}>
+            <RequireAuthorization
+              allowedRole={page.attributes.authorization.allowedRoles}
+              basename={basename}
+            >
               {pageContent}
             </RequireAuthorization>
           );
@@ -1537,9 +1541,10 @@ function AppError({ error }: FallbackProps) {
 
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
+  basename: string;
 }
 
-function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
@@ -1566,7 +1571,7 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
       hasHeader={hasAuthentication && !IS_RENDERED_IN_CANVAS}
       clipped={SHOW_PREVIEW_HEADER}
     >
-      <RenderedPages pages={pages} hasAuthentication={hasAuthentication} />
+      <RenderedPages pages={pages} hasAuthentication={hasAuthentication} basename={basename} />
     </AppLayout>
   );
 }
@@ -1597,7 +1602,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  const authContext = useAuth({ dom });
+  const authContext = useAuth({ dom, basename });
 
   return (
     <BrowserRouter basename={basename}>
@@ -1615,7 +1620,10 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                         <AuthContext.Provider value={authContext}>
                           <Routes>
                             <Route path="/signin" element={<SignInPage />} />
-                            <Route path="*" element={<ToolpadAppLayout dom={dom} />} />
+                            <Route
+                              path="*"
+                              element={<ToolpadAppLayout dom={dom} basename={basename} />}
+                            />
                           </Routes>
                         </AuthContext.Provider>
                         {showDevtools ? (

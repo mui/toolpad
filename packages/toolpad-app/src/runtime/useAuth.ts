@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as appDom from '../appDom';
 
-const AUTH_API_PATH = `${window.location.origin}/api/auth`;
+const AUTH_API_PATH = '/api/auth';
 
 export const AUTH_SESSION_PATH = `${AUTH_API_PATH}/session`;
 export const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
@@ -38,7 +38,12 @@ export const AuthContext = React.createContext<AuthPayload>({
   hasAuthentication: false,
 });
 
-export function useAuth({ dom }: { dom: appDom.RenderTree }): AuthPayload {
+interface UseAuthInput {
+  dom: appDom.RenderTree;
+  basename: string;
+}
+
+export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
   const app = appDom.getApp(dom);
 
   const authProviders = app.attributes.authorization?.providers ?? [];
@@ -50,7 +55,7 @@ export function useAuth({ dom }: { dom: appDom.RenderTree }): AuthPayload {
   const [isSigningOut, setIsSigningOut] = React.useState(true);
 
   const getCsrfToken = React.useCallback(async () => {
-    const csrfResponse = await fetch(AUTH_CSRF_PATH, {
+    const csrfResponse = await fetch(`${basename}${AUTH_CSRF_PATH}`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -58,7 +63,7 @@ export function useAuth({ dom }: { dom: appDom.RenderTree }): AuthPayload {
     const { csrfToken } = await csrfResponse.json();
 
     return csrfToken;
-  }, []);
+  }, [basename]);
 
   const signOut = React.useCallback(async () => {
     try {
@@ -66,7 +71,7 @@ export function useAuth({ dom }: { dom: appDom.RenderTree }): AuthPayload {
 
       const csrfToken = await getCsrfToken();
 
-      await fetch(AUTH_SIGNOUT_PATH, {
+      await fetch(`${basename}${AUTH_SIGNOUT_PATH}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -80,12 +85,12 @@ export function useAuth({ dom }: { dom: appDom.RenderTree }): AuthPayload {
 
     setSession(null);
     setIsSigningOut(false);
-  }, [getCsrfToken]);
+  }, [basename, getCsrfToken]);
 
   const getSession = React.useCallback(async () => {
     try {
       setIsSigningIn(true);
-      const sessionResponse = await fetch(AUTH_SESSION_PATH);
+      const sessionResponse = await fetch(`${basename}${AUTH_SESSION_PATH}`);
       setSession(await sessionResponse.json());
     } catch (error) {
       console.error((error as Error).message);
@@ -93,7 +98,7 @@ export function useAuth({ dom }: { dom: appDom.RenderTree }): AuthPayload {
     }
 
     setIsSigningIn(false);
-  }, [signOut]);
+  }, [basename, signOut]);
 
   const signIn = React.useCallback(
     async (provider: AuthProvider) => {
@@ -102,7 +107,7 @@ export function useAuth({ dom }: { dom: appDom.RenderTree }): AuthPayload {
 
         const csrfToken = await getCsrfToken();
 
-        const signInResponse = await fetch(`${AUTH_SIGNIN_PATH}/${provider}`, {
+        const signInResponse = await fetch(`${basename}${AUTH_SIGNIN_PATH}/${provider}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -120,7 +125,7 @@ export function useAuth({ dom }: { dom: appDom.RenderTree }): AuthPayload {
         setIsSigningIn(false);
       }
     },
-    [getCsrfToken, signOut],
+    [basename, getCsrfToken, signOut],
   );
 
   React.useEffect(() => {

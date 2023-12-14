@@ -6,9 +6,14 @@ import { AUTH_SIGNIN_PATH, AuthContext } from './useAuth';
 export interface RequireAuthorizationProps {
   children?: React.ReactNode;
   allowedRole?: string | string[];
+  basename: string;
 }
 
-export function RequireAuthorization({ children, allowedRole }: RequireAuthorizationProps) {
+export function RequireAuthorization({
+  children,
+  allowedRole,
+  basename,
+}: RequireAuthorizationProps) {
   const { session, isSigningIn } = React.useContext(AuthContext);
   const user = session?.user ?? null;
 
@@ -20,7 +25,7 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
   let reason = null;
   if (!user) {
     if (!isSigningIn) {
-      window.location.replace(AUTH_SIGNIN_PATH);
+      window.location.replace(`${basename}${AUTH_SIGNIN_PATH}`);
     }
 
     return (

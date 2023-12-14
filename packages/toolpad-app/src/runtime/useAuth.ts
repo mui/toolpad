@@ -1,6 +1,8 @@
 import * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import api from './api';
 
-const AUTH_API_PATH = '/api/auth';
+const AUTH_API_PATH = `${window.location.origin}/api/auth`;
 
 const AUTH_SESSION_PATH = `${AUTH_API_PATH}/session`;
 const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
@@ -17,23 +19,38 @@ export interface AuthSession {
   };
 }
 
-export interface AuthSessionPayload {
+export interface AuthPayload {
   session: AuthSession | null;
   signIn: (provider: AuthProvider) => void | Promise<void>;
   signOut: () => void | Promise<void>;
   isSigningIn: boolean;
   isSigningOut: boolean;
+  authProviders: AuthProvider[];
+  isLoadingAuthProviders: boolean;
+  hasAuthentication: boolean;
 }
 
-export const AuthSessionContext = React.createContext<AuthSessionPayload>({
+export const AuthContext = React.createContext<AuthPayload>({
   session: null,
   signIn: () => {},
   signOut: () => {},
   isSigningIn: false,
   isSigningOut: false,
+  authProviders: [],
+  isLoadingAuthProviders: false,
+  hasAuthentication: false,
 });
 
-export function useAuthSession(): AuthSessionPayload {
+export function useAuth(): AuthPayload {
+  const { data: authProviders = [], isLoading: isLoadingAuthProviders } = useQuery({
+    queryKey: ['getAuthProviders'],
+    queryFn: async () => {
+      return api.methods.getAuthProviders();
+    },
+  });
+
+  const hasAuthentication = !isLoadingAuthProviders && authProviders.length > 0;
+
   const [session, setSession] = React.useState<AuthSession | null>(null);
   const [isSigningIn, setIsSigningIn] = React.useState(true);
   const [isSigningOut, setIsSigningOut] = React.useState(true);
@@ -113,8 +130,10 @@ export function useAuthSession(): AuthSessionPayload {
   );
 
   React.useEffect(() => {
-    getSession();
-  }, [getSession]);
+    if (hasAuthentication) {
+      getSession();
+    }
+  }, [getSession, hasAuthentication]);
 
   return {
     session,
@@ -122,5 +141,8 @@ export function useAuthSession(): AuthSessionPayload {
     signOut,
     isSigningIn,
     isSigningOut,
+    authProviders,
+    isLoadingAuthProviders,
+    hasAuthentication,
   };
 }

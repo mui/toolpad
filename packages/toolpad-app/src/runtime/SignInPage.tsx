@@ -1,11 +1,9 @@
 import * as React from 'react';
 import { Alert, CircularProgress, Snackbar, Stack, Typography, useTheme } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import { useQuery } from '@tanstack/react-query';
 import { LoadingButton } from '@mui/lab';
 import { useSearchParams } from 'react-router-dom';
-import api from './api';
-import { AuthProvider, AuthSessionContext } from './useAuthSession';
+import { AuthProvider, AuthContext } from './useAuth';
 
 const AUTH_ERROR_URL_PARAM = 'error';
 
@@ -13,19 +11,14 @@ export default function SignInPage() {
   const theme = useTheme();
   const [urlParams] = useSearchParams();
 
-  const { signIn, isSigningIn } = React.useContext(AuthSessionContext);
+  const { signIn, isSigningIn } = React.useContext(AuthContext);
 
   const [errorSnackbarMessage, setErrorSnackbarMessage] = React.useState<string>('');
   const [latestSelectedProvider, setLatestSelectedProvider] = React.useState<AuthProvider | null>(
     null,
   );
 
-  const { data: authProviders = [], isLoading: isLoadingAuthProviders } = useQuery({
-    queryKey: ['getAuthProviders'],
-    queryFn: async () => {
-      return api.methods.getAuthProviders();
-    },
-  });
+  const { authProviders, isLoadingAuthProviders } = React.useContext(AuthContext);
 
   const handleSignIn = React.useCallback(
     (provider: AuthProvider) => () => {

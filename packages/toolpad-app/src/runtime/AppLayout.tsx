@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
-import { AuthSessionContext } from './useAuthSession';
+import { AuthContext } from './useAuth';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -160,7 +160,7 @@ export function AppLayout({
 
   const hasNavigation = hasNavigationProp && hasShell;
 
-  const { session, signOut, isSigningIn } = React.useContext(AuthSessionContext);
+  const { session, signOut, isSigningIn } = React.useContext(AuthContext);
 
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {

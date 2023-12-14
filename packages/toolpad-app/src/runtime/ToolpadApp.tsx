@@ -42,7 +42,7 @@ import {
 } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
-import { QueryClientProvider, useQuery, useMutation } from '@tanstack/react-query';
+import { QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
   BrowserRouter,
   Routes,
@@ -93,7 +93,7 @@ import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
-import { AuthSessionContext, useAuthSession } from './useAuthSession';
+import { AuthContext, useAuth } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
 
@@ -1544,15 +1544,7 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const { data: authProviders = [], isLoading: isLoadingAuthProviders } = useQuery({
-    queryKey: ['getAuthProviders'],
-    queryFn: async () => {
-      return api.methods.getAuthProviders();
-    },
-    enabled: !IS_RENDERED_IN_CANVAS,
-  });
-
-  const hasAuthentication = !isLoadingAuthProviders && authProviders.length > 0;
+  const { hasAuthentication, isLoadingAuthProviders } = React.useContext(AuthContext);
 
   const pageMatch = useMatch('/pages/:slug');
   const activePageSlug = pageMatch?.params.slug;
@@ -1614,11 +1606,11 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  const authSessionContext = useAuthSession();
+  const authContext = useAuth();
 
   return (
     <BrowserRouter basename={basename}>
-      <AuthSessionContext.Provider value={authSessionContext}>
+      <AuthContext.Provider value={authContext}>
         <UseDataProviderContext.Provider value={useDataProvider}>
           <AppThemeProvider dom={dom}>
             <CssBaseline enableColorScheme />
@@ -1647,7 +1639,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
             </AppRoot>
           </AppThemeProvider>
         </UseDataProviderContext.Provider>
-      </AuthSessionContext.Provider>
+      </AuthContext.Provider>
     </BrowserRouter>
   );
 }

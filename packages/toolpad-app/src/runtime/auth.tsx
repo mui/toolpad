@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { Box, CircularProgress, Container } from '@mui/material';
-import { AuthSessionContext } from './useAuthSession';
+import { AuthContext } from './useAuth';
 
 export interface RequireAuthorizationProps {
   children?: React.ReactNode;
@@ -9,7 +9,7 @@ export interface RequireAuthorizationProps {
 }
 
 export function RequireAuthorization({ children, allowedRole }: RequireAuthorizationProps) {
-  const { session, isSigningIn } = React.useContext(AuthSessionContext);
+  const { session, isSigningIn } = React.useContext(AuthContext);
   const user = session?.user ?? null;
 
   const allowedRolesSet = React.useMemo<Set<string>>(
@@ -20,7 +20,7 @@ export function RequireAuthorization({ children, allowedRole }: RequireAuthoriza
   let reason = null;
   if (!user) {
     if (!isSigningIn) {
-      window.location.replace('/api/auth/signin');
+      window.location.replace(`${window.location.origin}/api/auth/signin`);
     }
 
     return (

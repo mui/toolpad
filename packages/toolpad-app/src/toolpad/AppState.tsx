@@ -350,6 +350,8 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
               }
             }
           }
+
+          newDom = appDom.saveNode(newDom, action.draft);
           return update(state, {
             currentView: {
               ...state.currentView,
@@ -527,7 +529,6 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
           const queries = appDom.getChildNodes(state.dom, pageNode).queries ?? [];
           if (queries.length) {
             const selectedQuery = queries?.find((query) => query?.id === action.queryId);
-
             const newTab: QueryTab = {
               meta: {
                 id: action.queryId,

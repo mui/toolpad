@@ -58,6 +58,8 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
+import EditIcon from '@mui/icons-material/Edit';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
@@ -528,6 +530,38 @@ function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
   );
 }
 
+interface UpdateActionProps {
+  id: GridRowId;
+  dataProvider: ToolpadDataProviderBase<Record<string, unknown>, PaginationMode>;
+  refetch: () => unknown;
+}
+
+function UpdateAction({ id, dataProvider, refetch }: UpdateActionProps) {
+  const [loading, setLoading] = React.useState(false);
+
+  const setActionError = React.useContext(SetActionErrorContext);
+  invariant(setActionError, 'setActionError must be defined');
+
+  const handleUpdateClick = React.useCallback(async () => {
+    invariant(dataProvider.updateRecord, 'dataProvider must be defined');
+    setLoading(true);
+    try {
+      await dataProvider.updateRecord(id);
+      await refetch();
+    } catch (error) {
+      setActionError(errorFrom(error));
+    } finally {
+      setLoading(false);
+    }
+  }, [dataProvider, id, refetch, setActionError]);
+
+  return (
+    <IconButton onClick={handleUpdateClick} size="small" aria-label={`Edit row with id "${id}"`}>
+      {loading ? <CircularProgress size={16} /> : <EditIcon fontSize="inherit" />}
+    </IconButton>
+  );
+}
+
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
   rowLoadingError?: unknown;
   getActions?: GridActionsColDef['getActions'];
@@ -538,6 +572,8 @@ function useDataProviderDataGridProps(
 ): DataProviderDataGridProps {
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
   const { dataProvider } = useDataProvider(dataProviderId || null);
+
+  console.log(dataProvider);
 
   const [rawPaginationModel, setRawPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
@@ -638,14 +674,33 @@ function useDataProviderDataGridProps(
     0;
 
   const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
-    if (!dataProvider?.deleteRecord) {
+    if (!dataProvider?.deleteRecord && !dataProvider?.updateRecord) {
       return undefined;
     }
 
     return ({ id }) => {
       const result = [];
+      const isEditing = true;
+      const loading = false;
 
-      if (dataProvider?.deleteRecord) {
+      if (dataProvider.updateRecord) {
+        if (isEditing) {
+          return [
+            <IconButton key="commit" size="small" aria-label={`Edit row with id "${id}"`}>
+              {loading ? <CircularProgress size={16} /> : <SaveIcon fontSize="inherit" />}
+            </IconButton>,
+            <IconButton key="cancel" size="small" aria-label="Cancel">
+              <CloseIcon fontSize="inherit" />
+            </IconButton>,
+          ];
+        }
+
+        result.push(
+          <UpdateAction key="update" id={id} dataProvider={dataProvider} refetch={refetch} />,
+        );
+      }
+
+      if (dataProvider.deleteRecord) {
         result.push(
           <DeleteAction key="delete" id={id} dataProvider={dataProvider} refetch={refetch} />,
         );
@@ -682,6 +737,7 @@ function useDataProviderDataGridProps(
     rows: data?.records ?? [],
     rowLoadingError,
     getActions,
+    editMode: 'row',
   };
 }
 

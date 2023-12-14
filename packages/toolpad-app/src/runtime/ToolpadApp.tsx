@@ -1571,19 +1571,6 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   );
 }
 
-export function ToolpadAppRoutes({ dom }: { dom: appDom.RenderTree }) {
-  const authContext = useAuth({ dom });
-
-  return (
-    <AuthContext.Provider value={authContext}>
-      <Routes>
-        <Route path="/signin" element={<SignInPage />} />
-        <Route path="*" element={<ToolpadAppLayout dom={dom} />} />
-      </Routes>
-    </AuthContext.Provider>
-  );
-}
-
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   basename: string;
@@ -1610,6 +1597,8 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
+  const authContext = useAuth({ dom });
+
   return (
     <BrowserRouter basename={basename}>
       <UseDataProviderContext.Provider value={useDataProvider}>
@@ -1623,7 +1612,12 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
                       <QueryClientProvider client={queryClient}>
-                        <ToolpadAppRoutes dom={dom} />
+                        <AuthContext.Provider value={authContext}>
+                          <Routes>
+                            <Route path="/signin" element={<SignInPage />} />
+                            <Route path="*" element={<ToolpadAppLayout dom={dom} />} />
+                          </Routes>
+                        </AuthContext.Provider>
                         {showDevtools ? (
                           <ReactQueryDevtoolsProduction initialIsOpen={false} />
                         ) : null}

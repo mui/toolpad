@@ -21,6 +21,8 @@ import {
 import { Link, useSearchParams } from 'react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { AuthContext } from './useAuth';
+import productIconDark from '../../public/product-icon-dark.svg';
+import productIconLight from '../../public/product-icon-light.svg';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -52,9 +54,10 @@ function AppPagesNavigation({
 
   const theme = useTheme();
 
-  const productIconSrc = `${window.location.origin}/${
-    theme.palette.mode === 'dark' ? 'product-icon-dark.svg' : 'product-icon-light.svg'
-  }`;
+  const productIcon = new URL(
+    theme.palette.mode === 'dark' ? productIconDark : productIconLight,
+    import.meta.url,
+  ).href;
 
   const initialPageSlug = pages[0].slug;
 
@@ -85,7 +88,7 @@ function AppPagesNavigation({
           gap: 1,
         }}
       >
-        <img src={productIconSrc} alt="Toolpad logo" width={35} height={35} />
+        <img src={productIcon} alt="Toolpad logo" width={35} height={35} />
         <Box
           data-testid="brand"
           sx={{
@@ -192,6 +195,7 @@ export function AppLayout({
             color="transparent"
             sx={{
               boxShadow: 'none',
+              pointerEvents: 'none',
             }}
           >
             {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
@@ -199,7 +203,13 @@ export function AppLayout({
               <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
                 {session?.user && !isSigningIn ? (
                   <React.Fragment>
-                    <Button color="inherit" onClick={handleOpenUserMenu}>
+                    <Button
+                      color="inherit"
+                      onClick={handleOpenUserMenu}
+                      sx={{
+                        pointerEvents: 'auto',
+                      }}
+                    >
                       <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
                         {session.user.name || session.user.email}
                       </Typography>

@@ -4,6 +4,8 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import { LoadingButton } from '@mui/lab';
 import { useSearchParams } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './useAuth';
+import productIconDark from '../../public/product-icon-dark.svg';
+import productIconLight from '../../public/product-icon-light.svg';
 
 const AUTH_ERROR_URL_PARAM = 'error';
 
@@ -46,9 +48,10 @@ export default function SignInPage() {
     setErrorSnackbarMessage('');
   }, []);
 
-  const productIconSrc = `${window.location.origin}/${
-    theme.palette.mode === 'dark' ? 'product-icon-dark.svg' : 'product-icon-light.svg'
-  }`;
+  const productIcon = new URL(
+    theme.palette.mode === 'dark' ? productIconDark : productIconLight,
+    import.meta.url,
+  ).href;
 
   return (
     <React.Fragment>
@@ -60,7 +63,7 @@ export default function SignInPage() {
         gap={2}
         sx={{ backgroundColor: theme.palette.background.default }}
       >
-        <img src={productIconSrc} alt="Toolpad logo" width={56} height={56} />
+        <img src={productIcon} alt="Toolpad logo" width={56} height={56} />
         <Typography variant="h1">Sign In</Typography>
         <Typography variant="subtitle1" mb={1}>
           You must be authenticated to use this app.

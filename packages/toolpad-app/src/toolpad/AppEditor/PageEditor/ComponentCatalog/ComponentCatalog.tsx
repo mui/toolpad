@@ -40,7 +40,7 @@ const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Radio', { url: 'https://github.com/mui/mui-toolpad/issues/744', displayName: 'Radio' }],
 ]);
 
-export const COMPONENT_CATALOG_WIDTH_COLLAPSED = 40;
+const COMPONENT_CATALOG_WIDTH_COLLAPSED = 40;
 
 const ComponentCatalogRoot = styled('div')({
   position: 'relative',

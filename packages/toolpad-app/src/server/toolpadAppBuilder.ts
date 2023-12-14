@@ -318,6 +318,8 @@ if (import.meta.hot) {
           '@emotion/react',
           '@mui/icons-material',
           '@mui/icons-material/ArrowDropDownRounded',
+          '@mui/icons-material/Close',
+          '@mui/icons-material/Delete',
           '@mui/icons-material/DarkMode',
           '@mui/icons-material/Edit',
           '@mui/icons-material/Error',

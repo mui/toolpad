@@ -1,34 +1,41 @@
-import { Typography, styled } from '@mui/material';
+import { SxProps, Typography, styled } from '@mui/material';
 import * as React from 'react';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import ErrorIcon from '@mui/icons-material/Error';
 
 const OverlayRoot = styled('div')(({ theme }) => ({
-  position: 'absolute',
-  inset: '0 0 0 0',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  borderWidth: 1,
-  borderStyle: 'solid',
-  borderRadius: theme.shape.borderRadius,
-  borderColor: theme.palette.divider,
+  padding: theme.spacing(2),
 }));
 
-interface ErrorOverlayProps {
-  error?: unknown;
+interface ErrorContentProps {
+  sx?: SxProps;
+  error: NonNullable<unknown>;
 }
 
-export default function ErrorOverlay({ error }: ErrorOverlayProps) {
-  const errMessage = error ? errorFrom(error).message : null;
-  return errMessage ? (
-    <OverlayRoot>
+export function ErrorContent({ sx, error }: ErrorContentProps) {
+  const errMessage = errorFrom(error).message;
+  return (
+    <OverlayRoot sx={sx}>
       <Typography sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
         <ErrorIcon fontSize="small" color="error" />
         Error
       </Typography>
       <Typography variant="body2">{errMessage}</Typography>
     </OverlayRoot>
-  ) : null;
+  );
 }
+
+const ErrorOverlay = styled(ErrorContent)(({ theme }) => ({
+  position: 'absolute',
+  inset: '0 0 0 0',
+  borderWidth: 1,
+  borderStyle: 'solid',
+  borderRadius: theme.shape.borderRadius,
+  borderColor: theme.palette.divider,
+}));
+
+export default ErrorOverlay;

@@ -14,9 +14,7 @@ function BooleanPropEditor({ propType, label, value, onChange, disabled }: Edito
   return (
     <PropertyControl propType={propType}>
       <FormControlLabel
-        control={
-          <Checkbox size="small" checked={!!value} disabled={disabled} onChange={handleChange} />
-        }
+        control={<Checkbox checked={!!value} disabled={disabled} onChange={handleChange} />}
         label={label}
       />
     </PropertyControl>

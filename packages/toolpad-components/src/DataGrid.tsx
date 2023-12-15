@@ -26,6 +26,7 @@ import {
   GridSortModel,
   GridNoRowsOverlay,
   GridRowModesModel,
+  GridRowModes,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -57,7 +58,7 @@ import {
   Alert,
   Collapse,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
@@ -407,7 +408,7 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
 export interface SerializableGridColumn
   extends Pick<
     GridColDef,
-    'field' | 'type' | 'align' | 'width' | 'headerName' | 'sortable' | 'filterable'
+    'field' | 'type' | 'align' | 'width' | 'headerName' | 'sortable' | 'filterable' | 'editable'
   > {
   numberFormat?: NumberFormat;
   dateFormat?: DateFormat;
@@ -433,12 +434,16 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map((column) => {
-    const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};
+    let baseColumn: Omit<SerializableGridColumn, 'field'> = { editable: true };
+
+    if (column.type) {
+      baseColumn = { ...baseColumn, ...CUSTOM_COLUMN_TYPES[column.type] };
+    }
 
     if (column.type === 'number' && column.numberFormat) {
       const format = createNumberFormat(column.numberFormat);
       return {
-        ...customType,
+        ...baseColumn,
         ...column,
         valueFormatter: ({ value }) => format.format(value),
       };
@@ -447,7 +452,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
     if (column.type === 'date') {
       const format = createDateFormat(column.dateFormat);
       return {
-        ...customType,
+        ...baseColumn,
         ...column,
         valueFormatter: ({ value }) => {
           try {
@@ -462,7 +467,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
     if (column.type === 'dateTime') {
       const format = createDateFormat(column.dateTimeFormat);
       return {
-        ...customType,
+        ...baseColumn,
         ...column,
         valueFormatter: ({ value }) => {
           try {
@@ -476,7 +481,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
 
     const type = column.type && column.type in DEFAULT_COLUMN_TYPES ? column.type : undefined;
 
-    return { ...customType, ...column, type };
+    return { ...baseColumn, ...column, type };
   });
 }
 
@@ -537,32 +542,6 @@ interface UpdateActionProps {
   refetch: () => unknown;
 }
 
-function UpdateAction({ id, dataProvider, refetch }: UpdateActionProps) {
-  const [loading, setLoading] = React.useState(false);
-
-  const setActionError = React.useContext(SetActionErrorContext);
-  invariant(setActionError, 'setActionError must be defined');
-
-  const handleUpdateClick = React.useCallback(async () => {
-    invariant(dataProvider.updateRecord, 'dataProvider must be defined');
-    setLoading(true);
-    try {
-      await dataProvider.updateRecord(id);
-      await refetch();
-    } catch (error) {
-      setActionError(errorFrom(error));
-    } finally {
-      setLoading(false);
-    }
-  }, [dataProvider, id, refetch, setActionError]);
-
-  return (
-    <IconButton onClick={handleUpdateClick} size="small" aria-label={`Edit row with id "${id}"`}>
-      {loading ? <CircularProgress size={16} /> : <EditIcon fontSize="inherit" />}
-    </IconButton>
-  );
-}
-
 interface GridState {
   editedRow: GridRowId | null;
 }
@@ -583,11 +562,7 @@ function useDataProviderDataGridProps(
   });
 
   const rowModesModel: GridRowModesModel = React.useMemo(() => {
-    return gridState.editedRow
-      ? {
-          [gridState.editedRow]: 'edit',
-        }
-      : {};
+    return gridState.editedRow ? { [gridState.editedRow]: { mode: GridRowModes.Edit } } : {};
   }, [gridState.editedRow]);
 
   const [rawPaginationModel, setRawPaginationModel] = React.useState<GridPaginationModel>({

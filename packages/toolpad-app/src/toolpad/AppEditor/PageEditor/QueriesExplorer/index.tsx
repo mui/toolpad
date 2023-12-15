@@ -321,13 +321,16 @@ function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
         queryPanel: {
           ...currentView.queryPanel,
           queryTabs: currentView.queryPanel?.queryTabs?.map((tab) => {
-            if (tab?.meta?.id === nodeId) {
+            if (tab?.meta?.id === nodeId && tab.draft && tab.saved) {
+              const updatedNode = { ...tab.draft, name: updatedName };
               return {
                 ...tab,
                 meta: {
                   ...tab.meta,
                   name: updatedName,
                 },
+                draft: updatedNode,
+                saved: updatedNode,
               };
             }
             return tab;

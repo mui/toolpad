@@ -10,7 +10,7 @@
 
 The possible options for the the display mode are:
 
-- **App shell**: Pages with their display mode set to this value will render within the navigation sidebar on the left, allowing for easy navigation between all pages:
+- **App shell**: Pages with their display mode set to this value will render within the navigation sidebar on the left, allowing for easy navigation between all pages.
 
 To display a different name for a page in the sidebar, the page **display name** can be set.
 

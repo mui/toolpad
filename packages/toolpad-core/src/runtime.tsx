@@ -178,7 +178,7 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
     if (!nodeId || !canvasEvents) {
       return null;
     }
-    return {
+    const nodeRuntime: NodeRuntime<P> = {
       nodeId,
       nodeName,
       updateAppDomConstProp: (prop, value) => {
@@ -195,7 +195,9 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
           value,
         });
       },
-    } satisfies NodeRuntime<P>;
+    };
+
+    return nodeRuntime;
   }, [canvasEvents, nodeId, nodeName]);
 }
 
@@ -293,6 +295,7 @@ export function useComponent(id: string) {
 
 export interface ToolpadDataProviderIntrospection {
   paginationMode: PaginationMode;
+  hasDeleteRecord: boolean;
 }
 
 export interface UseDataProviderHookResult<R, P extends PaginationMode> {

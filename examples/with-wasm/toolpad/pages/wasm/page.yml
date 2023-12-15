@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: page
 spec:
-  id: sR_fqKE
-  title: Default page
+  title: WASM example
   content:
     - component: TextField
       name: number1

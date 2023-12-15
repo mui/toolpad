@@ -1,5 +1,213 @@
 # Changelog
 
+## 0.1.41
+
+<!-- generated comparing v0.1.40..master -->
+
+_Dec 13, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Support server-side sorting and filtering, support delete in data providers.
+
+- &#8203;<!-- 9 -->improve vite omptimizeDeps after recent dataSource updates (#2990) @Janpot
+- &#8203;<!-- 8 -->Support serverside sorting/filtering (#2982) @Janpot
+- &#8203;<!-- 7 -->Fix formatting for Date objects in the grid (#2984) @Janpot
+- &#8203;<!-- 6 -->Open links in the same tab unless configured otherwise (#2983) @Janpot
+- &#8203;<!-- 5 -->Support delete in data providers (#2978) @Janpot
+- &#8203;<!-- 4 -->Initial authorization implementation (#2931) @Janpot
+- &#8203;<!-- 3 -->Update custom server nextjs README.md (#2977) @prakhargupta1
+- &#8203;<!-- 2 -->[core] Update workflows and issue templates to reflect the updated label (#2992) @MBilalShafi
+- &#8203;<!-- 1 -->[core] Update `no-response` workflow (#2989) @MBilalShafi
+
+All contributors of this release in alphabetical order: @Janpot, @MBilalShafi, @prakhargupta1
+
+## 0.1.40
+
+<!-- generated comparing v0.1.39..master -->
+
+_Dec 7, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Some important fixes, code pages UI improvements, preparation for new features and docs improvements!
+
+- &#8203;<!-- 12 -->Fix sizing of page container (#2974) @Janpot
+- &#8203;<!-- 11 -->Fix crash when a query name is the same as a page name (#2975) @Janpot
+- &#8203;<!-- 10 -->Move custom server documentation to concepts section (#2972) @prakhargupta1
+- &#8203;<!-- 09 -->Add json-schema url to yaml files (#2970) @Janpot
+- &#8203;<!-- 08 -->Add a new feature as default Value (#2922) @JerryWu1234
+- &#8203;<!-- 07 -->Unclutter UI for code pages (#2961) @Janpot
+- &#8203;<!-- 06 -->Update release instructions smoke test (#2958) @Janpot
+- &#8203;<!-- 05 -->Remove id from examples (#2959) @Janpot
+- &#8203;<!-- 04 -->[core] Upgrade monorepo (#2979) @bharatkashyap
+- &#8203;<!-- 03 -->[docs] Why Toolpad? iteration (#2854) @oliviertassinari
+- &#8203;<!-- 02 -->[examples] Polish examples (#2962) @oliviertassinari
+- &#8203;<!-- 01 -->[WIP] Allow importing server functions in custom pages (#2953) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1
+
+## 0.1.39
+
+<!-- generated comparing v0.1.38..master -->
+
+_Dec 1, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Pages are now routed to by their name. Bug fixes.
+
+- &#8203;<!-- 16 -->Make routing page name based (#2949) @Janpot
+- &#8203;<!-- 14 -->Update monorepo (#2955) @Janpot
+- &#8203;<!-- 13 -->Tweak titles to improve SERP results (#2954) @Janpot
+- &#8203;<!-- 12 -->Allow omitting page.yml for code pages (#2947) @Janpot
+- &#8203;<!-- 11 -->Use ESM for CLI (#2920) @Janpot
+- &#8203;<!-- 10 -->Update documentation for HTTP requests secret handling (#2951) @prakhargupta1
+- &#8203;<!-- 09 -->Refactor virtual files implementation (#2946) @Janpot
+- &#8203;<!-- 08 -->Make page title optional in the yml files (#2948) @Janpot
+- &#8203;<!-- 07 -->Update CONTRIBUTING.md (#2940) @Janpot
+- &#8203;<!-- 06 -->Fix Toolpad not picking a free port (#2943) @Janpot
+- &#8203;<!-- 05 -->Fix crash when function result type contains a constructor property (#2941) @Janpot
+- &#8203;<!-- 04 -->Fix Date serialization in serverless functions (#2942) @Janpot
+- &#8203;<!-- 03 -->Link the latest 3 examples to the overview page (#2933) @prakhargupta1
+- &#8203;<!-- 02 -->[docs] Fix 404 regressions in the docs (#2939) @oliviertassinari
+- &#8203;<!-- 01 -->[Example] Run Next.js and Toolpad together (#2918) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
+## v0.1.38
+
+<!-- generated comparing v0.1.37..master -->
+
+_Nov 23, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Support custom code files for pages, fixes for the CLI tool, documentation improvements for examples and other behind the scenes work!
+
+- &#8203;<!-- 13 -->Fix reactDevtools build location for dev mode (#2921) @Janpot
+- &#8203;<!-- 12 -->Try out circleci parallelism (#2895) @Janpot
+- &#8203;<!-- 11 -->Update README of examples with new CTA instructions (#2885) @Janpot
+- &#8203;<!-- 10 -->Improve custom server documentation (#2898) @Janpot
+- &#8203;<!-- 09 -->Remove --create option from toolpad CLI (#2899) @Janpot
+- &#8203;<!-- 08 -->Isolate tsx in renovate.json (#2905) @Janpot
+- &#8203;<!-- 07 -->Fix failing CTA test (#2900) @Janpot
+- &#8203;<!-- 06 -->Update instructions for smoke testing the release (#2894) @Janpot
+- &#8203;<!-- 05 -->[core] Upgrade monorepo (#2926) @bharatkashyap
+- &#8203;<!-- 04 -->[core] Rename OpenCollective @oliviertassinari
+- &#8203;<!-- 03 -->[docs] Add button and datagrid component guide, split Managing state doc (#2678) @prakhargupta1
+- &#8203;<!-- 02 -->[docs] Add README to Stripe example (#2892) @bharatkashyap
+- &#8203;<!-- 01 -->[experiment] Support custom code files for pages (#2891) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
+## 0.1.37
+
+<!-- generated comparing v0.1.36..master -->
+
+_Nov 10, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Allow bootstrapping examples with `create-toolpad-app`, support integrating Toolpad apps programmatically in custom servers. Bind any HTTP query variable to an environment variable. Support a new Switch component.
+
+- &#8203;<!-- 14 -->Support create-toolpad-app --example argument (#2884) @Janpot
+- &#8203;<!-- 13 -->Add custom server documentation (#2879) @Janpot
+- &#8203;<!-- 12 -->Link issues in docs (#2890) @prakhargupta1
+- &#8203;<!-- 11 -->Support running multiple handlers side-by-side in a custom server (#2882) @Janpot
+- &#8203;<!-- 10 -->charts example (#2880) @prakhargupta1
+- &#8203;<!-- 09 -->Fix editor command failing on master (#2881) @Janpot
+- &#8203;<!-- 08 -->Add instructions to start the editor for custom servers (#2878) @Janpot
+- &#8203;<!-- 07 -->Add Toolpad editor command for connecting to custom servers (#2800) @Janpot
+- &#8203;<!-- 06 -->Allow binding query parameters to environment variables (#2777) @JerryWu1234
+- &#8203;<!-- 05 -->Close the editor vite devserver when the program exits (#2877) @Janpot
+- &#8203;<!-- 04 -->Fix a deprecation message in the tests (#2876) @Janpot
+- &#8203;<!-- 03 -->Add Switch component as a variant to Checkbox (#2787) @JerryWu1234
+- &#8203;<!-- 02 -->Remove PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD (#2855) @Janpot
+- &#8203;<!-- 01 -->[docs] Fix images width overflow on Firefox (#2874) @bharatkashyap
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @JerryWu1234, @prakhargupta1
+
+## 0.1.36
+
+<!-- generated comparing v0.1.35..master -->
+
+_Nov 3, 2023_
+
+A big thanks to the 1 contributor who made this release possible. Here are some highlights ✨:
+
+Fix app not loading due to ESM issues in charts.
+
+- &#8203;<!-- 1 -->Fix ESM charts issues in production (#2861) @apedroferreira
+
+All contributors of this release in alphabetical order: @apedroferreira
+
+## 0.1.35
+
+<!-- generated comparing v0.1.34..master -->
+
+_Nov 2, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+Use `@mui/x-charts` in Chart component, better preview header in apps, fix port option alias, add Stripe and Supabase examples.
+
+- &#8203;<!-- 9 -->Add supabase example showcasing list component (#2851) @prakhargupta1
+- &#8203;<!-- 8 -->Migrate Chart component to X charts library (#2500) @apedroferreira
+- &#8203;<!-- 7 -->Fix port option alias (#2847) @Janpot
+- &#8203;<!-- 6 -->Add preview header to custom server (#2845) @Janpot
+- &#8203;<!-- 5 -->Update monorepo (#2852) @apedroferreira
+- &#8203;<!-- 4 -->Lock file maintenance (#2849) @renovate[bot]
+- &#8203;<!-- 3 -->Remove crypto-js (#2843) @Janpot
+- &#8203;<!-- 2 -->[docs] Casing consistency @oliviertassinari
+- &#8203;<!-- 1 -->[docs] Add Stripe script example (#2477) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
+## 0.1.34
+
+<!-- generated comparing v0.1.33..master -->
+
+_Oct 25, 2023_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Improvements to the Support page, some fixes to the tests.
+
+- &#8203;<!-- 4 -->Update Support URL in Help menu (#2832) @bharatkashyap
+- &#8203;<!-- 3 -->Fix flaky tests (#2812) @apedroferreira
+- &#8203;<!-- 2 -->[core] Monorepo upgrade (#2825) @bharatkashyap
+- &#8203;<!-- 1 -->[docs] A few Support page improvements (#2824) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap
+
+## 0.1.33
+
+<!-- generated comparing v0.1.32..master -->
+
+_Oct 19, 2023_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+Add a new password option to the TextField component, improvements to the docs and examples, and some core infrastructure updates!
+
+- &#8203;<!-- 14 -->Add support page (#2807) @prakhargupta1
+- &#8203;<!-- 13 -->Link WASM example to overview page and improve crud app (#2726) @prakhargupta1
+- &#8203;<!-- 12 -->Run prettier on project (#2811) @apedroferreira
+- &#8203;<!-- 11 -->Changed MenuItem to ToggleButton (#2776) (#2796) @biplobsd
+- &#8203;<!-- 10 -->Add password option to TextField Component (#2797) @Kirera-Wainaina
+- &#8203;<!-- 09 -->Add tests for custom server (#2798) @Janpot
+- &#8203;<!-- 08 -->Improve release docs wording (#2794) @Janpot
+- &#8203;<!-- 07 -->Isolate project runtime from editor (#2788) @Janpot
+- &#8203;<!-- 06 -->Remove babel-plugin-transform-rename-import (#2786) @Janpot
+- &#8203;<!-- 05 -->Update release process (#2793) @Janpot
+- &#8203;<!-- 04 -->Fix creating new page with blur and default name + scroll only below explorer headers (#2790) @apedroferreira
+- &#8203;<!-- 03 -->Turn integration tests into a yarn workspace (#2783) @Janpot
+- &#8203;<!-- 02 -->[docs] Update Data Providers (#2813) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Add 'Why Toolpad?' (#2632) @prakhargupta1
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @biplobsd, @Janpot, @Kirera-Wainaina, @prakhargupta1
+
 ## 0.1.32
 
 <!-- generated comparing v0.1.31..master -->

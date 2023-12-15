@@ -22,8 +22,6 @@ import ToolpadApp from './ToolpadApp';
 
 afterEach(cleanup);
 
-const COMPONENTS = {};
-
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
@@ -35,7 +33,7 @@ function renderPage(
   let dom = appDom.createDom();
   const root = appDom.getNode(dom, dom.root, 'app');
   const page = appDom.createNode(dom, 'page', {
-    name: 'Page',
+    name: 'thePage',
     attributes: {
       title: '',
     },
@@ -44,13 +42,13 @@ function renderPage(
 
   dom = initPage(dom, page);
 
-  window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
+  window.history.replaceState({}, 'Test page', `/toolpad/pages/thePage`);
 
   const state = createRuntimeState({ dom });
 
   return render(
     <CanvasEventsContext.Provider value={canvasEvents}>
-      <ToolpadApp extraComponents={COMPONENTS} state={state} basename="toolpad" />
+      <ToolpadApp state={state} basename="toolpad" />
     </CanvasEventsContext.Provider>,
   );
 }

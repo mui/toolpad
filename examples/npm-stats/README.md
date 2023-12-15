@@ -3,7 +3,7 @@
 <p class="description">This analytics dashboard shows how to track a KPI from a third-party data source.</p>
 
 <a href="https://mui-toolpad-npm-stats-production.up.railway.app/prod/pages/evZC-gp" target="_blank">
-  <img src="https://mui.com/static/toolpad/docs/examples/npm-stats.png" alt="npm stats app" style="aspect-ratio: 1.8" width="100%">
+  <img src="https://mui.com/static/toolpad/docs/examples/npm-stats.png" alt="npm stats app" style="aspect-ratio: 67/37;" width="1440">
 </a>
 
 ## Check out the live app
@@ -12,20 +12,18 @@
 
 ## How to run
 
-Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
-
-<!-- #default-branch-switch -->
+Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-curl https://codeload.github.com/mui/mui-toolpad/tar.gz/master | tar -xz --strip=2  mui-toolpad-master/examples/npm-stats
-cd npm-stats
+npx create-toolpad-app@latest --example npm-stats
 ```
 
-Install it and run:
+```bash
+yarn create toolpad-app --example npm-stats
+```
 
 ```bash
-npm install
-npm run dev
+pnpm create toolpad-app --example npm-stats
 ```
 
 or:

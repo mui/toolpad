@@ -2,14 +2,13 @@ import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
-import { ToolpadComponents } from '@mui/toolpad-core';
-import ToolpadApp from '../runtime/ToolpadApp';
+import ToolpadApp, { IS_RENDERED_IN_CANVAS } from '../runtime/ToolpadApp';
 import { queryClient } from '../runtime/api';
 import { AppCanvasState } from '../types';
 import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
-import { bridge, setCommandHandler } from './ToolpadBridge';
+import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
 
 const handleScreenUpdate = throttle(
   () => {
@@ -22,15 +21,11 @@ const handleScreenUpdate = throttle(
 export interface AppCanvasProps {
   state: AppCanvasState;
   basename: string;
-  extraComponents: ToolpadComponents;
 }
 
-export default function AppCanvas({
-  extraComponents,
-  basename,
-  state: initialState,
-}: AppCanvasProps) {
+export default function AppCanvas({ basename, state: initialState }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState>(initialState);
+  const [readyBridge, setReadyBridge] = React.useState<ToolpadBridge>();
 
   const appRootRef = React.useRef<HTMLDivElement>();
   const appRootCleanupRef = React.useRef<() => void>();
@@ -120,6 +115,7 @@ export default function AppCanvas({
     });
 
     bridge.canvasEvents.emit('ready', {});
+    setReadyBridge(bridge);
   }, []);
 
   const savedNodes = state?.savedNodes;
@@ -129,16 +125,15 @@ export default function AppCanvas({
     };
   }, [savedNodes]);
 
-  return (
-    <CanvasHooksContext.Provider value={editorHooks}>
-      <CanvasEventsContext.Provider value={bridge?.canvasEvents || null}>
-        <ToolpadApp
-          rootRef={onAppRoot}
-          extraComponents={extraComponents}
-          basename={basename}
-          state={state}
-        />
-      </CanvasEventsContext.Provider>
-    </CanvasHooksContext.Provider>
-  );
+  if (IS_RENDERED_IN_CANVAS) {
+    return readyBridge ? (
+      <CanvasHooksContext.Provider value={editorHooks}>
+        <CanvasEventsContext.Provider value={readyBridge.canvasEvents}>
+          <ToolpadApp rootRef={onAppRoot} basename={basename} state={state} />
+        </CanvasEventsContext.Provider>
+      </CanvasHooksContext.Provider>
+    ) : null;
+  }
+
+  return <ToolpadApp basename={basename} state={state} />;
 }

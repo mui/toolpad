@@ -84,11 +84,7 @@ export class ToolpadEditor {
   }
 
   async goToPage(name: string) {
-    await this.explorer.getByText(name).click();
-  }
-
-  async goToPageById(id: string) {
-    await gotoIfNotCurrent(this.page, `/_toolpad/app/pages/${id}`);
+    await gotoIfNotCurrent(this.page, `/_toolpad/app/pages/${name}`);
   }
 
   async createComponent(name: string) {
@@ -137,7 +133,12 @@ export class ToolpadEditor {
 
     await this.componentCatalog.hover();
 
-    const pageRootBoundingBox = await this.pageRoot.boundingBox();
+    let pageRootBoundingBox;
+    await expect(async () => {
+      pageRootBoundingBox = await this.pageRoot.boundingBox();
+      expect(pageRootBoundingBox).toBeTruthy();
+    }).toPass();
+
     if (!moveTargetX) {
       moveTargetX = pageRootBoundingBox!.x + pageRootBoundingBox!.width / 2;
     }
@@ -148,7 +149,7 @@ export class ToolpadEditor {
     const sourceLocator = this.getComponentCatalogItem(componentName);
     await expect(sourceLocator).toBeVisible();
 
-    await this.dragTo(sourceLocator, moveTargetX, moveTargetY, hasDrop);
+    await this.dragTo(sourceLocator, moveTargetX!, moveTargetY!, hasDrop);
 
     await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }

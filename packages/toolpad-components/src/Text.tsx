@@ -36,6 +36,7 @@ interface TextProps {
   value: string;
   markdown: string;
   href?: string;
+  openInNewTab?: boolean;
   loading?: boolean;
   error?: unknown;
   sx?: SxProps;
@@ -122,10 +123,11 @@ interface LinkContentProps {
   value: string;
   href?: string;
   loading?: boolean;
+  openInNewTab?: boolean;
   sx?: SxProps;
 }
 
-function LinkContent({ value, href, loading, sx }: LinkContentProps) {
+function LinkContent({ value, href, loading, sx, openInNewTab }: LinkContentProps) {
   const content = React.useMemo(() => {
     if (loading) {
       return <Skeleton variant="text" />;
@@ -136,7 +138,7 @@ function LinkContent({ value, href, loading, sx }: LinkContentProps) {
   return (
     <MuiLink
       href={href}
-      target="_blank"
+      target={openInNewTab ? '_blank' : undefined}
       rel="noopener noreferrer"
       sx={{
         minWidth: loading || !value ? 150 : undefined,
@@ -313,6 +315,13 @@ export default createBuiltin(Text, {
       helperText: 'The url that is being linked.',
       type: 'string',
       default: 'about:blank',
+      visible: ({ mode }: TextProps) => mode === 'link',
+    },
+    openInNewTab: {
+      label: 'Open in a new tab',
+      helperText: 'Clicking the link should open a new tab.',
+      type: 'boolean',
+      default: false,
       visible: ({ mode }: TextProps) => mode === 'link',
     },
     variant: {

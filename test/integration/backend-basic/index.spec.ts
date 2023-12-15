@@ -1,20 +1,17 @@
 import * as path from 'path';
 import * as url from 'url';
-import { fileReplace } from '../../../packages/toolpad-utils/src/fs';
+import invariant from 'invariant';
+import { fileReplace } from '@mui/toolpad-utils/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { waitForMatch } from '../../utils/streams';
-import { expectBasicPageContent } from './shared';
+import { expectBasicRuntimeTests } from './shared';
 import { setPageHidden } from '../../utils/page';
 import { withTemporaryEdits } from '../../utils/fs';
 import clickCenter from '../../utils/clickCenter';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
-
-const BASIC_TESTS_PAGE_ID = '5q1xd0t';
-const EXTRACTED_TYPES_PAGE_ID = 'dt1T4rY';
-const DATA_PROVIDERS_PAGE_ID = 'VnOzPpU';
 
 test.use({
   ignoreConsoleErrors: [
@@ -28,8 +25,10 @@ test.use({
 });
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
+  },
+  localAppConfig: {
     cmd: 'dev',
     env: {
       SECRET_BAZ: 'Some baz secret',
@@ -43,14 +42,19 @@ test('functions basics', async ({ page, context }) => {
   ]);
 
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
-  await expectBasicPageContent(page);
+  await expectBasicRuntimeTests(page);
 });
 
 test('function editor reload', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
+  await editorModel.goToPage('basic');
 
   const functionsFilePath = path.resolve(localApp.dir, './toolpad/resources/functions.ts');
   await withTemporaryEdits(functionsFilePath, async () => {
@@ -68,8 +72,13 @@ test('function editor reload', async ({ page, localApp }) => {
 });
 
 test('function editor parameters update', async ({ page, localApp, argosScreenshot }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(BASIC_TESTS_PAGE_ID);
+  await editorModel.goToPage('basic');
 
   await editorModel.pageEditor.getByRole('button', { name: 'withParams' }).click();
 
@@ -97,7 +106,7 @@ test('function editor parameters update', async ({ page, localApp, argosScreensh
 
 test('bound parameters are preserved on manual call', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await page.getByRole('button', { name: 'Run Manual Query' }).click();
 
@@ -106,7 +115,7 @@ test('bound parameters are preserved on manual call', async ({ page }) => {
 
 test('global variables are retained in function runtime', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('basic');
+  await runtimeModel.goToPage('basic');
 
   await expect(page.getByText('global value: 1', { exact: true })).toBeVisible();
   await expect(page.getByText('global value: 2', { exact: true })).not.toBeVisible();
@@ -118,16 +127,34 @@ test('global variables are retained in function runtime', async ({ page }) => {
 
 test('Query serialization', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('serialization');
+  await runtimeModel.goToPage('serialization');
 
-  await expect(page.getByText('Circlular property: [Circular]', { exact: true })).toBeVisible();
+  await expect(page.getByText('Circular property: hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Non-circular: hello:hello', { exact: true })).toBeVisible();
   await expect(page.getByText('Invalid error: undefined', { exact: true })).toBeVisible();
+  await expect(
+    page.getByText('Some Date object: 2023-11-27T14:35:35.511Z', { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText('Some RegExp: "foo" i', { exact: true })).toBeVisible();
+});
+
+test('Circular scope value, binding editor', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPage('serialization');
+
+  await editorModel.waitForOverlay();
+  await clickCenter(
+    page,
+    editorModel.appCanvas.getByText('Circular property: hello', { exact: true }),
+  );
+  await editorModel.componentEditor.waitFor();
+  await page.getByLabel('Bind property "Value"').click();
+  await expect(page.getByRole('dialog', { name: 'Bind property "Value' })).toBeVisible();
 });
 
 test('Extracted types', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('extractedTypes');
+  await runtimeModel.goToPage('extractedTypes');
 
   await expect(
     page.getByText(
@@ -143,8 +170,13 @@ test('Extracted types', async ({ page }) => {
 });
 
 test('function editor extracted parameters', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(EXTRACTED_TYPES_PAGE_ID);
+  await editorModel.goToPage('extractedTypes');
 
   await editorModel.pageEditor.getByRole('button', { name: 'bareWithParams' }).click();
   const queryEditor = page.getByRole('dialog', { name: 'bareWithParams' });
@@ -188,7 +220,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
 
 test('data providers', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById(DATA_PROVIDERS_PAGE_ID);
+  await editorModel.goToPage('dataProviders');
 
   await editorModel.waitForOverlay();
 
@@ -213,4 +245,21 @@ test('data providers', async ({ page }) => {
   await editorModel.appCanvas.getByRole('option', { name: '25', exact: true }).click();
 
   await expect(grid2.getByText('Cursor item 0')).toBeVisible();
+});
+
+test('data providers crud', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPage('crud');
+
+  await editorModel.waitForOverlay();
+
+  const grid = editorModel.appCanvas.getByRole('grid');
+
+  await expect(grid.getByText('Index item 5')).toBeVisible();
+
+  await clickCenter(page, grid);
+
+  await grid.getByRole('button', { name: 'Delete row with id "5"', exact: true }).click();
+
+  await expect(grid.getByText('Index item 5')).not.toBeVisible();
 });

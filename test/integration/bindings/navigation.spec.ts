@@ -6,15 +6,17 @@ import { expect, test } from '../../playwright/localTest';
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture-navigation'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });
 
 test('navigation action', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.goToPage('page1');
 
   const getPageUrlSearch = (): string => new URL(page.url()).search;
 

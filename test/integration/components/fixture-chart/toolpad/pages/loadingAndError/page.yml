@@ -17,9 +17,9 @@ spec:
                 data:
                   $$jsExpression: |
                     alwaysLoading.data
-                color: "#1976d2"
-                xKey: ""
-                yKey: ""
+                color: '#1976d2'
+                xKey: ''
+                yKey: ''
         - component: Chart
           name: chart1
           props:
@@ -29,9 +29,9 @@ spec:
                 data:
                   $$jsExpression: |
                     error.data
-                color: "#1976d2"
-                xKey: ""
-                yKey: ""
+                color: '#1976d2'
+                xKey: ''
+                yKey: ''   
   queries:
     - name: alwaysLoading
       query:

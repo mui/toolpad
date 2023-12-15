@@ -1,4 +1,4 @@
-# Data Providers
+# Data providers
 
 <p class="description">Bring tabular data to the frontend with server-side pagination and filtering.</p>
 
@@ -6,37 +6,29 @@ Toolpad functions are great to bring some backend state to the page, but they fa
 
 Follow these steps to create a new data provider:
 
-1. Drag a data grid into the canvas
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/data-provider-1.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
-2. Under its **Row Source** property, select the option **Data Provider**.
+A data provider that iterates over a static list could look as follows:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/rows-source.png", "alt": "Select data provider row source", "caption": "Select data provider row source", "zoom": false, "width": 297}}
+```tsx
+import { createDataProvider } from '@mui/toolpad-core/server';
+import DATA from './movies.json';
 
-3. Click the data provider selector and choose **Create new data provider**.
+export default createDataProvider({
+  async getRecords({ paginationModel: { start = 0, pageSize } }) {
+    const records = DATA.slice(start, start + pageSize);
+    return { records, totalCount: DATA.length };
+  },
+});
+```
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/create-data-provider.png", "alt": "Create data provider", "caption": "Create data provider", "zoom": false, "width": 294}}
-
-4. Name the new data provider and click **Create**
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/create-data-provider-dialog.png", "alt": "Create data provider dialog", "caption": "Create data provider dialog", "zoom": false, "width": 490}}
-
-5. Use the code button to open your code editor with the data provider backend.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/open-editor.png", "alt": "Open data provider editor", "caption": "Open data provider editor", "zoom": false, "width": 272}}
-
-6. A data provider that iterates over a static list could look as follows:
-
-   ```tsx
-   import { createDataProvider } from '@mui/toolpad-core/server';
-   import DATA from './movies.json';
-
-   export default createDataProvider({
-     async getRecords({ paginationModel: { start = 0, pageSize } }) {
-       const records = DATA.slice(start, start + pageSize);
-       return { records, totalCount: DATA.length };
-     },
-   });
-   ```
+   <video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/data-provider-2.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Pagination
 
@@ -82,35 +74,105 @@ export default createDataProvider({
 });
 ```
 
-## Filtering 🚧
+## Filtering
 
-:::warning
-This feature isn't implemented yet. It's coming.
-:::
+Toolpad data sources support server-side filtering. You can implement a server-side filter by reading the `filterModel` property that is passed to the `getRecords` function. This model contains an `items` property and a `logicOperator`. By combining them you can achieve complex serverside filters.
 
-## Sorting 🚧
+```tsx
+export default createDataProvider({
+  async getRecords({ filterModel }) {
+    console.log(filterModel);
+  },
+});
+```
 
-:::warning
-This feature isn't implemented yet. It's coming.
-:::
+For example, this could print the following if the corresponding column filters were applied in the data grid:
+
+```tsx
+{
+  logicOperator: 'and',
+  items: [
+    { field: 'first_name', operator: 'startsWith', value: 'L' },
+    { field: 'last_name', operator: 'equals', value: 'Skywalker' },
+  ]
+}
+```
+
+Now the data grid filter UI will be hooked up to your backend function in the data provider.
+
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/filtering.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+Uncheck the column option "filterable" if you want to disable filtering for a certain column:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-filterable.png", "alt": "Disable filterable", "caption": "Disable filterable", "zoom": false, "width": 320 }}
+
+## Sorting
+
+Toolpad data sources support server-side sorting. To achieve this you'll have to consume the `sortModel` property that is passed to the `getRecords` method:
+
+```tsx
+export default createDataProvider({
+  async getRecords({ sortModel }) {
+    console.log(sortModel);
+  },
+});
+```
+
+Depending on which column has been set to sort by, this will result in:
+
+```tsx
+[{ field: 'name', sort: 'asc' }];
+```
+
+Now the data grid sorting UI will be hooked up to your backend function in the data provider.
+
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/sorting.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+Uncheck the column option "sortable" if you want to disable sorting for a certain column:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-sortable.png", "alt": "Disable sortable", "caption": "Disable sortable", "zoom": false, "width": 325 }}
 
 ## Row editing 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2887](https://github.com/mui/mui-toolpad/issues/2887) if you want to see it land faster.
 :::
 
 ## Row creation 🚧
 
 :::warning
-This feature isn't implemented yet. It's coming.
+This feature isn't implemented yet.
+
+👍 Upvote [issue #2888](https://github.com/mui/mui-toolpad/issues/2888) if you want to see it land faster.
 :::
 
-## Deleting rows 🚧
+## Deleting rows
 
-:::warning
-This feature isn't implemented yet. It's coming.
-:::
+The data provider can be extended to automatically support row deletion. To enable this, you'll have to add a `deleteRecord` method to the data provider interface that accepts the `id` of the row that is to be deleted.
+
+```tsx
+export default createDataProvider({
+  async getRecords({ paginationModel: { start = 0, pageSize } }) {
+    return db.query(`SELECT * FROM users`);
+  },
+
+  async deleteRecord(id) {
+    await db.query(`DELETE FROM users WHERE id = ?`, [id]);
+  },
+});
+```
+
+When a data provider contains a `deleteRecord` method, each row will have a delete button. When the user clicks that delete button, the delete method will be called with the id of that row and after successful deletion, the data will be reloaded.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/data-providers-delete.png", "alt": "Data provider delete", "caption": "Delete action in data provider" }}
 
 ## API
 

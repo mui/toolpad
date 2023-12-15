@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as url from 'url';
+import invariant from 'invariant';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expect, test } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
@@ -8,21 +9,28 @@ import { ToolpadEditor } from '../../models/ToolpadEditor';
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });
 
 test('custom components can use external libraries', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page');
+  await runtimeModel.goToPage('page');
 
   const test1 = page.getByText('Page D');
   await expect(test1).toBeVisible();
 });
 
 test('can create new custom components', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();

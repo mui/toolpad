@@ -64,6 +64,14 @@ export interface AppDomNodeBase {
 export interface AppNode extends AppDomNodeBase {
   readonly type: 'app';
   readonly parentId: null;
+  readonly attributes: {
+    readonly authorization?: {
+      readonly roles?: {
+        readonly name: string;
+        readonly description?: string;
+      }[];
+    };
+  };
 }
 
 export interface ThemeNode extends AppDomNodeBase {
@@ -85,10 +93,16 @@ export type PageDisplayMode = 'standalone' | 'shell';
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
-    readonly title: string;
+    readonly title?: string;
+    readonly alias?: string[];
     readonly parameters?: [string, string][];
     readonly module?: string;
     readonly display?: PageDisplayMode;
+    readonly codeFile?: string;
+    readonly authorization?: {
+      readonly allowAll?: boolean;
+      readonly allowedRoles?: string[];
+    };
   };
 }
 
@@ -500,7 +514,7 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
-export function createFragmentInternal<T extends AppDomNodeType>(
+function createFragmentInternal<T extends AppDomNodeType>(
   id: NodeId,
   type: T,
   init: AppDomNodeInitOfType<T> & { name: string },
@@ -875,21 +889,6 @@ export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P>
   return result;
 }
 
-const nodeByNameCache = new WeakMap<AppDom, Map<string, NodeId>>();
-function getNodeIdByNameIndex(dom: AppDom): Map<string, NodeId> {
-  let cached = nodeByNameCache.get(dom);
-  if (!cached) {
-    cached = new Map(Array.from(Object.values(dom.nodes), (node) => [node.name, node.id]));
-    nodeByNameCache.set(dom, cached);
-  }
-  return cached;
-}
-
-export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
-  const index = getNodeIdByNameIndex(dom);
-  return index.get(name) ?? null;
-}
-
 export function getNodeFirstChild(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
   const nodeChildren = (getChildNodes(dom, node) as NodeChildren<ElementNode>)[parentProp] || [];
   return nodeChildren.length > 0 ? nodeChildren[0] : null;
@@ -1205,4 +1204,12 @@ export function getRequiredEnvVars(dom: AppDom): Set<string> {
     .map((binding) => binding.$$env);
 
   return new Set(allVars);
+}
+
+export function getPageTitle(node: PageNode): string {
+  return node.attributes.title || node.name;
+}
+
+export function isCodePage(node: PageNode): boolean {
+  return !!node.attributes.codeFile;
 }

@@ -15,8 +15,7 @@ import {
 } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
-import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -266,8 +265,8 @@ function QueryEditor({
     },
     { retry: false },
   );
-  const envVarNames = React.useMemo(() => introspection?.data?.envVarNames || [], [introspection]);
 
+  const env = React.useMemo(() => introspection?.data?.env, [introspection]);
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       setInput((existing) => ({ ...existing, params: newParams }));
@@ -334,12 +333,10 @@ function QueryEditor({
   );
 
   const paramsEntries = input.params || EMPTY_PARAMS;
-
-  const jsBrowserRuntime = useBrowserJsRuntime();
-  const jsServerRuntime = useServerJsRuntime();
+  const jsServerRuntime = React.useMemo(() => createServerJsRuntime(env ?? {}), [env]);
 
   const paramsEditorLiveValue = useEvaluateLiveBindingEntries({
-    jsRuntime: jsBrowserRuntime,
+    jsRuntime: jsServerRuntime,
     input: paramsEntries,
     globalScope,
   });
@@ -410,9 +407,9 @@ function QueryEditor({
 
   return (
     <PanelGroup direction="horizontal">
-      <Panel defaultSize={50} minSize={20}>
+      <Panel defaultSizePercentage={50} minSizePercentage={20}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={60} minSize={40}>
+          <Panel defaultSizePercentage={60} minSizePercentage={40}>
             <QueryInputPanel onRunPreview={handleRunPreview}>
               <Stack gap={2} sx={{ px: 3, pt: 1 }}>
                 <Typography>Query</Typography>
@@ -482,7 +479,7 @@ function QueryEditor({
                         globalScopeMeta={QUERY_SCOPE_META}
                         liveValue={liveHeaders}
                         jsRuntime={jsServerRuntime}
-                        envVarNames={envVarNames}
+                        env={env}
                       />
                     </TabPanel>
                     <TabPanel disableGutters value="response">
@@ -530,7 +527,8 @@ function QueryEditor({
                 globalScope={globalScope}
                 globalScopeMeta={globalScopeMeta}
                 liveValue={paramsEditorLiveValue}
-                jsRuntime={jsBrowserRuntime}
+                jsRuntime={jsServerRuntime}
+                env={env}
               />
             </Box>
           </Panel>
@@ -539,9 +537,9 @@ function QueryEditor({
 
       <PanelResizeHandle />
 
-      <Panel defaultSize={50} minSize={20}>
+      <Panel defaultSizePercentage={50} minSizePercentage={20}>
         <PanelGroup direction="vertical">
-          <Panel defaultSize={60}>
+          <Panel defaultSizePercentage={60}>
             <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
               <ResolvedPreview
                 preview={preview}

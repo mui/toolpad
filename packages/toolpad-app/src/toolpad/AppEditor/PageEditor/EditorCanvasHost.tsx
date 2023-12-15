@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Fade, styled } from '@mui/material';
-import { NodeId } from '@mui/toolpad-core';
+import { NodeHashes } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
@@ -8,12 +8,12 @@ import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
-import { NodeHashes, RuntimeState } from '../../../types';
 import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 import { useProject } from '../../../project';
+import { RuntimeState } from '../../../runtime';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -38,7 +38,7 @@ function Overlay(props: OverlayProps) {
 
 export interface EditorCanvasHostProps {
   className?: string;
-  pageNodeId: NodeId;
+  pageName: string;
   runtimeState: RuntimeState;
   savedNodes: NodeHashes;
   onConsoleEntry?: (entry: LogEntry) => void;
@@ -79,7 +79,7 @@ function useOnChange<T = unknown>(value: T, handler: (newValue: T, oldValue: T) 
 
 export default function EditorCanvasHost({
   className,
-  pageNodeId,
+  pageName,
   runtimeState,
   base,
   savedNodes,
@@ -124,7 +124,7 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `${base}/pages/${pageNodeId}`;
+  const src = `${base}/pages/${pageName}`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));

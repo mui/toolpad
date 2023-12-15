@@ -54,7 +54,10 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
       synonyms: ['graph', 'bar chart', 'pie chart', 'line chart', 'plot'],
     },
   ],
-  ['TextField', { displayName: 'Text Field', builtIn: 'TextField', synonyms: ['input', 'field'] }],
+  [
+    'TextField',
+    { displayName: 'Text Field', builtIn: 'TextField', synonyms: ['input', 'field', 'password'] },
+  ],
   ['DatePicker', { displayName: 'Date Picker', builtIn: 'DatePicker', synonyms: ['time'] }],
   ['FilePicker', { displayName: 'File Picker', builtIn: 'FilePicker', synonyms: [] }],
   ['Text', { displayName: 'Text', builtIn: 'Text', synonyms: ['markdown', 'link', 'output'] }],
@@ -86,8 +89,38 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
   ['Tabs', { displayName: 'Tabs', builtIn: 'Tabs', synonyms: [] }],
   ['Container', { displayName: 'Container', builtIn: 'Container', synonyms: [] }],
   ['Metric', { displayName: 'Metric', builtIn: 'Metric', synonyms: ['value', 'number', 'output'] }],
-  ['Checkbox', { displayName: 'Checkbox', builtIn: 'Checkbox', synonyms: ['switch'] }],
+  [
+    'Checkbox',
+    {
+      displayName: 'Checkbox',
+      initialProps: {
+        mode: 'checkbox',
+      },
+      builtIn: 'Checkbox',
+      synonyms: ['switch'],
+    },
+  ],
+  [
+    'Switch',
+    {
+      displayName: 'Switch',
+      initialProps: {
+        mode: 'switch',
+      },
+      builtIn: 'Checkbox',
+      synonyms: ['switch'],
+    },
+  ],
   [FORM_COMPONENT_ID, { displayName: 'Form', builtIn: 'Form', synonyms: [] }],
+  [
+    'Password',
+    {
+      displayName: 'Password',
+      builtIn: 'TextField',
+      synonyms: [],
+      initialProps: { password: true },
+    },
+  ],
 ]);
 
 function createCodeComponent(domNode: appDom.CodeComponentNode): ToolpadComponentDefinition {

@@ -6,6 +6,7 @@ import PageHierarchyExplorer from './HierarchyExplorer';
 import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
 import { useProject } from '../../project';
+import * as appDom from '../../appDom';
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
@@ -19,7 +20,9 @@ export interface ComponentPanelProps {
 
 export default function PagePanel({ className, sx }: ComponentPanelProps) {
   const project = useProject();
-  const { dom } = useAppState();
+  const { dom, currentView } = useAppState();
+
+  const currentPageNode = currentView?.name ? appDom.getPageByName(dom, currentView.name) : null;
 
   return (
     <PagePanelRoot className={className} sx={sx}>
@@ -41,13 +44,17 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
       <Divider />
 
       <PanelGroup autoSaveId="toolpad-page-panel" direction="vertical">
-        <Panel minSize={10} defaultSize={30} maxSize={75}>
+        <Panel minSizePercentage={10} defaultSizePercentage={30} maxSizePercentage={75}>
           <PagesExplorer />
         </Panel>
-        <PanelResizeHandle />
-        <Panel minSize={25} maxSize={90}>
-          <PageHierarchyExplorer />
-        </Panel>
+        {currentPageNode && !appDom.isCodePage(currentPageNode) ? (
+          <React.Fragment>
+            <PanelResizeHandle />
+            <Panel minSizePercentage={25} maxSizePercentage={90}>
+              <PageHierarchyExplorer />
+            </Panel>
+          </React.Fragment>
+        ) : null}
       </PanelGroup>
     </PagePanelRoot>
   );

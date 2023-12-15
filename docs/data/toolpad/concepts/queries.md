@@ -49,5 +49,5 @@ You can set the **mode** of the query to either be automatically refetched on pa
   in the `onClick` binding of a Button component. This will trigger this query when the Button is clicked.
 
 :::info
-See the [event handling](/toolpad/concepts/managing-state/#event-handling) section for more details, and the [deleting data grid row](/toolpad/how-to-guides/delete-datagrid-row/) guide for a detailed usage example.
+See the [event handling](/toolpad/concepts/event-handling/) section for more details, and the [deleting data grid row](/toolpad/how-to-guides/delete-datagrid-row/) guide for a detailed usage example.
 :::

@@ -68,14 +68,14 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   const handleButtonClick = React.useCallback(() => {
     appStateApi.setView({
       kind: 'page',
-      nodeId: pageNodeId,
+      name: page.name,
       view: { kind: 'pageParameters' },
     });
-  }, [appStateApi, pageNodeId]);
+  }, [appStateApi, page.name]);
 
   const handleDialogClose = React.useCallback(() => {
-    appStateApi.setView({ kind: 'page', nodeId: pageNodeId });
-  }, [appStateApi, pageNodeId]);
+    appStateApi.setView({ kind: 'page', name: page.name });
+  }, [appStateApi, page.name]);
 
   const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
     hasUnsavedChanges,
@@ -98,7 +98,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [closeDialog, currentView, openDialog]);
 
   return (
-    <React.Fragment>
+    <div>
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleButtonClick}>
         Add page parameters
       </Button>
@@ -109,7 +109,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
             Page parameters allow you to pass external data into the Toolpad page state via the URL
             query. Read more in the{' '}
             <Link
-              href="https://mui.com/toolpad/concepts/managing-state/#page-parameters"
+              href="https://mui.com/toolpad/concepts/page-properties/#page-parameters"
               target="_blank"
               rel="noopener"
             >
@@ -135,6 +135,6 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           </Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
+    </div>
   );
 }

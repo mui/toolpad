@@ -34,7 +34,11 @@ import {
   JsExpressionAttrValue,
   ComponentConfig,
 } from '@mui/toolpad-core';
-import { createProvidedContext, useAssertedContext } from '@mui/toolpad-utils/react';
+import {
+  createGlobalState,
+  createProvidedContext,
+  useAssertedContext,
+} from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
 import { QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -65,8 +69,8 @@ import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../appDom';
-import { RuntimeState } from '../types';
-import { getBindingType, getBindingValue } from '../bindings';
+import { RuntimeState } from './types';
+import { getBindingType, getBindingValue } from './bindings';
 import {
   getElementNodeComponentId,
   INTERNAL_COMPONENTS,
@@ -80,7 +84,7 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY } from './constants';
+import { HTML_ID_EDITOR_OVERLAY, IS_PREVIEW, PREVIEW_HEADER_HEIGHT } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { useDataQuery, UseFetch } from './useDataQuery';
 import { NavigateToPage } from './CanvasHooksContext';
@@ -88,15 +92,21 @@ import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
+import { AuthenticationProvider, RequireAuthorization, User } from './auth';
 
 const browserJsRuntime = getBrowserRuntime();
 
-const isPreview = process.env.NODE_ENV !== 'production';
-const isCustomServer = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
-const isRenderedInCanvas =
+export const IS_RENDERED_IN_CANVAS =
   typeof window === 'undefined'
     ? false
     : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
+
+const SHOW_PREVIEW_HEADER = IS_PREVIEW && !IS_RENDERED_IN_CANVAS;
+
+export type PageComponents = Partial<Record<string, React.ComponentType>>;
+
+export const componentsStore = createGlobalState<ToolpadComponents>({});
+export const pageComponentsStore = createGlobalState<PageComponents>({});
 
 const Pre = styled('pre')(({ theme }) => ({
   margin: 0,
@@ -118,7 +128,8 @@ const internalComponents: ToolpadComponents = Object.fromEntries(
 );
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
-  import('@tanstack/react-query-devtools/build/lib/index.prod.js').then((d) => ({
+  // eslint-disable-next-line import/extensions
+  import('@tanstack/react-query-devtools/build/modern/production.js').then((d) => ({
     default: d.ReactQueryDevtools,
   })),
 );
@@ -143,14 +154,14 @@ function usePageNavigator(): NavigateToPage {
   const canvasEvents = React.useContext(CanvasEventsContext);
 
   const navigateToPage: NavigateToPage = React.useCallback(
-    (pageNodeId, pageParameters) => {
+    (pageName, pageParameters) => {
       const urlParams = pageParameters && new URLSearchParams(pageParameters);
 
       if (canvasEvents) {
-        canvasEvents.emit('pageNavigationRequest', { pageNodeId });
+        canvasEvents.emit('pageNavigationRequest', { pageName });
       } else {
         navigate({
-          pathname: `/pages/${pageNodeId}`,
+          pathname: `/pages/${pageName}`,
           ...(urlParams
             ? {
                 search: urlParams.toString(),
@@ -178,6 +189,7 @@ const AppRoot = styled('div')({
   minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
+  paddingTop: SHOW_PREVIEW_HEADER ? PREVIEW_HEADER_HEIGHT : 0,
 });
 
 const EditorOverlay = styled('div')({
@@ -371,6 +383,13 @@ function parseBinding(
   const bindingType = getBindingType(bindable);
 
   if (bindingType === 'const') {
+    return {
+      scopePath,
+      result: { value: bindable },
+    };
+  }
+
+  if (bindingType === 'env') {
     return {
       scopePath,
       result: { value: bindable },
@@ -1282,18 +1301,16 @@ function MutationNode({ node, page }: MutationNodeProps) {
   );
 
   const {
-    isLoading,
+    isPending,
     data: responseData = EMPTY_OBJECT,
     error: fetchError,
     mutateAsync,
-  } = useMutation(
-    async (overrides: any = {}) => {
+  } = useMutation({
+    mutationKey: [node.name, params],
+    mutationFn: async (overrides: any = {}) => {
       return api.methods.execQuery(page.name, node.name, { ...params, ...overrides });
     },
-    {
-      mutationKey: [node.name, params],
-    },
-  );
+  });
 
   const { data, error: apiError } = responseData || EMPTY_OBJECT;
 
@@ -1305,8 +1322,8 @@ function MutationNode({ node, page }: MutationNodeProps) {
       await mutateAsync(overrides);
     };
     return {
-      isLoading,
-      isFetching: isLoading,
+      isLoading: isPending,
+      isFetching: isPending,
       error,
       data,
       rows: Array.isArray(data) ? data : EMPTY_ARRAY,
@@ -1316,7 +1333,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
         throw new Error(`refetch is not supported in manual queries`);
       },
     };
-  }, [isLoading, error, data, mutateAsync]);
+  }, [isPending, error, data, mutateAsync]);
 
   React.useEffect(() => {
     for (const [key, value] of Object.entries(mutationResult)) {
@@ -1345,16 +1362,25 @@ function FetchNode({ node, page }: FetchNodeProps) {
   }
 }
 
-export interface RenderedNodeProps {
-  nodeId: NodeId;
+interface RenderedProCodePageProps {
+  page: appDom.PageNode;
 }
 
-export function RenderedPage({ nodeId }: RenderedNodeProps) {
+function RenderedProCodePage({ page }: RenderedProCodePageProps) {
+  const pageComponents = pageComponentsStore.useValue();
+  const PageComponent = pageComponents[page.name] ?? PageNotFound;
+  return <PageComponent />;
+}
+
+interface RenderedLowCodePageProps {
+  page: appDom.PageNode;
+}
+
+function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
   const dom = useDomContext();
-  const page = appDom.getNode(dom, nodeId, 'page');
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
-  usePageTitle(page.attributes.title);
+  usePageTitle(appDom.getPageTitle(page));
 
   const location = useLocation();
   const components = useComponents();
@@ -1398,6 +1424,24 @@ export function RenderedPage({ nodeId }: RenderedNodeProps) {
   );
 }
 
+export interface RenderedNodeProps {
+  nodeId: NodeId;
+}
+
+export interface RenderedPageProps {
+  page: appDom.PageNode;
+}
+
+export function RenderedPage({ page }: RenderedPageProps) {
+  usePageTitle(appDom.getPageTitle(page));
+
+  if (page.attributes.codeFile) {
+    return <RenderedProCodePage page={page} />;
+  }
+
+  return <RenderedLowCodePage page={page} />;
+}
+
 function PageNotFound() {
   return (
     <Container
@@ -1414,6 +1458,14 @@ function PageNotFound() {
   );
 }
 
+/**
+ * Returns whether authentication has been configured for this application.
+ */
+function useAppHasAuthentication() {
+  // TODO: read from authentication
+  return false;
+}
+
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
 }
@@ -1421,32 +1473,43 @@ interface RenderedPagesProps {
 function RenderedPages({ pages }: RenderedPagesProps) {
   const defaultPage = pages[0];
 
-  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
+  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}`} replace />;
+  const { search } = useLocation();
+
+  const appAuthenticationEnabled = useAppHasAuthentication();
+
   return (
     <Routes>
-      {pages.map((page) => (
-        <React.Fragment key={page.id}>
-          <Route
-            path={`/pages/${page.id}`}
-            element={
-              <RenderedPage
-                nodeId={page.id}
-                // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
-                // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-                key={page.id}
-              />
-            }
+      {pages.map((page) => {
+        let pageContent = (
+          <RenderedPage
+            page={page}
+            // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
+            // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+            key={page.name}
           />
-        </React.Fragment>
-      ))}
-      {pages.map((page) => (
-        <React.Fragment key={page.id}>
+        );
+
+        if (!IS_RENDERED_IN_CANVAS && appAuthenticationEnabled && page.attributes.authorization) {
+          pageContent = (
+            <RequireAuthorization allowedRole={page.attributes.authorization.allowedRoles}>
+              {pageContent}
+            </RequireAuthorization>
+          );
+        }
+
+        return <Route key={page.name} path={`/pages/${page.name}`} element={pageContent} />;
+      })}
+      {pages.flatMap((page) =>
+        page.attributes.alias?.map((alias) => (
           <Route
-            path={`/pages/${page.name}`}
-            element={<Navigate to={`/pages/${page.id}`} replace />}
+            key={`${page.name}-${alias}`}
+            path={`/pages/${alias}`}
+            element={<Navigate to={`/pages/${page.name}${search}`} replace />}
           />
-        </React.Fragment>
-      ))}
+        )),
+      )}
+
       <Route path="/pages" element={defaultPageNavigation} />
       <Route path="/" element={defaultPageNavigation} />
       <Route path="*" element={<PageNotFound />} />
@@ -1487,14 +1550,12 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
   const pageMatch = useMatch('/pages/:slug');
-  const pageId = pageMatch?.params.slug;
-
-  const showPreviewHeader = isPreview && !isRenderedInCanvas && !isCustomServer;
+  const activePage = pageMatch?.params.slug;
 
   const navEntries = React.useMemo(
     () =>
       pages.map((page) => ({
-        slug: page.id,
+        slug: page.name,
         displayName: page.name,
         hasShell: page?.attributes.display !== 'standalone',
       })),
@@ -1502,29 +1563,27 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   );
 
   return (
-    <React.Fragment>
-      {showPreviewHeader ? <PreviewHeader pageId={pageId} /> : null}
-      <AppLayout
-        activePage={pageMatch?.params.slug}
-        pages={navEntries}
-        hasShell={!isRenderedInCanvas}
-        clipped={showPreviewHeader}
-      >
-        <RenderedPages pages={pages} />
-      </AppLayout>
-    </React.Fragment>
+    <AppLayout
+      activePage={activePage}
+      pages={navEntries}
+      hasShell={!IS_RENDERED_IN_CANVAS}
+      clipped={SHOW_PREVIEW_HEADER}
+    >
+      <RenderedPages pages={pages} />
+    </AppLayout>
   );
 }
 
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
-  extraComponents: ToolpadComponents;
   basename: string;
   state: RuntimeState;
 }
 
-export default function ToolpadApp({ rootRef, extraComponents, basename, state }: ToolpadAppProps) {
+export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps) {
   const { dom } = state;
+
+  const extraComponents = componentsStore.useValue();
 
   const components = React.useMemo(
     () => ({ ...internalComponents, ...extraComponents }),
@@ -1541,30 +1600,37 @@ export default function ToolpadApp({ rootRef, extraComponents, basename, state }
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
+  const currentUser: User | null = null;
+
   return (
-    <UseDataProviderContext.Provider value={useDataProvider}>
-      <AppThemeProvider dom={dom}>
-        <CssBaseline enableColorScheme />
-        <AppRoot ref={rootRef}>
-          <ComponentsContextProvider value={components}>
-            <DomContextProvider value={dom}>
-              <ErrorBoundary FallbackComponent={AppError}>
-                <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                  <React.Suspense fallback={<AppLoading />}>
-                    <QueryClientProvider client={queryClient}>
-                      <BrowserRouter basename={basename}>
-                        <ToolpadAppLayout dom={dom} />
-                      </BrowserRouter>
-                      {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
-                    </QueryClientProvider>
-                  </React.Suspense>
-                </ResetNodeErrorsKeyProvider>
-              </ErrorBoundary>
-            </DomContextProvider>
-          </ComponentsContextProvider>
-          <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-        </AppRoot>
-      </AppThemeProvider>
-    </UseDataProviderContext.Provider>
+    <BrowserRouter basename={basename}>
+      <UseDataProviderContext.Provider value={useDataProvider}>
+        <AppThemeProvider dom={dom}>
+          <CssBaseline enableColorScheme />
+          {SHOW_PREVIEW_HEADER ? <PreviewHeader basename={basename} /> : null}
+          <AppRoot ref={rootRef}>
+            <ComponentsContextProvider value={components}>
+              <DomContextProvider value={dom}>
+                <ErrorBoundary FallbackComponent={AppError}>
+                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                    <React.Suspense fallback={<AppLoading />}>
+                      <QueryClientProvider client={queryClient}>
+                        <AuthenticationProvider user={currentUser}>
+                          <ToolpadAppLayout dom={dom} />
+                        </AuthenticationProvider>
+                        {showDevtools ? (
+                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
+                        ) : null}
+                      </QueryClientProvider>
+                    </React.Suspense>
+                  </ResetNodeErrorsKeyProvider>
+                </ErrorBoundary>
+              </DomContextProvider>
+            </ComponentsContextProvider>
+            <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+          </AppRoot>
+        </AppThemeProvider>
+      </UseDataProviderContext.Provider>
+    </BrowserRouter>
   );
 }

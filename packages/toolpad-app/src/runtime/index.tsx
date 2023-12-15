@@ -2,15 +2,17 @@ import Button from '@mui/material/Button';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { ToolpadComponents } from '@mui/toolpad-core';
-import { Emitter } from '@mui/toolpad-utils/events';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';
-import RuntimeToolpadApp, { ToolpadAppProps } from './ToolpadApp';
-import { RuntimeState } from '../types';
-
-let componentsStore: ToolpadComponents = {};
-const events = new Emitter<{ update: {} }>();
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import api from './api';
+import RuntimeToolpadApp, {
+  ToolpadAppProps,
+  componentsStore,
+  pageComponentsStore,
+} from './ToolpadApp';
+import { RuntimeState } from './types';
 
 const cache = createCache({
   key: 'css',
@@ -23,16 +25,12 @@ cache.compat = true;
 /**
  * This allows us to hot update the components when a file is added/removed
  */
-export function setComponents(newComponents: ToolpadComponents) {
-  componentsStore = newComponents;
-  events.emit('update', {});
-}
-
-const subscribe = (cb: () => void) => events.subscribe('update', cb);
-const getSnapshot = () => componentsStore;
-
-function useComponents() {
-  return React.useSyncExternalStore(subscribe, getSnapshot);
+export function setComponents(
+  newComponents: ToolpadComponents,
+  pageComponents: Record<string, React.ComponentType>,
+) {
+  componentsStore.setState(newComponents);
+  pageComponentsStore.setState(pageComponents);
 }
 
 export interface RootProps {
@@ -42,13 +40,12 @@ export interface RootProps {
 }
 
 function Root({ ToolpadApp, initialState, base }: RootProps) {
-  const components = useComponents();
   return (
     <React.StrictMode>
       <CacheProvider value={cache}>
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
-        <ToolpadApp basename={base} state={initialState} extraComponents={components} />
+        <ToolpadApp basename={base} state={initialState} />
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />
       </CacheProvider>
     </React.StrictMode>
@@ -70,3 +67,15 @@ export function init({ ToolpadApp = RuntimeToolpadApp, initialState, base }: Ini
 export { AppLayout } from './AppLayout';
 
 export { DomContextProvider, ComponentsContextProvider, RenderedPage } from './ToolpadApp';
+
+export type { RuntimeState };
+
+export function createRemoteFunction(functionFile: string, functionName: string) {
+  return async function remote(...params: any[]) {
+    const { data, error } = await api.methods.execFunction(functionFile, functionName, params);
+    if (error) {
+      throw errorFrom(error);
+    }
+    return data;
+  };
+}

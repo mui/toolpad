@@ -3,14 +3,17 @@ import { AppBar, Box, Toolbar, Tooltip, Chip, Link, useTheme } from '@mui/materi
 import UserFeedback from './UserFeedback';
 import ThemeModeMenu from './ThemeModeMenu';
 import { useThemeMode, ThemeMode } from '../../../ThemeContext';
+import productIconDark from '../../../../public/product-icon-dark.svg';
+import productIconLight from '../../../../public/product-icon-light.svg';
 
 export interface HeaderProps {
+  navigation?: React.ReactNode;
   actions?: React.ReactNode;
   status?: React.ReactNode;
   enableUserFeedback?: boolean;
 }
 
-function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
+function Header({ navigation, actions, status, enableUserFeedback = true }: HeaderProps) {
   const theme = useTheme();
   const { themeMode, setThemeMode } = useThemeMode();
 
@@ -21,8 +24,7 @@ function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
     [setThemeMode],
   );
 
-  const productIcon =
-    theme.palette.mode === 'dark' ? '/product-icon-dark.svg' : '/product-icon-light.svg';
+  const productIcon = theme.palette.mode === 'dark' ? productIconDark : productIconLight;
 
   return (
     <React.Fragment>
@@ -67,6 +69,7 @@ function Header({ actions, status, enableUserFeedback = true }: HeaderProps) {
               </Link>
             </Tooltip>
             <Chip sx={{ ml: 1 }} label="Beta" size="small" color="grey" />
+            {navigation}
           </Box>
           <Box
             sx={{

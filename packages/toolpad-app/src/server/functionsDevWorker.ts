@@ -4,10 +4,14 @@ import { createRequire } from 'node:module';
 import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'node:url';
-import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
-import { ServerContext, getServerContext, withContext } from '@mui/toolpad-core/serverRuntime';
+import {
+  ServerContext,
+  getServerContext,
+  initialContextStore,
+  withContext,
+} from '@mui/toolpad-core/serverRuntime';
 import { isWebContainer } from '@webcontainer/env';
-import SuperJSON from 'superjson';
+import * as superjson from 'superjson';
 import { createRpcClient, serveRpc } from '@mui/toolpad-utils/workerRpc';
 import { workerData } from 'node:worker_threads';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
@@ -15,6 +19,8 @@ import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@mui/toolpad-
 import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { GetRecordsParams, GetRecordsResult, PaginationMode } from '@mui/toolpad-core';
+import invariant from 'invariant';
+import type { GridRowId } from '@mui/x-data-grid';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -29,6 +35,9 @@ const moduleCache = new Map<string, ModuleObject>();
 function loadModule(fullPath: string, content: string) {
   const moduleRequire = createRequire(url.pathToFileURL(fullPath));
   const moduleObject: ModuleObject = { exports: {} };
+
+  const serverRuntime = moduleRequire('@mui/toolpad-core/serverRuntime');
+  serverRuntime.initStore(initialContextStore);
 
   vm.runInThisContext(`((require, exports, module) => {\n${content}\n})`)(
     moduleRequire,
@@ -105,8 +114,7 @@ async function execute(msg: ExecuteParams): Promise<ExecuteResult> {
       ? await fn(...msg.parameters)
       : await withContext(ctx, async () => fn(...msg.parameters));
 
-    const withoutCircularRefs = replaceRecursive(rawResult, getCircularReplacer());
-    const serializedResult = SuperJSON.stringify(withoutCircularRefs);
+    const serializedResult = superjson.stringify(rawResult);
 
     return { result: serializedResult, newCookies: Array.from(newCookies.entries()) };
   } finally {
@@ -117,6 +125,9 @@ async function execute(msg: ExecuteParams): Promise<ExecuteResult> {
 const dataProviderSchema: z.ZodType<ToolpadDataProvider<any, any>> = z.object({
   paginationMode: z.enum(['index', 'cursor']).optional().default('index'),
   getRecords: z.function(z.tuple([z.any()]), z.any()),
+  deleteRecord: z.function(z.tuple([z.any()]), z.any()).optional(),
+  updateRecord: z.function(z.tuple([z.any()]), z.any()).optional(),
+  createRecord: z.function(z.tuple([z.any()]), z.any()).optional(),
   [TOOLPAD_DATA_PROVIDER_MARKER]: z.literal(true),
 });
 
@@ -148,6 +159,7 @@ async function introspectDataProvider(
 
   return {
     paginationMode: dataProvider.paginationMode,
+    hasDeleteRecord: !!dataProvider.deleteRecord,
   };
 }
 
@@ -161,10 +173,21 @@ async function getDataProviderRecords<R, P extends PaginationMode>(
   return dataProvider.getRecords(params);
 }
 
+async function deleteDataProviderRecord(
+  filePath: string,
+  name: string,
+  id: GridRowId,
+): Promise<void> {
+  const dataProvider = await loadDataProvider(filePath, name);
+  invariant(dataProvider.deleteRecord, 'DataProvider does not support deleteRecord');
+  return dataProvider.deleteRecord(id);
+}
+
 type WorkerRpcServer = {
   execute: typeof execute;
   introspectDataProvider: typeof introspectDataProvider;
   getDataProviderRecords: typeof getDataProviderRecords;
+  deleteDataProviderRecord: typeof deleteDataProviderRecord;
 };
 
 if (!isMainThread && parentPort) {
@@ -172,12 +195,13 @@ if (!isMainThread && parentPort) {
     execute,
     introspectDataProvider,
     getDataProviderRecords,
+    deleteDataProviderRecord,
   });
 }
 
 export function createWorker(env: Record<string, any>) {
   const workerRpcChannel = new MessageChannel();
-  const worker = new Worker(path.resolve(currentDirectory, '../cli/functionsDevWorker.js'), {
+  const worker = new Worker(path.resolve(currentDirectory, '../cli/functionsDevWorker.mjs'), {
     env,
     workerData: {
       workerRpcPort: workerRpcChannel.port1,
@@ -208,7 +232,7 @@ export function createWorker(env: Record<string, any>) {
         }
       }
 
-      const result = SuperJSON.parse(serializedResult);
+      const result = superjson.parse(serializedResult);
 
       return result;
     },
@@ -226,6 +250,10 @@ export function createWorker(env: Record<string, any>) {
       params: GetRecordsParams<R, P>,
     ): Promise<GetRecordsResult<R, P>> {
       return client.getDataProviderRecords(filePath, name, params);
+    },
+
+    async deleteDataProviderRecord(filePath: string, name: string, id: GridRowId): Promise<void> {
+      return client.deleteDataProviderRecord(filePath, name, id);
     },
   };
 }

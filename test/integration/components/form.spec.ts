@@ -6,15 +6,17 @@ import { test, expect } from '../../playwright/localTest';
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture-form'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });
 
 test('submits form data', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('form');
+  await runtimeModel.goToPage('form');
 
   const nameInput = page.getByLabel('name');
   await nameInput.clear();
@@ -68,7 +70,7 @@ test('submits form data', async ({ page }) => {
 
 test('resets form data', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('form');
+  await runtimeModel.goToPage('form');
 
   const nameInput = page.getByLabel('name');
   await nameInput.clear();
@@ -103,7 +105,7 @@ test('resets form data', async ({ page }) => {
 
 test('validates form data', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('form');
+  await runtimeModel.goToPage('form');
 
   const nameInput = page.getByLabel('name');
   await nameInput.clear();

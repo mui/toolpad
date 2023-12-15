@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NodeId } from '@mui/toolpad-core';
+import { NodeHashes, NodeId } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
@@ -12,7 +12,6 @@ import { omit, update } from '../utils/immutability';
 import { useProjectApi } from '../projectApi';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';
-import { NodeHashes } from '../types';
 import { hasFieldFocus } from '../utils/fields';
 import { DomView, getViewFromPathname, PageViewTab } from '../utils/domView';
 
@@ -259,7 +258,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       let newView = action.view;
       if (action.view.kind === 'page') {
         if (typeof action.view.selectedNodeId === 'undefined') {
-          const isSameNode = action.view.nodeId === state.currentView.nodeId;
+          const isSameNode = action.view.name === state.currentView.name;
 
           newView = {
             ...action.view,
@@ -445,7 +444,7 @@ export interface DomContextProps {
 
 export default function AppProvider({ appUrl, children }: DomContextProps) {
   const projectApi = useProjectApi();
-  const { data: dom } = projectApi.useQuery('loadDom', [], { suspense: true });
+  const { data: dom } = projectApi.useSuspenseQuery('loadDom', []);
 
   invariant(dom, 'Suspense should load the dom');
 
@@ -455,9 +454,9 @@ export default function AppProvider({ appUrl, children }: DomContextProps) {
   const { pages = [] } = appDom.getChildNodes(dom, app);
   const firstPage = pages.length > 0 ? pages[0] : null;
 
-  const initialView = getViewFromPathname(location.pathname) || {
+  const initialView: DomView = getViewFromPathname(location.pathname) || {
     kind: 'page',
-    nodeId: firstPage?.id,
+    name: firstPage?.name,
     selectedNodeId: null,
     tab: 'page',
   };

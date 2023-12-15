@@ -28,6 +28,7 @@ import {
   GridRowModes,
   GridApiPro,
   GridRowModesModel,
+  GridRowModel,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -514,8 +515,7 @@ interface DeleteActionProps {
 function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
   const [loading, setLoading] = React.useState(false);
 
-  const setActionError = React.useContext(SetActionErrorContext);
-  invariant(setActionError, 'setActionError must be defined');
+  const setActionError = useNonNullableContext(SetActionErrorContext);
 
   const handleDeleteClick = React.useCallback(async () => {
     invariant(dataProvider.deleteRecord, 'dataProvider must be defined');
@@ -545,6 +545,7 @@ interface DataProviderDataGridProps extends Partial<DataGridProProps> {
 function useDataProviderDataGridProps(
   dataProviderId: string | null | undefined,
   api: GridApiPro,
+  setActionError: (error: Error) => void,
 ): DataProviderDataGridProps {
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
   const { dataProvider } = useDataProvider(dataProviderId || null);
@@ -649,6 +650,38 @@ function useDataProviderDataGridProps(
       : undefined) ??
     0;
 
+  const [rowUpdating, setRowUpdating] = React.useState<Partial<Record<string, boolean>>>({});
+
+  const handleProcessRowUpdate = React.useCallback(
+    async (newRow: GridRowModel, oldRow: GridRowModel) => {
+      invariant(
+        dataProvider?.updateRecord,
+        'Edit action should be unavailable when dataProvider.updateRecord is not defined',
+      );
+
+      // TODO: handle when idField is not 'id'
+      const idField = 'id';
+      const { [idField]: id, ...oldValues } = oldRow;
+      const { [idField]: discarded, ...newValues } = newRow;
+      const values = Object.fromEntries(
+        Object.entries(newValues).filter(([key, value]) => value !== oldValues[key]),
+      );
+
+      setRowUpdating((oldState) => ({ ...oldState, [id]: true }));
+      try {
+        await dataProvider.updateRecord(id, values);
+        return newRow;
+      } finally {
+        setRowUpdating((oldState) => {
+          const { [id]: discard, ...newState } = oldState;
+          return newState;
+        });
+        await refetch();
+      }
+    },
+    [dataProvider, refetch],
+  );
+
   const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
     if (!dataProvider?.deleteRecord && !dataProvider?.updateRecord) {
       return undefined;
@@ -656,33 +689,31 @@ function useDataProviderDataGridProps(
 
     return ({ id }) => {
       const result = [];
-      const loading = false;
 
       if (dataProvider.updateRecord) {
         const rowIsInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+        const rowIsUpdating = rowUpdating[id];
 
-        if (rowIsInEditMode) {
-          const closeEditUi = () => {
-            api.stopRowEditMode({ id, ignoreModifications: true });
-          };
-
+        if (rowIsInEditMode || rowIsUpdating) {
           return [
             <IconButton
               key="commit"
               size="small"
               aria-label={`Edit row with id "${id}"`}
-              onClick={() => {
-                closeEditUi();
+              disabled={rowIsUpdating}
+              onClick={async () => {
+                api.stopRowEditMode({ id });
               }}
             >
-              {loading ? <CircularProgress size={16} /> : <SaveIcon fontSize="inherit" />}
+              {rowIsUpdating ? <CircularProgress size={16} /> : <SaveIcon fontSize="inherit" />}
             </IconButton>,
             <IconButton
               key="cancel"
               size="small"
               aria-label="Cancel"
+              disabled={rowIsUpdating}
               onClick={() => {
-                closeEditUi();
+                api.stopRowEditMode({ id, ignoreModifications: true });
               }}
             >
               <CloseIcon fontSize="inherit" />
@@ -712,7 +743,7 @@ function useDataProviderDataGridProps(
 
       return result;
     };
-  }, [api, dataProvider, refetch, rowModesModel]);
+  }, [api, dataProvider, refetch, rowModesModel, rowUpdating]);
 
   if (!dataProvider) {
     return {};
@@ -744,6 +775,8 @@ function useDataProviderDataGridProps(
     editMode: 'row',
     rowModesModel,
     onRowModesModelChange: (model) => setRowModesModel(model),
+    processRowUpdate: handleProcessRowUpdate,
+    onProcessRowUpdateError: (err) => setActionError(errorFrom(err)),
   };
 }
 
@@ -780,6 +813,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const apiRef = useGridApiRef();
+  const [actionError, setActionError] = React.useState<Error | null>();
 
   const {
     rows: dataProviderRowsInput,
@@ -788,6 +822,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   } = useDataProviderDataGridProps(
     rowsSource === 'dataProvider' ? dataProviderId : null,
     apiRef.current,
+    setActionError,
   );
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
@@ -935,8 +970,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
     return columns;
   }, [columns, getProviderActions]);
-
-  const [actionError, setActionError] = React.useState<Error | null>();
 
   const open = !!actionError;
   const lastActionError = useLatest(actionError);

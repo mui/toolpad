@@ -129,7 +129,7 @@ const dataProviderSchema: z.ZodType<ToolpadDataProvider<any, any>> = z.object({
   paginationMode: z.enum(['index', 'cursor']).optional().default('index'),
   getRecords: z.function(z.tuple([z.any()]), z.any()),
   deleteRecord: z.function(z.tuple([z.any()]), z.any()).optional(),
-  updateRecord: z.function(z.tuple([z.any()]), z.any()).optional(),
+  updateRecord: z.function(z.tuple([z.any(), z.any()]), z.any()).optional(),
   createRecord: z.function(z.tuple([z.any()]), z.any()).optional(),
   [TOOLPAD_DATA_PROVIDER_MARKER]: z.literal(true),
 });

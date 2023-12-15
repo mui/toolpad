@@ -54,10 +54,7 @@ function AppPagesNavigation({
 
   const theme = useTheme();
 
-  const productIcon = new URL(
-    theme.palette.mode === 'dark' ? productIconDark : productIconLight,
-    import.meta.url,
-  ).href;
+  const productIcon = theme.palette.mode === 'dark' ? productIconDark : productIconLight;
 
   const initialPageSlug = pages[0].slug;
 

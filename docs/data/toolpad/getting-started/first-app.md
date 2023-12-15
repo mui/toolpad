@@ -66,11 +66,9 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
    in the editor. Click **Run** again to verify the result.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-4a.png", "alt": "Transform response", "caption": "The dog API response transformed", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-4.png", "alt": "Transform response", "caption": "The dog API response transformed", "indent": 1  }}
 
-5. Click on **Save** to save the query, and then rename it to `dogQuery` via the extended options menu visible on hovering over the saved query in the explorer.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-4b.png", "alt": "Transform response", "caption": "The dog API response transformed", "indent": 1  }}
+5. Click on **Save** to save the query, and then rename it to `dogQuery` by double clicking on it in the explorer.
 
 ### Bind data to UI
 

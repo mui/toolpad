@@ -661,10 +661,9 @@ function useDataProviderDataGridProps(
 
       // TODO: handle when idField is not 'id'
       const idField = 'id';
-      const { [idField]: id, ...oldValues } = oldRow;
-      const { [idField]: discarded, ...newValues } = newRow;
+      const id = oldRow[idField];
       const values = Object.fromEntries(
-        Object.entries(newValues).filter(([key, value]) => value !== oldValues[key]),
+        Object.entries(newRow).filter(([key, value]) => value !== oldRow[key]),
       );
 
       setRowUpdating((oldState) => ({ ...oldState, [id]: true }));

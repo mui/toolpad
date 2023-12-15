@@ -51,8 +51,8 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 ### Fetch data
 
 1. Locate the create new button in the queries explorer. Press it and choose **REST API**.
-   00
-   {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-2.png", "alt":"Choose REST API", "caption":"The Add query menu", "zoom": false  }}
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-2.png", "alt":"Choose REST API", "caption":"The Add query menu", "zoom": false  }}
 
 2. We'll be using the [dog API](https://dog.ceo/dog-api/) for this tutorial. Set `https://dog.ceo/api/breeds/list/all` as the **URL**. Click the **Run** button to inspect the result of this request, and expand the `message` object in the response. If all went well, it will look like this:
 
@@ -72,7 +72,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 ### Bind data to UI
 
-1. Save the query and close the query editor. Next, we will bind this data to components on the page. Click the **Data Grid** component to select it.
+1. Next, we will bind this data to components on the page. Click the **Data Grid** component to select it.
 
 1. Find the **rows** property in the inspector. Notice that there's a small **Bind** button to its right. Properties with this button next to them can be bound to state available on the page:
 
@@ -122,7 +122,9 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 4. Save the binding and close the binding editor. Save the query and exit the query editor.
 
-5. In the canvas select the **Image** component to view its properties in the inspector. Click on the **Bind** button next to the **src** prop to open the binding editor, and bind it to `imageQuery.data.message`.
+5. Rename the query to `imageQuery` by double clicking on it in the query explorer.
+
+6. In the canvas select the **Image** component to view its properties in the inspector. Click on the **Bind** button next to the `src` prop to open the binding editor, and bind it to `imageQuery.data.message`.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-11.png", "alt": "Bind image src to Java", "caption": "Binding the Image src to the query response", "indent": 1  }}
 

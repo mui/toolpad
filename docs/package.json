@@ -28,6 +28,7 @@
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.15.0",
     "@mui/material": "5.15.0",
+    "@mui/material-nextjs": "^5.15.0",
     "@mui/monorepo": "https://github.com/mui/material-ui.git",
     "@mui/styles": "5.15.0",
     "@mui/toolpad": "workspace:*",

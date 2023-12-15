@@ -25,8 +25,9 @@ import {
   GridFilterModel,
   GridSortModel,
   GridNoRowsOverlay,
-  GridRowModesModel,
   GridRowModes,
+  GridApiPro,
+  GridRowModesModel,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -536,16 +537,6 @@ function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
   );
 }
 
-interface UpdateActionProps {
-  id: GridRowId;
-  dataProvider: ToolpadDataProviderBase<Record<string, unknown>, PaginationMode>;
-  refetch: () => unknown;
-}
-
-interface GridState {
-  editedRow: GridRowId | null;
-}
-
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
   rowLoadingError?: unknown;
   getActions?: GridActionsColDef['getActions'];
@@ -553,17 +544,10 @@ interface DataProviderDataGridProps extends Partial<DataGridProProps> {
 
 function useDataProviderDataGridProps(
   dataProviderId: string | null | undefined,
+  api: GridApiPro,
 ): DataProviderDataGridProps {
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
   const { dataProvider } = useDataProvider(dataProviderId || null);
-
-  const [gridState, setGridState] = React.useState<GridState>({
-    editedRow: null,
-  });
-
-  const rowModesModel: GridRowModesModel = React.useMemo(() => {
-    return gridState.editedRow ? { [gridState.editedRow]: { mode: GridRowModes.Edit } } : {};
-  }, [gridState.editedRow]);
 
   const [rawPaginationModel, setRawPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
@@ -620,6 +604,8 @@ function useDataProviderDataGridProps(
     [rawSortModel],
   );
 
+  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+
   const {
     data,
     isFetching,
@@ -673,9 +659,11 @@ function useDataProviderDataGridProps(
       const loading = false;
 
       if (dataProvider.updateRecord) {
-        if (gridState.editedRow !== null) {
+        const rowIsInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+
+        if (rowIsInEditMode) {
           const closeEditUi = () => {
-            setGridState((prevState) => ({ ...prevState, editedRow: null }));
+            api.stopRowEditMode({ id, ignoreModifications: true });
           };
 
           return [
@@ -706,7 +694,7 @@ function useDataProviderDataGridProps(
           <IconButton
             key="update"
             onClick={() => {
-              setGridState((prevState) => ({ ...prevState, editedRow: id }));
+              api.startRowEditMode({ id });
             }}
             size="small"
             aria-label={`Edit row with id "${id}"`}
@@ -724,7 +712,7 @@ function useDataProviderDataGridProps(
 
       return result;
     };
-  }, [dataProvider, gridState.editedRow, refetch]);
+  }, [api, dataProvider, refetch, rowModesModel]);
 
   if (!dataProvider) {
     return {};
@@ -755,6 +743,7 @@ function useDataProviderDataGridProps(
     getActions,
     editMode: 'row',
     rowModesModel,
+    onRowModesModelChange: (model) => setRowModesModel(model),
   };
 }
 
@@ -790,11 +779,16 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
+  const apiRef = useGridApiRef();
+
   const {
     rows: dataProviderRowsInput,
     getActions: getProviderActions,
     ...dataProviderProps
-  } = useDataProviderDataGridProps(rowsSource === 'dataProvider' ? dataProviderId : null);
+  } = useDataProviderDataGridProps(
+    rowsSource === 'dataProvider' ? dataProviderId : null,
+    apiRef.current,
+  );
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
@@ -903,7 +897,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [columnsProp],
   );
 
-  const apiRef = useGridApiRef();
   React.useEffect(() => {
     apiRef.current.updateColumns(columns);
   }, [apiRef, columns]);

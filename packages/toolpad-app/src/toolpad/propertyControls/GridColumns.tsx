@@ -237,7 +237,7 @@ function GridColumnEditor({
       <FormControlLabel
         control={
           <Checkbox
-            checked={editedColumn.filterable ?? true}
+            checked={editedColumn.editable ?? true}
             disabled={disabled}
             onChange={(event) =>
               handleColumnChange({

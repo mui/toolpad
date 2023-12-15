@@ -147,7 +147,3 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-13.png", "alt": "Preview of app", "caption": "The preview of our application", "indent": 1  }}
 
 2. That's it! Feel free to browse through the rest of the documentation to know more about what you can do with Toolpad.
-
-```
-
-```

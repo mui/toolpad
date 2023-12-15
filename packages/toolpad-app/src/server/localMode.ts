@@ -541,6 +541,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       apiVersion: API_VERSION,
       kind: 'page',
       spec: {
+        displayName: node.attributes.displayName,
         alias: node.attributes.alias,
         title: node.attributes.title,
         parameters: undefinedWhenEmpty(
@@ -723,6 +724,7 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
   let fragment = appDom.createFragment('page', {
     name: pageName,
     attributes: {
+      displayName: pageFileSpec.displayName,
       // Convert deprecated id to alias
       alias: pageFileSpec.id ? [pageFileSpec.id] : pageFileSpec.alias,
       title: pageFileSpec.title,

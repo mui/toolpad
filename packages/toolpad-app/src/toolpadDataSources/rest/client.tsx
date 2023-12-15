@@ -480,7 +480,7 @@ function QueryEditor({
   return currentTab ? (
     <PanelGroup autoSaveId="toolpad/rest-panel" direction="horizontal">
       <Panel
-        id={'rest-query-left'}
+        id="rest-query-left"
         defaultSizePercentage={50}
         minSizePercentage={40}
         style={{ overflow: 'auto' }}
@@ -629,7 +629,7 @@ function QueryEditor({
         </TabContext>
       </Panel>
       <PanelResizeHandle />
-      <Panel id={'rest-query-right'} defaultSizePercentage={50} minSizePercentage={20}>
+      <Panel id="rest-query-right" defaultSizePercentage={50} minSizePercentage={20}>
         <PanelGroup autoSaveId="toolpad/rest/params-tools-split" direction="vertical">
           <Panel defaultSizePercentage={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box display={'flex'} flexDirection={'column'}>

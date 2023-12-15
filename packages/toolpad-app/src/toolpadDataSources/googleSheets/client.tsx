@@ -141,7 +141,7 @@ function QueryEditor({
 
   return (
     <PanelGroup autoSaveId="toolpad/google-sheets-panel" direction="horizontal">
-      <Panel id={'google-sheets-query-config'} defaultSizePercentage={50}>
+      <Panel id="google-sheets-query-config" defaultSizePercentage={50}>
         <QueryInputPanel onRunPreview={handleRunPreview}>
           <Stack direction="column" gap={2} sx={{ px: 3, pt: 1 }}>
             <Autocomplete
@@ -203,7 +203,7 @@ function QueryEditor({
         </QueryInputPanel>
       </Panel>
       <PanelResizeHandle />
-      <Panel id={'google-sheets-query-response'} defaultSizePercentage={50}>
+      <Panel id="google-sheets-query-response" defaultSizePercentage={50}>
         <Box
           sx={{
             height: '100%',

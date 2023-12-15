@@ -47,11 +47,11 @@ function PageEditorContent({ node }: PageEditorContentProps) {
           minSizePercentage={0}
           maxSizePercentage={100}
           order={1}
-          id={'editor'}
+          id="editor"
         >
           <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
             <Panel
-              id={'page-editor'}
+              id="page-editor"
               defaultSizePercentage={75}
               minSizePercentage={50}
               maxSizePercentage={80}
@@ -63,7 +63,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
             </Panel>
             <PanelResizeHandle />
             <Panel
-              id={'component-panel'}
+              id="component-panel"
               defaultSizePercentage={25}
               maxSizePercentage={50}
               minSizePercentage={20}
@@ -75,7 +75,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
         <PanelResizeHandle />
 
         {showQuery ? (
-          <Panel minSizePercentage={35} maxSizePercentage={100} order={2} id={'query-panel'}>
+          <Panel minSizePercentage={35} maxSizePercentage={100} order={2} id="query-panel">
             <QueryEditor />
           </Panel>
         ) : null}

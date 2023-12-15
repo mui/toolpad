@@ -16,7 +16,7 @@ To display a different name for a page in the sidebar, the page **display name**
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/page-properties/app-shell.png", "alt": "App shell display mode ", "caption": "Page with display mode set to App shell", "indent": 1 }}
 
-- **No shell**: Pages with their display mode set to this value will render without the navigation sidebar
+- **No shell**: Pages with their display mode set to this value will render without the navigation sidebar.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/page-properties/no-shell.png", "alt": "No shell display mode ", "caption": "Page with display mode set to No shell", "indent": 1}}
 

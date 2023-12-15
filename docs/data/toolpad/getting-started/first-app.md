@@ -50,15 +50,23 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 ### Fetch data
 
-1. Locate the create new button in the queries explorer. Press it and choose **REST API**.
+1. Locate the **+** (create new) button in the queries explorer. Press it and choose **REST API**.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-2.png", "alt":"Choose REST API", "caption":"The Add query menu", "zoom": false  }}
 
-2. We'll be using the [dog API](https://dog.ceo/dog-api/) for this tutorial. Set `https://dog.ceo/api/breeds/list/all` as the **URL**. Click the **Run** button to inspect the result of this request, and expand the `message` object in the response. If all went well, it will look like this:
+2. We'll be using the [dog API](https://dog.ceo/dog-api/) for this tutorial. Set
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-3.png", "alt": "Fetch URL", "caption": "The dog API response", "indent": 1  }}
+   ```html
+   https://dog.ceo/api/breeds/list/all
+   ```
 
-4. To transform the response according to our needs, we choose the **Transform** tab and enable the **Transform response** option. Write the JavaScript expression:
+   as the **URL**. Click the **Run** button to inspect the result of this request, and expand the `message` object in the response. If all went well, it will look like this:
+
+{{"component": "modules/components/DocsImage.tsx", "src":"/static/toolpad/docs/getting-started/first-app/step-3.png", "alt": "Fetch URL", "caption": "The dog API response", "indent": 1  }}
+
+3. To transform the response
+   according to our needs, we choose the **Transform** tab and enable the **Transform
+   response** option. Write the JavaScript expression:
 
    ```js
    return Object.entries(data.message);
@@ -122,7 +130,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 4. Save the binding and close the binding editor. Save the query and exit the query editor.
 
-5. Rename the query to `imageQuery` by double clicking on it in the query explorer.
+5. Rename the query to `imageQuery` by double clicking on it in the queries explorer.
 
 6. In the canvas select the **Image** component to view its properties in the inspector. Click on the **Bind** button next to the `src` prop to open the binding editor, and bind it to `imageQuery.data.message`.
 
@@ -139,3 +147,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-13.png", "alt": "Preview of app", "caption": "The preview of our application", "indent": 1  }}
 
 2. That's it! Feel free to browse through the rest of the documentation to know more about what you can do with Toolpad.
+
+```
+
+```

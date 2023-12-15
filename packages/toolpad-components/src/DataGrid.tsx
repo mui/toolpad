@@ -25,6 +25,7 @@ import {
   GridFilterModel,
   GridSortModel,
   GridNoRowsOverlay,
+  GridRowModesModel,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -562,6 +563,10 @@ function UpdateAction({ id, dataProvider, refetch }: UpdateActionProps) {
   );
 }
 
+interface GridState {
+  editedRow: GridRowId | null;
+}
+
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
   rowLoadingError?: unknown;
   getActions?: GridActionsColDef['getActions'];
@@ -573,7 +578,17 @@ function useDataProviderDataGridProps(
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
   const { dataProvider } = useDataProvider(dataProviderId || null);
 
-  console.log(dataProvider);
+  const [gridState, setGridState] = React.useState<GridState>({
+    editedRow: null,
+  });
+
+  const rowModesModel: GridRowModesModel = React.useMemo(() => {
+    return gridState.editedRow
+      ? {
+          [gridState.editedRow]: 'edit',
+        }
+      : {};
+  }, [gridState.editedRow]);
 
   const [rawPaginationModel, setRawPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
@@ -680,23 +695,49 @@ function useDataProviderDataGridProps(
 
     return ({ id }) => {
       const result = [];
-      const isEditing = true;
       const loading = false;
 
       if (dataProvider.updateRecord) {
-        if (isEditing) {
+        if (gridState.editedRow !== null) {
+          const closeEditUi = () => {
+            setGridState((prevState) => ({ ...prevState, editedRow: null }));
+          };
+
           return [
-            <IconButton key="commit" size="small" aria-label={`Edit row with id "${id}"`}>
+            <IconButton
+              key="commit"
+              size="small"
+              aria-label={`Edit row with id "${id}"`}
+              onClick={() => {
+                closeEditUi();
+              }}
+            >
               {loading ? <CircularProgress size={16} /> : <SaveIcon fontSize="inherit" />}
             </IconButton>,
-            <IconButton key="cancel" size="small" aria-label="Cancel">
+            <IconButton
+              key="cancel"
+              size="small"
+              aria-label="Cancel"
+              onClick={() => {
+                closeEditUi();
+              }}
+            >
               <CloseIcon fontSize="inherit" />
             </IconButton>,
           ];
         }
 
         result.push(
-          <UpdateAction key="update" id={id} dataProvider={dataProvider} refetch={refetch} />,
+          <IconButton
+            key="update"
+            onClick={() => {
+              setGridState((prevState) => ({ ...prevState, editedRow: id }));
+            }}
+            size="small"
+            aria-label={`Edit row with id "${id}"`}
+          >
+            <EditIcon fontSize="inherit" />
+          </IconButton>,
         );
       }
 
@@ -708,7 +749,7 @@ function useDataProviderDataGridProps(
 
       return result;
     };
-  }, [dataProvider, refetch]);
+  }, [dataProvider, gridState.editedRow, refetch]);
 
   if (!dataProvider) {
     return {};
@@ -738,6 +779,7 @@ function useDataProviderDataGridProps(
     rowLoadingError,
     getActions,
     editMode: 'row',
+    rowModesModel,
   };
 }
 

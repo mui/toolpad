@@ -29,7 +29,7 @@
                       "google"
                     ]
                   },
-                  "description": "The name of the authentication provider to use."
+                  "description": "Authentication providers to use."
                 },
                 "roles": {
                   "type": "array",

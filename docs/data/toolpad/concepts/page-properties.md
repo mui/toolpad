@@ -12,7 +12,7 @@ The possible options for the the display mode are:
 
 - **App shell**: Pages with their display mode set to this value will render within the navigation sidebar on the left, allowing for easy navigation between all pages:
 
-To display a different name for a page in the sidebar, the page `display name` property can be used.
+To display a different name for a page in the sidebar, the page **display name** can be set.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/page-properties/app-shell.png", "alt": "App shell display mode ", "caption": "Page with display mode set to App shell", "indent": 1 }}
 

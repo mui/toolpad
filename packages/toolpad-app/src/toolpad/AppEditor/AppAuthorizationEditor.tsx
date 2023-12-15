@@ -1,8 +1,10 @@
 import * as React from 'react';
 import {
   Alert,
+  Box,
   Button,
   Checkbox,
+  Chip,
   Dialog,
   DialogActions,
   DialogContent,
@@ -15,6 +17,7 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
+  Tab,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -31,21 +34,100 @@ import {
 } from '@mui/x-data-grid';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
+import { TabContext, TabList } from '@mui/lab';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
 import { AuthProvider } from '../../types';
+import TabPanel from '../../components/TabPanel';
 
 const AUTH_PROVIDERS = new Map([
   ['github', { name: 'GitHub', Icon: GitHubIcon }],
   ['google', { name: 'Google', Icon: GoogleIcon }],
 ]);
 
-interface EditToolbarProps {
+export function AppAuthenticationEditor() {
+  const { dom } = useAppState();
+  const appState = useAppStateApi();
+
+  const handleAuthProvidersChange = React.useCallback(
+    (event: SelectChangeEvent<AuthProvider[]>) => {
+      const {
+        target: { value: providers },
+      } = event;
+
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
+          ...app.attributes?.authorization,
+          providers: (typeof providers === 'string'
+            ? providers.split(',')
+            : providers) as AuthProvider[],
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const appNode = appDom.getApp(dom);
+  const authorization = appNode.attributes.authorization;
+
+  const authProviders = React.useMemo(
+    () => authorization?.providers ?? [],
+    [authorization?.providers],
+  );
+
+  return (
+    <Stack direction="column">
+      <FormControl>
+        <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
+        <Select<AuthProvider[]>
+          labelId="auth-providers-label"
+          label="Authentication providers"
+          id="auth-providers"
+          multiple
+          value={authProviders}
+          onChange={handleAuthProvidersChange}
+          fullWidth
+          renderValue={(selected) =>
+            selected
+              .map((selectedValue) => AUTH_PROVIDERS.get(selectedValue)?.name ?? '')
+              .join(', ')
+          }
+        >
+          {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
+            <MenuItem key={value} value={value}>
+              <Stack direction="row" alignItems="center">
+                <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
+                <Icon fontSize="small" />
+                <Typography ml={1}>{name}</Typography>
+              </Stack>
+            </MenuItem>
+          ))}
+        </Select>
+        <FormHelperText id="auth-providers-helper-text">
+          If set, only authenticated users can use the app.
+        </FormHelperText>
+      </FormControl>
+      <Alert severity="info" sx={{ mt: 1 }}>
+        Certain environment variables must be set for authentication providers to work.{' '}
+        <Link href="/" target="_blank">
+          Learn how to set up authentication
+        </Link>
+        .
+      </Alert>
+    </Stack>
+  );
+}
+
+interface RolesToolbarProps {
   addNewRoleDisabled: boolean;
   onAddNewRole: () => void;
 }
 
-function EditToolbar({ addNewRoleDisabled, onAddNewRole }: EditToolbarProps) {
+function RolesToolbar({ addNewRoleDisabled, onAddNewRole }: RolesToolbarProps) {
   return (
     <GridToolbarContainer>
       <Button
@@ -71,7 +153,7 @@ interface RoleRow extends Role {
   isNew?: boolean;
 }
 
-export default function AppAuthorizationEditor() {
+export function AppRolesEditor() {
   const { dom } = useAppState();
   const appState = useAppStateApi();
 
@@ -158,6 +240,7 @@ export default function AppAuthorizationEditor() {
         field: 'name',
         headerName: 'Name',
         editable: true,
+        flex: 0.25,
       },
       {
         field: 'description',
@@ -260,7 +343,7 @@ export default function AppAuthorizationEditor() {
   };
 
   const handleAddNewRole = React.useCallback(() => {
-    const draftRowId = `<draf_row>-${Math.random()}`;
+    const draftRowId = `<draft_row>-${Math.random()}`;
     setDraftRow({ id: draftRowId, name: '', description: '', pages: [], isNew: true });
     setRowModesModel((oldModel) => ({
       ...oldModel,
@@ -295,7 +378,7 @@ export default function AppAuthorizationEditor() {
           return true;
         }}
         slots={{
-          toolbar: EditToolbar,
+          toolbar: RolesToolbar,
         }}
         slotProps={{
           toolbar: {
@@ -309,24 +392,53 @@ export default function AppAuthorizationEditor() {
   );
 }
 
-export function AppAuthenticationEditor() {
+interface UsersToolbarProps {
+  addNewUserDisabled: boolean;
+  onAddNewUser: () => void;
+}
+
+function UsersToolbar({ addNewUserDisabled, onAddNewUser }: UsersToolbarProps) {
+  return (
+    <GridToolbarContainer>
+      <Button
+        color="primary"
+        startIcon={<AddIcon />}
+        onClick={onAddNewUser}
+        disabled={addNewUserDisabled}
+      >
+        Add user
+      </Button>
+    </GridToolbarContainer>
+  );
+}
+
+interface User {
+  email: string;
+  roles: string[];
+}
+
+interface UserRow extends User {
+  id: string;
+  isNew?: boolean;
+}
+
+export function AppAuthorizationUsersEditor() {
   const { dom } = useAppState();
   const appState = useAppStateApi();
 
-  const handleAuthProvidersChange = React.useCallback(
-    (event: SelectChangeEvent<AuthProvider[]>) => {
-      const {
-        target: { value: providers },
-      } = event;
+  const [draftRow, setDraftRow] = React.useState<UserRow | null>(null);
 
+  const appNode = appDom.getApp(dom);
+  const authorization = appNode.attributes.authorization;
+
+  const addUser = React.useCallback(
+    (user: User) => {
       appState.update((draft) => {
         const app = appDom.getApp(draft);
 
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
           ...app.attributes?.authorization,
-          providers: (typeof providers === 'string'
-            ? providers.split(',')
-            : providers) as AuthProvider[],
+          users: [...(app.attributes?.authorization?.users ?? []), user],
         });
 
         return draft;
@@ -335,80 +447,290 @@ export function AppAuthenticationEditor() {
     [appState],
   );
 
-  const appNode = appDom.getApp(dom);
-  const authorization = appNode.attributes.authorization;
+  const updateUser = React.useCallback(
+    (email: string, values: Omit<User, 'email'>) => {
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
 
-  const authProviders = React.useMemo(
-    () => authorization?.providers ?? [],
-    [authorization?.providers],
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
+          ...app.attributes?.authorization,
+          users: (app.attributes?.authorization?.users ?? []).map((user) => {
+            if (user.email === email) {
+              return {
+                ...user,
+                ...values,
+              };
+            }
+            return user;
+          }),
+        });
+
+        return draft;
+      });
+    },
+    [appState],
   );
+
+  const deleteUser = React.useCallback(
+    (email: string) => {
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
+          ...app.attributes?.authorization,
+          users: (app.attributes?.authorization?.users ?? []).filter(
+            (user) => user.email !== email,
+          ),
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const handleEditRoles = React.useCallback(
+    (email: string) => (event: SelectChangeEvent<AuthProvider[]>) => {
+      const {
+        target: { value: roles },
+      } = event;
+
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
+          ...app.attributes?.authorization,
+          users: (app.attributes?.authorization?.users ?? []).map((user) => {
+            if (user.email === email) {
+              return {
+                ...user,
+                roles: (typeof roles === 'string' ? roles.split(',') : roles) as string[],
+              };
+            }
+            return user;
+          }),
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const usersRows = React.useMemo<UserRow[]>(() => {
+    const users = authorization?.users;
+
+    const existingRows =
+      users?.map((user) => ({
+        ...user,
+        id: user.email,
+      })) ?? [];
+
+    return [...existingRows, ...(draftRow ? [draftRow] : [])];
+  }, [authorization?.users, draftRow]);
+
+  const usersColumns = React.useMemo<GridColDef[]>(
+    () => [
+      {
+        field: 'email',
+        headerName: 'Email',
+        editable: true,
+        flex: 0.25,
+      },
+      {
+        field: 'roles',
+        headerName: 'Roles',
+        renderCell: ({ row, value }) => {
+          return (
+            <Select
+              multiple
+              value={value}
+              onChange={handleEditRoles(row.email)}
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {selected.map((selectedValue) => (
+                    <Chip key={selectedValue} label={selectedValue} size="small" />
+                  ))}
+                </Box>
+              )}
+              fullWidth
+              sx={{ height: '100%' }}
+            >
+              {(authorization?.roles ?? []).map((role) => (
+                <MenuItem key={role.name} value={role.name}>
+                  {role.name}
+                </MenuItem>
+              ))}
+            </Select>
+          );
+        },
+        flex: 1,
+      },
+      {
+        field: 'actions',
+        type: 'actions',
+        headerName: '',
+        width: 50,
+        cellClassName: 'actions',
+        getActions: ({ row }) => {
+          return [
+            <GridActionsCellItem
+              key="delete"
+              icon={<DeleteIcon />}
+              label="Delete"
+              onClick={() => deleteUser(row.email)}
+              color="inherit"
+            />,
+          ];
+        },
+      },
+    ],
+    [authorization?.roles, deleteUser, handleEditRoles],
+  );
+
+  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+
+  const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
+    setRowModesModel(newRowModesModel);
+  };
+
+  const processRowUpdate = (
+    newRow: GridRowModel<UserRow>,
+    oldRow: GridRowModel<UserRow>,
+  ): UserRow => {
+    setDraftRow(null);
+
+    if (!newRow.email) {
+      throw new Error(`Invalid row`);
+    }
+
+    const exists = usersRows.some((row) => row.id !== newRow.id && row.email === newRow.email);
+
+    if (exists) {
+      throw new Error(`User with email "${newRow.email}" already exists`);
+    }
+
+    if (oldRow.isNew) {
+      addUser({
+        email: newRow.email,
+        roles: newRow.roles,
+      });
+    } else {
+      updateUser(newRow.email, {
+        roles: newRow.roles,
+      });
+    }
+
+    return {
+      ...newRow,
+      id: newRow.email,
+      roles: [],
+      isNew: false,
+    };
+  };
+
+  const handleAddNewUser = React.useCallback(() => {
+    const draftRowId = `<draft_row>-${Math.random()}`;
+    setDraftRow({ id: draftRowId, email: '', roles: [], isNew: true });
+    setRowModesModel((oldModel) => ({
+      ...oldModel,
+      [draftRowId]: { mode: GridRowModes.Edit, fieldToFocus: 'email' },
+    }));
+  }, []);
 
   return (
-    <Stack direction="column">
-      <FormControl>
-        <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
-        <Select<AuthProvider[]>
-          labelId="auth-providers-label"
-          label="Authentication providers"
-          id="auth-providers"
-          multiple
-          value={authProviders}
-          onChange={handleAuthProvidersChange}
-          fullWidth
-          renderValue={(selected) =>
-            selected
-              .map((selectedValue) => AUTH_PROVIDERS.get(selectedValue)?.name ?? '')
-              .join(', ')
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+    <div
+      style={{ height: 350, width: '100%' }}
+      onKeyDown={(event) => {
+        if (Object.keys(rowModesModel).length > 0) {
+          // Avoid the escape key from closing a dialog this grid is rendered in
+          event.stopPropagation();
+        }
+      }}
+    >
+      <DataGrid
+        rows={usersRows}
+        columns={usersColumns}
+        hideFooter
+        editMode="row"
+        rowModesModel={rowModesModel}
+        onRowModesModelChange={handleRowModesModelChange}
+        processRowUpdate={processRowUpdate}
+        // onProcessRowUpdateError={(error) => console.log(error)}
+        isCellEditable={(params) => {
+          if (params.field === 'email') {
+            return !!params.row.isNew;
           }
-        >
-          {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
-            <MenuItem key={value} value={value}>
-              <Stack direction="row" alignItems="center">
-                <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
-                <Icon fontSize="small" />
-                <Typography ml={1}>{name}</Typography>
-              </Stack>
-            </MenuItem>
-          ))}
-        </Select>
-        <FormHelperText id="auth-providers-helper-text">
-          If set, only authenticated users can use the app.
-        </FormHelperText>
-      </FormControl>
-      <Alert severity="info" sx={{ mt: 1 }}>
-        Certain environment variables must be set for authentication providers to work.{' '}
-        <Link href="/" target="_blank">
-          Learn how to set up authentication
-        </Link>
-        .
-      </Alert>
-    </Stack>
+          return true;
+        }}
+        slots={{
+          toolbar: UsersToolbar,
+        }}
+        slotProps={{
+          toolbar: {
+            onAddNewUser: handleAddNewUser,
+            addNewUserDisabled: !!draftRow,
+          },
+        }}
+        autoHeight
+      />
+    </div>
   );
 }
-
 export interface AppAuthorizationDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-export function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialogProps) {
+export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialogProps) {
+  const [activeTab, setActiveTab] = React.useState<'authentication' | 'roles' | 'users'>(
+    'authentication',
+  );
+
+  const handleActiveTabChange = React.useCallback((event: React.SyntheticEvent, newTab: string) => {
+    setActiveTab(newTab as 'authentication' | 'roles' | 'users');
+  }, []);
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Authorization</DialogTitle>
-      <DialogContent>
-        <Typography variant="subtitle1" mb={1}>
-          Authentication
-        </Typography>
-        <AppAuthenticationEditor />
-        <Typography variant="subtitle1" mt={1} mb={1}>
-          Roles
-        </Typography>
-        <Typography variant="body2">
-          Define the roles for your application. You can configure your pages to be accessible to
-          specific roles only.
-        </Typography>
-        <AppAuthorizationEditor />
-      </DialogContent>
+      <TabContext value={activeTab}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <TabList
+            onChange={handleActiveTabChange}
+            aria-label="Authorization configuration options"
+          >
+            <Tab label="Authentication" value="authentication" sx={{ px: 2 }} />
+            <Tab label="Roles" value="roles" sx={{ px: 2 }} />
+            <Tab label="Users" value="users" sx={{ px: 2 }} />
+          </TabList>
+        </Box>
+        <DialogContent sx={{ minHeight: 460 }}>
+          <TabPanel disableGutters value="authentication">
+            <Typography variant="subtitle1" mb={1}>
+              Authentication
+            </Typography>
+            <AppAuthenticationEditor />
+          </TabPanel>
+          <TabPanel disableGutters value="roles">
+            <Typography variant="subtitle1" mb={1}>
+              Roles
+            </Typography>
+            <Typography variant="body2">
+              Define the roles for your application. You can configure your pages to be accessible
+              to specific roles only.
+            </Typography>
+            <AppRolesEditor />
+          </TabPanel>
+          <TabPanel disableGutters value="users">
+            <Typography variant="body2">
+              Assign one or more roles to users of the app by their email addresses.
+            </Typography>
+            <AppAuthorizationUsersEditor />
+          </TabPanel>
+        </DialogContent>
+      </TabContext>
       <DialogActions>
         <Button color="inherit" variant="text" onClick={onClose}>
           Close

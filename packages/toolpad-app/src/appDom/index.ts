@@ -71,6 +71,10 @@ export interface AppNode extends AppDomNodeBase {
         readonly name: string;
         readonly description?: string;
       }[];
+      readonly users?: {
+        readonly email: string;
+        readonly roles: string[];
+      }[];
     };
   };
 }

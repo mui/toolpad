@@ -277,6 +277,15 @@ export const applicationSchema = toolpadObjectSchema(
           )
           .optional()
           .describe('Available roles for this application. These can be assigned to users.'),
+        users: z
+          .array(
+            z.object({
+              email: z.string().describe('The email address of the user.'),
+              roles: z.array(z.string()).describe('Names of the roles assigned to the user.'),
+            }),
+          )
+          .optional()
+          .describe('User roles for this application.'),
       })
       .optional()
       .describe('Authorization configuration for this application.'),

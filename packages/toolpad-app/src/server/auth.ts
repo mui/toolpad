@@ -53,6 +53,9 @@ export function createAuthHandler(base: string): Router {
                 response_type: 'code',
               },
             },
+            // profile(profile) {
+            //   return profile;
+            // },
           }),
         ],
         secret: process.env.TOOLPAD_AUTH_SECRET,
@@ -72,6 +75,19 @@ export function createAuthHandler(base: string): Router {
           async redirect({ baseUrl }) {
             return `${baseUrl}${base}`;
           },
+          // jwt({ token, user }) {
+          //   if (user) {
+          //     token.role = user.role;
+          //   }
+          //   return token;
+          // },
+          // session({ session, token }) {
+          //   if (session.user) {
+          //     session.user.role = token.role;
+          //   }
+
+          //   return session;
+          // },
         },
       })) as Response;
 

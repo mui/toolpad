@@ -42,6 +42,7 @@ export function RequireAuthorization({
       </Container>
     );
   }
+
   if (!user.roles || user.roles.length <= 0) {
     reason = 'User has no roles defined.';
   } else if (!user.roles.some((role) => allowedRolesSet.has(role))) {

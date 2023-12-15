@@ -3,7 +3,7 @@ import { UseDataProviderHook } from '@mui/toolpad-core/runtime';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
 import { ToolpadDataProviderBase } from '@mui/toolpad-core';
-import { GridRowId } from '@mui/x-data-grid';
+import type { GridRowId } from '@mui/x-data-grid';
 import api from './api';
 
 export const useDataProvider: UseDataProviderHook = (id) => {

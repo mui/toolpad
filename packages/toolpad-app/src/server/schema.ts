@@ -264,7 +264,7 @@ export const applicationSchema = toolpadObjectSchema(
         providers: z
           .array(z.enum(['github', 'google']))
           .optional()
-          .describe('The name of the authentication provider to use.'),
+          .describe('Authentication providers to use.'),
         roles: z
           .array(
             z.union([

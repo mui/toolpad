@@ -22,6 +22,7 @@ const MONOREPO_PACKAGES = {
   '@mui/lab': path.resolve(MONOREPO_PATH, './packages/mui-lab/src'),
   '@mui/material': path.resolve(MONOREPO_PATH, './packages/mui-material/src'),
   '@mui/material-next': path.resolve(MONOREPO_PATH, './packages/mui-material-next/src'),
+  '@mui/material-nextjs': path.resolve(MONOREPO_PATH, './packages/mui-material-nextjs/src'),
   '@mui/private-theming': path.resolve(MONOREPO_PATH, './packages/mui-private-theming/src'),
   '@mui/styled-engine': path.resolve(MONOREPO_PATH, './packages/mui-styled-engine/src'),
   '@mui/styled-engine-sc': path.resolve(MONOREPO_PATH, './packages/mui-styled-engine-sc/src'),

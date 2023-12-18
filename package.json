@@ -98,7 +98,7 @@
     "vitest": "1.0.4",
     "yargs": "17.7.2",
     "zod": "3.22.4",
-    "zod-to-json-schema": "3.22.1"
+    "zod-to-json-schema": "3.22.3"
   },
   "engines": {
     "npm": "please-use-yarn",

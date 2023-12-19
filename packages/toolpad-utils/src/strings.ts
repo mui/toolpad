@@ -171,3 +171,6 @@ export function indent(text: string, length = 2): string {
 export function isValidJsIdentifier(base: string): boolean {
   return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(base);
 }
+
+/* Validates an email address */
+export const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;

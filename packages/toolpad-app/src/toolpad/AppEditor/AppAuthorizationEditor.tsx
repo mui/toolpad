@@ -16,6 +16,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Snackbar,
   Stack,
   Tab,
   Tooltip,
@@ -27,6 +28,7 @@ import {
   DataGrid,
   GridActionsCellItem,
   GridColDef,
+  GridRenderCellParams,
   GridRowModel,
   GridRowModes,
   GridRowModesModel,
@@ -35,6 +37,8 @@ import {
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import { TabContext, TabList } from '@mui/lab';
+import { EMAIL_REGEX } from '@mui/toolpad-utils/strings';
+import { GridApiCommunity } from '@mui/x-data-grid/internals';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
 import { AuthProvider } from '../../types';
@@ -153,7 +157,7 @@ interface RoleRow extends Role {
   isNew?: boolean;
 }
 
-export function AppRolesEditor() {
+export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error: Error) => void }) {
   const { dom } = useAppState();
   const appState = useAppStateApi();
 
@@ -370,7 +374,7 @@ export function AppRolesEditor() {
         rowModesModel={rowModesModel}
         onRowModesModelChange={handleRowModesModelChange}
         processRowUpdate={processRowUpdate}
-        // onProcessRowUpdateError={(error) => console.log(error)}
+        onProcessRowUpdateError={onRowUpdateError}
         isCellEditable={(params) => {
           if (params.field === 'name') {
             return !!params.row.isNew;
@@ -422,7 +426,11 @@ interface UserRow extends User {
   isNew?: boolean;
 }
 
-export function AppAuthorizationUsersEditor() {
+export function AppAuthorizationUsersEditor({
+  onRowUpdateError,
+}: {
+  onRowUpdateError: (error: Error) => void;
+}) {
   const { dom } = useAppState();
   const appState = useAppStateApi();
 
@@ -490,31 +498,18 @@ export function AppAuthorizationUsersEditor() {
   );
 
   const handleEditRoles = React.useCallback(
-    (email: string) => (event: SelectChangeEvent<AuthProvider[]>) => {
+    (email: string, gridApi: GridApiCommunity) => (event: SelectChangeEvent<AuthProvider[]>) => {
       const {
         target: { value: roles },
       } = event;
 
-      appState.update((draft) => {
-        const app = appDom.getApp(draft);
-
-        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
-          ...app.attributes?.authorization,
-          users: (app.attributes?.authorization?.users ?? []).map((user) => {
-            if (user.email === email) {
-              return {
-                ...user,
-                roles: (typeof roles === 'string' ? roles.split(',') : roles) as string[],
-              };
-            }
-            return user;
-          }),
-        });
-
-        return draft;
+      gridApi.setEditCellValue({
+        id: draftRow?.id || email,
+        field: 'roles',
+        value: roles,
       });
     },
-    [appState],
+    [draftRow?.id],
   );
 
   const usersRows = React.useMemo<UserRow[]>(() => {
@@ -529,6 +524,57 @@ export function AppAuthorizationUsersEditor() {
     return [...existingRows, ...(draftRow ? [draftRow] : [])];
   }, [authorization?.users, draftRow]);
 
+  const renderRolesCell = React.useCallback(
+    ({ row }: GridRenderCellParams) => {
+      const rowUser = (authorization?.users ?? []).find((user) => user.email === row.email);
+
+      return (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+          {rowUser && rowUser.roles.length === 0 ? (
+            <Typography variant="body2">No roles assigned.</Typography>
+          ) : null}
+          {rowUser
+            ? rowUser.roles.map((role) => <Chip key={role} label={role} size="small" />)
+            : null}
+        </Box>
+      );
+    },
+    [authorization?.users],
+  );
+
+  const renderEditRolesCell = React.useCallback(
+    ({ row, value, api }: GridRenderCellParams) => {
+      return (
+        <Select
+          multiple
+          value={value}
+          onChange={handleEditRoles(row.email, api)}
+          renderValue={(selected) => (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              {selected.map((selectedValue) => (
+                <Chip key={selectedValue} label={selectedValue} size="small" />
+              ))}
+            </Box>
+          )}
+          fullWidth
+          sx={{
+            height: '100%',
+            '.MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+          }}
+        >
+          {(authorization?.roles ?? []).map((role) => (
+            <MenuItem key={role.name} value={role.name}>
+              {role.name}
+            </MenuItem>
+          ))}
+        </Select>
+      );
+    },
+    [authorization?.roles, handleEditRoles],
+  );
+
   const usersColumns = React.useMemo<GridColDef[]>(
     () => [
       {
@@ -540,30 +586,10 @@ export function AppAuthorizationUsersEditor() {
       {
         field: 'roles',
         headerName: 'Roles',
-        renderCell: ({ row, value }) => {
-          return (
-            <Select
-              multiple
-              value={value}
-              onChange={handleEditRoles(row.email)}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((selectedValue) => (
-                    <Chip key={selectedValue} label={selectedValue} size="small" />
-                  ))}
-                </Box>
-              )}
-              fullWidth
-              sx={{ height: '100%' }}
-            >
-              {(authorization?.roles ?? []).map((role) => (
-                <MenuItem key={role.name} value={role.name}>
-                  {role.name}
-                </MenuItem>
-              ))}
-            </Select>
-          );
-        },
+        type: 'singleSelect',
+        editable: true,
+        renderCell: renderRolesCell,
+        renderEditCell: renderEditRolesCell,
         flex: 1,
       },
       {
@@ -580,12 +606,13 @@ export function AppAuthorizationUsersEditor() {
               label="Delete"
               onClick={() => deleteUser(row.email)}
               color="inherit"
+              disabled={row.isNew}
             />,
           ];
         },
       },
     ],
-    [authorization?.roles, deleteUser, handleEditRoles],
+    [deleteUser, renderEditRolesCell, renderRolesCell],
   );
 
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
@@ -608,6 +635,10 @@ export function AppAuthorizationUsersEditor() {
 
     if (exists) {
       throw new Error(`User with email "${newRow.email}" already exists`);
+    }
+
+    if (!EMAIL_REGEX.test(newRow.email)) {
+      throw new Error(`"${newRow.email}" is not a valid email`);
     }
 
     if (oldRow.isNew) {
@@ -657,7 +688,7 @@ export function AppAuthorizationUsersEditor() {
         rowModesModel={rowModesModel}
         onRowModesModelChange={handleRowModesModelChange}
         processRowUpdate={processRowUpdate}
-        // onProcessRowUpdateError={(error) => console.log(error)}
+        onProcessRowUpdateError={onRowUpdateError}
         isCellEditable={(params) => {
           if (params.field === 'email') {
             return !!params.row.isNew;
@@ -692,50 +723,67 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
     setActiveTab(newTab as 'authentication' | 'roles' | 'users');
   }, []);
 
+  const [errorSnackbarMessage, setErrorSnackbarMessage] = React.useState<string>('');
+
+  const handleRowUpdateError = React.useCallback((error: Error) => {
+    setErrorSnackbarMessage(error.message);
+  }, []);
+
+  const handleErrorSnackbarClose = React.useCallback(() => {
+    setErrorSnackbarMessage('');
+  }, []);
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Authorization</DialogTitle>
-      <TabContext value={activeTab}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList
-            onChange={handleActiveTabChange}
-            aria-label="Authorization configuration options"
-          >
-            <Tab label="Authentication" value="authentication" sx={{ px: 2 }} />
-            <Tab label="Roles" value="roles" sx={{ px: 2 }} />
-            <Tab label="Users" value="users" sx={{ px: 2 }} />
-          </TabList>
-        </Box>
-        <DialogContent sx={{ minHeight: 460 }}>
-          <TabPanel disableGutters value="authentication">
-            <Typography variant="subtitle1" mb={1}>
-              Authentication
-            </Typography>
-            <AppAuthenticationEditor />
-          </TabPanel>
-          <TabPanel disableGutters value="roles">
-            <Typography variant="subtitle1" mb={1}>
-              Roles
-            </Typography>
-            <Typography variant="body2">
-              Define the roles for your application. You can configure your pages to be accessible
-              to specific roles only.
-            </Typography>
-            <AppRolesEditor />
-          </TabPanel>
-          <TabPanel disableGutters value="users">
-            <Typography variant="body2">
-              Assign one or more roles to users of the app by their email addresses.
-            </Typography>
-            <AppAuthorizationUsersEditor />
-          </TabPanel>
-        </DialogContent>
-      </TabContext>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <React.Fragment>
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+        <DialogTitle>Authorization</DialogTitle>
+        <TabContext value={activeTab}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <TabList
+              onChange={handleActiveTabChange}
+              aria-label="Authorization configuration options"
+            >
+              <Tab label="Authentication" value="authentication" sx={{ px: 2 }} />
+              <Tab label="Roles" value="roles" sx={{ px: 2 }} />
+              <Tab label="Users" value="users" sx={{ px: 2 }} />
+            </TabList>
+          </Box>
+          <DialogContent sx={{ minHeight: 460 }}>
+            <TabPanel disableGutters value="authentication">
+              <AppAuthenticationEditor />
+            </TabPanel>
+            <TabPanel disableGutters value="roles">
+              <Typography variant="body2">
+                Define the roles for your application. You can configure your pages to be accessible
+                to specific roles only.
+              </Typography>
+              <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
+            </TabPanel>
+            <TabPanel disableGutters value="users">
+              <Typography variant="body2">
+                Assign one or more roles to each user by email address.
+              </Typography>
+              <AppAuthorizationUsersEditor onRowUpdateError={handleRowUpdateError} />
+            </TabPanel>
+          </DialogContent>
+        </TabContext>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={!!errorSnackbarMessage}
+        autoHideDuration={6000}
+        onClose={handleErrorSnackbarClose}
+      >
+        {errorSnackbarMessage ? (
+          <Alert onClose={handleErrorSnackbarClose} severity="error">
+            {errorSnackbarMessage}
+          </Alert>
+        ) : undefined}
+      </Snackbar>
+    </React.Fragment>
   );
 }

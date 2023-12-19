@@ -342,7 +342,7 @@ if (import.meta.hot) {
           '@mui/toolpad > @mui/x-date-pickers/LocalizationProvider',
           '@mui/toolpad > @mui/toolpad-components > @mui/x-license-pro',
           '@mui/toolpad > @tanstack/react-query',
-          '@mui/toolpad > @tanstack/react-query-devtools/build/lib/index.prod.js',
+          '@mui/toolpad > @tanstack/react-query-devtools/production',
           '@mui/toolpad > dayjs',
           '@mui/toolpad > dayjs/locale/en',
           '@mui/toolpad > dayjs/locale/fr',

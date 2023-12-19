@@ -128,7 +128,7 @@ const internalComponents: ToolpadComponents = Object.fromEntries(
 );
 
 const ReactQueryDevtoolsProduction = React.lazy(() =>
-  import('@tanstack/react-query-devtools/build/modern/production.js').then((d) => ({
+  import('@tanstack/react-query-devtools/production').then((d) => ({
     default: d.ReactQueryDevtools,
   })),
 );

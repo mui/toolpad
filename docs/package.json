@@ -55,7 +55,6 @@
     "date-fns-jalali": "2.29.3-0",
     "doctrine": "3.0.0",
     "exceljs": "4.4.0",
-    "express": "4.18.2",
     "fg-loadcss": "3.1.0",
     "fs-extra": "11.2.0",
     "invariant": "2.2.4",

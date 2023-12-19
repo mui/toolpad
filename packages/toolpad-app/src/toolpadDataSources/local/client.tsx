@@ -226,8 +226,8 @@ function QueryEditor({
   return currentTab ? (
     <PanelGroup autoSaveId="toolpad/local-panel" direction="horizontal">
       <Panel
-        defaultSizePercentage={50}
-        minSizePercentage={40}
+        defaultSize={50}
+        minSize={40}
         style={{ overflow: 'auto', scrollbarGutter: 'stable' }}
         id="local-query-left"
       >

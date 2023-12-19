@@ -284,6 +284,7 @@ export type Application = z.infer<typeof applicationSchema>;
 export const pageSchema = toolpadObjectSchema(
   'page',
   z.object({
+    displayName: z.string().optional().describe('Page name to display in the UI.'),
     id: z
       .string()
       .optional()

@@ -479,12 +479,7 @@ function QueryEditor({
 
   return currentTab ? (
     <PanelGroup autoSaveId="toolpad/rest-panel" direction="horizontal">
-      <Panel
-        id="rest-query-left"
-        defaultSizePercentage={50}
-        minSizePercentage={40}
-        style={{ overflow: 'auto' }}
-      >
+      <Panel id="rest-query-left" defaultSize={50} minSize={40} style={{ overflow: 'auto' }}>
         <TabContext value={currentTab?.tabType ?? 'config'}>
           <Stack direction="column" gap={0}>
             <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -629,9 +624,9 @@ function QueryEditor({
         </TabContext>
       </Panel>
       <PanelResizeHandle />
-      <Panel id="rest-query-right" defaultSizePercentage={50} minSizePercentage={20}>
+      <Panel id="rest-query-right" defaultSize={50} minSize={20}>
         <PanelGroup autoSaveId="toolpad/rest/params-tools-split" direction="vertical">
-          <Panel defaultSizePercentage={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+          <Panel defaultSize={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <Box display={'flex'} flexDirection={'column'}>
               <TabContext value="parameters">
                 <TabList
@@ -658,7 +653,7 @@ function QueryEditor({
             </Box>
           </Panel>
           <PanelResizeHandle />
-          <Panel defaultSizePercentage={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
+          <Panel defaultSize={50} style={{ overflow: 'auto', scrollbarGutter: 'stable' }}>
             <TabContext value={currentTab.toolsTabType}>
               <Box
                 sx={{

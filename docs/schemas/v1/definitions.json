@@ -79,6 +79,10 @@
         "spec": {
           "type": "object",
           "properties": {
+            "displayName": {
+              "type": "string",
+              "description": "Page name to display in the UI."
+            },
             "id": {
               "type": "string",
               "description": "Serves as a canonical id of the page. Deprecated: use an alias instead."

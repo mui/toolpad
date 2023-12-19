@@ -296,11 +296,11 @@ function QueryEditor({
         </TabContext>
       </Panel>
       <PanelResizeHandle />
-      <Panel id="local-query-right" defaultSizePercentage={50} minSizePercentage={20}>
+      <Panel id="local-query-right" defaultSize={50} minSize={20}>
         <PanelGroup autoSaveId="toolpad/local/params-tools-split" direction="vertical">
           <Panel
             id="parameters-editor"
-            defaultSizePercentage={50}
+            defaultSize={50}
             style={{ overflow: 'auto', scrollbarGutter: 'stable' }}
           >
             <Box display={'flex'} flexDirection={'column'}>
@@ -355,7 +355,7 @@ function QueryEditor({
 
           <Panel
             id="preview"
-            defaultSizePercentage={50}
+            defaultSize={50}
             style={{ overflow: 'auto', scrollbarGutter: 'stable' }}
           >
             <TabContext value={currentTab.toolsTabType}>

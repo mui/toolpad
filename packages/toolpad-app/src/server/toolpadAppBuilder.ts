@@ -352,7 +352,7 @@ if (import.meta.hot) {
           '@mui/toolpad > lodash-es',
           '@mui/toolpad > markdown-to-jsx',
           '@mui/toolpad > nanoid/non-secure',
-          'prop-types',
+          '@mui/toolpad > @mui/toolpad-components > @mui/x-charts > prop-types',
           'react',
           'react-dom',
           'react-dom/client',

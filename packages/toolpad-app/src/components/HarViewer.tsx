@@ -1,6 +1,6 @@
 import { fromHar } from 'perf-cascade';
 import * as React from 'react';
-import { Har } from 'har-format';
+import type { Har } from 'har-format';
 import { styled, SxProps } from '@mui/material';
 import { useTheme, Theme } from '@mui/material/styles';
 import { createHarLog } from '../utils/har';

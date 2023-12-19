@@ -10,7 +10,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@mui/material": "5.15.0",
+    "@mui/material": "5.15.1",
     "@mui/toolpad": "0.1.37"
   }
 }

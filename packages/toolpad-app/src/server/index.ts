@@ -10,7 +10,6 @@ import prettyBytes from 'pretty-bytes';
 import type { ViteDevServer } from 'vite';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
-// eslint-disable-next-line import/extensions
 import openBrowser from 'react-dev-utils/openBrowser.js';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';

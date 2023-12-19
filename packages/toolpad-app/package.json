@@ -162,7 +162,6 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-import": "2.29.1",
     "formidable": "3.5.1",
-    "get-port": "7.0.0",
     "monaco-editor": "0.45.0",
     "react-devtools-inline": "5.0.0",
     "react-transition-group": "4.4.5",

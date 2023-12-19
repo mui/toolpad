@@ -29,7 +29,7 @@ export function ErrorContent({ sx, error }: ErrorContentProps) {
   );
 }
 
-const ErrorOverlay = styled(ErrorContent)(({ theme }) => ({
+const ErrorOverlay: React.ComponentType<ErrorContentProps> = styled(ErrorContent)(({ theme }) => ({
   position: 'absolute',
   inset: '0 0 0 0',
   borderWidth: 1,

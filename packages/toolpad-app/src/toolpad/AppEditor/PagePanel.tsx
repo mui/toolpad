@@ -58,21 +58,11 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
               <PageHierarchyExplorer />
             </Panel>
             <PanelResizeHandle />
-            <Panel
-              id={'queries-explorer'}
-              minSizePercentage={10}
-              defaultSizePercentage={25}
-              maxSizePercentage={90}
-            >
+            <Panel id={'queries-explorer'} minSize={10} defaultSize={25} maxSize={90}>
               <QueriesExplorer />
             </Panel>
             <PanelResizeHandle />
-            <Panel
-              id={'actions-explorer'}
-              minSizePercentage={10}
-              defaultSizePercentage={25}
-              maxSizePercentage={90}
-            >
+            <Panel id={'actions-explorer'} minSize={10} defaultSize={25} maxSize={90}>
               <ActionsExplorer />
             </Panel>
           </React.Fragment>

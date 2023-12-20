@@ -379,6 +379,8 @@ export default class FunctionsManager {
     return {
       paginationMode: dataProvider.paginationMode,
       hasDeleteRecord: !!dataProvider.deleteRecord,
+      hasUpdateRecord: !!dataProvider.updateRecord,
+      hasCreateRecord: !!dataProvider.createRecord,
     };
   }
 

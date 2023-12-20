@@ -234,6 +234,22 @@ function GridColumnEditor({
         label="Filterable"
       />
 
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.editable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                editable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Editable"
+      />
+
       <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
         {editedColumn.type === 'number' ? (
           <NumberFormatEditor

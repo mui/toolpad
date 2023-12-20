@@ -1,13 +1,5 @@
 import * as React from 'react';
-import {
-  Box,
-  Drawer,
-  List,
-  ListSubheader,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-} from '@mui/material';
+import { Box, Drawer, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
 
@@ -47,21 +39,24 @@ function AppPagesNavigation({
       sx={{
         width: DRAWER_WIDTH,
         flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: DRAWER_WIDTH, boxSizing: 'border-box' },
+        [`& .MuiDrawer-paper`]: {
+          width: DRAWER_WIDTH,
+          boxSizing: 'border-box',
+          border: 'none',
+        },
       }}
     >
       {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
-      <List
-        component="nav"
-        subheader={
-          <ListSubheader id={navListSubheaderId} sx={{ px: 4 }}>
-            Pages
-          </ListSubheader>
-        }
-        aria-labelledby={navListSubheaderId}
-      >
+      <List component="nav" sx={{ px: 2 }} aria-labelledby={navListSubheaderId}>
         {pages.map((page) => (
-          <ListItem key={page.slug} disablePadding>
+          <ListItem
+            key={page.slug}
+            disablePadding
+            sx={{
+              borderRadius: '24px',
+              overflow: 'hidden',
+            }}
+          >
             <ListItemButton
               component={Link}
               to={`pages/${page.slug}${search}`}

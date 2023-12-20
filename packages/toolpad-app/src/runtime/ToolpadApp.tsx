@@ -68,7 +68,6 @@ import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
-import { guessTitle } from '@mui/toolpad-utils/strings';
 import * as appDom from '../appDom';
 import { RuntimeState } from './types';
 import { getBindingType, getBindingValue } from './bindings';

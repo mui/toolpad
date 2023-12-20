@@ -410,8 +410,9 @@ export default class FunctionsManager {
     values: Record<string, unknown>,
   ): Promise<void> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
-    invariant(this.devWorker, 'devWorker must be initialized');
-    return this.devWorker.updateDataProviderRecord(fullPath, exportName, id, values);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    invariant(dataProvider.updateRecord, 'DataProvider does not support updateRecord');
+    return dataProvider.updateRecord(id, values);
   }
 
   async createDataProviderRecord(
@@ -420,7 +421,8 @@ export default class FunctionsManager {
     values: Record<string, unknown>,
   ): Promise<void> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
-    invariant(this.devWorker, 'devWorker must be initialized');
-    return this.devWorker.createDataProviderRecord(fullPath, exportName, values);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    invariant(dataProvider.createRecord, 'DataProvider does not support createRecord');
+    return dataProvider.createRecord(values);
   }
 }

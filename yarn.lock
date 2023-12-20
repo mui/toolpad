@@ -1164,6 +1164,11 @@
     clsx "^2.0.0"
     prop-types "^15.8.1"
 
+"@mui/material-nextjs@^5.15.0":
+  version "5.15.0"
+  resolved "https://registry.yarnpkg.com/@mui/material-nextjs/-/material-nextjs-5.15.0.tgz#a5bceb1f9d6848640b9661852a80193519527431"
+  integrity sha512-UC3lnoRqJXoWUBeekqjxC4CpxMElz4D4bBCegOhrm80qGV1cP5TBJGjalqoSUq6HSl+COVv6u//AjjIMKCj/qA==
+
 "@mui/material@5.15.1":
   version "5.15.1"
   resolved "https://registry.yarnpkg.com/@mui/material/-/material-5.15.1.tgz#5fc15c6eb9efe4b62b0c30b13bf5fa042bda71a1"
@@ -2279,6 +2284,11 @@
   dependencies:
     "@types/through" "*"
     rxjs "^7.2.0"
+
+"@types/invariant@2.2.35":
+  version "2.2.35"
+  resolved "https://registry.yarnpkg.com/@types/invariant/-/invariant-2.2.35.tgz#cd3ebf581a6557452735688d8daba6cf0bd5a3be"
+  integrity sha512-DxX1V9P8zdJPYQat1gHyY0xj3efl8gnMVjiM9iCY6y27lj+PoQWkgjt8jDqmovPqULkKVpKRg8J36iQiA+EtEg==
 
 "@types/invariant@2.2.37":
   version "2.2.37"

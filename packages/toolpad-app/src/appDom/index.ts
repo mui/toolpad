@@ -839,7 +839,6 @@ export function saveNode(dom: AppDom, node: AppDomNode) {
   if (!nodeExists(dom, node.id)) {
     throw new Error(`Attempt to update node "${node.id}", but it doesn't exist in the dom`);
   }
-
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: update(dom.nodes[node.id], omit(node, ...RESERVED_NODE_PROPERTIES)),

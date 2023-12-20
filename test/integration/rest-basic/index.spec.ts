@@ -71,19 +71,19 @@ test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) 
   await editorModel.goto();
   await editorModel.waitForOverlay();
 
-  await editorModel.pageEditor.getByRole('button', { name: 'Add query' }).click();
-  await page.getByRole('button', { name: 'HTTP request' }).click();
+  await editorModel.queriesExplorer.getByLabel('Create new query').click();
+  await page.getByRole('button', { name: 'REST API' }).click();
 
-  const newQueryEditor = page.getByRole('dialog', { name: 'query' });
+  const queryEditor = editorModel.queryEditorPanel;
 
-  await expect(newQueryEditor).toBeVisible();
+  await expect(queryEditor).toBeVisible();
 
-  const urlInput = newQueryEditor.getByLabel('url', { exact: true });
+  const urlInput = queryEditor.getByLabel('url', { exact: true });
   await urlInput.click();
   await urlInput.fill('http://foo.bar');
 
   await argosScreenshot('rest-editor', {
-    clip: (await newQueryEditor.boundingBox()) || undefined,
+    clip: (await queryEditor.boundingBox()) || undefined,
   });
 
   const envFilePath = path.resolve(localApp.dir, './.env');
@@ -93,33 +93,33 @@ test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) 
     await expect(editorModel.appCanvas.getByText('query4 authorization: bar')).toBeVisible();
   });
 
-  // Make sure switching tabs does not close query editor
+  // Make sure switching tabs does not close query editor`
   const newTab = await context.newPage();
   await newTab.bringToFront();
   await page.bringToFront();
   await newTab.close();
-  await expect(newQueryEditor).toBeVisible();
+  await expect(queryEditor).toBeVisible();
 
-  await newQueryEditor.getByRole('button', { name: 'Save' }).click();
-  await expect(newQueryEditor).not.toBeVisible();
+  await page.getByLabel('Unsaved changes 1').hover();
+  page.on('dialog', (dialog) => dialog.accept());
+  await page.getByLabel('Close query tab 1').click();
+  await expect(queryEditor).not.toBeVisible();
 
-  await editorModel.pageEditor.getByRole('button', { name: 'query1' }).click();
+  await editorModel.queriesExplorer.getByText('query1').click();
 
-  const existingQueryEditor = page.getByRole('dialog', { name: 'query1' });
+  await expect(queryEditor).toBeVisible();
 
-  await expect(existingQueryEditor).toBeVisible();
-
-  await existingQueryEditor.getByRole('button', { name: 'Preview' }).click();
-  const networkTab = existingQueryEditor.getByRole('tabpanel', { name: 'Network' });
+  await queryEditor.getByRole('button', { name: 'Run' }).click();
+  await queryEditor.getByRole('tab', { name: 'Dev Tools' }).click();
+  const networkTab = queryEditor.getByRole('tabpanel', { name: 'Dev Tools' });
   await expect(networkTab.getByText('/get?query1_param1=query1_value')).not.toBeEmpty();
 
-  await newQueryEditor.getByRole('tab', { name: 'Headers' }).click();
+  await queryEditor.getByRole('tab', { name: 'Headers' }).click();
 
-  await existingQueryEditor.getByRole('button', { name: 'Cancel' }).click();
-  await expect(existingQueryEditor).not.toBeVisible();
+  await page.getByLabel('Close query tab 1').click();
+  await expect(queryEditor).not.toBeVisible();
 
-  await editorModel.pageEditor.getByRole('button', { name: 'queryWithEnv' }).click();
+  await editorModel.queriesExplorer.getByText('queryWithEnv').click();
 
-  const queryWithEnvQueryEditor = page.getByRole('dialog', { name: 'queryWithEnv' });
-  await queryWithEnvQueryEditor.getByRole('tab', { name: 'Headers' }).click();
+  await queryEditor.getByRole('tab', { name: 'Headers' }).click();
 });

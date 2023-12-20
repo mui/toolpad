@@ -2,7 +2,7 @@
 
 <p class="description">These offer a fast way to load external data from REST APIs, via a configurable interface.</p>
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-1.png", "alt": "Add HTTP request", "caption": "Adding a query via the HTTP Request editor" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-1.png", "alt": "Add HTTP request", "caption": "Adding a query via the HTTP Request panel" }}
 
 ## HTTP Request editor
 
@@ -13,7 +13,7 @@ The following options are configurable here:
   You can add query parameters to your request here. These get appended to the request URL, like
   `https://dog.ceo/api/breed/akita/images/random?param1=value1`
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-2.png", "alt": "Add query params", "caption": "Adding a query parameter", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-2.png", "alt": "Add query params", "caption": "Adding a query parameter", "indent": 1, "aspectRatio": 6 }}
 
 - ### Body
 
@@ -25,13 +25,13 @@ The following options are configurable here:
 
   > `GET` requests do not have a request body
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-3.png", "alt": "Add request body", "caption": "Adding a request body", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-3.png", "alt": "Add request body", "caption": "Adding a request body", "indent": 1, "aspectRatio": 6 }}
 
 - ### Request headers
 
   You can define extra headers to be sent along with the request in this tab.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/http-query-headers.png", "alt": "Add request header", "caption": "Adding a request header", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-4.png", "alt": "Add request header", "caption": "Adding a request header", "indent": 1, "aspectRatio": 6 }}
 
 - ### Response
 
@@ -43,13 +43,13 @@ The following options are configurable here:
 
   - `raw`: Do not parse the response and return the response as text.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-5.png", "alt": "Add response parse format", "caption": "Adding a response parse format", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-5.png", "alt": "Add response parse format", "caption": "Adding a response parse format", "indent": 1, "aspectRatio": 6 }}
 
 - ### Transform
 
   You can transform the response via a JavaScript expression in this tab. This expression must return a `data` variable.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-6.png", "alt": "Add transformation", "caption": "Transforming the response via JavaScript", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-6.png", "alt": "Add transformation", "caption": "Transforming the response via JavaScript", "indent": 1, "aspectRatio": 6 }}
 
 ## Parameters
 
@@ -57,9 +57,9 @@ To be really useful, you need to connect these queries with data present on your
 
 You can define these in the interface available in the HTTP Request query editor. You can bind a parameter to any value available on the page, and the parameter can be bound to any value in the query.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/example-parameter.png", "alt": "HTTP Request parameter", "caption": "Creating a parameter and binding it", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/example-parameter.png", "alt": "HTTP Request parameter", "caption": "Creating a parameter and binding it", "indent": 1, "aspectRatio": 6 }}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/url-bound-parameter.png", "alt": "Server-side values", "caption": "Using the parameter in the query URL", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/bound-parameter.png", "alt": "Server-side values", "caption": "Using the parameter in the query URL", "indent": 1, "aspectRatio": 6 }}
 
 ### Secrets
 

@@ -5,7 +5,7 @@
 The most powerful way of bringing data into Toolpad is through your own code. You can define functions inside `toolpad/resources` and use them when creating a query of this type. The following video shows how you can use this feature to read data from PostgreSQL.
 
 <video controls width="auto" height="100%" style="contain" alt="custom-function">
-  <source src="/static/toolpad/docs/concepts/connecting-to-data/pg-function.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/concepts/connecting-to-data/postgres.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -36,7 +36,7 @@ You get the following response:
 </li>
 </ul>
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-8.png", "alt": "Server-side values", "caption": "Using server-side values in custom functions", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-8.png", "alt": "Server-side values", "caption": "Using server-side values in custom functions", "indent": 1, "aspectRatio": 6 }}
 
 <ul>
 
@@ -67,7 +67,7 @@ export async function getAnimals(
 }
 ```
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/custom-function-params.png", "alt": "Controls for custom function parameters", "caption": "Controls for custom function parameters", "indent": 1, "zoom": false, "width": 639}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-9.png", "alt": "Controls for custom function parameters", "caption": "Controls for custom function parameters", "indent": 1,  "aspectRatio": 6}}
 
 :::info
 Toolpad also provides a `createFunction` API to be able to define your parameters when creating custom functions:

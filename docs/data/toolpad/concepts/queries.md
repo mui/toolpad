@@ -10,13 +10,19 @@ Toolpad uses `react-query` internally to run queries and actions. Look into [its
 
 Queries allow you to bring backend data to your Toolpad page. They are called automatically on page load, so that data is available as state on the page as soon as the user interacts with it. You can modify the following settings for queries:
 
-- **`Enabled`**
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-settings.png", "alt": "Query settings", "caption": "Settings for queries", "indent": 1, "aspectRatio": 6}}
 
-  You can use this option to enable or disable the query from running
+- **`Mode`**
+
+  You can turn a query into an action through this setting.
 
 - **`Refetch interval`**
 
   You can configure the query to run on an interval, for example every 30s.
+
+- **`Enabled`**
+
+  You can use this option to enable or disable the query from running
 
 Queries may be programatically re-fetched via the `refetch` function available on these query objects. For example, for a query named `getOrders`, we can add
 
@@ -35,6 +41,7 @@ createCustomer.call();
 ```
 
 in the `onClick` binding of a Button component.
+
 :::info
 See the [event handling](/toolpad/concepts/event-handling/) section for more details
 :::

@@ -18,6 +18,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import * as url from 'node:url';
 import type { GridRowId } from '@mui/x-data-grid';
+import invariant from 'invariant';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import * as functionsRuntime from './functionsRuntime';
@@ -25,7 +26,6 @@ import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWo
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
-import invariant from 'invariant';
 
 export interface CreateDataProviderOptions {
   paginationMode: PaginationMode;

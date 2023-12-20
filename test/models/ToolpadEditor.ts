@@ -47,7 +47,11 @@ export class ToolpadEditor {
 
   readonly explorer: Locator;
 
+  readonly queriesExplorer: Locator;
+
   readonly confirmationDialog: Locator;
+
+  readonly queryEditorPanel: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -68,7 +72,9 @@ export class ToolpadEditor {
     this.pageOverlay = this.appCanvas.getByTestId('page-overlay');
 
     this.explorer = page.getByTestId('pages-explorer');
+    this.queriesExplorer = page.getByTestId('query-explorer');
     this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });
+    this.queryEditorPanel = page.getByRole('tabpanel', { name: 'Query editor panel', exact: true });
   }
 
   async goto() {

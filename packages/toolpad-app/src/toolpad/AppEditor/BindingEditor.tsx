@@ -649,8 +649,8 @@ export function BindingEditor<V>({
       aria-label={`Bind property "${label}"`}
       checked={hasBinding}
       disabled={disabled}
-      icon={<AddLinkIcon />}
-      checkedIcon={<LinkIcon />}
+      icon={<AddLinkIcon fontSize="inherit" />}
+      checkedIcon={<LinkIcon fontSize="inherit" />}
       onClick={handleOpen}
       color={error ? 'error' : undefined}
       sx={{ visibility: hidden ? 'hidden' : 'visible' }}

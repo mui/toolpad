@@ -29,7 +29,8 @@ test('can place new components from catalog', async ({ page }) => {
 
   await expect(canvasInputLocator).toHaveCount(1);
   await expect(canvasInputLocator).toBeVisible();
-  expect(await page.getByLabel('Node name').inputValue()).toBe('textField');
+
+  await expect(editorModel.componentEditor.getByText('textField')).toBeVisible();
 
   // Drag in a second component
 

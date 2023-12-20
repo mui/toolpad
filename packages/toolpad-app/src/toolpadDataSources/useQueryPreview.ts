@@ -14,10 +14,10 @@ export default function useQueryPreview<Q, P, R extends QueryPreviewResult<any> 
   dofetch: (query: Q, params: P) => Promise<R>,
   query: Q,
   params: P,
-  { onPreview = () => {} }: UseQueryPreviewOptions<R> = {},
+  { onPreview }: UseQueryPreviewOptions<R> = {},
 ) {
   const [preview, setPreview] = React.useState<R | null>(null);
-  const [isLoading, setIsloading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const cancelRunPreview = React.useRef<(() => void) | null>(null);
   const runPreview = React.useCallback(() => {
@@ -28,7 +28,7 @@ export default function useQueryPreview<Q, P, R extends QueryPreviewResult<any> 
       canceled = true;
     };
 
-    setIsloading(true);
+    setIsLoading(true);
     dofetch(query, params)
       .then(
         (result) => {
@@ -42,7 +42,7 @@ export default function useQueryPreview<Q, P, R extends QueryPreviewResult<any> 
         },
       )
       .finally(() => {
-        setIsloading(false);
+        setIsLoading(false);
         cancelRunPreview.current = null;
       });
   }, [dofetch, query, params, onPreview]);

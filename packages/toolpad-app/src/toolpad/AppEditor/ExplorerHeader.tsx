@@ -4,6 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 interface ExplorerHeaderProps {
   headerText: string;
+  headerIcon?: React.ReactNode;
   createLabelText?: string;
   onCreate?: React.MouseEventHandler<HTMLButtonElement>;
 }
@@ -22,6 +23,7 @@ const ExplorerHeaderTitle = styled(Typography)(({ theme }) => ({
 
 export default function ExplorerHeader({
   headerText,
+  headerIcon,
   onCreate,
   createLabelText,
 }: ExplorerHeaderProps) {
@@ -32,6 +34,7 @@ export default function ExplorerHeader({
       justifyContent="space-between"
       sx={{ pl: 2.5 }}
     >
+      {headerIcon}
       <ExplorerHeaderTitle
         variant="body2"
         sx={{

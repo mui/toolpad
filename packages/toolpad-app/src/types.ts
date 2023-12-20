@@ -91,8 +91,7 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
 export type Methods = Record<string, (...args: any[]) => Awaitable<any>>;
 
-export interface QueryEditorProps<C, Q, A extends Methods = {}>
-  extends WithControlledProp<appDom.QueryNode<Q>> {
+export interface QueryEditorProps<C, Q, A extends Methods = {}> {
   connectionParams: Maybe<C>;
   execApi: <K extends keyof A>(
     query: K,
@@ -100,7 +99,10 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}>
   ) => Promise<Awaited<ReturnType<A[K]>>>;
   globalScope: Record<string, any>;
   globalScopeMeta: ScopeMeta;
-  onChange: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
+  value: appDom.QueryNode<Q>;
+  onSave?: (newNode: appDom.QueryNode<Q>) => void;
+  settingsTab?: React.ReactNode;
+  onChange?: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;
   runtimeConfig: RuntimeConfig;
 }

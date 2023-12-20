@@ -1,116 +1,109 @@
 import * as React from 'react';
+import LoadingButton from '@mui/lab/LoadingButton';
 import { BindableAttrEntries } from '@mui/toolpad-core';
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  InputBase,
-  Popover,
-  Skeleton,
-  Stack,
-  Typography,
-  generateUtilityClasses,
-  styled,
-} from '@mui/material';
+import { Alert, Box, Divider, Stack, Tab } from '@mui/material';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
+
 import { useQuery } from '@tanstack/react-query';
-import { ensureSuffix } from '@mui/toolpad-utils/strings';
-import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
+import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import TabPanel from '../../components/TabPanel';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
 import {
   useEvaluateLiveBindingEntries,
   useEvaluateLiveBindings,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
-import * as appDom from '../../appDom';
+import { useAppState, useAppStateApi } from '../../toolpad/AppState';
+import { QueryEditorTabType, QueryEditorToolsTabType } from '../../utils/domView';
+import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import JsonView from '../../components/JsonView';
 import OpenCodeEditorButton from '../../toolpad/OpenCodeEditor';
 import useQueryPreview from '../useQueryPreview';
-import QueryInputPanel from '../QueryInputPanel';
 import QueryPreview from '../QueryPreview';
 import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl, usePropControlsContext } from '../../toolpad/propertyControls';
-import { parseFunctionId, parseLegacyFunctionId, serializeFunctionId } from './shared';
-import FlexFill from '../../components/FlexFill';
-import { FileIntrospectionResult } from '../../server/functionsTypesWorker';
-
-const fileTreeItemClasses = generateUtilityClasses('FileTreeItem', ['actionButton', 'handlerItem']);
-
-const FileTreeItemRoot = styled(TreeItem)(({ theme }) => ({
-  [`& .${treeItemClasses.label}`]: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 2,
-    paddingRight: 0,
-
-    [`&:hover .${fileTreeItemClasses.actionButton}`]: {
-      visibility: 'visible',
-    },
-  },
-
-  [`& .${fileTreeItemClasses.actionButton}`]: {
-    visibility: 'hidden',
-  },
-
-  [`& .${fileTreeItemClasses.handlerItem} .${treeItemClasses.label}`]: {
-    fontSize: '0.8em',
-    padding: 0,
-    fontFamily: theme.typography.fontFamilyCode,
-  },
-}));
-
-interface HandlerFileTreeItemProps {
-  file: FileIntrospectionResult;
-}
-
-function HandlerFileTreeItem({ file }: HandlerFileTreeItemProps) {
-  return (
-    <FileTreeItemRoot
-      key={file.name}
-      nodeId={serializeFunctionId({ file: file.name })}
-      label={
-        <React.Fragment>
-          {file.name}
-          <FlexFill />
-          <OpenCodeEditorButton iconButton filePath={file.name} fileType="resource" />
-        </React.Fragment>
-      }
-    >
-      {file.handlers.map((handler) => {
-        return (
-          <TreeItem
-            className={fileTreeItemClasses.handlerItem}
-            key={handler.name}
-            nodeId={serializeFunctionId({ file: file.name, handler: handler.name })}
-            label={handler.name}
-          />
-        );
-      })}
-    </FileTreeItemRoot>
-  );
-}
+import { parseLegacyFunctionId, serializeFunctionId, transformLegacyFunctionId } from './shared';
+import FunctionSelector from './FunctionSelector';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
+
+interface ResolvedPreviewProps {
+  preview: any;
+}
+
+function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement | null {
+  if (!preview) {
+    return (
+      <Alert
+        severity="info"
+        sx={(theme) => ({
+          my: theme.spacing(2),
+          mx: 'auto',
+          p: theme.spacing(1),
+          fontSize: theme.typography.pxToRem(11),
+          width: 'fit-content',
+        })}
+      >
+        No request has been sent yet. <br />
+        Click Run
+        <PlayArrowIcon
+          aria-label="Run preview"
+          sx={{ verticalAlign: 'middle', fontSize: '12px', mr: 0.25 }}
+        />
+        to preview the response here.
+      </Alert>
+    );
+  }
+
+  const { data } = preview;
+
+  return <JsonView sx={{ height: '100%' }} src={data} copyToClipboard />;
+}
 
 function QueryEditor({
   globalScope,
   globalScopeMeta,
   value: input,
-  onChange: setInput,
+  settingsTab,
   execApi,
 }: QueryEditorProps<LocalConnectionParams, LocalQuery, LocalPrivateApi>) {
+  const appStateApi = useAppStateApi();
+  const { currentView } = useAppState();
   const introspection = useQuery({
     queryKey: ['introspection'],
     queryFn: () => execApi('introspection', []),
     retry: false,
   });
+
+  const updateProp = React.useCallback(
+    function updateProp<K extends keyof LocalQuery>(prop: K, value: LocalQuery[K]) {
+      appStateApi.updateQueryDraft((draft) => ({
+        ...draft,
+        attributes: {
+          ...draft.attributes,
+          query: {
+            ...draft.attributes.query,
+            [prop]: value,
+          },
+        },
+      }));
+    },
+    [appStateApi],
+  );
+
+  const currentTab = React.useMemo(() => {
+    if (
+      currentView.kind === 'page' &&
+      currentView.view?.kind === 'query' &&
+      currentView.queryPanel?.currentTabIndex !== undefined
+    ) {
+      return currentView.queryPanel?.queryTabs?.[currentView.queryPanel?.currentTabIndex];
+    }
+    return null;
+  }, [currentView]);
 
   const propTypeControls = usePropControlsContext();
 
@@ -119,22 +112,21 @@ function QueryEditor({
     ? parseLegacyFunctionId(input.attributes.query.function)
     : {};
 
-  const selectedNodeId: string | undefined = selectedFile
-    ? serializeFunctionId({
-        file: selectedFile,
-        handler: selectedFunction,
-      })
-    : undefined;
-
   const selectedOption = React.useMemo(() => {
     return introspection.data?.files
       .find((file) => file.name === selectedFile)
       ?.handlers.find((handler) => handler.name === selectedFunction);
   }, [introspection.data?.files, selectedFile, selectedFunction]);
 
-  const parameterDefs = Object.fromEntries(selectedOption?.parameters || []);
+  const parameterDefs = React.useMemo(
+    () => Object.fromEntries(selectedOption?.parameters || []),
+    [selectedOption?.parameters],
+  );
 
-  const paramsEntries = input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS;
+  const paramsEntries = React.useMemo(
+    () => input.params?.filter(([key]) => !!parameterDefs[key]) || EMPTY_PARAMS,
+    [input.params, parameterDefs],
+  );
 
   const paramsObject = Object.fromEntries(paramsEntries);
 
@@ -151,21 +143,40 @@ function QueryEditor({
     [paramsEditorLiveValue],
   );
 
+  const handleToolsTabTypeChange = React.useCallback(
+    (value: QueryEditorToolsTabType) => {
+      appStateApi.updateQueryTab((tab) => ({
+        ...tab,
+        toolsTabType: value,
+      }));
+    },
+    [appStateApi],
+  );
+
   const fetchServerPreview = React.useCallback(
-    async (query: LocalQuery, params: Record<string, string>) =>
-      execApi('debugExec', [query, params]),
+    async (query: LocalQuery, params: Record<string, string>) => {
+      return execApi('debugExec', [query, params]);
+    },
     [execApi],
   );
 
-  const {
-    preview,
-    runPreview: handleRunPreview,
-    isLoading: previewIsLoading,
-  } = useQueryPreview(
+  const { preview, runPreview, isLoading } = useQueryPreview(
     fetchServerPreview,
     input.attributes.query,
     previewParams as Record<string, string>,
   );
+
+  const handleRunPreview = React.useCallback(() => {
+    runPreview();
+  }, [runPreview]);
+
+  React.useEffect(() => {
+    appStateApi.updateQueryTab((tab) => ({
+      ...tab,
+      previewHandler: handleRunPreview,
+      isPreviewLoading: isLoading,
+    }));
+  }, [handleRunPreview, appStateApi, isLoading]);
 
   const liveBindings = useEvaluateLiveBindings({
     jsRuntime: jsBrowserRuntime,
@@ -173,227 +184,222 @@ function QueryEditor({
     globalScope,
   });
 
-  const setSelectedHandler = React.useCallback(
-    (id: string) => {
-      setInput((draft) => {
-        return appDom.setQueryProp(draft, 'function', id);
-      });
-    },
-    [setInput],
-  );
-
   const handleSelectFunction = React.useCallback(
-    (_event: React.SyntheticEvent, nodeId: string) => {
-      const parsed = parseFunctionId(nodeId);
-      if (parsed.handler) {
-        setSelectedHandler(nodeId);
-      }
+    (functionId: string) => {
+      updateProp('function', functionId);
     },
-    [setSelectedHandler],
+    [updateProp],
   );
 
-  const handlerTreeRef = React.useRef<HTMLUListElement>(null);
+  const proposedFileName = React.useMemo(() => {
+    const existingNames = new Set(introspection.data?.files.map((file) => file.name) || []);
+    const baseName = 'functions';
+    let counter = 2;
 
-  React.useEffect(() => {
-    handlerTreeRef.current?.querySelector(`.${treeItemClasses.selected}`)?.scrollIntoView();
-  }, []);
+    while (existingNames.has(`${baseName}${counter}.ts`)) {
+      counter += 1;
+    }
 
-  const [newHandlerInput, setNewHandlerInput] = React.useState('');
-  const [newHandlerLoading, setNewHandlerLoading] = React.useState(false);
-
-  const {
-    value: isCreateNewHandlerOpen,
-    setTrue: handleOpenCreateNewHandler,
-    setFalse: handleCloseCreateNewHandlerDialog,
-  } = useBoolean(false);
-
-  const handleCloseCreateNewHandler = React.useCallback(() => {
-    setNewHandlerInput('');
-    handleCloseCreateNewHandlerDialog();
-  }, [handleCloseCreateNewHandlerDialog]);
-
-  const [expanded, setExpanded] = React.useState<string[]>(selectedFile ? [selectedFile] : []);
-
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  const createNewInputRef = React.useRef(null);
-  const open = !!anchorEl;
-
-  const inputError: string | null = React.useMemo(() => {
-    const alreadyExists = introspection.data?.files.some(
-      (file) => file.name === newHandlerInput || file.name === ensureSuffix(newHandlerInput, '.ts'),
-    );
-
-    return alreadyExists ? 'File already exists' : null;
-  }, [introspection.data?.files, newHandlerInput]);
-
-  React.useEffect(() => {
-    setAnchorEl(inputError ? createNewInputRef.current : null);
-  }, [inputError]);
+    return `${baseName}${counter}.ts`;
+  }, [introspection.data?.files]);
 
   const handleCreateNewCommit = React.useCallback(async () => {
-    if (!newHandlerInput || inputError || newHandlerLoading) {
-      handleCloseCreateNewHandler();
-      return;
-    }
-
-    const fileName = ensureSuffix(newHandlerInput, '.ts');
-
-    setNewHandlerLoading(true);
     try {
-      await execApi('createNew', [fileName]);
+      await execApi('createNew', [proposedFileName]);
       await introspection.refetch();
     } catch (error) {
-      // eslint-disable-next-line no-alert
-      window.alert(errorFrom(error).message);
-    } finally {
-      setNewHandlerLoading(false);
+      console.error(errorFrom(error).message);
     }
+    return serializeFunctionId({ file: proposedFileName, handler: 'default' });
+  }, [execApi, introspection, proposedFileName]);
 
-    const newNodeId = serializeFunctionId({ file: fileName, handler: 'default' });
-    setSelectedHandler(newNodeId);
-    setExpanded([fileName]);
-    handleCloseCreateNewHandler();
-  }, [
-    execApi,
-    handleCloseCreateNewHandler,
-    inputError,
-    introspection,
-    newHandlerInput,
-    newHandlerLoading,
-    setSelectedHandler,
-  ]);
+  const handleTabTypeChange = React.useCallback(
+    (value: QueryEditorTabType) => {
+      appStateApi.updateQueryTab((tab) => ({
+        ...tab,
+        tabType: value,
+      }));
+    },
+    [appStateApi],
+  );
 
-  return (
-    <PanelGroup direction="horizontal">
-      <Panel defaultSize={50} minSize={20}>
-        <QueryInputPanel
-          previewDisabled={!selectedOption}
-          onRunPreview={handleRunPreview}
-          actions={<Button onClick={handleOpenCreateNewHandler}>New handler file</Button>}
-        >
-          <Stack direction="row" sx={{ gap: 2, height: '100%', mx: 3 }}>
-            <Box sx={{ position: 'relative', overflow: 'auto', height: '100%', width: '40%' }}>
-              <TreeView
-                ref={handlerTreeRef}
-                selected={selectedNodeId}
-                onNodeSelect={handleSelectFunction}
-                defaultCollapseIcon={<ExpandMoreIcon />}
-                defaultExpandIcon={<ChevronRightIcon />}
-                expanded={expanded}
-                onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
+  return currentTab ? (
+    <PanelGroup autoSaveId="toolpad/local-panel" direction="horizontal">
+      <Panel
+        defaultSize={50}
+        minSize={40}
+        style={{ overflow: 'auto', scrollbarGutter: 'stable' }}
+        id="local-query-left"
+      >
+        <TabContext value={currentTab?.tabType ?? 'config'}>
+          <Stack direction="column" gap={0}>
+            <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <TabList
+                sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                onChange={(event, value) => handleTabTypeChange(value)}
+                aria-label="Query editor active tab type"
               >
-                {isCreateNewHandlerOpen ? (
-                  <TreeItem
-                    nodeId="::create::"
-                    label={
-                      <React.Fragment>
-                        <InputBase
-                          ref={createNewInputRef}
-                          value={newHandlerInput}
-                          onChange={(event) =>
-                            setNewHandlerInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''))
-                          }
-                          autoFocus
-                          disabled={newHandlerLoading}
-                          endAdornment={newHandlerLoading ? <CircularProgress size={16} /> : null}
-                          onBlur={handleCreateNewCommit}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter') {
-                              handleCreateNewCommit();
-                            } else if (event.key === 'Escape') {
-                              handleCloseCreateNewHandler();
-                              event.stopPropagation();
-                            }
-                          }}
-                        />
-                        <Popover
-                          open={open}
-                          anchorEl={anchorEl}
-                          onClose={() => setAnchorEl(null)}
-                          disableAutoFocus
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          }}
-                        >
-                          <Alert severity="error" variant="outlined">
-                            {inputError}
-                          </Alert>
-                        </Popover>
-                      </React.Fragment>
-                    }
-                  />
-                ) : null}
-
-                {introspection.data?.files?.map((file) => (
-                  <HandlerFileTreeItem key={file.name} file={file} />
-                ))}
-
-                {introspection.isLoading ? (
-                  <React.Fragment>
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                  </React.Fragment>
-                ) : null}
-              </TreeView>
-              {introspection.error ? (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    inset: '0 0 0 0',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  {errorFrom(introspection.error).message}
-                </Box>
-              ) : null}
-            </Box>
-
-            <Stack sx={{ gap: 1, flex: 1, overflow: 'auto' }}>
-              <Typography>Parameters:</Typography>
-              {Object.entries(parameterDefs).map(([name, definiton]) => {
-                const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
-                return Control ? (
-                  <BindableEditor
-                    key={name}
-                    liveBinding={liveBindings[name]}
-                    globalScope={globalScope}
-                    globalScopeMeta={globalScopeMeta}
-                    label={name}
-                    propType={definiton}
-                    jsRuntime={jsBrowserRuntime}
-                    renderControl={(renderControlParams) => (
-                      <Control {...renderControlParams} propType={definiton} />
-                    )}
-                    value={paramsObject[name]}
-                    onChange={(newValue) => {
-                      const paramKeys = Object.keys(parameterDefs);
-                      const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
-                        const paramValue = key === name ? newValue : paramsObject[key];
-                        return paramValue ? [[key, paramValue]] : [];
-                      });
-                      setInput((existing) => ({
-                        ...existing,
-                        params: newParams,
-                      }));
-                    }}
-                  />
-                ) : null;
-              })}
+                <Tab label="Config" value="config" />
+                <Tab label="Settings" value="settings" />
+              </TabList>
             </Stack>
+
+            <Divider />
+            <TabPanel value="config" disableGutters>
+              <Stack
+                display="flex"
+                flexDirection={'row'}
+                sx={{
+                  alignItems: 'flex-start',
+                  mt: 2,
+                  mx: 2,
+                }}
+              >
+                <FunctionSelector
+                  files={introspection.data?.files || []}
+                  selectedFunctionId={transformLegacyFunctionId(
+                    input.attributes.query.function || '',
+                  )}
+                  onCreateNew={handleCreateNewCommit}
+                  onSelect={handleSelectFunction}
+                />
+                <OpenCodeEditorButton
+                  filePath={selectedFile ?? ''}
+                  fileType="resource"
+                  disableRipple
+                  sx={(theme) => ({
+                    marginTop: theme.spacing(1),
+                    marginLeft: theme.spacing(1),
+                    border: '1px solid',
+                    borderColor: theme.palette.divider,
+                  })}
+                />
+                {introspection.error ? (
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: '0 0 0 0',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {errorFrom(introspection.error).message}
+                  </Box>
+                ) : null}
+              </Stack>
+            </TabPanel>
+            <TabPanel value="settings" disableGutters>
+              {settingsTab}
+            </TabPanel>
           </Stack>
-        </QueryInputPanel>
+        </TabContext>
       </Panel>
       <PanelResizeHandle />
-      <Panel defaultSize={50} minSize={20}>
-        <QueryPreview isLoading={previewIsLoading} error={preview?.error}>
-          <JsonView sx={{ height: '100%' }} copyToClipboard src={preview?.data} />
-        </QueryPreview>
+      <Panel id="local-query-right" defaultSize={50} minSize={20}>
+        <PanelGroup autoSaveId="toolpad/local/params-tools-split" direction="vertical">
+          <Panel
+            id="parameters-editor"
+            defaultSize={50}
+            style={{ overflow: 'auto', scrollbarGutter: 'stable' }}
+          >
+            <Box display={'flex'} flexDirection={'column'}>
+              <TabContext value="parameters">
+                <TabList
+                  sx={{
+                    '& button': { fontSize: 12, fontWeight: 'normal', cursor: 'default' },
+                  }}
+                  aria-label="Query editor parameters"
+                >
+                  <Tab label="Parameters" value="parameters" />
+                </TabList>
+
+                <Divider sx={{ mb: 1.5 }} />
+                <TabPanel value="parameters" disableGutters sx={{ ml: 1 }}>
+                  <Grid2 display="grid" gridTemplateColumns={'1fr 1fr 1fr'} gap={2}>
+                    {Object.entries(parameterDefs).map(([name, definiton]) => {
+                      const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
+                      return Control ? (
+                        <BindableEditor
+                          key={name}
+                          liveBinding={liveBindings[name]}
+                          globalScope={globalScope}
+                          globalScopeMeta={globalScopeMeta}
+                          label={name}
+                          propType={definiton}
+                          jsRuntime={jsBrowserRuntime}
+                          renderControl={(renderControlParams) => (
+                            <Control {...renderControlParams} propType={definiton} />
+                          )}
+                          value={paramsObject[name]}
+                          onChange={(newValue) => {
+                            const paramKeys = Object.keys(parameterDefs);
+                            const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
+                              const paramValue = key === name ? newValue : paramsObject[key];
+                              return paramValue ? [[key, paramValue]] : [];
+                            });
+                            appStateApi.updateQueryDraft((draft) => ({
+                              ...draft,
+                              params: newParams,
+                            }));
+                          }}
+                        />
+                      ) : null;
+                    })}
+                  </Grid2>
+                </TabPanel>
+              </TabContext>
+            </Box>
+          </Panel>
+          <PanelResizeHandle />
+
+          <Panel
+            id="preview"
+            defaultSize={50}
+            style={{ overflow: 'auto', scrollbarGutter: 'stable' }}
+          >
+            <TabContext value={currentTab.toolsTabType}>
+              <Box
+                sx={{
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                  display: 'flex',
+                  height: 32,
+                  justifyContent: 'space-between',
+                }}
+              >
+                <TabList
+                  sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+                  onChange={(event, value) => handleToolsTabTypeChange(value)}
+                  aria-label="Query tools active tab"
+                >
+                  <Tab label="Preview" value="preview" />
+                </TabList>
+                <LoadingButton
+                  variant="text"
+                  size="small"
+                  loading={isLoading}
+                  disabled={isLoading}
+                  onClick={runPreview}
+                  endIcon={<PlayArrowIcon aria-label="Run preview" onClick={runPreview} />}
+                >
+                  Run
+                </LoadingButton>
+              </Box>
+              <TabPanel value="preview" disableGutters>
+                <QueryPreview isLoading={currentTab.isPreviewLoading} error={preview?.error}>
+                  <ResolvedPreview preview={preview} />
+                </QueryPreview>
+              </TabPanel>
+            </TabContext>
+          </Panel>
+        </PanelGroup>
       </Panel>
     </PanelGroup>
+  ) : (
+    <Alert severity="error">
+      An error occurred while rendering this tab. Please refresh and try again.
+    </Alert>
   );
 }
 
@@ -402,7 +408,7 @@ function getInitialQueryValue(): LocalQuery {
 }
 
 const dataSource: ClientDataSource<LocalConnectionParams, LocalQuery, LocalPrivateApi> = {
-  displayName: 'Local',
+  displayName: 'Custom',
   QueryEditor,
   getInitialQueryValue,
   hasDefault: true,

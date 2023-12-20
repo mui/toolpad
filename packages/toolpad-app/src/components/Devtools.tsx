@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TabPanel, TabContext, TabList } from '@mui/lab';
 import { Box, IconButton, styled, SxProps, Tab } from '@mui/material';
-import { Har } from 'har-format';
+import type { Har } from 'har-format';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import Console, { LogEntry } from './Console';
 import lazyComponent from '../utils/lazyComponent';

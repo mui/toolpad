@@ -100,8 +100,10 @@ export default createDataProvider({
   },
 
   async deleteRecord(id) {
-    await model.delete({
-      where: { id: Number(id) },
-    });
+    await model.delete({ where: { id: Number(id) } });
+  },
+
+  async updateRecord(id, data) {
+    await model.update({ where: { id: Number(id) }, data });
   },
 });

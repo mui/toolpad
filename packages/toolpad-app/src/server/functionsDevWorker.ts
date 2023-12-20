@@ -36,8 +36,9 @@ function loadModule(fullPath: string, content: string) {
   const moduleRequire = createRequire(url.pathToFileURL(fullPath));
   const moduleObject: ModuleObject = { exports: {} };
 
-  const serverRuntime = moduleRequire('@mui/toolpad-core/serverRuntime');
-  serverRuntime.initStore(initialContextStore);
+  const toolpadServer = moduleRequire('@mui/toolpad/server');
+  // eslint-disable-next-line no-underscore-dangle
+  toolpadServer.__initContextStore(initialContextStore);
 
   vm.runInThisContext(`((require, exports, module) => {\n${content}\n})`)(
     moduleRequire,
@@ -126,7 +127,7 @@ const dataProviderSchema: z.ZodType<ToolpadDataProvider<any, any>> = z.object({
   paginationMode: z.enum(['index', 'cursor']).optional().default('index'),
   getRecords: z.function(z.tuple([z.any()]), z.any()),
   deleteRecord: z.function(z.tuple([z.any()]), z.any()).optional(),
-  updateRecord: z.function(z.tuple([z.any()]), z.any()).optional(),
+  updateRecord: z.function(z.tuple([z.any(), z.any()]), z.any()).optional(),
   createRecord: z.function(z.tuple([z.any()]), z.any()).optional(),
   [TOOLPAD_DATA_PROVIDER_MARKER]: z.literal(true),
 });
@@ -160,6 +161,8 @@ async function introspectDataProvider(
   return {
     paginationMode: dataProvider.paginationMode,
     hasDeleteRecord: !!dataProvider.deleteRecord,
+    hasUpdateRecord: !!dataProvider.updateRecord,
+    hasCreateRecord: !!dataProvider.createRecord,
   };
 }
 
@@ -183,11 +186,34 @@ async function deleteDataProviderRecord(
   return dataProvider.deleteRecord(id);
 }
 
+async function updateDataProviderRecord(
+  filePath: string,
+  name: string,
+  id: GridRowId,
+  values: Record<string, unknown>,
+): Promise<void> {
+  const dataProvider = await loadDataProvider(filePath, name);
+  invariant(dataProvider.updateRecord, 'DataProvider does not support updateRecord');
+  return dataProvider.updateRecord(id, values);
+}
+
+async function createDataProviderRecord(
+  filePath: string,
+  name: string,
+  values: Record<string, unknown>,
+): Promise<void> {
+  const dataProvider = await loadDataProvider(filePath, name);
+  invariant(dataProvider.createRecord, 'DataProvider does not support createRecord');
+  return dataProvider.createRecord(values);
+}
+
 type WorkerRpcServer = {
   execute: typeof execute;
   introspectDataProvider: typeof introspectDataProvider;
   getDataProviderRecords: typeof getDataProviderRecords;
   deleteDataProviderRecord: typeof deleteDataProviderRecord;
+  updateDataProviderRecord: typeof updateDataProviderRecord;
+  createDataProviderRecord: typeof createDataProviderRecord;
 };
 
 if (!isMainThread && parentPort) {
@@ -196,6 +222,8 @@ if (!isMainThread && parentPort) {
     introspectDataProvider,
     getDataProviderRecords,
     deleteDataProviderRecord,
+    updateDataProviderRecord,
+    createDataProviderRecord,
   });
 }
 
@@ -237,24 +265,11 @@ export function createWorker(env: Record<string, any>) {
       return result;
     },
 
-    async introspectDataProvider(
-      filePath: string,
-      name: string,
-    ): Promise<ToolpadDataProviderIntrospection> {
-      return client.introspectDataProvider(filePath, name);
-    },
-
-    async getDataProviderRecords<R, P extends PaginationMode>(
-      filePath: string,
-      name: string,
-      params: GetRecordsParams<R, P>,
-    ): Promise<GetRecordsResult<R, P>> {
-      return client.getDataProviderRecords(filePath, name, params);
-    },
-
-    async deleteDataProviderRecord(filePath: string, name: string, id: GridRowId): Promise<void> {
-      return client.deleteDataProviderRecord(filePath, name, id);
-    },
+    introspectDataProvider: client.introspectDataProvider.bind(client),
+    getDataProviderRecords: client.getDataProviderRecords.bind(client),
+    deleteDataProviderRecord: client.deleteDataProviderRecord.bind(client),
+    updateDataProviderRecord: client.updateDataProviderRecord.bind(client),
+    createDataProviderRecord: client.createDataProviderRecord.bind(client),
   };
 }
 

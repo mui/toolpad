@@ -17,7 +17,11 @@ let contextStore = new AsyncLocalStorage<ServerContext>();
 
 export const initialContextStore = contextStore;
 
-export function initStore(store: AsyncLocalStorage<ServerContext>) {
+/**
+ * INTERNAL: Do not use
+ */
+// eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
+export function __initContextStore(store: AsyncLocalStorage<ServerContext>) {
   contextStore = store;
 }
 

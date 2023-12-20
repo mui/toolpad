@@ -31,8 +31,8 @@ commands:
       - run:
           name: Install pnpm package manager
           command: |
-            corepack enable
-            corepack prepare pnpm@latest --activate
+            corepack enable --install-directory ~/bin
+            corepack prepare pnpm@latest-8 --activate
 
       - when:
           condition: << parameters.browsers >>

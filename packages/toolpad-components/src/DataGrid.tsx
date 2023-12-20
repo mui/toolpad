@@ -698,7 +698,7 @@ function useDataProviderDataGridProps(
             <IconButton
               key="commit"
               size="small"
-              aria-label={`Edit row with id "${id}"`}
+              aria-label={`Save updates to row with id "${id}"`}
               disabled={rowIsUpdating}
               onClick={async () => {
                 api.stopRowEditMode({ id });
@@ -709,7 +709,7 @@ function useDataProviderDataGridProps(
             <IconButton
               key="cancel"
               size="small"
-              aria-label="Cancel"
+              aria-label="Cancel updates"
               disabled={rowIsUpdating}
               onClick={() => {
                 api.stopRowEditMode({ id, ignoreModifications: true });
@@ -879,8 +879,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const hasExplicitRowId: boolean = React.useMemo(() => {
     const hasRowIdField: boolean = !!(rowIdFieldProp && rowIdFieldProp !== 'id');
-    const parsedRows = rowsInput;
-    return parsedRows.length === 0 || hasRowIdField || !!parsedRows[0].id;
+    return hasRowIdField || rowsInput.length === 0 || rowsInput[0].id !== undefined;
   }, [rowIdFieldProp, rowsInput]);
 
   const rows: GridRowsProp = React.useMemo(

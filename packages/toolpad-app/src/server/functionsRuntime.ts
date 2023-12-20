@@ -4,13 +4,9 @@ import * as fs from 'fs/promises';
 import * as vm from 'vm';
 import * as url from 'node:url';
 import { initialContextStore } from '@mui/toolpad-core/serverRuntime';
-import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@mui/toolpad-core/server';
 import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
-import { GetRecordsParams, GetRecordsResult, PaginationMode } from '@mui/toolpad-core';
-import invariant from 'invariant';
-import type { GridRowId } from '@mui/x-data-grid';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 
@@ -38,7 +34,7 @@ function loadModule(fullPath: string, content: string) {
   return moduleObject;
 }
 
-async function resolveExports(filePath: string): Promise<Map<string, unknown>> {
+async function loadExports(filePath: string): Promise<Map<string, unknown>> {
   const fullPath = path.resolve(filePath);
   const content = await fs.readFile(fullPath, 'utf-8');
 
@@ -66,11 +62,11 @@ const dataProviderSchema: z.ZodType<ToolpadDataProvider<any, any>> = z.object({
   [TOOLPAD_DATA_PROVIDER_MARKER]: z.literal(true),
 });
 
-async function loadDataProvider(
+export async function loadDataProvider(
   filePath: string,
   name: string,
 ): Promise<ToolpadDataProvider<any, any>> {
-  const exports = await resolveExports(filePath);
+  const exports = await loadExports(filePath);
   const dataProviderExport = exports.get(name);
 
   if (!dataProviderExport || typeof dataProviderExport !== 'object') {
@@ -86,40 +82,8 @@ async function loadDataProvider(
   throw fromZodError(parsed.error);
 }
 
-export async function introspectDataProvider(
-  filePath: string,
-  name: string,
-): Promise<ToolpadDataProviderIntrospection> {
-  const dataProvider = await loadDataProvider(filePath, name);
-
-  return {
-    paginationMode: dataProvider.paginationMode,
-    hasDeleteRecord: !!dataProvider.deleteRecord,
-  };
-}
-
-export async function getDataProviderRecords<R, P extends PaginationMode>(
-  filePath: string,
-  name: string,
-  params: GetRecordsParams<R, P>,
-): Promise<GetRecordsResult<R, P>> {
-  const dataProvider = await loadDataProvider(filePath, name);
-
-  return dataProvider.getRecords(params);
-}
-
-export async function deleteDataProviderRecord(
-  filePath: string,
-  name: string,
-  id: GridRowId,
-): Promise<void> {
-  const dataProvider = await loadDataProvider(filePath, name);
-  invariant(dataProvider.deleteRecord, 'DataProvider does not support deleteRecord');
-  return dataProvider.deleteRecord(id);
-}
-
 export async function execute(filePath: string, name: string, parameters: unknown[]): Promise<any> {
-  const exports = await resolveExports(filePath);
+  const exports = await loadExports(filePath);
 
   const fn = exports.get(name);
   if (typeof fn !== 'function') {

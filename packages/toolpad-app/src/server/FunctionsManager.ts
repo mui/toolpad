@@ -25,6 +25,7 @@ import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWo
 import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
+import invariant from 'invariant';
 
 export interface CreateDataProviderOptions {
   paginationMode: PaginationMode;
@@ -374,7 +375,11 @@ export default class FunctionsManager {
     exportName: string = 'default',
   ): Promise<ToolpadDataProviderIntrospection> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
-    return functionsRuntime.introspectDataProvider(fullPath, exportName);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    return {
+      paginationMode: dataProvider.paginationMode,
+      hasDeleteRecord: !!dataProvider.deleteRecord,
+    };
   }
 
   async getDataProviderRecords<R, P extends PaginationMode>(
@@ -383,7 +388,8 @@ export default class FunctionsManager {
     params: GetRecordsParams<R, P>,
   ): Promise<GetRecordsResult<R, P>> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
-    return functionsRuntime.getDataProviderRecords(fullPath, exportName, params);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    return dataProvider.getRecords(params);
   }
 
   async deleteDataProviderRecord(
@@ -392,6 +398,8 @@ export default class FunctionsManager {
     id: GridRowId,
   ): Promise<void> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
-    return functionsRuntime.deleteDataProviderRecord(fullPath, exportName, id);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    invariant(dataProvider.deleteRecord, 'DataProvider does not support deleteRecord');
+    return dataProvider.deleteRecord(id);
   }
 }

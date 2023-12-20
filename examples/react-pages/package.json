@@ -10,7 +10,7 @@
   "dependencies": {
     "@mui/material": "5.15.1",
     "@mui/toolpad": "0.1.41",
-    "@mui/x-data-grid": "6.18.4",
+    "@mui/x-data-grid": "6.18.5",
     "@tanstack/react-query": "5.14.1"
   },
   "devDependencies": {}

@@ -11,4 +11,8 @@ export default createDataProvider({
   async deleteRecord(id) {
     DATA = DATA.filter((item) => item.id !== id);
   },
+
+  async updateRecord(id, updates) {
+    DATA = DATA.map((item) => (item.id === id ? { ...item, ...updates } : item));
+  },
 });

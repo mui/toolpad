@@ -68,7 +68,7 @@ function getSnapshot() {
 }
 
 export interface DatePickerProps
-  extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue'>,
+  extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue' | 'name'>,
     Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'> {
   value?: string;
   onChange: (newValue: string | null) => void;

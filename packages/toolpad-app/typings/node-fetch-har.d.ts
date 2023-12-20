@@ -1,5 +1,5 @@
 declare module 'node-fetch-har' {
-  import { Har } from 'har-format';
+  import type { Har } from 'har-format';
   import fetch from 'node-fetch';
 
   export interface WithHarOptions {

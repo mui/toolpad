@@ -8,7 +8,7 @@ import {
   PropValueType,
   ToolpadDataProviderBase,
 } from './types';
-import { ServerContext, getServerContext } from './serverRuntime';
+import { ServerContext, __initContextStore, getServerContext } from './serverRuntime';
 
 /**
  * The runtime configuration for a Toolpad function. Describes the parameters it accepts and their
@@ -140,3 +140,5 @@ export function createDataProvider<R, P extends PaginationMode = 'index'>(
 ): ToolpadDataProvider<R, P> {
   return Object.assign(input, { [TOOLPAD_DATA_PROVIDER_MARKER]: true as const });
 }
+
+export { __initContextStore };

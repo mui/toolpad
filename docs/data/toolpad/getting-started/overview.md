@@ -8,7 +8,7 @@ Toolpad is a self-hosted, low-code internal tool builder. It is open-sourced, an
 Toolpad is designed for any developer who wants to create internal apps faster.
 Drag and drop pre-built UI components, connect your data sources, release your app, and you're done! Check out the interactive product walkthrough of Toolpad below:
 
-<iframe id="toolpad-first-app" src="https://demo.arcade.software/MDlpNzHbuXwvPh4MK9ff?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen title="Default page | Toolpad editor" style="width: 100%; height: min(60vw, 500px); border-radius: 0.75rem"></iframe>
+<iframe id="toolpad-first-app" src="https://demo.arcade.software/IpenLZL7QdOH6kkuNClX?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen title="Default page | Toolpad editor" style="width: 100%; height: min(60vw, 500px); border-radius: 0.75rem"></iframe>
 
 > You can check out the demo video [here](https://github.com/mui/mui-toolpad#product-walkthrough).
 

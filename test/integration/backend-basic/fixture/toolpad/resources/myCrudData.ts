@@ -5,7 +5,6 @@ let DATA = Array.from({ length: 100_000 }, (_, id) => ({ id, name: `Index item $
 export default createDataProvider({
   async getRecords({ paginationModel: { start = 0, pageSize } }) {
     const records = DATA.slice(start, start + pageSize);
-    console.log(records);
     return { records, totalCount: DATA.length };
   },
 

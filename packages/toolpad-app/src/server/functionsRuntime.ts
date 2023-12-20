@@ -26,7 +26,7 @@ function loadModule(fullPath: string, content: string) {
   const moduleObject: ModuleObject = { exports: {} };
 
   const serverRuntime = moduleRequire('@mui/toolpad-core/serverRuntime');
-  serverRuntime.initStore(initialContextStore);
+  serverRuntime.__initContextStore(initialContextStore);
 
   vm.runInThisContext(`((require, exports, module) => {\n${content}\n})`)(
     moduleRequire,

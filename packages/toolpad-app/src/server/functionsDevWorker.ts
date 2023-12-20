@@ -23,10 +23,7 @@ import invariant from 'invariant';
 import type { GridRowId } from '@mui/x-data-grid';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
-
-export function getWorkerPath() {
-  return url.fileURLToPath(import.meta.url);
-}
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 interface ModuleObject {
   exports: Record<string, unknown>;
@@ -232,7 +229,7 @@ if (!isMainThread && parentPort) {
 
 export function createWorker(env: Record<string, any>) {
   const workerRpcChannel = new MessageChannel();
-  const worker = new Worker(getWorkerPath(), {
+  const worker = new Worker(path.resolve(currentDirectory, '../cli/functionsDevWorker.mjs'), {
     env,
     workerData: {
       workerRpcPort: workerRpcChannel.port1,

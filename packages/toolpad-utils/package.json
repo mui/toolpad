@@ -55,6 +55,7 @@
     "invariant": "2.2.4",
     "prettier": "2.8.8",
     "react-is": "18.2.0",
+    "title": "3.5.3",
     "yaml": "2.3.4",
     "yaml-diff-patch": "2.0.0"
   },
@@ -62,6 +63,7 @@
     "@types/invariant": "2.2.37",
     "@types/prettier": "2.7.3",
     "@types/react": "18.2.45",
-    "@types/react-is": "18.2.4"
+    "@types/react-is": "18.2.4",
+    "@types/title": "3.4.3"
   }
 }

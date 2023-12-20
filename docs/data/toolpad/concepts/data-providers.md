@@ -138,13 +138,32 @@ Uncheck the column option "sortable" if you want to disable sorting for a certai
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-sortable.png", "alt": "Disable sortable", "caption": "Disable sortable", "zoom": false, "width": 325 }}
 
-## Row editing 🚧
+## Row editing
 
-:::warning
-This feature isn't implemented yet.
+The data provider can be extended to automatically support row editing. To enable this, you'll have to add a `updateRecord` method to the data provider interface that accepts the `id` of the row that is to be deleted, and an object containing all the updated fields from the row editing operation.
 
-👍 Upvote [issue #2887](https://github.com/mui/mui-toolpad/issues/2887) if you want to see it land faster.
-:::
+```tsx
+export default createDataProvider({
+  async getRecords() {
+    return prisma.users.findMany();
+  },
+
+  async updateRecord(id, data) {
+    return prisma.users.update({ where: { id }, data });
+  },
+});
+```
+
+When this method is available in the data provider, each row will have an edit button. This edit button brings the row in edit mode. To commit the changes press the save button on the row that is in edit mode. To discard the changes use the cancel button.
+
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/editing.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+You can disable the editing functionality for specific columns by unchecking the **Editable** option in the column definition.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-editable.png", "alt": "Disable editable", "caption": "Disable editable", "zoom": false, "width": 308 }}
 
 ## Row creation 🚧
 

@@ -64,7 +64,7 @@ test('can create/delete page', async ({ page, localApp }) => {
 
   await editorModel.createPage('someOtherPage');
 
-  const pageMenuItem = editorModel.getExplorerItem('someOtherPage');
+  const pageMenuItem = editorModel.getExplorerItem('Some Other Page');
   const pageFolder = path.resolve(localApp.dir, './toolpad/pages/someOtherPage');
   const pageFile = path.resolve(pageFolder, './page.yml');
 

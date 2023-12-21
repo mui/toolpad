@@ -11,7 +11,7 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
-import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
+import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
@@ -1206,8 +1206,12 @@ export function getRequiredEnvVars(dom: AppDom): Set<string> {
   return new Set(allVars);
 }
 
+export function getPageDisplayName(node: PageNode): string {
+  return node.attributes.displayName || guessTitle(node.name);
+}
+
 export function getPageTitle(node: PageNode): string {
-  return node.attributes.title || node.name;
+  return node.attributes.title || getPageDisplayName(node);
 }
 
 export function isCodePage(node: PageNode): boolean {

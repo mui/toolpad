@@ -422,7 +422,7 @@
               "description": "Authorization configuration for this page."
             },
             "unstable_codeFile": {
-              "type": "string",
+              "type": "boolean",
               "description": "The content of the page as JSX. Experimental, do not use!."
             },
             "display": {

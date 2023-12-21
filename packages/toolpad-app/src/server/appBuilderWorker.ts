@@ -24,6 +24,7 @@ async function main() {
     root: project.getRoot(),
     base,
     getComponents: () => project.getComponentsManifest(),
+    getPagesManifest: () => project.getPagesManifest(),
     outDir: project.getAppOutputFolder(),
     loadDom: () => project.loadDom(),
   });

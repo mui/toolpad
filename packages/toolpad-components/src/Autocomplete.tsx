@@ -8,7 +8,6 @@ import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import {
   FORM_INPUT_ARG_TYPES,
-  FORM_TEXT_INPUT_ARG_TYPES,
   FormInputComponentProps,
   useFormInput,
   withComponentForm,
@@ -163,7 +162,6 @@ export default createBuiltin(FormWrappedAutocomplete, {
       type: 'boolean',
     },
     ...FORM_INPUT_ARG_TYPES,
-    ...FORM_TEXT_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

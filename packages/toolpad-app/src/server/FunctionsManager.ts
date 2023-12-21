@@ -254,7 +254,7 @@ export default class FunctionsManager {
 
   private async createRuntimeWorker() {
     const oldWorker = this.devWorker;
-    this.devWorker = createDevWorker(await this.project.envManager.getEnv());
+    this.devWorker = createDevWorker(this.project.envManager.getEnv());
     await oldWorker?.terminate();
     this.project.invalidateQueries();
   }

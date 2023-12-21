@@ -65,8 +65,10 @@ export interface AppNode extends AppDomNodeBase {
   readonly type: 'app';
   readonly parentId: null;
   readonly attributes: {
-    readonly authorization?: {
+    readonly authentication?: {
       readonly providers?: AuthProvider[];
+    };
+    readonly authorization?: {
       readonly roles?: {
         readonly name: string;
         readonly description?: string;

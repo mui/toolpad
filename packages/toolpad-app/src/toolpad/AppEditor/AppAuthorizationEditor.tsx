@@ -314,19 +314,19 @@ export function AppAuthenticationEditor() {
   const appState = useAppStateApi();
 
   const handleAuthProvidersChange = React.useCallback(
-    (event: SelectChangeEvent<AuthProvider[]>) => {
+    (event: SelectChangeEvent<AuthProvider['id'][]>) => {
       const {
-        target: { value: providers },
+        target: { value: providerIds },
       } = event;
 
       appState.update((draft) => {
         const app = appDom.getApp(draft);
 
-        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
-          ...app.attributes?.authorization,
-          providers: (typeof providers === 'string'
-            ? providers.split(',')
-            : providers) as AuthProvider[],
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
+          ...app.attributes?.authentication,
+          providers: (typeof providerIds === 'string' ? providerIds.split(',') : providerIds).map(
+            (providerId) => ({ id: providerId } as AuthProvider),
+          ),
         });
 
         return draft;
@@ -336,23 +336,23 @@ export function AppAuthenticationEditor() {
   );
 
   const appNode = appDom.getApp(dom);
-  const authorization = appNode.attributes.authorization;
+  const { authentication } = appNode.attributes;
 
-  const authProviders = React.useMemo(
-    () => authorization?.providers ?? [],
-    [authorization?.providers],
-  );
+  const authProviderIds = React.useMemo(
+    () => authentication?.providers ?? [],
+    [authentication?.providers],
+  ).map((provider) => provider.id);
 
   return (
     <Stack direction="column">
       <FormControl>
         <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
-        <Select<AuthProvider[]>
+        <Select<AuthProvider['id'][]>
           labelId="auth-providers-label"
           label="Authentication providers"
           id="auth-providers"
           multiple
-          value={authProviders}
+          value={authProviderIds}
           onChange={handleAuthProvidersChange}
           fullWidth
           renderValue={(selected) =>
@@ -364,7 +364,7 @@ export function AppAuthenticationEditor() {
           {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
             <MenuItem key={value} value={value}>
               <Stack direction="row" alignItems="center">
-                <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
+                <Checkbox checked={authProviderIds.indexOf(value as AuthProvider['id']) > -1} />
                 <Icon fontSize="small" />
                 <Typography ml={1}>{name}</Typography>
               </Stack>

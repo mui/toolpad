@@ -8,7 +8,7 @@ export const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
 export const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
 export const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
-export type AuthProvider = 'github' | 'google';
+export type AuthProvider = { id: 'github' | 'google' };
 export interface AuthSession {
   user: {
     name: string;
@@ -46,7 +46,7 @@ interface UseAuthInput {
 export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
   const app = appDom.getApp(dom);
 
-  const authProviders = app.attributes.authorization?.providers ?? [];
+  const authProviders = app.attributes.authentication?.providers ?? [];
 
   const hasAuthentication = authProviders.length > 0;
 

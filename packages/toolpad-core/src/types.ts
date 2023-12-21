@@ -389,7 +389,7 @@ export type RuntimeEvents = {
   };
   screenUpdate: {};
   ready: {};
-  pageNavigationRequest: { pageNodeId: NodeId };
+  pageNavigationRequest: { pageName: string };
   vmUpdated: { vm: ApplicationVm };
 };
 
@@ -499,13 +499,39 @@ export interface CursorPaginationModel {
   pageSize: number;
 }
 
+export interface FilterModelItem {
+  field: string;
+  operator: string;
+  value: unknown;
+}
+
+export type LogicOperator = 'and' | 'or';
+
+export interface FilterModel {
+  items: FilterModelItem[];
+  logicOperator: LogicOperator;
+}
+
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortItem {
+  field: string;
+  sort: SortDirection;
+}
+
+export type SortModel = SortItem[];
+
 export type PaginationMode = 'index' | 'cursor';
+
+export type PaginationModel<M extends PaginationMode = PaginationMode> = M extends 'cursor'
+  ? CursorPaginationModel
+  : IndexPaginationModel;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface GetRecordsParams<R, P extends PaginationMode> {
-  paginationModel: P extends 'cursor' ? CursorPaginationModel : IndexPaginationModel;
-  // filterModel: FilterModel;
-  // sortModel: SortModel;
+  paginationModel: PaginationModel<P>;
+  filterModel: FilterModel;
+  sortModel: SortModel;
 }
 
 export interface GetRecordsResult<R, P extends PaginationMode> {
@@ -518,9 +544,8 @@ export interface GetRecordsResult<R, P extends PaginationMode> {
 export interface ToolpadDataProviderBase<R, P extends PaginationMode = 'index'> {
   paginationMode?: P;
   getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
-  // getTotalCount?: () => Promise<number>;
-  // updateRecord?: (id: string, record: R) => Promise<void>;
-  // deleteRecord?: (id: string) => Promise<void>;
+  deleteRecord?: (id: string | number) => Promise<void>;
+  // updateRecord?: (id: string | number, record: R) => Promise<void>;
   // createRecord?: (record: R) => Promise<void>;
 }
 

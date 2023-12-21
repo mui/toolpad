@@ -20,6 +20,11 @@ import {
   getGridDefaultColumnTypes,
   GridColTypeDef,
   GridPaginationModel,
+  GridActionsColDef,
+  GridRowId,
+  GridFilterModel,
+  GridSortModel,
+  GridNoRowsOverlay,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -30,8 +35,11 @@ import {
   useNode,
   useComponents,
   UseDataProviderContext,
-  CursorPaginationModel,
-  IndexPaginationModel,
+  ToolpadDataProviderBase,
+  PaginationMode,
+  FilterModel,
+  SortModel,
+  PaginationModel,
 } from '@mui/toolpad-core';
 import {
   Box,
@@ -43,7 +51,13 @@ import {
   Typography,
   Tooltip,
   Popover,
+  IconButton,
+  CircularProgress,
+  Alert,
+  Collapse,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
@@ -53,9 +67,10 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import invariant from 'invariant';
 import { NumberFormat, createFormat as createNumberFormat } from '@mui/toolpad-core/numberFormat';
 import { DateFormat, createFormat as createDateFormat } from '@mui/toolpad-core/dateFormat';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import ErrorOverlay from './components/ErrorOverlay';
+import ErrorOverlay, { ErrorContent } from './components/ErrorOverlay';
 
 type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
@@ -64,6 +79,8 @@ const LICENSE_INFO: MuiLicenseInfo = {
 };
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
+
+const SetActionErrorContext = React.createContext<((error: Error) => void) | undefined>(undefined);
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -298,6 +315,10 @@ function dateValueGetter({ value }: GridValueGetterParams<any, any>): Date | und
     return undefined;
   }
 
+  if (value instanceof Date) {
+    return value;
+  }
+
   if (typeof value === 'number') {
     return new Date(value);
   }
@@ -381,7 +402,10 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
 };
 
 export interface SerializableGridColumn
-  extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
+  extends Pick<
+    GridColDef,
+    'field' | 'type' | 'align' | 'width' | 'headerName' | 'sortable' | 'filterable'
+  > {
   numberFormat?: NumberFormat;
   dateFormat?: DateFormat;
   dateTimeFormat?: DateFormat;
@@ -417,7 +441,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
       };
     }
 
-    if (column.type === 'date' && column.dateFormat) {
+    if (column.type === 'date') {
       const format = createDateFormat(column.dateFormat);
       return {
         ...customType,
@@ -425,14 +449,14 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
         valueFormatter: ({ value }) => {
           try {
             return format.format(value);
-          } catch (err) {
-            return 'Invalid';
+          } catch {
+            return 'Invalid Date';
           }
         },
       };
     }
 
-    if (column.type === 'dateTime' && column.dateTimeFormat) {
+    if (column.type === 'dateTime') {
       const format = createDateFormat(column.dateTimeFormat);
       return {
         ...customType,
@@ -441,7 +465,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
           try {
             return format.format(value);
           } catch {
-            return 'Invalid';
+            return 'Invalid Date';
           }
         },
       };
@@ -470,12 +494,43 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
   hideToolbar?: boolean;
-  rawRows?: GridRowsProp;
-  onRawRowsChange?: (rows: GridRowsProp) => void;
+}
+
+interface DeleteActionProps {
+  id: GridRowId;
+  dataProvider: ToolpadDataProviderBase<unknown, PaginationMode>;
+  refetch: () => unknown;
+}
+
+function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
+  const [loading, setLoading] = React.useState(false);
+
+  const setActionError = React.useContext(SetActionErrorContext);
+  invariant(setActionError, 'setActionError must be defined');
+
+  const handleDeleteClick = React.useCallback(async () => {
+    invariant(dataProvider.deleteRecord, 'dataProvider must be defined');
+    setLoading(true);
+    try {
+      await dataProvider.deleteRecord(id);
+      await refetch();
+    } catch (error) {
+      setActionError(errorFrom(error));
+    } finally {
+      setLoading(false);
+    }
+  }, [dataProvider, id, refetch, setActionError]);
+
+  return (
+    <IconButton onClick={handleDeleteClick} size="small" aria-label={`Delete row with id "${id}"`}>
+      {loading ? <CircularProgress size={16} /> : <DeleteIcon fontSize="inherit" />}
+    </IconButton>
+  );
 }
 
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
-  error?: unknown;
+  rowLoadingError?: unknown;
+  getActions?: GridActionsColDef['getActions'];
 }
 
 function useDataProviderDataGridProps(
@@ -484,60 +539,90 @@ function useDataProviderDataGridProps(
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
   const { dataProvider } = useDataProvider(dataProviderId || null);
 
-  const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
+  const [rawPaginationModel, setRawPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
     pageSize: 100,
   });
 
-  const { page, pageSize } = paginationModel;
-
   const mapPageToNextCursor = React.useRef(new Map<number, string>());
 
-  const { data, isFetching, isPlaceholderData, isLoading, error } = useQuery({
+  const paginationModel = React.useMemo<PaginationModel>(() => {
+    const page = rawPaginationModel.page;
+    const pageSize = rawPaginationModel.pageSize;
+    if (dataProvider?.paginationMode === 'cursor') {
+      // cursor based pagination
+      let cursor: string | null = null;
+      if (page !== 0) {
+        cursor = mapPageToNextCursor.current.get(page - 1) ?? null;
+        if (cursor === null) {
+          throw new Error(`No cursor found for page ${page - 1}`);
+        }
+      }
+      return {
+        cursor,
+        pageSize,
+      };
+      // TODO: when docs are on ts>5, replace with
+      //     } satisfies CursorPaginationModel;
+    }
+
+    // index based pagination
+    return {
+      start: page * pageSize,
+      pageSize,
+    };
+    // TODO: when docs are on ts>5, replace with
+    //     } satisfies IndexPaginationModel;
+  }, [dataProvider?.paginationMode, rawPaginationModel.page, rawPaginationModel.pageSize]);
+
+  const [rawFilterModel, setRawFilterModel] = React.useState<GridFilterModel>();
+
+  const filterModel = React.useMemo<FilterModel>(
+    () => ({
+      items:
+        rawFilterModel?.items.map(({ field, operator, value }) => ({ field, operator, value })) ??
+        [],
+      logicOperator: rawFilterModel?.logicOperator ?? 'and',
+    }),
+    [rawFilterModel],
+  );
+
+  const [rawSortModel, setRawSortModel] = React.useState<GridSortModel>();
+
+  const sortModel = React.useMemo<SortModel>(
+    () => rawSortModel?.map(({ field, sort }) => ({ field, sort: sort ?? 'asc' })) ?? [],
+    [rawSortModel],
+  );
+
+  const {
+    data,
+    isFetching,
+    isPlaceholderData,
+    isLoading,
+    error: rowLoadingError,
+    refetch,
+  } = useQuery({
     enabled: !!dataProvider,
-    queryKey: ['toolpadDataProvider', dataProviderId, page, pageSize],
+    queryKey: ['toolpadDataProvider', dataProviderId, paginationModel, filterModel, sortModel],
     placeholderData: keepPreviousData,
     queryFn: async () => {
       invariant(dataProvider, 'dataProvider must be defined');
-      let dataProviderPaginationModel: IndexPaginationModel | CursorPaginationModel;
-      if (dataProvider.paginationMode === 'cursor') {
-        // cursor based pagination
-        let cursor: string | null = null;
-        if (page !== 0) {
-          cursor = mapPageToNextCursor.current.get(page - 1) ?? null;
-          if (cursor === null) {
-            throw new Error(`No cursor found for page ${page - 1}`);
-          }
-        }
-        dataProviderPaginationModel = {
-          cursor,
-          pageSize,
-        };
-        // TODO: when docs are on ts>5, replace with
-        //     } satisfies CursorPaginationModel;
-      } else {
-        // index based pagination
-        dataProviderPaginationModel = {
-          start: page * pageSize,
-          pageSize,
-        };
-        // TODO: when docs are on ts>5, replace with
-        //     } satisfies IndexPaginationModel;
-      }
 
       const result = await dataProvider.getRecords({
-        paginationModel: dataProviderPaginationModel,
+        paginationModel,
+        filterModel,
+        sortModel,
       });
 
       if (dataProvider.paginationMode === 'cursor') {
         if (typeof result.cursor === 'undefined') {
           throw new Error(
-            `No cursor returned for page ${page}. Return \`null\` to signal the end of the data.`,
+            `No cursor returned for page ${rawPaginationModel.page}. Return \`null\` to signal the end of the data.`,
           );
         }
 
         if (typeof result.cursor === 'string') {
-          mapPageToNextCursor.current.set(page, result.cursor);
+          mapPageToNextCursor.current.set(rawPaginationModel.page, result.cursor);
         }
       }
 
@@ -547,8 +632,27 @@ function useDataProviderDataGridProps(
 
   const rowCount =
     data?.totalCount ??
-    (data?.hasNextPage ? (paginationModel.page + 1) * paginationModel.pageSize + 1 : undefined) ??
+    (data?.hasNextPage
+      ? (rawPaginationModel.page + 1) * rawPaginationModel.pageSize + 1
+      : undefined) ??
     0;
+
+  const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
+    if (!dataProvider?.deleteRecord) {
+      return undefined;
+    }
+
+    return ({ id }) => {
+      const result = [];
+
+      if (dataProvider?.deleteRecord) {
+        result.push(
+          <DeleteAction key="delete" id={id} dataProvider={dataProvider} refetch={refetch} />,
+        );
+      }
+      return result;
+    };
+  }, [dataProvider, refetch]);
 
   if (!dataProvider) {
     return {};
@@ -557,20 +661,39 @@ function useDataProviderDataGridProps(
   return {
     loading: isLoading || (isPlaceholderData && isFetching),
     paginationMode: 'server',
+    filterMode: 'server',
+    sortingMode: 'server',
     pagination: true,
-    paginationModel,
     rowCount,
+    paginationModel: rawPaginationModel,
     onPaginationModelChange(model) {
-      setPaginationModel((prevModel) => {
+      setRawPaginationModel((prevModel) => {
         if (prevModel.pageSize !== model.pageSize) {
           return { ...model, page: 0 };
         }
         return model;
       });
     },
+    filterModel: rawFilterModel,
+    onFilterModelChange: setRawFilterModel,
+    sortModel: rawSortModel,
+    onSortModelChange: setRawSortModel,
     rows: data?.records ?? [],
-    error,
+    rowLoadingError,
+    getActions,
   };
+}
+
+interface NoRowsOverlayProps extends React.ComponentProps<typeof GridNoRowsOverlay> {
+  error: Error;
+}
+
+function NoRowsOverlay(props: NoRowsOverlayProps) {
+  if (props.error) {
+    return <ErrorContent sx={{ height: '100%' }} error={props.error} />;
+  }
+
+  return <GridNoRowsOverlay {...props} />;
 }
 
 function dataGridFallbackRender({ error }: FallbackProps) {
@@ -589,14 +712,15 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     hideToolbar,
     rowsSource,
     dataProviderId,
-    onRawRowsChange,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { rows: dataProviderRowsInput, ...dataProviderProps } = useDataProviderDataGridProps(
-    rowsSource === 'dataProvider' ? dataProviderId : null,
-  );
+  const {
+    rows: dataProviderRowsInput,
+    getActions: getProviderActions,
+    ...dataProviderProps
+  } = useDataProviderDataGridProps(rowsSource === 'dataProvider' ? dataProviderId : null);
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
@@ -716,16 +840,46 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  let error: Error | null = null;
-  if (dataProviderProps?.error) {
-    error = errorFrom(dataProviderProps.error);
+  let rowLoadingError: Error | null = null;
+  if (dataProviderProps?.rowLoadingError) {
+    rowLoadingError = errorFrom(dataProviderProps.rowLoadingError);
   } else if (errorProp) {
-    error = errorFrom(errorProp);
+    rowLoadingError = errorFrom(errorProp);
   }
 
   React.useEffect(() => {
     nodeRuntime?.updateEditorNodeData('rawRows', rows);
   }, [nodeRuntime, rows]);
+
+  const renderedColumns = React.useMemo<GridColDef[]>(() => {
+    if (getProviderActions) {
+      return [
+        ...columns,
+        {
+          field: '___actions',
+          type: 'actions',
+          headerName: '',
+          flex: 1,
+          align: 'right',
+          getActions: getProviderActions,
+        },
+      ];
+    }
+
+    return columns;
+  }, [columns, getProviderActions]);
+
+  const [actionError, setActionError] = React.useState<Error | null>();
+
+  const open = !!actionError;
+  const lastActionError = useLatest(actionError);
+
+  React.useEffect(() => {
+    if (actionError) {
+      // Log error to console as well for full stacktrace
+      console.error(actionError);
+    }
+  }, [actionError]);
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
@@ -733,35 +887,62 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
         ref={ref}
         style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
       >
-        <ErrorOverlay error={error} />
-
         <div
           style={{
             position: 'absolute',
             inset: '0 0 0 0',
-            visibility: error ? 'hidden' : 'visible',
           }}
         >
           <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
-            <DataGridPro
-              apiRef={apiRef}
-              slots={{
-                toolbar: hideToolbar ? null : GridToolbar,
-                loadingOverlay: SkeletonLoadingOverlay,
-              }}
-              onColumnResize={handleResize}
-              onColumnOrderChange={handleColumnOrderChange}
-              rows={rows}
-              columns={columns}
-              key={gridKey}
-              getRowId={getRowId}
-              onRowSelectionModelChange={onSelectionModelChange}
-              rowSelectionModel={selectionModel}
-              {...props}
-              {...dataProviderProps}
-            />
+            <SetActionErrorContext.Provider value={setActionError}>
+              <DataGridPro
+                apiRef={apiRef}
+                slots={{
+                  toolbar: hideToolbar ? null : GridToolbar,
+                  loadingOverlay: SkeletonLoadingOverlay,
+                  noRowsOverlay: NoRowsOverlay,
+                }}
+                slotProps={{
+                  noRowsOverlay: {
+                    error: rowLoadingError,
+                  } as any,
+                }}
+                onColumnResize={handleResize}
+                onColumnOrderChange={handleColumnOrderChange}
+                rows={rows}
+                columns={renderedColumns}
+                key={gridKey}
+                getRowId={getRowId}
+                onRowSelectionModelChange={onSelectionModelChange}
+                rowSelectionModel={selectionModel}
+                {...props}
+                {...dataProviderProps}
+              />
+            </SetActionErrorContext.Provider>
           </ErrorBoundary>
         </div>
+
+        <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
+          <Collapse in={!!open}>
+            <Alert
+              severity="error"
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                    setActionError(null);
+                  }}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              {lastActionError?.message}
+            </Alert>
+          </Collapse>
+        </Box>
       </div>
     </LicenseInfoProvider>
   );

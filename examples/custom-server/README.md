@@ -5,7 +5,7 @@
 Example showcasing custom server integration of Toolpad apps. [The docs](https://mui.com/toolpad/concepts/custom-server/).
 
 <a target="_blank">
-  <img src="https://mui.com//static/toolpad/marketing/custom-server.png" alt="Custom server" style="aspect-ratio: 1.8" width="100%">
+  <img src="https://mui.com/static/toolpad/marketing/custom-server.png" alt="Custom server" style="aspect-ratio: 131/88;" width="524">
 </a>
 
 ## How to run
@@ -13,7 +13,7 @@ Example showcasing custom server integration of Toolpad apps. [The docs](https:/
 Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-npx create-toolpad-app@latest  --example custom-server
+npx create-toolpad-app@latest --example custom-server
 ```
 
 ```bash

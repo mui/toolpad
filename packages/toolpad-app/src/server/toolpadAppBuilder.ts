@@ -82,6 +82,55 @@ function toolpadVitePlugin({ base }: ToolpadVitePluginParams): Plugin {
       }
       return null;
     },
+
+    transform(code, id) {
+      if (/\/resources\//.test(id)) {
+        const codeFile = path.basename(id);
+
+        const functionExports = [];
+
+        const lines = code.split('\n');
+        for (let i = 0; i < lines.length; i += 1) {
+          const line = lines[i];
+          const lineNr = i + 1;
+          if (/\s*export\b/.test(line)) {
+            const match = line.match(/\s*export\s+async\s+function\s+([a-zA-Z0-9]+)\b/);
+
+            if (match) {
+              const functionName = match[1];
+              functionExports.push(functionName);
+            } else {
+              console.warn(
+                `Unsupported export at "${id}:${lineNr}". Only exports of the form "export async function foo(...) {" are supported.`,
+              );
+            }
+          }
+        }
+
+        return `
+          import { createRemoteFunction } from '@mui/toolpad/runtime';
+
+          const functionFile = ${JSON.stringify(codeFile)};
+
+          ${functionExports
+            .map(
+              (functionName) =>
+                `const __${functionName} = createRemoteFunction(functionFile, ${JSON.stringify(
+                  functionName,
+                )})`,
+            )
+            .join('\n')}
+
+          export {
+            ${functionExports
+              .map((functionName) => `__${functionName} as ${functionName}`)
+              .join(',\n')}
+          }
+        `;
+      }
+
+      return code;
+    },
   };
 }
 
@@ -269,6 +318,8 @@ if (import.meta.hot) {
           '@emotion/react',
           '@mui/icons-material',
           '@mui/icons-material/ArrowDropDownRounded',
+          '@mui/icons-material/Close',
+          '@mui/icons-material/Delete',
           '@mui/icons-material/DarkMode',
           '@mui/icons-material/Edit',
           '@mui/icons-material/Error',

@@ -3,7 +3,7 @@
 <p class="description">A Toolpad app that shows how to use charts to build an analytics dashboard.</p>
 
 <a target="_blank">
-  <img src="https://mui.com//static/toolpad/marketing/charts.png" alt="Charts in Toolpad" style="aspect-ratio: 1.8" width="100%">
+  <img src="https://mui.com/static/toolpad/marketing/charts.png" alt="Charts in Toolpad" style="aspect-ratio: 575/317;" width="1433">
 </a>
 
 ## How to run

@@ -5,7 +5,7 @@ import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import { BindableAttrValue, NodeId, PropBindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrValue, PropBindableAttrValue } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
@@ -40,6 +40,8 @@ import {
   Theme,
   themeSchema,
   API_VERSION,
+  applicationSchema,
+  Application,
 } from './schema';
 import { format, resolvePrettierConfig } from '../utils/prettier';
 import {
@@ -61,6 +63,7 @@ import { VersionInfo, checkVersion } from './versionInfo';
 import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
+import packageInfo from '../packageInfo';
 
 declare global {
   // eslint-disable-next-line
@@ -74,6 +77,10 @@ invariant(
 
 function getThemeFile(root: string): string {
   return path.join(root, './theme.yml');
+}
+
+function getApplicationFile(root: string): string {
+  return path.join(root, './application.yml');
 }
 
 function getComponentsFolder(root: string): string {
@@ -214,18 +221,20 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
   return Object.fromEntries(resultEntries.filter(Boolean));
 }
 
-async function loadThemeFromFile(root: string): Promise<Theme | null> {
-  const themeFilePath = getThemeFile(root);
-  const content = await readMaybeFile(themeFilePath);
+async function loadObjectFromFile<T extends z.ZodType>(
+  filePath: string,
+  schema: T,
+): Promise<z.infer<T> | null> {
+  const content = await readMaybeFile(filePath);
   if (content) {
     const parsedFile = yaml.parse(content);
-    const result = themeSchema.safeParse(parsedFile);
+    const result = schema.safeParse(parsedFile);
     if (result.success) {
       return result.data;
     }
 
     console.error(
-      `${chalk.red('error')} - Failed to read theme ${chalk.cyan(themeFilePath)}. ${fromZodError(
+      `${chalk.red('error')} - Failed to read theme ${chalk.cyan(filePath)}. ${fromZodError(
         result.error,
       )}`,
     );
@@ -233,6 +242,16 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
     return null;
   }
   return null;
+}
+
+async function loadThemeFromFile(root: string): Promise<Theme | null> {
+  const themeFilePath = getThemeFile(root);
+  return loadObjectFromFile(themeFilePath, themeSchema);
+}
+
+async function loadApplicationFromFile(root: string): Promise<Application | null> {
+  const applicationFilePath = getApplicationFile(root);
+  return loadObjectFromFile(applicationFilePath, applicationSchema);
 }
 
 async function createDefaultCodeComponent(name: string, filePath: string): Promise<string> {
@@ -359,12 +378,26 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
   dom = appDom.addNode(
     dom,
     appDom.createNode(dom, 'theme', {
-      theme: themeFileSpec.options,
+      theme: themeFileSpec?.options,
       attributes: {},
     }),
     app,
     'themes',
   );
+  return dom;
+}
+
+function mergeApplicationIntoDom(dom: appDom.AppDom, applicationFile: Application): appDom.AppDom {
+  const applicationFileSpec = applicationFile.spec;
+  const app = appDom.getApp(dom);
+
+  dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'authorization', {
+    ...applicationFileSpec?.authorization,
+    roles: applicationFileSpec?.authorization?.roles?.map((role) =>
+      typeof role === 'string' ? { name: role } : role,
+    ),
+  });
+
   return dom;
 }
 
@@ -508,7 +541,8 @@ function expandFromDom<N extends appDom.AppDomNode>(
       apiVersion: API_VERSION,
       kind: 'page',
       spec: {
-        id: node.id,
+        displayName: node.attributes.displayName,
+        alias: node.attributes.alias,
         title: node.attributes.title,
         parameters: undefinedWhenEmpty(
           node.attributes.parameters?.map(([name, value]) => ({ name, value })) ?? [],
@@ -517,6 +551,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
         display: node.attributes.display,
         unstable_codeFile: node.attributes.codeFile,
+        authorization: node.attributes.authorization,
       },
     } satisfies Page;
   }
@@ -684,14 +719,19 @@ function createDomQueryFromPageFileQuery(query: QueryConfig): FetchQuery | Local
 }
 
 function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.AppDom {
-  const pageFileSpec = pageFile.spec;
-  let fragment = appDom.createFragmentInternal(pageFileSpec.id as NodeId, 'page', {
+  const pageFileSpec = pageFile.spec ?? {};
+
+  let fragment = appDom.createFragment('page', {
     name: pageName,
     attributes: {
+      displayName: pageFileSpec.displayName,
+      // Convert deprecated id to alias
+      alias: pageFileSpec.id ? [pageFileSpec.id] : pageFileSpec.alias,
       title: pageFileSpec.title,
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
       codeFile: pageFileSpec.unstable_codeFile || undefined,
+      authorization: pageFileSpec.authorization || undefined,
     },
   });
 
@@ -778,7 +818,7 @@ function optimizePage(page: Page): Page {
     ...page,
     spec: {
       ...page.spec,
-      content: page.spec.content?.map(optimizePageElement),
+      content: page.spec?.content?.map(optimizePageElement),
     },
   };
 }
@@ -827,11 +867,29 @@ function extractThemeFromDom(dom: appDom.AppDom): Theme | null {
   return null;
 }
 
+function extractApplicationFromDom(dom: appDom.AppDom): Application | null {
+  const rootNode = appDom.getApp(dom);
+
+  return {
+    apiVersion: API_VERSION,
+    kind: 'application',
+    spec: {
+      authorization: rootNode.attributes.authorization,
+    },
+  };
+}
+
+function getSchemaUrl(obj: string) {
+  return `https://raw.githubusercontent.com/mui/mui-toolpad/v${packageInfo.version}/docs/schemas/v1/definitions.json#properties/${obj}`;
+}
+
 async function writePagesToFiles(root: string, pages: PagesContent) {
   await Promise.all(
     Object.entries(pages).map(async ([name, page]) => {
       const pageFileName = getPageFile(root, name);
-      await updateYamlFile(pageFileName, optimizePage(page));
+      await updateYamlFile(pageFileName, optimizePage(page), {
+        schemaUrl: getSchemaUrl('Page'),
+      });
     }),
   );
 }
@@ -839,9 +897,20 @@ async function writePagesToFiles(root: string, pages: PagesContent) {
 async function writeThemeFile(root: string, theme: Theme | null) {
   const themeFilePath = getThemeFile(root);
   if (theme) {
-    await updateYamlFile(themeFilePath, theme);
+    await updateYamlFile(themeFilePath, theme, {
+      schemaUrl: getSchemaUrl('Theme'),
+    });
   } else {
     await fs.rm(themeFilePath, { recursive: true, force: true });
+  }
+}
+
+async function writeApplicationFile(root: string, application: Application | null) {
+  const applicationFilePath = getApplicationFile(root);
+  if (application) {
+    await updateYamlFile(applicationFilePath, application);
+  } else {
+    await fs.rm(applicationFilePath, { recursive: true, force: true });
   }
 }
 
@@ -850,6 +919,7 @@ async function writeDomToDisk(root: string, dom: appDom.AppDom): Promise<void> {
   await Promise.all([
     writePagesToFiles(root, pagesContent),
     writeThemeFile(root, extractThemeFromDom(dom)),
+    writeApplicationFile(root, extractApplicationFromDom(dom)),
   ]);
 }
 
@@ -872,19 +942,22 @@ export type ProjectFolderEntry = {
 };
 
 interface ToolpadProjectFolder {
+  application: Application | null;
   pages: Record<string, Page>;
   components: Record<string, { code: string }>;
   theme: Theme | null;
 }
 
 async function readProjectFolder(root: string): Promise<ToolpadProjectFolder> {
-  const [componentsContent, pagesContent, theme] = await Promise.all([
+  const [componentsContent, pagesContent, theme, application] = await Promise.all([
     loadCodeComponentsFromFiles(root),
     loadPagesFromFiles(root),
     loadThemeFromFile(root),
+    loadApplicationFromFile(root),
   ]);
 
   return {
+    application,
     pages: pagesContent,
     components: componentsContent,
     theme,
@@ -896,12 +969,13 @@ async function writeProjectFolder(
   folder: ToolpadProjectFolder,
   writeComponents: boolean = false,
 ): Promise<void> {
-  await writePagesToFiles(root, folder.pages);
-  await writeThemeFile(root, folder.theme);
-  if (writeComponents) {
-    const componentsFolder = getComponentsFolder(root);
-    await writeCodeComponentsToFiles(componentsFolder, folder.components);
-  }
+  const componentsFolder = getComponentsFolder(root);
+  await Promise.all([
+    writePagesToFiles(root, folder.pages),
+    writeThemeFile(root, folder.theme),
+    writeApplicationFile(root, folder.application),
+    writeComponents ? writeCodeComponentsToFiles(componentsFolder, folder.components) : null,
+  ]);
 }
 
 function projectFolderToAppDom(projectFolder: ToolpadProjectFolder): appDom.AppDom {
@@ -910,6 +984,9 @@ function projectFolderToAppDom(projectFolder: ToolpadProjectFolder): appDom.AppD
   dom = mergeComponentsContentIntoDom(dom, projectFolder.components);
   if (projectFolder.theme) {
     dom = mergeThemeIntoAppDom(dom, projectFolder.theme);
+  }
+  if (projectFolder.application) {
+    dom = mergeApplicationIntoDom(dom, projectFolder.application);
   }
   return dom;
 }
@@ -929,6 +1006,7 @@ function getDomFilePatterns(root: string) {
     path.resolve(root, './pages/*/page.yml'),
     path.resolve(root, './components'),
     path.resolve(root, './components/*.*'),
+    path.resolve(root, './application.yml'),
   ];
 }
 /**

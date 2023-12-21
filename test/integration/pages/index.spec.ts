@@ -20,7 +20,7 @@ test.use({
 test('must load page in initial URL without altering URL', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await page.goto(`/_toolpad/app/pages/g433ywb?abcd=123`);
+  await page.goto(`/_toolpad/app/pages/page2?abcd=123`);
 
   await editorModel.waitForOverlay();
 
@@ -29,7 +29,7 @@ test('must load page in initial URL without altering URL', async ({ page }) => {
   });
   await expect(pageButton2).toBeVisible();
 
-  await expect(page).toHaveURL(/\/pages\/g433ywb\?abcd=123/);
+  await expect(page).toHaveURL(/\/pages\/page2\?abcd=123/);
 });
 
 test('must show a message when a non-existing url is accessed', async ({ page }) => {
@@ -46,7 +46,7 @@ test('can rename page', async ({ page, localApp }) => {
 
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('g433ywb');
+  await editorModel.goToPage('page2');
   await editorModel.waitForOverlay();
 
   const text = editorModel.appCanvas.getByText('foo');

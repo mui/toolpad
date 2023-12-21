@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { NodeId } from '@mui/toolpad-core';
 import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../../components/resizablePanels';
 import RenderPanel from './RenderPanel';
@@ -37,14 +36,14 @@ function PageEditorContent({ node }: PageEditorContentProps) {
   return (
     <PageEditorProvider key={node.id} nodeId={node.id}>
       <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
-        <Panel defaultSizePercentage={75} minSizePercentage={50} maxSizePercentage={80}>
+        <Panel defaultSize={75} minSize={50} maxSize={80}>
           <PageEditorRoot>
-            <ComponentCatalog />
+            {appDom.isCodePage(node) ? null : <ComponentCatalog />}
             <RenderPanel className={classes.renderPanel} />
           </PageEditorRoot>
         </Panel>
         <PanelResizeHandle />
-        <Panel defaultSizePercentage={25} maxSizePercentage={50} minSizePercentage={20}>
+        <Panel defaultSize={25} maxSize={50} minSize={20}>
           <ComponentPanel />
         </Panel>
       </PanelGroup>
@@ -53,18 +52,18 @@ function PageEditorContent({ node }: PageEditorContentProps) {
 }
 
 interface PageEditorProps {
-  nodeId?: NodeId;
+  name: string;
 }
 
-export default function PageEditor({ nodeId }: PageEditorProps) {
+export default function PageEditor({ name }: PageEditorProps) {
   const { dom } = useAppState();
-  const pageNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'page');
+  const pageNode = React.useMemo(() => appDom.getPageByName(dom, name), [dom, name]);
 
   useUndoRedo();
 
   return pageNode ? (
     <PageEditorContent node={pageNode} />
   ) : (
-    <NotFoundEditor message={`Non-existing Page "${nodeId}"`} />
+    <NotFoundEditor message={`Non-existing Page "${name}"`} />
   );
 }

@@ -18,6 +18,7 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import * as url from 'node:url';
 import invariant from 'invariant';
+import type { GridRowId } from '@mui/x-data-grid';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import { createWorker as createDevWorker } from './functionsDevWorker';
@@ -323,7 +324,6 @@ export default class FunctionsManager {
     name: string,
     parameters: Record<string, unknown>,
   ): Promise<ExecFetchResult<unknown>> {
-    const outputFilePath = await this.getBuiltOutputFilePath(fileName);
     const extractedTypes = await this.introspect();
 
     if (extractedTypes.error) {
@@ -341,8 +341,18 @@ export default class FunctionsManager {
       ? [{ parameters }]
       : handler.parameters.map(([parameterName]) => parameters[parameterName]);
 
+    return this.execFunction(fileName, name, executeParams);
+  }
+
+  async execFunction(
+    fileName: string,
+    name: string,
+    parameters: unknown[],
+  ): Promise<ExecFetchResult<unknown>> {
+    const outputFilePath = await this.getBuiltOutputFilePath(fileName);
+
     invariant(this.devWorker, 'devWorker must be initialized');
-    const data = await this.devWorker.execute(outputFilePath, name, executeParams);
+    const data = await this.devWorker.execute(outputFilePath, name, parameters);
 
     return { data };
   }
@@ -398,5 +408,15 @@ export default class FunctionsManager {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
     invariant(this.devWorker, 'devWorker must be initialized');
     return this.devWorker.getDataProviderRecords(fullPath, exportName, params);
+  }
+
+  async deleteDataProviderRecord(
+    fileName: string,
+    exportName: string,
+    id: GridRowId,
+  ): Promise<void> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    invariant(this.devWorker, 'devWorker must be initialized');
+    return this.devWorker.deleteDataProviderRecord(fullPath, exportName, id);
   }
 }

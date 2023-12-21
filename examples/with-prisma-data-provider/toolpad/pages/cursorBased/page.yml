@@ -1,8 +1,9 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.40/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  id: -vzMDF1
-  title: Default page
+  title: Prisma data source example with cursor
   content:
     - component: Text
       name: text

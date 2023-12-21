@@ -11,7 +11,7 @@ function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spe
         `Defines the version of this object. Used in determining compatibility between Toolpad "${kind}" objects.`,
       ),
     kind: z.literal(kind).describe(`Describes the nature of this Toolpad "${kind}" object.`),
-    spec: spec.describe(`Defines the shape of this "${kind}" object`),
+    spec: spec.optional().describe(`Defines the shape of this "${kind}" object`),
   });
 }
 
@@ -256,10 +256,40 @@ elementSchema = baseElementSchema
   })
   .describe('The instance of a component. Used to build user interfaces in pages.');
 
+export const applicationSchema = toolpadObjectSchema(
+  'application',
+  z.object({
+    authorization: z
+      .object({
+        roles: z
+          .array(
+            z.union([
+              z.string(),
+              z.object({
+                name: z.string().describe('The name of the role.'),
+                description: z.string().optional().describe('A description of the role.'),
+              }),
+            ]),
+          )
+          .optional()
+          .describe('Available roles for this application. These can be assigned to users.'),
+      })
+      .optional()
+      .describe('Authorization configuration for this application.'),
+  }),
+);
+
+export type Application = z.infer<typeof applicationSchema>;
+
 export const pageSchema = toolpadObjectSchema(
   'page',
   z.object({
-    id: z.string().describe('Serves as a canonical id of the page.'),
+    displayName: z.string().optional().describe('Page name to display in the UI.'),
+    id: z
+      .string()
+      .optional()
+      .describe('Serves as a canonical id of the page. Deprecated: use an alias instead.'),
+    alias: z.array(z.string()).optional().describe('Page name aliases.'),
     title: z.string().optional().describe('Title for this page.'),
     parameters: z
       .array(nameStringValuePairSchema)
@@ -273,6 +303,16 @@ export const pageSchema = toolpadObjectSchema(
       .array(elementSchema)
       .optional()
       .describe('The content of the page. This defines the UI.'),
+    authorization: z
+      .object({
+        allowAll: z.boolean().optional().describe('Allow all users to access this page.'),
+        allowedRoles: z
+          .array(z.string())
+          .optional()
+          .describe('Roles that are allowed to access this page.'),
+      })
+      .optional()
+      .describe('Authorization configuration for this page.'),
     unstable_codeFile: z
       .string()
       .optional()
@@ -327,6 +367,7 @@ export type Theme = z.infer<typeof themeSchema>;
 
 export const META = {
   schemas: {
+    Application: applicationSchema,
     Page: pageSchema,
     Theme: themeSchema,
   },

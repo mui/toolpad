@@ -17,7 +17,7 @@ test.use({
 
 test('Column prop updates are not lost on drag interactions', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  editorModel.goToPageById('331kqzd');
+  editorModel.goToPage('page1');
 
   await editorModel.waitForOverlay();
 
@@ -64,7 +64,7 @@ function cellLocator(gridLocator: Locator, rowIndex: number, collIndex: number) 
 
 test('Date columns', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  editorModel.goToPageById('h0FFFmL');
+  editorModel.goToPage('dateColumns');
 
   await editorModel.waitForOverlay();
 
@@ -75,4 +75,5 @@ test('Date columns', async ({ page }) => {
   await expect(cellLocator(canvasGridLocator, 2, 3)).toHaveText('Invalid Date');
   await expect(cellLocator(canvasGridLocator, 2, 4)).toHaveText('Invalid Date');
   await expect(cellLocator(canvasGridLocator, 2, 5)).toHaveText('1/1/1970');
+  await expect(cellLocator(canvasGridLocator, 2, 6)).toHaveText('1/1/1970');
 });

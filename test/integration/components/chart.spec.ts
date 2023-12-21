@@ -23,7 +23,7 @@ test.use({
 
 test('shows chart data', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('chart');
+  await runtimeModel.goToPage('chart');
 
   const barChartColumn = page.locator('.MuiBarElement-root');
   await expect(barChartColumn).toHaveCount(5);
@@ -36,7 +36,7 @@ test('shows chart data', async ({ page }) => {
 
 test('shows chart loading and errors', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('loadingAndError');
+  await runtimeModel.goToPage('loadingAndError');
 
   await expect(page.getByText('BOOM!', { exact: true })).toBeVisible();
   await expect(page.locator('[aria-busy="true"]')).toBeVisible();

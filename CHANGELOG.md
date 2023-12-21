@@ -1,5 +1,80 @@
 # Changelog
 
+## 0.1.41
+
+<!-- generated comparing v0.1.40..master -->
+
+_Dec 13, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Support server-side sorting and filtering, support delete in data providers.
+
+- &#8203;<!-- 9 -->improve vite omptimizeDeps after recent dataSource updates (#2990) @Janpot
+- &#8203;<!-- 8 -->Support serverside sorting/filtering (#2982) @Janpot
+- &#8203;<!-- 7 -->Fix formatting for Date objects in the grid (#2984) @Janpot
+- &#8203;<!-- 6 -->Open links in the same tab unless configured otherwise (#2983) @Janpot
+- &#8203;<!-- 5 -->Support delete in data providers (#2978) @Janpot
+- &#8203;<!-- 4 -->Initial authorization implementation (#2931) @Janpot
+- &#8203;<!-- 3 -->Update custom server nextjs README.md (#2977) @prakhargupta1
+- &#8203;<!-- 2 -->[core] Update workflows and issue templates to reflect the updated label (#2992) @MBilalShafi
+- &#8203;<!-- 1 -->[core] Update `no-response` workflow (#2989) @MBilalShafi
+
+All contributors of this release in alphabetical order: @Janpot, @MBilalShafi, @prakhargupta1
+
+## 0.1.40
+
+<!-- generated comparing v0.1.39..master -->
+
+_Dec 7, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Some important fixes, code pages UI improvements, preparation for new features and docs improvements!
+
+- &#8203;<!-- 12 -->Fix sizing of page container (#2974) @Janpot
+- &#8203;<!-- 11 -->Fix crash when a query name is the same as a page name (#2975) @Janpot
+- &#8203;<!-- 10 -->Move custom server documentation to concepts section (#2972) @prakhargupta1
+- &#8203;<!-- 09 -->Add json-schema url to yaml files (#2970) @Janpot
+- &#8203;<!-- 08 -->Add a new feature as default Value (#2922) @JerryWu1234
+- &#8203;<!-- 07 -->Unclutter UI for code pages (#2961) @Janpot
+- &#8203;<!-- 06 -->Update release instructions smoke test (#2958) @Janpot
+- &#8203;<!-- 05 -->Remove id from examples (#2959) @Janpot
+- &#8203;<!-- 04 -->[core] Upgrade monorepo (#2979) @bharatkashyap
+- &#8203;<!-- 03 -->[docs] Why Toolpad? iteration (#2854) @oliviertassinari
+- &#8203;<!-- 02 -->[examples] Polish examples (#2962) @oliviertassinari
+- &#8203;<!-- 01 -->[WIP] Allow importing server functions in custom pages (#2953) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari, @prakhargupta1
+
+## 0.1.39
+
+<!-- generated comparing v0.1.38..master -->
+
+_Dec 1, 2023_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+Pages are now routed to by their name. Bug fixes.
+
+- &#8203;<!-- 16 -->Make routing page name based (#2949) @Janpot
+- &#8203;<!-- 14 -->Update monorepo (#2955) @Janpot
+- &#8203;<!-- 13 -->Tweak titles to improve SERP results (#2954) @Janpot
+- &#8203;<!-- 12 -->Allow omitting page.yml for code pages (#2947) @Janpot
+- &#8203;<!-- 11 -->Use ESM for CLI (#2920) @Janpot
+- &#8203;<!-- 10 -->Update documentation for HTTP requests secret handling (#2951) @prakhargupta1
+- &#8203;<!-- 09 -->Refactor virtual files implementation (#2946) @Janpot
+- &#8203;<!-- 08 -->Make page title optional in the yml files (#2948) @Janpot
+- &#8203;<!-- 07 -->Update CONTRIBUTING.md (#2940) @Janpot
+- &#8203;<!-- 06 -->Fix Toolpad not picking a free port (#2943) @Janpot
+- &#8203;<!-- 05 -->Fix crash when function result type contains a constructor property (#2941) @Janpot
+- &#8203;<!-- 04 -->Fix Date serialization in serverless functions (#2942) @Janpot
+- &#8203;<!-- 03 -->Link the latest 3 examples to the overview page (#2933) @prakhargupta1
+- &#8203;<!-- 02 -->[docs] Fix 404 regressions in the docs (#2939) @oliviertassinari
+- &#8203;<!-- 01 -->[Example] Run Next.js and Toolpad together (#2918) @Janpot
+
+All contributors of this release in alphabetical order: @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
 ## v0.1.38
 
 <!-- generated comparing v0.1.37..master -->

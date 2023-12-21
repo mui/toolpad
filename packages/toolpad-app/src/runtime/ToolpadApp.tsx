@@ -92,10 +92,11 @@ import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
+import { AuthenticationProvider, RequireAuthorization, User } from './auth';
 
 const browserJsRuntime = getBrowserRuntime();
 
-const IS_RENDERED_IN_CANVAS =
+export const IS_RENDERED_IN_CANVAS =
   typeof window === 'undefined'
     ? false
     : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
@@ -153,14 +154,14 @@ function usePageNavigator(): NavigateToPage {
   const canvasEvents = React.useContext(CanvasEventsContext);
 
   const navigateToPage: NavigateToPage = React.useCallback(
-    (pageNodeId, pageParameters) => {
+    (pageName, pageParameters) => {
       const urlParams = pageParameters && new URLSearchParams(pageParameters);
 
       if (canvasEvents) {
-        canvasEvents.emit('pageNavigationRequest', { pageNodeId });
+        canvasEvents.emit('pageNavigationRequest', { pageName });
       } else {
         navigate({
-          pathname: `/pages/${pageNodeId}`,
+          pathname: `/pages/${pageName}`,
           ...(urlParams
             ? {
                 search: urlParams.toString(),
@@ -1427,10 +1428,11 @@ export interface RenderedNodeProps {
   nodeId: NodeId;
 }
 
-export function RenderedPage({ nodeId }: RenderedNodeProps) {
-  const dom = useDomContext();
-  const page = appDom.getNode(dom, nodeId, 'page');
+export interface RenderedPageProps {
+  page: appDom.PageNode;
+}
 
+export function RenderedPage({ page }: RenderedPageProps) {
   usePageTitle(appDom.getPageTitle(page));
 
   if (page.attributes.codeFile) {
@@ -1456,6 +1458,14 @@ function PageNotFound() {
   );
 }
 
+/**
+ * Returns whether authentication has been configured for this application.
+ */
+function useAppHasAuthentication() {
+  // TODO: read from authentication
+  return false;
+}
+
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
 }
@@ -1463,32 +1473,43 @@ interface RenderedPagesProps {
 function RenderedPages({ pages }: RenderedPagesProps) {
   const defaultPage = pages[0];
 
-  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
+  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}`} replace />;
+  const { search } = useLocation();
+
+  const appAuthenticationEnabled = useAppHasAuthentication();
+
   return (
     <Routes>
-      {pages.map((page) => (
-        <React.Fragment key={page.id}>
-          <Route
-            path={`/pages/${page.id}`}
-            element={
-              <RenderedPage
-                nodeId={page.id}
-                // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
-                // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-                key={page.id}
-              />
-            }
+      {pages.map((page) => {
+        let pageContent = (
+          <RenderedPage
+            page={page}
+            // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
+            // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+            key={page.name}
           />
-        </React.Fragment>
-      ))}
-      {pages.map((page) => (
-        <React.Fragment key={page.id}>
+        );
+
+        if (!IS_RENDERED_IN_CANVAS && appAuthenticationEnabled && page.attributes.authorization) {
+          pageContent = (
+            <RequireAuthorization allowedRole={page.attributes.authorization.allowedRoles}>
+              {pageContent}
+            </RequireAuthorization>
+          );
+        }
+
+        return <Route key={page.name} path={`/pages/${page.name}`} element={pageContent} />;
+      })}
+      {pages.flatMap((page) =>
+        page.attributes.alias?.map((alias) => (
           <Route
-            path={`/pages/${page.name}`}
-            element={<Navigate to={`/pages/${page.id}`} replace />}
+            key={`${page.name}-${alias}`}
+            path={`/pages/${alias}`}
+            element={<Navigate to={`/pages/${page.name}${search}`} replace />}
           />
-        </React.Fragment>
-      ))}
+        )),
+      )}
+
       <Route path="/pages" element={defaultPageNavigation} />
       <Route path="/" element={defaultPageNavigation} />
       <Route path="*" element={<PageNotFound />} />
@@ -1534,8 +1555,8 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
   const navEntries = React.useMemo(
     () =>
       pages.map((page) => ({
-        slug: page.id,
-        displayName: page.name,
+        slug: page.name,
+        displayName: page.attributes.displayName ?? page.name,
         hasShell: page?.attributes.display !== 'standalone',
       })),
     [pages],
@@ -1579,6 +1600,8 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
+  const currentUser: User | null = null;
+
   return (
     <BrowserRouter basename={basename}>
       <UseDataProviderContext.Provider value={useDataProvider}>
@@ -1592,7 +1615,9 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
                       <QueryClientProvider client={queryClient}>
-                        <ToolpadAppLayout dom={dom} />
+                        <AuthenticationProvider user={currentUser}>
+                          <ToolpadAppLayout dom={dom} />
+                        </AuthenticationProvider>
                         {showDevtools ? (
                           <ReactQueryDevtoolsProduction initialIsOpen={false} />
                         ) : null}

@@ -1,4 +1,4 @@
-import { IconButton, InputAdornment, TextField } from '@mui/material';
+import { IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
 import * as React from 'react';
 import ResetIcon from '@mui/icons-material/RestartAlt';
 import * as appDom from '../../appDom';
@@ -63,9 +63,11 @@ export default function PageDisplayNameEditor({ node }: PageDisplayNameEditorPro
         endAdornment:
           pageDisplayNameInput === node.attributes.displayName ? (
             <InputAdornment position="end">
-              <IconButton aria-label="Reset to default value" onClick={handleReset} edge="end">
-                <ResetIcon />
-              </IconButton>
+              <Tooltip title="Reset to default value">
+                <IconButton onClick={handleReset} edge="end">
+                  <ResetIcon />
+                </IconButton>
+              </Tooltip>
             </InputAdornment>
           ) : null,
       }}

@@ -168,9 +168,6 @@ import { init, setComponents } from '@mui/toolpad/runtime';
 import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
-import pagesManifest from 'virtual:toolpad-files:pages-manifest.json';
-
-console.log(pagesManifest)
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 

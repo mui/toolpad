@@ -1053,7 +1053,10 @@ class ToolpadProject {
     };
 
     chokidar
-      .watch([path.resolve(this.root, './pages/*/page.*')], watchOptions)
+      .watch(
+        [path.resolve(this.root, './pages'), path.resolve(this.root, './pages/*/page.*')],
+        watchOptions,
+      )
       .on('add', handlePageFileChange)
       .on('addDir', handlePageFileChange)
       .on('unlink', handlePageFileChange)

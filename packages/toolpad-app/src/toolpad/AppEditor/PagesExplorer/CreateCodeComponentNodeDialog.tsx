@@ -42,11 +42,14 @@ export default function CreateCodeComponentDialog({
   const codeComponents = useToolpadComponents();
 
   const existingNames = React.useMemo(
-    () => new Set(Object.values(codeComponents).map((component) => component?.displayName)),
+    () =>
+      new Set(
+        Object.values(codeComponents)
+          .map((component) => component?.displayName)
+          .filter(Boolean),
+      ),
     [codeComponents],
   );
-
-  console.log(existingNames);
 
   const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
 

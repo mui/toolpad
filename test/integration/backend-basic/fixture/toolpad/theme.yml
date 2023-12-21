@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.41/docs/schemas/v1/definitions.json#properties/Theme
+
+apiVersion: v1
+kind: theme
+spec:
+  options:
+    palette:
+      mode: light

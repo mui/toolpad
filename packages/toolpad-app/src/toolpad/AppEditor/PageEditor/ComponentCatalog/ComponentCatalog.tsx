@@ -89,7 +89,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     [openStart, setOpenStart],
   );
 
-  const toolpadComponents = useToolpadComponents(dom);
+  const toolpadComponents = useToolpadComponents();
 
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     const def = toolpadComponents[componentType];

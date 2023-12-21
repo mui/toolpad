@@ -1488,7 +1488,8 @@ function RenderedPages({ pages, hasAuthentication = false, basename }: RenderedP
         if (!IS_RENDERED_IN_CANVAS && hasAuthentication && page.attributes.authorization) {
           pageContent = (
             <RequireAuthorization
-              allowedRole={page.attributes.authorization.allowedRoles}
+              allowAll={page.attributes.authorization.allowAll}
+              allowedRoles={page.attributes.authorization.allowedRoles}
               basename={basename}
             >
               {pageContent}

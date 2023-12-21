@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Checkbox,
@@ -19,6 +20,7 @@ import {
   Snackbar,
   Stack,
   Tab,
+  TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -154,6 +156,7 @@ interface Role {
 interface RoleRow extends Role {
   id: string;
   pages: string[];
+  users: string[];
   isNew?: boolean;
 }
 
@@ -233,6 +236,9 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
         pages: pages
           .filter((page) => page.attributes.authorization?.allowedRoles?.includes(role.name))
           .map((page) => page.name),
+        users: (appNode.attributes.authorization?.users ?? [])
+          .filter((user) => (user.roles ?? []).includes(role.name))
+          .map((user) => user.email),
       })) ?? [];
 
     return [...existingRows, ...(draftRow ? [draftRow] : [])];
@@ -244,7 +250,7 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
         field: 'name',
         headerName: 'Name',
         editable: true,
-        flex: 0.25,
+        flex: 0.4,
       },
       {
         field: 'description',
@@ -269,6 +275,22 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
         },
       },
       {
+        field: 'users',
+        headerName: 'Users',
+        type: 'number',
+        renderCell: ({ value }) => {
+          const previewLength = 3;
+          const preview = `${value.slice(0, previewLength).join(', ')}${
+            value.length > previewLength ? '...' : ''
+          }`;
+          return (
+            <Tooltip title={preview}>
+              <span>{value.length}</span>
+            </Tooltip>
+          );
+        },
+      },
+      {
         field: 'actions',
         type: 'actions',
         headerName: '',
@@ -276,11 +298,12 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
         cellClassName: 'actions',
         getActions: ({ row }) => {
           const isBlockedByPages = row.pages.length > 0;
+          const isBlockedByUsers = row.users.length > 0;
 
           const deleteButton = (
             <GridActionsCellItem
               key="delete"
-              disabled={isBlockedByPages || row.isNew}
+              disabled={isBlockedByPages || isBlockedByUsers || row.isNew}
               icon={<DeleteIcon />}
               label="Delete"
               onClick={() => deleteRole(row.name)}
@@ -289,10 +312,10 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
           );
 
           return [
-            isBlockedByPages ? (
+            isBlockedByPages || isBlockedByUsers ? (
               <Tooltip
                 key="delete"
-                title="This role can't be deleted because it is still associated with existing pages."
+                title="This role can't be deleted because it is still associated with existing pages or users."
               >
                 <span>{deleteButton}</span>
               </Tooltip>
@@ -342,13 +365,14 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
       ...newRow,
       id: newRow.name,
       pages: [],
+      users: [],
       isNew: false,
     };
   };
 
   const handleAddNewRole = React.useCallback(() => {
     const draftRowId = `<draft_row>-${Math.random()}`;
-    setDraftRow({ id: draftRowId, name: '', description: '', pages: [], isNew: true });
+    setDraftRow({ id: draftRowId, name: '', description: '', pages: [], users: [], isNew: true });
     setRowModesModel((oldModel) => ({
       ...oldModel,
       [draftRowId]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
@@ -498,17 +522,14 @@ export function AppAuthorizationUsersEditor({
   );
 
   const handleEditRoles = React.useCallback(
-    (email: string, gridApi: GridApiCommunity) => (event: SelectChangeEvent<AuthProvider[]>) => {
-      const {
-        target: { value: roles },
-      } = event;
-
-      gridApi.setEditCellValue({
-        id: draftRow?.id || email,
-        field: 'roles',
-        value: roles,
-      });
-    },
+    (email: string, gridApi: GridApiCommunity) =>
+      (event: React.SyntheticEvent<Element, Event>, roles: AuthProvider[]) => {
+        gridApi.setEditCellValue({
+          id: draftRow?.id || email,
+          field: 'roles',
+          value: roles,
+        });
+      },
     [draftRow?.id],
   );
 
@@ -531,7 +552,9 @@ export function AppAuthorizationUsersEditor({
       return (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
           {rowUser && rowUser.roles.length === 0 ? (
-            <Typography variant="body2">No roles assigned.</Typography>
+            <Typography variant="body2" color="grey">
+              No roles assigned.
+            </Typography>
           ) : null}
           {rowUser
             ? rowUser.roles.map((role) => <Chip key={role} label={role} size="small" />)
@@ -545,31 +568,26 @@ export function AppAuthorizationUsersEditor({
   const renderEditRolesCell = React.useCallback(
     ({ row, value, api }: GridRenderCellParams) => {
       return (
-        <Select
+        <Autocomplete
           multiple
+          options={authorization?.roles?.map((role) => role.name) ?? []}
           value={value}
           onChange={handleEditRoles(row.email, api)}
-          renderValue={(selected) => (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {selected.map((selectedValue) => (
-                <Chip key={selectedValue} label={selectedValue} size="small" />
-              ))}
-            </Box>
-          )}
           fullWidth
+          noOptionsText="No roles assigned"
+          renderInput={(params) => <TextField {...params} />}
           sx={{
+            position: 'relative',
+            top: '-3px',
             height: '100%',
+            '.MuiFormControl-root': {
+              marginTop: 0,
+            },
             '.MuiOutlinedInput-notchedOutline': {
               border: 'none',
             },
           }}
-        >
-          {(authorization?.roles ?? []).map((role) => (
-            <MenuItem key={role.name} value={role.name}>
-              {role.name}
-            </MenuItem>
-          ))}
-        </Select>
+        />
       );
     },
     [authorization?.roles, handleEditRoles],
@@ -581,7 +599,7 @@ export function AppAuthorizationUsersEditor({
         field: 'email',
         headerName: 'Email',
         editable: true,
-        flex: 0.25,
+        flex: 0.4,
       },
       {
         field: 'roles',
@@ -655,7 +673,7 @@ export function AppAuthorizationUsersEditor({
     return {
       ...newRow,
       id: newRow.email,
-      roles: [],
+      roles: newRow.roles,
       isNew: false,
     };
   };

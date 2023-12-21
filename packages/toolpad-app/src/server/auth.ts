@@ -4,8 +4,27 @@ import GithubProvider from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import { asyncHandler } from '../utils/express';
 import { encodeRequestBody } from './httpApiAdapters';
+import * as appDom from '../appDom';
+import { ToolpadProject } from './localMode';
 
-export function createAuthHandler(base: string): Router {
+async function getProfileRoles(email: string, project: ToolpadProject) {
+  const dom = await project.loadDom();
+
+  const app = appDom.getApp(dom);
+
+  let roles: string[] = [];
+  if (email) {
+    const authUser = app.attributes.authorization?.users?.find((user) => user.email === email);
+    roles = authUser?.roles ?? [];
+  }
+
+  return roles;
+}
+
+export function createAuthHandler(project: ToolpadProject): Router {
+  const { options } = project;
+  const { base } = options;
+
   const router = express.Router();
 
   router.use(
@@ -42,6 +61,18 @@ export function createAuthHandler(base: string): Router {
           GithubProvider({
             clientId: process.env.TOOLPAD_GITHUB_ID,
             clientSecret: process.env.TOOLPAD_GITHUB_SECRET,
+            async profile(profile) {
+              const roles = await getProfileRoles(profile.email ?? '', project);
+
+              return {
+                ...profile,
+                id: profile.email ?? String(profile.id),
+                name: profile.name,
+                email: profile.email,
+                image: profile.avatar_url,
+                roles,
+              };
+            },
           }),
           GoogleProvider({
             clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
@@ -53,9 +84,17 @@ export function createAuthHandler(base: string): Router {
                 response_type: 'code',
               },
             },
-            // profile(profile) {
-            //   return profile;
-            // },
+            async profile(profile) {
+              const roles = await getProfileRoles(profile.email, project);
+
+              return {
+                id: profile.email,
+                name: profile.name,
+                email: profile.email,
+                image: profile.picture,
+                roles,
+              };
+            },
           }),
         ],
         secret: process.env.TOOLPAD_AUTH_SECRET,
@@ -75,19 +114,19 @@ export function createAuthHandler(base: string): Router {
           async redirect({ baseUrl }) {
             return `${baseUrl}${base}`;
           },
-          // jwt({ token, user }) {
-          //   if (user) {
-          //     token.role = user.role;
-          //   }
-          //   return token;
-          // },
-          // session({ session, token }) {
-          //   if (session.user) {
-          //     session.user.role = token.role;
-          //   }
+          jwt({ token, user }) {
+            if (user) {
+              token.roles = user.roles ?? [];
+            }
+            return token;
+          },
+          session({ session, token }) {
+            if (session.user) {
+              session.user.roles = token.roles ?? [];
+            }
 
-          //   return session;
-          // },
+            return session;
+          },
         },
       })) as Response;
 

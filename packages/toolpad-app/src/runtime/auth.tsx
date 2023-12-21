@@ -5,21 +5,23 @@ import { AUTH_SIGNIN_PATH, AuthContext } from './useAuth';
 
 export interface RequireAuthorizationProps {
   children?: React.ReactNode;
-  allowedRole?: string | string[];
+  allowAll?: boolean;
+  allowedRoles?: string[];
   basename: string;
 }
 
 export function RequireAuthorization({
   children,
-  allowedRole,
+  allowAll,
+  allowedRoles,
   basename,
 }: RequireAuthorizationProps) {
   const { session, isSigningIn } = React.useContext(AuthContext);
   const user = session?.user ?? null;
 
   const allowedRolesSet = React.useMemo<Set<string>>(
-    () => new Set(asArray(allowedRole ?? [])),
-    [allowedRole],
+    () => new Set(asArray(allowedRoles ?? [])),
+    [allowedRoles],
   );
 
   let reason = null;
@@ -43,16 +45,11 @@ export function RequireAuthorization({
     );
   }
 
-  if (!user.roles || user.roles.length <= 0) {
-    reason = 'User has no roles defined.';
-  } else if (!user.roles.some((role) => allowedRolesSet.has(role))) {
-    const rolesList = user?.roles?.map((role) => JSON.stringify(role)).join(', ');
-    reason = `User with role(s) ${rolesList} is not allowed access to this resource.`;
+  if (!allowAll && !user.roles.some((role) => allowedRolesSet.has(role))) {
+    reason = `User does not have the roles to access this page.`;
   }
 
-  // @TODO: Once we have roles we can add back this check.
-  const skipReason = true;
-  return !skipReason && reason ? (
+  return reason ? (
     <Box
       sx={{
         flex: 1,

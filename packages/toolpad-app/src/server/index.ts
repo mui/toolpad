@@ -124,7 +124,7 @@ async function createDevHandler(project: ToolpadProject) {
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
 
   if (process.env.TOOLPAD_AUTH_SECRET) {
-    const authHandler = createAuthHandler(project.options.base);
+    const authHandler = createAuthHandler(project);
     handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
   }
 

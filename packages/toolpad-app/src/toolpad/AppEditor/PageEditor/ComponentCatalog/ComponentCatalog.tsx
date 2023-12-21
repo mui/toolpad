@@ -40,11 +40,11 @@ const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Radio', { url: 'https://github.com/mui/mui-toolpad/issues/744', displayName: 'Radio' }],
 ]);
 
-const WIDTH_COLLAPSED = 40;
+const COMPONENT_CATALOG_WIDTH_COLLAPSED = 40;
 
 const ComponentCatalogRoot = styled('div')({
   position: 'relative',
-  width: WIDTH_COLLAPSED + 1,
+  width: COMPONENT_CATALOG_WIDTH_COLLAPSED + 1,
   height: '100%',
   zIndex: 1,
   overflow: 'visible',
@@ -354,7 +354,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              width: WIDTH_COLLAPSED,
+              width: COMPONENT_CATALOG_WIDTH_COLLAPSED,
             }}
           >
             <Box sx={{ mt: 2 }}>{openStart ? <ArrowLeftIcon /> : <ArrowRightIcon />}</Box>

@@ -5,12 +5,16 @@ import PagesExplorer from './PagesExplorer';
 import PageHierarchyExplorer from './HierarchyExplorer';
 import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
+import { QueriesExplorer, ActionsExplorer } from './PageEditor/QueriesExplorer';
 import { useProject } from '../../project';
 import * as appDom from '../../appDom';
+
+const PAGE_PANEL_WIDTH = 250;
 
 const PagePanelRoot = styled('div')({
   display: 'flex',
   flexDirection: 'column',
+  width: PAGE_PANEL_WIDTH,
 });
 
 export interface ComponentPanelProps {
@@ -44,14 +48,22 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
       <Divider />
 
       <PanelGroup autoSaveId="toolpad-page-panel" direction="vertical">
-        <Panel minSize={10} defaultSize={30} maxSize={75}>
+        <Panel minSize={10} defaultSize={30} maxSize={75} id={'pages-explorer'}>
           <PagesExplorer />
         </Panel>
         {currentPageNode && !appDom.isCodePage(currentPageNode) ? (
           <React.Fragment>
             <PanelResizeHandle />
-            <Panel minSize={25} maxSize={90}>
+            <Panel minSize={25} maxSize={90} id={'hierarchy-explorer'}>
               <PageHierarchyExplorer />
+            </Panel>
+            <PanelResizeHandle />
+            <Panel id={'queries-explorer'} minSize={10} defaultSize={25} maxSize={90}>
+              <QueriesExplorer />
+            </Panel>
+            <PanelResizeHandle />
+            <Panel id={'actions-explorer'} minSize={10} defaultSize={25} maxSize={90}>
+              <ActionsExplorer />
             </Panel>
           </React.Fragment>
         ) : null}

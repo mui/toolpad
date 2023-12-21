@@ -1,8 +1,9 @@
 import * as path from 'path';
 import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect, Locator } from '../../playwright/localTest';
+import { test, expect } from '../../playwright/localTest';
 import clickCenter from '../../utils/clickCenter';
+import { cellLocator } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -55,12 +56,6 @@ test('Column prop updates are not lost on drag interactions', async ({ page }) =
     editorModel.pageRoot.getByRole('row', { name: 'Todd Breitenberg' }).getByTestId('CheckIcon'),
   ).toBeVisible();
 });
-
-function cellLocator(gridLocator: Locator, rowIndex: number, collIndex: number) {
-  return gridLocator
-    .locator(`[aria-rowindex="${rowIndex}"]`)
-    .locator(`[aria-colindex="${collIndex}"]`);
-}
 
 test('Date columns', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);

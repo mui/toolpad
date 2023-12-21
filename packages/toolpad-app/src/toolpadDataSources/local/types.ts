@@ -2,7 +2,6 @@ import { BindableAttrValue, ExecFetchResult, PrimitiveValueType } from '@mui/too
 import type { IntrospectionResult } from '../../server/functionsTypesWorker';
 
 export interface LocalConnectionParams {}
-
 export interface LocalQuery {
   /**
    * name of the handler to execute.

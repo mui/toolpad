@@ -44,8 +44,8 @@
     "@mui/toolpad-core": "0.1.41",
     "@mui/toolpad-utils": "0.1.41",
     "@mui/x-charts": "6.18.3",
-    "@mui/x-data-grid-pro": "6.18.4",
-    "@mui/x-date-pickers": "6.18.4",
+    "@mui/x-data-grid-pro": "6.18.5",
+    "@mui/x-date-pickers": "6.18.5",
     "@mui/x-license-pro": "6.10.2",
     "@tanstack/react-query": "5.14.1",
     "dayjs": "1.11.10",
@@ -55,6 +55,7 @@
     "react-hook-form": "7.49.2"
   },
   "devDependencies": {
+    "@types/invariant": "2.2.35",
     "@types/react": "18.2.45",
     "react": "18.2.0"
   },

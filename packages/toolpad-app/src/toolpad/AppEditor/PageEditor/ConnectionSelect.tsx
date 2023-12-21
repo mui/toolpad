@@ -80,27 +80,16 @@ export default function ConnectionSelect({
   }, [options, value]);
 
   return (
-    <TextField
-      sx={sx}
-      select
-      fullWidth
-      value={selection}
-      label="Connection"
-      onChange={handleSelectionChange}
-    >
+    <TextField sx={sx} select value={selection} label="Connection" onChange={handleSelectionChange}>
       {options.map((option, index) => {
         const config = dataSources[option.dataSourceId];
         const dataSourceLabel = config
           ? config.displayName
           : `<unknown datasource "${option.dataSourceId}">`;
 
-        const connectionLabel = option.connectionId
-          ? appDom.getMaybeNode(dom, option.connectionId)?.name
-          : '<default>';
         return (
           <MenuItem key={index} value={index}>
             {dataSourceLabel}
-            {config?.ConnectionParamsInput ? ` | ${connectionLabel}` : ''}
           </MenuItem>
         );
       })}

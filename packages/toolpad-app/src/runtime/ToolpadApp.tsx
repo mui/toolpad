@@ -563,8 +563,12 @@ function parseBindings(
     }
 
     if (appDom.isQuery(elm)) {
+      let kind: 'query' | 'action' = 'query';
+      if (elm.attributes.mode === 'mutation') {
+        kind = 'action';
+      }
       scopeMeta[elm.name] = {
-        kind: 'query',
+        kind,
       };
 
       if (elm.params) {
@@ -1556,7 +1560,7 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
     () =>
       pages.map((page) => ({
         slug: page.name,
-        displayName: page.attributes.displayName ?? page.name,
+        displayName: appDom.getPageDisplayName(page),
         hasShell: page?.attributes.display !== 'standalone',
       })),
     [pages],

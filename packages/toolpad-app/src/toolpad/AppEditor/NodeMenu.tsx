@@ -47,6 +47,13 @@ export default function NodeMenu({
   const deletedNode = deletedNodeId && appDom.getMaybeNode(dom, deletedNodeId);
   const latestDeletedNode = useLatest(deletedNode);
 
+  const isAction = React.useMemo(() => {
+    if (latestDeletedNode?.type === 'query' && latestDeletedNode?.attributes?.mode === 'mutation') {
+      return true;
+    }
+    return false;
+  }, [latestDeletedNode]);
+
   const handleDeleteNodeDialogClose = React.useCallback(
     (confirmed: boolean, event: React.MouseEvent) => {
       event.stopPropagation();
@@ -118,7 +125,8 @@ export default function NodeMenu({
         onClose={handleDeleteNodeDialogClose}
         okButton="Delete"
       >
-        Delete {latestDeletedNode?.type} &quot;{latestDeletedNode?.name}&quot;?
+        Delete {isAction ? 'action' : 'query'} &quot;{latestDeletedNode?.name}
+        &quot;?
       </ConfirmDialog>
     </React.Fragment>
   );

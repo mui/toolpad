@@ -352,12 +352,14 @@ export const FORM_INPUT_ARG_TYPES: BuiltinArgTypeDefinitions<
     type: 'string',
   },
   isRequired: {
+    label: 'Required',
     helperText: 'Whether the input is required to have a value.',
     type: 'boolean',
     default: false,
     category: 'validation',
   },
   isInvalid: {
+    label: 'Invalid',
     helperText: 'Whether the input value is invalid.',
     type: 'boolean',
     default: false,

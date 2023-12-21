@@ -5,7 +5,7 @@ import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
 import { getHtmlContent, createViteConfig } from './toolpadAppBuilder';
 import type { RuntimeConfig } from '../types';
 import type * as appDom from '../appDom';
-import type { ComponentEntry } from './localMode';
+import type { ComponentEntry, PagesManifest } from './localMode';
 import createRuntimeState from '../runtime/createRuntimeState';
 import { postProcessHtml } from './toolpadAppServer';
 
@@ -15,9 +15,10 @@ export type WorkerRpc = {
   notifyReady: () => Promise<void>;
   loadDom: () => Promise<appDom.AppDom>;
   getComponents: () => Promise<ComponentEntry[]>;
+  getPagesManifest: () => Promise<PagesManifest>;
 };
 
-const { notifyReady, loadDom, getComponents } = createRpcClient<WorkerRpc>(
+const { notifyReady, loadDom, getComponents, getPagesManifest } = createRpcClient<WorkerRpc>(
   workerData.mainThreadRpcPort,
 );
 
@@ -75,6 +76,7 @@ export async function main({ port, ...config }: AppViteServerConfig) {
     dev: true,
     plugins: [devServerPlugin(config)],
     getComponents,
+    getPagesManifest,
     loadDom,
   });
 

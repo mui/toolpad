@@ -92,6 +92,7 @@ async function createDevHandler(project: ToolpadProject) {
     notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
     getComponents: async () => project.getComponents(),
+    getPagesManifest: async () => project.getPagesManifest(),
   });
 
   project.events.on('componentsListChanged', () => {

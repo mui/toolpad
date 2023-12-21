@@ -11,6 +11,7 @@ import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce, throttle } from 'lodash-es';
 import { Emitter } from '@mui/toolpad-utils/events';
+import { guessTitle } from '@mui/toolpad-utils/strings';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import { execa } from 'execa';
@@ -124,7 +125,7 @@ export interface ComponentEntry {
 
 async function getComponents(root: string): Promise<ComponentEntry[]> {
   const componentsFolder = getComponentsFolder(root);
-  const entries = (await readMaybeDir(componentsFolder)) || [];
+  const entries = await readMaybeDir(componentsFolder);
   const result = entries.map((entry) => {
     if (entry.isFile()) {
       const fileName = entry.name;
@@ -151,7 +152,7 @@ async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsCont
 
 async function loadPagesFromFiles(root: string): Promise<PagesContent> {
   const pagesFolder = getPagesFolder(root);
-  const entries = (await readMaybeDir(pagesFolder)) || [];
+  const entries = await readMaybeDir(pagesFolder);
   const resultEntries = await Promise.all(
     entries.map(async (entry): Promise<[string, Page] | null> => {
       if (entry.isDirectory()) {
@@ -197,8 +198,6 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
 
         for (const extension of extensions) {
           if (pageDirEntries.has(`page${extension}`)) {
-            const codeFileName = `./page${extension}`;
-
             return [
               pageName,
               {
@@ -206,7 +205,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
                 kind: 'page',
                 spec: {
                   id: pageName,
-                  unstable_codeFile: codeFileName,
+                  unstable_codeFile: true,
                 },
               } satisfies Page,
             ];
@@ -1057,6 +1056,8 @@ class ToolpadProject {
 
   private pendingVersionCheck: Promise<VersionInfo> | undefined;
 
+  private pagesManifestPromise: Promise<PagesManifest> | undefined;
+
   constructor(root: string, options: ToolpadProjectOptions) {
     invariant(
       // eslint-disable-next-line no-underscore-dangle
@@ -1125,6 +1126,17 @@ class ToolpadProject {
     chokidar.watch(getDomFilePatterns(this.root), watchOptions).on('all', () => {
       updateDomFromExternal();
     });
+
+    chokidar
+      .watch([path.resolve(this.root, './pages/*/page.*')], watchOptions)
+      .on('all', async () => {
+        const oldManifest = await this.pagesManifestPromise;
+        this.pagesManifestPromise = buildPagesManifest(this.root);
+        const newManifest = await this.pagesManifestPromise;
+        if (JSON.stringify(oldManifest) !== JSON.stringify(newManifest)) {
+          this.events.emit('pagesManifestChanged', {});
+        }
+      });
   }
 
   private async loadDomAndFingerprint() {
@@ -1343,6 +1355,13 @@ class ToolpadProject {
       return null;
     }
   }
+
+  async getPagesManifest(): Promise<PagesManifest> {
+    if (!this.pagesManifestPromise) {
+      this.pagesManifestPromise = buildPagesManifest(this.root);
+    }
+    return this.pagesManifestPromise;
+  }
 }
 
 export type { ToolpadProject };
@@ -1371,4 +1390,79 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   await project.init();
 
   return project;
+}
+
+const basePagesManifestEntrySchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+  legacy: z.boolean().optional(),
+});
+
+export interface PagesManifestEntry extends z.infer<typeof basePagesManifestEntrySchema> {
+  children: PagesManifestEntry[];
+}
+
+const pagesManifestEntrySchema: z.ZodType<PagesManifestEntry> = basePagesManifestEntrySchema.extend(
+  {
+    children: z.array(z.lazy(() => pagesManifestEntrySchema)),
+  },
+);
+
+const pagesManifestSchema = z.object({
+  pages: z.array(pagesManifestEntrySchema),
+});
+
+export type PagesManifest = z.infer<typeof pagesManifestSchema>;
+
+async function buildPagesManifest(root: string): Promise<PagesManifest> {
+  const pagesFolder = getPagesFolder(root);
+  const pageDirs = await readMaybeDir(pagesFolder);
+  const pages = (
+    await Promise.all(
+      pageDirs.map(async (page) => {
+        if (page.isDirectory()) {
+          const pagePath = path.resolve(pagesFolder, page.name);
+          const title = guessTitle(page.name);
+
+          const extensions = ['.tsx', '.jsx'];
+
+          for (const extension of extensions) {
+            const pageFilePath = path.resolve(pagePath, `page${extension}`);
+
+            // eslint-disable-next-line no-await-in-loop
+            const stat = await fs.stat(pageFilePath).catch(() => null);
+            if (stat?.isFile()) {
+              return [
+                {
+                  slug: page.name,
+                  title,
+                  children: [],
+                },
+              ];
+            }
+          }
+
+          const pageFilePath = path.resolve(pagePath, 'page.yml');
+
+          const stat = await fs.stat(pageFilePath).catch(() => null);
+          if (stat?.isFile()) {
+            return [
+              {
+                slug: page.name,
+                title,
+                legacy: true,
+                children: [],
+              },
+            ];
+          }
+        }
+
+        return [];
+      }),
+    )
+  ).flat();
+
+  pages.sort((page1, page2) => page1.title.localeCompare(page2.title));
+
+  return { pages };
 }

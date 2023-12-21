@@ -3,7 +3,7 @@ import * as url from 'node:url';
 import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
-import type { ComponentEntry } from './localMode';
+import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import * as appDom from '../appDom';
 import { pathToNodeImportSpecifier } from '../utils/paths';
@@ -143,6 +143,7 @@ export interface CreateViteConfigParams {
   plugins?: Plugin[];
   getComponents: () => Promise<ComponentEntry[]>;
   loadDom: () => Promise<appDom.AppDom>;
+  getPagesManifest: () => Promise<PagesManifest>;
 }
 
 export async function createViteConfig({
@@ -154,6 +155,7 @@ export async function createViteConfig({
   plugins = [],
   getComponents,
   loadDom,
+  getPagesManifest,
 }: CreateViteConfigParams) {
   const mode = dev ? 'development' : 'production';
 
@@ -166,6 +168,9 @@ import { init, setComponents } from '@mui/toolpad/runtime';
 import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
+import pagesManifest from 'virtual:toolpad-files:pages-manifest.json';
+
+console.log(pagesManifest)
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
@@ -229,7 +234,7 @@ if (import.meta.hot) {
     for (const page of pages) {
       const codeFile = page.attributes.codeFile;
       if (codeFile) {
-        const importPath = path.resolve(root, `./pages/${page.name}`, codeFile);
+        const importPath = path.resolve(root, `./pages/${page.name}/page`);
         const relativeImportPath = path.relative(root, importPath);
         const importSpec = `toolpad-user-project:${pathToNodeImportSpecifier(relativeImportPath)}`;
         imports.set(page.name, importSpec);
@@ -260,6 +265,7 @@ if (import.meta.hot) {
     ['canvas.tsx', getEntryPoint(true)],
     ['components.tsx', await createComponentsFile()],
     ['page-components.tsx', await createPageComponentsFile()],
+    ['pages-manifest.json', JSON.stringify(await getPagesManifest(), null, 2)],
   ]);
 
   const virtualToolpadFiles = viteVirtualPlugin(virtualFiles, 'toolpad-files');
@@ -391,6 +397,7 @@ export interface ToolpadBuilderParams {
   outDir: string;
   getComponents: () => Promise<ComponentEntry[]>;
   loadDom: () => Promise<appDom.AppDom>;
+  getPagesManifest: () => Promise<PagesManifest>;
   root: string;
   base: string;
 }
@@ -399,6 +406,7 @@ export async function buildApp({
   root,
   base,
   getComponents,
+  getPagesManifest,
   loadDom,
   outDir,
 }: ToolpadBuilderParams) {
@@ -408,6 +416,7 @@ export async function buildApp({
     base,
     outDir,
     getComponents,
+    getPagesManifest,
     loadDom,
   });
   const vite = await import('vite');

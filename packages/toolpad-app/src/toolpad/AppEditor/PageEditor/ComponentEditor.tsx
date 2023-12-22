@@ -12,7 +12,6 @@ import {
 import { ExactEntriesOf } from '../../../utils/types';
 import * as appDom from '../../../appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
-import { useAppState } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 import { useToolpadComponent } from '../toolpadComponents';
 import { getElementNodeComponentId } from '../../../runtime/toolpadComponents';
@@ -165,12 +164,11 @@ interface SelectedNodeEditorProps {
 }
 
 function SelectedNodeEditor({ node }: SelectedNodeEditorProps) {
-  const { dom } = useAppState();
   const { bindings, viewState } = usePageEditorState();
 
   const componentConfig = viewState.nodes[node.id]?.componentConfig || { argTypes: {} };
 
-  const component = useToolpadComponent(dom, getElementNodeComponentId(node));
+  const component = useToolpadComponent(getElementNodeComponentId(node));
 
   const displayName = component?.displayName || '<unknown>';
 

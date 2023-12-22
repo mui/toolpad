@@ -200,6 +200,8 @@ export type ProjectEvents = {
   envChanged: {};
   // Functions or datasources have been updated
   functionsChanged: {};
+  // Pagesmanifest has changed
+  pagesManifestChanged: {};
 };
 
 export interface ToolpadProjectOptions {

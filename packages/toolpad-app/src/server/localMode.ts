@@ -11,6 +11,7 @@ import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce, throttle } from 'lodash-es';
 import { Emitter } from '@mui/toolpad-utils/events';
+import { guessTitle } from '@mui/toolpad-utils/strings';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import { execa } from 'execa';
@@ -115,43 +116,16 @@ function getAppOutputFolder(root: string) {
   return path.join(getOutputFolder(root), 'app');
 }
 
-type ComponentsContent = Record<string, { code: string }>;
-
 export interface ComponentEntry {
   name: string;
   path: string;
 }
 
-async function getComponents(root: string): Promise<ComponentEntry[]> {
-  const componentsFolder = getComponentsFolder(root);
-  const entries = (await readMaybeDir(componentsFolder)) || [];
-  const result = entries.map((entry) => {
-    if (entry.isFile()) {
-      const fileName = entry.name;
-      const componentName = entry.name.replace(/\.tsx$/, '');
-      const filePath = path.resolve(componentsFolder, fileName);
-      return { name: componentName, path: filePath };
-    }
-    return null;
-  });
-  return result.filter(Boolean);
-}
-
-async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
-  const components = await getComponents(root);
-  const resultEntries = await Promise.all(
-    components.map(async (component): Promise<[string, { code: string }]> => {
-      const content = await fs.readFile(component.path, { encoding: 'utf-8' });
-      return [component.name, { code: content }];
-    }),
-  );
-
-  return Object.fromEntries(resultEntries);
-}
+export type ComponentsManifest = ComponentEntry[];
 
 async function loadPagesFromFiles(root: string): Promise<PagesContent> {
   const pagesFolder = getPagesFolder(root);
-  const entries = (await readMaybeDir(pagesFolder)) || [];
+  const entries = await readMaybeDir(pagesFolder);
   const resultEntries = await Promise.all(
     entries.map(async (entry): Promise<[string, Page] | null> => {
       if (entry.isDirectory()) {
@@ -197,8 +171,6 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
 
         for (const extension of extensions) {
           if (pageDirEntries.has(`page${extension}`)) {
-            const codeFileName = `./page${extension}`;
-
             return [
               pageName,
               {
@@ -206,7 +178,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
                 kind: 'page',
                 spec: {
                   id: pageName,
-                  unstable_codeFile: codeFileName,
+                  unstable_codeFile: true,
                 },
               } satisfies Page,
             ];
@@ -318,58 +290,6 @@ async function initGitignore(root: string) {
       encoding: 'utf-8',
     });
   }
-}
-
-async function writeCodeComponentsToFiles(
-  componentsFolder: string,
-  components: ComponentsContent,
-): Promise<void> {
-  await Promise.all(
-    Object.entries(components).map(async ([componentName, content]) => {
-      const filePath = getComponentFilePath(componentsFolder, componentName);
-      await writeFileRecursive(filePath, content.code, { encoding: 'utf-8' });
-    }),
-  );
-}
-
-function mergeComponentsContentIntoDom(
-  dom: appDom.AppDom,
-  componentsContent: ComponentsContent,
-): appDom.AppDom {
-  const rootNode = appDom.getApp(dom);
-  const { codeComponents: codeComponentNodes = [] } = appDom.getChildNodes(dom, rootNode);
-  const names = new Set([
-    ...Object.keys(componentsContent),
-    ...codeComponentNodes.map((node) => node.name),
-  ]);
-
-  for (const name of names) {
-    const content: { code: string } | undefined = componentsContent[name];
-    const codeComponentNode = codeComponentNodes.find((node) => node.name === name);
-    if (content) {
-      if (codeComponentNode) {
-        dom = appDom.setNodeNamespacedProp(
-          dom,
-          codeComponentNode,
-          'attributes',
-          'code',
-          content.code,
-        );
-      } else {
-        const newNode = appDom.createNode(dom, 'codeComponent', {
-          name,
-          attributes: {
-            code: content.code,
-          },
-        });
-        dom = appDom.addNode(dom, newNode, rootNode, 'codeComponents');
-      }
-    } else if (codeComponentNode) {
-      dom = appDom.removeNode(dom, codeComponentNode.id);
-    }
-  }
-
-  return dom;
 }
 
 function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppDom {
@@ -944,13 +864,11 @@ export type ProjectFolderEntry = {
 interface ToolpadProjectFolder {
   application: Application | null;
   pages: Record<string, Page>;
-  components: Record<string, { code: string }>;
   theme: Theme | null;
 }
 
 async function readProjectFolder(root: string): Promise<ToolpadProjectFolder> {
-  const [componentsContent, pagesContent, theme, application] = await Promise.all([
-    loadCodeComponentsFromFiles(root),
+  const [pagesContent, theme, application] = await Promise.all([
     loadPagesFromFiles(root),
     loadThemeFromFile(root),
     loadApplicationFromFile(root),
@@ -959,29 +877,21 @@ async function readProjectFolder(root: string): Promise<ToolpadProjectFolder> {
   return {
     application,
     pages: pagesContent,
-    components: componentsContent,
     theme,
   };
 }
 
-async function writeProjectFolder(
-  root: string,
-  folder: ToolpadProjectFolder,
-  writeComponents: boolean = false,
-): Promise<void> {
-  const componentsFolder = getComponentsFolder(root);
+async function writeProjectFolder(root: string, folder: ToolpadProjectFolder): Promise<void> {
   await Promise.all([
     writePagesToFiles(root, folder.pages),
     writeThemeFile(root, folder.theme),
     writeApplicationFile(root, folder.application),
-    writeComponents ? writeCodeComponentsToFiles(componentsFolder, folder.components) : null,
   ]);
 }
 
 function projectFolderToAppDom(projectFolder: ToolpadProjectFolder): appDom.AppDom {
   let dom = appDom.createDom();
   dom = mergePagesIntoDom(dom, projectFolder.pages);
-  dom = mergeComponentsContentIntoDom(dom, projectFolder.components);
   if (projectFolder.theme) {
     dom = mergeThemeIntoAppDom(dom, projectFolder.theme);
   }
@@ -1004,8 +914,7 @@ export async function loadDomFromDisk(root: string): Promise<appDom.AppDom> {
 function getDomFilePatterns(root: string) {
   return [
     path.resolve(root, './pages/*/page.yml'),
-    path.resolve(root, './components'),
-    path.resolve(root, './components/*.*'),
+    path.resolve(root, './theme.yml'),
     path.resolve(root, './application.yml'),
   ];
 }
@@ -1025,11 +934,6 @@ async function calculateDomFingerprint(root: string): Promise<number> {
   return insecureHash(JSON.stringify(mtimes));
 }
 
-function getCodeComponentsFingerprint(dom: appDom.AppDom) {
-  const { codeComponents = [] } = appDom.getChildNodes(dom, appDom.getApp(dom));
-  return codeComponents.map(({ name }) => name).join('|');
-}
-
 class ToolpadProject {
   private root: string;
 
@@ -1040,8 +944,6 @@ class ToolpadProject {
   private domAndFingerprintLock = new Lock();
 
   options: ToolpadProjectOptions;
-
-  private codeComponentsFingerprint: null | string = null;
 
   envManager: EnvManager;
 
@@ -1056,6 +958,10 @@ class ToolpadProject {
   private lastVersionCheck = 0;
 
   private pendingVersionCheck: Promise<VersionInfo> | undefined;
+
+  private componentsManifestPromise: Promise<ComponentsManifest> | undefined;
+
+  private pagesManifestPromise: Promise<PagesManifest> | undefined;
 
   constructor(root: string, options: ToolpadProjectOptions) {
     invariant(
@@ -1093,7 +999,7 @@ class ToolpadProject {
 
     const updateDomFromExternal = debounce(() => {
       this.domAndFingerprintLock.use(async () => {
-        const [dom, fingerprint] = await this.loadDomAndFingerprint();
+        const [, fingerprint] = await this.loadDomAndFingerprint();
         const newFingerprint = await calculateDomFingerprint(this.root);
         if (fingerprint !== newFingerprint) {
           // eslint-disable-next-line no-console
@@ -1104,14 +1010,6 @@ class ToolpadProject {
           ]);
           this.events.emit('change', {});
           this.events.emit('externalChange', {});
-
-          const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
-          if (this.codeComponentsFingerprint !== newCodeComponentsFingerprint) {
-            this.codeComponentsFingerprint = newCodeComponentsFingerprint;
-            if (this.codeComponentsFingerprint !== null) {
-              this.events.emit('componentsListChanged', {});
-            }
-          }
         }
       });
     }, 100);
@@ -1125,6 +1023,44 @@ class ToolpadProject {
     chokidar.watch(getDomFilePatterns(this.root), watchOptions).on('all', () => {
       updateDomFromExternal();
     });
+
+    const handleComponentFileChange = async () => {
+      const oldManifest = await this.componentsManifestPromise;
+      this.componentsManifestPromise = this.buildComponentsManifest();
+      const newManifest = await this.componentsManifestPromise;
+      if (JSON.stringify(oldManifest) !== JSON.stringify(newManifest)) {
+        this.events.emit('componentsListChanged', {});
+      }
+    };
+
+    chokidar
+      .watch(
+        [path.resolve(this.root, './components'), path.resolve(this.root, './components/*.*')],
+        watchOptions,
+      )
+      .on('add', handleComponentFileChange)
+      .on('addDir', handleComponentFileChange)
+      .on('unlink', handleComponentFileChange)
+      .on('unlinkDir', handleComponentFileChange);
+
+    const handlePageFileChange = async () => {
+      const oldManifest = await this.pagesManifestPromise;
+      this.pagesManifestPromise = buildPagesManifest(this.root);
+      const newManifest = await this.pagesManifestPromise;
+      if (JSON.stringify(oldManifest) !== JSON.stringify(newManifest)) {
+        this.events.emit('pagesManifestChanged', {});
+      }
+    };
+
+    chokidar
+      .watch(
+        [path.resolve(this.root, './pages'), path.resolve(this.root, './pages/*/page.*')],
+        watchOptions,
+      )
+      .on('add', handlePageFileChange)
+      .on('addDir', handlePageFileChange)
+      .on('unlink', handlePageFileChange)
+      .on('unlinkDir', handlePageFileChange);
   }
 
   private async loadDomAndFingerprint() {
@@ -1213,8 +1149,26 @@ class ToolpadProject {
     return dom;
   }
 
-  async getComponents(): Promise<ComponentEntry[]> {
-    return getComponents(this.getRoot());
+  async buildComponentsManifest(): Promise<ComponentsManifest> {
+    const componentsFolder = getComponentsFolder(this.getRoot());
+    const entries = (await readMaybeDir(componentsFolder)) || [];
+    const result = entries.map((entry) => {
+      if (entry.isFile()) {
+        const fileName = entry.name;
+        const componentName = entry.name.replace(/\.tsx$/, '');
+        const filePath = path.resolve(componentsFolder, fileName);
+        return { name: componentName, path: filePath };
+      }
+      return null;
+    });
+    return result.filter(Boolean);
+  }
+
+  async getComponentsManifest(): Promise<ComponentsManifest> {
+    if (!this.componentsManifestPromise) {
+      this.componentsManifestPromise = this.buildComponentsManifest();
+    }
+    return this.componentsManifestPromise;
   }
 
   async writeDomToDisk(newDom: appDom.AppDom) {
@@ -1343,6 +1297,13 @@ class ToolpadProject {
       return null;
     }
   }
+
+  async getPagesManifest(): Promise<PagesManifest> {
+    if (!this.pagesManifestPromise) {
+      this.pagesManifestPromise = buildPagesManifest(this.root);
+    }
+    return this.pagesManifestPromise;
+  }
 }
 
 export type { ToolpadProject };
@@ -1371,4 +1332,79 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   await project.init();
 
   return project;
+}
+
+const basePagesManifestEntrySchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+  legacy: z.boolean().optional(),
+});
+
+export interface PagesManifestEntry extends z.infer<typeof basePagesManifestEntrySchema> {
+  children: PagesManifestEntry[];
+}
+
+const pagesManifestEntrySchema: z.ZodType<PagesManifestEntry> = basePagesManifestEntrySchema.extend(
+  {
+    children: z.array(z.lazy(() => pagesManifestEntrySchema)),
+  },
+);
+
+const pagesManifestSchema = z.object({
+  pages: z.array(pagesManifestEntrySchema),
+});
+
+export type PagesManifest = z.infer<typeof pagesManifestSchema>;
+
+async function buildPagesManifest(root: string): Promise<PagesManifest> {
+  const pagesFolder = getPagesFolder(root);
+  const pageDirs = await readMaybeDir(pagesFolder);
+  const pages = (
+    await Promise.all(
+      pageDirs.map(async (page) => {
+        if (page.isDirectory()) {
+          const pagePath = path.resolve(pagesFolder, page.name);
+          const title = guessTitle(page.name);
+
+          const extensions = ['.tsx', '.jsx'];
+
+          for (const extension of extensions) {
+            const pageFilePath = path.resolve(pagePath, `page${extension}`);
+
+            // eslint-disable-next-line no-await-in-loop
+            const stat = await fs.stat(pageFilePath).catch(() => null);
+            if (stat?.isFile()) {
+              return [
+                {
+                  slug: page.name,
+                  title,
+                  children: [],
+                },
+              ];
+            }
+          }
+
+          const pageFilePath = path.resolve(pagePath, 'page.yml');
+
+          const stat = await fs.stat(pageFilePath).catch(() => null);
+          if (stat?.isFile()) {
+            return [
+              {
+                slug: page.name,
+                title,
+                legacy: true,
+                children: [],
+              },
+            ];
+          }
+        }
+
+        return [];
+      }),
+    )
+  ).flat();
+
+  pages.sort((page1, page2) => page1.title.localeCompare(page2.title));
+
+  return { pages };
 }

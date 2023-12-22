@@ -103,11 +103,24 @@ function SelectOptionsPropEditor({
 
   const handleOptionChange = React.useCallback(
     (newOption: string | SelectOption) => {
+      const errorState = value.some((item) =>
+        (item as SelectOption)?.value
+          ? (item as SelectOption).value === (newOption as SelectOption)?.value ?? newOption
+          : item === (newOption as SelectOption)?.value ?? newOption,
+      );
+
+      if (errorState) {
+        setAddOptionState(true);
+      } else {
+        setAddOptionState(false);
+      }
+
       if (typeof newOption === 'object') {
         if (!newOption.label) {
           newOption = newOption.value;
         }
       }
+
       onChange(value.map((option, i) => (i === editingIndex ? newOption : option)));
     },
     [editingIndex, onChange, value],
@@ -151,6 +164,14 @@ function SelectOptionsPropEditor({
               <Stack gap={1} py={1}>
                 <TextField
                   label="Value"
+                  error={addOptionState}
+                  helperText={
+                    addOptionState ? (
+                      <span>
+                        Do not input <kbd>same</kbd> value
+                      </span>
+                    ) : null
+                  }
                   value={editingOption.value}
                   onChange={(event) => {
                     handleOptionChange({ ...editingOption, value: event.target.value });

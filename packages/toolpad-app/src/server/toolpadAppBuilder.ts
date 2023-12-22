@@ -367,6 +367,7 @@ if (import.meta.hot) {
           'react/jsx-runtime',
           'recharts',
           'superjson',
+          'title',
           'zod',
         ],
         exclude: [

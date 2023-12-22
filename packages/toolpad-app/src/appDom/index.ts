@@ -41,15 +41,7 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-type AppDomNodeType =
-  | 'app'
-  | 'connection'
-  | 'theme'
-  | 'page'
-  | 'element'
-  | 'codeComponent'
-  | 'query'
-  | 'mutation';
+type AppDomNodeType = 'app' | 'connection' | 'theme' | 'page' | 'element' | 'query' | 'mutation';
 
 export interface AppDomNodeBase {
   readonly id: NodeId;
@@ -120,14 +112,6 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
   };
 }
 
-export interface CodeComponentNode extends AppDomNodeBase {
-  readonly type: 'codeComponent';
-  readonly attributes: {
-    readonly code: string;
-    readonly isNew?: boolean;
-  };
-}
-
 export type FetchMode = 'query' | 'mutation';
 
 /**
@@ -175,7 +159,6 @@ type AppDomNodeOfType<K extends AppDomNodeType> = {
   theme: ThemeNode;
   page: PageNode;
   element: ElementNode;
-  codeComponent: CodeComponentNode;
   query: QueryNode;
   mutation: MutationNode;
 }[K];
@@ -185,7 +168,6 @@ type AllowedChildren = {
     pages: 'page';
     connections: 'connection';
     themes: 'theme';
-    codeComponents: 'codeComponent';
   };
   theme: {};
   connection: {};
@@ -197,7 +179,6 @@ type AllowedChildren = {
   element: {
     [prop: string]: 'element';
   };
-  codeComponent: {};
   query: {};
   mutation: {};
 };
@@ -327,14 +308,6 @@ export function isConnection<P>(node: AppDomNode): node is ConnectionNode<P> {
 
 export function assertIsConnection<P>(node: AppDomNode): asserts node is ConnectionNode<P> {
   assertIsType<ConnectionNode>(node, 'connection');
-}
-
-export function isCodeComponent(node: AppDomNode): node is CodeComponentNode {
-  return isType<CodeComponentNode>(node, 'codeComponent');
-}
-
-export function assertIsCodeComponent(node: AppDomNode): asserts node is CodeComponentNode {
-  assertIsType<CodeComponentNode>(node, 'codeComponent');
 }
 
 export function isTheme(node: AppDomNode): node is ThemeNode {

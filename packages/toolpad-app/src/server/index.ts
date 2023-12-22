@@ -91,7 +91,7 @@ async function createDevHandler(project: ToolpadProject) {
   serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
     notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
-    getComponents: async () => project.getComponents(),
+    getComponents: async () => project.getComponentsManifest(),
     getPagesManifest: async () => project.getPagesManifest(),
   });
 

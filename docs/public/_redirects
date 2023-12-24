@@ -34,6 +34,7 @@
 /toolpad/concepts/display-mode/ /toolpad/concepts/page-properties/#display-mode 301
 /toolpad/concepts/managing-state/ /toolpad/concepts/event-handling/ 301
 /toolpad/reference/components/datagrid/ /toolpad/reference/components/data-grid/ 301
+/toolpad/getting-started/overview/ /toolpad/getting-started/ 301
 
 # Create separate namespace on https://mui.com
 / /toolpad/

@@ -3,8 +3,8 @@
 
 # Legacy redirection
 # 2022
-/toolpad/getting-started/setup/ /toolpad/getting-started/overview/ 301
-/toolpad/getting-started/tutorial/ /toolpad/getting-started/overview/ 301
+/toolpad/getting-started/setup/ /toolpad/getting-started/ 301
+/toolpad/getting-started/tutorial/ /toolpad/getting-started/ 301
 /toolpad/data-fetching/rest/ /toolpad/concepts/http-requests/ 301
 /toolpad/data-fetching/google-sheets/ /toolpad/how-to-guides/connect-to-googlesheets/ 301
 
@@ -34,6 +34,7 @@
 /toolpad/concepts/display-mode/ /toolpad/concepts/page-properties/#display-mode 301
 /toolpad/concepts/managing-state/ /toolpad/concepts/event-handling/ 301
 /toolpad/reference/components/datagrid/ /toolpad/reference/components/data-grid/ 301
+/toolpad/getting-started/overview/ /toolpad/getting-started/ 301
 
 # Create separate namespace on https://mui.com
 / /toolpad/

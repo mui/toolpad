@@ -341,7 +341,7 @@ export function AppAuthenticationEditor() {
   const authProviders = React.useMemo(
     () => authentication?.providers ?? [],
     [authentication?.providers],
-  ).map((provider) => provider.provider);
+  ).map((providerConfig) => providerConfig.provider);
 
   return (
     <Stack direction="column">

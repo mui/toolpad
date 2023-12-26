@@ -1,8 +1,5 @@
 import express from 'express';
 
-/**
- * Encodes an express request body based on the content type header.
- */
 export function encodeRequestBody(req: express.Request) {
   const contentType = req.headers['content-type'];
 
@@ -19,4 +16,26 @@ export function encodeRequestBody(req: express.Request) {
   }
 
   return req.body;
+}
+
+export function adaptRequestFromExpressToFetch(req: express.Request) {
+  // Converting Express req headers to Fetch API's Headers
+  const headers = new Headers();
+  for (const headerName of Object.keys(req.headers)) {
+    const headerValue: string = req.headers[headerName]?.toString() ?? '';
+    if (Array.isArray(headerValue)) {
+      for (const value of headerValue) {
+        headers.append(headerName, value);
+      }
+    } else {
+      headers.append(headerName, headerValue);
+    }
+  }
+
+  // Creating Fetch API's Request object from Express' req
+  return new Request(`${req.protocol}://${req.get('host')}${req.originalUrl}`, {
+    method: req.method,
+    headers,
+    body: /GET|HEAD/.test(req.method) ? undefined : encodeRequestBody(req),
+  });
 }

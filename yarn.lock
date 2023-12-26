@@ -169,15 +169,16 @@
   resolved "https://registry.yarnpkg.com/@assemblyscript/loader/-/loader-0.10.1.tgz#70e45678f06c72fa2e350e8553ec4a4d72b92e06"
   integrity sha512-H71nDOOL8Y7kWRLqf6Sums+01Q5msqBW2KhDUTemh1tvY04eSkSXrK0uj/4mmY0Xr16/3zyZmsrxN7CKuRbNRg==
 
-"@auth/core@0.18.3":
-  version "0.18.3"
-  resolved "https://registry.yarnpkg.com/@auth/core/-/core-0.18.3.tgz#e85c2e8f3dbcee47ff7759d94a762781acedb505"
-  integrity sha512-YXQWxi3pKxngt+2vo3dq8+wDANlUH8nhQgX6EVdd3Enfe3vweBtHqzaWrtWzQnVb8wdGxdhxaoOlYroEBE+/yw==
+"@auth/core@0.19.0":
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/@auth/core/-/core-0.19.0.tgz#d51dcd980ce054006ddcda9fddf4de06ba33a9ce"
+  integrity sha512-BkFg2SoNftMN6A2Sn2g1lLFLTO74qMtFKsZmSCEF9d1csqSaEXIv50k6OrfniODWi5tZP8bcfSxGodv75khlOA==
   dependencies:
     "@panva/hkdf" "^1.1.1"
-    cookie "0.5.0"
-    jose "^5.1.0"
-    oauth4webapi "^2.3.0"
+    "@types/cookie" "0.6.0"
+    cookie "0.6.0"
+    jose "^5.1.3"
+    oauth4webapi "^2.4.0"
     preact "10.11.3"
     preact-render-to-string "5.2.3"
 
@@ -7628,10 +7629,10 @@ jest-worker@^27.4.5:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-jose@^5.1.0:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/jose/-/jose-5.1.1.tgz#d61b923baa6bdeb01040afae8295a084c4b9eb58"
-  integrity sha512-bfB+lNxowY49LfrBO0ITUn93JbUhxUN8I11K6oI5hJu/G6PO6fEUddVLjqdD0cQ9SXIHWXuWh7eJYwZF7Z0N/g==
+jose@^5.1.3:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-5.2.0.tgz#d0ffd7f7e31253f633eefb190a930cd14a916995"
+  integrity sha512-oW3PCnvyrcm1HMvGTzqjxxfnEs9EoFOFWi2HsEGhlFVOXxTE3K9GKWVMFoFw06yPUqwpvEWic1BmtUZBI/tIjw==
 
 joycon@^3.0.1:
   version "3.1.1"
@@ -9331,7 +9332,7 @@ nx@17.1.3, "nx@>=17.1.2 < 18":
     "@nx/nx-win32-arm64-msvc" "17.1.3"
     "@nx/nx-win32-x64-msvc" "17.1.3"
 
-oauth4webapi@^2.3.0:
+oauth4webapi@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/oauth4webapi/-/oauth4webapi-2.4.0.tgz#2a5e75996a33878cced3f367753aa42f21d36e27"
   integrity sha512-ZWl8ov8HeGVyc9Icl1cag76HvIcDAp23eIIT+UVGir+dEu8BMgMlvZeZwqLVd0P8DqaumH4N+QLQXN69G1QjSA==

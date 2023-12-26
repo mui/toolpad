@@ -314,9 +314,9 @@ export function AppAuthenticationEditor() {
   const appState = useAppStateApi();
 
   const handleAuthProvidersChange = React.useCallback(
-    (event: SelectChangeEvent<AuthProvider['id'][]>) => {
+    (event: SelectChangeEvent<AuthProvider['provider'][]>) => {
       const {
-        target: { value: providerIds },
+        target: { value: providers },
       } = event;
 
       appState.update((draft) => {
@@ -324,8 +324,8 @@ export function AppAuthenticationEditor() {
 
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
           ...app.attributes?.authentication,
-          providers: (typeof providerIds === 'string' ? providerIds.split(',') : providerIds).map(
-            (providerId) => ({ id: providerId } as AuthProvider),
+          providers: (typeof providers === 'string' ? providers.split(',') : providers).map(
+            (provider) => ({ provider } as AuthProvider),
           ),
         });
 
@@ -338,21 +338,21 @@ export function AppAuthenticationEditor() {
   const appNode = appDom.getApp(dom);
   const { authentication } = appNode.attributes;
 
-  const authProviderIds = React.useMemo(
+  const authProviders = React.useMemo(
     () => authentication?.providers ?? [],
     [authentication?.providers],
-  ).map((provider) => provider.id);
+  ).map((provider) => provider.provider);
 
   return (
     <Stack direction="column">
       <FormControl>
         <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
-        <Select<AuthProvider['id'][]>
+        <Select<AuthProvider['provider'][]>
           labelId="auth-providers-label"
           label="Authentication providers"
           id="auth-providers"
           multiple
-          value={authProviderIds}
+          value={authProviders}
           onChange={handleAuthProvidersChange}
           fullWidth
           renderValue={(selected) =>
@@ -364,7 +364,7 @@ export function AppAuthenticationEditor() {
           {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
             <MenuItem key={value} value={value}>
               <Stack direction="row" alignItems="center">
-                <Checkbox checked={authProviderIds.indexOf(value as AuthProvider['id']) > -1} />
+                <Checkbox checked={authProviders.indexOf(value as AuthProvider['provider']) > -1} />
                 <Icon fontSize="small" />
                 <Typography ml={1}>{name}</Typography>
               </Stack>

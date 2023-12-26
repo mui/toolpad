@@ -51,7 +51,7 @@ pnpm create toolpad-app my-toolpad-app
 
 ## Documentation
 
-Check out our [documentation](https://mui.com/toolpad/getting-started/overview/).
+Check out our [documentation](https://mui.com/toolpad/getting-started/).
 
 ## Examples
 

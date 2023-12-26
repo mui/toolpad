@@ -98,6 +98,10 @@
         "spec": {
           "type": "object",
           "properties": {
+            "displayName": {
+              "type": "string",
+              "description": "Page name to display in the UI."
+            },
             "id": {
               "type": "string",
               "description": "Serves as a canonical id of the page. Deprecated: use an alias instead."
@@ -413,7 +417,7 @@
               "description": "Authorization configuration for this page."
             },
             "unstable_codeFile": {
-              "type": "string",
+              "type": "boolean",
               "description": "The content of the page as JSX. Experimental, do not use!."
             },
             "display": {

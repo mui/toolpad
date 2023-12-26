@@ -25,7 +25,6 @@ export default defineConfig((options) => [
       // Worker entry points
       appServerWorker: './src/server/appServerWorker.ts',
       appBuilderWorker: './src/server/appBuilderWorker.ts',
-      functionsDevWorker: './src/server/functionsDevWorker.ts',
       functionsTypesWorker: './src/server/functionsTypesWorker.ts',
     },
     format: ['esm'],

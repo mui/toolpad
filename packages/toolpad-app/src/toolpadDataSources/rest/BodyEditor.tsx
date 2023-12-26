@@ -10,6 +10,8 @@ import {
   Toolbar,
   ToolbarProps,
   Typography,
+  inputLabelClasses,
+  inputBaseClasses,
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
 import { BindableAttrValue, LiveBinding, ScopeMeta } from '@mui/toolpad-core';
@@ -122,7 +124,11 @@ function RawBodyEditor({
           <TextField
             select
             label="content-type"
-            sx={{ width: 200 }}
+            sx={{
+              [`& .${inputLabelClasses.root}`]: { fontSize: 12 },
+              [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
+              width: 200,
+            }}
             value={value?.contentType}
             onChange={handleContentTypeChange}
             disabled={disabled}
@@ -241,11 +247,17 @@ export default function BodyEditor({
       <BodyEditorToolbar>
         <TextField
           label="body"
-          sx={{ width: 200 }}
+          // sx={{ width: 200 }}
           select
           value={activeTab}
           onChange={handleTabChange}
           disabled={disabled}
+          sx={{
+            [`& .${inputLabelClasses.root}`]: { fontSize: 12 },
+            [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
+            width: 200,
+          }}
+          inputProps={{ sx: { fontSize: 12 } }}
         >
           <MenuItem value="raw">raw</MenuItem>
           <MenuItem value="urlEncoded">x-www-form-urlencoded</MenuItem>

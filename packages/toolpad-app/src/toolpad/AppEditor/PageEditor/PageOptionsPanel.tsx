@@ -14,11 +14,12 @@ import {
 import * as React from 'react';
 import { useAppState, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
-import QueryEditor from './QueryEditor';
+
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
 import PageTitleEditor from '../PageTitleEditor';
+import PageDisplayNameEditor from '../PageDisplayNameEditor';
 import { FEATURE_FLAG_AUTHORIZATION } from '../../../constants';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
@@ -34,7 +35,6 @@ export default function PageOptionsPanel() {
   const appNode = appDom.getApp(dom);
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
-
   const handleDisplayModeChange = React.useCallback(
     (event: React.MouseEvent<HTMLElement>, newValue: appDom.PageDisplayMode) => {
       domApi.update((draft) =>
@@ -80,6 +80,7 @@ export default function PageOptionsPanel() {
       <Typography variant="subtitle1">Page:</Typography>
       <div>
         <NodeNameEditor node={page} />
+        <PageDisplayNameEditor node={page} />
         <PageTitleEditor node={page} />
       </div>
       <div>
@@ -146,7 +147,6 @@ export default function PageOptionsPanel() {
           <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
           <Typography variant="overline">Page State:</Typography>
           <UrlQueryEditor pageNodeId={pageNodeId} />
-          <QueryEditor />
         </div>
       )}
     </Stack>

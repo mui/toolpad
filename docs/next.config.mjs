@@ -22,6 +22,7 @@ const MONOREPO_PACKAGES = {
   '@mui/lab': path.resolve(MONOREPO_PATH, './packages/mui-lab/src'),
   '@mui/material': path.resolve(MONOREPO_PATH, './packages/mui-material/src'),
   '@mui/material-next': path.resolve(MONOREPO_PATH, './packages/mui-material-next/src'),
+  '@mui/material-nextjs': path.resolve(MONOREPO_PATH, './packages/mui-material-nextjs/src'),
   '@mui/private-theming': path.resolve(MONOREPO_PATH, './packages/mui-private-theming/src'),
   '@mui/styled-engine': path.resolve(MONOREPO_PATH, './packages/mui-styled-engine/src'),
   '@mui/styled-engine-sc': path.resolve(MONOREPO_PATH, './packages/mui-styled-engine-sc/src'),
@@ -43,6 +44,7 @@ export default withDocsInfra(
       // SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-toolpad/blob/master',
       SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
       SOURCE_GITHUB_BRANCH: 'master',
+      GITHUB_TEMPLATE_DOCS_FEEDBACK: '4.docs-feedback.yml',
     },
     webpack: (config, options) => {
       return {

@@ -11,7 +11,7 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
-import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
+import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { AuthProvider, ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
@@ -41,15 +41,7 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-type AppDomNodeType =
-  | 'app'
-  | 'connection'
-  | 'theme'
-  | 'page'
-  | 'element'
-  | 'codeComponent'
-  | 'query'
-  | 'mutation';
+type AppDomNodeType = 'app' | 'connection' | 'theme' | 'page' | 'element' | 'query' | 'mutation';
 
 export interface AppDomNodeBase {
   readonly id: NodeId;
@@ -101,7 +93,8 @@ export interface PageNode extends AppDomNodeBase {
     readonly parameters?: [string, string][];
     readonly module?: string;
     readonly display?: PageDisplayMode;
-    readonly codeFile?: string;
+    readonly codeFile?: boolean;
+    readonly displayName?: string;
     readonly authorization?: {
       readonly allowAll?: boolean;
       readonly allowedRoles?: string[];
@@ -119,14 +112,6 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
     readonly horizontalAlign?: BoxProps['justifyContent'];
     readonly verticalAlign?: BoxProps['alignItems'];
     readonly columnSize?: number;
-  };
-}
-
-export interface CodeComponentNode extends AppDomNodeBase {
-  readonly type: 'codeComponent';
-  readonly attributes: {
-    readonly code: string;
-    readonly isNew?: boolean;
   };
 }
 
@@ -177,7 +162,6 @@ type AppDomNodeOfType<K extends AppDomNodeType> = {
   theme: ThemeNode;
   page: PageNode;
   element: ElementNode;
-  codeComponent: CodeComponentNode;
   query: QueryNode;
   mutation: MutationNode;
 }[K];
@@ -187,7 +171,6 @@ type AllowedChildren = {
     pages: 'page';
     connections: 'connection';
     themes: 'theme';
-    codeComponents: 'codeComponent';
   };
   theme: {};
   connection: {};
@@ -199,7 +182,6 @@ type AllowedChildren = {
   element: {
     [prop: string]: 'element';
   };
-  codeComponent: {};
   query: {};
   mutation: {};
 };
@@ -329,14 +311,6 @@ export function isConnection<P>(node: AppDomNode): node is ConnectionNode<P> {
 
 export function assertIsConnection<P>(node: AppDomNode): asserts node is ConnectionNode<P> {
   assertIsType<ConnectionNode>(node, 'connection');
-}
-
-export function isCodeComponent(node: AppDomNode): node is CodeComponentNode {
-  return isType<CodeComponentNode>(node, 'codeComponent');
-}
-
-export function assertIsCodeComponent(node: AppDomNode): asserts node is CodeComponentNode {
-  assertIsType<CodeComponentNode>(node, 'codeComponent');
 }
 
 export function isTheme(node: AppDomNode): node is ThemeNode {
@@ -841,7 +815,6 @@ export function saveNode(dom: AppDom, node: AppDomNode) {
   if (!nodeExists(dom, node.id)) {
     throw new Error(`Attempt to update node "${node.id}", but it doesn't exist in the dom`);
   }
-
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: update(dom.nodes[node.id], omit(node, ...RESERVED_NODE_PROPERTIES)),
@@ -1209,8 +1182,12 @@ export function getRequiredEnvVars(dom: AppDom): Set<string> {
   return new Set(allVars);
 }
 
+export function getPageDisplayName(node: PageNode): string {
+  return node.attributes.displayName || guessTitle(node.name);
+}
+
 export function getPageTitle(node: PageNode): string {
-  return node.attributes.title || node.name;
+  return node.attributes.title || getPageDisplayName(node);
 }
 
 export function isCodePage(node: PageNode): boolean {

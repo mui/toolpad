@@ -44,6 +44,7 @@ export default withDocsInfra(
       // SOURCE_CODE_ROOT_URL: 'https://github.com/mui/mui-toolpad/blob/master',
       SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
       SOURCE_GITHUB_BRANCH: 'master',
+      GITHUB_TEMPLATE_DOCS_FEEDBACK: '4.docs-feedback.yml',
     },
     webpack: (config, options) => {
       return {

@@ -8,7 +8,7 @@ export const TOOLPAD_TARGET_CLOUD = 'CLOUD';
 export const TOOLPAD_TARGET_PRO = 'PRO';
 export const REPOSITORY_URL = 'https://github.com/mui/mui-toolpad';
 export const LANDING_PAGE_URL = 'https://mui.com/toolpad/';
-export const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/overview/';
+export const DOCUMENTATION_URL = 'https://mui.com/toolpad/getting-started/';
 export const DOCUMENTATION_INSTALLATION_URL =
   'https://mui.com/toolpad/getting-started/installation/';
 export const ROADMAP_URL = 'https://github.com/orgs/mui/projects/9';

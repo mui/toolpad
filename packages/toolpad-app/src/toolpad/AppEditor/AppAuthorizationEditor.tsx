@@ -33,7 +33,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
-import { AuthProvider } from '../../types';
+import { AuthProviderConfig, AuthProvider } from '../../types';
 
 const AUTH_PROVIDERS = new Map([
   ['github', { name: 'GitHub', Icon: GitHubIcon }],
@@ -314,7 +314,7 @@ export function AppAuthenticationEditor() {
   const appState = useAppStateApi();
 
   const handleAuthProvidersChange = React.useCallback(
-    (event: SelectChangeEvent<AuthProvider['provider'][]>) => {
+    (event: SelectChangeEvent<AuthProvider[]>) => {
       const {
         target: { value: providers },
       } = event;
@@ -325,7 +325,7 @@ export function AppAuthenticationEditor() {
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
           ...app.attributes?.authentication,
           providers: (typeof providers === 'string' ? providers.split(',') : providers).map(
-            (provider) => ({ provider } as AuthProvider),
+            (provider) => ({ provider } as AuthProviderConfig),
           ),
         });
 
@@ -347,7 +347,7 @@ export function AppAuthenticationEditor() {
     <Stack direction="column">
       <FormControl>
         <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
-        <Select<AuthProvider['provider'][]>
+        <Select<AuthProvider[]>
           labelId="auth-providers-label"
           label="Authentication providers"
           id="auth-providers"
@@ -364,7 +364,7 @@ export function AppAuthenticationEditor() {
           {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
             <MenuItem key={value} value={value}>
               <Stack direction="row" alignItems="center">
-                <Checkbox checked={authProviders.indexOf(value as AuthProvider['provider']) > -1} />
+                <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
                 <Icon fontSize="small" />
                 <Typography ml={1}>{name}</Typography>
               </Stack>

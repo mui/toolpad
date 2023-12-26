@@ -8,7 +8,7 @@ export const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
 export const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
 export const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
-export type AuthProvider = { provider: 'github' | 'google' };
+export type AuthProvider = 'github' | 'google';
 export interface AuthSession {
   user: {
     name: string;
@@ -20,7 +20,7 @@ export interface AuthSession {
 
 export interface AuthPayload {
   session: AuthSession | null;
-  signIn: (provider: AuthProvider['provider']) => void | Promise<void>;
+  signIn: (provider: AuthProvider) => void | Promise<void>;
   signOut: () => void | Promise<void>;
   isSigningIn: boolean;
   isSigningOut: boolean;
@@ -44,9 +44,11 @@ interface UseAuthInput {
 }
 
 export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
-  const app = appDom.getApp(dom);
-
-  const authProviders = app.attributes.authentication?.providers ?? [];
+  const authProviders = React.useMemo(() => {
+    const app = appDom.getApp(dom);
+    const authProviderConfigs = app.attributes.authentication?.providers ?? [];
+    return authProviderConfigs.map((providerConfig) => providerConfig.provider);
+  }, [dom]);
 
   const hasAuthentication = authProviders.length > 0;
 
@@ -101,7 +103,7 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
   }, [basename, signOut]);
 
   const signIn = React.useCallback(
-    async (provider: AuthProvider['provider']) => {
+    async (provider: AuthProvider) => {
       try {
         setIsSigningIn(true);
 

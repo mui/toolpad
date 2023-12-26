@@ -13,7 +13,7 @@ import invariant from 'invariant';
 import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
 import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
-import { AuthProvider, ConnectionStatus } from '../types';
+import { AuthProviderConfig, ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { envBindingSchema } from '../server/schema';
@@ -58,7 +58,7 @@ export interface AppNode extends AppDomNodeBase {
   readonly parentId: null;
   readonly attributes: {
     readonly authentication?: {
-      readonly providers?: AuthProvider[];
+      readonly providers?: AuthProviderConfig[];
     };
     readonly authorization?: {
       readonly roles?: {

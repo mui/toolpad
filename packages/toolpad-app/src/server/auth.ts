@@ -93,7 +93,6 @@ export async function createAuthPagesMiddleware(project: ToolpadProject) {
 
     if (
       hasAuthentication &&
-      req.originalUrl.startsWith(base) &&
       req.get('sec-fetch-dest') === 'document' &&
       req.originalUrl !== signInPath &&
       !req.originalUrl.startsWith(`${base}/api/auth`)

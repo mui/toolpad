@@ -16,14 +16,14 @@ export default function SignInPage() {
   const { signIn, isSigningIn } = React.useContext(AuthContext);
 
   const [errorSnackbarMessage, setErrorSnackbarMessage] = React.useState<string>('');
-  const [latestSelectedProvider, setLatestSelectedProvider] = React.useState<
-    AuthProvider['provider'] | null
-  >(null);
+  const [latestSelectedProvider, setLatestSelectedProvider] = React.useState<AuthProvider | null>(
+    null,
+  );
 
-  const { authProviders: authProviderConfigs } = React.useContext(AuthContext);
+  const { authProviders } = React.useContext(AuthContext);
 
   const handleSignIn = React.useCallback(
-    (provider: AuthProvider['provider']) => () => {
+    (provider: AuthProvider) => () => {
       setLatestSelectedProvider(provider);
       signIn(provider);
     },
@@ -47,11 +47,6 @@ export default function SignInPage() {
   const handleErrorSnackbarClose = React.useCallback(() => {
     setErrorSnackbarMessage('');
   }, []);
-
-  const authProviders = React.useMemo(
-    () => authProviderConfigs.map((providerConfig) => providerConfig.provider),
-    [authProviderConfigs],
-  );
 
   const productIcon = theme.palette.mode === 'dark' ? productIconDark : productIconLight;
 

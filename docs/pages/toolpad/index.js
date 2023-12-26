@@ -32,7 +32,7 @@ export default function Home() {
       <Head
         title="MUI Toolpad: Low-code admin builder"
         description="Build apps with MUI components, connect to data sources, APIs and build your internal tools 10x faster. Open-source and powered by MUI."
-        card="/static/toolpad/marketing/social-preview.jpg"
+        card="/static/toolpad/marketing/toolpad-og.jpg"
       />
       <NoSsr>
         <SignUpToast />

@@ -36,7 +36,7 @@ The data provider supports two styles of pagination. Index based, and cursor bas
 
 ### Index based
 
-This is the strategy your data is paginated by when it returns data based on a page number and page size. The `getRecords` method will receive `page` and `pageSize` values in it `paginationModel` parameter and returns a set of records representing the page. Index based pagination is the default but you can explicitly enable this by setting `paginationMode` to `'index'`.
+This is the strategy where your data is paginated by when it returns data based on a page number and page size. The `getRecords` method will receive `page` and `pageSize` values in it `paginationModel` parameter and returns a set of records representing the page. Index based pagination is the default but you can explicitly enable this by setting `paginationMode` to `'index'`.
 
 ```tsx
 export default createDataProvider({
@@ -53,7 +53,7 @@ export default createDataProvider({
 
 ### Cursor based
 
-This is the strategy your data is paginated by when it returns data based on a cursor and a page size. The `getRecords` method will receive `cursor` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. You indicate the cursor of the next page with a `cursor` property in the result. Pass `null` to signal the end of the collection. You can enable Cursor based pagination by setting `paginationMode` to `'cursor'`.
+This is the strategy where your data is paginated by when it returns data based on a cursor and a page size. The `getRecords` method will receive `cursor` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. You indicate the cursor of the next page with a `cursor` property in the result. Pass `null` to signal the end of the collection. You can enable Cursor based pagination by setting `paginationMode` to `'cursor'`.
 
 The `cursor` property of the `paginationModel` is `null` when Toolpad fetches the initial page. Any result set returned from the `getRecords` function must be accompanied with a `cursor` property, a string which contains a reference to the next page. This value will be passed as the `cursor` parameter in the `paginationModel` when fetching the subsequent page. Return `null` for this value to indicate the end of the sequence.
 

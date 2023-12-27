@@ -31,9 +31,7 @@ import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import { NumberFormatEditor } from '@mui/toolpad-core/numberFormat';
 import { DateFormatEditor } from '@mui/toolpad-core/dateFormat';
 import type { EditorProps } from '../../types';
-import { useToolpadComponents } from '../AppEditor/toolpadComponents';
-import { ToolpadComponentDefinition } from '../../runtime/toolpadComponents';
-import { useAppState } from '../AppState';
+import { ToolpadComponentDefinition, useToolpadComponents } from '../AppEditor/toolpadComponents';
 import PropertyControl from '../../components/PropertyControl';
 
 // TODO: this import suggests leaky abstraction
@@ -117,8 +115,7 @@ function GridColumnEditor({
   value: editedColumn,
   onChange: handleColumnChange,
 }: GridColumnEditorProps) {
-  const { dom } = useAppState();
-  const toolpadComponents = useToolpadComponents(dom);
+  const toolpadComponents = useToolpadComponents();
   const codeComponents: ToolpadComponentDefinition[] = React.useMemo(() => {
     return Object.values(toolpadComponents)
       .filter(Boolean)
@@ -232,6 +229,22 @@ function GridColumnEditor({
           />
         }
         label="Filterable"
+      />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.editable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                editable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Editable"
       />
 
       <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>

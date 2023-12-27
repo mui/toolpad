@@ -2,10 +2,12 @@ import express, { Router } from 'express';
 import { Auth } from '@auth/core';
 import GithubProvider from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
+import { JWT, getToken } from '@auth/core/jwt';
+import { Session } from '@auth/core/types';
 import { asyncHandler } from '../utils/express';
-import { encodeRequestBody } from './httpApiAdapters';
 import * as appDom from '../appDom';
 import { ToolpadProject } from './localMode';
+import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 
 async function getProfileRoles(email: string, project: ToolpadProject) {
   const dom = await project.loadDom();
@@ -30,25 +32,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
   router.use(
     '/*',
     asyncHandler(async (req, res) => {
-      // Converting Express req headers to Fetch API's Headers
-      const headers = new Headers();
-      for (const headerName of Object.keys(req.headers)) {
-        const headerValue: string = req.headers[headerName]?.toString() ?? '';
-        if (Array.isArray(headerValue)) {
-          for (const value of headerValue) {
-            headers.append(headerName, value);
-          }
-        } else {
-          headers.append(headerName, headerValue);
-        }
-      }
-
-      // Creating Fetch API's Request object from Express' req
-      const request = new Request(`${req.protocol}://${req.get('host')}${req.originalUrl}`, {
-        method: req.method,
-        headers,
-        body: /GET|HEAD/.test(req.method) ? undefined : encodeRequestBody(req),
-      });
+      const request = adaptRequestFromExpressToFetch(req);
 
       const response = (await Auth(request, {
         pages: {
@@ -120,6 +104,9 @@ export function createAuthHandler(project: ToolpadProject): Router {
             }
             return token;
           },
+          // @TODO: Types for session callback are broken as it says token does not exist but it does
+          // Github issue: https://github.com/nextauthjs/next-auth/issues/9437
+          // @ts-ignore
           session({ session, token }) {
             if (session.user) {
               session.user.roles = token.roles ?? [];
@@ -144,4 +131,50 @@ export function createAuthHandler(project: ToolpadProject): Router {
   );
 
   return router;
+}
+
+export async function createAuthPagesMiddleware(project: ToolpadProject) {
+  return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const { options } = project;
+    const { base } = options;
+
+    const dom = await project.loadDom();
+
+    const app = appDom.getApp(dom);
+
+    const authProviders = app.attributes.authentication?.providers ?? [];
+
+    const hasAuthentication = authProviders.length > 0;
+
+    const signInPath = `${base}/signin`;
+
+    if (
+      hasAuthentication &&
+      req.get('sec-fetch-dest') === 'document' &&
+      req.originalUrl !== signInPath &&
+      !req.originalUrl.startsWith(`${base}/api/auth`)
+    ) {
+      const request = adaptRequestFromExpressToFetch(req);
+
+      let token;
+      if (process.env.TOOLPAD_AUTH_SECRET) {
+        // @TODO: Library types are wrong as salt should not be required, remove once fixed
+        // Github discussion: https://github.com/nextauthjs/next-auth/discussions/9133
+        // @ts-ignore
+        token = await getToken({
+          req: request,
+          secret: process.env.TOOLPAD_AUTH_SECRET,
+        });
+      }
+
+      if (!token) {
+        res.redirect(signInPath);
+        res.end();
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  };
 }

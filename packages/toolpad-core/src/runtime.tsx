@@ -296,16 +296,23 @@ export function useComponent(id: string) {
 export interface ToolpadDataProviderIntrospection {
   paginationMode: PaginationMode;
   hasDeleteRecord: boolean;
+  hasUpdateRecord: boolean;
+  hasCreateRecord: boolean;
 }
 
-export interface UseDataProviderHookResult<R, P extends PaginationMode> {
+export interface UseDataProviderHookResult<
+  R extends Record<string, unknown>,
+  P extends PaginationMode,
+> {
   isLoading: boolean;
   error?: unknown;
   dataProvider: ToolpadDataProviderBase<R, P> | null;
 }
 
 export interface UseDataProviderHook {
-  <R, P extends PaginationMode>(id: string | null): UseDataProviderHookResult<R, P>;
+  <R extends Record<string, unknown>, P extends PaginationMode>(
+    id: string | null,
+  ): UseDataProviderHookResult<R, P>;
 }
 
 export const UseDataProviderContext = React.createContext<UseDataProviderHook | null>(null);

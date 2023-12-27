@@ -363,7 +363,7 @@ export type ScopeMetaField = {
       props?: Record<string, ScopeMetaPropField>;
     }
   | {
-      kind: 'query' | 'local';
+      kind: 'query' | 'action' | 'local';
     }
 );
 
@@ -541,12 +541,15 @@ export interface GetRecordsResult<R, P extends PaginationMode> {
   cursor?: P extends 'cursor' ? string | null : undefined;
 }
 
-export interface ToolpadDataProviderBase<R, P extends PaginationMode = 'index'> {
+export interface ToolpadDataProviderBase<
+  R extends Record<string, unknown> = {},
+  P extends PaginationMode = 'index',
+> {
   paginationMode?: P;
   getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
   deleteRecord?: (id: string | number) => Promise<void>;
-  // updateRecord?: (id: string | number, record: R) => Promise<void>;
-  // createRecord?: (record: R) => Promise<void>;
+  updateRecord?: (id: string | number, record: Partial<R>) => Promise<void>;
+  createRecord?: (record: R) => Promise<void>;
 }
 
 export type NodeHashes = Record<NodeId, number | undefined>;

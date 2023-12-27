@@ -66,7 +66,11 @@ function AppPagesNavigation({
       sx={{
         width: DRAWER_WIDTH,
         flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: DRAWER_WIDTH, boxSizing: 'border-box' },
+        [`& .MuiDrawer-paper`]: {
+          width: DRAWER_WIDTH,
+          boxSizing: 'border-box',
+          border: 'none',
+        },
       }}
     >
       {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
@@ -77,8 +81,8 @@ function AppPagesNavigation({
         underline="none"
         sx={{
           ml: 3,
-          mt: 1,
-          mb: '4px',
+          mt: 2,
+          mb: 1,
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
@@ -100,9 +104,16 @@ function AppPagesNavigation({
           MUI Toolpad
         </Box>
       </MuiLink>
-      <List component="nav" aria-labelledby={navListSubheaderId}>
+      <List component="nav" sx={{ px: 2 }} aria-labelledby={navListSubheaderId}>
         {pages.map((page) => (
-          <ListItem key={page.slug} disablePadding>
+          <ListItem
+            key={page.slug}
+            disablePadding
+            sx={{
+              borderRadius: '24px',
+              overflow: 'hidden',
+            }}
+          >
             <ListItemButton
               component={Link}
               to={`pages/${page.slug}${search}`}

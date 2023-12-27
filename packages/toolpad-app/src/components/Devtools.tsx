@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { TabPanel, TabContext, TabList } from '@mui/lab';
 import { Box, IconButton, styled, SxProps, Tab } from '@mui/material';
-import { Har } from 'har-format';
+import type { Har } from 'har-format';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import Console, { LogEntry } from './Console';
 import lazyComponent from '../utils/lazyComponent';
@@ -62,7 +62,12 @@ export default function Devtools({ sx, log, onLogClear, har, onHarClear }: Devto
   }, [activeTab, onHarClear, onLogClear]);
 
   return (
-    <Box sx={{ ...sx, display: 'flex', flexDirection: 'column' }}>
+    <Box
+      sx={{
+        ...sx,
+        flexDirection: 'column',
+      }}
+    >
       <TabContext value={activeTab}>
         <Box
           sx={{
@@ -70,20 +75,38 @@ export default function Devtools({ sx, log, onLogClear, har, onHarClear }: Devto
             borderColor: 'divider',
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'start',
             pr: 1,
           }}
         >
-          <TabList onChange={handleDebuggerTabChange} aria-label="Debugger">
-            {log ? <Tab label="Console" value="console" /> : null}
-            {har ? <Tab label="Network" value="network" /> : null}
-          </TabList>
           {handleClearClick ? (
             <IconButton disabled={!clearEnabled} onClick={handleClearClick}>
               <DoDisturbIcon />
             </IconButton>
           ) : null}
+
+          <TabList
+            onChange={handleDebuggerTabChange}
+            aria-label="Debugger"
+            sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
+          >
+            {log ? (
+              <Tab
+                label="Console"
+                value="console"
+                sx={{ borderBottom: (theme) => `1px solid ${theme.palette.grey[300]}` }}
+              />
+            ) : null}
+            {har ? (
+              <Tab
+                label="Network"
+                value="network"
+                sx={{ borderBottom: (theme) => `1px solid ${theme.palette.grey[300]}` }}
+              />
+            ) : null}
+          </TabList>
         </Box>
+
         {log ? (
           <DebuggerTabPanel value="console">
             <Console sx={{ flex: 1 }} value={log} />

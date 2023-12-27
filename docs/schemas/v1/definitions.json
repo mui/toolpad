@@ -17,17 +17,32 @@
         "spec": {
           "type": "object",
           "properties": {
-            "authorization": {
+            "authentication": {
               "type": "object",
               "properties": {
                 "providers": {
                   "type": "array",
                   "items": {
-                    "type": "string",
-                    "enum": ["github", "google"]
+                    "type": "object",
+                    "properties": {
+                      "provider": {
+                        "type": "string",
+                        "enum": ["github", "google"],
+                        "description": "Unique identifier for this authentication provider."
+                      }
+                    },
+                    "required": ["provider"],
+                    "additionalProperties": false
                   },
                   "description": "Authentication providers to use."
-                },
+                }
+              },
+              "additionalProperties": false,
+              "description": "Authentication configuration for this application."
+            },
+            "authorization": {
+              "type": "object",
+              "properties": {
                 "roles": {
                   "type": "array",
                   "items": {
@@ -104,6 +119,10 @@
         "spec": {
           "type": "object",
           "properties": {
+            "displayName": {
+              "type": "string",
+              "description": "Page name to display in the UI."
+            },
             "id": {
               "type": "string",
               "description": "Serves as a canonical id of the page. Deprecated: use an alias instead."
@@ -419,7 +438,7 @@
               "description": "Authorization configuration for this page."
             },
             "unstable_codeFile": {
-              "type": "string",
+              "type": "boolean",
               "description": "The content of the page as JSX. Experimental, do not use!."
             },
             "display": {

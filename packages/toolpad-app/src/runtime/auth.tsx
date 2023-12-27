@@ -24,12 +24,13 @@ export function RequireAuthorization({
     [allowedRoles],
   );
 
-  let reason = null;
-  if (!user) {
-    if (!isSigningIn) {
+  React.useEffect(() => {
+    if (!user && !isSigningIn) {
       window.location.replace(`${basename}${AUTH_SIGNIN_PATH}`);
     }
+  }, [basename, isSigningIn, user]);
 
+  if (!user) {
     return (
       <Container
         sx={{
@@ -45,6 +46,7 @@ export function RequireAuthorization({
     );
   }
 
+  let reason = null;
   if (!allowAll && !user.roles.some((role) => allowedRolesSet.has(role))) {
     reason = `User does not have the roles to access this page.`;
   }

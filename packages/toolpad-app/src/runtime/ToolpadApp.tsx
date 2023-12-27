@@ -73,7 +73,6 @@ import { RuntimeState } from './types';
 import { getBindingType, getBindingValue } from './bindings';
 import {
   getElementNodeComponentId,
-  INTERNAL_COMPONENTS,
   isPageLayoutComponent,
   isPageRow,
   PAGE_ROW_COMPONENT_ID,
@@ -116,16 +115,13 @@ const Pre = styled('pre')(({ theme }) => ({
 }));
 
 const internalComponents: ToolpadComponents = Object.fromEntries(
-  [...INTERNAL_COMPONENTS].map(([name]) => {
-    let builtIn = (builtIns as any)[name];
-
+  Object.entries(builtIns).map(([name, builtIn]) => {
     if (!isToolpadComponent(builtIn)) {
       builtIn = createToolpadComponentThatThrows(
         new Error(`Imported builtIn "${name}" is not a ToolpadComponent`),
       );
     }
-
-    return [name, builtIn];
+    return [name, builtIn] as [string, ToolpadComponent];
   }),
 );
 
@@ -565,8 +561,12 @@ function parseBindings(
     }
 
     if (appDom.isQuery(elm)) {
+      let kind: 'query' | 'action' = 'query';
+      if (elm.attributes.mode === 'mutation') {
+        kind = 'action';
+      }
       scopeMeta[elm.name] = {
-        kind: 'query',
+        kind,
       };
 
       if (elm.params) {
@@ -1558,7 +1558,7 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
     () =>
       pages.map((page) => ({
         slug: page.name,
-        displayName: page.name,
+        displayName: appDom.getPageDisplayName(page),
         hasShell: page?.attributes.display !== 'standalone',
       })),
     [pages],

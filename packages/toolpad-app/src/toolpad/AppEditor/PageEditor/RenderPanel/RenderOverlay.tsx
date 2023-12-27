@@ -1104,7 +1104,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           return normalizePageRowColumnSizes(draft, pageNode);
         },
         currentView.kind === 'page'
-          ? { ...omit(currentView, 'tab'), selectedNodeId: newNode?.id || draggedNodeId }
+          ? { ...omit(currentView, 'pageViewTab'), selectedNodeId: newNode?.id || draggedNodeId }
           : currentView,
       );
 

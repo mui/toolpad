@@ -43,8 +43,8 @@ import { EMAIL_REGEX } from '@mui/toolpad-utils/strings';
 import { GridApiCommunity } from '@mui/x-data-grid/internals';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
-import { AuthProvider } from '../../types';
 import TabPanel from '../../components/TabPanel';
+import { AuthProviderConfig, AuthProvider } from '../../types';
 
 const AUTH_PROVIDERS = new Map([
   ['github', { name: 'GitHub', Icon: GitHubIcon }],
@@ -64,11 +64,11 @@ export function AppAuthenticationEditor() {
       appState.update((draft) => {
         const app = appDom.getApp(draft);
 
-        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
-          ...app.attributes?.authorization,
-          providers: (typeof providers === 'string'
-            ? providers.split(',')
-            : providers) as AuthProvider[],
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
+          ...app.attributes?.authentication,
+          providers: (typeof providers === 'string' ? providers.split(',') : providers).map(
+            (provider) => ({ provider } as AuthProviderConfig),
+          ),
         });
 
         return draft;
@@ -78,12 +78,12 @@ export function AppAuthenticationEditor() {
   );
 
   const appNode = appDom.getApp(dom);
-  const authorization = appNode.attributes.authorization;
+  const { authentication } = appNode.attributes;
 
   const authProviders = React.useMemo(
-    () => authorization?.providers ?? [],
-    [authorization?.providers],
-  );
+    () => authentication?.providers ?? [],
+    [authentication?.providers],
+  ).map((providerConfig) => providerConfig.provider);
 
   return (
     <Stack direction="column">

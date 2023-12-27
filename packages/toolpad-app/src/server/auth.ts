@@ -2,8 +2,7 @@ import express, { Router } from 'express';
 import { Auth } from '@auth/core';
 import GithubProvider from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
-import { JWT, getToken } from '@auth/core/jwt';
-import { Session } from '@auth/core/types';
+import { getToken } from '@auth/core/jwt';
 import { asyncHandler } from '../utils/express';
 import * as appDom from '../appDom';
 import { ToolpadProject } from './localMode';
@@ -148,6 +147,7 @@ export async function createAuthPagesMiddleware(project: ToolpadProject) {
 
     const signInPath = `${base}/signin`;
 
+    let isRedirect = false;
     if (
       hasAuthentication &&
       req.get('sec-fetch-dest') === 'document' &&
@@ -168,11 +168,13 @@ export async function createAuthPagesMiddleware(project: ToolpadProject) {
       }
 
       if (!token) {
-        res.redirect(signInPath);
-        res.end();
-      } else {
-        next();
+        isRedirect = true;
       }
+    }
+
+    if (isRedirect) {
+      res.redirect(signInPath);
+      res.end();
     } else {
       next();
     }

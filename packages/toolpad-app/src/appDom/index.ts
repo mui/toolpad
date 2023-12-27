@@ -1087,6 +1087,9 @@ export function createDefaultDom(): AppDom {
     attributes: {
       title: 'Page 1',
       display: 'shell',
+      authorization: {
+        allowAll: true,
+      },
     },
   });
 

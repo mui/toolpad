@@ -1579,6 +1579,7 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
       hasNavigation={!IS_RENDERED_IN_CANVAS}
       hasHeader={hasAuthentication && !IS_RENDERED_IN_CANVAS}
       clipped={SHOW_PREVIEW_HEADER}
+      basename={basename}
     >
       <RenderedPages pages={pages} hasAuthentication={hasAuthentication} basename={basename} />
     </AppLayout>

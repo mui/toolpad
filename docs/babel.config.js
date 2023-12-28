@@ -7,7 +7,7 @@ const { version: transformRuntimeVersion } = fse.readJSONSync(
 const errorCodesPath = require.resolve('@mui/monorepo/docs/public/static/error-codes.json');
 const missingError = process.env.MUI_EXTRACT_ERROR_CODES === 'true' ? 'write' : 'annotate';
 
-const muiErrorMacro = require.resolve('@mui/monorepo/packages/mui-utils/macros/MuiError.macro');
+const muiErrorMacro = require.resolve('@mui/monorepo/packages/mui-babel-macros/MuiError.macro');
 
 module.exports = {
   presets: [

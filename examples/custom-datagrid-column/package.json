@@ -8,6 +8,6 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.42"
+    "@mui/toolpad": "0.1.43"
   }
 }

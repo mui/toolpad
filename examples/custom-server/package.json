@@ -9,7 +9,7 @@
     "edit": "toolpad editor http://localhost:3001/my-app"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.42",
+    "@mui/toolpad": "0.1.43",
     "express": "4.18.2"
   },
   "devDependencies": {}

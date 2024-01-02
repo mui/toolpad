@@ -1,10 +1,20 @@
 import * as React from 'react';
 import {
+  Alert,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  Link,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -19,8 +29,16 @@ import {
   GridRowModesModel,
   GridToolbarContainer,
 } from '@mui/x-data-grid';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import GoogleIcon from '@mui/icons-material/Google';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
+import { AuthProviderConfig, AuthProvider } from '../../types';
+
+const AUTH_PROVIDERS = new Map([
+  ['github', { name: 'GitHub', Icon: GitHubIcon }],
+  ['google', { name: 'Google', Icon: GoogleIcon }],
+]);
 
 interface EditToolbarProps {
   addNewRoleDisabled: boolean;
@@ -291,6 +309,83 @@ export default function AppAuthorizationEditor() {
   );
 }
 
+export function AppAuthenticationEditor() {
+  const { dom } = useAppState();
+  const appState = useAppStateApi();
+
+  const handleAuthProvidersChange = React.useCallback(
+    (event: SelectChangeEvent<AuthProvider[]>) => {
+      const {
+        target: { value: providers },
+      } = event;
+
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
+          ...app.attributes?.authentication,
+          providers: (typeof providers === 'string' ? providers.split(',') : providers).map(
+            (provider) => ({ provider } as AuthProviderConfig),
+          ),
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const appNode = appDom.getApp(dom);
+  const { authentication } = appNode.attributes;
+
+  const authProviders = React.useMemo(
+    () => authentication?.providers ?? [],
+    [authentication?.providers],
+  ).map((providerConfig) => providerConfig.provider);
+
+  return (
+    <Stack direction="column">
+      <FormControl>
+        <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
+        <Select<AuthProvider[]>
+          labelId="auth-providers-label"
+          label="Authentication providers"
+          id="auth-providers"
+          multiple
+          value={authProviders}
+          onChange={handleAuthProvidersChange}
+          fullWidth
+          renderValue={(selected) =>
+            selected
+              .map((selectedValue) => AUTH_PROVIDERS.get(selectedValue)?.name ?? '')
+              .join(', ')
+          }
+        >
+          {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
+            <MenuItem key={value} value={value}>
+              <Stack direction="row" alignItems="center">
+                <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
+                <Icon fontSize="small" />
+                <Typography ml={1}>{name}</Typography>
+              </Stack>
+            </MenuItem>
+          ))}
+        </Select>
+        <FormHelperText id="auth-providers-helper-text">
+          If set, only authenticated users can use the app.
+        </FormHelperText>
+      </FormControl>
+      <Alert severity="info" sx={{ mt: 1 }}>
+        Certain environment variables must be set for authentication providers to work.{' '}
+        <Link href="/" target="_blank">
+          Learn how to set up authentication
+        </Link>
+        .
+      </Alert>
+    </Stack>
+  );
+}
+
 export interface AppAuthorizationDialogProps {
   open: boolean;
   onClose: () => void;
@@ -301,7 +396,14 @@ export function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialog
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>Authorization</DialogTitle>
       <DialogContent>
-        <Typography>
+        <Typography variant="subtitle1" mb={1}>
+          Authentication
+        </Typography>
+        <AppAuthenticationEditor />
+        <Typography variant="subtitle1" mt={1} mb={1}>
+          Roles
+        </Typography>
+        <Typography variant="body2">
           Define the roles for your application. You can configure your pages to be accessible to
           specific roles only.
         </Typography>

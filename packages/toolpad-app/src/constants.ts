@@ -20,4 +20,5 @@ export const VERSION_CHECK_INTERVAL = 1000 * 60 * 10;
 
 // TODO: Remove once global functions UI is ready
 export const FEATURE_FLAG_GLOBAL_FUNCTIONS = false;
+
 export const FEATURE_FLAG_AUTHORIZATION = false;

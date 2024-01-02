@@ -91,7 +91,9 @@ import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
-import { AuthenticationProvider, RequireAuthorization, User } from './auth';
+import { AuthContext, useAuth } from './useAuth';
+import { RequireAuthorization } from './auth';
+import SignInPage from './SignInPage';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -1458,25 +1460,18 @@ function PageNotFound() {
   );
 }
 
-/**
- * Returns whether authentication has been configured for this application.
- */
-function useAppHasAuthentication() {
-  // TODO: read from authentication
-  return false;
-}
-
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
+  hasAuthentication?: boolean;
+  basename: string;
 }
 
-function RenderedPages({ pages }: RenderedPagesProps) {
-  const defaultPage = pages[0];
-
-  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}`} replace />;
+function RenderedPages({ pages, hasAuthentication = false, basename }: RenderedPagesProps) {
   const { search } = useLocation();
 
-  const appAuthenticationEnabled = useAppHasAuthentication();
+  const defaultPage = pages[0];
+
+  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
 
   return (
     <Routes>
@@ -1490,9 +1485,12 @@ function RenderedPages({ pages }: RenderedPagesProps) {
           />
         );
 
-        if (!IS_RENDERED_IN_CANVAS && appAuthenticationEnabled && page.attributes.authorization) {
+        if (!IS_RENDERED_IN_CANVAS && hasAuthentication && page.attributes.authorization) {
           pageContent = (
-            <RequireAuthorization allowedRole={page.attributes.authorization.allowedRoles}>
+            <RequireAuthorization
+              allowedRole={page.attributes.authorization.allowedRoles}
+              basename={basename}
+            >
               {pageContent}
             </RequireAuthorization>
           );
@@ -1543,14 +1541,17 @@ function AppError({ error }: FallbackProps) {
 
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
+  basename: string;
 }
 
-function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
+  const { hasAuthentication } = React.useContext(AuthContext);
+
   const pageMatch = useMatch('/pages/:slug');
-  const activePage = pageMatch?.params.slug;
+  const activePageSlug = pageMatch?.params.slug;
 
   const navEntries = React.useMemo(
     () =>
@@ -1564,12 +1565,13 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
 
   return (
     <AppLayout
-      activePage={activePage}
+      activePageSlug={activePageSlug}
       pages={navEntries}
-      hasShell={!IS_RENDERED_IN_CANVAS}
+      hasNavigation={!IS_RENDERED_IN_CANVAS}
+      hasHeader={hasAuthentication && !IS_RENDERED_IN_CANVAS}
       clipped={SHOW_PREVIEW_HEADER}
     >
-      <RenderedPages pages={pages} />
+      <RenderedPages pages={pages} hasAuthentication={hasAuthentication} basename={basename} />
     </AppLayout>
   );
 }
@@ -1600,7 +1602,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  const currentUser: User | null = null;
+  const authContext = useAuth({ dom, basename });
 
   return (
     <BrowserRouter basename={basename}>
@@ -1615,9 +1617,15 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
                       <QueryClientProvider client={queryClient}>
-                        <AuthenticationProvider user={currentUser}>
-                          <ToolpadAppLayout dom={dom} />
-                        </AuthenticationProvider>
+                        <AuthContext.Provider value={authContext}>
+                          <Routes>
+                            <Route path="/signin" element={<SignInPage />} />
+                            <Route
+                              path="*"
+                              element={<ToolpadAppLayout dom={dom} basename={basename} />}
+                            />
+                          </Routes>
+                        </AuthContext.Provider>
                         {showDevtools ? (
                           <ReactQueryDevtoolsProduction initialIsOpen={false} />
                         ) : null}

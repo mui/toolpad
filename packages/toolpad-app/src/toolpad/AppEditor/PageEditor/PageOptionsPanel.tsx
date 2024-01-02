@@ -90,8 +90,7 @@ export default function PageOptionsPanel() {
           placement="left-start"
           title={
             <Typography variant="inherit">
-              Control how the navigation panel is rendered in the final application. Read more in
-              the{' '}
+              Control how the app shell is displayed in the final application. Read more in the{' '}
               <Link
                 href="https://mui.com/toolpad/concepts/page-properties/#display-mode"
                 target="_blank"

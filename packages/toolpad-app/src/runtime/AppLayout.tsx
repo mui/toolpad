@@ -1,7 +1,28 @@
 import * as React from 'react';
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import {
+  Box,
+  Drawer,
+  Stack,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  AppBar,
+  Toolbar,
+  Avatar,
+  Typography,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Button,
+  useTheme,
+  Link as MuiLink,
+} from '@mui/material';
 import { Link, useSearchParams } from 'react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
+import { AuthContext } from './useAuth';
+import productIconDark from '../../public/product-icon-dark.svg';
+import productIconLight from '../../public/product-icon-light.svg';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -17,19 +38,25 @@ export interface NavigationEntry {
 const DRAWER_WIDTH = 250; // px
 
 interface AppPagesNavigationProps {
-  activePage?: string;
+  activePageSlug?: string;
   pages: NavigationEntry[];
   clipped?: boolean;
   search?: string;
 }
 
 function AppPagesNavigation({
-  activePage,
+  activePageSlug,
   pages,
   clipped = false,
   search,
 }: AppPagesNavigationProps) {
   const navListSubheaderId = React.useId();
+
+  const theme = useTheme();
+
+  const productIcon = theme.palette.mode === 'dark' ? productIconDark : productIconLight;
+
+  const initialPageSlug = pages[0].slug;
 
   return (
     <Drawer
@@ -47,6 +74,36 @@ function AppPagesNavigation({
       }}
     >
       {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
+      <MuiLink
+        color="inherit"
+        aria-label="Go to home page"
+        href={initialPageSlug}
+        underline="none"
+        sx={{
+          ml: 3,
+          mt: 2,
+          mb: 1,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 1,
+        }}
+      >
+        <img src={productIcon} alt="Toolpad logo" width={35} height={35} />
+        <Box
+          data-testid="brand"
+          sx={{
+            color: 'primary.main',
+            lineHeight: '21px',
+            fontSize: '16px',
+            fontWeight: 700,
+            letterSpacing: 0,
+            fontFamily: theme.typography.fontFamily,
+          }}
+        >
+          MUI Toolpad
+        </Box>
+      </MuiLink>
       <List component="nav" sx={{ px: 2 }} aria-labelledby={navListSubheaderId}>
         {pages.map((page) => (
           <ListItem
@@ -60,9 +117,13 @@ function AppPagesNavigation({
             <ListItemButton
               component={Link}
               to={`pages/${page.slug}${search}`}
-              selected={activePage === page.slug}
+              selected={activePageSlug === page.slug}
             >
-              <ListItemText primary={page.displayName} sx={{ ml: 2 }} />
+              <ListItemText
+                primary={page.displayName}
+                primaryTypographyProps={{ fontSize: '14px' }}
+                sx={{ ml: 2 }}
+              />
             </ListItemButton>
           </ListItem>
         ))}
@@ -72,20 +133,24 @@ function AppPagesNavigation({
 }
 
 export interface ToolpadAppLayoutProps {
-  activePage?: string;
+  activePageSlug?: string;
   pages?: NavigationEntry[];
-  hasShell?: boolean;
+  hasNavigation?: boolean;
+  hasHeader?: boolean;
   children?: React.ReactNode;
   clipped?: boolean;
 }
 
 export function AppLayout({
-  activePage,
+  activePageSlug,
   pages = [],
-  hasShell: hasShellProp = true,
+  hasNavigation: hasNavigationProp = true,
+  hasHeader = false,
   children,
   clipped,
 }: ToolpadAppLayoutProps) {
+  const theme = useTheme();
+
   const [urlParams] = useSearchParams();
 
   const retainedSearch = React.useMemo(() => {
@@ -98,23 +163,104 @@ export function AppLayout({
     return urlParams.size > 0 ? `?${urlParams.toString()}` : '';
   }, [urlParams]);
 
-  const navEntry = pages.find((page) => page.slug === activePage);
+  const navEntry = pages.find((page) => page.slug === activePageSlug);
 
   const displayMode = urlParams.get(TOOLPAD_DISPLAY_MODE_URL_PARAM);
 
-  const hasShell = hasShellProp && navEntry?.hasShell !== false && displayMode !== 'standalone';
+  const hasShell = navEntry?.hasShell !== false && displayMode !== 'standalone';
+
+  const hasNavigation = hasNavigationProp && hasShell;
+
+  const { session, signOut, isSigningIn } = React.useContext(AuthContext);
+
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleSignOut = React.useCallback(() => {
+    signOut();
+    handleCloseUserMenu();
+  }, [signOut]);
 
   return (
     <Box sx={{ flex: 1, display: 'flex' }}>
-      {hasShell ? (
+      {hasNavigation ? (
         <AppPagesNavigation
-          activePage={activePage}
+          activePageSlug={activePageSlug}
           pages={pages}
           clipped={clipped}
           search={retainedSearch}
         />
       ) : null}
-      <Box sx={{ minWidth: 0, flex: 1, position: 'relative' }}>{children}</Box>
+      <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>
+        {hasHeader ? (
+          <AppBar
+            position="fixed"
+            color="transparent"
+            sx={{
+              boxShadow: 'none',
+              pointerEvents: 'none',
+            }}
+          >
+            {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
+            <Toolbar variant="dense">
+              <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
+                {session?.user && !isSigningIn ? (
+                  <React.Fragment>
+                    <Button
+                      color="inherit"
+                      onClick={handleOpenUserMenu}
+                      sx={{
+                        pointerEvents: 'auto',
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
+                        {session.user.name || session.user.email}
+                      </Typography>
+                      <Tooltip title="User settings">
+                        <Avatar
+                          alt={session.user.name || session.user.email}
+                          src={session.user.image}
+                          sx={{
+                            bgcolor: theme.palette.secondary.main,
+                            width: 32,
+                            height: 32,
+                          }}
+                        />
+                      </Tooltip>
+                    </Button>
+                    <Menu
+                      sx={{ mt: '45px' }}
+                      id="menu-appbar-user"
+                      anchorEl={anchorElUser}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                      }}
+                      open={Boolean(anchorElUser)}
+                      onClose={handleCloseUserMenu}
+                    >
+                      <MenuItem onClick={handleSignOut}>
+                        <ListItemText>Sign out</ListItemText>
+                      </MenuItem>
+                    </Menu>
+                  </React.Fragment>
+                ) : null}
+              </Stack>
+            </Toolbar>
+          </AppBar>
+        ) : null}
+        {children}
+      </Box>
     </Box>
   );
 }

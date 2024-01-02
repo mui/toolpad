@@ -184,7 +184,7 @@ export default function PreviewHeader({ basename }: PreviewHeaderProps) {
         position: 'fixed',
         width: '100%',
         height: PREVIEW_HEADER_HEIGHT,
-        zIndex: theme.zIndex.drawer + 1,
+        zIndex: theme.zIndex.drawer + 2,
       }}
     >
       <Alert

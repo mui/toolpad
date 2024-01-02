@@ -78,7 +78,7 @@
 <li>
 
 :::info
-See the [Render documentation](https://docs.render.com/docs/node-version) on Node versions for more information.
+See the [Render documentation](https://docs.render.com/node-version) on Node versions for more information.
 :::
 
 </li>
@@ -92,4 +92,4 @@ That's it! We're up and running in a few minutes.
 
 Make changes, push to GitHub, and your app will automatically redeploy each time.
 
-Check out the Render documentation for more advanced settings, like adding [environment variables](https://docs.render.com/docs/configure-environment-variables) to your app.
+Check out the Render documentation for more advanced settings, like adding [environment variables](https://docs.render.com/configure-environment-variables) to your app.

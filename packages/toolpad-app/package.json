@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.1.42",
+  "version": "0.1.43",
   "license": "MIT",
   "bin": {
     "toolpad": "./cli.mjs"
@@ -57,9 +57,9 @@
     "@mui/lab": "5.0.0-alpha.158",
     "@mui/material": "5.15.2",
     "@mui/system": "5.15.2",
-    "@mui/toolpad-components": "0.1.42",
-    "@mui/toolpad-core": "0.1.42",
-    "@mui/toolpad-utils": "0.1.42",
+    "@mui/toolpad-components": "0.1.43",
+    "@mui/toolpad-core": "0.1.43",
+    "@mui/toolpad-utils": "0.1.43",
     "@mui/types": "7.2.11",
     "@mui/utils": "5.15.2",
     "@mui/x-charts": "6.18.4",
@@ -147,10 +147,10 @@
     "@types/har-format": "1.2.15",
     "@types/invariant": "2.2.37",
     "@types/lodash-es": "4.17.12",
-    "@types/node-fetch": "2.6.9",
+    "@types/node-fetch": "2.6.10",
     "@types/pg": "8.10.9",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.45",
+    "@types/react": "18.2.46",
     "@types/react-dom": "18.2.18",
     "@types/react-is": "18.2.4",
     "@types/semver": "7.5.6",

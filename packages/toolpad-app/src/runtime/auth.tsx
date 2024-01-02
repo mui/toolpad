@@ -51,7 +51,9 @@ export function RequireAuthorization({
     reason = `User does not have the roles to access this page.`;
   }
 
-  return reason ? (
+  // @TODO: Once we have roles we can add back this check.
+  const skipReason = true;
+  return !skipReason && reason ? (
     <Box
       sx={{
         flex: 1,

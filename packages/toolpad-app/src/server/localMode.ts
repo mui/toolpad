@@ -65,6 +65,7 @@ import { VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
 import packageInfo from '../packageInfo';
+import type { PagesManifest, PagesManifestEntry } from '../runtime/types';
 
 declare global {
   // eslint-disable-next-line
@@ -1339,27 +1340,16 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   return project;
 }
 
-const basePagesManifestEntrySchema = z.object({
+export const pagesManifestEntrySchema: z.ZodType<PagesManifestEntry> = z.object({
   slug: z.string(),
   title: z.string(),
   legacy: z.boolean().optional(),
+  children: z.array(z.lazy(() => pagesManifestEntrySchema)),
 });
 
-export interface PagesManifestEntry extends z.infer<typeof basePagesManifestEntrySchema> {
-  children: PagesManifestEntry[];
-}
-
-const pagesManifestEntrySchema: z.ZodType<PagesManifestEntry> = basePagesManifestEntrySchema.extend(
-  {
-    children: z.array(z.lazy(() => pagesManifestEntrySchema)),
-  },
-);
-
-const pagesManifestSchema = z.object({
+export const pagesManifestSchema: z.ZodType<PagesManifest> = z.object({
   pages: z.array(pagesManifestEntrySchema),
 });
-
-export type PagesManifest = z.infer<typeof pagesManifestSchema>;
 
 async function buildPagesManifest(root: string): Promise<PagesManifest> {
   const pagesFolder = getPagesFolder(root);

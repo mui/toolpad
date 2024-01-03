@@ -12,7 +12,7 @@ import RuntimeToolpadApp, {
   componentsStore,
   pageComponentsStore,
 } from './ToolpadApp';
-import { RuntimeState } from './types';
+import { PagesManifest, RuntimeState } from './types';
 
 const cache = createCache({
   key: 'css',
@@ -37,15 +37,16 @@ export interface RootProps {
   initialState: RuntimeState;
   base: string;
   ToolpadApp: React.ComponentType<ToolpadAppProps>;
+  pagesManifest: PagesManifest;
 }
 
-function Root({ ToolpadApp, initialState, base }: RootProps) {
+function Root({ ToolpadApp, initialState, base, pagesManifest }: RootProps) {
   return (
     <React.StrictMode>
       <CacheProvider value={cache}>
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
-        <ToolpadApp basename={base} state={initialState} />
+        <ToolpadApp basename={base} state={initialState} pagesManifest={pagesManifest} />
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />
       </CacheProvider>
     </React.StrictMode>
@@ -56,11 +57,22 @@ export interface InitParams {
   initialState: RuntimeState;
   base: string;
   ToolpadApp?: React.ComponentType<ToolpadAppProps>;
+  pagesManifest: PagesManifest;
 }
 
-export function init({ ToolpadApp = RuntimeToolpadApp, initialState, base }: InitParams) {
+export function init({
+  ToolpadApp = RuntimeToolpadApp,
+  initialState,
+  base,
+  pagesManifest,
+}: InitParams) {
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-    <Root base={base} ToolpadApp={ToolpadApp} initialState={initialState} />,
+    <Root
+      base={base}
+      ToolpadApp={ToolpadApp}
+      initialState={initialState}
+      pagesManifest={pagesManifest}
+    />,
   );
 }
 

@@ -69,7 +69,7 @@ import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '../appDom';
-import { RuntimeState } from './types';
+import { PagesManifest, RuntimeState } from './types';
 import { getBindingType, getBindingValue } from './bindings';
 import {
   getElementNodeComponentId,
@@ -1580,9 +1580,16 @@ export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   basename: string;
   state: RuntimeState;
+  pagesManifest: PagesManifest;
 }
 
-export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps) {
+export default function ToolpadApp({
+  rootRef,
+  basename,
+  state,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  pagesManifest,
+}: ToolpadAppProps) {
   const { dom } = state;
 
   const extraComponents = componentsStore.useValue();

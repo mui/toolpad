@@ -3,11 +3,12 @@ import * as url from 'node:url';
 import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
-import type { ComponentEntry, PagesManifest } from './localMode';
+import type { ComponentEntry } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import * as appDom from '../appDom';
 import { pathToNodeImportSpecifier } from '../utils/paths';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
+import type { PagesManifest } from '../runtime/types';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -168,6 +169,7 @@ import { init, setComponents } from '@mui/toolpad/runtime';
 import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
+import pagesManifest from 'virtual:toolpad-files:pages-manifest.json';
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
@@ -177,6 +179,7 @@ init({
   ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
   base: ${JSON.stringify(base)},
   initialState,
+  pagesManifest
 })
 
 if (import.meta.hot) {

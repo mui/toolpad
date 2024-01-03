@@ -9,6 +9,7 @@ import getPageViewState from './getPageViewState';
 import { rectContainsPoint } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
+import { PagesManifest } from '../runtime/types';
 
 const handleScreenUpdate = throttle(
   () => {
@@ -21,9 +22,14 @@ const handleScreenUpdate = throttle(
 export interface AppCanvasProps {
   state: AppCanvasState;
   basename: string;
+  pagesManifest: PagesManifest;
 }
 
-export default function AppCanvas({ basename, state: initialState }: AppCanvasProps) {
+export default function AppCanvas({
+  basename,
+  state: initialState,
+  pagesManifest,
+}: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState>(initialState);
   const [readyBridge, setReadyBridge] = React.useState<ToolpadBridge>();
 
@@ -129,7 +135,12 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
     return readyBridge ? (
       <CanvasHooksContext.Provider value={editorHooks}>
         <CanvasEventsContext.Provider value={readyBridge.canvasEvents}>
-          <ToolpadApp rootRef={onAppRoot} basename={basename} state={state} />
+          <ToolpadApp
+            rootRef={onAppRoot}
+            basename={basename}
+            state={state}
+            pagesManifest={pagesManifest}
+          />
         </CanvasEventsContext.Provider>
       </CanvasHooksContext.Provider>
     ) : null;

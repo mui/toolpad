@@ -13,3 +13,14 @@ export interface RuntimeState {
   // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
   dom: appDom.RenderTree;
 }
+
+export interface PagesManifestEntry {
+  slug: string;
+  title: string;
+  legacy?: boolean;
+  children: PagesManifestEntry[];
+}
+
+export interface PagesManifest {
+  pages: PagesManifestEntry[];
+}

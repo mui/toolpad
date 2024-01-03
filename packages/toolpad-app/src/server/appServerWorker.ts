@@ -5,9 +5,10 @@ import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
 import { getHtmlContent, createViteConfig } from './toolpadAppBuilder';
 import type { RuntimeConfig } from '../types';
 import type * as appDom from '../appDom';
-import type { ComponentEntry, PagesManifest } from './localMode';
+import type { ComponentEntry } from './localMode';
 import createRuntimeState from '../runtime/createRuntimeState';
 import { postProcessHtml } from './toolpadAppServer';
+import type { PagesManifest } from '../runtime/types';
 
 export type Command = { kind: 'reload-components' } | { kind: 'exit' };
 

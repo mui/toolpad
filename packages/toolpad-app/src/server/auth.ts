@@ -1,14 +1,18 @@
 import express, { Router } from 'express';
 import { Auth } from '@auth/core';
-import GithubProvider from '@auth/core/providers/github';
+import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import { getToken } from '@auth/core/jwt';
+import { TokenSet } from '@auth/core/types';
+import { OAuthConfig } from '@auth/core/providers';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
 import * as appDom from '../appDom';
 
-export function createAuthHandler(base: string): Router {
+export function createAuthHandler(project: ToolpadProject): Router {
+  const { base } = project.options;
+
   const router = express.Router();
 
   router.use(
@@ -27,6 +31,42 @@ export function createAuthHandler(base: string): Router {
           GithubProvider({
             clientId: process.env.TOOLPAD_GITHUB_ID,
             clientSecret: process.env.TOOLPAD_GITHUB_SECRET,
+            userinfo: {
+              url: 'https://api.github.com/user',
+              async request({
+                tokens,
+                provider,
+              }: {
+                tokens: TokenSet;
+                provider: OAuthConfig<GitHubProfile>;
+              }) {
+                const profile = await fetch(provider.userinfo?.url as URL, {
+                  headers: {
+                    Authorization: `Bearer ${tokens.access_token}`,
+                    'User-Agent': 'authjs',
+                  },
+                }).then(async (githubRes) => githubRes.json());
+
+                if (!profile.email) {
+                  // If the user does not have a public email, get another via the GitHub API
+                  // See https://docs.github.com/en/rest/users/emails#list-public-email-addresses-for-the-authenticated-user
+                  const githubRes = await fetch('https://api.github.com/user/emails', {
+                    headers: {
+                      Authorization: `Bearer ${tokens.access_token}`,
+                      'User-Agent': 'authjs',
+                    },
+                  });
+
+                  if (githubRes.ok) {
+                    const emails: GitHubEmail[] = await githubRes.json();
+                    profile.email = (emails.find((e) => e.primary) ?? emails[0]).email;
+                    profile.verifiedEmails = emails.filter((e) => e.verified).map((e) => e.email);
+                  }
+                }
+
+                return profile;
+              },
+            },
           }),
           GoogleProvider({
             clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
@@ -44,12 +84,30 @@ export function createAuthHandler(base: string): Router {
         trustHost: true,
         callbacks: {
           async signIn({ account, profile }) {
+            const dom = await project.loadDom();
+
+            const app = appDom.getApp(dom);
+            const requiredEmails = app.attributes.authentication?.requiredEmail ?? [];
+
+            if (account?.provider === 'github') {
+              return Boolean(
+                profile?.verifiedEmails &&
+                  (requiredEmails.length === 0 ||
+                    requiredEmails.some((requiredEmail) =>
+                      profile.verifiedEmails!.some((verifiedEmail) =>
+                        new RegExp(requiredEmail).test(verifiedEmail),
+                      ),
+                    )),
+              );
+            }
             if (account?.provider === 'google') {
               return Boolean(
                 profile?.email_verified &&
                   profile?.email &&
-                  (!process.env.TOOLPAD_GOOGLE_AUTH_DOMAIN ||
-                    profile.email.endsWith(`@${process.env.TOOLPAD_GOOGLE_AUTH_DOMAIN}`)),
+                  (requiredEmails.length === 0 ||
+                    requiredEmails.some(
+                      (requiredEmail) => new RegExp(requiredEmail).test(profile.email!) ?? false,
+                    )),
               );
             }
             return true;
@@ -91,10 +149,11 @@ export async function createAuthPagesMiddleware(project: ToolpadProject) {
 
     const signInPath = `${base}/signin`;
 
+    let isRedirect = false;
     if (
       hasAuthentication &&
       req.get('sec-fetch-dest') === 'document' &&
-      req.originalUrl !== signInPath &&
+      req.originalUrl.split('?')[0] !== signInPath &&
       !req.originalUrl.startsWith(`${base}/api/auth`)
     ) {
       const request = adaptRequestFromExpressToFetch(req);
@@ -111,11 +170,13 @@ export async function createAuthPagesMiddleware(project: ToolpadProject) {
       }
 
       if (!token) {
-        res.redirect(signInPath);
-        res.end();
-      } else {
-        next();
+        isRedirect = true;
       }
+    }
+
+    if (isRedirect) {
+      res.redirect(signInPath);
+      res.end();
     } else {
       next();
     }

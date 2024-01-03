@@ -244,6 +244,7 @@ export function Slots({ prop, children, hasLayout = false }: SlotsProps) {
     return <React.Fragment>{children}</React.Fragment>;
   }
   const count = React.Children.count(children);
+
   return count > 0 ? (
     <SlotsWrapper
       parentId={nodeId}

@@ -1223,9 +1223,12 @@ interface PageRootProps {
   children?: React.ReactNode;
 }
 
-const PageRoot = React.forwardRef(function PageRoot({ children }: PageRootProps, ref) {
+const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRoot(
+  { children, ...props }: PageRootProps,
+  ref,
+) {
   return (
-    <Container ref={ref}>
+    <Container ref={ref} {...props}>
       <Stack
         data-testid="page-root"
         direction="column"

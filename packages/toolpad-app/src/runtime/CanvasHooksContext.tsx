@@ -16,7 +16,7 @@ export interface CanvasHooks {
     props: Record<string, unknown>,
     componentConfig: ComponentConfig,
     elm: Element | undefined,
-  ) => void;
+  ) => () => void;
 }
 
 export const CanvasHooksContext = React.createContext<CanvasHooks>({});

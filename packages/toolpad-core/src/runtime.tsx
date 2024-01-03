@@ -8,7 +8,6 @@ import { Stack } from '@mui/material';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
 import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, TOOLPAD_COMPONENT } from './constants';
 import type {
-  SlotType,
   ComponentConfig,
   RuntimeEvent,
   RuntimeError,
@@ -40,61 +39,6 @@ export const NodeRuntimeContext = React.createContext<{
   nodeName: null,
 });
 export const CanvasEventsContext = React.createContext<Emitter<RuntimeEvents> | null>(null);
-
-// NOTE: These props aren't used, they are only there to transfer information from the
-// React elements to the fibers.
-interface SlotsWrapperProps {
-  children?: React.ReactNode;
-  // eslint-disable-next-line react/no-unused-prop-types
-  [RUNTIME_PROP_SLOTS]: string;
-  slotType: SlotType;
-  // eslint-disable-next-line react/no-unused-prop-types
-  parentId: string;
-}
-
-function SlotsWrapper({ children, slotType, [RUNTIME_PROP_SLOTS]: slotName }: SlotsWrapperProps) {
-  const node = useNode();
-  if (slotType === 'layout') {
-    return (
-      <Stack
-        direction="column"
-        sx={{
-          gap: 1,
-        }}
-        data-toolpad-slot-name={slotName}
-        data-toolpad-slot-parent={node?.nodeId}
-        data-toolpad-slot-type={slotType}
-      >
-        {children}
-      </Stack>
-    );
-  }
-
-  return <React.Fragment>{children}</React.Fragment>;
-}
-
-interface PlaceholderWrapperProps {
-  // eslint-disable-next-line react/no-unused-prop-types
-  [RUNTIME_PROP_SLOTS]: string;
-  // eslint-disable-next-line react/no-unused-prop-types
-  parentId: string;
-}
-
-// We want typescript to enforce these props, even when they're not used
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function PlaceholderWrapper(props: PlaceholderWrapperProps) {
-  return (
-    <div
-      style={{
-        minHeight: 72,
-        minWidth: 200,
-      }}
-      data-toolpad-slot-name={props[RUNTIME_PROP_SLOTS]}
-      data-toolpad-slot-parent={props.parentId}
-      data-toolpad-slot-type="single"
-    />
-  );
-}
 
 export interface NodeErrorProps {
   error: RuntimeError;
@@ -222,12 +166,14 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
   return count > 0 ? (
     <React.Fragment>{children}</React.Fragment>
   ) : (
-    <PlaceholderWrapper
-      parentId={nodeId}
-      {...{
-        [RUNTIME_PROP_SLOTS]: prop,
-        slotType: 'single',
+    <div
+      style={{
+        minHeight: 72,
+        minWidth: 200,
       }}
+      data-toolpad-slot-name={prop}
+      data-toolpad-slot-parent={nodeId}
+      data-toolpad-slot-type="single"
     />
   );
 }
@@ -245,19 +191,27 @@ export function Slots({ prop, children, hasLayout = false }: SlotsProps) {
   }
   const count = React.Children.count(children);
 
-  return count > 0 ? (
-    <SlotsWrapper
-      parentId={nodeId}
-      {...{
-        [RUNTIME_PROP_SLOTS]: prop,
-        slotType: hasLayout ? 'layout' : 'multiple',
-      }}
-    >
-      {children}
-    </SlotsWrapper>
-  ) : (
-    <Placeholder prop={prop} />
-  );
+  if (count <= 0) {
+    return <Placeholder prop={prop} />;
+  }
+
+  if (hasLayout) {
+    return (
+      <Stack
+        direction="column"
+        sx={{
+          gap: 1,
+        }}
+        data-toolpad-slot-name={prop}
+        data-toolpad-slot-parent={nodeId}
+        data-toolpad-slot-type="layout"
+      >
+        {children}
+      </Stack>
+    );
+  }
+
+  return <React.Fragment>{children}</React.Fragment>;
 }
 
 export function isToolpadComponent(

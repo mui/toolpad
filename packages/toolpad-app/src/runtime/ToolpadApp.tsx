@@ -1228,7 +1228,7 @@ const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRo
   ref,
 ) {
   return (
-    <Container ref={ref} {...props}>
+    <Container ref={ref}>
       <Stack
         data-testid="page-root"
         direction="column"
@@ -1236,6 +1236,7 @@ const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRo
           my: 2,
           gap: 1,
         }}
+        {...props}
       >
         {children}
       </Stack>

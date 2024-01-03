@@ -1187,12 +1187,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
   }, [node, wrappedProps, componentConfig, canvasHooks]);
 
   return (
-    <NodeRuntimeWrapper
-      nodeId={nodeId}
-      nodeName={node.name}
-      componentConfig={Component[TOOLPAD_COMPONENT]}
-      NodeError={NodeError}
-    >
+    <NodeRuntimeWrapper nodeId={nodeId} nodeName={node.name} NodeError={NodeError}>
       {isLayoutNode ? (
         <Component
           {...wrappedProps}

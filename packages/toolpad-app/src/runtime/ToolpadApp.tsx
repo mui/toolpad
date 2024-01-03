@@ -86,7 +86,7 @@ import evalJsBindings, {
 import { HTML_ID_EDITOR_OVERLAY, IS_PREVIEW, PREVIEW_HEADER_HEIGHT } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { useDataQuery, UseFetch } from './useDataQuery';
-import { NavigateToPage } from './CanvasHooksContext';
+import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
@@ -1178,6 +1178,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     };
   }, [nodeId, argTypes, vmRef, scope]);
 
+  const nodeRef = React.useRef();
+
+  const canvasHooks = React.useContext(CanvasHooksContext);
+
+  React.useEffect(() => {
+    return canvasHooks.registerNode?.(node, wrappedProps, componentConfig, nodeRef.current);
+  }, [node, wrappedProps, componentConfig, canvasHooks]);
+
   return (
     <NodeRuntimeWrapper
       nodeId={nodeId}
@@ -1186,7 +1194,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       NodeError={NodeError}
     >
       {isLayoutNode ? (
-        <Component {...wrappedProps} />
+        <Component
+          {...wrappedProps}
+          ref={nodeRef}
+          data-toolpad-node-id={nodeId}
+          data-toolpad-slot-name="children"
+          data-toolpad-slot-parent={nodeId}
+          data-toolpad-slot-type="multiple"
+        />
       ) : (
         <Box
           sx={{
@@ -1194,6 +1209,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             alignItems: boundLayoutProps.verticalAlign,
             justifyContent: boundLayoutProps.horizontalAlign,
           }}
+          ref={nodeRef}
+          data-toolpad-node-id={nodeId}
         >
           <Component {...wrappedProps} />
         </Box>
@@ -1206,9 +1223,9 @@ interface PageRootProps {
   children?: React.ReactNode;
 }
 
-function PageRoot({ children }: PageRootProps) {
+const PageRoot = React.forwardRef(function PageRoot({ children }: PageRootProps, ref) {
   return (
-    <Container>
+    <Container ref={ref}>
       <Stack
         data-testid="page-root"
         direction="column"
@@ -1221,7 +1238,7 @@ function PageRoot({ children }: PageRootProps) {
       </Stack>
     </Container>
   );
-}
+});
 
 const PageRootComponent = createComponent(PageRoot, {
   argTypes: {

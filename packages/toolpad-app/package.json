@@ -164,7 +164,6 @@
     "eslint-plugin-import": "2.29.1",
     "formidable": "3.5.1",
     "monaco-editor": "0.45.0",
-    "react-devtools-inline": "5.0.0",
     "react-transition-group": "4.4.5",
     "webpack": "5.89.0"
   },

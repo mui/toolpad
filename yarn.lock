@@ -1348,7 +1348,6 @@
 
 "@mui/monorepo@https://github.com/mui/material-ui.git":
   version "5.15.2"
-  uid "48251abb01cac73ee9924feb804286f97c2e45ff"
   resolved "https://github.com/mui/material-ui.git#48251abb01cac73ee9924feb804286f97c2e45ff"
 
 "@mui/private-theming@^5.15.2":
@@ -10840,14 +10839,6 @@ react-dev-utils@12.0.1:
     strip-ansi "^6.0.1"
     text-table "^0.2.0"
 
-react-devtools-inline@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/react-devtools-inline/-/react-devtools-inline-5.0.0.tgz#8cafeb788324ac33f52730a82b54c0fac9768ed2"
-  integrity sha512-zrbsL0UfCw+gp+RDD3wcEfOQME+/YNgmZn42kxAVujfyCgVIuCHbAwx0W6AWYPYekUBqsuRSeVs5FJAVoFEjPQ==
-  dependencies:
-    source-map-js "^0.6.2"
-    sourcemap-codec "^1.4.8"
-
 react-docgen@7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/react-docgen/-/react-docgen-7.0.1.tgz#b6528fe45385908645ffbee1ec0d65709e1e047c"
@@ -11765,11 +11756,6 @@ sort-keys@^2.0.0:
   dependencies:
     is-plain-obj "^1.0.0"
 
-source-map-js@^0.6.2:
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-0.6.2.tgz#0bb5de631b41cfbda6cfba8bd05a80efdfd2385e"
-  integrity sha512-/3GptzWzu0+0MBQFrDKzw/DvvMTUORvgY6k6jd/VS6iCR4RDTKWH6v6WPwQoUO8667uQEf9Oe38DxAYWY5F/Ug==
-
 source-map-js@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.0.2.tgz#adbc361d9c62df380125e7f161f71c826f1e490c"
@@ -11804,11 +11790,6 @@ source-map@^0.7.3:
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.4.tgz#a9bbe705c9d8846f4e08ff6765acf0f1b0898656"
   integrity sha512-l3BikUxvPOcn5E74dZiq5BGsTb5yEwhaTSzccU6t4sDOH8NWJCstKO5QT2CvtFoK6F0saL7p9xHAqHOlCPJygA==
-
-sourcemap-codec@^1.4.8:
-  version "1.4.8"
-  resolved "https://registry.yarnpkg.com/sourcemap-codec/-/sourcemap-codec-1.4.8.tgz#ea804bd94857402e6992d05a38ef1ae35a9ab4c4"
-  integrity sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==
 
 spawn-command@0.0.2:
   version "0.0.2"
@@ -13310,6 +13291,7 @@ wordwrap@^1.0.0:
   integrity sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==

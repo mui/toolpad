@@ -2,11 +2,15 @@ import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
+import { FlowDirection, SlotType } from '@mui/toolpad-core';
 import ToolpadApp, { IS_RENDERED_IN_CANVAS } from '../runtime/ToolpadApp';
 import { queryClient } from '../runtime/api';
-import { AppCanvasState } from '../types';
-import getPageViewState from './getPageViewState';
-import { rectContainsPoint } from '../utils/geometry';
+import { AppCanvasState, PageViewState, SlotsState } from '../types';
+import {
+  getRelativeBoundingRect,
+  getRelativeOuterRect,
+  rectContainsPoint,
+} from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
 
@@ -76,14 +80,15 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
     }
   });
 
+  const viewState = React.useRef<PageViewState>({ nodes: {} });
+
   React.useEffect(() => {
     if (!bridge) {
       return;
     }
 
     setCommandHandler(bridge.canvasCommands, 'getPageViewState', () => {
-      invariant(appRootRef.current, 'App ref not attached');
-      return getPageViewState(appRootRef.current);
+      return viewState.current;
     });
 
     setCommandHandler(bridge.canvasCommands, 'getViewCoordinates', (clientX, clientY) => {
@@ -122,6 +127,59 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
   const editorHooks: CanvasHooks = React.useMemo(() => {
     return {
       savedNodes,
+      registerNode: (node, props, componentConfig, elm) => {
+        if (!appRootRef.current || !elm) {
+          return;
+        }
+
+        const slotElms = appRootRef.current.querySelectorAll(
+          `[data-toolpad-slot-parent="${node.id}"]`,
+        );
+
+        const slots: SlotsState = {};
+
+        for (const slotElm of slotElms) {
+          const slotName = slotElm.getAttribute('data-toolpad-slot-name');
+          const slotType = slotElm.getAttribute('data-toolpad-slot-type');
+
+          invariant(slotName, 'Slot name not found');
+          invariant(slotType, 'Slot type not found');
+
+          if (slots[slotName]) {
+            continue;
+          }
+
+          const rect =
+            slotType === 'single'
+              ? getRelativeBoundingRect(appRootRef.current, slotElm)
+              : getRelativeBoundingRect(appRootRef.current, slotElm);
+
+          const display = window.getComputedStyle(slotElm).display;
+          let flowDirection: FlowDirection = 'row';
+          if (slotType === 'layout') {
+            flowDirection = 'column';
+          } else if (display === 'grid') {
+            const gridAutoFlow = window.getComputedStyle(slotElm).gridAutoFlow;
+            flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
+          } else if (display === 'flex') {
+            flowDirection = window.getComputedStyle(slotElm).flexDirection as FlowDirection;
+          }
+
+          slots[slotName] = {
+            type: slotType as SlotType,
+            rect,
+            flowDirection,
+          };
+        }
+
+        viewState.current.nodes[node.id] = {
+          nodeId: node.id,
+          componentConfig,
+          props,
+          rect: getRelativeOuterRect(appRootRef.current, elm),
+          slots,
+        };
+      },
     };
   }, [savedNodes]);
 

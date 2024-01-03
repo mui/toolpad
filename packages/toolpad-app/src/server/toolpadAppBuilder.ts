@@ -20,9 +20,8 @@ export interface GetHtmlContentParams {
   base: string;
 }
 
-export function getHtmlContent({ canvas, base }: GetHtmlContentParams) {
+export function getHtmlContent({ canvas }: GetHtmlContentParams) {
   const entryPoint = canvas ? CANVAS_ENTRY : MAIN_ENTRY;
-  const devtoolsSrc = `${base}/__toolpad_dev__/reactDevtools/bootstrap.global.js`;
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -36,21 +35,6 @@ export function getHtmlContent({ canvas, base }: GetHtmlContentParams) {
       </head>
       <body>
         <div id="root"></div>
-
-        ${
-          canvas
-            ? `
-              <script>
-                // Add the data-toolpad-canvas attribute to the canvas iframe element
-                if (window.frameElement?.dataset.toolpadCanvas) {
-                  var script = document.createElement('script');
-                  script.src = ${JSON.stringify(devtoolsSrc)};
-                  document.write(script.outerHTML);
-                }
-              </script>
-            `
-            : ''
-        }
     
         <!-- __TOOLPAD_SCRIPTS__ -->
 

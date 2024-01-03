@@ -104,11 +104,6 @@ async function createDevHandler(project: ToolpadProject) {
   handler.use('/__toolpad_dev__/rpc', createRpcHandler(rpcServer));
 
   handler.use(
-    '/__toolpad_dev__/reactDevtools',
-    express.static(path.resolve(currentDirectory, '../../dist/reactDevtools')),
-  );
-
-  handler.use(
     '/__toolpad_dev__/manifest.json',
     asyncHandler(async (req, res) => {
       const wsProtocol = req.protocol === 'http' ? 'ws' : 'wss';

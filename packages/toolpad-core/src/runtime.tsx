@@ -52,7 +52,8 @@ interface SlotsWrapperProps {
   parentId: string;
 }
 
-function SlotsWrapper({ children, slotType }: SlotsWrapperProps) {
+function SlotsWrapper({ children, slotType, [RUNTIME_PROP_SLOTS]: slotName }: SlotsWrapperProps) {
+  const node = useNode();
   if (slotType === 'layout') {
     return (
       <Stack
@@ -60,6 +61,9 @@ function SlotsWrapper({ children, slotType }: SlotsWrapperProps) {
         sx={{
           gap: 1,
         }}
+        data-toolpad-slot-name={slotName}
+        data-toolpad-slot-parent={node?.nodeId}
+        data-toolpad-slot-type={slotType}
       >
         {children}
       </Stack>
@@ -85,6 +89,9 @@ function PlaceholderWrapper(props: PlaceholderWrapperProps) {
         minHeight: 72,
         minWidth: 200,
       }}
+      data-toolpad-slot-name={props[RUNTIME_PROP_SLOTS]}
+      data-toolpad-slot-parent={props.parentId}
+      data-toolpad-slot-type="single"
     />
   );
 }

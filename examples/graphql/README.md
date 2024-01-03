@@ -2,15 +2,13 @@
 
 <p class="description">An app that shows latest 100 stargezers' info for any GitHub repository.</p>
 
-<a target="_blank">
+<a href="https://mui-toolpad-graphql-production.up.railway.app/prod/pages/page" target="_blank">
   <img src="https://mui.com/static/toolpad/marketing/graphql.png" alt="Toolpad example app using graphQL API" style="aspect-ratio: 687/376;" width="1434">
 </a>
 
-A Toolpad app that shows how to:
+## Check out the live app
 
-- call a graphQL API using custom functions
-- use data grid, metric and textField components
-- work with secrets in Toolpad
+[Open example](https://mui-toolpad-graphql-production.up.railway.app/prod/pages/page)
 
 ## How to run
 
@@ -31,3 +29,15 @@ pnpm create toolpad-app --example graphql
 or:
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/graphql)
+
+## What's inside
+
+A Toolpad app that shows how to:
+
+- call a graphQL API using custom functions
+- use data grid, metric and textField components
+- work with secrets in Toolpad
+
+## The source
+
+[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/graphql)

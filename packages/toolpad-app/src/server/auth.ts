@@ -135,7 +135,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
   return router;
 }
 
-export async function createAuthPagesMiddleware(project: ToolpadProject) {
+export async function createRequireAuthMiddleware(project: ToolpadProject) {
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { options } = project;
     const { base } = options;
@@ -148,14 +148,14 @@ export async function createAuthPagesMiddleware(project: ToolpadProject) {
 
     const hasAuthentication = authProviders.length > 0;
 
+    const isPageRequest = req.get('sec-fetch-dest') === 'document';
     const signInPath = `${base}/signin`;
 
-    let isRedirect = false;
+    let isUnauthorized = false;
     if (
+      (!project.options.dev || isPageRequest) &&
       hasAuthentication &&
-      req.get('sec-fetch-dest') === 'document' &&
-      req.originalUrl.split('?')[0] !== signInPath &&
-      !req.originalUrl.startsWith(`${base}/api/auth`)
+      req.originalUrl.split('?')[0] !== signInPath
     ) {
       const request = adaptRequestFromExpressToFetch(req);
 
@@ -171,12 +171,16 @@ export async function createAuthPagesMiddleware(project: ToolpadProject) {
       }
 
       if (!token) {
-        isRedirect = true;
+        isUnauthorized = true;
       }
     }
 
-    if (isRedirect) {
-      res.redirect(signInPath);
+    if (isUnauthorized) {
+      if (isPageRequest) {
+        res.redirect(signInPath);
+      } else {
+        res.status(401).send('Unauthorized');
+      }
       res.end();
     } else {
       next();

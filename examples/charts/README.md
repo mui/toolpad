@@ -2,9 +2,13 @@
 
 <p class="description">A Toolpad app that shows how to use charts to build an analytics dashboard.</p>
 
-<a target="_blank">
+<a href="https://mui-toolpad-charts-production.up.railway.app/prod/pages/page" target="_blank">
   <img src="https://mui.com/static/toolpad/marketing/charts.png" alt="Charts in Toolpad" style="aspect-ratio: 575/317;" width="1433">
 </a>
+
+## Check out the live app
+
+[Open example](https://mui-toolpad-charts-production.up.railway.app/prod/pages/page)
 
 ## How to run
 
@@ -27,5 +31,7 @@ pnpm create toolpad-app --example charts
 This app demonstrates the following capabilities of Toolpad:
 
 1. Usage of the four types of charts.
+
+## The source
 
 [Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/charts)

@@ -41,13 +41,6 @@ function toolpadVitePlugin(): Plugin {
   return {
     name: 'toolpad',
 
-    async resolveId(id) {
-      if (id.endsWith('.html')) {
-        return id;
-      }
-      return null;
-    },
-
     async load(id) {
       if (id.endsWith('.html')) {
         // production build only

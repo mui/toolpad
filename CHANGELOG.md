@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.1.44
+
+<!-- generated comparing v0.1.43..master -->
+
+_Jan 3, 2024_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+More live examples, some documentation fixes.
+
+- &#8203;<!-- 7 -->Hosted 5 more examples on railway and linked them to docs (#3043) @prakhargupta1
+- &#8203;<!-- 6 -->Add authentication (#2925) @apedroferreira
+- &#8203;<!-- 5 -->Lock file maintenance (#3040) @renovate[bot]
+- &#8203;<!-- 4 -->[docs] Fix dead link to live demo (#3041) @oliviertassinari
+- &#8203;<!-- 3 -->[docs] Fix example image scale @oliviertassinari
+- &#8203;<!-- 2 -->[docs] Fix 301 link to Render.com @oliviertassinari
+- &#8203;<!-- 1 -->[docs] Lint next.config.mjs (#3027) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
 ## 0.1.43
 
 <!-- generated comparing v0.1.42..master -->

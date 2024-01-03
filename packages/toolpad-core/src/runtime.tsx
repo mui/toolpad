@@ -6,9 +6,8 @@ import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { Stack } from '@mui/material';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
-import { RUNTIME_PROP_NODE_ID, RUNTIME_PROP_SLOTS, TOOLPAD_COMPONENT } from './constants';
+import { TOOLPAD_COMPONENT } from './constants';
 import type {
-  ComponentConfig,
   RuntimeEvent,
   RuntimeError,
   PaginationMode,
@@ -44,69 +43,31 @@ export interface NodeErrorProps {
   error: RuntimeError;
 }
 
-export interface NodeFiberHostProps {
-  children: React.ReactElement;
-  [RUNTIME_PROP_NODE_ID]: string;
-  componentConfig: ComponentConfig<any>;
-  nodeError?: RuntimeError | null;
-}
-
-// We will use [RUNTIME_PROP_NODE_ID] while walking the fibers to detect React Elements that
-// represent AppDomNodes. We use a wrapper to ensure only one element exists in the React tree
-// that has [RUNTIME_PROP_NODE_ID] property with this nodeId (We could clone the child and add
-// the prop, but the child may be spreading its props to other elements). We also don't want this
-// property to end up on DOM nodes.
-// IMPORTANT! This node must directly wrap the React Element for the AppDomNode
-function NodeFiberHost({ children }: NodeFiberHostProps) {
-  return children;
-}
-
 export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
   nodeId: NodeId;
   nodeName: string;
-  componentConfig: ComponentConfig<any>;
   NodeError: React.ComponentType<NodeErrorProps>;
 }
 
 export function NodeRuntimeWrapper({
   nodeId,
   nodeName,
-  componentConfig,
   children,
   NodeError,
 }: NodeRuntimeWrapperProps) {
   const resetNodeErrorsKey = React.useContext(ResetNodeErrorsKeyContext);
 
   const ErrorFallback = React.useCallback(
-    ({ error }: FallbackProps) => (
-      <NodeFiberHost
-        {...{
-          [RUNTIME_PROP_NODE_ID]: nodeId,
-          nodeError: error,
-          componentConfig,
-        }}
-      >
-        <NodeError error={error} />
-      </NodeFiberHost>
-    ),
-    [NodeError, componentConfig, nodeId],
+    ({ error }: FallbackProps) => <NodeError error={error} />,
+    [NodeError],
   );
 
   const nodeRuntimeValue = React.useMemo(() => ({ nodeId, nodeName }), [nodeId, nodeName]);
 
   return (
     <ErrorBoundary resetKeys={[resetNodeErrorsKey]} fallbackRender={ErrorFallback}>
-      <NodeRuntimeContext.Provider value={nodeRuntimeValue}>
-        <NodeFiberHost
-          {...{
-            [RUNTIME_PROP_NODE_ID]: nodeId,
-            componentConfig,
-          }}
-        >
-          {children}
-        </NodeFiberHost>
-      </NodeRuntimeContext.Provider>
+      <NodeRuntimeContext.Provider value={nodeRuntimeValue}>{children}</NodeRuntimeContext.Provider>
     </ErrorBoundary>
   );
 }

@@ -13,15 +13,8 @@ import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
-const CANVAS_ENTRY = '/canvas.tsx';
 
-export interface GetHtmlContentParams {
-  canvas: boolean;
-  base: string;
-}
-
-export function getHtmlContent({ canvas }: GetHtmlContentParams) {
-  const entryPoint = canvas ? CANVAS_ENTRY : MAIN_ENTRY;
+export function getHtmlContent() {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -38,17 +31,13 @@ export function getHtmlContent({ canvas }: GetHtmlContentParams) {
     
         <!-- __TOOLPAD_SCRIPTS__ -->
 
-        <script type="module" src=${JSON.stringify(entryPoint)}></script>
+        <script type="module" src=${JSON.stringify(MAIN_ENTRY)}></script>
       </body>
     </html>
   `;
 }
 
-interface ToolpadVitePluginParams {
-  base: string;
-}
-
-function toolpadVitePlugin({ base }: ToolpadVitePluginParams): Plugin {
+function toolpadVitePlugin(): Plugin {
   return {
     name: 'toolpad',
 
@@ -62,7 +51,7 @@ function toolpadVitePlugin({ base }: ToolpadVitePluginParams): Plugin {
     async load(id) {
       if (id.endsWith('.html')) {
         // production build only
-        return getHtmlContent({ canvas: false, base });
+        return getHtmlContent();
       }
       return null;
     },
@@ -286,11 +275,9 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            replacement: 'virtual:toolpad-files:main.tsx',
-          },
-          {
-            find: CANVAS_ENTRY,
-            replacement: 'virtual:toolpad-files:canvas.tsx',
+            replacement: dev
+              ? 'virtual:toolpad-files:canvas.tsx'
+              : 'virtual:toolpad-files:main.tsx',
           },
         ],
       },
@@ -364,7 +351,7 @@ if (import.meta.hot) {
       appType: 'custom',
       logLevel: 'info',
       root,
-      plugins: [virtualToolpadFiles, react(), toolpadVitePlugin({ base }), ...plugins],
+      plugins: [virtualToolpadFiles, react(), toolpadVitePlugin(), ...plugins],
       base,
       define: {
         'process.env.NODE_ENV': `'${mode}'`,

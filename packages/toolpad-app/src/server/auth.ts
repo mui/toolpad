@@ -92,6 +92,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
             if (account?.provider === 'github') {
               return Boolean(
                 profile?.verifiedEmails &&
+                  profile.verifiedEmails.length > 0 &&
                   (requiredEmails.length === 0 ||
                     requiredEmails.some((requiredEmail) =>
                       profile.verifiedEmails!.some((verifiedEmail) =>

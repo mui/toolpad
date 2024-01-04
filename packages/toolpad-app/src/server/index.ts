@@ -27,7 +27,11 @@ import { createRpcHandler } from './rpc';
 import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
-import { createAuthHandler, createRequireAuthMiddleware } from './auth';
+import {
+  MISSING_SECRET_ERROR_MESSAGE,
+  createAuthHandler,
+  createRequireAuthMiddleware,
+} from './auth';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -114,10 +118,11 @@ async function createDevHandler(project: ToolpadProject) {
     }),
   );
 
-  if (process.env.TOOLPAD_AUTH_SECRET) {
-    const authHandler = createAuthHandler(project);
-    handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
+  if (!process.env.TOOLPAD_AUTH_SECRET) {
+    console.error(MISSING_SECRET_ERROR_MESSAGE);
   }
+  const authHandler = createAuthHandler(project);
+  handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
 
   handler.use(await createRequireAuthMiddleware(project));
 

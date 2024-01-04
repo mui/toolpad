@@ -17,6 +17,9 @@ const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [
   'azure-ad',
 ];
 
+export const MISSING_SECRET_ERROR_MESSAGE =
+  'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at [insert link to docs here]';
+
 export function createAuthHandler(project: ToolpadProject): Router {
   const { base } = project.options;
 
@@ -176,6 +179,11 @@ export function createAuthHandler(project: ToolpadProject): Router {
   router.use(
     '/*',
     asyncHandler(async (req, res) => {
+      if (!process.env.TOOLPAD_AUTH_SECRET) {
+        res.status(400).json({ message: MISSING_SECRET_ERROR_MESSAGE, code: 'MissingSecret' });
+        return;
+      }
+
       const request = adaptRequestFromExpressToFetch(req);
 
       const response = (await Auth(request, authConfig)) as Response;

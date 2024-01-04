@@ -12,7 +12,11 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '.
 import createRuntimeState from '../runtime/createRuntimeState';
 import type { RuntimeConfig } from '../types';
 import type { RuntimeState } from '../runtime';
-import { createAuthHandler, createRequireAuthMiddleware } from './auth';
+import {
+  MISSING_SECRET_ERROR_MESSAGE,
+  createAuthHandler,
+  createRequireAuthMiddleware,
+} from './auth';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;
@@ -63,11 +67,11 @@ export async function createProdHandler(project: ToolpadProject) {
     basicAuthUnauthorized(res);
   });
 
-  if (process.env.TOOLPAD_AUTH_SECRET) {
-    const authHandler = createAuthHandler(project);
-    handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
+  if (!process.env.TOOLPAD_AUTH_SECRET) {
+    console.error(MISSING_SECRET_ERROR_MESSAGE);
   }
-
+  const authHandler = createAuthHandler(project);
+  handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
   handler.use(await createRequireAuthMiddleware(project));
 
   handler.use('/api/data', project.dataManager.createDataHandler());

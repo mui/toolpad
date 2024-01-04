@@ -9,7 +9,7 @@
     "edit": "toolpad editor http://localhost:3001/my-toolpad-app"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.43",
+    "@mui/toolpad": "0.1.44",
     "next": "14.0.2"
   },
   "devDependencies": {}

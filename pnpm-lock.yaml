@@ -56,7 +56,7 @@ importers:
         version: 1.4.0
       '@mui/monorepo':
         specifier: github:mui/material-ui
-        version: github.com/mui/material-ui/273e721d1eebe48a2a3e4f44dae4ebd69e7b6b67
+        version: github.com/mui/material-ui/cb76f8fdd6e0237d8f7119f6fd9b43ee7fd8e954
       '@mui/x-charts':
         specifier: 6.18.4
         version: 6.18.4(@mui/material@5.15.2)(@mui/system@5.15.2)(react-dom@18.2.0)(react@18.2.0)
@@ -221,7 +221,7 @@ importers:
         version: 5.15.0(@emotion/cache@11.11.0)(@emotion/server@11.11.0)(@mui/material@5.15.2)(next@13.4.19)(react@18.2.0)
       '@mui/monorepo':
         specifier: https://github.com/mui/material-ui.git
-        version: github.com/mui/material-ui/273e721d1eebe48a2a3e4f44dae4ebd69e7b6b67
+        version: github.com/mui/material-ui/cb76f8fdd6e0237d8f7119f6fd9b43ee7fd8e954
       '@mui/styles':
         specifier: 5.15.2
         version: 5.15.2(react@18.2.0)
@@ -832,9 +832,6 @@ importers:
       monaco-editor:
         specifier: 0.45.0
         version: 0.45.0
-      react-devtools-inline:
-        specifier: 5.0.0
-        version: 5.0.0
       react-transition-group:
         specifier: 4.4.5
         version: 4.4.5(react-dom@18.2.0)(react@18.2.0)
@@ -12222,13 +12219,6 @@ packages:
       - vue-template-compiler
     dev: false
 
-  /react-devtools-inline@5.0.0:
-    resolution: {integrity: sha512-zrbsL0UfCw+gp+RDD3wcEfOQME+/YNgmZn42kxAVujfyCgVIuCHbAwx0W6AWYPYekUBqsuRSeVs5FJAVoFEjPQ==}
-    dependencies:
-      source-map-js: 0.6.2
-      sourcemap-codec: 1.4.8
-    dev: true
-
   /react-docgen@7.0.1:
     resolution: {integrity: sha512-rCz0HBIT0LWbIM+///LfRrJoTKftIzzwsYDf0ns5KwaEjejMHQRtphcns+IXFHDNY9pnz6G8l/JbbI6pD4EAIA==}
     engines: {node: '>=16.14.0'}
@@ -13143,11 +13133,6 @@ packages:
       is-plain-obj: 1.1.0
     dev: true
 
-  /source-map-js@0.6.2:
-    resolution: {integrity: sha512-/3GptzWzu0+0MBQFrDKzw/DvvMTUORvgY6k6jd/VS6iCR4RDTKWH6v6WPwQoUO8667uQEf9Oe38DxAYWY5F/Ug==}
-    engines: {node: '>=0.10.0'}
-    dev: true
-
   /source-map-js@1.0.2:
     resolution: {integrity: sha512-R0XvVJ9WusLiqTCEiGCmICCMplcCkIwwR11mOSD9CR5u+IXYdiseeEuXCVAjS54zqwkLcPNnmU4OeJ6tUrWhDw==}
     engines: {node: '>=0.10.0'}
@@ -13177,11 +13162,6 @@ packages:
     dependencies:
       whatwg-url: 7.1.0
     dev: false
-
-  /sourcemap-codec@1.4.8:
-    resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
-    deprecated: Please use @jridgewell/sourcemap-codec instead
-    dev: true
 
   /spawn-command@0.0.2:
     resolution: {integrity: sha512-zC8zGoGkmc8J9ndvml8Xksr1Amk9qBujgbF0JAIWO7kXr43w0h/0GJNM/Vustixu+YE8N/MTrQ7N31FvHUACxQ==}
@@ -15020,8 +15000,8 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  github.com/mui/material-ui/273e721d1eebe48a2a3e4f44dae4ebd69e7b6b67:
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/273e721d1eebe48a2a3e4f44dae4ebd69e7b6b67}
+  github.com/mui/material-ui/cb76f8fdd6e0237d8f7119f6fd9b43ee7fd8e954:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/cb76f8fdd6e0237d8f7119f6fd9b43ee7fd8e954}
     name: '@mui/monorepo'
     version: 5.15.3
     requiresBuild: true

@@ -35,7 +35,7 @@ export interface ToolpadAppDevServerParams {
   customServer: boolean;
 }
 
-function devServerPlugin({ config, base }: ToolpadAppDevServerParams): Plugin {
+function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
   return {
     name: 'toolpad-dev-server',
 
@@ -46,7 +46,7 @@ function devServerPlugin({ config, base }: ToolpadAppDevServerParams): Plugin {
           try {
             const dom = await loadDom();
 
-            const template = getHtmlContent({ canvas: true, base });
+            const template = getHtmlContent();
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 

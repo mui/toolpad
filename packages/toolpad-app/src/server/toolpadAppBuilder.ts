@@ -338,7 +338,7 @@ if (import.meta.hot) {
           'react/jsx-runtime',
           'recharts',
           '@mui/toolpad > superjson',
-          'title',
+          '@mui/toolpad > @mui/toolpad-utils > title',
           'zod',
         ],
         exclude: [

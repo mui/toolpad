@@ -41,7 +41,7 @@
                   },
                   "description": "Authentication providers to use."
                 },
-                "requiredEmail": {
+                "requiredDomain": {
                   "type": "array",
                   "items": {
                     "type": "string"

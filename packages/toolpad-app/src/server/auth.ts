@@ -87,16 +87,16 @@ export function createAuthHandler(project: ToolpadProject): Router {
             const dom = await project.loadDom();
 
             const app = appDom.getApp(dom);
-            const requiredEmails = app.attributes.authentication?.requiredEmail ?? [];
+            const requiredDomains = app.attributes.authentication?.requiredDomain ?? [];
 
             if (account?.provider === 'github') {
               return Boolean(
                 profile?.verifiedEmails &&
                   profile.verifiedEmails.length > 0 &&
-                  (requiredEmails.length === 0 ||
-                    requiredEmails.some((requiredEmail) =>
+                  (requiredDomains.length === 0 ||
+                    requiredDomains.some((requiredDomain) =>
                       profile.verifiedEmails!.some((verifiedEmail) =>
-                        new RegExp(requiredEmail).test(verifiedEmail),
+                        verifiedEmail.endsWith(`@${requiredDomain}`),
                       ),
                     )),
               );
@@ -105,9 +105,9 @@ export function createAuthHandler(project: ToolpadProject): Router {
               return Boolean(
                 profile?.email_verified &&
                   profile?.email &&
-                  (requiredEmails.length === 0 ||
-                    requiredEmails.some(
-                      (requiredEmail) => new RegExp(requiredEmail).test(profile.email!) ?? false,
+                  (requiredDomains.length === 0 ||
+                    requiredDomains.some(
+                      (requiredDomain) => profile.email!.endsWith(`@${requiredDomain}`) ?? false,
                     )),
               );
             }

@@ -73,7 +73,7 @@ export function AppAuthenticationEditor() {
     [appState],
   );
 
-  const handleRequiredEmailChange = React.useCallback(
+  const handleRequiredDomainChange = React.useCallback(
     (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const {
         target: { value: email },
@@ -84,11 +84,11 @@ export function AppAuthenticationEditor() {
 
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
           ...app.attributes?.authentication,
-          requiredEmail: updateArray(
-            app.attributes?.authentication?.requiredEmail ?? [],
+          requiredDomain: updateArray(
+            app.attributes?.authentication?.requiredDomain ?? [],
             email,
             index,
-          ).filter((requiredEmail) => requiredEmail !== ''),
+          ).filter((requiredDomain) => requiredDomain !== ''),
         });
 
         return draft;
@@ -105,7 +105,7 @@ export function AppAuthenticationEditor() {
     [authentication?.providers],
   ).map((providerConfig) => providerConfig.provider);
 
-  const requiredEmails = authentication?.requiredEmail ?? [];
+  const requiredDomains = authentication?.requiredDomain ?? [];
 
   return (
     <Stack direction="column">
@@ -150,17 +150,17 @@ export function AppAuthenticationEditor() {
         .
       </Alert>
       <Typography variant="subtitle1" mt={2}>
-        Required email patterns
+        Required email domains
       </Typography>
       <Typography variant="body2" mt={1}>
-        If set, authenticated user emails must match one of the patterns below.
+        If set, authenticated user emails must be in one of the domains below.
       </Typography>
-      {[...requiredEmails, ''].map((email, index) => (
+      {[...requiredDomains, ''].map((email, index) => (
         <TextField
           key={index}
           value={email}
-          onChange={handleRequiredEmailChange(index)}
-          placeholder="@example.com"
+          onChange={handleRequiredDomainChange(index)}
+          placeholder="example.com"
         />
       ))}
     </Stack>

@@ -32,20 +32,20 @@ export async function readMaybeFile(filePath: string): Promise<string | null> {
     return await fs.readFile(filePath, { encoding: 'utf-8' });
   } catch (rawError) {
     const error = errorFrom(rawError);
-    if (error.code === 'ENOENT') {
+    if (error.code === 'ENOENT' || error.code === 'EISDIR') {
       return null;
     }
     throw error;
   }
 }
 
-export async function readMaybeDir(dirPath: string): Promise<Dirent[] | null> {
+export async function readMaybeDir(dirPath: string): Promise<Dirent[]> {
   try {
     return await fs.readdir(dirPath, { withFileTypes: true });
   } catch (rawError: unknown) {
     const error = errorFrom(rawError);
-    if (errorFrom(error).code === 'ENOENT') {
-      return null;
+    if (error.code === 'ENOENT' || error.code === 'ENOTDIR') {
+      return [];
     }
     throw error;
   }

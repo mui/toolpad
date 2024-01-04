@@ -252,7 +252,18 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
     </Stack>
   );
 
-  return hasEnv ? (
+  const envBindingEditor = (
+    <EnvBindingEditor
+      value={(value as EnvAttrValue)?.$$env ? (value as EnvAttrValue) : null}
+      onChange={onChange}
+    />
+  );
+
+  if (!hasEnv) {
+    return jsExpressionBindingEditor;
+  }
+
+  return (
     <TabContext value={activeTab}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <TabList onChange={handleTabChange} aria-label="Choose action kind ">
@@ -267,14 +278,9 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
         </Box>
       </TabPanel>
       <TabPanel value="env" disableGutters>
-        <EnvBindingEditor
-          value={(value as EnvAttrValue)?.$$env ? (value as EnvAttrValue) : null}
-          onChange={onChange}
-        />
+        {envBindingEditor}
       </TabPanel>
     </TabContext>
-  ) : (
-    jsExpressionBindingEditor
   );
 }
 
@@ -649,8 +655,8 @@ export function BindingEditor<V>({
       aria-label={`Bind property "${label}"`}
       checked={hasBinding}
       disabled={disabled}
-      icon={<AddLinkIcon />}
-      checkedIcon={<LinkIcon />}
+      icon={<AddLinkIcon fontSize="inherit" />}
+      checkedIcon={<LinkIcon fontSize="inherit" />}
       onClick={handleOpen}
       color={error ? 'error' : undefined}
       sx={{ visibility: hidden ? 'hidden' : 'visible' }}

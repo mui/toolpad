@@ -1,10 +1,11 @@
-import { TextField } from '@mui/material';
+import { IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
 import * as React from 'react';
-import { AppDom, PageNode, setNodeNamespacedProp } from '../../appDom';
+import ResetIcon from '@mui/icons-material/RestartAlt';
+import * as appDom from '../../appDom';
 import { useDomApi } from '../AppState';
 
 interface PageDisplayNameEditorProps {
-  node: PageNode;
+  node: appDom.PageNode;
 }
 
 function validateInput(input: string) {
@@ -16,9 +17,11 @@ function validateInput(input: string) {
 
 export default function PageDisplayNameEditor({ node }: PageDisplayNameEditorProps) {
   const domApi = useDomApi();
-  const [pageDisplayNameInput, setPageDisplayNameInput] = React.useState(
-    node.attributes.displayName ?? node.name,
-  );
+
+  const pageDisplayName = React.useMemo(() => appDom.getPageDisplayName(node), [node]);
+
+  const [pageDisplayNameInput, setPageDisplayNameInput] = React.useState(pageDisplayName);
+  React.useEffect(() => setPageDisplayNameInput(pageDisplayName), [pageDisplayName]);
 
   const handlePageDisplayNameChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => setPageDisplayNameInput(event.target.value),
@@ -26,10 +29,16 @@ export default function PageDisplayNameEditor({ node }: PageDisplayNameEditorPro
   );
 
   const handleCommit = React.useCallback(() => {
-    domApi.update((dom: AppDom) =>
-      setNodeNamespacedProp(dom, node, 'attributes', 'displayName', pageDisplayNameInput),
+    domApi.update((dom: appDom.AppDom) =>
+      appDom.setNodeNamespacedProp(dom, node, 'attributes', 'displayName', pageDisplayNameInput),
     );
   }, [node, pageDisplayNameInput, domApi]);
+
+  const handleReset = React.useCallback(() => {
+    domApi.update((dom: appDom.AppDom) =>
+      appDom.setNodeNamespacedProp(dom, node, 'attributes', 'displayName', undefined),
+    );
+  }, [node, domApi]);
 
   const handleKeyPress = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -50,6 +59,18 @@ export default function PageDisplayNameEditor({ node }: PageDisplayNameEditorPro
       onKeyDown={handleKeyPress}
       error={!pageDisplayNameInput}
       helperText={validateInput(pageDisplayNameInput)}
+      InputProps={{
+        endAdornment:
+          pageDisplayNameInput === node.attributes.displayName ? (
+            <InputAdornment position="end">
+              <Tooltip title="Reset to default value">
+                <IconButton onClick={handleReset} edge="end">
+                  <ResetIcon />
+                </IconButton>
+              </Tooltip>
+            </InputAdornment>
+          ) : null,
+      }}
     />
   );
 }

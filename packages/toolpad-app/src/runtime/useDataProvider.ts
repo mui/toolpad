@@ -39,6 +39,20 @@ export const useDataProvider: UseDataProviderHook = (id) => {
             return api.methods.deleteDataProviderRecord(filePath, name, recordId);
           }
         : undefined,
+      updateRecord: introspection.hasUpdateRecord
+        ? async (recordId: GridRowId, values: Record<string, unknown>) => {
+            invariant(id, 'id is required');
+            const [filePath, name] = id.split(':');
+            return api.methods.updateDataProviderRecord(filePath, name, recordId, values);
+          }
+        : undefined,
+      createRecord: introspection.hasCreateRecord
+        ? async (values: Record<string, unknown>) => {
+            invariant(id, 'id is required');
+            const [filePath, name] = id.split(':');
+            return api.methods.createDataProviderRecord(filePath, name, values);
+          }
+        : undefined,
     };
   }, [id, introspection]);
 

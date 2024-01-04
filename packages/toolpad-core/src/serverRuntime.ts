@@ -1,6 +1,7 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { IncomingMessage, ServerResponse } from 'node:http';
 import * as cookie from 'cookie';
+import { isWebContainer } from '@webcontainer/env';
 
 export interface ServerContext {
   /**
@@ -40,5 +41,14 @@ export function createServerContext(req: IncomingMessage, res: ServerResponse): 
 }
 
 export function withContext<R = void>(ctx: ServerContext, doWork: () => Promise<R>): Promise<R> {
+  const shouldBypassContext = isWebContainer();
+
+  if (shouldBypassContext) {
+    console.warn(
+      'Bypassing server context in web containers, see https://github.com/stackblitz/core/issues/2711',
+    );
+    return doWork();
+  }
+
   return contextStore.run(ctx, doWork);
 }

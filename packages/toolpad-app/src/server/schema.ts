@@ -259,6 +259,21 @@ elementSchema = baseElementSchema
 export const applicationSchema = toolpadObjectSchema(
   'application',
   z.object({
+    authentication: z
+      .object({
+        providers: z
+          .array(
+            z.object({
+              provider: z
+                .enum(['github', 'google'])
+                .describe('Unique identifier for this authentication provider.'),
+            }),
+          )
+          .optional()
+          .describe('Authentication providers to use.'),
+      })
+      .optional()
+      .describe('Authentication configuration for this application.'),
     authorization: z
       .object({
         roles: z
@@ -313,8 +328,8 @@ export const pageSchema = toolpadObjectSchema(
       })
       .optional()
       .describe('Authorization configuration for this page.'),
-    unstable_codeFile: z
-      .string()
+    unstable_codeFile: z.coerce
+      .boolean()
       .optional()
       .describe('The content of the page as JSX. Experimental, do not use!.'),
     display: z

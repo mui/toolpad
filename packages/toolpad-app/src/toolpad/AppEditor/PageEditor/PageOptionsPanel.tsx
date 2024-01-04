@@ -14,7 +14,7 @@ import {
 import * as React from 'react';
 import { useAppState, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
-import QueryEditor from './QueryEditor';
+
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import * as appDom from '../../../appDom';
@@ -90,8 +90,7 @@ export default function PageOptionsPanel() {
           placement="left-start"
           title={
             <Typography variant="inherit">
-              Control how the navigation panel is rendered in the final application. Read more in
-              the{' '}
+              Control how the app shell is displayed in the final application. Read more in the{' '}
               <Link
                 href="https://mui.com/toolpad/concepts/page-properties/#display-mode"
                 target="_blank"
@@ -148,7 +147,6 @@ export default function PageOptionsPanel() {
           <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
           <Typography variant="overline">Page State:</Typography>
           <UrlQueryEditor pageNodeId={pageNodeId} />
-          <QueryEditor />
         </div>
       )}
     </Stack>

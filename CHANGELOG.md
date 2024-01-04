@@ -1,5 +1,53 @@
 # Changelog
 
+## 0.1.43
+
+<!-- generated comparing v0.1.42..master -->
+
+_Dec 28, 2023_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Happy holidays! House keeping, minor documentation updates and some clean up to the marketing website.
+
+- &#8203;<!-- 9 -->[chore] Upgrade monorepo 5.15.2 (#3033) @bharatkashyap
+- &#8203;<!-- 8 -->[code-infra] Sync bug issue template (#3029) @oliviertassinari
+- &#8203;<!-- 7 -->[core] Fix use of correct CSS syntax @oliviertassinari
+- &#8203;<!-- 6 -->[core] Yaml format match most common convention @oliviertassinari
+- &#8203;<!-- 5 -->[core] Delete strange issue template (#3025) @oliviertassinari
+- &#8203;<!-- 4 -->[docs] Fix typo (#3032) @bharatkashyap
+- &#8203;<!-- 3 -->[docs] Flatten the getting-started folder (#3028) @oliviertassinari
+- &#8203;<!-- 2 -->[docs] Fix missing issue template (#3026) @oliviertassinari
+- &#8203;<!-- 1 -->[website] Update the social preview image (#3031) @danilo-leal
+
+## 0.1.42
+
+<!-- generated comparing v0.1.41..master -->
+
+_Dec 22, 2023_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+This week: a big overhaul to our query editor! Improved titles for pages in the sidebar. Support server-side row updates for the data grid.
+
+- &#8203;<!-- 15 -->Remove components from appDom (#3017) @Janpot
+- &#8203;<!-- 14 -->Introduce pagesManifest (#3016) @Janpot
+- &#8203;<!-- 13 -->Add labels to form validation properties (#3015) @Janpot
+- &#8203;<!-- 12 -->Guess proper default page titles based on page name (#3014) @Janpot
+- &#8203;<!-- 11 -->Remove functions worker (#3013) @Janpot
+- &#8203;<!-- 10 -->Add a new query panel (#2393) @bharatkashyap
+- &#8203;<!-- 09 -->Support updating rows in the data provider (#3001) @Janpot
+- &#8203;<!-- 08 -->Improve styling of the application navigation (#2993) @Janpot
+- &#8203;<!-- 07 -->Bring in some fixes from pnpm migration branch (#3010) @Janpot
+- &#8203;<!-- 06 -->Update yarn.lock (#3008) @apedroferreira
+- &#8203;<!-- 05 -->Update monorepo (#2998) @apedroferreira
+- &#8203;<!-- 04 -->fix 2527, customize page name (#2850) @JerryWu1234
+- &#8203;<!-- 03 -->Fix changelog (#2995) @apedroferreira
+- &#8203;<!-- 02 -->[docs] Update documentation for query panel (#3000) @bharatkashyap
+- &#8203;<!-- 01 -->[docs] Fix 301 links @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @oliviertassinari
+
 ## 0.1.41
 
 <!-- generated comparing v0.1.40..master -->

@@ -2,13 +2,13 @@
 
 <p class="description">This analytics dashboard shows how to track a KPI from a third-party data source.</p>
 
-<a href="https://mui-toolpad-npm-stats-production.up.railway.app/prod/pages/evZC-gp" target="_blank">
+<a href="https://mui-toolpad-npm-stats-production.up.railway.app/prod/pages/page" target="_blank">
   <img src="https://mui.com/static/toolpad/docs/examples/npm-stats.png" alt="npm stats app" style="aspect-ratio: 67/37;" width="1440">
 </a>
 
 ## Check out the live app
 
-[Open example](https://mui-toolpad-npm-stats-production.up.railway.app/prod/pages/evZC-gp)
+[Open example](https://mui-toolpad-npm-stats-production.up.railway.app/prod/pages/page)
 
 ## How to run
 

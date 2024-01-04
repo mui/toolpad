@@ -25,7 +25,6 @@ export default defineConfig((options) => [
       // Worker entry points
       appServerWorker: './src/server/appServerWorker.ts',
       appBuilderWorker: './src/server/appBuilderWorker.ts',
-      functionsDevWorker: './src/server/functionsDevWorker.ts',
       functionsTypesWorker: './src/server/functionsTypesWorker.ts',
     },
     format: ['esm'],
@@ -65,6 +64,7 @@ export default defineConfig((options) => [
     tsconfig: './tsconfig.runtime.json',
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/runtime'))],
+    external: [/.*\.(svg|png|jpe?g|gif|ico|webp)$/],
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('runtime: build successful');

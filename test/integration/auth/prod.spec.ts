@@ -26,6 +26,7 @@ test.use({
 });
 
 test('Must be authenticated to view pages', async ({ page, context, baseURL }) => {
+  // @TODO: Try mocking https://api.github.com/user and https://api.github.com/user/emails instead
   await page.route('*/**/api/auth/signin/github', async (route) => {
     const token = await encode({
       token: {

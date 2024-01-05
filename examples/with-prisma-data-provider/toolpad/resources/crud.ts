@@ -108,7 +108,6 @@ export default createDataProvider({
   },
 
   async createRecord(data) {
-    console.log(data);
     return model.create({ data });
   },
 });

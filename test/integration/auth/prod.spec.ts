@@ -1,8 +1,18 @@
 import * as path from 'path';
 import * as url from 'url';
+import { encode } from '@auth/core/jwt';
 import { test, expect } from '../../playwright/localTest';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
+const TOOLPAD_AUTH_SECRET = 'donttellanyone';
+
+const SESSION_USER = {
+  name: 'Adelbert Steiner',
+  email: 'steiner@plutoknights.com',
+  image: 'https://placehold.co/600x400',
+  roles: [],
+};
 
 test.use({
   ignoreConsoleErrors: [
@@ -17,34 +27,68 @@ test.use({
   localAppConfig: {
     cmd: 'start',
     env: {
-      TOOLPAD_AUTH_SECRET: 'donttellanyone',
+      TOOLPAD_AUTH_SECRET,
     },
   },
 });
 
-test('Must redirect to sign-in page if user is not authenticated', async ({ page }) => {
-  await page.goto('/prod/pages/mypage');
-  await expect(page).toHaveURL('/prod/signin');
-});
-
-test.only('Must be redirected on sign in', async ({ page }) => {
-  await page.goto('/prod/signin');
-
-  const githubLoginButton = page.getByText('Sign in with GitHub');
-
+test('Must be authenticated to view pages', async ({ page, context, baseURL }) => {
   await page.route('*/**/api/auth/csrf', async (route) => {
-    const json = { csrfToken: 'idontlikehackers' };
+    const csrfToken = 'idontlikehackers';
+
+    context.addCookies([{ name: 'authjs.csrf-token', value: csrfToken, url: baseURL }]);
+
+    const json = { csrfToken };
     await route.fulfill({ json });
   });
 
   await page.route('*/**/api/auth/signin/github', async (route) => {
-    const json = { url: { signInUrl: '/prod/pages/mypage' } };
+    const token = await encode({
+      token: {
+        user: SESSION_USER,
+      },
+      secret: TOOLPAD_AUTH_SECRET,
+      salt: 'authjs.session-token',
+    });
+
+    context.addCookies([{ name: 'authjs.session-token', value: token, url: baseURL }]);
+
+    const json = { url: '/prod/pages/mypage' };
     await route.fulfill({ json });
   });
 
+  await page.route('*/**/api/auth/session', async (route) => {
+    const json = {
+      user: SESSION_USER,
+    };
+    await route.fulfill({ json });
+  });
+
+  await page.route('*/**/api/auth/signout', async (route) => {
+    context.clearCookies();
+    await route.fulfill({ json: null });
+  });
+
+  await page.goto('/prod/pages/mypage');
+
+  // Is redirected when unauthenticated
+  await expect(page).toHaveURL('/prod/signin');
+
+  const githubLoginButton = page.getByText('Sign in with GitHub');
+
   await githubLoginButton.click();
 
+  // Goes to correct redirect URL, and is not redirected when authenticated
   await expect(page).toHaveURL('/prod/pages/mypage');
-});
 
-test('Must be able to view pages if authenticated', async ({ page }) => {});
+  const profileButtonLocator = page.getByText('Adelbert Steiner');
+
+  await expect(profileButtonLocator).toBeVisible();
+
+  // Sign out
+
+  await profileButtonLocator.click();
+  await page.getByText('Sign out').click();
+
+  await expect(page).toHaveURL(/\/prod\/signin/);
+});

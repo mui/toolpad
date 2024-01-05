@@ -883,7 +883,7 @@ function useDataProviderDataGridProps(
     slotProps: {
       toolbar: {
         hasCreateButton: !!dataProvider.createRecord,
-        createDisabled: false,
+        createDisabled: !!isEditing,
         onCreateClick: () => {
           const draftRowId = crypto.randomUUID();
           setDraftRow({ id: draftRowId, [DRAFT_ROW_MARKER]: true });

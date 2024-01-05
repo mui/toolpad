@@ -27,21 +27,20 @@ export function createAuthHandler(project: ToolpadProject): Router {
         tokens: TokenSet;
         provider: OAuthConfig<GitHubProfile>;
       }) {
+        const headers = {
+          Authorization: `Bearer ${tokens.access_token}`,
+          'User-Agent': 'authjs',
+        };
+
         const profile = await fetch(provider.userinfo?.url as URL, {
-          headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-            'User-Agent': 'authjs',
-          },
+          headers,
         }).then(async (githubRes) => githubRes.json());
 
         if (!profile.email) {
           // If the user does not have a public email, get another via the GitHub API
           // See https://docs.github.com/en/rest/users/emails#list-public-email-addresses-for-the-authenticated-user
           const githubRes = await fetch('https://api.github.com/user/emails', {
-            headers: {
-              Authorization: `Bearer ${tokens.access_token}`,
-              'User-Agent': 'authjs',
-            },
+            headers,
           });
 
           if (githubRes.ok) {

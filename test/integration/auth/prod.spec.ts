@@ -7,13 +7,6 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const TOOLPAD_AUTH_SECRET = 'donttellanyone';
 
-const SESSION_USER = {
-  name: 'Adelbert Steiner',
-  email: 'steiner@plutoknights.com',
-  image: 'https://placehold.co/600x400',
-  roles: [],
-};
-
 test.use({
   ignoreConsoleErrors: [
     /Failed to load resource: the server responded with a status of 401 \(Unauthorized\)/,
@@ -33,19 +26,12 @@ test.use({
 });
 
 test('Must be authenticated to view pages', async ({ page, context, baseURL }) => {
-  await page.route('*/**/api/auth/csrf', async (route) => {
-    const csrfToken = 'idontlikehackers';
-
-    context.addCookies([{ name: 'authjs.csrf-token', value: csrfToken, url: baseURL }]);
-
-    const json = { csrfToken };
-    await route.fulfill({ json });
-  });
-
   await page.route('*/**/api/auth/signin/github', async (route) => {
     const token = await encode({
       token: {
-        user: SESSION_USER,
+        name: 'Adelbert Steiner',
+        email: 'steiner@plutoknights.com',
+        picture: 'https://placehold.co/600x400',
       },
       secret: TOOLPAD_AUTH_SECRET,
       salt: 'authjs.session-token',
@@ -55,18 +41,6 @@ test('Must be authenticated to view pages', async ({ page, context, baseURL }) =
 
     const json = { url: '/prod/pages/mypage' };
     await route.fulfill({ json });
-  });
-
-  await page.route('*/**/api/auth/session', async (route) => {
-    const json = {
-      user: SESSION_USER,
-    };
-    await route.fulfill({ json });
-  });
-
-  await page.route('*/**/api/auth/signout', async (route) => {
-    context.clearCookies();
-    await route.fulfill({ json: null });
   });
 
   await page.goto('/prod/pages/mypage');

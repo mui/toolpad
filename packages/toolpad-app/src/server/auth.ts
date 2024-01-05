@@ -3,7 +3,7 @@ import { Auth } from '@auth/core';
 import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import { getToken } from '@auth/core/jwt';
-import { TokenSet } from '@auth/core/types';
+import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
@@ -15,109 +15,114 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
   const router = express.Router();
 
+  const githubProvider = GithubProvider({
+    clientId: process.env.TOOLPAD_GITHUB_ID,
+    clientSecret: process.env.TOOLPAD_GITHUB_SECRET,
+    userinfo: {
+      url: 'https://api.github.com/user',
+      async request({
+        tokens,
+        provider,
+      }: {
+        tokens: TokenSet;
+        provider: OAuthConfig<GitHubProfile>;
+      }) {
+        const profile = await fetch(provider.userinfo?.url as URL, {
+          headers: {
+            Authorization: `Bearer ${tokens.access_token}`,
+            'User-Agent': 'authjs',
+          },
+        }).then(async (githubRes) => githubRes.json());
+
+        if (!profile.email) {
+          // If the user does not have a public email, get another via the GitHub API
+          // See https://docs.github.com/en/rest/users/emails#list-public-email-addresses-for-the-authenticated-user
+          const githubRes = await fetch('https://api.github.com/user/emails', {
+            headers: {
+              Authorization: `Bearer ${tokens.access_token}`,
+              'User-Agent': 'authjs',
+            },
+          });
+
+          if (githubRes.ok) {
+            const emails: GitHubEmail[] = await githubRes.json();
+            profile.email = (emails.find((e) => e.primary) ?? emails[0]).email;
+            profile.verifiedEmails = emails.filter((e) => e.verified).map((e) => e.email);
+          }
+        }
+
+        return profile;
+      },
+    },
+  });
+
+  const googleProvider = GoogleProvider({
+    clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
+    clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
+    authorization: {
+      params: {
+        prompt: 'consent',
+        access_type: 'offline',
+        response_type: 'code',
+      },
+    },
+  });
+
+  const authConfig: AuthConfig = {
+    pages: {
+      signIn: `${base}/signin`,
+      signOut: base,
+      error: `${base}/signin`, // Error code passed in query string as ?error=
+      verifyRequest: base,
+    },
+    providers: [githubProvider, googleProvider],
+    secret: process.env.TOOLPAD_AUTH_SECRET,
+    trustHost: true,
+    callbacks: {
+      async signIn({ account, profile }) {
+        const dom = await project.loadDom();
+        const app = appDom.getApp(dom);
+
+        const restrictedDomains = app.attributes.authentication?.restrictedDomains ?? [];
+
+        if (account?.provider === 'github') {
+          return Boolean(
+            profile?.verifiedEmails &&
+              profile.verifiedEmails.length > 0 &&
+              (restrictedDomains.length === 0 ||
+                restrictedDomains.some((restrictedDomain) =>
+                  profile.verifiedEmails!.some((verifiedEmail) =>
+                    verifiedEmail.endsWith(`@${restrictedDomain}`),
+                  ),
+                )),
+          );
+        }
+
+        if (account?.provider === 'google') {
+          return Boolean(
+            profile?.email_verified &&
+              profile?.email &&
+              (restrictedDomains.length === 0 ||
+                restrictedDomains.some(
+                  (restrictedDomain) => profile.email!.endsWith(`@${restrictedDomain}`) ?? false,
+                )),
+          );
+        }
+
+        return true;
+      },
+      async redirect({ baseUrl }) {
+        return `${baseUrl}${base}`;
+      },
+    },
+  };
+
   router.use(
     '/*',
     asyncHandler(async (req, res) => {
       const request = adaptRequestFromExpressToFetch(req);
 
-      const response = (await Auth(request, {
-        pages: {
-          signIn: `${base}/signin`,
-          signOut: base,
-          error: `${base}/signin`, // Error code passed in query string as ?error=
-          verifyRequest: base,
-        },
-        providers: [
-          GithubProvider({
-            clientId: process.env.TOOLPAD_GITHUB_ID,
-            clientSecret: process.env.TOOLPAD_GITHUB_SECRET,
-            userinfo: {
-              url: 'https://api.github.com/user',
-              async request({
-                tokens,
-                provider,
-              }: {
-                tokens: TokenSet;
-                provider: OAuthConfig<GitHubProfile>;
-              }) {
-                const profile = await fetch(provider.userinfo?.url as URL, {
-                  headers: {
-                    Authorization: `Bearer ${tokens.access_token}`,
-                    'User-Agent': 'authjs',
-                  },
-                }).then(async (githubRes) => githubRes.json());
-
-                if (!profile.email) {
-                  // If the user does not have a public email, get another via the GitHub API
-                  // See https://docs.github.com/en/rest/users/emails#list-public-email-addresses-for-the-authenticated-user
-                  const githubRes = await fetch('https://api.github.com/user/emails', {
-                    headers: {
-                      Authorization: `Bearer ${tokens.access_token}`,
-                      'User-Agent': 'authjs',
-                    },
-                  });
-
-                  if (githubRes.ok) {
-                    const emails: GitHubEmail[] = await githubRes.json();
-                    profile.email = (emails.find((e) => e.primary) ?? emails[0]).email;
-                    profile.verifiedEmails = emails.filter((e) => e.verified).map((e) => e.email);
-                  }
-                }
-
-                return profile;
-              },
-            },
-          }),
-          GoogleProvider({
-            clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
-            clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
-            authorization: {
-              params: {
-                prompt: 'consent',
-                access_type: 'offline',
-                response_type: 'code',
-              },
-            },
-          }),
-        ],
-        secret: process.env.TOOLPAD_AUTH_SECRET,
-        trustHost: true,
-        callbacks: {
-          async signIn({ account, profile }) {
-            const dom = await project.loadDom();
-
-            const app = appDom.getApp(dom);
-            const requiredDomains = app.attributes.authentication?.requiredDomain ?? [];
-
-            if (account?.provider === 'github') {
-              return Boolean(
-                profile?.verifiedEmails &&
-                  profile.verifiedEmails.length > 0 &&
-                  (requiredDomains.length === 0 ||
-                    requiredDomains.some((requiredDomain) =>
-                      profile.verifiedEmails!.some((verifiedEmail) =>
-                        verifiedEmail.endsWith(`@${requiredDomain}`),
-                      ),
-                    )),
-              );
-            }
-            if (account?.provider === 'google') {
-              return Boolean(
-                profile?.email_verified &&
-                  profile?.email &&
-                  (requiredDomains.length === 0 ||
-                    requiredDomains.some(
-                      (requiredDomain) => profile.email!.endsWith(`@${requiredDomain}`) ?? false,
-                    )),
-              );
-            }
-            return true;
-          },
-          async redirect({ baseUrl }) {
-            return `${baseUrl}${base}`;
-          },
-        },
-      })) as Response;
+      const response = (await Auth(request, authConfig)) as Response;
 
       // Converting Fetch API's Response to Express' res
       res.status(response.status);

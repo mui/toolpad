@@ -73,10 +73,10 @@ export function AppAuthenticationEditor() {
     [appState],
   );
 
-  const handleRequiredDomainChange = React.useCallback(
+  const handleRestrictedDomainsChange = React.useCallback(
     (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
       const {
-        target: { value: email },
+        target: { value: domain },
       } = event;
 
       appState.update((draft) => {
@@ -84,11 +84,11 @@ export function AppAuthenticationEditor() {
 
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
           ...app.attributes?.authentication,
-          requiredDomain: updateArray(
-            app.attributes?.authentication?.requiredDomain ?? [],
-            email,
+          restrictedDomains: updateArray(
+            app.attributes?.authentication?.restrictedDomains ?? [],
+            domain,
             index,
-          ).filter((requiredDomain) => requiredDomain !== ''),
+          ).filter((restrictedDomain) => restrictedDomain !== ''),
         });
 
         return draft;
@@ -105,7 +105,7 @@ export function AppAuthenticationEditor() {
     [authentication?.providers],
   ).map((providerConfig) => providerConfig.provider);
 
-  const requiredDomains = authentication?.requiredDomain ?? [];
+  const restrictedDomains = authentication?.restrictedDomains ?? [];
 
   return (
     <Stack direction="column">
@@ -155,11 +155,11 @@ export function AppAuthenticationEditor() {
       <Typography variant="body2" mt={1}>
         If set, authenticated user emails must be in one of the domains below.
       </Typography>
-      {[...requiredDomains, ''].map((email, index) => (
+      {[...restrictedDomains, ''].map((domain, index) => (
         <TextField
           key={index}
-          value={email}
-          onChange={handleRequiredDomainChange(index)}
+          value={domain}
+          onChange={handleRestrictedDomainsChange(index)}
           placeholder="example.com"
         />
       ))}

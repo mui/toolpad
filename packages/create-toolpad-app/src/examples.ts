@@ -18,6 +18,8 @@ async function downloadTar(url: string) {
     throw new Error(`HTTP ${response.status} - ${response.statusText}`);
   }
   invariant(response.body, 'Missing response body');
+  // @ts-expect-error - @types/node ReadableStream clashing with lib.dom ReadableStream
+  // https://github.com/microsoft/TypeScript/issues/29867
   await pipeline(Readable.fromWeb(response.body), createWriteStream(tempFile));
   return tempFile;
 }

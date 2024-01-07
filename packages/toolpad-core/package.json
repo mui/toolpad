@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@mui/material": "5.15.3",
-    "@mui/toolpad-utils": "0.1.44",
+    "@mui/toolpad-utils": "workspace:*",
     "@tanstack/react-query": "5.14.6",
     "@types/json-schema": "7.0.15",
     "@webcontainer/env": "1.1.0",

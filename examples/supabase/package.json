@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@mui/toolpad": "0.1.44",
-    "@supabase/supabase-js": "2.39.1"
+    "@supabase/supabase-js": "2.39.2"
   }
 }

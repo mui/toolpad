@@ -56,7 +56,7 @@ importers:
         version: 1.4.0
       '@mui/monorepo':
         specifier: github:mui/material-ui
-        version: github.com/mui/material-ui/55182657898ab0bf3c03446ae2a05fe4edf2d0c9
+        version: github.com/mui/material-ui/97c3b4641bf4eee26bdd9a44de9744b19f6b438f
       '@mui/x-charts':
         specifier: 6.18.7
         version: 6.18.7(@mui/material@5.15.3)(@mui/system@5.15.3)(react-dom@18.2.0)(react@18.2.0)
@@ -174,9 +174,6 @@ importers:
       vitest-fail-on-console:
         specifier: 0.5.1
         version: 0.5.1(jsdom@23.2.0)
-      yarn-deduplicate:
-        specifier: 6.0.2
-        version: 6.0.2
 
   docs:
     dependencies:
@@ -221,7 +218,7 @@ importers:
         version: 5.15.3(@emotion/cache@11.11.0)(@emotion/server@11.11.0)(@mui/material@5.15.3)(next@13.4.19)(react@18.2.0)
       '@mui/monorepo':
         specifier: https://github.com/mui/material-ui.git
-        version: github.com/mui/material-ui/55182657898ab0bf3c03446ae2a05fe4edf2d0c9
+        version: github.com/mui/material-ui/97c3b4641bf4eee26bdd9a44de9744b19f6b438f
       '@mui/styles':
         specifier: 5.15.3
         version: 5.15.3(react@18.2.0)
@@ -6084,11 +6081,6 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       delayed-stream: 1.0.0
-
-  /commander@10.0.1:
-    resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
-    engines: {node: '>=14'}
-    dev: true
 
   /commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
@@ -14986,17 +14978,6 @@ packages:
       y18n: 5.0.8
       yargs-parser: 21.1.1
 
-  /yarn-deduplicate@6.0.2:
-    resolution: {integrity: sha512-Efx4XEj82BgbRJe5gvQbZmEO7pU5DgHgxohYZp98/+GwPqdU90RXtzvHirb7hGlde0sQqk5G3J3Woyjai8hVqA==}
-    engines: {node: '>=v14', yarn: '>=1 <2'}
-    hasBin: true
-    dependencies:
-      '@yarnpkg/lockfile': 1.1.0
-      commander: 10.0.1
-      semver: 7.5.4
-      tslib: 2.6.2
-    dev: true
-
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
@@ -15048,8 +15029,8 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  github.com/mui/material-ui/55182657898ab0bf3c03446ae2a05fe4edf2d0c9:
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/55182657898ab0bf3c03446ae2a05fe4edf2d0c9}
+  github.com/mui/material-ui/97c3b4641bf4eee26bdd9a44de9744b19f6b438f:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/97c3b4641bf4eee26bdd9a44de9744b19f6b438f}
     name: '@mui/monorepo'
     version: 5.15.3
     requiresBuild: true

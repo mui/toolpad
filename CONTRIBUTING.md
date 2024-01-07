@@ -18,22 +18,22 @@ This will use the local version of Toolpad as built in the monorepo. This is rec
 1. Install dependencies:
 
    ```bash
-   yarn install
+   pnpm install
    ```
 
 1. Run the build in watch mode
 
    ```bash
-   yarn dev
+   pnpm dev
    ```
 
 1. Run Toolpad
 
    ```bash
-   yarn toolpad dev test/integration/backend-basic/fixture/toolpad --dev
+   pnpm toolpad dev test/integration/backend-basic/fixture/toolpad --dev
    ```
 
-   **Note:** It's important to note the difference between `yarn toolpad dev` and the `--dev` parameter. The first instruction runs Toolpad in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.
+   **Note:** It's important to note the difference between `pnpm toolpad dev` and the `--dev` parameter. The first instruction runs Toolpad in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.
 
 If your application has dependencies other than `@mui/toolpad`, you have to temporarily add it to the workspace:
 
@@ -54,16 +54,20 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
 1. Run
 
    ```bash
-   yarn install
+   pnpm install
    ```
 
 1. Make sure to start the build in watch mode again and the run the app with
 
    ```bash
-   yarn toolpad dev examples/qr-generator --dev
+   pnpm toolpad dev examples/qr-generator --dev
    ```
 
 ### Linking Toolpad in a folder on your system (advanced)
+
+<!--
+
+TODO: how would this work with pnpm (https://pnpm.io/package_json#dependenciesmetainjected)
 
 <details>
 <summary>Expand instructions</summary>
@@ -134,6 +138,8 @@ yarn install
 
 </details>
 
+-->
+
 ## Running integration tests
 
 The playwright tests can be run in one of two modes:
@@ -141,15 +147,15 @@ The playwright tests can be run in one of two modes:
 1. Build the production target, then run the integration tests in production mode:
 
    ```bash
-   yarn release:build
-   yarn test:integration --project chromium
+   pnpm release:build
+   pnpm test:integration --project chromium
    ```
 
 2. Toolpad in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_NEXT_DEV` environment variable (slower)
 
    ```bash
-   yarn dev
-   TOOLPAD_NEXT_DEV=1 yarn test:integration --project chromium
+   pnpm dev
+   TOOLPAD_NEXT_DEV=1 pnpm test:integration --project chromium
    ```
 
 Use the `--ui` flag to run the tests interactively.
@@ -159,13 +165,13 @@ Use the `--ui` flag to run the tests interactively.
 1. If you haven't already, install the project dependencies using
 
    ```bash
-   yarn
+   pnpm
    ```
 
 1. To start the documentation application in dev mode run
 
    ```bash
-   yarn docs:dev
+   pnpm docs:dev
    ```
 
    If all goes well it should print
@@ -182,13 +188,13 @@ Use the `--ui` flag to run the tests interactively.
 - Run to build the project
 
   ```bash
-  yarn && yarn release:build
+  pnpm && pnpm release:build
   ```
 
 - Run it on your project of choice
 
   ```bash
-  yarn toolpad dev /path/to/my/toolpad/project
+  pnpm toolpad dev /path/to/my/toolpad/project
   ```
 
 ## Using CodeSandbox CI
@@ -214,7 +220,7 @@ Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn
 5. Run
 
    ```bash
-   yarn --force
+   pnpm
    ```
 
 You'll now be able to explore your project with the Toolpad version from the GitHub PR.

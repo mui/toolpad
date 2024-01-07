@@ -29,7 +29,7 @@ export interface RunningLocalApp {
   stdout: Readable;
 }
 
-// You'll need to have `yarn dev` running for this
+// You'll need to have `pnpm dev` running for this
 const VERBOSE = true;
 
 interface SetupContext {

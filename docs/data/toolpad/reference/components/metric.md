@@ -1,4 +1,4 @@
-<!-- This file has been auto-generated using `yarn docs:build:api`. -->
+<!-- This file has been auto-generated using `pnpm docs:build:api`. -->
 
 # Metric
 

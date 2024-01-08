@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as url from 'url';
 import { encode } from '@auth/core/jwt';
-import { test, expect } from '../../playwright/localTest';
+import { test, expect, BrowserContext } from '../../playwright/localTest';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -25,12 +25,10 @@ test.use({
   },
 });
 
-test('Must be authenticated to view pages', async ({ page, context, baseURL }) => {
-  // Is redirected when unauthenticated
-  await page.goto('/prod/pages/mypage');
-  await expect(page).toHaveURL('/prod/signin');
-
-  // Authenticate mock user
+const authenticateUser = async (
+  context: BrowserContext,
+  baseURL: string | undefined,
+): Promise<void> => {
   const token = await encode({
     token: {
       name: 'Adelbert Steiner',
@@ -41,9 +39,20 @@ test('Must be authenticated to view pages', async ({ page, context, baseURL }) =
     salt: 'authjs.session-token',
   });
   await context.addCookies([{ name: 'authjs.session-token', value: token, url: baseURL }]);
+};
+
+test('Must be authenticated to view pages', async ({ page, context, baseURL }) => {
+  // Is redirected when unauthenticated
+  await page.goto('/prod/pages/mypage');
+  await expect(page).toHaveURL('/prod/signin');
+
+  // Authenticate mock user
+  await authenticateUser(context, baseURL);
 
   // Sees page content when authenticated
   await page.goto('/prod/pages/mypage');
   await expect(page).toHaveURL('/prod/pages/mypage');
-  await expect(page.getByText('Adelbert Steiner')).toBeVisible();
+
+  const profileButtonLocator = page.getByText('Adelbert Steiner');
+  await expect(profileButtonLocator).toBeVisible();
 });

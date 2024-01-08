@@ -94,7 +94,7 @@
       "automerge": true
     }
   ],
-  "postUpdateOptions": ["pnpmDedupe"],
+  "postUpdateOptions": ["yarnDedupeHighest"],
   "prConcurrentLimit": 30,
   "prHourlyLimit": 0,
   "rangeStrategy": "bump",

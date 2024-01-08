@@ -11,7 +11,6 @@ module.exports = {
       webpack: {
         config: path.join(__dirname, './eslintWebpackResolverConfig.js'),
       },
-      exports: {},
     },
   },
   extends: [
@@ -74,13 +73,6 @@ module.exports = {
         skipShapeProps: true,
       },
     ],
-    'import/no-unresolved': [
-      'error',
-      {
-        // https://github.com/import-js/eslint-plugin-import/issues/1739
-        ignore: ['\\.md\\?@mui/markdown$'],
-      },
-    ],
     'import/no-restricted-paths': [
       'error',
       {
@@ -103,12 +95,8 @@ module.exports = {
     {
       files: ['examples/**/*'],
       rules: {
-        // We use it for demonstration purposes
         'no-console': 'off',
-        // Personal preference
         'no-underscore-dangle': 'off',
-        // no node_modules in examples as they are not installed
-        'import/no-unresolved': 'off',
       },
     },
     {

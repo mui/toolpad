@@ -1,5 +1,4 @@
 {
-  "installCommand": "install:codesandbox",
   "buildCommand": "release:build",
   "node": "18",
   "packages": [

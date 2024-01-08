@@ -3,49 +3,30 @@ import { Emitter } from '../events';
 
 // storage events only work across windows, we'll use an event emitter to announce within the window
 const emitter = new Emitter<Record<string, null>>();
-// local cache, needed for getSnapshot
-const cache = new Map<string, string>();
 
 function subscribe(area: Storage, key: string, cb: () => void): () => void {
-  const onKeyChange = () => {
-    // invalidate local cache
-    cache.delete(key);
-    cb();
-  };
   const storageHandler = (event: StorageEvent) => {
     if (event.storageArea === area && event.key === key) {
-      onKeyChange();
+      cb();
     }
   };
   window.addEventListener('storage', storageHandler);
-  emitter.on(key, onKeyChange);
+  emitter.on(key, cb);
   return () => {
     window.removeEventListener('storage', storageHandler);
-    emitter.off(key, onKeyChange);
+    emitter.off(key, cb);
   };
 }
 
 function getSnapshot(area: Storage, key: string): string | null {
-  let value = cache.get(key) ?? null;
-  if (!value) {
-    const item = area.getItem(key);
-    value = item;
-    if (value === null) {
-      cache.delete(key);
-    } else {
-      cache.set(key, value);
-    }
-  }
-  return value;
+  return area.getItem(key);
 }
 
 function setValue(area: Storage, key: string, value: string | null) {
   if (typeof window !== 'undefined') {
     if (value === null) {
-      cache.delete(key);
       area.removeItem(key);
     } else {
-      cache.set(key, value);
       area.setItem(key, String(value));
     }
     emitter.emit(key, null);

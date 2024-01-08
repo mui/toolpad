@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
     "target": "es2020",
-    "module": "ESNext",
+    "module": "esnext",
     "moduleResolution": "bundler",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext",
+      "dom" // For the global fetch, remove when https://github.com/DefinitelyTyped/DefinitelyTyped/issues/60924 is resolved
+    ],
     "isolatedModules": true,
     "strict": true,
     "resolveJsonModule": true,
@@ -13,7 +16,8 @@
     "outDir": "./dist",
     "pretty": true,
     "rootDir": "src",
-    "preserveWatchOutput": true
+    "preserveWatchOutput": true,
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

@@ -41,19 +41,19 @@
   },
   "dependencies": {
     "@mui/material": "5.15.3",
-    "@mui/toolpad-utils": "0.1.44",
-    "@tanstack/react-query": "5.14.6",
+    "@mui/toolpad-utils": "workspace:*",
+    "@tanstack/react-query": "5.17.8",
     "@types/json-schema": "7.0.15",
     "@webcontainer/env": "1.1.0",
     "cookie": "0.6.0",
     "invariant": "2.2.4",
-    "quickjs-emscripten": "0.24.0",
+    "quickjs-emscripten": "0.26.0",
     "react-error-boundary": "4.0.12",
     "react-is": "18.2.0"
   },
   "devDependencies": {
     "@types/cookie": "0.6.0",
-    "@types/react": "18.2.46",
+    "@types/react": "18.2.47",
     "@types/react-is": "18.2.4",
     "concurrently": "8.2.2"
   },

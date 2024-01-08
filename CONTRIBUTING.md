@@ -37,19 +37,24 @@ This will use the local version of Toolpad as built in the monorepo. This is rec
 
 If your application has dependencies other than `@mui/toolpad`, you have to temporarily add it to the workspace:
 
-1. update `package.json` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode` this would be:
+1. update `pnpm-workspace.yaml` (in the workspace root, not in your app), add your app folder to list. e.g. for `examples/qr-generator` which has a dependency on `qrcode` this would be:
 
-   ```json
-   "workspaces": {
-     "packages": [
-       "packages/*",
-       "docs",
-       "examples/qr-generator"
-     ]
-   },
+   ```yaml
+   # ./pnpm-workspace.yaml
+   packages:
+     - 'packages/*'
+     - 'docs'
+     - 'test'
+     - 'examples/qr-generator'
    ```
 
-   You may also temporarily remove/rename the `dev`/`build` commands in `examples/qr-generator/package.json` to avoid them getting picked up automatically by `lerna`.
+   You may then also want to ignore the workspace when running the `dev`/`build`command as in:
+
+   ```
+   pnpm dev --ignore qr-generator
+   ```
+
+   This prevents the scripts in the workspace from being picked up by `lerna`.
 
 1. Run
 

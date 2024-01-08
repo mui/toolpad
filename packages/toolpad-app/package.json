@@ -6,8 +6,8 @@
     "toolpad": "./cli.mjs"
   },
   "scripts": {
-    "build": "concurrently \"yarn:build:*\"",
-    "dev": "concurrently \"yarn:dev:*\"",
+    "build": "concurrently \"pnpm:build:*\"",
+    "dev": "concurrently \"pnpm:dev:*\"",
     "cli": "./cli.mjs",
     "lint": "prettier --check .",
     "fix": "prettier --write .",
@@ -15,7 +15,7 @@
     "build:editor": "vite build ./src/toolpad",
     "build:typings": "tsx ./scripts/typings.mts",
     "dev:cli": "tsup --watch",
-    "dev:typings": "yarn build:typings",
+    "dev:typings": "pnpm build:typings",
     "waitForApp": "tsx ./scripts/waitForApp.mts",
     "check-types": "tsup && tsc --noEmit",
     "test": "vitest run"
@@ -57,9 +57,9 @@
     "@mui/lab": "5.0.0-alpha.159",
     "@mui/material": "5.15.3",
     "@mui/system": "5.15.3",
-    "@mui/toolpad-components": "0.1.44",
-    "@mui/toolpad-core": "0.1.44",
-    "@mui/toolpad-utils": "0.1.44",
+    "@mui/toolpad-components": "workspace:*",
+    "@mui/toolpad-core": "workspace:*",
+    "@mui/toolpad-utils": "workspace:*",
     "@mui/types": "7.2.12",
     "@mui/utils": "5.15.3",
     "@mui/x-charts": "6.18.7",

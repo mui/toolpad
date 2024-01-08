@@ -1,6 +1,5 @@
 .next
 .yarn
-pnpm-lock.yaml
 /docs/export
 /docs/schemas
 /packages/**/dist

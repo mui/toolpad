@@ -68,6 +68,7 @@ import {
   Alert,
   Collapse,
   Button,
+  useEventCallback,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import CloseIcon from '@mui/icons-material/Close';
@@ -98,7 +99,9 @@ const LICENSE_INFO: MuiLicenseInfo = {
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
-const SetActionErrorContext = React.createContext<((error: Error) => void) | undefined>(undefined);
+const SetActionResultContext = React.createContext<((result: ActionResult) => void) | undefined>(
+  undefined,
+);
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -510,6 +513,11 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   });
 }
 
+interface ActionResult {
+  action: 'create' | 'update' | 'delete';
+  error?: Error;
+}
+
 const EMPTY_ROWS: GridRowsProp = [];
 
 interface Selection {
@@ -538,7 +546,7 @@ interface DeleteActionProps {
 function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
   const [loading, setLoading] = React.useState(false);
 
-  const setActionError = useNonNullableContext(SetActionErrorContext);
+  const setActionResult = useNonNullableContext(SetActionResultContext);
 
   const handleDeleteClick = React.useCallback(async () => {
     invariant(dataProvider.deleteRecord, 'dataProvider must be defined');
@@ -546,12 +554,14 @@ function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
     try {
       await dataProvider.deleteRecord(id);
       await refetch();
+
+      setActionResult({ action: 'delete' });
     } catch (error) {
-      setActionError(errorFrom(error));
+      setActionResult({ action: 'delete', error: errorFrom(error) });
     } finally {
       setLoading(false);
     }
-  }, [dataProvider, id, refetch, setActionError]);
+  }, [dataProvider, id, refetch, setActionResult]);
 
   return (
     <IconButton onClick={handleDeleteClick} size="small" aria-label={`Delete row with id "${id}"`}>
@@ -595,7 +605,7 @@ interface DataProviderDataGridProps extends Partial<DataGridProProps> {
 function useDataProviderDataGridProps(
   dataProviderId: string | null | undefined,
   apiRef: React.MutableRefObject<GridApiPro>,
-  setActionError: (error: Error) => void,
+  setActionResult: (result: ActionResult) => void,
 ): DataProviderDataGridProps {
   // TODO: handle when idField is not 'id'
   const idField = 'id';
@@ -731,9 +741,12 @@ function useDataProviderDataGridProps(
         Object.entries(newRow).filter(([key, value]) => value !== oldRow[key]),
       );
 
+      const action = oldRow[DRAFT_ROW_MARKER] ? 'create' : 'update';
+
       setRowUpdating((oldState) => ({ ...oldState, [id]: true }));
+
       try {
-        if (oldRow[DRAFT_ROW_MARKER]) {
+        if (action === 'create') {
           invariant(
             dataProvider?.createRecord,
             'Edit action should be unavailable when dataProvider.createRecord is not defined',
@@ -755,16 +768,20 @@ function useDataProviderDataGridProps(
           }
           return newRecord;
         }
+      } catch (error) {
+        setActionResult({ action, error: errorFrom(error) });
+        throw error;
       } finally {
         setRowUpdating((oldState) => {
           const { [id]: discard, ...newState } = oldState;
           return newState;
         });
         setDraftRow(null);
+        setActionResult({ action });
         await refetch();
       }
     },
-    [dataProvider, refetch],
+    [dataProvider, refetch, setActionResult],
   );
 
   const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
@@ -772,19 +789,21 @@ function useDataProviderDataGridProps(
       return undefined;
     }
 
-    return ({ id }) => {
+    return ({ id, row }) => {
       const result = [];
 
       if (dataProvider.updateRecord) {
         const rowIsInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         const rowIsUpdating = rowUpdating[id];
 
+        const isDraft = row[DRAFT_ROW_MARKER];
+
         if (rowIsInEditMode || rowIsUpdating) {
           return [
             <IconButton
               key="commit"
               size="small"
-              aria-label={`Save updates to row with id "${id}"`}
+              aria-label={`Save updates to ${isDraft ? 'new row' : `row with id "${id}"`}`}
               disabled={rowIsUpdating}
               onClick={async () => {
                 apiRef.current.stopRowEditMode({ id });
@@ -874,7 +893,6 @@ function useDataProviderDataGridProps(
     rowModesModel,
     onRowModesModelChange: (model) => setRowModesModel(model),
     processRowUpdate: handleProcessRowUpdate,
-    onProcessRowUpdateError: (err) => setActionError(errorFrom(err)),
     onRowEditStart: handleRowEditStart,
     onRowEditStop: handleRowEditStop,
     slots: {
@@ -915,6 +933,76 @@ function NoRowsOverlay(props: NoRowsOverlayProps) {
   return <GridNoRowsOverlay {...props} />;
 }
 
+interface ActionResultOverlayProps {
+  result?: ActionResult | null;
+  onClose?: () => void;
+}
+
+function ActionResultOverlay({ result, onClose }: ActionResultOverlayProps) {
+  const [hovered, setHovered] = React.useState(false);
+  const open = !!result;
+  const actionError = result?.error;
+
+  React.useEffect(() => {
+    if (actionError) {
+      // Log error to console as well for full stacktrace
+      console.error(actionError);
+    }
+  }, [actionError]);
+
+  const lastResult = useLatest(result);
+
+  let message = '';
+  if (lastResult) {
+    if (lastResult.action === 'create') {
+      message = actionError
+        ? `Failed to create a record, ${actionError.message}`
+        : 'New record created successfully';
+    } else if (lastResult.action === 'update') {
+      message = actionError
+        ? `Failed to update a record, ${actionError.message}`
+        : 'Record updated successfully';
+    } else if (lastResult.action === 'delete') {
+      message = actionError
+        ? `Failed to delete a record, ${actionError.message}`
+        : 'Record deleted successfully';
+    }
+  }
+
+  const handleClose = useEventCallback(() => {
+    onClose?.();
+  });
+
+  React.useEffect(() => {
+    if (result && !hovered) {
+      const timeout = setTimeout(handleClose, 2000);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+    return () => {};
+  }, [hovered, result, handleClose]);
+
+  return (
+    <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
+      <Collapse in={!!open}>
+        <Alert
+          severity={lastResult?.error ? 'error' : 'success'}
+          action={
+            <IconButton aria-label="close" color="inherit" size="small" onClick={onClose}>
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          onMouseEnter={() => setHovered(true)}
+          onMouseOut={() => setHovered(false)}
+        >
+          {message}
+        </Alert>
+      </Collapse>
+    </Box>
+  );
+}
+
 function dataGridFallbackRender({ error }: FallbackProps) {
   return <ErrorOverlay error={error} />;
 }
@@ -936,7 +1024,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const apiRef = useGridApiRef();
-  const [actionError, setActionError] = React.useState<Error | null>();
+  const [actionResult, setActionResult] = React.useState<ActionResult | null>();
 
   const {
     rows: dataProviderRowsInput,
@@ -947,7 +1035,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   } = useDataProviderDataGridProps(
     rowsSource === 'dataProvider' ? dataProviderId : null,
     apiRef,
-    setActionError,
+    setActionResult,
   );
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
@@ -1095,16 +1183,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     return columns;
   }, [columns, getProviderActions]);
 
-  const open = !!actionError;
-  const lastActionError = useLatest(actionError);
-
-  React.useEffect(() => {
-    if (actionError) {
-      // Log error to console as well for full stacktrace
-      console.error(actionError);
-    }
-  }, [actionError]);
-
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <div
@@ -1118,7 +1196,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           }}
         >
           <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
-            <SetActionErrorContext.Provider value={setActionError}>
+            <SetActionResultContext.Provider value={setActionResult}>
               <DataGridPro
                 apiRef={apiRef}
                 slots={{
@@ -1144,31 +1222,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 {...props}
                 {...dataProviderProps}
               />
-            </SetActionErrorContext.Provider>
+            </SetActionResultContext.Provider>
           </ErrorBoundary>
         </div>
 
-        <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
-          <Collapse in={!!open}>
-            <Alert
-              severity="error"
-              action={
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={() => {
-                    setActionError(null);
-                  }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-            >
-              {lastActionError?.message}
-            </Alert>
-          </Collapse>
-        </Box>
+        <ActionResultOverlay result={actionResult} onClose={() => setActionResult(null)} />
       </div>
     </LicenseInfoProvider>
   );

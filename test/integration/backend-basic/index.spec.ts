@@ -297,4 +297,10 @@ test('data providers crud', async ({ page }) => {
   await expect(
     grid.getByRole('button', { name: 'Save updates to row with id "7"', exact: true }),
   ).not.toBeVisible();
+
+  await grid.getByRole('button', { name: 'Add record', exact: true }).click();
+
+  await cellLocator(grid, 2, 1).getByRole('textbox').fill('created');
+
+  await grid.getByRole('button', { name: 'Save updates to new row', exact: true }).click();
 });

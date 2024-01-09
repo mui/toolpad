@@ -976,6 +976,7 @@ export default function AppProvider({ appUrl, children }: DomContextProps) {
         dispatch({ type: 'DOM_SAVED', savedDom: domToSave });
       })
       .catch((err) => {
+        console.error(err.message);
         dispatch({ type: 'DOM_SAVING_ERROR', error: err.message });
       });
   }, [projectApi, state]);

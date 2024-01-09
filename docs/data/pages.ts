@@ -78,6 +78,7 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/concepts/page-properties',
       },
+      { pathname: '/toolpad/concepts/authorization' },
       { pathname: '/toolpad/concepts/custom-server' },
     ],
   },

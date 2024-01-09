@@ -336,22 +336,25 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         if (currentTabIndex !== undefined && queryTabs) {
           let newDom = state.dom;
           let nodeName = action.draft.name;
+          let target = action.draft;
           // Check if the dom contains this query draft via its id
           try {
             appDom.getNode(state.dom, action.draft.id);
           } catch (err) {
             if (state.currentView?.name) {
-              // const pageNode = appDom.getNode(state.dom, state.currentView.nodeId, 'page');
               const pageNode = appDom.getPageByName(state.dom, state.currentView.name);
               if (pageNode) {
                 newDom = appDom.addNode(state.dom, action.draft, pageNode, 'queries');
-                const createdNode = appDom.getNode(newDom, action.draft.id);
+                const createdNode = appDom.getNode(newDom, action.draft.id, 'query');
                 nodeName = createdNode.name;
+                newDom = appDom.saveNode(newDom, createdNode);
+                target = createdNode;
               }
             }
           }
 
-          newDom = appDom.saveNode(newDom, action.draft);
+          newDom = appDom.saveNode(newDom, target);
+
           return update(state, {
             currentView: {
               ...state.currentView,
@@ -361,11 +364,12 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
                   if (index === currentTabIndex) {
                     return {
                       ...tab,
+                      draft: target,
                       meta: {
                         ...tab.meta,
                         name: nodeName,
                       },
-                      saved: action.draft,
+                      saved: target,
                     };
                   }
                   return tab;

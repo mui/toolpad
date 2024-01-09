@@ -2,7 +2,8 @@ import { createDataProvider } from '@mui/toolpad/server';
 
 let nextId = 0;
 function createRecord(values = {}) {
-  const id = nextId++;
+  const id = nextId;
+  nextId += 1;
   return { name: `Index item ${id}`, ...values, id };
 }
 let DATA = Array.from({ length: 100_000 }, () => createRecord());

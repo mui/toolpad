@@ -751,7 +751,7 @@ function useDataProviderDataGridProps(
           );
           const newRecord = await dataProvider.updateRecord(id, values);
           if (!newRecord) {
-            throw new Error('No record returned by createRecord');
+            return newRow;
           }
           return newRecord;
         }

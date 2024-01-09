@@ -548,7 +548,7 @@ export interface ToolpadDataProviderBase<
   paginationMode?: P;
   getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
   deleteRecord?: (id: string | number) => Promise<void>;
-  updateRecord?: (id: string | number, record: Partial<R>) => Promise<R>;
+  updateRecord?: (id: string | number, record: Partial<R>) => Promise<R | undefined | null>;
   createRecord?: (record: R) => Promise<R>;
 }
 

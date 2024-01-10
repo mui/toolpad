@@ -9,7 +9,7 @@ import { waitForMatch } from '../../utils/streams';
 import { expectBasicRuntimeTests } from './shared';
 import { setPageHidden } from '../../utils/page';
 import { withTemporaryEdits } from '../../utils/fs';
-import { clickCenter, getCenter, cellLocator } from '../../utils/locators';
+import { clickCenter, cellLocator } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -315,9 +315,13 @@ test('data providers crud', async ({ page }) => {
     editorModel.appCanvas.getByText('New record created successfully', { exact: true }),
   ).toBeVisible();
 
-  const { x, y } = await getCenter(grid);
-  await page.mouse.move(x, y);
-  await page.mouse.wheel(0, 10000);
+  await editorModel.appCanvas.getByRole('link', { name: 'Go to new record' }).click();
 
   await expect(cellLocator(grid, 102, 1)).toHaveText('created');
+
+  await grid.getByRole('button', { name: 'Add record', exact: true }).click();
+
+  await page.keyboard.press('Escape');
+
+  await expect(cellLocator(grid, 2, 1)).toHaveText('Index item 0');
 });

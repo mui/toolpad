@@ -513,10 +513,27 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   });
 }
 
-interface ActionResult {
-  action: 'create' | 'update' | 'delete';
-  error?: Error;
-}
+type ActionResult =
+  | {
+      action: 'create';
+      id: GridRowId;
+      error?: undefined;
+    }
+  | {
+      action: 'create';
+      id?: undefined;
+      error: Error;
+    }
+  | {
+      action: 'update';
+      id: GridRowId;
+      error?: Error;
+    }
+  | {
+      action: 'delete';
+      id: GridRowId;
+      error?: Error;
+    };
 
 const EMPTY_ROWS: GridRowsProp = [];
 
@@ -555,9 +572,9 @@ function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
       await dataProvider.deleteRecord(id);
       await refetch();
 
-      setActionResult({ action: 'delete' });
+      setActionResult({ action: 'delete', id });
     } catch (error) {
-      setActionResult({ action: 'delete', error: errorFrom(error) });
+      setActionResult({ action: 'delete', id, error: errorFrom(error) });
     } finally {
       setLoading(false);
     }
@@ -604,11 +621,10 @@ interface DataProviderDataGridProps extends Partial<DataGridProProps> {
 
 function useDataProviderDataGridProps(
   dataProviderId: string | null | undefined,
+  idField: string,
   apiRef: React.MutableRefObject<GridApiPro>,
   setActionResult: (result: ActionResult) => void,
 ): DataProviderDataGridProps {
-  // TODO: handle when idField is not 'id'
-  const idField = 'id';
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
   const { dataProvider } = useDataProvider(dataProviderId || null);
 
@@ -747,41 +763,48 @@ function useDataProviderDataGridProps(
 
       try {
         if (action === 'create') {
-          invariant(
-            dataProvider?.createRecord,
-            'Edit action should be unavailable when dataProvider.createRecord is not defined',
-          );
-          const newRecord = await dataProvider.createRecord(values);
-          if (!newRecord) {
-            throw new Error('No record returned by createRecord');
+          try {
+            invariant(
+              dataProvider?.createRecord,
+              'Edit action should be unavailable when dataProvider.createRecord is not defined',
+            );
+            const newRecord = await dataProvider.createRecord(values);
+            if (!newRecord) {
+              throw new Error('No record returned by createRecord');
+            }
+
+            setActionResult({ action, id: newRecord[idField] as GridRowId });
+            return newRecord;
+            // eslint-disable-next-line no-else-return
+          } catch (error) {
+            setActionResult({ action, error: errorFrom(error) });
+            throw error;
           }
-          return newRecord;
-          // eslint-disable-next-line no-else-return
         } else {
-          invariant(
-            dataProvider?.updateRecord,
-            'Edit action should be unavailable when dataProvider.updateRecord is not defined',
-          );
-          const newRecord = await dataProvider.updateRecord(id, values);
-          if (!newRecord) {
-            return newRow;
+          try {
+            invariant(
+              dataProvider?.updateRecord,
+              'Edit action should be unavailable when dataProvider.updateRecord is not defined',
+            );
+            let newRecord = await dataProvider.updateRecord(id, values);
+            newRecord ??= newRow;
+            setActionResult({ action, id: newRecord[idField] as GridRowId });
+            return newRecord;
+          } catch (error) {
+            setActionResult({ action, id, error: errorFrom(error) });
+            throw error;
           }
-          return newRecord;
         }
-      } catch (error) {
-        setActionResult({ action, error: errorFrom(error) });
-        throw error;
       } finally {
         setRowUpdating((oldState) => {
           const { [id]: discard, ...newState } = oldState;
           return newState;
         });
         setDraftRow(null);
-        setActionResult({ action });
         await refetch();
       }
     },
-    [dataProvider, refetch, setActionResult],
+    [dataProvider, idField, refetch, setActionResult],
   );
 
   const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
@@ -934,11 +957,12 @@ function NoRowsOverlay(props: NoRowsOverlayProps) {
 }
 
 interface ActionResultOverlayProps {
-  result?: ActionResult | null;
-  onClose?: () => void;
+  result: ActionResult | null;
+  onClose: () => void;
+  apiRef: React.MutableRefObject<GridApiPro>;
 }
 
-function ActionResultOverlay({ result, onClose }: ActionResultOverlayProps) {
+function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayProps) {
   const [hovered, setHovered] = React.useState(false);
   const open = !!result;
   const actionError = result?.error;
@@ -952,25 +976,46 @@ function ActionResultOverlay({ result, onClose }: ActionResultOverlayProps) {
 
   const lastResult = useLatest(result);
 
-  let message = '';
+  let message: React.ReactNode = null;
   if (lastResult) {
     if (lastResult.action === 'create') {
-      message = actionError
-        ? `Failed to create a record, ${actionError.message}`
-        : 'New record created successfully';
+      message = lastResult.error ? (
+        `Failed to create a record, ${lastResult.error.message}`
+      ) : (
+        <React.Fragment>
+          New {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <Link
+            href="#"
+            color="inherit"
+            onClick={(event) => {
+              event.preventDefault();
+              const index = apiRef.current.getAllRowIds().indexOf(lastResult.id);
+              const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
+              const fieldToFocus: string | undefined = visibleFields[0];
+              if (index >= 0 && fieldToFocus) {
+                apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
+                apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
+              }
+            }}
+          >
+            record
+          </Link>{' '}
+          created successfully
+        </React.Fragment>
+      );
     } else if (lastResult.action === 'update') {
-      message = actionError
-        ? `Failed to update a record, ${actionError.message}`
+      message = lastResult.error
+        ? `Failed to update a record, ${lastResult.error.message}`
         : 'Record updated successfully';
     } else if (lastResult.action === 'delete') {
-      message = actionError
-        ? `Failed to delete a record, ${actionError.message}`
+      message = lastResult.error
+        ? `Failed to delete a record, ${lastResult.error.message}`
         : 'Record deleted successfully';
     }
   }
 
   const handleClose = useEventCallback(() => {
-    onClose?.();
+    onClose();
   });
 
   React.useEffect(() => {
@@ -1024,7 +1069,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const apiRef = useGridApiRef();
-  const [actionResult, setActionResult] = React.useState<ActionResult | null>();
+  const [actionResult, setActionResult] = React.useState<ActionResult | null>(null);
+
+  const rowIdField = rowIdFieldProp ?? 'id';
 
   const {
     rows: dataProviderRowsInput,
@@ -1034,6 +1081,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     ...dataProviderProps
   } = useDataProviderDataGridProps(
     rowsSource === 'dataProvider' ? dataProviderId : null,
+    rowIdField,
     apiRef,
     setActionResult,
   );
@@ -1166,21 +1214,20 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }, [nodeRuntime, rows]);
 
   const renderedColumns = React.useMemo<GridColDef[]>(() => {
+    const result = [...columns];
+
     if (getProviderActions) {
-      return [
-        ...columns,
-        {
-          field: '___actions',
-          type: 'actions',
-          headerName: '',
-          flex: 1,
-          align: 'right',
-          getActions: getProviderActions,
-        },
-      ];
+      result.push({
+        field: '___actions',
+        type: 'actions',
+        headerName: '',
+        flex: 1,
+        align: 'right',
+        getActions: getProviderActions,
+      });
     }
 
-    return columns;
+    return result;
   }, [columns, getProviderActions]);
 
   return (
@@ -1226,7 +1273,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           </ErrorBoundary>
         </div>
 
-        <ActionResultOverlay result={actionResult} onClose={() => setActionResult(null)} />
+        <ActionResultOverlay
+          result={actionResult}
+          onClose={() => setActionResult(null)}
+          apiRef={apiRef}
+        />
       </div>
     </LicenseInfoProvider>
   );

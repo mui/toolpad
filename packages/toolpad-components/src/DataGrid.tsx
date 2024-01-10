@@ -985,7 +985,7 @@ function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayPro
         `Failed to create a record, ${lastResult.error.message}`
       ) : (
         <React.Fragment>
-          New {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <Link
             href="#"
             color="inherit"
@@ -1001,7 +1001,7 @@ function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayPro
             }}
             aria-label="Go to new record"
           >
-            record
+            New record
           </Link>{' '}
           created successfully
         </React.Fragment>

@@ -73,7 +73,6 @@ import { RuntimeState } from './types';
 import { getBindingType, getBindingValue } from './bindings';
 import {
   getElementNodeComponentId,
-  INTERNAL_COMPONENTS,
   isPageLayoutComponent,
   isPageRow,
   PAGE_ROW_COMPONENT_ID,
@@ -87,15 +86,18 @@ import evalJsBindings, {
 import { HTML_ID_EDITOR_OVERLAY, IS_PREVIEW, PREVIEW_HEADER_HEIGHT } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { useDataQuery, UseFetch } from './useDataQuery';
-import { NavigateToPage } from './CanvasHooksContext';
+import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
+import { AuthContext, useAuth } from './useAuth';
+import { RequireAuthorization } from './auth';
+import SignInPage from './SignInPage';
 
 const browserJsRuntime = getBrowserRuntime();
 
-const IS_RENDERED_IN_CANVAS =
+export const IS_RENDERED_IN_CANVAS =
   typeof window === 'undefined'
     ? false
     : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
@@ -113,16 +115,13 @@ const Pre = styled('pre')(({ theme }) => ({
 }));
 
 const internalComponents: ToolpadComponents = Object.fromEntries(
-  [...INTERNAL_COMPONENTS].map(([name]) => {
-    let builtIn = (builtIns as any)[name];
-
+  Object.entries(builtIns).map(([name, builtIn]) => {
     if (!isToolpadComponent(builtIn)) {
       builtIn = createToolpadComponentThatThrows(
         new Error(`Imported builtIn "${name}" is not a ToolpadComponent`),
       );
     }
-
-    return [name, builtIn];
+    return [name, builtIn] as [string, ToolpadComponent];
   }),
 );
 
@@ -153,14 +152,14 @@ function usePageNavigator(): NavigateToPage {
   const canvasEvents = React.useContext(CanvasEventsContext);
 
   const navigateToPage: NavigateToPage = React.useCallback(
-    (pageNodeId, pageParameters) => {
+    (pageName, pageParameters) => {
       const urlParams = pageParameters && new URLSearchParams(pageParameters);
 
       if (canvasEvents) {
-        canvasEvents.emit('pageNavigationRequest', { pageNodeId });
+        canvasEvents.emit('pageNavigationRequest', { pageName });
       } else {
         navigate({
-          pathname: `/pages/${pageNodeId}`,
+          pathname: `/pages/${pageName}`,
           ...(urlParams
             ? {
                 search: urlParams.toString(),
@@ -562,8 +561,12 @@ function parseBindings(
     }
 
     if (appDom.isQuery(elm)) {
+      let kind: 'query' | 'action' = 'query';
+      if (elm.attributes.mode === 'mutation') {
+        kind = 'action';
+      }
       scopeMeta[elm.name] = {
-        kind: 'query',
+        kind,
       };
 
       if (elm.params) {
@@ -1175,15 +1178,25 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     };
   }, [nodeId, argTypes, vmRef, scope]);
 
+  const nodeRef = React.useRef();
+
+  const canvasHooks = React.useContext(CanvasHooksContext);
+
+  React.useEffect(() => {
+    return canvasHooks.registerNode?.(node, wrappedProps, componentConfig, nodeRef.current);
+  }, [node, wrappedProps, componentConfig, canvasHooks]);
+
   return (
-    <NodeRuntimeWrapper
-      nodeId={nodeId}
-      nodeName={node.name}
-      componentConfig={Component[TOOLPAD_COMPONENT]}
-      NodeError={NodeError}
-    >
+    <NodeRuntimeWrapper nodeId={nodeId} nodeName={node.name} NodeError={NodeError}>
       {isLayoutNode ? (
-        <Component {...wrappedProps} />
+        <Component
+          {...wrappedProps}
+          ref={nodeRef}
+          data-toolpad-node-id={nodeId}
+          data-toolpad-slot-name="children"
+          data-toolpad-slot-parent={nodeId}
+          data-toolpad-slot-type="multiple"
+        />
       ) : (
         <Box
           sx={{
@@ -1191,6 +1204,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             alignItems: boundLayoutProps.verticalAlign,
             justifyContent: boundLayoutProps.horizontalAlign,
           }}
+          ref={nodeRef}
+          data-toolpad-node-id={nodeId}
         >
           <Component {...wrappedProps} />
         </Box>
@@ -1203,9 +1218,12 @@ interface PageRootProps {
   children?: React.ReactNode;
 }
 
-function PageRoot({ children }: PageRootProps) {
+const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRoot(
+  { children, ...props }: PageRootProps,
+  ref,
+) {
   return (
-    <Container>
+    <Container ref={ref}>
       <Stack
         data-testid="page-root"
         direction="column"
@@ -1213,12 +1231,13 @@ function PageRoot({ children }: PageRootProps) {
           my: 2,
           gap: 1,
         }}
+        {...props}
       >
         {children}
       </Stack>
     </Container>
   );
-}
+});
 
 const PageRootComponent = createComponent(PageRoot, {
   argTypes: {
@@ -1379,7 +1398,7 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
   const dom = useDomContext();
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
-  usePageTitle(page.attributes.title);
+  usePageTitle(appDom.getPageTitle(page));
 
   const location = useLocation();
   const components = useComponents();
@@ -1427,11 +1446,12 @@ export interface RenderedNodeProps {
   nodeId: NodeId;
 }
 
-export function RenderedPage({ nodeId }: RenderedNodeProps) {
-  const dom = useDomContext();
-  const page = appDom.getNode(dom, nodeId, 'page');
+export interface RenderedPageProps {
+  page: appDom.PageNode;
+}
 
-  usePageTitle(page.attributes.title);
+export function RenderedPage({ page }: RenderedPageProps) {
+  usePageTitle(appDom.getPageTitle(page));
 
   if (page.attributes.codeFile) {
     return <RenderedProCodePage page={page} />;
@@ -1458,37 +1478,52 @@ function PageNotFound() {
 
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
+  hasAuthentication?: boolean;
+  basename: string;
 }
 
-function RenderedPages({ pages }: RenderedPagesProps) {
+function RenderedPages({ pages, hasAuthentication = false, basename }: RenderedPagesProps) {
+  const { search } = useLocation();
+
   const defaultPage = pages[0];
 
-  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.id}`} replace />;
+  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
+
   return (
     <Routes>
-      {pages.map((page) => (
-        <React.Fragment key={page.id}>
-          <Route
-            path={`/pages/${page.id}`}
-            element={
-              <RenderedPage
-                nodeId={page.id}
-                // Make sure the page itself mounts when the route changes. This make sure all pageBindings are reinitialized
-                // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-                key={page.id}
-              />
-            }
+      {pages.map((page) => {
+        let pageContent = (
+          <RenderedPage
+            page={page}
+            // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
+            // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+            key={page.name}
           />
-        </React.Fragment>
-      ))}
-      {pages.map((page) => (
-        <React.Fragment key={page.id}>
+        );
+
+        if (!IS_RENDERED_IN_CANVAS && hasAuthentication && page.attributes.authorization) {
+          pageContent = (
+            <RequireAuthorization
+              allowedRole={page.attributes.authorization.allowedRoles}
+              basename={basename}
+            >
+              {pageContent}
+            </RequireAuthorization>
+          );
+        }
+
+        return <Route key={page.name} path={`/pages/${page.name}`} element={pageContent} />;
+      })}
+      {pages.flatMap((page) =>
+        page.attributes.alias?.map((alias) => (
           <Route
-            path={`/pages/${page.name}`}
-            element={<Navigate to={`/pages/${page.id}`} replace />}
+            key={`${page.name}-${alias}`}
+            path={`/pages/${alias}`}
+            element={<Navigate to={`/pages/${page.name}${search}`} replace />}
           />
-        </React.Fragment>
-      ))}
+        )),
+      )}
+
       <Route path="/pages" element={defaultPageNavigation} />
       <Route path="/" element={defaultPageNavigation} />
       <Route path="*" element={<PageNotFound />} />
@@ -1522,20 +1557,23 @@ function AppError({ error }: FallbackProps) {
 
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
+  basename: string;
 }
 
-function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
+  const { hasAuthentication } = React.useContext(AuthContext);
+
   const pageMatch = useMatch('/pages/:slug');
-  const activePage = pageMatch?.params.slug;
+  const activePageSlug = pageMatch?.params.slug;
 
   const navEntries = React.useMemo(
     () =>
       pages.map((page) => ({
-        slug: page.id,
-        displayName: page.name,
+        slug: page.name,
+        displayName: appDom.getPageDisplayName(page),
         hasShell: page?.attributes.display !== 'standalone',
       })),
     [pages],
@@ -1543,12 +1581,13 @@ function ToolpadAppLayout({ dom }: ToolpadAppLayoutProps) {
 
   return (
     <AppLayout
-      activePage={activePage}
+      activePageSlug={activePageSlug}
       pages={navEntries}
-      hasShell={!IS_RENDERED_IN_CANVAS}
+      hasNavigation={!IS_RENDERED_IN_CANVAS}
+      hasHeader={hasAuthentication && !IS_RENDERED_IN_CANVAS}
       clipped={SHOW_PREVIEW_HEADER}
     >
-      <RenderedPages pages={pages} />
+      <RenderedPages pages={pages} hasAuthentication={hasAuthentication} basename={basename} />
     </AppLayout>
   );
 }
@@ -1579,6 +1618,8 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
+  const authContext = useAuth({ dom, basename });
+
   return (
     <BrowserRouter basename={basename}>
       <UseDataProviderContext.Provider value={useDataProvider}>
@@ -1592,7 +1633,15 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
                       <QueryClientProvider client={queryClient}>
-                        <ToolpadAppLayout dom={dom} />
+                        <AuthContext.Provider value={authContext}>
+                          <Routes>
+                            <Route path="/signin" element={<SignInPage />} />
+                            <Route
+                              path="*"
+                              element={<ToolpadAppLayout dom={dom} basename={basename} />}
+                            />
+                          </Routes>
+                        </AuthContext.Provider>
                         {showDevtools ? (
                           <ReactQueryDevtoolsProduction initialIsOpen={false} />
                         ) : null}

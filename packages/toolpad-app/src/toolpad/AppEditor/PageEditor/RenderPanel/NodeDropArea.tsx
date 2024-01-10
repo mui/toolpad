@@ -49,7 +49,7 @@ const StyledNodeDropArea = styled('div', {
     pointerEvents: 'none',
     position: 'absolute',
     [`&.${dropAreaHighlightClasses.highlightedTop}`]: {
-      '&:after': {
+      '&::after': {
         backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
@@ -60,7 +60,7 @@ const StyledNodeDropArea = styled('div', {
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedRight}`]: {
-      '&:after': {
+      '&::after': {
         backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
@@ -71,7 +71,7 @@ const StyledNodeDropArea = styled('div', {
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedBottom}`]: {
-      '&:after': {
+      '&::after': {
         backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
@@ -82,7 +82,7 @@ const StyledNodeDropArea = styled('div', {
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedLeft}`]: {
-      '&:after': {
+      '&::after': {
         backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',

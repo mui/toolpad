@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: page
 spec:
-  id: b4UWL4X
-  title: Default page
+  title: Stripe scripts
   content:
     - component: Text
       name: text

@@ -11,9 +11,9 @@ import {
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
-import { pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
+import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
-import { ConnectionStatus } from '../types';
+import { AuthProviderConfig, ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
 import { ExactEntriesOf, Maybe } from '../utils/types';
 import { envBindingSchema } from '../server/schema';
@@ -41,15 +41,7 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-type AppDomNodeType =
-  | 'app'
-  | 'connection'
-  | 'theme'
-  | 'page'
-  | 'element'
-  | 'codeComponent'
-  | 'query'
-  | 'mutation';
+type AppDomNodeType = 'app' | 'connection' | 'theme' | 'page' | 'element' | 'query' | 'mutation';
 
 export interface AppDomNodeBase {
   readonly id: NodeId;
@@ -64,6 +56,17 @@ export interface AppDomNodeBase {
 export interface AppNode extends AppDomNodeBase {
   readonly type: 'app';
   readonly parentId: null;
+  readonly attributes: {
+    readonly authentication?: {
+      readonly providers?: AuthProviderConfig[];
+    };
+    readonly authorization?: {
+      readonly roles?: {
+        readonly name: string;
+        readonly description?: string;
+      }[];
+    };
+  };
 }
 
 export interface ThemeNode extends AppDomNodeBase {
@@ -85,11 +88,17 @@ export type PageDisplayMode = 'standalone' | 'shell';
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
-    readonly title: string;
+    readonly title?: string;
+    readonly alias?: string[];
     readonly parameters?: [string, string][];
     readonly module?: string;
     readonly display?: PageDisplayMode;
-    readonly codeFile?: string;
+    readonly codeFile?: boolean;
+    readonly displayName?: string;
+    readonly authorization?: {
+      readonly allowAll?: boolean;
+      readonly allowedRoles?: string[];
+    };
   };
 }
 
@@ -103,14 +112,6 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
     readonly horizontalAlign?: BoxProps['justifyContent'];
     readonly verticalAlign?: BoxProps['alignItems'];
     readonly columnSize?: number;
-  };
-}
-
-export interface CodeComponentNode extends AppDomNodeBase {
-  readonly type: 'codeComponent';
-  readonly attributes: {
-    readonly code: string;
-    readonly isNew?: boolean;
   };
 }
 
@@ -161,7 +162,6 @@ type AppDomNodeOfType<K extends AppDomNodeType> = {
   theme: ThemeNode;
   page: PageNode;
   element: ElementNode;
-  codeComponent: CodeComponentNode;
   query: QueryNode;
   mutation: MutationNode;
 }[K];
@@ -171,7 +171,6 @@ type AllowedChildren = {
     pages: 'page';
     connections: 'connection';
     themes: 'theme';
-    codeComponents: 'codeComponent';
   };
   theme: {};
   connection: {};
@@ -183,7 +182,6 @@ type AllowedChildren = {
   element: {
     [prop: string]: 'element';
   };
-  codeComponent: {};
   query: {};
   mutation: {};
 };
@@ -313,14 +311,6 @@ export function isConnection<P>(node: AppDomNode): node is ConnectionNode<P> {
 
 export function assertIsConnection<P>(node: AppDomNode): asserts node is ConnectionNode<P> {
   assertIsType<ConnectionNode>(node, 'connection');
-}
-
-export function isCodeComponent(node: AppDomNode): node is CodeComponentNode {
-  return isType<CodeComponentNode>(node, 'codeComponent');
-}
-
-export function assertIsCodeComponent(node: AppDomNode): asserts node is CodeComponentNode {
-  assertIsType<CodeComponentNode>(node, 'codeComponent');
 }
 
 export function isTheme(node: AppDomNode): node is ThemeNode {
@@ -501,7 +491,7 @@ export function createNode<T extends AppDomNodeType>(
   });
 }
 
-export function createFragmentInternal<T extends AppDomNodeType>(
+function createFragmentInternal<T extends AppDomNodeType>(
   id: NodeId,
   type: T,
   init: AppDomNodeInitOfType<T> & { name: string },
@@ -825,7 +815,6 @@ export function saveNode(dom: AppDom, node: AppDomNode) {
   if (!nodeExists(dom, node.id)) {
     throw new Error(`Attempt to update node "${node.id}", but it doesn't exist in the dom`);
   }
-
   return update(dom, {
     nodes: update(dom.nodes, {
       [node.id]: update(dom.nodes[node.id], omit(node, ...RESERVED_NODE_PROPERTIES)),
@@ -874,21 +863,6 @@ export function fromConstPropValues<P>(props: BindableAttrValues<P>): Partial<P>
     }
   });
   return result;
-}
-
-const nodeByNameCache = new WeakMap<AppDom, Map<string, NodeId>>();
-function getNodeIdByNameIndex(dom: AppDom): Map<string, NodeId> {
-  let cached = nodeByNameCache.get(dom);
-  if (!cached) {
-    cached = new Map(Array.from(Object.values(dom.nodes), (node) => [node.name, node.id]));
-    nodeByNameCache.set(dom, cached);
-  }
-  return cached;
-}
-
-export function getNodeIdByName(dom: AppDom, name: string): NodeId | null {
-  const index = getNodeIdByNameIndex(dom);
-  return index.get(name) ?? null;
 }
 
 export function getNodeFirstChild(dom: AppDom, node: ElementNode | PageNode, parentProp: string) {
@@ -1206,4 +1180,16 @@ export function getRequiredEnvVars(dom: AppDom): Set<string> {
     .map((binding) => binding.$$env);
 
   return new Set(allVars);
+}
+
+export function getPageDisplayName(node: PageNode): string {
+  return node.attributes.displayName || guessTitle(node.name);
+}
+
+export function getPageTitle(node: PageNode): string {
+  return node.attributes.title || getPageDisplayName(node);
+}
+
+export function isCodePage(node: PageNode): boolean {
+  return !!node.attributes.codeFile;
 }

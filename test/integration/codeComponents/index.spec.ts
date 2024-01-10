@@ -19,7 +19,7 @@ test.use({
 
 test('custom components can use external libraries', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page');
+  await runtimeModel.goToPage('page');
 
   const test1 = page.getByText('Page D');
   await expect(test1).toBeVisible();

@@ -3,9 +3,9 @@ import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
-    pathname: '/toolpad/getting-started',
+    pathname: '/toolpad/getting-started-group',
     children: [
-      { pathname: '/toolpad/getting-started/overview' },
+      { pathname: '/toolpad/getting-started', title: 'Overview' },
       { pathname: '/toolpad/getting-started/installation' },
       { pathname: '/toolpad/getting-started/why-toolpad', title: 'Why Toolpad?' },
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
@@ -78,6 +78,7 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/concepts/page-properties',
       },
+      { pathname: '/toolpad/concepts/custom-server' },
     ],
   },
   {
@@ -86,9 +87,7 @@ const pages: MuiPage[] = [
       { pathname: '/toolpad/components/button' },
       {
         pathname: '/toolpad/components/datagrid',
-      },
-      {
-        pathname: '/toolpad/concepts/custom-server',
+        title: 'Data Grid',
       },
     ],
   },
@@ -148,7 +147,7 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/how-to-guides/embed-pages',
-            title: 'Embed a Toolpad page',
+            title: 'Embedding Toolpad pages',
           },
           {
             pathname: '/toolpad/how-to-guides/basic-auth',

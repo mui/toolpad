@@ -96,6 +96,7 @@ module.exports = {
       files: ['examples/**/*'],
       rules: {
         'no-console': 'off',
+        'no-underscore-dangle': 'off',
       },
     },
     {
@@ -121,7 +122,6 @@ module.exports = {
         'packages/toolpad-app/src/components/**/*',
         'packages/toolpad-app/src/toolpad/**/*',
         'packages/toolpad-app/src/runtime/**/*',
-        'packages/toolpad-app/reactDevtools/**/*',
       ],
       excludedFiles: ['*.spec.ts', '*.spec.tsx'],
       rules: {

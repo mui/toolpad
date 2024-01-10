@@ -33,7 +33,7 @@ function renderPage(
   let dom = appDom.createDom();
   const root = appDom.getNode(dom, dom.root, 'app');
   const page = appDom.createNode(dom, 'page', {
-    name: 'Page',
+    name: 'thePage',
     attributes: {
       title: '',
     },
@@ -42,7 +42,7 @@ function renderPage(
 
   dom = initPage(dom, page);
 
-  window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
+  window.history.replaceState({}, 'Test page', `/toolpad/pages/thePage`);
 
   const state = createRuntimeState({ dom });
 

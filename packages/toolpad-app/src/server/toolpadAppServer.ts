@@ -12,6 +12,7 @@ import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '.
 import createRuntimeState from '../runtime/createRuntimeState';
 import type { RuntimeConfig } from '../types';
 import type { RuntimeState } from '../runtime';
+import { createAuthHandler } from './auth';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;
@@ -66,6 +67,11 @@ export async function createProdHandler(project: ToolpadProject) {
 
   const runtimeRpcServer = createRpcServer(project);
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
+
+  if (process.env.TOOLPAD_AUTH_SECRET) {
+    const authHandler = createAuthHandler(project.options.base);
+    handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
+  }
 
   handler.use(
     asyncHandler(async (req, res) => {

@@ -1,32 +1,20 @@
 import * as path from 'path';
 import * as url from 'node:url';
-import { InlineConfig, Plugin, build } from 'vite';
+import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
-import type { ComponentEntry } from './localMode';
+import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import * as appDom from '../appDom';
 import { pathToNodeImportSpecifier } from '../utils/paths';
+import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
-const CANVAS_ENTRY = '/canvas.tsx';
 
-const componentsId = `virtual:toolpad:components.js`;
-const pageComponentsId = `virtual:toolpad:page-components.js`;
-export const resolvedComponentsId = `\0${componentsId}`;
-export const resolvedPageComponentsId = `\0${pageComponentsId}`;
-
-export interface GetHtmlContentParams {
-  canvas: boolean;
-  base: string;
-}
-
-export function getHtmlContent({ canvas, base }: GetHtmlContentParams) {
-  const entryPoint = canvas ? CANVAS_ENTRY : MAIN_ENTRY;
-  const devtoolsSrc = `${base}/__toolpad_dev__/reactDevtools/bootstrap.global.js`;
+export function getHtmlContent() {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -40,104 +28,22 @@ export function getHtmlContent({ canvas, base }: GetHtmlContentParams) {
       </head>
       <body>
         <div id="root"></div>
-
-        ${
-          canvas
-            ? `
-              <script>
-                // Add the data-toolpad-canvas attribute to the canvas iframe element
-                if (window.frameElement?.dataset.toolpadCanvas) {
-                  var script = document.createElement('script');
-                  script.src = ${JSON.stringify(devtoolsSrc)};
-                  document.write(script.outerHTML);
-                }
-              </script>
-            `
-            : ''
-        }
     
         <!-- __TOOLPAD_SCRIPTS__ -->
 
-        <script type="module" src=${JSON.stringify(entryPoint)}></script>
+        <script type="module" src=${JSON.stringify(MAIN_ENTRY)}></script>
       </body>
     </html>
   `;
 }
 
-interface ToolpadVitePluginParams {
-  root: string;
-  base: string;
-  loadDom: () => Promise<appDom.AppDom>;
-  getComponents: () => Promise<ComponentEntry[]>;
-}
-
-function toolpadVitePlugin({
-  root,
-  base,
-  getComponents,
-  loadDom,
-}: ToolpadVitePluginParams): Plugin {
-  const resolvedRuntimeEntryPointId = `\0${MAIN_ENTRY}`;
-  const resolvedCanvasEntryPointId = `\0${CANVAS_ENTRY}`;
-
-  const getEntryPoint = (isCanvas: boolean) => `
-    import { init, setComponents } from '@mui/toolpad/runtime';
-    import components from ${JSON.stringify(componentsId)};
-    import pageComponents from ${JSON.stringify(pageComponentsId)};
-    ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
-    
-    const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
-
-    setComponents(components, pageComponents);
-
-    init({
-      ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
-      base: ${JSON.stringify(base)},
-      initialState,
-    })
-
-    if (import.meta.hot) {
-      // TODO: investigate why this doesn't work, see https://github.com/vitejs/vite/issues/12912
-      import.meta.hot.accept(
-        [${JSON.stringify(componentsId)}, ${JSON.stringify(pageComponentsId)}],
-        (newComponents, newPageComponents) => {
-        if (newComponents) {
-          console.log('hot updating Toolpad components')
-          setComponents(
-            newComponents ?? components,
-            newPageComponents ?? pageComponents
-          );
-        }
-      });
-    }
-  `;
-
+function toolpadVitePlugin(): Plugin {
   return {
     name: 'toolpad',
 
-    async resolveId(id, importer) {
+    async resolveId(id) {
       if (id.endsWith('.html')) {
         return id;
-      }
-      if (id === MAIN_ENTRY) {
-        return resolvedRuntimeEntryPointId;
-      }
-      if (id === CANVAS_ENTRY) {
-        return resolvedCanvasEntryPointId;
-      }
-      if (id === componentsId) {
-        return resolvedComponentsId;
-      }
-      if (id === pageComponentsId) {
-        return resolvedPageComponentsId;
-      }
-      if (
-        importer === resolvedRuntimeEntryPointId ||
-        importer === resolvedComponentsId ||
-        importer === resolvedPageComponentsId
-      ) {
-        const newId = path.resolve(root, id);
-        return this.resolve(newId, importer);
       }
       return null;
     },
@@ -145,77 +51,58 @@ function toolpadVitePlugin({
     async load(id) {
       if (id.endsWith('.html')) {
         // production build only
-        return getHtmlContent({ canvas: false, base });
+        return getHtmlContent();
       }
-      if (id === resolvedRuntimeEntryPointId) {
-        return {
-          code: getEntryPoint(false),
-          map: null,
-        };
-      }
-      if (id === resolvedCanvasEntryPointId) {
-        return {
-          code: getEntryPoint(true),
-          map: null,
-        };
-      }
-      if (id === resolvedComponentsId) {
-        const components = await getComponents();
+      return null;
+    },
 
-        const imports = components.map(({ name }) => `import ${name} from './components/${name}';`);
+    transform(code, id) {
+      if (/\/resources\//.test(id)) {
+        const codeFile = path.basename(id);
 
-        const defaultExportProperties = components.map(
-          ({ name }) => `${JSON.stringify(`codeComponent.${name}`)}: ${name}`,
-        );
+        const functionExports = [];
 
-        const code = `
-          ${imports.join('\n')}
+        const lines = code.split('\n');
+        for (let i = 0; i < lines.length; i += 1) {
+          const line = lines[i];
+          const lineNr = i + 1;
+          if (/\s*export\b/.test(line)) {
+            const match = line.match(/\s*export\s+async\s+function\s+([a-zA-Z0-9]+)\b/);
 
-          export default {
-            ${indent(defaultExportProperties.join(',\n'), 2)}
-          };
-        `;
-
-        return {
-          code,
-          map: null,
-        };
-      }
-      if (id === resolvedPageComponentsId) {
-        const dom = await loadDom();
-        const appNode = appDom.getApp(dom);
-        const { pages = [] } = appDom.getChildNodes(dom, appNode);
-
-        const imports = new Map<string, string>();
-
-        for (const page of pages) {
-          const codeFile = page.attributes.codeFile;
-          if (codeFile) {
-            const importPath = path.resolve(root, `./pages/${page.name}`, codeFile);
-            const relativeImportPath = path.relative(root, importPath);
-            const importSpec = pathToNodeImportSpecifier(relativeImportPath);
-            imports.set(page.name, importSpec);
+            if (match) {
+              const functionName = match[1];
+              functionExports.push(functionName);
+            } else {
+              console.warn(
+                `Unsupported export at "${id}:${lineNr}". Only exports of the form "export async function foo(...) {" are supported.`,
+              );
+            }
           }
         }
 
-        const importLines = Array.from(
-          imports.entries(),
-          ([name, spec]) => `${name}: React.lazy(() => import(${JSON.stringify(spec)}))`,
-        );
+        return `
+          import { createRemoteFunction } from '@mui/toolpad/runtime';
 
-        const code = `
-          import * as React from 'react';
-          
-          export default {
-            ${importLines.join(',\n')}
+          const functionFile = ${JSON.stringify(codeFile)};
+
+          ${functionExports
+            .map(
+              (functionName) =>
+                `const __${functionName} = createRemoteFunction(functionFile, ${JSON.stringify(
+                  functionName,
+                )})`,
+            )
+            .join('\n')}
+
+          export {
+            ${functionExports
+              .map((functionName) => `__${functionName} as ${functionName}`)
+              .join(',\n')}
           }
         `;
-        return {
-          code,
-          map: null,
-        };
       }
-      return null;
+
+      return code;
     },
   };
 }
@@ -229,13 +116,10 @@ export interface CreateViteConfigParams {
   plugins?: Plugin[];
   getComponents: () => Promise<ComponentEntry[]>;
   loadDom: () => Promise<appDom.AppDom>;
+  getPagesManifest: () => Promise<PagesManifest>;
 }
 
-export interface CreateViteConfigResult {
-  viteConfig: InlineConfig;
-}
-
-export function createViteConfig({
+export async function createViteConfig({
   outDir,
   root,
   dev,
@@ -244,10 +128,124 @@ export function createViteConfig({
   plugins = [],
   getComponents,
   loadDom,
-}: CreateViteConfigParams): CreateViteConfigResult {
+  getPagesManifest,
+}: CreateViteConfigParams) {
   const mode = dev ? 'development' : 'production';
 
+  const getEntryPoint = (isCanvas: boolean) => {
+    const componentsId = 'virtual:toolpad-files:components.tsx';
+    const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
+
+    return `
+import { init, setComponents } from '@mui/toolpad/runtime';
+import components from ${JSON.stringify(componentsId)};
+import pageComponents from ${JSON.stringify(pageComponentsId)};
+${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
+
+const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
+
+setComponents(components, pageComponents);
+
+init({
+  ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
+  base: ${JSON.stringify(base)},
+  initialState,
+})
+
+if (import.meta.hot) {
+  // TODO: investigate why this doesn't work, see https://github.com/vitejs/vite/issues/12912
+  import.meta.hot.accept(
+    [${JSON.stringify(componentsId)}, ${JSON.stringify(pageComponentsId)}],
+    (newComponents, newPageComponents) => {
+    if (newComponents) {
+      console.log('hot updating Toolpad components')
+      setComponents(
+        newComponents ?? components,
+        newPageComponents ?? pageComponents
+      );
+    }
+  });
+}
+`;
+  };
+
+  const createComponentsFile = async () => {
+    const components = await getComponents();
+
+    const imports = components.map(
+      ({ name }) => `import ${name} from 'toolpad-user-project:./components/${name}';`,
+    );
+
+    const defaultExportProperties = components.map(
+      ({ name }) => `${JSON.stringify(`codeComponent.${name}`)}: ${name}`,
+    );
+
+    const code = `
+      ${imports.join('\n')}
+
+      export default {
+        ${indent(defaultExportProperties.join(',\n'), 2)}
+      };
+    `;
+
+    return {
+      code,
+      map: null,
+    };
+  };
+
+  const createPageComponentsFile = async () => {
+    const dom = await loadDom();
+    const appNode = appDom.getApp(dom);
+    const { pages = [] } = appDom.getChildNodes(dom, appNode);
+
+    const imports = new Map<string, string>();
+
+    for (const page of pages) {
+      const codeFile = page.attributes.codeFile;
+      if (codeFile) {
+        const importPath = path.resolve(root, `./pages/${page.name}/page`);
+        const relativeImportPath = path.relative(root, importPath);
+        const importSpec = `toolpad-user-project:${pathToNodeImportSpecifier(relativeImportPath)}`;
+        imports.set(page.name, importSpec);
+      }
+    }
+
+    const importLines = Array.from(
+      imports.entries(),
+      ([name, spec]) => `${name}: React.lazy(() => import(${JSON.stringify(spec)}))`,
+    );
+
+    const code = `
+      import * as React from 'react';
+      
+      export default {
+        ${importLines.join(',\n')}
+      }
+    `;
+
+    return {
+      code,
+      map: null,
+    };
+  };
+
+  const virtualFiles = new Map<string, VirtualFileContent>([
+    ['main.tsx', getEntryPoint(false)],
+    ['canvas.tsx', getEntryPoint(true)],
+    ['components.tsx', await createComponentsFile()],
+    ['page-components.tsx', await createPageComponentsFile()],
+    ['pages-manifest.json', JSON.stringify(await getPagesManifest(), null, 2)],
+  ]);
+
+  const virtualToolpadFiles = viteVirtualPlugin(virtualFiles, 'toolpad-files');
+
   return {
+    reloadComponents: async () => {
+      const newFiles = new Map(virtualFiles);
+      newFiles.set('components.tsx', await createComponentsFile());
+      replaceFiles(virtualToolpadFiles, newFiles);
+    },
     viteConfig: {
       configFile: false,
       mode,
@@ -271,6 +269,16 @@ export function createViteConfig({
             find: /^@mui\/icons-material\/(?!esm\/)([^/]*)/,
             replacement: '@mui/icons-material/esm/$1',
           },
+          {
+            find: /^toolpad-user-project:(.*)$/,
+            replacement: `${root}/$1`,
+          },
+          {
+            find: MAIN_ENTRY,
+            replacement: dev
+              ? 'virtual:toolpad-files:canvas.tsx'
+              : 'virtual:toolpad-files:main.tsx',
+          },
         ],
       },
       server: {
@@ -284,6 +292,8 @@ export function createViteConfig({
           '@emotion/react',
           '@mui/icons-material',
           '@mui/icons-material/ArrowDropDownRounded',
+          '@mui/icons-material/Close',
+          '@mui/icons-material/Delete',
           '@mui/icons-material/DarkMode',
           '@mui/icons-material/Edit',
           '@mui/icons-material/Error',
@@ -328,6 +338,7 @@ export function createViteConfig({
           'react/jsx-runtime',
           'recharts',
           'superjson',
+          'title',
           'zod',
         ],
         exclude: [
@@ -340,14 +351,14 @@ export function createViteConfig({
       appType: 'custom',
       logLevel: 'info',
       root,
-      plugins: [react(), toolpadVitePlugin({ root, base, getComponents, loadDom }), ...plugins],
+      plugins: [virtualToolpadFiles, react(), toolpadVitePlugin(), ...plugins],
       base,
       define: {
         'process.env.NODE_ENV': `'${mode}'`,
         'process.env.BASE_URL': `'${base}'`,
         'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
       },
-    },
+    } satisfies InlineConfig,
   };
 }
 
@@ -355,6 +366,7 @@ export interface ToolpadBuilderParams {
   outDir: string;
   getComponents: () => Promise<ComponentEntry[]>;
   loadDom: () => Promise<appDom.AppDom>;
+  getPagesManifest: () => Promise<PagesManifest>;
   root: string;
   base: string;
 }
@@ -363,16 +375,19 @@ export async function buildApp({
   root,
   base,
   getComponents,
+  getPagesManifest,
   loadDom,
   outDir,
 }: ToolpadBuilderParams) {
-  const { viteConfig } = createViteConfig({
+  const { viteConfig } = await createViteConfig({
     dev: false,
     root,
     base,
     outDir,
     getComponents,
+    getPagesManifest,
     loadDom,
   });
-  await build(viteConfig);
+  const vite = await import('vite');
+  await vite.build(viteConfig);
 }

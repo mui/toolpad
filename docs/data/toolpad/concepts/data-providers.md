@@ -36,7 +36,7 @@ The data provider supports two styles of pagination. Index based, and cursor bas
 
 ### Index based
 
-This is the strategy your data is paginated by when it returns data based on a page number and page size. The `getRecords` method will receive `page` and `pageSize` values in it `paginationModel` parameter and returns a set of records representing the page. Index based pagination is the default but you can explicitly enable this by setting `paginationMode` to `'index'`.
+This is the strategy where your data is paginated by when it returns data based on a page number and page size. The `getRecords` method will receive `page` and `pageSize` values in it `paginationModel` parameter and returns a set of records representing the page. Index based pagination is the default but you can explicitly enable this by setting `paginationMode` to `'index'`.
 
 ```tsx
 export default createDataProvider({
@@ -53,7 +53,7 @@ export default createDataProvider({
 
 ### Cursor based
 
-This is the strategy your data is paginated by when it returns data based on a cursor and a page size. The `getRecords` method will receive `cursor` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. You indicate the cursor of the next page with a `cursor` property in the result. Pass `null` to signal the end of the collection. You can enable Cursor based pagination by setting `paginationMode` to `'cursor'`.
+This is the strategy where your data is paginated by when it returns data based on a cursor and a page size. The `getRecords` method will receive `cursor` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. You indicate the cursor of the next page with a `cursor` property in the result. Pass `null` to signal the end of the collection. You can enable Cursor based pagination by setting `paginationMode` to `'cursor'`.
 
 The `cursor` property of the `paginationModel` is `null` when Toolpad fetches the initial page. Any result set returned from the `getRecords` function must be accompanied with a `cursor` property, a string which contains a reference to the next page. This value will be passed as the `cursor` parameter in the `paginationModel` when fetching the subsequent page. Return `null` for this value to indicate the end of the sequence.
 
@@ -74,44 +74,124 @@ export default createDataProvider({
 });
 ```
 
-## Filtering 🚧
+## Filtering
 
-:::warning
-This feature isn't implemented yet.
+Toolpad data sources support server-side filtering. You can implement a server-side filter by reading the `filterModel` property that is passed to the `getRecords` function. This model contains an `items` property and a `logicOperator`. By combining them you can achieve complex serverside filters.
 
-👍 Upvote [issue #2886](https://github.com/mui/mui-toolpad/issues/2886) if you want to see it land faster.
-:::
+```tsx
+export default createDataProvider({
+  async getRecords({ filterModel }) {
+    console.log(filterModel);
+  },
+});
+```
 
-## Sorting 🚧
+For example, this could print the following if the corresponding column filters were applied in the data grid:
 
-:::warning
-This feature isn't implemented yet.
+```tsx
+{
+  logicOperator: 'and',
+  items: [
+    { field: 'first_name', operator: 'startsWith', value: 'L' },
+    { field: 'last_name', operator: 'equals', value: 'Skywalker' },
+  ]
+}
+```
 
-👍 Upvote [issue #2539](https://github.com/mui/mui-toolpad/issues/2539) if you want to see it land faster.
-:::
+Now the data grid filter UI will be hooked up to your backend function in the data provider.
 
-## Row editing 🚧
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/filtering.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
-:::warning
-This feature isn't implemented yet.
+Uncheck the column option "filterable" if you want to disable filtering for a certain column:
 
-👍 Upvote [issue #2887](https://github.com/mui/mui-toolpad/issues/2887) if you want to see it land faster.
-:::
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-filterable.png", "alt": "Disable filterable", "caption": "Disable filterable", "zoom": false, "width": 320 }}
+
+## Sorting
+
+Toolpad data sources support server-side sorting. To achieve this you'll have to consume the `sortModel` property that is passed to the `getRecords` method:
+
+```tsx
+export default createDataProvider({
+  async getRecords({ sortModel }) {
+    console.log(sortModel);
+  },
+});
+```
+
+Depending on which column has been set to sort by, this will result in:
+
+```tsx
+[{ field: 'name', sort: 'asc' }];
+```
+
+Now the data grid sorting UI will be hooked up to your backend function in the data provider.
+
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/sorting.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+Uncheck the column option "sortable" if you want to disable sorting for a certain column:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-sortable.png", "alt": "Disable sortable", "caption": "Disable sortable", "zoom": false, "width": 325 }}
+
+## Row editing
+
+The data provider can be extended to automatically support row editing. To enable this, you'll have to add a `updateRecord` method to the data provider interface that accepts the `id` of the row that is to be deleted, and an object containing all the updated fields from the row editing operation.
+
+```tsx
+export default createDataProvider({
+  async getRecords() {
+    return prisma.users.findMany();
+  },
+
+  async updateRecord(id, data) {
+    return prisma.users.update({ where: { id }, data });
+  },
+});
+```
+
+When this method is available in the data provider, each row will have an edit button. This edit button brings the row in edit mode. To commit the changes press the save button on the row that is in edit mode. To discard the changes use the cancel button.
+
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/editing.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+You can disable the editing functionality for specific columns by unchecking the **Editable** option in the column definition.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-editable.png", "alt": "Disable editable", "caption": "Disable editable", "zoom": false, "width": 308 }}
 
 ## Row creation 🚧
 
 :::warning
 This feature isn't implemented yet.
+
 👍 Upvote [issue #2888](https://github.com/mui/mui-toolpad/issues/2888) if you want to see it land faster.
 :::
 
-## Deleting rows 🚧
+## Deleting rows
 
-:::warning
-This feature isn't implemented yet.
+The data provider can be extended to automatically support row deletion. To enable this, you'll have to add a `deleteRecord` method to the data provider interface that accepts the `id` of the row that is to be deleted.
 
-👍 Upvote [issue #2889](https://github.com/mui/mui-toolpad/issues/2889) if you want to see it land faster.
-:::
+```tsx
+export default createDataProvider({
+  async getRecords({ paginationModel: { start = 0, pageSize } }) {
+    return db.query(`SELECT * FROM users`);
+  },
+
+  async deleteRecord(id) {
+    await db.query(`DELETE FROM users WHERE id = ?`, [id]);
+  },
+});
+```
+
+When a data provider contains a `deleteRecord` method, each row will have a delete button. When the user clicks that delete button, the delete method will be called with the id of that row and after successful deletion, the data will be reloaded.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/data-providers-delete.png", "alt": "Data provider delete", "caption": "Delete action in data provider" }}
 
 ## API
 

@@ -16,7 +16,7 @@ test.use({
 
 test('input basics', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page1');
+  await runtimeModel.goToPage('page1');
 
   const textField1 = page.locator('label:has-text("textField1")');
   const textField2 = page.locator('label:has-text("textField2")');
@@ -39,7 +39,7 @@ test('input basics', async ({ page }) => {
 
 test('event mutations', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('page2');
+  await runtimeModel.goToPage('page2');
 
   await page.getByText('Mutation tests').waitFor({ state: 'visible' });
 

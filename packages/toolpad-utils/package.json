@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-utils",
-  "version": "0.1.38",
+  "version": "0.1.44",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -55,13 +55,15 @@
     "invariant": "2.2.4",
     "prettier": "2.8.8",
     "react-is": "18.2.0",
+    "title": "3.5.3",
     "yaml": "2.3.4",
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
     "@types/invariant": "2.2.37",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.37",
-    "@types/react-is": "18.2.4"
+    "@types/react": "18.2.47",
+    "@types/react-is": "18.2.4",
+    "@types/title": "3.4.3"
   }
 }

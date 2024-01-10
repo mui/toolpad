@@ -1,5 +1,5 @@
 import { BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
-import { Har } from 'har-format';
+import type { Har } from 'har-format';
 import { Maybe } from '../../utils/types';
 
 interface AuthenticationBase {

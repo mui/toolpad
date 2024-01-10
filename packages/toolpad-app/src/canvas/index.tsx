@@ -2,13 +2,18 @@ import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
-import ToolpadApp from '../runtime/ToolpadApp';
+import { FlowDirection, SlotType } from '@mui/toolpad-core';
+import ToolpadApp, { IS_RENDERED_IN_CANVAS } from '../runtime/ToolpadApp';
 import { queryClient } from '../runtime/api';
-import { AppCanvasState } from '../types';
-import getPageViewState from './getPageViewState';
-import { rectContainsPoint } from '../utils/geometry';
+import { AppCanvasState, NodeInfo, PageViewState, SlotsState } from '../types';
+import {
+  getRelativeBoundingRect,
+  getRelativeOuterRect,
+  rectContainsPoint,
+} from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
-import { bridge, setCommandHandler } from './ToolpadBridge';
+import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
+import { update } from '../utils/immutability';
 
 const handleScreenUpdate = throttle(
   () => {
@@ -18,6 +23,56 @@ const handleScreenUpdate = throttle(
   { trailing: true },
 );
 
+function updateNodeInfo(nodeInfo: NodeInfo, rootElm: Element): NodeInfo {
+  const nodeElm = rootElm.querySelector(`[data-toolpad-node-id="${nodeInfo.nodeId}"]`);
+
+  if (!nodeElm) {
+    return nodeInfo;
+  }
+
+  const rect = getRelativeOuterRect(rootElm, nodeElm);
+
+  const slotElms = rootElm.querySelectorAll(`[data-toolpad-slot-parent="${nodeInfo.nodeId}"]`);
+
+  const slots: SlotsState = {};
+
+  for (const slotElm of slotElms) {
+    const slotName = slotElm.getAttribute('data-toolpad-slot-name');
+    const slotType = slotElm.getAttribute('data-toolpad-slot-type');
+
+    invariant(slotName, 'Slot name not found');
+    invariant(slotType, 'Slot type not found');
+
+    if (slots[slotName]) {
+      continue;
+    }
+
+    const slotRect =
+      slotType === 'single'
+        ? getRelativeBoundingRect(rootElm, slotElm)
+        : getRelativeBoundingRect(rootElm, slotElm);
+
+    const display = window.getComputedStyle(slotElm).display;
+    let flowDirection: FlowDirection = 'row';
+    if (slotType === 'layout') {
+      flowDirection = 'column';
+    } else if (display === 'grid') {
+      const gridAutoFlow = window.getComputedStyle(slotElm).gridAutoFlow;
+      flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
+    } else if (display === 'flex') {
+      flowDirection = window.getComputedStyle(slotElm).flexDirection as FlowDirection;
+    }
+
+    slots[slotName] = {
+      type: slotType as SlotType,
+      rect: slotRect,
+      flowDirection,
+    };
+  }
+
+  return { ...nodeInfo, rect, slots };
+}
+
 export interface AppCanvasProps {
   state: AppCanvasState;
   basename: string;
@@ -25,6 +80,7 @@ export interface AppCanvasProps {
 
 export default function AppCanvas({ basename, state: initialState }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState>(initialState);
+  const [readyBridge, setReadyBridge] = React.useState<ToolpadBridge>();
 
   const appRootRef = React.useRef<HTMLDivElement>();
   const appRootCleanupRef = React.useRef<() => void>();
@@ -75,14 +131,25 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
     }
   });
 
+  const viewState = React.useRef<PageViewState>({ nodes: {} });
+
   React.useEffect(() => {
     if (!bridge) {
       return;
     }
 
     setCommandHandler(bridge.canvasCommands, 'getPageViewState', () => {
-      invariant(appRootRef.current, 'App ref not attached');
-      return getPageViewState(appRootRef.current);
+      invariant(appRootRef.current, 'App root not found');
+
+      let nodes = viewState.current.nodes;
+
+      for (const [nodeId, nodeInfo] of Object.entries(nodes)) {
+        nodes = update(nodes, {
+          [nodeId]: updateNodeInfo(nodeInfo, appRootRef.current),
+        });
+      }
+
+      return { nodes };
     });
 
     setCommandHandler(bridge.canvasCommands, 'getViewCoordinates', (clientX, clientY) => {
@@ -114,20 +181,36 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
     });
 
     bridge.canvasEvents.emit('ready', {});
+    setReadyBridge(bridge);
   }, []);
 
   const savedNodes = state?.savedNodes;
   const editorHooks: CanvasHooks = React.useMemo(() => {
     return {
       savedNodes,
+      registerNode: (node, props, componentConfig) => {
+        viewState.current.nodes[node.id] = {
+          nodeId: node.id,
+          props,
+          componentConfig,
+        };
+
+        return () => {
+          delete viewState.current.nodes[node.id];
+        };
+      },
     };
   }, [savedNodes]);
 
-  return (
-    <CanvasHooksContext.Provider value={editorHooks}>
-      <CanvasEventsContext.Provider value={bridge?.canvasEvents || null}>
-        <ToolpadApp rootRef={onAppRoot} basename={basename} state={state} />
-      </CanvasEventsContext.Provider>
-    </CanvasHooksContext.Provider>
-  );
+  if (IS_RENDERED_IN_CANVAS) {
+    return readyBridge ? (
+      <CanvasHooksContext.Provider value={editorHooks}>
+        <CanvasEventsContext.Provider value={readyBridge.canvasEvents}>
+          <ToolpadApp rootRef={onAppRoot} basename={basename} state={state} />
+        </CanvasEventsContext.Provider>
+      </CanvasHooksContext.Provider>
+    ) : null;
+  }
+
+  return <ToolpadApp basename={basename} state={state} />;
 }

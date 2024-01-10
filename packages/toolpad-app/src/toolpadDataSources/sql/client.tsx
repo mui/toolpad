@@ -200,7 +200,7 @@ export function QueryEditor({
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
-      setInput((existing) => ({ ...existing, params: newParams }));
+      setInput?.((existing) => ({ ...existing, params: newParams }));
     },
     [setInput],
   );
@@ -233,16 +233,16 @@ export function QueryEditor({
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <PanelGroup autoSaveId="toolpad-sql-panel" direction="horizontal">
-      <Panel defaultSizePercentage={50}>
-        <PanelGroup direction="vertical">
-          <Panel defaultSizePercentage={85}>
+    <PanelGroup autoSaveId="toolpad/sql-panel" direction="horizontal">
+      <Panel id="sql-query-left" defaultSize={50}>
+        <PanelGroup autoSaveId="toolpad/sql/params-tools-split" direction="vertical">
+          <Panel defaultSize={85}>
             <QueryInputPanel onRunPreview={handleRunPreview}>
               <Box sx={{ flex: 1, minHeight: 0 }}>
                 <MonacoEditor
                   value={input.attributes.query.sql}
                   onChange={(newValue) =>
-                    setInput((existing) => appDom.setQueryProp(existing, 'sql', newValue))
+                    setInput?.((existing) => appDom.setQueryProp(existing, 'sql', newValue))
                   }
                   language="sql"
                 />
@@ -257,7 +257,7 @@ export function QueryEditor({
               }}
             />
           </PanelResizeHandle>
-          <Panel defaultSizePercentage={15}>
+          <Panel defaultSize={15}>
             <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
               <Typography>Parameters</Typography>
               <ParametersEditor
@@ -272,7 +272,7 @@ export function QueryEditor({
           </Panel>
         </PanelGroup>
       </Panel>
-      <Panel defaultSizePercentage={50}>
+      <Panel id="sql-query-right" defaultSize={50}>
         <Box
           sx={{
             height: '100%',

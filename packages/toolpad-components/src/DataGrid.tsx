@@ -775,7 +775,6 @@ function useDataProviderDataGridProps(
 
             setActionResult({ action, id: newRecord[idField] as GridRowId });
             return newRecord;
-            // eslint-disable-next-line no-else-return
           } catch (error) {
             setActionResult({ action, error: errorFrom(error) });
             throw error;

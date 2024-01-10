@@ -28,6 +28,7 @@ import { createRpcHandler } from './rpc';
 import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
+import { createAuthHandler, createAuthPagesMiddleware } from './auth';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -103,11 +104,6 @@ async function createDevHandler(project: ToolpadProject) {
   handler.use('/__toolpad_dev__/rpc', createRpcHandler(rpcServer));
 
   handler.use(
-    '/__toolpad_dev__/reactDevtools',
-    express.static(path.resolve(currentDirectory, '../../dist/reactDevtools')),
-  );
-
-  handler.use(
     '/__toolpad_dev__/manifest.json',
     asyncHandler(async (req, res) => {
       const wsProtocol = req.protocol === 'http' ? 'ws' : 'wss';
@@ -122,6 +118,12 @@ async function createDevHandler(project: ToolpadProject) {
   const runtimeRpcServer = createRuntimeRpcServer(project);
 
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
+
+  if (process.env.TOOLPAD_AUTH_SECRET) {
+    const authHandler = createAuthHandler(project.options.base);
+    handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
+  }
+
   handler.use(
     (req, res, next) => {
       // Stall the request until the dev server is ready
@@ -313,7 +315,10 @@ async function createToolpadHandler({
   router.use(express.static(publicPath, { index: false }));
 
   const appHandler = await createToolpadAppHandler(project);
-  router.use(project.options.base, appHandler.handler);
+
+  const authPagesMiddleware = await createAuthPagesMiddleware(project);
+
+  router.use(project.options.base, authPagesMiddleware, appHandler.handler);
 
   let editorHandler: AppHandler | undefined;
   if (dev) {

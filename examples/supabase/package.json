@@ -8,7 +8,7 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.42",
-    "@supabase/supabase-js": "2.39.1"
+    "@mui/toolpad": "0.1.44",
+    "@supabase/supabase-js": "2.39.2"
   }
 }

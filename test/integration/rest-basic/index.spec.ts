@@ -122,4 +122,31 @@ test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) 
   await editorModel.queriesExplorer.getByText('queryWithEnv').click();
 
   await queryEditor.getByRole('tab', { name: 'Headers' }).click();
+
+  await editorModel.queriesExplorer.getByLabel('Create new query').click();
+  await page.getByRole('button', { name: 'REST API' }).click();
+
+  await expect(queryEditor).toBeVisible();
+
+  await urlInput.click();
+  await urlInput.fill('http://foo.bar');
+
+  const saveButton = queryEditor.getByRole('button', { name: 'Save' });
+  await saveButton.click();
+
+  const query = await editorModel.queriesExplorer.getByLabel('query', { exact: true });
+  await expect(query).toBeVisible();
+
+  await editorModel.queriesExplorer.getByLabel('Create new query').click();
+  await page.getByRole('button', { name: 'REST API' }).click();
+
+  await expect(queryEditor).toBeVisible();
+
+  await urlInput.click();
+  await urlInput.fill('http://foo.bar');
+
+  await saveButton.click();
+
+  const query3 = await editorModel.queriesExplorer.getByLabel('query3', { exact: true });
+  await expect(query3).toBeVisible();
 });

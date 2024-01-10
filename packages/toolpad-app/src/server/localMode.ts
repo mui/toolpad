@@ -311,6 +311,10 @@ function mergeApplicationIntoDom(dom: appDom.AppDom, applicationFile: Applicatio
   const applicationFileSpec = applicationFile.spec;
   const app = appDom.getApp(dom);
 
+  dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'authentication', {
+    ...applicationFileSpec?.authentication,
+  });
+
   dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'authorization', {
     ...applicationFileSpec?.authorization,
     roles: applicationFileSpec?.authorization?.roles?.map((role) =>
@@ -794,6 +798,7 @@ function extractApplicationFromDom(dom: appDom.AppDom): Application | null {
     apiVersion: API_VERSION,
     kind: 'application',
     spec: {
+      authentication: rootNode.attributes.authentication,
       authorization: rootNode.attributes.authorization,
     },
   };

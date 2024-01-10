@@ -17,6 +17,34 @@
         "spec": {
           "type": "object",
           "properties": {
+            "authentication": {
+              "type": "object",
+              "properties": {
+                "providers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "provider": {
+                        "type": "string",
+                        "enum": [
+                          "github",
+                          "google"
+                        ],
+                        "description": "Unique identifier for this authentication provider."
+                      }
+                    },
+                    "required": [
+                      "provider"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "description": "Authentication providers to use."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Authentication configuration for this application."
+            },
             "authorization": {
               "type": "object",
               "properties": {

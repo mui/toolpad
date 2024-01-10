@@ -7,9 +7,13 @@ export interface PageColumnProps {
   children?: React.ReactNode;
 }
 
-function PageColumn({ gap, children }: PageColumnProps) {
+const PageColumn = React.forwardRef(function PageColumn(
+  { gap, children, ...props }: PageColumnProps,
+  ref,
+) {
   return (
     <Box
+      ref={ref}
       sx={{
         gap,
         display: 'grid',
@@ -17,11 +21,12 @@ function PageColumn({ gap, children }: PageColumnProps) {
         gridAutoRows: 'fit-content',
         gridAutoColumns: '100%',
       }}
+      {...props}
     >
       {children}
     </Box>
   );
-}
+});
 
 export default createBuiltin(PageColumn, {
   helperText: 'A page column component.',

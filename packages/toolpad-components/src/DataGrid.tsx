@@ -693,7 +693,6 @@ function useDataProviderDataGridProps(
   const [draftRow, setDraftRow] = React.useState<GridRowModel | null>(null);
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-    console.log(params);
     // Blurring the cell shouldn't end edit mode
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;

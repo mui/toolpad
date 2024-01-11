@@ -181,7 +181,7 @@ export default createDataProvider({
 });
 ```
 
-After you make this method available in the data provider, a "Add record" button will appear in the data grid toolbar. Click this button and a new editable row appears at the top of the grid. Fill in the values and click the save button to finish creating the row. You'll have to return the newly created row from the `createRecord` method so that the grid can update accordingly.
+After you make this method available in the data provider, an "Add record" button will appear in the data grid toolbar. Click this button and a new editable row appears at the top of the grid. Fill in the values and click the "Save" button to finish creating the row. You'll have to return the newly created row from the `createRecord` method so that the grid can update accordingly.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
   <source src="/static/toolpad/docs/concepts/data-providers/creating.mp4" type="video/mp4">

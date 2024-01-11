@@ -279,6 +279,10 @@ if (import.meta.hot) {
               ? 'virtual:toolpad-files:canvas.tsx'
               : 'virtual:toolpad-files:main.tsx',
           },
+          {
+            find: '@mui/toolpad',
+            replacement: path.resolve(currentDirectory, '../exports'),
+          },
         ],
       },
       server: {
@@ -348,7 +352,7 @@ if (import.meta.hot) {
       },
       appType: 'custom',
       logLevel: 'info',
-      root,
+      root: currentDirectory,
       plugins: [virtualToolpadFiles, react(), toolpadVitePlugin(), ...plugins],
       base,
       define: {

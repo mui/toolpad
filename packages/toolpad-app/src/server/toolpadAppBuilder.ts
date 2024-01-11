@@ -54,9 +54,10 @@ function toolpadVitePlugin(): Plugin {
       for (const moduleName of DEFAULT_MODULES) {
         if (id === moduleName || id.startsWith(`${moduleName}/`)) {
           // eslint-disable-next-line no-await-in-loop
-          const userMod = await this.resolve(id, parent);
-          // eslint-disable-next-line no-await-in-loop
-          const fallbackMod = await this.resolve(id, currentDirectory);
+          const [userMod, fallbackMod] = await Promise.all([
+            this.resolve(id, parent),
+            this.resolve(id, currentDirectory),
+          ]);
           return userMod || fallbackMod;
         }
       }

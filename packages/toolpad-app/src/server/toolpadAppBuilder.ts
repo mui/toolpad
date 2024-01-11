@@ -290,7 +290,9 @@ if (import.meta.hot) {
           allow: [root, path.resolve(currentDirectory, '../../../../')],
         },
       },
-      optimizeDeps: {},
+      optimizeDeps: {
+        entries: [MAIN_ENTRY],
+      },
       appType: 'custom',
       logLevel: 'info',
       root: currentDirectory,

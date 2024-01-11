@@ -118,7 +118,6 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   const packageJson: PackageJson = {
     name: path.basename(absolutePath),
     version: '0.1.0',
-    private: true,
     scripts: {
       dev: 'toolpad dev',
       build: 'toolpad build',

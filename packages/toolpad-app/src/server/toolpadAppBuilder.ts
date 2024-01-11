@@ -13,6 +13,12 @@ import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
+const DEFAULT_MODULES = [
+  '@mui/material',
+  '@mui/icons-material',
+  '@mui/x-data-grid',
+  '@mui/x-charts',
+];
 
 export function getHtmlContent() {
   return `
@@ -41,9 +47,18 @@ function toolpadVitePlugin(): Plugin {
   return {
     name: 'toolpad',
 
-    async resolveId(id) {
+    async resolveId(id, parent) {
       if (id.endsWith('.html')) {
         return id;
+      }
+      for (const moduleName of DEFAULT_MODULES) {
+        if (id === moduleName || id.startsWith(`${moduleName}/`)) {
+          // eslint-disable-next-line no-await-in-loop
+          const userMod = await this.resolve(id, parent);
+          // eslint-disable-next-line no-await-in-loop
+          const fallbackMod = await this.resolve(id, currentDirectory);
+          return userMod || fallbackMod;
+        }
       }
       return null;
     },
@@ -263,6 +278,7 @@ if (import.meta.hot) {
       },
       envFile: false,
       resolve: {
+        dedupe: DEFAULT_MODULES,
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
@@ -292,6 +308,7 @@ if (import.meta.hot) {
       },
       optimizeDeps: {
         entries: [MAIN_ENTRY],
+        include: DEFAULT_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
       },
       appType: 'custom',
       logLevel: 'info',

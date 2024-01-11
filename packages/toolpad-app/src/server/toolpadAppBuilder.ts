@@ -51,15 +51,15 @@ function toolpadVitePlugin(): Plugin {
       if (id.endsWith('.html')) {
         return id;
       }
-      for (const moduleName of DEFAULT_MODULES) {
-        if (id === moduleName || id.startsWith(`${moduleName}/`)) {
-          // eslint-disable-next-line no-await-in-loop
-          const [userMod, fallbackMod] = await Promise.all([
-            this.resolve(id, parent),
-            this.resolve(id, currentDirectory),
-          ]);
-          return userMod || fallbackMod;
-        }
+      const hasFallback = DEFAULT_MODULES.some(
+        (moduleName) => moduleName === id || id.startsWith(`${moduleName}/`),
+      );
+      if (hasFallback) {
+        const [userMod, fallbackMod] = await Promise.all([
+          this.resolve(id, parent),
+          this.resolve(id, currentDirectory),
+        ]);
+        return userMod || fallbackMod;
       }
       return null;
     },

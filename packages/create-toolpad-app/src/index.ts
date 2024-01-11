@@ -187,7 +187,7 @@ const run = async () => {
     })
     .option('install', {
       type: 'boolean',
-      describe: 'Where to install dependencies',
+      describe: 'Install dependencies',
       default: true,
     })
     .option('example', {

@@ -3,7 +3,6 @@ import * as url from 'node:url';
 import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
-import { createRequire } from 'module';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import * as appDom from '../appDom';
@@ -12,7 +11,6 @@ import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtu
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
-const require = createRequire(import.meta.url);
 
 const MAIN_ENTRY = '/main.tsx';
 
@@ -242,23 +240,6 @@ if (import.meta.hot) {
 
   const virtualToolpadFiles = viteVirtualPlugin(virtualFiles, 'toolpad-files');
 
-  const provideDefaultModule = (id: string) => {
-    try {
-      require.resolve(id, {
-        paths: [root],
-      });
-      // No need to provide default module, the user has this installed
-      return [];
-    } catch (err: any) {
-      if (err.code !== 'MODULE_NOT_FOUND') {
-        throw err;
-      }
-      // eslint-disable-next-line no-console
-      console.log(`Unable to resolve "${id}" in the user project, providing a default`);
-      return [{ find: id, replacement: require.resolve(id) }];
-    }
-  };
-
   return {
     reloadComponents: async () => {
       const newFiles = new Map(virtualFiles);
@@ -302,7 +283,6 @@ if (import.meta.hot) {
             find: '@mui/toolpad',
             replacement: path.resolve(currentDirectory, '../exports'),
           },
-          ...provideDefaultModule('@mui/material'),
         ],
       },
       server: {

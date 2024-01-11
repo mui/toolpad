@@ -548,8 +548,8 @@ export interface ToolpadDataProviderBase<
   paginationMode?: P;
   getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
   deleteRecord?: (id: string | number) => Promise<void>;
-  updateRecord?: (id: string | number, record: Partial<R>) => Promise<void>;
-  createRecord?: (record: R) => Promise<void>;
+  updateRecord?: (id: string | number, record: Partial<R>) => Promise<R | void>;
+  createRecord?: (record: R) => Promise<R>;
 }
 
 export type NodeHashes = Record<NodeId, number | undefined>;

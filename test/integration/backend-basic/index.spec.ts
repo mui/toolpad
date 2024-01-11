@@ -9,8 +9,7 @@ import { waitForMatch } from '../../utils/streams';
 import { expectBasicRuntimeTests } from './shared';
 import { setPageHidden } from '../../utils/page';
 import { withTemporaryEdits } from '../../utils/fs';
-import clickCenter from '../../utils/clickCenter';
-import { cellLocator } from '../../utils/locators';
+import { clickCenter, cellLocator } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -275,6 +274,10 @@ test('data providers crud', async ({ page }) => {
 
   await grid.getByRole('button', { name: 'Delete row with id "5"', exact: true }).click();
 
+  await expect(
+    editorModel.appCanvas.getByText('Record deleted successfully', { exact: true }),
+  ).toBeVisible();
+
   await expect(grid.getByText('Index item 5')).not.toBeVisible();
 
   await grid.getByRole('button', { name: 'Edit row with id "7"', exact: true }).click();
@@ -291,10 +294,34 @@ test('data providers crud', async ({ page }) => {
 
   await grid.getByRole('button', { name: 'Save updates to row with id "7"', exact: true }).click();
 
+  await expect(
+    editorModel.appCanvas.getByText('Record updated successfully', { exact: true }),
+  ).toBeVisible();
+
   await expect(cellLocator(grid, 8, 1)).toHaveText('edited');
 
   await expect(grid.getByRole('button', { name: 'Cancel updates', exact: true })).not.toBeVisible();
   await expect(
     grid.getByRole('button', { name: 'Save updates to row with id "7"', exact: true }),
   ).not.toBeVisible();
+
+  await grid.getByRole('button', { name: 'Add record', exact: true }).click();
+
+  await cellLocator(grid, 2, 1).getByRole('textbox').fill('created');
+
+  await grid.getByRole('button', { name: 'Save updates to new row', exact: true }).click();
+
+  await expect(
+    editorModel.appCanvas.getByText('New record created successfully', { exact: true }),
+  ).toBeVisible();
+
+  await editorModel.appCanvas.getByRole('link', { name: 'Go to new record' }).click();
+
+  await expect(cellLocator(grid, 102, 1)).toHaveText('created');
+
+  await grid.getByRole('button', { name: 'Add record', exact: true }).click();
+
+  await page.keyboard.press('Escape');
+
+  await expect(cellLocator(grid, 2, 1)).toHaveText('Index item 0');
 });

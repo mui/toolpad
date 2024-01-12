@@ -890,6 +890,10 @@ function useDataProviderDataGridProps(
     return rowData;
   }, [data?.records, draftRow]);
 
+  if (!dataProviderId) {
+    return {};
+  }
+
   if (dataProviderLoadError) {
     return {
       rowLoadingError: dataProviderLoadError,

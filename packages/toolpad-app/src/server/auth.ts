@@ -97,24 +97,20 @@ export function createAuthHandler(project: ToolpadProject): Router {
     secret: process.env.TOOLPAD_AUTH_SECRET,
     trustHost: true,
     callbacks: {
-      async signIn({ account, profile }) {
+      async signIn({ profile }) {
         const dom = await project.loadDom();
         const app = appDom.getApp(dom);
 
         const restrictedDomains = app.attributes.authentication?.restrictedDomains ?? [];
 
-        if (account?.provider === 'github' || account?.provider === 'google') {
-          return Boolean(
-            profile?.email_verified &&
-              profile?.email &&
-              (restrictedDomains.length === 0 ||
-                restrictedDomains.some(
-                  (restrictedDomain) => profile.email!.endsWith(`@${restrictedDomain}`) ?? false,
-                )),
-          );
-        }
-
-        return true;
+        return Boolean(
+          profile?.email_verified &&
+            profile?.email &&
+            (restrictedDomains.length === 0 ||
+              restrictedDomains.some(
+                (restrictedDomain) => profile.email!.endsWith(`@${restrictedDomain}`) ?? false,
+              )),
+        );
       },
       async redirect({ baseUrl }) {
         return `${baseUrl}${base}`;

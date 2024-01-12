@@ -10,62 +10,81 @@ import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
 import * as appDom from '../appDom';
 
-const githubProvider = GithubProvider({
-  clientId: process.env.TOOLPAD_GITHUB_ID,
-  clientSecret: process.env.TOOLPAD_GITHUB_SECRET,
-  userinfo: {
-    url: 'https://api.github.com/user',
-    async request({
-      tokens,
-      provider,
-    }: {
-      tokens: TokenSet;
-      provider: OAuthConfig<GitHubProfile>;
-    }) {
-      const headers = {
-        Authorization: `Bearer ${tokens.access_token}`,
-        'User-Agent': 'authjs',
-      };
-
-      const profile = await fetch(provider.userinfo?.url as URL, {
-        headers,
-      }).then(async (githubRes) => githubRes.json());
-
-      if (!profile.email) {
-        // If the user does not have a public email, get another via the GitHub API
-        // See https://docs.github.com/en/rest/users/emails#list-public-email-addresses-for-the-authenticated-user
-        const githubRes = await fetch('https://api.github.com/user/emails', {
-          headers,
-        });
-
-        if (githubRes.ok) {
-          const emails: GitHubEmail[] = await githubRes.json();
-          profile.email = (emails.find((e) => e.primary) ?? emails[0]).email;
-          profile.verifiedEmails = emails.filter((e) => e.verified).map((e) => e.email);
-        }
-      }
-
-      return profile;
-    },
-  },
-});
-
-const googleProvider = GoogleProvider({
-  clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
-  clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
-  authorization: {
-    params: {
-      prompt: 'consent',
-      access_type: 'offline',
-      response_type: 'code',
-    },
-  },
-});
-
 export function createAuthHandler(project: ToolpadProject): Router {
   const { base } = project.options;
 
   const router = express.Router();
+
+  const githubProvider = GithubProvider({
+    clientId: process.env.TOOLPAD_GITHUB_CLIENT_ID,
+    clientSecret: process.env.TOOLPAD_GITHUB_CLIENT_SECRET,
+    userinfo: {
+      url: 'https://api.github.com/user',
+      async request({
+        tokens,
+        provider,
+      }: {
+        tokens: TokenSet;
+        provider: OAuthConfig<GitHubProfile>;
+      }) {
+        const dom = await project.loadDom();
+        const app = appDom.getApp(dom);
+
+        const restrictedDomains = app.attributes.authentication?.restrictedDomains ?? [];
+
+        const headers = {
+          Authorization: `Bearer ${tokens.access_token}`,
+          'User-Agent': 'authjs',
+        };
+
+        const profile = await fetch(provider.userinfo?.url as URL, {
+          headers,
+        }).then(async (githubRes) => githubRes.json());
+
+        if (!profile.email) {
+          // If the user does not have a public email, get another via the GitHub API
+          // See https://docs.github.com/en/rest/users/emails#list-public-email-addresses-for-the-authenticated-user
+          const githubRes = await fetch('https://api.github.com/user/emails', {
+            headers,
+          });
+
+          if (githubRes.ok) {
+            const githubEmails: GitHubEmail[] = await githubRes.json();
+
+            const activeEmail =
+              (restrictedDomains.length > 0
+                ? githubEmails.find(
+                    (githubEmail) =>
+                      githubEmail.verified &&
+                      restrictedDomains.some((restrictedDomain) =>
+                        githubEmail.email.endsWith(`@${restrictedDomain}`),
+                      ),
+                  )
+                : null) ??
+              githubEmails.find((githubEmail) => githubEmail.primary) ??
+              githubEmails[0];
+
+            profile.email = activeEmail.email;
+            profile.email_verified = activeEmail.verified;
+          }
+        }
+
+        return profile;
+      },
+    },
+  });
+
+  const googleProvider = GoogleProvider({
+    clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
+    clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
+    authorization: {
+      params: {
+        prompt: 'consent',
+        access_type: 'offline',
+        response_type: 'code',
+      },
+    },
+  });
 
   const authConfig: AuthConfig = {
     pages: {
@@ -84,20 +103,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
         const restrictedDomains = app.attributes.authentication?.restrictedDomains ?? [];
 
-        if (account?.provider === 'github') {
-          return Boolean(
-            profile?.verifiedEmails &&
-              profile.verifiedEmails.length > 0 &&
-              (restrictedDomains.length === 0 ||
-                restrictedDomains.some((restrictedDomain) =>
-                  profile.verifiedEmails!.some((verifiedEmail) =>
-                    verifiedEmail.endsWith(`@${restrictedDomain}`),
-                  ),
-                )),
-          );
-        }
-
-        if (account?.provider === 'google') {
+        if (account?.provider === 'google' || account?.provider === 'github') {
           return Boolean(
             profile?.email_verified &&
               profile?.email &&

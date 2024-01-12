@@ -65,13 +65,13 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
     });
     const { csrfToken } = await csrfResponse.json();
 
-    return csrfToken;
+    return csrfToken ?? '';
   }, [basename]);
 
   const signOut = React.useCallback(async () => {
     setIsSigningOut(true);
 
-    let csrfToken;
+    let csrfToken = '';
     try {
       csrfToken = await getCsrfToken();
     } catch (error) {

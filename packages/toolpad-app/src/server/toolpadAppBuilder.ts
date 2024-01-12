@@ -13,13 +13,10 @@ import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
-
-const DEFAULT_MODULES = [
+const FALLBACK_MODULES = [
   '@mui/material',
-  '@mui/x-data-grid',
-  '@mui/x-data-grid-pro',
-  '@mui/lab',
   '@mui/icons-material',
+  '@mui/x-data-grid',
   '@mui/x-charts',
 ];
 
@@ -54,14 +51,15 @@ function toolpadVitePlugin(): Plugin {
       if (id.endsWith('.html')) {
         return id;
       }
-      for (const mod of DEFAULT_MODULES) {
-        if (id === mod || id.startsWith(`${mod}/`)) {
-          // eslint-disable-next-line no-await-in-loop
-          const userMod = await this.resolve(id, parent);
-          // eslint-disable-next-line no-await-in-loop
-          const fallbackMod = await this.resolve(id, currentDirectory);
-          return userMod || fallbackMod;
-        }
+      const hasFallback = FALLBACK_MODULES.some(
+        (moduleName) => moduleName === id || id.startsWith(`${moduleName}/`),
+      );
+      if (hasFallback) {
+        const [userMod, fallbackMod] = await Promise.all([
+          this.resolve(id, parent),
+          this.resolve(id, currentDirectory),
+        ]);
+        return userMod || fallbackMod;
       }
       return null;
     },
@@ -281,7 +279,7 @@ if (import.meta.hot) {
       },
       envFile: false,
       resolve: {
-        dedupe: DEFAULT_MODULES,
+        dedupe: FALLBACK_MODULES,
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
@@ -310,7 +308,8 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
-        entries: [MAIN_ENTRY, ...DEFAULT_MODULES.map((mod) => `@mui/toolpad > ${mod}`)],
+        entries: [MAIN_ENTRY],
+        include: FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
       },
       appType: 'custom',
       logLevel: 'info',

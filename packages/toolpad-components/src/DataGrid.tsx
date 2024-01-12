@@ -626,7 +626,11 @@ function useDataProviderDataGridProps(
   setActionResult: (result: ActionResult) => void,
 ): DataProviderDataGridProps {
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
-  const { dataProvider } = useDataProvider(dataProviderId || null);
+  const {
+    dataProvider,
+    error: dataProviderLoadError,
+    isLoading: dataProviderLoading,
+  } = useDataProvider(dataProviderId || null);
 
   const [rawPaginationModel, setRawPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
@@ -886,9 +890,23 @@ function useDataProviderDataGridProps(
     return rowData;
   }, [data?.records, draftRow]);
 
-  if (!dataProvider) {
+  if (!dataProviderId) {
     return {};
   }
+
+  if (dataProviderLoadError) {
+    return {
+      rowLoadingError: dataProviderLoadError,
+    };
+  }
+
+  if (dataProviderLoading) {
+    return {
+      loading: true,
+    };
+  }
+
+  invariant(dataProvider, "dataProvider must be defined if it's loaded without error");
 
   return {
     loading: isLoading || (isPlaceholderData && isFetching),

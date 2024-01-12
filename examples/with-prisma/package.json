@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "prisma generate && toolpad dev",
-    "build": "prisma generate && toolpad build",
+    "dev": "toolpad dev",
+    "build": "toolpad build",
     "start": "toolpad start",
     "prisma": "prisma"
   },

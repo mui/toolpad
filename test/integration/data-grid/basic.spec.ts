@@ -2,8 +2,7 @@ import * as path from 'path';
 import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/localTest';
-import clickCenter from '../../utils/clickCenter';
-import { cellLocator } from '../../utils/locators';
+import { clickCenter, cellLocator } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 

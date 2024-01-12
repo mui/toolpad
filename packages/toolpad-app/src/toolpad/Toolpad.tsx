@@ -105,7 +105,9 @@ function EditorShell({ children }: EditorShellProps) {
     <ToolpadShell
       navigation={
         FEATURE_FLAG_AUTHORIZATION ? (
-          <Button onClick={handleAuthorizationDialogOpen}>Authorization</Button>
+          <Stack sx={{ ml: 3 }}>
+            <Button onClick={handleAuthorizationDialogOpen}>Authorization</Button>
+          </Stack>
         ) : null
       }
       actions={

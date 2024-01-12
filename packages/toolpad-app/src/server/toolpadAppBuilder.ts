@@ -13,7 +13,7 @@ import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
-const DEFAULT_MODULES = [
+const FALLBACK_MODULES = [
   '@mui/material',
   '@mui/icons-material',
   '@mui/x-data-grid',
@@ -51,7 +51,7 @@ function toolpadVitePlugin(): Plugin {
       if (id.endsWith('.html')) {
         return id;
       }
-      const hasFallback = DEFAULT_MODULES.some(
+      const hasFallback = FALLBACK_MODULES.some(
         (moduleName) => moduleName === id || id.startsWith(`${moduleName}/`),
       );
       if (hasFallback) {
@@ -279,7 +279,7 @@ if (import.meta.hot) {
       },
       envFile: false,
       resolve: {
-        dedupe: DEFAULT_MODULES,
+        dedupe: FALLBACK_MODULES,
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
@@ -309,7 +309,7 @@ if (import.meta.hot) {
       },
       optimizeDeps: {
         entries: [MAIN_ENTRY],
-        include: DEFAULT_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
+        include: FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
       },
       appType: 'custom',
       logLevel: 'info',

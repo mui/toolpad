@@ -103,7 +103,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
         const restrictedDomains = app.attributes.authentication?.restrictedDomains ?? [];
 
-        if (account?.provider === 'google' || account?.provider === 'github') {
+        if (account?.provider === 'github' || account?.provider === 'google') {
           return Boolean(
             profile?.email_verified &&
               profile?.email &&

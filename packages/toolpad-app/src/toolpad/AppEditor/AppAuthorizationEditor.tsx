@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   Alert,
+  Box,
   Button,
   Checkbox,
   Dialog,
@@ -14,7 +15,10 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Snackbar,
   Stack,
+  Tab,
+  TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -31,21 +35,144 @@ import {
 } from '@mui/x-data-grid';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
+import { TabContext, TabList } from '@mui/lab';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
+import TabPanel from '../../components/TabPanel';
 import { AuthProviderConfig, AuthProvider } from '../../types';
+import { updateArray } from '../../utils/immutability';
 
 const AUTH_PROVIDERS = new Map([
   ['github', { name: 'GitHub', Icon: GitHubIcon }],
   ['google', { name: 'Google', Icon: GoogleIcon }],
 ]);
 
-interface EditToolbarProps {
+export function AppAuthenticationEditor() {
+  const { dom } = useAppState();
+  const appState = useAppStateApi();
+
+  const handleAuthProvidersChange = React.useCallback(
+    (event: SelectChangeEvent<AuthProvider[]>) => {
+      const {
+        target: { value: providers },
+      } = event;
+
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
+          ...app.attributes?.authentication,
+          providers: (typeof providers === 'string' ? providers.split(',') : providers).map(
+            (provider) => ({ provider } as AuthProviderConfig),
+          ),
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const handleRestrictedDomainsChange = React.useCallback(
+    (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      const {
+        target: { value: domain },
+      } = event;
+
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
+          ...app.attributes?.authentication,
+          restrictedDomains: updateArray(
+            app.attributes?.authentication?.restrictedDomains ?? [],
+            domain,
+            index,
+          ).filter((restrictedDomain) => restrictedDomain !== ''),
+        });
+
+        return draft;
+      });
+    },
+    [appState],
+  );
+
+  const appNode = appDom.getApp(dom);
+  const { authentication } = appNode.attributes;
+
+  const authProviders = React.useMemo(
+    () => authentication?.providers ?? [],
+    [authentication?.providers],
+  ).map((providerConfig) => providerConfig.provider);
+
+  const restrictedDomains = authentication?.restrictedDomains ?? [];
+
+  return (
+    <Stack direction="column">
+      <Typography variant="subtitle1" mb={1}>
+        Providers
+      </Typography>
+      <FormControl>
+        <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
+        <Select<AuthProvider[]>
+          labelId="auth-providers-label"
+          label="Authentication providers"
+          id="auth-providers"
+          multiple
+          value={authProviders}
+          onChange={handleAuthProvidersChange}
+          fullWidth
+          renderValue={(selected) =>
+            selected
+              .map((selectedValue) => AUTH_PROVIDERS.get(selectedValue)?.name ?? '')
+              .join(', ')
+          }
+        >
+          {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
+            <MenuItem key={value} value={value}>
+              <Stack direction="row" alignItems="center">
+                <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
+                <Icon fontSize="small" />
+                <Typography ml={1}>{name}</Typography>
+              </Stack>
+            </MenuItem>
+          ))}
+        </Select>
+        <FormHelperText id="auth-providers-helper-text">
+          If set, only authenticated users can use the app.
+        </FormHelperText>
+      </FormControl>
+      <Alert severity="info" sx={{ mt: 1 }}>
+        Certain environment variables must be set for authentication providers to work.{' '}
+        <Link href="/" target="_blank">
+          Learn how to set up authentication
+        </Link>
+        .
+      </Alert>
+      <Typography variant="subtitle1" mt={2}>
+        Required email domains
+      </Typography>
+      <Typography variant="body2" mt={1}>
+        If set, authenticated user emails must be in one of the domains below.
+      </Typography>
+      {[...restrictedDomains, ''].map((domain, index) => (
+        <TextField
+          key={index}
+          value={domain}
+          onChange={handleRestrictedDomainsChange(index)}
+          placeholder="example.com"
+        />
+      ))}
+    </Stack>
+  );
+}
+
+interface RolesToolbarProps {
   addNewRoleDisabled: boolean;
   onAddNewRole: () => void;
 }
 
-function EditToolbar({ addNewRoleDisabled, onAddNewRole }: EditToolbarProps) {
+function RolesToolbar({ addNewRoleDisabled, onAddNewRole }: RolesToolbarProps) {
   return (
     <GridToolbarContainer>
       <Button
@@ -71,7 +198,7 @@ interface RoleRow extends Role {
   isNew?: boolean;
 }
 
-export default function AppAuthorizationEditor() {
+export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error: Error) => void }) {
   const { dom } = useAppState();
   const appState = useAppStateApi();
 
@@ -158,6 +285,7 @@ export default function AppAuthorizationEditor() {
         field: 'name',
         headerName: 'Name',
         editable: true,
+        flex: 0.4,
       },
       {
         field: 'description',
@@ -260,7 +388,7 @@ export default function AppAuthorizationEditor() {
   };
 
   const handleAddNewRole = React.useCallback(() => {
-    const draftRowId = `<draf_row>-${Math.random()}`;
+    const draftRowId = `<draft_row>-${Math.random()}`;
     setDraftRow({ id: draftRowId, name: '', description: '', pages: [], isNew: true });
     setRowModesModel((oldModel) => ({
       ...oldModel,
@@ -287,7 +415,7 @@ export default function AppAuthorizationEditor() {
         rowModesModel={rowModesModel}
         onRowModesModelChange={handleRowModesModelChange}
         processRowUpdate={processRowUpdate}
-        // onProcessRowUpdateError={(error) => console.log(error)}
+        onProcessRowUpdateError={onRowUpdateError}
         isCellEditable={(params) => {
           if (params.field === 'name') {
             return !!params.row.isNew;
@@ -295,7 +423,7 @@ export default function AppAuthorizationEditor() {
           return true;
         }}
         slots={{
-          toolbar: EditToolbar,
+          toolbar: RolesToolbar,
         }}
         slotProps={{
           toolbar: {
@@ -308,112 +436,74 @@ export default function AppAuthorizationEditor() {
     </div>
   );
 }
-
-export function AppAuthenticationEditor() {
-  const { dom } = useAppState();
-  const appState = useAppStateApi();
-
-  const handleAuthProvidersChange = React.useCallback(
-    (event: SelectChangeEvent<AuthProvider[]>) => {
-      const {
-        target: { value: providers },
-      } = event;
-
-      appState.update((draft) => {
-        const app = appDom.getApp(draft);
-
-        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
-          ...app.attributes?.authentication,
-          providers: (typeof providers === 'string' ? providers.split(',') : providers).map(
-            (provider) => ({ provider } as AuthProviderConfig),
-          ),
-        });
-
-        return draft;
-      });
-    },
-    [appState],
-  );
-
-  const appNode = appDom.getApp(dom);
-  const { authentication } = appNode.attributes;
-
-  const authProviders = React.useMemo(
-    () => authentication?.providers ?? [],
-    [authentication?.providers],
-  ).map((providerConfig) => providerConfig.provider);
-
-  return (
-    <Stack direction="column">
-      <FormControl>
-        <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
-        <Select<AuthProvider[]>
-          labelId="auth-providers-label"
-          label="Authentication providers"
-          id="auth-providers"
-          multiple
-          value={authProviders}
-          onChange={handleAuthProvidersChange}
-          fullWidth
-          renderValue={(selected) =>
-            selected
-              .map((selectedValue) => AUTH_PROVIDERS.get(selectedValue)?.name ?? '')
-              .join(', ')
-          }
-        >
-          {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
-            <MenuItem key={value} value={value}>
-              <Stack direction="row" alignItems="center">
-                <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
-                <Icon fontSize="small" />
-                <Typography ml={1}>{name}</Typography>
-              </Stack>
-            </MenuItem>
-          ))}
-        </Select>
-        <FormHelperText id="auth-providers-helper-text">
-          If set, only authenticated users can use the app.
-        </FormHelperText>
-      </FormControl>
-      <Alert severity="info" sx={{ mt: 1 }}>
-        Certain environment variables must be set for authentication providers to work.{' '}
-        <Link href="/" target="_blank">
-          Learn how to set up authentication
-        </Link>
-        .
-      </Alert>
-    </Stack>
-  );
-}
-
 export interface AppAuthorizationDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
-export function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialogProps) {
+export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialogProps) {
+  const [activeTab, setActiveTab] = React.useState<'authentication' | 'roles' | 'users'>(
+    'authentication',
+  );
+
+  const handleActiveTabChange = React.useCallback((event: React.SyntheticEvent, newTab: string) => {
+    setActiveTab(newTab as 'authentication' | 'roles' | 'users');
+  }, []);
+
+  const [errorSnackbarMessage, setErrorSnackbarMessage] = React.useState<string>('');
+
+  const handleRowUpdateError = React.useCallback((error: Error) => {
+    setErrorSnackbarMessage(error.message);
+  }, []);
+
+  const handleErrorSnackbarClose = React.useCallback(() => {
+    setErrorSnackbarMessage('');
+  }, []);
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Authorization</DialogTitle>
-      <DialogContent>
-        <Typography variant="subtitle1" mb={1}>
-          Authentication
-        </Typography>
-        <AppAuthenticationEditor />
-        <Typography variant="subtitle1" mt={1} mb={1}>
-          Roles
-        </Typography>
-        <Typography variant="body2">
-          Define the roles for your application. You can configure your pages to be accessible to
-          specific roles only.
-        </Typography>
-        <AppAuthorizationEditor />
-      </DialogContent>
-      <DialogActions>
-        <Button color="inherit" variant="text" onClick={onClose}>
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <React.Fragment>
+      <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+        <DialogTitle>Authorization</DialogTitle>
+        <TabContext value={activeTab}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+            <TabList
+              onChange={handleActiveTabChange}
+              aria-label="Authorization configuration options"
+            >
+              <Tab label="Authentication" value="authentication" sx={{ px: 2 }} />
+              <Tab label="Roles" value="roles" sx={{ px: 2 }} />
+            </TabList>
+          </Box>
+          <DialogContent sx={{ minHeight: 460 }}>
+            <TabPanel disableGutters value="authentication">
+              <AppAuthenticationEditor />
+            </TabPanel>
+            <TabPanel disableGutters value="roles">
+              <Typography variant="body2">
+                Define the roles for your application. You can configure your pages to be accessible
+                to specific roles only.
+              </Typography>
+              <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
+            </TabPanel>
+          </DialogContent>
+        </TabContext>
+        <DialogActions>
+          <Button color="inherit" variant="text" onClick={onClose}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={!!errorSnackbarMessage}
+        autoHideDuration={6000}
+        onClose={handleErrorSnackbarClose}
+      >
+        {errorSnackbarMessage ? (
+          <Alert onClose={handleErrorSnackbarClose} severity="error">
+            {errorSnackbarMessage}
+          </Alert>
+        ) : undefined}
+      </Snackbar>
+    </React.Fragment>
   );
 }

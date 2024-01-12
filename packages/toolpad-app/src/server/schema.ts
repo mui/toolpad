@@ -271,6 +271,10 @@ export const applicationSchema = toolpadObjectSchema(
           )
           .optional()
           .describe('Authentication providers to use.'),
+        restrictedDomains: z
+          .array(z.string())
+          .optional()
+          .describe('Valid email patterns for the authenticated user.'),
       })
       .optional()
       .describe('Authentication configuration for this application.'),

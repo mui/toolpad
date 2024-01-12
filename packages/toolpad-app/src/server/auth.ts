@@ -2,6 +2,7 @@ import express, { Router } from 'express';
 import { Auth } from '@auth/core';
 import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
+import AzureADProvider from '@auth/core/providers/azure-ad';
 import { getToken } from '@auth/core/jwt';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
@@ -62,6 +63,12 @@ const googleProvider = GoogleProvider({
   },
 });
 
+const azureADProvider = AzureADProvider({
+  clientId: process.env.TOOLPAD_AZURE_AD_CLIENT_ID,
+  clientSecret: process.env.TOOLPAD_AZURE_AD_CLIENT_SECRET,
+  tenantId: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
+});
+
 export function createAuthHandler(project: ToolpadProject): Router {
   const { base } = project.options;
 
@@ -74,7 +81,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
       error: `${base}/signin`, // Error code passed in query string as ?error=
       verifyRequest: base,
     },
-    providers: [githubProvider, googleProvider],
+    providers: [githubProvider, googleProvider, azureADProvider],
     secret: process.env.TOOLPAD_AUTH_SECRET,
     trustHost: true,
     callbacks: {
@@ -108,10 +115,39 @@ export function createAuthHandler(project: ToolpadProject): Router {
           );
         }
 
+        if (account?.provider === 'azure-ad') {
+          return Boolean(
+            profile?.email &&
+              (restrictedDomains.length === 0 ||
+                restrictedDomains.some(
+                  (restrictedDomain) => profile.email!.endsWith(`@${restrictedDomain}`) ?? false,
+                )),
+          );
+        }
+
         return true;
       },
       async redirect({ baseUrl }) {
         return `${baseUrl}${base}`;
+      },
+      jwt({ token, account }) {
+        if (account?.provider === 'azure-ad' && account.id_token) {
+          const [, payload] = account.id_token.split('.');
+          const idToken = JSON.parse(Buffer.from(payload, 'base64').toString('utf8'));
+
+          token.roles = idToken.roles ?? [];
+        }
+        return token;
+      },
+      // @TODO: Types for session callback are broken as it says token does not exist but it does
+      // Github issue: https://github.com/nextauthjs/next-auth/issues/9437
+      // @ts-ignore
+      session({ session, token }) {
+        if (session.user) {
+          session.user.roles = token.roles ?? [];
+        }
+
+        return session;
       },
     },
   };

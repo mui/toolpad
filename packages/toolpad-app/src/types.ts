@@ -213,7 +213,7 @@ export interface ToolpadProjectOptions {
 
 export type CodeEditorFileType = 'resource' | 'component';
 
-export type AuthProvider = 'github' | 'google';
+export type AuthProvider = 'github' | 'google' | 'azure-ad';
 
 export interface AuthProviderConfig {
   provider: AuthProvider;

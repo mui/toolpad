@@ -19,8 +19,10 @@ import {
   Stack,
   Tab,
   TextField,
+  Theme,
   Tooltip,
   Typography,
+  useTheme,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -41,15 +43,27 @@ import * as appDom from '../../appDom';
 import TabPanel from '../../components/TabPanel';
 import { AuthProviderConfig, AuthProvider } from '../../types';
 import { updateArray } from '../../utils/immutability';
+import AzureIcon from '../../components/icons/AzureIcon';
 
-const AUTH_PROVIDERS = new Map([
-  ['github', { name: 'GitHub', Icon: GitHubIcon }],
-  ['google', { name: 'Google', Icon: GoogleIcon }],
-]);
+function getAuthProviderOptions(theme: Theme) {
+  return new Map([
+    ['github', { name: 'GitHub', Icon: GitHubIcon }],
+    ['google', { name: 'Google', Icon: GoogleIcon }],
+    [
+      'azure-ad',
+      {
+        name: 'Azure AD',
+        Icon: () => <AzureIcon color={theme.palette.primary.main} />,
+      },
+    ],
+  ]);
+}
 
 export function AppAuthenticationEditor() {
   const { dom } = useAppState();
   const appState = useAppStateApi();
+
+  const theme = useTheme();
 
   const handleAuthProvidersChange = React.useCallback(
     (event: SelectChangeEvent<AuthProvider[]>) => {
@@ -107,6 +121,8 @@ export function AppAuthenticationEditor() {
 
   const restrictedDomains = authentication?.restrictedDomains ?? [];
 
+  const authProviderOptions = React.useMemo(() => getAuthProviderOptions(theme), [theme]);
+
   return (
     <Stack direction="column">
       <Typography variant="subtitle1" mb={1}>
@@ -124,11 +140,11 @@ export function AppAuthenticationEditor() {
           fullWidth
           renderValue={(selected) =>
             selected
-              .map((selectedValue) => AUTH_PROVIDERS.get(selectedValue)?.name ?? '')
+              .map((selectedValue) => authProviderOptions.get(selectedValue)?.name ?? '')
               .join(', ')
           }
         >
-          {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
+          {[...authProviderOptions].map(([value, { name, Icon }]) => (
             <MenuItem key={value} value={value}>
               <Stack direction="row" alignItems="center">
                 <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />

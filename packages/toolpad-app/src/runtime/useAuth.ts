@@ -8,7 +8,7 @@ export const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
 export const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
 export const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
-export type AuthProvider = 'github' | 'google';
+export type AuthProvider = 'github' | 'google' | 'azure-ad';
 
 export interface AuthSession {
   user: {

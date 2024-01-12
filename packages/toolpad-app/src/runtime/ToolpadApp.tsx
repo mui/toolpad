@@ -1504,7 +1504,8 @@ function RenderedPages({ pages, hasAuthentication = false, basename }: RenderedP
         if (!IS_RENDERED_IN_CANVAS && hasAuthentication) {
           pageContent = (
             <RequireAuthorization
-              allowedRole={page.attributes.authorization?.allowedRoles ?? []}
+              allowAll={page.attributes.authorization?.allowAll ?? true}
+              allowedRoles={page.attributes.authorization?.allowedRoles ?? []}
               basename={basename}
             >
               {pageContent}
@@ -1564,19 +1565,27 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const { hasAuthentication } = React.useContext(AuthContext);
+  const { session, hasAuthentication } = React.useContext(AuthContext);
 
   const pageMatch = useMatch('/pages/:slug');
   const activePageSlug = pageMatch?.params.slug;
 
+  const authFilteredPages = React.useMemo(() => {
+    const userRoles = session?.user?.roles ?? [];
+    return pages.filter((page) => {
+      const { allowAll = true, allowedRoles = [] } = page.attributes.authorization ?? {};
+      return allowAll || userRoles.some((role) => allowedRoles.includes(role));
+    });
+  }, [pages, session?.user?.roles]);
+
   const navEntries = React.useMemo(
     () =>
-      pages.map((page) => ({
+      authFilteredPages.map((page) => ({
         slug: page.name,
         displayName: appDom.getPageDisplayName(page),
         hasShell: page?.attributes.display !== 'standalone',
       })),
-    [pages],
+    [authFilteredPages],
   );
 
   return (
@@ -1586,6 +1595,7 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
       hasNavigation={!IS_RENDERED_IN_CANVAS}
       hasHeader={hasAuthentication && !IS_RENDERED_IN_CANVAS}
       clipped={SHOW_PREVIEW_HEADER}
+      basename={basename}
     >
       <RenderedPages pages={pages} hasAuthentication={hasAuthentication} basename={basename} />
     </AppLayout>

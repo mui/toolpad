@@ -1,17 +1,16 @@
 import * as React from 'react';
 
 interface AzureIconProps {
-  height?: number;
-  width?: number;
+  size?: number;
   color?: string;
 }
 
-export default function AzureIcon({ height = 18, width = 18, color = '#fff' }: AzureIconProps) {
+export default function AzureIcon({ size = 18, color = '#fff' }: AzureIconProps) {
   return (
     <svg
       viewBox="0 0 59.242 47.271"
-      width={width}
-      height={height}
+      width={size}
+      height={size}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path

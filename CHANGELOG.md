@@ -8,7 +8,7 @@ _Jan 12, 2024_
 
 A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
 
-Enable creating rows in data providers. Support pnpm. Improvements to our new query editor.
+Enable creating rows in data providers. Support pnpm as a package manager for installing Toolpad. Improvements to our new query editor.
 
 - &#8203;<!-- 12 -->Make Toolpad apps compatible with pnpm (#3074) @Janpot
 - &#8203;<!-- 11 -->Handle errors during data provider introspection (#3076) @Janpot

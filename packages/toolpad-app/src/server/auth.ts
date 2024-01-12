@@ -157,7 +157,7 @@ export async function createRequireAuthMiddleware(project: ToolpadProject) {
     const isPageRequest = req.get('sec-fetch-dest') === 'document';
     const signInPath = `${base}/signin`;
 
-    let isUnauthorized = false;
+    let isAuthorized = true;
     if (
       (!project.options.dev || isPageRequest) &&
       hasAuthentication &&
@@ -177,11 +177,11 @@ export async function createRequireAuthMiddleware(project: ToolpadProject) {
       }
 
       if (!token) {
-        isUnauthorized = true;
+        isAuthorized = false;
       }
     }
 
-    if (isUnauthorized) {
+    if (!isAuthorized) {
       if (isPageRequest) {
         res.redirect(signInPath);
       } else {

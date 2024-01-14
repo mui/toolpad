@@ -69,6 +69,7 @@ import {
   Collapse,
   Button,
   useEventCallback,
+  Snackbar,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import CloseIcon from '@mui/icons-material/Close';
@@ -982,7 +983,6 @@ interface ActionResultOverlayProps {
 }
 
 function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayProps) {
-  const [hovered, setHovered] = React.useState(false);
   const open = !!result;
   const actionError = result?.error;
 
@@ -1034,36 +1034,24 @@ function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayPro
     }
   }
 
-  const handleClose = useEventCallback(() => {
-    onClose();
-  });
-
-  React.useEffect(() => {
-    if (result && !hovered) {
-      const timeout = setTimeout(handleClose, 2000);
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
-    return () => {};
-  }, [hovered, result, handleClose]);
-
   return (
     <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
-      <Collapse in={!!open}>
-        <Alert
-          severity={lastResult?.error ? 'error' : 'success'}
-          action={
-            <IconButton aria-label="close" color="inherit" size="small" onClick={onClose}>
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }
-          onMouseEnter={() => setHovered(true)}
-          onMouseOut={() => setHovered(false)}
-        >
+      <Snackbar
+        sx={{ position: 'absolute' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={open}
+        autoHideDuration={2000}
+        onClose={onClose}
+        action={
+          <IconButton size="small" aria-label="close" color="inherit" onClick={onClose}>
+            <CloseIcon fontSize="inherit" />
+          </IconButton>
+        }
+      >
+        <Alert severity={lastResult?.error ? 'error' : 'success'} onClose={onClose}>
           {message}
         </Alert>
-      </Collapse>
+      </Snackbar>
     </Box>
   );
 }

@@ -92,6 +92,8 @@ import ErrorOverlay, { ErrorContent } from './components/ErrorOverlay';
 
 const DRAFT_ROW_MARKER = Symbol('draftRow');
 
+const ACTIONS_COLUMN_FIELD = '___actions___';
+
 type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
 const LICENSE_INFO: MuiLicenseInfo = {
@@ -1226,11 +1228,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
     if (getProviderActions) {
       result.push({
-        field: '___actions',
+        field: ACTIONS_COLUMN_FIELD,
         type: 'actions',
-        headerName: '',
-        flex: 1,
         align: 'right',
+        resizable: false,
+        pinnable: false,
         getActions: getProviderActions,
       });
     }
@@ -1274,6 +1276,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 getRowId={getRowId}
                 onRowSelectionModelChange={onSelectionModelChange}
                 rowSelectionModel={selectionModel}
+                initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
                 {...props}
                 {...dataProviderProps}
               />

@@ -521,17 +521,17 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
-"@date-io/core@^2.17.0":
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/@date-io/core/-/core-2.17.0.tgz#360a4d0641f069776ed22e457876e8a8a58c205e"
-  integrity sha512-+EQE8xZhRM/hsY0CDTVyayMDDY5ihc4MqXCrPxooKw19yAzUIC6uUqsZeaOFNL9YKTNxYKrJP5DFgE8o5xRCOw==
+"@date-io/core@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@date-io/core/-/core-3.0.0.tgz#9fd2375383b5791b7211dfce3e576211f9ddce5e"
+  integrity sha512-S3j+IAQVBYNkQzchVVhX40eBkGDreBpScy9RXwTS5j2+k07+62pMVPisQ44Gq76Rqy5AOG/EZXCwBpY/jbemvA==
 
-"@date-io/date-fns-jalali@2.17.0":
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/@date-io/date-fns-jalali/-/date-fns-jalali-2.17.0.tgz#6d693aa56af362a3f8effc78de06bc0ab1d825ac"
-  integrity sha512-KpnYctxafW9lgILD6fE1qsacT3EnNkii9fIDiIAJ+9hXL0GcobQUB3KrTAsEQjMKSMP1WhsvwgJ0JNRdW5Zc8g==
+"@date-io/date-fns-jalali@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@date-io/date-fns-jalali/-/date-fns-jalali-3.0.0.tgz#f1705e5fbef1c935ab8993713588d533e8e2a2c3"
+  integrity sha512-8ZQy7wSelouC4nunewGZhUUhKrqmX5v2GD9cUHYGrCaXHkn5PvBku/z8f42X+y4zASaoxZBrZnogUKbF5JfxyA==
   dependencies:
-    "@date-io/core" "^2.17.0"
+    "@date-io/core" "^3.0.0"
 
 "@discoveryjs/json-ext@0.5.7":
   version "0.5.7"

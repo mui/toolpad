@@ -14,9 +14,9 @@
     "qrcode": "^1.5.3"
   },
   "devDependencies": {
-    "@types/node": "^20.10.6",
+    "@types/node": "^20.11.1",
     "@types/qrcode": "^1.5.5",
-    "prisma": "^5.7.1",
+    "prisma": "^5.8.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }

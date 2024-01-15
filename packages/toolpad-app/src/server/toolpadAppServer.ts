@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { Server } from 'http';

@@ -67,6 +67,7 @@ function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
 }
 
 export interface AppViteServerConfig extends ToolpadAppDevServerParams {
+  toolpadDevMode: boolean;
   port: number;
   mainThreadRpcPort: MessagePort;
 }

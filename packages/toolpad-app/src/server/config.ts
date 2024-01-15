@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 type BasicAuthConfig =
   | {
       basicAuthUser: string;
@@ -19,7 +21,7 @@ export type ServerConfig = {
 
 function readConfig(): ServerConfig {
   if (typeof window !== 'undefined') {
-    throw new Error(`Serverside config can't be loaded on the client side`);
+    throw new Error(`Server-side config can't be loaded on the client side`);
   }
 
   // Whitespace separated, do not use spaces in your keys

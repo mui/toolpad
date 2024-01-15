@@ -205,6 +205,7 @@ export type ProjectEvents = {
 };
 
 export interface ToolpadProjectOptions {
+  toolpadDevMode: boolean;
   dev: boolean;
   externalUrl?: string;
   base: string;

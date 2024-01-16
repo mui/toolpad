@@ -30,6 +30,12 @@ export default defineConfig((options) => [
     format: ['esm'],
     outDir: 'dist/cli',
     silent: true,
+    // Code splitting in esbuild is buggy. It doesn't preserve order of imports correctly.
+    // It's important that `dotenv/config` remains the first import in the program because it
+    // needs to set up environment variables before anything else is imported.
+    // To fix this, we disable code splitting.
+    // See: https://github.com/evanw/esbuild/issues/399
+    splitting: false,
     clean: !options.watch,
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/cli'))],

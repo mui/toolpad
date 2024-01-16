@@ -65,13 +65,13 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
     });
     const { csrfToken } = await csrfResponse.json();
 
-    return csrfToken;
+    return csrfToken ?? '';
   }, [basename]);
 
   const signOut = React.useCallback(async () => {
     setIsSigningOut(true);
 
-    let csrfToken;
+    let csrfToken = '';
     try {
       csrfToken = await getCsrfToken();
     } catch (error) {
@@ -110,11 +110,16 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
 
   const signIn = React.useCallback(
     async (provider: AuthProvider) => {
+      setIsSigningIn(true);
+
+      let csrfToken = '';
       try {
-        setIsSigningIn(true);
+        csrfToken = await getCsrfToken();
+      } catch (error) {
+        console.error((error as Error).message);
+      }
 
-        const csrfToken = await getCsrfToken();
-
+      try {
         const signInResponse = await fetch(`${basename}${AUTH_SIGNIN_PATH}/${provider}`, {
           method: 'POST',
           headers: {

@@ -165,13 +165,28 @@ You can disable the editing functionality for specific columns by unchecking the
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-editable.png", "alt": "Disable editable", "caption": "Disable editable", "zoom": false, "width": 308 }}
 
-## Row creation 🚧
+## Row creation
 
-:::warning
-This feature isn't implemented yet.
+The data provider can be extended to support creating new rows. To enable this, you have to add a `createRecord` method to the data provider interface. This method will receive an object with all values provided by the user in the creation UI.
 
-👍 Upvote [issue #2888](https://github.com/mui/mui-toolpad/issues/2888) if you want to see it land faster.
-:::
+```tsx
+export default createDataProvider({
+  async getRecords() {
+    return prisma.users.findMany();
+  },
+
+  async createRecord(data) {
+    return prisma.users.create({ data });
+  },
+});
+```
+
+After you make this method available in the data provider, an "Add record" button will appear in the data grid toolbar. Click this button and a new editable row appears at the top of the grid. Fill in the values and click the "Save" button to finish creating the row. You'll have to return the newly created row from the `createRecord` method so that the grid can update accordingly.
+
+<video controls width="auto" height="100%" style="contain" alt="component-library">
+  <source src="/static/toolpad/docs/concepts/data-providers/creating.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Deleting rows
 

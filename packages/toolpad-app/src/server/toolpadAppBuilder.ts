@@ -13,6 +13,12 @@ import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';
+const FALLBACK_MODULES = [
+  '@mui/material',
+  '@mui/icons-material',
+  '@mui/x-data-grid',
+  '@mui/x-charts',
+];
 
 export function getHtmlContent() {
   return `
@@ -41,9 +47,19 @@ function toolpadVitePlugin(): Plugin {
   return {
     name: 'toolpad',
 
-    async resolveId(id) {
+    async resolveId(id, parent) {
       if (id.endsWith('.html')) {
         return id;
+      }
+      const hasFallback = FALLBACK_MODULES.some(
+        (moduleName) => moduleName === id || id.startsWith(`${moduleName}/`),
+      );
+      if (hasFallback) {
+        const [userMod, fallbackMod] = await Promise.all([
+          this.resolve(id, parent),
+          this.resolve(id, currentDirectory),
+        ]);
+        return userMod || fallbackMod;
       }
       return null;
     },
@@ -108,6 +124,7 @@ function toolpadVitePlugin(): Plugin {
 }
 
 export interface CreateViteConfigParams {
+  toolpadDevMode: boolean;
   outDir: string;
   root: string;
   dev: boolean;
@@ -120,6 +137,7 @@ export interface CreateViteConfigParams {
 }
 
 export async function createViteConfig({
+  toolpadDevMode,
   outDir,
   root,
   dev,
@@ -263,6 +281,7 @@ if (import.meta.hot) {
       },
       envFile: false,
       resolve: {
+        dedupe: FALLBACK_MODULES,
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
@@ -279,6 +298,10 @@ if (import.meta.hot) {
               ? 'virtual:toolpad-files:canvas.tsx'
               : 'virtual:toolpad-files:main.tsx',
           },
+          {
+            find: '@mui/toolpad',
+            replacement: path.resolve(currentDirectory, '../exports'),
+          },
         ],
       },
       server: {
@@ -287,70 +310,16 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
+        force: toolpadDevMode ? true : undefined,
         include: [
-          '@emotion/cache',
-          '@emotion/react',
-          '@mui/icons-material',
-          '@mui/icons-material/ArrowDropDownRounded',
-          '@mui/icons-material/Close',
-          '@mui/icons-material/Delete',
-          '@mui/icons-material/DarkMode',
-          '@mui/icons-material/Edit',
-          '@mui/icons-material/Error',
-          '@mui/icons-material/HelpOutlined',
-          '@mui/icons-material/LightMode',
-          '@mui/icons-material/OpenInNew',
-          '@mui/icons-material/SettingsBrightnessOutlined',
-          '@mui/lab',
-          '@mui/material',
-          '@mui/material/CircularProgress',
-          '@mui/material/Button',
-          '@mui/material/colors',
-          '@mui/material/styles',
-          '@mui/material/useMediaQuery',
-          '@mui/utils',
-          '@mui/utils/useEventCallback',
-          '@mui/x-data-grid-pro',
-          '@mui/x-date-pickers/AdapterDayjs',
-          '@mui/x-date-pickers/DesktopDatePicker',
-          '@mui/x-date-pickers/LocalizationProvider',
-          '@mui/x-license-pro',
-          '@tanstack/react-query',
-          '@tanstack/react-query-devtools/build/modern/production.js',
-          'dayjs',
-          'dayjs/locale/en',
-          'dayjs/locale/fr',
-          'dayjs/locale/nl',
-          'fractional-indexing',
-          'invariant',
-          'lodash-es',
-          'markdown-to-jsx',
-          'nanoid/non-secure',
-          'prop-types',
-          'react',
-          'react-dom',
-          'react-dom/client',
-          'react-error-boundary',
-          'react-hook-form',
-          'react-is',
-          'react-router-dom',
-          'react/jsx-dev-runtime',
-          'react/jsx-runtime',
-          'recharts',
-          'superjson',
-          'title',
-          'zod',
-        ],
-        exclude: [
-          '@mui/toolpad-core',
-          '@mui/toolpad/browser',
+          ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
           '@mui/toolpad/runtime',
           '@mui/toolpad/canvas',
         ],
       },
       appType: 'custom',
       logLevel: 'info',
-      root,
+      root: currentDirectory,
       plugins: [virtualToolpadFiles, react(), toolpadVitePlugin(), ...plugins],
       base,
       define: {
@@ -380,6 +349,7 @@ export async function buildApp({
   outDir,
 }: ToolpadBuilderParams) {
   const { viteConfig } = await createViteConfig({
+    toolpadDevMode: false,
     dev: false,
     root,
     base,

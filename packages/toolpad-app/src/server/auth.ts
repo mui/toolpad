@@ -10,69 +10,94 @@ import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
 import * as appDom from '../appDom';
+import { AuthProvider } from '../types';
 
-const githubProvider = GithubProvider({
-  clientId: process.env.TOOLPAD_GITHUB_CLIENT_ID,
-  clientSecret: process.env.TOOLPAD_GITHUB_CLIENT_SECRET,
-  userinfo: {
-    url: 'https://api.github.com/user',
-    async request({
-      tokens,
-      provider,
-    }: {
-      tokens: TokenSet;
-      provider: OAuthConfig<GitHubProfile>;
-    }) {
-      const headers = {
-        Authorization: `Bearer ${tokens.access_token}`,
-        'User-Agent': 'authjs',
-      };
-
-      const profile = await fetch(provider.userinfo?.url as URL, {
-        headers,
-      }).then(async (githubRes) => githubRes.json());
-
-      if (!profile.email) {
-        // If the user does not have a public email, get another via the GitHub API
-        // See https://docs.github.com/en/rest/users/emails#list-public-email-addresses-for-the-authenticated-user
-        const githubRes = await fetch('https://api.github.com/user/emails', {
-          headers,
-        });
-
-        if (githubRes.ok) {
-          const emails: GitHubEmail[] = await githubRes.json();
-          profile.email = (emails.find((e) => e.primary) ?? emails[0]).email;
-          profile.verifiedEmails = emails.filter((e) => e.verified).map((e) => e.email);
-        }
-      }
-
-      return profile;
-    },
-  },
-});
-
-const googleProvider = GoogleProvider({
-  clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
-  clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
-  authorization: {
-    params: {
-      prompt: 'consent',
-      access_type: 'offline',
-      response_type: 'code',
-    },
-  },
-});
-
-const azureADProvider = AzureADProvider({
-  clientId: process.env.TOOLPAD_AZURE_AD_CLIENT_ID,
-  clientSecret: process.env.TOOLPAD_AZURE_AD_CLIENT_SECRET,
-  tenantId: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
-});
+const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [
+  // Azure AD should be fine to skip as the user has to belong to the organization to sign in
+  'azure-ad',
+];
 
 export function createAuthHandler(project: ToolpadProject): Router {
   const { base } = project.options;
 
   const router = express.Router();
+
+  const githubProvider = GithubProvider({
+    clientId: process.env.TOOLPAD_GITHUB_CLIENT_ID,
+    clientSecret: process.env.TOOLPAD_GITHUB_CLIENT_SECRET,
+    userinfo: {
+      url: 'https://api.github.com/user',
+      async request({
+        tokens,
+        provider,
+      }: {
+        tokens: TokenSet;
+        provider: OAuthConfig<GitHubProfile>;
+      }) {
+        const dom = await project.loadDom();
+        const app = appDom.getApp(dom);
+
+        const restrictedDomains = app.attributes.authentication?.restrictedDomains ?? [];
+
+        const headers = {
+          Authorization: `Bearer ${tokens.access_token}`,
+          'User-Agent': 'authjs',
+        };
+
+        const profile = await fetch(provider.userinfo?.url as URL, {
+          headers,
+        }).then(async (githubRes) => githubRes.json());
+
+        if (!profile.email) {
+          // If the user does not have a public email, get another via the GitHub API
+          // See https://docs.github.com/en/rest/users/emails#list-public-email-addresses-for-the-authenticated-user
+          const githubRes = await fetch('https://api.github.com/user/emails', {
+            headers,
+          });
+
+          if (githubRes.ok) {
+            const githubEmails: GitHubEmail[] = await githubRes.json();
+
+            const activeEmail =
+              (restrictedDomains.length > 0
+                ? githubEmails.find(
+                    (githubEmail) =>
+                      githubEmail.verified &&
+                      restrictedDomains.some((restrictedDomain) =>
+                        githubEmail.email.endsWith(`@${restrictedDomain}`),
+                      ),
+                  )
+                : null) ??
+              githubEmails.find((githubEmail) => githubEmail.primary) ??
+              githubEmails[0];
+
+            profile.email = activeEmail.email;
+            profile.email_verified = activeEmail.verified;
+          }
+        }
+
+        return profile;
+      },
+    },
+  });
+
+  const googleProvider = GoogleProvider({
+    clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
+    clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
+    authorization: {
+      params: {
+        prompt: 'consent',
+        access_type: 'offline',
+        response_type: 'code',
+      },
+    },
+  });
+
+  const azureADProvider = AzureADProvider({
+    clientId: process.env.TOOLPAD_AZURE_AD_CLIENT_ID,
+    clientSecret: process.env.TOOLPAD_AZURE_AD_CLIENT_SECRET,
+    tenantId: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
+  });
 
   const authConfig: AuthConfig = {
     pages: {
@@ -85,47 +110,24 @@ export function createAuthHandler(project: ToolpadProject): Router {
     secret: process.env.TOOLPAD_AUTH_SECRET,
     trustHost: true,
     callbacks: {
-      async signIn({ account, profile }) {
+      async signIn({ profile, account }) {
         const dom = await project.loadDom();
         const app = appDom.getApp(dom);
 
         const restrictedDomains = app.attributes.authentication?.restrictedDomains ?? [];
 
-        if (account?.provider === 'github') {
-          return Boolean(
-            profile?.verifiedEmails &&
-              profile.verifiedEmails.length > 0 &&
-              (restrictedDomains.length === 0 ||
-                restrictedDomains.some((restrictedDomain) =>
-                  profile.verifiedEmails!.some((verifiedEmail) =>
-                    verifiedEmail.endsWith(`@${restrictedDomain}`),
-                  ),
-                )),
-          );
-        }
+        const skipEmailVerification =
+          !!account?.provider &&
+          SKIP_VERIFICATION_PROVIDERS.includes(account.provider as AuthProvider);
 
-        if (account?.provider === 'google') {
-          return Boolean(
-            profile?.email_verified &&
-              profile?.email &&
-              (restrictedDomains.length === 0 ||
-                restrictedDomains.some(
-                  (restrictedDomain) => profile.email!.endsWith(`@${restrictedDomain}`) ?? false,
-                )),
-          );
-        }
-
-        if (account?.provider === 'azure-ad') {
-          return Boolean(
+        return Boolean(
+          (profile?.email_verified || skipEmailVerification) &&
             profile?.email &&
-              (restrictedDomains.length === 0 ||
-                restrictedDomains.some(
-                  (restrictedDomain) => profile.email!.endsWith(`@${restrictedDomain}`) ?? false,
-                )),
-          );
-        }
-
-        return true;
+            (restrictedDomains.length === 0 ||
+              restrictedDomains.some(
+                (restrictedDomain) => profile.email!.endsWith(`@${restrictedDomain}`) ?? false,
+              )),
+        );
       },
       async redirect({ baseUrl }) {
         return `${baseUrl}${base}`;
@@ -194,7 +196,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
   return router;
 }
 
-export async function createAuthPagesMiddleware(project: ToolpadProject) {
+export async function createRequireAuthMiddleware(project: ToolpadProject) {
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { options } = project;
     const { base } = options;
@@ -207,14 +209,14 @@ export async function createAuthPagesMiddleware(project: ToolpadProject) {
 
     const hasAuthentication = authProviders.length > 0;
 
+    const isPageRequest = req.get('sec-fetch-dest') === 'document';
     const signInPath = `${base}/signin`;
 
-    let isRedirect = false;
+    let isAuthorized = true;
     if (
+      (!project.options.dev || isPageRequest) &&
       hasAuthentication &&
-      req.get('sec-fetch-dest') === 'document' &&
-      req.originalUrl.split('?')[0] !== signInPath &&
-      !req.originalUrl.startsWith(`${base}/api/auth`)
+      req.originalUrl.split('?')[0] !== signInPath
     ) {
       const request = adaptRequestFromExpressToFetch(req);
 
@@ -230,12 +232,16 @@ export async function createAuthPagesMiddleware(project: ToolpadProject) {
       }
 
       if (!token) {
-        isRedirect = true;
+        isAuthorized = false;
       }
     }
 
-    if (isRedirect) {
-      res.redirect(signInPath);
+    if (!isAuthorized) {
+      if (isPageRequest) {
+        res.redirect(signInPath);
+      } else {
+        res.status(401).send('Unauthorized');
+      }
       res.end();
     } else {
       next();

@@ -1326,6 +1326,7 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   const dir = resolveProjectDir(dirInput);
 
   const resolvedConfig: ToolpadProjectOptions = {
+    toolpadDevMode: false,
     dev: false,
     base: '/prod',
     customServer: false,

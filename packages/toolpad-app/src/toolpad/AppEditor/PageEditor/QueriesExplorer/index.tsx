@@ -464,10 +464,7 @@ export function ActionsExplorer() {
     return [];
   }, [currentPageName, dom]);
 
-  const actions = React.useMemo(() => {
-    return queryNodes.filter((query) => query.attributes?.mode === 'mutation');
-  }, [queryNodes]);
-
+  const actions = queryNodes.filter((query) => appDom.isAction(query));
   const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
   const createPopoverOpen = Boolean(anchorEl);
   const handleCreateClose = () => {

@@ -1194,3 +1194,7 @@ export function getPageTitle(node: PageNode): string {
 export function isCodePage(node: PageNode): boolean {
   return !!node.attributes.codeFile;
 }
+
+export function isAction(node: AppDomNode): boolean {
+  return node.type === 'query' && node.attributes?.mode === 'mutation';
+}

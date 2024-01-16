@@ -1479,15 +1479,9 @@ interface RenderedPagesProps {
   pages: appDom.PageNode[];
   defaultPage: appDom.PageNode;
   hasAuthentication?: boolean;
-  basename: string;
 }
 
-function RenderedPages({
-  pages,
-  defaultPage,
-  hasAuthentication = false,
-  basename,
-}: RenderedPagesProps) {
+function RenderedPages({ pages, defaultPage, hasAuthentication = false }: RenderedPagesProps) {
   const { search } = useLocation();
 
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
@@ -1509,7 +1503,6 @@ function RenderedPages({
             <RequireAuthorization
               allowAll={page.attributes.authorization?.allowAll ?? true}
               allowedRoles={page.attributes.authorization?.allowedRoles ?? []}
-              basename={basename}
             >
               {pageContent}
             </RequireAuthorization>
@@ -1568,7 +1561,7 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const { session, hasAuthentication, isSigningIn } = React.useContext(AuthContext);
+  const { session, hasAuthentication } = React.useContext(AuthContext);
 
   const pageMatch = useMatch('/pages/:slug');
   const activePageSlug = pageMatch?.params.slug;
@@ -1591,7 +1584,7 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
     [authFilteredPages],
   );
 
-  if (!IS_RENDERED_IN_CANVAS && isSigningIn && hasAuthentication) {
+  if (!IS_RENDERED_IN_CANVAS && !session?.user && hasAuthentication) {
     return <AppLoading />;
   }
 
@@ -1608,7 +1601,6 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
         pages={pages}
         defaultPage={authFilteredPages[0] ?? pages[0]}
         hasAuthentication={hasAuthentication}
-        basename={basename}
       />
     </AppLayout>
   );

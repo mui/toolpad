@@ -1,7 +1,7 @@
 import { Box, TextField, IconButton, SxProps } from '@mui/material';
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { WithControlledProp } from '../utils/types';
+import { WithControlledProp } from '@mui/toolpad-utils/types';
 
 function renderStringValueEditor({
   label,

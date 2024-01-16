@@ -16,8 +16,8 @@ import {
 import { TabContext } from '@mui/lab';
 import { BindableAttrValue, LiveBinding, ScopeMeta } from '@mui/toolpad-core';
 import { useServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+import { Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
 import { Body, RawBody, UrlEncodedBody } from './types';
-import { Maybe, WithControlledProp } from '../../utils/types';
 import {
   useEvaluateLiveBinding,
   useEvaluateLiveBindingEntries,

@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
-import { WithControlledProp } from '../utils/types';
+import { WithControlledProp } from '@mui/toolpad-utils/types';
 import ColorTool from './ColorTool';
 import FlexFill from './FlexFill';
 

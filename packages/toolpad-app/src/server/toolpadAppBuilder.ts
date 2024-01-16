@@ -124,6 +124,7 @@ function toolpadVitePlugin(): Plugin {
 }
 
 export interface CreateViteConfigParams {
+  toolpadDevMode: boolean;
   outDir: string;
   root: string;
   dev: boolean;
@@ -136,6 +137,7 @@ export interface CreateViteConfigParams {
 }
 
 export async function createViteConfig({
+  toolpadDevMode,
   outDir,
   root,
   dev,
@@ -308,8 +310,12 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
-        entries: [MAIN_ENTRY],
-        include: FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
+        force: toolpadDevMode ? true : undefined,
+        include: [
+          ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
+          '@mui/toolpad/runtime',
+          '@mui/toolpad/canvas',
+        ],
       },
       appType: 'custom',
       logLevel: 'info',
@@ -343,6 +349,7 @@ export async function buildApp({
   outDir,
 }: ToolpadBuilderParams) {
   const { viteConfig } = await createViteConfig({
+    toolpadDevMode: false,
     dev: false,
     root,
     base,

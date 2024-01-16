@@ -12,8 +12,8 @@ import { ToolpadProject } from './localMode';
 import * as appDom from '../appDom';
 
 const githubProvider = GithubProvider({
-  clientId: process.env.TOOLPAD_GITHUB_ID,
-  clientSecret: process.env.TOOLPAD_GITHUB_SECRET,
+  clientId: process.env.TOOLPAD_GITHUB_CLIENT_ID,
+  clientSecret: process.env.TOOLPAD_GITHUB_CLIENT_SECRET,
   userinfo: {
     url: 'https://api.github.com/user',
     async request({
@@ -130,13 +130,32 @@ export function createAuthHandler(project: ToolpadProject): Router {
       async redirect({ baseUrl }) {
         return `${baseUrl}${base}`;
       },
-      jwt({ token, account }) {
+      async jwt({ token, account }) {
         if (account?.provider === 'azure-ad' && account.id_token) {
           const [, payload] = account.id_token.split('.');
-          const idToken = JSON.parse(Buffer.from(payload, 'base64').toString('utf8'));
+          const idToken: { roles?: string[] } = JSON.parse(
+            Buffer.from(payload, 'base64').toString('utf8'),
+          );
 
-          token.roles = idToken.roles ?? [];
+          const dom = await project.loadDom();
+          const app = appDom.getApp(dom);
+
+          const authorization = app.attributes.authorization ?? {};
+          const roleNames = authorization?.roles?.map((role) => role.name) ?? [];
+          const roleMappings = authorization?.roleMappings?.['azure-ad'] ?? {};
+
+          token.roles = (idToken.roles ?? []).flatMap((providerRole) =>
+            roleNames
+              .filter((role) =>
+                roleMappings[role]
+                  ? roleMappings[role].includes(providerRole)
+                  : role === providerRole,
+              )
+              // Remove duplicates in case multiple provider roles map to the same role
+              .filter((value, index, self) => self.indexOf(value) === index),
+          );
         }
+
         return token;
       },
       // @TODO: Types for session callback are broken as it says token does not exist but it does

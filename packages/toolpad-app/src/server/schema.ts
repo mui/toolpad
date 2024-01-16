@@ -256,6 +256,8 @@ elementSchema = baseElementSchema
   })
   .describe('The instance of a component. Used to build user interfaces in pages.');
 
+const authProviderSchema = z.enum(['github', 'google', 'azure-ad']);
+
 export const applicationSchema = toolpadObjectSchema(
   'application',
   z.object({
@@ -264,9 +266,9 @@ export const applicationSchema = toolpadObjectSchema(
         providers: z
           .array(
             z.object({
-              provider: z
-                .enum(['github', 'google', 'azure-ad'])
-                .describe('Unique identifier for this authentication provider.'),
+              provider: authProviderSchema.describe(
+                'Unique identifier for this authentication provider.',
+              ),
             }),
           )
           .optional()
@@ -292,6 +294,12 @@ export const applicationSchema = toolpadObjectSchema(
           )
           .optional()
           .describe('Available roles for this application. These can be assigned to users.'),
+        roleMappings: z
+          .record(authProviderSchema, z.record(z.array(z.string())))
+          .optional()
+          .describe(
+            'Role mapping definitions from authentication provider roles to Toolpad roles.',
+          ),
       })
       .optional()
       .describe('Authorization configuration for this application.'),

@@ -27,16 +27,11 @@
                     "properties": {
                       "provider": {
                         "type": "string",
-                        "enum": [
-                          "github",
-                          "google"
-                        ],
+                        "enum": ["github", "google", "azure-ad"],
                         "description": "Unique identifier for this authentication provider."
                       }
                     },
-                    "required": [
-                      "provider"
-                    ],
+                    "required": ["provider"],
                     "additionalProperties": false
                   },
                   "description": "Authentication providers to use."
@@ -74,14 +69,28 @@
                             "description": "A description of the role."
                           }
                         },
-                        "required": [
-                          "name"
-                        ],
+                        "required": ["name"],
                         "additionalProperties": false
                       }
                     ]
                   },
                   "description": "Available roles for this application. These can be assigned to users."
+                },
+                "roleMappings": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "propertyNames": {
+                    "enum": ["github", "google", "azure-ad"]
+                  },
+                  "description": "Role mapping definitions from authentication provider roles to Toolpad roles."
                 }
               },
               "additionalProperties": false,
@@ -92,10 +101,7 @@
           "description": "Defines the shape of this \"application\" object"
         }
       },
-      "required": [
-        "apiVersion",
-        "kind"
-      ],
+      "required": ["apiVersion", "kind"],
       "additionalProperties": false
     },
     "Page": {
@@ -185,9 +191,7 @@
                           "description": "The value"
                         }
                       },
-                      "required": [
-                        "name"
-                      ],
+                      "required": ["name"],
                       "additionalProperties": false,
                       "description": "A name/value pair."
                     },
@@ -276,11 +280,7 @@
                                     "type": "string"
                                   }
                                 },
-                                "required": [
-                                  "kind",
-                                  "content",
-                                  "contentType"
-                                ],
+                                "required": ["kind", "content", "contentType"],
                                 "additionalProperties": false
                               },
                               {
@@ -297,10 +297,7 @@
                                     }
                                   }
                                 },
-                                "required": [
-                                  "kind",
-                                  "content"
-                                ],
+                                "required": ["kind", "content"],
                                 "additionalProperties": false
                               }
                             ],
@@ -324,9 +321,7 @@
                                     "const": "raw"
                                   }
                                 },
-                                "required": [
-                                  "kind"
-                                ],
+                                "required": ["kind"],
                                 "additionalProperties": false,
                                 "description": "Don't interpret this body at all."
                               },
@@ -338,9 +333,7 @@
                                     "const": "json"
                                   }
                                 },
-                                "required": [
-                                  "kind"
-                                ],
+                                "required": ["kind"],
                                 "additionalProperties": false,
                                 "description": "Interpret the fetch response as JSON"
                               },
@@ -356,10 +349,7 @@
                                     "description": "First row contains headers"
                                   }
                                 },
-                                "required": [
-                                  "kind",
-                                  "headers"
-                                ],
+                                "required": ["kind", "headers"],
                                 "additionalProperties": false,
                                 "description": "Interpret the fetch response as CSV"
                               },
@@ -371,9 +361,7 @@
                                     "const": "xml"
                                   }
                                 },
-                                "required": [
-                                  "kind"
-                                ],
+                                "required": ["kind"],
                                 "additionalProperties": false,
                                 "description": "Interpret the fetch response as XML"
                               }
@@ -381,9 +369,7 @@
                             "description": "How to parse the response."
                           }
                         },
-                        "required": [
-                          "kind"
-                        ],
+                        "required": ["kind"],
                         "additionalProperties": false
                       },
                       {
@@ -399,9 +385,7 @@
                             "description": "The function to be executed on the backend by this query."
                           }
                         },
-                        "required": [
-                          "kind"
-                        ],
+                        "required": ["kind"],
                         "additionalProperties": false
                       }
                     ],
@@ -424,9 +408,7 @@
                     "description": "Time to cache before refetching"
                   }
                 },
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "additionalProperties": false
               },
               "description": "Queries that are used by the page. These will load data when the page opens."
@@ -480,10 +462,7 @@
           "description": "Defines the shape of this \"page\" object"
         }
       },
-      "required": [
-        "apiVersion",
-        "kind"
-      ],
+      "required": ["apiVersion", "kind"],
       "additionalProperties": false
     },
     "Theme": {
@@ -510,10 +489,7 @@
                   "properties": {
                     "mode": {
                       "type": "string",
-                      "enum": [
-                        "light",
-                        "dark"
-                      ]
+                      "enum": ["light", "dark"]
                     },
                     "primary": {
                       "$ref": "#/definitions/SimplePaletteColorOptions"
@@ -533,18 +509,11 @@
           "description": "Defines the shape of this \"theme\" object"
         }
       },
-      "required": [
-        "apiVersion",
-        "kind"
-      ],
+      "required": ["apiVersion", "kind"],
       "additionalProperties": false
     }
   },
-  "required": [
-    "Application",
-    "Page",
-    "Theme"
-  ],
+  "required": ["Application", "Page", "Theme"],
   "additionalProperties": false,
   "definitions": {
     "JsExpressionBinding": {
@@ -555,9 +524,7 @@
           "description": "The expression to be evaluated."
         }
       },
-      "required": [
-        "$$jsExpression"
-      ],
+      "required": ["$$jsExpression"],
       "additionalProperties": false,
       "description": "A binding that evaluates an expression and returns the result."
     },
@@ -569,9 +536,7 @@
           "description": "The name of an environment variable."
         }
       },
-      "required": [
-        "$$env"
-      ],
+      "required": ["$$env"],
       "additionalProperties": false,
       "description": "An environment variable."
     },
@@ -583,9 +548,7 @@
           "description": "The code to be executed."
         }
       },
-      "required": [
-        "$$jsExpressionAction"
-      ],
+      "required": ["$$jsExpressionAction"],
       "additionalProperties": false,
       "description": "A javascript expression to be executed when this action is triggered."
     },
@@ -615,16 +578,11 @@
               "description": "Parameters to pass when navigating to this page"
             }
           },
-          "required": [
-            "page",
-            "parameters"
-          ],
+          "required": ["page", "parameters"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "$$navigationAction"
-      ],
+      "required": ["$$navigationAction"],
       "additionalProperties": false,
       "description": "A navigation from one page to another, optionally passing parameters to the next page."
     },
@@ -716,10 +674,7 @@
           "description": "The properties to configure this instance of the component."
         }
       },
-      "required": [
-        "component",
-        "name"
-      ],
+      "required": ["component", "name"],
       "additionalProperties": false,
       "description": "The instance of a component. Used to build user interfaces in pages."
     },
@@ -734,9 +689,7 @@
           "description": "The subtree, that describes the UI to be rendered by the template."
         }
       },
-      "required": [
-        "$$template"
-      ],
+      "required": ["$$template"],
       "additionalProperties": false,
       "description": "Describes a fragment of Toolpad elements, to be used as a template."
     },
@@ -752,10 +705,7 @@
           "description": "The value"
         }
       },
-      "required": [
-        "name",
-        "value"
-      ],
+      "required": ["name", "value"],
       "additionalProperties": false,
       "description": "a name/value pair with a string value."
     },
@@ -781,10 +731,7 @@
           "description": "The value"
         }
       },
-      "required": [
-        "name",
-        "value"
-      ],
+      "required": ["name", "value"],
       "additionalProperties": false,
       "description": "A name/value pair where the value is dynamically bindable to strings."
     },
@@ -804,9 +751,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "main"
-      ],
+      "required": ["main"],
       "additionalProperties": false
     }
   },

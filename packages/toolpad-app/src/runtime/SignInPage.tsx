@@ -65,7 +65,7 @@ export default function SignInPage() {
         <Typography variant="subtitle1" mb={1}>
           You must be authenticated to use this app.
         </Typography>
-        <Stack sx={{ width: 320 }} gap={2}>
+        <Stack sx={{ width: 300 }} gap={2}>
           {authProviders.includes('github') ? (
             <LoadingButton
               variant="contained"

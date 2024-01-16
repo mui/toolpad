@@ -59,7 +59,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
         <PanelResizeHandle />
 
         {showQuery ? (
-          <Panel minSize={10} maxSize={90} order={2} id="query-panel">
+          <Panel minSize={10} maxSize={90} defaultSize={35} order={2} id="query-panel">
             <QueryEditor />
           </Panel>
         ) : null}

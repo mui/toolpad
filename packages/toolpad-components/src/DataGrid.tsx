@@ -169,7 +169,7 @@ function isValidDate(input: string) {
   return false;
 }
 
-const SkeletonCell = styled(Box)(({ theme }) => ({
+const SkeletonCell = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',

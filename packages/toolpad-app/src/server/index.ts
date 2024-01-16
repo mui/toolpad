@@ -10,7 +10,6 @@ import prettyBytes from 'pretty-bytes';
 import type { ViteDevServer } from 'vite';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
-// eslint-disable-next-line import/extensions
 import openBrowser from 'react-dev-utils/openBrowser.js';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
@@ -28,7 +27,7 @@ import { createRpcHandler } from './rpc';
 import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
-import { createAuthHandler, createAuthPagesMiddleware } from './auth';
+import { createAuthHandler, createRequireAuthMiddleware } from './auth';
 
 import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -114,15 +113,17 @@ async function createDevHandler(project: ToolpadProject) {
     }),
   );
 
-  handler.use('/api/data', project.dataManager.createDataHandler());
-  const runtimeRpcServer = createRuntimeRpcServer(project);
-
-  handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
-
   if (process.env.TOOLPAD_AUTH_SECRET) {
     const authHandler = createAuthHandler(project);
     handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
   }
+
+  handler.use(await createRequireAuthMiddleware(project));
+
+  handler.use('/api/data', project.dataManager.createDataHandler());
+  const runtimeRpcServer = createRuntimeRpcServer(project);
+
+  handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
 
   handler.use(
     (req, res, next) => {
@@ -316,9 +317,7 @@ async function createToolpadHandler({
 
   const appHandler = await createToolpadAppHandler(project);
 
-  const authPagesMiddleware = await createAuthPagesMiddleware(project);
-
-  router.use(project.options.base, authPagesMiddleware, appHandler.handler);
+  router.use(project.options.base, appHandler.handler);
 
   let editorHandler: AppHandler | undefined;
   if (dev) {

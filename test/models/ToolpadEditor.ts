@@ -74,7 +74,7 @@ export class ToolpadEditor {
     this.explorer = page.getByTestId('pages-explorer');
     this.queriesExplorer = page.getByTestId('query-explorer');
     this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });
-    this.queryEditorPanel = page.getByRole('tabpanel', { name: 'Query editor panel', exact: true });
+    this.queryEditorPanel = page.getByRole('tabpanel', { name: 'Query editor', exact: true });
   }
 
   async goto() {

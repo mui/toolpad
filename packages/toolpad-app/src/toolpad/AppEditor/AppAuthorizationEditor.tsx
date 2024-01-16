@@ -470,17 +470,17 @@ interface RoleMappingRow extends RoleMapping {
 }
 
 export function AppRoleMappingsEditor({
-  roleEnabledAuthProviderOptions,
+  roleEnabledActiveAuthProviderOptions,
   onRowUpdateError,
 }: {
-  roleEnabledAuthProviderOptions: [string, AuthProviderOption][];
+  roleEnabledActiveAuthProviderOptions: [string, AuthProviderOption][];
   onRowUpdateError: (error: Error) => void;
 }) {
   const { dom } = useAppState();
   const appState = useAppStateApi();
 
   const [activeAuthProvider, setAuthProvider] = React.useState<AuthProvider | null>(
-    (roleEnabledAuthProviderOptions[0]?.[0] as AuthProvider) ?? null,
+    (roleEnabledActiveAuthProviderOptions[0]?.[0] as AuthProvider) ?? null,
   );
 
   const handleAuthProviderChange = React.useCallback(
@@ -580,7 +580,7 @@ export function AppRoleMappingsEditor({
         select
         sx={{ mt: 2 }}
       >
-        {roleEnabledAuthProviderOptions.map(([value, { name }]) => (
+        {roleEnabledActiveAuthProviderOptions.map(([value, { name }]) => (
           <MenuItem key={value} value={value}>
             {name}
           </MenuItem>
@@ -643,7 +643,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
     setErrorSnackbarMessage('');
   }, []);
 
-  const roleEnabledAuthProviderOptions = React.useMemo(() => {
+  const roleEnabledActiveAuthProviderOptions = React.useMemo(() => {
     const appNode = appDom.getApp(dom);
 
     const authProviders = (appNode.attributes.authentication?.providers ?? []).map(
@@ -668,7 +668,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
             >
               <Tab label="Authentication" value="authentication" sx={{ px: 2 }} />
               <Tab label="Roles" value="roles" sx={{ px: 2 }} />
-              {roleEnabledAuthProviderOptions.length > 0 ? (
+              {roleEnabledActiveAuthProviderOptions.length > 0 ? (
                 <Tab label="Role mappings" value="roleMappings" sx={{ px: 2 }} />
               ) : null}
             </TabList>
@@ -690,7 +690,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
               </Typography>
               <AppRoleMappingsEditor
                 onRowUpdateError={handleRowUpdateError}
-                roleEnabledAuthProviderOptions={roleEnabledAuthProviderOptions}
+                roleEnabledActiveAuthProviderOptions={roleEnabledActiveAuthProviderOptions}
               />
             </TabPanel>
           </DialogContent>

@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 type BasicAuthConfig =
   | {
       basicAuthUser: string;

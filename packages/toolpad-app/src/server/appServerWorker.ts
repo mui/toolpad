@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { parentPort, workerData, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
 import type { Plugin } from 'vite';

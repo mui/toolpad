@@ -1477,14 +1477,18 @@ function PageNotFound() {
 
 interface RenderedPagesProps {
   pages: appDom.PageNode[];
+  defaultPage: appDom.PageNode;
   hasAuthentication?: boolean;
   basename: string;
 }
 
-function RenderedPages({ pages, hasAuthentication = false, basename }: RenderedPagesProps) {
+function RenderedPages({
+  pages,
+  defaultPage,
+  hasAuthentication = false,
+  basename,
+}: RenderedPagesProps) {
   const { search } = useLocation();
-
-  const defaultPage = pages[0];
 
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
 
@@ -1596,7 +1600,12 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
       clipped={SHOW_PREVIEW_HEADER}
       basename={basename}
     >
-      <RenderedPages pages={pages} hasAuthentication={hasAuthentication} basename={basename} />
+      <RenderedPages
+        pages={pages}
+        defaultPage={authFilteredPages[0] ?? pages[0]}
+        hasAuthentication={hasAuthentication}
+        basename={basename}
+      />
     </AppLayout>
   );
 }

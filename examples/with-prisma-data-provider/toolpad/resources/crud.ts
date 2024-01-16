@@ -104,6 +104,10 @@ export default createDataProvider({
   },
 
   async updateRecord(id, data) {
-    await model.update({ where: { id: Number(id) }, data });
+    return model.update({ where: { id: Number(id) }, data });
+  },
+
+  async createRecord(data) {
+    return model.create({ data });
   },
 });

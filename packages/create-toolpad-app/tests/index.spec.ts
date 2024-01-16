@@ -70,7 +70,7 @@ test(
 
     expect(gitignore.length).toBeGreaterThan(0);
 
-    toolpadProcess = execa('yarn', ['dev', '--create'], {
+    toolpadProcess = execa('pnpm', ['dev', '--create'], {
       cwd: testDir,
       env: {
         FORCE_COLOR: '0',

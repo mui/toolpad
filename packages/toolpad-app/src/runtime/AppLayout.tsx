@@ -225,6 +225,9 @@ export function AppLayout({
                         <Avatar
                           alt={session.user.name || session.user.email}
                           src={session.user.image}
+                          imgProps={{
+                            referrerPolicy: 'no-referrer',
+                          }}
                           sx={{
                             bgcolor: theme.palette.secondary.main,
                             width: 32,

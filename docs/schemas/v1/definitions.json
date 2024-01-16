@@ -40,6 +40,13 @@
                     "additionalProperties": false
                   },
                   "description": "Authentication providers to use."
+                },
+                "restrictedDomains": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Valid email patterns for the authenticated user."
                 }
               },
               "additionalProperties": false,

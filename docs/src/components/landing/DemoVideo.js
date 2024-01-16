@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
@@ -8,7 +7,7 @@ import VolumeOffRoundedIcon from '@mui/icons-material/VolumeOffRounded';
 import VolumeUpRoundedIcon from '@mui/icons-material/VolumeUpRounded';
 import { styled, alpha } from '@mui/material/styles';
 
-const VideoContainer = styled(Box)(({ theme }) => [
+const VideoContainer = styled('div')(({ theme }) => [
   {
     position: 'relative',
     width: '100%',

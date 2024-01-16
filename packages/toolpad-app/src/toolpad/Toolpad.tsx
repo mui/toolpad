@@ -16,7 +16,7 @@ import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
 import { FEATURE_FLAG_AUTHORIZATION, FEATURE_FLAG_GLOBAL_FUNCTIONS } from '../constants';
 import { ProjectProvider } from '../project';
-import { AppAuthorizationDialog } from './AppEditor/AppAuthorizationEditor';
+import AppAuthorizationDialog from './AppEditor/AppAuthorizationEditor';
 import useBoolean from '../utils/useBoolean';
 
 const Centered = styled('div')({
@@ -105,7 +105,9 @@ function EditorShell({ children }: EditorShellProps) {
     <ToolpadShell
       navigation={
         FEATURE_FLAG_AUTHORIZATION ? (
-          <Button onClick={handleAuthorizationDialogOpen}>Authorization</Button>
+          <Stack sx={{ ml: 3 }}>
+            <Button onClick={handleAuthorizationDialogOpen}>Authorization</Button>
+          </Stack>
         ) : null
       }
       actions={

@@ -3,7 +3,7 @@ import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test } from '../../playwright/localTest';
-import clickCenter from '../../utils/clickCenter';
+import { clickCenter } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 

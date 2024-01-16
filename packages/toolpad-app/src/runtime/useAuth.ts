@@ -65,15 +65,20 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
     });
     const { csrfToken } = await csrfResponse.json();
 
-    return csrfToken;
+    return csrfToken ?? '';
   }, [basename]);
 
   const signOut = React.useCallback(async () => {
+    setIsSigningOut(true);
+
+    let csrfToken = '';
     try {
-      setIsSigningOut(true);
+      csrfToken = await getCsrfToken();
+    } catch (error) {
+      console.error((error as Error).message);
+    }
 
-      const csrfToken = await getCsrfToken();
-
+    try {
       await fetch(`${basename}${AUTH_SIGNOUT_PATH}`, {
         method: 'POST',
         headers: {

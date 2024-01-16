@@ -5,32 +5,26 @@
   "description": "Build MUI apps quickly",
   "repository": "https://github.com/mui/mui-toolpad.git",
   "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*",
-      "docs",
-      "test"
-    ]
-  },
   "bin": {
     "toolpad": "./dist/index.js"
   },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "install:codesandbox": "corepack enable && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install --no-frozen-lockfile",
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
     "deduplicate": "node scripts/deduplicate.mjs",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs",
-    "docs:dev": "yarn workspace docs dev",
-    "docs:build": "yarn workspace docs build",
+    "docs:dev": "pnpm --filter docs dev",
+    "docs:build": "pnpm --filter docs build",
     "docs:build:api": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildApi.ts",
-    "docs:export": "yarn workspace docs export",
+    "docs:export": "pnpm --filter docs export",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "jsonlint": "node ./scripts/jsonlint.mjs",
     "release:build": "lerna run --ignore docs --stream build",
     "release:version": "lerna version --exact --no-changelog --no-push --no-git-tag-version",
-    "release:publish": "yarn && yarn release:build && lerna publish from-package --force-publish --no-git-tag-version --no-push",
-    "release:publish-canary": "yarn && yarn release:build && lerna publish from-package --force-publish --no-git-tag-version --no-push --pre-dist-tag canary",
+    "release:publish": "pnpm publish --recursive --tag latest",
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "test:integration": "rimraf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
@@ -43,18 +37,18 @@
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },
   "devDependencies": {
-    "@argos-ci/core": "1.4.0",
-    "@mui/monorepo": "https://github.com/mui/material-ui.git",
+    "@argos-ci/core": "1.4.1",
+    "@mui/monorepo": "github:mui/material-ui",
     "@mui/x-charts": "6.18.7",
     "@next/eslint-plugin-next": "14.0.4",
-    "@playwright/test": "1.39.0",
+    "@playwright/test": "1.40.1",
     "@testing-library/react": "14.1.2",
     "@types/archiver": "6.0.2",
     "@types/gtag.js": "0.0.18",
-    "@types/node": "20.10.6",
+    "@types/node": "20.11.1",
     "@types/rimraf": "3.0.2",
-    "@typescript-eslint/eslint-plugin": "6.18.0",
-    "@typescript-eslint/parser": "6.18.0",
+    "@typescript-eslint/eslint-plugin": "6.18.1",
+    "@typescript-eslint/parser": "6.18.1",
     "chalk": "5.3.0",
     "eslint": "8.56.0",
     "eslint-config-airbnb": "19.0.4",
@@ -64,6 +58,7 @@
     "eslint-plugin-filenames": "1.3.2",
     "eslint-plugin-import": "2.29.1",
     "eslint-plugin-jsx-a11y": "6.8.0",
+    "eslint-plugin-material-ui": "workspace:*",
     "eslint-plugin-mocha": "10.2.0",
     "eslint-plugin-react": "7.33.2",
     "eslint-plugin-react-hooks": "4.6.0",
@@ -73,11 +68,11 @@
     "globby": "14.0.0",
     "jsdom": "23.2.0",
     "lerna": "8.0.2",
-    "markdownlint-cli2": "0.11.0",
+    "markdownlint-cli2": "0.12.1",
     "prettier": "2.8.8",
     "pretty-quick": "3.1.3",
     "react-inspector": "6.0.2",
-    "recharts": "2.10.3",
+    "recharts": "2.10.4",
     "regenerator-runtime": "0.14.1",
     "rimraf": "5.0.5",
     "typescript": "5.3.3",
@@ -89,21 +84,24 @@
     "archiver": "6.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.3.0",
+    "eslint-import-resolver-exports": "1.0.0-beta.5",
     "inquirer": "9.2.12",
     "lodash": "4.17.21",
     "semver": "7.5.4",
     "tsup": "8.0.1",
     "tsx": "4.7.0",
-    "vitest": "1.1.3",
+    "vitest": "1.2.0",
     "yargs": "17.7.2",
     "zod": "3.22.4",
     "zod-to-json-schema": "3.22.3"
   },
   "engines": {
     "npm": "please-use-yarn",
-    "node": ">=18"
+    "node": ">=18",
+    "pnpm": "8.7.0"
   },
   "resolutions": {
     "google-auth-library": "*"
-  }
+  },
+  "packageManager": "pnpm@8.7.0"
 }

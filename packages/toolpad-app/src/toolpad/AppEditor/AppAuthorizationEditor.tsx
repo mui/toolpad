@@ -19,10 +19,8 @@ import {
   Stack,
   Tab,
   TextField,
-  Theme,
   Tooltip,
   Typography,
-  useTheme,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -51,26 +49,22 @@ interface AuthProviderOption {
   hasRoles: boolean;
 }
 
-function getAuthProviderOptions(theme: Theme) {
-  return new Map<string, AuthProviderOption>([
-    ['github', { name: 'GitHub', icon: <GitHubIcon fontSize="small" />, hasRoles: false }],
-    ['google', { name: 'Google', icon: <GoogleIcon fontSize="small" />, hasRoles: false }],
-    [
-      'azure-ad',
-      {
-        name: 'Azure AD',
-        icon: <AzureIcon color={theme.palette.primary.main} />,
-        hasRoles: true,
-      },
-    ],
-  ]);
-}
+const AUTH_PROVIDER_OPTIONS = new Map<string, AuthProviderOption>([
+  ['github', { name: 'GitHub', icon: <GitHubIcon fontSize="small" />, hasRoles: false }],
+  ['google', { name: 'Google', icon: <GoogleIcon fontSize="small" />, hasRoles: false }],
+  [
+    'azure-ad',
+    {
+      name: 'Azure AD',
+      icon: <AzureIcon />,
+      hasRoles: true,
+    },
+  ],
+]);
 
 export function AppAuthenticationEditor() {
   const { dom } = useAppState();
   const appState = useAppStateApi();
-
-  const theme = useTheme();
 
   const handleAuthProvidersChange = React.useCallback(
     (event: SelectChangeEvent<AuthProvider[]>) => {
@@ -128,8 +122,6 @@ export function AppAuthenticationEditor() {
 
   const restrictedDomains = authentication?.restrictedDomains ?? [];
 
-  const authProviderOptions = React.useMemo(() => getAuthProviderOptions(theme), [theme]);
-
   return (
     <Stack direction="column">
       <Typography variant="subtitle1" mb={1}>
@@ -147,11 +139,11 @@ export function AppAuthenticationEditor() {
           fullWidth
           renderValue={(selected) =>
             selected
-              .map((selectedValue) => authProviderOptions.get(selectedValue)?.name ?? '')
+              .map((selectedValue) => AUTH_PROVIDER_OPTIONS.get(selectedValue)?.name ?? '')
               .join(', ')
           }
         >
-          {[...authProviderOptions].map(([value, { name, icon }]) => (
+          {[...AUTH_PROVIDER_OPTIONS].map(([value, { name, icon }]) => (
             <MenuItem key={value} value={value}>
               <Stack direction="row" alignItems="center">
                 <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
@@ -623,8 +615,6 @@ export interface AppAuthorizationDialogProps {
 export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialogProps) {
   const { dom } = useAppState();
 
-  const theme = useTheme();
-
   const [activeTab, setActiveTab] = React.useState<'authentication' | 'roles' | 'users'>(
     'authentication',
   );
@@ -649,12 +639,11 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
     const authProviders = (appNode.attributes.authentication?.providers ?? []).map(
       (providerConfig) => providerConfig.provider,
     );
-    const authProviderOptions = getAuthProviderOptions(theme);
 
-    return [...authProviderOptions].filter(
+    return [...AUTH_PROVIDER_OPTIONS].filter(
       ([optionKey, { hasRoles }]) => hasRoles && authProviders.includes(optionKey as AuthProvider),
     );
-  }, [dom, theme]);
+  }, [dom]);
 
   return (
     <React.Fragment>

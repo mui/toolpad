@@ -1568,7 +1568,7 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
-  const { session, hasAuthentication } = React.useContext(AuthContext);
+  const { session, hasAuthentication, isSigningIn } = React.useContext(AuthContext);
 
   const pageMatch = useMatch('/pages/:slug');
   const activePageSlug = pageMatch?.params.slug;
@@ -1590,6 +1590,10 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
       })),
     [authFilteredPages],
   );
+
+  if (!IS_RENDERED_IN_CANVAS && isSigningIn && hasAuthentication) {
+    return <AppLoading />;
+  }
 
   return (
     <AppLayout

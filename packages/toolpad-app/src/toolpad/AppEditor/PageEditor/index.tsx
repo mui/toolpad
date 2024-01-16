@@ -42,7 +42,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
   return (
     <PageEditorProvider key={node.id} nodeId={node.id}>
       <PanelGroup autoSaveId="toolpad/editor-panel-split" direction="vertical">
-        <Panel defaultSize={100} minSize={0} maxSize={100} order={1} id="editor">
+        <Panel order={1} id="editor">
           <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
             <Panel id="page-editor" defaultSize={75} minSize={50} maxSize={80}>
               <PageEditorRoot>
@@ -59,7 +59,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
         <PanelResizeHandle />
 
         {showQuery ? (
-          <Panel minSize={35} maxSize={100} order={2} id="query-panel">
+          <Panel minSize={10} maxSize={90} defaultSize={35} order={2} id="query-panel">
             <QueryEditor />
           </Panel>
         ) : null}

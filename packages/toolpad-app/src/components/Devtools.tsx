@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { TabPanel, TabContext, TabList } from '@mui/lab';
-import { Box, IconButton, styled, SxProps, Tab } from '@mui/material';
+import { Box, IconButton, LinearProgress, styled, SxProps, Tab } from '@mui/material';
 import type { Har } from 'har-format';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import Console, { LogEntry } from './Console';
@@ -114,7 +114,9 @@ export default function Devtools({ sx, log, onLogClear, har, onHarClear }: Devto
         ) : null}
         {har ? (
           <DebuggerTabPanel value="network">
-            <HarViewer sx={{ flex: 1 }} value={har} />
+            <React.Suspense fallback={<LinearProgress />}>
+              <HarViewer sx={{ flex: 1 }} value={har} />
+            </React.Suspense>
           </DebuggerTabPanel>
         ) : null}
       </TabContext>

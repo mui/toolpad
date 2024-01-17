@@ -51,7 +51,7 @@ export async function tryFormatExpression(
   config?: prettier.Options,
 ): Promise<string> {
   try {
-    return formatExpression(code, config);
+    return await formatExpression(code, config);
   } catch (err) {
     return code;
   }

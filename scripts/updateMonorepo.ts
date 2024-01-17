@@ -21,7 +21,7 @@ async function updateToLatest(dependency: string, repo: string, branch: string =
   // eslint-disable-next-line no-console
   console.log(`Updating "${repo}" to latest commit ${latestCommit}...`);
 
-  await $`pnpm update -r ${dependency}@github:mui/material-ui#${latestCommit}`;
+  await $`pnpm update -r ${dependency}@github:${repo}#${latestCommit}`;
 
   // eslint-disable-next-line no-console
   console.log(`Deduping...`);

@@ -2,7 +2,7 @@ import * as execa from 'execa';
 
 const $ = execa.$({ stdio: 'inherit' });
 
-async function updateToLatest(dependency: string, repo: string, branch: string = 'master') {
+async function updateGithubDependency(dependency: string, repo: string, branch: string = 'master') {
   const url = new URL(`https://api.github.com/repos/${repo}/commits`);
   url.searchParams.set('sha', branch);
   url.searchParams.set('per_page', '1');
@@ -21,7 +21,7 @@ async function updateToLatest(dependency: string, repo: string, branch: string =
   // eslint-disable-next-line no-console
   console.log(`Updating "${repo}" to latest commit ${latestCommit}...`);
 
-  await $`pnpm update -r ${dependency}@github:mui/material-ui#${latestCommit}`;
+  await $`pnpm update -r ${dependency}@github:${repo}#${latestCommit}`;
 
   // eslint-disable-next-line no-console
   console.log(`Deduping...`);
@@ -29,4 +29,4 @@ async function updateToLatest(dependency: string, repo: string, branch: string =
   await $({ stdio: 'inherit' })`pnpm dedupe`;
 }
 
-updateToLatest('@mui/monorepo', 'mui/material-ui');
+updateGithubDependency('@mui/monorepo', 'mui/material-ui');

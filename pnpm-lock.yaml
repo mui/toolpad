@@ -55,8 +55,8 @@ importers:
         specifier: 1.4.1
         version: 1.4.1
       '@mui/monorepo':
-        specifier: github:mui/material-ui#23a9e24d1088cd5f680d53fe60ef6d4a3da5e9f2
-        version: github.com/mui/material-ui/23a9e24d1088cd5f680d53fe60ef6d4a3da5e9f2
+        specifier: github:mui/material-ui#b6705ec218180021e2740d3b8244aca7f393a2ed
+        version: github.com/mui/material-ui/b6705ec218180021e2740d3b8244aca7f393a2ed
       '@mui/x-charts':
         specifier: 6.18.7
         version: 6.18.7(@mui/material@5.15.5)(@mui/system@5.15.5)(react-dom@18.2.0)(react@18.2.0)
@@ -208,8 +208,8 @@ importers:
         specifier: 11.11.0
         version: 11.11.0(@emotion/react@11.11.3)(@types/react@18.2.48)(react@18.2.0)
       '@mui/icons-material':
-        specifier: 5.15.4
-        version: 5.15.4(@mui/material@5.15.5)(react@18.2.0)
+        specifier: 5.15.5
+        version: 5.15.5(@mui/material@5.15.5)(react@18.2.0)
       '@mui/lab':
         specifier: 5.0.0-alpha.161
         version: 5.0.0-alpha.161(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.5)(react-dom@18.2.0)(react@18.2.0)
@@ -220,8 +220,8 @@ importers:
         specifier: ^5.15.5
         version: 5.15.5(@emotion/cache@11.11.0)(@emotion/server@11.11.0)(@mui/material@5.15.5)(next@13.4.19)(react@18.2.0)
       '@mui/monorepo':
-        specifier: github:mui/material-ui#23a9e24d1088cd5f680d53fe60ef6d4a3da5e9f2
-        version: github.com/mui/material-ui/23a9e24d1088cd5f680d53fe60ef6d4a3da5e9f2
+        specifier: github:mui/material-ui#b6705ec218180021e2740d3b8244aca7f393a2ed
+        version: github.com/mui/material-ui/b6705ec218180021e2740d3b8244aca7f393a2ed
       '@mui/styles':
         specifier: 5.15.5
         version: 5.15.5(react@18.2.0)
@@ -505,8 +505,8 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       '@mui/icons-material':
-        specifier: 5.15.4
-        version: 5.15.4(@mui/material@5.15.5)(@types/react@18.2.48)(react@18.2.0)
+        specifier: 5.15.5
+        version: 5.15.5(@mui/material@5.15.5)(@types/react@18.2.48)(react@18.2.0)
       '@mui/lab':
         specifier: 5.0.0-alpha.161
         version: 5.0.0-alpha.161(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.5)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
@@ -842,8 +842,8 @@ importers:
   packages/toolpad-components:
     dependencies:
       '@mui/icons-material':
-        specifier: 5.15.4
-        version: 5.15.4(@mui/material@5.15.5)(@types/react@18.2.48)(react@18.2.0)
+        specifier: 5.15.5
+        version: 5.15.5(@mui/material@5.15.5)(@types/react@18.2.48)(react@18.2.0)
       '@mui/lab':
         specifier: 5.0.0-alpha.161
         version: 5.0.0-alpha.161(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.5)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
@@ -2463,8 +2463,8 @@ packages:
   /@mui/core-downloads-tracker@5.15.5:
     resolution: {integrity: sha512-VhT8klyXy8GrWrARqLMoM6Nzz809Jc3Wn5wd7WOZfre2vFO1rBV1dBANAPBhBqpaQI0HCMRTWEYoSyOFgRnz4A==}
 
-  /@mui/icons-material@5.15.4(@mui/material@5.15.5)(@types/react@18.2.48)(react@18.2.0):
-    resolution: {integrity: sha512-q/Yk7aokN8qGMpR7bwoDpBSeaNe6Bv7vaY9yHYodP37c64TM6ime05ueb/wgksOVszrKkNXC67E/XYbRWOoUFA==}
+  /@mui/icons-material@5.15.5(@mui/material@5.15.5)(@types/react@18.2.48)(react@18.2.0):
+    resolution: {integrity: sha512-qiql0fd1JY7TZ1wm1RldvU7sL8QUatE9OC12i/qm5rnm/caTFyAfOyTIR7qqxorsJvoZGyrzwoMkal6Ij9kM0A==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@mui/material': ^5.0.0
@@ -2480,8 +2480,8 @@ packages:
       react: 18.2.0
     dev: false
 
-  /@mui/icons-material@5.15.4(@mui/material@5.15.5)(react@18.2.0):
-    resolution: {integrity: sha512-q/Yk7aokN8qGMpR7bwoDpBSeaNe6Bv7vaY9yHYodP37c64TM6ime05ueb/wgksOVszrKkNXC67E/XYbRWOoUFA==}
+  /@mui/icons-material@5.15.5(@mui/material@5.15.5)(react@18.2.0):
+    resolution: {integrity: sha512-qiql0fd1JY7TZ1wm1RldvU7sL8QUatE9OC12i/qm5rnm/caTFyAfOyTIR7qqxorsJvoZGyrzwoMkal6Ij9kM0A==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@mui/material': ^5.0.0
@@ -15049,8 +15049,8 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  github.com/mui/material-ui/23a9e24d1088cd5f680d53fe60ef6d4a3da5e9f2:
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/23a9e24d1088cd5f680d53fe60ef6d4a3da5e9f2}
+  github.com/mui/material-ui/b6705ec218180021e2740d3b8244aca7f393a2ed:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/b6705ec218180021e2740d3b8244aca7f393a2ed}
     name: '@mui/monorepo'
     version: 5.15.5
     requiresBuild: true

@@ -11,7 +11,12 @@ async function updateToLatest(dependency: string, repo: string, branch: string =
     throw new Error(`HTTP ${res.status} while fetching "${url}"`);
   }
   const commits = await res.json();
-  const latestCommit: string = commits[0]?.sha;
+
+  if (commits.length <= 0) {
+    throw new Error(`No commits found for "${branch}"`);
+  }
+
+  const latestCommit: string = commits[0].sha;
 
   // eslint-disable-next-line no-console
   console.log(`Updating "${repo}" to latest commit ${latestCommit}...`);

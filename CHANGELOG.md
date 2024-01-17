@@ -1,6 +1,6 @@
 # Changelog
 
-## TODO RELEASE NAME
+## 0.1.46
 
 <!-- generated comparing v0.1.45..master -->
 

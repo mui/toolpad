@@ -1,5 +1,5 @@
 import prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel.js';
+import parserBabel from 'prettier/parser-babel';
 
 const DEFAULT_OPTIONS = {
   parser: 'babel-ts',

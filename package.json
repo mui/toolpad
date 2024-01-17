@@ -33,7 +33,7 @@
     "check-types": "lerna run check-types",
     "toolpad": "node --enable-source-maps packages/toolpad-app/cli.mjs",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
-    "updateMonorepo": "tsx ./scripts/updateMonorepo.ts",
+    "update-monorepo": "tsx ./scripts/updateMonorepo.ts",
     "check-changes": "git add -A && git diff --exit-code --staged",
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },

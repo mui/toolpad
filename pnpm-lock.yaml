@@ -55,7 +55,7 @@ importers:
         specifier: 1.4.1
         version: 1.4.1
       '@mui/monorepo':
-        specifier: github:mui/material-ui
+        specifier: github:mui/material-ui#85b24e9ada2bdf4c041d9d8271a17e84a1a11bc2
         version: github.com/mui/material-ui/85b24e9ada2bdf4c041d9d8271a17e84a1a11bc2
       '@mui/x-charts':
         specifier: 6.18.7
@@ -221,7 +221,7 @@ importers:
         version: 5.15.4(@emotion/cache@11.11.0)(@emotion/server@11.11.0)(@mui/material@5.15.4)(next@13.4.19)(react@18.2.0)
       '@mui/monorepo':
         specifier: https://github.com/mui/material-ui.git
-        version: github.com/mui/material-ui/85b24e9ada2bdf4c041d9d8271a17e84a1a11bc2
+        version: github.com/mui/material-ui/23a9e24d1088cd5f680d53fe60ef6d4a3da5e9f2
       '@mui/styles':
         specifier: 5.15.4
         version: 5.15.4(react@18.2.0)
@@ -15004,6 +15004,23 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
+  github.com/mui/material-ui/23a9e24d1088cd5f680d53fe60ef6d4a3da5e9f2:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/23a9e24d1088cd5f680d53fe60ef6d4a3da5e9f2}
+    name: '@mui/monorepo'
+    version: 5.15.5
+    requiresBuild: true
+    dependencies:
+      '@googleapis/sheets': 5.0.5
+      '@slack/bolt': 3.17.1
+      google-auth-library: 9.4.1
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - encoding
+      - supports-color
+      - utf-8-validate
+    dev: false
+
   github.com/mui/material-ui/85b24e9ada2bdf4c041d9d8271a17e84a1a11bc2:
     resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/85b24e9ada2bdf4c041d9d8271a17e84a1a11bc2}
     name: '@mui/monorepo'
@@ -15019,3 +15036,4 @@ packages:
       - encoding
       - supports-color
       - utf-8-validate
+    dev: true

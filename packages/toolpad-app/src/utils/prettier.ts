@@ -32,7 +32,7 @@ export async function formatExpression(
   code: string,
   config?: prettier.Options | null,
 ): Promise<string> {
-  const formatted = prettier.format(code, {
+  const formatted = await prettier.format(code, {
     ...config,
     ...DEFAULT_OPTIONS,
     semi: false,

@@ -63,7 +63,7 @@ export function AppAuthenticationEditor() {
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
           ...app.attributes?.authentication,
           providers: (typeof providers === 'string' ? providers.split(',') : providers).map(
-            (provider) => ({ provider } as AuthProviderConfig),
+            (provider) => ({ provider }) as AuthProviderConfig,
           ),
         });
 

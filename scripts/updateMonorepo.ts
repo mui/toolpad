@@ -3,7 +3,9 @@ import * as execa from 'execa';
 const $ = execa.$({ stdio: 'inherit' });
 
 async function updateToLatest(repo: string, branch: string = 'master') {
-  const url = `https://api.github.com/repos/${repo}/commits?sha=${branch}&per_page=1`;
+  const url = new URL(`https://api.github.com/repos/${repo}/commits`);
+  url.searchParams.set('sha', branch);
+  url.searchParams.set('per_page', '1');
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`HTTP ${res.status} while fetching "${url}"`);

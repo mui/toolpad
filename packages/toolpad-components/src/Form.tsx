@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Box, BoxProps, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useNode } from '@mui/toolpad-core';
+import { UnstableSlots, useNode } from '@mui/toolpad-core';
 import { equalProperties } from '@mui/toolpad-utils/collections';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
@@ -28,7 +28,6 @@ interface FormProps extends BoxProps {
 }
 
 function Form({
-  children,
   value,
   onChange,
   onSubmit = () => {},
@@ -80,7 +79,9 @@ function Form({
       {hasChrome ? (
         <Box sx={{ ...sx, width: '100%' }}>
           <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
-            {children}
+            <Stack direction="column" sx={{ gap: 1 }}>
+              <UnstableSlots prop="children" />
+            </Stack>
 
             <Box
               sx={{
@@ -119,7 +120,9 @@ function Form({
           </form>
         </Box>
       ) : (
-        children
+        <Stack direction="column" sx={{ gap: 1 }}>
+          <UnstableSlots prop="children" />
+        </Stack>
       )}
     </FormContext.Provider>
   );
@@ -129,9 +132,8 @@ export default createBuiltin(Form, {
   helperText: 'A form component.',
   argTypes: {
     children: {
-      helperText: 'The form content.',
       type: 'element',
-      control: { type: 'layoutSlot' },
+      helperText: 'The form content.',
     },
     value: {
       helperText: 'The value that is controlled by this form.',

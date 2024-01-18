@@ -58,12 +58,6 @@ export interface NodeRuntimeWrapperProps {
   NodeError: React.ComponentType<NodeErrorProps>;
 }
 
-if (window.runtimectx) {
-  console.log('oh no', window.runtimectx, NodeRuntimeContext);
-} else {
-  window.runtimectx = NodeRuntimeContext;
-}
-
 export function NodeRuntimeWrapper({
   nodeId,
   nodeName,

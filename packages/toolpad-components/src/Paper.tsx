@@ -1,12 +1,15 @@
 import * as React from 'react';
 import { Paper as MuiPaper, PaperProps as MuiPaperProps } from '@mui/material';
+import { UnstableSlots } from '@mui/toolpad-core/browser';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 function Paper({ children, sx, ...rest }: MuiPaperProps) {
   return (
     <MuiPaper sx={{ padding: 1, width: '100%', ...sx }} {...rest}>
-      {children}
+      <Stack direction="column" sx={{ gap: 1 }}>
+        <UnstableSlots prop="children" />
+      </Stack>
     </MuiPaper>
   );
 }
@@ -23,9 +26,8 @@ export default createBuiltin(Paper, {
       default: 1,
     },
     children: {
-      helperText: 'The content of the component.',
       type: 'element',
-      control: { type: 'layoutSlot' },
+      helperText: 'The content of the component.',
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Container as MUIContainer, ContainerProps } from '@mui/material';
+import { Container as MUIContainer, ContainerProps, Stack } from '@mui/material';
+import { UnstableSlots } from '@mui/toolpad-core/browser';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
@@ -10,7 +11,9 @@ interface Props extends ContainerProps {
 function Container({ children, visible, sx, ...props }: Props) {
   return visible ? (
     <MUIContainer disableGutters sx={sx} {...props}>
-      {children}
+      <Stack direction="column" sx={{ gap: 1 }}>
+        <UnstableSlots prop="children" />
+      </Stack>
     </MUIContainer>
   ) : null;
 }
@@ -20,7 +23,6 @@ export default createBuiltin(Container, {
   argTypes: {
     children: {
       type: 'element',
-      control: { type: 'layoutSlot' },
       helperText: 'The content of the component.',
     },
     visible: {

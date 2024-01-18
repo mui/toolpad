@@ -22,10 +22,10 @@ export type Awaitable<T> = T | Promise<T> | PromiseLike<T>;
 export type Join<T extends unknown[], D extends string> = T extends []
   ? ''
   : T extends [string | number | boolean | bigint]
-  ? `${T[0]}`
-  : T extends [string | number | boolean | bigint, ...infer U]
-  ? `${T[0]}${D}${Join<U, D>}`
-  : string;
+    ? `${T[0]}`
+    : T extends [string | number | boolean | bigint, ...infer U]
+      ? `${T[0]}${D}${Join<U, D>}`
+      : string;
 
 /**
  * @example
@@ -36,10 +36,10 @@ export type Join<T extends unknown[], D extends string> = T extends []
 export type Split<S extends string, D extends string> = string extends S
   ? string[]
   : S extends ''
-  ? []
-  : S extends `${infer T}${D}${infer U}`
-  ? [T, ...Split<U, D>]
-  : [S];
+    ? []
+    : S extends `${infer T}${D}${infer U}`
+      ? [T, ...Split<U, D>]
+      : [S];
 
 /**
  * @example
@@ -49,10 +49,10 @@ export type Split<S extends string, D extends string> = string extends S
 export type CapitalizeAll<T extends string[]> = T extends []
   ? []
   : T extends [string, ...infer U]
-  ? U extends string[]
-    ? [Capitalize<T[0]>, ...CapitalizeAll<U>]
-    : never
-  : never;
+    ? U extends string[]
+      ? [Capitalize<T[0]>, ...CapitalizeAll<U>]
+      : never
+    : never;
 
 /**
  * @example
@@ -63,10 +63,10 @@ export type CapitalizeAll<T extends string[]> = T extends []
 export type CapitalizeTail<T extends string[]> = T extends []
   ? []
   : T extends [string, ...infer U]
-  ? U extends string[]
-    ? [T[0], ...CapitalizeAll<U>]
-    : never
-  : never;
+    ? U extends string[]
+      ? [T[0], ...CapitalizeAll<U>]
+      : never
+    : never;
 
 /**
  * sString template type that converts snake-case to camel-case

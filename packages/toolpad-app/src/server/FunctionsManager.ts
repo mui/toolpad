@@ -223,6 +223,7 @@ export default class FunctionsManager {
       metafile: true,
       outdir: this.getFunctionsOutputFolder(),
       platform: 'node',
+      format: 'esm',
       packages: 'external',
       target: 'es2022',
       tsconfigRaw: JSON.stringify({ compilerOptions }),

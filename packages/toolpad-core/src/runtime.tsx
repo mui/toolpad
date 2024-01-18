@@ -3,8 +3,12 @@ import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { Emitter } from '@mui/toolpad-utils/events';
 import * as ReactIs from 'react-is';
 import { hasOwnProperty } from '@mui/toolpad-utils/collections';
-import { createProvidedContext } from '@mui/toolpad-utils/react';
-import { Stack } from '@mui/material';
+import getComponentDisplayName, {
+  createProvidedContext,
+  isValidReactNode,
+} from '@mui/toolpad-utils/react';
+import invariant from 'invariant';
+import { Box, Stack, styled } from '@mui/material';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
 import { TOOLPAD_COMPONENT } from './constants';
 import type {
@@ -13,8 +17,9 @@ import type {
   PaginationMode,
   ToolpadDataProviderBase,
   NodeId,
+  ComponentConfig,
+  PropValueType,
 } from './types';
-import { createComponent } from './browser';
 
 const ResetNodeErrorsKeyContext = React.createContext(0);
 
@@ -29,6 +34,8 @@ declare global {
     __TOOLPAD_RUNTIME_EVENT__?: RuntimeEvent[] | ((event: RuntimeEvent) => void);
   }
 }
+
+const NodeRuntimePropsContext = React.createContext<Record<string, unknown>>({});
 
 export const NodeRuntimeContext = React.createContext<{
   nodeId: NodeId | null;
@@ -47,13 +54,21 @@ export interface NodeRuntimeWrapperProps {
   children: React.ReactElement;
   nodeId: NodeId;
   nodeName: string;
+  props: Record<string, unknown>;
   NodeError: React.ComponentType<NodeErrorProps>;
+}
+
+if (window.runtimectx) {
+  console.log('oh no', window.runtimectx, NodeRuntimeContext);
+} else {
+  window.runtimectx = NodeRuntimeContext;
 }
 
 export function NodeRuntimeWrapper({
   nodeId,
   nodeName,
   children,
+  props,
   NodeError,
 }: NodeRuntimeWrapperProps) {
   const resetNodeErrorsKey = React.useContext(ResetNodeErrorsKeyContext);
@@ -67,7 +82,11 @@ export function NodeRuntimeWrapper({
 
   return (
     <ErrorBoundary resetKeys={[resetNodeErrorsKey]} fallbackRender={ErrorFallback}>
-      <NodeRuntimeContext.Provider value={nodeRuntimeValue}>{children}</NodeRuntimeContext.Provider>
+      <NodeRuntimePropsContext.Provider value={props}>
+        <NodeRuntimeContext.Provider value={nodeRuntimeValue}>
+          {children}
+        </NodeRuntimeContext.Provider>
+      </NodeRuntimePropsContext.Provider>
     </ErrorBoundary>
   );
 }
@@ -111,6 +130,11 @@ export function useNode<P = {}>(): NodeRuntime<P> | null {
 
     return nodeRuntime;
   }, [canvasEvents, nodeId, nodeName]);
+}
+
+export function useProp(name: string) {
+  const props = React.useContext(NodeRuntimePropsContext);
+  return props[name];
 }
 
 export interface PlaceholderProps {
@@ -239,3 +263,104 @@ export interface UseDataProviderHook {
 }
 
 export const UseDataProviderContext = React.createContext<UseDataProviderHook | null>(null);
+
+type MaybeLegacyArgTypeDefinition = ArgTypeDefinition & { typeDef?: PropValueType };
+
+/**
+ * Marks the wrapped React component as a Toolpad compatible component.
+ * This makes it available in the Toolpad editor.
+ * Optionally, you can pass a configuration object to specify the component's argument types.
+ * Argument types define the properties that can be set in the Toolpad editor for this component.
+ * Additionally, you'll be able to bind page state to these properties.
+ * @param Component The React component to wrap.
+ * @param config The configuration for the component.
+ */
+export function createComponent<P extends object>(
+  Component: React.ComponentType<P>,
+  config?: ComponentConfig<P>,
+): ToolpadComponent<P> {
+  // TODO: Remove post beta
+  if (config?.argTypes) {
+    for (const [name, argType] of Object.entries(config.argTypes)) {
+      const maybeLegacyArgtype = argType as MaybeLegacyArgTypeDefinition;
+      if (maybeLegacyArgtype.typeDef) {
+        const componentName = getComponentDisplayName(Component);
+        console.warn(
+          `Detected deprecated argType definition for "${name}" in the "${componentName}" component.`,
+        );
+        Object.assign(maybeLegacyArgtype, maybeLegacyArgtype.typeDef);
+        delete maybeLegacyArgtype.typeDef;
+      }
+    }
+  }
+  return Object.assign(Component, {
+    [TOOLPAD_COMPONENT]: config || { argTypes: {} },
+  });
+}
+
+export interface UnstableSlotProps {
+  prop: string;
+}
+
+export function UnstableSlot({ prop }: UnstableSlotProps) {
+  const node = useNode();
+  invariant(node, 'Slot must be used inside a node');
+
+  const rawContent = useProp(prop);
+  const content = isValidReactNode(rawContent) ? rawContent : null;
+
+  if (rawContent && content !== rawContent) {
+    console.warn(`Invalid content for slot "${prop}" in "${node.nodeName}"`);
+    return null;
+  }
+
+  const count = React.Children.count(content);
+
+  return count > 0 ? (
+    content
+  ) : (
+    <Box
+      sx={{
+        minHeight: 72,
+        minWidth: 200,
+      }}
+      data-toolpad-slot-name={prop}
+      data-toolpad-slot-parent={node.nodeId}
+      data-toolpad-slot-type="single"
+    />
+  );
+}
+
+export interface UnstableSlotsProps {
+  prop: string;
+}
+
+export function UnstableSlots({ prop }: UnstableSlotsProps) {
+  const node = useNode();
+  invariant(node, 'Slot must be used inside a node');
+
+  const rawContent = useProp(prop);
+  const content = isValidReactNode(rawContent) ? rawContent : null;
+
+  if (rawContent && content !== rawContent) {
+    console.warn(`Invalid content for slot "${prop}" in "${node.nodeName}"`);
+    return null;
+  }
+
+  const count = React.Children.count(content);
+
+  if (count <= 0) {
+    return <UnstableSlot prop={prop} />;
+  }
+
+  return (
+    <Box
+      sx={{ display: 'contents' }}
+      data-toolpad-slot-name={prop}
+      data-toolpad-slot-parent={node.nodeId}
+      data-toolpad-slot-type="layout"
+    >
+      {content}
+    </Box>
+  );
+}

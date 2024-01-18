@@ -127,3 +127,17 @@ export function createGlobalState<T>(initialState: T) {
     subscribe,
   };
 }
+
+export function isValidReactNode(node: unknown): node is React.ReactNode {
+  return (
+    typeof node === 'string' ||
+    typeof node === 'number' ||
+    typeof node === 'boolean' ||
+    ReactIs.isElement(node) ||
+    ReactIs.isFragment(node) ||
+    ReactIs.isPortal(node) ||
+    typeof node === 'undefined' ||
+    node === null ||
+    (Array.isArray(node) && node.every(isValidReactNode))
+  );
+}

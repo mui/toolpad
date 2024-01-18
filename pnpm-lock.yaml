@@ -939,6 +939,9 @@ importers:
       '@types/cookie':
         specifier: 0.6.0
         version: 0.6.0
+      '@types/invariant':
+        specifier: 2.2.37
+        version: 2.2.37
       '@types/react':
         specifier: 18.2.48
         version: 18.2.48

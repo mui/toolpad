@@ -8,7 +8,7 @@ import getComponentDisplayName, {
   isValidReactNode,
 } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
-import { Box, Stack, styled } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
 import { TOOLPAD_COMPONENT } from './constants';
 import type {

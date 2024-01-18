@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Paper as MuiPaper, PaperProps as MuiPaperProps } from '@mui/material';
+import { Paper as MuiPaper, PaperProps as MuiPaperProps, Stack } from '@mui/material';
 import { UnstableSlots } from '@mui/toolpad-core/browser';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';

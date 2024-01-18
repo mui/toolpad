@@ -19,11 +19,11 @@ import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import * as url from 'node:url';
 import type { GridRowId } from '@mui/x-data-grid';
 import invariant from 'invariant';
+import { Awaitable } from '@mui/toolpad-utils/types';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import * as functionsRuntime from './functionsRuntime';
 import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
-import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
 
@@ -222,7 +222,9 @@ export default class FunctionsManager {
       bundle: true,
       metafile: true,
       outdir: this.getFunctionsOutputFolder(),
+      outExtension: { '.js': '.mjs' },
       platform: 'node',
+      format: 'esm',
       packages: 'external',
       target: 'es2022',
       tsconfigRaw: JSON.stringify({ compilerOptions }),
@@ -293,7 +295,7 @@ export default class FunctionsManager {
 
     const outputFilePath = path.resolve(
       this.getFunctionsOutputFolder(),
-      `${path.basename(fileName, '.ts')}.js`,
+      `${path.basename(fileName, '.ts')}.mjs`,
     );
 
     return outputFilePath;

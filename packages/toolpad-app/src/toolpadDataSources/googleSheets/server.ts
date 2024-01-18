@@ -4,6 +4,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
 import { asArray } from '@mui/toolpad-utils/collections';
 import * as express from 'express';
+import { Maybe } from '@mui/toolpad-utils/types';
 import { ServerDataSource, CreateHandlerApi } from '../../types';
 import config from '../../server/config';
 import {
@@ -12,7 +13,6 @@ import {
   GoogleSheetsApiQuery,
   GoogleSheetsResult,
 } from './types';
-import { Maybe } from '../../utils/types';
 import type { IToolpadProject } from '../server';
 
 /**

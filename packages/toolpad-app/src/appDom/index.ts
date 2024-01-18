@@ -13,9 +13,9 @@ import invariant from 'invariant';
 import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
 import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { ExactEntriesOf, Maybe } from '@mui/toolpad-utils/types';
 import { AuthProvider, AuthProviderConfig, ConnectionStatus } from '../types';
 import { omit, update, updateOrCreate } from '../utils/immutability';
-import { ExactEntriesOf, Maybe } from '../utils/types';
 import { envBindingSchema } from '../server/schema';
 
 export const CURRENT_APPDOM_VERSION = 7;

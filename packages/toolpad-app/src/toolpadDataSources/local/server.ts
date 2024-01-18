@@ -1,7 +1,7 @@
 import { ExecFetchResult } from '@mui/toolpad-core';
+import { Maybe } from '@mui/toolpad-utils/types';
 import { ServerDataSource } from '../../types';
 import { LocalQuery, LocalConnectionParams, LocalPrivateApi } from './types';
-import { Maybe } from '../../utils/types';
 import { parseLegacyFunctionId } from './shared';
 import type { IToolpadProject } from '../server';
 

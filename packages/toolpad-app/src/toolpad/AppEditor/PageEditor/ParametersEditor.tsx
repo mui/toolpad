@@ -2,7 +2,7 @@ import { Box, TextField, IconButton, SxProps, inputLabelClasses } from '@mui/mat
 import * as React from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { BindableAttrValue, ScopeMeta, JsRuntime, LiveBinding } from '@mui/toolpad-core';
-import { WithControlledProp } from '../../../utils/types';
+import { WithControlledProp } from '@mui/toolpad-utils/types';
 import BindableEditor from './BindableEditor';
 
 export interface StringRecordEntriesEditorProps

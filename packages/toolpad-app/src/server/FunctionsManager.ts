@@ -222,6 +222,7 @@ export default class FunctionsManager {
       bundle: true,
       metafile: true,
       outdir: this.getFunctionsOutputFolder(),
+      outExtension: { '.js': '.mjs' },
       platform: 'node',
       format: 'esm',
       packages: 'external',
@@ -294,7 +295,7 @@ export default class FunctionsManager {
 
     const outputFilePath = path.resolve(
       this.getFunctionsOutputFolder(),
-      `${path.basename(fileName, '.ts')}.js`,
+      `${path.basename(fileName, '.ts')}.mjs`,
     );
 
     return outputFilePath;

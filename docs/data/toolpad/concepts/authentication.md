@@ -58,11 +58,11 @@ In the Google OAuth client settings screen, under the **Authorized redirect URIs
 
 ### Azure Active Directory (now Entra ID)
 
-| environment variable name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                 |
-| :------------------------------------------------------------------------------------------------------------------------- | :-------------------------- |
-| `TOOLPAD_AZURE_AD_CLIENT_ID`                                                                                                 | Azure AD application (client) ID.     |
-| `TOOLPAD_AZURE_AD_CLIENT_SECRET`                                                                                             | Azure AD application client secret. |
-| `TOOLPAD_AZURE_AD_TENANT_ID`                                                                                             | Azure AD application directory (tenant) ID |
+| environment variable name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                                |
+| :------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------- |
+| `TOOLPAD_AZURE_AD_CLIENT_ID`                                                                                               | Azure AD application (client) ID.          |
+| `TOOLPAD_AZURE_AD_CLIENT_SECRET`                                                                                           | Azure AD application client secret.        |
+| `TOOLPAD_AZURE_AD_TENANT_ID`                                                                                               | Azure AD application directory (tenant) ID |
 
 Follow these steps to configure your Azure AD client and get the necessary environment variables:
 

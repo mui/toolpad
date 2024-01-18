@@ -1,6 +1,6 @@
-# Authorization
+# Authentication
 
-<p class="description">Restrict a Toolpad application or some of its pages to certain authenticated users.</p>
+<p class="description">Restrict a Toolpad application to authenticated users only, under certain authentication providers.</p>
 
 You can configure a Toolpad application so that users have to sign in with specific authentication providers in order to access it.
 
@@ -56,8 +56,32 @@ In the Google OAuth client settings screen, under the **Authorized redirect URIs
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/google-redirect-url.png", "alt": "Google redirect URIs configuration", "caption": "Google redirect URIs configuration", "zoom": false, "width": 460 }}
 
+### Azure Active Directory (now Entra ID)
+
+| environment variable name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                 |
+| :------------------------------------------------------------------------------------------------------------------------- | :-------------------------- |
+| `TOOLPAD_AZURE_AD_CLIENT_ID`                                                                                                 | Azure AD application (client) ID.     |
+| `TOOLPAD_AZURE_AD_CLIENT_SECRET`                                                                                             | Azure AD application client secret. |
+| `TOOLPAD_AZURE_AD_TENANT_ID`                                                                                             | Azure AD application directory (tenant) ID |
+
+Follow these steps to configure your Azure AD client and get the necessary environment variables:
+
+1. Go to https://portal.azure.com, search for "Microsoft Entra ID" and go to it.
+
+2. In the left-side menu, go to **App registrations** and create a new app by choosing **New registration**.
+
+3. When registering your application, under the **Redirect URI** option, make sure to include the production path of your application followed by `/api/auth/callback/azure-ad`, as in `http://mui.com/api/auth/callback/azure-ad`.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/azure-ad-redirect-url.png", "alt": "Azure AD redirect URI configuration", "caption": "Azure AD redirect URI configuration", "aspectRatio": 6 }}
+
+4. Once your application has ben created, go to its page in **App registrations** where you can find the client and tenant IDs under the **Overview** option in the left-side menu.
+
+5. Go to **Certificates & secrets** and use the option **New client secret** to generate a client secret.
+
+With the Azure AD provider, only existing users of your Azure AD application will be able to sign in.
+
 ## Restricted domains
 
 In the authentication settings, you can specify one or more domains (such as `mui.com`) to restrict user authentication based on the signed-in user's email address.
 
-If any restricted domains are set, the user must have at least one verified email assigned to their current authentication provider that belongs to one of those domains, otherwise they will not be able to sign in.
+If any restricted domains are set, the user must have at least one email address assigned to their current authentication provider that belongs to one of those domains, otherwise they will not be able to sign in.

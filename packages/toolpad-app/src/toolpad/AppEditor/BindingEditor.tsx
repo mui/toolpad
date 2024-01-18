@@ -38,11 +38,11 @@ import { TabContext, TabList } from '@mui/lab';
 import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import useLatest from '@mui/toolpad-utils/hooks/useLatest';
+import { WithControlledProp, Maybe } from '@mui/toolpad-utils/types';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
-import { WithControlledProp, Maybe } from '../../utils/types';
 
 import { tryFormatExpression } from '../../utils/prettier';
 import useShortcut from '../../utils/useShortcut';

@@ -7,6 +7,7 @@ import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import AppEditor from './AppEditor';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ThemeProvider } from '../ThemeContext';
@@ -17,7 +18,6 @@ import AppProvider, { AppState, useAppStateContext } from './AppState';
 import { FEATURE_FLAG_AUTHORIZATION, FEATURE_FLAG_GLOBAL_FUNCTIONS } from '../constants';
 import { ProjectProvider } from '../project';
 import AppAuthorizationDialog from './AppEditor/AppAuthorizationEditor';
-import useBoolean from '../utils/useBoolean';
 
 const Centered = styled('div')({
   height: '100%',

@@ -14,7 +14,7 @@ import {
   ScopeMeta,
   EnvAttrValue,
 } from '@mui/toolpad-core';
-import { WithControlledProp } from '../../../utils/types';
+import { WithControlledProp } from '@mui/toolpad-utils/types';
 import { getBindingType } from '../../../runtime/bindings';
 import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
 

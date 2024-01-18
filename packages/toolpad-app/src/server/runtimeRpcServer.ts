@@ -1,5 +1,7 @@
+import type express from 'express';
 import { createMethod, MethodResolvers } from './rpc';
 import type { ToolpadProject } from './localMode';
+import { RemoveLastParameter } from '../utils/types';
 
 // Methods exposed to the Toolpad runtime
 export function createRpcServer(project: ToolpadProject) {
@@ -29,9 +31,11 @@ export function createRpcServer(project: ToolpadProject) {
     >(({ params }) => {
       return project.functionsManager.createDataProviderRecord(...params);
     }),
-    execQuery: createMethod<typeof project.dataManager.execQuery>(({ params }) => {
-      return project.dataManager.execQuery(...params);
-    }),
+    execQuery: createMethod<RemoveLastParameter<typeof project.dataManager.execQuery>>(
+      ({ params, req }) => {
+        return project.dataManager.execQuery(...params, req as express.Request);
+      },
+    ),
     execFunction: createMethod<typeof project.functionsManager.execFunction>(({ params }) => {
       return project.functionsManager.execFunction(...params);
     }),

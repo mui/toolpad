@@ -12,6 +12,7 @@ import applyTransform from '../toolpadDataSources/applyTransform';
 import { asyncHandler } from '../utils/express';
 import type FunctionsManager from './FunctionsManager';
 import type EnvManager from './EnvManager';
+import { getHasAuthentication, getUserToken } from './auth';
 
 function withSerializedError<T extends { error?: unknown }>(
   withError: T,
@@ -111,7 +112,12 @@ export default class DataManager {
     return result;
   }
 
-  async execQuery(pageName: string, queryName: string, params: any): Promise<ExecFetchResult<any>> {
+  async execQuery(
+    pageName: string,
+    queryName: string,
+    params: any,
+    req: express.Request,
+  ): Promise<ExecFetchResult<any>> {
     const dom = await this.project.loadDom();
 
     const page = appDom.getPageByName(dom, pageName);
@@ -128,6 +134,19 @@ export default class DataManager {
 
     if (!appDom.isQuery(dataNode)) {
       throw new Error(`Invalid node type for data request`);
+    }
+
+    const hasAuthentication = await getHasAuthentication(this.project);
+
+    if (!this.project.options.dev && hasAuthentication) {
+      const { allowAll = true, allowedRoles = [] } = page.attributes.authorization ?? {};
+
+      const token = await getUserToken(req);
+      const userRoles = token?.roles ?? [];
+
+      if (!allowAll && !userRoles.some((role) => allowedRoles.includes(role))) {
+        throw new Error(`Unauthorized. Must have the roles to call queries from this page.`);
+      }
     }
 
     try {
@@ -200,7 +219,7 @@ export default class DataManager {
 
         const ctx = createServerContext(req, res);
         const result = await withContext(ctx, async () => {
-          return this.execQuery(pageName, queryName, req.body);
+          return this.execQuery(pageName, queryName, req.body, req);
         });
         res.json(result);
       }),

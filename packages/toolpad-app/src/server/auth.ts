@@ -3,14 +3,14 @@ import { Auth } from '@auth/core';
 import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import AzureADProvider from '@auth/core/providers/azure-ad';
-import { getToken } from '@auth/core/jwt';
+import { JWT, getToken } from '@auth/core/jwt';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
 import * as appDom from '../appDom';
-import { AuthProvider } from '../types';
+import { AuthProvider, AuthProviderConfig } from '../types';
 
 const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [
   // Azure AD should be fine to skip as the user has to belong to the organization to sign in
@@ -196,18 +196,47 @@ export function createAuthHandler(project: ToolpadProject): Router {
   return router;
 }
 
+async function getAuthProviders(
+  project: Pick<ToolpadProject, 'loadDom' | 'options'>,
+): Promise<AuthProviderConfig[]> {
+  const dom = await project.loadDom();
+  const app = appDom.getApp(dom);
+
+  const authProviders = app.attributes.authentication?.providers ?? [];
+
+  return authProviders;
+}
+
+export async function getHasAuthentication(
+  project: Pick<ToolpadProject, 'loadDom' | 'options'>,
+): Promise<boolean> {
+  const authProviders = await getAuthProviders(project);
+  return authProviders.length > 0;
+}
+
+export async function getUserToken(req: express.Request): Promise<JWT | null> {
+  let token = null;
+  if (process.env.TOOLPAD_AUTH_SECRET) {
+    const request = adaptRequestFromExpressToFetch(req);
+
+    // @TODO: Library types are wrong as salt should not be required, remove once fixed
+    // Github discussion: https://github.com/nextauthjs/next-auth/discussions/9133
+    // @ts-ignore
+    token = await getToken({
+      req: request,
+      secret: process.env.TOOLPAD_AUTH_SECRET,
+    });
+  }
+
+  return token;
+}
+
 export async function createRequireAuthMiddleware(project: ToolpadProject) {
   return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { options } = project;
     const { base } = options;
 
-    const dom = await project.loadDom();
-
-    const app = appDom.getApp(dom);
-
-    const authProviders = app.attributes.authentication?.providers ?? [];
-
-    const hasAuthentication = authProviders.length > 0;
+    const hasAuthentication = await getHasAuthentication(project);
 
     const isPageRequest = req.get('sec-fetch-dest') === 'document';
     const signInPath = `${base}/signin`;
@@ -218,19 +247,7 @@ export async function createRequireAuthMiddleware(project: ToolpadProject) {
       hasAuthentication &&
       req.originalUrl.split('?')[0] !== signInPath
     ) {
-      const request = adaptRequestFromExpressToFetch(req);
-
-      let token;
-      if (process.env.TOOLPAD_AUTH_SECRET) {
-        // @TODO: Library types are wrong as salt should not be required, remove once fixed
-        // Github discussion: https://github.com/nextauthjs/next-auth/discussions/9133
-        // @ts-ignore
-        token = await getToken({
-          req: request,
-          secret: process.env.TOOLPAD_AUTH_SECRET,
-        });
-      }
-
+      const token = await getUserToken(req);
       if (!token) {
         isAuthorized = false;
       }

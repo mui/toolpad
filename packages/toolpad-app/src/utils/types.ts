@@ -81,3 +81,13 @@ export type SnakeToCamel<T extends string> = Join<CapitalizeTail<Split<T, '-'>>,
 export type Maybe<T> = T | undefined | null;
 
 export type ValueOf<T> = T[keyof T];
+
+export type Pop<T extends any[]> = T extends [...infer U, any] ? U : never;
+
+/**
+ * @example
+ * type T0 = RemoveLastParameter<(a: string, b: number) => void>;  // (a: string) => void
+ */
+export type RemoveLastParameter<T extends (...args: any[]) => any> = (
+  ...args: Pop<Parameters<T>>
+) => ReturnType<T>;

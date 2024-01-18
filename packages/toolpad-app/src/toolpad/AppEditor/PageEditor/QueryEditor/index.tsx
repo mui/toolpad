@@ -108,7 +108,7 @@ export default function QueryEditor() {
     return '';
   }, [currentView]);
 
-  const currentTabIndex = React.useMemo(() => {
+  const currentTabIndex: string = React.useMemo(() => {
     if (currentView.kind === 'page' && currentView.view?.kind === 'query') {
       return currentView.queryPanel?.currentTabIndex?.toString() || '';
     }
@@ -118,7 +118,7 @@ export default function QueryEditor() {
   const handleTabChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string) => {
       if (currentView.kind === 'page') {
-        const tabIndex = parseInt(newValue, 10);
+        const tabIndex = Number(newValue);
         const queryId = currentView.queryPanel?.queryTabs?.[tabIndex]?.meta?.id;
         if (queryId) {
           appStateApi.setView({
@@ -178,7 +178,7 @@ export default function QueryEditor() {
   }, [appStateApi]);
 
   const saveDisabled = React.useMemo(
-    () => !hasUnsavedChanges(parseInt(currentTabIndex, 10)),
+    () => !hasUnsavedChanges(Number(currentTabIndex)),
     [hasUnsavedChanges, currentTabIndex],
   );
 
@@ -203,7 +203,7 @@ export default function QueryEditor() {
     <Stack
       direction="column"
       sx={{ height: '100%', overflow: 'hidden', borderBottom: 5, borderColor: 'divider' }}
-      aria-label="Query editor panel"
+      aria-label="Query editor"
       role="tabpanel"
     >
       <TabContext value={currentTabIndex}>
@@ -212,7 +212,7 @@ export default function QueryEditor() {
           justifyContent={'space-between'}
           sx={{ maxHeight: 36, borderBottom: 1, borderColor: 'divider' }}
         >
-          <TabList onChange={handleTabChange} aria-label="Query editor panel">
+          <TabList onChange={handleTabChange} aria-label="Query editor tabs">
             {currentView.queryPanel?.queryTabs?.map((query, index) => (
               <Tab
                 key={index}

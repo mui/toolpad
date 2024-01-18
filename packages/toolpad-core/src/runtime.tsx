@@ -296,7 +296,7 @@ export interface UnstableSlotProps {
   prop: string;
 }
 
-export function UnstableSlot({ prop }: UnstableSlotProps) {
+export function UnstableSlot({ prop }: UnstableSlotProps): React.ReactNode {
   const node = useNode();
   invariant(node, 'Slot must be used inside a node');
 
@@ -311,7 +311,7 @@ export function UnstableSlot({ prop }: UnstableSlotProps) {
   const count = React.Children.count(content);
 
   return count > 0 ? (
-    content
+    <React.Fragment>{content}</React.Fragment>
   ) : (
     <Box
       sx={{
@@ -329,7 +329,7 @@ export interface UnstableSlotsProps {
   prop: string;
 }
 
-export function UnstableSlots({ prop }: UnstableSlotsProps) {
+export function UnstableSlots({ prop }: UnstableSlotsProps): React.ReactNode {
   const node = useNode();
   invariant(node, 'Slot must be used inside a node');
 

@@ -131,12 +131,12 @@ export function useProp(name: string) {
   return props[name];
 }
 
-export interface PlaceholderProps {
+interface PlaceholderProps {
   prop: string;
   children?: React.ReactNode;
 }
 
-export function Placeholder({ prop, children }: PlaceholderProps) {
+function Placeholder({ prop, children }: PlaceholderProps) {
   const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
@@ -160,10 +160,9 @@ export function Placeholder({ prop, children }: PlaceholderProps) {
 export interface SlotsProps {
   prop: string;
   children?: React.ReactNode;
-  hasLayout?: boolean;
 }
 
-export function Slots({ prop, children, hasLayout = false }: SlotsProps) {
+export function Slots({ prop, children }: SlotsProps) {
   const { nodeId } = React.useContext(NodeRuntimeContext);
   if (!nodeId) {
     return <React.Fragment>{children}</React.Fragment>;
@@ -174,23 +173,19 @@ export function Slots({ prop, children, hasLayout = false }: SlotsProps) {
     return <Placeholder prop={prop} />;
   }
 
-  if (hasLayout) {
-    return (
-      <Stack
-        direction="column"
-        sx={{
-          gap: 1,
-        }}
-        data-toolpad-slot-name={prop}
-        data-toolpad-slot-parent={nodeId}
-        data-toolpad-slot-type="layout"
-      >
-        {children}
-      </Stack>
-    );
-  }
-
-  return <React.Fragment>{children}</React.Fragment>;
+  return (
+    <Stack
+      direction="column"
+      sx={{
+        gap: 1,
+      }}
+      data-toolpad-slot-name={prop}
+      data-toolpad-slot-parent={nodeId}
+      data-toolpad-slot-type="layout"
+    >
+      {children}
+    </Stack>
+  );
 }
 
 export function isToolpadComponent(

@@ -1131,11 +1131,7 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
         let wrappedValue = value;
         if (argType.control?.type === 'layoutSlot') {
-          wrappedValue = (
-            <Slots prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
-              {value}
-            </Slots>
-          );
+          wrappedValue = <Slots prop={propName}>{value}</Slots>;
         }
 
         if (isTemplate) {

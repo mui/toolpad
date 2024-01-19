@@ -1,12 +1,5 @@
-export type {
-  PlaceholderProps,
-  SlotsProps,
-  NodeRuntime,
-  NodeErrorProps,
-  Components,
-} from './runtime';
+export type { SlotsProps, NodeRuntime, NodeErrorProps, Components } from './runtime';
 export {
-  Placeholder,
   Slots,
   useNode,
   ComponentsContext,

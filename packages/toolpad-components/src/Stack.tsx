@@ -1,6 +1,16 @@
-import { Stack } from '@mui/material';
+import * as React from 'react';
+import { Stack as MuiStack, StackProps } from '@mui/material';
+import { UnstableSlots } from '@mui/toolpad-core';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
+
+function Stack(props: StackProps) {
+  return (
+    <MuiStack {...props}>
+      <UnstableSlots prop="children" />
+    </MuiStack>
+  );
+}
 
 export default createBuiltin(Stack, {
   helperText: 'The Material UI [Stack](https://mui.com/material-ui/react-stack/) component.',
@@ -35,7 +45,6 @@ export default createBuiltin(Stack, {
     children: {
       helperText: 'The content of the component.',
       type: 'element',
-      control: { type: 'slots' },
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

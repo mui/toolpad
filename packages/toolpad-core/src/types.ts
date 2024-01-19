@@ -184,8 +184,6 @@ export interface ArgControlSpec {
     | 'select' // select control
     | 'string' // text input
     | 'color' // color picker
-    | 'slot' // slot in canvas
-    | 'slots' // slots in canvas
     | 'layoutSlot' // slot with inner layout
     | 'multiSelect' // multi select ({ type: 'array', items: { type: 'enum', values: ['1', '2', '3'] } })
     | 'date' // date picker

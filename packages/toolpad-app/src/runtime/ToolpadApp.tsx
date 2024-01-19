@@ -16,7 +16,6 @@ import {
   createComponent,
   TOOLPAD_COMPONENT,
   Slots,
-  Placeholder,
   NodeId,
   BindableAttrValue,
   NestedBindableAttrs,
@@ -58,6 +57,7 @@ import {
   NodeErrorProps,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
+  UnstableSlots,
   UseDataProviderContext,
 } from '@mui/toolpad-core/runtime';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -1130,14 +1130,12 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
         const value = hookResult[propName];
 
         let wrappedValue = value;
-        if (argType.control?.type === 'slots' || argType.control?.type === 'layoutSlot') {
+        if (argType.control?.type === 'layoutSlot') {
           wrappedValue = (
             <Slots prop={propName} hasLayout={argType.control?.type === 'layoutSlot'}>
               {value}
             </Slots>
           );
-        } else if (argType.control?.type === 'slot') {
-          wrappedValue = <Placeholder prop={propName}>{value}</Placeholder>;
         }
 
         if (isTemplate) {
@@ -1237,7 +1235,7 @@ const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRo
         }}
         {...props}
       >
-        {children}
+        <UnstableSlots prop="children" />
       </Stack>
     </Container>
   );
@@ -1247,7 +1245,6 @@ const PageRootComponent = createComponent(PageRoot, {
   argTypes: {
     children: {
       type: 'element',
-      control: { type: 'slots' },
     },
   },
 });

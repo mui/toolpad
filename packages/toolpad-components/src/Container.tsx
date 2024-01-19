@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Container as MUIContainer, ContainerProps, Stack } from '@mui/material';
-import { UnstableSlots } from '@mui/toolpad-core/browser';
+import { UnstableSlots } from '@mui/toolpad-core';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 

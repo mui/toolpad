@@ -45,11 +45,7 @@ function shouldRenderControl<P extends object>(
   componentConfig: ComponentConfig<P>,
 ) {
   if (propTypeDef.type === 'element' || propTypeDef.type === 'template') {
-    return (
-      propTypeDef.control?.type !== 'slot' &&
-      propTypeDef.control?.type !== 'slots' &&
-      propTypeDef.control?.type !== 'layoutSlot'
-    );
+    return !!propTypeDef.control && propTypeDef.control.type !== 'layoutSlot';
   }
 
   if (typeof propTypeDef.visible === 'boolean') {

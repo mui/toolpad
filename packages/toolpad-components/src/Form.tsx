@@ -28,6 +28,7 @@ interface FormProps extends BoxProps {
 }
 
 function Form({
+  children,
   value,
   onChange,
   onSubmit = () => {},
@@ -120,9 +121,7 @@ function Form({
           </form>
         </Box>
       ) : (
-        <Stack direction="column" sx={{ gap: 1 }}>
-          <UnstableSlots prop="children" />
-        </Stack>
+        children
       )}
     </FormContext.Provider>
   );

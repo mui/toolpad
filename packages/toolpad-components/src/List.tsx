@@ -14,7 +14,7 @@ export type ListProps = {
 function List({ itemCount, renderItem, disablePadding = false, sx }: ListProps) {
   return (
     <MuiList disablePadding={disablePadding} sx={{ width: '100%', ...sx }}>
-      {[...Array(itemCount).keys()].map((index) => (
+      {Array.from(Array(itemCount), (_, index) => (
         <ListItem key={index} disablePadding={disablePadding}>
           <Box sx={{ width: '100%', p: 0, m: 0 }}>{renderItem(`item-${index}`, { i: index })}</Box>
         </ListItem>

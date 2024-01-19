@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
+import { UnstableSlots } from '@mui/toolpad-core';
 import createBuiltin from './createBuiltin';
 
 export interface PageRowProps {
@@ -28,7 +29,7 @@ const PageRow = React.forwardRef(function PageRow(
       }}
       {...props}
     >
-      {children}
+      <UnstableSlots prop="children" />
     </Box>
   );
 });
@@ -45,7 +46,6 @@ export default createBuiltin(PageRow, {
     children: {
       helperText: 'The content of the component.',
       type: 'element',
-      control: { type: 'slots' },
     },
   },
 });

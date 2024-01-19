@@ -35,6 +35,7 @@ export default createBuiltin(List, {
       helperText: 'List item template to render.',
       type: 'template',
       control: { type: 'layoutSlot' },
+      visible: false,
     },
     disablePadding: {
       helperText: 'If true, vertical padding is removed from the list.',

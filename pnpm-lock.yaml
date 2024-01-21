@@ -754,8 +754,8 @@ importers:
         specifier: 3.22.4
         version: 3.22.4
       zod-validation-error:
-        specifier: 2.1.0
-        version: 2.1.0(zod@3.22.4)
+        specifier: 3.0.0
+        version: 3.0.0(zod@3.22.4)
     devDependencies:
       '@types/babel__code-frame':
         specifier: 7.0.6
@@ -15019,8 +15019,8 @@ packages:
       zod: 3.22.4
     dev: false
 
-  /zod-validation-error@2.1.0(zod@3.22.4):
-    resolution: {integrity: sha512-VJh93e2wb4c3tWtGgTa0OF/dTt/zoPCPzXq4V11ZjxmEAFaPi/Zss1xIZdEB5RD8GD00U0/iVXgqkF77RV7pdQ==}
+  /zod-validation-error@3.0.0(zod@3.22.4):
+    resolution: {integrity: sha512-x+agsJJG9rvC7axF0xqTEdZhJkLHyIZkdOAWDJSmwGPzxNHMHwtU6w2yDOAAP6yuSfTAUhAMJRBfhVGY64ySEQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       zod: ^3.18.0

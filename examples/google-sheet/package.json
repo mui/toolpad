@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@mui/toolpad": "0.1.46",
-    "googleapis": "130.0.0"
+    "googleapis": "131.0.0"
   }
 }

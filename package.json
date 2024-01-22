@@ -39,10 +39,10 @@
   },
   "devDependencies": {
     "@argos-ci/core": "1.4.1",
-    "@mui/monorepo": "github:mui/material-ui#35a1472bec5d34f5a439cd4f73ddc44eaab95df3",
-    "@mui/x-charts": "6.18.7",
+    "@mui/monorepo": "github:mui/material-ui#3ceb5b6a318fe83b48ba0b43340909ffbfccbf48",
+    "@mui/x-charts": "6.19.1",
     "@next/eslint-plugin-next": "14.0.4",
-    "@playwright/test": "1.40.1",
+    "@playwright/test": "1.41.1",
     "@testing-library/react": "14.1.2",
     "@types/archiver": "6.0.2",
     "@types/gtag.js": "0.0.18",
@@ -91,7 +91,7 @@
     "semver": "7.5.4",
     "tsup": "8.0.1",
     "tsx": "4.7.0",
-    "vitest": "1.2.0",
+    "vitest": "1.2.1",
     "yargs": "17.7.2",
     "zod": "3.22.4",
     "zod-to-json-schema": "3.22.3"

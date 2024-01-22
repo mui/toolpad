@@ -147,7 +147,7 @@
     "@types/har-format": "1.2.15",
     "@types/invariant": "2.2.37",
     "@types/lodash-es": "4.17.12",
-    "@types/node-fetch": "2.6.10",
+    "@types/node-fetch": "2.6.11",
     "@types/pg": "8.10.9",
     "@types/prettier": "2.7.3",
     "@types/react": "18.2.48",

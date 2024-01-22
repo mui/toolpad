@@ -1,1 +1,1 @@
-export { createComponent, UnstableSlot, UnstableSlots } from './runtime';
+export { createComponent, Slot, Slots, Template, TemplateInstance } from './runtime';

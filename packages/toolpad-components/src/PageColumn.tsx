@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box } from '@mui/material';
-import { UnstableSlots } from '@mui/toolpad-core';
+import { Slots } from '@mui/toolpad-core';
 import createBuiltin from './createBuiltin';
 
 export interface PageColumnProps {
@@ -24,7 +24,7 @@ const PageColumn = React.forwardRef(function PageColumn(
       }}
       {...props}
     >
-      <UnstableSlots prop="children" />
+      <Slots prop="children" />
     </Box>
   );
 });

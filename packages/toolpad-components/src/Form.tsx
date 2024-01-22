@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Box, BoxProps, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { UnstableSlots, useNode } from '@mui/toolpad-core';
+import { Slots, useNode } from '@mui/toolpad-core';
 import { equalProperties } from '@mui/toolpad-utils/collections';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
@@ -81,7 +81,7 @@ function Form({
         <Box sx={{ ...sx, width: '100%' }}>
           <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
             <Stack direction="column" sx={{ gap: 1 }}>
-              <UnstableSlots prop="children" />
+              <Slots prop="children" />
             </Stack>
 
             <Box

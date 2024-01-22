@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Container as MUIContainer, ContainerProps, Stack } from '@mui/material';
-import { UnstableSlots } from '@mui/toolpad-core';
+import { Slots } from '@mui/toolpad-core';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
@@ -12,7 +12,7 @@ function Container({ children, visible, sx, ...props }: Props) {
   return visible ? (
     <MUIContainer disableGutters sx={sx} {...props}>
       <Stack direction="column" sx={{ gap: 1 }}>
-        <UnstableSlots prop="children" />
+        <Slots prop="children" />
       </Stack>
     </MUIContainer>
   ) : null;

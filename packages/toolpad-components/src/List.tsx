@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TemplateRenderer } from '@mui/toolpad-core';
+import { Template, TemplateInstance, TemplateRenderer } from '@mui/toolpad-core';
 import { Box, List as MuiList, ListItem, SxProps } from '@mui/material';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin from './createBuiltin';
@@ -7,16 +7,23 @@ import createBuiltin from './createBuiltin';
 export type ListProps = {
   itemCount: number;
   disablePadding?: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
   renderItem: TemplateRenderer;
   sx?: SxProps;
 };
 
-function List({ itemCount, renderItem, disablePadding = false, sx }: ListProps) {
+function List({ itemCount, disablePadding = false, sx }: ListProps) {
   return (
     <MuiList disablePadding={disablePadding} sx={{ width: '100%', ...sx }}>
       {Array.from(Array(itemCount), (_, index) => (
         <ListItem key={index} disablePadding={disablePadding}>
-          <Box sx={{ width: '100%', p: 0, m: 0 }}>{renderItem(`item-${index}`, { i: index })}</Box>
+          <Box sx={{ position: 'relative', width: '100%', p: 0, m: 0 }}>
+            {index === 0 ? (
+              <Template prop="renderItem" scope={{ i: index }} />
+            ) : (
+              <TemplateInstance prop="renderItem" scope={{ i: index }} />
+            )}
+          </Box>
         </ListItem>
       ))}
     </MuiList>
@@ -34,7 +41,6 @@ export default createBuiltin(List, {
     renderItem: {
       helperText: 'List item template to render.',
       type: 'template',
-      control: { type: 'layoutSlot' },
       visible: false,
     },
     disablePadding: {

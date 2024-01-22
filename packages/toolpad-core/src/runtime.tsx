@@ -7,8 +7,7 @@ import getComponentDisplayName, {
   createProvidedContext,
   isValidReactNode,
 } from '@mui/toolpad-utils/react';
-import invariant from 'invariant';
-import { Box, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
 import { TOOLPAD_COMPONENT } from './constants';
 import type {
@@ -131,63 +130,6 @@ export function useProp(name: string) {
   return props[name];
 }
 
-interface PlaceholderProps {
-  prop: string;
-  children?: React.ReactNode;
-}
-
-function Placeholder({ prop, children }: PlaceholderProps) {
-  const { nodeId } = React.useContext(NodeRuntimeContext);
-  if (!nodeId) {
-    return <React.Fragment>{children}</React.Fragment>;
-  }
-  const count = React.Children.count(children);
-  return count > 0 ? (
-    <React.Fragment>{children}</React.Fragment>
-  ) : (
-    <div
-      style={{
-        minHeight: 72,
-        minWidth: 200,
-      }}
-      data-toolpad-slot-name={prop}
-      data-toolpad-slot-parent={nodeId}
-      data-toolpad-slot-type="single"
-    />
-  );
-}
-
-export interface SlotsProps {
-  prop: string;
-  children?: React.ReactNode;
-}
-
-export function Slots({ prop, children }: SlotsProps) {
-  const { nodeId } = React.useContext(NodeRuntimeContext);
-  if (!nodeId) {
-    return <React.Fragment>{children}</React.Fragment>;
-  }
-  const count = React.Children.count(children);
-
-  if (count <= 0) {
-    return <Placeholder prop={prop} />;
-  }
-
-  return (
-    <Stack
-      direction="column"
-      sx={{
-        gap: 1,
-      }}
-      data-toolpad-slot-name={prop}
-      data-toolpad-slot-parent={nodeId}
-      data-toolpad-slot-type="layout"
-    >
-      {children}
-    </Stack>
-  );
-}
-
 export function isToolpadComponent(
   maybeComponent: unknown,
 ): maybeComponent is ToolpadComponent<any> {
@@ -287,11 +229,11 @@ export function createComponent<P extends object>(
   });
 }
 
-export interface UnstableSlotProps {
+export interface SlotProps {
   prop: string;
 }
 
-export function UnstableSlot({ prop }: UnstableSlotProps): React.ReactNode {
+export function Slot({ prop }: SlotProps): React.ReactNode {
   const node = useNode();
 
   const rawContent = useProp(prop);
@@ -324,11 +266,11 @@ export function UnstableSlot({ prop }: UnstableSlotProps): React.ReactNode {
   );
 }
 
-export interface UnstableSlotsProps {
+export interface SlotsProps {
   prop: string;
 }
 
-export function UnstableSlots({ prop }: UnstableSlotsProps): React.ReactNode {
+export function Slots({ prop }: SlotsProps): React.ReactNode {
   const node = useNode();
 
   const rawContent = useProp(prop);
@@ -347,7 +289,7 @@ export function UnstableSlots({ prop }: UnstableSlotsProps): React.ReactNode {
   const count = React.Children.count(content);
 
   if (count <= 0) {
-    return <UnstableSlot prop={prop} />;
+    return <Slot prop={prop} />;
   }
 
   return (
@@ -360,4 +302,62 @@ export function UnstableSlots({ prop }: UnstableSlotsProps): React.ReactNode {
       {content}
     </Box>
   );
+}
+
+export interface TemplateProps {
+  prop: string;
+  scope?: Record<string, unknown>;
+}
+
+export function Template({ prop, scope }: TemplateProps) {
+  const node = useNode();
+  const scopeId = React.useId();
+
+  const rawContent = useProp(prop);
+  const renderContent = typeof rawContent === 'function' ? rawContent : null;
+  const content = renderContent?.(scopeId, scope);
+
+  if (!node) {
+    // production
+    return content;
+  }
+
+  const count = React.Children.count(content);
+
+  if (count <= 0) {
+    return (
+      <Box
+        sx={{
+          minHeight: 72,
+          minWidth: 200,
+        }}
+        data-toolpad-slot-name={prop}
+        data-toolpad-slot-parent={node.nodeId}
+        data-toolpad-slot-type="single"
+      />
+    );
+  }
+
+  return (
+    <Box
+      sx={{ display: 'contents' }}
+      data-toolpad-slot-name={prop}
+      data-toolpad-slot-parent={node.nodeId}
+      data-toolpad-slot-type="layout"
+    >
+      {content}
+    </Box>
+  );
+}
+
+export interface TemplateInstanceProps {
+  prop: string;
+  scope?: Record<string, unknown>;
+}
+
+export function TemplateInstance({ prop, scope = {} }: TemplateInstanceProps) {
+  const scopeId = React.useId();
+  const rawContent = useProp(prop);
+  const renderContent = typeof rawContent === 'function' ? rawContent : null;
+  return renderContent?.(scopeId, scope);
 }

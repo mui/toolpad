@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { Stack as MuiStack, StackProps } from '@mui/material';
-import { UnstableSlots } from '@mui/toolpad-core';
+import { Slots } from '@mui/toolpad-core';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
 function Stack(props: StackProps) {
   return (
     <MuiStack {...props}>
-      <UnstableSlots prop="children" />
+      <Slots prop="children" />
     </MuiStack>
   );
 }

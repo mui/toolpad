@@ -15,7 +15,6 @@ import {
   ToolpadComponent,
   createComponent,
   TOOLPAD_COMPONENT,
-  Slots,
   NodeId,
   BindableAttrValue,
   NestedBindableAttrs,
@@ -57,7 +56,7 @@ import {
   NodeErrorProps,
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
-  UnstableSlots,
+  Slots,
   UseDataProviderContext,
 } from '@mui/toolpad-core/runtime';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -1123,36 +1122,26 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
     const hookResult: Record<string, any> = { ...props };
     // Wrap element props
     for (const [propName, argType] of Object.entries(argTypes)) {
-      const isElement = argType?.type === 'element';
       const isTemplate = argType?.type === 'template';
 
-      if (isElement || isTemplate) {
+      if (isTemplate) {
         const value = hookResult[propName];
-
-        let wrappedValue = value;
-        if (argType.control?.type === 'layoutSlot') {
-          wrappedValue = <Slots prop={propName}>{value}</Slots>;
-        }
-
-        if (isTemplate) {
-          appDom.assertIsElement(node);
-          hookResult[propName] = (key: string, localScope: Record<string, unknown>) => {
-            return (
-              <TemplateScoped
-                id={`${node.id}.props.${propName}.${key}`}
-                localScope={localScope}
-                node={node}
-                propName={propName}
-              >
-                {wrappedValue}
-              </TemplateScoped>
-            );
-          };
-        } else {
-          hookResult[propName] = wrappedValue;
-        }
+        appDom.assertIsElement(node);
+        hookResult[propName] = (key: string, localScope: Record<string, unknown>) => {
+          return value ? (
+            <TemplateScoped
+              id={`${node.id}.props.${propName}.${key}`}
+              localScope={localScope}
+              node={node}
+              propName={propName}
+            >
+              {value}
+            </TemplateScoped>
+          ) : null;
+        };
       }
     }
+
     return hookResult;
   }, [argTypes, node, props]);
 
@@ -1231,7 +1220,7 @@ const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRo
         }}
         {...props}
       >
-        <UnstableSlots prop="children" />
+        <Slots prop="children" />
       </Stack>
     </Container>
   );

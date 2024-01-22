@@ -120,7 +120,7 @@ module.exports = {
         'packages/toolpad-core/**/*',
         'packages/toolpad-components/**/*',
       ],
-      excludedFiles: ['tsup.config.ts', '*.spec.ts', '*.spec.tsx', 'vitest.config.ts'],
+      excludedFiles: ['tsup.config.ts', '*.spec.ts', '*.spec.tsx', 'vitest.config.mts'],
       rules: {
         'import/no-extraneous-dependencies': ['error'],
       },

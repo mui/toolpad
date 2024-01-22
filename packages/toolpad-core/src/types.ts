@@ -239,18 +239,18 @@ export type JsonSchemaToTs<T extends JSONSchema7> = T extends {
       [K in keyof T['properties']]?: JsonSchemaToTs<NonNullable<T['properties']>[K]>;
     }
   : T extends { type: 'array'; items?: JSONSchema7 }
-  ? T['items'] extends undefined
-    ? unknown[]
-    : JsonSchemaToTs<NonNullable<T['items']>>[]
-  : T extends { type: 'string' }
-  ? string
-  : T extends { type: 'number' | 'integer' }
-  ? number
-  : T extends { type: 'boolean' }
-  ? boolean
-  : T extends { type: 'null' }
-  ? null
-  : unknown;
+    ? T['items'] extends undefined
+      ? unknown[]
+      : JsonSchemaToTs<NonNullable<T['items']>>[]
+    : T extends { type: 'string' }
+      ? string
+      : T extends { type: 'number' | 'integer' }
+        ? number
+        : T extends { type: 'boolean' }
+          ? boolean
+          : T extends { type: 'null' }
+            ? null
+            : unknown;
 
 export type InferParameterType<T extends PropValueType> = T extends {
   type: 'object' | 'array';
@@ -548,8 +548,8 @@ export interface ToolpadDataProviderBase<
   paginationMode?: P;
   getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
   deleteRecord?: (id: string | number) => Promise<void>;
-  updateRecord?: (id: string | number, record: Partial<R>) => Promise<void>;
-  createRecord?: (record: R) => Promise<void>;
+  updateRecord?: (id: string | number, record: Partial<R>) => Promise<R | void>;
+  createRecord?: (record: R) => Promise<R>;
 }
 
 export type NodeHashes = Record<NodeId, number | undefined>;

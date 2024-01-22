@@ -11,10 +11,10 @@ import {
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import * as appDom from '../../../appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
-import useBoolean from '../../../utils/useBoolean';
 import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
 
 export interface UrlQueryEditorProps {

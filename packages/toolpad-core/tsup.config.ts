@@ -20,7 +20,7 @@ function cleanFolderOnFailure(folder: string): EsbuildPlugin {
 
 export default defineConfig({
   entry: ['src/*{.ts,.tsx}'],
-  format: ['esm', 'cjs'],
+  format: ['esm'],
   dts: false,
   silent: true,
   sourcemap: true,

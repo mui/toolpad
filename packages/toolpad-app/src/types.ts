@@ -11,8 +11,8 @@ import {
   NodeHashes,
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
+import type { Awaitable, Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
 import type * as appDom from './appDom';
-import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
 import type { Rectangle } from './utils/geometry';
 import type { RuntimeState } from './runtime';
 
@@ -205,6 +205,7 @@ export type ProjectEvents = {
 };
 
 export interface ToolpadProjectOptions {
+  toolpadDevMode: boolean;
   dev: boolean;
   externalUrl?: string;
   base: string;

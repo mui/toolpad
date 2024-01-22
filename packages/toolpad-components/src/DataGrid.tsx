@@ -1,7 +1,6 @@
 import {
   DataGridProProps,
   DataGridPro,
-  GridToolbar,
   GridColumnResizeParams,
   GridRowsProp,
   GridColumnOrderChangeParams,
@@ -29,6 +28,15 @@ import {
   GridApiPro,
   GridRowModesModel,
   GridRowModel,
+  GridToolbarContainer,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
+  GridToolbarDensitySelector,
+  GridToolbarExport,
+  gridVisibleColumnFieldsSelector,
+  GridEventListener,
+  GridRowEditStopReasons,
+  GridRowEditStartReasons,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -58,12 +66,14 @@ import {
   IconButton,
   CircularProgress,
   Alert,
-  Collapse,
+  Button,
+  Snackbar,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
@@ -78,6 +88,10 @@ import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay, { ErrorContent } from './components/ErrorOverlay';
 
+const DRAFT_ROW_MARKER = Symbol('draftRow');
+
+const ACTIONS_COLUMN_FIELD = '___actions___';
+
 type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
 const LICENSE_INFO: MuiLicenseInfo = {
@@ -86,7 +100,9 @@ const LICENSE_INFO: MuiLicenseInfo = {
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
-const SetActionErrorContext = React.createContext<((error: Error) => void) | undefined>(undefined);
+const SetActionResultContext = React.createContext<((result: ActionResult) => void) | undefined>(
+  undefined,
+);
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -153,7 +169,7 @@ function isValidDate(input: string) {
   return false;
 }
 
-const SkeletonCell = styled(Box)(({ theme }) => ({
+const SkeletonCell = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -436,6 +452,17 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map((column) => {
+    const isIdColumn = column.field === 'id';
+
+    if (isIdColumn) {
+      return {
+        ...column,
+        editable: false,
+        hide: true,
+        renderCell: ({ row, value }) => (row[DRAFT_ROW_MARKER] ? '' : value),
+      };
+    }
+
     let baseColumn: Omit<SerializableGridColumn, 'field'> = { editable: true };
 
     if (column.type) {
@@ -487,6 +514,28 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   });
 }
 
+type ActionResult =
+  | {
+      action: 'create';
+      id: GridRowId;
+      error?: undefined;
+    }
+  | {
+      action: 'create';
+      id?: undefined;
+      error: Error;
+    }
+  | {
+      action: 'update';
+      id: GridRowId;
+      error?: Error;
+    }
+  | {
+      action: 'delete';
+      id: GridRowId;
+      error?: Error;
+    };
+
 const EMPTY_ROWS: GridRowsProp = [];
 
 interface Selection {
@@ -515,7 +564,7 @@ interface DeleteActionProps {
 function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
   const [loading, setLoading] = React.useState(false);
 
-  const setActionError = useNonNullableContext(SetActionErrorContext);
+  const setActionResult = useNonNullableContext(SetActionResultContext);
 
   const handleDeleteClick = React.useCallback(async () => {
     invariant(dataProvider.deleteRecord, 'dataProvider must be defined');
@@ -523,17 +572,46 @@ function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
     try {
       await dataProvider.deleteRecord(id);
       await refetch();
+
+      setActionResult({ action: 'delete', id });
     } catch (error) {
-      setActionError(errorFrom(error));
+      setActionResult({ action: 'delete', id, error: errorFrom(error) });
     } finally {
       setLoading(false);
     }
-  }, [dataProvider, id, refetch, setActionError]);
+  }, [dataProvider, id, refetch, setActionResult]);
 
   return (
     <IconButton onClick={handleDeleteClick} size="small" aria-label={`Delete row with id "${id}"`}>
       {loading ? <CircularProgress size={16} /> : <DeleteIcon fontSize="inherit" />}
     </IconButton>
+  );
+}
+
+interface EditToolbarProps {
+  hasCreateButton?: boolean;
+  createDisabled?: boolean;
+  onCreateClick?: () => void;
+}
+
+function EditToolbar({ hasCreateButton, onCreateClick, createDisabled }: EditToolbarProps) {
+  return (
+    <GridToolbarContainer>
+      {hasCreateButton ? (
+        <Button
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={onCreateClick}
+          disabled={createDisabled}
+        >
+          Add record
+        </Button>
+      ) : null}
+      <GridToolbarColumnsButton />
+      <GridToolbarFilterButton />
+      <GridToolbarDensitySelector />
+      <GridToolbarExport />
+    </GridToolbarContainer>
   );
 }
 
@@ -544,11 +622,16 @@ interface DataProviderDataGridProps extends Partial<DataGridProProps> {
 
 function useDataProviderDataGridProps(
   dataProviderId: string | null | undefined,
-  api: GridApiPro,
-  setActionError: (error: Error) => void,
+  idField: string,
+  apiRef: React.MutableRefObject<GridApiPro>,
+  setActionResult: (result: ActionResult) => void,
 ): DataProviderDataGridProps {
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
-  const { dataProvider } = useDataProvider(dataProviderId || null);
+  const {
+    dataProvider,
+    error: dataProviderLoadError,
+    isLoading: dataProviderLoading,
+  } = useDataProvider(dataProviderId || null);
 
   const [rawPaginationModel, setRawPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
@@ -607,6 +690,28 @@ function useDataProviderDataGridProps(
 
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
 
+  const isEditing = React.useMemo(
+    () => Object.values(rowModesModel).some((mode) => mode.mode === GridRowModes.Edit),
+    [rowModesModel],
+  );
+
+  const [draftRow, setDraftRow] = React.useState<GridRowModel | null>(null);
+
+  const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
+    // Blurring the cell shouldn't end edit mode
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
+    } else {
+      setDraftRow(null);
+    }
+  };
+
+  const handleRowEditStart: GridEventListener<'rowEditStart'> = (params, event) => {
+    if (isEditing && params.reason === GridRowEditStartReasons.cellDoubleClick) {
+      event.defaultMuiPrevented = true;
+    }
+  };
+
   const {
     data,
     isFetching,
@@ -654,31 +759,58 @@ function useDataProviderDataGridProps(
 
   const handleProcessRowUpdate = React.useCallback(
     async (newRow: GridRowModel, oldRow: GridRowModel) => {
-      invariant(
-        dataProvider?.updateRecord,
-        'Edit action should be unavailable when dataProvider.updateRecord is not defined',
-      );
-
-      // TODO: handle when idField is not 'id'
-      const idField = 'id';
       const id = oldRow[idField];
       const values = Object.fromEntries(
         Object.entries(newRow).filter(([key, value]) => value !== oldRow[key]),
       );
 
+      const action = oldRow[DRAFT_ROW_MARKER] ? 'create' : 'update';
+
       setRowUpdating((oldState) => ({ ...oldState, [id]: true }));
+
       try {
-        await dataProvider.updateRecord(id, values);
-        return newRow;
+        if (action === 'create') {
+          try {
+            invariant(
+              dataProvider?.createRecord,
+              'Edit action should be unavailable when dataProvider.createRecord is not defined',
+            );
+            const newRecord = await dataProvider.createRecord(values);
+            if (!newRecord) {
+              throw new Error('No record returned by createRecord');
+            }
+
+            setActionResult({ action, id: newRecord[idField] as GridRowId });
+            return newRecord;
+          } catch (error) {
+            setActionResult({ action, error: errorFrom(error) });
+            throw error;
+          }
+        } else {
+          try {
+            invariant(
+              dataProvider?.updateRecord,
+              'Edit action should be unavailable when dataProvider.updateRecord is not defined',
+            );
+            let newRecord = await dataProvider.updateRecord(id, values);
+            newRecord ??= newRow;
+            setActionResult({ action, id: newRecord[idField] as GridRowId });
+            return newRecord;
+          } catch (error) {
+            setActionResult({ action, id, error: errorFrom(error) });
+            throw error;
+          }
+        }
       } finally {
         setRowUpdating((oldState) => {
           const { [id]: discard, ...newState } = oldState;
           return newState;
         });
+        setDraftRow(null);
         await refetch();
       }
     },
-    [dataProvider, refetch],
+    [dataProvider, idField, refetch, setActionResult],
   );
 
   const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
@@ -686,22 +818,24 @@ function useDataProviderDataGridProps(
       return undefined;
     }
 
-    return ({ id }) => {
+    return ({ id, row }) => {
       const result = [];
 
       if (dataProvider.updateRecord) {
         const rowIsInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         const rowIsUpdating = rowUpdating[id];
 
+        const isDraft = row[DRAFT_ROW_MARKER];
+
         if (rowIsInEditMode || rowIsUpdating) {
           return [
             <IconButton
               key="commit"
               size="small"
-              aria-label={`Save updates to row with id "${id}"`}
+              aria-label={`Save updates to ${isDraft ? 'new row' : `row with id "${id}"`}`}
               disabled={rowIsUpdating}
               onClick={async () => {
-                api.stopRowEditMode({ id });
+                apiRef.current.stopRowEditMode({ id });
               }}
             >
               {rowIsUpdating ? <CircularProgress size={16} /> : <SaveIcon fontSize="inherit" />}
@@ -712,7 +846,8 @@ function useDataProviderDataGridProps(
               aria-label="Cancel updates"
               disabled={rowIsUpdating}
               onClick={() => {
-                api.stopRowEditMode({ id, ignoreModifications: true });
+                setDraftRow(null);
+                apiRef.current.stopRowEditMode({ id, ignoreModifications: true });
               }}
             >
               <CloseIcon fontSize="inherit" />
@@ -720,33 +855,59 @@ function useDataProviderDataGridProps(
           ];
         }
 
-        result.push(
-          <IconButton
-            key="update"
-            onClick={() => {
-              api.startRowEditMode({ id });
-            }}
-            size="small"
-            aria-label={`Edit row with id "${id}"`}
-          >
-            <EditIcon fontSize="inherit" />
-          </IconButton>,
-        );
+        if (!isEditing) {
+          result.push(
+            <IconButton
+              key="update"
+              onClick={() => {
+                apiRef.current.startRowEditMode({ id });
+              }}
+              size="small"
+              aria-label={`Edit row with id "${id}"`}
+            >
+              <EditIcon fontSize="inherit" />
+            </IconButton>,
+          );
+        }
       }
 
-      if (dataProvider.deleteRecord) {
-        result.push(
-          <DeleteAction key="delete" id={id} dataProvider={dataProvider} refetch={refetch} />,
-        );
+      if (!isEditing) {
+        if (dataProvider.deleteRecord) {
+          result.push(
+            <DeleteAction key="delete" id={id} dataProvider={dataProvider} refetch={refetch} />,
+          );
+        }
       }
 
       return result;
     };
-  }, [api, dataProvider, refetch, rowModesModel, rowUpdating]);
+  }, [apiRef, dataProvider, isEditing, refetch, rowModesModel, rowUpdating]);
 
-  if (!dataProvider) {
+  const rows = React.useMemo<GridRowsProp>(() => {
+    let rowData = data?.records ?? [];
+    if (draftRow) {
+      rowData = [draftRow, ...rowData];
+    }
+    return rowData;
+  }, [data?.records, draftRow]);
+
+  if (!dataProviderId) {
     return {};
   }
+
+  if (dataProviderLoadError) {
+    return {
+      rowLoadingError: dataProviderLoadError,
+    };
+  }
+
+  if (dataProviderLoading) {
+    return {
+      loading: true,
+    };
+  }
+
+  invariant(dataProvider, "dataProvider must be defined if it's loaded without error");
 
   return {
     loading: isLoading || (isPlaceholderData && isFetching),
@@ -768,14 +929,38 @@ function useDataProviderDataGridProps(
     onFilterModelChange: setRawFilterModel,
     sortModel: rawSortModel,
     onSortModelChange: setRawSortModel,
-    rows: data?.records ?? [],
+    rows,
     rowLoadingError,
     getActions,
     editMode: 'row',
     rowModesModel,
     onRowModesModelChange: (model) => setRowModesModel(model),
     processRowUpdate: handleProcessRowUpdate,
-    onProcessRowUpdateError: (err) => setActionError(errorFrom(err)),
+    onRowEditStart: handleRowEditStart,
+    onRowEditStop: handleRowEditStop,
+    slots: {
+      toolbar: EditToolbar,
+    },
+    slotProps: {
+      toolbar: {
+        hasCreateButton: !!dataProvider.createRecord,
+        createDisabled: !!isEditing,
+        onCreateClick: () => {
+          const draftRowId = crypto.randomUUID();
+          setDraftRow({ id: draftRowId, [DRAFT_ROW_MARKER]: true });
+          const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
+          const firstVisibleFieldIndex = visibleFields.findIndex((field) => field !== idField);
+          const fieldToFocus =
+            firstVisibleFieldIndex >= 0 ? visibleFields[firstVisibleFieldIndex] : undefined;
+          const colIndex = firstVisibleFieldIndex >= 0 ? firstVisibleFieldIndex : 0;
+          setRowModesModel((oldModel) => ({
+            ...oldModel,
+            [draftRowId]: { mode: GridRowModes.Edit, fieldToFocus },
+          }));
+          apiRef.current.scrollToIndexes({ rowIndex: 0, colIndex });
+        },
+      },
+    },
   };
 }
 
@@ -789,6 +974,86 @@ function NoRowsOverlay(props: NoRowsOverlayProps) {
   }
 
   return <GridNoRowsOverlay {...props} />;
+}
+
+interface ActionResultOverlayProps {
+  result: ActionResult | null;
+  onClose: () => void;
+  apiRef: React.MutableRefObject<GridApiPro>;
+}
+
+function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayProps) {
+  const open = !!result;
+  const actionError = result?.error;
+
+  React.useEffect(() => {
+    if (actionError) {
+      // Log error to console as well for full stacktrace
+      console.error(actionError);
+    }
+  }, [actionError]);
+
+  const lastResult = useLatest(result);
+
+  let message: React.ReactNode = null;
+  if (lastResult) {
+    if (lastResult.action === 'create') {
+      message = lastResult.error ? (
+        `Failed to create a record, ${lastResult.error.message}`
+      ) : (
+        <React.Fragment>
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <Link
+            href="#"
+            color="inherit"
+            onClick={(event) => {
+              event.preventDefault();
+              const index = apiRef.current.getAllRowIds().indexOf(lastResult.id);
+              const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
+              const fieldToFocus: string | undefined = visibleFields[0];
+              if (index >= 0 && fieldToFocus) {
+                apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
+                apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
+              }
+            }}
+            aria-label="Go to new record"
+          >
+            New record
+          </Link>{' '}
+          created successfully
+        </React.Fragment>
+      );
+    } else if (lastResult.action === 'update') {
+      message = lastResult.error
+        ? `Failed to update a record, ${lastResult.error.message}`
+        : 'Record updated successfully';
+    } else if (lastResult.action === 'delete') {
+      message = lastResult.error
+        ? `Failed to delete a record, ${lastResult.error.message}`
+        : 'Record deleted successfully';
+    }
+  }
+
+  return (
+    <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
+      <Snackbar
+        sx={{ position: 'absolute' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={open}
+        autoHideDuration={2000}
+        onClose={onClose}
+        action={
+          <IconButton size="small" aria-label="close" color="inherit" onClick={onClose}>
+            <CloseIcon fontSize="inherit" />
+          </IconButton>
+        }
+      >
+        <Alert severity={lastResult?.error ? 'error' : 'success'} onClose={onClose}>
+          {message}
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
 }
 
 function dataGridFallbackRender({ error }: FallbackProps) {
@@ -812,16 +1077,21 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const apiRef = useGridApiRef();
-  const [actionError, setActionError] = React.useState<Error | null>();
+  const [actionResult, setActionResult] = React.useState<ActionResult | null>(null);
+
+  const rowIdField = rowIdFieldProp ?? 'id';
 
   const {
     rows: dataProviderRowsInput,
     getActions: getProviderActions,
+    slots: dataProviderSlots,
+    slotProps: dataProviderSlotProps,
     ...dataProviderProps
   } = useDataProviderDataGridProps(
     rowsSource === 'dataProvider' ? dataProviderId : null,
-    apiRef.current,
-    setActionError,
+    rowIdField,
+    apiRef,
+    setActionResult,
   );
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
@@ -952,32 +1222,21 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }, [nodeRuntime, rows]);
 
   const renderedColumns = React.useMemo<GridColDef[]>(() => {
+    const result = [...columns];
+
     if (getProviderActions) {
-      return [
-        ...columns,
-        {
-          field: '___actions',
-          type: 'actions',
-          headerName: '',
-          flex: 1,
-          align: 'right',
-          getActions: getProviderActions,
-        },
-      ];
+      result.push({
+        field: ACTIONS_COLUMN_FIELD,
+        type: 'actions',
+        align: 'right',
+        resizable: false,
+        pinnable: false,
+        getActions: getProviderActions,
+      });
     }
 
-    return columns;
+    return result;
   }, [columns, getProviderActions]);
-
-  const open = !!actionError;
-  const lastActionError = useLatest(actionError);
-
-  React.useEffect(() => {
-    if (actionError) {
-      // Log error to console as well for full stacktrace
-      console.error(actionError);
-    }
-  }, [actionError]);
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
@@ -992,18 +1251,20 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           }}
         >
           <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
-            <SetActionErrorContext.Provider value={setActionError}>
+            <SetActionResultContext.Provider value={setActionResult}>
               <DataGridPro
                 apiRef={apiRef}
                 slots={{
-                  toolbar: hideToolbar ? null : GridToolbar,
+                  ...dataProviderSlots,
                   loadingOverlay: SkeletonLoadingOverlay,
                   noRowsOverlay: NoRowsOverlay,
+                  toolbar: hideToolbar ? null : dataProviderSlots?.toolbar,
                 }}
                 slotProps={{
                   noRowsOverlay: {
                     error: rowLoadingError,
                   } as any,
+                  ...dataProviderSlotProps,
                 }}
                 onColumnResize={handleResize}
                 onColumnOrderChange={handleColumnOrderChange}
@@ -1013,34 +1274,19 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 getRowId={getRowId}
                 onRowSelectionModelChange={onSelectionModelChange}
                 rowSelectionModel={selectionModel}
+                initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
                 {...props}
                 {...dataProviderProps}
               />
-            </SetActionErrorContext.Provider>
+            </SetActionResultContext.Provider>
           </ErrorBoundary>
         </div>
 
-        <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
-          <Collapse in={!!open}>
-            <Alert
-              severity="error"
-              action={
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={() => {
-                    setActionError(null);
-                  }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-            >
-              {lastActionError?.message}
-            </Alert>
-          </Collapse>
-        </Box>
+        <ActionResultOverlay
+          result={actionResult}
+          onClose={() => setActionResult(null)}
+          apiRef={apiRef}
+        />
       </div>
     </LicenseInfoProvider>
   );

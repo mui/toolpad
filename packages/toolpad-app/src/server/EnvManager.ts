@@ -4,8 +4,8 @@ import * as dotenv from 'dotenv';
 import { Emitter } from '@mui/toolpad-utils/events';
 import chalk from 'chalk';
 import { truncate } from '@mui/toolpad-utils/strings';
+import { Awaitable } from '@mui/toolpad-utils/types';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
-import { Awaitable } from '../utils/types';
 
 interface IToolpadProject {
   options: ToolpadProjectOptions;

@@ -1,5 +1,51 @@
 # Changelog
 
+## 0.1.46
+
+<!-- generated comparing v0.1.45..master -->
+
+_Jan 17, 2024_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Improvements to authorization and data providers, and some behind-the-scenes clean up!
+
+- &#8203;<!-- 8 -->Fix screenshot flakeyness (#3087) @Janpot
+- &#8203;<!-- 7 -->Load dotenv/config before reading the config (#3085) @Janpot
+- &#8203;<!-- 6 -->Tweak data providers UI in the grid (#3084) @Janpot
+- &#8203;<!-- 5 -->Improve authorization middleware (#3048) @apedroferreira
+- &#8203;<!-- 4 -->Add universal required email configuration for authentication (#3047) @apedroferreira
+- &#8203;<!-- 3 -->[code-infra] Replace hardcoded repository in monorepo update script (#3092) @Janpot
+- &#8203;<!-- 2 -->[code-infra] Add monorepo update script (#3091) @Janpot
+- &#8203;<!-- 1 -->[core] Use pnpm (#3065) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot
+
+## 0.1.45
+
+<!-- generated comparing v0.1.44..master -->
+
+_Jan 12, 2024_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Enable creating rows in data providers. Support pnpm as a package manager for installing Toolpad. Improvements to our new query editor.
+
+- &#8203;<!-- 12 -->Make Toolpad apps compatible with pnpm (#3074) @Janpot
+- &#8203;<!-- 11 -->Handle errors during data provider introspection (#3076) @Janpot
+- &#8203;<!-- 10 -->Update help text of --install flag in create-toolpad-app (#3072) @Janpot
+- &#8203;<!-- 09 -->Don't create private packages with create-toolpad-app (#3073) @Janpot
+- &#8203;<!-- 08 -->Add serverside row creation (#3058) @Janpot
+- &#8203;<!-- 07 -->Revert pnpm migration (#3064) @Janpot
+- &#8203;<!-- 06 -->Fix mismatch in query names (#3054) @bharatkashyap
+- &#8203;<!-- 05 -->Remove cache from useStorageState (#3057) @Janpot
+- &#8203;<!-- 04 -->add pnpmDedupe to renovate.json (#3062) @Janpot
+- &#8203;<!-- 03 -->[code infra] pnpm take 2 (#2546) @Janpot
+- &#8203;<!-- 02 -->Remove react-devtools (#3044) @Janpot
+- &#8203;<!-- 01 -->[core] Remove issue emoji @oliviertassinari
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari
+
 ## 0.1.44
 
 <!-- generated comparing v0.1.43..master -->

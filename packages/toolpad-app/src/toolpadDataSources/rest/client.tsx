@@ -21,6 +21,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
 import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
+import { Maybe } from '@mui/toolpad-utils/types';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -41,7 +42,6 @@ import {
   useEvaluateLiveBindingEntries,
 } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import MapEntriesEditor from '../../components/MapEntriesEditor';
-import { Maybe } from '../../utils/types';
 import AuthenticationEditor from './AuthenticationEditor';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import { useAppState, useAppStateApi } from '../../toolpad/AppState';

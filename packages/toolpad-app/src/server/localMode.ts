@@ -24,6 +24,7 @@ import {
   readJsonFile,
 } from '@mui/toolpad-utils/fs';
 import { z } from 'zod';
+import { Awaitable } from '@mui/toolpad-utils/types';
 import * as appDom from '../appDom';
 import insecureHash from '../utils/insecureHash';
 import {
@@ -57,7 +58,6 @@ import type {
   ToolpadProjectOptions,
   CodeEditorFileType,
 } from '../types';
-import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
 import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
@@ -1326,6 +1326,7 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   const dir = resolveProjectDir(dirInput);
 
   const resolvedConfig: ToolpadProjectOptions = {
+    toolpadDevMode: false,
     dev: false,
     base: '/prod',
     customServer: false,

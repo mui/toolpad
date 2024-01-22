@@ -31,6 +31,11 @@
       "schedule": ["at any time"]
     },
     {
+      "groupName": "MUI Monorepo",
+      "matchPackagePatterns": ["@mui/monorepo"],
+      "schedule": ["on sunday before 6:00am"]
+    },
+    {
       "groupName": "playwright",
       "matchPackageNames": ["playwright", "mcr.microsoft.com/playwright"],
       "matchPackagePatterns": ["^@playwright/"]

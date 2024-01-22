@@ -293,10 +293,14 @@ export interface UnstableSlotProps {
 
 export function UnstableSlot({ prop }: UnstableSlotProps): React.ReactNode {
   const node = useNode();
-  invariant(node, 'Slot must be used inside a node');
 
   const rawContent = useProp(prop);
   const content = isValidReactNode(rawContent) ? rawContent : null;
+
+  if (!node) {
+    // production
+    return content;
+  }
 
   if (rawContent && content !== rawContent) {
     console.warn(`Invalid content for slot "${prop}" in "${node.nodeName}"`);
@@ -326,10 +330,14 @@ export interface UnstableSlotsProps {
 
 export function UnstableSlots({ prop }: UnstableSlotsProps): React.ReactNode {
   const node = useNode();
-  invariant(node, 'Slot must be used inside a node');
 
   const rawContent = useProp(prop);
   const content = isValidReactNode(rawContent) ? rawContent : null;
+
+  if (!node) {
+    // production
+    return content;
+  }
 
   if (rawContent && content !== rawContent) {
     console.warn(`Invalid content for slot "${prop}" in "${node.nodeName}"`);

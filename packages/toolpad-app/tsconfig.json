@@ -36,7 +36,8 @@
     "**/*.ts",
     "**/*.tsx",
     "typings/**/*.d.ts",
-    "scripts/*.mts"
+    "scripts/*.mts",
+    "vitest.config.mts"
   ],
   "exclude": ["node_modules", "./scripts", "./public"]
 }

@@ -1,6 +1,5 @@
 export type { SlotsProps, NodeRuntime, NodeErrorProps, Components } from './runtime';
 export {
-  Slots,
   useNode,
   ComponentsContext,
   isToolpadComponent,

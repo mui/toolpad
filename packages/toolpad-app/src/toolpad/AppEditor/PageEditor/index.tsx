@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
 import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../../components/resizablePanels';
 import RenderPanel from './RenderPanel';
 import { PageEditorProvider } from './PageEditorProvider';
 import ComponentPanel from './ComponentPanel';
 import { useAppState } from '../../AppState';
-import * as appDom from '../../../appDom';
 import ComponentCatalog from './ComponentCatalog';
 import NotFoundEditor from '../NotFoundEditor';
 import useUndoRedo from '../../hooks/useUndoRedo';

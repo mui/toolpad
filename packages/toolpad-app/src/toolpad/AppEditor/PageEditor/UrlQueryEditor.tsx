@@ -12,7 +12,7 @@ import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
-import * as appDom from '../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';

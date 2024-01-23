@@ -19,7 +19,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
-import * as appDom from '../../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import QueryIcon from '../../QueryIcon';
 import { useAppState, useAppStateApi } from '../../../AppState';

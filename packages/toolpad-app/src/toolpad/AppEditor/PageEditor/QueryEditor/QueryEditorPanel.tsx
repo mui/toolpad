@@ -14,7 +14,7 @@ import { BindableAttrValue, LiveBinding } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import invariant from 'invariant';
 import { usePageEditorState } from '../PageEditorProvider';
-import * as appDom from '../../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import { useEvaluateLiveBinding } from '../../useEvaluateLiveBinding';
 import { useAppState, useAppStateApi } from '../../../AppState';

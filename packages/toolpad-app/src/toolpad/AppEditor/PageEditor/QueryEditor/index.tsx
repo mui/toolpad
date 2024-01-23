@@ -7,7 +7,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import { useAppState, useAppStateApi } from '../../../AppState';
 import { usePageEditorState } from '../PageEditorProvider';
-import * as appDom from '../../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import QueryIcon from '../../QueryIcon';
 import QueryEditorPanel from './QueryEditorPanel';
 import useShortcut from '../../../../utils/useShortcut';

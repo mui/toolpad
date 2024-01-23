@@ -30,7 +30,7 @@ import lazyComponent from '../../utils/lazyComponent';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import useQueryPreview from '../useQueryPreview';
-import * as appDom from '../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import {
   SqlConnectionStatus,
   SqlConnectionParams,

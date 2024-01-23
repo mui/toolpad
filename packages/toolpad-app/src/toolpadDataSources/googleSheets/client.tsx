@@ -32,7 +32,7 @@ import { usePrivateQuery } from '../context';
 import QueryInputPanel from '../QueryInputPanel';
 import useQueryPreview from '../useQueryPreview';
 import useFetchPrivate from '../useFetchPrivate';
-import * as appDom from '../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 
 const EMPTY_ROWS: any[] = [];
 

@@ -5,7 +5,7 @@ import clsx from 'clsx';
 import invariant from 'invariant';
 
 import { omit } from '@mui/toolpad-utils/immutability';
-import * as appDom from '../../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppStateApi, useAppState, useDomApi } from '../../../AppState';
 import {
   DropZone,

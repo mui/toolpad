@@ -13,7 +13,7 @@ import type {
   BindableAttrValues,
   SecretAttrValue,
   BindableAttrEntries,
-} from '../types';
+} from './types';
 
 export const CURRENT_APPDOM_VERSION = 7;
 

@@ -12,7 +12,7 @@ import {
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
 import type { Awaitable, Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
-import type * as appDom from './appDom';
+import type * as appDom from '@mui/toolpad-core/appDom';
 import type { Rectangle } from './utils/geometry';
 import type { RuntimeState } from './runtime';
 

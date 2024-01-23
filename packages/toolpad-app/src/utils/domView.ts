@@ -1,6 +1,6 @@
 import { NodeId } from '@mui/toolpad-core';
 import { matchPath } from 'react-router-dom';
-import { QueryNode, FetchMode } from '../appDom';
+import { QueryNode, FetchMode } from '@mui/toolpad-core/appDom';
 
 export type QueryMeta = {
   name?: string;

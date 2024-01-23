@@ -25,7 +25,7 @@ import {
 } from '@mui/toolpad-utils/fs';
 import { z } from 'zod';
 import { Awaitable } from '@mui/toolpad-utils/types';
-import * as appDom from '../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import insecureHash from '../utils/insecureHash';
 import {
   Page,

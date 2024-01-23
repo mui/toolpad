@@ -8,7 +8,7 @@ import { mapValues } from '@mui/toolpad-utils/collections';
 import useDebouncedHandler from '@mui/toolpad-utils/hooks/useDebouncedHandler';
 import useEventCallback from '@mui/utils/useEventCallback';
 import { omit, update } from '@mui/toolpad-utils/immutability';
-import * as appDom from '../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useProjectApi } from '../projectApi';
 import useShortcut from '../utils/useShortcut';
 import insecureHash from '../utils/insecureHash';

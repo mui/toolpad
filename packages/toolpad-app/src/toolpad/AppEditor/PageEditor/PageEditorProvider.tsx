@@ -1,7 +1,7 @@
 import { NodeId, LiveBindings, ScopeMeta, ApplicationVm } from '@mui/toolpad-core';
 import * as React from 'react';
 import { update, updateOrCreate } from '@mui/toolpad-utils/immutability';
-import * as appDom from '../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { PageViewState } from '../../../types';
 import { RectangleEdge } from '../../../utils/geometry';
 

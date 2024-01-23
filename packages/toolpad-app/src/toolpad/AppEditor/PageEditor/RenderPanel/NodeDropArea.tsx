@@ -4,7 +4,7 @@ import { styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
 
 import { FlowDirection } from '../../../../types';
-import * as appDom from '../../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import {
   absolutePositionCss,
   isHorizontalFlow,

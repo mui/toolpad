@@ -27,7 +27,7 @@ import LegendToggleIcon from '@mui/icons-material/LegendToggle';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
 import { blueberryTwilightPalette } from '@mui/x-charts/colorPalettes';
 import { updateArray, remove } from '@mui/toolpad-utils/immutability';
-import * as appDom from '../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';

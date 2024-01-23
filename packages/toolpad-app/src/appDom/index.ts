@@ -7,16 +7,13 @@ import {
   BindableAttrValues,
   SecretAttrValue,
   BindableAttrEntries,
-  EnvAttrValue,
 } from '@mui/toolpad-core';
 import invariant from 'invariant';
 import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
 import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
 import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { ExactEntriesOf, Maybe } from '@mui/toolpad-utils/types';
-import { AuthProviderConfig, ConnectionStatus } from '../types';
-import { omit, update, updateOrCreate } from '../utils/immutability';
-import { envBindingSchema } from '../server/schema';
+import { omit, update, updateOrCreate } from '@mui/toolpad-utils/immutability';
 
 export const CURRENT_APPDOM_VERSION = 7;
 
@@ -39,6 +36,17 @@ export function compareFractionalIndex(index1: string, index2: string): number {
     return 0;
   }
   return index1 > index2 ? 1 : -1;
+}
+
+export type AuthProvider = 'github' | 'google';
+
+export interface AuthProviderConfig {
+  provider: AuthProvider;
+}
+
+export interface ConnectionStatus {
+  timestamp: number;
+  error?: string;
 }
 
 type AppDomNodeType = 'app' | 'connection' | 'theme' | 'page' | 'element' | 'query' | 'mutation';
@@ -1157,30 +1165,6 @@ export function applyDiff(dom: AppDom, diff: DomDiff): AppDom {
   }
 
   return result;
-}
-
-function findEnvBindings(obj: unknown): EnvAttrValue[] {
-  if (Array.isArray(obj)) {
-    return obj.flatMap((item) => findEnvBindings(item));
-  }
-
-  if (obj && typeof obj === 'object') {
-    try {
-      return [envBindingSchema.parse(obj)];
-    } catch {
-      return Object.values(obj).flatMap((value) => findEnvBindings(value));
-    }
-  }
-
-  return [];
-}
-
-export function getRequiredEnvVars(dom: AppDom): Set<string> {
-  const allVars = Object.values(dom.nodes)
-    .flatMap((node) => findEnvBindings(node))
-    .map((binding) => binding.$$env);
-
-  return new Set(allVars);
 }
 
 export function getPageDisplayName(node: PageNode): string {

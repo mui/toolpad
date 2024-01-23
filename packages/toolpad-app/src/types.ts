@@ -109,11 +109,6 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}> {
 
 export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;
 
-export interface ConnectionStatus {
-  timestamp: number;
-  error?: string;
-}
-
 export interface ExecFetchFn<Q, R extends ExecFetchResult> {
   (fetchQuery: Q, params: Record<string, string>): Promise<R>;
 }
@@ -213,9 +208,3 @@ export interface ToolpadProjectOptions {
 }
 
 export type CodeEditorFileType = 'resource' | 'component';
-
-export type AuthProvider = 'github' | 'google';
-
-export interface AuthProviderConfig {
-  provider: AuthProvider;
-}

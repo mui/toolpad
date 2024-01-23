@@ -36,11 +36,11 @@ import {
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import { TabContext, TabList } from '@mui/lab';
+import { updateArray } from '@mui/toolpad-utils/immutability';
 import { useAppState, useAppStateApi } from '../AppState';
 import * as appDom from '../../appDom';
 import TabPanel from '../../components/TabPanel';
 import { AuthProviderConfig, AuthProvider } from '../../types';
-import { updateArray } from '../../utils/immutability';
 
 const AUTH_PROVIDERS = new Map([
   ['github', { name: 'GitHub', Icon: GitHubIcon }],

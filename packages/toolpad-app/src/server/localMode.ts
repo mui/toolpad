@@ -5,7 +5,7 @@ import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import { BindableAttrValue, PropBindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrValue, EnvAttrValue, PropBindableAttrValue } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
@@ -44,6 +44,7 @@ import {
   API_VERSION,
   applicationSchema,
   Application,
+  envBindingSchema,
 } from './schema';
 import { format, resolvePrettierConfig } from '../utils/prettier';
 import {
@@ -939,6 +940,30 @@ async function calculateDomFingerprint(root: string): Promise<number> {
   return insecureHash(JSON.stringify(mtimes));
 }
 
+function findEnvBindings(obj: unknown): EnvAttrValue[] {
+  if (Array.isArray(obj)) {
+    return obj.flatMap((item) => findEnvBindings(item));
+  }
+
+  if (obj && typeof obj === 'object') {
+    try {
+      return [envBindingSchema.parse(obj)];
+    } catch {
+      return Object.values(obj).flatMap((value) => findEnvBindings(value));
+    }
+  }
+
+  return [];
+}
+
+export function getRequiredEnvVars(dom: appDom.AppDom): Set<string> {
+  const allVars = Object.values(dom.nodes)
+    .flatMap((node) => findEnvBindings(node))
+    .map((binding) => binding.$$env);
+
+  return new Set(allVars);
+}
+
 class ToolpadProject {
   private root: string;
 
@@ -1095,7 +1120,7 @@ class ToolpadProject {
   }
 
   alertOnMissingVariablesInDom(dom: appDom.AppDom) {
-    const requiredVars = appDom.getRequiredEnvVars(dom);
+    const requiredVars = getRequiredEnvVars(dom);
     const missingVars = Array.from(requiredVars).filter(
       (key) => typeof process.env[key] === 'undefined',
     );

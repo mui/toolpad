@@ -21,6 +21,7 @@ import { BindableAttrEntries, BindableAttrValue, ExecFetchResult } from '@mui/to
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { serializeError, errorFrom } from '@mui/toolpad-utils/errors';
 import { Maybe } from '@mui/toolpad-utils/types';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
@@ -30,7 +31,6 @@ import lazyComponent from '../../utils/lazyComponent';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import useQueryPreview from '../useQueryPreview';
-import * as appDom from '@mui/toolpad-core/appDom';
 import {
   SqlConnectionStatus,
   SqlConnectionParams,

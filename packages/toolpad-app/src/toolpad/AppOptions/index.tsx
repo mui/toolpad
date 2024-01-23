@@ -4,9 +4,9 @@ import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CodeIcon from '@mui/icons-material/Code';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
+import * as appDom from '@mui/toolpad-core/appDom';
 import useMenu from '../../utils/useMenu';
 import AppExportDialog from './AppExportDialog';
-import * as appDom from '../../appDom';
 
 interface AppOptionsProps {
   dom?: appDom.AppDom;

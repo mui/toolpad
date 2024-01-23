@@ -3,7 +3,7 @@ import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
-import * as appDom from '../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState } from '../../AppState';
 import dataSources from '../../../toolpadDataSources/client';
 

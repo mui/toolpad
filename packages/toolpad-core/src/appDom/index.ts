@@ -1,19 +1,19 @@
 import { nanoid } from 'nanoid/non-secure';
 import { generateKeyBetween } from 'fractional-indexing';
-import {
+import invariant from 'invariant';
+import type { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
+import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
+import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { ExactEntriesOf, Maybe } from '@mui/toolpad-utils/types';
+import { omit, update, updateOrCreate } from '@mui/toolpad-utils/immutability';
+import type {
   NodeId,
   NodeReference,
   BindableAttrValue,
   BindableAttrValues,
   SecretAttrValue,
   BindableAttrEntries,
-} from '@mui/toolpad-core';
-import invariant from 'invariant';
-import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
-import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
-import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
-import { ExactEntriesOf, Maybe } from '@mui/toolpad-utils/types';
-import { omit, update, updateOrCreate } from '@mui/toolpad-utils/immutability';
+} from '../types';
 
 export const CURRENT_APPDOM_VERSION = 7;
 
@@ -553,7 +553,9 @@ export function createElement<P>(
  * Get all descendants of a `node`, flattens childNodes objects into one single array
  */
 export function getDescendants(dom: AppDom, node: AppDomNode): readonly AppDomNode[] {
-  const children: readonly AppDomNode[] = Object.values(getChildNodes(dom, node))
+  const children: readonly AppDomNode[] = (
+    Object.values(getChildNodes(dom, node)) as AppDomNode[][]
+  )
     .flat()
     .filter(Boolean);
   return [...children, ...children.flatMap((child) => getDescendants(dom, child))];

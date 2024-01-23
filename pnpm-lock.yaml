@@ -917,9 +917,15 @@ importers:
       cookie:
         specifier: 0.6.0
         version: 0.6.0
+      fractional-indexing:
+        specifier: 3.2.0
+        version: 3.2.0
       invariant:
         specifier: 2.2.4
         version: 2.2.4
+      nanoid:
+        specifier: 5.0.4
+        version: 5.0.4
       quickjs-emscripten:
         specifier: 0.26.0
         version: 0.26.0
@@ -939,6 +945,9 @@ importers:
       '@types/cookie':
         specifier: 0.6.0
         version: 0.6.0
+      '@types/invariant':
+        specifier: 2.2.37
+        version: 2.2.37
       '@types/react':
         specifier: 18.2.48
         version: 18.2.48

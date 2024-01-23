@@ -256,7 +256,7 @@ elementSchema = baseElementSchema
   })
   .describe('The instance of a component. Used to build user interfaces in pages.');
 
-const authProviderSchema = z.enum(['github', 'google', 'azure-ad']);
+const authProviderSchema = z.enum(['github', 'google', 'azure-ad', 'credentials']);
 
 export const applicationSchema = toolpadObjectSchema(
   'application',

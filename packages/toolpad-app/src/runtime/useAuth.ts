@@ -8,7 +8,7 @@ const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
 const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
 const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
-export type AuthProvider = 'github' | 'google' | 'azure-ad';
+export type AuthProvider = 'github' | 'google' | 'azure-ad' | 'credentials';
 
 export interface AuthSession {
   user: {
@@ -21,7 +21,11 @@ export interface AuthSession {
 
 export interface AuthPayload {
   session: AuthSession | null;
-  signIn: (provider: AuthProvider) => void | Promise<void>;
+  signIn: (
+    provider: AuthProvider,
+    payload?: Record<string, unknown>,
+    isLocalProvider?: boolean,
+  ) => void | Promise<void>;
   signOut: () => void | Promise<void>;
   isSigningIn: boolean;
   isSigningOut: boolean;
@@ -111,7 +115,7 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
   }, [basename, signOut]);
 
   const signIn = React.useCallback(
-    async (provider: AuthProvider) => {
+    async (provider: AuthProvider, payload?: Record<string, unknown>, isLocalProvider = false) => {
       setIsSigningIn(true);
 
       let csrfToken = '';
@@ -122,14 +126,19 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
       }
 
       try {
-        const signInResponse = await fetch(`${basename}${AUTH_SIGNIN_PATH}/${provider}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Auth-Return-Redirect': '1',
+        const signInResponse = await fetch(
+          isLocalProvider
+            ? `${basename}${AUTH_API_PATH}/callback/${provider}`
+            : `${basename}${AUTH_SIGNIN_PATH}/${provider}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'X-Auth-Return-Redirect': '1',
+            },
+            body: new URLSearchParams({ csrfToken, ...payload }),
           },
-          body: new URLSearchParams({ csrfToken }),
-        });
+        );
         const { url: signInUrl } = await signInResponse.json();
 
         window.location.href = signInUrl;

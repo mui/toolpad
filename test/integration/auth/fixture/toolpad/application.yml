@@ -3,5 +3,5 @@ kind: application
 spec:
   authentication:
     providers: [{ provider: google }, { provider: github }]
-    requiredEmail:
+    restrictedDomains:
       - mui.com

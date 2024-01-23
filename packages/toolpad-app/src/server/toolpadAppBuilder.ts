@@ -312,9 +312,9 @@ if (import.meta.hot) {
       optimizeDeps: {
         force: toolpadDevMode ? true : undefined,
         include: [
-          ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
           '@mui/toolpad/runtime',
           '@mui/toolpad/canvas',
+          ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
         ],
       },
       appType: 'custom',

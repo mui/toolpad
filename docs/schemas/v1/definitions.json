@@ -30,7 +30,8 @@
                         "enum": [
                           "github",
                           "google",
-                          "azure-ad"
+                          "azure-ad",
+                          "credentials"
                         ],
                         "description": "Unique identifier for this authentication provider."
                       }
@@ -99,7 +100,8 @@
                     "enum": [
                       "github",
                       "google",
-                      "azure-ad"
+                      "azure-ad",
+                      "credentials"
                     ]
                   },
                   "description": "Role mapping definitions from authentication provider roles to Toolpad roles."

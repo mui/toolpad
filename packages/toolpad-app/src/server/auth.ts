@@ -3,6 +3,7 @@ import { Auth } from '@auth/core';
 import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import AzureADProvider from '@auth/core/providers/azure-ad';
+import CredentialsProvider from '@auth/core/providers/credentials';
 import { getToken } from '@auth/core/jwt';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
@@ -15,6 +16,7 @@ import { AuthProvider } from '../types';
 const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [
   // Azure AD should be fine to skip as the user has to belong to the organization to sign in
   'azure-ad',
+  'credentials',
 ];
 
 const MISSING_SECRET_ERROR_MESSAGE =
@@ -106,6 +108,17 @@ export function createAuthHandler(project: ToolpadProject): Router {
     tenantId: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
   });
 
+  const credentialsProvider = CredentialsProvider({
+    name: 'Credentials',
+    async authorize(credentials) {
+      if (process.env.NODE_ENV !== 'test') {
+        throw new Error('Credentials authentication provider can only be used in test mode.');
+      }
+
+      return { id: '1', name: 'J Smith', email: 'jsmith@example.com', roles: [] };
+    },
+  });
+
   const authConfig: AuthConfig = {
     pages: {
       signIn: `${base}/signin`,
@@ -113,11 +126,11 @@ export function createAuthHandler(project: ToolpadProject): Router {
       error: `${base}/signin`, // Error code passed in query string as ?error=
       verifyRequest: base,
     },
-    providers: [githubProvider, googleProvider, azureADProvider],
+    providers: [githubProvider, googleProvider, azureADProvider, credentialsProvider],
     secret: process.env.TOOLPAD_AUTH_SECRET,
     trustHost: true,
     callbacks: {
-      async signIn({ profile, account }) {
+      async signIn({ profile, account, user }) {
         const dom = await project.loadDom();
         const app = appDom.getApp(dom);
 
@@ -129,10 +142,10 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
         return Boolean(
           (profile?.email_verified || skipEmailVerification) &&
-            profile?.email &&
+            user?.email &&
             (restrictedDomains.length === 0 ||
               restrictedDomains.some(
-                (restrictedDomain) => profile.email!.endsWith(`@${restrictedDomain}`) ?? false,
+                (restrictedDomain) => user.email!.endsWith(`@${restrictedDomain}`) ?? false,
               )),
         );
       },

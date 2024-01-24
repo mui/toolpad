@@ -309,14 +309,14 @@ if (import.meta.hot) {
           allow: [root, path.resolve(currentDirectory, '../../../../')],
         },
       },
-      optimizeDeps: {
-        force: toolpadDevMode ? true : undefined,
-        include: [
-          '@mui/toolpad/runtime',
-          '@mui/toolpad/canvas',
-          ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
-        ],
-      },
+      // optimizeDeps: {
+      //   force: toolpadDevMode ? true : undefined,
+      //   include: [
+      //     ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
+      //     '@mui/toolpad/runtime',
+      //     '@mui/toolpad/canvas',
+      //   ],
+      // },
       appType: 'custom',
       logLevel: 'info',
       root: currentDirectory,

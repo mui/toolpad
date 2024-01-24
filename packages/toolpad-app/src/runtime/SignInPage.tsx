@@ -26,13 +26,22 @@ type CredentialsFormInputs = {
   password: string;
 };
 
+const azureIconSvg = (
+  <svg viewBox="0 0 59.242 47.271" width={18} height={18} xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="m32.368 0-17.468 15.145-14.9 26.75h13.437zm2.323 3.543-7.454 21.008 14.291 17.956-27.728 4.764h45.442z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
 export default function SignInPage() {
   const theme = useTheme();
   const [urlParams] = useSearchParams();
 
   const { signIn, isSigningIn } = React.useContext(AuthContext);
 
-  const [errorSnackbarMessage, setErrorSnackbarMessage] = React.useState<string>('');
+  const [errorSnackbarMessage, setErrorSnackbarMessage] = React.useState<React.ReactNode>('');
   const [latestSelectedProvider, setLatestSelectedProvider] = React.useState<AuthProvider | null>(
     null,
   );
@@ -67,6 +76,8 @@ export default function SignInPage() {
       setErrorSnackbarMessage(
         'There was an error with your authentication provider configuration.',
       );
+    } else if (authError === 'MissingSecretError') {
+      setErrorSnackbarMessage('Missing secret for authentication. Please provide a secret.');
     } else if (authError) {
       setErrorSnackbarMessage('An authentication error occurred.');
     }
@@ -220,15 +231,7 @@ export default function SignInPage() {
                 <LoadingButton
                   variant="contained"
                   onClick={handleSignIn('azure-ad')}
-                  startIcon={
-                    <img
-                      alt="Microsoft Azure logo"
-                      loading="lazy"
-                      height="18"
-                      width="18"
-                      src="https://authjs.dev/img/providers/azure.svg"
-                    />
-                  }
+                  startIcon={azureIconSvg}
                   loading={isSigningIn && latestSelectedProvider === 'azure-ad'}
                   disabled={isSigningIn}
                   loadingPosition="start"

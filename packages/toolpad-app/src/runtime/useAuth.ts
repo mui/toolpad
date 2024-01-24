@@ -46,9 +46,10 @@ export const AuthContext = React.createContext<AuthPayload>({
 interface UseAuthInput {
   dom: appDom.RenderTree;
   basename: string;
+  isRenderedInCanvas?: boolean;
 }
 
-export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
+export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInput): AuthPayload {
   const authProviders = React.useMemo(() => {
     const app = appDom.getApp(dom);
     const authProviderConfigs = app.attributes.authentication?.providers ?? [];
@@ -139,9 +140,10 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
             body: new URLSearchParams({ csrfToken, ...payload }),
           },
         );
-        const { url: signInUrl } = await signInResponse.json();
 
-        window.location.href = signInUrl;
+        const { url: signInUrl, error } = await signInResponse.json();
+
+        window.location.href = error ? `${window.location.pathname}?error=${error}` : signInUrl;
       } catch (error) {
         console.error((error as Error).message);
         signOut();
@@ -153,10 +155,10 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
   );
 
   React.useEffect(() => {
-    if (hasAuthentication) {
+    if (!isRenderedInCanvas && hasAuthentication) {
       getSession();
     }
-  }, [getSession, hasAuthentication]);
+  }, [getSession, hasAuthentication, isRenderedInCanvas]);
 
   return {
     session,

@@ -7,6 +7,7 @@ import CredentialsProvider from '@auth/core/providers/credentials';
 import { getToken } from '@auth/core/jwt';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
+import chalk from 'chalk';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
@@ -22,9 +23,24 @@ const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [
 const MISSING_SECRET_ERROR_MESSAGE =
   'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at [insert link to docs here]';
 
+function getMappedRoles(
+  roles: string[],
+  allRoles: string[],
+  roleMappings: Record<string, string[]>,
+): string[] {
+  return (roles ?? []).flatMap((providerRole) =>
+    allRoles
+      .filter((role) =>
+        roleMappings[role] ? roleMappings[role].includes(providerRole) : role === providerRole,
+      )
+      // Remove duplicates in case multiple provider roles map to the same role
+      .filter((value, index, self) => self.indexOf(value) === index),
+  );
+}
+
 export function createAuthHandler(project: ToolpadProject): Router {
   if (!process.env.TOOLPAD_AUTH_SECRET) {
-    console.error(MISSING_SECRET_ERROR_MESSAGE);
+    console.error(`\n${chalk.red(MISSING_SECRET_ERROR_MESSAGE)}\n`);
   }
 
   const { base } = project.options;
@@ -110,12 +126,27 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
   const credentialsProvider = CredentialsProvider({
     name: 'Credentials',
-    async authorize(credentials) {
+    async authorize({ username, password }) {
       if (process.env.NODE_ENV !== 'test') {
         throw new Error('Credentials authentication provider can only be used in test mode.');
       }
 
-      return { id: '1', name: 'J Smith', email: 'jsmith@example.com', roles: [] };
+      if (username === 'admin' && password === 'admin') {
+        return {
+          id: 'admin',
+          name: 'Mr. Admin',
+          email: 'admin@example.com',
+          roles: ['credentials-admin'],
+        };
+      }
+      if (username === 'mui' && password === 'mui') {
+        return { id: 'mui', name: 'MUI', email: 'test@mui.com', roles: [] };
+      }
+      if (username === 'test' && password === 'test') {
+        return { id: 'test', name: 'Mrs. Test', email: 'test@example.com', roles: [] };
+      }
+
+      return null;
     },
   });
 
@@ -152,30 +183,27 @@ export function createAuthHandler(project: ToolpadProject): Router {
       async redirect({ baseUrl }) {
         return `${baseUrl}${base}`;
       },
-      async jwt({ token, account }) {
+      async jwt({ token, account, user }) {
+        const dom = await project.loadDom();
+        const app = appDom.getApp(dom);
+
+        const authorization = app.attributes.authorization ?? {};
+        const roleNames = authorization?.roles?.map((role) => role.name) ?? [];
+        const roleMappings = account?.provider
+          ? authorization?.roleMappings?.[account.provider as AuthProvider] ?? {}
+          : {};
+
         if (account?.provider === 'azure-ad' && account.id_token) {
           const [, payload] = account.id_token.split('.');
           const idToken: { roles?: string[] } = JSON.parse(
             Buffer.from(payload, 'base64').toString('utf8'),
           );
 
-          const dom = await project.loadDom();
-          const app = appDom.getApp(dom);
+          token.roles = getMappedRoles(idToken?.roles ?? [], roleNames, roleMappings);
+        }
 
-          const authorization = app.attributes.authorization ?? {};
-          const roleNames = authorization?.roles?.map((role) => role.name) ?? [];
-          const roleMappings = authorization?.roleMappings?.['azure-ad'] ?? {};
-
-          token.roles = (idToken.roles ?? []).flatMap((providerRole) =>
-            roleNames
-              .filter((role) =>
-                roleMappings[role]
-                  ? roleMappings[role].includes(providerRole)
-                  : role === providerRole,
-              )
-              // Remove duplicates in case multiple provider roles map to the same role
-              .filter((value, index, self) => self.indexOf(value) === index),
-          );
+        if (account?.provider === 'credentials') {
+          token.roles = getMappedRoles(user?.roles ?? [], roleNames, roleMappings);
         }
 
         return token;
@@ -197,7 +225,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
     '/*',
     asyncHandler(async (req, res) => {
       if (!process.env.TOOLPAD_AUTH_SECRET) {
-        res.status(400).json({ message: MISSING_SECRET_ERROR_MESSAGE, code: 'MissingSecret' });
+        res.status(400).json({ error: 'MissingSecretError' });
         return;
       }
 

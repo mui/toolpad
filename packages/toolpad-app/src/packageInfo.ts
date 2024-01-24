@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as url from 'node:url';
 import * as fs from 'fs';
 
-const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+const currentDirectory = url.fileURLToPath(new URL('.', String(import.meta.url)));
 
 const pkgJsonContent = fs.readFileSync(path.resolve(currentDirectory, '../../package.json'), {
   encoding: 'utf-8',

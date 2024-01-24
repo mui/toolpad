@@ -6,7 +6,7 @@ import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import * as crypto from 'crypto';
 
-import.meta.url ??= url.pathToFileURL(__filename).toString();
+// import.meta.url ??= url.pathToFileURL(__filename).toString();
 
 async function loadExports(filePath: string): Promise<Map<string, unknown>> {
   const fullPath = path.resolve(filePath);

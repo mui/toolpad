@@ -14,7 +14,7 @@ export interface RunOptions {
   base: string;
 }
 
-import.meta.url ??= url.pathToFileURL(__filename).toString();
+// import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 async function runCommand(

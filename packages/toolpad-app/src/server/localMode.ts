@@ -5,12 +5,7 @@ import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import {
-  BindableAttrValue,
-  BindableAttrValues,
-  EnvAttrValue,
-  PropBindableAttrValue,
-} from '@mui/toolpad-core';
+import { BindableAttrValue, EnvAttrValue, PropBindableAttrValue } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
@@ -31,7 +26,6 @@ import {
 import { z } from 'zod';
 import { Awaitable } from '@mui/toolpad-utils/types';
 import * as appDom from '@mui/toolpad-core/appDom';
-import { update } from '@mui/toolpad-utils/immutability';
 import insecureHash from '../utils/insecureHash';
 import {
   Page,

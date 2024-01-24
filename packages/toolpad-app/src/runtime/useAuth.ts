@@ -141,9 +141,9 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
           },
         );
 
-        const { url: signInUrl, error } = await signInResponse.json();
+        const { url: signInUrl } = await signInResponse.json();
 
-        window.location.href = error ? `${window.location.pathname}?error=${error}` : signInUrl;
+        window.location.href = signInUrl;
       } catch (error) {
         console.error((error as Error).message);
         signOut();

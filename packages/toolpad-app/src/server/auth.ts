@@ -20,8 +20,14 @@ const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [
   'credentials',
 ];
 
-const MISSING_SECRET_ERROR_MESSAGE =
-  'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at [insert link to docs here]';
+export async function getHasAuthentication(project: ToolpadProject): Promise<boolean> {
+  const dom = await project.loadDom();
+  const app = appDom.getApp(dom);
+
+  const authProviders = app.attributes.authentication?.providers ?? [];
+
+  return authProviders.length > 0;
+}
 
 function getMappedRoles(
   roles: string[],
@@ -40,7 +46,11 @@ function getMappedRoles(
 
 export function createAuthHandler(project: ToolpadProject): Router {
   if (!process.env.TOOLPAD_AUTH_SECRET) {
-    console.error(`\n${chalk.red(MISSING_SECRET_ERROR_MESSAGE)}\n`);
+    console.error(
+      `\n${chalk.red(
+        'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at [insert link to docs here]',
+      )}\n`,
+    );
   }
 
   const { base } = project.options;
@@ -225,7 +235,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
     '/*',
     asyncHandler(async (req, res) => {
       if (!process.env.TOOLPAD_AUTH_SECRET) {
-        res.status(400).json({ error: 'MissingSecretError' });
+        res.status(400).json({ url: `${base}/signin?error=MissingSecretError` });
         return;
       }
 
@@ -254,23 +264,11 @@ export async function createRequireAuthMiddleware(project: ToolpadProject) {
     const { options } = project;
     const { base } = options;
 
-    const dom = await project.loadDom();
-
-    const app = appDom.getApp(dom);
-
-    const authProviders = app.attributes.authentication?.providers ?? [];
-
-    const hasAuthentication = authProviders.length > 0;
-
     const isPageRequest = req.get('sec-fetch-dest') === 'document';
     const signInPath = `${base}/signin`;
 
     let isAuthorized = true;
-    if (
-      (!project.options.dev || isPageRequest) &&
-      hasAuthentication &&
-      req.originalUrl.split('?')[0] !== signInPath
-    ) {
+    if ((!project.options.dev || isPageRequest) && req.originalUrl.split('?')[0] !== signInPath) {
       const request = adaptRequestFromExpressToFetch(req);
 
       let token;

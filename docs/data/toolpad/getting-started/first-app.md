@@ -112,6 +112,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 2. Click on the **Bind** button next to the breed parameter value, and add the following JavaScript expression in the binding editor:
 
+   <!-- prettier-ignore -->
    ```jsx
    dataGrid.selection?.[0] ?? 'akita'
    ```
@@ -122,6 +123,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 3. Then bind the query **URL** to the following JavaScript expression:
 
+   <!-- prettier-ignore -->
    ```js
    `https://dog.ceo/api/breed/${parameters.breed}/images/random`
    ```

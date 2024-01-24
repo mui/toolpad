@@ -5,7 +5,12 @@ import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import { BindableAttrValue, EnvAttrValue, PropBindableAttrValue } from '@mui/toolpad-core';
+import {
+  BindableAttrValue,
+  BindableAttrValues,
+  EnvAttrValue,
+  PropBindableAttrValue,
+} from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
@@ -559,7 +564,7 @@ function mergeElementIntoDom(
   parentProp: string,
   elm: ElementType,
 ): appDom.AppDom {
-  let appDomElmProps: appDom.BindableAttrValues<any> = {};
+  let appDomElmProps: BindableAttrValues<any> = {};
 
   for (const [propName, propValue] of Object.entries(elm.props ?? {})) {
     if (isTemplate(propValue)) {

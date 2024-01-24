@@ -27,25 +27,18 @@
                     "properties": {
                       "provider": {
                         "type": "string",
-                        "enum": [
-                          "github",
-                          "google"
-                        ],
+                        "enum": ["github", "google"],
                         "description": "Unique identifier for this authentication provider."
                       }
                     },
-                    "required": [
-                      "provider"
-                    ],
+                    "required": ["provider"],
                     "additionalProperties": false
                   },
                   "description": "Authentication providers to use."
                 },
                 "restrictedDomains": {
                   "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
+                  "items": { "type": "string" },
                   "description": "Valid email patterns for the authenticated user."
                 }
               },
@@ -59,9 +52,7 @@
                   "type": "array",
                   "items": {
                     "anyOf": [
-                      {
-                        "type": "string"
-                      },
+                      { "type": "string" },
                       {
                         "type": "object",
                         "properties": {
@@ -74,9 +65,7 @@
                             "description": "A description of the role."
                           }
                         },
-                        "required": [
-                          "name"
-                        ],
+                        "required": ["name"],
                         "additionalProperties": false
                       }
                     ]
@@ -92,10 +81,7 @@
           "description": "Defines the shape of this \"application\" object"
         }
       },
-      "required": [
-        "apiVersion",
-        "kind"
-      ],
+      "required": ["apiVersion", "kind"],
       "additionalProperties": false
     },
     "Page": {
@@ -124,9 +110,7 @@
             },
             "alias": {
               "type": "array",
-              "items": {
-                "type": "string"
-              },
+              "items": { "type": "string" },
               "description": "Page name aliases."
             },
             "title": {
@@ -135,9 +119,7 @@
             },
             "parameters": {
               "type": "array",
-              "items": {
-                "$ref": "#/definitions/NameStringValuePair"
-              },
+              "items": { "$ref": "#/definitions/NameStringValuePair" },
               "description": "Parameters for the page. These can be set inside of the url query string."
             },
             "queries": {
@@ -151,15 +133,9 @@
                   },
                   "enabled": {
                     "anyOf": [
-                      {
-                        "type": "boolean"
-                      },
-                      {
-                        "$ref": "#/definitions/JsExpressionBinding"
-                      },
-                      {
-                        "$ref": "#/definitions/EnvBinding"
-                      }
+                      { "type": "boolean" },
+                      { "$ref": "#/definitions/JsExpressionBinding" },
+                      { "$ref": "#/definitions/EnvBinding" }
                     ],
                     "description": "Activates or deactivates the query. When deactivated the data won't be loaded when the page opens."
                   },
@@ -168,26 +144,17 @@
                     "items": {
                       "type": "object",
                       "properties": {
-                        "name": {
-                          "type": "string",
-                          "description": "The name"
-                        },
+                        "name": { "type": "string", "description": "The name" },
                         "value": {
                           "anyOf": [
                             {},
-                            {
-                              "$ref": "#/definitions/JsExpressionBinding"
-                            },
-                            {
-                              "$ref": "#/definitions/EnvBinding"
-                            }
+                            { "$ref": "#/definitions/JsExpressionBinding" },
+                            { "$ref": "#/definitions/EnvBinding" }
                           ],
                           "description": "The value"
                         }
                       },
-                      "required": [
-                        "name"
-                      ],
+                      "required": ["name"],
                       "additionalProperties": false,
                       "description": "A name/value pair."
                     },
@@ -220,15 +187,9 @@
                           },
                           "url": {
                             "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "$ref": "#/definitions/JsExpressionBinding"
-                              },
-                              {
-                                "$ref": "#/definitions/EnvBinding"
-                              }
+                              { "type": "string" },
+                              { "$ref": "#/definitions/JsExpressionBinding" },
+                              { "$ref": "#/definitions/EnvBinding" }
                             ],
                             "description": "The URL of the request"
                           },
@@ -255,32 +216,19 @@
                               {
                                 "type": "object",
                                 "properties": {
-                                  "kind": {
-                                    "type": "string",
-                                    "const": "raw"
-                                  },
+                                  "kind": { "type": "string", "const": "raw" },
                                   "content": {
                                     "anyOf": [
-                                      {
-                                        "type": "string"
-                                      },
+                                      { "type": "string" },
                                       {
                                         "$ref": "#/definitions/JsExpressionBinding"
                                       },
-                                      {
-                                        "$ref": "#/definitions/EnvBinding"
-                                      }
+                                      { "$ref": "#/definitions/EnvBinding" }
                                     ]
                                   },
-                                  "contentType": {
-                                    "type": "string"
-                                  }
+                                  "contentType": { "type": "string" }
                                 },
-                                "required": [
-                                  "kind",
-                                  "content",
-                                  "contentType"
-                                ],
+                                "required": ["kind", "content", "contentType"],
                                 "additionalProperties": false
                               },
                               {
@@ -297,10 +245,7 @@
                                     }
                                   }
                                 },
-                                "required": [
-                                  "kind",
-                                  "content"
-                                ],
+                                "required": ["kind", "content"],
                                 "additionalProperties": false
                               }
                             ],
@@ -319,61 +264,40 @@
                               {
                                 "type": "object",
                                 "properties": {
-                                  "kind": {
-                                    "type": "string",
-                                    "const": "raw"
-                                  }
+                                  "kind": { "type": "string", "const": "raw" }
                                 },
-                                "required": [
-                                  "kind"
-                                ],
+                                "required": ["kind"],
                                 "additionalProperties": false,
                                 "description": "Don't interpret this body at all."
                               },
                               {
                                 "type": "object",
                                 "properties": {
-                                  "kind": {
-                                    "type": "string",
-                                    "const": "json"
-                                  }
+                                  "kind": { "type": "string", "const": "json" }
                                 },
-                                "required": [
-                                  "kind"
-                                ],
+                                "required": ["kind"],
                                 "additionalProperties": false,
                                 "description": "Interpret the fetch response as JSON"
                               },
                               {
                                 "type": "object",
                                 "properties": {
-                                  "kind": {
-                                    "type": "string",
-                                    "const": "csv"
-                                  },
+                                  "kind": { "type": "string", "const": "csv" },
                                   "headers": {
                                     "type": "boolean",
                                     "description": "First row contains headers"
                                   }
                                 },
-                                "required": [
-                                  "kind",
-                                  "headers"
-                                ],
+                                "required": ["kind", "headers"],
                                 "additionalProperties": false,
                                 "description": "Interpret the fetch response as CSV"
                               },
                               {
                                 "type": "object",
                                 "properties": {
-                                  "kind": {
-                                    "type": "string",
-                                    "const": "xml"
-                                  }
+                                  "kind": { "type": "string", "const": "xml" }
                                 },
-                                "required": [
-                                  "kind"
-                                ],
+                                "required": ["kind"],
                                 "additionalProperties": false,
                                 "description": "Interpret the fetch response as XML"
                               }
@@ -381,9 +305,7 @@
                             "description": "How to parse the response."
                           }
                         },
-                        "required": [
-                          "kind"
-                        ],
+                        "required": ["kind"],
                         "additionalProperties": false
                       },
                       {
@@ -399,9 +321,7 @@
                             "description": "The function to be executed on the backend by this query."
                           }
                         },
-                        "required": [
-                          "kind"
-                        ],
+                        "required": ["kind"],
                         "additionalProperties": false
                       }
                     ],
@@ -424,18 +344,14 @@
                     "description": "Time to cache before refetching"
                   }
                 },
-                "required": [
-                  "name"
-                ],
+                "required": ["name"],
                 "additionalProperties": false
               },
               "description": "Queries that are used by the page. These will load data when the page opens."
             },
             "content": {
               "type": "array",
-              "items": {
-                "$ref": "#/definitions/Element"
-              },
+              "items": { "$ref": "#/definitions/Element" },
               "description": "The content of the page. This defines the UI."
             },
             "authorization": {
@@ -447,9 +363,7 @@
                 },
                 "allowedRoles": {
                   "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
+                  "items": { "type": "string" },
                   "description": "Roles that are allowed to access this page."
                 }
               },
@@ -480,10 +394,7 @@
           "description": "Defines the shape of this \"page\" object"
         }
       },
-      "required": [
-        "apiVersion",
-        "kind"
-      ],
+      "required": ["apiVersion", "kind"],
       "additionalProperties": false
     },
     "Theme": {
@@ -508,13 +419,7 @@
                 "palette": {
                   "type": "object",
                   "properties": {
-                    "mode": {
-                      "type": "string",
-                      "enum": [
-                        "light",
-                        "dark"
-                      ]
-                    },
+                    "mode": { "type": "string", "enum": ["light", "dark"] },
                     "primary": {
                       "$ref": "#/definitions/SimplePaletteColorOptions"
                     },
@@ -533,18 +438,11 @@
           "description": "Defines the shape of this \"theme\" object"
         }
       },
-      "required": [
-        "apiVersion",
-        "kind"
-      ],
+      "required": ["apiVersion", "kind"],
       "additionalProperties": false
     }
   },
-  "required": [
-    "Application",
-    "Page",
-    "Theme"
-  ],
+  "required": ["Application", "Page", "Theme"],
   "additionalProperties": false,
   "definitions": {
     "JsExpressionBinding": {
@@ -555,9 +453,7 @@
           "description": "The expression to be evaluated."
         }
       },
-      "required": [
-        "$$jsExpression"
-      ],
+      "required": ["$$jsExpression"],
       "additionalProperties": false,
       "description": "A binding that evaluates an expression and returns the result."
     },
@@ -569,9 +465,7 @@
           "description": "The name of an environment variable."
         }
       },
-      "required": [
-        "$$env"
-      ],
+      "required": ["$$env"],
       "additionalProperties": false,
       "description": "An environment variable."
     },
@@ -583,9 +477,7 @@
           "description": "The code to be executed."
         }
       },
-      "required": [
-        "$$jsExpressionAction"
-      ],
+      "required": ["$$jsExpressionAction"],
       "additionalProperties": false,
       "description": "A javascript expression to be executed when this action is triggered."
     },
@@ -604,71 +496,37 @@
               "additionalProperties": {
                 "anyOf": [
                   {},
-                  {
-                    "$ref": "#/definitions/JsExpressionBinding"
-                  },
-                  {
-                    "$ref": "#/definitions/EnvBinding"
-                  }
+                  { "$ref": "#/definitions/JsExpressionBinding" },
+                  { "$ref": "#/definitions/EnvBinding" }
                 ]
               },
               "description": "Parameters to pass when navigating to this page"
             }
           },
-          "required": [
-            "page",
-            "parameters"
-          ],
+          "required": ["page", "parameters"],
           "additionalProperties": false
         }
       },
-      "required": [
-        "$$navigationAction"
-      ],
+      "required": ["$$navigationAction"],
       "additionalProperties": false,
       "description": "A navigation from one page to another, optionally passing parameters to the next page."
     },
     "BindableProp": {
       "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "number"
-        },
-        {
-          "type": "boolean"
-        },
-        {
-          "type": "null"
-        },
-        {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/BindableProp"
-          }
-        },
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "null" },
+        { "type": "array", "items": { "$ref": "#/definitions/BindableProp" } },
         {
           "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/BindableProp"
-          }
+          "additionalProperties": { "$ref": "#/definitions/BindableProp" }
         },
-        {
-          "$ref": "#/definitions/JsExpressionBinding"
-        },
-        {
-          "$ref": "#/definitions/EnvBinding"
-        },
-        {
-          "$ref": "#/definitions/JsExpressionAction"
-        },
-        {
-          "$ref": "#/definitions/NavigationAction"
-        },
-        {
-          "$ref": "#/definitions/Template"
-        }
+        { "$ref": "#/definitions/JsExpressionBinding" },
+        { "$ref": "#/definitions/EnvBinding" },
+        { "$ref": "#/definitions/JsExpressionAction" },
+        { "$ref": "#/definitions/NavigationAction" },
+        { "$ref": "#/definitions/Template" }
       ]
     },
     "Element": {
@@ -703,23 +561,16 @@
         },
         "children": {
           "type": "array",
-          "items": {
-            "$ref": "#/definitions/Element"
-          },
+          "items": { "$ref": "#/definitions/Element" },
           "description": "The children of this element."
         },
         "props": {
           "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/BindableProp"
-          },
+          "additionalProperties": { "$ref": "#/definitions/BindableProp" },
           "description": "The properties to configure this instance of the component."
         }
       },
-      "required": [
-        "component",
-        "name"
-      ],
+      "required": ["component", "name"],
       "additionalProperties": false,
       "description": "The instance of a component. Used to build user interfaces in pages."
     },
@@ -728,85 +579,50 @@
       "properties": {
         "$$template": {
           "type": "array",
-          "items": {
-            "$ref": "#/definitions/Element"
-          },
+          "items": { "$ref": "#/definitions/Element" },
           "description": "The subtree, that describes the UI to be rendered by the template."
         }
       },
-      "required": [
-        "$$template"
-      ],
+      "required": ["$$template"],
       "additionalProperties": false,
       "description": "Describes a fragment of Toolpad elements, to be used as a template."
     },
     "NameStringValuePair": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name"
-        },
-        "value": {
-          "type": "string",
-          "description": "The value"
-        }
+        "name": { "type": "string", "description": "The name" },
+        "value": { "type": "string", "description": "The value" }
       },
-      "required": [
-        "name",
-        "value"
-      ],
+      "required": ["name", "value"],
       "additionalProperties": false,
       "description": "a name/value pair with a string value."
     },
     "BindableNameStringValue": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name"
-        },
+        "name": { "type": "string", "description": "The name" },
         "value": {
           "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "$ref": "#/definitions/JsExpressionBinding"
-            },
-            {
-              "$ref": "#/definitions/EnvBinding"
-            }
+            { "type": "string" },
+            { "$ref": "#/definitions/JsExpressionBinding" },
+            { "$ref": "#/definitions/EnvBinding" }
           ],
           "description": "The value"
         }
       },
-      "required": [
-        "name",
-        "value"
-      ],
+      "required": ["name", "value"],
       "additionalProperties": false,
       "description": "A name/value pair where the value is dynamically bindable to strings."
     },
     "SimplePaletteColorOptions": {
       "type": "object",
       "properties": {
-        "main": {
-          "type": "string"
-        },
-        "light": {
-          "type": "string"
-        },
-        "dark": {
-          "type": "string"
-        },
-        "contrastText": {
-          "type": "string"
-        }
+        "main": { "type": "string" },
+        "light": { "type": "string" },
+        "dark": { "type": "string" },
+        "contrastText": { "type": "string" }
       },
-      "required": [
-        "main"
-      ],
+      "required": ["main"],
       "additionalProperties": false
     }
   },

@@ -518,7 +518,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
     for (const [propName, children] of Object.entries(childNodes)) {
       const expandedChildren = undefinedWhenEmpty(expandChildren(children, dom));
       if (expandedChildren) {
-        if (node.props?.[propName].$$template) {
+        if (node.props?.[propName]?.$$template) {
           elm.props ??= {};
           elm.props[propName] = { $$template: expandedChildren };
         } else if (propName === 'children') {

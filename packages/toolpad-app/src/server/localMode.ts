@@ -564,13 +564,11 @@ function mergeElementIntoDom(
   parentProp: string,
   elm: ElementType,
 ): appDom.AppDom {
-  let appDomElmProps: BindableAttrValues<any> = {};
+  let appDomElmProps: BindableAttrValues<any> = { ...elm.props };
 
-  for (const [propName, propValue] of Object.entries(elm.props ?? {})) {
+  for (const [propName, propValue] of Object.entries(appDomElmProps)) {
     if (isTemplate(propValue)) {
       appDomElmProps = update(appDomElmProps[propName], { [propName]: { $$template: true } });
-    } else {
-      appDomElmProps = update(appDomElmProps[propName], { [propName]: propValue });
     }
   }
 

@@ -13,7 +13,7 @@ import { debounce, throttle } from 'lodash-es';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { guessTitle } from '@mui/toolpad-utils/strings';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
+import { hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { execa } from 'execa';
 import {
   writeFileRecursive,
@@ -26,6 +26,7 @@ import {
 import { z } from 'zod';
 import { Awaitable } from '@mui/toolpad-utils/types';
 import * as appDom from '@mui/toolpad-core/appDom';
+import { update } from '@mui/toolpad-utils/immutability';
 import insecureHash from '../utils/insecureHash';
 import {
   Page,
@@ -45,6 +46,7 @@ import {
   applicationSchema,
   Application,
   envBindingSchema,
+  Elements,
 } from './schema';
 import { format, resolvePrettierConfig } from '../utils/prettier';
 import {
@@ -501,17 +503,9 @@ function expandFromDom<N extends appDom.AppDomNode>(
   }
 
   if (appDom.isElement(node)) {
-    const { children, ...templates } = appDom.getChildNodes(dom, node);
+    const childNodes = appDom.getChildNodes(dom, node);
 
-    const templateProps = mapValues(templates, (subtree) =>
-      subtree
-        ? {
-            $$template: expandChildren(subtree, dom),
-          }
-        : undefined,
-    );
-
-    return {
+    const elm: ElementType = {
       component: node.attributes.component,
       name: node.name,
       layout: undefinedWhenEmpty({
@@ -519,9 +513,25 @@ function expandFromDom<N extends appDom.AppDomNode>(
         horizontalAlign: stringOnly(node.layout?.horizontalAlign),
         verticalAlign: stringOnly(node.layout?.verticalAlign),
       }),
-      props: undefinedWhenEmpty({ ...node.props, ...templateProps }),
-      children: undefinedWhenEmpty(expandChildren(children || [], dom)),
-    } satisfies ElementType;
+      props: undefinedWhenEmpty({ ...node.props }),
+    };
+
+    for (const [propName, children] of Object.entries(childNodes)) {
+      const expandedChildren = undefinedWhenEmpty(expandChildren(children, dom));
+      if (expandedChildren) {
+        if (node.props?.[propName].$$template) {
+          elm.props ??= {};
+          elm.props[propName] = { $$template: expandedChildren };
+        } else if (propName === 'children') {
+          elm.children = expandedChildren;
+        } else {
+          elm.props ??= {};
+          elm.props[propName] = { $$elements: expandedChildren };
+        }
+      }
+    }
+
+    return elm;
   }
 
   throw new Error(`Unsupported node type "${node.type}"`);
@@ -535,20 +545,37 @@ function isTemplate(bindableProp?: BindableProp): bindableProp is Template {
   );
 }
 
+function isElements(bindableProp?: BindableProp): bindableProp is Elements {
+  return !!(
+    bindableProp &&
+    typeof bindableProp === 'object' &&
+    hasOwnProperty(bindableProp, '$$elements')
+  );
+}
+
 function mergeElementIntoDom(
   dom: appDom.AppDom,
   parent: appDom.ElementNode | appDom.PageNode,
   parentProp: string,
   elm: ElementType,
 ): appDom.AppDom {
-  const plainProps = filterValues(elm.props ?? {}, (prop) => !isTemplate(prop)) as Record<
-    string,
-    Exclude<BindableProp, Template>
-  >;
+  let appDomElmProps: appDom.BindableAttrValues<any> = {};
 
-  const templateProps = filterValues(elm.props ?? {}, isTemplate) as Record<string, Template>;
+  for (const [propName, propValue] of Object.entries(elm.props ?? {})) {
+    if (isTemplate(propValue)) {
+      appDomElmProps = update(appDomElmProps[propName], { [propName]: { $$template: true } });
+    } else {
+      appDomElmProps = update(appDomElmProps[propName], { [propName]: propValue });
+    }
+  }
 
-  const elmNode = appDom.createElement(dom, elm.component, plainProps, elm.layout ?? {}, elm.name);
+  const elmNode = appDom.createElement(
+    dom,
+    elm.component,
+    appDomElmProps,
+    elm.layout ?? {},
+    elm.name,
+  );
 
   dom = appDom.addNode(dom, elmNode, parent, parentProp as any);
 
@@ -558,9 +585,15 @@ function mergeElementIntoDom(
     }
   }
 
-  for (const [propName, templateProp] of Object.entries(templateProps)) {
-    for (const child of templateProp.$$template) {
-      dom = mergeElementIntoDom(dom, elmNode, propName, child);
+  for (const [propName, propValue] of Object.entries(elm.props ?? {})) {
+    if (isTemplate(propValue)) {
+      for (const child of propValue.$$template) {
+        dom = mergeElementIntoDom(dom, elmNode, propName, child);
+      }
+    } else if (isElements(propValue)) {
+      for (const child of propValue.$$elements) {
+        dom = mergeElementIntoDom(dom, elmNode, propName, child);
+      }
     }
   }
 

@@ -186,6 +186,10 @@ export type Template = {
   $$template: ElementType[];
 };
 
+export type Elements = {
+  $$elements: ElementType[];
+};
+
 let elementSchema: z.ZodType<ElementType>;
 
 const templateSchema: z.ZodType<Template> = z
@@ -195,6 +199,12 @@ const templateSchema: z.ZodType<Template> = z
       .describe('The subtree, that describes the UI to be rendered by the template.'),
   })
   .describe('Describes a fragment of Toolpad elements, to be used as a template.');
+
+const elementsSchema: z.ZodType<Elements> = z
+  .object({
+    $$elements: z.lazy(() => z.array(elementSchema)).describe('The subtree, that describes the UI'),
+  })
+  .describe('Describes a fragment of Toolpad elements.');
 
 const baseElementSchema = z.object({
   component: z.string().describe('The component that this element was based on.'),
@@ -235,6 +245,7 @@ export const bindablePropSchema: z.ZodType = z.lazy(() =>
     jsExpressionActionSchema,
     navigationActionSchema,
     templateSchema,
+    elementsSchema,
   ]),
 );
 

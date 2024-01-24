@@ -668,6 +668,23 @@
         },
         {
           "$ref": "#/definitions/Template"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "$$elements": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Element"
+              },
+              "description": "The subtree, that describes the UI"
+            }
+          },
+          "required": [
+            "$$elements"
+          ],
+          "additionalProperties": false,
+          "description": "Describes a fragment of Toolpad elements."
         }
       ]
     },

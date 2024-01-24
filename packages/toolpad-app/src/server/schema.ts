@@ -187,7 +187,7 @@ export type Template = {
 };
 
 export type Elements = {
-  $$elements: ElementType[];
+  $$children: ElementType[];
 };
 
 let elementSchema: z.ZodType<ElementType>;
@@ -202,7 +202,7 @@ const templateSchema: z.ZodType<Template> = z
 
 const elementsSchema: z.ZodType<Elements> = z
   .object({
-    $$elements: z.lazy(() => z.array(elementSchema)).describe('The subtree, that describes the UI'),
+    $$children: z.lazy(() => z.array(elementSchema)).describe('The subtree, that describes the UI'),
   })
   .describe('Describes a fragment of Toolpad elements.');
 

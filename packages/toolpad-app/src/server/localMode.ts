@@ -526,7 +526,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
           elm.children = expandedChildren;
         } else {
           elm.props ??= {};
-          elm.props[propName] = { $$elements: expandedChildren };
+          elm.props[propName] = { $$children: expandedChildren };
         }
       }
     }
@@ -549,7 +549,7 @@ function isElements(bindableProp?: BindableProp): bindableProp is Elements {
   return !!(
     bindableProp &&
     typeof bindableProp === 'object' &&
-    hasOwnProperty(bindableProp, '$$elements')
+    hasOwnProperty(bindableProp, '$$children')
   );
 }
 
@@ -591,7 +591,7 @@ function mergeElementIntoDom(
         dom = mergeElementIntoDom(dom, elmNode, propName, child);
       }
     } else if (isElements(propValue)) {
-      for (const child of propValue.$$elements) {
+      for (const child of propValue.$$children) {
         dom = mergeElementIntoDom(dom, elmNode, propName, child);
       }
     }

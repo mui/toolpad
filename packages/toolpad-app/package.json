@@ -31,9 +31,6 @@
   ],
   "exports": {
     "./package.json": "./package.json",
-    "./cli": {
-      "require": "./dist/cli/index.js"
-    },
     ".": {
       "types": "./dist/exports/index.d.ts",
       "import": "./dist/exports/index.mjs"

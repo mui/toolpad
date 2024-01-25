@@ -40,6 +40,7 @@ import {
   createGlobalState,
   createProvidedContext,
   useAssertedContext,
+  useNonNullableContext,
 } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
@@ -1620,8 +1621,8 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
 
   const authContext = useAuth({ dom, basename });
 
-  const appContext = React.useContext(AppHostContext);
-  const showPreviewHeader: boolean = !!appContext?.isPreview && !IS_RENDERED_IN_CANVAS;
+  const appHost = useNonNullableContext(AppHostContext);
+  const showPreviewHeader: boolean = !!appHost?.isPreview && !IS_RENDERED_IN_CANVAS;
 
   return (
     <BrowserRouter basename={basename}>
@@ -1632,7 +1633,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
           <AppRoot
             ref={rootRef}
             sx={{
-              paddingTop: showPreviewHeader ? PREVIEW_HEADER_HEIGHT : 0,
+              paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
             }}
           >
             <ComponentsContextProvider value={components}>

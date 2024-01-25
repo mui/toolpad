@@ -96,7 +96,7 @@ import api, { queryClient } from './api';
 import { AuthContext, useAuth } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
-import { AppContext } from './AppContext';
+import { AppHostContext } from './AppHostContext';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -1620,7 +1620,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
 
   const authContext = useAuth({ dom, basename });
 
-  const appContext = React.useContext(AppContext);
+  const appContext = React.useContext(AppHostContext);
   const showPreviewHeader: boolean = !!appContext?.isPreview && !IS_RENDERED_IN_CANVAS;
 
   return (

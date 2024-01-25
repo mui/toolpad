@@ -2,17 +2,17 @@
 
 import * as React from 'react';
 import ToolpadApp, { ToolpadAppProps } from '../runtime/ToolpadApp';
-import { AppContext, AppContextValue } from '../runtime/AppContext';
+import { AppHostContext, AppHost } from '../runtime/AppHostContext';
 
-const appContext: AppContextValue = {
+const appContext: AppHost = {
   isPreview: false,
   isCustomServer: true,
 };
 
 export default function ToolpadAppClient(props: ToolpadAppProps) {
   return (
-    <AppContext.Provider value={appContext}>
+    <AppHostContext.Provider value={appContext}>
       <ToolpadApp {...props} />
-    </AppContext.Provider>
+    </AppHostContext.Provider>
   );
 }

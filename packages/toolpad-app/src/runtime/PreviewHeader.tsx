@@ -18,7 +18,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useMatch } from 'react-router-dom';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
-import { AppContext } from './AppContext';
+import { AppHostContext } from './AppHostContext';
 
 interface CopyToClipboardButtonProps extends IconButtonProps {
   content: string;
@@ -179,7 +179,7 @@ export default function PreviewHeader({ basename }: PreviewHeaderProps) {
 
   const theme = useTheme();
 
-  const appContext = React.useContext(AppContext);
+  const appContext = React.useContext(AppHostContext);
 
   return appContext ? (
     <Box

@@ -146,7 +146,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
           id: 'admin',
           name: 'Lord Admin',
           email: 'admin@example.com',
-          roles: ['credentials-admin'],
+          roles: ['mock-admin'],
         };
       }
       if (username === 'mui' && password === 'mui') {

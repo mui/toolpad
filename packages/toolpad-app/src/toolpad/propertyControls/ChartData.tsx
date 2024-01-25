@@ -26,13 +26,13 @@ import ShowChartIcon from '@mui/icons-material/ShowChart';
 import LegendToggleIcon from '@mui/icons-material/LegendToggle';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
 import { blueberryTwilightPalette } from '@mui/x-charts/colorPalettes';
-import * as appDom from '../../appDom';
+import { updateArray, remove } from '@mui/toolpad-utils/immutability';
+import * as appDom from '@mui/toolpad-core/appDom';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import { useAppState, useDomApi } from '../AppState';
 import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
-import { updateArray, remove } from '../../utils/immutability';
 import { createToolpadAppTheme } from '../../runtime/AppThemeProvider';
 import ColorPicker from '../../components/ColorPicker';
 

@@ -6,10 +6,10 @@ import AzureADProvider from '@auth/core/providers/azure-ad';
 import { getToken } from '@auth/core/jwt';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
-import * as appDom from '../appDom';
 import { AuthProvider } from '../types';
 
 const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [

@@ -1,9 +1,9 @@
 import { NodeId, LiveBindings, ScopeMeta, ApplicationVm } from '@mui/toolpad-core';
 import * as React from 'react';
-import * as appDom from '../../../appDom';
+import { update, updateOrCreate } from '@mui/toolpad-utils/immutability';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { PageViewState } from '../../../types';
 import { RectangleEdge } from '../../../utils/geometry';
-import { update, updateOrCreate } from '../../../utils/immutability';
 
 export const DROP_ZONE_TOP = 'top';
 export const DROP_ZONE_BOTTOM = 'bottom';

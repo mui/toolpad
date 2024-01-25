@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material';
 import * as React from 'react';
-import * as appDom from '../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useDomApi } from '../AppState';
 
 interface PageTitleEditorProps {

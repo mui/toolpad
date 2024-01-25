@@ -1,12 +1,12 @@
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Tab, Box, styled, Typography, Link } from '@mui/material';
 import * as React from 'react';
+import * as appDom from '@mui/toolpad-core/appDom';
 import PageOptionsPanel from './PageOptionsPanel';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';
 import { useAppState, useAppStateApi } from '../../AppState';
 import { PageViewTab } from '../../../utils/domView';
-import * as appDom from '../../../appDom';
 
 const classes = {
   panel: 'Toolpad_Panel',

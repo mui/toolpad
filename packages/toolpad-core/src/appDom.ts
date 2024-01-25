@@ -1,22 +1,19 @@
 import { nanoid } from 'nanoid/non-secure';
 import { generateKeyBetween } from 'fractional-indexing';
-import {
+import invariant from 'invariant';
+import type { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
+import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
+import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { ExactEntriesOf, Maybe } from '@mui/toolpad-utils/types';
+import { omit, update, updateOrCreate } from '@mui/toolpad-utils/immutability';
+import type {
   NodeId,
   NodeReference,
   BindableAttrValue,
   BindableAttrValues,
   SecretAttrValue,
   BindableAttrEntries,
-  EnvAttrValue,
-} from '@mui/toolpad-core';
-import invariant from 'invariant';
-import { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
-import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
-import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
-import { AuthProvider, AuthProviderConfig, ConnectionStatus } from '../types';
-import { omit, update, updateOrCreate } from '../utils/immutability';
-import { ExactEntriesOf, Maybe } from '../utils/types';
-import { envBindingSchema } from '../server/schema';
+} from './types';
 
 export const CURRENT_APPDOM_VERSION = 7;
 
@@ -39,6 +36,17 @@ export function compareFractionalIndex(index1: string, index2: string): number {
     return 0;
   }
   return index1 > index2 ? 1 : -1;
+}
+
+export type AuthProvider = 'github' | 'google' | 'azure-ad';
+
+export interface AuthProviderConfig {
+  provider: AuthProvider;
+}
+
+export interface ConnectionStatus {
+  timestamp: number;
+  error?: string;
 }
 
 type AppDomNodeType = 'app' | 'connection' | 'theme' | 'page' | 'element' | 'query' | 'mutation';
@@ -546,7 +554,9 @@ export function createElement<P>(
  * Get all descendants of a `node`, flattens childNodes objects into one single array
  */
 export function getDescendants(dom: AppDom, node: AppDomNode): readonly AppDomNode[] {
-  const children: readonly AppDomNode[] = Object.values(getChildNodes(dom, node))
+  const children: readonly AppDomNode[] = (
+    Object.values(getChildNodes(dom, node)) as AppDomNode[][]
+  )
     .flat()
     .filter(Boolean);
   return [...children, ...children.flatMap((child) => getDescendants(dom, child))];
@@ -1161,30 +1171,6 @@ export function applyDiff(dom: AppDom, diff: DomDiff): AppDom {
   }
 
   return result;
-}
-
-function findEnvBindings(obj: unknown): EnvAttrValue[] {
-  if (Array.isArray(obj)) {
-    return obj.flatMap((item) => findEnvBindings(item));
-  }
-
-  if (obj && typeof obj === 'object') {
-    try {
-      return [envBindingSchema.parse(obj)];
-    } catch {
-      return Object.values(obj).flatMap((value) => findEnvBindings(value));
-    }
-  }
-
-  return [];
-}
-
-export function getRequiredEnvVars(dom: AppDom): Set<string> {
-  const allVars = Object.values(dom.nodes)
-    .flatMap((node) => findEnvBindings(node))
-    .map((binding) => binding.$$env);
-
-  return new Set(allVars);
 }
 
 export function getPageDisplayName(node: PageNode): string {

@@ -4,7 +4,8 @@ import { styled } from '@mui/material';
 import clsx from 'clsx';
 import invariant from 'invariant';
 
-import * as appDom from '../../../../appDom';
+import { omit } from '@mui/toolpad-utils/immutability';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppStateApi, useAppState, useDomApi } from '../../../AppState';
 import {
   DropZone,
@@ -37,7 +38,6 @@ import {
   RECTANGLE_EDGE_TOP,
   rectContainsPoint,
 } from '../../../../utils/geometry';
-import { omit } from '../../../../utils/immutability';
 import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';

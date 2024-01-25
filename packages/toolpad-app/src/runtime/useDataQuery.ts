@@ -3,8 +3,8 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { CanvasHooksContext } from './CanvasHooksContext';
-import * as appDom from '../appDom';
 import api from './api';
 
 export type UseDataQueryConfig = Pick<

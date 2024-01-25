@@ -3,8 +3,8 @@ import clsx from 'clsx';
 import { styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
 
+import * as appDom from '@mui/toolpad-core/appDom';
 import { FlowDirection } from '../../../../types';
-import * as appDom from '../../../../appDom';
 import {
   absolutePositionCss,
   isHorizontalFlow,

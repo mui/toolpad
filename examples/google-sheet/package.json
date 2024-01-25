@@ -8,7 +8,7 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.45",
-    "googleapis": "130.0.0"
+    "@mui/toolpad": "0.1.46",
+    "googleapis": "131.0.0"
   }
 }

@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-export interface AppHostContextValue {
+export interface AppHost {
   isPreview: boolean;
   isCustomServer: boolean;
 }
 
-export const AppHostContext = React.createContext<AppHostContextValue | null>(null);
+export const AppHostContext = React.createContext<AppHost | null>(null);

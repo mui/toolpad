@@ -17,6 +17,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import { useMatch } from 'react-router-dom';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { AppHostContext } from './AppHostContext';
 
@@ -179,7 +180,7 @@ export default function PreviewHeader({ basename }: PreviewHeaderProps) {
 
   const theme = useTheme();
 
-  const appContext = React.useContext(AppHostContext);
+  const appContext = useNonNullableContext(AppHostContext);
 
   return appContext ? (
     <Box

@@ -10,6 +10,7 @@ import { createServerJsRuntime } from '@mui/toolpad-core/jsServerRuntime';
 import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
 import { removePrefix } from '@mui/toolpad-utils/strings';
+import { Maybe } from '@mui/toolpad-utils/types';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource } from '../../types';
 import {
@@ -21,7 +22,6 @@ import {
   RestConnectionParams,
   UrlEncodedBody,
 } from './types';
-import { Maybe } from '../../utils/types';
 import applyTransform from '../applyTransform';
 import { HTTP_NO_BODY, getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
 import type { IToolpadProject } from '../server';

@@ -1,11 +1,10 @@
 {
   "name": "@mui/toolpad-core",
-  "version": "0.1.45",
+  "version": "0.1.46",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "license": "MIT",
-  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
@@ -13,13 +12,15 @@
     "./package.json": "./package.json",
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     },
     "./*": {
       "types": "./dist/*.d.ts",
-      "import": "./dist/*.js",
-      "require": "./dist/*.cjs"
+      "import": "./dist/*.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
     }
   },
   "files": [
@@ -40,19 +41,22 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/material": "5.15.4",
+    "@mui/material": "5.15.6",
     "@mui/toolpad-utils": "workspace:*",
-    "@tanstack/react-query": "5.17.10",
+    "@tanstack/react-query": "5.17.19",
     "@types/json-schema": "7.0.15",
     "@webcontainer/env": "1.1.0",
     "cookie": "0.6.0",
+    "fractional-indexing": "3.2.0",
     "invariant": "2.2.4",
+    "nanoid": "5.0.4",
     "quickjs-emscripten": "0.26.0",
     "react-error-boundary": "4.0.12",
     "react-is": "18.2.0"
   },
   "devDependencies": {
     "@types/cookie": "0.6.0",
+    "@types/invariant": "2.2.37",
     "@types/react": "18.2.48",
     "@types/react-is": "18.2.4",
     "concurrently": "8.2.2"

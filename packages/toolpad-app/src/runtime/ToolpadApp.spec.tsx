@@ -16,7 +16,7 @@ import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { test, expect, afterEach } from 'vitest';
-import * as appDom from '../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import createRuntimeState from './createRuntimeState';
 import ToolpadApp from './ToolpadApp';
 

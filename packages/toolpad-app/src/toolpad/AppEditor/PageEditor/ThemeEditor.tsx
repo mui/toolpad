@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as appDom from '../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useDomApi } from '../../AppState';
 import MuiThemeEditor from '../../../components/MuiThemeEditor';
 

@@ -31,6 +31,11 @@
       "schedule": ["at any time"]
     },
     {
+      "groupName": "MUI Monorepo",
+      "matchPackagePatterns": ["@mui/monorepo"],
+      "schedule": ["on sunday before 6:00am"]
+    },
+    {
       "groupName": "playwright",
       "matchPackageNames": ["playwright", "mcr.microsoft.com/playwright"],
       "matchPackagePatterns": ["^@playwright/"]
@@ -61,11 +66,6 @@
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
-    },
-    {
-      "groupName": "prettier",
-      "matchPackageNames": ["prettier", "pretty-quick"],
-      "description": "prettier made breaking changes in v3, pretty-quick needs to catch up before we can upgrade. https://github.com/azz/pretty-quick/issues/164"
     },
     {
       "groupName": "next",

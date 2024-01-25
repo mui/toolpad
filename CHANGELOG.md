@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.1.46
+
+<!-- generated comparing v0.1.45..master -->
+
+_Jan 17, 2024_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Improvements to authorization and data providers, and some behind-the-scenes clean up!
+
+- &#8203;<!-- 8 -->Fix screenshot flakeyness (#3087) @Janpot
+- &#8203;<!-- 7 -->Load dotenv/config before reading the config (#3085) @Janpot
+- &#8203;<!-- 6 -->Tweak data providers UI in the grid (#3084) @Janpot
+- &#8203;<!-- 5 -->Improve authorization middleware (#3048) @apedroferreira
+- &#8203;<!-- 4 -->Add universal required email configuration for authentication (#3047) @apedroferreira
+- &#8203;<!-- 3 -->[code-infra] Replace hardcoded repository in monorepo update script (#3092) @Janpot
+- &#8203;<!-- 2 -->[code-infra] Add monorepo update script (#3091) @Janpot
+- &#8203;<!-- 1 -->[core] Use pnpm (#3065) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot
+
 ## 0.1.45
 
 <!-- generated comparing v0.1.44..master -->

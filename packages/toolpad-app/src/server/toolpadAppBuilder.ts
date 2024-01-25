@@ -3,9 +3,9 @@ import * as url from 'node:url';
 import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
+import * as appDom from '@mui/toolpad-core/appDom';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
-import * as appDom from '../appDom';
 import { pathToNodeImportSpecifier } from '../utils/paths';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
 
@@ -124,6 +124,7 @@ function toolpadVitePlugin(): Plugin {
 }
 
 export interface CreateViteConfigParams {
+  toolpadDevMode: boolean;
   outDir: string;
   root: string;
   dev: boolean;
@@ -136,6 +137,7 @@ export interface CreateViteConfigParams {
 }
 
 export async function createViteConfig({
+  toolpadDevMode,
   outDir,
   root,
   dev,
@@ -308,8 +310,8 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
-        entries: [MAIN_ENTRY],
-        include: FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
+        force: toolpadDevMode ? true : undefined,
+        include: [...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`)],
       },
       appType: 'custom',
       logLevel: 'info',
@@ -343,6 +345,7 @@ export async function buildApp({
   outDir,
 }: ToolpadBuilderParams) {
   const { viteConfig } = await createViteConfig({
+    toolpadDevMode: false,
     dev: false,
     root,
     base,

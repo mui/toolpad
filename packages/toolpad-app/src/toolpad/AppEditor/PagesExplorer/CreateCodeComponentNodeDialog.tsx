@@ -14,7 +14,7 @@ import invariant from 'invariant';
 import CloseIcon from '@mui/icons-material/Close';
 import useEventCallback from '@mui/utils/useEventCallback';
 import useLatest from '@mui/toolpad-utils/hooks/useLatest';
-import * as appDom from '../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import DialogForm from '../../../components/DialogForm';
 import { useNodeNameValidation } from './validation';
 import { useProjectApi } from '../../../projectApi';

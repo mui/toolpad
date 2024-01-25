@@ -1630,7 +1630,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
           <AppRoot
             ref={rootRef}
             sx={{
-              paddingTop: showPreviewHeader ? PREVIEW_HEADER_HEIGHT : 0,
+              paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
             }}
           >
             <ComponentsContextProvider value={components}>

@@ -29,19 +29,15 @@
     "server",
     "runtime"
   ],
-  "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    "./cli": {
-      "require": "./dist/cli/index.js"
-    },
     ".": {
       "types": "./dist/exports/index.d.ts",
-      "import": "./dist/exports/index.js"
+      "import": "./dist/exports/index.mjs"
     },
     "./*": {
       "types": "./dist/exports/*.d.ts",
-      "import": "./dist/exports/*.js"
+      "import": "./dist/exports/*.mjs"
     }
   },
   "dependencies": {

@@ -41,7 +41,8 @@ export function compareFractionalIndex(index1: string, index2: string): number {
 export type AuthProvider = 'github' | 'google' | 'azure-ad';
 
 export interface AuthProviderConfig {
-  provider: AuthProvider;
+  readonly provider: AuthProvider;
+  readonly roles?: { source: string[]; target: string }[];
 }
 
 export interface ConnectionStatus {
@@ -74,7 +75,6 @@ export interface AppNode extends AppDomNodeBase {
         readonly name: string;
         readonly description?: string;
       }[];
-      readonly roleMappings?: Partial<Record<AuthProvider, Record<string, string[]>>>;
     };
   };
 }

@@ -10,9 +10,8 @@ import * as appDom from '@mui/toolpad-core/appDom';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
-import { AuthProvider } from '../types';
 
-const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [
+const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
   // Azure AD should be fine to skip as the user has to belong to the organization to sign in
   'azure-ad',
 ];
@@ -118,7 +117,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
         const skipEmailVerification =
           !!account?.provider &&
-          SKIP_VERIFICATION_PROVIDERS.includes(account.provider as AuthProvider);
+          SKIP_VERIFICATION_PROVIDERS.includes(account.provider as appDom.AuthProvider);
 
         return Boolean(
           (profile?.email_verified || skipEmailVerification) &&
@@ -144,15 +143,24 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
           const authorization = app.attributes.authorization ?? {};
           const roleNames = authorization?.roles?.map((role) => role.name) ?? [];
-          const roleMappings = authorization?.roleMappings?.['azure-ad'] ?? {};
+
+          const authentication = app.attributes.authentication ?? {};
+          const roleMappings =
+            authentication?.providers?.find(
+              (providerConfig) => providerConfig.provider === 'azure-ad',
+            )?.roles ?? [];
 
           token.roles = (idToken.roles ?? []).flatMap((providerRole) =>
             roleNames
-              .filter((role) =>
-                roleMappings[role]
-                  ? roleMappings[role].includes(providerRole)
-                  : role === providerRole,
-              )
+              .filter((role) => {
+                const targetRoleMapping = roleMappings.find(
+                  (roleMapping) => roleMapping.target === role,
+                );
+
+                return targetRoleMapping
+                  ? targetRoleMapping.source.includes(providerRole)
+                  : role === providerRole;
+              })
               // Remove duplicates in case multiple provider roles map to the same role
               .filter((value, index, self) => self.indexOf(value) === index),
           );

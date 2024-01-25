@@ -77,7 +77,7 @@ export function AppAuthenticationEditor() {
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
           ...app.attributes?.authentication,
           providers: (typeof providers === 'string' ? providers.split(',') : providers).map(
-            (provider) => ({ provider } as appDom.AuthProviderConfig),
+            (provider) => ({ provider }) as appDom.AuthProviderConfig,
           ),
         });
 
@@ -492,15 +492,32 @@ export function AppRoleMappingsEditor({
       appState.update((draft) => {
         const app = appDom.getApp(draft);
 
-        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authorization', {
-          ...app.attributes?.authorization,
-          roleMappings: {
-            ...(app.attributes?.authorization?.roleMappings ?? {}),
-            [activeAuthProvider]: {
-              ...(app.attributes?.authorization?.roleMappings?.[activeAuthProvider] ?? {}),
-              [role]: (providerRoles || role).split(',').map((updatedRole) => updatedRole.trim()),
+        const activeAuthProviderConfig = app.attributes?.authentication?.providers?.find(
+          (providerConfig) => providerConfig.provider === activeAuthProvider,
+        );
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
+          ...app.attributes?.authentication,
+          providers: [
+            ...(app.attributes?.authentication?.providers ?? []).filter(
+              (providerConfig) => providerConfig.provider !== activeAuthProvider,
+            ),
+            {
+              ...activeAuthProviderConfig,
+              provider: activeAuthProvider,
+              roles: [
+                ...(activeAuthProviderConfig?.roles ?? []).filter(
+                  (roleMapping) => roleMapping.target !== role,
+                ),
+                {
+                  source: (providerRoles || role)
+                    .split(',')
+                    .map((updatedRole) => updatedRole.trim()),
+                  target: role,
+                },
+              ],
             },
-          },
+          ],
         });
 
         return draft;
@@ -517,16 +534,26 @@ export function AppRoleMappingsEditor({
     const appNode = appDom.getApp(dom);
     const authorization = appNode.attributes.authorization;
     const roles = authorization?.roles ?? [];
+
+    const authentication = appNode.attributes.authentication;
     const roleMappings = activeAuthProvider
-      ? authorization?.roleMappings?.[activeAuthProvider]
-      : {};
+      ? authentication?.providers?.find(
+          (providerConfig) => providerConfig.provider === activeAuthProvider,
+        )?.roles ?? []
+      : [];
 
     const existingRows =
-      roles?.map((role) => ({
-        id: role.name,
-        role: role.name,
-        providerRoles: roleMappings?.[role.name] ? roleMappings?.[role.name].join(', ') : role.name,
-      })) ?? [];
+      roles?.map((role) => {
+        const targetRoleMapping = roleMappings.find(
+          (roleMapping) => roleMapping.target === role.name,
+        );
+
+        return {
+          id: role.name,
+          role: role.name,
+          providerRoles: targetRoleMapping ? targetRoleMapping.source.join(', ') : role.name,
+        };
+      }) ?? [];
 
     return existingRows;
   }, [activeAuthProvider, dom]);

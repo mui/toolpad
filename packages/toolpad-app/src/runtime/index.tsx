@@ -13,6 +13,10 @@ import RuntimeToolpadApp, {
   pageComponentsStore,
 } from './ToolpadApp';
 import { RuntimeState } from './types';
+import { AppContext } from './AppContext';
+
+const IS_PREVIEW = process.env.NODE_ENV !== 'production';
+const IS_CUSTOM_SERVER = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
 
 const cache = createCache({
   key: 'css',
@@ -39,13 +43,20 @@ export interface RootProps {
   ToolpadApp: React.ComponentType<ToolpadAppProps>;
 }
 
+const appContext = {
+  isPreview: IS_PREVIEW,
+  isCustomServer: IS_CUSTOM_SERVER,
+};
+
 function Root({ ToolpadApp, initialState, base }: RootProps) {
   return (
     <React.StrictMode>
       <CacheProvider value={cache}>
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
-        <ToolpadApp basename={base} state={initialState} />
+        <AppContext.Provider value={appContext}>
+          <ToolpadApp basename={base} state={initialState} />
+        </AppContext.Provider>
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />
       </CacheProvider>
     </React.StrictMode>

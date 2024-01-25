@@ -85,7 +85,7 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY, IS_PREVIEW, PREVIEW_HEADER_HEIGHT } from './constants';
+import { HTML_ID_EDITOR_OVERLAY, PREVIEW_HEADER_HEIGHT } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { useDataQuery, UseFetch } from './useDataQuery';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
@@ -96,6 +96,7 @@ import api, { queryClient } from './api';
 import { AuthContext, useAuth } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
+import { AppContext } from './AppContext';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -103,8 +104,6 @@ export const IS_RENDERED_IN_CANVAS =
   typeof window === 'undefined'
     ? false
     : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
-
-const SHOW_PREVIEW_HEADER = IS_PREVIEW && !IS_RENDERED_IN_CANVAS;
 
 export type PageComponents = Partial<Record<string, React.ComponentType>>;
 
@@ -188,7 +187,6 @@ const AppRoot = styled('div')({
   minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
-  paddingTop: SHOW_PREVIEW_HEADER ? PREVIEW_HEADER_HEIGHT : 0,
 });
 
 const EditorOverlay = styled('div')({
@@ -1559,9 +1557,10 @@ function AppError({ error }: FallbackProps) {
 export interface ToolpadAppLayoutProps {
   dom: appDom.RenderTree;
   basename: string;
+  clipped: boolean;
 }
 
-function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
@@ -1586,7 +1585,7 @@ function ToolpadAppLayout({ dom, basename }: ToolpadAppLayoutProps) {
       pages={navEntries}
       hasNavigation={!IS_RENDERED_IN_CANVAS}
       hasHeader={hasAuthentication && !IS_RENDERED_IN_CANVAS}
-      clipped={SHOW_PREVIEW_HEADER}
+      clipped={clipped}
     >
       <RenderedPages pages={pages} hasAuthentication={hasAuthentication} basename={basename} />
     </AppLayout>
@@ -1621,13 +1620,21 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
 
   const authContext = useAuth({ dom, basename });
 
+  const appContext = React.useContext(AppContext);
+  const showPreviewHeader: boolean = !!appContext?.isPreview && !IS_RENDERED_IN_CANVAS;
+
   return (
     <BrowserRouter basename={basename}>
       <UseDataProviderContext.Provider value={useDataProvider}>
         <AppThemeProvider dom={dom}>
           <CssBaseline enableColorScheme />
-          {SHOW_PREVIEW_HEADER ? <PreviewHeader basename={basename} /> : null}
-          <AppRoot ref={rootRef}>
+          {showPreviewHeader ? <PreviewHeader basename={basename} /> : null}
+          <AppRoot
+            ref={rootRef}
+            sx={{
+              paddingTop: showPreviewHeader ? PREVIEW_HEADER_HEIGHT : 0,
+            }}
+          >
             <ComponentsContextProvider value={components}>
               <DomContextProvider value={dom}>
                 <ErrorBoundary FallbackComponent={AppError}>
@@ -1639,7 +1646,13 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                             <Route path="/signin" element={<SignInPage />} />
                             <Route
                               path="*"
-                              element={<ToolpadAppLayout dom={dom} basename={basename} />}
+                              element={
+                                <ToolpadAppLayout
+                                  dom={dom}
+                                  basename={basename}
+                                  clipped={showPreviewHeader}
+                                />
+                              }
                             />
                           </Routes>
                         </AuthContext.Provider>

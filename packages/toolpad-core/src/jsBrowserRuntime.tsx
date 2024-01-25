@@ -2,15 +2,23 @@ import { errorFrom } from '@mui/toolpad-utils/errors';
 import { TOOLPAD_LOADING_MARKER } from './jsRuntime';
 import { BindingEvaluationResult, JsRuntime } from './types';
 
+function getIframe(): HTMLIFrameElement {
+  const iframeId = 'toolpad-browser-runtime-iframe';
+  let iframe = document.getElementById(iframeId) as HTMLIFrameElement;
+
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = iframeId;
+    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+    iframe.style.display = 'none';
+    document.documentElement.appendChild(iframe);
+  }
+  return iframe;
+}
+
 function createBrowserRuntime(): JsRuntime {
-  let iframe: HTMLIFrameElement;
   function evalCode(code: string, globalScope: Record<string, unknown>) {
-    if (!iframe) {
-      iframe = document.createElement('iframe');
-      iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
-      iframe.style.display = 'none';
-      document.documentElement.appendChild(iframe);
-    }
+    const iframe: HTMLIFrameElement = getIframe();
 
     // eslint-disable-next-line no-underscore-dangle
     (iframe.contentWindow as any).__SCOPE = globalScope;

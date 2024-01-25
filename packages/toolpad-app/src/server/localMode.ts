@@ -911,7 +911,7 @@ async function loadProjectFolder(root: string): Promise<ToolpadProjectFolder> {
   return readProjectFolder(root);
 }
 
-export async function loadDomFromDisk(root: string): Promise<appDom.AppDom> {
+async function loadDomFromDisk(root: string): Promise<appDom.AppDom> {
   const projectFolder = await loadProjectFolder(root);
 
   return projectFolderToAppDom(projectFolder);
@@ -1438,4 +1438,9 @@ async function buildPagesManifest(root: string): Promise<PagesManifest> {
   pages.sort((page1, page2) => page1.title.localeCompare(page2.title));
 
   return { pages };
+}
+
+export async function loadDom(root: string) {
+  const resolvedRoot = resolveProjectDir(root);
+  return loadDomFromDisk(resolvedRoot);
 }

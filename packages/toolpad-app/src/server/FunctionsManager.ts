@@ -31,8 +31,7 @@ export interface CreateDataProviderOptions {
   paginationMode: PaginationMode;
 }
 
-import.meta.url ??= url.pathToFileURL(__filename).toString();
-const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+const currentDirectory = url.fileURLToPath(new URL('.', String(import.meta.url)));
 
 async function createDefaultFunction(filePath: string): Promise<string> {
   const result = await format(

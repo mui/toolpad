@@ -48,7 +48,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
   if (!process.env.TOOLPAD_AUTH_SECRET) {
     console.error(
       `\n${chalk.red(
-        'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at [insert link to docs here]',
+        'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at https://mui.com/toolpad/concepts/authentication/#authentication-providers',
       )}\n`,
     );
   }
@@ -134,7 +134,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
     tenantId: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
   });
 
-  const credentialsProvider = CredentialsProvider({
+  const mockCredentialsProvider = CredentialsProvider({
     name: 'Credentials',
     async authorize({ username, password }) {
       if (process.env.NODE_ENV !== 'test') {
@@ -144,16 +144,16 @@ export function createAuthHandler(project: ToolpadProject): Router {
       if (username === 'admin' && password === 'admin') {
         return {
           id: 'admin',
-          name: 'Mr. Admin',
+          name: 'Lord Admin',
           email: 'admin@example.com',
           roles: ['credentials-admin'],
         };
       }
       if (username === 'mui' && password === 'mui') {
-        return { id: 'mui', name: 'MUI', email: 'test@mui.com', roles: [] };
+        return { id: 'mui', name: 'Mr. MUI 2024', email: 'test@mui.com', roles: [] };
       }
       if (username === 'test' && password === 'test') {
-        return { id: 'test', name: 'Mrs. Test', email: 'test@example.com', roles: [] };
+        return { id: 'test', name: 'Miss Test', email: 'test@example.com', roles: [] };
       }
 
       return null;
@@ -167,7 +167,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
       error: `${base}/signin`, // Error code passed in query string as ?error=
       verifyRequest: base,
     },
-    providers: [githubProvider, googleProvider, azureADProvider, credentialsProvider],
+    providers: [githubProvider, googleProvider, azureADProvider, mockCredentialsProvider],
     secret: process.env.TOOLPAD_AUTH_SECRET,
     trustHost: true,
     callbacks: {

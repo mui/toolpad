@@ -173,7 +173,7 @@ export default function SignInPage() {
                     size="large"
                     fullWidth
                   >
-                    Sign In
+                    Sign in
                   </LoadingButton>
                 </Stack>
               </form>
@@ -246,9 +246,11 @@ export default function SignInPage() {
               ) : null}
               {authProviders.includes('credentials') ? (
                 <React.Fragment>
-                  <Divider>
-                    <Typography variant="caption">OR</Typography>
-                  </Divider>
+                  {authProviders.length > 1 ? (
+                    <Divider>
+                      <Typography variant="caption">OR</Typography>
+                    </Divider>
+                  ) : null}
                   <LoadingButton
                     variant="contained"
                     onClick={handleCredentialsSignIn}

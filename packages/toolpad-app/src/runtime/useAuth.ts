@@ -63,12 +63,17 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
   const [isSigningOut, setIsSigningOut] = React.useState(true);
 
   const getCsrfToken = React.useCallback(async () => {
-    const csrfResponse = await fetch(`${basename}${AUTH_CSRF_PATH}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const { csrfToken } = await csrfResponse.json();
+    let csrfToken = '';
+    try {
+      const csrfResponse = await fetch(`${basename}${AUTH_CSRF_PATH}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      csrfToken = (await csrfResponse.json())?.csrfToken;
+    } catch (error) {
+      console.error((error as Error).message);
+    }
 
     return csrfToken ?? '';
   }, [basename]);
@@ -76,12 +81,7 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
   const signOut = React.useCallback(async () => {
     setIsSigningOut(true);
 
-    let csrfToken = '';
-    try {
-      csrfToken = await getCsrfToken();
-    } catch (error) {
-      console.error((error as Error).message);
-    }
+    const csrfToken = await getCsrfToken();
 
     try {
       await fetch(`${basename}${AUTH_SIGNOUT_PATH}`, {
@@ -103,9 +103,17 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
   }, [basename, getCsrfToken]);
 
   const getSession = React.useCallback(async () => {
+    setIsSigningIn(true);
+
+    await getCsrfToken();
+
     try {
       setIsSigningIn(true);
-      const sessionResponse = await fetch(`${basename}${AUTH_SESSION_PATH}`);
+      const sessionResponse = await fetch(`${basename}${AUTH_SESSION_PATH}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       setSession(await sessionResponse.json());
     } catch (error) {
       console.error((error as Error).message);
@@ -113,18 +121,13 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
     }
 
     setIsSigningIn(false);
-  }, [basename, signOut]);
+  }, [basename, getCsrfToken, signOut]);
 
   const signIn = React.useCallback(
     async (provider: AuthProvider, payload?: Record<string, unknown>, isLocalProvider = false) => {
       setIsSigningIn(true);
 
-      let csrfToken = '';
-      try {
-        csrfToken = await getCsrfToken();
-      } catch (error) {
-        console.error((error as Error).message);
-      }
+      const csrfToken = await getCsrfToken();
 
       try {
         const signInResponse = await fetch(
@@ -137,7 +140,7 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
               'Content-Type': 'application/x-www-form-urlencoded',
               'X-Auth-Return-Redirect': '1',
             },
-            body: new URLSearchParams({ csrfToken, ...payload }),
+            body: new URLSearchParams({ ...payload, csrfToken }),
           },
         );
 
@@ -158,7 +161,7 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
     if (!isRenderedInCanvas && hasAuthentication) {
       getSession();
     }
-  }, [getSession, hasAuthentication, isRenderedInCanvas]);
+  }, [getCsrfToken, getSession, hasAuthentication, isRenderedInCanvas]);
 
   return {
     session,

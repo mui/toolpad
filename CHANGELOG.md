@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.48
+
+<!-- generated comparing v0.1.47..master -->
+
+_Jan 26, 2024_
+
+Fixing a failed release
+
 ## 0.1.47
 
 <!-- generated comparing v0.1.46..master -->

@@ -38,7 +38,7 @@ test('Must be authenticated with valid domain to view app', async ({ page }) => 
   await tryCredentialsSignIn(page, 'mui', 'mui');
   await expect(page).toHaveURL(/\/prod\/pages\/mypage/);
 
-  // Is not redirected when unauthenticated
+  // Is not redirected when authenticated
   await page.goto('/prod/pages/mypage');
   await expect(page).toHaveURL(/\/prod\/pages\/mypage/);
 

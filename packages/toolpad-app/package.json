@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad",
-  "version": "0.1.47",
+  "version": "0.1.48",
   "license": "MIT",
   "bin": {
     "toolpad": "./cli.mjs"

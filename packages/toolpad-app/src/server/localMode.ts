@@ -109,7 +109,7 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
-function getOutputFolder(root: string) {
+export function getOutputFolder(root: string) {
   return path.join(root, '.generated');
 }
 

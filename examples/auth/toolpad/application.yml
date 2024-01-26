@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: application
+spec:
+  {
+    authentication:
+      {
+        providers:
+          [
+            { provider: github },
+            { provider: google },
+            { provider: azure-ad },
+            { provider: credentials },
+          ],
+        restrictedDomains: [],
+      },
+    authorization: {},
+  }

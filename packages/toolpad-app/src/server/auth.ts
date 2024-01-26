@@ -6,6 +6,7 @@ import AzureADProvider from '@auth/core/providers/azure-ad';
 import { getToken } from '@auth/core/jwt';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
+import chalk from 'chalk';
 import * as appDom from '@mui/toolpad-core/appDom';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
@@ -17,6 +18,14 @@ const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
 ];
 
 export function createAuthHandler(project: ToolpadProject): Router {
+  if (!process.env.TOOLPAD_AUTH_SECRET) {
+    console.error(
+      `\n${chalk.red(
+        'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at https://mui.com/toolpad/concepts/authentication/#authentication-secret',
+      )}\n`,
+    );
+  }
+
   const { base } = project.options;
 
   const router = express.Router();

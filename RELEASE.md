@@ -38,10 +38,10 @@
    1. Run
 
    ```bash
-   npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke
+   npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke --use-pnpm
    cd smoke
-   yarn add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@mui/toolpad -S
-   yarn && yarn dev
+   pnpm add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@mui/toolpad -S
+   pnpm dedupe && pnpm dev
    ```
 
    And verify the editor works

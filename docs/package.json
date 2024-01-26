@@ -30,7 +30,7 @@
     "@mui/lab": "5.0.0-alpha.162",
     "@mui/material": "5.15.6",
     "@mui/material-nextjs": "^5.15.6",
-    "@mui/monorepo": "github:mui/material-ui#3ceb5b6a318fe83b48ba0b43340909ffbfccbf48",
+    "@mui/monorepo": "github:mui/material-ui#5cbe910ddcef8a39a7318378ef779c12aecc0bbc",
     "@mui/styles": "5.15.6",
     "@mui/toolpad": "workspace:*",
     "@mui/utils": "5.15.6",

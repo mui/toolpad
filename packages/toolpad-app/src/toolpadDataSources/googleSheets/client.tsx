@@ -15,6 +15,7 @@ import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -32,7 +33,6 @@ import { usePrivateQuery } from '../context';
 import QueryInputPanel from '../QueryInputPanel';
 import useQueryPreview from '../useQueryPreview';
 import useFetchPrivate from '../useFetchPrivate';
-import * as appDom from '../../appDom';
 
 const EMPTY_ROWS: any[] = [];
 

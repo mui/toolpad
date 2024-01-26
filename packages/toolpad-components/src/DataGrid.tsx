@@ -66,9 +66,8 @@ import {
   IconButton,
   CircularProgress,
   Alert,
-  Collapse,
   Button,
-  useEventCallback,
+  Snackbar,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import CloseIcon from '@mui/icons-material/Close';
@@ -90,6 +89,8 @@ import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay, { ErrorContent } from './components/ErrorOverlay';
 
 const DRAFT_ROW_MARKER = Symbol('draftRow');
+
+const ACTIONS_COLUMN_FIELD = '___actions___';
 
 type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
@@ -982,7 +983,6 @@ interface ActionResultOverlayProps {
 }
 
 function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayProps) {
-  const [hovered, setHovered] = React.useState(false);
   const open = !!result;
   const actionError = result?.error;
 
@@ -1034,36 +1034,24 @@ function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayPro
     }
   }
 
-  const handleClose = useEventCallback(() => {
-    onClose();
-  });
-
-  React.useEffect(() => {
-    if (result && !hovered) {
-      const timeout = setTimeout(handleClose, 2000);
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
-    return () => {};
-  }, [hovered, result, handleClose]);
-
   return (
     <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
-      <Collapse in={!!open}>
-        <Alert
-          severity={lastResult?.error ? 'error' : 'success'}
-          action={
-            <IconButton aria-label="close" color="inherit" size="small" onClick={onClose}>
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }
-          onMouseEnter={() => setHovered(true)}
-          onMouseOut={() => setHovered(false)}
-        >
+      <Snackbar
+        sx={{ position: 'absolute' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={open}
+        autoHideDuration={2000}
+        onClose={onClose}
+        action={
+          <IconButton size="small" aria-label="close" color="inherit" onClick={onClose}>
+            <CloseIcon fontSize="inherit" />
+          </IconButton>
+        }
+      >
+        <Alert severity={lastResult?.error ? 'error' : 'success'} onClose={onClose}>
           {message}
         </Alert>
-      </Collapse>
+      </Snackbar>
     </Box>
   );
 }
@@ -1238,11 +1226,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
     if (getProviderActions) {
       result.push({
-        field: '___actions',
+        field: ACTIONS_COLUMN_FIELD,
         type: 'actions',
-        headerName: '',
-        flex: 1,
         align: 'right',
+        resizable: false,
+        pinnable: false,
         getActions: getProviderActions,
       });
     }
@@ -1286,6 +1274,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 getRowId={getRowId}
                 onRowSelectionModelChange={onSelectionModelChange}
                 rowSelectionModel={selectionModel}
+                initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
                 {...props}
                 {...dataProviderProps}
               />

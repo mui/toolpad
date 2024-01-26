@@ -7,6 +7,7 @@ export function update<T>(dest: T, src: Partial<T>): T {
   Object.entries(src).forEach(([key, value]) => {
     if (dest[key as keyof T] !== value) {
       result = result || { ...dest };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (result as any)[key] = value;
     }
   });

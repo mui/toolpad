@@ -29,7 +29,6 @@ import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
 import { createAuthHandler, createRequireAuthMiddleware } from './auth';
 
-import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const DEFAULT_PORT = 3000;
@@ -63,6 +62,7 @@ async function createDevHandler(project: ToolpadProject) {
 
   const worker = new Worker(appServerPath, {
     workerData: {
+      toolpadDevMode: project.options.toolpadDevMode,
       outDir: project.getAppOutputFolder(),
       base: project.options.base,
       config: runtimeConfig,
@@ -292,7 +292,7 @@ async function createToolpadHandler({
 }: ToolpadHandlerConfig): Promise<AppHandler> {
   const editorBasename = '/_toolpad';
 
-  const project = await initProject({ dev, dir, externalUrl, base });
+  const project = await initProject({ toolpadDevMode, dev, dir, externalUrl, base });
   await project.start();
 
   const router = express.Router();

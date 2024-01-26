@@ -11,8 +11,8 @@ import {
   NodeHashes,
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
-import type * as appDom from './appDom';
-import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
+import type { Awaitable, Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
+import type * as appDom from '@mui/toolpad-core/appDom';
 import type { Rectangle } from './utils/geometry';
 import type { RuntimeState } from './runtime';
 
@@ -109,11 +109,6 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}> {
 
 export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;
 
-export interface ConnectionStatus {
-  timestamp: number;
-  error?: string;
-}
-
 export interface ExecFetchFn<Q, R extends ExecFetchResult> {
   (fetchQuery: Q, params: Record<string, string>): Promise<R>;
 }
@@ -205,6 +200,7 @@ export type ProjectEvents = {
 };
 
 export interface ToolpadProjectOptions {
+  toolpadDevMode: boolean;
   dev: boolean;
   externalUrl?: string;
   base: string;
@@ -212,9 +208,3 @@ export interface ToolpadProjectOptions {
 }
 
 export type CodeEditorFileType = 'resource' | 'component';
-
-export type AuthProvider = 'github' | 'google';
-
-export interface AuthProviderConfig {
-  provider: AuthProvider;
-}

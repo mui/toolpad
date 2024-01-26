@@ -5,10 +5,10 @@ import GoogleProvider from '@auth/core/providers/google';
 import { getToken } from '@auth/core/jwt';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
-import * as appDom from '../appDom';
 
 export function createAuthHandler(project: ToolpadProject): Router {
   const { base } = project.options;

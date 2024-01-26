@@ -2,7 +2,7 @@
 
 <p class="description">An app that shows how to set up authentication in Toolpad.</p>
 
-Example showcasing custom server integration of Toolpad apps. [The docs](https://mui.com/toolpad/concepts/authentication/).
+Example showcasing how to set up authentication providers in a Toolpad app. [The docs](https://mui.com/toolpad/concepts/authentication/).
 
 <a target="_blank">
   <img src="https://mui.com/static/toolpad/marketing/authentication.png" alt="Authentication" style="aspect-ratio: 131/88;" width="524">

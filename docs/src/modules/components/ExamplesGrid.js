@@ -107,6 +107,13 @@ function layouts() {
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/charts',
     },
     {
+      title: 'Authentication',
+      description: 'An app that shows how to set up authentication in Toolpad.',
+      src: '/static/toolpad/marketing/authentication.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/auth',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/auth',
+    },
+    {
       title: 'Custom server',
       description: 'An app that shows how to use Toolpad with a custom server.',
       src: '/static/toolpad/marketing/custom-server.png',

@@ -20,7 +20,7 @@ const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [
   'credentials',
 ];
 
-export async function getHasAuthentication(project: ToolpadProject): Promise<boolean> {
+export async function getRequireAuthentication(project: ToolpadProject): Promise<boolean> {
   const dom = await project.loadDom();
   const app = appDom.getApp(dom);
 

@@ -3,6 +3,7 @@ import invariant from 'invariant';
 import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { FlowDirection, SlotType } from '@mui/toolpad-core';
+import { update } from '@mui/toolpad-utils/immutability';
 import ToolpadApp, { IS_RENDERED_IN_CANVAS } from '../runtime/ToolpadApp';
 import { queryClient } from '../runtime/api';
 import { AppCanvasState, NodeInfo, PageViewState, SlotsState } from '../types';
@@ -13,7 +14,6 @@ import {
 } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
-import { update } from '../utils/immutability';
 
 const handleScreenUpdate = throttle(
   () => {

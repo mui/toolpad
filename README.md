@@ -31,7 +31,7 @@ A [big change](https://github.com/mui/mui-toolpad/discussions/1748) is coming: w
 
 ## Product walkthrough
 
-https://github.com/mui/mui-toolpad/assets/92228082/03d3da62-a8a7-4d2d-a07e-975744af9683
+![readme_video](https://github.com/prakhargupta1/mui-toolpad/assets/92228082/efcab7c7-4f34-487c-8a62-e059b5e58bcc)
 
 ## Notice
 

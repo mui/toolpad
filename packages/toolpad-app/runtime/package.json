@@ -1,5 +1,0 @@
-{
-  "type": "commonjs",
-  "main": "../dist/exports/runtime.js",
-  "types": "../dist/exports/runtime.d.ts"
-}

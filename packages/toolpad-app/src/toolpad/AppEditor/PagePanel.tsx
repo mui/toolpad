@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { styled, SxProps, Box, Divider, Typography } from '@mui/material';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import PagesExplorer from './PagesExplorer';
 import PageHierarchyExplorer from './HierarchyExplorer';
@@ -7,7 +8,6 @@ import { useAppState } from '../AppState';
 import AppOptions from '../AppOptions';
 import { QueriesExplorer, ActionsExplorer } from './PageEditor/QueriesExplorer';
 import { useProject } from '../../project';
-import * as appDom from '../../appDom';
 
 const PAGE_PANEL_WIDTH = 250;
 

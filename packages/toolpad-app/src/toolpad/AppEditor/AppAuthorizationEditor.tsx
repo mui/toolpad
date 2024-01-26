@@ -36,11 +36,10 @@ import {
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import { TabContext, TabList } from '@mui/lab';
+import { updateArray } from '@mui/toolpad-utils/immutability';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useAppStateApi } from '../AppState';
-import * as appDom from '../../appDom';
 import TabPanel from '../../components/TabPanel';
-import { AuthProviderConfig, AuthProvider } from '../../types';
-import { updateArray } from '../../utils/immutability';
 
 const AUTH_PROVIDERS = new Map([
   ['github', { name: 'GitHub', Icon: GitHubIcon }],
@@ -52,7 +51,7 @@ export function AppAuthenticationEditor() {
   const appState = useAppStateApi();
 
   const handleAuthProvidersChange = React.useCallback(
-    (event: SelectChangeEvent<AuthProvider[]>) => {
+    (event: SelectChangeEvent<appDom.AuthProvider[]>) => {
       const {
         target: { value: providers },
       } = event;
@@ -63,7 +62,7 @@ export function AppAuthenticationEditor() {
         draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
           ...app.attributes?.authentication,
           providers: (typeof providers === 'string' ? providers.split(',') : providers).map(
-            (provider) => ({ provider } as AuthProviderConfig),
+            (provider) => ({ provider }) as appDom.AuthProviderConfig,
           ),
         });
 
@@ -114,7 +113,7 @@ export function AppAuthenticationEditor() {
       </Typography>
       <FormControl>
         <InputLabel id="auth-providers-label">Authentication providers</InputLabel>
-        <Select<AuthProvider[]>
+        <Select<appDom.AuthProvider[]>
           labelId="auth-providers-label"
           label="Authentication providers"
           id="auth-providers"
@@ -131,7 +130,7 @@ export function AppAuthenticationEditor() {
           {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
             <MenuItem key={value} value={value}>
               <Stack direction="row" alignItems="center">
-                <Checkbox checked={authProviders.indexOf(value as AuthProvider) > -1} />
+                <Checkbox checked={authProviders.indexOf(value as appDom.AuthProvider) > -1} />
                 <Icon fontSize="small" />
                 <Typography ml={1}>{name}</Typography>
               </Stack>

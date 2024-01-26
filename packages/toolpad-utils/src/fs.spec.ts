@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { describe, test, beforeEach, afterEach, expect } from 'vitest';
-import { fileReplace, fileReplaceAll, compareFolders } from './fs';
+import { fileReplace, fileReplaceAll, compareSameLayerFolder } from './fs';
 
 describe('fileReplace', () => {
   let testDir: string;
@@ -71,14 +71,10 @@ describe('compareFolders', () => {
     targetDir = path.resolve(testDir, './target');
     sourceFile = path.resolve(sourceDir, './test1.txt');
     targetFile = path.resolve(targetDir, './test2.txt');
-
-    // await fs.writeFile(sourceFile, 'Hello World', { encoding: 'utf-8' });
-
-    // await fs.writeFile(targetFile, 'Hello World', { encoding: 'utf-8' });
   });
   test('test a same dir', async () => {
     await fs.mkdir(sourceDir);
-    const result = (await compareFolders(testDir, testDir)).shift();
+    const result = (await compareSameLayerFolder(testDir, testDir)).shift();
     expect(result).toMatchObject({
       name: 'source',
       type: 'folder',
@@ -87,13 +83,13 @@ describe('compareFolders', () => {
   test('test a different dir', async () => {
     await fs.mkdir(sourceDir);
     await fs.mkdir(targetDir);
-    const result = await compareFolders(sourceDir, targetDir);
+    const result = await compareSameLayerFolder(sourceDir, targetDir);
     expect(result).length(0);
   });
   test('test a same file', async () => {
     await fs.mkdir(sourceDir);
     await fs.writeFile(sourceFile, 'Hello World', { encoding: 'utf-8' });
-    const result = (await compareFolders(sourceDir, sourceDir)).shift();
+    const result = (await compareSameLayerFolder(sourceDir, sourceDir)).shift();
     expect(result).toMatchObject({
       name: 'test1.txt',
       type: 'file',
@@ -105,14 +101,14 @@ describe('compareFolders', () => {
     await fs.writeFile(sourceFile, 'Hello World', { encoding: 'utf-8' });
     await fs.mkdir(targetDir);
     await fs.writeFile(targetFile, 'Hello World', { encoding: 'utf-8' });
-    const result = await compareFolders(sourceDir, targetDir);
+    const result = await compareSameLayerFolder(sourceDir, targetDir);
     expect(result).length(0);
   });
 
   test('test a different layer file', async () => {
     await fs.mkdir(sourceDir);
     await fs.writeFile(sourceFile, 'Hello World', { encoding: 'utf-8' });
-    const result = await compareFolders(sourceDir, path.resolve(testDir));
+    const result = await compareSameLayerFolder(path.resolve(testDir), sourceDir);
     expect(result).length(0);
   });
 

@@ -136,7 +136,7 @@ export interface ReturnCompareFoldersOption {
   type: 'file' | 'folder';
 }
 
-export async function compareFolders(sourcePath: string, targetPath: string) {
+export async function compareSameLayerFolder(sourcePath: string, targetPath: string) {
   try {
     const list: ReturnCompareFoldersOption[] = [];
     await handle(sourcePath, targetPath, list);
@@ -174,8 +174,8 @@ export async function compareFolders(sourcePath: string, targetPath: string) {
       const sourceFileList = sourceList.filter(Boolean) as Dirent[];
       const targetFileList = targetList.filter(Boolean) as Dirent[];
 
-      sourceFileList.filter(Boolean).forEach((file) => {
-        if (targetFileList.filter(Boolean).some((f) => f.name === file.name)) {
+      sourceFileList.forEach((file) => {
+        if (targetFileList.some((f) => f.name === file.name)) {
           sameList.push({
             name: file.name,
             type: 'file',
@@ -200,7 +200,6 @@ export async function compareFolders(sourcePath: string, targetPath: string) {
     ]);
     const sourceDir = sourceDirList.filter(Boolean) as Dirent[];
     const targetDir = targetDirList.filter(Boolean) as Dirent[];
-
     sourceDir.forEach((folder) => {
       if (targetDir.some((f) => f.name === folder.name)) {
         sameList.push({
@@ -213,7 +212,7 @@ export async function compareFolders(sourcePath: string, targetPath: string) {
     await Promise.all(
       sourceDir.map(async (folder) => {
         const subFolder1 = path.join(folderPathSource, folder.name);
-        const subFolder2 = path.join(folderPathSource, folder.name);
+        const subFolder2 = path.join(folderPathTarget, folder.name);
         await handle(subFolder1, subFolder2, sameList);
       }),
     );

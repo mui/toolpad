@@ -317,7 +317,7 @@ async function createToolpadHandler({
   router.use(express.static(publicPath, { index: false }));
 
   const childrenPublic = path.resolve(project.getRoot(), './public');
-  console.log(childrenPublic, '>>>>>>');
+
   router.use(express.static(childrenPublic, { index: false }));
 
   const appHandler = await createToolpadAppHandler(project);

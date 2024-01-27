@@ -54,9 +54,8 @@ const Video = styled('video')(({ theme }) => [
 const videoMainControls = (theme) => ({
   position: 'absolute',
   transform: 'translate(-50%,-50%)',
-  background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[400]} 0%, ${
-    (theme.vars || theme).palette.primary[600]
-  } 150%)`,
+  background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[400]} 0%, ${(theme.vars || theme).palette.primary[600]
+    } 150%)`,
   borderRadius: 99,
   width: 58,
   height: 58,
@@ -69,9 +68,8 @@ const videoMainControls = (theme) => ({
   zIndex: 10,
   '&:hover': {
     scale: '1.02',
-    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[500]} 0%, ${
-      (theme.vars || theme).palette.primary[700]
-    } 150%)`,
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[500]} 0%, ${(theme.vars || theme).palette.primary[700]
+      } 150%)`,
     boxShadow: `0 8px 16px ${alpha(theme.palette.primary[900], 0.5)}`,
   },
 });
@@ -94,9 +92,8 @@ const videoSecondaryControls = (theme) => ({
     scale: '1.03',
     borderColor: (theme.vars || theme).palette.primary[300],
     boxShadow: `0 4px 8px ${alpha(theme.palette.grey[500], 0.4)}`,
-    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[50]} 0%, ${
-      (theme.vars || theme).palette.primary[100]
-    } 150%)`,
+    background: `linear-gradient(120deg, ${(theme.vars || theme).palette.primary[50]} 0%, ${(theme.vars || theme).palette.primary[100]
+      } 150%)`,
   },
   ...theme.applyDarkStyles({
     borderColor: (theme.vars || theme).palette.primary[200],

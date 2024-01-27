@@ -1,13 +1,13 @@
 <!-- markdownlint-disable-next-line -->
 <p align="center">
-  <a href="https://mui.com/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/logo.svg" alt="MUI logo"></a>
+  <a href="https://mui.com/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/logo.svg" alt="MUI Toolpad logo"></a>
 </p>
 
-<h1 align="center">MUI Toolpad</h1>
+<h1 align="center">MUI Toolpad</h1>
 
 <div align="center">
 
-Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal tools builder designed to extend the [MUI](https://mui.com/) React components. It's designed for developers of all trades who want to save time building internal applications.
+Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal tools builder designed to extend the [MUI](https://mui.com/) React components. It's designed for developers of all trades who want to save time building internal applications.
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
 
@@ -35,7 +35,7 @@ A [big change](https://github.com/mui/mui-toolpad/discussions/1748) is coming: w
 
 ## Notice
 
-MUI Toolpad is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.
+MUI Toolpad is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.
 
 ## Quick setup locally
 

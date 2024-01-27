@@ -408,7 +408,7 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   },
   link: {
     renderCell: ({ value }) => (
-      <Link href={value} target="_blank" rel="noopener noreferrer nofollow">
+      <Link href={value} target="_blank" rel="noopener nofollow">
         {value}
       </Link>
     ),

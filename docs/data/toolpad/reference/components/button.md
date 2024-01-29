@@ -4,7 +4,7 @@
 
 <p class="description">API docs for the Toolpad Button component.</p>
 
-The Material UI [Button](https://mui.com/material-ui/react-button/) component.
+The Material UI [Button](https://mui.com/material-ui/react-button/) component.
 
 Buttons allow users to take actions, and make choices, with a single tap.
 

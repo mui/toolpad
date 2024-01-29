@@ -4,7 +4,7 @@
 
 <p class="description">API docs for the Toolpad Stack component.</p>
 
-The Material UI [Stack](https://mui.com/material-ui/react-stack/) component.
+The Material UI [Stack](https://mui.com/material-ui/react-stack/) component.
 
 ## Properties
 

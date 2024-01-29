@@ -31,7 +31,7 @@ commands:
       - run:
           name: Install pnpm package manager
           command: |
-            corepack enable
+            corepack enable --install-directory ~/bin
             corepack prepare --activate
 
       - when:

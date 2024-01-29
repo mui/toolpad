@@ -643,8 +643,8 @@ importers:
         specifier: 2.2.3
         version: 2.2.3
       latest-version:
-        specifier: 7.0.0
-        version: 7.0.0
+        specifier: 8.0.0
+        version: 8.0.0
       lodash-es:
         specifier: 4.17.21
         version: 4.17.21
@@ -8741,9 +8741,9 @@ packages:
     dependencies:
       get-intrinsic: 1.2.2
 
-  /got@12.6.1:
-    resolution: {integrity: sha512-mThBblvlAF1d4O5oqyvN+ZxLAYwIJK7bpMxgYqPD9okW0C3qm5FFn7k811QrcuEBwaogR3ngOFoCfs6mRv7teQ==}
-    engines: {node: '>=14.16'}
+  /got@13.0.0:
+    resolution: {integrity: sha512-XfBk1CxOOScDcMr9O1yKkNaQyy865NbYs+F7dr4H0LZMVgCj2Le59k6PqbNHoL5ToeaEQUYh6c6yMfVcc6SJxA==}
+    engines: {node: '>=16'}
     dependencies:
       '@sindresorhus/is': 5.6.0
       '@szmarczak/http-timer': 5.0.1
@@ -9885,11 +9885,11 @@ packages:
       language-subtag-registry: 0.3.22
     dev: true
 
-  /latest-version@7.0.0:
-    resolution: {integrity: sha512-KvNT4XqAMzdcL6ka6Tl3i2lYeFDgXNCuIX+xNx6ZMVR1dFq+idXd9FLKNMOIx0t9mJ9/HudyX4oZWXZQ0UJHeg==}
-    engines: {node: '>=14.16'}
+  /latest-version@8.0.0:
+    resolution: {integrity: sha512-FvwzZ43AtFdin94Mmuu/Sa+2vpDKbaDarz/MZU2EuDU7B9aGWq+c6M7EccBD7XJGnEwBmSDRRYabkvnEKqqksw==}
+    engines: {node: '>=18'}
     dependencies:
-      package-json: 8.1.1
+      package-json: 9.0.0
     dev: false
 
   /lazystream@1.0.1:
@@ -11636,11 +11636,11 @@ packages:
       p-reduce: 2.1.0
     dev: true
 
-  /package-json@8.1.1:
-    resolution: {integrity: sha512-cbH9IAIJHNj9uXi196JVsRlt7cHKak6u/e6AkL/bkRelZ7rlL3X1YKxsZwa36xipOEKAsdtmaG6aAJoM1fx2zA==}
-    engines: {node: '>=14.16'}
+  /package-json@9.0.0:
+    resolution: {integrity: sha512-vGgkl6BR8SJUcOdhj49/17fqYpBYr4fAlbBA3we5j548q114UAafKBEVck85Kk2HKhVzWGIAVybFpJ9LesJY6w==}
+    engines: {node: '>=18'}
     dependencies:
-      got: 12.6.1
+      got: 13.0.0
       registry-auth-token: 5.0.2
       registry-url: 6.0.1
       semver: 7.5.4

@@ -1,6 +1,6 @@
-# MUI Toolpad docs
+# MUI Toolpad docs
 
-This is the documentation website of MUI Toolpad.
+This is the documentation website of MUI Toolpad.
 
 To start the docs site in development mode, from the project root, run:
 
@@ -12,7 +12,7 @@ If you do not have yarn installed, select your OS and follow the instructions on
 
 _DO NOT USE NPM, use Yarn to install the dependencies._
 
-Visit the [MUI Toolpad documentation](https://mui.com/toolpad/getting-started/).
+Visit the [MUI Toolpad documentation](https://mui.com/toolpad/getting-started/).
 
 ## How can I add a new demo to the documentation?
 

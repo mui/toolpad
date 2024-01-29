@@ -4,7 +4,7 @@
 
 <p class="description">API docs for the Toolpad Autocomplete component.</p>
 
-A text input with autocomplete suggestions. Uses the Material UI [Autocomplete](https://mui.com/material-ui/react-autocomplete/) under the hood
+A text input with autocomplete suggestions. Uses the Material UI [Autocomplete](https://mui.com/material-ui/react-autocomplete/) under the hood
 
 ## Properties
 
@@ -21,4 +21,4 @@ A text input with autocomplete suggestions. Uses the Material UI [Autocomplete](
 | <span class="prop-name">name</span>         | <span class="prop-type">string</span>  |                                             | Name of this input. Used as a reference in form data.                                                                                                                                                                                                                                |
 | <span class="prop-name">isRequired</span>   | <span class="prop-type">boolean</span> | <span class="prop-default">false</span>     | Whether the input is required to have a value.                                                                                                                                                                                                                                       |
 | <span class="prop-name">isInvalid</span>    | <span class="prop-type">boolean</span> | <span class="prop-default">false</span>     | Whether the input value is invalid.                                                                                                                                                                                                                                                  |
-| <span class="prop-name">sx</span>           | <span class="prop-type">object</span>  |                                             | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |
+| <span class="prop-name">sx</span>           | <span class="prop-type">object</span>  |                                             | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |

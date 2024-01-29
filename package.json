@@ -24,7 +24,7 @@
     "jsonlint": "node ./scripts/jsonlint.mjs",
     "release:build": "lerna run --ignore docs --stream build",
     "release:version": "lerna version --exact --no-changelog --no-push --no-git-tag-version",
-    "release:publish": "pnpm publish --recursive --tag latest",
+    "release:publish": "pnpm dedupe && pnpm release:build && pnpm publish --recursive --tag latest",
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
     "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
     "test:integration": "rimraf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@argos-ci/core": "1.4.1",
-    "@mui/monorepo": "github:mui/material-ui#3ceb5b6a318fe83b48ba0b43340909ffbfccbf48",
+    "@mui/monorepo": "github:mui/material-ui#5cbe910ddcef8a39a7318378ef779c12aecc0bbc",
     "@mui/x-charts": "6.19.1",
     "@next/eslint-plugin-next": "14.1.0",
     "@playwright/test": "1.41.1",

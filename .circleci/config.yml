@@ -28,14 +28,15 @@ commands:
           keys:
             - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
 
+      - run:
+          name: Install pnpm package manager
+          command: |
+            corepack enable
+            corepack prepare --activate
+
       - when:
           condition: << parameters.browsers >>
           steps:
-            - run:
-                name: Install pnpm package manager
-                command: |
-                  corepack enable
-                  corepack prepare --activate
             - run:
                 name: Prepare playwright hash
                 command: pnpm list --json --filter playwright > /tmp/playwright_info.json

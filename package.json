@@ -67,7 +67,7 @@
     "execa": "8.0.1",
     "format-util": "1.0.5",
     "globby": "14.0.0",
-    "jsdom": "23.2.0",
+    "jsdom": "24.0.0",
     "lerna": "8.0.2",
     "markdownlint-cli2": "0.12.1",
     "prettier": "3.2.4",

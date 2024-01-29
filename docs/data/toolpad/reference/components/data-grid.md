@@ -4,7 +4,7 @@
 
 <p class="description">API docs for the Toolpad DataGrid component.</p>
 
-The MUI X [Data Grid](https://mui.com/x/react-data-grid/) component.
+The MUI X [Data Grid](https://mui.com/x/react-data-grid/) component.
 
 The datagrid lets users display tabular data in a flexible grid.
 

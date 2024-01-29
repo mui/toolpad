@@ -91,22 +91,6 @@
                     ]
                   },
                   "description": "Available roles for this application. These can be assigned to users."
-                },
-                "roleMappings": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    }
-                  },
-                  "propertyNames": {
-                    "enum": ["github", "google", "azure-ad"]
-                  },
-                  "description": "Role mapping definitions from authentication provider roles to Toolpad roles."
                 }
               },
               "additionalProperties": false,

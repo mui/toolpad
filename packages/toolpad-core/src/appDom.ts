@@ -75,7 +75,6 @@ export interface AppNode extends AppDomNodeBase {
         readonly name: string;
         readonly description?: string;
       }[];
-      readonly roleMappings?: Partial<Record<AuthProvider, Record<string, string[]>>>;
     };
   };
 }

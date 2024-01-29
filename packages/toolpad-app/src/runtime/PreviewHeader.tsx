@@ -17,7 +17,9 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import { useMatch } from 'react-router-dom';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { IS_CUSTOM_SERVER, PREVIEW_HEADER_HEIGHT } from './constants';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { PREVIEW_HEADER_HEIGHT } from './constants';
+import { AppHostContext } from './AppHostContext';
 
 interface CopyToClipboardButtonProps extends IconButtonProps {
   content: string;
@@ -178,7 +180,9 @@ export default function PreviewHeader({ basename }: PreviewHeaderProps) {
 
   const theme = useTheme();
 
-  return (
+  const appContext = useNonNullableContext(AppHostContext);
+
+  return appContext ? (
     <Box
       sx={{
         position: 'fixed',
@@ -193,7 +197,7 @@ export default function PreviewHeader({ basename }: PreviewHeaderProps) {
           borderRadius: 0,
         }}
         action={
-          IS_CUSTOM_SERVER ? (
+          appContext.isCustomServer ? (
             <CustomServerInstructions basename={basename} />
           ) : (
             <OpenInEditorButton
@@ -208,5 +212,5 @@ export default function PreviewHeader({ basename }: PreviewHeaderProps) {
         </Typography>
       </Alert>
     </Box>
-  );
+  ) : null;
 }

@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import * as z from 'zod';
+import * as prettier from 'prettier';
 import { META } from '../../packages/toolpad-app/src/server/schema';
 
 const currentDirectory = __dirname;
@@ -14,7 +15,10 @@ async function main() {
   const jsonSchema = zodToJsonSchema(z.object(META.schemas), {
     definitions: META.definitions,
   });
-  await fs.writeFile(schemaFile, JSON.stringify(jsonSchema, null, 2));
+  await prettier.resolveConfigFile(schemaFile);
+  const jsonContent = JSON.stringify(jsonSchema);
+  const fileContent = await prettier.format(jsonContent, { filepath: schemaFile });
+  await fs.writeFile(schemaFile, fileContent);
 }
 
 main().catch((err) => {

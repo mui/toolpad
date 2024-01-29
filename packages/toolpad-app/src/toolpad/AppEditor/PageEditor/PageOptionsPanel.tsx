@@ -12,12 +12,12 @@ import {
   Checkbox,
 } from '@mui/material';
 import * as React from 'react';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useDomApi } from '../../AppState';
 import { usePageEditorState } from './PageEditorProvider';
 
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
-import * as appDom from '../../../appDom';
 import PageTitleEditor from '../PageTitleEditor';
 import PageDisplayNameEditor from '../PageDisplayNameEditor';
 import { FEATURE_FLAG_AUTHORIZATION } from '../../../constants';

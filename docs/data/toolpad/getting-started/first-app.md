@@ -3,8 +3,8 @@
 <p class="description">Learn the fundamentals of building with Toolpad by creating a small application.</p>
 
 This guide will walk you through the process of creating a small Toolpad application.
-You'll use the MUI X Data Grid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api/).
-When you click on the name of a breed, a random photo of the breed will be displayed using the Material UI Image component.
+You'll use the MUI X Data Grid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api/).
+When you click on the name of a breed, a random photo of the breed will be displayed using the Material UI Image component.
 
 ## Purpose
 
@@ -112,8 +112,9 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 2. Click on the **Bind** button next to the breed parameter value, and add the following JavaScript expression in the binding editor:
 
+   <!-- prettier-ignore -->
    ```jsx
-   dataGrid.selection?.[0] ?? 'akita';
+   dataGrid.selection?.[0] ?? 'akita'
    ```
 
    This will use the selected value from the Data Grid, and default to the "akita" breed when no row has been selected.
@@ -122,8 +123,9 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 3. Then bind the query **URL** to the following JavaScript expression:
 
+   <!-- prettier-ignore -->
    ```js
-   `https://dog.ceo/api/breed/${parameters.breed}/images/random`;
+   `https://dog.ceo/api/breed/${parameters.breed}/images/random`
    ```
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/first-app/step-10.png", "alt": "URL binding", "caption": "Binding the URL to a JavaScript expression", "indent": 1 }}

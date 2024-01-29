@@ -3,13 +3,12 @@ import * as url from 'node:url';
 import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
+import * as appDom from '@mui/toolpad-core/appDom';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
-import * as appDom from '../appDom';
 import { pathToNodeImportSpecifier } from '../utils/paths';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
 
-import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const MAIN_ENTRY = '/main.tsx';

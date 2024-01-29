@@ -10,7 +10,7 @@ import {
   LiveBinding,
 } from '@mui/toolpad-core';
 import { ExactEntriesOf } from '@mui/toolpad-utils/types';
-import * as appDom from '../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { useToolpadComponent } from '../toolpadComponents';

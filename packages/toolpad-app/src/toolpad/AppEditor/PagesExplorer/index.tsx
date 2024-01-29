@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import invariant from 'invariant';
 import { alphabeticComparator, createPropComparator } from '@mui/toolpad-utils/comparators';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
-import * as appDom from '../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppStateApi, useAppState, useDomApi } from '../../AppState';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';

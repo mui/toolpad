@@ -1,7 +1,7 @@
 import type express from 'express';
+import { RemoveLastParameter } from '@mui/toolpad-utils/types';
 import { createMethod, MethodResolvers } from './rpc';
 import type { ToolpadProject } from './localMode';
-import { RemoveLastParameter } from '../utils/types';
 
 // Methods exposed to the Toolpad runtime
 export function createRpcServer(project: ToolpadProject) {

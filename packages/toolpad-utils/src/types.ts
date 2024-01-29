@@ -84,6 +84,18 @@ export type Maybe<T> = T | undefined | null;
 
 export type ValueOf<T> = T[keyof T];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Pop<T extends any[]> = T extends [...infer U, any] ? U : never;
+
+/**
+ * @example
+ * type T0 = RemoveLastParameter<(a: string, b: number) => void>;  // (a: string) => void
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RemoveLastParameter<T extends (...args: any[]) => any> = (
+  ...args: Pop<Parameters<T>>
+) => ReturnType<T>;
+
 export interface Brand<B> {
   readonly [brand]: B;
 }

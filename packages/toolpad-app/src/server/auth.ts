@@ -205,7 +205,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
 }
 
 async function getAuthProviders(
-  project: Pick<ToolpadProject, 'loadDom' | 'options'>,
+  project: Pick<ToolpadProject, 'loadDom'>,
 ): Promise<appDom.AuthProviderConfig[]> {
   const dom = await project.loadDom();
   const app = appDom.getApp(dom);
@@ -216,7 +216,7 @@ async function getAuthProviders(
 }
 
 export async function getHasAuthentication(
-  project: Pick<ToolpadProject, 'loadDom' | 'options'>,
+  project: Pick<ToolpadProject, 'loadDom'>,
 ): Promise<boolean> {
   const authProviders = await getAuthProviders(project);
   return authProviders.length > 0;

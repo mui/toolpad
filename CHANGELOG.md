@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.1.48
+
+<!-- generated comparing v0.1.47..master -->
+
+_Jan 26, 2024_
+
+Fixing a failed release
+
+## 0.1.47
+
+<!-- generated comparing v0.1.46..master -->
+
+_Jan 25, 2024_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Small improvements to documentation and examples, general cleanup and enhancements for more stability.
+
+- &#8203;<!-- 10 -->Improve portability of ToolpadApp (#3126) @Janpot
+- &#8203;<!-- 09 -->Run prettier on files after generating schema json (#3123) @Janpot
+- &#8203;<!-- 08 -->Add missing dependencies to the next.js example (#3124) @Janpot
+- &#8203;<!-- 07 -->Move App dom to Toolpad core (#3116) @Janpot
+- &#8203;<!-- 06 -->In the readme.md replaced product demo video with gif (#3069) @prakhargupta1
+- &#8203;<!-- 05 -->Remove old package.json (#3101) @Janpot
+- &#8203;<!-- 04 -->Adjust schedule for monorepo update (#3112) @Janpot
+- &#8203;<!-- 03 -->Make toolpad-core and toopad-components ESM only (#3099) @Janpot
+- &#8203;<!-- 02 -->Remove types and useBoolean proxy modules (#3088) @Janpot
+- &#8203;<!-- 01 -->[docs] `;` causes query to fail (#3119) @bharatkashyap
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @prakhargupta1
+
 ## 0.1.46
 
 <!-- generated comparing v0.1.45..master -->
@@ -624,7 +655,7 @@ Chart component improvements, add scrolling to pages in app sidebar, Windows fix
 - &#8203;<!-- 11 -->Remove some Next.js leftovers around monaco-editor (#2437) @Janpot
 - &#8203;<!-- 10 -->Improve rest test flakyness (#2438) @Janpot
 - &#8203;<!-- 09 -->Remove logging of RPC errors (#2410) @Janpot
-- &#8203;<!-- 08 -->Scope MUI X license to builtin components only (#2427) @Janpot
+- &#8203;<!-- 08 -->Scope MUI X license to builtin components only (#2427) @Janpot
 - &#8203;<!-- 07 -->Clean up worker communication with devserver (#2418) @Janpot
 - &#8203;<!-- 06 -->Add note about why we need usePolling (#2426) @Janpot
 - &#8203;<!-- 05 -->Adjust timeout and import node-fetch in create-toolpad-app test (#2414) (#2419) @Kirera-Wainaina
@@ -1909,7 +1940,7 @@ Fixes and improvements all around, banner prompting to upgrade Toolpad
 - &#8203;<!-- 15 -->Fix naive content-type sniffing implementation (#940) @Janpot
 - &#8203;<!-- 14 -->Format function source on save (#942) @Janpot
 - &#8203;<!-- 13 -->Allow recreating data grid columns from existing data (#914) @apedroferreira
-- &#8203;<!-- 12 -->Port MUI X renovate.json (#933) @Janpot
+- &#8203;<!-- 12 -->Port MUI X renovate.json (#933) @Janpot
 - &#8203;<!-- 11 -->Run yarn upgrade (#923) @apedroferreira
 - &#8203;<!-- 10 -->Try enabling renovate again (#913) @Janpot
 - &#8203;<!-- 09 -->Make sure to always assign the overlayroot (#915) @Janpot

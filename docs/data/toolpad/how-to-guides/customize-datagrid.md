@@ -10,7 +10,7 @@ By default, you can connect any JSON data to a Toolpad data grid and it will att
 
 ## Customizing cell rendering
 
-However, if the default column options are not sufficient, Toolpad allows you to customize your data grid with custom components, using the powerful features of the <a href="https://mui.com/x/react-data-grid/">MUI X Data Grid</a>.
+However, if the default column options are not sufficient, Toolpad allows you to customize your data grid with custom components, using the powerful features of the <a href="https://mui.com/x/react-data-grid/">MUI X Data Grid</a>.
 
 ### Creating a custom component
 

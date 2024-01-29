@@ -1,12 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import * as url from 'node:url';
 import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@mui/toolpad-core/server';
 import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import * as crypto from 'crypto';
-
-import.meta.url ??= url.pathToFileURL(__filename).toString();
 
 async function loadExports(filePath: string): Promise<Map<string, unknown>> {
   const fullPath = path.resolve(filePath);

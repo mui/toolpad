@@ -89,11 +89,7 @@ module.exports = {
             // Don't leak the internal runtime abstraction. It's on its way to be moved towards a separate package
             target: './packages/toolpad-app/src/runtime',
             from: './packages/toolpad-app/src/',
-            except: [
-              './runtime',
-              // TODO: move ./src/appDom to ./src/runtime/appDom
-              './appDom',
-            ],
+            except: ['./runtime'],
           },
         ],
       },

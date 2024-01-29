@@ -1,5 +1,0 @@
-{
-  "type": "commonjs",
-  "main": "../dist/exports/browser.js",
-  "types": "../dist/exports/browser.d.ts"
-}

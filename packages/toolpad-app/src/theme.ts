@@ -287,7 +287,7 @@ export const getDesignTokens = (mode: 'light' | 'dark') =>
         scrollMarginTop: 'calc(var(--MuiDocs-header-height) + 32px)',
       },
     },
-  } as ThemeOptions);
+  }) as ThemeOptions;
 
 export function getThemedComponents(theme: Theme): { components: Theme['components'] } {
   return {

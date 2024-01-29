@@ -1,4 +1,4 @@
-import * as appDom from '../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 
 export const PAGE_ROW_COMPONENT_ID = 'PageRow';
 export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as appDom from '../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 
 const AUTH_API_PATH = '/api/auth';
 

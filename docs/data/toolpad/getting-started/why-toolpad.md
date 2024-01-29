@@ -4,7 +4,7 @@
 
 ## TL;DR
 
-- **Higher-level API**. Toolpad operates at a higher abstraction level than Material UI. It sets healthy UI constraints that prevent common pitfalls and anti-patterns.
+- **Higher-level API**. Toolpad operates at a higher abstraction level than Material UI. It sets healthy UI constraints that prevent common pitfalls and anti-patterns.
 - **Drag-and-drop builder**. Toolpad comes with a drag-and-drop builder to simplify UI building. The builder saves the UI as a YAML file, so you can even modify and version the visual output on your file system.
 - **Less boilerplate** so you can focus on the essential parts of the app.
 - **Run alongside existing code**. Toolpad integrates well with your existing code. You can use your database models, client libraries, secrets, and bespoke components directly.
@@ -75,7 +75,7 @@ Addressing the problems mentioned above leads to a better developer experience. 
 
 ### Drag-and-drop builder
 
-Toolpad works as a drag-and-drop UI builder and uses MUI's own Material UI components. Material UI includes all of the foundational components required for internal use cases. Toolpad currently supports 16 of them, and we're continuously adding more.
+Toolpad works as a drag-and-drop UI builder and uses MUI's own Material UI components. Material UI includes all of the foundational components required for internal use cases. Toolpad currently supports 16 of them, and we're continuously adding more.
 
 Toolpad supports adding any number of custom React components for other use cases. The drag-and-drop builder enables you to quickly assemble a minimum viable UI that's endlessly customizable, ensuring the best of both worlds: speed _and_ flexibility.
 

@@ -1,7 +1,7 @@
 import { IconButton, InputAdornment, TextField, Tooltip } from '@mui/material';
 import * as React from 'react';
 import ResetIcon from '@mui/icons-material/RestartAlt';
-import * as appDom from '../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useDomApi } from '../AppState';
 
 interface PageDisplayNameEditorProps {

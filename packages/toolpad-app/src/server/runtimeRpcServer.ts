@@ -1,4 +1,4 @@
-import type express from 'express';
+import * as express from 'express';
 import { RemoveLastParameter } from '@mui/toolpad-utils/types';
 import { createMethod, MethodResolvers } from './rpc';
 import type { ToolpadProject } from './localMode';

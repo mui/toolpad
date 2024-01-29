@@ -98,12 +98,7 @@
   },
   "engines": {
     "npm": "please-use-yarn",
-<<<<<<< HEAD
-    "node": ">=18",
-    "pnpm": ">=8.7.0"
-=======
     "node": ">=18"
->>>>>>> upstream/master
   },
   "resolutions": {
     "google-auth-library": "*"

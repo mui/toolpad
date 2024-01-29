@@ -2,6 +2,7 @@ import express, { Router } from 'express';
 import { Auth } from '@auth/core';
 import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
+import AzureADProvider from '@auth/core/providers/azure-ad';
 import { getToken } from '@auth/core/jwt';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
@@ -9,6 +10,11 @@ import * as appDom from '@mui/toolpad-core/appDom';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
+
+const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
+  // Azure AD should be fine to skip as the user has to belong to the organization to sign in
+  'azure-ad',
+];
 
 export function createAuthHandler(project: ToolpadProject): Router {
   const { base } = project.options;
@@ -86,6 +92,12 @@ export function createAuthHandler(project: ToolpadProject): Router {
     },
   });
 
+  const azureADProvider = AzureADProvider({
+    clientId: process.env.TOOLPAD_AZURE_AD_CLIENT_ID,
+    clientSecret: process.env.TOOLPAD_AZURE_AD_CLIENT_SECRET,
+    tenantId: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
+  });
+
   const authConfig: AuthConfig = {
     pages: {
       signIn: `${base}/signin`,
@@ -93,18 +105,22 @@ export function createAuthHandler(project: ToolpadProject): Router {
       error: `${base}/signin`, // Error code passed in query string as ?error=
       verifyRequest: base,
     },
-    providers: [githubProvider, googleProvider],
+    providers: [githubProvider, googleProvider, azureADProvider],
     secret: process.env.TOOLPAD_AUTH_SECRET,
     trustHost: true,
     callbacks: {
-      async signIn({ profile }) {
+      async signIn({ profile, account }) {
         const dom = await project.loadDom();
         const app = appDom.getApp(dom);
 
         const restrictedDomains = app.attributes.authentication?.restrictedDomains ?? [];
 
+        const skipEmailVerification =
+          !!account?.provider &&
+          SKIP_VERIFICATION_PROVIDERS.includes(account.provider as appDom.AuthProvider);
+
         return Boolean(
-          profile?.email_verified &&
+          (profile?.email_verified || skipEmailVerification) &&
             profile?.email &&
             (restrictedDomains.length === 0 ||
               restrictedDomains.some(
@@ -114,6 +130,53 @@ export function createAuthHandler(project: ToolpadProject): Router {
       },
       async redirect({ baseUrl }) {
         return `${baseUrl}${base}`;
+      },
+      async jwt({ token, account }) {
+        if (account?.provider === 'azure-ad' && account.id_token) {
+          const [, payload] = account.id_token.split('.');
+          const idToken: { roles?: string[] } = JSON.parse(
+            Buffer.from(payload, 'base64').toString('utf8'),
+          );
+
+          const dom = await project.loadDom();
+          const app = appDom.getApp(dom);
+
+          const authorization = app.attributes.authorization ?? {};
+          const roleNames = authorization?.roles?.map((role) => role.name) ?? [];
+
+          const authentication = app.attributes.authentication ?? {};
+          const roleMappings =
+            authentication?.providers?.find(
+              (providerConfig) => providerConfig.provider === 'azure-ad',
+            )?.roles ?? [];
+
+          token.roles = (idToken.roles ?? []).flatMap((providerRole) =>
+            roleNames
+              .filter((role) => {
+                const targetRoleMapping = roleMappings.find(
+                  (roleMapping) => roleMapping.target === role,
+                );
+
+                return targetRoleMapping
+                  ? targetRoleMapping.source.includes(providerRole)
+                  : role === providerRole;
+              })
+              // Remove duplicates in case multiple provider roles map to the same role
+              .filter((value, index, self) => self.indexOf(value) === index),
+          );
+        }
+
+        return token;
+      },
+      // @TODO: Types for session callback are broken as it says token does not exist but it does
+      // Github issue: https://github.com/nextauthjs/next-auth/issues/9437
+      // @ts-ignore
+      session({ session, token }) {
+        if (session.user) {
+          session.user.roles = token.roles ?? [];
+        }
+
+        return session;
       },
     },
   };

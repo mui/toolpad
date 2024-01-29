@@ -71,7 +71,7 @@ const FormWrappedTextField = withComponentForm(TextField);
 
 export default createBuiltin(FormWrappedTextField, {
   helperText:
-    'The Material UI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.',
+    'The Material UI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {
     value: {
@@ -92,7 +92,7 @@ export default createBuiltin(FormWrappedTextField, {
     },
     variant: {
       helperText:
-        'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
+        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
       type: 'string',
       enum: ['outlined', 'filled', 'standard'],
       default: 'outlined',

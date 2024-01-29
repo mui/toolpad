@@ -3,7 +3,7 @@
 <p class="description">Be it a database table or an external API, Toolpad offers mechanisms to bring server-side data to the page as well as make mutations to external data sources. </p>
 
 :::info
-Toolpad uses `react-query` internally to run queries and actions. Look into [its documentation](https://tanstack.com/query/latest/docs/react/guides/queries) for more details on query objects.
+Toolpad uses `react-query` internally to run queries and actions. Look into [its documentation](https://tanstack.com/query/latest/docs/framework/react/guides/queries) for more details on query objects.
 :::
 
 ## Queries

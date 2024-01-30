@@ -1,10 +1,10 @@
-<!-- This file has been auto-generated using `pnpm docs:build:api`. -->
+<!-- ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`. -->
 
 # TextField
 
 <p class="description">API docs for the Toolpad TextField component.</p>
 
-The Material UI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.
+The Material UI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.
 
 ## Properties
 
@@ -24,4 +24,4 @@ The Material UI [TextField](https://mui.com/material-ui/react-text-field/) compo
 | <span class="prop-name">isInvalid</span>    | <span class="prop-type">boolean</span> | <span class="prop-default">false</span>      | Whether the input value is invalid.                                                                                                                                                                                                                                                  |
 | <span class="prop-name">minLength</span>    | <span class="prop-type">number</span>  | <span class="prop-default">0</span>          | Minimum value length.                                                                                                                                                                                                                                                                |
 | <span class="prop-name">maxLength</span>    | <span class="prop-type">number</span>  | <span class="prop-default">0</span>          | Maximum value length.                                                                                                                                                                                                                                                                |
-| <span class="prop-name">sx</span>           | <span class="prop-type">object</span>  |                                              | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |
+| <span class="prop-name">sx</span>           | <span class="prop-type">object</span>  |                                              | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |

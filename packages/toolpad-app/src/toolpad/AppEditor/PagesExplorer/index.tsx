@@ -239,6 +239,9 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         attributes: {
           title: newPageName,
           display: 'shell',
+          authorization: {
+            allowAll: true,
+          },
         },
       });
       const appNode = appDom.getApp(dom);

@@ -1,10 +1,10 @@
-<!-- This file has been auto-generated using `pnpm docs:build:api`. -->
+<!-- ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`. -->
 
 # Button
 
 <p class="description">API docs for the Toolpad Button component.</p>
 
-The Material UI [Button](https://mui.com/material-ui/react-button/) component.
+The Material UI [Button](https://mui.com/material-ui/react-button/) component.
 
 Buttons allow users to take actions, and make choices, with a single tap.
 
@@ -20,4 +20,4 @@ Buttons allow users to take actions, and make choices, with a single tap.
 | <span class="prop-name">fullWidth</span> | <span class="prop-type">boolean</span> |                                                 | Whether the button should occupy all available horizontal space.                                                                                                                                                                                                                     |
 | <span class="prop-name">loading</span>   | <span class="prop-type">boolean</span> |                                                 | Displays a loading animation indicating the button isn't interactive yet                                                                                                                                                                                                             |
 | <span class="prop-name">disabled</span>  | <span class="prop-type">boolean</span> |                                                 | Whether the button is disabled.                                                                                                                                                                                                                                                      |
-| <span class="prop-name">sx</span>        | <span class="prop-type">object</span>  |                                                 | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |
+| <span class="prop-name">sx</span>        | <span class="prop-type">object</span>  |                                                 | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |

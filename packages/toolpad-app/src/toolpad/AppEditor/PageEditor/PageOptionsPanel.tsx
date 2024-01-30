@@ -63,17 +63,17 @@ export default function PageOptionsPanel() {
   const handleAllowAllChange = React.useCallback(
     (event: React.SyntheticEvent, isAllowed: boolean) => {
       domApi.update((draft) =>
-        appDom.setNodeNamespacedProp(
-          draft,
-          page,
-          'attributes',
-          'authorization',
-          isAllowed ? undefined : { allowedRoles: [] },
-        ),
+        appDom.setNodeNamespacedProp(draft, page, 'attributes', 'authorization', {
+          allowAll: isAllowed,
+          ...(isAllowed ? { allowedRoles: [] } : {}),
+        }),
       );
     },
     [domApi, page],
   );
+
+  const allowAll = page.attributes.authorization?.allowAll ?? true;
+  const allowedRoles = page.attributes.authorization?.allowedRoles ?? [];
 
   return (
     <Stack spacing={2} alignItems="stretch" data-testid="page-editor">
@@ -123,17 +123,15 @@ export default function PageOptionsPanel() {
         <div>
           <Typography variant="body2">Authorization:</Typography>
           <FormControlLabel
-            control={
-              <Checkbox checked={!page.attributes.authorization} onChange={handleAllowAllChange} />
-            }
+            control={<Checkbox checked={allowAll} onChange={handleAllowAllChange} />}
             label="Allow access to all roles"
           />
           <Autocomplete
             multiple
             options={Array.from(availableRoles.keys())}
-            value={page.attributes.authorization?.allowedRoles ?? []}
+            value={allowAll ? [] : allowedRoles}
             onChange={handleAllowedRolesChange}
-            disabled={!page.attributes.authorization}
+            disabled={allowAll}
             fullWidth
             noOptionsText="No roles defined"
             renderInput={(params) => (

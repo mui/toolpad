@@ -1,10 +1,10 @@
-<!-- This file has been auto-generated using `pnpm docs:build:api`. -->
+<!-- ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`. -->
 
 # Autocomplete
 
 <p class="description">API docs for the Toolpad Autocomplete component.</p>
 
-A text input with autocomplete suggestions. Uses the Material UI [Autocomplete](https://mui.com/material-ui/react-autocomplete/) under the hood
+A text input with autocomplete suggestions. Uses the Material UI [Autocomplete](https://mui.com/material-ui/react-autocomplete/) under the hood
 
 ## Properties
 

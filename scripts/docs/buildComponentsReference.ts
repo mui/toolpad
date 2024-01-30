@@ -6,7 +6,8 @@ import * as builtins from '@mui/toolpad-components';
 import * as toolpadCore from '@mui/toolpad-core';
 import { escapeCell, writePrettifiedFile } from './utils';
 
-const AUTO_GENERATED_WARNING = 'This file has been auto-generated using `pnpm docs:build:api`.';
+const AUTO_GENERATED_WARNING =
+  'ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`.';
 
 const currentDirectory = __dirname;
 const projectRoot = path.resolve(currentDirectory, '..', '..');

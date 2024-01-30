@@ -50,7 +50,7 @@
     "fractional-indexing": "3.2.0",
     "invariant": "2.2.4",
     "nanoid": "5.0.4",
-    "quickjs-emscripten": "0.26.0",
+    "quickjs-emscripten": "0.27.0",
     "react-error-boundary": "4.0.12",
     "react-is": "18.2.0"
   },

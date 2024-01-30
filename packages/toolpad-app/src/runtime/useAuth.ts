@@ -3,12 +3,12 @@ import * as appDom from '@mui/toolpad-core/appDom';
 
 const AUTH_API_PATH = '/api/auth';
 
-export const AUTH_SESSION_PATH = `${AUTH_API_PATH}/session`;
-export const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
-export const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
-export const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
+const AUTH_SESSION_PATH = `${AUTH_API_PATH}/session`;
+const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
+const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
+const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
-export type AuthProvider = 'github' | 'google';
+export type AuthProvider = 'github' | 'google' | 'azure-ad';
 
 export interface AuthSession {
   user: {
@@ -93,6 +93,8 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
 
     setSession(null);
     setIsSigningOut(false);
+
+    window.location.replace(`${basename}${AUTH_SIGNIN_PATH}`);
   }, [basename, getCsrfToken]);
 
   const getSession = React.useCallback(async () => {
@@ -110,11 +112,16 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
 
   const signIn = React.useCallback(
     async (provider: AuthProvider) => {
+      setIsSigningIn(true);
+
+      let csrfToken = '';
       try {
-        setIsSigningIn(true);
+        csrfToken = await getCsrfToken();
+      } catch (error) {
+        console.error((error as Error).message);
+      }
 
-        const csrfToken = await getCsrfToken();
-
+      try {
         const signInResponse = await fetch(`${basename}${AUTH_SIGNIN_PATH}/${provider}`, {
           method: 'POST',
           headers: {

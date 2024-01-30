@@ -27,8 +27,28 @@
                     "properties": {
                       "provider": {
                         "type": "string",
-                        "enum": ["github", "google"],
+                        "enum": ["github", "google", "azure-ad"],
                         "description": "Unique identifier for this authentication provider."
+                      },
+                      "roles": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "source": {
+                              "type": "array",
+                              "items": { "type": "string" },
+                              "description": "Authentication provider roles to be mapped from."
+                            },
+                            "target": {
+                              "type": "string",
+                              "description": "Toolpad role to be mapped to."
+                            }
+                          },
+                          "required": ["source", "target"],
+                          "additionalProperties": false
+                        },
+                        "description": "Role mapping definition for this authentication provider."
                       }
                     },
                     "required": ["provider"],

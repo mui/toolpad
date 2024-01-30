@@ -1,10 +1,10 @@
-<!-- This file has been auto-generated using `pnpm docs:build:api`. -->
+<!-- ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`. -->
 
 # Tabs
 
 <p class="description">API docs for the Toolpad Tabs component.</p>
 
-The Material UI [Tabs](https://mui.com/material-ui/react-tabs/) component.
+The Material UI [Tabs](https://mui.com/material-ui/react-tabs/) component.
 
 ## Properties
 

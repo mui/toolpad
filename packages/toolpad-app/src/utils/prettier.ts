@@ -1,5 +1,5 @@
 import prettier from 'prettier';
-import parserBabel from 'prettier/parser-babel.js';
+import parserBabel from 'prettier/parser-babel';
 
 const DEFAULT_OPTIONS = {
   parser: 'babel-ts',
@@ -32,7 +32,7 @@ export async function formatExpression(
   code: string,
   config?: prettier.Options | null,
 ): Promise<string> {
-  const formatted = prettier.format(code, {
+  const formatted = await prettier.format(code, {
     ...config,
     ...DEFAULT_OPTIONS,
     semi: false,
@@ -51,7 +51,7 @@ export async function tryFormatExpression(
   config?: prettier.Options,
 ): Promise<string> {
   try {
-    return formatExpression(code, config);
+    return await formatExpression(code, config);
   } catch (err) {
     return code;
   }

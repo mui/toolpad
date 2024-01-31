@@ -17,4 +17,4 @@ The roadmap does not represent a commitment, obligation, or promise to deliver a
 
 ## Global roadmap
 
-To learn more about our plans for MUI in general, visit the [global roadmap](/material-ui/discover-more/roadmap/).
+To learn more about our plans for Material UI in general, visit the [global roadmap](/material-ui/discover-more/roadmap/).

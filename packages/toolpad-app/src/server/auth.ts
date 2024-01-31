@@ -11,10 +11,9 @@ import chalk from 'chalk';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import { ToolpadProject } from './localMode';
-import * as appDom from '../appDom';
-import { AuthProvider } from '../types';
+import * as appDom from '@mui/toolpad-core/appDom';
 
-const SKIP_VERIFICATION_PROVIDERS: AuthProvider[] = [
+const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
   // Azure AD should be fine to skip as the user has to belong to the organization to sign in
   'azure-ad',
   'credentials',
@@ -32,13 +31,19 @@ export async function getRequireAuthentication(project: ToolpadProject): Promise
 function getMappedRoles(
   roles: string[],
   allRoles: string[],
-  roleMappings: Record<string, string[]>,
+  roleMappings: appDom.AuthProviderConfig['roles'] = []
 ): string[] {
   return (roles ?? []).flatMap((providerRole) =>
     allRoles
-      .filter((role) =>
-        roleMappings[role] ? roleMappings[role].includes(providerRole) : role === providerRole,
-      )
+      .filter((role) => {
+        const targetRoleMapping = roleMappings.find(
+          (roleMapping) => roleMapping.target === role,
+        );
+
+        return targetRoleMapping
+          ? targetRoleMapping.source.includes(providerRole)
+          : role === providerRole;
+      })
       // Remove duplicates in case multiple provider roles map to the same role
       .filter((value, index, self) => self.indexOf(value) === index),
   );
@@ -179,7 +184,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
         const skipEmailVerification =
           !!account?.provider &&
-          SKIP_VERIFICATION_PROVIDERS.includes(account.provider as AuthProvider);
+          SKIP_VERIFICATION_PROVIDERS.includes(account.provider as appDom.AuthProvider);
 
         return Boolean(
           (profile?.email_verified || skipEmailVerification) &&
@@ -199,11 +204,14 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
         const authorization = app.attributes.authorization ?? {};
         const roleNames = authorization?.roles?.map((role) => role.name) ?? [];
-        const roleMappings = account?.provider
-          ? authorization?.roleMappings?.[account.provider as AuthProvider] ?? {}
-          : {};
+
+        const authentication = app.attributes.authentication ?? {};
 
         if (account?.provider === 'azure-ad' && account.id_token) {
+          const roleMappings = authentication?.providers?.find(
+            (providerConfig) => providerConfig.provider === 'azure-ad',
+          )?.roles ?? [];
+          
           const [, payload] = account.id_token.split('.');
           const idToken: { roles?: string[] } = JSON.parse(
             Buffer.from(payload, 'base64').toString('utf8'),
@@ -213,6 +221,10 @@ export function createAuthHandler(project: ToolpadProject): Router {
         }
 
         if (account?.provider === 'credentials') {
+          const roleMappings = authentication?.providers?.find(
+            (providerConfig) => providerConfig.provider === 'azure-ad',
+          )?.roles ?? [];
+          
           token.roles = getMappedRoles(user?.roles ?? [], roleNames, roleMappings);
         }
 

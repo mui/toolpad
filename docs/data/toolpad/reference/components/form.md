@@ -1,4 +1,4 @@
-<!-- This file has been auto-generated using `pnpm docs:build:api`. -->
+<!-- ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`. -->
 
 # Form
 
@@ -17,4 +17,4 @@ A form component.
 | <span class="prop-name">formControlsFullWidth</span> | <span class="prop-type">boolean</span> | <span class="prop-default">false</span>    | Whether the form controls should occupy all available horizontal space.                                                                                                                                                                                                              |
 | <span class="prop-name">submitButtonText</span>      | <span class="prop-type">string</span>  | <span class="prop-default">"Submit"</span> | Submit button text.                                                                                                                                                                                                                                                                  |
 | <span class="prop-name">hasResetButton</span>        | <span class="prop-type">boolean</span> | <span class="prop-default">false</span>    | Show button to reset form values.                                                                                                                                                                                                                                                    |
-| <span class="prop-name">sx</span>                    | <span class="prop-type">object</span>  |                                            | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |
+| <span class="prop-name">sx</span>                    | <span class="prop-type">object</span>  |                                            | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |

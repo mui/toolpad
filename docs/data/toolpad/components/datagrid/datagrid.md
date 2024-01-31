@@ -4,7 +4,7 @@
 
 ## Demo
 
-Toolpad builds on top of the [MUI X Data Grid](https://mui.com/x/react-data-grid/) to add faster customisation and integration with your internal tools.
+Toolpad builds on top of the [MUI X Data Grid](https://mui.com/x/react-data-grid/) to add faster customisation and integration with your internal tools.
 
 {{"demo": "DataGrid.js", "hideToolbar": true, "bg": "inline"}}
 

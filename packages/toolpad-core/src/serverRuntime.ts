@@ -14,17 +14,7 @@ export interface ServerContext {
   setCookie: (name: string, value: string) => void;
 }
 
-let contextStore = new AsyncLocalStorage<ServerContext>();
-
-export const initialContextStore = contextStore;
-
-/**
- * INTERNAL: Do not use
- */
-// eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
-export function __initContextStore(store: AsyncLocalStorage<ServerContext>) {
-  contextStore = store;
-}
+const contextStore = new AsyncLocalStorage<ServerContext>();
 
 export function getServerContext(): ServerContext | undefined {
   return contextStore.getStore();

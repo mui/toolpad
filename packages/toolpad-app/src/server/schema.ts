@@ -266,9 +266,20 @@ export const applicationSchema = toolpadObjectSchema(
         providers: z
           .array(
             z.object({
-              provider: authProviderSchema.describe(
-                'Unique identifier for this authentication provider.',
-              ),
+              provider: z
+                .enum(['github', 'google', 'azure-ad'])
+                .describe('Unique identifier for this authentication provider.'),
+              roles: z
+                .array(
+                  z.object({
+                    source: z
+                      .array(z.string())
+                      .describe('Authentication provider roles to be mapped from.'),
+                    target: z.string().describe('Toolpad role to be mapped to.'),
+                  }),
+                )
+                .optional()
+                .describe('Role mapping definition for this authentication provider.'),
             }),
           )
           .optional()

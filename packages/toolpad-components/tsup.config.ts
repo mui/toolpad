@@ -23,7 +23,7 @@ function cleanFolderOnFailure(folder: string): EsbuildPlugin {
 
 export default defineConfig((options) => ({
   entry: ['src/*{.ts,.tsx}'],
-  format: ['esm', 'cjs'],
+  format: ['esm'],
   dts: false,
   silent: true,
   clean: !options.watch,

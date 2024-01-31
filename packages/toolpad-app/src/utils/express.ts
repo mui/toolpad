@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { Awaitable } from './types';
+import { Awaitable } from '@mui/toolpad-utils/types';
 
 export function asyncHandler(
   handler: (

@@ -1,6 +1,6 @@
 import { BindableAttrValue } from '@mui/toolpad-core';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
-import { Maybe } from '../../utils/types';
+import { Maybe } from '@mui/toolpad-utils/types';
 import { Authentication, RestConnectionParams } from './types';
 import type { RuntimeConfig } from '../../types';
 

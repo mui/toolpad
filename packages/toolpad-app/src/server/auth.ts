@@ -190,6 +190,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
   });
 
   const authConfig: AuthConfig = {
+    basePath: base,
     pages: {
       signIn: `${base}/signin`,
       signOut: base,

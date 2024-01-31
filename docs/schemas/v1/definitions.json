@@ -27,12 +27,7 @@
                     "properties": {
                       "provider": {
                         "type": "string",
-                        "enum": [
-                          "github",
-                          "google",
-                          "azure-ad",
-                          "credentials"
-                        ],
+                        "enum": ["github", "google", "azure-ad", "credentials"],
                         "description": "Unique identifier for this authentication provider."
                       },
                       "roles": {

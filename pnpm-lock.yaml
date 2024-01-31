@@ -484,8 +484,8 @@ importers:
   packages/toolpad-app:
     dependencies:
       '@auth/core':
-        specifier: 0.20.0
-        version: 0.20.0
+        specifier: 0.24.0
+        version: 0.24.0
       '@emotion/cache':
         specifier: 11.11.0
         version: 11.11.0
@@ -1227,8 +1227,8 @@ packages:
     engines: {node: '>=16.0.0'}
     dev: true
 
-  /@auth/core@0.20.0:
-    resolution: {integrity: sha512-04lQH58H5d/9xQ63MOTDTOC7sXWYlr/RhJ97wfFLXzll7nYyCKbkrT3ZMdzdLC5O+qt90sQDK85TAtLlcZ2WBg==}
+  /@auth/core@0.24.0:
+    resolution: {integrity: sha512-wwTyapljg4ydyvtQRXSeOaj6nBVSvPkVoXws6i+/vPfINxz4lo9UuLifPLqW7iO72/f4Ttaez0g3XA42VtKQ8A==}
     peerDependencies:
       nodemailer: ^6.8.0
     peerDependenciesMeta:

@@ -29,7 +29,7 @@ function SelectOptionsPropEditor({
   value = [],
   onChange,
 }: EditorProps<(string | SelectOption)[]>) {
-  const [optionErrorMessage, setOptionErrorMessage] = React.useState(false);
+  const [optionErrorMessage, setOptionErrorMessage] = React.useState('');
   const [editOptionsDialogOpen, setEditOptionsDialogOpen] = React.useState(false);
   const optionInputRef = React.useRef<HTMLInputElement | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
@@ -52,9 +52,9 @@ function SelectOptionsPropEditor({
     (callback: (value: string | SelectOption, index: number) => boolean) => {
       const errorState = value.some(callback);
       if (errorState) {
-        setOptionErrorMessage(true);
+        setOptionErrorMessage('Must not have duplicate values');
       } else {
-        setOptionErrorMessage(false);
+        setOptionErrorMessage('');
       }
     },
     [value],
@@ -75,7 +75,7 @@ function SelectOptionsPropEditor({
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'Enter') {
         const inputText = (event.target as HTMLInputElement).value;
-        if (optionErrorMessage) {
+        if (optionErrorMessage || !inputText) {
           return;
         }
         onChange([...value, inputText]);
@@ -148,6 +148,7 @@ function SelectOptionsPropEditor({
         fullWidth
         open={editOptionsDialogOpen}
         onClose={() => {
+          setOptionErrorMessage('');
           setEditOptionsDialogOpen(false);
         }}
       >
@@ -163,7 +164,7 @@ function SelectOptionsPropEditor({
               <Stack gap={1} py={1}>
                 <TextField
                   label="Value"
-                  error={optionErrorMessage}
+                  error={!!optionErrorMessage}
                   helperText={
                     optionErrorMessage ? (
                       <span>
@@ -244,7 +245,7 @@ function SelectOptionsPropEditor({
               ) : null}
               <TextField
                 fullWidth
-                error={optionErrorMessage}
+                error={!!optionErrorMessage}
                 sx={{ my: 1 }}
                 variant="outlined"
                 onInput={validateOptionValue}

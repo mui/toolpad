@@ -15,7 +15,7 @@ import { APP_FUNCTIONS_ROUTE } from '../routes';
 import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
-import { FEATURE_FLAG_AUTHORIZATION, FEATURE_FLAG_GLOBAL_FUNCTIONS } from '../constants';
+import {  FEATURE_FLAG_GLOBAL_FUNCTIONS } from '../constants';
 import { ProjectProvider } from '../project';
 import AppAuthorizationDialog from './AppEditor/AppAuthorizationEditor';
 
@@ -104,11 +104,9 @@ function EditorShell({ children }: EditorShellProps) {
   return (
     <ToolpadShell
       navigation={
-        FEATURE_FLAG_AUTHORIZATION ? (
           <Stack sx={{ ml: 3 }}>
             <Button onClick={handleAuthorizationDialogOpen}>Authorization</Button>
           </Stack>
-        ) : null
       }
       actions={
         previewPath ? (

@@ -31,11 +31,7 @@ async function getAuthProviders(
 }
 
 export async function getRequireAuthentication(project: ToolpadProject): Promise<boolean> {
-  const dom = await project.loadDom();
-  const app = appDom.getApp(dom);
-
-  const authProviders = app.attributes.authentication?.providers ?? [];
-
+  const authProviders = await getAuthProviders(project);
   return authProviders.length > 0;
 }
 
@@ -250,7 +246,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
         if (account?.provider === 'credentials') {
           const roleMappings = authentication?.providers?.find(
-            (providerConfig) => providerConfig.provider === 'azure-ad',
+            (providerConfig) => providerConfig.provider === 'credentials',
           )?.roles ?? [];
           
           token.roles = getMappedRoles(user?.roles ?? [], roleNames, roleMappings);

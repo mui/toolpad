@@ -58,7 +58,7 @@ const AUTH_PROVIDER_OPTIONS = new Map<string, AuthProviderOption>([
       icon: <AzureIcon />,
       hasRoles: true,
     },
-  ],
+  ]
 ]);
 
 export function AppAuthenticationEditor() {

@@ -24,7 +24,7 @@ test.use({
   },
 });
 
-test.only('Must have required roles to access pages', async ({ page, request }) => {
+test('Must have required roles to access pages', async ({ page, request }) => {
   await page.goto('/prod/signin');
 
   // Sign in without admin role

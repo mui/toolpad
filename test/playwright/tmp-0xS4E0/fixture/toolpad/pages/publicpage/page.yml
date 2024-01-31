@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.48/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: publicpage
+  display: shell
+  authorization:
+    allowAll: true
+  displayName: Public Page
+  content:
+    - component: Text
+      name: text
+      props:
+        value: This page is open to all, regardless of gender, race or social status.

@@ -58,7 +58,7 @@ const AUTH_PROVIDER_OPTIONS = new Map<string, AuthProviderOption>([
       icon: <AzureIcon />,
       hasRoles: true,
     },
-  ]
+  ],
 ]);
 
 export function AppAuthenticationEditor() {
@@ -668,8 +668,9 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
       .map((providerConfig) => providerConfig.provider);
 
     return [...AUTH_PROVIDER_OPTIONS].filter(
-      ([optionKey, { hasRoles }]) => hasRoles && authProviders.includes(optionKey as appDom.AuthProvider),
-    )
+      ([optionKey, { hasRoles }]) =>
+        hasRoles && authProviders.includes(optionKey as appDom.AuthProvider),
+    );
   }, [dom]);
 
   return (

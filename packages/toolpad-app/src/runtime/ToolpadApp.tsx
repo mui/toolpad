@@ -1596,10 +1596,7 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
       clipped={clipped}
       basename={basename}
     >
-      <RenderedPages
-        pages={pages}
-        defaultPage={authFilteredPages[0] ?? pages[0]}
-      />
+      <RenderedPages pages={pages} defaultPage={authFilteredPages[0] ?? pages[0]} />
     </AppLayout>
   );
 }

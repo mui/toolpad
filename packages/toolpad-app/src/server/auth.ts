@@ -7,11 +7,11 @@ import CredentialsProvider from '@auth/core/providers/credentials';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
 import chalk from 'chalk';
+import * as appDom from '@mui/toolpad-core/appDom';
+import { JWT, getToken } from '@auth/core/jwt';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import type { ToolpadProject } from './localMode';
-import * as appDom from '@mui/toolpad-core/appDom';
-import { JWT, getToken } from '@auth/core/jwt';
 
 const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
   // Azure AD should be fine to skip as the user has to belong to the organization to sign in
@@ -55,14 +55,12 @@ export async function getUserToken(req: express.Request): Promise<JWT | null> {
 function getMappedRoles(
   roles: string[],
   allRoles: string[],
-  roleMappings: appDom.AuthProviderConfig['roles'] = []
+  roleMappings: appDom.AuthProviderConfig['roles'] = [],
 ): string[] {
   return (roles ?? []).flatMap((providerRole) =>
     allRoles
       .filter((role) => {
-        const targetRoleMapping = roleMappings.find(
-          (roleMapping) => roleMapping.target === role,
-        );
+        const targetRoleMapping = roleMappings.find((roleMapping) => roleMapping.target === role);
 
         return targetRoleMapping
           ? targetRoleMapping.source.includes(providerRole)
@@ -233,10 +231,11 @@ export function createAuthHandler(project: ToolpadProject): Router {
         const authentication = app.attributes.authentication ?? {};
 
         if (account?.provider === 'azure-ad' && account.id_token) {
-          const roleMappings = authentication?.providers?.find(
-            (providerConfig) => providerConfig.provider === 'azure-ad',
-          )?.roles ?? [];
-          
+          const roleMappings =
+            authentication?.providers?.find(
+              (providerConfig) => providerConfig.provider === 'azure-ad',
+            )?.roles ?? [];
+
           const [, payload] = account.id_token.split('.');
           const idToken: { roles?: string[] } = JSON.parse(
             Buffer.from(payload, 'base64').toString('utf8'),
@@ -246,10 +245,11 @@ export function createAuthHandler(project: ToolpadProject): Router {
         }
 
         if (account?.provider === 'credentials') {
-          const roleMappings = authentication?.providers?.find(
-            (providerConfig) => providerConfig.provider === 'credentials',
-          )?.roles ?? [];
-          
+          const roleMappings =
+            authentication?.providers?.find(
+              (providerConfig) => providerConfig.provider === 'credentials',
+            )?.roles ?? [];
+
           token.roles = getMappedRoles(user?.roles ?? [], roleNames, roleMappings);
         }
 

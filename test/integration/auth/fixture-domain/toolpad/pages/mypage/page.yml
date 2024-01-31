@@ -1,13 +1,20 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.44/docs/schemas/v1/definitions.json#properties/Page
-
 apiVersion: v1
 kind: page
 spec:
-  displayName: My Page
-  title: mypage
-  display: shell
+  id: 5q1xd0t
+  title: Page
   content:
-    - component: Text
-      name: text
-      props:
-        value: Hello world
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Text
+          name: typography
+          props:
+            value:
+              $$jsExpression: |
+                `message: ${hello.data.message}`
+  queries:
+    - name: hello
+      query:
+        function: hello
+        kind: local

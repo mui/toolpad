@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.45/docs/schemas/v1/definitions.json#properties/Page
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.48/docs/schemas/v1/definitions.json#properties/Page
 
 apiVersion: v1
 kind: page
@@ -12,7 +12,15 @@ spec:
   displayName: Admin Page
   content:
     - component: Text
-      name: text
+      name: typography
+      layout:
+        columnSize: 1
       props:
-        value: I just want to tell all the admins out there to never stop
-          administrating.
+        value:
+          $$jsExpression: |
+            `message: ${hello.data.message}`
+  queries:
+    - name: hello
+      query:
+        function: hello
+        kind: local

@@ -4,20 +4,31 @@ import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers
 import GoogleProvider from '@auth/core/providers/google';
 import AzureADProvider from '@auth/core/providers/azure-ad';
 import CredentialsProvider from '@auth/core/providers/credentials';
-import { getToken } from '@auth/core/jwt';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
 import chalk from 'chalk';
 import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
-import { ToolpadProject } from './localMode';
+import type { ToolpadProject } from './localMode';
 import * as appDom from '@mui/toolpad-core/appDom';
+import { JWT, getToken } from '@auth/core/jwt';
 
 const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
   // Azure AD should be fine to skip as the user has to belong to the organization to sign in
   'azure-ad',
   'credentials',
 ];
+
+async function getAuthProviders(
+  project: Pick<ToolpadProject, 'loadDom'>,
+): Promise<appDom.AuthProviderConfig[]> {
+  const dom = await project.loadDom();
+  const app = appDom.getApp(dom);
+
+  const authProviders = app.attributes.authentication?.providers ?? [];
+
+  return authProviders;
+}
 
 export async function getRequireAuthentication(project: ToolpadProject): Promise<boolean> {
   const dom = await project.loadDom();
@@ -26,6 +37,23 @@ export async function getRequireAuthentication(project: ToolpadProject): Promise
   const authProviders = app.attributes.authentication?.providers ?? [];
 
   return authProviders.length > 0;
+}
+
+export async function getUserToken(req: express.Request): Promise<JWT | null> {
+  let token = null;
+  if (process.env.TOOLPAD_AUTH_SECRET) {
+    const request = adaptRequestFromExpressToFetch(req);
+
+    // @TODO: Library types are wrong as salt should not be required, remove once fixed
+    // Github discussion: https://github.com/nextauthjs/next-auth/discussions/9133
+    // @ts-ignore
+    token = await getToken({
+      req: request,
+      secret: process.env.TOOLPAD_AUTH_SECRET,
+    });
+  }
+
+  return token;
 }
 
 function getMappedRoles(
@@ -281,19 +309,7 @@ export async function createRequireAuthMiddleware(project: ToolpadProject) {
 
     let isAuthorized = true;
     if ((!project.options.dev || isPageRequest) && req.originalUrl.split('?')[0] !== signInPath) {
-      const request = adaptRequestFromExpressToFetch(req);
-
-      let token;
-      if (process.env.TOOLPAD_AUTH_SECRET) {
-        // @TODO: Library types are wrong as salt should not be required, remove once fixed
-        // Github discussion: https://github.com/nextauthjs/next-auth/discussions/9133
-        // @ts-ignore
-        token = await getToken({
-          req: request,
-          secret: process.env.TOOLPAD_AUTH_SECRET,
-        });
-      }
-
+      const token = await getUserToken(req);
       if (!token) {
         isAuthorized = false;
       }

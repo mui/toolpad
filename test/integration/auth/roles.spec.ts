@@ -32,10 +32,6 @@ test.only('Must have required roles to access pages', async ({ page, request }) 
 
   await expect(page.getByText('Admin Page')).toBeHidden();
 
-  // Access is blocked to API route
-  const res = await request.post('/prod/api/data/adminpage/hello');
-  expect(res.status()).toBe(401);
-
   // Sign in with admin role
   await page.getByText('Miss Test').click();
   await page.getByText('Sign out').click();

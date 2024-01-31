@@ -13,7 +13,7 @@ test.use({
 
 test.use({
   projectConfig: {
-    template: path.resolve(currentDirectory, './fixture-basic'),
+    template: path.resolve(currentDirectory, './fixture-domain'),
   },
   localAppConfig: {
     cmd: 'start',
@@ -24,10 +24,14 @@ test.use({
   },
 });
 
-test('Must be authenticated with valid domain to view app', async ({ page }) => {
+test('Must be authenticated with valid domain to access app', async ({ page, request }) => {
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');
   await expect(page).toHaveURL(/\/prod\/signin/);
+
+  // Access is blocked to API route
+  const res = await request.post('/prod/api/data/page/hello');
+  expect(res.status()).toBe(401);
 
   // Sign in with invalid domain
   await tryCredentialsSignIn(page, 'test', 'test');
@@ -37,6 +41,7 @@ test('Must be authenticated with valid domain to view app', async ({ page }) => 
   // Sign in with valid domain
   await tryCredentialsSignIn(page, 'mui', 'mui');
   await expect(page).toHaveURL(/\/prod\/pages\/mypage/);
+  await expect(page.getByText('message: hello world')).toBeVisible();
 
   // Is not redirected when authenticated
   await page.goto('/prod/pages/mypage');

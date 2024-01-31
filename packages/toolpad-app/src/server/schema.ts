@@ -305,12 +305,6 @@ export const applicationSchema = toolpadObjectSchema(
           )
           .optional()
           .describe('Available roles for this application. These can be assigned to users.'),
-        roleMappings: z
-          .record(authProviderSchema, z.record(z.array(z.string())))
-          .optional()
-          .describe(
-            'Role mapping definitions from authentication provider roles to Toolpad roles.',
-          ),
       })
       .optional()
       .describe('Authorization configuration for this application.'),

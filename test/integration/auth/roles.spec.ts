@@ -24,7 +24,7 @@ test.use({
   },
 });
 
-test.only('Must have required roles to view pages', async ({ page }) => {
+test.only('Must have required roles to access pages', async ({ page, request }) => {
   await page.goto('/prod/signin');
 
   // Sign in without admin role
@@ -32,13 +32,15 @@ test.only('Must have required roles to view pages', async ({ page }) => {
 
   await expect(page.getByText('Admin Page')).toBeHidden();
 
+  // Access is blocked to API route
+  const res = await request.post('/prod/api/data/adminpage/hello');
+  expect(res.status()).toBe(401);
+
   // Sign in with admin role
   await page.getByText('Miss Test').click();
   await page.getByText('Sign out').click();
   await tryCredentialsSignIn(page, 'admin', 'admin');
 
   await expect(page.getByText('Admin Page')).toBeVisible();
-  await expect(
-    page.getByText('I just want to tell all the admins out there to never stop administrating.'),
-  ).toBeVisible();
+  await expect(page.getByText('message: hello world')).toBeVisible();
 });

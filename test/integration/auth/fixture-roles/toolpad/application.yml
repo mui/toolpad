@@ -2,10 +2,9 @@ apiVersion: v1
 kind: application
 spec:
   authentication:
-    providers: [{ provider: credentials }]
+    providers: [{ provider: credentials }, { roles: [{ source: 'admin', target: ['mockAdmin', 'god']}]}]
     restrictedDomains: []
   authorization:
     {
       roles: [{ name: admin, description: A very important person. }],
-      roleMappings: { credentials: { admin: ['mock-admin', 'god'] } },
     }

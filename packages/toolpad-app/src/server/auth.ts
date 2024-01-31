@@ -139,7 +139,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
     tenantId: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
   });
 
-  const mockCredentialsProvider = CredentialsProvider({
+  const credentialsProvider = CredentialsProvider({
     name: 'Credentials',
     async authorize({ username, password }) {
       if (process.env.NODE_ENV !== 'test') {
@@ -172,7 +172,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
       error: `${base}/signin`, // Error code passed in query string as ?error=
       verifyRequest: base,
     },
-    providers: [githubProvider, googleProvider, azureADProvider, mockCredentialsProvider],
+    providers: [githubProvider, googleProvider, azureADProvider, credentialsProvider],
     secret: process.env.TOOLPAD_AUTH_SECRET,
     trustHost: true,
     callbacks: {

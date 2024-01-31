@@ -12,19 +12,20 @@
     "./package.json": "./package.json",
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./*": {
       "types": "./dist/*.d.ts",
-      "import": "./dist/*.js"
+      "default": "./dist/*.js"
     },
     "./server": {
       "types": "./dist/server.d.ts",
-      "import": "./dist/server.js"
+      "default": "./dist/server.js"
     }
   },
   "files": [
     "dist",
+    "public",
     "server",
     "browser"
   ],

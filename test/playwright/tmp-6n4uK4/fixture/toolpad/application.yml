@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: application
-spec:
-  authentication:
-    providers: [{ provider: google }, { provider: github }]
-    requiredEmail:
-      - mui.com

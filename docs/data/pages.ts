@@ -117,6 +117,10 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/how-to-guides/render-deploy',
             title: 'Deploy to Render',
           },
+          {
+            pathname: '/toolpad/how-to-guides/iis-deploy',
+            title: 'Deploy to IIS',
+          },
         ],
       },
       {

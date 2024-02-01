@@ -17,6 +17,11 @@
         "spec": {
           "type": "object",
           "properties": {
+            "plan": {
+              "type": "string",
+              "enum": ["free", "pro"],
+              "description": "The plan for this application."
+            },
             "authentication": {
               "type": "object",
               "properties": {

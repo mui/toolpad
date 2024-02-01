@@ -38,10 +38,11 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-export type AuthProvider = 'github' | 'google';
+export type AuthProvider = 'github' | 'google' | 'azure-ad';
 
 export interface AuthProviderConfig {
-  provider: AuthProvider;
+  readonly provider: AuthProvider;
+  readonly roles?: { source: string[]; target: string }[];
 }
 
 export interface ConnectionStatus {
@@ -1094,6 +1095,9 @@ export function createDefaultDom(): AppDom {
     attributes: {
       title: 'Page 1',
       display: 'shell',
+      authorization: {
+        allowAll: true,
+      },
     },
   });
 

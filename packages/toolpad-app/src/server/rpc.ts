@@ -74,7 +74,7 @@ export function createRpcHandler(definition: MethodResolvers): express.RequestHa
       let rawResult;
       let error: Error | null = null;
       try {
-        const ctx = createServerContext(req, res);
+        const ctx = await createServerContext(req, res);
         rawResult = await withContext(ctx, async () => {
           return method({ params, req, res });
         });

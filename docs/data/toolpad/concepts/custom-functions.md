@@ -174,3 +174,16 @@ export async function getData() {
   return api.getData(token);
 }
 ```
+
+### Get the current authenticated user with `context.user`
+
+If your Toolpad app has [authentication](/toolpad/concepts/authentication/) enabled, you can get data from the authenticated logged-in user, such as their `email`, `name` or `image`. Example:
+
+```jsx
+import { getContext } from '@mui/toolpad/server';
+
+export async function getCurrentUserEmail() {
+  const { user } = getContext();
+  return user?.email;
+}
+```

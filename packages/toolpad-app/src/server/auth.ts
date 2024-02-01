@@ -8,9 +8,9 @@ import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
 import chalk from 'chalk';
 import * as appDom from '@mui/toolpad-core/appDom';
-import { JWT, getToken } from '@auth/core/jwt';
+import { adaptRequestFromExpressToFetch } from '@mui/toolpad-utils/httpApiAdapters';
+import { getUserToken } from '@mui/toolpad-core/auth';
 import { asyncHandler } from '../utils/express';
-import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import type { ToolpadProject } from './localMode';
 
 const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
@@ -33,23 +33,6 @@ async function getAuthProviders(
 export async function getRequireAuthentication(project: ToolpadProject): Promise<boolean> {
   const authProviders = await getAuthProviders(project);
   return authProviders.length > 0;
-}
-
-export async function getUserToken(req: express.Request): Promise<JWT | null> {
-  let token = null;
-  if (process.env.TOOLPAD_AUTH_SECRET) {
-    const request = adaptRequestFromExpressToFetch(req);
-
-    // @TODO: Library types are wrong as salt should not be required, remove once fixed
-    // Github discussion: https://github.com/nextauthjs/next-auth/discussions/9133
-    // @ts-ignore
-    token = await getToken({
-      req: request,
-      secret: process.env.TOOLPAD_AUTH_SECRET,
-    });
-  }
-
-  return token;
 }
 
 function getMappedRoles(

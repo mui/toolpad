@@ -38,6 +38,8 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
+type ToolpadPlan = 'free' | 'pro';
+
 export type AuthProvider = 'github' | 'google' | 'azure-ad';
 
 export interface AuthProviderConfig {
@@ -66,6 +68,7 @@ export interface AppNode extends AppDomNodeBase {
   readonly type: 'app';
   readonly parentId: null;
   readonly attributes: {
+    readonly plan?: ToolpadPlan;
     readonly authentication?: {
       readonly providers?: AuthProviderConfig[];
       readonly restrictedDomains?: string[];
@@ -1183,4 +1186,9 @@ export function getPageTitle(node: PageNode): string {
 
 export function isCodePage(node: PageNode): boolean {
   return !!node.attributes.codeFile;
+}
+
+export function getPlan(dom: AppDom): ToolpadPlan | undefined {
+  const appNode = getApp(dom);
+  return appNode.attributes.plan;
 }

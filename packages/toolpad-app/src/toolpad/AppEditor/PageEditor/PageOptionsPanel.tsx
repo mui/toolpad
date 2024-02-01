@@ -19,6 +19,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import PageTitleEditor from '../PageTitleEditor';
+import { ErrorUpgrade } from '../ErrorUpgrade';
 import PageDisplayNameEditor from '../PageDisplayNameEditor';
 import { FEATURE_FLAG_AUTHORIZATION } from '../../../constants';
 
@@ -30,6 +31,8 @@ const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] =
 export default function PageOptionsPanel() {
   const { nodeId: pageNodeId } = usePageEditorState();
   const { dom } = useAppState();
+  const plan = appDom.getPlan(dom);
+  const isPaidPlan = plan !== undefined && plan !== 'free';
   const domApi = useDomApi();
 
   const appNode = appDom.getApp(dom);
@@ -122,22 +125,28 @@ export default function PageOptionsPanel() {
       {FEATURE_FLAG_AUTHORIZATION ? (
         <div>
           <Typography variant="body2">Authorization:</Typography>
-          <FormControlLabel
-            control={<Checkbox checked={allowAll} onChange={handleAllowAllChange} />}
-            label="Allow access to all roles"
-          />
-          <Autocomplete
-            multiple
-            options={Array.from(availableRoles.keys())}
-            value={allowAll ? [] : allowedRoles}
-            onChange={handleAllowedRolesChange}
-            disabled={allowAll}
-            fullWidth
-            noOptionsText="No roles defined"
-            renderInput={(params) => (
-              <TextField {...params} label="Allowed roles" placeholder="Roles" />
-            )}
-          />
+          {isPaidPlan ? (
+            <React.Fragment>
+              <FormControlLabel
+                control={<Checkbox checked={allowAll} onChange={handleAllowAllChange} />}
+                label="Allow access to all roles"
+              />
+              <Autocomplete
+                multiple
+                options={Array.from(availableRoles.keys())}
+                value={allowAll ? [] : allowedRoles}
+                onChange={handleAllowedRolesChange}
+                disabled={allowAll}
+                fullWidth
+                noOptionsText="No roles defined"
+                renderInput={(params) => (
+                  <TextField {...params} label="Allowed roles" placeholder="Roles" />
+                )}
+              />
+            </React.Fragment>
+          ) : (
+            <ErrorUpgrade feature="Authorization" hideAction />
+          )}
         </div>
       ) : null}
       {appDom.isCodePage(page) ? null : (

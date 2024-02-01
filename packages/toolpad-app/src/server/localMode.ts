@@ -312,6 +312,8 @@ function mergeApplicationIntoDom(dom: appDom.AppDom, applicationFile: Applicatio
   const applicationFileSpec = applicationFile.spec;
   const app = appDom.getApp(dom);
 
+  dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'plan', applicationFileSpec?.plan);
+
   dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'authentication', {
     ...applicationFileSpec?.authentication,
   });
@@ -794,11 +796,11 @@ function extractThemeFromDom(dom: appDom.AppDom): Theme | null {
 
 function extractApplicationFromDom(dom: appDom.AppDom): Application | null {
   const rootNode = appDom.getApp(dom);
-
   return {
     apiVersion: API_VERSION,
     kind: 'application',
     spec: {
+      plan: rootNode.attributes.plan,
       authentication: rootNode.attributes.authentication,
       authorization: rootNode.attributes.authorization,
     },
@@ -962,6 +964,22 @@ export function getRequiredEnvVars(dom: appDom.AppDom): Set<string> {
     .map((binding) => binding.$$env);
 
   return new Set(allVars);
+}
+
+export interface PaidFeaturesConfig {
+  roles?: boolean;
+  'role permissions'?: boolean;
+}
+
+export function detectPaidFeatures(application: Application): PaidFeaturesConfig | null {
+  if (!application.spec || !application.spec.authorization) {
+    return null;
+  }
+
+  const { authorization } = application.spec;
+  const hasRoles = authorization.roles && authorization.roles.length > 0;
+  const hasPaidFeatures = hasRoles;
+  return hasPaidFeatures ? { roles: hasRoles } : null;
 }
 
 class ToolpadProject {
@@ -1142,6 +1160,31 @@ class ToolpadProject {
 
     // Only alert once per missing variable
     this.alertedMissingVars = new Set(missingVars);
+  }
+
+  async checkPlan() {
+    const [dom] = await this.loadDomAndFingerprint();
+
+    const application = extractApplicationFromDom(dom);
+    if (!application || !application.spec) {
+      return;
+    }
+
+    if (!application.spec.plan || application.spec.plan === 'free') {
+      const paidFeatures = detectPaidFeatures(application);
+      if (paidFeatures) {
+        throw new Error(
+          `You are using ${chalk.bgBlue(Object.keys(paidFeatures))} which ${Object.keys(paidFeatures).length > 1 ? 'are paid features' : 'is a paid feature'}. To continue using Toolpad, upgrade your plan or remove this feature.`,
+        );
+      }
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.yellow(
+          'warn',
+        )}  - You are using features that will ${chalk.bold('not be covered under our MIT License')} in the future. You will have to purchase a paid license to use them in production.`,
+      );
+    }
   }
 
   async start() {

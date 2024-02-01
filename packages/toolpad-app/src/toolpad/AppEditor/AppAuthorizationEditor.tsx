@@ -41,6 +41,7 @@ import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
 import AzureIcon from '../../components/icons/AzureIcon';
+import { ErrorUpgrade } from './ErrorUpgrade';
 
 interface AuthProviderOption {
   name: string;
@@ -640,6 +641,8 @@ export interface AppAuthorizationDialogProps {
 
 export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialogProps) {
   const { dom } = useAppState();
+  const plan = appDom.getPlan(dom);
+  const isPaidPlan = plan !== undefined && plan !== 'free';
 
   const [activeTab, setActiveTab] = React.useState<'authentication' | 'roles' | 'users'>(
     'authentication',
@@ -693,22 +696,37 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
             <TabPanel disableGutters value="authentication">
               <AppAuthenticationEditor />
             </TabPanel>
-            <TabPanel disableGutters value="roles">
-              <Typography variant="body2">
-                Define the roles for your application. You can configure your pages to be accessible
-                to specific roles only.
-              </Typography>
-              <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
-            </TabPanel>
-            <TabPanel disableGutters value="roleMappings">
-              <Typography variant="body2">
-                Define mappings from authentication provider roles to Toolpad roles.
-              </Typography>
-              <AppRoleMappingsEditor
-                onRowUpdateError={handleRowUpdateError}
-                roleEnabledActiveAuthProviderOptions={roleEnabledActiveAuthProviderOptions}
-              />
-            </TabPanel>
+
+            <React.Fragment>
+              <TabPanel disableGutters value="roles">
+                {isPaidPlan ? (
+                  <React.Fragment>
+                    <Typography variant="body2">
+                      Define the roles for your application. You can configure your pages to be
+                      accessible to specific roles only.
+                    </Typography>
+                    <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
+                  </React.Fragment>
+                ) : (
+                  <ErrorUpgrade feature="Roles" />
+                )}
+              </TabPanel>
+              <TabPanel disableGutters value="roleMappings">
+                {isPaidPlan ? (
+                  <React.Fragment>
+                    <Typography variant="body2">
+                      Define mappings from authentication provider roles to Toolpad roles.
+                    </Typography>
+                    <AppRoleMappingsEditor
+                      onRowUpdateError={handleRowUpdateError}
+                      roleEnabledActiveAuthProviderOptions={roleEnabledActiveAuthProviderOptions}
+                    />
+                  </React.Fragment>
+                ) : (
+                  <ErrorUpgrade feature="Role mapping" />
+                )}
+              </TabPanel>
+            </React.Fragment>
           </DialogContent>
         </TabContext>
         <DialogActions>

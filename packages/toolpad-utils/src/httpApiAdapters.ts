@@ -4,11 +4,14 @@ export function encodeRequestBody(req: express.Request) {
   const contentType = req.headers['content-type'];
 
   if (typeof req.body === 'object' && contentType?.includes('application/x-www-form-urlencoded')) {
-    return Object.entries(req.body as Record<string, unknown>).reduce((acc, [key, value]) => {
-      const encKey = encodeURIComponent(key);
-      const encValue = encodeURIComponent(value);
-      return `${acc ? `${acc}&` : ''}${encKey}=${encValue}`;
-    }, '');
+    return Object.entries(req.body as Record<string, string | number | boolean>).reduce(
+      (acc, [key, value]) => {
+        const encKey = encodeURIComponent(key);
+        const encValue = encodeURIComponent(value);
+        return `${acc ? `${acc}&` : ''}${encKey}=${encValue}`;
+      },
+      '',
+    );
   }
 
   if (contentType?.includes('application/json')) {

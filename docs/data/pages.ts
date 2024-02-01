@@ -21,7 +21,6 @@ const pages: MuiPage[] = [
         ],
       },
       { pathname: '/toolpad/getting-started/roadmap' },
-      { pathname: '/toolpad/getting-started/upgrade' },
       {
         pathname: '/toolpad/getting-started/support',
         title: 'Support',

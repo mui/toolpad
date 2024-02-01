@@ -22,6 +22,10 @@ You can quickly create a good value on the command line with this `openssl` comm
 openssl rand -base64 32
 ```
 
+:::warning
+Please make sure to keep this secret safe and do not share it with anyone!
+:::
+
 ## Authentication providers
 
 In the authentication settings, you can set up one or more authentication providers for users to be able to sign in with, such as Github and Google.
@@ -57,6 +61,10 @@ In the Google OAuth client settings screen, under the **Authorized redirect URIs
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/google-redirect-url.png", "alt": "Google redirect URIs configuration", "caption": "Google redirect URIs configuration", "zoom": false, "width": 460 }}
 
 ### Azure Active Directory (now Entra ID)
+
+:::warning
+The Azure AD authentication provider will be a paid feature of Toolpad very soon, so it's only available for free for a limited time.
+:::
 
 | environment variable name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                                |
 | :------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------- |

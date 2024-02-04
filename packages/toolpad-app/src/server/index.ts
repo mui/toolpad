@@ -15,7 +15,7 @@ import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import * as url from 'node:url';
 import cors from 'cors';
-import { compareSameLayerFolder, readMaybeDir } from '@mui/toolpad-utils/fs';
+import { readMaybeDir } from '@mui/toolpad-utils/fs';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
 import { initProject, resolveProjectDir, type ToolpadProject } from './localMode';

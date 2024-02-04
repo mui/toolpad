@@ -319,8 +319,8 @@ importers:
         specifier: 7.4.0
         version: 7.4.0(react@18.2.0)
       marked:
-        specifier: 11.2.0
-        version: 11.2.0
+        specifier: 12.0.0
+        version: 12.0.0
       next:
         specifier: 13.4.19
         version: 13.4.19(@babel/core@7.23.9)(react-dom@18.2.0)(react@18.2.0)
@@ -709,8 +709,8 @@ importers:
         specifier: 18.2.0
         version: 18.2.0
       react-resizable-panels:
-        specifier: 1.0.10
-        version: 1.0.10(react-dom@18.2.0)(react@18.2.0)
+        specifier: 2.0.3
+        version: 2.0.3(react-dom@18.2.0)(react@18.2.0)
       react-router-dom:
         specifier: 6.21.3
         version: 6.21.3(react-dom@18.2.0)(react@18.2.0)
@@ -10455,8 +10455,8 @@ packages:
       markdownlint-micromark: 0.1.8
     dev: true
 
-  /marked@11.2.0:
-    resolution: {integrity: sha512-HR0m3bvu0jAPYiIvLUUQtdg1g6D247//lvcekpHO1WMvbwDlwSkZAX9Lw4F4YHE1T0HaaNve0tuAWuV1UJ6vtw==}
+  /marked@12.0.0:
+    resolution: {integrity: sha512-Vkwtq9rLqXryZnWaQc86+FHLC6tr/fycMfYAhiOIXkrNmeGAyhSxjqu0Rs1i0bBqw5u0S7+lV9fdH2ZSVaoa0w==}
     engines: {node: '>= 18'}
     hasBin: true
     dev: false
@@ -12538,8 +12538,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /react-resizable-panels@1.0.10(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-0+g0CNqregkuocr+Mi+e6wgWVARnKTYIX3U1QK7GlkLQKCmbymZakx80YGwcRO7HNnKJTQ5v38HlBos/cGxWvg==}
+  /react-resizable-panels@2.0.3(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-m0upi03cdqCt/g/dUxRQkHiBzo0UDtMIYwcf8qhKM+QG0cnpusOVFKOD2ElpGrtxB/oIxTItuKYsDOeu76JHvg==}
     peerDependencies:
       react: ^16.14.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0

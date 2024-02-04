@@ -15,7 +15,7 @@ import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
 import * as url from 'node:url';
 import cors from 'cors';
-import { compareSameLayerFolder } from '@mui/toolpad-utils/fs';
+import { compareSameLayerFolder, readMaybeDir } from '@mui/toolpad-utils/fs';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
 import { initProject, resolveProjectDir, type ToolpadProject } from './localMode';
@@ -317,12 +317,13 @@ async function createToolpadHandler({
   router.use(express.static(publicPath, { index: false }));
 
   const childrenPublic = path.resolve(project.getRoot(), './public');
-  const sameNameStatic = await compareSameLayerFolder(publicPath, childrenPublic);
-  sameNameStatic.forEach((item) => {
+  const childrenPublicDirs = await readMaybeDir(childrenPublic);
+
+  if (childrenPublicDirs.some((item) => item.name === editorBasename.slice(1))) {
     console.warn(
-      `${chalk.yellow('warning:')} The ${chalk.red(item.type)} named ${chalk.red(item.name)} is a keyword. please rename it.`,
+      `${chalk.yellow('warning:')} The ${chalk.red(editorBasename)} is a keyword. please rename it.`,
     );
-  });
+  }
 
   router.use(express.static(childrenPublic, { index: false }));
 

@@ -536,8 +536,11 @@ export function BindingEditorDialog<V>({
         (input as JsExpressionAttrValue).$$jsExpression,
         data!,
       );
+      // Remove trailing spaces, newline characters for cleanliness and
+      // trailing semicolons since they introduce crashes while evaluation
+      const cleanedExpression = jsExpression.trim().replace(/;*$/, '');
       newValue = {
-        $$jsExpression: jsExpression,
+        $$jsExpression: cleanedExpression,
       };
     }
 

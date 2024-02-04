@@ -136,7 +136,7 @@
   "devDependencies": {
     "@types/babel__code-frame": "7.0.6",
     "@types/express": "4.17.21",
-    "@types/express-serve-static-core": "4.17.42",
+    "@types/express-serve-static-core": "4.17.43",
     "@types/formidable": "3.4.5",
     "@types/glob": "8.1.0",
     "@types/har-format": "1.2.15",
@@ -145,7 +145,7 @@
     "@types/node-fetch": "2.6.11",
     "@types/pg": "8.11.0",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.48",
+    "@types/react": "18.2.52",
     "@types/react-dom": "18.2.18",
     "@types/react-is": "18.2.4",
     "@types/semver": "7.5.6",
@@ -160,7 +160,7 @@
     "formidable": "3.5.1",
     "monaco-editor": "0.45.0",
     "react-transition-group": "4.4.5",
-    "webpack": "5.90.0"
+    "webpack": "5.90.1"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

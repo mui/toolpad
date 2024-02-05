@@ -78,6 +78,20 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/concepts/page-properties',
       },
+      {
+        pathname: '/toolpad/concepts/authorization',
+        title: 'Authorization',
+        children: [
+          {
+            pathname: '/toolpad/concepts/authentication',
+            title: 'Authentication',
+          },
+          {
+            pathname: '/toolpad/concepts/rbac',
+            title: 'Role-based access control',
+          },
+        ],
+      },
       { pathname: '/toolpad/concepts/custom-server' },
     ],
   },

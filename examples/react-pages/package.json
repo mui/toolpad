@@ -8,10 +8,10 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/material": "5.15.6",
+    "@mui/material": "5.15.7",
     "@mui/toolpad": "0.1.48",
-    "@mui/x-data-grid": "6.19.2",
-    "@tanstack/react-query": "5.17.19"
+    "@mui/x-data-grid": "6.19.3",
+    "@tanstack/react-query": "5.18.1"
   },
   "devDependencies": {}
 }

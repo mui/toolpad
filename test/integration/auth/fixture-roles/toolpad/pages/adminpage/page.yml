@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.48/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: adminpage
+  display: shell
+  authorization:
+    allowAll: false
+    allowedRoles:
+      - admin
+  displayName: Admin Page
+  content:
+    - component: Text
+      name: typography
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `message: ${hello.data.message}`
+  queries:
+    - name: hello
+      query:
+        function: hello
+        kind: local

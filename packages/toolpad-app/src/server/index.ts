@@ -27,7 +27,7 @@ import { createRpcHandler } from './rpc';
 import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
-import { createAuthHandler, createRequireAuthMiddleware } from './auth';
+import { createAuthHandler, createRequireAuthMiddleware, getRequireAuthentication } from './auth';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -113,12 +113,13 @@ async function createDevHandler(project: ToolpadProject) {
     }),
   );
 
-  if (process.env.TOOLPAD_AUTH_SECRET) {
+  const hasAuthentication = await getRequireAuthentication(project);
+  if (hasAuthentication) {
     const authHandler = createAuthHandler(project);
     handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
-  }
 
-  handler.use(await createRequireAuthMiddleware(project));
+    handler.use(await createRequireAuthMiddleware(project));
+  }
 
   handler.use('/api/data', project.dataManager.createDataHandler());
   const runtimeRpcServer = createRuntimeRpcServer(project);

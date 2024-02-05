@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: page
+spec:
+  id: LNlhDSA
+  title: Default page
+  content:
+    - component: Button
+      name: button
+    - component: Autocomplete
+      name: autocomplete
+    - component: PageRow
+      name: pageRow
+      props:
+        justifyContent: start
+      children:
+        - component: DataGrid
+          name: dataGrid
+          layout:
+            columnSize: 1.0008813909991188
+        - component: Button
+          name: button1
+          layout:
+            columnSize: 1.1686990285813008
+        - component: PageColumn
+          name: pageColumn
+          layout:
+            columnSize: 0.8304195804195804
+          children:
+            - component: Autocomplete
+              name: autocomplete1
+              layout:
+                columnSize: 1
+                height: 136
+            - component: Button
+              name: button2
+              layout:
+                columnSize: 0.5706898888759198
+                height: 68
+            - component: Autocomplete
+              name: autocomplete2
+              layout:
+                height: 120

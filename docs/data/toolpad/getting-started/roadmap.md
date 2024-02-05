@@ -40,4 +40,8 @@ Currently, accessing these features requires you to add the following to your `a
 spec: { plan: pro }
 ```
 
+:::info
+Add the above alongside any existing content of the `spec` attribute
+:::
+
 Using these features in production will require the purchase of a paid license. Please get in touch with us at [toolpad@mui.com](mailto:toolpad@mui.com) if you require to do so.

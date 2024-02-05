@@ -41,7 +41,7 @@ import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
 import AzureIcon from '../../components/icons/AzureIcon';
-import { ErrorUpgrade } from './ErrorUpgrade';
+import { UpgradeAlert } from './UpgradeAlert';
 
 interface AuthProviderOption {
   name: string;
@@ -65,6 +65,8 @@ const AUTH_PROVIDER_OPTIONS = new Map<string, AuthProviderOption>([
 export function AppAuthenticationEditor() {
   const { dom } = useAppState();
   const appState = useAppStateApi();
+  const plan = appDom.getPlan(dom);
+  const isPaidPlan = plan !== undefined && plan !== 'free';
 
   const handleAuthProvidersChange = React.useCallback(
     (event: SelectChangeEvent<appDom.AuthProvider[]>) => {
@@ -143,12 +145,13 @@ export function AppAuthenticationEditor() {
               .join(', ')
           }
         >
-          {[...AUTH_PROVIDER_OPTIONS].map(([value, { name, icon }]) => (
-            <MenuItem key={value} value={value}>
+          {[...AUTH_PROVIDER_OPTIONS].map(([value, { name, icon, hasRoles }]) => (
+            <MenuItem key={value} value={value} disabled={hasRoles && !isPaidPlan}>
               <Stack direction="row" alignItems="center">
                 <Checkbox checked={authProviders.indexOf(value as appDom.AuthProvider) > -1} />
                 {icon}
-                <Typography ml={1}>{name}</Typography>
+                <Typography mx={1}>{name}</Typography>
+                {hasRoles && !isPaidPlan ? <UpgradeAlert feature={name} hideAction /> : null}
               </Stack>
             </MenuItem>
           ))}
@@ -164,6 +167,7 @@ export function AppAuthenticationEditor() {
         </Link>
         .
       </Alert>
+
       <Typography variant="subtitle1" mt={2}>
         Required email domains
       </Typography>
@@ -178,6 +182,20 @@ export function AppAuthenticationEditor() {
           placeholder="example.com"
         />
       ))}
+      {!isPaidPlan ? (
+        <UpgradeAlert
+          type="error"
+          feature="Using authentication with a few specific providers (like Azure Active Directory)"
+          sx={{ position: 'absolute', bottom: (theme) => theme.spacing(4) }}
+        />
+      ) : (
+        <UpgradeAlert
+          type="warning"
+          warning="You are using features that are not covered by our MIT License. You will have to buy a license to use them in production."
+          hideAction
+          sx={{ position: 'absolute', bottom: (theme) => theme.spacing(4) }}
+        />
+      )}
     </Stack>
   );
 }
@@ -708,7 +726,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
                     <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
                   </React.Fragment>
                 ) : (
-                  <ErrorUpgrade feature="Roles" />
+                  <UpgradeAlert type="error" feature="Role based access control" />
                 )}
               </TabPanel>
               <TabPanel disableGutters value="roleMappings">
@@ -723,7 +741,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
                     />
                   </React.Fragment>
                 ) : (
-                  <ErrorUpgrade feature="Role mapping" />
+                  <UpgradeAlert feature="Role mapping" />
                 )}
               </TabPanel>
             </React.Fragment>

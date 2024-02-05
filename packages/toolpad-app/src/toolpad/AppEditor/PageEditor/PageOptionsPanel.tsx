@@ -19,7 +19,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import PageTitleEditor from '../PageTitleEditor';
-import { ErrorUpgrade } from '../ErrorUpgrade';
+import { UpgradeAlert } from '../UpgradeAlert';
 import PageDisplayNameEditor from '../PageDisplayNameEditor';
 import { FEATURE_FLAG_AUTHORIZATION } from '../../../constants';
 
@@ -145,7 +145,7 @@ export default function PageOptionsPanel() {
               />
             </React.Fragment>
           ) : (
-            <ErrorUpgrade feature="Authorization" hideAction />
+            <UpgradeAlert feature="Role based access control" hideAction />
           )}
         </div>
       ) : null}

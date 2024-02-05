@@ -62,7 +62,7 @@ import type {
 import EnvManager from './EnvManager';
 import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
-import { VERSION_CHECK_INTERVAL } from '../constants';
+import { UPGRADE_URL, VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
 import packageInfo from '../packageInfo';
@@ -966,19 +966,27 @@ export function getRequiredEnvVars(dom: appDom.AppDom): Set<string> {
   return new Set(allVars);
 }
 
-export interface PaidFeaturesConfig {
-  roles?: boolean;
-  'role permissions'?: boolean;
+interface PaidFeature {
+  id: string;
+  label: string;
 }
 
-function detectPaidFeatures(application: Application): PaidFeaturesConfig | null {
+function detectPaidFeatures(application: Application): PaidFeature[] | null {
   if (!application.spec || !application.spec.authorization) {
     return null;
   }
 
-  const hasRoles = !!application?.spec?.authorization?.roles;
-  const hasPaidFeatures = hasRoles;
-  return hasPaidFeatures ? { roles: hasRoles } : null;
+  const hasRoles = Boolean(application?.spec?.authorization?.roles);
+  const hasAzureActiveDirectory = application?.spec?.authentication?.providers?.some(
+    (elems) => elems.provider === 'azure-ad',
+  );
+  const paidFeatures = [
+    hasRoles ? { id: 'roles', label: 'Role based access control' } : undefined,
+    hasAzureActiveDirectory
+      ? { id: 'azure-ad', label: 'Azure Active Directory authentication' }
+      : undefined,
+  ].filter(Boolean) as PaidFeature[];
+  return paidFeatures.length > 0 ? paidFeatures : null;
 }
 
 class ToolpadProject {
@@ -1173,7 +1181,7 @@ class ToolpadProject {
       const paidFeatures = detectPaidFeatures(application);
       if (paidFeatures) {
         throw new Error(
-          `You are using ${chalk.bgBlue(Object.keys(paidFeatures))} which ${Object.keys(paidFeatures).length > 1 ? 'are paid features' : 'is a paid feature'}. To continue using Toolpad, upgrade your plan or remove this feature.`,
+          `You are using ${chalk.bgBlue(paidFeatures.map((feature) => feature.label))} which ${paidFeatures.length > 1 ? 'are paid features' : 'is a paid feature'}. To continue using Toolpad, upgrade your plan or remove this feature. Learn more at ${chalk.cyan(UPGRADE_URL)}.`,
         );
       }
     } else {
@@ -1181,7 +1189,7 @@ class ToolpadProject {
       console.log(
         `${chalk.yellow(
           'warn',
-        )}  - You are using features that will ${chalk.bold('not be covered under our MIT License')} in the future. You will have to purchase a paid license to use them in production.`,
+        )}  - You are using features that ${chalk.bold('are not covered under our MIT License')}. You will have to buy a license to use them in production.`,
       );
     }
   }

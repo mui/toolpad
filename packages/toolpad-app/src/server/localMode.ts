@@ -971,13 +971,12 @@ export interface PaidFeaturesConfig {
   'role permissions'?: boolean;
 }
 
-export function detectPaidFeatures(application: Application): PaidFeaturesConfig | null {
+function detectPaidFeatures(application: Application): PaidFeaturesConfig | null {
   if (!application.spec || !application.spec.authorization) {
     return null;
   }
 
-  const { authorization } = application.spec;
-  const hasRoles = authorization.roles && authorization.roles.length > 0;
+  const hasRoles = !!application?.spec?.authorization?.roles;
   const hasPaidFeatures = hasRoles;
   return hasPaidFeatures ? { roles: hasRoles } : null;
 }

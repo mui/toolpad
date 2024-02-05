@@ -38,7 +38,7 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-type ToolpadPlan = 'free' | 'pro';
+type ToolpadPlan = 'free' | 'pro' | undefined;
 
 export type AuthProvider = 'github' | 'google' | 'azure-ad';
 
@@ -1188,7 +1188,7 @@ export function isCodePage(node: PageNode): boolean {
   return !!node.attributes.codeFile;
 }
 
-export function getPlan(dom: AppDom): ToolpadPlan | undefined {
+export function getPlan(dom: AppDom): ToolpadPlan {
   const appNode = getApp(dom);
   return appNode.attributes.plan;
 }

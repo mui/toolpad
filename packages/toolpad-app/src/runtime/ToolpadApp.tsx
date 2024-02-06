@@ -44,7 +44,6 @@ import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
 import { QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
-  BrowserRouter,
   Routes,
   Route,
   useLocation,
@@ -98,11 +97,6 @@ import SignInPage from './SignInPage';
 import { AppHostContext } from './AppHostContext';
 
 const browserJsRuntime = getBrowserRuntime();
-
-export const IS_RENDERED_IN_CANVAS =
-  typeof window === 'undefined'
-    ? false
-    : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
 
 export type PageComponents = Partial<Record<string, React.ComponentType>>;
 
@@ -1484,6 +1478,8 @@ function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
 
   const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
 
+  const appHost = useNonNullableContext(AppHostContext);
+
   return (
     <Routes>
       {pages.map((page) => {
@@ -1496,7 +1492,7 @@ function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
           />
         );
 
-        if (!IS_RENDERED_IN_CANVAS) {
+        if (!appHost.isCanvas) {
           pageContent = (
             <RequireAuthorization
               allowAll={page.attributes.authorization?.allowAll ?? true}
@@ -1583,7 +1579,9 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
     [authFilteredPages],
   );
 
-  if (!IS_RENDERED_IN_CANVAS && !session?.user && hasAuthentication) {
+  const appHost = useNonNullableContext(AppHostContext);
+
+  if (!appHost.isCanvas && !session?.user && hasAuthentication) {
     return <AppLoading />;
   }
 
@@ -1591,8 +1589,8 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
     <AppLayout
       activePageSlug={activePageSlug}
       pages={navEntries}
-      hasNavigation={!IS_RENDERED_IN_CANVAS}
-      hasHeader={hasAuthentication && !IS_RENDERED_IN_CANVAS}
+      hasNavigation={!appHost.isCanvas}
+      hasHeader={hasAuthentication && !appHost.isCanvas}
       clipped={clipped}
       basename={basename}
     >
@@ -1630,7 +1628,8 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
   const authContext = useAuth({ dom, basename, isRenderedInCanvas: IS_RENDERED_IN_CANVAS });
 
   const appHost = useNonNullableContext(AppHostContext);
-  const showPreviewHeader: boolean = !!appHost?.isPreview && !IS_RENDERED_IN_CANVAS;
+  const showPreviewHeader: boolean = !!appHost.isPreview && !appHost.isCanvas;
+
 
   return (
     <BrowserRouter basename={basename}>

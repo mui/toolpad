@@ -8,7 +8,6 @@ import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
-import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';

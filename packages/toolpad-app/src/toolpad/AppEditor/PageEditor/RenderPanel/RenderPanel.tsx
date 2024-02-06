@@ -13,9 +13,7 @@ import { getBindingType } from '../../../../runtime/bindings';
 import createRuntimeState from '../../../../runtime/createRuntimeState';
 import { RuntimeState } from '../../../../runtime';
 
-const EXPERIMENTAL_INLINE_CANVAS = false;
-
-const EditorCanvasHost = EXPERIMENTAL_INLINE_CANVAS
+const EditorCanvasHost = process.env.EXPERIMENTAL_INLINE_CANVAS
   ? EditorCanvasHostInline
   : EditorCanvasHostLegacy;
 

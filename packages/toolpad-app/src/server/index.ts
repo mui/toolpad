@@ -58,46 +58,50 @@ async function createDevHandler(project: ToolpadProject) {
     project.getRuntimeConfig(),
   ]);
 
-  const mainThreadRpcChannel = new MessageChannel();
+  let readyPromise: Promise<void>;
+  let worker: Worker;
 
-  const worker = new Worker(appServerPath, {
-    workerData: {
-      toolpadDevMode: project.options.toolpadDevMode,
-      outDir: project.getAppOutputFolder(),
-      base: project.options.base,
-      config: runtimeConfig,
-      root: project.getRoot(),
-      port: devPort,
-      mainThreadRpcPort: mainThreadRpcChannel.port1,
-      customServer: project.options.customServer,
-    } satisfies AppViteServerConfig,
-    transferList: [mainThreadRpcChannel.port1],
-    env: {
-      ...process.env,
-      NODE_ENV: 'development',
-    },
-  });
+  if (!process.env.EXPERIMENTAL_INLINE_CANVAS) {
+    const mainThreadRpcChannel = new MessageChannel();
+    worker = new Worker(appServerPath, {
+      workerData: {
+        toolpadDevMode: project.options.toolpadDevMode,
+        outDir: project.getAppOutputFolder(),
+        base: project.options.base,
+        config: runtimeConfig,
+        root: project.getRoot(),
+        port: devPort,
+        mainThreadRpcPort: mainThreadRpcChannel.port1,
+        customServer: project.options.customServer,
+      } satisfies AppViteServerConfig,
+      transferList: [mainThreadRpcChannel.port1],
+      env: {
+        ...process.env,
+        NODE_ENV: 'development',
+      },
+    });
 
-  worker.once('exit', (code) => {
-    console.error(`App dev server failed ${code}`);
-    process.exit(1);
-  });
+    worker.once('exit', (code) => {
+      console.error(`App dev server failed ${code}`);
+      process.exit(1);
+    });
 
-  let resolveReadyPromise: () => void | undefined;
-  const readyPromise = new Promise<void>((resolve) => {
-    resolveReadyPromise = resolve;
-  });
+    let resolveReadyPromise: () => void | undefined;
+    readyPromise = new Promise<void>((resolve) => {
+      resolveReadyPromise = resolve;
+    });
 
-  serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
-    notifyReady: async () => resolveReadyPromise?.(),
-    loadDom: async () => project.loadDom(),
-    getComponents: async () => project.getComponentsManifest(),
-    getPagesManifest: async () => project.getPagesManifest(),
-  });
+    serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
+      notifyReady: async () => resolveReadyPromise?.(),
+      loadDom: async () => project.loadDom(),
+      getComponents: async () => project.getComponentsManifest(),
+      getPagesManifest: async () => project.getPagesManifest(),
+    });
 
-  project.events.on('componentsListChanged', () => {
-    worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
-  });
+    project.events.on('componentsListChanged', () => {
+      worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
+    });
+  }
 
   const rpcServer = createProjectRpcServer(project);
   handler.use('/__toolpad_dev__/rpc', createRpcHandler(rpcServer));
@@ -126,20 +130,22 @@ async function createDevHandler(project: ToolpadProject) {
 
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
 
-  handler.use(
-    (req, res, next) => {
-      // Stall the request until the dev server is ready
-      readyPromise.then(next, next);
-    },
-    createProxyMiddleware({
-      logLevel: 'silent',
-      ws: true,
-      target: {
-        host: 'localhost',
-        port: devPort,
+  if (!process.env.EXPERIMENTAL_INLINE_CANVAS) {
+    handler.use(
+      (req, res, next) => {
+        // Stall the request until the dev server is ready
+        readyPromise.then(next, next);
       },
-    }),
-  );
+      createProxyMiddleware({
+        logLevel: 'silent',
+        ws: true,
+        target: {
+          host: 'localhost',
+          port: devPort,
+        },
+      }),
+    );
+  }
 
   const wsServer = new WebSocketServer({ port: wsPort });
 

@@ -6,6 +6,7 @@ import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import { BrowserRouter } from 'react-router-dom';
 import api from './api';
 import RuntimeToolpadApp, {
   ToolpadAppProps,
@@ -13,7 +14,7 @@ import RuntimeToolpadApp, {
   pageComponentsStore,
 } from './ToolpadApp';
 import { RuntimeState } from './types';
-import { AppHostContext } from './AppHostContext';
+import { AppHost, AppHostContext, RouterProps } from './AppHostContext';
 
 const IS_PREVIEW = process.env.NODE_ENV !== 'production';
 const IS_CUSTOM_SERVER = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
@@ -43,9 +44,23 @@ export interface RootProps {
   ToolpadApp: React.ComponentType<ToolpadAppProps>;
 }
 
-const appHost = {
+const BaseContext = React.createContext<string>('/');
+
+function RuntimeRouter({ children }: RouterProps) {
+  const base = React.useContext(BaseContext);
+  return <BrowserRouter basename={base}>{children}</BrowserRouter>;
+}
+
+const IS_RENDERED_IN_CANVAS =
+  typeof window === 'undefined'
+    ? false
+    : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
+
+const appHost: AppHost = {
   isPreview: IS_PREVIEW,
   isCustomServer: IS_CUSTOM_SERVER,
+  isCanvas: IS_RENDERED_IN_CANVAS,
+  Router: RuntimeRouter,
 };
 
 function Root({ ToolpadApp, initialState, base }: RootProps) {
@@ -54,9 +69,11 @@ function Root({ ToolpadApp, initialState, base }: RootProps) {
       <CacheProvider value={cache}>
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
-        <AppHostContext.Provider value={appHost}>
-          <ToolpadApp basename={base} state={initialState} />
-        </AppHostContext.Provider>
+        <BaseContext.Provider value={base}>
+          <AppHostContext.Provider value={appHost}>
+            <ToolpadApp basename={base} state={initialState} />
+          </AppHostContext.Provider>
+        </BaseContext.Provider>
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />
       </CacheProvider>
     </React.StrictMode>

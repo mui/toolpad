@@ -21,7 +21,6 @@ import NodeNameEditor from '../NodeNameEditor';
 import PageTitleEditor from '../PageTitleEditor';
 import { UpgradeAlert } from '../UpgradeAlert';
 import PageDisplayNameEditor from '../PageDisplayNameEditor';
-import { FEATURE_FLAG_AUTHORIZATION } from '../../../constants';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
   { value: 'shell', label: 'App shell' },
@@ -122,33 +121,31 @@ export default function PageOptionsPanel() {
           </ToggleButtonGroup>
         </Tooltip>
       </div>
-      {FEATURE_FLAG_AUTHORIZATION ? (
-        <div>
-          <Typography variant="body2">Authorization:</Typography>
-          {isPaidPlan ? (
-            <React.Fragment>
-              <FormControlLabel
-                control={<Checkbox checked={allowAll} onChange={handleAllowAllChange} />}
-                label="Allow access to all roles"
-              />
-              <Autocomplete
-                multiple
-                options={Array.from(availableRoles.keys())}
-                value={allowAll ? [] : allowedRoles}
-                onChange={handleAllowedRolesChange}
-                disabled={allowAll}
-                fullWidth
-                noOptionsText="No roles defined"
-                renderInput={(params) => (
-                  <TextField {...params} label="Allowed roles" placeholder="Roles" />
-                )}
-              />
-            </React.Fragment>
-          ) : (
-            <UpgradeAlert feature="Role based access control" hideAction />
-          )}
-        </div>
-      ) : null}
+      <div>
+        <Typography variant="body2">Authorization:</Typography>
+        {isPaidPlan ? (
+          <React.Fragment>
+            <FormControlLabel
+              control={<Checkbox checked={allowAll} onChange={handleAllowAllChange} />}
+              label="Allow access to all roles"
+            />
+            <Autocomplete
+              multiple
+              options={Array.from(availableRoles.keys())}
+              value={allowAll ? [] : allowedRoles}
+              onChange={handleAllowedRolesChange}
+              disabled={allowAll}
+              fullWidth
+              noOptionsText="No roles defined"
+              renderInput={(params) => (
+                <TextField {...params} label="Allowed roles" placeholder="Roles" />
+              )}
+            />
+          </React.Fragment>
+        ) : (
+          <UpgradeAlert feature="Role based access control" hideAction />
+        )}
+      </div>
       {appDom.isCodePage(page) ? null : (
         <div>
           <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />

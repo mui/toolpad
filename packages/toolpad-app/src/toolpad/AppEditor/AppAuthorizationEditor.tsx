@@ -141,6 +141,7 @@ export function AppAuthenticationEditor() {
           fullWidth
           renderValue={(selected) =>
             selected
+              .filter((selectedValue) => AUTH_PROVIDER_OPTIONS.has(selectedValue))
               .map((selectedValue) => AUTH_PROVIDER_OPTIONS.get(selectedValue)?.name ?? '')
               .join(', ')
           }
@@ -162,7 +163,7 @@ export function AppAuthenticationEditor() {
       </FormControl>
       <Alert severity="info" sx={{ mt: 1 }}>
         Certain environment variables must be set for authentication providers to work.{' '}
-        <Link href="/" target="_blank">
+        <Link href="https://mui.com/toolpad/concepts/authentication" target="_blank">
           Learn how to set up authentication
         </Link>
         .
@@ -683,9 +684,9 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
   const roleEnabledActiveAuthProviderOptions = React.useMemo(() => {
     const appNode = appDom.getApp(dom);
 
-    const authProviders = (appNode.attributes.authentication?.providers ?? []).map(
-      (providerConfig) => providerConfig.provider,
-    );
+    const authProviders = (appNode.attributes.authentication?.providers ?? [])
+      .filter((providerConfig) => AUTH_PROVIDER_OPTIONS.has(providerConfig.provider))
+      .map((providerConfig) => providerConfig.provider);
 
     return [...AUTH_PROVIDER_OPTIONS].filter(
       ([optionKey, { hasRoles }]) =>

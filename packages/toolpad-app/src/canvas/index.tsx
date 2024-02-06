@@ -4,6 +4,7 @@ import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { FlowDirection, SlotType } from '@mui/toolpad-core';
 import { update } from '@mui/toolpad-utils/immutability';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import ToolpadApp from '../runtime/ToolpadApp';
 import { queryClient } from '../runtime/api';
 import { AppCanvasState, NodeInfo, PageViewState, SlotsState } from '../types';
@@ -14,7 +15,6 @@ import {
 } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
-import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import { AppHostContext } from '../runtime/AppHostContext';
 
 const handleScreenUpdate = throttle(
@@ -78,7 +78,6 @@ export function updateNodeInfo(nodeInfo: NodeInfo, rootElm: Element): NodeInfo {
 export interface AppCanvasProps {
   state: AppCanvasState;
   basename: string;
-  hooks?: CanvasHooks;
 }
 
 export default function AppCanvas({ basename, state: initialState }: AppCanvasProps) {

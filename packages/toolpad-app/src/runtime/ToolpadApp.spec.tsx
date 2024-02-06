@@ -17,10 +17,10 @@ import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { test, expect, afterEach } from 'vitest';
 import * as appDom from '@mui/toolpad-core/appDom';
+import { MemoryRouter } from 'react-router-dom';
 import createRuntimeState from './createRuntimeState';
 import ToolpadApp from './ToolpadApp';
-import { AppHost, AppHostContext } from './AppHostContext';
-import { MemoryRouter } from 'react-router-dom';
+import { AppHost, AppHostContext, RouterProps } from './AppHostContext';
 
 afterEach(cleanup);
 
@@ -32,7 +32,7 @@ const appHost: AppHost = {
   isPreview: false,
   isCustomServer: false,
   isCanvas: false,
-  Router: ({ children }) => <MemoryRouter>{children}</MemoryRouter>,
+  Router: ({ children }: RouterProps) => <MemoryRouter>{children}</MemoryRouter>,
 };
 
 function renderPage(

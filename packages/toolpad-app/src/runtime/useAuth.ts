@@ -11,7 +11,7 @@ const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 export type AuthProvider = 'github' | 'google' | 'azure-ad' | 'credentials';
 
 function isResponseJSON(response: Response): boolean {
-  return response.headers.get('content-type')?.indexOf('application/json') !== -1 || false;
+  return response.headers.get('content-type')?.includes('application/json') || false;
 }
 
 export interface AuthSession {

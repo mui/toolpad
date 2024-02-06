@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-pascal-case */
 import * as React from 'react';
 import { styled } from '@mui/material';
 import { NodeHashes } from '@mui/toolpad-core';

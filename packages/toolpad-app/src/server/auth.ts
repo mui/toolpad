@@ -13,6 +13,8 @@ import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import type { ToolpadProject } from './localMode';
 
+globalThis.crypto ??= (await import('node:crypto')) as Crypto;
+
 const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
   // Azure AD should be fine to skip as the user has to belong to the organization to sign in
   'azure-ad',
@@ -146,13 +148,6 @@ export function createAuthHandler(project: ToolpadProject): Router {
   const googleProvider = GoogleProvider({
     clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
     clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
-    authorization: {
-      params: {
-        prompt: 'consent',
-        access_type: 'offline',
-        response_type: 'code',
-      },
-    },
   });
 
   const azureADProvider = AzureADProvider({

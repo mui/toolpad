@@ -20,6 +20,7 @@ import * as appDom from '@mui/toolpad-core/appDom';
 import createRuntimeState from './createRuntimeState';
 import ToolpadApp from './ToolpadApp';
 import { AppHost, AppHostContext } from './AppHostContext';
+import { MemoryRouter } from 'react-router-dom';
 
 afterEach(cleanup);
 
@@ -31,7 +32,7 @@ const appHost: AppHost = {
   isPreview: false,
   isCustomServer: false,
   isCanvas: false,
-  Router: ({ children }) => children,
+  Router: ({ children }) => <MemoryRouter>{children}</MemoryRouter>,
 };
 
 function renderPage(

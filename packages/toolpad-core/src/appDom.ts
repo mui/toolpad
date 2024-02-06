@@ -38,7 +38,7 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-export type AuthProvider = 'github' | 'google' | 'azure-ad';
+export type AuthProvider = 'github' | 'google' | 'azure-ad' | 'credentials';
 
 export interface AuthProviderConfig {
   readonly provider: AuthProvider;

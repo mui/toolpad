@@ -6,7 +6,6 @@ import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
-import { HashRouter, UNSAFE_LocationContext } from 'react-router-dom';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
 import { LogEntry } from '../../../components/Console';
@@ -15,9 +14,6 @@ import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
 import { useProject } from '../../../project';
 import { RuntimeState } from '../../../runtime';
-import { AppHost, AppHostContext } from '../../../runtime/AppHostContext';
-import ToolpadApp from '../../../runtime/ToolpadApp';
-import { CanvasHooks, CanvasHooksContext } from '../../../runtime/CanvasHooksContext';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -80,13 +76,6 @@ function useOnChange<T = unknown>(value: T, handler: (newValue: T, oldValue: T) 
     }
   }, [value, stableHandler]);
 }
-
-const appHost: AppHost = {
-  isPreview: true,
-  isCustomServer: false,
-  isCanvas: true,
-  Router: HashRouter,
-};
 
 export default function EditorCanvasHost({
   className,
@@ -206,53 +195,15 @@ export default function EditorCanvasHost({
     return project.events.subscribe('queriesInvalidated', invalidateCanvasQueries);
   }, [project.events, invalidateCanvasQueries]);
 
-  const state = React.useMemo(() => ({ ...runtimeState, savedNodes }), [runtimeState, savedNodes]);
-
-  const [portal, setPortal] = React.useState<HTMLIFrameElement | null>(null);
-
-  const handleIframeLoad = React.useCallback<React.ReactEventHandler<HTMLIFrameElement>>(
-    (event) => {
-      console.log(event.currentTarget.contentWindow?.location);
-      setPortal(event.currentTarget.contentDocument.getElementById('root'));
-    },
-    [],
-  );
-
-  const canvasHooks: CanvasHooks = React.useMemo(
-    () => ({
-      overlayRef: setEditorOverlayRoot,
-      savedNodes,
-    }),
-    [savedNodes],
-  );
-
-  console.log('editorOverlayRoot', editorOverlayRoot);
-
   return (
     <CanvasRoot className={className}>
-      <CanvasFrame srcDoc={`<!DOCTYPE html><div id="root"></div>`} onLoad={handleIframeLoad} />
-      {portal
-        ? ReactDOM.createPortal(
-            <Overlay container={portal}>
-              <CanvasHooksContext.Provider value={canvasHooks}>
-                <UNSAFE_LocationContext.Provider value={null}>
-                  <AppHostContext.Provider value={appHost}>
-                    <ToolpadApp basename="/" state={state} />
-                  </AppHostContext.Provider>
-                </UNSAFE_LocationContext.Provider>
-              </CanvasHooksContext.Provider>
-            </Overlay>,
-            portal,
-          )
-        : null}
-
-      {/* <CanvasFrame
+      <CanvasFrame
         name="data-toolpad-canvas"
         onLoad={handleFrameLoad}
         src={src}
         // Used by the runtime to know when to load react devtools
         data-toolpad-canvas
-        /> */}
+      />
       {editorOverlayRoot
         ? ReactDOM.createPortal(
             <Overlay container={editorOverlayRoot}>{overlay}</Overlay>,
@@ -260,11 +211,11 @@ export default function EditorCanvasHost({
           )
         : null}
 
-      {/* <Fade in={loading} appear={false} timeout={{ enter: 0, exit: 100 }}>
+      <Fade in={loading} appear={false} timeout={{ enter: 0, exit: 100 }}>
         <CanvasOverlay>
           <CenteredSpinner />
         </CanvasOverlay>
-      </Fade> */}
+      </Fade>
     </CanvasRoot>
   );
 }

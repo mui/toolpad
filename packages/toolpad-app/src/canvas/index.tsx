@@ -14,7 +14,6 @@ import {
 } from '../utils/geometry';
 import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
-import { useEventCallback } from '@mui/material';
 import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import { AppHostContext } from '../runtime/AppHostContext';
 

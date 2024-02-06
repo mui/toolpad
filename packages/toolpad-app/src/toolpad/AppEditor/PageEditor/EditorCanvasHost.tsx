@@ -41,7 +41,6 @@ export interface EditorCanvasHostProps {
   pageName: string;
   runtimeState: RuntimeState;
   savedNodes: NodeHashes;
-  onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
   onInit?: (bridge: ToolpadBridge) => void;
   base: string;
@@ -84,7 +83,6 @@ export default function EditorCanvasHost({
   base,
   savedNodes,
   overlay,
-  onConsoleEntry,
   onInit,
 }: EditorCanvasHostProps) {
   const project = useProject();
@@ -101,11 +99,6 @@ export default function EditorCanvasHost({
   React.useEffect(() => {
     updateOnBridge();
   }, [updateOnBridge]);
-
-  const onConsoleEntryRef = React.useRef(onConsoleEntry);
-  React.useLayoutEffect(() => {
-    onConsoleEntryRef.current = onConsoleEntry;
-  });
 
   const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 

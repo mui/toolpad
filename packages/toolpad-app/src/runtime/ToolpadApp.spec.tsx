@@ -27,7 +27,12 @@ afterEach(cleanup);
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
 
-const appHost: AppHost = { isPreview: false, isCustomServer: false, isCanvas: false };
+const appHost: AppHost = {
+  isPreview: false,
+  isCustomServer: false,
+  isCanvas: false,
+  Router: ({ children }) => children,
+};
 
 function renderPage(
   initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom,

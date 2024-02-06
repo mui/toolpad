@@ -294,6 +294,7 @@ async function createToolpadHandler({
   const editorBasename = '/_toolpad';
 
   const project = await initProject({ toolpadDevMode, dev, dir, externalUrl, base });
+  await project.checkPlan();
   await project.start();
 
   const router = express.Router();

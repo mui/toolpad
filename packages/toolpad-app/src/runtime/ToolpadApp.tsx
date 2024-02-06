@@ -90,7 +90,7 @@ import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
 import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
-import api, { queryClient } from './api';
+import { RuntimeApiContext, createApi, queryClient } from './api';
 import { AuthContext, useAuth } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
@@ -1310,6 +1310,8 @@ function MutationNode({ node, page }: MutationNodeProps) {
     Object.fromEntries(node.params ?? []),
   );
 
+  const runtimeApi = useNonNullableContext(RuntimeApiContext);
+
   const {
     isPending,
     data: responseData = EMPTY_OBJECT,
@@ -1318,7 +1320,7 @@ function MutationNode({ node, page }: MutationNodeProps) {
   } = useMutation({
     mutationKey: [node.name, params],
     mutationFn: async (overrides: any = {}) => {
-      return api.methods.execQuery(page.name, node.name, { ...params, ...overrides });
+      return runtimeApi.methods.execQuery(page.name, node.name, { ...params, ...overrides });
     },
   });
 
@@ -1602,10 +1604,16 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   basename: string;
+  apiUrl?: string;
   state: RuntimeState;
 }
 
-export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps) {
+export default function ToolpadApp({
+  rootRef,
+  basename,
+  state,
+  apiUrl = `${basename}/api/runtime-rpc`,
+}: ToolpadAppProps) {
   const { dom } = state;
 
   const extraComponents = componentsStore.useValue();
@@ -1631,8 +1639,10 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
 
   const canvasHooks = React.useContext(CanvasHooksContext);
 
+  const runtimeApi = React.useMemo(() => createApi(apiUrl), [apiUrl]);
+
   return (
-    <appHost.Router>
+    <RuntimeApiContext.Provider value={runtimeApi}>
       <UseDataProviderContext.Provider value={useDataProvider}>
         <AppThemeProvider dom={dom}>
           <CssBaseline enableColorScheme />
@@ -1677,6 +1687,6 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
           </AppRoot>
         </AppThemeProvider>
       </UseDataProviderContext.Provider>
-    </appHost.Router>
+    </RuntimeApiContext.Provider>
   );
 }

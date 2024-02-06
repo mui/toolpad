@@ -7,14 +7,14 @@ import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { BrowserRouter } from 'react-router-dom';
-import api from './api';
 import RuntimeToolpadApp, {
   ToolpadAppProps,
   componentsStore,
   pageComponentsStore,
 } from './ToolpadApp';
 import { RuntimeState } from './types';
-import { AppHost, AppHostContext, RouterProps } from './AppHostContext';
+import { AppHost, AppHostContext } from './AppHostContext';
+import { createApi } from './api';
 
 const IS_PREVIEW = process.env.NODE_ENV !== 'production';
 const IS_CUSTOM_SERVER = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
@@ -44,13 +44,6 @@ export interface RootProps {
   ToolpadApp: React.ComponentType<ToolpadAppProps>;
 }
 
-const BaseContext = React.createContext<string>('/');
-
-function RuntimeRouter({ children }: RouterProps) {
-  const base = React.useContext(BaseContext);
-  return <BrowserRouter basename={base}>{children}</BrowserRouter>;
-}
-
 const IS_RENDERED_IN_CANVAS =
   typeof window === 'undefined'
     ? false
@@ -60,7 +53,6 @@ const appHost: AppHost = {
   isPreview: IS_PREVIEW,
   isCustomServer: IS_CUSTOM_SERVER,
   isCanvas: IS_RENDERED_IN_CANVAS,
-  Router: RuntimeRouter,
 };
 
 function Root({ ToolpadApp, initialState, base }: RootProps) {
@@ -69,11 +61,11 @@ function Root({ ToolpadApp, initialState, base }: RootProps) {
       <CacheProvider value={cache}>
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
-        <BaseContext.Provider value={base}>
-          <AppHostContext.Provider value={appHost}>
+        <AppHostContext.Provider value={appHost}>
+          <BrowserRouter basename={base}>
             <ToolpadApp basename={base} state={initialState} />
-          </AppHostContext.Provider>
-        </BaseContext.Provider>
+          </BrowserRouter>
+        </AppHostContext.Provider>
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />
       </CacheProvider>
     </React.StrictMode>
@@ -99,8 +91,14 @@ export { DomContextProvider, ComponentsContextProvider, RenderedPage } from './T
 export type { RuntimeState };
 
 export function createRemoteFunction(functionFile: string, functionName: string) {
+  const runtimeApi = createApi(`${process.env.BASE_URL}/api/runtime-rpc`);
+
   return async function remote(...params: any[]) {
-    const { data, error } = await api.methods.execFunction(functionFile, functionName, params);
+    const { data, error } = await runtimeApi.methods.execFunction(
+      functionFile,
+      functionName,
+      params,
+    );
     if (error) {
       throw errorFrom(error);
     }

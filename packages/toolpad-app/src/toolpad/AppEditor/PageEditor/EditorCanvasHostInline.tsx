@@ -5,7 +5,7 @@ import { NodeHashes } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
-import { HashRouter, UNSAFE_LocationContext } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { update } from '@mui/toolpad-utils/immutability';
 import { throttle } from 'lodash-es';
@@ -44,7 +44,6 @@ function Overlay(props: OverlayProps) {
 
 export interface EditorCanvasHostProps {
   className?: string;
-  pageName: string;
   runtimeState: RuntimeState;
   savedNodes: NodeHashes;
   overlay?: React.ReactNode;
@@ -68,12 +67,10 @@ const appHost: AppHost = {
   isPreview: true,
   isCustomServer: false,
   isCanvas: true,
-  Router: HashRouter,
 };
 
 export default function EditorCanvasHost({
   className,
-  pageName,
   runtimeState,
   base,
   savedNodes,
@@ -211,9 +208,6 @@ export default function EditorCanvasHost({
     [],
   );
 
-  // eslint-disable-next-line no-console
-  console.log(pageName);
-
   return (
     <CanvasRoot className={className}>
       <CanvasFrame srcDoc={`<!DOCTYPE html><div id="root"></div>`} onLoad={handleIframeLoad} />
@@ -221,12 +215,21 @@ export default function EditorCanvasHost({
         ? ReactDOM.createPortal(
             <Overlay container={portal}>
               <CanvasHooksContext.Provider value={canvasHooks}>
-                {/* @ts-expect-error TODO fix routing */}
-                <UNSAFE_LocationContext.Provider value={null}>
-                  <AppHostContext.Provider value={appHost}>
-                    <ToolpadApp rootRef={onAppRoot} basename={base} state={state} />
-                  </AppHostContext.Provider>
-                </UNSAFE_LocationContext.Provider>
+                <AppHostContext.Provider value={appHost}>
+                  <Routes>
+                    <Route
+                      path="/app/*"
+                      element={
+                        <ToolpadApp
+                          rootRef={onAppRoot}
+                          basename={'/_toolpad/app'}
+                          state={state}
+                          apiUrl={`${base}/api/runtime-rpc`}
+                        />
+                      }
+                    />
+                  </Routes>
+                </AppHostContext.Provider>
               </CanvasHooksContext.Provider>
             </Overlay>,
             portal,

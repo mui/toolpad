@@ -209,7 +209,11 @@ export default function EditorCanvasHost({
 
   return (
     <CanvasRoot className={className}>
-      <CanvasFrame srcDoc={`<!DOCTYPE html><div id="root"></div>`} onLoad={handleIframeLoad} />
+      <CanvasFrame
+        name="data-toolpad-canvas"
+        srcDoc={`<!DOCTYPE html><div id="root"></div>`}
+        onLoad={handleIframeLoad}
+      />
       {portal
         ? ReactDOM.createPortal(
             <Overlay container={portal}>

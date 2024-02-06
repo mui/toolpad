@@ -17,6 +17,10 @@ import { AppHost, AppHostContext } from './AppHostContext';
 
 const IS_PREVIEW = process.env.NODE_ENV !== 'production';
 const IS_CUSTOM_SERVER = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
+const IS_RENDERED_IN_CANVAS =
+  typeof window === 'undefined'
+    ? false
+    : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
 
 const cache = createCache({
   key: 'css',
@@ -42,11 +46,6 @@ export interface RootProps {
   base: string;
   ToolpadApp: React.ComponentType<ToolpadAppProps>;
 }
-
-const IS_RENDERED_IN_CANVAS =
-  typeof window === 'undefined'
-    ? false
-    : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
 
 const appHost: AppHost = {
   isPreview: IS_PREVIEW,

@@ -162,7 +162,7 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
   const appHost = useNonNullableContext(AppHostContext);
 
   React.useEffect(() => {
-    if (hasAuthentication && !!appHost.isCanvas) {
+    if (hasAuthentication && !appHost.isCanvas) {
       getSession();
     }
   }, [getCsrfToken, getSession, hasAuthentication, appHost.isCanvas]);

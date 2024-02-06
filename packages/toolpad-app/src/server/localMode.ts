@@ -983,7 +983,7 @@ function detectPaidFeatures(application: Application): PaidFeature[] | null {
   const paidFeatures = [
     hasRoles ? { id: 'roles', label: 'Role based access control' } : undefined,
     hasAzureActiveDirectory
-      ? { id: 'azure-ad', label: 'Azure Active Directory authentication' }
+      ? { id: 'azure-ad', label: 'Azure AD authentication provider' }
       : undefined,
   ].filter(Boolean) as PaidFeature[];
   return paidFeatures.length > 0 ? paidFeatures : null;

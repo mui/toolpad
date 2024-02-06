@@ -1625,8 +1625,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  const authContext = useAuth({ dom, basename, isRenderedInCanvas: IS_RENDERED_IN_CANVAS });
-
+  const authContext = useAuth({ dom, basename });
   const appHost = useNonNullableContext(AppHostContext);
   const showPreviewHeader: boolean = !!appHost.isPreview && !appHost.isCanvas;
 

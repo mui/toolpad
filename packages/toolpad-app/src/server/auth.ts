@@ -13,8 +13,6 @@ import { asyncHandler } from '../utils/express';
 import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
 import type { ToolpadProject } from './localMode';
 
-globalThis.crypto ??= (await import('node:crypto')) as Crypto;
-
 const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
   // Azure AD should be fine to skip as the user has to belong to the organization to sign in
   'azure-ad',

@@ -12,6 +12,10 @@ const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
 export type AuthProvider = 'github' | 'google' | 'azure-ad' | 'credentials';
 
+function isResponseJSON(response: Response): boolean {
+  return response.headers.get('content-type')?.includes('application/json') || false;
+}
+
 export interface AuthSession {
   user: {
     name: string;
@@ -48,9 +52,10 @@ export const AuthContext = React.createContext<AuthPayload>({
 interface UseAuthInput {
   dom: appDom.RenderTree;
   basename: string;
+  signInPagePath?: string;
 }
 
-export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
+export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPayload {
   const authProviders = React.useMemo(() => {
     const app = appDom.getApp(dom);
     const authProviderConfigs = app.attributes.authentication?.providers ?? [];
@@ -71,7 +76,9 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
           'Content-Type': 'application/json',
         },
       });
-      csrfToken = (await csrfResponse.json())?.csrfToken;
+      if (isResponseJSON(csrfResponse)) {
+        csrfToken = (await csrfResponse.json())?.csrfToken;
+      }
     } catch (error) {
       console.error((error as Error).message);
     }
@@ -100,8 +107,10 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
     setSession(null);
     setIsSigningOut(false);
 
-    window.location.replace(`${basename}${AUTH_SIGNIN_PATH}`);
-  }, [basename, getCsrfToken]);
+    if (!signInPagePath || window.location.pathname !== signInPagePath) {
+      window.location.href = `${basename}${AUTH_SIGNIN_PATH}`;
+    }
+  }, [basename, getCsrfToken, signInPagePath]);
 
   const getSession = React.useCallback(async () => {
     setIsSigningIn(true);
@@ -115,7 +124,11 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
           'Content-Type': 'application/json',
         },
       });
-      setSession(await sessionResponse.json());
+      if (isResponseJSON(sessionResponse)) {
+        setSession(await sessionResponse.json());
+      } else {
+        signOut();
+      }
     } catch (error) {
       console.error((error as Error).message);
       signOut();

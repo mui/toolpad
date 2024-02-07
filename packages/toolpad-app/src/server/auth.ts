@@ -146,13 +146,6 @@ export function createAuthHandler(project: ToolpadProject): Router {
   const googleProvider = GoogleProvider({
     clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
     clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
-    authorization: {
-      params: {
-        prompt: 'consent',
-        access_type: 'offline',
-        response_type: 'code',
-      },
-    },
   });
 
   const azureADProvider = AzureADProvider({

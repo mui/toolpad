@@ -53,6 +53,7 @@ import {
   useMatch,
   useParams,
   BrowserRouter,
+  Outlet,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -1531,17 +1532,6 @@ function DefaultPageNavigation() {
   );
 }
 
-function RenderedPages() {
-  return (
-    <Routes>
-      <Route path="/pages/:pageName" element={<RenderedPage />} />
-      <Route path="/pages" element={<DefaultPageNavigation />} />
-      <Route path="/" element={<DefaultPageNavigation />} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
-  );
-}
-
 const FullPageCentered = styled('div')({
   width: '100%',
   height: '100%',
@@ -1608,7 +1598,7 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
       clipped={clipped}
       basename={basename}
     >
-      <RenderedPages />
+      <Outlet />
     </AppLayout>
   );
 }
@@ -1666,7 +1656,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                           <Routes>
                             <Route path="/signin" element={<SignInPage />} />
                             <Route
-                              path="*"
+                              path="/"
                               element={
                                 <ToolpadAppLayout
                                   dom={dom}
@@ -1674,7 +1664,12 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                                   clipped={showPreviewHeader}
                                 />
                               }
-                            />
+                            >
+                              <Route path="/pages/:pageName" element={<RenderedPage />} />
+                              <Route path="/pages" element={<DefaultPageNavigation />} />
+                              <Route path="/" element={<DefaultPageNavigation />} />
+                              <Route path="*" element={<PageNotFound />} />
+                            </Route>
                           </Routes>
                         </AuthContext.Provider>
                         {showDevtools ? (

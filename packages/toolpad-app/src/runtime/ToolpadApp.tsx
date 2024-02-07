@@ -97,7 +97,7 @@ import api, { queryClient } from './api';
 import { AuthContext, AuthSession, useAuth } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
-import { AppHostContext } from './AppHostContext';
+import { AppHost, AppHostContext } from './AppHostContext';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -1556,13 +1556,17 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
-export interface ToolpadAppLayoutProps {
-  dom: appDom.RenderTree;
-  basename: string;
-  clipped: boolean;
+function shouldShowPreviewHeader(appHost: AppHost): boolean {
+  return !!appHost.isPreview && !appHost.isCanvas;
 }
 
-function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
+export interface ToolpadAppLayoutProps {
+  basename: string;
+}
+
+function ToolpadAppLayout({ basename }: ToolpadAppLayoutProps) {
+  const dom = useDomContext();
+
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
@@ -1584,6 +1588,8 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
   );
 
   const appHost = useNonNullableContext(AppHostContext);
+
+  const clipped = shouldShowPreviewHeader(appHost);
 
   if (!appHost.isCanvas && !session?.user && hasAuthentication) {
     return <AppLoading />;
@@ -1632,7 +1638,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
   const authContext = useAuth({ dom, basename });
 
   const appHost = useNonNullableContext(AppHostContext);
-  const showPreviewHeader: boolean = !!appHost.isPreview && !appHost.isCanvas;
+  const showPreviewHeader = shouldShowPreviewHeader(appHost);
 
   return (
     <BrowserRouter basename={basename}>
@@ -1655,16 +1661,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                         <AuthContext.Provider value={authContext}>
                           <Routes>
                             <Route path="/signin" element={<SignInPage />} />
-                            <Route
-                              path="/"
-                              element={
-                                <ToolpadAppLayout
-                                  dom={dom}
-                                  basename={basename}
-                                  clipped={showPreviewHeader}
-                                />
-                              }
-                            >
+                            <Route path="/" element={<ToolpadAppLayout basename={basename} />}>
                               <Route path="/pages/:pageName" element={<RenderedPage />} />
                               <Route path="/pages" element={<DefaultPageNavigation />} />
                               <Route path="/" element={<DefaultPageNavigation />} />

@@ -154,7 +154,7 @@ export async function createViteConfig({
     const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
 
     return `
-import { init, setComponents } from '@mui/toolpad/runtime';
+import { init, setComponents } from '@mui/toolpad/entrypoint';
 import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}

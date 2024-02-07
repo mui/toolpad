@@ -155,13 +155,6 @@ test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
       steps: 1,
     },
   );
-  await page.mouse.move(
-    inputBoundingBox!.x + inputBoundingBox!.width + 12,
-    inputBoundingBox!.y + inputBoundingBox!.height / 2,
-    {
-      steps: 1,
-    },
-  );
   await argosScreenshot('drop-preview-outside-right', screenshotConfig);
 
   // Check preview when dragging inside empty container

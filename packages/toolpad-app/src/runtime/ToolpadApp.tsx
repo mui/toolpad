@@ -1560,11 +1560,7 @@ function shouldShowPreviewHeader(appHost: AppHost): boolean {
   return !!appHost.isPreview && !appHost.isCanvas;
 }
 
-export interface ToolpadAppLayoutProps {
-  basename: string;
-}
-
-function ToolpadAppLayout({ basename }: ToolpadAppLayoutProps) {
+function ToolpadAppLayout() {
   const dom = useDomContext();
 
   const root = appDom.getApp(dom);
@@ -1602,7 +1598,6 @@ function ToolpadAppLayout({ basename }: ToolpadAppLayoutProps) {
       hasNavigation={!appHost.isCanvas}
       hasHeader={hasAuthentication && !appHost.isCanvas}
       clipped={clipped}
-      basename={basename}
     >
       <Outlet />
     </AppLayout>
@@ -1661,7 +1656,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                         <AuthContext.Provider value={authContext}>
                           <Routes>
                             <Route path="/signin" element={<SignInPage />} />
-                            <Route path="/" element={<ToolpadAppLayout basename={basename} />}>
+                            <Route path="/" element={<ToolpadAppLayout />}>
                               <Route path="/pages/:pageName" element={<RenderedPage />} />
                               <Route path="/pages" element={<DefaultPageNavigation />} />
                               <Route path="/" element={<DefaultPageNavigation />} />

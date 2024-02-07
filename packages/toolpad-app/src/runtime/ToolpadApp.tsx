@@ -52,6 +52,7 @@ import {
   Location as RouterLocation,
   useNavigate,
   useMatch,
+  useParams,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -1383,6 +1384,7 @@ interface RenderedProCodePageProps {
 }
 
 function RenderedProCodePage({ page }: RenderedProCodePageProps) {
+  usePageTitle(appDom.getPageTitle(page));
   const pageComponents = pageComponentsStore.useValue();
   const PageComponent = pageComponents[page.name] ?? PageNotFound;
   return <PageComponent />;
@@ -1393,6 +1395,7 @@ interface RenderedLowCodePageProps {
 }
 
 function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
+  usePageTitle(appDom.getPageTitle(page));
   const dom = useDomContext();
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
@@ -1444,21 +1447,54 @@ export interface RenderedNodeProps {
   nodeId: NodeId;
 }
 
-export interface RenderedPageProps {
-  page: appDom.PageNode;
-}
+export function RenderedPage() {
+  const { pageName } = useParams();
 
-export function RenderedPage({ page }: RenderedPageProps) {
-  usePageTitle(appDom.getPageTitle(page));
+  invariant(pageName, 'Page name must be provided as a route parameter');
 
-  if (page.attributes.codeFile) {
-    return <RenderedProCodePage page={page} />;
+  const dom = useDomContext();
+  const appHost = useNonNullableContext(AppHostContext);
+  const { search } = useLocation();
+
+  const page = appDom.getPageByName(dom, pageName);
+
+  if (!page) {
+    const aliasedPageName = appDom.getPageForAlias(dom, pageName);
+
+    if (aliasedPageName) {
+      return <Navigate to={`/pages/${aliasedPageName}${search}`} replace />;
+    }
+
+    return <PageNotFound />;
   }
 
-  return <RenderedLowCodePage page={page} />;
+  let pageContent = page.attributes.codeFile ? (
+    <RenderedProCodePage page={page} />
+  ) : (
+    // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
+    // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+    <RenderedLowCodePage page={page} key={page.name} />
+  );
+
+  if (!appHost.isCanvas) {
+    pageContent = (
+      <RequireAuthorization
+        allowAll={page.attributes.authorization?.allowAll ?? true}
+        allowedRoles={page.attributes.authorization?.allowedRoles ?? []}
+      >
+        {pageContent}
+      </RequireAuthorization>
+    );
+  }
+
+  return pageContent;
 }
 
-function PageNotFound() {
+interface PageNotFoundProps {
+  msg?: React.ReactNode;
+}
+
+function PageNotFound({ msg = "The page doesn't exist in this application." }: PageNotFoundProps) {
   return (
     <Container
       sx={{
@@ -1469,56 +1505,27 @@ function PageNotFound() {
       }}
     >
       <Typography variant="h1">Not found</Typography>
-      <Typography>The page doesn&apos;t exist in this application.</Typography>
+      <Typography>{msg}</Typography>
     </Container>
   );
 }
 
 interface RenderedPagesProps {
-  pages: appDom.PageNode[];
-  defaultPage: appDom.PageNode;
+  defaultPage?: string;
 }
 
-function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
+function RenderedPages({ defaultPage }: RenderedPagesProps) {
   const { search } = useLocation();
 
-  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
+  const defaultPageNavigation = defaultPage ? (
+    <Navigate to={`/pages/${defaultPage}${search}`} replace />
+  ) : (
+    <PageNotFound msg="No pages available." />
+  );
 
   return (
     <Routes>
-      {pages.map((page) => {
-        let pageContent = (
-          <RenderedPage
-            page={page}
-            // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
-            // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-            key={page.name}
-          />
-        );
-
-        if (!IS_RENDERED_IN_CANVAS) {
-          pageContent = (
-            <RequireAuthorization
-              allowAll={page.attributes.authorization?.allowAll ?? true}
-              allowedRoles={page.attributes.authorization?.allowedRoles ?? []}
-            >
-              {pageContent}
-            </RequireAuthorization>
-          );
-        }
-
-        return <Route key={page.name} path={`/pages/${page.name}`} element={pageContent} />;
-      })}
-      {pages.flatMap((page) =>
-        page.attributes.alias?.map((alias) => (
-          <Route
-            key={`${page.name}-${alias}`}
-            path={`/pages/${alias}`}
-            element={<Navigate to={`/pages/${page.name}${search}`} replace />}
-          />
-        )),
-      )}
-
+      <Route path="/pages/:pageName" element={<RenderedPage />} />
       <Route path="/pages" element={defaultPageNavigation} />
       <Route path="/" element={defaultPageNavigation} />
       <Route path="*" element={<PageNotFound />} />
@@ -1587,6 +1594,8 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
     return <AppLoading />;
   }
 
+  const defaultpage = authFilteredPages[0] ?? pages[0];
+
   return (
     <AppLayout
       activePageSlug={activePageSlug}
@@ -1596,7 +1605,7 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
       clipped={clipped}
       basename={basename}
     >
-      <RenderedPages pages={pages} defaultPage={authFilteredPages[0] ?? pages[0]} />
+      <RenderedPages defaultPage={defaultpage?.name} />
     </AppLayout>
   );
 }

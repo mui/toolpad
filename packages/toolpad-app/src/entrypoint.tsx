@@ -49,12 +49,6 @@ const IS_RENDERED_IN_CANVAS =
     ? false
     : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
 
-async function lazyEditor() {
-  return {
-    element: <div>editor</div>,
-  };
-}
-
 const appHost: AppHost = {
   isPreview: IS_PREVIEW,
   isCustomServer: IS_CUSTOM_SERVER,
@@ -70,7 +64,6 @@ function Root({ ToolpadApp, initialState, base }: RootProps) {
         <AppHostContext.Provider value={appHost}>
           <BrowserRouter basename={base}>
             <Routes>
-              <Route path="/_toolpad/*" lazy={lazyEditor} />
               <Route path="*" element={<ToolpadApp basename={base} state={initialState} />} />
             </Routes>
           </BrowserRouter>

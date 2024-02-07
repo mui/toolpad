@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as appDom from '@mui/toolpad-core/appDom';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { AppHostContext } from './AppHostContext';
 
 const AUTH_API_PATH = '/api/auth';
 
@@ -50,16 +52,10 @@ export const AuthContext = React.createContext<AuthPayload>({
 interface UseAuthInput {
   dom: appDom.RenderTree;
   basename: string;
-  isRenderedInCanvas?: boolean;
   signInPagePath?: string;
 }
 
-export function useAuth({
-  dom,
-  basename,
-  isRenderedInCanvas = true,
-  signInPagePath,
-}: UseAuthInput): AuthPayload {
+export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPayload {
   const authProviders = React.useMemo(() => {
     const app = appDom.getApp(dom);
     const authProviderConfigs = app.attributes.authentication?.providers ?? [];
@@ -175,11 +171,13 @@ export function useAuth({
     [basename, getCsrfToken, signOut],
   );
 
+  const appHost = useNonNullableContext(AppHostContext);
+
   React.useEffect(() => {
-    if (!isRenderedInCanvas && hasAuthentication) {
+    if (hasAuthentication && !appHost.isCanvas) {
       getSession();
     }
-  }, [getCsrfToken, getSession, hasAuthentication, isRenderedInCanvas]);
+  }, [getCsrfToken, getSession, hasAuthentication, appHost.isCanvas]);
 
   return {
     session,

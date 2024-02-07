@@ -36,7 +36,6 @@ import {
 } from '@mui/toolpad-core';
 import {
   createGlobalState,
-  createProvidedContext,
   useAssertedContext,
   useNonNullableContext,
 } from '@mui/toolpad-utils/react';
@@ -267,11 +266,15 @@ const ApplicationVmApiContext = React.createContext<
   React.MutableRefObject<ApplicationVmApi> | undefined
 >(undefined);
 const RuntimeScopeContext = React.createContext<RuntimeScope | undefined>(undefined);
-const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
-const [useEvaluateScopeExpression, EvaluateScopeExpressionProvider] =
-  createProvidedContext<(expr: string) => any>('EvaluateScopeExpression');
 
-export { DomContextProvider, ComponentsContextProvider };
+const DomContext = React.createContext<appDom.AppDom | undefined>(undefined);
+const useDomContext = () => useNonNullableContext(DomContext);
+
+type EvaluateScopeExpression = (expr: string) => any;
+const EvaluateScopeExpressionContext = React.createContext<EvaluateScopeExpression | undefined>(
+  undefined,
+);
+const useEvaluateScopeExpression = () => useNonNullableContext(EvaluateScopeExpressionContext);
 
 interface SetBindingContextValue {
   setBinding: (id: string, result: BindingEvaluationResult, scopeId?: string) => void;
@@ -851,9 +854,9 @@ function RuntimeScoped({
   return (
     <RuntimeScopeContext.Provider value={childScope}>
       <SetBindingContext.Provider value={setBindingContext}>
-        <EvaluateScopeExpressionProvider value={evaluateScopeExpression}>
+        <EvaluateScopeExpressionContext.Provider value={evaluateScopeExpression}>
           {children}
-        </EvaluateScopeExpressionProvider>
+        </EvaluateScopeExpressionContext.Provider>
       </SetBindingContext.Provider>
     </RuntimeScopeContext.Provider>
   );
@@ -1560,7 +1563,11 @@ function shouldShowPreviewHeader(appHost: AppHost): boolean {
   return !!appHost.isPreview && !appHost.isCanvas;
 }
 
-function ToolpadAppLayout() {
+interface ToolpadAppLayoutProps {
+  children?: React.ReactNode;
+}
+
+function ToolpadAppLayout({ children }: ToolpadAppLayoutProps) {
   const dom = useDomContext();
 
   const root = appDom.getApp(dom);
@@ -1599,7 +1606,7 @@ function ToolpadAppLayout() {
       hasHeader={hasAuthentication && !appHost.isCanvas}
       clipped={clipped}
     >
-      <Outlet />
+      {children}
     </AppLayout>
   );
 }
@@ -1648,7 +1655,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
             }}
           >
             <ComponentsContextProvider value={components}>
-              <DomContextProvider value={dom}>
+              <DomContext.Provider value={dom}>
                 <ErrorBoundary FallbackComponent={AppError}>
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
@@ -1656,7 +1663,14 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                         <AuthContext.Provider value={authContext}>
                           <Routes>
                             <Route path="/signin" element={<SignInPage />} />
-                            <Route path="/" element={<ToolpadAppLayout />}>
+                            <Route
+                              path="/"
+                              element={
+                                <ToolpadAppLayout>
+                                  <Outlet />
+                                </ToolpadAppLayout>
+                              }
+                            >
                               <Route path="/pages/:pageName" element={<RenderedPage />} />
                               <Route path="/pages" element={<DefaultPageNavigation />} />
                               <Route path="/" element={<DefaultPageNavigation />} />
@@ -1671,7 +1685,7 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                     </React.Suspense>
                   </ResetNodeErrorsKeyProvider>
                 </ErrorBoundary>
-              </DomContextProvider>
+              </DomContext.Provider>
             </ComponentsContextProvider>
             <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
           </AppRoot>

@@ -93,7 +93,7 @@ import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import api, { queryClient } from './api';
-import { AuthContext, useAuth } from './useAuth';
+import { AuthContext, AuthSession, useAuth } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
 import { AppHostContext } from './AppHostContext';
@@ -1505,24 +1505,38 @@ function PageNotFound({ msg = "The page doesn't exist in this application." }: P
   );
 }
 
-interface RenderedPagesProps {
-  defaultPage?: string;
+function isPageAllowed(page: appDom.PageNode, session: AuthSession | null): boolean {
+  const userRoles = session?.user?.roles ?? [];
+  const { allowAll = true, allowedRoles = [] } = page.attributes.authorization ?? {};
+  return allowAll || userRoles.some((role) => allowedRoles.includes(role));
 }
 
-function RenderedPages({ defaultPage }: RenderedPagesProps) {
+function DefaultPageNavigation() {
   const { search } = useLocation();
+  const dom = useDomContext();
+  const { session } = React.useContext(AuthContext);
 
-  const defaultPageNavigation = defaultPage ? (
-    <Navigate to={`/pages/${defaultPage}${search}`} replace />
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  const defaultPage: appDom.PageNode | null = React.useMemo(
+    () => pages.find((page) => isPageAllowed(page, session)) ?? null,
+    [pages, session],
+  );
+
+  return defaultPage ? (
+    <Navigate to={`/pages/${defaultPage.name}${search}`} replace />
   ) : (
     <PageNotFound msg="No pages available." />
   );
+}
 
+function RenderedPages() {
   return (
     <Routes>
       <Route path="/pages/:pageName" element={<RenderedPage />} />
-      <Route path="/pages" element={defaultPageNavigation} />
-      <Route path="/" element={defaultPageNavigation} />
+      <Route path="/pages" element={<DefaultPageNavigation />} />
+      <Route path="/" element={<DefaultPageNavigation />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
@@ -1567,22 +1581,16 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
   const pageMatch = useMatch('/pages/:slug');
   const activePageSlug = pageMatch?.params.slug;
 
-  const authFilteredPages = React.useMemo(() => {
-    const userRoles = session?.user?.roles ?? [];
-    return pages.filter((page) => {
-      const { allowAll = true, allowedRoles = [] } = page.attributes.authorization ?? {};
-      return allowAll || userRoles.some((role) => allowedRoles.includes(role));
-    });
-  }, [pages, session?.user?.roles]);
-
   const navEntries = React.useMemo(
     () =>
-      authFilteredPages.map((page) => ({
-        slug: page.name,
-        displayName: appDom.getPageDisplayName(page),
-        hasShell: page?.attributes.display !== 'standalone',
-      })),
-    [authFilteredPages],
+      pages
+        .filter((page) => isPageAllowed(page, session))
+        .map((page) => ({
+          slug: page.name,
+          displayName: appDom.getPageDisplayName(page),
+          hasShell: page?.attributes.display !== 'standalone',
+        })),
+    [pages, session],
   );
 
   const appHost = useNonNullableContext(AppHostContext);
@@ -1590,8 +1598,6 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
   if (!appHost.isCanvas && !session?.user && hasAuthentication) {
     return <AppLoading />;
   }
-
-  const defaultpage = authFilteredPages[0] ?? pages[0];
 
   return (
     <AppLayout
@@ -1602,7 +1608,7 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
       clipped={clipped}
       basename={basename}
     >
-      <RenderedPages defaultPage={defaultpage?.name} />
+      <RenderedPages />
     </AppLayout>
   );
 }

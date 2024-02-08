@@ -298,8 +298,8 @@ if (import.meta.hot) {
         chunkSizeWarningLimit: Infinity,
         rollupOptions: {
           input: {
-            app: './index.html',
-            editor: './editor.html',
+            app: '/index.html',
+            ...(dev ? { editor: '/editor.html' } : {}),
           },
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {

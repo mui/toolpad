@@ -146,11 +146,11 @@ const queryClient = new QueryClient({
   },
 });
 
-export interface ToolpadEditorProps {
+interface ToolpadEditorContentProps {
   appUrl: string;
 }
 
-export function ToolpadEditor({ appUrl }: ToolpadEditorProps) {
+function ToolpadEditorContent({ appUrl }: ToolpadEditorContentProps) {
   return (
     <ThemeProvider>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
@@ -185,10 +185,10 @@ export interface ToolpadProps {
   appUrl: string;
 }
 
-export default function Toolpad({ appUrl, basename }: ToolpadProps) {
+export default function ToolpadEditor({ basename, appUrl }: ToolpadProps) {
   return (
     <BrowserRouter basename={basename}>
-      <ToolpadEditor appUrl={appUrl} />
+      <ToolpadEditorContent appUrl={appUrl} />
     </BrowserRouter>
   );
 }

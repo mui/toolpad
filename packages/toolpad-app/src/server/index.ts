@@ -235,50 +235,46 @@ async function createEditorHandler(
   const router = express.Router();
   let viteApp: ViteDevServer | undefined;
 
-  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
-    router.use('/_toolpad', (req, res) => res.redirect(`${appUrl}/_toolpad`));
-  } else {
-    const transformIndexHtml = (html: string) => {
-      return html.replace(
-        '<!-- __TOOLPAD_SCRIPTS__ -->',
+  const transformIndexHtml = (html: string) => {
+    return html.replace(
+      '<!-- __TOOLPAD_SCRIPTS__ -->',
 
-        `<script>window[${JSON.stringify(APP_URL_WINDOW_PROPERTY)}] = ${JSON.stringify(
-          appUrl,
-        )}</script>
+      `<script>window[${JSON.stringify(APP_URL_WINDOW_PROPERTY)}] = ${JSON.stringify(
+        appUrl,
+      )}</script>
       `,
-      );
-    };
+    );
+  };
 
-    if (toolpadDevMode) {
-      // eslint-disable-next-line no-console
-      console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
+  if (toolpadDevMode) {
+    // eslint-disable-next-line no-console
+    console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
 
-      const vite = await import('vite');
-      viteApp = await vite.createServer({
-        configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.mts'),
-        root: path.resolve(currentDirectory, '../../src/toolpad'),
-        server: { middlewareMode: true },
-        plugins: [
-          {
-            name: 'toolpad:transform-index-html',
-            transformIndexHtml,
-          },
-        ],
-      });
+    const vite = await import('vite');
+    viteApp = await vite.createServer({
+      configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.mts'),
+      root: path.resolve(currentDirectory, '../../src/toolpad'),
+      server: { middlewareMode: true },
+      plugins: [
+        {
+          name: 'toolpad:transform-index-html',
+          transformIndexHtml,
+        },
+      ],
+    });
 
-      router.use('/', viteApp.middlewares);
-    } else {
-      router.use(
-        '/',
-        express.static(path.resolve(currentDirectory, '../../dist/editor'), { index: false }),
-        asyncHandler(async (req, res) => {
-          const htmlFilePath = path.resolve(currentDirectory, '../../dist/editor/index.html');
-          let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
-          html = transformIndexHtml(html);
-          res.setHeader('Content-Type', 'text/html').status(200).end(html);
-        }),
-      );
-    }
+    router.use('/', viteApp.middlewares);
+  } else {
+    router.use(
+      '/',
+      express.static(path.resolve(currentDirectory, '../../dist/editor'), { index: false }),
+      asyncHandler(async (req, res) => {
+        const htmlFilePath = path.resolve(currentDirectory, '../../dist/editor/index.html');
+        let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
+        html = transformIndexHtml(html);
+        res.setHeader('Content-Type', 'text/html').status(200).end(html);
+      }),
+    );
   }
 
   return {
@@ -328,8 +324,12 @@ async function createToolpadHandler({
 
   let editorHandler: AppHandler | undefined;
   if (dev) {
-    editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
-    router.use(editorBasename, editorHandler.handler);
+    if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+      router.use('/_toolpad', (req, res) => res.redirect(`${project.options.base}/editor`));
+    } else {
+      editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
+      router.use(editorBasename, editorHandler.handler);
+    }
   }
 
   return {

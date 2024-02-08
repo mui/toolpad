@@ -19,6 +19,7 @@ const pkgJson = JSON.parse(pkgJsonContent);
 const TOOLPAD_BUILD = process.env.GIT_SHA1?.slice(0, 7) || 'dev';
 
 const MAIN_ENTRY = '/main.tsx';
+const EDITOR_ENTRY = '/editor.tsx';
 const FALLBACK_MODULES = [
   '@mui/material',
   '@mui/icons-material',
@@ -26,7 +27,7 @@ const FALLBACK_MODULES = [
   '@mui/x-charts',
 ];
 
-export function getHtmlContent() {
+function getHtmlContent(entry: string) {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -43,10 +44,18 @@ export function getHtmlContent() {
     
         <!-- __TOOLPAD_SCRIPTS__ -->
 
-        <script type="module" src=${JSON.stringify(MAIN_ENTRY)}></script>
+        <script type="module" src=${JSON.stringify(entry)}></script>
       </body>
     </html>
   `;
+}
+
+export function getAppHtmlContent() {
+  return getHtmlContent(MAIN_ENTRY);
+}
+
+export function getEditorHtmlContent() {
+  return getHtmlContent(EDITOR_ENTRY);
 }
 
 function toolpadVitePlugin(): Plugin {
@@ -71,9 +80,14 @@ function toolpadVitePlugin(): Plugin {
     },
 
     async load(id) {
-      if (id.endsWith('.html')) {
+      if (id.endsWith('index.html')) {
         // production build only
-        return getHtmlContent();
+        return getAppHtmlContent();
+      }
+
+      if (id.endsWith('editor.html')) {
+        // production build only
+        return getEditorHtmlContent();
       }
       return null;
     },
@@ -156,9 +170,9 @@ export async function createViteConfig({
 }: CreateViteConfigParams) {
   const mode = dev ? 'development' : 'production';
 
-  const getEntryPoint = (isDev: boolean) => {
-    const isLegacyCanvas = isDev && !process.env.EXPERIMENTAL_INLINE_CANVAS;
-    const isNewDevMode = isDev && process.env.EXPERIMENTAL_INLINE_CANVAS;
+  const getEntryPoint = (target: 'prod' | 'dev' | 'editor') => {
+    const isCanvas = target === 'dev';
+    const isEditor = target === 'editor';
 
     const componentsId = 'virtual:toolpad-files:components.tsx';
     const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
@@ -167,16 +181,16 @@ export async function createViteConfig({
 import { init, setComponents } from '@mui/toolpad/entrypoint';
 import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
-${isLegacyCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
-${isNewDevMode ? `import { ToolpadEditor } from '@mui/toolpad/editor'` : ''}
+${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
+${isEditor ? `import ToolpadEditor from '@mui/toolpad/editor'` : ''}
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
 setComponents(components, pageComponents);
 
 init({
-  ${isLegacyCanvas ? `ToolpadApp: AppCanvas,` : ''}
-  ${isNewDevMode ? `ToolpadEditor,` : ''}
+  ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
+  ${isEditor ? `ToolpadApp: ToolpadEditor,` : ''}
   base: ${JSON.stringify(base)},
   initialState,
 })
@@ -260,8 +274,9 @@ if (import.meta.hot) {
   };
 
   const virtualFiles = new Map<string, VirtualFileContent>([
-    ['main.tsx', getEntryPoint(false)],
-    ['dev.tsx', getEntryPoint(true)],
+    ['main.tsx', getEntryPoint('prod')],
+    ['dev.tsx', getEntryPoint('dev')],
+    ['editor.tsx', getEntryPoint('editor')],
     ['components.tsx', await createComponentsFile()],
     ['page-components.tsx', await createPageComponentsFile()],
     ['pages-manifest.json', JSON.stringify(await getPagesManifest(), null, 2)],
@@ -282,6 +297,10 @@ if (import.meta.hot) {
         outDir,
         chunkSizeWarningLimit: Infinity,
         rollupOptions: {
+          input: {
+            app: './index.html',
+            editor: './editor.html',
+          },
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
               return;
@@ -305,8 +324,11 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            // eslint-disable-next-line no-nested-ternary
             replacement: dev ? 'virtual:toolpad-files:dev.tsx' : 'virtual:toolpad-files:main.tsx',
+          },
+          {
+            find: EDITOR_ENTRY,
+            replacement: 'virtual:toolpad-files:editor.tsx',
           },
           {
             find: '@mui/toolpad',

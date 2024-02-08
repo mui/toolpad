@@ -3,7 +3,7 @@ import invariant from 'invariant';
 import type { Plugin } from 'vite';
 import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
 import type * as appDom from '@mui/toolpad-core/appDom';
-import { getHtmlContent, createViteConfig } from './toolpadAppBuilder';
+import { getAppHtmlContent, createViteConfig, getEditorHtmlContent } from './toolpadAppBuilder';
 import type { RuntimeConfig } from '../types';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import createRuntimeState from '../runtime/createRuntimeState';
@@ -46,7 +46,9 @@ function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
           try {
             const dom = await loadDom();
 
-            const template = getHtmlContent();
+            const template = req.url.startsWith('/editor')
+              ? getEditorHtmlContent()
+              : getAppHtmlContent();
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 

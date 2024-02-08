@@ -4,7 +4,6 @@ import { NodeHashes } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
-import { Route, Routes } from 'react-router-dom';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { update } from '@mui/toolpad-utils/immutability';
 import { throttle } from 'lodash-es';
@@ -14,7 +13,7 @@ import { createCommands, type ToolpadBridge } from '../../../canvas/ToolpadBridg
 import { useProject } from '../../../project';
 import { RuntimeState } from '../../../runtime';
 import { AppHost, AppHostContext } from '../../../runtime/AppHostContext';
-import ToolpadApp, { RenderedPage, ToolpadAppProvider } from '../../../runtime/ToolpadApp';
+import { RenderedPage, ToolpadAppProvider } from '../../../runtime/ToolpadApp';
 import { CanvasHooks, CanvasHooksContext } from '../../../runtime/CanvasHooksContext';
 import { rectContainsPoint } from '../../../utils/geometry';
 import { queryClient } from '../../../runtime/api';
@@ -23,7 +22,7 @@ import { updateNodeInfo } from '../../../canvas';
 
 interface OverlayProps {
   children?: React.ReactNode;
-  container: HTMLElement;
+  container?: HTMLElement;
 }
 
 function Overlay(props: OverlayProps) {
@@ -83,8 +82,6 @@ export default function EditorCanvasHost({
 
   const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 
-  const state = React.useMemo(() => ({ ...runtimeState, savedNodes }), [runtimeState, savedNodes]);
-
   const [portal, setPortal] = React.useState<HTMLElement | null>(null);
 
   const handleIframeLoad = React.useCallback<React.ReactEventHandler<HTMLIFrameElement>>(
@@ -118,7 +115,6 @@ export default function EditorCanvasHost({
     [savedNodes],
   );
 
-  const appRootRef = React.useRef<HTMLDivElement>();
   const appRootCleanupRef = React.useRef<() => void>();
   const projectEventSubscriptionRef = React.useRef<() => void>();
   const onAppRoot = React.useCallback(
@@ -172,8 +168,6 @@ export default function EditorCanvasHost({
       projectEventSubscriptionRef.current = project.events.subscribe('queriesInvalidated', () => {
         bridge.canvasCommands.invalidateQueries();
       });
-
-      appRootRef.current = appRoot;
 
       const mutationObserver = new MutationObserver(handleScreenUpdate);
 

@@ -57,7 +57,7 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
   await page.mouse.move(
     firstInputBoundingBox!.x + firstInputBoundingBox!.width - 5,
     firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
-    { steps: 1 },
+    { steps: 10 },
   );
 
   await page.mouse.down();
@@ -65,7 +65,7 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
   await page.mouse.move(
     firstInputBoundingBox!.x + firstInputBoundingBox!.width / 2,
     firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
-    { steps: 1 },
+    { steps: 10 },
   );
 
   await argosScreenshot('resize-grid');
@@ -114,17 +114,17 @@ test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
   await argosScreenshot('drop-preview-left', screenshotConfig);
 
   await page.mouse.move(...getDropPreviewTopCoordinates(inputBoundingBox!), {
-    steps: 1,
+    steps: 10,
   });
   await argosScreenshot('drop-preview-top', screenshotConfig);
 
   await page.mouse.move(...getDropPreviewRightCoordinates(inputBoundingBox!), {
-    steps: 1,
+    steps: 10,
   });
   await argosScreenshot('drop-preview-right', screenshotConfig);
 
   await page.mouse.move(...getDropPreviewBottomCoordinates(inputBoundingBox!), {
-    steps: 1,
+    steps: 10,
   });
   await argosScreenshot('drop-preview-bottom', screenshotConfig);
 
@@ -134,7 +134,7 @@ test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
     inputBoundingBox!.x + inputBoundingBox!.width / 2,
     inputBoundingBox!.y - 12,
     {
-      steps: 1,
+      steps: 10,
     },
   );
   await argosScreenshot('drop-preview-outside-top', screenshotConfig);
@@ -167,7 +167,7 @@ test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
     containerDropAreaBoundingBox!.x + containerDropAreaBoundingBox!.width / 2,
     containerDropAreaBoundingBox!.y + containerDropAreaBoundingBox!.height / 2,
     {
-      steps: 1,
+      steps: 10,
     },
   );
   await argosScreenshot('container-drop-preview-empty', screenshotConfig);
@@ -179,22 +179,22 @@ test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
     .boundingBox();
 
   await page.mouse.move(...getDropPreviewLeftCoordinates(containerButtonBoundingBox!), {
-    steps: 1,
+    steps: 10,
   });
   await argosScreenshot('container-drop-preview-left', screenshotConfig);
 
   await page.mouse.move(...getDropPreviewTopCoordinates(containerButtonBoundingBox!), {
-    steps: 1,
+    steps: 10,
   });
   await argosScreenshot('container-drop-preview-top', screenshotConfig);
 
   await page.mouse.move(...getDropPreviewRightCoordinates(containerButtonBoundingBox!), {
-    steps: 1,
+    steps: 10,
   });
   await argosScreenshot('container-drop-preview-right', screenshotConfig);
 
   await page.mouse.move(...getDropPreviewBottomCoordinates(containerButtonBoundingBox!), {
-    steps: 1,
+    steps: 10,
   });
   await argosScreenshot('container-drop-preview-bottom', screenshotConfig);
 });

@@ -4,6 +4,7 @@ import componentsManifest from './toolpad/reference/components/manifest.json';
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started-group',
+    title: 'Getting Started',
     children: [
       { pathname: '/toolpad/getting-started', title: 'Overview' },
       { pathname: '/toolpad/getting-started/installation' },
@@ -77,6 +78,20 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/concepts/page-properties',
+      },
+      {
+        pathname: '/toolpad/concepts/authorization',
+        title: 'Authorization',
+        children: [
+          {
+            pathname: '/toolpad/concepts/authentication',
+            title: 'Authentication',
+          },
+          {
+            pathname: '/toolpad/concepts/rbac',
+            title: 'Role-based access control',
+          },
+        ],
       },
       { pathname: '/toolpad/concepts/custom-server' },
     ],

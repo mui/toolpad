@@ -27,7 +27,10 @@ import { createRpcHandler } from './rpc';
 import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
-import { createAuthHandler, createRequireAuthMiddleware } from './auth';
+import { createAuthHandler, createRequireAuthMiddleware, getRequireAuthentication } from './auth';
+
+// crypto must be polyfilled to use @auth/core in Node 18 or lower
+globalThis.crypto ??= (await import('node:crypto')) as Crypto;
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -113,12 +116,13 @@ async function createDevHandler(project: ToolpadProject) {
     }),
   );
 
-  if (process.env.TOOLPAD_AUTH_SECRET) {
+  const hasAuthentication = await getRequireAuthentication(project);
+  if (hasAuthentication) {
     const authHandler = createAuthHandler(project);
     handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
-  }
 
-  handler.use(await createRequireAuthMiddleware(project));
+    handler.use(await createRequireAuthMiddleware(project));
+  }
 
   handler.use('/api/data', project.dataManager.createDataHandler());
   const runtimeRpcServer = createRuntimeRpcServer(project);
@@ -293,6 +297,7 @@ async function createToolpadHandler({
   const editorBasename = '/_toolpad';
 
   const project = await initProject({ toolpadDevMode, dev, dir, externalUrl, base });
+  await project.checkPlan();
   await project.start();
 
   const router = express.Router();

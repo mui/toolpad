@@ -11,6 +11,10 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
+      "matchDepTypes": ["peerDependencies"],
+      "rangeStrategy": "widen"
+    },
+    {
       "groupName": "dependencies",
       "matchManagers": ["npm"],
       "matchDepTypes": ["dependencies"]

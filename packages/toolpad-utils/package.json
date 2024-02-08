@@ -1,6 +1,6 @@
 {
   "name": "@mui/toolpad-utils",
-  "version": "0.1.48",
+  "version": "0.1.49",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -11,20 +11,25 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+    "./events": {
+      "types": "./dist/events.d.ts",
+      "require": "./dist/events.cjs",
+      "default": "./dist/events.js"
     },
     "./*": {
       "types": "./dist/*.d.ts",
-      "import": "./dist/*.js",
-      "require": "./dist/*.cjs"
+      "require": "./dist/*.cjs",
+      "default": "./dist/*.js"
+    },
+    "./hooks/useBoolean": {
+      "types": "./dist/hooks/useBoolean.d.ts",
+      "require": "./dist/hooks/useBoolean.cjs",
+      "default": "./dist/hooks/useBoolean.js"
     },
     "./hooks/*": {
       "types": "./dist/hooks/*.d.ts",
-      "import": "./dist/hooks/*.js",
-      "require": "./dist/hooks/*.cjs"
+      "require": "./dist/hooks/*.cjs",
+      "default": "./dist/hooks/*.js"
     }
   },
   "files": [
@@ -53,7 +58,7 @@
   },
   "dependencies": {
     "invariant": "2.2.4",
-    "prettier": "3.2.4",
+    "prettier": "3.2.5",
     "react-is": "18.2.0",
     "title": "3.5.3",
     "yaml": "2.3.4",
@@ -62,7 +67,7 @@
   "devDependencies": {
     "@types/invariant": "2.2.37",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.48",
+    "@types/react": "18.2.52",
     "@types/react-is": "18.2.4",
     "@types/title": "3.4.3"
   }

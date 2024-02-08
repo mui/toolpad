@@ -1,5 +1,7 @@
 import * as React from 'react';
 import * as appDom from '@mui/toolpad-core/appDom';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { AppHostContext } from './AppHostContext';
 
 const AUTH_API_PATH = '/api/auth';
 
@@ -8,7 +10,11 @@ const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
 const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
 const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
-export type AuthProvider = 'github' | 'google' | 'azure-ad';
+export type AuthProvider = 'github' | 'google' | 'azure-ad' | 'credentials';
+
+function isResponseJSON(response: Response): boolean {
+  return response.headers.get('content-type')?.includes('application/json') || false;
+}
 
 export interface AuthSession {
   user: {
@@ -21,7 +27,11 @@ export interface AuthSession {
 
 export interface AuthPayload {
   session: AuthSession | null;
-  signIn: (provider: AuthProvider) => void | Promise<void>;
+  signIn: (
+    provider: AuthProvider,
+    payload?: Record<string, unknown>,
+    isLocalProvider?: boolean,
+  ) => void | Promise<void>;
   signOut: () => void | Promise<void>;
   isSigningIn: boolean;
   isSigningOut: boolean;
@@ -42,9 +52,10 @@ export const AuthContext = React.createContext<AuthPayload>({
 interface UseAuthInput {
   dom: appDom.RenderTree;
   basename: string;
+  signInPagePath?: string;
 }
 
-export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
+export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPayload {
   const authProviders = React.useMemo(() => {
     const app = appDom.getApp(dom);
     const authProviderConfigs = app.attributes.authentication?.providers ?? [];
@@ -58,12 +69,19 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
   const [isSigningOut, setIsSigningOut] = React.useState(true);
 
   const getCsrfToken = React.useCallback(async () => {
-    const csrfResponse = await fetch(`${basename}${AUTH_CSRF_PATH}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const { csrfToken } = await csrfResponse.json();
+    let csrfToken = '';
+    try {
+      const csrfResponse = await fetch(`${basename}${AUTH_CSRF_PATH}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (isResponseJSON(csrfResponse)) {
+        csrfToken = (await csrfResponse.json())?.csrfToken;
+      }
+    } catch (error) {
+      console.error((error as Error).message);
+    }
 
     return csrfToken ?? '';
   }, [basename]);
@@ -71,12 +89,7 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
   const signOut = React.useCallback(async () => {
     setIsSigningOut(true);
 
-    let csrfToken = '';
-    try {
-      csrfToken = await getCsrfToken();
-    } catch (error) {
-      console.error((error as Error).message);
-    }
+    const csrfToken = await getCsrfToken();
 
     try {
       await fetch(`${basename}${AUTH_SIGNOUT_PATH}`, {
@@ -94,42 +107,57 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
     setSession(null);
     setIsSigningOut(false);
 
-    window.location.replace(`${basename}${AUTH_SIGNIN_PATH}`);
-  }, [basename, getCsrfToken]);
+    if (!signInPagePath || window.location.pathname !== signInPagePath) {
+      window.location.href = `${basename}${AUTH_SIGNIN_PATH}`;
+    }
+  }, [basename, getCsrfToken, signInPagePath]);
 
   const getSession = React.useCallback(async () => {
+    setIsSigningIn(true);
+
+    await getCsrfToken();
+
     try {
       setIsSigningIn(true);
-      const sessionResponse = await fetch(`${basename}${AUTH_SESSION_PATH}`);
-      setSession(await sessionResponse.json());
+      const sessionResponse = await fetch(`${basename}${AUTH_SESSION_PATH}`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (isResponseJSON(sessionResponse)) {
+        setSession(await sessionResponse.json());
+      } else {
+        signOut();
+      }
     } catch (error) {
       console.error((error as Error).message);
       signOut();
     }
 
     setIsSigningIn(false);
-  }, [basename, signOut]);
+  }, [basename, getCsrfToken, signOut]);
 
   const signIn = React.useCallback(
-    async (provider: AuthProvider) => {
+    async (provider: AuthProvider, payload?: Record<string, unknown>, isLocalProvider = false) => {
       setIsSigningIn(true);
 
-      let csrfToken = '';
-      try {
-        csrfToken = await getCsrfToken();
-      } catch (error) {
-        console.error((error as Error).message);
-      }
+      const csrfToken = await getCsrfToken();
 
       try {
-        const signInResponse = await fetch(`${basename}${AUTH_SIGNIN_PATH}/${provider}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Auth-Return-Redirect': '1',
+        const signInResponse = await fetch(
+          isLocalProvider
+            ? `${basename}${AUTH_API_PATH}/callback/${provider}`
+            : `${basename}${AUTH_SIGNIN_PATH}/${provider}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'X-Auth-Return-Redirect': '1',
+            },
+            body: new URLSearchParams({ ...payload, csrfToken }),
           },
-          body: new URLSearchParams({ csrfToken }),
-        });
+        );
+
         const { url: signInUrl } = await signInResponse.json();
 
         window.location.href = signInUrl;
@@ -143,11 +171,13 @@ export function useAuth({ dom, basename }: UseAuthInput): AuthPayload {
     [basename, getCsrfToken, signOut],
   );
 
+  const appHost = useNonNullableContext(AppHostContext);
+
   React.useEffect(() => {
-    if (hasAuthentication) {
+    if (hasAuthentication && !appHost.isCanvas) {
       getSession();
     }
-  }, [getSession, hasAuthentication]);
+  }, [getCsrfToken, getSession, hasAuthentication, appHost.isCanvas]);
 
   return {
     session,

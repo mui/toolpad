@@ -13,10 +13,14 @@ import RuntimeToolpadApp, {
   pageComponentsStore,
 } from './ToolpadApp';
 import { RuntimeState } from './types';
-import { AppHostContext } from './AppHostContext';
+import { AppHost, AppHostContext } from './AppHostContext';
 
 const IS_PREVIEW = process.env.NODE_ENV !== 'production';
 const IS_CUSTOM_SERVER = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
+const IS_RENDERED_IN_CANVAS =
+  typeof window === 'undefined'
+    ? false
+    : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
 
 const cache = createCache({
   key: 'css',
@@ -43,9 +47,10 @@ export interface RootProps {
   ToolpadApp: React.ComponentType<ToolpadAppProps>;
 }
 
-const appHost = {
+const appHost: AppHost = {
   isPreview: IS_PREVIEW,
   isCustomServer: IS_CUSTOM_SERVER,
+  isCanvas: IS_RENDERED_IN_CANVAS,
 };
 
 function Root({ ToolpadApp, initialState, base }: RootProps) {
@@ -77,7 +82,7 @@ export function init({ ToolpadApp = RuntimeToolpadApp, initialState, base }: Ini
 
 export { AppLayout } from './AppLayout';
 
-export { DomContextProvider, ComponentsContextProvider, RenderedPage } from './ToolpadApp';
+export { RenderedPage } from './ToolpadApp';
 
 export type { RuntimeState };
 

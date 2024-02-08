@@ -62,11 +62,7 @@ function Root({ ToolpadApp, initialState, base }: RootProps) {
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
         <AppHostContext.Provider value={appHost}>
-          <BrowserRouter basename={base}>
-            <Routes>
-              <Route path="*" element={<ToolpadApp basename={base} state={initialState} />} />
-            </Routes>
-          </BrowserRouter>
+          <ToolpadApp basename={base} state={initialState} />
         </AppHostContext.Provider>
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />
       </CacheProvider>

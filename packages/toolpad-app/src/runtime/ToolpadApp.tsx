@@ -52,6 +52,7 @@ import {
   useMatch,
   useParams,
   Outlet,
+  BrowserRouter,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -1712,23 +1713,25 @@ export interface ToolpadAppProps {
 
 export default function ToolpadApp(props: ToolpadAppProps) {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <ToolpadAppProvider {...props}>
-            <Outlet />
-          </ToolpadAppProvider>
-        }
-      >
-        <Route path="/signin" Component={SignInPage} />
-        <Route path="/" Component={PagesLayoutRoute}>
-          <Route path="/pages/:pageName" Component={PageRoute} />
-          <Route path="/pages" Component={DefaultPageRoute} />
-          <Route path="/" Component={DefaultPageRoute} />
-          <Route path="*" Component={PageNotFound} />
+    <BrowserRouter basename={props.basename}>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ToolpadAppProvider {...props}>
+              <Outlet />
+            </ToolpadAppProvider>
+          }
+        >
+          <Route path="/signin" Component={SignInPage} />
+          <Route path="/" Component={PagesLayoutRoute}>
+            <Route path="/pages/:pageName" Component={PageRoute} />
+            <Route path="/pages" Component={DefaultPageRoute} />
+            <Route path="/" Component={DefaultPageRoute} />
+            <Route path="*" Component={PageNotFound} />
+          </Route>
         </Route>
-      </Route>
-    </Routes>
+      </Routes>
+    </BrowserRouter>
   );
 }

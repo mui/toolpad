@@ -37,11 +37,11 @@ This describes a certain context under which a backend function was called.
 
 **Properties**
 
-| Name        | Type                                                               | Description                                                               |
-| :---------- | :----------------------------------------------------------------- | :------------------------------------------------------------------------ |
-| `cookies`   | `Record<string, string>`                                           | A dictionary mapping cookie name to cookie value.                         |
-| `setCookie` | `(name: string, value: string) => void`                            | Use to set a cookie `name` with `value`.                                  |
-| `user`      | `{ name: string; email: string; avatar: string; roles: string[] }` | Get current [authenticated](/toolpad/concepts/authentication/) user data. |
+| Name        | Type                                                               | Description                                                                         |
+| :---------- | :----------------------------------------------------------------- | :---------------------------------------------------------------------------------- |
+| `cookies`   | `Record<string, string>`                                           | A dictionary mapping cookie name to cookie value.                                   |
+| `setCookie` | `(name: string, value: string) => void`                            | Use to set a cookie `name` with `value`.                                            |
+| `user`      | `{ name: string; email: string; avatar: string; roles: string[] }` | Get current [authenticated](/toolpad/concepts/authentication/) logged-in user data. |
 
 ## Usage
 

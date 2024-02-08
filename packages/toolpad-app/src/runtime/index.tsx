@@ -82,7 +82,7 @@ export function init({ ToolpadApp = RuntimeToolpadApp, initialState, base }: Ini
 
 export { AppLayout } from './AppLayout';
 
-export { DomContextProvider, ComponentsContextProvider, RenderedPage } from './ToolpadApp';
+export { RenderedPage } from './ToolpadApp';
 
 export type { RuntimeState };
 

@@ -1192,3 +1192,14 @@ export function getPlan(dom: AppDom): ToolpadPlan {
   const appNode = getApp(dom);
   return appNode.attributes.plan;
 }
+
+export function getPageForAlias(dom: AppDom, alias: string): string | null {
+  const app = getApp(dom);
+  const pages = getChildNodes(dom, app).pages;
+  for (const page of pages) {
+    if (page.attributes.alias?.includes(alias)) {
+      return page.name;
+    }
+  }
+  return null;
+}

@@ -1446,26 +1446,12 @@ export interface RenderedNodeProps {
   nodeId: NodeId;
 }
 
-export function RenderedPage() {
-  const { pageName } = useParams();
+export interface RenderedPageProps {
+  page: appDom.PageNode;
+}
 
-  invariant(pageName, 'Page name must be provided as a route parameter');
-
-  const dom = useDomContext();
+export function RenderedPage({ page }: RenderedPageProps) {
   const appHost = useNonNullableContext(AppHostContext);
-  const { search } = useLocation();
-
-  const page = appDom.getPageByName(dom, pageName);
-
-  if (!page) {
-    const aliasedPageName = appDom.getPageForAlias(dom, pageName);
-
-    if (aliasedPageName) {
-      return <Navigate to={`/pages/${aliasedPageName}${search}`} replace />;
-    }
-
-    return <PageNotFound />;
-  }
 
   let pageContent = page.attributes.codeFile ? (
     <RenderedProCodePage page={page} />
@@ -1513,26 +1499,6 @@ function isPageAllowed(page: appDom.PageNode, session: AuthSession | null): bool
   const userRoles = session?.user?.roles ?? [];
   const { allowAll = true, allowedRoles = [] } = page.attributes.authorization ?? {};
   return allowAll || userRoles.some((role) => allowedRoles.includes(role));
-}
-
-function DefaultPageNavigation() {
-  const { search } = useLocation();
-  const dom = useDomContext();
-  const { session } = React.useContext(AuthContext);
-
-  const root = appDom.getApp(dom);
-  const { pages = [] } = appDom.getChildNodes(dom, root);
-
-  const defaultPage: appDom.PageNode | null = React.useMemo(
-    () => pages.find((page) => isPageAllowed(page, session)) ?? null,
-    [pages, session],
-  );
-
-  return defaultPage ? (
-    <Navigate to={`/pages/${defaultPage.name}${search}`} replace />
-  ) : (
-    <PageNotFound msg="No pages available." />
-  );
 }
 
 const FullPageCentered = styled('div')({
@@ -1611,6 +1577,57 @@ function ToolpadAppLayout({ children }: ToolpadAppLayoutProps) {
   );
 }
 
+function PageRoute() {
+  const { pageName } = useParams();
+
+  invariant(pageName, 'Page name must be provided as a route parameter');
+
+  const dom = useDomContext();
+  const { search } = useLocation();
+
+  const page = appDom.getPageByName(dom, pageName);
+
+  if (!page) {
+    const aliasedPageName = appDom.getPageForAlias(dom, pageName);
+
+    if (aliasedPageName) {
+      return <Navigate to={`/pages/${aliasedPageName}${search}`} replace />;
+    }
+
+    return <PageNotFound />;
+  }
+
+  return <RenderedPage page={page} />;
+}
+
+function PagesLayoutRoute() {
+  return (
+    <ToolpadAppLayout>
+      <Outlet />
+    </ToolpadAppLayout>
+  );
+}
+
+function DefaultPageRoute() {
+  const { search } = useLocation();
+  const dom = useDomContext();
+  const { session } = React.useContext(AuthContext);
+
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  const defaultPage: appDom.PageNode | null = React.useMemo(
+    () => pages.find((page) => isPageAllowed(page, session)) ?? null,
+    [pages, session],
+  );
+
+  return defaultPage ? (
+    <Navigate to={`/pages/${defaultPage.name}${search}`} replace />
+  ) : (
+    <PageNotFound msg="No pages available." />
+  );
+}
+
 export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   basename: string;
@@ -1662,19 +1679,12 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
                       <QueryClientProvider client={queryClient}>
                         <AuthContext.Provider value={authContext}>
                           <Routes>
-                            <Route path="/signin" element={<SignInPage />} />
-                            <Route
-                              path="/"
-                              element={
-                                <ToolpadAppLayout>
-                                  <Outlet />
-                                </ToolpadAppLayout>
-                              }
-                            >
-                              <Route path="/pages/:pageName" element={<RenderedPage />} />
-                              <Route path="/pages" element={<DefaultPageNavigation />} />
-                              <Route path="/" element={<DefaultPageNavigation />} />
-                              <Route path="*" element={<PageNotFound />} />
+                            <Route path="/signin" Component={SignInPage} />
+                            <Route path="/" Component={PagesLayoutRoute}>
+                              <Route path="/pages/:pageName" Component={PageRoute} />
+                              <Route path="/pages" Component={DefaultPageRoute} />
+                              <Route path="/" Component={DefaultPageRoute} />
+                              <Route path="*" Component={PageNotFound} />
                             </Route>
                           </Routes>
                         </AuthContext.Provider>

@@ -1529,11 +1529,11 @@ function shouldShowPreviewHeader(appHost: AppHost): boolean {
   return !!appHost.isPreview && !appHost.isCanvas;
 }
 
-interface ToolpadPagesLayoutProps {
+interface ToolpadAppLayoutProps {
   children?: React.ReactNode;
 }
 
-function ToolpadPagesLayout({ children }: ToolpadPagesLayoutProps) {
+function ToolpadAppLayout({ children }: ToolpadAppLayoutProps) {
   const dom = useDomContext();
 
   const root = appDom.getApp(dom);
@@ -1602,9 +1602,9 @@ function PageRoute() {
 
 function PagesLayoutRoute() {
   return (
-    <ToolpadPagesLayout>
+    <ToolpadAppLayout>
       <Outlet />
-    </ToolpadPagesLayout>
+    </ToolpadAppLayout>
   );
 }
 
@@ -1629,12 +1629,18 @@ function DefaultPageRoute() {
 }
 
 export interface ToolpadAppProviderProps {
+  rootRef?: React.Ref<HTMLDivElement>;
   basename: string;
   state: RuntimeState;
   children?: React.ReactNode;
 }
 
-export function ToolpadAppProvider({ basename, state, children }: ToolpadAppProviderProps) {
+export function ToolpadAppProvider({
+  rootRef,
+  basename,
+  state,
+  children,
+}: ToolpadAppProviderProps) {
   const { dom } = state;
 
   const extraComponents = componentsStore.useValue();
@@ -1656,52 +1662,38 @@ export function ToolpadAppProvider({ basename, state, children }: ToolpadAppProv
 
   const authContext = useAuth({ dom, basename });
 
-  return (
-    <UseDataProviderContext.Provider value={useDataProvider}>
-      <ComponentsContextProvider value={components}>
-        <DomContext.Provider value={dom}>
-          <ErrorBoundary FallbackComponent={AppError}>
-            <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-              <React.Suspense fallback={<AppLoading />}>
-                <QueryClientProvider client={queryClient}>
-                  <AuthContext.Provider value={authContext}>{children}</AuthContext.Provider>
-                  {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
-                </QueryClientProvider>
-              </React.Suspense>
-            </ResetNodeErrorsKeyProvider>
-          </ErrorBoundary>
-        </DomContext.Provider>
-      </ComponentsContextProvider>
-    </UseDataProviderContext.Provider>
-  );
-}
-
-interface ToolpadAppLayoutProps {
-  rootRef?: React.Ref<HTMLDivElement>;
-  basename: string;
-  children: React.ReactNode;
-}
-
-function ToolpadAppLayout({ rootRef, basename, children }: ToolpadAppLayoutProps) {
-  const dom = useDomContext();
-
   const appHost = useNonNullableContext(AppHostContext);
   const showPreviewHeader = shouldShowPreviewHeader(appHost);
 
   return (
-    <AppThemeProvider dom={dom}>
-      <CssBaseline enableColorScheme />
-      {showPreviewHeader ? <PreviewHeader basename={basename} /> : null}
-      <AppRoot
-        ref={rootRef}
-        sx={{
-          paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
-        }}
-      >
-        {children}
-        <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-      </AppRoot>
-    </AppThemeProvider>
+    <UseDataProviderContext.Provider value={useDataProvider}>
+      <AppThemeProvider dom={dom}>
+        <CssBaseline enableColorScheme />
+        {showPreviewHeader ? <PreviewHeader basename={basename} /> : null}
+        <AppRoot
+          ref={rootRef}
+          sx={{
+            paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
+          }}
+        >
+          <ComponentsContextProvider value={components}>
+            <DomContext.Provider value={dom}>
+              <ErrorBoundary FallbackComponent={AppError}>
+                <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                  <React.Suspense fallback={<AppLoading />}>
+                    <QueryClientProvider client={queryClient}>
+                      <AuthContext.Provider value={authContext}>{children}</AuthContext.Provider>
+                      {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
+                    </QueryClientProvider>
+                  </React.Suspense>
+                </ResetNodeErrorsKeyProvider>
+              </ErrorBoundary>
+            </DomContext.Provider>
+          </ComponentsContextProvider>
+          <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+        </AppRoot>
+      </AppThemeProvider>
+    </UseDataProviderContext.Provider>
   );
 }
 
@@ -1713,27 +1705,25 @@ export interface ToolpadAppProps {
 
 export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps) {
   return (
-    <ToolpadAppProvider basename={basename} state={state}>
-      <BrowserRouter basename={basename}>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ToolpadAppLayout rootRef={rootRef} basename={basename}>
-                <Outlet />
-              </ToolpadAppLayout>
-            }
-          >
-            <Route path="/signin" Component={SignInPage} />
-            <Route path="/" Component={PagesLayoutRoute}>
-              <Route path="/pages/:pageName" Component={PageRoute} />
-              <Route path="/pages" Component={DefaultPageRoute} />
-              <Route path="/" Component={DefaultPageRoute} />
-              <Route path="*" Component={PageNotFound} />
-            </Route>
+    <BrowserRouter basename={basename}>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ToolpadAppProvider basename={basename} state={state} rootRef={rootRef}>
+              <Outlet />
+            </ToolpadAppProvider>
+          }
+        >
+          <Route path="/signin" Component={SignInPage} />
+          <Route path="/" Component={PagesLayoutRoute}>
+            <Route path="/pages/:pageName" Component={PageRoute} />
+            <Route path="/pages" Component={DefaultPageRoute} />
+            <Route path="/" Component={DefaultPageRoute} />
+            <Route path="*" Component={PageNotFound} />
           </Route>
-        </Routes>
-      </BrowserRouter>
-    </ToolpadAppProvider>
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }

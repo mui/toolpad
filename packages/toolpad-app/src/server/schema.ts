@@ -259,6 +259,7 @@ elementSchema = baseElementSchema
 export const applicationSchema = toolpadObjectSchema(
   'application',
   z.object({
+    plan: z.enum(['free', 'pro']).optional().describe('The plan for this application.'),
     authentication: z
       .object({
         providers: z

@@ -1633,7 +1633,7 @@ export default function ToolpadApp({
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  const authContext = useAuth({ dom, basename });
+  const authContext = useAuth({ dom, basename, signInPagePath: `${basename}/signin` });
   const appHost = useNonNullableContext(AppHostContext);
   const showPreviewHeader: boolean = !!appHost.isPreview && !appHost.isCanvas;
 

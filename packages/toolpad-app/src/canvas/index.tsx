@@ -80,7 +80,7 @@ export interface AppCanvasProps {
 
 export default function AppCanvas({ basename, state: initialState }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState>(initialState);
-  const [readyBridge, setReadyBridge] = React.useState<ToolpadBridge>();
+  const [readyBridge, setReadyBridge] = React.useState<ToolpadBridge | undefined>();
 
   const appRootRef = React.useRef<HTMLDivElement>();
   const appRootCleanupRef = React.useRef<() => void>();

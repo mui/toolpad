@@ -14,7 +14,7 @@ import { createCommands, type ToolpadBridge } from '../../../canvas/ToolpadBridg
 import { useProject } from '../../../project';
 import { RuntimeState } from '../../../runtime';
 import { AppHost, AppHostContext } from '../../../runtime/AppHostContext';
-import ToolpadApp, { RenderedPage } from '../../../runtime/ToolpadApp';
+import ToolpadApp from '../../../runtime/ToolpadApp';
 import { CanvasHooks, CanvasHooksContext } from '../../../runtime/CanvasHooksContext';
 import { rectContainsPoint } from '../../../utils/geometry';
 import { queryClient } from '../../../runtime/api';
@@ -224,7 +224,6 @@ export default function EditorCanvasHost({
             <Overlay container={portal}>
               <CanvasHooksContext.Provider value={canvasHooks}>
                 <AppHostContext.Provider value={appHost}>
-                  {/* <RenderedPage page={page} /> */}
                   <Routes>
                     <Route
                       path="/app/*"

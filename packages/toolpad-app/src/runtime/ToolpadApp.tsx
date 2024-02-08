@@ -1629,11 +1629,7 @@ function DefaultPageRoute() {
   );
 }
 
-export interface ToolpadAppProviderProps {
-  rootRef?: React.Ref<HTMLDivElement>;
-  basename: string;
-  apiUrl?: string;
-  state: RuntimeState;
+export interface ToolpadAppProviderProps extends ToolpadAppProps {
   children?: React.ReactNode;
 }
 
@@ -1642,7 +1638,7 @@ export function ToolpadAppProvider({
   basename,
   state,
   children,
-  apiUrl,
+  apiUrl = `${basename}/api/runtime-rpc`,
 }: ToolpadAppProviderProps) {
   const { dom } = state;
 
@@ -1711,15 +1707,16 @@ export interface ToolpadAppProps {
   rootRef?: React.Ref<HTMLDivElement>;
   basename: string;
   state: RuntimeState;
+  apiUrl?: string;
 }
 
-export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps) {
+export default function ToolpadApp(props: ToolpadAppProps) {
   return (
     <Routes>
       <Route
         path="/"
         element={
-          <ToolpadAppProvider basename={basename} state={state} rootRef={rootRef}>
+          <ToolpadAppProvider {...props}>
             <Outlet />
           </ToolpadAppProvider>
         }

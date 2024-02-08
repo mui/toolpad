@@ -29,6 +29,9 @@ import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
 import { createAuthHandler, createRequireAuthMiddleware, getRequireAuthentication } from './auth';
 
+// crypto must be polyfilled to use @auth/core in Node 18 or lower
+globalThis.crypto ??= (await import('node:crypto')) as Crypto;
+
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const DEFAULT_PORT = 3000;
@@ -294,6 +297,7 @@ async function createToolpadHandler({
   const editorBasename = '/_toolpad';
 
   const project = await initProject({ toolpadDevMode, dev, dir, externalUrl, base });
+  await project.checkPlan();
   await project.start();
 
   const router = express.Router();

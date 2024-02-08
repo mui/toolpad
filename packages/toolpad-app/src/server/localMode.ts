@@ -62,7 +62,7 @@ import type {
 import EnvManager from './EnvManager';
 import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
-import { VERSION_CHECK_INTERVAL } from '../constants';
+import { UPGRADE_URL, VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
 import packageInfo from '../packageInfo';
@@ -311,6 +311,8 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
 function mergeApplicationIntoDom(dom: appDom.AppDom, applicationFile: Application): appDom.AppDom {
   const applicationFileSpec = applicationFile.spec;
   const app = appDom.getApp(dom);
+
+  dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'plan', applicationFileSpec?.plan);
 
   dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'authentication', {
     ...applicationFileSpec?.authentication,
@@ -794,11 +796,11 @@ function extractThemeFromDom(dom: appDom.AppDom): Theme | null {
 
 function extractApplicationFromDom(dom: appDom.AppDom): Application | null {
   const rootNode = appDom.getApp(dom);
-
   return {
     apiVersion: API_VERSION,
     kind: 'application',
     spec: {
+      plan: rootNode.attributes.plan,
       authentication: rootNode.attributes.authentication,
       authorization: rootNode.attributes.authorization,
     },
@@ -962,6 +964,29 @@ export function getRequiredEnvVars(dom: appDom.AppDom): Set<string> {
     .map((binding) => binding.$$env);
 
   return new Set(allVars);
+}
+
+interface PaidFeature {
+  id: string;
+  label: string;
+}
+
+function detectPaidFeatures(application: Application): PaidFeature[] | null {
+  if (!application.spec || !application.spec.authorization) {
+    return null;
+  }
+
+  const hasRoles = Boolean(application?.spec?.authorization?.roles);
+  const hasAzureActiveDirectory = application?.spec?.authentication?.providers?.some(
+    (elems) => elems.provider === 'azure-ad',
+  );
+  const paidFeatures = [
+    hasRoles ? { id: 'roles', label: 'Role based access control' } : undefined,
+    hasAzureActiveDirectory
+      ? { id: 'azure-ad', label: 'Azure AD authentication provider' }
+      : undefined,
+  ].filter(Boolean) as PaidFeature[];
+  return paidFeatures.length > 0 ? paidFeatures : null;
 }
 
 class ToolpadProject {
@@ -1142,6 +1167,31 @@ class ToolpadProject {
 
     // Only alert once per missing variable
     this.alertedMissingVars = new Set(missingVars);
+  }
+
+  async checkPlan() {
+    const [dom] = await this.loadDomAndFingerprint();
+
+    const application = extractApplicationFromDom(dom);
+    if (!application || !application.spec) {
+      return;
+    }
+
+    if (!application.spec.plan || application.spec.plan === 'free') {
+      const paidFeatures = detectPaidFeatures(application);
+      if (paidFeatures) {
+        throw new Error(
+          `You are using ${chalk.bgBlue(paidFeatures.map((feature) => feature.label))} which ${paidFeatures.length > 1 ? 'are paid features' : 'is a paid feature'}. To continue using Toolpad, upgrade your plan or remove this feature. Learn more at ${chalk.cyan(UPGRADE_URL)}.`,
+        );
+      }
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.yellow(
+          'warn',
+        )}  - You are using features that ${chalk.bold('are not covered under our MIT License')}. You will have to buy a license to use them in production.`,
+      );
+    }
   }
 
   async start() {

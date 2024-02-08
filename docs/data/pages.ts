@@ -4,6 +4,7 @@ import componentsManifest from './toolpad/reference/components/manifest.json';
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started-group',
+    title: 'Getting Started',
     children: [
       { pathname: '/toolpad/getting-started', title: 'Overview' },
       { pathname: '/toolpad/getting-started/installation' },

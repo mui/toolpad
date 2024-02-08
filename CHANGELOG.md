@@ -1,5 +1,46 @@
 # Changelog
 
+## v0.1.49
+
+<!-- generated comparing v0.1.48..master -->
+
+_Feb 8, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- Adds **authentication and authorization** support with Google, GitHub, and Azure AD (_paid_), along with detailed documentation on how to get up and running.
+
+- Miscellaneous bug fixes and maintenance work.
+
+- &#8203;<!-- 26 -->Authentication fixes/improvements (#3174) @apedroferreira
+- &#8203;<!-- 25 -->chore(deps): bump mui core (#3175) @renovate[bot]
+- &#8203;<!-- 24 -->Add isCanvas into app host context (#3170) @Janpot
+- &#8203;<!-- 23 -->Fix a few react-resizable-panels warnings (#3173) @Janpot
+- &#8203;<!-- 22 -->Improve package layout (#3148) @Janpot
+- &#8203;<!-- 21 -->Add authorization docs (#3067) @apedroferreira
+- &#8203;<!-- 20 -->Authentication/authorization tests (#3056) @apedroferreira
+- &#8203;<!-- 19 -->Update renovate.json @Janpot
+- &#8203;<!-- 18 -->chore(deps): bump dependencies (#3163) @renovate[bot]
+- &#8203;<!-- 17 -->chore(deps): bump dependencies (major) (#3166) @renovate[bot]
+- &#8203;<!-- 16 -->chore(deps): bump devdependencies (#3160) @renovate[bot]
+- &#8203;<!-- 15 -->chore(deps): bump github/codeql-action action to v3.24.0 (#3164) @renovate[bot]
+- &#8203;<!-- 14 -->chore(deps): bump pnpm to 8.15.1 (#3162) @renovate[bot]
+- &#8203;<!-- 13 -->chore(deps): bump playwright (#3161) @renovate[bot]
+- &#8203;<!-- 12 -->chore(deps): bump @mui/monorepo digest to 3c445c6 (#3159) @renovate[bot]
+- &#8203;<!-- 11 -->fix: "Unexpected token ';'" in expressions with trailing ';' (#3147) @bharatkashyap
+- &#8203;<!-- 10 -->Lock file maintenance (#3150) @renovate[bot]
+- &#8203;<!-- 09 -->Add stronger warning to the auto generated files to avoid hand-editing (#3146) @Janpot
+- &#8203;<!-- 08 -->Add RBAC with Azure AD authentication provider (#3077) @apedroferreira
+- &#8203;<!-- 07 -->Run prettier (#3144) @Janpot
+- &#8203;<!-- 06 -->Update monorepo (#3134) @apedroferreira
+- &#8203;<!-- 05 -->[code-infra] Avoid aliasing to the monorepo dependencies (#3137) @Janpot
+- &#8203;<!-- 04 -->[core] [docs] Add warnings, docs and gating for paid features (#3156) @bharatkashyap
+- &#8203;<!-- 03 -->[core] Use non breaking spaces (#3145) @oliviertassinari
+- &#8203;<!-- 02 -->[core] Sync with main repo @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix 301 link @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @renovate[bot]
+
 ## 0.1.48
 
 <!-- generated comparing v0.1.47..master -->

@@ -60,3 +60,7 @@ test-results
 .yarn-playwright-cache
 
 /test/regressions/screenshots/**
+
+# vale downloaded config
+.github/styles/Google
+.github/styles/write-good

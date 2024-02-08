@@ -61,50 +61,45 @@ async function createDevHandler(project: ToolpadProject) {
     project.getRuntimeConfig(),
   ]);
 
-  let readyPromise: Promise<void>;
-  let worker: Worker;
+  const mainThreadRpcChannel = new MessageChannel();
+  const worker = new Worker(appServerPath, {
+    workerData: {
+      toolpadDevMode: project.options.toolpadDevMode,
+      outDir: project.getAppOutputFolder(),
+      base: project.options.base,
+      config: runtimeConfig,
+      root: project.getRoot(),
+      port: devPort,
+      mainThreadRpcPort: mainThreadRpcChannel.port1,
+      customServer: project.options.customServer,
+    } satisfies AppViteServerConfig,
+    transferList: [mainThreadRpcChannel.port1],
+    env: {
+      ...process.env,
+      NODE_ENV: 'development',
+    },
+  });
 
-  if (!process.env.EXPERIMENTAL_INLINE_CANVAS) {
-    const mainThreadRpcChannel = new MessageChannel();
-    worker = new Worker(appServerPath, {
-      workerData: {
-        toolpadDevMode: project.options.toolpadDevMode,
-        outDir: project.getAppOutputFolder(),
-        base: project.options.base,
-        config: runtimeConfig,
-        root: project.getRoot(),
-        port: devPort,
-        mainThreadRpcPort: mainThreadRpcChannel.port1,
-        customServer: project.options.customServer,
-      } satisfies AppViteServerConfig,
-      transferList: [mainThreadRpcChannel.port1],
-      env: {
-        ...process.env,
-        NODE_ENV: 'development',
-      },
-    });
+  worker.once('exit', (code) => {
+    console.error(`App dev server failed ${code}`);
+    process.exit(1);
+  });
 
-    worker.once('exit', (code) => {
-      console.error(`App dev server failed ${code}`);
-      process.exit(1);
-    });
+  let resolveReadyPromise: () => void | undefined;
+  const readyPromise = new Promise<void>((resolve) => {
+    resolveReadyPromise = resolve;
+  });
 
-    let resolveReadyPromise: () => void | undefined;
-    readyPromise = new Promise<void>((resolve) => {
-      resolveReadyPromise = resolve;
-    });
+  serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
+    notifyReady: async () => resolveReadyPromise?.(),
+    loadDom: async () => project.loadDom(),
+    getComponents: async () => project.getComponentsManifest(),
+    getPagesManifest: async () => project.getPagesManifest(),
+  });
 
-    serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
-      notifyReady: async () => resolveReadyPromise?.(),
-      loadDom: async () => project.loadDom(),
-      getComponents: async () => project.getComponentsManifest(),
-      getPagesManifest: async () => project.getPagesManifest(),
-    });
-
-    project.events.on('componentsListChanged', () => {
-      worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
-    });
-  }
+  project.events.on('componentsListChanged', () => {
+    worker.postMessage({ kind: 'reload-components' } satisfies AppDevServerCommand);
+  });
 
   const rpcServer = createProjectRpcServer(project);
   handler.use('/__toolpad_dev__/rpc', createRpcHandler(rpcServer));
@@ -133,22 +128,20 @@ async function createDevHandler(project: ToolpadProject) {
 
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
 
-  if (!process.env.EXPERIMENTAL_INLINE_CANVAS) {
-    handler.use(
-      (req, res, next) => {
-        // Stall the request until the dev server is ready
-        readyPromise.then(next, next);
+  handler.use(
+    (req, res, next) => {
+      // Stall the request until the dev server is ready
+      readyPromise.then(next, next);
+    },
+    createProxyMiddleware({
+      logLevel: 'silent',
+      ws: true,
+      target: {
+        host: 'localhost',
+        port: devPort,
       },
-      createProxyMiddleware({
-        logLevel: 'silent',
-        ws: true,
-        target: {
-          host: 'localhost',
-          port: devPort,
-        },
-      }),
-    );
-  }
+    }),
+  );
 
   const wsServer = new WebSocketServer({ port: wsPort });
 
@@ -240,49 +233,52 @@ async function createEditorHandler(
   { toolpadDevMode = false }: EditorHandlerParams,
 ): Promise<AppHandler> {
   const router = express.Router();
-
-  const transformIndexHtml = (html: string) => {
-    return html.replace(
-      '<!-- __TOOLPAD_SCRIPTS__ -->',
-
-      `<script>window[${JSON.stringify(APP_URL_WINDOW_PROPERTY)}] = ${JSON.stringify(
-        appUrl,
-      )}</script>
-      `,
-    );
-  };
-
   let viteApp: ViteDevServer | undefined;
 
-  if (toolpadDevMode) {
-    // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
-
-    const vite = await import('vite');
-    viteApp = await vite.createServer({
-      configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.mts'),
-      root: path.resolve(currentDirectory, '../../src/toolpad'),
-      server: { middlewareMode: true },
-      plugins: [
-        {
-          name: 'toolpad:transform-index-html',
-          transformIndexHtml,
-        },
-      ],
-    });
-
-    router.use('/', viteApp.middlewares);
+  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+    router.use('/_toolpad', (req, res) => res.redirect(`${appUrl}/_toolpad`));
   } else {
-    router.use(
-      '/',
-      express.static(path.resolve(currentDirectory, '../../dist/editor'), { index: false }),
-      asyncHandler(async (req, res) => {
-        const htmlFilePath = path.resolve(currentDirectory, '../../dist/editor/index.html');
-        let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
-        html = transformIndexHtml(html);
-        res.setHeader('Content-Type', 'text/html').status(200).end(html);
-      }),
-    );
+    const transformIndexHtml = (html: string) => {
+      return html.replace(
+        '<!-- __TOOLPAD_SCRIPTS__ -->',
+
+        `<script>window[${JSON.stringify(APP_URL_WINDOW_PROPERTY)}] = ${JSON.stringify(
+          appUrl,
+        )}</script>
+      `,
+      );
+    };
+
+    if (toolpadDevMode) {
+      // eslint-disable-next-line no-console
+      console.log(`${chalk.blue('info')}  - Running Toolpad editor in dev mode`);
+
+      const vite = await import('vite');
+      viteApp = await vite.createServer({
+        configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.mts'),
+        root: path.resolve(currentDirectory, '../../src/toolpad'),
+        server: { middlewareMode: true },
+        plugins: [
+          {
+            name: 'toolpad:transform-index-html',
+            transformIndexHtml,
+          },
+        ],
+      });
+
+      router.use('/', viteApp.middlewares);
+    } else {
+      router.use(
+        '/',
+        express.static(path.resolve(currentDirectory, '../../dist/editor'), { index: false }),
+        asyncHandler(async (req, res) => {
+          const htmlFilePath = path.resolve(currentDirectory, '../../dist/editor/index.html');
+          let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
+          html = transformIndexHtml(html);
+          res.setHeader('Content-Type', 'text/html').status(200).end(html);
+        }),
+      );
+    }
   }
 
   return {

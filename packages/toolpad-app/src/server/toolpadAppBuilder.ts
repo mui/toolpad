@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as url from 'node:url';
+import * as fs from 'fs';
 import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
@@ -10,6 +11,12 @@ import { pathToNodeImportSpecifier } from '../utils/paths';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
+const pkgJsonContent = fs.readFileSync(path.resolve(currentDirectory, '../../package.json'), {
+  encoding: 'utf-8',
+});
+const pkgJson = JSON.parse(pkgJsonContent);
+const TOOLPAD_BUILD = process.env.GIT_SHA1?.slice(0, 7) || 'dev';
 
 const MAIN_ENTRY = '/main.tsx';
 const FALLBACK_MODULES = [
@@ -149,7 +156,10 @@ export async function createViteConfig({
 }: CreateViteConfigParams) {
   const mode = dev ? 'development' : 'production';
 
-  const getEntryPoint = (isCanvas: boolean) => {
+  const getEntryPoint = (isDev: boolean) => {
+    const isLegacyCanvas = isDev && !process.env.EXPERIMENTAL_INLINE_CANVAS;
+    const isNewDevMode = isDev && process.env.EXPERIMENTAL_INLINE_CANVAS;
+
     const componentsId = 'virtual:toolpad-files:components.tsx';
     const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
 
@@ -157,14 +167,16 @@ export async function createViteConfig({
 import { init, setComponents } from '@mui/toolpad/entrypoint';
 import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
-${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
+${isLegacyCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
+${isNewDevMode ? `import { ToolpadEditor } from '@mui/toolpad/editor'` : ''}
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
 setComponents(components, pageComponents);
 
 init({
-  ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
+  ${isLegacyCanvas ? `ToolpadApp: AppCanvas,` : ''}
+  ${isNewDevMode ? `ToolpadEditor,` : ''}
   base: ${JSON.stringify(base)},
   initialState,
 })
@@ -249,7 +261,7 @@ if (import.meta.hot) {
 
   const virtualFiles = new Map<string, VirtualFileContent>([
     ['main.tsx', getEntryPoint(false)],
-    ['canvas.tsx', getEntryPoint(true)],
+    ['dev.tsx', getEntryPoint(true)],
     ['components.tsx', await createComponentsFile()],
     ['page-components.tsx', await createPageComponentsFile()],
     ['pages-manifest.json', JSON.stringify(await getPagesManifest(), null, 2)],
@@ -293,9 +305,8 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            replacement: dev
-              ? 'virtual:toolpad-files:canvas.tsx'
-              : 'virtual:toolpad-files:main.tsx',
+            // eslint-disable-next-line no-nested-ternary
+            replacement: dev ? 'virtual:toolpad-files:dev.tsx' : 'virtual:toolpad-files:main.tsx',
           },
           {
             find: '@mui/toolpad',
@@ -321,6 +332,11 @@ if (import.meta.hot) {
         'process.env.NODE_ENV': `'${mode}'`,
         'process.env.BASE_URL': `'${base}'`,
         'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
+        'process.env.TOOLPAD_VERSION': JSON.stringify(pkgJson.version),
+        'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),
+        'process.env.EXPERIMENTAL_INLINE_CANVAS': JSON.stringify(
+          process.env.EXPERIMENTAL_INLINE_CANVAS,
+        ),
       },
     } satisfies InlineConfig,
   };

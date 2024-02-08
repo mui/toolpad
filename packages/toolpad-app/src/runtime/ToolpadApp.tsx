@@ -1529,11 +1529,11 @@ function shouldShowPreviewHeader(appHost: AppHost): boolean {
   return !!appHost.isPreview && !appHost.isCanvas;
 }
 
-interface ToolpadAppLayoutProps {
+interface ToolpadPagesLayoutProps {
   children?: React.ReactNode;
 }
 
-function ToolpadAppLayout({ children }: ToolpadAppLayoutProps) {
+function ToolpadPagesLayout({ children }: ToolpadPagesLayoutProps) {
   const dom = useDomContext();
 
   const root = appDom.getApp(dom);
@@ -1602,9 +1602,9 @@ function PageRoute() {
 
 function PagesLayoutRoute() {
   return (
-    <ToolpadAppLayout>
+    <ToolpadPagesLayout>
       <Outlet />
-    </ToolpadAppLayout>
+    </ToolpadPagesLayout>
   );
 }
 
@@ -1628,13 +1628,13 @@ function DefaultPageRoute() {
   );
 }
 
-export interface ToolpadAppProps {
-  rootRef?: React.Ref<HTMLDivElement>;
+export interface ToolpadAppProviderProps {
   basename: string;
   state: RuntimeState;
+  children?: React.ReactNode;
 }
 
-export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps) {
+export function ToolpadAppProvider({ basename, state, children }: ToolpadAppProviderProps) {
   const { dom } = state;
 
   const extraComponents = componentsStore.useValue();
@@ -1656,51 +1656,84 @@ export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps
 
   const authContext = useAuth({ dom, basename });
 
+  return (
+    <UseDataProviderContext.Provider value={useDataProvider}>
+      <ComponentsContextProvider value={components}>
+        <DomContext.Provider value={dom}>
+          <ErrorBoundary FallbackComponent={AppError}>
+            <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+              <React.Suspense fallback={<AppLoading />}>
+                <QueryClientProvider client={queryClient}>
+                  <AuthContext.Provider value={authContext}>{children}</AuthContext.Provider>
+                  {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
+                </QueryClientProvider>
+              </React.Suspense>
+            </ResetNodeErrorsKeyProvider>
+          </ErrorBoundary>
+        </DomContext.Provider>
+      </ComponentsContextProvider>
+    </UseDataProviderContext.Provider>
+  );
+}
+
+interface ToolpadAppLayoutProps {
+  rootRef?: React.Ref<HTMLDivElement>;
+  basename: string;
+  children: React.ReactNode;
+}
+
+function ToolpadAppLayout({ rootRef, basename, children }: ToolpadAppLayoutProps) {
+  const dom = useDomContext();
+
   const appHost = useNonNullableContext(AppHostContext);
   const showPreviewHeader = shouldShowPreviewHeader(appHost);
 
   return (
-    <BrowserRouter basename={basename}>
-      <UseDataProviderContext.Provider value={useDataProvider}>
-        <AppThemeProvider dom={dom}>
-          <CssBaseline enableColorScheme />
-          {showPreviewHeader ? <PreviewHeader basename={basename} /> : null}
-          <AppRoot
-            ref={rootRef}
-            sx={{
-              paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
-            }}
+    <AppThemeProvider dom={dom}>
+      <CssBaseline enableColorScheme />
+      {showPreviewHeader ? <PreviewHeader basename={basename} /> : null}
+      <AppRoot
+        ref={rootRef}
+        sx={{
+          paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
+        }}
+      >
+        {children}
+        <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
+      </AppRoot>
+    </AppThemeProvider>
+  );
+}
+
+export interface ToolpadAppProps {
+  rootRef?: React.Ref<HTMLDivElement>;
+  basename: string;
+  state: RuntimeState;
+}
+
+export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps) {
+  return (
+    <ToolpadAppProvider basename={basename} state={state}>
+      <BrowserRouter basename={basename}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ToolpadAppLayout rootRef={rootRef} basename={basename}>
+                <Outlet />
+              </ToolpadAppLayout>
+            }
           >
-            <ComponentsContextProvider value={components}>
-              <DomContext.Provider value={dom}>
-                <ErrorBoundary FallbackComponent={AppError}>
-                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                    <React.Suspense fallback={<AppLoading />}>
-                      <QueryClientProvider client={queryClient}>
-                        <AuthContext.Provider value={authContext}>
-                          <Routes>
-                            <Route path="/signin" Component={SignInPage} />
-                            <Route path="/" Component={PagesLayoutRoute}>
-                              <Route path="/pages/:pageName" Component={PageRoute} />
-                              <Route path="/pages" Component={DefaultPageRoute} />
-                              <Route path="/" Component={DefaultPageRoute} />
-                              <Route path="*" Component={PageNotFound} />
-                            </Route>
-                          </Routes>
-                        </AuthContext.Provider>
-                        {showDevtools ? (
-                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
-                        ) : null}
-                      </QueryClientProvider>
-                    </React.Suspense>
-                  </ResetNodeErrorsKeyProvider>
-                </ErrorBoundary>
-              </DomContext.Provider>
-            </ComponentsContextProvider>
-            <EditorOverlay id={HTML_ID_EDITOR_OVERLAY} />
-          </AppRoot>
-        </AppThemeProvider>
-      </UseDataProviderContext.Provider>
-    </BrowserRouter>
+            <Route path="/signin" Component={SignInPage} />
+            <Route path="/" Component={PagesLayoutRoute}>
+              <Route path="/pages/:pageName" Component={PageRoute} />
+              <Route path="/pages" Component={DefaultPageRoute} />
+              <Route path="/" Component={DefaultPageRoute} />
+              <Route path="*" Component={PageNotFound} />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ToolpadAppProvider>
   );
 }

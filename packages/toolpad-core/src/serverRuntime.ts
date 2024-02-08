@@ -5,7 +5,7 @@ import { isWebContainer } from '@webcontainer/env';
 import type express from 'express';
 import { getUserToken } from './auth';
 
-interface ContextUser {
+interface ServerContextUser {
   name: string;
   email: string;
   avatar: string;
@@ -21,7 +21,7 @@ export interface ServerContext {
    * Use to set a cookie `name` with `value`.
    */
   setCookie: (name: string, value: string) => void;
-  user: ContextUser | null;
+  user: ServerContextUser | null;
 }
 
 const contextStore = new AsyncLocalStorage<ServerContext>();

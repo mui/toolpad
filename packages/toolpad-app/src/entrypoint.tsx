@@ -5,7 +5,6 @@ import { ToolpadComponents } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { RuntimeState } from './runtime/types';
 import {
   AppHost,

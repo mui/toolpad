@@ -9,11 +9,12 @@ import { Emitter } from '@mui/toolpad-utils/events';
 import { update } from '@mui/toolpad-utils/immutability';
 import { throttle } from 'lodash-es';
 import invariant from 'invariant';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { createCommands, type ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import { useProject } from '../../../project';
 import { RuntimeState } from '../../../runtime';
 import { AppHost, AppHostContext } from '../../../runtime/AppHostContext';
-import ToolpadApp from '../../../runtime/ToolpadApp';
+import ToolpadApp, { RenderedPage } from '../../../runtime/ToolpadApp';
 import { CanvasHooks, CanvasHooksContext } from '../../../runtime/CanvasHooksContext';
 import { rectContainsPoint } from '../../../utils/geometry';
 import { queryClient } from '../../../runtime/api';
@@ -43,6 +44,7 @@ function Overlay(props: OverlayProps) {
 
 export interface EditorCanvasHostProps {
   className?: string;
+  pageName: string;
   runtimeState: RuntimeState;
   savedNodes: NodeHashes;
   overlay?: React.ReactNode;
@@ -69,6 +71,7 @@ const appHost: AppHost = {
 };
 
 export default function EditorCanvasHost({
+  pageName,
   className,
   runtimeState,
   base,
@@ -207,6 +210,8 @@ export default function EditorCanvasHost({
     [],
   );
 
+  const page = appDom.getPageByName(runtimeState.dom, pageName);
+
   return (
     <CanvasRoot className={className}>
       <CanvasFrame
@@ -214,11 +219,12 @@ export default function EditorCanvasHost({
         srcDoc={`<!DOCTYPE html><div id="root"></div>`}
         onLoad={handleIframeLoad}
       />
-      {portal
+      {page && portal
         ? ReactDOM.createPortal(
             <Overlay container={portal}>
               <CanvasHooksContext.Provider value={canvasHooks}>
                 <AppHostContext.Provider value={appHost}>
+                  {/* <RenderedPage page={page} /> */}
                   <Routes>
                     <Route
                       path="/app/*"

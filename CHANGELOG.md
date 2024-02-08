@@ -10,8 +10,6 @@ A big thanks to the 5 contributors who made this release possible. Here are some
 
 - Adds **authentication and authorization** support with Google, GitHub, and Azure AD (_paid_), along with detailed documentation on how to get up and running.
 
-- Initial work for making the app editor canvas more modular in the future.
-
 - Miscellaneous bug fixes and maintenance work.
 
 - &#8203;<!-- 26 -->Authentication fixes/improvements (#3174) @apedroferreira

@@ -6,10 +6,10 @@ import type express from 'express';
 import { getUserToken } from './auth';
 
 interface ServerContextUser {
-  name: string;
-  email: string;
-  avatar: string;
-  roles: string[];
+  name?: string | null;
+  email?: string | null;
+  avatar?: string | null;
+  roles?: string[];
 }
 
 export interface ServerContext {

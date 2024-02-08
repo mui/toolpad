@@ -42,7 +42,6 @@ interface AppPagesNavigationProps {
   pages: NavigationEntry[];
   clipped?: boolean;
   search?: string;
-  basename: string;
 }
 
 function AppPagesNavigation({
@@ -50,7 +49,6 @@ function AppPagesNavigation({
   pages,
   clipped = false,
   search,
-  basename,
 }: AppPagesNavigationProps) {
   const navListSubheaderId = React.useId();
 
@@ -75,9 +73,10 @@ function AppPagesNavigation({
     >
       {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
       <MuiLink
+        component={Link}
         color="inherit"
         aria-label="Go to home page"
-        href={basename}
+        to="/"
         underline="none"
         sx={{
           ml: 3,
@@ -139,7 +138,6 @@ export interface ToolpadAppLayoutProps {
   hasHeader?: boolean;
   children?: React.ReactNode;
   clipped?: boolean;
-  basename: string;
 }
 
 export function AppLayout({
@@ -149,7 +147,6 @@ export function AppLayout({
   hasHeader = false,
   children,
   clipped,
-  basename,
 }: ToolpadAppLayoutProps) {
   const theme = useTheme();
 
@@ -196,7 +193,6 @@ export function AppLayout({
           pages={pages}
           clipped={clipped}
           search={retainedSearch}
-          basename={basename}
         />
       ) : null}
       <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>

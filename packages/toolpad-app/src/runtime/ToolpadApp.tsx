@@ -36,7 +36,6 @@ import {
 } from '@mui/toolpad-core';
 import {
   createGlobalState,
-  createProvidedContext,
   useAssertedContext,
   useNonNullableContext,
 } from '@mui/toolpad-utils/react';
@@ -51,6 +50,8 @@ import {
   Location as RouterLocation,
   useNavigate,
   useMatch,
+  useParams,
+  Outlet,
 } from 'react-router-dom';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import {
@@ -91,10 +92,10 @@ import PreviewHeader from './PreviewHeader';
 import { AppLayout } from './AppLayout';
 import { useDataProvider } from './useDataProvider';
 import { RuntimeApiContext, createApi, queryClient } from './api';
-import { AuthContext, useAuth } from './useAuth';
+import { AuthContext, useAuth, AuthSession } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
-import { AppHostContext } from './AppHostContext';
+import { AppHost, AppHostContext } from './AppHostContext';
 
 const browserJsRuntime = getBrowserRuntime();
 
@@ -264,11 +265,15 @@ const ApplicationVmApiContext = React.createContext<
   React.MutableRefObject<ApplicationVmApi> | undefined
 >(undefined);
 const RuntimeScopeContext = React.createContext<RuntimeScope | undefined>(undefined);
-const [useDomContext, DomContextProvider] = createProvidedContext<appDom.AppDom>('Dom');
-const [useEvaluateScopeExpression, EvaluateScopeExpressionProvider] =
-  createProvidedContext<(expr: string) => any>('EvaluateScopeExpression');
 
-export { DomContextProvider, ComponentsContextProvider };
+const DomContext = React.createContext<appDom.AppDom | undefined>(undefined);
+const useDomContext = () => useNonNullableContext(DomContext);
+
+type EvaluateScopeExpression = (expr: string) => any;
+const EvaluateScopeExpressionContext = React.createContext<EvaluateScopeExpression | undefined>(
+  undefined,
+);
+const useEvaluateScopeExpression = () => useNonNullableContext(EvaluateScopeExpressionContext);
 
 interface SetBindingContextValue {
   setBinding: (id: string, result: BindingEvaluationResult, scopeId?: string) => void;
@@ -848,9 +853,9 @@ function RuntimeScoped({
   return (
     <RuntimeScopeContext.Provider value={childScope}>
       <SetBindingContext.Provider value={setBindingContext}>
-        <EvaluateScopeExpressionProvider value={evaluateScopeExpression}>
+        <EvaluateScopeExpressionContext.Provider value={evaluateScopeExpression}>
           {children}
-        </EvaluateScopeExpressionProvider>
+        </EvaluateScopeExpressionContext.Provider>
       </SetBindingContext.Provider>
     </RuntimeScopeContext.Provider>
   );
@@ -1379,6 +1384,7 @@ interface RenderedProCodePageProps {
 }
 
 function RenderedProCodePage({ page }: RenderedProCodePageProps) {
+  usePageTitle(appDom.getPageTitle(page));
   const pageComponents = pageComponentsStore.useValue();
   const PageComponent = pageComponents[page.name] ?? PageNotFound;
   return <PageComponent />;
@@ -1389,6 +1395,7 @@ interface RenderedLowCodePageProps {
 }
 
 function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
+  usePageTitle(appDom.getPageTitle(page));
   const dom = useDomContext();
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
@@ -1445,16 +1452,35 @@ export interface RenderedPageProps {
 }
 
 export function RenderedPage({ page }: RenderedPageProps) {
-  usePageTitle(appDom.getPageTitle(page));
+  const appHost = useNonNullableContext(AppHostContext);
 
-  if (page.attributes.codeFile) {
-    return <RenderedProCodePage page={page} />;
+  let pageContent = page.attributes.codeFile ? (
+    <RenderedProCodePage page={page} />
+  ) : (
+    // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
+    // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
+    <RenderedLowCodePage page={page} key={page.name} />
+  );
+
+  if (!appHost.isCanvas) {
+    pageContent = (
+      <RequireAuthorization
+        allowAll={page.attributes.authorization?.allowAll ?? true}
+        allowedRoles={page.attributes.authorization?.allowedRoles ?? []}
+      >
+        {pageContent}
+      </RequireAuthorization>
+    );
   }
 
-  return <RenderedLowCodePage page={page} />;
+  return pageContent;
 }
 
-function PageNotFound() {
+interface PageNotFoundProps {
+  msg?: React.ReactNode;
+}
+
+function PageNotFound({ msg = "The page doesn't exist in this application." }: PageNotFoundProps) {
   return (
     <Container
       sx={{
@@ -1465,63 +1491,15 @@ function PageNotFound() {
       }}
     >
       <Typography variant="h1">Not found</Typography>
-      <Typography>The page doesn&apos;t exist in this application.</Typography>
+      <Typography>{msg}</Typography>
     </Container>
   );
 }
 
-interface RenderedPagesProps {
-  pages: appDom.PageNode[];
-  defaultPage: appDom.PageNode;
-}
-
-function RenderedPages({ pages, defaultPage }: RenderedPagesProps) {
-  const { search } = useLocation();
-
-  const defaultPageNavigation = <Navigate to={`/pages/${defaultPage.name}${search}`} replace />;
-
-  const appHost = useNonNullableContext(AppHostContext);
-
-  return (
-    <Routes>
-      {pages.map((page) => {
-        let pageContent = (
-          <RenderedPage
-            page={page}
-            // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
-            // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-            key={page.name}
-          />
-        );
-
-        if (!appHost.isCanvas) {
-          pageContent = (
-            <RequireAuthorization
-              allowAll={page.attributes.authorization?.allowAll ?? true}
-              allowedRoles={page.attributes.authorization?.allowedRoles ?? []}
-            >
-              {pageContent}
-            </RequireAuthorization>
-          );
-        }
-
-        return <Route key={page.name} path={`/pages/${page.name}`} element={pageContent} />;
-      })}
-      {pages.flatMap((page) =>
-        page.attributes.alias?.map((alias) => (
-          <Route
-            key={`${page.name}-${alias}`}
-            path={`/pages/${alias}`}
-            element={<Navigate to={`/pages/${page.name}${search}`} replace />}
-          />
-        )),
-      )}
-
-      <Route path="/pages" element={defaultPageNavigation} />
-      <Route path="/" element={defaultPageNavigation} />
-      <Route path="*" element={<PageNotFound />} />
-    </Routes>
-  );
+function isPageAllowed(page: appDom.PageNode, session: AuthSession | null): boolean {
+  const userRoles = session?.user?.roles ?? [];
+  const { allowAll = true, allowedRoles = [] } = page.attributes.authorization ?? {};
+  return allowAll || userRoles.some((role) => allowedRoles.includes(role));
 }
 
 const FullPageCentered = styled('div')({
@@ -1548,13 +1526,17 @@ function AppError({ error }: FallbackProps) {
   );
 }
 
-export interface ToolpadAppLayoutProps {
-  dom: appDom.RenderTree;
-  basename: string;
-  clipped: boolean;
+function shouldShowPreviewHeader(appHost: AppHost): boolean {
+  return !!appHost.isPreview && !appHost.isCanvas;
 }
 
-function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
+interface ToolpadAppLayoutProps {
+  children?: React.ReactNode;
+}
+
+function ToolpadAppLayout({ children }: ToolpadAppLayoutProps) {
+  const dom = useDomContext();
+
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
@@ -1563,25 +1545,21 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
   const pageMatch = useMatch('/pages/:slug');
   const activePageSlug = pageMatch?.params.slug;
 
-  const authFilteredPages = React.useMemo(() => {
-    const userRoles = session?.user?.roles ?? [];
-    return pages.filter((page) => {
-      const { allowAll = true, allowedRoles = [] } = page.attributes.authorization ?? {};
-      return allowAll || userRoles.some((role) => allowedRoles.includes(role));
-    });
-  }, [pages, session?.user?.roles]);
-
   const navEntries = React.useMemo(
     () =>
-      authFilteredPages.map((page) => ({
-        slug: page.name,
-        displayName: appDom.getPageDisplayName(page),
-        hasShell: page?.attributes.display !== 'standalone',
-      })),
-    [authFilteredPages],
+      pages
+        .filter((page) => isPageAllowed(page, session))
+        .map((page) => ({
+          slug: page.name,
+          displayName: appDom.getPageDisplayName(page),
+          hasShell: page?.attributes.display !== 'standalone',
+        })),
+    [pages, session],
   );
 
   const appHost = useNonNullableContext(AppHostContext);
+
+  const clipped = shouldShowPreviewHeader(appHost);
 
   if (!appHost.isCanvas && !session?.user && hasAuthentication) {
     return <AppLoading />;
@@ -1594,26 +1572,78 @@ function ToolpadAppLayout({ dom, basename, clipped }: ToolpadAppLayoutProps) {
       hasNavigation={!appHost.isCanvas}
       hasHeader={hasAuthentication && !appHost.isCanvas}
       clipped={clipped}
-      basename={basename}
     >
-      <RenderedPages pages={pages} defaultPage={authFilteredPages[0] ?? pages[0]} />
+      {children}
     </AppLayout>
   );
 }
 
-export interface ToolpadAppProps {
+function PageRoute() {
+  const { pageName } = useParams();
+
+  invariant(pageName, 'Page name must be provided as a route parameter');
+
+  const dom = useDomContext();
+  const { search } = useLocation();
+
+  const page = appDom.getPageByName(dom, pageName);
+
+  if (!page) {
+    const aliasedPageName = appDom.getPageForAlias(dom, pageName);
+
+    if (aliasedPageName) {
+      return <Navigate to={`/pages/${aliasedPageName}${search}`} replace />;
+    }
+
+    return <PageNotFound />;
+  }
+
+  return <RenderedPage page={page} />;
+}
+
+function PagesLayoutRoute() {
+  return (
+    <ToolpadAppLayout>
+      <Outlet />
+    </ToolpadAppLayout>
+  );
+}
+
+function DefaultPageRoute() {
+  const { search } = useLocation();
+  const dom = useDomContext();
+  const { session } = React.useContext(AuthContext);
+
+  const root = appDom.getApp(dom);
+  const { pages = [] } = appDom.getChildNodes(dom, root);
+
+  const defaultPage: appDom.PageNode | null = React.useMemo(
+    () => pages.find((page) => isPageAllowed(page, session)) ?? null,
+    [pages, session],
+  );
+
+  return defaultPage ? (
+    <Navigate to={`/pages/${defaultPage.name}${search}`} replace />
+  ) : (
+    <PageNotFound msg="No pages available." />
+  );
+}
+
+export interface ToolpadAppProviderProps {
   rootRef?: React.Ref<HTMLDivElement>;
   basename: string;
   apiUrl?: string;
   state: RuntimeState;
+  children?: React.ReactNode;
 }
 
-export default function ToolpadApp({
+export function ToolpadAppProvider({
   rootRef,
   basename,
   state,
-  apiUrl = `${basename}/api/runtime-rpc`,
-}: ToolpadAppProps) {
+  children,
+  apiUrl,
+}: ToolpadAppProviderProps) {
   const { dom } = state;
 
   const extraComponents = componentsStore.useValue();
@@ -1635,7 +1665,7 @@ export default function ToolpadApp({
 
   const authContext = useAuth({ dom, basename, signInPagePath: `${basename}/signin` });
   const appHost = useNonNullableContext(AppHostContext);
-  const showPreviewHeader: boolean = !!appHost.isPreview && !appHost.isCanvas;
+  const showPreviewHeader = shouldShowPreviewHeader(appHost);
 
   const canvasHooks = React.useContext(CanvasHooksContext);
 
@@ -1654,26 +1684,12 @@ export default function ToolpadApp({
             }}
           >
             <ComponentsContextProvider value={components}>
-              <DomContextProvider value={dom}>
+              <DomContext.Provider value={dom}>
                 <ErrorBoundary FallbackComponent={AppError}>
                   <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                     <React.Suspense fallback={<AppLoading />}>
                       <QueryClientProvider client={queryClient}>
-                        <AuthContext.Provider value={authContext}>
-                          <Routes>
-                            <Route path="/signin" element={<SignInPage />} />
-                            <Route
-                              path="*"
-                              element={
-                                <ToolpadAppLayout
-                                  dom={dom}
-                                  basename={basename}
-                                  clipped={showPreviewHeader}
-                                />
-                              }
-                            />
-                          </Routes>
-                        </AuthContext.Provider>
+                        <AuthContext.Provider value={authContext}>{children}</AuthContext.Provider>
                         {showDevtools ? (
                           <ReactQueryDevtoolsProduction initialIsOpen={false} />
                         ) : null}
@@ -1681,12 +1697,41 @@ export default function ToolpadApp({
                     </React.Suspense>
                   </ResetNodeErrorsKeyProvider>
                 </ErrorBoundary>
-              </DomContextProvider>
+              </DomContext.Provider>
             </ComponentsContextProvider>
             <EditorOverlay ref={canvasHooks.overlayRef} id={HTML_ID_EDITOR_OVERLAY} />
           </AppRoot>
         </AppThemeProvider>
       </UseDataProviderContext.Provider>
     </RuntimeApiContext.Provider>
+  );
+}
+
+export interface ToolpadAppProps {
+  rootRef?: React.Ref<HTMLDivElement>;
+  basename: string;
+  state: RuntimeState;
+}
+
+export default function ToolpadApp({ rootRef, basename, state }: ToolpadAppProps) {
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ToolpadAppProvider basename={basename} state={state} rootRef={rootRef}>
+            <Outlet />
+          </ToolpadAppProvider>
+        }
+      >
+        <Route path="/signin" Component={SignInPage} />
+        <Route path="/" Component={PagesLayoutRoute}>
+          <Route path="/pages/:pageName" Component={PageRoute} />
+          <Route path="/pages" Component={DefaultPageRoute} />
+          <Route path="/" Component={DefaultPageRoute} />
+          <Route path="*" Component={PageNotFound} />
+        </Route>
+      </Route>
+    </Routes>
   );
 }

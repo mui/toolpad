@@ -17,7 +17,6 @@ import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { test, expect, afterEach } from 'vitest';
 import * as appDom from '@mui/toolpad-core/appDom';
-import { MemoryRouter } from 'react-router-dom';
 import createRuntimeState from './createRuntimeState';
 import ToolpadApp from './ToolpadApp';
 import { AppHost, AppHostContext } from './AppHostContext';
@@ -53,9 +52,7 @@ function renderPage(
   return render(
     <CanvasEventsContext.Provider value={canvasEvents}>
       <AppHostContext.Provider value={appHost}>
-        <MemoryRouter>
-          <ToolpadApp state={state} basename="toolpad" />
-        </MemoryRouter>
+        <ToolpadApp state={state} basename="toolpad" />
       </AppHostContext.Provider>
     </CanvasEventsContext.Provider>,
   );

@@ -295,11 +295,12 @@ if (import.meta.hot) {
       mode,
       build: {
         outDir,
+        emptyOutDir: true,
         chunkSizeWarningLimit: Infinity,
         rollupOptions: {
           input: {
-            app: '/index.html',
-            ...(dev ? { editor: '/editor.html' } : {}),
+            index: path.resolve(currentDirectory, './index.html'),
+            ...(dev ? { editor: path.resolve(currentDirectory, './editor.html') } : {}),
           },
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {

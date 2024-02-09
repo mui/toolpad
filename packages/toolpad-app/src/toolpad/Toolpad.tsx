@@ -146,12 +146,11 @@ const queryClient = new QueryClient({
   },
 });
 
-export interface ToolpadProps {
-  basename: string;
+interface ToolpadEditorContentProps {
   appUrl: string;
 }
 
-export default function Toolpad({ appUrl, basename }: ToolpadProps) {
+function ToolpadEditorContent({ appUrl }: ToolpadEditorContentProps) {
   return (
     <ThemeProvider>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
@@ -162,23 +161,34 @@ export default function Toolpad({ appUrl, basename }: ToolpadProps) {
           <React.Suspense fallback={<FullPageLoader />}>
             <QueryClientProvider client={queryClient}>
               <ProjectProvider url={appUrl}>
-                <BrowserRouter basename={basename}>
-                  <AppProvider appUrl={appUrl}>
-                    <EditorShell>
-                      <Routes>
-                        {FEATURE_FLAG_GLOBAL_FUNCTIONS ? (
-                          <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
-                        ) : null}
-                        <Route path="/*" element={<AppEditor />} />
-                      </Routes>
-                    </EditorShell>
-                  </AppProvider>
-                </BrowserRouter>
+                <AppProvider appUrl={appUrl}>
+                  <EditorShell>
+                    <Routes>
+                      {FEATURE_FLAG_GLOBAL_FUNCTIONS ? (
+                        <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
+                      ) : null}
+                      <Route path="*" element={<AppEditor />} />
+                    </Routes>
+                  </EditorShell>
+                </AppProvider>
               </ProjectProvider>
             </QueryClientProvider>
           </React.Suspense>
         </ErrorBoundary>
       </Box>
     </ThemeProvider>
+  );
+}
+
+export interface ToolpadProps {
+  basename: string;
+  appUrl: string;
+}
+
+export default function ToolpadEditor({ basename, appUrl }: ToolpadProps) {
+  return (
+    <BrowserRouter basename={basename}>
+      <ToolpadEditorContent appUrl={appUrl} />
+    </BrowserRouter>
   );
 }

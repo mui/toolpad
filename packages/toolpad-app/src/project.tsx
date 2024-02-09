@@ -69,12 +69,13 @@ type Project = Awaited<ReturnType<typeof createProject>>;
 
 const ProjectContext = React.createContext<Project | undefined>(undefined);
 
-export interface ProjectProps {
+export interface ProjectProviderProps {
   url: string;
   children: React.ReactNode;
+  fallback: React.ReactNode;
 }
 
-export function ProjectProvider({ url, children }: ProjectProps) {
+export function ProjectProvider({ url, children, fallback }: ProjectProviderProps) {
   const { data: manifest } = useSuspenseQuery({
     queryKey: ['app-dev-manifest', url],
     queryFn: () => fetchAppDevManifest(url),
@@ -96,7 +97,7 @@ export function ProjectProvider({ url, children }: ProjectProps) {
 
   return (
     <ProjectContext.Provider value={project}>
-      {project ? children : 'loading'}
+      {project ? children : fallback}
     </ProjectContext.Provider>
   );
 }

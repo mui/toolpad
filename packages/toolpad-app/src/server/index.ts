@@ -326,7 +326,6 @@ async function createToolpadHandler({
   if (dev) {
     if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
       router.use('/_toolpad', (req, res) => {
-        console.log(req.url);
         res.redirect(`${project.options.base}/editor${req.url}`);
       });
     } else {

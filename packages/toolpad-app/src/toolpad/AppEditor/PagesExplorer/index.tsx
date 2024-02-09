@@ -61,6 +61,7 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
     nodeId,
     labelIcon,
     labelText,
+    title,
     onRenameNode,
     onDeleteNode,
     onDuplicateNode,
@@ -69,7 +70,6 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
     duplicateLabelText = 'Duplicate',
     toolpadNodeId,
     validateItemName,
-    title,
     ...other
   } = props;
 

@@ -45,8 +45,6 @@ export default function EditableTreeItem({
   const [itemNameInput, setItemNameInput] = React.useState(suggestedNewItemName);
   const [isInternalEditing, setIsInternalEditing] = React.useState(false);
 
-  console.log(itemNameInput);
-
   const isEditing = isExternalEditing || isInternalEditing;
 
   const newItemValidationResult = React.useMemo(

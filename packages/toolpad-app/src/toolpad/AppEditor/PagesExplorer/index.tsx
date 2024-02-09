@@ -278,7 +278,9 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       if (nodeId === activePage?.id) {
         const siblings = appDom.getSiblings(dom, deletedNode);
         const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
-        domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
+        domViewAfterDelete = firstSiblingOfType
+          ? getNodeEditorDomView(firstSiblingOfType)
+          : { kind: 'page' };
       }
 
       await projectApi.methods.deletePage(deletedNode.name);

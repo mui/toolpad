@@ -43,7 +43,7 @@ test('Must be authenticated with valid domain to access app', async ({ page, req
   // Sign in with valid domain
   await tryCredentialsSignIn(page, 'mui', 'mui');
   await expect(page).toHaveURL(/\/prod\/pages\/mypage/);
-  await expect(page.getByText('message: hello world')).toBeVisible();
+  await expect(page.getByText('my email: test@mui.com')).toBeVisible();
 
   // Is not redirected when authenticated
   await page.goto('/prod/pages/mypage');

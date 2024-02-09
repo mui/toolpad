@@ -110,6 +110,7 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
               textOverflow: 'ellipsis',
               maxWidth: '40%',
               overflow: 'hidden',
+              marginLeft: '2px',
             }}
           >
             {title}

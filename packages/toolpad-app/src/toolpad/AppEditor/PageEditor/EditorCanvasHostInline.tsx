@@ -39,6 +39,9 @@ function Overlay(props: OverlayProps) {
     [container],
   );
 
+  // See https://github.com/emotion-js/emotion/issues/1105#issuecomment-1058225197
+  cache.compat = true;
+
   return <CacheProvider value={cache}>{children}</CacheProvider>;
 }
 

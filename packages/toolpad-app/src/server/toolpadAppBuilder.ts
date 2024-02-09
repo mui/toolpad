@@ -343,7 +343,7 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
-        force: toolpadDevMode ? true : undefined,
+        force: !process.env.EXPERIMENTAL_INLINE_CANVAS && toolpadDevMode ? true : undefined,
         include: [...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`)],
       },
       appType: 'custom',

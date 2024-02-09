@@ -48,7 +48,7 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
       <Divider />
 
       <PanelGroup autoSaveId="toolpad-page-panel" direction="vertical">
-        <Panel id="pages-explorer" order={1} minSize={10} defaultSize={30} maxSize={75}>
+        <Panel id="pages-explorer" order={1} minSize={10} defaultSize={30}>
           <PagesExplorer />
         </Panel>
         {currentPageNode && !appDom.isCodePage(currentPageNode) ? (

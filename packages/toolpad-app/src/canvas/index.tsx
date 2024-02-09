@@ -5,7 +5,6 @@ import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { FlowDirection, SlotType } from '@mui/toolpad-core';
 import { update } from '@mui/toolpad-utils/immutability';
 import { useNonNullableContext } from '@mui/toolpad-utils/react';
-import ToolpadApp from '../runtime/ToolpadApp';
 import { queryClient } from '../runtime/api';
 import { AppCanvasState, NodeInfo, PageViewState, SlotsState } from '../types';
 import {
@@ -13,9 +12,8 @@ import {
   getRelativeOuterRect,
   rectContainsPoint,
 } from '../utils/geometry';
-import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
-import { AppHostContext } from '../runtime/AppHostContext';
+import { AppHostContext, ToolpadApp, CanvasHooks, CanvasHooksContext } from '../runtime';
 
 const handleScreenUpdate = throttle(
   () => {
@@ -25,7 +23,7 @@ const handleScreenUpdate = throttle(
   { trailing: true },
 );
 
-function updateNodeInfo(nodeInfo: NodeInfo, rootElm: Element): NodeInfo {
+export function updateNodeInfo(nodeInfo: NodeInfo, rootElm: Element): NodeInfo {
   const nodeElm = rootElm.querySelector(`[data-toolpad-node-id="${nodeInfo.nodeId}"]`);
 
   if (!nodeElm) {

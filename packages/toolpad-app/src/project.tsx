@@ -84,18 +84,21 @@ export function ProjectProvider({ url, children }: ProjectProps) {
 
   const queryClient = useQueryClient();
 
-  const project = React.useMemo(
-    () => createProject(url, manifest, queryClient),
-    [url, manifest, queryClient],
-  );
+  const [project, setProject] = React.useState<Project | undefined>();
 
   React.useEffect(() => {
+    const newProject = createProject(url, manifest, queryClient);
+    setProject(newProject);
     return () => {
-      project.dispose();
+      newProject.dispose();
     };
-  }, [project]);
+  }, [url, manifest, queryClient]);
 
-  return <ProjectContext.Provider value={project}>{children}</ProjectContext.Provider>;
+  return (
+    <ProjectContext.Provider value={project}>
+      {project ? children : 'loading'}
+    </ProjectContext.Provider>
+  );
 }
 
 export function useProject() {

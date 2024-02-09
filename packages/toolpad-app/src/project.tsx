@@ -51,7 +51,13 @@ function createProject(url: string, serializedManifest: string, queryClient: Que
   });
 
   const dispose = () => {
-    ws.close();
+    if (ws.readyState === ws.OPEN) {
+      ws.close();
+    } else {
+      ws.onopen = () => {
+        ws.close();
+      };
+    }
     unsubExternalChange();
     unsubFunctionsChanged();
   };

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, Box, IconButton, Stack, Typography } from '@mui/material';
+import { styled, Box, IconButton, Stack, Tooltip } from '@mui/material';
 import { TreeView, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -61,7 +61,6 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
     nodeId,
     labelIcon,
     labelText,
-    title,
     onRenameNode,
     onDeleteNode,
     onDuplicateNode,
@@ -70,6 +69,7 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
     duplicateLabelText = 'Duplicate',
     toolpadNodeId,
     validateItemName,
+    title,
     ...other
   } = props;
 
@@ -100,45 +100,35 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
       nodeId={nodeId}
       labelText={labelText}
       renderLabel={(children) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {labelIcon}
-          {children}
-          <Typography
-            variant="caption"
-            sx={{
-              whiteSpace: 'nowrap',
-              textOverflow: 'ellipsis',
-              maxWidth: '40%',
-              overflow: 'hidden',
-              marginLeft: '2px',
-            }}
-          >
-            {title}
-          </Typography>
-          {toolpadNodeId ? (
-            <NodeMenu
-              renderButton={({ buttonProps, menuProps }) => (
-                <IconButton
-                  className={clsx(classes.treeItemMenuButton, {
-                    [classes.treeItemMenuOpen]: menuProps.open,
-                  })}
-                  aria-label="Open page explorer menu"
-                  size="small"
-                  {...buttonProps}
-                >
-                  <MoreVertIcon fontSize="inherit" />
-                </IconButton>
-              )}
-              nodeId={toolpadNodeId}
-              renameLabelText={renameLabelText}
-              deleteLabelText={deleteLabelText}
-              duplicateLabelText={duplicateLabelText}
-              onRenameNode={startEditing}
-              onDeleteNode={onDeleteNode}
-              onDuplicateNode={onDuplicateNode}
-            />
-          ) : null}
-        </Box>
+        <Tooltip title={title} placement="right" disableInteractive>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {labelIcon}
+            {children}
+            {toolpadNodeId ? (
+              <NodeMenu
+                renderButton={({ buttonProps, menuProps }) => (
+                  <IconButton
+                    className={clsx(classes.treeItemMenuButton, {
+                      [classes.treeItemMenuOpen]: menuProps.open,
+                    })}
+                    aria-label="Open page explorer menu"
+                    size="small"
+                    {...buttonProps}
+                  >
+                    <MoreVertIcon fontSize="inherit" />
+                  </IconButton>
+                )}
+                nodeId={toolpadNodeId}
+                renameLabelText={renameLabelText}
+                deleteLabelText={deleteLabelText}
+                duplicateLabelText={duplicateLabelText}
+                onRenameNode={startEditing}
+                onDeleteNode={onDeleteNode}
+                onDuplicateNode={onDuplicateNode}
+              />
+            ) : null}
+          </Box>
+        </Tooltip>
       )}
       suggestedNewItemName={labelText}
       onCancel={stopEditing}

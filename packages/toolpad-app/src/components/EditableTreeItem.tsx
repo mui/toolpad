@@ -12,7 +12,7 @@ import {
 
 export interface EditableTreeItemProps extends Omit<TreeItemProps, 'label'> {
   labelText?: string;
-  renderLabel?: (children: React.ReactNode) => React.ReactNode;
+  renderLabel?: (children: React.ReactNode, isEditing: boolean) => React.ReactNode;
   suggestedNewItemName?: string;
   isEditing?: boolean;
   onEdit?: (newItemName: string) => void | Promise<void>;
@@ -125,53 +125,58 @@ export default function EditableTreeItem({
     <TreeItem
       {...rest}
       onClick={handleClick}
-      label={renderLabel(
-        isEditing ? (
-          <React.Fragment>
-            <InputBase
-              {...inputProps}
-              ref={inputRef}
-              value={itemNameInput}
-              onChange={handleChange}
-              autoFocus
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              fullWidth
-              sx={{
-                ...(inputProps?.sx || {}),
-                ...labelTextSx,
-                padding: 0,
-              }}
-            />
-            {inputErrorPopoverAnchorEl ? (
-              <Popover
-                open={!!validationErrorMessage}
-                anchorEl={inputErrorPopoverAnchorEl}
-                disableAutoFocus
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-              >
-                {validationErrorMessage ? (
-                  <Alert severity="error" variant="outlined">
-                    {validationErrorMessage}
-                  </Alert>
+      label={
+        <React.Fragment>
+          {renderLabel(
+            isEditing ? (
+              <React.Fragment>
+                <InputBase
+                  {...inputProps}
+                  ref={inputRef}
+                  value={itemNameInput}
+                  onChange={handleChange}
+                  autoFocus
+                  onFocus={handleFocus}
+                  onBlur={handleBlur}
+                  onKeyDown={handleKeyDown}
+                  fullWidth
+                  sx={{
+                    ...(inputProps?.sx || {}),
+                    ...labelTextSx,
+                    padding: 0,
+                  }}
+                />
+                {inputErrorPopoverAnchorEl ? (
+                  <Popover
+                    open={!!validationErrorMessage}
+                    anchorEl={inputErrorPopoverAnchorEl}
+                    disableAutoFocus
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left',
+                    }}
+                  >
+                    {validationErrorMessage ? (
+                      <Alert severity="error" variant="outlined">
+                        {validationErrorMessage}
+                      </Alert>
+                    ) : null}
+                  </Popover>
                 ) : null}
-              </Popover>
-            ) : null}
-          </React.Fragment>
-        ) : (
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 'inherit', flexGrow: 1, ...labelTextSx }}
-            noWrap
-          >
-            {labelText}
-          </Typography>
-        ),
-      )}
+              </React.Fragment>
+            ) : (
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 'inherit', flexGrow: 1, ...labelTextSx }}
+                noWrap
+              >
+                {labelText}
+              </Typography>
+            ),
+            isEditing,
+          )}
+        </React.Fragment>
+      }
       sx={
         isEditing
           ? {

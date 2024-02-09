@@ -5,7 +5,7 @@ import { isWebContainer } from '@webcontainer/env';
 import type express from 'express';
 import { getUserToken } from './auth';
 
-interface ServerContextUser {
+interface ServerContextSession {
   name?: string | null;
   email?: string | null;
   avatar?: string | null;
@@ -21,7 +21,10 @@ export interface ServerContext {
    * Use to set a cookie `name` with `value`.
    */
   setCookie: (name: string, value: string) => void;
-  user: ServerContextUser | null;
+  /**
+   * Data about current logged-in user session, if authenticated.
+   */
+  session: ServerContextSession | null;
 }
 
 const contextStore = new AsyncLocalStorage<ServerContext>();
@@ -37,7 +40,7 @@ export async function createServerContext(
   const cookies = cookie.parse(req.headers.cookie || '');
 
   const token = await getUserToken(req as express.Request);
-  const user = token && {
+  const session = token && {
     name: token.name,
     email: token.email,
     avatar: token.picture,
@@ -49,7 +52,7 @@ export async function createServerContext(
     setCookie(name, value) {
       res.setHeader('Set-Cookie', cookie.serialize(name, value, { path: '/' }));
     },
-    user,
+    session,
   };
 }
 

@@ -1422,11 +1422,13 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
     }
   });
 
-  const applicationVm = useApplicationVm((vm) => {
+  const onApplicationVmUpdate = useEventCallback((vm: ApplicationVm) => {
     if (canvasEvents) {
       canvasEvents.emit('vmUpdated', { vm });
     }
   });
+
+  const applicationVm = useApplicationVm(onApplicationVmUpdate);
 
   return (
     <ApplicationVmApiContext.Provider value={applicationVm}>

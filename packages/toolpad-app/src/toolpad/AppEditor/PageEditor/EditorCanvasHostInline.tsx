@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { NodeHashes } from '@mui/toolpad-core';
+import { NodeHashes, RuntimeEvents } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
@@ -9,6 +9,7 @@ import { update } from '@mui/toolpad-utils/immutability';
 import { throttle } from 'lodash-es';
 import invariant from 'invariant';
 import * as appDom from '@mui/toolpad-core/appDom';
+import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { createCommands, type ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import { useProject } from '../../../project';
 import { RuntimeState } from '../../../runtime';
@@ -79,6 +80,8 @@ export default function EditorCanvasHost({
   onInit,
 }: EditorCanvasHostProps) {
   const project = useProject();
+
+  const [canvasEvents, setCanvasEvents] = React.useState<Emitter<RuntimeEvents> | null>(null);
 
   const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 
@@ -190,6 +193,7 @@ export default function EditorCanvasHost({
       };
 
       onInit?.(bridge);
+      setCanvasEvents(bridge.canvasEvents);
     },
     [onInit, project.events],
   );
@@ -217,11 +221,13 @@ export default function EditorCanvasHost({
         ? ReactDOM.createPortal(
             <Overlay container={portal}>
               <CanvasHooksContext.Provider value={canvasHooks}>
-                <AppHostContext.Provider value={appHost}>
-                  <ToolpadAppProvider rootRef={onAppRoot} basename={base} state={runtimeState}>
-                    <RenderedPage page={page} />
-                  </ToolpadAppProvider>
-                </AppHostContext.Provider>
+                <CanvasEventsContext.Provider value={canvasEvents}>
+                  <AppHostContext.Provider value={appHost}>
+                    <ToolpadAppProvider rootRef={onAppRoot} basename={base} state={runtimeState}>
+                      <RenderedPage page={page} />
+                    </ToolpadAppProvider>
+                  </AppHostContext.Provider>
+                </CanvasEventsContext.Provider>
               </CanvasHooksContext.Provider>
             </Overlay>,
             portal,

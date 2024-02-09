@@ -158,7 +158,6 @@ export interface PagesExplorerProps {
 export default function PagesExplorer({ className }: PagesExplorerProps) {
   const projectApi = useProjectApi();
   const { dom, currentView } = useAppState();
-  const domApi = useDomApi();
   const appStateApi = useAppStateApi();
 
   const app = appDom.getApp(dom);
@@ -284,18 +283,23 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
 
       await projectApi.methods.deletePage(deletedNode.name);
 
-      appStateApi.update(
-        (draft) => appDom.removeNode(draft, nodeId),
-        domViewAfterDelete || { kind: 'page' },
-      );
+      appStateApi.update((draft) => appDom.removeNode(draft, nodeId), domViewAfterDelete);
     },
     [projectApi, activePage?.id, appStateApi, dom],
   );
 
   const handleRenameNode = React.useCallback(
     (nodeId: NodeId, updatedName: string) => {
-      domApi.setNodeName(nodeId, updatedName);
-      appStateApi.setView({ kind: 'page', name: updatedName });
+      appStateApi.update(
+        (draft) => {
+          const page = appDom.getNode(draft, nodeId, 'page');
+          return appDom.setNodeName(draft, page, updatedName);
+        },
+        {
+          kind: 'page',
+          name: updatedName,
+        },
+      );
 
       const oldNameNode = dom.nodes[nodeId];
       if (oldNameNode.type === 'page' && updatedName !== oldNameNode.name) {
@@ -304,7 +308,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         }, 300);
       }
     },
-    [appStateApi, dom.nodes, domApi, projectApi.methods],
+    [appStateApi, dom.nodes, projectApi.methods],
   );
 
   const handleDuplicateNode = React.useCallback(

@@ -45,6 +45,8 @@ export default function EditableTreeItem({
   const [itemNameInput, setItemNameInput] = React.useState(suggestedNewItemName);
   const [isInternalEditing, setIsInternalEditing] = React.useState(false);
 
+  console.log(itemNameInput);
+
   const isEditing = isExternalEditing || isInternalEditing;
 
   const newItemValidationResult = React.useMemo(
@@ -81,10 +83,10 @@ export default function EditableTreeItem({
       handleCancel();
       return;
     }
+
     if (onEdit) {
       onEdit(itemNameInput);
     }
-    setItemNameInput('');
     setIsInternalEditing(false);
   }, [handleCancel, itemNameInput, newItemValidationResult.isValid, onEdit]);
 

@@ -291,17 +291,12 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
 
   const handleRenameNode = React.useCallback(
     (nodeId: NodeId, updatedName: string) => {
-      domApi.setNodeName(nodeId, updatedName);
-      appStateApi.setView({ kind: 'page', name: updatedName });
-
-      const oldNameNode = dom.nodes[nodeId];
-      if (oldNameNode.type === 'page' && updatedName !== oldNameNode.name) {
-        setTimeout(async () => {
-          await projectApi.methods.deletePage(oldNameNode.name);
-        }, 300);
-      }
+      domApi.update((draft) => {
+        const page = appDom.getNode(draft, nodeId, 'page');
+        return appDom.setNodeNamespacedProp(draft, page, 'attributes', 'displayName', updatedName);
+      });
     },
-    [projectApi, dom.nodes, domApi, appStateApi],
+    [domApi],
   );
 
   const handleDuplicateNode = React.useCallback(
@@ -373,7 +368,6 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             onRenameNode={handleRenameNode}
             onDuplicateNode={handleDuplicateNode}
             onDeleteNode={handleDeletePage}
-            validateItemName={validatePageName}
           />
         ))}
       </TreeView>

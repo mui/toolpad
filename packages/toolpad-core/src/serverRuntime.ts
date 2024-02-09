@@ -12,10 +12,6 @@ interface ServerContextSessionUser {
   roles?: string[];
 }
 
-interface ServerContextSession {
-  user: ServerContextSessionUser;
-}
-
 export interface ServerContext {
   /**
    * A dictionary mapping cookie name to cookie value.
@@ -28,7 +24,7 @@ export interface ServerContext {
   /**
    * Data about current authenticated session.
    */
-  session: ServerContextSession | null;
+  session: { user: ServerContextSessionUser } | null;
 }
 
 const contextStore = new AsyncLocalStorage<ServerContext>();

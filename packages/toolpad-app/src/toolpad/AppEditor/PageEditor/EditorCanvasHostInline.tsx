@@ -172,7 +172,7 @@ export default function EditorCanvasHost({
       );
 
       projectEventSubscriptionRef.current = project.events.subscribe('queriesInvalidated', () => {
-        bridge.canvasCommands.invalidateQueries();
+        queryClient.invalidateQueries();
       });
 
       const mutationObserver = new MutationObserver(handleScreenUpdate);

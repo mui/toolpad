@@ -160,7 +160,7 @@ function ToolpadEditorContent({ appUrl }: ToolpadEditorContentProps) {
         <ErrorBoundary fallbackRender={ErrorFallback}>
           <React.Suspense fallback={<FullPageLoader />}>
             <QueryClientProvider client={queryClient}>
-              <ProjectProvider url={appUrl}>
+              <ProjectProvider url={appUrl} fallback={<FullPageLoader />}>
                 <AppProvider appUrl={appUrl}>
                   <EditorShell>
                     <Routes>

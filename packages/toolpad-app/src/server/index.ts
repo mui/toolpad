@@ -325,7 +325,10 @@ async function createToolpadHandler({
   let editorHandler: AppHandler | undefined;
   if (dev) {
     if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
-      router.use('/_toolpad', (req, res) => res.redirect(`${project.options.base}/editor`));
+      router.use('/_toolpad', (req, res) => {
+        console.log(req.url);
+        res.redirect(`${project.options.base}/editor${req.url}`);
+      });
     } else {
       editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
       router.use(editorBasename, editorHandler.handler);

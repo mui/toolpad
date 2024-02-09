@@ -87,7 +87,7 @@ test('can create/delete page', async ({ page, localApp }) => {
   // Delete current page
 
   const currentPageMenuItem = editorModel.getExplorerItem('andOneMorePage');
-  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/someOtherPage');
+  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/andOneMorePage');
   const pageFile = path.resolve(pageFolder, './page.yml');
 
   await expect(currentPageMenuItem).toBeVisible();

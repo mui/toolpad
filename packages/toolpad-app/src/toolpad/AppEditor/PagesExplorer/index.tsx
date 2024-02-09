@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, Box, IconButton, Stack } from '@mui/material';
+import { styled, Box, IconButton, Stack, Typography } from '@mui/material';
 import { TreeView, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -61,6 +61,7 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
     nodeId,
     labelIcon,
     labelText,
+    title,
     onRenameNode,
     onDeleteNode,
     onDuplicateNode,
@@ -102,6 +103,17 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {labelIcon}
           {children}
+          <Typography
+            variant="caption"
+            sx={{
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              maxWidth: '40%',
+              overflow: 'hidden',
+            }}
+          >
+            {title}
+          </Typography>
           {toolpadNodeId ? (
             <NodeMenu
               renderButton={({ buttonProps, menuProps }) => (
@@ -291,12 +303,17 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
 
   const handleRenameNode = React.useCallback(
     (nodeId: NodeId, updatedName: string) => {
-      domApi.update((draft) => {
-        const page = appDom.getNode(draft, nodeId, 'page');
-        return appDom.setNodeNamespacedProp(draft, page, 'attributes', 'displayName', updatedName);
-      });
+      domApi.setNodeName(nodeId, updatedName);
+      appStateApi.setView({ kind: 'page', name: updatedName });
+
+      const oldNameNode = dom.nodes[nodeId];
+      if (oldNameNode.type === 'page' && updatedName !== oldNameNode.name) {
+        setTimeout(async () => {
+          await projectApi.methods.deletePage(oldNameNode.name);
+        }, 300);
+      }
     },
-    [domApi],
+    [appStateApi, dom.nodes, domApi, projectApi.methods],
   );
 
   const handleDuplicateNode = React.useCallback(
@@ -363,11 +380,12 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             key={page.id}
             nodeId={page.id}
             toolpadNodeId={page.id}
-            labelText={appDom.getPageDisplayName(page)}
-            title={page.name}
+            labelText={page.name}
+            title={appDom.getPageDisplayName(page)}
             onRenameNode={handleRenameNode}
             onDuplicateNode={handleDuplicateNode}
             onDeleteNode={handleDeletePage}
+            validateItemName={validatePageName}
           />
         ))}
       </TreeView>

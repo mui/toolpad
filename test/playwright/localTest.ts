@@ -58,8 +58,18 @@ interface LocalServerConfig {
   env?: Record<string, string>;
   base?: string;
 }
+export async function getTemporaryDir() {
+  const tmpDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
 
-export async function getTemporaryDir(
+  return {
+    path: tmpDir,
+    [asyncDisposeSymbol]: async () => {
+      await fs.rm(tmpDir, { recursive: true, maxRetries: 3, retryDelay: 1000 });
+    },
+  };
+}
+
+async function getTestFixtureTempDir(
   workerInfo: WorkerInfo,
   { template, setup }: ProjectConfig = {},
 ) {
@@ -311,7 +321,7 @@ const test = baseTest.extend<
   projectConfig: [undefined, { option: true, scope: 'worker' }],
   projectDir: [
     async ({ projectConfig }, use, workerInfo) => {
-      await using(await getTemporaryDir(workerInfo, projectConfig), async (projectDir) => {
+      await using(await getTestFixtureTempDir(workerInfo, projectConfig), async (projectDir) => {
         await use(projectDir);
       });
     },

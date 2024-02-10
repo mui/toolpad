@@ -10,7 +10,7 @@ import archiver from 'archiver';
 import * as url from 'url';
 import getPort from 'get-port';
 import * as execa from 'execa';
-import { PageScreenshotOptions, test as baseTest } from './test';
+import { PageScreenshotOptions, WorkerInfo, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
 import { asyncDisposeSymbol, using } from '../utils/resources';
 
@@ -59,8 +59,12 @@ interface LocalServerConfig {
   base?: string;
 }
 
-export async function getTemporaryDir({ template, setup }: ProjectConfig = {}) {
-  const tmpTestDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
+export async function getTemporaryDir(
+  workerInfo: WorkerInfo,
+  { template, setup }: ProjectConfig = {},
+) {
+  const tmpTestDir = path.resolve(currentDirectory, `./.tmp-test-dir-${workerInfo.parallelIndex}`);
+  await fs.mkdir(tmpTestDir);
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
   const projectDir = path.resolve(tmpTestDir, './fixture');
@@ -306,8 +310,8 @@ const test = baseTest.extend<
   customServerConfig: [undefined, { option: true, scope: 'worker' }],
   projectConfig: [undefined, { option: true, scope: 'worker' }],
   projectDir: [
-    async ({ projectConfig }, use) => {
-      await using(await getTemporaryDir(projectConfig), async (projectDir) => {
+    async ({ projectConfig }, use, workerInfo) => {
+      await using(await getTemporaryDir(workerInfo, projectConfig), async (projectDir) => {
         await use(projectDir);
       });
     },

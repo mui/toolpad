@@ -55,8 +55,8 @@ importers:
         specifier: 1.5.3
         version: 1.5.3
       '@mui/monorepo':
-        specifier: github:mui/material-ui#3c445c68d6098841eff7c6b7b021965905d0b078
-        version: github.com/mui/material-ui/3c445c68d6098841eff7c6b7b021965905d0b078
+        specifier: github:mui/material-ui#7de26c9991eb677ac4ec509157555d9ad4c7bf94
+        version: github.com/mui/material-ui/7de26c9991eb677ac4ec509157555d9ad4c7bf94
       '@mui/x-charts':
         specifier: 6.19.4
         version: 6.19.4(@mui/material@5.15.9)(@mui/system@5.15.9)(react-dom@18.2.0)(react@18.2.0)
@@ -223,8 +223,8 @@ importers:
         specifier: ^5.15.9
         version: 5.15.9(@emotion/cache@11.11.0)(@emotion/server@11.11.0)(@mui/material@5.15.9)(next@13.4.19)(react@18.2.0)
       '@mui/monorepo':
-        specifier: github:mui/material-ui#3c445c68d6098841eff7c6b7b021965905d0b078
-        version: github.com/mui/material-ui/3c445c68d6098841eff7c6b7b021965905d0b078
+        specifier: github:mui/material-ui#7de26c9991eb677ac4ec509157555d9ad4c7bf94
+        version: github.com/mui/material-ui/7de26c9991eb677ac4ec509157555d9ad4c7bf94
       '@mui/styles':
         specifier: 5.15.9
         version: 5.15.9(react@18.2.0)
@@ -15267,10 +15267,10 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  github.com/mui/material-ui/3c445c68d6098841eff7c6b7b021965905d0b078:
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/3c445c68d6098841eff7c6b7b021965905d0b078}
+  github.com/mui/material-ui/7de26c9991eb677ac4ec509157555d9ad4c7bf94:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/7de26c9991eb677ac4ec509157555d9ad4c7bf94}
     name: '@mui/monorepo'
-    version: 5.15.7
+    version: 5.15.9
     requiresBuild: true
     dependencies:
       '@googleapis/sheets': 5.0.5

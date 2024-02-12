@@ -1400,8 +1400,6 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
   const dom = useDomContext();
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
-  usePageTitle(appDom.getPageTitle(page));
-
   const location = useLocation();
   const components = useComponents();
 

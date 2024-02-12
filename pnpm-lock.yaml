@@ -899,6 +899,9 @@ importers:
 
   packages/toolpad-core:
     dependencies:
+      '@auth/core':
+        specifier: 0.25.1
+        version: 0.25.1
       '@mui/material':
         specifier: 5.15.10
         version: 5.15.10(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.55)(react-dom@18.2.0)(react@18.2.0)
@@ -945,6 +948,9 @@ importers:
       '@types/cookie':
         specifier: 0.6.0
         version: 0.6.0
+      '@types/express':
+        specifier: 4.17.21
+        version: 4.17.21
       '@types/invariant':
         specifier: 2.2.37
         version: 2.2.37
@@ -982,6 +988,9 @@ importers:
         specifier: 2.0.0
         version: 2.0.0
     devDependencies:
+      '@types/express':
+        specifier: 4.17.21
+        version: 4.17.21
       '@types/invariant':
         specifier: 2.2.37
         version: 2.2.37

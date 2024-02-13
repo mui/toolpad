@@ -300,7 +300,9 @@ if (import.meta.hot) {
         rollupOptions: {
           input: {
             index: path.resolve(currentDirectory, './index.html'),
-            ...(dev ? { editor: path.resolve(currentDirectory, './editor.html') } : {}),
+            ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+              ? { editor: path.resolve(currentDirectory, './editor.html') }
+              : {}),
           },
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
@@ -328,13 +330,21 @@ if (import.meta.hot) {
             replacement: dev ? 'virtual:toolpad-files:dev.tsx' : 'virtual:toolpad-files:main.tsx',
           },
           {
-            find: EDITOR_ENTRY,
-            replacement: 'virtual:toolpad-files:editor.tsx',
-          },
-          {
             find: '@mui/toolpad',
             replacement: path.resolve(currentDirectory, '../exports'),
           },
+          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+            ? [
+                {
+                  find: EDITOR_ENTRY,
+                  replacement: 'virtual:toolpad-files:editor.tsx',
+                },
+                {
+                  find: 'vm',
+                  replacement: 'vm-browserify',
+                },
+              ]
+            : []),
         ],
       },
       server: {
@@ -344,7 +354,18 @@ if (import.meta.hot) {
       },
       optimizeDeps: {
         force: !process.env.EXPERIMENTAL_INLINE_CANVAS && toolpadDevMode ? true : undefined,
-        include: [...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`)],
+        include: [
+          ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
+          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+            ? [
+                'perf-cascade',
+                'monaco-editor',
+                'monaco-editor/esm/vs/basic-languages/javascript/javascript',
+                'monaco-editor/esm/vs/basic-languages/typescript/typescript',
+                'monaco-editor/esm/vs/basic-languages/markdown/markdown',
+              ]
+            : []),
+        ],
       },
       appType: 'custom',
       logLevel: 'info',

@@ -4,7 +4,7 @@
 
 Example showcasing how to set up GitHub authentication in a Toolpad app. [The docs](https://mui.com/toolpad/concepts/authentication/).
 
-To use this example, you need to set the environment variables shown in [examples/auth-github/env.example](env.example).
+To use this example, you need to set the environment variables shown in [examples/auth-github/.env.example](env.example).
 To get those values, please:
 
 - Follow [this section](https://mui.com/toolpad/concepts/authentication/#authentication-secret) on how to create an authentication secret.

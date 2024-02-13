@@ -17,13 +17,9 @@ export function createRemoteFunction(functionFile: string, functionName: string)
   };
 }
 
-export {
-  default as ToolpadApp,
-  RenderedPage,
-  componentsStore,
-  pageComponentsStore,
-  type ToolpadAppProps,
-} from './ToolpadApp';
+export { default as ToolpadApp, RenderedPage, type ToolpadAppProps } from './ToolpadApp';
+
+export { componentsStore, pageComponentsStore } from './globalState';
 
 export { AppHostContext, type AppHost } from './AppHostContext';
 

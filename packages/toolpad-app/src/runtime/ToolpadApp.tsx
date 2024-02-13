@@ -34,11 +34,7 @@ import {
   JsExpressionAttrValue,
   ComponentConfig,
 } from '@mui/toolpad-core';
-import {
-  createGlobalState,
-  useAssertedContext,
-  useNonNullableContext,
-} from '@mui/toolpad-utils/react';
+import { useAssertedContext, useNonNullableContext } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
 import { QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -97,13 +93,11 @@ import { AuthContext, useAuth, AuthSession } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
 import { AppHost, AppHostContext } from './AppHostContext';
+import { componentsStore, pageComponentsStore } from './globalState';
 
 const browserJsRuntime = getBrowserRuntime();
 
 export type PageComponents = Partial<Record<string, React.ComponentType>>;
-
-export const componentsStore = createGlobalState<ToolpadComponents>({});
-export const pageComponentsStore = createGlobalState<PageComponents>({});
 
 const Pre = styled('pre')(({ theme }) => ({
   margin: 0,

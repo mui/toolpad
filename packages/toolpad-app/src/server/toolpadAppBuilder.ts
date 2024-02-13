@@ -325,7 +325,12 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            replacement: dev ? 'virtual:toolpad-files:dev.tsx' : 'virtual:toolpad-files:main.tsx',
+            // eslint-disable-next-line no-nested-ternary
+            replacement: process.env.EXPERIMENTAL_INLINE_CANVAS
+              ? 'virtual:toolpad-files:main.tsx'
+              : dev
+                ? 'virtual:toolpad-files:dev.tsx'
+                : 'virtual:toolpad-files:main.tsx',
           },
           {
             find: EDITOR_ENTRY,
@@ -333,7 +338,11 @@ if (import.meta.hot) {
           },
           {
             find: '@mui/toolpad',
-            replacement: path.resolve(currentDirectory, '../exports'),
+            replacement: toolpadDevMode
+              ? // load source
+                path.resolve(currentDirectory, '../../src/exports')
+              : // load compiled
+                path.resolve(currentDirectory, '../exports'),
           },
         ],
       },
@@ -349,7 +358,7 @@ if (import.meta.hot) {
       appType: 'custom',
       logLevel: 'info',
       root: currentDirectory,
-      plugins: [virtualToolpadFiles, react(), toolpadVitePlugin(), ...plugins],
+      plugins: [toolpadVitePlugin(), virtualToolpadFiles, react(), ...plugins],
       base,
       define: {
         'process.env.NODE_ENV': `'${mode}'`,

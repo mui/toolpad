@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.49/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
@@ -398,3 +400,4 @@ spec:
               customersGrid.selection.id
       mode: mutation
   display: standalone
+  displayName: Admin App(no data providers))

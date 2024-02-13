@@ -10,7 +10,7 @@ Example showcasing how to set up Google authentication in a Toolpad app. [The do
 
 ## How to run
 
-To use this example, you need to set the environment variables shown in [examples/auth-google/.env.example](.env.example).
+To use this example, you need to set the environment variables shown in [.env.example](examples/auth-google/.env.example).
 To get those values, please:
 
 - Follow [this section](https://mui.com/toolpad/concepts/authentication/#authentication-secret) on how to create an authentication secret.

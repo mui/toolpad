@@ -241,7 +241,21 @@ export default function EditorCanvasHost({
     <CanvasRoot className={className}>
       <CanvasFrame
         name="data-toolpad-canvas"
-        srcDoc={`<!DOCTYPE html><div id="root"></div>`}
+        srcDoc={`
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+              />
+            </head>
+            <body className="notranslate">
+              <div id="root"></div>
+            </body>
+          </html>
+        `}
         onLoad={handleIframeLoad}
       />
       {page && portal

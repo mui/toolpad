@@ -1,5 +1,5 @@
 {
-  "name": "auth",
+  "name": "auth-github",
   "version": "0.1.0",
   "private": true,
   "scripts": {

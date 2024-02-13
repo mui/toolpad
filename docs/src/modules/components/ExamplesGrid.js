@@ -107,11 +107,11 @@ function layouts() {
       source: 'https://github.com/mui/mui-toolpad/tree/master/examples/charts',
     },
     {
-      title: 'Authentication',
-      description: 'An app that shows how to set up authentication in Toolpad.',
-      src: '/static/toolpad/marketing/authentication.png',
-      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/auth',
-      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/auth',
+      title: 'Google Authentication',
+      description: 'An app that shows how to set up Google authentication in Toolpad.',
+      src: '/static/toolpad/marketing/auth-google.png',
+      href: 'https://github.com/mui/mui-toolpad/tree/master/examples/auth-google',
+      source: 'https://github.com/mui/mui-toolpad/tree/master/examples/auth-google',
     },
     {
       title: 'Custom server',

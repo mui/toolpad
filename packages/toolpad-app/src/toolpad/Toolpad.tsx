@@ -188,7 +188,6 @@ export interface ToolpadEditorProps {
 }
 
 export function ToolpadEditor({ basename, state }: ToolpadEditorProps) {
-  console.log(state);
   return (
     <BrowserRouter basename={basename}>
       <Routes>

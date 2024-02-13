@@ -48,7 +48,7 @@ const PREFIX = process.env.EXPERIMENTAL_INLINE_CANVAS ? '/editor' : '';
 export function getPathnameFromView(view: DomView): string {
   switch (view.kind) {
     case 'page':
-      return view.name ? `${PREFIX}/app/pages/${view.name}` : '${prefix}/app/pages';
+      return view.name ? `${PREFIX}/app/pages/${view.name}` : `${PREFIX}/app/pages`;
     default:
       throw new Error(`Unknown view "${(view as DomView).kind}".`);
   }

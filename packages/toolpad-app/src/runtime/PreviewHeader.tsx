@@ -106,7 +106,10 @@ function CodeView({ children }: CodeViewProps) {
   );
 }
 
-function OpenInEditorButton({ children = 'Open in editor', ...props }: ButtonProps) {
+function OpenInEditorButton<C extends React.ElementType>({
+  children = 'Open in editor',
+  ...props
+}: ButtonProps<C>) {
   return (
     <Button color="inherit" size="small" startIcon={<EditIcon />} {...props}>
       {children}

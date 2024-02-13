@@ -62,7 +62,6 @@ async function createDevHandler(project: ToolpadProject) {
   ]);
 
   const mainThreadRpcChannel = new MessageChannel();
-
   const worker = new Worker(appServerPath, {
     workerData: {
       toolpadDevMode: project.options.toolpadDevMode,
@@ -234,6 +233,7 @@ async function createEditorHandler(
   { toolpadDevMode = false }: EditorHandlerParams,
 ): Promise<AppHandler> {
   const router = express.Router();
+  let viteApp: ViteDevServer | undefined;
 
   const transformIndexHtml = (html: string) => {
     return html.replace(
@@ -245,8 +245,6 @@ async function createEditorHandler(
       `,
     );
   };
-
-  let viteApp: ViteDevServer | undefined;
 
   if (toolpadDevMode) {
     // eslint-disable-next-line no-console
@@ -326,8 +324,14 @@ async function createToolpadHandler({
 
   let editorHandler: AppHandler | undefined;
   if (dev) {
-    editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
-    router.use(editorBasename, editorHandler.handler);
+    if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+      router.use('/_toolpad', (req, res) => {
+        res.redirect(`${project.options.base}/editor${req.url}`);
+      });
+    } else {
+      editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
+      router.use(editorBasename, editorHandler.handler);
+    }
   }
 
   return {

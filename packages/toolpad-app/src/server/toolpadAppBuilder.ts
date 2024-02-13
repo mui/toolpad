@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as url from 'node:url';
+import * as fs from 'fs';
 import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
@@ -11,7 +12,14 @@ import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtu
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
+const pkgJsonContent = fs.readFileSync(path.resolve(currentDirectory, '../../package.json'), {
+  encoding: 'utf-8',
+});
+const pkgJson = JSON.parse(pkgJsonContent);
+const TOOLPAD_BUILD = process.env.GIT_SHA1?.slice(0, 7) || 'dev';
+
 const MAIN_ENTRY = '/main.tsx';
+const EDITOR_ENTRY = '/editor.tsx';
 const FALLBACK_MODULES = [
   '@mui/material',
   '@mui/icons-material',
@@ -19,7 +27,7 @@ const FALLBACK_MODULES = [
   '@mui/x-charts',
 ];
 
-export function getHtmlContent() {
+function getHtmlContent(entry: string) {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -36,10 +44,18 @@ export function getHtmlContent() {
     
         <!-- __TOOLPAD_SCRIPTS__ -->
 
-        <script type="module" src=${JSON.stringify(MAIN_ENTRY)}></script>
+        <script type="module" src=${JSON.stringify(entry)}></script>
       </body>
     </html>
   `;
+}
+
+export function getAppHtmlContent() {
+  return getHtmlContent(MAIN_ENTRY);
+}
+
+export function getEditorHtmlContent() {
+  return getHtmlContent(EDITOR_ENTRY);
 }
 
 function toolpadVitePlugin(): Plugin {
@@ -64,9 +80,14 @@ function toolpadVitePlugin(): Plugin {
     },
 
     async load(id) {
-      if (id.endsWith('.html')) {
+      if (id.endsWith('index.html')) {
         // production build only
-        return getHtmlContent();
+        return getAppHtmlContent();
+      }
+
+      if (id.endsWith('editor.html')) {
+        // production build only
+        return getEditorHtmlContent();
       }
       return null;
     },
@@ -149,15 +170,19 @@ export async function createViteConfig({
 }: CreateViteConfigParams) {
   const mode = dev ? 'development' : 'production';
 
-  const getEntryPoint = (isCanvas: boolean) => {
+  const getEntryPoint = (target: 'prod' | 'dev' | 'editor') => {
+    const isCanvas = target === 'dev';
+    const isEditor = target === 'editor';
+
     const componentsId = 'virtual:toolpad-files:components.tsx';
     const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
 
     return `
-import { init, setComponents } from '@mui/toolpad/runtime';
+import { init, setComponents } from '@mui/toolpad/entrypoint';
 import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
+${isEditor ? `import ToolpadEditor from '@mui/toolpad/editor'` : ''}
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
@@ -165,6 +190,7 @@ setComponents(components, pageComponents);
 
 init({
   ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
+  ${isEditor ? `ToolpadApp: ToolpadEditor,` : ''}
   base: ${JSON.stringify(base)},
   initialState,
 })
@@ -248,8 +274,9 @@ if (import.meta.hot) {
   };
 
   const virtualFiles = new Map<string, VirtualFileContent>([
-    ['main.tsx', getEntryPoint(false)],
-    ['canvas.tsx', getEntryPoint(true)],
+    ['main.tsx', getEntryPoint('prod')],
+    ['dev.tsx', getEntryPoint('dev')],
+    ['editor.tsx', getEntryPoint('editor')],
     ['components.tsx', await createComponentsFile()],
     ['page-components.tsx', await createPageComponentsFile()],
     ['pages-manifest.json', JSON.stringify(await getPagesManifest(), null, 2)],
@@ -268,8 +295,15 @@ if (import.meta.hot) {
       mode,
       build: {
         outDir,
+        emptyOutDir: true,
         chunkSizeWarningLimit: Infinity,
         rollupOptions: {
+          input: {
+            index: path.resolve(currentDirectory, './index.html'),
+            ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+              ? { editor: path.resolve(currentDirectory, './editor.html') }
+              : {}),
+          },
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
               return;
@@ -293,14 +327,24 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            replacement: dev
-              ? 'virtual:toolpad-files:canvas.tsx'
-              : 'virtual:toolpad-files:main.tsx',
+            replacement: dev ? 'virtual:toolpad-files:dev.tsx' : 'virtual:toolpad-files:main.tsx',
           },
           {
             find: '@mui/toolpad',
             replacement: path.resolve(currentDirectory, '../exports'),
           },
+          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+            ? [
+                {
+                  find: EDITOR_ENTRY,
+                  replacement: 'virtual:toolpad-files:editor.tsx',
+                },
+                {
+                  find: 'vm',
+                  replacement: 'vm-browserify',
+                },
+              ]
+            : []),
         ],
       },
       server: {
@@ -309,8 +353,19 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
-        force: toolpadDevMode ? true : undefined,
-        include: [...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`)],
+        force: !process.env.EXPERIMENTAL_INLINE_CANVAS && toolpadDevMode ? true : undefined,
+        include: [
+          ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
+          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+            ? [
+                'perf-cascade',
+                'monaco-editor',
+                'monaco-editor/esm/vs/basic-languages/javascript/javascript',
+                'monaco-editor/esm/vs/basic-languages/typescript/typescript',
+                'monaco-editor/esm/vs/basic-languages/markdown/markdown',
+              ]
+            : []),
+        ],
       },
       appType: 'custom',
       logLevel: 'info',
@@ -321,6 +376,11 @@ if (import.meta.hot) {
         'process.env.NODE_ENV': `'${mode}'`,
         'process.env.BASE_URL': `'${base}'`,
         'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
+        'process.env.TOOLPAD_VERSION': JSON.stringify(pkgJson.version),
+        'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),
+        'process.env.EXPERIMENTAL_INLINE_CANVAS': JSON.stringify(
+          process.env.EXPERIMENTAL_INLINE_CANVAS,
+        ),
       },
     } satisfies InlineConfig,
   };

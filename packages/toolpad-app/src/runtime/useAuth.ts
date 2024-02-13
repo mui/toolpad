@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as appDom from '@mui/toolpad-core/appDom';
 import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AppHostContext } from './AppHostContext';
 
 const AUTH_API_PATH = '/api/auth';
@@ -52,10 +53,13 @@ export const AuthContext = React.createContext<AuthPayload>({
 interface UseAuthInput {
   dom: appDom.RenderTree;
   basename: string;
-  signInPagePath?: string;
+  signInPagePath: string;
 }
 
 export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPayload {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const authProviders = React.useMemo(() => {
     const app = appDom.getApp(dom);
     const authProviderConfigs = app.attributes.authentication?.providers ?? [];
@@ -107,10 +111,10 @@ export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPa
     setSession(null);
     setIsSigningOut(false);
 
-    if (!signInPagePath || window.location.pathname !== signInPagePath) {
-      window.location.href = `${basename}${AUTH_SIGNIN_PATH}`;
+    if (location.pathname !== signInPagePath) {
+      navigate(signInPagePath);
     }
-  }, [basename, getCsrfToken, signInPagePath]);
+  }, [basename, getCsrfToken, location.pathname, navigate, signInPagePath]);
 
   const getSession = React.useCallback(async () => {
     setIsSigningIn(true);

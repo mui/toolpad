@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, Box, IconButton, Stack } from '@mui/material';
+import { styled, Box, IconButton, Stack, Tooltip } from '@mui/material';
 import { TreeView, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -10,7 +10,7 @@ import invariant from 'invariant';
 import { alphabeticComparator, createPropComparator } from '@mui/toolpad-utils/comparators';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import * as appDom from '@mui/toolpad-core/appDom';
-import { useAppStateApi, useAppState, useDomApi } from '../../AppState';
+import { useAppStateApi, useAppState } from '../../AppState';
 import useLocalStorageState from '../../../utils/useLocalStorageState';
 import NodeMenu from '../NodeMenu';
 import { DomView } from '../../../utils/domView';
@@ -61,6 +61,7 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
     nodeId,
     labelIcon,
     labelText,
+    title,
     onRenameNode,
     onDeleteNode,
     onDuplicateNode,
@@ -99,33 +100,35 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
       nodeId={nodeId}
       labelText={labelText}
       renderLabel={(children) => (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {labelIcon}
-          {children}
-          {toolpadNodeId ? (
-            <NodeMenu
-              renderButton={({ buttonProps, menuProps }) => (
-                <IconButton
-                  className={clsx(classes.treeItemMenuButton, {
-                    [classes.treeItemMenuOpen]: menuProps.open,
-                  })}
-                  aria-label="Open page explorer menu"
-                  size="small"
-                  {...buttonProps}
-                >
-                  <MoreVertIcon fontSize="inherit" />
-                </IconButton>
-              )}
-              nodeId={toolpadNodeId}
-              renameLabelText={renameLabelText}
-              deleteLabelText={deleteLabelText}
-              duplicateLabelText={duplicateLabelText}
-              onRenameNode={startEditing}
-              onDeleteNode={onDeleteNode}
-              onDuplicateNode={onDuplicateNode}
-            />
-          ) : null}
-        </Box>
+        <Tooltip title={title} placement="right" disableInteractive>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {labelIcon}
+            {children}
+            {toolpadNodeId ? (
+              <NodeMenu
+                renderButton={({ buttonProps, menuProps }) => (
+                  <IconButton
+                    className={clsx(classes.treeItemMenuButton, {
+                      [classes.treeItemMenuOpen]: menuProps.open,
+                    })}
+                    aria-label="Open page explorer menu"
+                    size="small"
+                    {...buttonProps}
+                  >
+                    <MoreVertIcon fontSize="inherit" />
+                  </IconButton>
+                )}
+                nodeId={toolpadNodeId}
+                renameLabelText={renameLabelText}
+                deleteLabelText={deleteLabelText}
+                duplicateLabelText={duplicateLabelText}
+                onRenameNode={startEditing}
+                onDeleteNode={onDeleteNode}
+                onDuplicateNode={onDuplicateNode}
+              />
+            ) : null}
+          </Box>
+        </Tooltip>
       )}
       suggestedNewItemName={labelText}
       onCancel={stopEditing}
@@ -155,7 +158,6 @@ export interface PagesExplorerProps {
 export default function PagesExplorer({ className }: PagesExplorerProps) {
   const projectApi = useProjectApi();
   const { dom, currentView } = useAppState();
-  const domApi = useDomApi();
   const appStateApi = useAppStateApi();
 
   const app = appDom.getApp(dom);
@@ -276,23 +278,30 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       if (nodeId === activePage?.id) {
         const siblings = appDom.getSiblings(dom, deletedNode);
         const firstSiblingOfType = siblings.find((sibling) => sibling.type === deletedNode.type);
-        domViewAfterDelete = firstSiblingOfType && getNodeEditorDomView(firstSiblingOfType);
+        domViewAfterDelete = firstSiblingOfType
+          ? getNodeEditorDomView(firstSiblingOfType)
+          : { kind: 'page' };
       }
 
       await projectApi.methods.deletePage(deletedNode.name);
 
-      appStateApi.update(
-        (draft) => appDom.removeNode(draft, nodeId),
-        domViewAfterDelete || { kind: 'page' },
-      );
+      appStateApi.update((draft) => appDom.removeNode(draft, nodeId), domViewAfterDelete);
     },
     [projectApi, activePage?.id, appStateApi, dom],
   );
 
   const handleRenameNode = React.useCallback(
     (nodeId: NodeId, updatedName: string) => {
-      domApi.setNodeName(nodeId, updatedName);
-      appStateApi.setView({ kind: 'page', name: updatedName });
+      appStateApi.update(
+        (draft) => {
+          const page = appDom.getNode(draft, nodeId, 'page');
+          return appDom.setNodeName(draft, page, updatedName);
+        },
+        {
+          kind: 'page',
+          name: updatedName,
+        },
+      );
 
       const oldNameNode = dom.nodes[nodeId];
       if (oldNameNode.type === 'page' && updatedName !== oldNameNode.name) {
@@ -301,7 +310,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         }, 300);
       }
     },
-    [projectApi, dom.nodes, domApi, appStateApi],
+    [appStateApi, dom.nodes, projectApi.methods],
   );
 
   const handleDuplicateNode = React.useCallback(
@@ -368,8 +377,8 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             key={page.id}
             nodeId={page.id}
             toolpadNodeId={page.id}
-            labelText={appDom.getPageDisplayName(page)}
-            title={page.name}
+            labelText={page.name}
+            title={appDom.getPageDisplayName(page)}
             onRenameNode={handleRenameNode}
             onDuplicateNode={handleDuplicateNode}
             onDeleteNode={handleDeletePage}

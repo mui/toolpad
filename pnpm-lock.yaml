@@ -422,12 +422,6 @@ importers:
         specifier: 2.2.1
         version: 2.2.1
 
-  examples/auth-google:
-    dependencies:
-      '@mui/toolpad':
-        specifier: 0.1.49
-        version: link:../../packages/toolpad-app
-
   packages/create-toolpad-app:
     dependencies:
       '@mui/toolpad-utils':

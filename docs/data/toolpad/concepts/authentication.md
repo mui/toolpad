@@ -28,24 +28,24 @@ Please make sure to keep this secret safe and do not share it with anyone!
 
 ## Authentication providers
 
-In the authentication settings, you can set up one or more authentication providers for users to be able to sign in with, such as Github and Google.
+In the authentication settings, you can set up one or more authentication providers for users to be able to sign in with, such as GitHub and Google.
 
 If any authentication providers are set, only authenticated users are able to access your Toolpad application.
 
 Each authentication provider has its own configuration options, to be set with certain environment variables.
 
-### Github
+### GitHub
 
 | environment variable name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                     |
 | :------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------ |
-| `TOOLPAD_GITHUB_CLIENT_ID`                                                                                                                               | Github OAuth app client ID.     |
-| `TOOLPAD_GITHUB_CLIENT_SECRET`                                                                                                                           | Github OAuth app client secret. |
+| `TOOLPAD_GITHUB_CLIENT_ID`                                                                                                                               | GitHub OAuth app client ID.     |
+| `TOOLPAD_GITHUB_CLIENT_SECRET`                                                                                                                           | GitHub OAuth app client secret. |
 
-Take a look at the following official instructions to [create a Github OAuth app](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app).
+Take a look at the following official instructions to [create a GitHub OAuth app](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app).
 
-In the Github OAuth app settings screen, in the **Authorization callback URL** option, use the production path of your application followed by `/api/auth/callback/github`, as in `http://mui.com/api/auth/callback/github`.
+In the GitHub OAuth app settings screen, in the **Authorization callback URL** option, use the production path of your application followed by `/api/auth/callback/github`, as in `http://mui.com/api/auth/callback/github`.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/github-callback-url.png", "alt": "Github callback URL configuration", "caption": "Github callback URL configuration", "zoom": false, "width": 460 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/github-callback-url.png", "alt": "GitHub callback URL configuration", "caption": "GitHub callback URL configuration", "zoom": false, "width": 460 }}
 
 ### Google
 

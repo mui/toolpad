@@ -82,7 +82,7 @@ Follow these steps to configure your Azure AD client and get the necessary envir
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/azure-ad-redirect-url.png", "alt": "Azure AD redirect URI configuration", "caption": "Azure AD redirect URI configuration", "aspectRatio": 6 }}
 
-4. Once your application has ben created, go to its page in **App registrations** where you can find the client and tenant IDs under the **Overview** option in the left-side menu.
+4. Once your application has been created, go to its page in **App registrations** where you can find the client and tenant IDs under the **Overview** option in the left-side menu.
 
 5. Go to **Certificates & secrets** and use the option **New client secret** to generate a client secret.
 

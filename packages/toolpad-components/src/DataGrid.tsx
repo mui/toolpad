@@ -698,12 +698,7 @@ function useDataProviderDataGridProps(
   const [draftRow, setDraftRow] = React.useState<GridRowModel | null>(null);
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
-    // Blurring the cell shouldn't end edit mode
-    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-      event.defaultMuiPrevented = true;
-    } else {
-      setDraftRow(null);
-    }
+    event.defaultMuiPrevented = true;
   };
 
   const handleRowEditStart: GridEventListener<'rowEditStart'> = (params, event) => {
@@ -784,7 +779,7 @@ function useDataProviderDataGridProps(
             return newRecord;
           } catch (error) {
             setActionResult({ action, error: errorFrom(error) });
-            throw error;
+            return oldRow;
           }
         } else {
           try {
@@ -798,7 +793,7 @@ function useDataProviderDataGridProps(
             return newRecord;
           } catch (error) {
             setActionResult({ action, id, error: errorFrom(error) });
-            throw error;
+            return oldRow;
           }
         }
       } finally {

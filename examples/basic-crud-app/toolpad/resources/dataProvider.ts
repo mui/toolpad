@@ -100,14 +100,14 @@ export default createDataProvider({
     return records.push(newRecord);
   },
 
-  async updateRecord(id, data) {
+  async updateRecord(id: number, data: Omit<Customer, 'id'>) {
     const index = records.findIndex((item) => item.id === id);
 
     Object.assign(records[index], data);
     return records[index];
   },
 
-  async deleteRecord(id) {
+  async deleteRecord(id: number) {
     const index = records.findIndex((item) => item.id === id);
     records.splice(index, 1);
   },

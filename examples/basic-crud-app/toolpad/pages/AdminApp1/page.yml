@@ -38,8 +38,7 @@ spec:
             - component: Text
               name: typography4
               props:
-                value: Acme corp. is a global e-com company and this is a support application to
-                  add new users
+                value: This page shows how to use data providers with the data grid in Toolpad.
             - component: Text
               name: typography1
               props:

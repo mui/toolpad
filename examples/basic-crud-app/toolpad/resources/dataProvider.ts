@@ -100,8 +100,6 @@ export default createDataProvider({
     return records.push(newRecord);
   },
 
-  // async updateRecord(id, data) {},
-
   async updateRecord(id, data) {
     const index = records.findIndex((item) => item.id === id);
 

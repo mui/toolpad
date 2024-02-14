@@ -814,14 +814,14 @@ function useDataProviderDataGridProps(
   );
 
   const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
-    if (!dataProvider?.deleteRecord && !dataProvider?.updateRecord) {
+    if (!dataProvider?.deleteRecord && !dataProvider?.updateRecord && !dataProvider?.createRecord) {
       return undefined;
     }
 
     return ({ id, row }) => {
       const result = [];
 
-      if (dataProvider.updateRecord) {
+      if (dataProvider.updateRecord || dataProvider.createRecord) {
         const rowIsInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         const rowIsUpdating = rowUpdating[id];
 
@@ -855,7 +855,7 @@ function useDataProviderDataGridProps(
           ];
         }
 
-        if (!isEditing) {
+        if (!isEditing && dataProvider.updateRecord) {
           result.push(
             <IconButton
               key="update"

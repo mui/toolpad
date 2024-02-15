@@ -62,7 +62,7 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
 1. Make sure to start the build in watch mode again and the run the app with
 
    ```bash
-   pnpm toolpad dev examples/qr-generator --dev
+   pnpm toolpad dev examples/qr-generator/toolpad --dev
    ```
 
 ### Linking Toolpad in a folder on your system (advanced)

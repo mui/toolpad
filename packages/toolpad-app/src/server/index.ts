@@ -399,9 +399,6 @@ export interface RunEditorOptions {
 }
 
 export async function runEditor(appUrl: string, options: RunEditorOptions = {}) {
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
-
   let appRootUrl;
   try {
     appRootUrl = await fetchAppUrl(appUrl);
@@ -415,6 +412,17 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
 
     process.exit(1);
   }
+
+  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.yellow('warn')}  - The editor command is deprecated and will be removed in the future, please visit ${chalk.cyan(`${appRootUrl}/editor`)}`,
+    );
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
 
   const app = express();
 

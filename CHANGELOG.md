@@ -1,5 +1,50 @@
 # Changelog
 
+## v0.1.50
+
+<!-- generated comparing v0.1.49..master -->
+
+_Feb 15, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Move editor canvas inline, add authenticated session data to server context, fix bugs in drag-and-drop, data grid and editable tree items, improve project setup documentation and add authenticaton examples for Google and GitHub.
+
+- &#8203;<!-- 32 -->Show save/discard for created record when updateRecords is unavailable (#3215) @Janpot
+- &#8203;<!-- 31 -->Add documentation about installing Toolpad in an existing project (#3214) @Janpot
+- &#8203;<!-- 30 -->Reroute "open in editor" link in app preview (#3207) @Janpot
+- &#8203;<!-- 29 -->Add authentication examples (#3135) @apedroferreira
+- &#8203;<!-- 28 -->Make sure the inline canvas uses the correct font (#3208) @Janpot
+- &#8203;<!-- 27 -->Remove semicolon from jsx (#3210) @iamsaumya
+- &#8203;<!-- 26 -->Fix vm shim in the editor (#3189) @Janpot
+- &#8203;<!-- 25 -->Remove second usePageTitle from RenderedLowCodePage (#3204) @iamsaumya
+- &#8203;<!-- 24 -->Create predictably named test directories (#3194) @Janpot
+- &#8203;<!-- 23 -->Fix test for code components under new editor runtime (#3193) @Janpot
+- &#8203;<!-- 22 -->Correct test urls for canvas tests (#3192) @Janpot
+- &#8203;<!-- 21 -->Fix undo/redo in new canvas implementation (#3191) @Janpot
+- &#8203;<!-- 20 -->Add authenticated session to app server context (#3157) @apedroferreira
+- &#8203;<!-- 19 -->chore(deps): bump mui core (#3205) @renovate[bot]
+- &#8203;<!-- 18 -->chore(deps): bump devdependencies (#3198) @renovate[bot]
+- &#8203;<!-- 17 -->chore(deps): bump tsx to 4.7.1 (#3199) @renovate[bot]
+- &#8203;<!-- 16 -->chore(deps): bump googleapis to 133.0.0 (#3201) @renovate[bot]
+- &#8203;<!-- 15 -->chore(deps): bump actions/setup-node digest to 60edb5d (#3197) @renovate[bot]
+- &#8203;<!-- 14 -->chore(deps): bump @mui/monorepo digest to 7de26c9 (#3196) @renovate[bot]
+- &#8203;<!-- 13 -->chore(deps): bump mui x to 6.19.4 (#3190) @renovate[bot]
+- &#8203;<!-- 12 -->Fix editable tree item bugs (#3187) @apedroferreira
+- &#8203;<!-- 11 -->Fix project loading several times (#3188) @Janpot
+- &#8203;<!-- 10 -->Add pie chart future component (#3185) @Janpot
+- &#8203;<!-- 09 -->Fix drag-and-drop when dragging outside components (#3177) @apedroferreira
+- &#8203;<!-- 08 -->chore(deps): bump @mui/toolpad to 0.1.49 (#3182) @renovate[bot]
+- &#8203;<!-- 07 -->chore(deps): bump mui core (#3183) @renovate[bot]
+- &#8203;<!-- 06 -->[code-infra] Deprecate usage of the next export command (#3217) @Janpot
+- &#8203;<!-- 05 -->[core] Fix link to issue template @oliviertassinari
+- &#8203;<!-- 04 -->[core] Add canvas mode that doesn't rely on vite (#3171) @Janpot
+- &#8203;<!-- 03 -->[core] Define routes statically (#3176) @Janpot
+- &#8203;<!-- 02 -->[docs] Fix typo @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix spelling of GitHub @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @iamsaumya, @Janpot, @oliviertassinari, @renovate[bot]
+
 ## v0.1.49
 
 <!-- generated comparing v0.1.48..master -->

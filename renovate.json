@@ -72,12 +72,6 @@
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "next",
-      "matchPackageNames": ["next"],
-      "allowedVersions": "<= 13.4.19",
-      "description": "https://github.com/mui/mui-toolpad/pull/2739"
-    },
-    {
       "groupName": "superjson",
       "matchPackageNames": ["superjson"],
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"

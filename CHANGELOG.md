@@ -8,7 +8,7 @@ _Feb 15, 2024_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-Move editor canvas inline, add authenticated session data to server context, fix bugs in drag-and-drop, data grid and editable tree items, improve project setup documentation and add authenticaton examples for Google and GitHub.
+Move editor canvas inline, add authenticated session data to server context, fix bugs in drag-and-drop, data grid and editable tree items, improve project setup documentation and add authentication examples for Google and GitHub.
 
 - &#8203;<!-- 32 -->Show save/discard for created record when updateRecords is unavailable (#3215) @Janpot
 - &#8203;<!-- 31 -->Add documentation about installing Toolpad in an existing project (#3214) @Janpot

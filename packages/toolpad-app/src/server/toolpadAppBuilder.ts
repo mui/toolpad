@@ -183,7 +183,9 @@ import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
 ${isEditor ? `import ToolpadEditor from '@mui/toolpad/editor'` : ''}
-import * as monaco from 'monaco-editor';
+
+// importing monaco to get around module ordering issues in esbuild
+import 'monaco-editor';
 
 window.MonacoEnvironment = {
   getWorker: async (_, label) => {
@@ -212,8 +214,6 @@ window.MonacoEnvironment = {
     throw new Error(\`Failed to resolve worker with label "\${label}"\`);
   },
 } as monaco.Environment;
-
-console.log(monaco)
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 

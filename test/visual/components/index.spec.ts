@@ -42,7 +42,7 @@ test('rendering components in the app editor', async ({ page, argosScreenshot })
   await argosScreenshot('with-selection');
 });
 
-test.only('building layouts', async ({ page, argosScreenshot }) => {
+test('building layouts', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPage('blank');
 

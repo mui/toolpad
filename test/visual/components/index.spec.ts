@@ -95,7 +95,7 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
   const firstInputBoundingBox = await firstInput.boundingBox();
 
   await page.mouse.move(
-    firstInputBoundingBox!.x + firstInputBoundingBox!.width - 5,
+    firstInputBoundingBox!.x + (2 / 3) * firstInputBoundingBox!.width,
     firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
     { steps: 10 },
   );

@@ -1070,22 +1070,14 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   (dragOverSlot?.flowDirection === 'row' ? DROP_ZONE_LEFT : DROP_ZONE_RIGHT);
 
                 const newParentIndex = isDraggingOverDirectionStart
-                  ? appDom.getNewFirstParentIndexInNode(
-                      draft,
-                      dragOverNode,
-                      dragOverSlotParentProp || 'children',
-                    )
-                  : appDom.getNewLastParentIndexInNode(
-                      draft,
-                      dragOverNode,
-                      dragOverSlotParentProp || 'children',
-                    );
+                  ? appDom.getNewFirstParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp)
+                  : appDom.getNewLastParentIndexInNode(draft, dragOverNode, dragOverSlotParentProp);
 
                 draft = addOrMoveNode(
                   draft,
                   draggedNode,
                   dragOverNode,
-                  dragOverSlotParentProp || 'children',
+                  dragOverSlotParentProp,
                   newParentIndex,
                 );
               }

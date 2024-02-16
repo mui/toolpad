@@ -30,7 +30,7 @@ test('rendering components in the app runtime', async ({ page, argosScreenshot }
 
 test('rendering components in the app editor', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPage('components');
 
   await editorModel.waitForOverlay();
 

@@ -8,6 +8,6 @@
     "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.49"
+    "@mui/toolpad": "0.1.50"
   }
 }

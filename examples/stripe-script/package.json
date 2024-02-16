@@ -8,7 +8,7 @@
     "start": "toolpad start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.49",
+    "@mui/toolpad": "0.1.50",
     "archiver": "6.0.1",
     "stripe": "^14.14.0"
   }

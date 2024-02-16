@@ -19,6 +19,10 @@ const MONOREPO_PACKAGES = {
 };
 
 export default withDocsInfra({
+  experimental: {
+    workerThreads: true,
+    cpus: 3,
+  },
   transpilePackages: ['@mui/monorepo', '@mui/x-charts'],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',

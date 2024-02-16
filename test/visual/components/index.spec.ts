@@ -62,7 +62,7 @@ test('building layouts', async ({ page, argosScreenshot }) => {
   // Place inside right of first element
   await editorModel.dragNewComponentToCanvas(
     'FullWidth',
-    firstFullWidthBoundingBox!.x + firstFullWidthBoundingBox!.width - 5,
+    firstFullWidthBoundingBox!.x + (2 / 3) * firstFullWidthBoundingBox!.width,
     firstFullWidthBoundingBox!.y + firstFullWidthBoundingBox!.height / 2,
   );
 
@@ -95,7 +95,7 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
   const firstInputBoundingBox = await firstInput.boundingBox();
 
   await page.mouse.move(
-    firstInputBoundingBox!.x + (2 / 3) * firstInputBoundingBox!.width,
+    firstInputBoundingBox!.x + firstInputBoundingBox!.width - 5,
     firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
     { steps: 10 },
   );

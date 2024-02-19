@@ -73,6 +73,7 @@ function SelectOptionsPropEditor({
 
   const handleOptionTextInput = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
+      validateOptionValue(event);
       if (event.key === 'Enter') {
         const inputText = (event.target as HTMLInputElement).value;
         if (optionErrorMessage || !inputText) {
@@ -84,7 +85,7 @@ function SelectOptionsPropEditor({
         }
       }
     },
-    [onChange, value, optionErrorMessage],
+    [onChange, value, optionErrorMessage, validateOptionValue],
   );
 
   const handleOptionDelete = React.useCallback(
@@ -165,13 +166,7 @@ function SelectOptionsPropEditor({
                 <TextField
                   label="Value"
                   error={!!optionErrorMessage}
-                  helperText={
-                    optionErrorMessage ? (
-                      <span>
-                        Do not input <kbd>same</kbd> value
-                      </span>
-                    ) : null
-                  }
+                  helperText={optionErrorMessage ? <span>This option already exists</span> : null}
                   value={editingOption.value}
                   onChange={(event) => {
                     handleOptionChange({ ...editingOption, value: event.target.value });
@@ -248,15 +243,12 @@ function SelectOptionsPropEditor({
                 error={!!optionErrorMessage}
                 sx={{ my: 1 }}
                 variant="outlined"
-                onInput={validateOptionValue}
                 inputRef={optionInputRef}
                 onKeyUp={handleOptionTextInput}
                 label={'Add option'}
                 helperText={
                   optionErrorMessage ? (
-                    <span>
-                      Do not input <kbd>same</kbd> value
-                    </span>
+                    <span>This option already exists</span>
                   ) : (
                     <span>
                       Press <kbd>Enter</kbd> or <kbd>Return</kbd> to add

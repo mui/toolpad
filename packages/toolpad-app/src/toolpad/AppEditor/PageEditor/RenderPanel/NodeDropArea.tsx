@@ -3,8 +3,8 @@ import clsx from 'clsx';
 import { styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
 
+import * as appDom from '@mui/toolpad-core/appDom';
 import { FlowDirection } from '../../../../types';
-import * as appDom from '../../../../appDom';
 import {
   absolutePositionCss,
   isHorizontalFlow,
@@ -12,7 +12,7 @@ import {
   Rectangle,
 } from '../../../../utils/geometry';
 
-import { useDom } from '../../../AppState';
+import { useAppState } from '../../../AppState';
 
 import {
   DROP_ZONE_CENTER,
@@ -49,7 +49,7 @@ const StyledNodeDropArea = styled('div', {
     pointerEvents: 'none',
     position: 'absolute',
     [`&.${dropAreaHighlightClasses.highlightedTop}`]: {
-      '&:after': {
+      '&::after': {
         backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
@@ -60,7 +60,7 @@ const StyledNodeDropArea = styled('div', {
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedRight}`]: {
-      '&:after': {
+      '&::after': {
         backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
@@ -71,7 +71,7 @@ const StyledNodeDropArea = styled('div', {
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedBottom}`]: {
-      '&:after': {
+      '&::after': {
         backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
@@ -82,7 +82,7 @@ const StyledNodeDropArea = styled('div', {
       },
     },
     [`&.${dropAreaHighlightClasses.highlightedLeft}`]: {
-      '&:after': {
+      '&::after': {
         backgroundColor: theme.palette.primary[500],
         content: "''",
         position: 'absolute',
@@ -156,7 +156,7 @@ export default function NodeDropArea({
   dropAreaRect,
   availableDropZones,
 }: NodeDropAreaProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const { dragOverNodeId, dragOverSlotParentProp, dragOverZone, viewState } = usePageEditorState();
 
   const { nodes: nodesInfo } = viewState;
@@ -191,19 +191,18 @@ export default function NodeDropArea({
   const isEmptySlot = dropAreaSlotChildNodes.length === 0;
 
   const highlightedZone = React.useMemo((): DropZone | null => {
-    const dropAreaParentParent = dropAreaNodeParent && appDom.getParent(dom, dropAreaNodeParent);
-
     if (dragOverZone && !availableDropZones.includes(dragOverZone)) {
       return null;
     }
-
     if (isPageNode && parentProp && !isEmptySlot) {
       return null;
     }
 
+    const dropAreaParentParent = dropAreaNodeParent && appDom.getParent(dom, dropAreaNodeParent);
+
     const pageAwareParentProp = isPageChild ? 'children' : parentProp;
 
-    if (dragOverZone === DROP_ZONE_TOP) {
+    if (dragOverZone === DROP_ZONE_TOP && !parentProp) {
       // Is dragging over page top and is slot
       if (
         dropAreaNodeParent &&
@@ -253,7 +252,8 @@ export default function NodeDropArea({
       if (
         dropAreaNodeParent &&
         dropAreaNodeParent.id === dragOverNodeId &&
-        pageAwareParentProp === dragOverSlotParentProp
+        pageAwareParentProp === dragOverSlotParentProp &&
+        !parentProp
       ) {
         const parentLastChild =
           pageAwareParentProp &&
@@ -277,7 +277,8 @@ export default function NodeDropArea({
       if (
         node.id === dragOverNodeId &&
         pageAwareParentProp &&
-        pageAwareParentProp === dragOverSlotParentProp
+        pageAwareParentProp === dragOverSlotParentProp &&
+        parentProp
       ) {
         if (isPageNode) {
           return DROP_ZONE_CENTER;

@@ -1,13 +1,18 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
+import * as url from 'url';
+import invariant from 'invariant';
 import { test, expect, Locator } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import clickCenter from '../../utils/clickCenter';
-import { folderExists } from '../../../packages/toolpad-utils/src/fs';
+import { clickCenter } from '../../utils/locators';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture'),
     cmd: 'dev',
   },
 });
@@ -15,7 +20,7 @@ test.use({
 test('can move elements in page', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goto();
+  await editorModel.goToPage('page1');
 
   await editorModel.waitForOverlay();
 
@@ -59,7 +64,7 @@ test('can move elements in page', async ({ page }) => {
 test('can delete elements from page', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goto();
+  await editorModel.goToPage('page1');
 
   await editorModel.waitForOverlay();
 
@@ -120,10 +125,50 @@ test('can delete elements from page', async ({ page }) => {
   await expect(canvasButtonLocator).toHaveCount(3);
 });
 
+test('can build component layout inside layout slots', async ({ page }) => {
+  const editorModel = new ToolpadEditor(page);
+
+  await editorModel.goToPage('container');
+
+  await editorModel.waitForOverlay();
+
+  const canvasInputLocator = editorModel.appCanvas.locator('input');
+
+  const dropAreaBoundingBox = await editorModel.appCanvas
+    .getByText('Drop component here')
+    .boundingBox();
+
+  await editorModel.dragNewComponentToCanvas(
+    'Text Field',
+    dropAreaBoundingBox!.x + dropAreaBoundingBox!.width / 2,
+    dropAreaBoundingBox!.y + dropAreaBoundingBox!.height / 2,
+  );
+
+  await expect(canvasInputLocator).toBeVisible();
+
+  const firstInputBoundingBox = await canvasInputLocator.boundingBox();
+
+  await editorModel.dragNewComponentToCanvas(
+    'Text Field',
+    dropAreaBoundingBox!.x + dropAreaBoundingBox!.width / 2,
+    firstInputBoundingBox!.y + (2 / 3) * firstInputBoundingBox!.height,
+  );
+
+  await expect(canvasInputLocator).toHaveCount(2);
+
+  await editorModel.dragNewComponentToCanvas(
+    'Text Field',
+    firstInputBoundingBox!.x + firstInputBoundingBox!.width / 2,
+    firstInputBoundingBox!.y + firstInputBoundingBox!.height / 2,
+  );
+
+  await expect(canvasInputLocator).toHaveCount(3);
+});
+
 test('must correctly size new layout columns', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('cSmMlic');
+  await editorModel.goToPage('page3');
 
   await editorModel.waitForOverlay();
 
@@ -180,7 +225,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 test('code editor auto-complete', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('K7SkzhT');
+  await editorModel.goToPage('page23');
 
   await editorModel.waitForOverlay();
 
@@ -205,7 +250,7 @@ test('code editor auto-complete', async ({ page }) => {
 test('must deselect selected element when clicking outside of it', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('K7SkzhT');
+  await editorModel.goToPage('page23');
 
   await editorModel.waitForOverlay();
 
@@ -221,30 +266,15 @@ test('must deselect selected element when clicking outside of it', async ({ page
   await page.mouse.click(textFieldBoundingBox!.x + 150, textFieldBoundingBox!.y + 150);
   await expect(textFieldNodeHudTag).toBeHidden();
 });
-test('can rename page', async ({ page, localApp }) => {
-  const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
-  await editorModel.waitForOverlay();
-  await editorModel.goToPage('page4');
-  await editorModel.waitForOverlay();
-  const text = editorModel.appCanvas.getByText('text-foo');
-  const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');
-  await expect.poll(async () => folderExists(oldPageFolder)).toBe(true);
-  const valueInput = await page.getByLabel('Node name');
-  await valueInput.click();
-  await page.keyboard.type('test1');
-  await valueInput.blur();
-  const text2 = editorModel.appCanvas.getByText('text-foo');
-  const newPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4test1');
-  await expect.poll(async () => folderExists(oldPageFolder)).toBe(false);
-  await expect.poll(async () => folderExists(newPageFolder)).toBe(true);
-  await expect(text).toEqual(text2);
-  await fs.rename(newPageFolder, oldPageFolder);
-});
 
 test('can react to pages renamed on disk', async ({ page, localApp }) => {
+  invariant(
+    localApp,
+    'test must be configured with `localAppConfig`. Add `test.use({ localAppConfig: ... })`',
+  );
+
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPage('page1');
   await editorModel.waitForOverlay();
 
   const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');

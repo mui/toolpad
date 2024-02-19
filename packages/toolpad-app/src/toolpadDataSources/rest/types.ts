@@ -1,6 +1,6 @@
 import { BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
-import { Har } from 'har-format';
-import { Maybe } from '../../utils/types';
+import type { Har } from 'har-format';
+import { Maybe } from '@mui/toolpad-utils/types';
 
 interface AuthenticationBase {
   type: 'basic' | 'bearerToken' | 'apiKey';
@@ -125,5 +125,5 @@ export interface FetchResult extends ExecFetchResult<any> {
 }
 
 export type IntrospectionResult = {
-  envVarNames: string[];
+  env: Record<string, string>;
 };

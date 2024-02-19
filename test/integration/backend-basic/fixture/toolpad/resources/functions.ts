@@ -81,10 +81,11 @@ export async function getGlobal() {
 
 interface Circular {
   a?: Circular;
+  msg: string;
 }
 
 export async function circularData() {
-  const a: Circular = {};
+  const a: Circular = { msg: 'hello' };
   a.a = a;
   return a;
 }
@@ -131,4 +132,28 @@ export async function getRawText() {
 
 export async function inspectContext() {
   return getContext();
+}
+
+export async function setCustomCookie() {
+  const context = getContext();
+  context.setCookie('MY_TOOLPAD_COOKIE', 'hello everybody!!!');
+}
+
+export async function someNonJson() {
+  return {
+    date: new Date(1701095735511),
+    regexp: /foo/i,
+  };
+}
+
+export interface RowDataPacket {
+  constructor: {
+    name: 'RowDataPacket';
+  };
+  [column: string]: any;
+  [column: number]: any;
+}
+
+export async function mysqlResult(): Promise<RowDataPacket[]> {
+  return [];
 }

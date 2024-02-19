@@ -11,7 +11,9 @@ import { execaCommand } from 'execa';
 import { satisfies } from 'semver';
 import { readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
+import { bashResolvePath } from '@mui/toolpad-utils/cli';
 import { PackageJson } from './packageType';
+import { downloadAndExtractExample } from './examples';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
@@ -116,7 +118,6 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   const packageJson: PackageJson = {
     name: path.basename(absolutePath),
     version: '0.1.0',
-    private: true,
     scripts: {
       dev: 'toolpad dev',
       build: 'toolpad build',
@@ -186,9 +187,15 @@ const run = async () => {
     })
     .option('install', {
       type: 'boolean',
-      describe: 'Where to install dependencies',
+      describe: 'Install dependencies',
       default: true,
     })
+    .option('example', {
+      type: 'string',
+      describe:
+        'The name of one of the available examples. See https://github.com/mui/mui-toolpad/tree/master/examples.',
+    })
+
     .help().argv;
 
   const pathArg = args._?.[0] as string;
@@ -220,9 +227,13 @@ const run = async () => {
 
   const answers = await inquirer.prompt(questions);
 
-  const absolutePath = path.join(process.cwd(), answers.path || pathArg);
+  const absolutePath = bashResolvePath(answers.path || pathArg);
 
-  await scaffoldProject(absolutePath, installFlag);
+  if (args.example) {
+    await downloadAndExtractExample(absolutePath, args.example);
+  } else {
+    await scaffoldProject(absolutePath, installFlag);
+  }
 
   const changeDirectoryInstruction =
     /* `path.relative` is truth-y if the relative path

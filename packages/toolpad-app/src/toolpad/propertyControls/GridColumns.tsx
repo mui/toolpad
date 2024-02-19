@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Checkbox,
+  FormControlLabel,
   IconButton,
   List,
   ListItem,
@@ -27,10 +29,9 @@ import {
 } from '@mui/toolpad-components';
 import { generateUniqueString } from '@mui/toolpad-utils/strings';
 import { NumberFormatEditor } from '@mui/toolpad-core/numberFormat';
+import { DateFormatEditor } from '@mui/toolpad-core/dateFormat';
 import type { EditorProps } from '../../types';
-import { useToolpadComponents } from '../AppEditor/toolpadComponents';
-import { ToolpadComponentDefinition } from '../../runtime/toolpadComponents';
-import { useDom } from '../AppState';
+import { ToolpadComponentDefinition, useToolpadComponents } from '../AppEditor/toolpadComponents';
 import PropertyControl from '../../components/PropertyControl';
 
 // TODO: this import suggests leaky abstraction
@@ -114,8 +115,7 @@ function GridColumnEditor({
   value: editedColumn,
   onChange: handleColumnChange,
 }: GridColumnEditorProps) {
-  const { dom } = useDom();
-  const toolpadComponents = useToolpadComponents(dom);
+  const toolpadComponents = useToolpadComponents();
   const codeComponents: ToolpadComponentDefinition[] = React.useMemo(() => {
     return Object.values(toolpadComponents)
       .filter(Boolean)
@@ -199,12 +199,81 @@ function GridColumnEditor({
         ))}
       </TextField>
 
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.sortable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                sortable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Sortable"
+      />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.filterable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                filterable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Filterable"
+      />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.editable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                editable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Editable"
+      />
+
       <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
         {editedColumn.type === 'number' ? (
           <NumberFormatEditor
             disabled={disabled}
             value={editedColumn.numberFormat}
             onChange={(numberFormat) => handleColumnChange({ ...editedColumn, numberFormat })}
+          />
+        ) : null}
+
+        {editedColumn.type === 'date' ? (
+          <DateFormatEditor
+            disabled={disabled}
+            disableTimeFormat
+            value={editedColumn.dateFormat}
+            onChange={(dateFormat) => {
+              handleColumnChange({ ...editedColumn, dateFormat });
+            }}
+          />
+        ) : null}
+
+        {editedColumn.type === 'dateTime' ? (
+          <DateFormatEditor
+            disabled={disabled}
+            value={editedColumn.dateTimeFormat}
+            onChange={(dateTimeFormat) => {
+              handleColumnChange({ ...editedColumn, dateTimeFormat });
+            }}
           />
         ) : null}
 
@@ -245,7 +314,7 @@ function GridColumnsPropEditor({
   onChange,
   disabled,
 }: EditorProps<SerializableGridColumns>) {
-  const { bindings } = usePageEditorState();
+  const { nodeData } = usePageEditorState();
   const [editedIndex, setEditedIndex] = React.useState<number | null>(null);
 
   const editedColumn = typeof editedIndex === 'number' ? value[editedIndex] : null;
@@ -259,19 +328,19 @@ function GridColumnsPropEditor({
     setMenuAnchorEl(null);
   };
 
-  const rowsValue = nodeId && bindings[`${nodeId}.props.rows`];
-  const definedRows: unknown = rowsValue?.value;
+  const gridNodeData = nodeId && nodeData[nodeId];
+
+  const rawRows: unknown = gridNodeData && gridNodeData.rawRows;
 
   const inferredColumns = React.useMemo(
-    () => inferColumns(Array.isArray(definedRows) ? definedRows : []),
-    [definedRows],
+    () => inferColumns(Array.isArray(rawRows) ? rawRows : []),
+    [rawRows],
   );
 
   const columnSuggestions = React.useMemo(() => {
     const existingFields = new Set(value.map(({ field }) => field));
     return inferredColumns.filter((column) => !existingFields.has(column.field));
   }, [inferredColumns, value]);
-  const hasColumnSuggestions = columnSuggestions.length > 0;
 
   const handleCreateColumn = React.useCallback(
     (suggestion: SerializableGridColumn) => () => {
@@ -308,10 +377,10 @@ function GridColumnsPropEditor({
   );
 
   const handleRecreateColumns = React.useCallback(() => {
-    if (hasColumnSuggestions) {
+    if (inferredColumns.length > 0) {
       onChange(inferredColumns);
     }
-  }, [hasColumnSuggestions, inferredColumns, onChange]);
+  }, [inferredColumns, onChange]);
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
 
@@ -372,7 +441,7 @@ function GridColumnsPropEditor({
                   <IconButton
                     aria-label="Recreate columns"
                     onClick={handleRecreateColumns}
-                    disabled={!hasColumnSuggestions}
+                    disabled={inferredColumns.length <= 0}
                   >
                     <RefreshIcon />
                   </IconButton>

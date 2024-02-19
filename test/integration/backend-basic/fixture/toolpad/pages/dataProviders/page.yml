@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.44/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: page
+  content:
+    - component: DataGrid
+      name: dataGrid
+      props:
+        dataProvider: myData.ts:default
+        dataProviderId: myIndexData.ts:default
+        columns:
+          - field: name
+            width: 135
+        height: 242
+        rowsSource: dataProvider
+    - component: DataGrid
+      name: dataGrid1
+      props:
+        dataProviderId: myCursorData.ts:default
+        columns:
+          - field: name
+            width: 133
+        height: 244
+        rowsSource: dataProvider
+  display: shell
+  queries:
+    - name: dataProviders
+      query:
+        function: hello
+        kind: local

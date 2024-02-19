@@ -1,6 +1,6 @@
 import { Grid, Typography, Button } from '@mui/material';
 import * as React from 'react';
-import useBoolean from '../../utils/useBoolean';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import CreatePageNodeDialog from './PagesExplorer/CreatePageNodeDialog';
 
 export default function NoPageFound() {

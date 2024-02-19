@@ -1,11 +1,11 @@
 import { NodeId } from '@mui/toolpad-core';
+import * as appDom from '@mui/toolpad-core/appDom';
 import {
   getElementNodeComponentId,
   isPageColumn,
   isPageLayoutComponent,
   isPageRow,
 } from '../../runtime/toolpadComponents';
-import * as appDom from '../../appDom';
 
 export function deleteOrphanedLayoutNodes(
   domBeforeChange: appDom.AppDom,
@@ -64,7 +64,6 @@ export function deleteOrphanedLayoutNodes(
           moveTargetNodeId !== parent.id &&
           (appDom.isPage(parentParent) ||
             (appDom.isElement(parentParent) &&
-              isPageLayoutComponent(parentParent) &&
               getElementNodeComponentId(lastContainerChild) !==
                 getElementNodeComponentId(parentParent)))
         ) {

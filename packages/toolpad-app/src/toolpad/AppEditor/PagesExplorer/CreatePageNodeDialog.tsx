@@ -8,10 +8,10 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import invariant from 'invariant';
-import * as appDom from '../../../appDom';
+import useEventCallback from '@mui/utils/useEventCallback';
+import * as appDom from '@mui/toolpad-core/appDom';
 import DialogForm from '../../../components/DialogForm';
-import useEvent from '../../../utils/useEvent';
-import { useAppStateApi, useDom } from '../../AppState';
+import { useAppStateApi, useAppState } from '../../AppState';
 import { useNodeNameValidation } from './validation';
 
 const DEFAULT_NAME = 'page';
@@ -22,7 +22,7 @@ export interface CreatePageDialogProps {
 }
 
 export default function CreatePageDialog({ open, onClose, ...props }: CreatePageDialogProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const appStateApi = useAppStateApi();
 
   const existingNames = React.useMemo(
@@ -33,7 +33,9 @@ export default function CreatePageDialog({ open, onClose, ...props }: CreatePage
   const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
 
   // Reset form
-  const handleReset = useEvent(() => setName(appDom.proposeName(DEFAULT_NAME, existingNames)));
+  const handleReset = useEventCallback(() =>
+    setName(appDom.proposeName(DEFAULT_NAME, existingNames)),
+  );
 
   React.useEffect(() => {
     if (open) {
@@ -58,13 +60,16 @@ export default function CreatePageDialog({ open, onClose, ...props }: CreatePage
             attributes: {
               title: name,
               display: 'shell',
+              authorization: {
+                allowAll: true,
+              },
             },
           });
           const appNode = appDom.getApp(dom);
 
           appStateApi.update((draft) => appDom.addNode(draft, newNode, appNode, 'pages'), {
             kind: 'page',
-            nodeId: newNode.id,
+            name: newNode.name,
           });
 
           onClose();

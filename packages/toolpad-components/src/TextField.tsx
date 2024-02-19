@@ -17,9 +17,11 @@ import { SX_PROP_HELPER_TEXT } from './constants';
 export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
+  label?: string;
   defaultValue: string;
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
+  password?: boolean;
 } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>;
 
 function TextField({
@@ -30,11 +32,12 @@ function TextField({
   minLength,
   maxLength,
   isInvalid,
+  password,
   ...rest
 }: TextFieldProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     value,
     onChange,
     emptyValue: '',
@@ -59,6 +62,7 @@ function TextField({
         error: Boolean(formInputError),
         helperText: formInputError.message || '',
       })}
+      type={password ? 'password' : 'text'}
     />,
   );
 }
@@ -67,7 +71,7 @@ const FormWrappedTextField = withComponentForm(TextField);
 
 export default createBuiltin(FormWrappedTextField, {
   helperText:
-    'The MUI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.',
+    'The Material UI [TextField](https://mui.com/material-ui/react-text-field/) component lets you input a text value.',
   layoutDirection: 'both',
   argTypes: {
     value: {
@@ -88,7 +92,7 @@ export default createBuiltin(FormWrappedTextField, {
     },
     variant: {
       helperText:
-        'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
+        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
       type: 'string',
       enum: ['outlined', 'filled', 'standard'],
       default: 'outlined',
@@ -101,6 +105,10 @@ export default createBuiltin(FormWrappedTextField, {
     },
     fullWidth: {
       helperText: 'Whether the input should occupy all available horizontal space.',
+      type: 'boolean',
+    },
+    password: {
+      helperText: "Masks the input to hide what's being typed.",
       type: 'boolean',
     },
     placeholder: {

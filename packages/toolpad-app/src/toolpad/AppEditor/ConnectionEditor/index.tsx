@@ -2,9 +2,9 @@ import * as React from 'react';
 import { Box, Container, Stack, Typography } from '@mui/material';
 import { NodeId } from '@mui/toolpad-core';
 import invariant from 'invariant';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { ConnectionEditorProps, ClientDataSource } from '../../../types';
-import { useDom, useDomApi } from '../../AppState';
-import * as appDom from '../../../appDom';
+import { useAppState, useDomApi } from '../../AppState';
 import dataSources from '../../../toolpadDataSources/client';
 import { ConnectionContextProvider } from '../../../toolpadDataSources/context';
 import NodeNameEditor from '../NodeNameEditor';
@@ -100,7 +100,7 @@ export interface ConnectionProps {
 }
 
 export default function ConnectionEditor({ nodeId }: ConnectionProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const connectionNode = appDom.getMaybeNode(dom, nodeId as NodeId, 'connection');
 
   useUndoRedo();

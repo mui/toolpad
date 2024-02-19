@@ -1,7 +1,8 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.44/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  id: Tysc6w5
   title: serialization
   display: shell
   queries:
@@ -17,32 +18,46 @@ spec:
       query:
         function: invalidError
         kind: local
+    - name: someNonJson
+      query:
+        function: functions.ts#someNonJson
+        kind: local
   content:
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: Text
-          name: text
-          props:
-            value:
-              $$jsExpression: |
-                `Circlular property: ${circularData.data.a}`
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: Text
-          name: text1
-          props:
-            value:
-              $$jsExpression: >
-                `Non-circular:
-                ${nonCircularData.data.a1.b}:${nonCircularData.data.a2.b}`
-    - component: PageRow
-      name: pageRow2
-      children:
-        - component: Text
-          name: text2
-          props:
-            value:
-              $$jsExpression: |
-                `Invalid error: ${invalidError.error?.message}`
+    - component: Text
+      name: text
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `Circular property: ${circularData.data.a.a.a.msg}`
+    - component: Text
+      name: text1
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: >
+            `Non-circular:
+            ${nonCircularData.data.a1.b}:${nonCircularData.data.a2.b}`
+    - component: Text
+      name: text2
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: |
+            `Invalid error: ${invalidError.error?.message}`
+    - component: Text
+      name: text3
+      props:
+        value:
+          $$jsExpression: |
+            `Some Date object: ${someNonJson.data.date.toISOString()}`
+    - component: Text
+      name: text4
+      props:
+        value:
+          $$jsExpression: >
+            `Some RegExp: "${someNonJson.data.regexp.source}"
+            ${someNonJson.data.regexp.flags}`

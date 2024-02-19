@@ -18,22 +18,15 @@ import {
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import invariant from 'invariant';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import useMenu from '../../../../utils/useMenu';
-import {
-  TOOLPAD_TARGET_CLOUD,
-  TOOLPAD_TARGET_CE,
-  TOOLPAD_TARGET_PRO,
-  DOCUMENTATION_URL,
-  VERSION_CHECK_INTERVAL,
-} from '../../../../constants';
-import client from '../../../../api';
-import useBoolean from '../../../../utils/useBoolean';
+import { DOCUMENTATION_URL, VERSION_CHECK_INTERVAL } from '../../../../constants';
+import { useProjectApi } from '../../../../projectApi';
 import type { PackageManager } from '../../../../server/versionInfo';
 
-const REPORT_BUG_URL =
-  'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
+const REPORT_BUG_URL = 'https://github.com/mui/mui-toolpad/issues/new/choose';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
-
+const SUPPORT_URL = 'https://mui.com/toolpad/getting-started/support';
 interface SnippetProps {
   children: string;
 }
@@ -69,19 +62,6 @@ function FeedbackMenuItemLink({ href, children }: FeedbackMenuItemLinkProps) {
   );
 }
 
-function getReadableTarget(): string {
-  switch (process.env.TOOLPAD_TARGET) {
-    case TOOLPAD_TARGET_CLOUD:
-      return 'Cloud';
-    case TOOLPAD_TARGET_CE:
-      return 'Community Edition';
-    case TOOLPAD_TARGET_PRO:
-      return 'Pro';
-    default:
-      return 'Unknown';
-  }
-}
-
 function getUpgradeMessage(packageManager: PackageManager | null): string {
   const pkgName = '@mui/toolpad';
   switch (packageManager) {
@@ -96,11 +76,12 @@ function getUpgradeMessage(packageManager: PackageManager | null): string {
 
 function UserFeedback() {
   const { buttonProps, menuProps } = useMenu();
+  const projectApi = useProjectApi();
 
   invariant(process.env.TOOLPAD_VERSION, 'Missing env var TOOLPAD_VERSION');
   invariant(process.env.TOOLPAD_BUILD, 'Missing env var TOOLPAD_BUILD');
 
-  const { data: versionInfo } = client.useQuery('getVersionInfo', [], {
+  const { data: versionInfo } = projectApi.useQuery('getVersionInfo', [], {
     staleTime: VERSION_CHECK_INTERVAL,
   });
 
@@ -141,8 +122,8 @@ function UserFeedback() {
         <FeedbackMenuItemLink href={FEATURE_REQUEST_URL}>
           Request or upvote feature
         </FeedbackMenuItemLink>
+        <FeedbackMenuItemLink href={SUPPORT_URL}>Request support</FeedbackMenuItemLink>
         <Divider />
-        <MenuItem disabled>{getReadableTarget()}</MenuItem>
 
         <MenuItem
           disabled={!updateAvailable}

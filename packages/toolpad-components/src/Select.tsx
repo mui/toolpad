@@ -17,6 +17,7 @@ export interface SelectOption {
 export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   value: string;
   onChange: (newValue: string) => void;
+  label?: string;
   defaultValue: string;
   options: (string | SelectOption)[];
 } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
@@ -34,7 +35,7 @@ function Select({
 }: SelectProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     value,
     onChange,
     defaultValue,
@@ -87,7 +88,7 @@ const FormWrappedSelect = withComponentForm(Select);
 
 export default createBuiltin(FormWrappedSelect, {
   helperText:
-    'The MUI [Select](https://mui.com/material-ui/react-select/) component lets you select a value from a set of options.',
+    'The Material UI [Select](https://mui.com/material-ui/react-select/) component lets you select a value from a set of options.',
   layoutDirection: 'both',
   loadingPropSource: ['value', 'options'],
   loadingProp: 'disabled',
@@ -133,7 +134,7 @@ export default createBuiltin(FormWrappedSelect, {
     },
     variant: {
       helperText:
-        'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
+        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
       type: 'string',
       enum: ['outlined', 'filled', 'standard'],
       default: 'outlined',

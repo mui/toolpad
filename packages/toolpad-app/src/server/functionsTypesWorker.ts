@@ -1,9 +1,9 @@
 import * as path from 'path';
 import invariant from 'invariant';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { glob } from 'glob';
 import chalk from 'chalk';
-import { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
+import type { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
 import { asArray } from '@mui/toolpad-utils/collections';
 import { PrimitiveValueType } from '@mui/toolpad-core';
 import { compilerOptions } from './functionsShared';
@@ -19,6 +19,10 @@ export interface HandlerIntrospectionResult {
   returnType: ReturnTypeIntrospectionResult;
 }
 
+export interface DataProviderIntrospectionResult {
+  name: string;
+}
+
 export interface IntrospectionMessage {
   message: string;
 }
@@ -28,6 +32,7 @@ export interface FileIntrospectionResult {
   errors: IntrospectionMessage[];
   warnings: IntrospectionMessage[];
   handlers: HandlerIntrospectionResult[];
+  dataProviders: DataProviderIntrospectionResult[];
 }
 
 export interface IntrospectionResult {
@@ -339,6 +344,20 @@ function isToolpadCreateFunction(exportType: ts.Type): boolean {
   return false;
 }
 
+function isToolpadCreateDataProvider(exportType: ts.Type): boolean {
+  const properties = exportType.getProperties();
+
+  for (const property of properties) {
+    if (ts.isPropertySignature(property.valueDeclaration!)) {
+      if (property.valueDeclaration.name.getText() === '[TOOLPAD_DATA_PROVIDER_MARKER]') {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 function getCreateFunctionParameters(
   callSignatures: readonly ts.Signature[],
   checker: ts.TypeChecker,
@@ -425,8 +444,9 @@ export default async function extractTypes({
         return null;
       }
 
-      const handlers = checker
-        .getExportsOfModule(moduleSymbol)
+      const exports = checker.getExportsOfModule(moduleSymbol);
+
+      const handlers: HandlerIntrospectionResult[] = exports
         .map((symbol) => {
           const exportType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!);
           const callSignatures = exportType.getCallSignatures();
@@ -450,6 +470,20 @@ export default async function extractTypes({
         })
         .filter(Boolean);
 
+      const dataProviders: DataProviderIntrospectionResult[] = exports
+        .map((symbol) => {
+          const exportType = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!);
+
+          if (isToolpadCreateDataProvider(exportType)) {
+            return {
+              name: symbol.name,
+            };
+          }
+
+          return null;
+        })
+        .filter(Boolean);
+
       return {
         name: relativeEntrypoint,
         errors: diagnostics
@@ -459,6 +493,7 @@ export default async function extractTypes({
           .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Warning)
           .map((diagnostic) => ({ message: formatDiagnostic(diagnostic) })),
         handlers,
+        dataProviders,
       } satisfies FileIntrospectionResult;
     })
     .filter(Boolean)

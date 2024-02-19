@@ -1,11 +1,16 @@
 import * as path from 'path';
+import * as url from 'url';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import clickCenter from '../../utils/clickCenter';
+import { clickCenter } from '../../utils/locators';
+
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture-basic'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture-basic'),
     cmd: 'dev',
   },
 });
@@ -24,9 +29,7 @@ test('can control component prop values in properties control panel', async ({ p
   const firstInputLocator = canvasInputLocator.first();
   await clickCenter(page, firstInputLocator);
 
-  await editorModel.componentEditor
-    .locator('h6:has-text("Text Field")')
-    .waitFor({ state: 'visible' });
+  await editorModel.componentEditor.getByText('textField1').waitFor({ state: 'visible' });
 
   const labelControlInput = editorModel.componentEditor.getByLabel('label', { exact: true });
 
@@ -65,9 +68,7 @@ test('can toggle boolean prop that is true by default', async ({ page }) => {
 
   await clickCenter(page, autocomplete);
 
-  await editorModel.componentEditor
-    .locator('h6:has-text("Autocomplete")')
-    .waitFor({ state: 'visible' });
+  await editorModel.componentEditor.getByText('autocomplete').waitFor({ state: 'visible' });
 
   const fullWidthControlInput = editorModel.componentEditor.getByLabel('fullWidth', {
     exact: true,

@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: page
 spec:
-  id: WduAwgm
-  title: Default page
+  title: Graphql
   content:
     - component: PageRow
       name: pageRow

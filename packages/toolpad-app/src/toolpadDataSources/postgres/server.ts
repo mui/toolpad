@@ -1,13 +1,15 @@
-import { Client, QueryConfig } from 'pg';
+import pg from 'pg';
 import { errorFrom } from '@mui/toolpad-utils/errors';
-import { Maybe } from '../../utils/types';
+import { Maybe } from '@mui/toolpad-utils/types';
 import { SqlConnectionParams, SqlQuery, SqlResult } from '../sql/types';
 import { createSqlServerDatasource } from '../sql/server';
+
+const { Client } = pg;
 
 /**
  * Substitute named parameters ($varName) in a postgres query with their positional parameter ($1)
  */
-function parseQuery(sql: string, params: [string, any][]): QueryConfig {
+function parseQuery(sql: string, params: [string, any][]): pg.QueryConfig {
   const substitutions = new Map(params.map(([name], i) => [name.toLowerCase(), i + 1]));
   const sqlWithNamedVars = sql.replaceAll(/\$([a-zA-Z][a-zA-Z0-9]*)/g, (match, varName) => {
     const index = substitutions.get(varName.toLowerCase());

@@ -8,7 +8,9 @@ Toolpad is a self-hosted, low-code internal tool builder. It is open-sourced, an
 Toolpad is designed for any developer who wants to create internal apps faster.
 Drag and drop pre-built UI components, connect your data sources, release your app, and you're done! Check out the interactive product walkthrough of Toolpad below:
 
-<iframe id="toolpad-first-app" src="https://demo.arcade.software/MDlpNzHbuXwvPh4MK9ff?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen title="Default page | Toolpad editor" style="width: 100%; height: min(60vw, 500px); border-radius: 0.75rem"></iframe>
+<iframe id="toolpad-first-app" src="https://demo.arcade.software/IpenLZL7QdOH6kkuNClX?embed" frameborder="0" loading="lazy" webkitallowfullscreen mozallowfullscreen allowfullscreen title="Default page | Toolpad editor" style="width: 100%; height: min(60vw, 500px); border-radius: 0.75rem"></iframe>
+
+> You can check out the demo video [here](https://github.com/mui/mui-toolpad#product-walkthrough).
 
 ## Key features
 
@@ -24,7 +26,7 @@ Drag and drop pre-built UI components, connect your data sources, release your a
 
 - **Build faster than ever before:** from first step to a finished app in a few hours—simply drag and drop the components you need.
 - **Extensible with code:** build low-code with pro-code extensibility. You can write JavaScript anywhere in Toolpad as soon as you feel limited by the built-in features.
-- **Connect your data:** Toolpad lets you return data right from serverside functions which can be automatically connected to components on the page.
+- **Connect your data:** Toolpad lets you return data right from server-side functions which can be automatically connected to components on the page.
 - **Own your code:** All configuration is stored in local files which you can version-control, edit, git-sync and deploy in any way you want.
 
 ## Terminology

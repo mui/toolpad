@@ -12,17 +12,12 @@ import {
 } from './Form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-const LOCALE_LOADERS = new Map(
-  // jest is choking on this dynamic import
-  process.env.NODE_ENV === 'test'
-    ? []
-    : [
-        ['en', () => import('dayjs/locale/en')],
-        ['nl', () => import('dayjs/locale/nl')],
-        ['fr', () => import('dayjs/locale/fr')],
-        // TODO...
-      ],
-);
+const LOCALE_LOADERS = new Map([
+  ['en', () => import('dayjs/locale/en')],
+  ['nl', () => import('dayjs/locale/nl')],
+  ['fr', () => import('dayjs/locale/fr')],
+  // TODO...
+]);
 
 interface LoadableLocale {
   locale: string;
@@ -73,10 +68,11 @@ function getSnapshot() {
 }
 
 export interface DatePickerProps
-  extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue'>,
+  extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue' | 'name'>,
     Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'> {
   value?: string;
   onChange: (newValue: string | null) => void;
+  label?: string;
   format: string;
   fullWidth: boolean;
   variant: 'outlined' | 'filled' | 'standard';
@@ -96,7 +92,7 @@ function DatePicker({
 }: DatePickerProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
-    label: rest.label as string,
+    label: rest.label,
     value: valueProp,
     onChange,
     defaultValue: defaultValueProp,
@@ -191,7 +187,7 @@ export default createBuiltin(FormWrappedDatePicker, {
     },
     variant: {
       helperText:
-        'One of the available MUI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
+        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
       type: 'string',
       enum: ['outlined', 'filled', 'standard'],
       default: 'outlined',

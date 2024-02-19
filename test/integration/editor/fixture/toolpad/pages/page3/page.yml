@@ -5,11 +5,10 @@ spec:
   title: page3
   display: shell
   content:
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: codeComponent.FullWidth
-          name: codeComponent_FullWidth
+    - component: codeComponent.FullWidth
+      name: codeComponent_FullWidth
+      layout:
+        columnSize: 1
     - component: PageRow
       name: pageRow
       children:

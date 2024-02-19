@@ -1,6 +1,11 @@
+import * as React from 'react';
 import { QueryClient } from '@tanstack/react-query';
-import { createRpcApi } from '../rpcClient';
-import type { ServerDefinition } from '../server/rpcRuntimeServer';
+// TODO: move this rpc logic to @mui/utils
+// eslint-disable-next-line import/no-restricted-paths
+import { ApiClient, createRpcApi } from '../rpcClient';
+
+// eslint-disable-next-line import/no-restricted-paths
+import type { ServerDefinition } from '../server/runtimeRpcServer';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -14,7 +19,8 @@ export const queryClient = new QueryClient({
   },
 });
 
-export default createRpcApi<ServerDefinition>(
-  queryClient,
-  new URL(`${process.env.BASE_URL}/api/runtime-rpc`, window.location.href),
-);
+export function createApi(url: string) {
+  return createRpcApi<ServerDefinition>(queryClient, new URL(url, window.location.href));
+}
+
+export const RuntimeApiContext = React.createContext<ApiClient<ServerDefinition> | null>(null);

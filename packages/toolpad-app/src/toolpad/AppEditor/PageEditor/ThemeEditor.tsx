@@ -1,6 +1,6 @@
 import * as React from 'react';
-import * as appDom from '../../../appDom';
-import { useDom, useDomApi } from '../../AppState';
+import * as appDom from '@mui/toolpad-core/appDom';
+import { useAppState, useDomApi } from '../../AppState';
 import MuiThemeEditor from '../../../components/MuiThemeEditor';
 
 export interface ComponentEditorProps {
@@ -8,7 +8,7 @@ export interface ComponentEditorProps {
 }
 
 export default function ComponentEditor({ className }: ComponentEditorProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const domApi = useDomApi();
 
   const app = appDom.getApp(dom);

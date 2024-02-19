@@ -1,25 +1,33 @@
 /**
- * @jest-environment jsdom
+ * @vitest-environment jsdom
  */
 
 import * as React from 'react';
-import { render, waitFor as waitForOrig, screen, fireEvent, act } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import {
+  render,
+  waitFor as waitForOrig,
+  screen,
+  fireEvent,
+  act,
+  cleanup,
+} from '@testing-library/react';
+import 'vitest-dom/extend-expect';
 import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { Emitter } from '@mui/toolpad-utils/events';
-import { jest } from '@jest/globals';
-import ToolpadApp from './ToolpadApp';
-import * as appDom from '../appDom';
+import { test, expect, afterEach } from 'vitest';
+import * as appDom from '@mui/toolpad-core/appDom';
 import createRuntimeState from './createRuntimeState';
+import ToolpadApp from './ToolpadApp';
+import { AppHost, AppHostContext } from './AppHostContext';
 
-async function loadComponents() {
-  return {};
-}
+afterEach(cleanup);
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
+
+const appHost: AppHost = { isPreview: false, isCustomServer: false, isCanvas: false };
 
 function renderPage(
   initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom,
@@ -28,7 +36,7 @@ function renderPage(
   let dom = appDom.createDom();
   const root = appDom.getNode(dom, dom.root, 'app');
   const page = appDom.createNode(dom, 'page', {
-    name: 'Page',
+    name: 'thePage',
     attributes: {
       title: '',
     },
@@ -37,13 +45,15 @@ function renderPage(
 
   dom = initPage(dom, page);
 
-  window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
+  window.history.replaceState({}, 'Test page', `/toolpad/pages/thePage`);
 
   const state = createRuntimeState({ dom });
 
   return render(
     <CanvasEventsContext.Provider value={canvasEvents}>
-      <ToolpadApp loadComponents={loadComponents} state={state} basename="toolpad" />
+      <AppHostContext.Provider value={appHost}>
+        <ToolpadApp state={state} basename="toolpad" />
+      </AppHostContext.Provider>
     </CanvasEventsContext.Provider>,
   );
 }
@@ -137,7 +147,6 @@ test(`default Value for binding`, async () => {
 
 test(`Databinding errors`, async () => {
   const canvasEvents = new Emitter<RuntimeEvents>();
-  const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {});
   let bindings: LiveBindings | undefined;
 
   const bindingsUpdateHandler = (event: RuntimeEvents['pageBindingsUpdated']) => {
@@ -208,10 +217,7 @@ test(`Databinding errors`, async () => {
         message: 'Cycle detected "cyclic1.value"',
       }),
     );
-
-    expect(consoleErrorMock).toHaveBeenCalled();
   } finally {
     canvasEvents.off('pageBindingsUpdated', bindingsUpdateHandler);
-    consoleErrorMock.mockRestore();
   }
 });

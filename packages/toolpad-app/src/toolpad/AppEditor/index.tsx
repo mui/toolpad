@@ -2,7 +2,7 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PageEditor from './PageEditor';
-import DomProvider, { useAppState } from '../AppState';
+import { useAppState } from '../AppState';
 import AppEditorShell from './AppEditorShell';
 import NoPageFound from './NoPageFound';
 import { getPathnameFromView } from '../../utils/domView';
@@ -15,7 +15,7 @@ const classes = {
 
 const EditorRoot = styled('div')(({ theme }) => ({
   height: 1,
-  minHeight: '100vh',
+  minHeight: '100%',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -51,25 +51,23 @@ function FileEditor() {
   const currentViewContent = React.useMemo(() => {
     switch (currentView.kind) {
       case 'page': {
-        if (currentView.nodeId) {
-          return <PageEditor nodeId={currentView.nodeId} />;
+        if (currentView.name) {
+          return <PageEditor name={currentView.name} />;
         }
         return <NoPageFound />;
       }
       default:
         return <NoPageFound />;
     }
-  }, [currentView.kind, currentView.nodeId]);
+  }, [currentView.kind, currentView.name]);
 
   return <AppEditorShell>{currentViewContent}</AppEditorShell>;
 }
 
 export default function Editor() {
   return (
-    <DomProvider>
-      <EditorRoot>
-        <FileEditor />
-      </EditorRoot>
-    </DomProvider>
+    <EditorRoot>
+      <FileEditor />
+    </EditorRoot>
   );
 }

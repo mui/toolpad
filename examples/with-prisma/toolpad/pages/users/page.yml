@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: page
 spec:
-  id: n5zz3LC
-  title: Default page
+  title: Prisma example
   content:
     - component: PageRow
       name: pageRow1

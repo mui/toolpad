@@ -9,18 +9,8 @@ spec:
       name: pageRow1
       children:
         [
-          {
-              component: TextField,
-              name: textField,
-              props: { fullWidth: true },
-              children: []
-            },
-          {
-              component: TextField,
-              name: textField1,
-              props: { fullWidth: true },
-              children: []
-            }
+          { component: TextField, name: textField, props: { fullWidth: true } },
+          { component: TextField, name: textField1, props: { fullWidth: true } },
         ]
       props:
         justifyContent: start

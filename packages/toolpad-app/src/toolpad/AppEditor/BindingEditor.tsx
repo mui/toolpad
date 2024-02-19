@@ -31,18 +31,19 @@ import {
   PropValueType,
   BindableAttrValue,
   NavigationAction,
-  NodeId,
   EnvAttrValue,
 } from '@mui/toolpad-core';
 import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
 import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
+import { errorFrom } from '@mui/toolpad-utils/errors';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
+import { WithControlledProp, Maybe } from '@mui/toolpad-utils/types';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
-import useLatest from '../../utils/useLatest';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
-import { WithControlledProp, Maybe } from '../../utils/types';
 
 import { tryFormatExpression } from '../../utils/prettier';
 import useShortcut from '../../utils/useShortcut';
@@ -50,9 +51,10 @@ import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
 
 import TabPanel from '../../components/TabPanel';
 
-import { useDom } from '../AppState';
-import * as appDom from '../../appDom';
-import { getBindingType, getBindingValue } from '../../bindings';
+import { useAppState } from '../AppState';
+import { getBindingType, getBindingValue } from '../../runtime/bindings';
+
+import { useProjectApi } from '../../projectApi';
 
 // eslint-disable-next-line import/no-cycle
 import BindableEditor from './PageEditor/BindableEditor';
@@ -68,7 +70,7 @@ interface BindingEditorContext {
   disabled?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
-  envVarNames?: string[];
+  env?: Record<string, string>;
 }
 
 const [useBindingEditorContext, BindingEditorContextProvider] =
@@ -135,8 +137,8 @@ function JsExpressionPreview({ jsRuntime, input, globalScope }: JsExpressionPrev
 export interface EnvBindingEditorProps extends WithControlledProp<EnvAttrValue | null> {}
 
 export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
-  const { envVarNames = [] } = useBindingEditorContext();
-
+  const context = useBindingEditorContext();
+  const envVarNames = Object.keys(context.env ?? {});
   const handleInputChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string | null) => {
       onChange({
@@ -181,19 +183,21 @@ function getValueBindingTab(value: Maybe<BindableAttrValue<any>>) {
 }
 
 export interface ValueBindingEditorProps
-  extends WithControlledProp<JsExpressionAttrValue | EnvAttrValue | null> {}
+  extends WithControlledProp<JsExpressionAttrValue | EnvAttrValue | null> {
+  error: unknown;
+}
 
-export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps) {
+export function ValueBindingEditor({ value, onChange, error }: ValueBindingEditorProps) {
   const {
     label,
     globalScope,
     globalScopeMeta = {},
     jsRuntime,
     propType,
-    envVarNames,
+    env,
   } = useBindingEditorContext();
 
-  const hasEnv = Boolean(envVarNames);
+  const hasEnv = Boolean(env);
 
   const [activeTab, setActiveTab] = React.useState<BindableType>(getValueBindingTab(value));
   React.useEffect(() => {
@@ -203,7 +207,6 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
   const handleTabChange = (event: React.SyntheticEvent, newValue: BindableType) => {
     setActiveTab(newValue);
   };
-
   const jsExpressionBindingEditor = (
     <Stack direction="row" sx={{ height: 400, gap: 2, my: hasEnv ? 3 : 0 }}>
       <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
@@ -221,7 +224,6 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
           Make the &quot;{label}&quot; property dynamic with a JavaScript expression. This property
           expects a type: <code>{propType?.type || 'any'}</code>.
         </Typography>
-
         <JsExpressionBindingEditor
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
@@ -232,13 +234,36 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
           }
           onChange={onChange}
         />
-
+        {error ? (
+          <Box
+            sx={{
+              marginTop: '20px',
+            }}
+          >
+            <Typography sx={{ mb: 2, color: 'red' }}>
+              Error while reading the prettier configuration:
+              {errorFrom(error).message ??
+                'The prettier config could not be loaded and therefore the code would not be formatted'}
+            </Typography>
+          </Box>
+        ) : null}
         <JsExpressionPreview jsRuntime={jsRuntime} input={value} globalScope={globalScope} />
       </Box>
     </Stack>
   );
 
-  return hasEnv ? (
+  const envBindingEditor = (
+    <EnvBindingEditor
+      value={(value as EnvAttrValue)?.$$env ? (value as EnvAttrValue) : null}
+      onChange={onChange}
+    />
+  );
+
+  if (!hasEnv) {
+    return jsExpressionBindingEditor;
+  }
+
+  return (
     <TabContext value={activeTab}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <TabList onChange={handleTabChange} aria-label="Choose action kind ">
@@ -253,14 +278,9 @@ export function ValueBindingEditor({ value, onChange }: ValueBindingEditorProps)
         </Box>
       </TabPanel>
       <TabPanel value="env" disableGutters>
-        <EnvBindingEditor
-          value={(value as EnvAttrValue)?.$$env ? (value as EnvAttrValue) : null}
-          onChange={onChange}
-        />
+        {envBindingEditor}
       </TabPanel>
     </TabContext>
-  ) : (
-    jsExpressionBindingEditor
   );
 }
 
@@ -338,7 +358,7 @@ function NavigationActionParameterEditor({
 export interface NavigationActionEditorProps extends WithControlledProp<NavigationAction | null> {}
 
 function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const root = appDom.getApp(dom);
   const { pages = [] } = appDom.getChildNodes(dom, root);
 
@@ -350,14 +370,15 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
 
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const pageId = event.target.value as NodeId;
-      const page = appDom.getNode(dom, pageId);
+      const pageName = event.target.value;
+      const page = appDom.getPageByName(dom, pageName);
 
-      const defaultActionParameters = appDom.isPage(page) ? getDefaultActionParameters(page) : {};
+      const defaultActionParameters =
+        page && appDom.isPage(page) ? getDefaultActionParameters(page) : {};
 
       onChange({
         $$navigationAction: {
-          page: pageId,
+          page: pageName,
           parameters: defaultActionParameters,
         },
       });
@@ -365,20 +386,24 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
     [dom, getDefaultActionParameters, onChange],
   );
 
-  const actionPageId = value?.$$navigationAction?.page || null;
+  const actionPageAliasOrName = value?.$$navigationAction?.page || null;
   const actionParameters = React.useMemo(
     () => value?.$$navigationAction.parameters || {},
     [value?.$$navigationAction.parameters],
   );
 
-  const actionPage = pages.find((availablePage) => availablePage.id === actionPageId);
+  const actionPage =
+    pages.find((availablePage) => availablePage.name === actionPageAliasOrName) ||
+    pages.find((availablePage) =>
+      availablePage.attributes.alias?.some((alias) => alias === actionPageAliasOrName),
+    );
 
   const handleActionParameterChange = React.useCallback(
     (actionParameterName: string) => (newValue: BindableAttrValue<string> | null) => {
-      if (actionPageId) {
+      if (actionPageAliasOrName) {
         onChange({
           $$navigationAction: {
-            page: actionPageId,
+            page: actionPageAliasOrName,
             parameters: {
               ...actionParameters,
               ...(newValue ? { [actionParameterName]: newValue } : {}),
@@ -387,7 +412,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         });
       }
     },
-    [actionPageId, actionParameters, onChange],
+    [actionPageAliasOrName, actionParameters, onChange],
   );
 
   const hasPagesAvailable = pages.length > 0;
@@ -404,13 +429,13 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
         sx={{ my: 3 }}
         label="Select a page"
         select
-        value={actionPageId || ''}
+        value={actionPageAliasOrName || ''}
         onChange={handlePageChange}
         disabled={!hasPagesAvailable}
         helperText={hasPagesAvailable ? null : 'No other pages available'}
       >
         {pages.map((page) => (
-          <MenuItem key={page.id} value={page.id}>
+          <MenuItem key={page.name} value={page.name}>
             {page.name}
           </MenuItem>
         ))}
@@ -492,6 +517,8 @@ export function BindingEditorDialog<V>({
   open,
   onClose,
 }: BindingEditorDialogProps<V>) {
+  const projectApi = useProjectApi();
+  const { error, data } = projectApi.useQuery('getPrettierConfig', []);
   const { propType, label } = useBindingEditorContext();
 
   const [input, setInput] = React.useState(value);
@@ -501,18 +528,25 @@ export function BindingEditorDialog<V>({
 
   const committedInput = React.useRef<BindableAttrValue<V> | null>(input);
 
-  const handleSave = React.useCallback(() => {
+  const handleSave = React.useCallback(async () => {
     let newValue = input;
 
     if ((input as JsExpressionAttrValue)?.$$jsExpression) {
+      const jsExpression = await tryFormatExpression(
+        (input as JsExpressionAttrValue).$$jsExpression,
+        data!,
+      );
+      // Remove trailing spaces, newline characters for cleanliness and
+      // trailing semicolons since they introduce crashes while evaluation
+      const cleanedExpression = jsExpression.trim().replace(/;*$/, '');
       newValue = {
-        $$jsExpression: tryFormatExpression((input as JsExpressionAttrValue).$$jsExpression),
+        $$jsExpression: cleanedExpression,
       };
     }
 
     committedInput.current = newValue;
     onChange(newValue);
-  }, [onChange, input]);
+  }, [onChange, input, data]);
 
   const hasUnsavedChanges = input
     ? getBindingType(input) !==
@@ -558,6 +592,7 @@ export function BindingEditorDialog<V>({
           <ActionEditor value={input} onChange={(newValue) => setInput(newValue)} />
         ) : (
           <ValueBindingEditor
+            error={error}
             value={
               (input as JsExpressionAttrValue)?.$$jsExpression || (input as EnvAttrValue)?.$$env
                 ? (input as JsExpressionAttrValue | EnvAttrValue)
@@ -594,7 +629,7 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
   hidden?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
-  envVarNames?: string[];
+  env?: Record<string, string>;
 }
 
 export function BindingEditor<V>({
@@ -608,10 +643,9 @@ export function BindingEditor<V>({
   value,
   onChange,
   liveBinding,
-  envVarNames,
+  env,
 }: BindingEditorProps<V>) {
   const [open, setOpen] = React.useState(false);
-
   const handleOpen = React.useCallback(() => setOpen(true), []);
   const handleClose = React.useCallback(() => setOpen(false), []);
 
@@ -624,8 +658,8 @@ export function BindingEditor<V>({
       aria-label={`Bind property "${label}"`}
       checked={hasBinding}
       disabled={disabled}
-      icon={<AddLinkIcon />}
-      checkedIcon={<LinkIcon />}
+      icon={<AddLinkIcon fontSize="inherit" />}
+      checkedIcon={<LinkIcon fontSize="inherit" />}
       onClick={handleOpen}
       color={error ? 'error' : undefined}
       sx={{ visibility: hidden ? 'hidden' : 'visible' }}
@@ -666,9 +700,9 @@ export function BindingEditor<V>({
       disabled,
       propType,
       liveBinding,
-      envVarNames,
+      env,
     }),
-    [disabled, envVarNames, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
+    [disabled, env, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
   );
 
   return (

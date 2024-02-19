@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.44/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: page
+  content:
+    - component: DataGrid
+      name: dataGrid
+      props:
+        dataProviderId: myCrudData.ts:default
+        columns:
+          - field: name
+            width: 133
+        height: 500
+        rowsSource: dataProvider

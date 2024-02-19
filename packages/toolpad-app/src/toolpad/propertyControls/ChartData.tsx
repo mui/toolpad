@@ -25,13 +25,14 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import LegendToggleIcon from '@mui/icons-material/LegendToggle';
 import { evaluateBindable } from '@mui/toolpad-core/jsRuntime';
-import * as appDom from '../../appDom';
+import { blueberryTwilightPalette } from '@mui/x-charts/colorPalettes';
+import { updateArray, remove } from '@mui/toolpad-utils/immutability';
+import * as appDom from '@mui/toolpad-core/appDom';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
-import { useDom, useDomApi } from '../AppState';
+import { useAppState, useDomApi } from '../AppState';
 import BindableEditor from '../AppEditor/PageEditor/BindableEditor';
-import { updateArray, remove } from '../../utils/immutability';
 import { createToolpadAppTheme } from '../../runtime/AppThemeProvider';
 import ColorPicker from '../../components/ColorPicker';
 
@@ -51,12 +52,14 @@ function ChartDataPropEditor({
   value = [],
   onChange,
 }: EditorProps<ChartDataSeries[]>) {
-  const { dom } = useDom();
+  const { dom } = useAppState();
   const domApi = useDomApi();
   const { pageState, bindings, globalScopeMeta } = usePageEditorState();
   const jsBrowserRuntime = useBrowserJsRuntime();
 
   const appTheme = React.useMemo(() => createToolpadAppTheme(dom), [dom]);
+
+  const defaultPalette = blueberryTwilightPalette(appTheme.palette.mode);
 
   const [dataSeriesEditIndex, setDataSeriesEditIndex] = React.useState<number | null>(null);
   const [popoverAnchorElement, setPopoverAnchorElement] = React.useState<HTMLElement | null>(null);
@@ -72,13 +75,20 @@ function ChartDataPropEditor({
         label: newDataSeriesLabel,
         kind: 'line',
         data: [],
-        color:
-          newDataSeriesCount % 2 === 0
-            ? appTheme.palette.secondary.main
-            : appTheme.palette.primary.main,
+        color: defaultPalette[(newDataSeriesCount - 1) % defaultPalette.length],
       },
     ]);
-  }, [appTheme, onChange, value]);
+  }, [defaultPalette, onChange, value]);
+
+  const previousDataSeriesCountRef = React.useRef(value.length);
+  React.useEffect(() => {
+    if (previousDataSeriesCountRef.current === 0 && value.length === 1) {
+      setDataSeriesEditIndex(0);
+      setPopoverAnchorElement(document.getElementById('data-series-button-1'));
+    }
+
+    previousDataSeriesCountRef.current = value.length;
+  }, [value.length]);
 
   const handleDataSeriesClick = React.useCallback(
     (index: number) => (event: React.MouseEvent<HTMLElement>) => {
@@ -90,9 +100,18 @@ function ChartDataPropEditor({
 
   const handleDuplicateDataSeries = React.useCallback(
     (index: number) => () => {
-      onChange([...value.slice(0, index + 1), value[index], ...value.slice(index + 1)]);
+      const newDataSeriesCount = value.length + 1;
+
+      onChange([
+        ...value.slice(0, index + 1),
+        {
+          ...value[index],
+          color: defaultPalette[(newDataSeriesCount - 1) % defaultPalette.length],
+        },
+        ...value.slice(index + 1),
+      ]);
     },
-    [onChange, value],
+    [defaultPalette, onChange, value],
   );
 
   const handleRemoveDataSeries = React.useCallback(
@@ -213,9 +232,11 @@ function ChartDataPropEditor({
         const dataResult = (evaluateBindable(jsBrowserRuntime, dataSeries.data, pageState).value ||
           []) as NonNullable<ChartDataSeries['data']>;
 
-        return dataResult
-          .flatMap((dataSeriesPoint) => Object.keys(dataSeriesPoint))
-          .filter((key, index, array) => array.indexOf(key) === index);
+        return Array.isArray(dataResult)
+          ? dataResult
+              .flatMap((dataSeriesPoint) => Object.keys(dataSeriesPoint))
+              .filter((key, index, array) => array.indexOf(key) === index)
+          : [];
       }),
     [jsBrowserRuntime, pageState, value],
   );
@@ -233,10 +254,16 @@ function ChartDataPropEditor({
               return (
                 <ListItem key={index} disableGutters>
                   <ListItemButton
+                    id={`data-series-button-${index + 1}`}
                     onClick={handleDataSeriesClick(index)}
                     aria-describedby={popoverId}
                   >
-                    <ListItemText primary={label} />
+                    <ListItemText
+                      primary={label}
+                      primaryTypographyProps={{
+                        style: { overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 166 },
+                      }}
+                    />
                   </ListItemButton>
                   <IconButton
                     aria-label="Duplicate data series"
@@ -315,14 +342,40 @@ function ChartDataPropEditor({
                 options={dataSeriesKeySuggestions[dataSeriesEditIndex]}
                 value={editDataSeries?.xKey || ''}
                 onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'xKey')}
-                renderInput={(params) => <TextField {...params} label="xKey" />}
+                renderInput={(params) => {
+                  const keyExists =
+                    !editDataSeries?.xKey ||
+                    dataSeriesKeySuggestions[dataSeriesEditIndex].includes(editDataSeries.xKey);
+
+                  return (
+                    <TextField
+                      {...params}
+                      label="xKey"
+                      error={!keyExists}
+                      helperText={keyExists ? '' : 'Property not present in data'}
+                    />
+                  );
+                }}
               />
               <Autocomplete
                 freeSolo
                 options={dataSeriesKeySuggestions[dataSeriesEditIndex]}
                 value={editDataSeries?.yKey || ''}
                 onInputChange={handleDataSeriesAutocompletePropChange(dataSeriesEditIndex, 'yKey')}
-                renderInput={(params) => <TextField {...params} label="yKey" />}
+                renderInput={(params) => {
+                  const keyExists =
+                    !editDataSeries?.yKey ||
+                    dataSeriesKeySuggestions[dataSeriesEditIndex].includes(editDataSeries.yKey);
+
+                  return (
+                    <TextField
+                      {...params}
+                      label="yKey"
+                      error={!keyExists}
+                      helperText={keyExists ? '' : 'Property not present in data'}
+                    />
+                  );
+                }}
               />
               <ColorPicker
                 label="color"

@@ -8,7 +8,6 @@ import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import {
   FORM_INPUT_ARG_TYPES,
-  FORM_TEXT_INPUT_ARG_TYPES,
   FormInputComponentProps,
   useFormInput,
   withComponentForm,
@@ -25,8 +24,9 @@ interface AutocompleteProps
     Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'> {
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
+  label?: string;
+  defaultValue: string;
   options: AutocompleteOption[];
-  label: string;
 }
 
 function Autocomplete({
@@ -34,6 +34,7 @@ function Autocomplete({
   label,
   onChange,
   value,
+  defaultValue,
   isRequired,
   minLength,
   maxLength,
@@ -41,14 +42,13 @@ function Autocomplete({
   sx,
   ...rest
 }: AutocompleteProps) {
-  const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
-
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
     label,
     value,
     onChange,
     emptyValue: null,
+    defaultValue,
     validationProps: { isRequired, minLength, maxLength, isInvalid },
   });
 
@@ -82,16 +82,9 @@ function Autocomplete({
     (event: React.SyntheticEvent<Element>, selection: AutocompleteOption | null) => {
       const newValue: AutocompleteValue = getValue(selection);
       onFormInputChange(newValue);
-      setSelectedVal(selection);
     },
     [getValue, onFormInputChange],
   );
-
-  React.useEffect(() => {
-    if (!value) {
-      setSelectedVal(null);
-    }
-  }, [value]);
 
   return renderFormInput(
     <MuiAutocomplete
@@ -99,7 +92,7 @@ function Autocomplete({
       options={options ?? []}
       isOptionEqualToValue={(option, selectedValue) => getValue(option) === getValue(selectedValue)}
       getOptionLabel={getOptionLabel}
-      value={selectedVal}
+      value={value}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -121,7 +114,7 @@ const FormWrappedAutocomplete = withComponentForm(Autocomplete);
 
 export default createBuiltin(FormWrappedAutocomplete, {
   helperText:
-    'A text input with autocomplete suggestions. Uses the MUI [Autocomplete](https://mui.com/material-ui/react-autocomplete/) under the hood',
+    'A text input with autocomplete suggestions. Uses the Material UI [Autocomplete](https://mui.com/material-ui/react-autocomplete/) under the hood',
   layoutDirection: 'both',
   loadingProp: 'loading',
   argTypes: {
@@ -137,6 +130,12 @@ export default createBuiltin(FormWrappedAutocomplete, {
       helperText: 'The value of the autocomplete.',
       type: 'string',
       onChangeProp: 'onChange',
+      default: '',
+      defaultValueProp: 'defaultValue',
+    },
+    defaultValue: {
+      helperText: 'A default value.',
+      type: 'string',
       default: '',
     },
     label: {
@@ -163,7 +162,6 @@ export default createBuiltin(FormWrappedAutocomplete, {
       type: 'boolean',
     },
     ...FORM_INPUT_ARG_TYPES,
-    ...FORM_TEXT_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

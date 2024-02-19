@@ -10,7 +10,7 @@ By default, you can connect any JSON data to a Toolpad data grid and it will att
 
 ## Customizing cell rendering
 
-However, if the default column options are not sufficient, Toolpad allows you to customize your data grid with custom components, using the powerful features of the <a href="https://mui.com/x/react-data-grid/">MUI X Data Grid</a>.
+However, if the default column options are not sufficient, Toolpad allows you to customize your data grid with custom components, using the powerful features of the <a href="https://mui.com/x/react-data-grid/">MUI X Data Grid</a>.
 
 ### Creating a custom component
 
@@ -19,7 +19,7 @@ Suppose we want to display only the first eight characters of the Order ID in a 
 We'll create a custom component to achieve this.
 
 :::info
-Follow the how-to guide on [creating a number component](/toolpad/how-to-guides/number-display/) if you want to see more details on creating custom components.
+Follow the how-to guide on [creating a custom component](/toolpad/concepts/custom-components/) if you want to learn more.
 :::
 
 A custom component that renders inside the data grid receives a `params` object as a prop, containing the following values:

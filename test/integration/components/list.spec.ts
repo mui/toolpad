@@ -1,17 +1,22 @@
 import * as path from 'path';
+import * as url from 'url';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test, expect } from '../../playwright/localTest';
 
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture-list'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture-list'),
     cmd: 'dev',
   },
 });
 
 test('list component behavior', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('list');
+  await runtimeModel.goToPage('list');
 
   const firstInput = page.getByLabel('textField0');
   const secondInput = page.getByLabel('textField1');

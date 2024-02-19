@@ -1,176 +1,200 @@
 apiVersion: v1
 kind: page
 spec:
-  id: b4UWL4X
-  title: Default page
+  title: Stripe scripts
   content:
-    - component: PageRow
-      name: pageRow2
-      children:
-        - component: Text
-          name: text
-          props:
-            value: Stripe Dashboard
-            variant: h4
-    - component: PageRow
-      name: pageRow3
-      children:
-        - component: Text
-          name: text1
-          props:
-            value: Invoices
-            variant: h5
-    - component: PageRow
-      name: pageRow1
-      children:
-        - component: DataGrid
-          name: dataGrid
-          props:
-            rows:
-              $$jsExpression: |
-                JSON.parse(listInvoices.data)
-            columns:
-              - field: id
-                type: string
-              - field: object
-                type: string
-              - field: account_country
-                type: string
-              - field: amount_due
-                type: number
-              - field: amount_paid
-                type: number
-              - field: amount_remaining
-                type: number
-              - field: amount_shipping
-                type: number
-              - field: collection_method
-                type: string
-              - field: created
-                type: number
-              - field: currency
-                type: string
-              - field: custom_fields
-                type: json
-              - field: customer
-                type: string
-              - field: customer_address
-                type: json
-              - field: customer_email
-                type: string
-              - field: customer_name
-                type: string
-              - field: customer_phone
-                type: json
-              - field: customer_shipping
-                type: json
-              - field: customer_tax_exempt
-                type: string
-              - field: customer_tax_ids
-                type: json
-              - field: default_payment_method
-                type: json
-              - field: default_source
-                type: json
-              - field: default_tax_rates
-                type: json
-              - field: description
-                type: json
-              - field: discount
-                type: json
-              - field: discounts
-                type: json
-              - field: due_date
-                type: number
-              - field: effective_at
-                type: number
-              - field: ending_balance
-                type: number
-              - field: footer
-                type: json
-              - field: from_invoice
-                type: json
-              - field: hosted_invoice_url
-                type: link
-              - field: invoice_pdf
-                type: link
-              - field: last_finalization_error
-                type: json
-              - field: latest_revision
-                type: json
-              - field: lines
-                type: json
-              - field: livemode
-                type: boolean
-              - field: metadata
-                type: json
-              - field: next_payment_attempt
-                type: json
-              - field: number
-                type: string
-              - field: on_behalf_of
-                type: json
-              - field: paid
-                type: boolean
-              - field: paid_out_of_band
-                type: boolean
-              - field: payment_intent
-                type: string
-              - field: payment_settings
-                type: json
-              - field: period_end
-                type: number
-              - field: period_start
-                type: number
-              - field: post_payment_credit_notes_amount
-                type: number
-              - field: pre_payment_credit_notes_amount
-                type: number
-              - field: quote
-                type: json
-              - field: receipt_number
-                type: json
-              - field: rendering_options
-                type: json
-              - field: shipping_cost
-                type: json
-              - field: shipping_details
-                type: json
-              - field: starting_balance
-                type: number
-              - field: statement_descriptor
-                type: json
-              - field: status
-                type: string
-              - field: status_transitions
-                type: json
-              - field: subscription
-                type: json
-              - field: subtotal
-                type: number
-              - field: subtotal_excluding_tax
-                type: number
-              - field: tax
-                type: json
-              - field: test_clock
-                type: json
-              - field: total
-                type: number
-              - field: total_discount_amounts
-                type: json
-              - field: total_excluding_tax
-                type: number
-              - field: total_tax_amounts
-                type: json
-              - field: transfer_data
-                type: json
-              - field: webhooks_delivered_at
-                type: number
+    - component: Text
+      name: text
+      layout:
+        columnSize: 1
+      props:
+        value: Stripe Dashboard
+        variant: h4
+    - component: Text
+      name: text1
+      layout:
+        columnSize: 1
+      props:
+        value: Invoices
+        variant: h5
+    - component: DataGrid
+      name: dataGrid
+      props:
+        rowsSource: dataProvider
+        dataProviderId: stripe.ts:default
+        columns:
+          - field: id
+            type: string
+          - field: object
+            type: string
+            width: 112
+          - field: account_country
+            type: string
+            width: 135
+          - field: account_name
+            type: string
+            width: 169
+          - field: account_tax_ids
+            type: json
+          - field: amount_due
+            type: number
+          - field: amount_paid
+            type: number
+          - field: amount_remaining
+            type: number
+          - field: amount_shipping
+            type: number
+          - field: application
+            type: json
+          - field: application_fee_amount
+            type: json
+          - field: attempt_count
+            type: number
+          - field: attempted
+            type: boolean
+          - field: auto_advance
+            type: boolean
+          - field: automatic_tax
+            type: json
+          - field: billing_reason
+            type: string
+          - field: charge
+            type: json
+          - field: collection_method
+            type: string
+          - field: created
+            type: number
+          - field: currency
+            type: string
+          - field: custom_fields
+            type: json
+          - field: customer
+            type: string
+          - field: customer_address
+            type: json
+          - field: customer_email
+            type: string
+          - field: customer_name
+            type: string
+          - field: customer_phone
+            type: json
+          - field: customer_shipping
+            type: json
+          - field: customer_tax_exempt
+            type: string
+          - field: customer_tax_ids
+            type: json
+          - field: default_payment_method
+            type: json
+          - field: default_source
+            type: json
+          - field: default_tax_rates
+            type: json
+          - field: description
+            type: json
+          - field: discount
+            type: json
+          - field: discounts
+            type: json
+          - field: due_date
+            type: number
+          - field: effective_at
+            type: number
+          - field: ending_balance
+            type: number
+          - field: footer
+            type: json
+          - field: from_invoice
+            type: json
+          - field: hosted_invoice_url
+            type: link
+          - field: invoice_pdf
+            type: link
+          - field: last_finalization_error
+            type: json
+          - field: latest_revision
+            type: json
+          - field: lines
+            type: json
+          - field: livemode
+            type: boolean
+          - field: metadata
+            type: json
+          - field: next_payment_attempt
+            type: json
+          - field: number
+            type: string
+          - field: on_behalf_of
+            type: json
+          - field: paid
+            type: boolean
+          - field: paid_out_of_band
+            type: boolean
+          - field: payment_intent
+            type: json
+          - field: payment_settings
+            type: json
+          - field: period_end
+            type: number
+          - field: period_start
+            type: number
+          - field: post_payment_credit_notes_amount
+            type: number
+          - field: pre_payment_credit_notes_amount
+            type: number
+          - field: quote
+            type: json
+          - field: receipt_number
+            type: json
+          - field: rendering
+            type: json
+          - field: rendering_options
+            type: json
+          - field: shipping_cost
+            type: json
+          - field: shipping_details
+            type: json
+          - field: starting_balance
+            type: number
+          - field: statement_descriptor
+            type: json
+          - field: status
+            type: string
+          - field: status_transitions
+            type: json
+          - field: subscription
+            type: json
+          - field: subscription_details
+            type: json
+          - field: subtotal
+            type: number
+          - field: subtotal_excluding_tax
+            type: number
+          - field: tax
+            type: json
+          - field: test_clock
+            type: json
+          - field: total
+            type: number
+          - field: total_discount_amounts
+            type: json
+          - field: total_excluding_tax
+            type: number
+          - field: total_tax_amounts
+            type: json
+          - field: transfer_data
+            type: json
+          - field: webhooks_delivered_at
+            type: number
     - component: PageRow
       name: pageRow
+      props:
+        justifyContent: start
       children:
         - component: Button
           name: button
+          layout:
+            columnSize: 0.8380279822097516
           props:
             content: Download PDFs
             onClick:
@@ -183,18 +207,26 @@ spec:
             disabled:
               $$jsExpression: |
                 listInvoices?.data?.length === 0
+        - component: Text
+          name: link
+          layout:
+            columnSize: 1.1619720177902484
+          props:
+            mode: link
+            value:
+              $$jsExpression: |
+                downloadPDFs.data ? 'Download .zip file' : ''
+            loading:
+              $$jsExpression: |
+                downloadPDFs.isLoading
+            href:
+              $$jsExpression: |
+                downloadPDFs.data
   queries:
     - name: downloadPDFs
       mode: mutation
       query:
         function: functions.ts#downloadPDFs
-        kind: local
-      parameters:
-        - name: limit
-          value: 10
-    - name: listInvoices
-      query:
-        function: functions.ts#listInvoices
         kind: local
       parameters:
         - name: limit

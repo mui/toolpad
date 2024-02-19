@@ -1193,7 +1193,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             display: 'flex',
             alignItems: boundLayoutProps.verticalAlign,
             justifyContent: boundLayoutProps.horizontalAlign,
-            minHeight: node.layout?.height ?? componentConfig.defaultLayoutHeight,
+            height: node.layout?.height ?? componentConfig.defaultLayoutHeight,
+            minHeight: '100%',
           }}
           ref={nodeRef}
           data-toolpad-node-id={nodeId}

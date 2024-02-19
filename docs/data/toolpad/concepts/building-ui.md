@@ -13,7 +13,7 @@ To access the list of available Toolpad components, hover your cursor over the v
 
 ---
 
-Toolpad has many [built-in components](/toolpad/reference/components/) and we are always adding more. To make it easier for us to understand what to add next, please [upvote](https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D) the components you need, or open a [feature request](https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&projects=&template=2.feature.yml).
+Toolpad has many [built-in components](/toolpad/reference/components/) and we are always adding more. To make it easier for us to understand what to add next, please [upvote](https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D) the components you need, or open a [feature request](https://github.com/mui/mui-toolpad/issues/new/choose).
 
 ## Using components
 

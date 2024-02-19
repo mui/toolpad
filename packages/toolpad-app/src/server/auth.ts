@@ -3,20 +3,66 @@ import { Auth } from '@auth/core';
 import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import AzureADProvider from '@auth/core/providers/azure-ad';
-import { getToken } from '@auth/core/jwt';
+import CredentialsProvider from '@auth/core/providers/credentials';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
+import chalk from 'chalk';
 import * as appDom from '@mui/toolpad-core/appDom';
+import { adaptRequestFromExpressToFetch } from '@mui/toolpad-utils/httpApiAdapters';
+import { getUserToken } from '@mui/toolpad-core/auth';
 import { asyncHandler } from '../utils/express';
-import { adaptRequestFromExpressToFetch } from './httpApiAdapters';
-import { ToolpadProject } from './localMode';
+import type { ToolpadProject } from './localMode';
 
 const SKIP_VERIFICATION_PROVIDERS: appDom.AuthProvider[] = [
   // Azure AD should be fine to skip as the user has to belong to the organization to sign in
   'azure-ad',
+  'credentials',
 ];
 
+async function getAuthProviders(
+  project: Pick<ToolpadProject, 'loadDom'>,
+): Promise<appDom.AuthProviderConfig[]> {
+  const dom = await project.loadDom();
+  const app = appDom.getApp(dom);
+
+  const authProviders = app.attributes.authentication?.providers ?? [];
+
+  return authProviders;
+}
+
+export async function getRequireAuthentication(project: ToolpadProject): Promise<boolean> {
+  const authProviders = await getAuthProviders(project);
+  return authProviders.length > 0;
+}
+
+function getMappedRoles(
+  roles: string[],
+  allRoles: string[],
+  roleMappings: appDom.AuthProviderConfig['roles'] = [],
+): string[] {
+  return (roles ?? []).flatMap((providerRole) =>
+    allRoles
+      .filter((role) => {
+        const targetRoleMapping = roleMappings.find((roleMapping) => roleMapping.target === role);
+
+        return targetRoleMapping
+          ? targetRoleMapping.source.includes(providerRole)
+          : role === providerRole;
+      })
+      // Remove duplicates in case multiple provider roles map to the same role
+      .filter((value, index, self) => self.indexOf(value) === index),
+  );
+}
+
 export function createAuthHandler(project: ToolpadProject): Router {
+  if (!process.env.TOOLPAD_AUTH_SECRET) {
+    console.error(
+      `\n${chalk.red(
+        'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at https://mui.com/toolpad/concepts/authentication/#authentication-secret',
+      )}\n`,
+    );
+  }
+
   const { base } = project.options;
 
   const router = express.Router();
@@ -83,13 +129,6 @@ export function createAuthHandler(project: ToolpadProject): Router {
   const googleProvider = GoogleProvider({
     clientId: process.env.TOOLPAD_GOOGLE_CLIENT_ID,
     clientSecret: process.env.TOOLPAD_GOOGLE_CLIENT_SECRET,
-    authorization: {
-      params: {
-        prompt: 'consent',
-        access_type: 'offline',
-        response_type: 'code',
-      },
-    },
   });
 
   const azureADProvider = AzureADProvider({
@@ -98,18 +137,45 @@ export function createAuthHandler(project: ToolpadProject): Router {
     tenantId: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
   });
 
+  const credentialsProvider = CredentialsProvider({
+    name: 'Credentials',
+    async authorize({ username, password }) {
+      if (process.env.NODE_ENV !== 'test') {
+        throw new Error('Credentials authentication provider can only be used in test mode.');
+      }
+
+      if (username === 'admin' && password === 'admin') {
+        return {
+          id: 'admin',
+          name: 'Lord Admin',
+          email: 'admin@example.com',
+          roles: ['mock-admin'],
+        };
+      }
+      if (username === 'mui' && password === 'mui') {
+        return { id: 'mui', name: 'Mr. MUI 2024', email: 'test@mui.com', roles: [] };
+      }
+      if (username === 'test' && password === 'test') {
+        return { id: 'test', name: 'Miss Test', email: 'test@example.com', roles: [] };
+      }
+
+      return null;
+    },
+  });
+
   const authConfig: AuthConfig = {
+    basePath: `${base}/api/auth`,
     pages: {
       signIn: `${base}/signin`,
       signOut: base,
       error: `${base}/signin`, // Error code passed in query string as ?error=
       verifyRequest: base,
     },
-    providers: [githubProvider, googleProvider, azureADProvider],
+    providers: [githubProvider, googleProvider, azureADProvider, credentialsProvider],
     secret: process.env.TOOLPAD_AUTH_SECRET,
     trustHost: true,
     callbacks: {
-      async signIn({ profile, account }) {
+      async signIn({ profile, account, user }) {
         const dom = await project.loadDom();
         const app = appDom.getApp(dom);
 
@@ -121,49 +187,46 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
         return Boolean(
           (profile?.email_verified || skipEmailVerification) &&
-            profile?.email &&
+            user?.email &&
             (restrictedDomains.length === 0 ||
               restrictedDomains.some(
-                (restrictedDomain) => profile.email!.endsWith(`@${restrictedDomain}`) ?? false,
+                (restrictedDomain) => user.email!.endsWith(`@${restrictedDomain}`) ?? false,
               )),
         );
       },
       async redirect({ baseUrl }) {
         return `${baseUrl}${base}`;
       },
-      async jwt({ token, account }) {
+      async jwt({ token, account, user }) {
+        const dom = await project.loadDom();
+        const app = appDom.getApp(dom);
+
+        const authorization = app.attributes.authorization ?? {};
+        const roleNames = authorization?.roles?.map((role) => role.name) ?? [];
+
+        const authentication = app.attributes.authentication ?? {};
+
         if (account?.provider === 'azure-ad' && account.id_token) {
-          const [, payload] = account.id_token.split('.');
-          const idToken: { roles?: string[] } = JSON.parse(
-            Buffer.from(payload, 'base64').toString('utf8'),
-          );
-
-          const dom = await project.loadDom();
-          const app = appDom.getApp(dom);
-
-          const authorization = app.attributes.authorization ?? {};
-          const roleNames = authorization?.roles?.map((role) => role.name) ?? [];
-
-          const authentication = app.attributes.authentication ?? {};
           const roleMappings =
             authentication?.providers?.find(
               (providerConfig) => providerConfig.provider === 'azure-ad',
             )?.roles ?? [];
 
-          token.roles = (idToken.roles ?? []).flatMap((providerRole) =>
-            roleNames
-              .filter((role) => {
-                const targetRoleMapping = roleMappings.find(
-                  (roleMapping) => roleMapping.target === role,
-                );
-
-                return targetRoleMapping
-                  ? targetRoleMapping.source.includes(providerRole)
-                  : role === providerRole;
-              })
-              // Remove duplicates in case multiple provider roles map to the same role
-              .filter((value, index, self) => self.indexOf(value) === index),
+          const [, payload] = account.id_token.split('.');
+          const idToken: { roles?: string[] } = JSON.parse(
+            Buffer.from(payload, 'base64').toString('utf8'),
           );
+
+          token.roles = getMappedRoles(idToken?.roles ?? [], roleNames, roleMappings);
+        }
+
+        if (account?.provider === 'credentials') {
+          const roleMappings =
+            authentication?.providers?.find(
+              (providerConfig) => providerConfig.provider === 'credentials',
+            )?.roles ?? [];
+
+          token.roles = getMappedRoles(user?.roles ?? [], roleNames, roleMappings);
         }
 
         return token;
@@ -184,6 +247,11 @@ export function createAuthHandler(project: ToolpadProject): Router {
   router.use(
     '/*',
     asyncHandler(async (req, res) => {
+      if (!process.env.TOOLPAD_AUTH_SECRET) {
+        res.status(400).json({ url: `${base}/signin?error=MissingSecretError` });
+        return;
+      }
+
       const request = adaptRequestFromExpressToFetch(req);
 
       const response = (await Auth(request, authConfig)) as Response;
@@ -209,36 +277,12 @@ export async function createRequireAuthMiddleware(project: ToolpadProject) {
     const { options } = project;
     const { base } = options;
 
-    const dom = await project.loadDom();
-
-    const app = appDom.getApp(dom);
-
-    const authProviders = app.attributes.authentication?.providers ?? [];
-
-    const hasAuthentication = authProviders.length > 0;
-
     const isPageRequest = req.get('sec-fetch-dest') === 'document';
     const signInPath = `${base}/signin`;
 
     let isAuthorized = true;
-    if (
-      (!project.options.dev || isPageRequest) &&
-      hasAuthentication &&
-      req.originalUrl.split('?')[0] !== signInPath
-    ) {
-      const request = adaptRequestFromExpressToFetch(req);
-
-      let token;
-      if (process.env.TOOLPAD_AUTH_SECRET) {
-        // @TODO: Library types are wrong as salt should not be required, remove once fixed
-        // Github discussion: https://github.com/nextauthjs/next-auth/discussions/9133
-        // @ts-ignore
-        token = await getToken({
-          req: request,
-          secret: process.env.TOOLPAD_AUTH_SECRET,
-        });
-      }
-
+    if ((!project.options.dev || isPageRequest) && req.originalUrl.split('?')[0] !== signInPath) {
+      const token = await getUserToken(req);
       if (!token) {
         isAuthorized = false;
       }

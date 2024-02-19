@@ -2,6 +2,10 @@
 
 <p class="description">Run Toolpad applications programmatically in existing node.js servers.</p>
 
+:::warning
+We're working on an improved integration method. You'll be able to run Toolpad applications as React server components. If this interests you, please upvote the [feature request](https://github.com/mui/mui-toolpad/issues/3012).
+:::
+
 The Toolpad `dev` command comes with its own built-in server. However, sometimes you'd want more control over the way Toolpad applications are hosted within your application. The Toolpad custom server integration API allows you to run a Toolpad application programmatically within an existing node.js server.
 
 :::info

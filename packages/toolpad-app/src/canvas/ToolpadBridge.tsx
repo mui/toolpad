@@ -15,7 +15,9 @@ type Commands<T extends Record<string, Function>> = T & {
   [COMMAND_HANDLERS]: Partial<T>;
 };
 
-function createCommands<T extends Record<string, Function>>(initial: Partial<T> = {}): Commands<T> {
+export function createCommands<T extends Record<string, Function>>(
+  initial: Partial<T> = {},
+): Commands<T> {
   return new Proxy(
     {
       [COMMAND_HANDLERS]: initial,

@@ -1,14 +1,17 @@
-import express from 'express';
+import type express from 'express';
 
 export function encodeRequestBody(req: express.Request) {
   const contentType = req.headers['content-type'];
 
-  if (contentType?.includes('application/x-www-form-urlencoded')) {
-    return Object.entries(req.body as Record<string, any>).reduce((acc, [key, value]) => {
-      const encKey = encodeURIComponent(key);
-      const encValue = encodeURIComponent(value);
-      return `${acc ? `${acc}&` : ''}${encKey}=${encValue}`;
-    }, '');
+  if (typeof req.body === 'object' && contentType?.includes('application/x-www-form-urlencoded')) {
+    return Object.entries(req.body as Record<string, string | number | boolean>).reduce(
+      (acc, [key, value]) => {
+        const encKey = encodeURIComponent(key);
+        const encValue = encodeURIComponent(value);
+        return `${acc ? `${acc}&` : ''}${encKey}=${encValue}`;
+      },
+      '',
+    );
   }
 
   if (contentType?.includes('application/json')) {

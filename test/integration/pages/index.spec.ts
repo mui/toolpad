@@ -56,7 +56,7 @@ test('can rename page', async ({ page, localApp }) => {
   const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page2');
   await expect.poll(async () => folderExists(oldPageFolder)).toBe(true);
 
-  await editorModel.explorer.getByText('Page 2').dblclick();
+  await editorModel.explorer.getByText('page2').dblclick();
   await page.keyboard.type('renamedpage');
   await page.keyboard.press('Enter');
 

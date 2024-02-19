@@ -442,7 +442,6 @@ export function QueriesExplorer() {
         handleCreateClose={handleCreateClose}
         createMode={'query'}
       />
-      ;
     </React.Fragment>
   );
 }
@@ -499,7 +498,6 @@ export function ActionsExplorer() {
         handleCreateClose={handleCreateClose}
         createMode={'mutation'}
       />
-      ;
     </React.Fragment>
   );
 }

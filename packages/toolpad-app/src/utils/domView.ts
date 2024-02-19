@@ -28,8 +28,6 @@ export type QueryPanel = {
   currentTabIndex?: number;
 };
 
-const APP_PAGE_ROUTE = '/app/pages/:pageName';
-
 export type PageView = { kind: 'query'; nodeId: NodeId };
 
 export type PageViewTab = 'page' | 'component' | 'theme';
@@ -45,17 +43,19 @@ export type DomView = {
   pageParametersDialogOpen?: boolean;
 };
 
+const PREFIX = process.env.EXPERIMENTAL_INLINE_CANVAS ? '/editor' : '';
+
 export function getPathnameFromView(view: DomView): string {
   switch (view.kind) {
     case 'page':
-      return view.name ? `/app/pages/${view.name}` : '/app/pages';
+      return view.name ? `${PREFIX}/app/pages/${view.name}` : `${PREFIX}/app/pages`;
     default:
       throw new Error(`Unknown view "${(view as DomView).kind}".`);
   }
 }
 
 export function getViewFromPathname(pathname: string): DomView | null {
-  const pageRouteMatch = matchPath(APP_PAGE_ROUTE, pathname);
+  const pageRouteMatch = matchPath(`${PREFIX}/app/pages/:pageName`, pathname);
   if (pageRouteMatch?.params.pageName) {
     return {
       kind: 'page',

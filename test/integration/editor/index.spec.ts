@@ -4,7 +4,7 @@ import * as url from 'url';
 import invariant from 'invariant';
 import { test, expect, Locator } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import clickCenter from '../../utils/clickCenter';
+import { clickCenter } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -20,7 +20,7 @@ test.use({
 test('can move elements in page', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('y4d19z0');
+  await editorModel.goToPage('page1');
 
   await editorModel.waitForOverlay();
 
@@ -64,7 +64,7 @@ test('can move elements in page', async ({ page }) => {
 test('can delete elements from page', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('y4d19z0');
+  await editorModel.goToPage('page1');
 
   await editorModel.waitForOverlay();
 
@@ -128,7 +128,7 @@ test('can delete elements from page', async ({ page }) => {
 test('can build component layout inside layout slots', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('UTdiEYQ');
+  await editorModel.goToPage('container');
 
   await editorModel.waitForOverlay();
 
@@ -168,7 +168,7 @@ test('can build component layout inside layout slots', async ({ page }) => {
 test('must correctly size new layout columns', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('cSmMlic');
+  await editorModel.goToPage('page3');
 
   await editorModel.waitForOverlay();
 
@@ -225,7 +225,7 @@ test('must correctly size new layout columns', async ({ page }) => {
 test('code editor auto-complete', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('K7SkzhT');
+  await editorModel.goToPage('page23');
 
   await editorModel.waitForOverlay();
 
@@ -250,7 +250,7 @@ test('code editor auto-complete', async ({ page }) => {
 test('must deselect selected element when clicking outside of it', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
 
-  await editorModel.goToPageById('K7SkzhT');
+  await editorModel.goToPage('page23');
 
   await editorModel.waitForOverlay();
 
@@ -274,7 +274,7 @@ test('can react to pages renamed on disk', async ({ page, localApp }) => {
   );
 
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById('y4d19z0');
+  await editorModel.goToPage('page1');
   await editorModel.waitForOverlay();
 
   const oldPageFolder = path.resolve(localApp.dir, './toolpad/pages/page4');

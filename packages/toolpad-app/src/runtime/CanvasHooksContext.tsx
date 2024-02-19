@@ -1,8 +1,9 @@
-import { NodeHashes, NodeId } from '@mui/toolpad-core';
+import { ComponentConfig, NodeHashes } from '@mui/toolpad-core';
 import * as React from 'react';
+import * as appDom from '@mui/toolpad-core/appDom';
 
 export interface NavigateToPage {
-  (pageNodeId: NodeId, pageParameters?: Record<string, string>): void;
+  (name: string, pageParameters?: Record<string, string>): void;
 }
 
 /**
@@ -10,6 +11,13 @@ export interface NavigateToPage {
  */
 export interface CanvasHooks {
   savedNodes?: NodeHashes;
+  registerNode?: (
+    node: appDom.AppDomNode,
+    props: Record<string, unknown>,
+    componentConfig: ComponentConfig,
+    elm: Element | undefined,
+  ) => () => void;
+  overlayRef?: (elm: HTMLDivElement) => void;
 }
 
 export const CanvasHooksContext = React.createContext<CanvasHooks>({});

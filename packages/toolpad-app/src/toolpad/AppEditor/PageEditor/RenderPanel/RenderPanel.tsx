@@ -2,8 +2,9 @@ import * as React from 'react';
 import { styled } from '@mui/material';
 import { NodeHashes, NodeId } from '@mui/toolpad-core';
 import useEventCallback from '@mui/utils/useEventCallback';
-import * as appDom from '../../../../appDom';
-import EditorCanvasHost from '../EditorCanvasHost';
+import * as appDom from '@mui/toolpad-core/appDom';
+import EditorCanvasHostLegacy from '../EditorCanvasHost';
+import EditorCanvasHostInline from '../EditorCanvasHostInline';
 import { getNodeHashes, useAppState, useAppStateApi, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
@@ -11,6 +12,10 @@ import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 import { getBindingType } from '../../../../runtime/bindings';
 import createRuntimeState from '../../../../runtime/createRuntimeState';
 import { RuntimeState } from '../../../../runtime';
+
+const EditorCanvasHost = process.env.EXPERIMENTAL_INLINE_CANVAS
+  ? EditorCanvasHostInline
+  : EditorCanvasHostLegacy;
 
 const classes = {
   view: 'Toolpad_View',
@@ -40,6 +45,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
   const appStateApi = useAppStateApi();
   const pageEditorApi = usePageEditorApi();
   const { nodeId: pageNodeId } = usePageEditorState();
+  const page = appDom.getNode(appState.dom, pageNodeId, 'page');
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
@@ -93,7 +99,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
     });
 
     initializedBridge.canvasEvents.on('pageNavigationRequest', (event) => {
-      appStateApi.setView({ kind: 'page', nodeId: event.pageNodeId });
+      appStateApi.setView({ kind: 'page', name: event.pageName });
     });
 
     setBridge(initializedBridge);
@@ -108,8 +114,8 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         runtimeState={runtimeState}
         base={appState.appUrl}
         savedNodes={savedNodes}
-        pageNodeId={pageNodeId}
-        overlay={<RenderOverlay bridge={bridge} />}
+        pageName={page.name}
+        overlay={appDom.isCodePage(page) ? null : <RenderOverlay bridge={bridge} />}
         onInit={handleInit}
       />
     </RenderPanelRoot>

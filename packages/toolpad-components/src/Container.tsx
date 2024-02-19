@@ -16,7 +16,7 @@ function Container({ children, visible, sx, ...props }: Props) {
 }
 
 export default createBuiltin(Container, {
-  helperText: 'The Material UI [Container](https://mui.com/material-ui/react-container/).',
+  helperText: 'The Material UI [Container](https://mui.com/material-ui/react-container/).',
   argTypes: {
     children: {
       type: 'element',

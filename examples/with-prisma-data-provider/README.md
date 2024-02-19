@@ -2,22 +2,28 @@
 
 <p class="description">A basic Toolpad application that demonstrates how to use data providers with Prisma.</p>
 
+<a href="https://mui-toolpad-with-prisma-data-provider-production.up.railway.app/prod/pages/crud" target="_blank">
+  <img src="https://mui.com/static/toolpad/marketing/with-prisma-data-provider.png" alt="Data provider example with Prisma ORM" style="aspect-ratio: 25/13;" width="1435">
+</a>
+
+## Check out the live app
+
+[Open example](https://mui-toolpad-with-prisma-data-provider-production.up.railway.app/prod/pages/crud)
+
 ## How to run
 
-Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
-
-<!-- #default-branch-switch -->
+Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-curl https://codeload.github.com/mui/mui-toolpad/tar.gz/master | tar -xz --strip=2  mui-toolpad-master/examples/with-prisma
-cd with-prisma
+npx create-toolpad-app@latest --example with-prisma-data-provider
 ```
 
-Install it and run:
+```bash
+yarn create toolpad-app --example with-prisma-data-provider
+```
 
 ```bash
-npm install
-npm run dev
+pnpm create toolpad-app --example with-prisma-data-provider
 ```
 
 ## What's inside
@@ -28,4 +34,6 @@ This app demonstrates the following capabilities of Toolpad:
 2. Using a Data Grid, Button and a text input component.
 3. Leveraging data providers to support pagination.
 
-[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma)
+## The source
+
+[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/with-prisma-data-provider)

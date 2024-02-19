@@ -4,7 +4,8 @@ import { styled } from '@mui/material';
 import clsx from 'clsx';
 import invariant from 'invariant';
 
-import * as appDom from '../../../../appDom';
+import { omit } from '@mui/toolpad-utils/immutability';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppStateApi, useAppState, useDomApi } from '../../../AppState';
 import {
   DropZone,
@@ -37,7 +38,6 @@ import {
   RECTANGLE_EDGE_TOP,
   rectContainsPoint,
 } from '../../../../utils/geometry';
-import { omit } from '../../../../utils/immutability';
 import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
@@ -595,7 +595,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             parentAwareBaseRect = {
               x: isPageChild ? 0 : baseRect.x,
               y: hasPositionGap ? baseRect.y : baseRect.y - parentGap,
-              width: isPageChild && parentRect ? parentRect.width : baseRect.width,
+              width:
+                isPageChild && parentRect ? parentRect.x * 2 + parentRect.width : baseRect.width,
               height: baseRect.height + gapCount * parentGap,
             };
           }
@@ -1023,7 +1024,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             }
 
             if ([DROP_ZONE_RIGHT, DROP_ZONE_LEFT].includes(dragOverZone)) {
-              if (isOriginalParentLayout || !isDraggingOverHorizontalContainer) {
+              if (!isDraggingOverHorizontalContainer) {
                 const hasNewPageRow = isOriginalParentLayout || isOriginalParentColumn;
 
                 if (hasNewPageRow) {
@@ -1068,11 +1069,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 }
               }
 
-              if (
-                dragOverSlotParentProp &&
-                !isOriginalParentLayout &&
-                isDraggingOverHorizontalContainer
-              ) {
+              if (dragOverSlotParentProp && isDraggingOverHorizontalContainer) {
                 const isDraggingOverDirectionStart =
                   dragOverZone ===
                   (dragOverSlot?.flowDirection === 'row' ? DROP_ZONE_LEFT : DROP_ZONE_RIGHT);
@@ -1109,7 +1106,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           return normalizePageRowColumnSizes(draft, pageNode);
         },
         currentView.kind === 'page'
-          ? { ...omit(currentView, 'tab'), selectedNodeId: newNode?.id || draggedNodeId }
+          ? { ...omit(currentView, 'pageViewTab'), selectedNodeId: newNode?.id || draggedNodeId }
           : currentView,
       );
 

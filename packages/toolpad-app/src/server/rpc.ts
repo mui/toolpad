@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import superjson from 'superjson';
+import * as superjson from 'superjson';
 import express from 'express';
 import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
@@ -74,7 +74,7 @@ export function createRpcHandler(definition: MethodResolvers): express.RequestHa
       let rawResult;
       let error: Error | null = null;
       try {
-        const ctx = createServerContext(req, res);
+        const ctx = await createServerContext(req, res);
         rawResult = await withContext(ctx, async () => {
           return method({ params, req, res });
         });

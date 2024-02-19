@@ -34,6 +34,7 @@ import PasswordIcon from '@mui/icons-material/Password';
 import LinkIcon from '@mui/icons-material/Link';
 import TextFormatIcon from '@mui/icons-material/TextFormat';
 import SpaceBarIcon from '@mui/icons-material/SpaceBar';
+import PieChartIcon from '@mui/icons-material/PieChart';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Password', PasswordIcon],
@@ -64,6 +65,7 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Chart', InsightsIcon],
   ['Map', PlaceIcon],
   ['Drawer', ViewSidebarIcon],
+  ['Pie Chart', PieChartIcon],
   ['Icon', MoodIcon],
   ['Html', HtmlIcon],
   ['PageRow', TableRowsIcon],

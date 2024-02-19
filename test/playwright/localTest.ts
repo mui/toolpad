@@ -4,20 +4,19 @@ import childProcess from 'child_process';
 import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
-import { listen } from '@mui/toolpad-utils/http';
 import { once } from 'events';
 import invariant from 'invariant';
-import * as archiver from 'archiver';
+import archiver from 'archiver';
 import * as url from 'url';
 import getPort from 'get-port';
-import { unstable_createHandler } from '@mui/toolpad';
-import express from 'express';
-import { PageScreenshotOptions, test as baseTest } from './test';
+import * as execa from 'execa';
+import { PageScreenshotOptions, WorkerInfo, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
+import { asyncDisposeSymbol, using } from '../utils/resources';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
-const CLI_CMD = path.resolve(currentDirectory, '../../packages/toolpad-app/cli.js');
+const CLI_CMD = path.resolve(currentDirectory, '../../packages/toolpad-app/cli.mjs');
 
 const PROJECT_ROOT = path.resolve(currentDirectory, '../../');
 
@@ -30,7 +29,7 @@ export interface RunningLocalApp {
   stdout: Readable;
 }
 
-// You'll need to have `yarn dev` running for this
+// You'll need to have `pnpm dev` running for this
 const VERBOSE = true;
 
 interface SetupContext {
@@ -59,12 +58,23 @@ interface LocalServerConfig {
   env?: Record<string, string>;
   base?: string;
 }
+export async function getTemporaryDir() {
+  const tmpDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
 
-const asyncDisposeSymbol: typeof Symbol.asyncDispose =
-  Symbol.asyncDispose ?? Symbol('asyncDispose');
+  return {
+    path: tmpDir,
+    [asyncDisposeSymbol]: async () => {
+      await fs.rm(tmpDir, { recursive: true, maxRetries: 3, retryDelay: 1000 });
+    },
+  };
+}
 
-async function getTestProjectDir({ template, setup }: ProjectConfig = {}) {
-  const tmpTestDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
+async function getTestFixtureTempDir(
+  workerInfo: WorkerInfo,
+  { template, setup }: ProjectConfig = {},
+) {
+  const tmpTestDir = path.resolve(currentDirectory, `./.tmp-test-dir-${workerInfo.parallelIndex}`);
+  await fs.mkdir(tmpTestDir);
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
   const projectDir = path.resolve(tmpTestDir, './fixture');
@@ -120,7 +130,7 @@ async function buildApp(projectDir: string, { base, env = {} }: BuildAppOptions 
   }
 }
 
-async function runCustomServer(
+export async function runCustomServer(
   projectDir: string,
   { dev = false, base = '/foo', env = {} }: LocalServerConfig,
 ) {
@@ -131,32 +141,34 @@ async function runCustomServer(
     await buildApp(projectDir, { base, env });
   }
 
-  const app = express();
+  const port = await getPort();
 
-  const toolpadHandler = await unstable_createHandler({
-    dev,
-    externalUrl: 'http://localhost:3000',
-    dir: projectDir,
-    base,
+  const child = execa.execaNode(path.resolve(projectDir, './server.mjs'), {
+    cwd: projectDir,
+    env: {
+      NODE_ENV: dev ? 'development' : 'production',
+      PORT: String(port),
+      BASE: base,
+    },
   });
 
-  app.use(base, toolpadHandler.handler);
-
-  const port = await getPort();
-  const server = await listen(app, port);
+  invariant(child.stdout && child.stderr, "Childprocess must be started with stdio: 'pipe'");
+  child.stdout.pipe(process.stdout);
+  child.stderr.pipe(process.stderr);
+  await waitForMatch(child.stdout, /Custom server listening/);
 
   return {
-    url: `http://localhost:${server.port}${base}`,
+    url: `http://localhost:${port}${base}`,
     dir: projectDir,
     stdout: process.stdout,
     [asyncDisposeSymbol]: async () => {
       process.env = origEnv;
-      await server.close();
+      await child.kill();
     },
   };
 }
 
-async function runApp(projectDir: string, options: LocalAppConfig) {
+export async function runApp(projectDir: string, options: LocalAppConfig) {
   const { cmd = 'start', env, base } = options;
 
   if (cmd === 'start') {
@@ -220,15 +232,67 @@ async function runApp(projectDir: string, options: LocalAppConfig) {
   };
 }
 
-async function using<T extends { [asyncDisposeSymbol]: () => void | Promise<void> }>(
-  resource: T,
-  callback: (resource: T) => Promise<void>,
-) {
-  try {
-    await callback(resource);
-  } finally {
-    await resource[asyncDisposeSymbol]();
+export interface EditorConfig {
+  cwd: string;
+  appUrl: string;
+  toolpadDev?: boolean;
+  env?: Record<string, string>;
+}
+
+export async function runEditor(options: EditorConfig) {
+  const { appUrl, cwd, env } = options;
+
+  const args: string[] = [CLI_CMD, 'editor', appUrl];
+
+  if (options.toolpadDev) {
+    args.push('--dev');
   }
+
+  // Run each test on its own port to avoid race conditions when running tests in parallel.
+  args.push('--port', String(await getPort()));
+
+  const child = childProcess.spawn('node', args, {
+    cwd,
+    stdio: 'pipe',
+    shell: !process.env.CI,
+    env: {
+      ...process.env,
+      ...env,
+    },
+  });
+
+  const port = await Promise.race([
+    once(child, 'exit').then(([code]) => {
+      throw new Error(`App process exited unexpectedly${code ? ` with code ${code}` : ''}`);
+    }),
+    (async () => {
+      invariant(child.stdout, "Childprocess must be started with stdio: 'pipe'");
+
+      if (VERBOSE) {
+        child.stdout?.pipe(process.stdout);
+        child.stderr?.pipe(process.stderr);
+      }
+
+      const match = await waitForMatch(child.stdout, /localhost:(\d+)/);
+
+      if (!match) {
+        throw new Error('Failed to start');
+      }
+
+      const detectedPort = Number(match[1]);
+
+      return detectedPort;
+    })(),
+  ]);
+
+  return {
+    url: `http://localhost:${port}`,
+    stdout: child.stdout,
+
+    [asyncDisposeSymbol]: () => {
+      child.kill();
+    },
+  };
 }
 
 const test = baseTest.extend<
@@ -256,8 +320,8 @@ const test = baseTest.extend<
   customServerConfig: [undefined, { option: true, scope: 'worker' }],
   projectConfig: [undefined, { option: true, scope: 'worker' }],
   projectDir: [
-    async ({ projectConfig }, use) => {
-      await using(await getTestProjectDir(projectConfig), async (projectDir) => {
+    async ({ projectConfig }, use, workerInfo) => {
+      await using(await getTestFixtureTempDir(workerInfo, projectConfig), async (projectDir) => {
         await use(projectDir);
       });
     },

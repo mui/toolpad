@@ -23,8 +23,10 @@ async function main() {
   await buildApp({
     root: project.getRoot(),
     base,
-    getComponents: () => project.getComponents(),
+    getComponents: () => project.getComponentsManifest(),
+    getPagesManifest: () => project.getPagesManifest(),
     outDir: project.getAppOutputFolder(),
+    loadDom: () => project.loadDom(),
   });
 
   await project.writeBuildInfo();

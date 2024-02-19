@@ -11,7 +11,7 @@ function toolpadObjectSchema<K extends string, T extends z.ZodType>(kind: K, spe
         `Defines the version of this object. Used in determining compatibility between Toolpad "${kind}" objects.`,
       ),
     kind: z.literal(kind).describe(`Describes the nature of this Toolpad "${kind}" object.`),
-    spec: spec.describe(`Defines the shape of this "${kind}" object`),
+    spec: spec.optional().describe(`Defines the shape of this "${kind}" object`),
   });
 }
 
@@ -257,10 +257,71 @@ elementSchema = baseElementSchema
   })
   .describe('The instance of a component. Used to build user interfaces in pages.');
 
+export const applicationSchema = toolpadObjectSchema(
+  'application',
+  z.object({
+    plan: z.enum(['free', 'pro']).optional().describe('The plan for this application.'),
+    authentication: z
+      .object({
+        providers: z
+          .array(
+            z.object({
+              provider: z
+                .enum(['github', 'google', 'azure-ad', 'credentials'])
+                .describe('Unique identifier for this authentication provider.'),
+              roles: z
+                .array(
+                  z.object({
+                    source: z
+                      .array(z.string())
+                      .describe('Authentication provider roles to be mapped from.'),
+                    target: z.string().describe('Toolpad role to be mapped to.'),
+                  }),
+                )
+                .optional()
+                .describe('Role mapping definition for this authentication provider.'),
+            }),
+          )
+          .optional()
+          .describe('Authentication providers to use.'),
+        restrictedDomains: z
+          .array(z.string())
+          .optional()
+          .describe('Valid email patterns for the authenticated user.'),
+      })
+      .optional()
+      .describe('Authentication configuration for this application.'),
+    authorization: z
+      .object({
+        roles: z
+          .array(
+            z.union([
+              z.string(),
+              z.object({
+                name: z.string().describe('The name of the role.'),
+                description: z.string().optional().describe('A description of the role.'),
+              }),
+            ]),
+          )
+          .optional()
+          .describe('Available roles for this application. These can be assigned to users.'),
+      })
+      .optional()
+      .describe('Authorization configuration for this application.'),
+  }),
+);
+
+export type Application = z.infer<typeof applicationSchema>;
+
 export const pageSchema = toolpadObjectSchema(
   'page',
   z.object({
-    id: z.string().describe('Serves as a canonical id of the page.'),
+    displayName: z.string().optional().describe('Page name to display in the UI.'),
+    id: z
+      .string()
+      .optional()
+      .describe('Serves as a canonical id of the page. Deprecated: use an alias instead.'),
+    alias: z.array(z.string()).optional().describe('Page name aliases.'),
     title: z.string().optional().describe('Title for this page.'),
     parameters: z
       .array(nameStringValuePairSchema)
@@ -274,6 +335,20 @@ export const pageSchema = toolpadObjectSchema(
       .array(elementSchema)
       .optional()
       .describe('The content of the page. This defines the UI.'),
+    authorization: z
+      .object({
+        allowAll: z.boolean().optional().describe('Allow all users to access this page.'),
+        allowedRoles: z
+          .array(z.string())
+          .optional()
+          .describe('Roles that are allowed to access this page.'),
+      })
+      .optional()
+      .describe('Authorization configuration for this page.'),
+    unstable_codeFile: z.coerce
+      .boolean()
+      .optional()
+      .describe('The content of the page as JSX. Experimental, do not use!.'),
     display: z
       .union([
         z
@@ -324,6 +399,7 @@ export type Theme = z.infer<typeof themeSchema>;
 
 export const META = {
   schemas: {
+    Application: applicationSchema,
     Page: pageSchema,
     Theme: themeSchema,
   },

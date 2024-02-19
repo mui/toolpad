@@ -8,7 +8,6 @@ import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import {
   FORM_INPUT_ARG_TYPES,
-  FORM_TEXT_INPUT_ARG_TYPES,
   FormInputComponentProps,
   useFormInput,
   withComponentForm,
@@ -26,6 +25,7 @@ interface AutocompleteProps
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
   label?: string;
+  defaultValue: string;
   options: AutocompleteOption[];
 }
 
@@ -34,6 +34,7 @@ function Autocomplete({
   label,
   onChange,
   value,
+  defaultValue,
   isRequired,
   minLength,
   maxLength,
@@ -41,14 +42,13 @@ function Autocomplete({
   sx,
   ...rest
 }: AutocompleteProps) {
-  const [selectedVal, setSelectedVal] = React.useState<AutocompleteOption | null>(null);
-
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
     name: rest.name,
     label,
     value,
     onChange,
     emptyValue: null,
+    defaultValue,
     validationProps: { isRequired, minLength, maxLength, isInvalid },
   });
 
@@ -82,16 +82,9 @@ function Autocomplete({
     (event: React.SyntheticEvent<Element>, selection: AutocompleteOption | null) => {
       const newValue: AutocompleteValue = getValue(selection);
       onFormInputChange(newValue);
-      setSelectedVal(selection);
     },
     [getValue, onFormInputChange],
   );
-
-  React.useEffect(() => {
-    if (!value) {
-      setSelectedVal(null);
-    }
-  }, [value]);
 
   return renderFormInput(
     <MuiAutocomplete
@@ -99,7 +92,7 @@ function Autocomplete({
       options={options ?? []}
       isOptionEqualToValue={(option, selectedValue) => getValue(option) === getValue(selectedValue)}
       getOptionLabel={getOptionLabel}
-      value={selectedVal}
+      value={value}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -138,6 +131,12 @@ export default createBuiltin(FormWrappedAutocomplete, {
       type: 'string',
       onChangeProp: 'onChange',
       default: '',
+      defaultValueProp: 'defaultValue',
+    },
+    defaultValue: {
+      helperText: 'A default value.',
+      type: 'string',
+      default: '',
     },
     label: {
       helperText: 'The label to display for the autocomplete.',
@@ -163,7 +162,6 @@ export default createBuiltin(FormWrappedAutocomplete, {
       type: 'boolean',
     },
     ...FORM_INPUT_ARG_TYPES,
-    ...FORM_TEXT_INPUT_ARG_TYPES,
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',

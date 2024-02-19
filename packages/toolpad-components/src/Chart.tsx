@@ -61,6 +61,10 @@ interface ChartProps extends BoxProps {
 }
 
 function Chart({ data = [], loading, error, sx }: ChartProps) {
+  const hasData =
+    data.length > 0 &&
+    data.some((dataSeries) => (dataSeries.data ? dataSeries.data.length > 0 : false));
+
   const xValues = React.useMemo(
     () =>
       data
@@ -167,7 +171,7 @@ function Chart({ data = [], loading, error, sx }: ChartProps) {
 
   return (
     <Box sx={{ ...sx, position: 'relative', height: '100%', width: '100%' }} aria-busy={loading}>
-      <ErrorOverlay error={displayError} />
+      {displayError ? <ErrorOverlay error={displayError} /> : null}
       {loading && !error ? (
         <div
           style={{
@@ -228,9 +232,13 @@ function Chart({ data = [], loading, error, sx }: ChartProps) {
             </React.Fragment>
           ) : null}
           {hasScatterCharts ? <ScatterPlot /> : null}
-          <ChartsLegend />
-          <ChartsTooltip />
-          <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />
+          {hasData ? (
+            <React.Fragment>
+              <ChartsLegend />
+              <ChartsTooltip />
+              <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />
+            </React.Fragment>
+          ) : null}
         </ResponsiveChartContainer>
       ) : null}
     </Box>

@@ -39,6 +39,10 @@ function groupScopeMeta(value: Record<string, unknown>, meta: ScopeMeta): Explor
       displayName: 'Queries',
       items: [],
     },
+    action: {
+      displayName: 'Actions',
+      items: [],
+    },
     other: {
       displayName: 'Other',
       items: [],
@@ -57,7 +61,6 @@ function groupScopeMeta(value: Record<string, unknown>, meta: ScopeMeta): Explor
       value: value[key],
     });
   }
-
   return structure;
 }
 

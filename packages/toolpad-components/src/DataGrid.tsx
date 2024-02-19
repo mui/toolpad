@@ -1,7 +1,6 @@
 import {
   DataGridProProps,
   DataGridPro,
-  GridToolbar,
   GridColumnResizeParams,
   GridRowsProp,
   GridColumnOrderChangeParams,
@@ -20,6 +19,24 @@ import {
   getGridDefaultColumnTypes,
   GridColTypeDef,
   GridPaginationModel,
+  GridActionsColDef,
+  GridRowId,
+  GridFilterModel,
+  GridSortModel,
+  GridNoRowsOverlay,
+  GridRowModes,
+  GridApiPro,
+  GridRowModesModel,
+  GridRowModel,
+  GridToolbarContainer,
+  GridToolbarColumnsButton,
+  GridToolbarFilterButton,
+  GridToolbarDensitySelector,
+  GridToolbarExport,
+  gridVisibleColumnFieldsSelector,
+  GridEventListener,
+  GridRowEditStopReasons,
+  GridRowEditStartReasons,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -30,8 +47,11 @@ import {
   useNode,
   useComponents,
   UseDataProviderContext,
-  CursorPaginationModel,
-  IndexPaginationModel,
+  ToolpadDataProviderBase,
+  PaginationMode,
+  FilterModel,
+  SortModel,
+  PaginationModel,
 } from '@mui/toolpad-core';
 import {
   Box,
@@ -43,7 +63,17 @@ import {
   Typography,
   Tooltip,
   Popover,
+  IconButton,
+  CircularProgress,
+  Alert,
+  Button,
+  Snackbar,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/DeleteOutline';
+import CloseIcon from '@mui/icons-material/Close';
+import SaveIcon from '@mui/icons-material/Save';
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { hasImageExtension } from '@mui/toolpad-utils/path';
@@ -53,9 +83,14 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import invariant from 'invariant';
 import { NumberFormat, createFormat as createNumberFormat } from '@mui/toolpad-core/numberFormat';
 import { DateFormat, createFormat as createDateFormat } from '@mui/toolpad-core/dateFormat';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
-import ErrorOverlay from './components/ErrorOverlay';
+import ErrorOverlay, { ErrorContent } from './components/ErrorOverlay';
+
+const DRAFT_ROW_MARKER = Symbol('draftRow');
+
+const ACTIONS_COLUMN_FIELD = '___actions___';
 
 type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
@@ -64,6 +99,10 @@ const LICENSE_INFO: MuiLicenseInfo = {
 };
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
+
+const SetActionResultContext = React.createContext<((result: ActionResult) => void) | undefined>(
+  undefined,
+);
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -130,7 +169,7 @@ function isValidDate(input: string) {
   return false;
 }
 
-const SkeletonCell = styled(Box)(({ theme }) => ({
+const SkeletonCell = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -298,6 +337,10 @@ function dateValueGetter({ value }: GridValueGetterParams<any, any>): Date | und
     return undefined;
   }
 
+  if (value instanceof Date) {
+    return value;
+  }
+
   if (typeof value === 'number') {
     return new Date(value);
   }
@@ -365,7 +408,7 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   },
   link: {
     renderCell: ({ value }) => (
-      <Link href={value} target="_blank" rel="noopener noreferrer nofollow">
+      <Link href={value} target="_blank" rel="noopener nofollow">
         {value}
       </Link>
     ),
@@ -381,7 +424,10 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
 };
 
 export interface SerializableGridColumn
-  extends Pick<GridColDef, 'field' | 'type' | 'align' | 'width' | 'headerName'> {
+  extends Pick<
+    GridColDef,
+    'field' | 'type' | 'align' | 'width' | 'headerName' | 'sortable' | 'filterable' | 'editable'
+  > {
   numberFormat?: NumberFormat;
   dateFormat?: DateFormat;
   dateTimeFormat?: DateFormat;
@@ -406,42 +452,57 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
 
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map((column) => {
-    const customType = column.type ? CUSTOM_COLUMN_TYPES[column.type] : {};
+    const isIdColumn = column.field === 'id';
+
+    if (isIdColumn) {
+      return {
+        ...column,
+        editable: false,
+        hide: true,
+        renderCell: ({ row, value }) => (row[DRAFT_ROW_MARKER] ? '' : value),
+      };
+    }
+
+    let baseColumn: Omit<SerializableGridColumn, 'field'> = { editable: true };
+
+    if (column.type) {
+      baseColumn = { ...baseColumn, ...CUSTOM_COLUMN_TYPES[column.type] };
+    }
 
     if (column.type === 'number' && column.numberFormat) {
       const format = createNumberFormat(column.numberFormat);
       return {
-        ...customType,
+        ...baseColumn,
         ...column,
         valueFormatter: ({ value }) => format.format(value),
       };
     }
 
-    if (column.type === 'date' && column.dateFormat) {
+    if (column.type === 'date') {
       const format = createDateFormat(column.dateFormat);
       return {
-        ...customType,
-        ...column,
-        valueFormatter: ({ value }) => {
-          try {
-            return format.format(value);
-          } catch (err) {
-            return 'Invalid';
-          }
-        },
-      };
-    }
-
-    if (column.type === 'dateTime' && column.dateTimeFormat) {
-      const format = createDateFormat(column.dateTimeFormat);
-      return {
-        ...customType,
+        ...baseColumn,
         ...column,
         valueFormatter: ({ value }) => {
           try {
             return format.format(value);
           } catch {
-            return 'Invalid';
+            return 'Invalid Date';
+          }
+        },
+      };
+    }
+
+    if (column.type === 'dateTime') {
+      const format = createDateFormat(column.dateTimeFormat);
+      return {
+        ...baseColumn,
+        ...column,
+        valueFormatter: ({ value }) => {
+          try {
+            return format.format(value);
+          } catch {
+            return 'Invalid Date';
           }
         },
       };
@@ -449,9 +510,31 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
 
     const type = column.type && column.type in DEFAULT_COLUMN_TYPES ? column.type : undefined;
 
-    return { ...customType, ...column, type };
+    return { ...baseColumn, ...column, type };
   });
 }
+
+type ActionResult =
+  | {
+      action: 'create';
+      id: GridRowId;
+      error?: undefined;
+    }
+  | {
+      action: 'create';
+      id?: undefined;
+      error: Error;
+    }
+  | {
+      action: 'update';
+      id: GridRowId;
+      error?: Error;
+    }
+  | {
+      action: 'delete';
+      id: GridRowId;
+      error?: Error;
+    };
 
 const EMPTY_ROWS: GridRowsProp = [];
 
@@ -469,70 +552,198 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   selection?: Selection | null;
   onSelectionChange?: (newSelection?: Selection | null) => void;
   hideToolbar?: boolean;
-  rawRows?: GridRowsProp;
-  onRawRowsChange?: (rows: GridRowsProp) => void;
+}
+
+interface DeleteActionProps {
+  id: GridRowId;
+  dataProvider: ToolpadDataProviderBase<Record<string, unknown>, PaginationMode>;
+  refetch: () => unknown;
+}
+
+function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
+  const [loading, setLoading] = React.useState(false);
+
+  const setActionResult = useNonNullableContext(SetActionResultContext);
+
+  const handleDeleteClick = React.useCallback(async () => {
+    invariant(dataProvider.deleteRecord, 'dataProvider must be defined');
+    setLoading(true);
+    try {
+      await dataProvider.deleteRecord(id);
+      await refetch();
+
+      setActionResult({ action: 'delete', id });
+    } catch (error) {
+      setActionResult({ action: 'delete', id, error: errorFrom(error) });
+    } finally {
+      setLoading(false);
+    }
+  }, [dataProvider, id, refetch, setActionResult]);
+
+  return (
+    <IconButton onClick={handleDeleteClick} size="small" aria-label={`Delete row with id "${id}"`}>
+      {loading ? <CircularProgress size={16} /> : <DeleteIcon fontSize="inherit" />}
+    </IconButton>
+  );
+}
+
+interface EditToolbarProps {
+  hasCreateButton?: boolean;
+  createDisabled?: boolean;
+  onCreateClick?: () => void;
+}
+
+function EditToolbar({ hasCreateButton, onCreateClick, createDisabled }: EditToolbarProps) {
+  return (
+    <GridToolbarContainer>
+      {hasCreateButton ? (
+        <Button
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={onCreateClick}
+          disabled={createDisabled}
+        >
+          Add record
+        </Button>
+      ) : null}
+      <GridToolbarColumnsButton />
+      <GridToolbarFilterButton />
+      <GridToolbarDensitySelector />
+      <GridToolbarExport />
+    </GridToolbarContainer>
+  );
 }
 
 interface DataProviderDataGridProps extends Partial<DataGridProProps> {
-  error?: unknown;
+  rowLoadingError?: unknown;
+  getActions?: GridActionsColDef['getActions'];
 }
 
 function useDataProviderDataGridProps(
   dataProviderId: string | null | undefined,
+  idField: string,
+  apiRef: React.MutableRefObject<GridApiPro>,
+  setActionResult: (result: ActionResult) => void,
 ): DataProviderDataGridProps {
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
-  const { dataProvider } = useDataProvider(dataProviderId || null);
+  const {
+    dataProvider,
+    error: dataProviderLoadError,
+    isLoading: dataProviderLoading,
+  } = useDataProvider(dataProviderId || null);
 
-  const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
+  const [rawPaginationModel, setRawPaginationModel] = React.useState<GridPaginationModel>({
     page: 0,
     pageSize: 100,
   });
 
-  const { page, pageSize } = paginationModel;
-
   const mapPageToNextCursor = React.useRef(new Map<number, string>());
 
-  const { data, isFetching, isPlaceholderData, isLoading, error } = useQuery({
+  const paginationModel = React.useMemo<PaginationModel>(() => {
+    const page = rawPaginationModel.page;
+    const pageSize = rawPaginationModel.pageSize;
+    if (dataProvider?.paginationMode === 'cursor') {
+      // cursor based pagination
+      let cursor: string | null = null;
+      if (page !== 0) {
+        cursor = mapPageToNextCursor.current.get(page - 1) ?? null;
+        if (cursor === null) {
+          throw new Error(`No cursor found for page ${page - 1}`);
+        }
+      }
+      return {
+        cursor,
+        pageSize,
+      };
+      // TODO: when docs are on ts>5, replace with
+      //     } satisfies CursorPaginationModel;
+    }
+
+    // index based pagination
+    return {
+      start: page * pageSize,
+      pageSize,
+    };
+    // TODO: when docs are on ts>5, replace with
+    //     } satisfies IndexPaginationModel;
+  }, [dataProvider?.paginationMode, rawPaginationModel.page, rawPaginationModel.pageSize]);
+
+  const [rawFilterModel, setRawFilterModel] = React.useState<GridFilterModel>();
+
+  const filterModel = React.useMemo<FilterModel>(
+    () => ({
+      items:
+        rawFilterModel?.items.map(({ field, operator, value }) => ({ field, operator, value })) ??
+        [],
+      logicOperator: rawFilterModel?.logicOperator ?? 'and',
+    }),
+    [rawFilterModel],
+  );
+
+  const [rawSortModel, setRawSortModel] = React.useState<GridSortModel>();
+
+  const sortModel = React.useMemo<SortModel>(
+    () => rawSortModel?.map(({ field, sort }) => ({ field, sort: sort ?? 'asc' })) ?? [],
+    [rawSortModel],
+  );
+
+  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+
+  const isEditing = React.useMemo(
+    () => Object.values(rowModesModel).some((mode) => mode.mode === GridRowModes.Edit),
+    [rowModesModel],
+  );
+
+  const [draftRow, setDraftRow] = React.useState<GridRowModel | null>(null);
+
+  const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
+    // Blurring the cell shouldn't end edit mode
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
+      setRowModesModel({});
+      setDraftRow(null);
+    }
+    if (params.reason === GridRowEditStopReasons.escapeKeyDown) {
+      setRowModesModel({});
+      setDraftRow(null);
+    }
+  };
+
+  const handleRowEditStart: GridEventListener<'rowEditStart'> = (params, event) => {
+    if (isEditing && params.reason === GridRowEditStartReasons.cellDoubleClick) {
+      event.defaultMuiPrevented = true;
+    }
+  };
+
+  const {
+    data,
+    isFetching,
+    isPlaceholderData,
+    isLoading,
+    error: rowLoadingError,
+    refetch,
+  } = useQuery({
     enabled: !!dataProvider,
-    queryKey: ['toolpadDataProvider', dataProviderId, page, pageSize],
+    queryKey: ['toolpadDataProvider', dataProviderId, paginationModel, filterModel, sortModel],
     placeholderData: keepPreviousData,
     queryFn: async () => {
       invariant(dataProvider, 'dataProvider must be defined');
-      let dataProviderPaginationModel: IndexPaginationModel | CursorPaginationModel;
-      if (dataProvider.paginationMode === 'cursor') {
-        // cursor based pagination
-        let cursor: string | null = null;
-        if (page !== 0) {
-          cursor = mapPageToNextCursor.current.get(page - 1) ?? null;
-          if (cursor === null) {
-            throw new Error(`No cursor found for page ${page - 1}`);
-          }
-        }
-        dataProviderPaginationModel = {
-          cursor,
-          pageSize,
-        } satisfies CursorPaginationModel;
-      } else {
-        // index based pagination
-        dataProviderPaginationModel = {
-          start: page * pageSize,
-          pageSize,
-        } satisfies IndexPaginationModel;
-      }
 
       const result = await dataProvider.getRecords({
-        paginationModel: dataProviderPaginationModel,
+        paginationModel,
+        filterModel,
+        sortModel,
       });
 
       if (dataProvider.paginationMode === 'cursor') {
         if (typeof result.cursor === 'undefined') {
           throw new Error(
-            `No cursor returned for page ${page}. Return \`null\` to signal the end of the data.`,
+            `No cursor returned for page ${rawPaginationModel.page}. Return \`null\` to signal the end of the data.`,
           );
         }
 
         if (typeof result.cursor === 'string') {
-          mapPageToNextCursor.current.set(page, result.cursor);
+          mapPageToNextCursor.current.set(rawPaginationModel.page, result.cursor);
         }
       }
 
@@ -542,30 +753,310 @@ function useDataProviderDataGridProps(
 
   const rowCount =
     data?.totalCount ??
-    (data?.hasNextPage ? (paginationModel.page + 1) * paginationModel.pageSize + 1 : undefined) ??
+    (data?.hasNextPage
+      ? (rawPaginationModel.page + 1) * rawPaginationModel.pageSize + 1
+      : undefined) ??
     0;
 
-  if (!dataProvider) {
+  const [rowUpdating, setRowUpdating] = React.useState<Partial<Record<string, boolean>>>({});
+
+  const handleProcessRowUpdate = React.useCallback(
+    async (newRow: GridRowModel, oldRow: GridRowModel) => {
+      const id = oldRow[idField];
+      const values = Object.fromEntries(
+        Object.entries(newRow).filter(([key, value]) => value !== oldRow[key]),
+      );
+
+      const action = oldRow[DRAFT_ROW_MARKER] ? 'create' : 'update';
+
+      setRowUpdating((oldState) => ({ ...oldState, [id]: true }));
+
+      try {
+        if (action === 'create') {
+          try {
+            invariant(
+              dataProvider?.createRecord,
+              'Edit action should be unavailable when dataProvider.createRecord is not defined',
+            );
+            const newRecord = await dataProvider.createRecord(values);
+            if (!newRecord) {
+              throw new Error('No record returned by createRecord');
+            }
+
+            setActionResult({ action, id: newRecord[idField] as GridRowId });
+            return newRecord;
+          } catch (error) {
+            setActionResult({ action, error: errorFrom(error) });
+            return oldRow;
+          }
+        } else {
+          try {
+            invariant(
+              dataProvider?.updateRecord,
+              'Edit action should be unavailable when dataProvider.updateRecord is not defined',
+            );
+            let newRecord = await dataProvider.updateRecord(id, values);
+            newRecord ??= newRow;
+            setActionResult({ action, id: newRecord[idField] as GridRowId });
+            return newRecord;
+          } catch (error) {
+            setActionResult({ action, id, error: errorFrom(error) });
+            return oldRow;
+          }
+        }
+      } finally {
+        setRowUpdating((oldState) => {
+          const { [id]: discard, ...newState } = oldState;
+          return newState;
+        });
+        setDraftRow(null);
+        await refetch();
+      }
+    },
+    [dataProvider, idField, refetch, setActionResult],
+  );
+
+  const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
+    if (!dataProvider?.deleteRecord && !dataProvider?.updateRecord && !dataProvider?.createRecord) {
+      return undefined;
+    }
+
+    return ({ id, row }) => {
+      const result = [];
+
+      if (dataProvider.updateRecord || dataProvider.createRecord) {
+        const rowIsInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+        const rowIsUpdating = rowUpdating[id];
+
+        const isDraft = row[DRAFT_ROW_MARKER];
+
+        if (rowIsInEditMode || rowIsUpdating) {
+          return [
+            <IconButton
+              key="commit"
+              size="small"
+              aria-label={`Save updates to ${isDraft ? 'new row' : `row with id "${id}"`}`}
+              disabled={rowIsUpdating}
+              onClick={async () => {
+                apiRef.current.stopRowEditMode({ id });
+              }}
+            >
+              {rowIsUpdating ? <CircularProgress size={16} /> : <SaveIcon fontSize="inherit" />}
+            </IconButton>,
+            <IconButton
+              key="cancel"
+              size="small"
+              aria-label="Cancel updates"
+              disabled={rowIsUpdating}
+              onClick={() => {
+                setDraftRow(null);
+                apiRef.current.stopRowEditMode({ id, ignoreModifications: true });
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>,
+          ];
+        }
+
+        if (!isEditing && dataProvider.updateRecord) {
+          result.push(
+            <IconButton
+              key="update"
+              onClick={() => {
+                apiRef.current.startRowEditMode({ id });
+              }}
+              size="small"
+              aria-label={`Edit row with id "${id}"`}
+            >
+              <EditIcon fontSize="inherit" />
+            </IconButton>,
+          );
+        }
+      }
+
+      if (!isEditing) {
+        if (dataProvider.deleteRecord) {
+          result.push(
+            <DeleteAction key="delete" id={id} dataProvider={dataProvider} refetch={refetch} />,
+          );
+        }
+      }
+
+      return result;
+    };
+  }, [apiRef, dataProvider, isEditing, refetch, rowModesModel, rowUpdating]);
+
+  const rows = React.useMemo<GridRowsProp>(() => {
+    let rowData = data?.records ?? [];
+    if (draftRow) {
+      rowData = [draftRow, ...rowData];
+    }
+    return rowData;
+  }, [data?.records, draftRow]);
+
+  if (!dataProviderId) {
     return {};
   }
+
+  if (dataProviderLoadError) {
+    return {
+      rowLoadingError: dataProviderLoadError,
+    };
+  }
+
+  if (dataProviderLoading) {
+    return {
+      loading: true,
+    };
+  }
+
+  invariant(dataProvider, "dataProvider must be defined if it's loaded without error");
 
   return {
     loading: isLoading || (isPlaceholderData && isFetching),
     paginationMode: 'server',
+    filterMode: 'server',
+    sortingMode: 'server',
     pagination: true,
-    paginationModel,
     rowCount,
+    paginationModel: rawPaginationModel,
     onPaginationModelChange(model) {
-      setPaginationModel((prevModel) => {
+      setRawPaginationModel((prevModel) => {
         if (prevModel.pageSize !== model.pageSize) {
           return { ...model, page: 0 };
         }
         return model;
       });
     },
-    rows: data?.records ?? [],
-    error,
+    filterModel: rawFilterModel,
+    onFilterModelChange: setRawFilterModel,
+    sortModel: rawSortModel,
+    onSortModelChange: setRawSortModel,
+    rows,
+    rowLoadingError,
+    getActions,
+    editMode: 'row',
+    rowModesModel,
+    onRowModesModelChange: (model) => setRowModesModel(model),
+    processRowUpdate: handleProcessRowUpdate,
+    onRowEditStart: handleRowEditStart,
+    onRowEditStop: handleRowEditStop,
+    slots: {
+      toolbar: EditToolbar,
+    },
+    slotProps: {
+      toolbar: {
+        hasCreateButton: !!dataProvider.createRecord,
+        createDisabled: !!isEditing,
+        onCreateClick: () => {
+          const draftRowId = crypto.randomUUID();
+          setDraftRow({ id: draftRowId, [DRAFT_ROW_MARKER]: true });
+          const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
+          const firstVisibleFieldIndex = visibleFields.findIndex((field) => field !== idField);
+          const fieldToFocus =
+            firstVisibleFieldIndex >= 0 ? visibleFields[firstVisibleFieldIndex] : undefined;
+          const colIndex = firstVisibleFieldIndex >= 0 ? firstVisibleFieldIndex : 0;
+          setRowModesModel((oldModel) => ({
+            ...oldModel,
+            [draftRowId]: { mode: GridRowModes.Edit, fieldToFocus },
+          }));
+          apiRef.current.scrollToIndexes({ rowIndex: 0, colIndex });
+        },
+      },
+    },
   };
+}
+
+interface NoRowsOverlayProps extends React.ComponentProps<typeof GridNoRowsOverlay> {
+  error: Error;
+}
+
+function NoRowsOverlay(props: NoRowsOverlayProps) {
+  if (props.error) {
+    return <ErrorContent sx={{ height: '100%' }} error={props.error} />;
+  }
+
+  return <GridNoRowsOverlay {...props} />;
+}
+
+interface ActionResultOverlayProps {
+  result: ActionResult | null;
+  onClose: () => void;
+  apiRef: React.MutableRefObject<GridApiPro>;
+}
+
+function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayProps) {
+  const open = !!result;
+  const actionError = result?.error;
+
+  React.useEffect(() => {
+    if (actionError) {
+      // Log error to console as well for full stacktrace
+      console.error(actionError);
+    }
+  }, [actionError]);
+
+  const lastResult = useLatest(result);
+
+  let message: React.ReactNode = null;
+  if (lastResult) {
+    if (lastResult.action === 'create') {
+      message = lastResult.error ? (
+        `Failed to create a record, ${lastResult.error.message}`
+      ) : (
+        <React.Fragment>
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+          <Link
+            href="#"
+            color="inherit"
+            onClick={(event) => {
+              event.preventDefault();
+              const index = apiRef.current.getAllRowIds().indexOf(lastResult.id);
+              const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
+              const fieldToFocus: string | undefined = visibleFields[0];
+              if (index >= 0 && fieldToFocus) {
+                apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
+                apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
+              }
+            }}
+            aria-label="Go to new record"
+          >
+            New record
+          </Link>{' '}
+          created successfully
+        </React.Fragment>
+      );
+    } else if (lastResult.action === 'update') {
+      message = lastResult.error
+        ? `Failed to update a record, ${lastResult.error.message}`
+        : 'Record updated successfully';
+    } else if (lastResult.action === 'delete') {
+      message = lastResult.error
+        ? `Failed to delete a record, ${lastResult.error.message}`
+        : 'Record deleted successfully';
+    }
+  }
+
+  return (
+    <Box sx={{ mt: 1, position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}>
+      <Snackbar
+        sx={{ position: 'absolute' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={open}
+        autoHideDuration={2000}
+        onClose={onClose}
+        action={
+          <IconButton size="small" aria-label="close" color="inherit" onClick={onClose}>
+            <CloseIcon fontSize="inherit" />
+          </IconButton>
+        }
+      >
+        <Alert severity={lastResult?.error ? 'error' : 'success'} onClose={onClose}>
+          {message}
+        </Alert>
+      </Snackbar>
+    </Box>
+  );
 }
 
 function dataGridFallbackRender({ error }: FallbackProps) {
@@ -583,14 +1074,27 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     hideToolbar,
     rowsSource,
     dataProviderId,
-    onRawRowsChange,
     sx,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
-  const { rows: dataProviderRowsInput, ...dataProviderProps } = useDataProviderDataGridProps(
+  const apiRef = useGridApiRef();
+  const [actionResult, setActionResult] = React.useState<ActionResult | null>(null);
+
+  const rowIdField = rowIdFieldProp ?? 'id';
+
+  const {
+    rows: dataProviderRowsInput,
+    getActions: getProviderActions,
+    slots: dataProviderSlots,
+    slotProps: dataProviderSlotProps,
+    ...dataProviderProps
+  } = useDataProviderDataGridProps(
     rowsSource === 'dataProvider' ? dataProviderId : null,
+    rowIdField,
+    apiRef,
+    setActionResult,
   );
 
   const nodeRuntime = useNode<ToolpadDataGridProps>();
@@ -648,8 +1152,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const hasExplicitRowId: boolean = React.useMemo(() => {
     const hasRowIdField: boolean = !!(rowIdFieldProp && rowIdFieldProp !== 'id');
-    const parsedRows = rowsInput;
-    return parsedRows.length === 0 || hasRowIdField || !!parsedRows[0].id;
+    return hasRowIdField || rowsInput.length === 0 || rowsInput[0].id !== undefined;
   }, [rowIdFieldProp, rowsInput]);
 
   const rows: GridRowsProp = React.useMemo(
@@ -700,7 +1203,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [columnsProp],
   );
 
-  const apiRef = useGridApiRef();
   React.useEffect(() => {
     apiRef.current.updateColumns(columns);
   }, [apiRef, columns]);
@@ -711,43 +1213,77 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [getRowId, columns],
   );
 
-  let error: Error | null = null;
-  if (dataProviderProps?.error) {
-    error = errorFrom(dataProviderProps.error);
+  let rowLoadingError: Error | null = null;
+  if (dataProviderProps?.rowLoadingError) {
+    rowLoadingError = errorFrom(dataProviderProps.rowLoadingError);
   } else if (errorProp) {
-    error = errorFrom(errorProp);
+    rowLoadingError = errorFrom(errorProp);
   }
 
   React.useEffect(() => {
     nodeRuntime?.updateEditorNodeData('rawRows', rows);
   }, [nodeRuntime, rows]);
 
+  const renderedColumns = React.useMemo<GridColDef[]>(() => {
+    const result = [...columns];
+
+    if (getProviderActions) {
+      result.push({
+        field: ACTIONS_COLUMN_FIELD,
+        type: 'actions',
+        align: 'right',
+        resizable: false,
+        pinnable: false,
+        getActions: getProviderActions,
+      });
+    }
+
+    return result;
+  }, [columns, getProviderActions]);
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
         <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
-          <DataGridPro
-            apiRef={apiRef}
-            slots={{
-              toolbar: hideToolbar ? null : GridToolbar,
-              loadingOverlay: SkeletonLoadingOverlay,
-            }}
-            onColumnResize={handleResize}
-            onColumnOrderChange={handleColumnOrderChange}
-            rows={rows}
-            columns={columns}
-            key={gridKey}
-            getRowId={getRowId}
-            onRowSelectionModelChange={onSelectionModelChange}
-            rowSelectionModel={selectionModel}
-            {...props}
-            {...dataProviderProps}
-            sx={{
-              height: '100%',
-              visibility: error ? 'hidden' : 'visible',
-            }}
-          />
+          <SetActionResultContext.Provider value={setActionResult}>
+            <DataGridPro
+              apiRef={apiRef}
+              slots={{
+                ...dataProviderSlots,
+                loadingOverlay: SkeletonLoadingOverlay,
+                noRowsOverlay: NoRowsOverlay,
+                toolbar: hideToolbar ? null : dataProviderSlots?.toolbar,
+              }}
+              slotProps={{
+                noRowsOverlay: {
+                  error: rowLoadingError,
+                } as any,
+                ...dataProviderSlotProps,
+              }}
+              onColumnResize={handleResize}
+              onColumnOrderChange={handleColumnOrderChange}
+              rows={rows}
+              columns={renderedColumns}
+              key={gridKey}
+              getRowId={getRowId}
+              onRowSelectionModelChange={onSelectionModelChange}
+              rowSelectionModel={selectionModel}
+              initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
+              {...props}
+              {...dataProviderProps}
+              sx={{
+                height: '100%',
+                visibility: error ? 'hidden' : 'visible',
+              }}
+            />
+          </SetActionResultContext.Provider>
         </ErrorBoundary>
+
+        <ActionResultOverlay
+          result={actionResult}
+          onClose={() => setActionResult(null)}
+          apiRef={apiRef}
+        />
       </Box>
     </LicenseInfoProvider>
   );

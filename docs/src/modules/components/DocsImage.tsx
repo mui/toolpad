@@ -40,7 +40,7 @@ const Img = styled('img')<DocsImageProps>(({ theme, zoom, indent, width, aspectR
   marginRight: indent ? 0 : undefined,
   zIndex: 5,
   borderRadius: 4,
-  maxWidth: zoom === false ? 'min(50vw, 500px)' : 'unset',
+  maxWidth: zoom === false ? 'min(50vw, 500px)' : '100%',
   cursor: zoom ? 'zoom-in' : 'initial',
   '&:hover': {
     '& ~ div': {

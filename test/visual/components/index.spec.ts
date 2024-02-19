@@ -3,8 +3,7 @@ import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test } from '../../playwright/localTest';
-import { clickCenter } from '../../utils/locators';
-import waitForBoundingBox from '../../utils/waitForBoundingBox';
+import { clickCenter, waitForBoundingBox } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -168,9 +167,6 @@ test('resizing element heights', async ({ page, argosScreenshot }) => {
   );
 
   await page.mouse.up();
-
-  // Wait for resizing to happen
-  await waitForBoundingBox(thirdGrid);
 
   await clickCenter(page, firstGrid);
   await argosScreenshot('vertical-resize-after', screenshotConfig);

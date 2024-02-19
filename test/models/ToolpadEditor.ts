@@ -1,7 +1,7 @@
 import { setTimeout } from 'timers/promises';
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
-import waitForBoundingBox from '../utils/waitForBoundingBox';
+import { waitForBoundingBox } from '../utils/locators';
 
 class CreateComponentDialog {
   readonly page: Page;

@@ -30,7 +30,7 @@ test('rendering components in the app runtime', async ({ page, argosScreenshot }
 
 test('rendering components in the app editor', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPage('components');
 
   await editorModel.waitForOverlay();
 
@@ -40,6 +40,46 @@ test('rendering components in the app editor', async ({ page, argosScreenshot })
 
   await clickCenter(page, image);
   await argosScreenshot('with-selection');
+});
+
+test('building layouts', async ({ page, argosScreenshot }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPage('blank');
+
+  await editorModel.waitForOverlay();
+
+  const getNthFullWidthBoundingBox = (
+    n: number,
+  ): Promise<{ x: number; y: number; width: number; height: number } | null> =>
+    editorModel.appCanvas.getByText('fullwidth').nth(n).boundingBox();
+
+  await editorModel.dragNewComponentToCanvas('FullWidth');
+
+  await argosScreenshot('building-layout-1');
+
+  const firstFullWidthBoundingBox = await getNthFullWidthBoundingBox(0);
+
+  // Place inside right of first element
+  await editorModel.dragNewComponentToCanvas(
+    'FullWidth',
+    firstFullWidthBoundingBox!.x + (2 / 3) * firstFullWidthBoundingBox!.width,
+    firstFullWidthBoundingBox!.y + firstFullWidthBoundingBox!.height / 2,
+  );
+
+  await argosScreenshot('building-layout-2');
+
+  const secondFullWidthBoundingBox = await getNthFullWidthBoundingBox(1);
+
+  // Place outside right of second element
+  await editorModel.dragNewComponentToCanvas(
+    'FullWidth',
+    secondFullWidthBoundingBox!.x + secondFullWidthBoundingBox!.width + 12,
+    secondFullWidthBoundingBox!.y + secondFullWidthBoundingBox!.height / 2,
+    true,
+    1,
+  );
+
+  await argosScreenshot('building-layout-3');
 });
 
 test('showing grid while resizing elements', async ({ page, argosScreenshot }) => {

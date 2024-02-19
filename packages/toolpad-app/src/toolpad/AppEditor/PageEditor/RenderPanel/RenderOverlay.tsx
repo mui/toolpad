@@ -1019,7 +1019,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             }
 
             if ([DROP_ZONE_RIGHT, DROP_ZONE_LEFT].includes(dragOverZone)) {
-              if (isOriginalParentLayout || !isDraggingOverHorizontalContainer) {
+              if (!isDraggingOverHorizontalContainer) {
                 const hasNewPageRow = isOriginalParentLayout || isOriginalParentColumn;
 
                 if (hasNewPageRow) {
@@ -1064,11 +1064,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                 }
               }
 
-              if (
-                dragOverSlotParentProp &&
-                !isOriginalParentLayout &&
-                isDraggingOverHorizontalContainer
-              ) {
+              if (dragOverSlotParentProp && isDraggingOverHorizontalContainer) {
                 const isDraggingOverDirectionStart =
                   dragOverZone ===
                   (dragOverSlot?.flowDirection === 'row' ? DROP_ZONE_LEFT : DROP_ZONE_RIGHT);

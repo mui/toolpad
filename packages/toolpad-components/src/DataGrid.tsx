@@ -1273,7 +1273,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               {...dataProviderProps}
               sx={{
                 height: '100%',
-                visibility: error ? 'hidden' : 'visible',
+                visibility: errorProp ? 'hidden' : 'visible',
               }}
             />
           </SetActionResultContext.Provider>

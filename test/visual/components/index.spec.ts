@@ -114,7 +114,7 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
 
 test('resizing element heights', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById('Dh9u36B');
+  await editorModel.goToPage('grids');
 
   await editorModel.waitForOverlay();
 

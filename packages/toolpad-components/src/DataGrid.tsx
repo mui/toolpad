@@ -408,7 +408,7 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   },
   link: {
     renderCell: ({ value }) => (
-      <Link href={value} target="_blank" rel="noopener noreferrer nofollow">
+      <Link href={value} target="_blank" rel="noopener nofollow">
         {value}
       </Link>
     ),
@@ -701,7 +701,11 @@ function useDataProviderDataGridProps(
     // Blurring the cell shouldn't end edit mode
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
-    } else {
+      setRowModesModel({});
+      setDraftRow(null);
+    }
+    if (params.reason === GridRowEditStopReasons.escapeKeyDown) {
+      setRowModesModel({});
       setDraftRow(null);
     }
   };
@@ -784,7 +788,7 @@ function useDataProviderDataGridProps(
             return newRecord;
           } catch (error) {
             setActionResult({ action, error: errorFrom(error) });
-            throw error;
+            return oldRow;
           }
         } else {
           try {
@@ -798,7 +802,7 @@ function useDataProviderDataGridProps(
             return newRecord;
           } catch (error) {
             setActionResult({ action, id, error: errorFrom(error) });
-            throw error;
+            return oldRow;
           }
         }
       } finally {
@@ -814,14 +818,14 @@ function useDataProviderDataGridProps(
   );
 
   const getActions = React.useMemo<GridActionsColDef['getActions'] | undefined>(() => {
-    if (!dataProvider?.deleteRecord && !dataProvider?.updateRecord) {
+    if (!dataProvider?.deleteRecord && !dataProvider?.updateRecord && !dataProvider?.createRecord) {
       return undefined;
     }
 
     return ({ id, row }) => {
       const result = [];
 
-      if (dataProvider.updateRecord) {
+      if (dataProvider.updateRecord || dataProvider.createRecord) {
         const rowIsInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         const rowIsUpdating = rowUpdating[id];
 
@@ -855,7 +859,7 @@ function useDataProviderDataGridProps(
           ];
         }
 
-        if (!isEditing) {
+        if (!isEditing && dataProvider.updateRecord) {
           result.push(
             <IconButton
               key="update"

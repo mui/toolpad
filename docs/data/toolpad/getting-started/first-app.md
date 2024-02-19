@@ -3,8 +3,8 @@
 <p class="description">Learn the fundamentals of building with Toolpad by creating a small application.</p>
 
 This guide will walk you through the process of creating a small Toolpad application.
-You'll use the MUI X Data Grid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api/).
-When you click on the name of a breed, a random photo of the breed will be displayed using the Material UI Image component.
+You'll use the MUI X Data Grid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api/).
+When you click on the name of a breed, a random photo of the breed will be displayed using the Material UI Image component.
 
 ## Purpose
 

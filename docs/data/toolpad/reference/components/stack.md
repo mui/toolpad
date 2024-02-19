@@ -1,10 +1,10 @@
-<!-- This file has been auto-generated using `pnpm docs:build:api`. -->
+<!-- ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`. -->
 
 # Stack
 
 <p class="description">API docs for the Toolpad Stack component.</p>
 
-The Material UI [Stack](https://mui.com/material-ui/react-stack/) component.
+The Material UI [Stack](https://mui.com/material-ui/react-stack/) component.
 
 ## Properties
 
@@ -16,4 +16,4 @@ The Material UI [Stack](https://mui.com/material-ui/react-stack/) component.
 | <span class="prop-name">gap</span>            | <span class="prop-type">number</span>  | <span class="prop-default">2</span>       | The gap between children.                                                                                                                                                                                                                                                            |
 | <span class="prop-name">margin</span>         | <span class="prop-type">number</span>  |                                           | The margin around the component.                                                                                                                                                                                                                                                     |
 | <span class="prop-name">children</span>       | <span class="prop-type">element</span> |                                           | The content of the component.                                                                                                                                                                                                                                                        |
-| <span class="prop-name">sx</span>             | <span class="prop-type">object</span>  |                                           | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |
+| <span class="prop-name">sx</span>             | <span class="prop-type">object</span>  |                                           | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |

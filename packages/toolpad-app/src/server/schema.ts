@@ -259,14 +259,26 @@ elementSchema = baseElementSchema
 export const applicationSchema = toolpadObjectSchema(
   'application',
   z.object({
+    plan: z.enum(['free', 'pro']).optional().describe('The plan for this application.'),
     authentication: z
       .object({
         providers: z
           .array(
             z.object({
               provider: z
-                .enum(['github', 'google'])
+                .enum(['github', 'google', 'azure-ad', 'credentials'])
                 .describe('Unique identifier for this authentication provider.'),
+              roles: z
+                .array(
+                  z.object({
+                    source: z
+                      .array(z.string())
+                      .describe('Authentication provider roles to be mapped from.'),
+                    target: z.string().describe('Toolpad role to be mapped to.'),
+                  }),
+                )
+                .optional()
+                .describe('Role mapping definition for this authentication provider.'),
             }),
           )
           .optional()

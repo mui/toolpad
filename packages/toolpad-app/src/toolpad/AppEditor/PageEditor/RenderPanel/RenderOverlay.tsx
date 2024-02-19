@@ -590,7 +590,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
             parentAwareBaseRect = {
               x: isPageChild ? 0 : baseRect.x,
               y: hasPositionGap ? baseRect.y : baseRect.y - parentGap,
-              width: isPageChild && parentRect ? parentRect.width : baseRect.width,
+              width:
+                isPageChild && parentRect ? parentRect.x * 2 + parentRect.width : baseRect.width,
               height: baseRect.height + gapCount * parentGap,
             };
           }

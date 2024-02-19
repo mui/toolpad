@@ -1,4 +1,4 @@
-<!-- This file has been auto-generated using `pnpm docs:build:api`. -->
+<!-- ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`. -->
 
 # DataGrid
 
@@ -22,4 +22,4 @@ The datagrid lets users display tabular data in a flexible grid.
 | <span class="prop-name">height</span>         | <span class="prop-type">number</span>  | <span class="prop-default">350</span>       | The height of the data grid.                                                                                                                                                                                                                                                         |
 | <span class="prop-name">loading</span>        | <span class="prop-type">boolean</span> |                                             | Displays a loading animation indicating the data grid isn't ready to present data yet.                                                                                                                                                                                               |
 | <span class="prop-name">hideToolbar</span>    | <span class="prop-type">boolean</span> |                                             | Hide the toolbar area that contains the data grid user controls.                                                                                                                                                                                                                     |
-| <span class="prop-name">sx</span>             | <span class="prop-type">object</span>  |                                             | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |
+| <span class="prop-name">sx</span>             | <span class="prop-type">object</span>  |                                             | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |

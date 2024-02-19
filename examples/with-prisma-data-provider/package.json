@@ -9,14 +9,14 @@
     "prisma": "prisma"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.46",
-    "@prisma/client": "5.8.1",
+    "@mui/toolpad": "0.1.50",
+    "@prisma/client": "5.9.1",
     "qrcode": "^1.5.3"
   },
   "devDependencies": {
-    "@types/node": "^20.11.5",
+    "@types/node": "^20.11.19",
     "@types/qrcode": "^1.5.5",
-    "prisma": "^5.8.1",
+    "prisma": "^5.9.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }

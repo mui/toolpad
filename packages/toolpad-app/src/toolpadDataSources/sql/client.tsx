@@ -76,7 +76,10 @@ function getConnectionStatusColor(response: SqlConnectionStatus) {
   return response.status;
 }
 
-function withDefaults(value: Maybe<SqlConnectionParams>, defaultPort: number): SqlConnectionParams {
+function withDefaults(
+  value: Maybe<Partial<SqlConnectionParams>>,
+  defaultPort: number,
+): SqlConnectionParams {
   return {
     host: '',
     user: '',
@@ -92,7 +95,7 @@ export function ConnectionParamsInput({
   onChange,
   defaultPort,
 }: SqlConnectionEditorProps<SqlConnectionParams>) {
-  const { handleSubmit, register, formState, reset, watch } = useForm({
+  const { handleSubmit, register, formState, reset, watch } = useForm<SqlConnectionParams>({
     defaultValues: withDefaults(value, defaultPort),
     reValidateMode: 'onChange',
     mode: 'all',
@@ -115,7 +118,7 @@ export function ConnectionParamsInput({
 
   const handleTestConnection = React.useCallback(() => {
     setConnectionStatus({ status: 'connecting' });
-    fetchPrivate({ kind: 'connectionStatus', params: values })
+    fetchPrivate({ kind: 'connectionStatus', params: withDefaults(values, defaultPort) })
       .then((response) => {
         setConnectionStatus(response.data);
       })
@@ -123,7 +126,7 @@ export function ConnectionParamsInput({
         const error = serializeError(errorFrom(rawError));
         setConnectionStatus({ status: 'error', error: error.message });
       });
-  }, [fetchPrivate, values, setConnectionStatus]);
+  }, [fetchPrivate, values, defaultPort]);
 
   const statusIcon = getConnectionStatusIcon(connectionStatus);
 

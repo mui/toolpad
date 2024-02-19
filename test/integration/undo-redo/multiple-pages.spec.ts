@@ -25,7 +25,7 @@ test('test undo and redo through different pages', async ({ page }) => {
   });
   await expect(pageButton1).toBeVisible();
 
-  await editorModel.explorer.getByText('Page 2').click();
+  await editorModel.explorer.getByText('page2').click();
 
   const pageButton2 = editorModel.appCanvas.getByRole('button', {
     name: 'page2Button',

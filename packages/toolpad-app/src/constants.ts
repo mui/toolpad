@@ -13,6 +13,7 @@ export const DOCUMENTATION_INSTALLATION_URL =
   'https://mui.com/toolpad/getting-started/installation/';
 export const ROADMAP_URL = 'https://github.com/orgs/mui/projects/9';
 export const SCHEDULE_DEMO_URL = 'https://calendly.com/prakhar-mui/toolpad';
+export const UPGRADE_URL = 'https://mui.com/toolpad/getting-started/roadmap/#paid-plan';
 
 export const TOOLPAD_BRIDGE_GLOBAL = '__TOOLPAD_BRIDGE__';
 
@@ -20,5 +21,3 @@ export const VERSION_CHECK_INTERVAL = 1000 * 60 * 10;
 
 // TODO: Remove once global functions UI is ready
 export const FEATURE_FLAG_GLOBAL_FUNCTIONS = false;
-
-export const FEATURE_FLAG_AUTHORIZATION = false;

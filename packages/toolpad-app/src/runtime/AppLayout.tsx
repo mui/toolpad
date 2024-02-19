@@ -56,8 +56,6 @@ function AppPagesNavigation({
 
   const productIcon = theme.palette.mode === 'dark' ? productIconDark : productIconLight;
 
-  const initialPageSlug = pages[0].slug;
-
   return (
     <Drawer
       variant="permanent"
@@ -75,9 +73,10 @@ function AppPagesNavigation({
     >
       {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
       <MuiLink
+        component={Link}
         color="inherit"
         aria-label="Go to home page"
-        href={initialPageSlug}
+        to="/"
         underline="none"
         sx={{
           ml: 3,

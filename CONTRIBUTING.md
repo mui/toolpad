@@ -2,7 +2,7 @@
 
 ## Local development
 
-If you would like to hack on MUI Toolpad or want to run the latest version, you can follow these steps:
+If you would like to hack on MUI Toolpad or want to run the latest version, you can follow these steps:
 
 _If you're looking into contributing to the docs, follow the [instructions](#building-and-running-the-documentation) down below_
 
@@ -62,7 +62,7 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
 1. Make sure to start the build in watch mode again and the run the app with
 
    ```bash
-   pnpm toolpad dev examples/qr-generator --dev
+   pnpm toolpad dev examples/qr-generator/toolpad --dev
    ```
 
 ### Linking Toolpad in a folder on your system (advanced)

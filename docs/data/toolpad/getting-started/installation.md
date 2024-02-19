@@ -52,3 +52,60 @@ pnpm run dev
 </codeblock>
 
 This starts the development server on port `3000` or the first available port after that and opens the browser to the Toolpad editor.
+
+## Install Toolpad in an existing project
+
+Start by installing the required dependencies:
+
+<codeblock storageKey="package-manager">
+
+```bash npm
+pnpm install -S @mui/toolpad
+```
+
+```bash yarn
+yarn add @mui/toolpad
+```
+
+```bash pnpm
+pnpm add @mui/toolpad
+```
+
+</codeblock>
+
+Then you'll have to add the toolpad scripts to yur `package.json`:
+
+```json
+// ./package.json
+...
+  "scripts": {
+    "toolpad:dev": "toolpad dev ./my-toolpad-app",
+    "toolpad:build": "toolpad build ./my-toolpad-app",
+    "toolpad:start": "toolpad start ./my-toolpad-app"
+  }
+...
+```
+
+Now you can start your toolpad application using one of the commands:
+
+<codeblock storageKey="package-manager">
+
+```bash npm
+npm run toolpad:dev
+```
+
+```bash yarn
+yarn toolpad:dev
+```
+
+```bash pnpm
+pnpm run toolpad:dev
+```
+
+</codeblock>
+
+When you run this command, Toolpad will automatically initialize a new application in the **./my-toolpad-app** folder.
+
+:::info
+To integrate a Toolpad application in an existing server, you can follow the custom server [integration guide](/toolpad/concepts/custom-server/).
+:::

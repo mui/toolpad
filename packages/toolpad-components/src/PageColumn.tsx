@@ -18,7 +18,7 @@ const PageColumn = React.forwardRef(function PageColumn(
         gap,
         display: 'grid',
         gridAutoFlow: 'row',
-        gridAutoRows: 'min-content',
+        gridAutoRows: 'fit-content',
         gridAutoColumns: '100%',
       }}
       {...props}

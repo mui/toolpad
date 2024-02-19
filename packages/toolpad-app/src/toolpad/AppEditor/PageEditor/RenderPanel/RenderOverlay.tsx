@@ -1378,15 +1378,23 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           }
 
           if (draggedEdge === RECTANGLE_EDGE_BOTTOM || draggedEdge === RECTANGLE_EDGE_TOP) {
-            draft = appDom.setNodeNamespacedProp(
-              draft,
-              draggedNode,
-              'layout',
-              'height',
-              resizePreviewRect.height,
-            );
+            const isValidTopResize =
+              draggedEdge === RECTANGLE_EDGE_TOP &&
+              previousSibling &&
+              previousSiblingRect &&
+              !isPageRow(previousSibling);
 
-            if (draggedEdge === RECTANGLE_EDGE_TOP && previousSibling && previousSiblingRect) {
+            if (draggedEdge === RECTANGLE_EDGE_BOTTOM || isValidTopResize) {
+              draft = appDom.setNodeNamespacedProp(
+                draft,
+                draggedNode,
+                'layout',
+                'height',
+                resizePreviewRect.height,
+              );
+            }
+
+            if (isValidTopResize && previousSiblingRect) {
               draft = appDom.setNodeNamespacedProp(
                 draft,
                 previousSibling,

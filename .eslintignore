@@ -11,3 +11,5 @@ pnpm-lock.yaml
 
 /test/integration/*/fixture*/
 /test/visual/*/fixture*/
+
+.pnpm-store

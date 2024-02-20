@@ -2,25 +2,6 @@ import { setTimeout } from 'timers/promises';
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
 
-class CreatePageDialog {
-  readonly page: Page;
-
-  readonly dialog: Locator;
-
-  readonly nameInput: Locator;
-
-  readonly createButton: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-    this.dialog = page.locator('[role="dialog"]', {
-      hasText: 'Create a new Page',
-    });
-    this.nameInput = this.dialog.locator('label:has-text("name")');
-    this.createButton = this.dialog.locator('button:has-text("Create")');
-  }
-}
-
 class CreateComponentDialog {
   readonly page: Page;
 
@@ -46,8 +27,6 @@ export class ToolpadEditor {
 
   readonly createPageBtn: Locator;
 
-  readonly createPageDialog: CreatePageDialog;
-
   readonly createComponentBtn: Locator;
 
   readonly createComponentDialog: CreateComponentDialog;
@@ -68,13 +47,16 @@ export class ToolpadEditor {
 
   readonly explorer: Locator;
 
+  readonly queriesExplorer: Locator;
+
   readonly confirmationDialog: Locator;
+
+  readonly queryEditorPanel: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.createPageBtn = page.locator('[aria-label="Create page"]');
-    this.createPageDialog = new CreatePageDialog(page);
+    this.createPageBtn = page.locator('[aria-label="Create new page"]');
 
     this.componentCatalog = page.getByTestId('component-catalog');
 
@@ -90,7 +72,9 @@ export class ToolpadEditor {
     this.pageOverlay = this.appCanvas.getByTestId('page-overlay');
 
     this.explorer = page.getByTestId('pages-explorer');
+    this.queriesExplorer = page.getByTestId('query-explorer');
     this.confirmationDialog = page.getByRole('dialog').filter({ hasText: 'Confirm' });
+    this.queryEditorPanel = page.getByRole('tabpanel', { name: 'Query editor', exact: true });
   }
 
   async goto() {
@@ -99,18 +83,14 @@ export class ToolpadEditor {
 
   async createPage(name: string) {
     await this.createPageBtn.click();
-    await this.createPageDialog.nameInput.fill(name);
+    await this.explorer.locator('input').fill(name);
     const { href: currentUrl } = new URL(this.page.url());
-    await this.createPageDialog.createButton.click();
+    await this.page.keyboard.press('Enter');
     await this.page.waitForURL((url) => url.href !== currentUrl);
   }
 
   async goToPage(name: string) {
-    await this.explorer.getByText(name).click();
-  }
-
-  async goToPageById(id: string) {
-    await gotoIfNotCurrent(this.page, `/_toolpad/app/pages/${id}`);
+    await gotoIfNotCurrent(this.page, `/_toolpad/app/pages/${name}`);
   }
 
   async createComponent(name: string) {
@@ -127,7 +107,13 @@ export class ToolpadEditor {
     await setTimeout(100);
   }
 
-  async dragTo(sourceLocator: Locator, moveTargetX: number, moveTargetY: number, hasDrop = true) {
+  async dragTo(
+    sourceLocator: Locator,
+    moveTargetX: number,
+    moveTargetY: number,
+    hasDrop = true,
+    steps = 10,
+  ) {
     const sourceBoundingBox = await sourceLocator.boundingBox();
 
     await this.page.mouse.move(
@@ -138,7 +124,7 @@ export class ToolpadEditor {
 
     await this.page.mouse.down();
 
-    await this.page.mouse.move(moveTargetX, moveTargetY, { steps: 10 });
+    await this.page.mouse.move(moveTargetX, moveTargetY, { steps });
 
     if (hasDrop) {
       await this.page.mouse.up();
@@ -154,12 +140,18 @@ export class ToolpadEditor {
     moveTargetX?: number,
     moveTargetY?: number,
     hasDrop = true,
+    steps?: number,
   ) {
     const style = await this.page.addStyleTag({ content: `* { transition: none !important; }` });
 
     await this.componentCatalog.hover();
 
-    const pageRootBoundingBox = await this.pageRoot.boundingBox();
+    let pageRootBoundingBox;
+    await expect(async () => {
+      pageRootBoundingBox = await this.pageRoot.boundingBox();
+      expect(pageRootBoundingBox).toBeTruthy();
+    }).toPass();
+
     if (!moveTargetX) {
       moveTargetX = pageRootBoundingBox!.x + pageRootBoundingBox!.width / 2;
     }
@@ -170,21 +162,17 @@ export class ToolpadEditor {
     const sourceLocator = this.getComponentCatalogItem(componentName);
     await expect(sourceLocator).toBeVisible();
 
-    await this.dragTo(sourceLocator, moveTargetX, moveTargetY, hasDrop);
+    await this.dragTo(sourceLocator, moveTargetX!, moveTargetY!, hasDrop, steps);
 
     await style.evaluate((elm) => elm.parentNode?.removeChild(elm));
   }
 
-  getPageItem(group: string, name: string): Locator {
-    return this.explorer
-      .getByRole('treeitem')
-      .filter({ hasText: group })
-      .getByRole('treeitem')
-      .filter({ hasText: name });
+  getExplorerItem(name: string): Locator {
+    return this.explorer.getByRole('treeitem').filter({ hasText: name });
   }
 
-  async openPageExplorerMenu(group: string, name: string) {
-    const pageItem = this.getPageItem(group, name);
+  async openPageExplorerMenu(pageName: string) {
+    const pageItem = this.getExplorerItem(pageName);
     const menuButton = pageItem.getByRole('button', { name: 'Open page explorer menu' });
     await pageItem.hover();
     await menuButton.click();

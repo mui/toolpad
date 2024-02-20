@@ -12,5 +12,5 @@
     "pretty": true,
     "preserveWatchOutput": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "public/serverModules.d.ts", "typings/**/*.d.ts"]
 }

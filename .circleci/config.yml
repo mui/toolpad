@@ -23,30 +23,28 @@ commands:
         description: 'Set to true if you intend to use any browser (e.g. with playwright).'
 
     steps:
-      - run:
-          name: View install environment
-          command: |
-            node --version
-            yarn --version
       - restore_cache:
-          name: Restore yarn cache
+          name: Restore pnpm Package Cache
           keys:
-            - v11-yarn-{{ checksum "yarn.lock" }}
-            - v0-next-{{ checksum "yarn.lock" }}
-      - run:
-          name: Set yarn cache folder
-          command: |
-            # Keep path in sync with `save_cache` for key "v8-yarn-"
-            yarn config set cache-folder /tmp/yarn-cache
-            # Debug information
-            yarn cache dir
-            yarn cache list
+            - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+
+      - when:
+          condition: << parameters.browsers >>
+          steps:
+            - run: corepack enable
+      - when:
+          condition:
+            not: << parameters.browsers >>
+          steps:
+            # See https://stackoverflow.com/a/73411601
+            - run: corepack enable --install-directory ~/bin
+
       - when:
           condition: << parameters.browsers >>
           steps:
             - run:
                 name: Prepare playwright hash
-                command: yarn --json list --pattern playwright > /tmp/playwright_info.json
+                command: pnpm list --json --filter playwright > /tmp/playwright_info.json
             - store_artifacts:
                 name: Debug playwright hash
                 path: /tmp/playwright_info.json
@@ -55,18 +53,27 @@ commands:
                 keys:
                   - v5-playwright-{{ arch }}-{{ checksum "/tmp/playwright_info.json" }}
       - run:
+          name: View install environment
+          command: |
+            node --version
+            pnpm --version
+      - run:
           name: Install js dependencies
-          command: yarn install
-          environment:
-            PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: <<# parameters.browsers >>0<</ parameters.browsers >><<^ parameters.browsers >>1<</ parameters.browsers >>
+          command: pnpm install
+      - when:
+          condition: << parameters.browsers >>
+          steps:
+            - run:
+                name: Install playwright browsers
+                command: pnpm playwright install --with-deps
+                environment:
+                  PLAYWRIGHT_BROWSERS_PATH: /tmp/pw-browsers
 
       - save_cache:
-          name: Save yarn cache
-          key: v11-yarn-{{ checksum "yarn.lock" }}
+          name: Save pnpm Package Cache
+          key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
           paths:
-            # Keep path in sync with "Set yarn cache folder"
-            # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
-            - /tmp/yarn-cache
+            - node_modules
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -89,7 +96,13 @@ jobs:
           command: git add -A && git diff --exit-code --staged
       - run:
           name: Check for duplicated packages
-          command: yarn deduplicate
+          command: |
+            if [[ $(git diff --name-status master | grep pnpm.lock) == "" ]];
+            then
+                echo "no changes to dependencies detected, skipping..."
+            else
+                pnpm dedupe --check
+            fi
 
   test_lint:
     <<: *defaults
@@ -98,13 +111,13 @@ jobs:
       - install_js
       - run:
           name: Eslint
-          command: yarn eslint
+          command: pnpm eslint
       - run:
           name: Lint JSON
-          command: yarn jsonlint
+          command: pnpm jsonlint
       - run:
           name: Lint Markdown
-          command: yarn markdownlint
+          command: pnpm markdownlint
   test_types:
     <<: *defaults
     steps:
@@ -112,33 +125,48 @@ jobs:
       - install_js
       - run:
           name: Check Typescript types
-          command: yarn check-types
+          command: pnpm check-types
   test_static:
     <<: *defaults
     steps:
       - checkout
       - install_js
       - run:
-          name: '`yarn prettier:all` changes committed?'
+          name: '`pnpm prettier:all` changes committed?'
           command: |
-            yarn prettier:all
-            yarn check-changes
+            pnpm prettier:all
+            pnpm check-changes
       - run:
-          name: '`yarn jsonSchemas` changes committed?'
+          name: '`pnpm jsonSchemas` changes committed?'
           command: |
-            yarn jsonSchemas
-            yarn check-changes
+            pnpm jsonSchemas
+            pnpm check-changes
       - run:
-          name: '`yarn docs:build:api` changes committed?'
+          name: '`pnpm docs:build:api` changes committed?'
           command: |
-            yarn docs:build:api
-            yarn check-changes
+            pnpm docs:build:api
+            pnpm check-changes
 
   test_unit:
     <<: *defaults
+
+    steps:
+      - checkout
+      - install_js:
+          browsers: false
+      - run:
+          name: 'Build packages'
+          command: pnpm release:build
+      - run:
+          name: Tests fake browser
+          command: pnpm test
+
+  test_integration:
+    <<: *defaults
     resource_class: 'large'
+    parallelism: 2
     docker:
-      - image: mcr.microsoft.com/playwright:v1.38.1-focal
+      - image: mcr.microsoft.com/playwright:v1.41.2-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
@@ -149,23 +177,17 @@ jobs:
           browsers: true
       - run:
           name: 'Build packages'
-          command: yarn release:build
-      - save_cache:
-          name: Save Next.js cache
-          key: v0-next-{{ checksum "yarn.lock" }}
-          paths:
-            - packages/toolpad-app/.next/cache
-      - run:
-          name: Tests fake browser
-          command: yarn test
+          command: pnpm release:build
       - run:
           name: Tests real browser
-          command: yarn test:integration
+          command: pnpm test:integration
+      - store_test_results:
+          path: test/test-results/junit.xml
       - run:
           name: Upload screenshots to Argos CI
-          command: yarn test:argos
+          command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} pnpm test:argos
       - store_artifacts:
-          path: test-results
+          path: test/test-results
           destination: playwright-test-results
 
 workflows:
@@ -182,5 +204,8 @@ workflows:
           requires:
             - checkout
       - test_unit:
+          requires:
+            - checkout
+      - test_integration:
           requires:
             - checkout

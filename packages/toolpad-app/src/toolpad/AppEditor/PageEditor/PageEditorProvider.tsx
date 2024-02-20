@@ -1,9 +1,9 @@
 import { NodeId, LiveBindings, ScopeMeta, ApplicationVm } from '@mui/toolpad-core';
 import * as React from 'react';
-import * as appDom from '../../../appDom';
+import { update, updateOrCreate } from '@mui/toolpad-utils/immutability';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { PageViewState } from '../../../types';
 import { RectangleEdge } from '../../../utils/geometry';
-import { update } from '../../../utils/immutability';
 
 export const DROP_ZONE_TOP = 'top';
 export const DROP_ZONE_BOTTOM = 'bottom';
@@ -29,6 +29,7 @@ export interface PageEditorState {
   readonly draggedEdge: RectangleEdge | null;
   readonly viewState: PageViewState;
   readonly pageState: Record<string, unknown>;
+  readonly nodeData: Record<NodeId, Record<string, unknown> | undefined>;
   readonly globalScopeMeta: ScopeMeta;
   readonly bindings: LiveBindings;
   readonly vm: ApplicationVm;
@@ -71,6 +72,12 @@ export type PageEditorAction =
       globalScopeMeta: ScopeMeta;
     }
   | {
+      type: 'NODE_DATA_UPDATE';
+      nodeId: NodeId;
+      prop: string;
+      value: unknown;
+    }
+  | {
       type: 'PAGE_VIEW_STATE_UPDATE';
       viewState: PageViewState;
     }
@@ -98,6 +105,7 @@ export function createPageEditorState(nodeId: NodeId): PageEditorState {
     pageState: {},
     globalScopeMeta: {},
     bindings: {},
+    nodeData: {},
     vm: {
       scopes: {},
       bindingScopes: {},
@@ -167,6 +175,16 @@ export function pageEditorReducer(
         globalScopeMeta,
       });
     }
+    case 'NODE_DATA_UPDATE': {
+      const { nodeId, prop, value } = action;
+      return update(state, {
+        nodeData: update(state.nodeData, {
+          [nodeId]: updateOrCreate(state.nodeData[nodeId], {
+            [prop]: value,
+          }),
+        }),
+      });
+    }
     case 'PAGE_BINDINGS_UPDATE': {
       const { bindings } = action;
       return update(state, {
@@ -225,6 +243,14 @@ function createPageEditorApi(dispatch: React.Dispatch<PageEditorAction>) {
         type: 'PAGE_STATE_UPDATE',
         pageState,
         globalScopeMeta,
+      });
+    },
+    nodeDataUpdate(nodeId: NodeId, prop: string, value: unknown) {
+      dispatch({
+        type: 'NODE_DATA_UPDATE',
+        nodeId,
+        prop,
+        value,
       });
     },
     pageBindingsUpdate(bindings: LiveBindings) {

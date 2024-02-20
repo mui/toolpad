@@ -21,25 +21,22 @@ export default defineConfig((options) => [
   {
     entry: {
       index: './cli/index.ts',
-      appServer: './cli/appServer.ts',
-      appBuilder: './cli/appBuilder.ts',
-      functionsDevWorker: './src/server/functionsDevWorker.ts',
+
+      // Worker entry points
+      appServerWorker: './src/server/appServerWorker.ts',
+      appBuilderWorker: './src/server/appBuilderWorker.ts',
       functionsTypesWorker: './src/server/functionsTypesWorker.ts',
     },
+    format: ['esm'],
     outDir: 'dist/cli',
     silent: true,
+    // Code splitting in esbuild is buggy. It doesn't preserve order of imports correctly.
+    // It's important that `dotenv/config` remains the first import in the program because it
+    // needs to set up environment variables before anything else is imported.
+    // To fix this, we disable code splitting.
+    // See: https://github.com/evanw/esbuild/issues/399
+    splitting: false,
     clean: !options.watch,
-    noExternal: [
-      'open-editor',
-      'execa',
-      'fractional-indexing',
-      'lodash-es',
-      'chalk',
-      'get-port',
-      'pretty-bytes',
-      'latest-version',
-      'nanoid',
-    ],
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './dist/cli'))],
     async onSuccess() {
@@ -48,24 +45,8 @@ export default defineConfig((options) => [
     },
   },
   {
-    entry: ['./reactDevtools/bootstrap.ts'],
-    silent: true,
-    clean: !options.watch,
-    outDir: './public/reactDevtools',
-    bundle: true,
-    sourcemap: true,
-    target: 'es6',
-    format: 'iife',
-    replaceNodeEnv: true,
-    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, './public/reactDevtools'))],
-    async onSuccess() {
-      // eslint-disable-next-line no-console
-      console.log('reactDevtools: build successful');
-    },
-  },
-  {
     entry: ['src/exports/*.ts', 'src/exports/*.tsx'],
-    format: ['esm', 'cjs'],
+    format: ['esm'],
     dts: true,
     silent: true,
     clean: !options.watch,
@@ -73,6 +54,17 @@ export default defineConfig((options) => [
     tsconfig: './tsconfig.runtime.json',
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/runtime'))],
+    external: [/.*\?worker/],
+    // publicDir: 'public',
+    loader: {
+      '.svg': 'copy',
+      '.png': 'copy',
+      '.jpg': 'copy',
+      '.jpeg': 'copy',
+      '.gif': 'copy',
+      '.ico': 'copy',
+      '.webp': 'copy',
+    },
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('runtime: build successful');

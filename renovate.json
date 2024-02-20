@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [":semanticCommitsDisabled"],
   "automerge": false,
   "commitMessageAction": "Bump",
   "commitMessageExtra": "to {{newValue}}",
@@ -10,6 +11,10 @@
   "labels": ["dependencies"],
   "stopUpdatingLabel": "on hold",
   "packageRules": [
+    {
+      "matchDepTypes": ["peerDependencies"],
+      "rangeStrategy": "widen"
+    },
     {
       "groupName": "dependencies",
       "matchManagers": ["npm"],
@@ -29,6 +34,11 @@
       "groupName": "MUI X",
       "matchPackagePatterns": ["^@mui/x-"],
       "schedule": ["at any time"]
+    },
+    {
+      "groupName": "MUI Monorepo",
+      "matchPackagePatterns": ["@mui/monorepo"],
+      "schedule": ["on sunday before 6:00am"]
     },
     {
       "groupName": "playwright",
@@ -53,14 +63,19 @@
       "allowedVersions": "< 3.0.0"
     },
     {
+      "groupName": "tsx",
+      "matchPackageNames": ["tsx"],
+      "description": "Investigating problems with importing X charts under node.js with tsx"
+    },
+    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "prettier",
-      "matchPackageNames": ["prettier", "pretty-quick"],
-      "description": "prettier made breaking changes in v3, pretty-quick needs to catch up before we can upgrade. https://github.com/azz/pretty-quick/issues/164"
+      "groupName": "superjson",
+      "matchPackageNames": ["superjson"],
+      "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
     },
     {
       "matchDepTypes": ["action"],
@@ -71,11 +86,6 @@
       "matchManagers": ["github-actions"]
     },
     {
-      "groupName": "requires-node-18",
-      "matchPackageNames": ["execa"],
-      "description": "Stalling updates until we break compatibility with Node 16"
-    },
-    {
       "groupName": "Update @mui/toolpad in examples",
       "matchPackageNames": ["@mui/toolpad"],
       "matchFiles": ["examples/*/package.json"],
@@ -83,7 +93,7 @@
       "automerge": true
     }
   ],
-  "postUpdateOptions": ["yarnDedupeHighest"],
+  "postUpdateOptions": ["pnpmDedupe"],
   "prConcurrentLimit": 30,
   "prHourlyLimit": 0,
   "rangeStrategy": "bump",

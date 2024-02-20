@@ -1,21 +1,18 @@
 import * as React from 'react';
 import { Fade, styled } from '@mui/material';
-import { NodeId } from '@mui/toolpad-core';
+import { NodeHashes } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
-import * as appDom from '../../../appDom';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../../../constants';
 import { HTML_ID_EDITOR_OVERLAY } from '../../../runtime/constants';
-import { NodeHashes } from '../../../types';
-import { LogEntry } from '../../../components/Console';
 import { useAppStateApi } from '../../AppState';
-import createRuntimeState from '../../../runtime/createRuntimeState';
 import type { ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import CenteredSpinner from '../../../components/CenteredSpinner';
-import { useOnProjectEvent } from '../../../projectEvents';
+import { useProject } from '../../../project';
+import { RuntimeState } from '../../../runtime';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -40,10 +37,9 @@ function Overlay(props: OverlayProps) {
 
 export interface EditorCanvasHostProps {
   className?: string;
-  pageNodeId: NodeId;
-  dom: appDom.AppDom;
+  pageName: string;
+  runtimeState: RuntimeState;
   savedNodes: NodeHashes;
-  onConsoleEntry?: (entry: LogEntry) => void;
   overlay?: React.ReactNode;
   onInit?: (bridge: ToolpadBridge) => void;
   base: string;
@@ -81,33 +77,27 @@ function useOnChange<T = unknown>(value: T, handler: (newValue: T, oldValue: T) 
 
 export default function EditorCanvasHost({
   className,
-  pageNodeId,
+  pageName,
+  runtimeState,
   base,
-  dom,
   savedNodes,
   overlay,
-  onConsoleEntry,
   onInit,
 }: EditorCanvasHostProps) {
+  const project = useProject();
   const appStateApi = useAppStateApi();
 
   const [bridge, setBridge] = React.useState<ToolpadBridge | null>(null);
 
   const updateOnBridge = React.useCallback(() => {
     if (bridge) {
-      const data = createRuntimeState({ dom });
-      bridge.canvasCommands.update({ ...data, savedNodes });
+      bridge.canvasCommands.update({ ...runtimeState, savedNodes });
     }
-  }, [bridge, dom, savedNodes]);
+  }, [bridge, runtimeState, savedNodes]);
 
   React.useEffect(() => {
     updateOnBridge();
   }, [updateOnBridge]);
-
-  const onConsoleEntryRef = React.useRef(onConsoleEntry);
-  React.useLayoutEffect(() => {
-    onConsoleEntryRef.current = onConsoleEntry;
-  });
 
   const [editorOverlayRoot, setEditorOverlayRoot] = React.useState<HTMLElement | null>(null);
 
@@ -126,7 +116,7 @@ export default function EditorCanvasHost({
     }
   });
 
-  const src = `${base}/pages/${pageNodeId}?toolpad-display=canvas`;
+  const src = `${base}/pages/${pageName}`;
 
   const [loading, setLoading] = React.useState(true);
   useOnChange(src, () => setLoading(true));
@@ -193,7 +183,9 @@ export default function EditorCanvasHost({
     bridge?.canvasCommands.invalidateQueries();
   });
 
-  useOnProjectEvent('queriesInvalidated', invalidateCanvasQueries);
+  React.useEffect(() => {
+    return project.events.subscribe('queriesInvalidated', invalidateCanvasQueries);
+  }, [project.events, invalidateCanvasQueries]);
 
   return (
     <CanvasRoot className={className}>

@@ -16,7 +16,7 @@ function Container({ children, visible, sx, ...props }: Props) {
 }
 
 export default createBuiltin(Container, {
-  helperText: 'The Material UI [Container](https://mui.com/material-ui/react-container/).',
+  helperText: 'The Material UI [Container](https://mui.com/material-ui/react-container/).',
   argTypes: {
     children: {
       type: 'element',
@@ -31,7 +31,6 @@ export default createBuiltin(Container, {
     sx: {
       helperText: SX_PROP_HELPER_TEXT,
       type: 'object',
-      default: { padding: 1, border: 'solid 1px' },
     },
   },
 });

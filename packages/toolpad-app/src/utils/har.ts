@@ -1,4 +1,4 @@
-import { Har } from 'har-format';
+import type { Har } from 'har-format';
 
 /**
  * Initializes an empty HAR object.

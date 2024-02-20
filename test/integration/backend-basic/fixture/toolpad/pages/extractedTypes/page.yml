@@ -1,13 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.44/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  id: dt1T4rY
   title: extractedTypes
   display: shell
   content:
     - component: Text
       name: text
-      children: []
       layout:
         columnSize: 1
       props:
@@ -16,7 +16,6 @@ spec:
             `bare function with parameters: ${bareWithParams.data?.message}`
     - component: Text
       name: text1
-      children: []
       layout:
         columnSize: 1
       props:

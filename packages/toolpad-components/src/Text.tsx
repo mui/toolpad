@@ -36,6 +36,7 @@ interface TextProps {
   value: string;
   markdown: string;
   href?: string;
+  openInNewTab?: boolean;
   loading?: boolean;
   error?: unknown;
   sx?: SxProps;
@@ -122,10 +123,11 @@ interface LinkContentProps {
   value: string;
   href?: string;
   loading?: boolean;
+  openInNewTab?: boolean;
   sx?: SxProps;
 }
 
-function LinkContent({ value, href, loading, sx }: LinkContentProps) {
+function LinkContent({ value, href, loading, sx, openInNewTab }: LinkContentProps) {
   const content = React.useMemo(() => {
     if (loading) {
       return <Skeleton variant="text" />;
@@ -136,8 +138,8 @@ function LinkContent({ value, href, loading, sx }: LinkContentProps) {
   return (
     <MuiLink
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={openInNewTab ? '_blank' : undefined}
+      rel="noopener"
       sx={{
         minWidth: loading || !value ? 150 : undefined,
         // Same as Typography
@@ -173,7 +175,7 @@ function MarkdownContent({ value, loading, sx }: MarkdownContentProps) {
                   component: MuiLink,
                   props: {
                     target: '_blank',
-                    rel: 'noopener noreferrer',
+                    rel: 'noopener',
                   },
                 },
                 pre: {
@@ -281,7 +283,7 @@ function Text(props: TextProps) {
 
 export default createBuiltin(Text, {
   helperText:
-    "The Text component lets you display text. Text can be rendered in multiple forms: plain, as a link, or as markdown. It's rendered using MUI [Typography](https://mui.com/material-ui/react-typography/).",
+    "The Text component lets you display text. Text can be rendered in multiple forms: plain, as a link, or as markdown. It's rendered using Material UI [Typography](https://mui.com/material-ui/react-typography/).",
   layoutDirection: 'both',
   loadingPropSource: ['value'],
   loadingProp: 'loading',
@@ -293,8 +295,14 @@ export default createBuiltin(Text, {
         'Defines how the content is rendered. Either as plain text, markdown, or as a link.',
       type: 'string',
       enum: ['text', 'markdown', 'link'],
+      enumLabels: {
+        text: 'Text',
+        markdown: 'Markdown',
+        link: 'Link',
+      },
       default: 'text',
       label: 'Mode',
+      control: { type: 'ToggleButtons' },
     },
     value: {
       helperText: 'The text content.',
@@ -307,6 +315,13 @@ export default createBuiltin(Text, {
       helperText: 'The url that is being linked.',
       type: 'string',
       default: 'about:blank',
+      visible: ({ mode }: TextProps) => mode === 'link',
+    },
+    openInNewTab: {
+      label: 'Open in a new tab',
+      helperText: 'Clicking the link should open a new tab.',
+      type: 'boolean',
+      default: false,
       visible: ({ mode }: TextProps) => mode === 'link',
     },
     variant: {

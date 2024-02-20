@@ -6,23 +6,24 @@ import serializeJavascript from 'serialize-javascript';
 import { ToolpadProject } from './localMode';
 import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
-import { createRpcRuntimeServer } from './rpcRuntimeServer';
+import { createRpcServer } from './runtimeRpcServer';
 import { createRpcHandler } from './rpc';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY } from '../constants';
-import type { RuntimeConfig } from '../config';
-import type * as appDom from '../appDom';
+import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import createRuntimeState from '../runtime/createRuntimeState';
-
-export const INITIAL_STATE_WINDOW_PROPERTY = '__initialToolpadState__';
+import type { RuntimeConfig } from '../types';
+import type { RuntimeState } from '../runtime';
+import { createAuthHandler, createRequireAuthMiddleware, getRequireAuthentication } from './auth';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;
-  dom: appDom.AppDom;
+  initialState: RuntimeState;
 }
 
-export function postProcessHtml(html: string, { config, dom }: PostProcessHtmlParams): string {
+export function postProcessHtml(
+  html: string,
+  { config, initialState }: PostProcessHtmlParams,
+): string {
   const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
-  const initialState = createRuntimeState({ dom });
   const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
 
   const toolpadScripts = [
@@ -62,23 +63,38 @@ export async function createProdHandler(project: ToolpadProject) {
     basicAuthUnauthorized(res);
   });
 
+  const hasAuthentication = await getRequireAuthentication(project);
+  if (hasAuthentication) {
+    const authHandler = createAuthHandler(project);
+    handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
+
+    handler.use(await createRequireAuthMiddleware(project));
+  }
+
   handler.use('/api/data', project.dataManager.createDataHandler());
 
-  const runtimeRpcServer = createRpcRuntimeServer(project);
+  const runtimeRpcServer = createRpcServer(project);
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
 
   handler.use(
     asyncHandler(async (req, res) => {
-      const dom = await project.loadDom();
-
       const htmlFilePath = path.resolve(project.getAppOutputFolder(), './index.html');
+
+      const [runtimeConfig, dom] = await Promise.all([
+        project.getRuntimeConfig(),
+        project.loadDom(),
+      ]);
+
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
-      html = postProcessHtml(html, { config: project.getRuntimeConfig(), dom });
+      html = postProcessHtml(html, {
+        config: runtimeConfig,
+        initialState: createRuntimeState({ dom }),
+      });
 
       res.setHeader('Content-Type', 'text/html; charset=utf-8').status(200).end(html);
     }),
   );
 
-  return { handler };
+  return { handler, dispose: async () => undefined };
 }

@@ -5,14 +5,13 @@ import express, { Router } from 'express';
 import cors from 'cors';
 import invariant from 'invariant';
 import { errorFrom, serializeError, SerializedError } from '@mui/toolpad-utils/errors';
-import { Methods, ServerDataSource, ToolpadProjectOptions } from '../types';
+import * as appDom from '@mui/toolpad-core/appDom';
+import type { RuntimeConfig, Methods, ServerDataSource, ToolpadProjectOptions } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
-import * as appDom from '../appDom';
 import applyTransform from '../toolpadDataSources/applyTransform';
 import { asyncHandler } from '../utils/express';
 import type FunctionsManager from './FunctionsManager';
 import type EnvManager from './EnvManager';
-import type { RuntimeConfig } from '../config';
 
 function withSerializedError<T extends { error?: unknown }>(
   withError: T,
@@ -27,10 +26,10 @@ interface IToolpadProject {
   options: ToolpadProjectOptions;
   getRoot(): string;
   loadDom(): Promise<appDom.AppDom>;
-  saveDom(dom: appDom.AppDom): Promise<{ fingerprint: number }>;
+  saveDom(dom: appDom.AppDom): Promise<void>;
   functionsManager: FunctionsManager;
   envManager: EnvManager;
-  getRuntimeConfig: () => RuntimeConfig;
+  getRuntimeConfig: () => Promise<RuntimeConfig>;
 }
 
 /**
@@ -199,7 +198,7 @@ export default class DataManager {
         invariant(typeof pageName === 'string', 'pageName url param required');
         invariant(typeof queryName === 'string', 'queryName url variable required');
 
-        const ctx = createServerContext(req, res);
+        const ctx = await createServerContext(req, res);
         const result = await withContext(ctx, async () => {
           return this.execQuery(pageName, queryName, req.body);
         });

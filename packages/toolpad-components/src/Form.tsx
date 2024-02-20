@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Container, ContainerProps, Box, Stack, BoxProps } from '@mui/material';
+import { Box, BoxProps, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNode } from '@mui/toolpad-core';
 import { equalProperties } from '@mui/toolpad-utils/collections';
@@ -15,7 +15,7 @@ export const FormContext = React.createContext<{
   fieldValues: {},
 });
 
-interface FormProps extends ContainerProps {
+interface FormProps extends BoxProps {
   value: FieldValues;
   onChange: (newValue: FieldValues) => void;
   onSubmit?: (data?: FieldValues) => unknown | Promise<unknown>;
@@ -39,7 +39,6 @@ function Form({
   mode = 'onSubmit',
   hasChrome = true,
   sx,
-  ...rest
 }: FormProps) {
   const form = useForm({ mode });
   const { isSubmitSuccessful } = form.formState;
@@ -79,7 +78,7 @@ function Form({
   return (
     <FormContext.Provider value={formContextValue}>
       {hasChrome ? (
-        <Container disableGutters sx={sx} {...rest}>
+        <Box sx={{ ...sx, width: '100%' }}>
           <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
             {children}
 
@@ -118,7 +117,7 @@ function Form({
               </Stack>
             </Box>
           </form>
-        </Container>
+        </Box>
       ) : (
         children
       )}
@@ -353,12 +352,14 @@ export const FORM_INPUT_ARG_TYPES: BuiltinArgTypeDefinitions<
     type: 'string',
   },
   isRequired: {
+    label: 'Required',
     helperText: 'Whether the input is required to have a value.',
     type: 'boolean',
     default: false,
     category: 'validation',
   },
   isInvalid: {
+    label: 'Invalid',
     helperText: 'Whether the input value is invalid.',
     type: 'boolean',
     default: false,

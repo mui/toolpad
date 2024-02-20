@@ -10,12 +10,6 @@ module.exports = {
     ['next/babel', { 'transform-runtime': { corejs: 2, version: transformRuntimeVersion } }],
   ],
   plugins: [
-    [
-      'babel-plugin-transform-rename-import',
-      {
-        replacements: [{ original: '@mui/utils/macros/MuiError.macro', replacement: 'react' }],
-      },
-    ],
     'babel-plugin-optimize-clsx',
     // for IE 11 support
     '@babel/plugin-transform-object-assign',

@@ -4,6 +4,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { match } from 'path-to-regexp';
 import { asArray } from '@mui/toolpad-utils/collections';
 import * as express from 'express';
+import { Maybe } from '@mui/toolpad-utils/types';
 import { ServerDataSource, CreateHandlerApi } from '../../types';
 import config from '../../server/config';
 import {
@@ -12,7 +13,6 @@ import {
   GoogleSheetsApiQuery,
   GoogleSheetsResult,
 } from './types';
-import { Maybe } from '../../utils/types';
 import type { IToolpadProject } from '../server';
 
 /**
@@ -64,7 +64,6 @@ function createSheetsClient(client: OAuth2Client) {
 export default function createDatasource(
   project: IToolpadProject,
 ): ServerDataSource<GoogleSheetsConnectionParams, GoogleSheetsApiQuery, GoogleSheetsPrivateQuery> {
-  const runtimeConfig = project.getRuntimeConfig();
   /**
    * Executor function for this connection
    * @param connection  The connection object
@@ -75,6 +74,7 @@ export default function createDatasource(
     connection: Maybe<GoogleSheetsConnectionParams>,
     query: GoogleSheetsApiQuery,
   ): Promise<GoogleSheetsResult> => {
+    const runtimeConfig = await project.getRuntimeConfig();
     const client = createOAuthClient(runtimeConfig.externalUrl);
     if (connection) {
       client.setCredentials(connection);
@@ -125,6 +125,7 @@ export default function createDatasource(
     connection: Maybe<GoogleSheetsConnectionParams>,
     query: GoogleSheetsPrivateQuery,
   ): Promise<any> => {
+    const runtimeConfig = await project.getRuntimeConfig();
     const client = createOAuthClient(runtimeConfig.externalUrl);
     if (connection) {
       client.setCredentials(connection);
@@ -217,6 +218,7 @@ export default function createDatasource(
         req: express.Request,
         res: express.Response,
       ): Promise<express.Response | void> => {
+        const runtimeConfig = await project.getRuntimeConfig();
         const client = createOAuthClient(runtimeConfig.externalUrl);
         try {
           const pathname = `/${asArray(req.query.path)

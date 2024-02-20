@@ -1,75 +1,54 @@
-import { Box, Button, Stack, Tooltip } from '@mui/material';
-import CloudDoneIcon from '@mui/icons-material/CloudDone';
-import SyncIcon from '@mui/icons-material/Sync';
-import SyncProblemIcon from '@mui/icons-material/SyncProblem';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Box } from '@mui/material';
+
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
-import { AppState, useAppState } from '../AppState';
-import ToolpadShell from '../ToolpadShell';
 import PagePanel from './PagePanel';
-import { getViewFromPathname } from '../../utils/domView';
 
-function getSaveState(appState: AppState): React.ReactNode {
-  if (appState.saveDomError) {
-    return (
-      <Tooltip title="Error while saving">
-        <SyncProblemIcon color="primary" />
-      </Tooltip>
-    );
-  }
+import { PropControlsContextProvider, PropTypeControls } from '../propertyControls';
 
-  const isSaving = appState.unsavedDomChanges > 0;
+import string from '../propertyControls/string';
+import boolean from '../propertyControls/boolean';
+import number from '../propertyControls/number';
+import select from '../propertyControls/select';
+import json from '../propertyControls/json';
+import event from '../propertyControls/event';
+import markdown from '../propertyControls/Markdown';
+import GridColumns from '../propertyControls/GridColumns';
+import ToggleButtons from '../propertyControls/ToggleButtons';
+import SelectOptions from '../propertyControls/SelectOptions';
+import ChartData from '../propertyControls/ChartData';
+import RowIdFieldSelect from '../propertyControls/RowIdFieldSelect';
+import HorizontalAlign from '../propertyControls/HorizontalAlign';
+import VerticalAlign from '../propertyControls/VerticalAlign';
+import NumberFormat from '../propertyControls/NumberFormat';
+import ColorScale from '../propertyControls/ColorScale';
+import DataProviderSelector from '../propertyControls/DataProviderSelector';
 
-  if (isSaving) {
-    return (
-      <Tooltip title="Saving changes…">
-        <SyncIcon color="primary" />
-      </Tooltip>
-    );
-  }
-
-  return (
-    <Tooltip title="All changes saved!">
-      <CloudDoneIcon color="primary" />
-    </Tooltip>
-  );
-}
-
+export const PROP_TYPE_CONTROLS: PropTypeControls = {
+  string,
+  boolean,
+  number,
+  select,
+  json,
+  markdown,
+  event,
+  GridColumns,
+  ToggleButtons,
+  SelectOptions,
+  ChartData,
+  RowIdFieldSelect,
+  HorizontalAlign,
+  VerticalAlign,
+  NumberFormat,
+  ColorScale,
+  DataProviderSelector,
+};
 export interface ToolpadShellProps {
-  actions?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export default function AppEditorShell({ children, ...props }: ToolpadShellProps) {
-  const appState = useAppState();
-
-  const location = useLocation();
-
-  const currentView = getViewFromPathname(location.pathname);
-  const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
-
-  const previewPath = currentPageId ? `${appState.base}/pages/${currentPageId}` : appState.base;
-
+export default function AppEditorShell({ children }: ToolpadShellProps) {
   return (
-    <ToolpadShell
-      actions={
-        <Stack direction="row" gap={1} alignItems="center">
-          <Button
-            variant="outlined"
-            endIcon={<OpenInNewIcon />}
-            color="primary"
-            component="a"
-            href={previewPath}
-            target="_blank"
-          >
-            Preview
-          </Button>
-        </Stack>
-      }
-      status={getSaveState(appState)}
-      {...props}
-    >
+    <PropControlsContextProvider value={PROP_TYPE_CONTROLS}>
       <Box
         sx={{
           display: 'flex',
@@ -95,6 +74,6 @@ export default function AppEditorShell({ children, ...props }: ToolpadShellProps
           {children}
         </Box>
       </Box>
-    </ToolpadShell>
+    </PropControlsContextProvider>
   );
 }

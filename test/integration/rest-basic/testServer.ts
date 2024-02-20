@@ -1,5 +1,5 @@
 import express from 'express';
-import { listen } from '../../../packages/toolpad-utils/src/http';
+import { listen } from '@mui/toolpad-utils/http';
 
 export async function startTestServer(port?: number) {
   const app = express();

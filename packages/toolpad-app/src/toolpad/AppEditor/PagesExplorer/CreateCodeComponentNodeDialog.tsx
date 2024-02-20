@@ -13,13 +13,17 @@ import * as React from 'react';
 import invariant from 'invariant';
 import CloseIcon from '@mui/icons-material/Close';
 import useEventCallback from '@mui/utils/useEventCallback';
-import * as appDom from '../../../appDom';
-import { useAppState } from '../../AppState';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
+import * as appDom from '@mui/toolpad-core/appDom';
 import DialogForm from '../../../components/DialogForm';
 import { useNodeNameValidation } from './validation';
-import client from '../../../api';
-import useLatest from '../../../utils/useLatest';
-import OpenCodeEditorButton from '../../../components/OpenCodeEditor';
+import { useProjectApi } from '../../../projectApi';
+import OpenCodeEditorButton from '../../OpenCodeEditor';
+import { useToolpadComponents } from '../toolpadComponents';
+
+function handleInputFocus(event: React.FocusEvent<HTMLInputElement>) {
+  event.target.select();
+}
 
 const DEFAULT_NAME = 'MyComponent';
 
@@ -33,11 +37,18 @@ export default function CreateCodeComponentDialog({
   onClose,
   ...props
 }: CreateCodeComponentDialogProps) {
-  const { dom } = useAppState();
+  const projectApi = useProjectApi();
+
+  const codeComponents = useToolpadComponents();
 
   const existingNames = React.useMemo(
-    () => appDom.getExistingNamesForChildren(dom, appDom.getApp(dom), 'codeComponents'),
-    [dom],
+    () =>
+      new Set(
+        Object.values(codeComponents)
+          .map((component) => component?.displayName)
+          .filter(Boolean),
+      ),
+    [codeComponents],
   );
 
   const [name, setName] = React.useState(appDom.proposeName(DEFAULT_NAME, existingNames));
@@ -52,10 +63,6 @@ export default function CreateCodeComponentDialog({
       handleReset();
     }
   }, [open, handleReset]);
-
-  const handleInputFocus = React.useCallback((event: React.FocusEvent<HTMLInputElement>) => {
-    event.target.select();
-  }, []);
 
   const inputErrorMsg = useNodeNameValidation(name, existingNames, 'component');
   const isNameValid = !inputErrorMsg;
@@ -75,7 +82,7 @@ export default function CreateCodeComponentDialog({
           onSubmit={async (event) => {
             event.preventDefault();
             invariant(isFormValid, 'Invalid form should not be submitted when submit is disabled');
-            await client.mutation.createComponent(name);
+            await projectApi.methods.createComponent(name);
             onClose();
             setSnackbarState({ name });
           }}

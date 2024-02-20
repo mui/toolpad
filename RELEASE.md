@@ -3,7 +3,7 @@
 1. Generate a new version using:
 
    ```bash
-   yarn release:version
+   pnpm release:version
    ```
 
    This command will bump the version in every package of the project.
@@ -11,7 +11,7 @@
 1. Generate the changelog using:
 
    ```bash
-   yarn release:changelog
+   pnpm release:changelog
    ```
 
    Running this command requires a [GitHub personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with the `public_repo` scope.
@@ -33,6 +33,21 @@
 
 1. Open a PR to the `master` branch with the proposed changes. Add the "release" label.
 
+1. Smoke test the release with the [CodeSandbox CI](https://ci.codesandbox.io/status/mui/mui-toolpad) package of the PR branch:
+
+   1. Run
+
+   ```bash
+   npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke --use-pnpm
+   cd smoke
+   pnpm add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@mui/toolpad -S
+   pnpm dedupe && pnpm dev
+   ```
+
+   And verify the editor works
+
+1. Merge the PR changes, then check out the `master` branch and pull the last commit.
+
 1. Publish the package to `npm`
 
    1. If you are not logged in to `npm` in your CLI, first log in with:
@@ -44,16 +59,14 @@
    1. Publish to `npm`
 
       ```bash
-      yarn release:publish
+      pnpm release:publish
       ```
 
       If you've created a prerelease, then instead use
 
       ```bash
-      yarn release:publish-canary
+      pnpm release:publish-canary
       ```
-
-1. Merge the changes.
 
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.
 
@@ -71,15 +84,3 @@
    1. Use `<version number>` as the **Release title**
    1. Mark as prerelease if necessary.
    1. **Publish release**
-
-1. Smoke test the release:
-
-   1. Run
-
-   ```bash
-   yarn create toolpad-app test-app
-   cd test-app
-   yarn dev
-   ```
-
-   And verify the editor works

@@ -63,6 +63,7 @@ You can look at more detailed guides of creating custom components in the how-to
 
 - [Map](/toolpad/how-to-guides/map-display/)
 - [Cube](/toolpad/how-to-guides/cube-component/)
+
   :::
 
 :::info

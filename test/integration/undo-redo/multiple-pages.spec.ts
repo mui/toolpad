@@ -1,10 +1,15 @@
 import * as path from 'path';
+import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { test, expect } from '../../playwright/localTest';
 
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+
 test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, './fixture-multiple-pages'),
+  },
   localAppConfig: {
-    template: path.resolve(__dirname, './fixture-multiple-pages'),
     cmd: 'dev',
   },
 });
@@ -20,7 +25,7 @@ test('test undo and redo through different pages', async ({ page }) => {
   });
   await expect(pageButton1).toBeVisible();
 
-  await editorModel.goToPage('page2');
+  await editorModel.explorer.getByText('page2').click();
 
   const pageButton2 = editorModel.appCanvas.getByRole('button', {
     name: 'page2Button',

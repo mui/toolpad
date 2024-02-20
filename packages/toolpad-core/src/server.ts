@@ -1,7 +1,13 @@
-/// <reference path="./serverModules.d.ts" />
+/// <reference path="../public/serverModules.d.ts" />
 
 import { TOOLPAD_FUNCTION } from './constants';
-import { InferParameterType, PrimitiveValueType, PropValueType } from './types';
+import {
+  InferParameterType,
+  PaginationMode,
+  PrimitiveValueType,
+  PropValueType,
+  ToolpadDataProviderBase,
+} from './types';
 import { ServerContext, getServerContext } from './serverRuntime';
 
 /**
@@ -99,7 +105,7 @@ export type { ServerContext };
  *
  * API:
  *
- * - [getContext API](https://mui.com/toolpad/reference/api/get-context)
+ * - [`getContext` API](https://mui.com/toolpad/reference/api/get-context)
  *
  */
 export function getContext(): ServerContext {
@@ -108,4 +114,32 @@ export function getContext(): ServerContext {
     throw new Error('getContext() must be called from within a Toolpad function.');
   }
   return ctx;
+}
+
+export const TOOLPAD_DATA_PROVIDER_MARKER = Symbol.for('TOOLPAD_DATA_PROVIDER_MARKER');
+
+export interface ToolpadDataProvider<
+  R extends Record<string, unknown>,
+  P extends PaginationMode = 'index',
+> extends ToolpadDataProviderBase<R, P> {
+  [TOOLPAD_DATA_PROVIDER_MARKER]: true;
+}
+
+/**
+ * Create a Toolpad data provider. Data providers act as a bridge between Toolpad and your data.
+ *
+ * Demos:
+ *
+ * - [Data providers](https://mui.com/toolpad/concepts/data-providers/)
+ *
+ * API:
+ *
+ * - [`createDataProvider` API](https://mui.com/toolpad/reference/api/create-data-provider/)
+ *
+ */
+export function createDataProvider<
+  R extends Record<string, unknown>,
+  P extends PaginationMode = 'index',
+>(input: ToolpadDataProviderBase<R, P>): ToolpadDataProvider<R, P> {
+  return Object.assign(input, { [TOOLPAD_DATA_PROVIDER_MARKER]: true as const });
 }

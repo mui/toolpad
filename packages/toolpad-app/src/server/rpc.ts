@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'http';
-import superjson from 'superjson';
+import * as superjson from 'superjson';
 import express from 'express';
 import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
@@ -11,30 +11,30 @@ import { asyncHandler } from '../utils/express';
 export interface Method<P extends any[] = any[], R = any> {
   (...params: P): Promise<R>;
 }
-export interface MethodsGroup {
+
+export interface Methods {
   readonly [key: string]: Method;
+}
+
+interface ResolverInput<P> {
+  params: P;
+  req: IncomingMessage;
+  res: ServerResponse;
+}
+
+export interface MethodResolver<F extends Method> {
+  (input: ResolverInput<Parameters<F>>): ReturnType<F>;
 }
 
 export interface MethodResolvers {
   readonly [key: string]: MethodResolver<any>;
 }
 
-export interface Definition {
-  readonly query: MethodResolvers;
-  readonly mutation: MethodResolvers;
-}
-
-export type MethodsOfGroup<R extends MethodResolvers> = {
+export type MethodsOf<R extends MethodResolvers> = {
   [K in keyof R]: (...params: Parameters<R[K]>[0]['params']) => ReturnType<R[K]>;
 };
 
-export interface MethodsOf<D extends Definition> {
-  readonly query: MethodsOfGroup<D['query']>;
-  readonly mutation: MethodsOfGroup<D['mutation']>;
-}
-
 const rpcRequestSchema = z.object({
-  type: z.union([z.literal('query'), z.literal('mutation')]),
   name: z.string(),
   params: z.array(z.any()),
 });
@@ -50,7 +50,7 @@ export type RpcResponse =
       error: { message: string; code?: unknown; stack?: string };
     };
 
-export function createRpcHandler(definition: Definition): express.RequestHandler {
+export function createRpcHandler(definition: MethodResolvers): express.RequestHandler {
   const router = express.Router();
   router.post(
     '/',
@@ -62,19 +62,19 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
         return;
       }
 
-      const { type, name, params } = parseResult.data;
+      const { name, params } = parseResult.data;
 
-      if (!hasOwnProperty(definition, type) || !hasOwnProperty(definition[type], name)) {
+      if (!hasOwnProperty(definition, name)) {
         // This is important to avoid RCE
         res.status(404).end();
         return;
       }
-      const method: MethodResolver<any> = definition[type][name];
+      const method: MethodResolver<any> = definition[name];
 
       let rawResult;
       let error: Error | null = null;
       try {
-        const ctx = createServerContext(req, res);
+        const ctx = await createServerContext(req, res);
         rawResult = await withContext(ctx, async () => {
           return method({ params, req, res });
         });
@@ -90,16 +90,6 @@ export function createRpcHandler(definition: Definition): express.RequestHandler
     }),
   );
   return router;
-}
-
-interface ResolverInput<P> {
-  params: P;
-  req: IncomingMessage;
-  res: ServerResponse;
-}
-
-export interface MethodResolver<F extends Method> {
-  (input: ResolverInput<Parameters<F>>): ReturnType<F>;
 }
 
 export function createMethod<F extends Method>(handler: MethodResolver<F>): MethodResolver<F> {

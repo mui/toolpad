@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: page
+spec:
+  title: Custom server
+  content:
+    - component: Text
+      name: text
+      props:
+        variant: h2
+        value: 👋 Hello from Toolpad
+    - component: Text
+      name: link
+      props:
+        mode: link
+        value: back
+        href: /

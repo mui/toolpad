@@ -2,8 +2,8 @@ import { TextField, MenuItem, SxProps } from '@mui/material';
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
 import { asArray } from '@mui/toolpad-utils/collections';
-import * as appDom from '../../../appDom';
-import { Maybe, WithControlledProp } from '../../../utils/types';
+import { Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState } from '../../AppState';
 import dataSources from '../../../toolpadDataSources/client';
 
@@ -80,27 +80,16 @@ export default function ConnectionSelect({
   }, [options, value]);
 
   return (
-    <TextField
-      sx={sx}
-      select
-      fullWidth
-      value={selection}
-      label="Connection"
-      onChange={handleSelectionChange}
-    >
+    <TextField sx={sx} select value={selection} label="Connection" onChange={handleSelectionChange}>
       {options.map((option, index) => {
         const config = dataSources[option.dataSourceId];
         const dataSourceLabel = config
           ? config.displayName
           : `<unknown datasource "${option.dataSourceId}">`;
 
-        const connectionLabel = option.connectionId
-          ? appDom.getMaybeNode(dom, option.connectionId)?.name
-          : '<default>';
         return (
           <MenuItem key={index} value={index}>
             {dataSourceLabel}
-            {config?.ConnectionParamsInput ? ` | ${connectionLabel}` : ''}
           </MenuItem>
         );
       })}

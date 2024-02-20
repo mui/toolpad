@@ -1,4 +1,10 @@
-import { Stack, SxProps } from '@mui/material';
+import {
+  Stack,
+  SxProps,
+  inputBaseClasses,
+  formLabelClasses,
+  typographyClasses,
+} from '@mui/material';
 import * as React from 'react';
 import {
   BindableAttrValue,
@@ -8,8 +14,8 @@ import {
   ScopeMeta,
   EnvAttrValue,
 } from '@mui/toolpad-core';
-import { WithControlledProp } from '../../../utils/types';
-import { getBindingType } from '../../../bindings';
+import { WithControlledProp } from '@mui/toolpad-utils/types';
+import { getBindingType } from '../../../runtime/bindings';
 import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
 
 // eslint-disable-next-line import/no-cycle
@@ -31,7 +37,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
   globalScopeMeta: ScopeMeta;
-  envVarNames?: string[];
+  env?: Record<string, string>;
   sx?: SxProps;
 }
 
@@ -47,7 +53,7 @@ export default function BindableEditor<V>({
   liveBinding,
   globalScope = {},
   globalScopeMeta = {},
-  envVarNames,
+  env,
   sx,
 }: BindableEditorProps<V>) {
   const propTypeControls = usePropControlsContext();
@@ -83,7 +89,17 @@ export default function BindableEditor<V>({
   const hasBinding = value && valueBindingType !== 'const';
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={sx}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      sx={{
+        [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
+        [`& .${formLabelClasses.root}`]: { fontSize: 12 },
+        [`& .${typographyClasses.root}`]: { fontSize: 12 },
+        ...sx,
+      }}
+    >
       <React.Fragment>
         {renderControl({
           label,
@@ -103,7 +119,7 @@ export default function BindableEditor<V>({
           disabled={disabled || !bindable}
           hidden={!bindable}
           liveBinding={liveBinding}
-          envVarNames={envVarNames}
+          env={env}
         />
       </React.Fragment>
     </Stack>

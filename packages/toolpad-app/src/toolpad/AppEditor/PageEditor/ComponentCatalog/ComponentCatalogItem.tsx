@@ -1,6 +1,5 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-
+import { ButtonBase, SxProps, Box } from '@mui/material';
 import SmartButtonIcon from '@mui/icons-material/SmartButton';
 import ImageIcon from '@mui/icons-material/Image';
 import GridOnIcon from '@mui/icons-material/GridOn';
@@ -31,13 +30,17 @@ import HtmlIcon from '@mui/icons-material/Html';
 import TableRowsIcon from '@mui/icons-material/TableRows';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import TagIcon from '@mui/icons-material/Tag';
-import { ButtonBase, SxProps } from '@mui/material';
 import PasswordIcon from '@mui/icons-material/Password';
+import LinkIcon from '@mui/icons-material/Link';
+import TextFormatIcon from '@mui/icons-material/TextFormat';
+import PieChartIcon from '@mui/icons-material/PieChart';
 
 const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Password', PasswordIcon],
   ['Autocomplete', ManageSearchIcon],
   ['Text', NotesIcon],
+  ['Link', LinkIcon],
+  ['Markdown', TextFormatIcon],
   ['Button', SmartButtonIcon],
   ['Image', ImageIcon],
   ['DataGrid', GridOnIcon],
@@ -61,6 +64,7 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['Chart', InsightsIcon],
   ['Map', PlaceIcon],
   ['Drawer', ViewSidebarIcon],
+  ['Pie Chart', PieChartIcon],
   ['Icon', MoodIcon],
   ['Html', HtmlIcon],
   ['PageRow', TableRowsIcon],

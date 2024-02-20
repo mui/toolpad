@@ -87,6 +87,7 @@ export interface StringValueType extends ValueTypeBase {
    * The different possible values for the property.
    */
   enum?: string[];
+  enumLabels?: Record<string, string>;
   default?: string;
 }
 
@@ -198,7 +199,9 @@ export interface ArgControlSpec {
     | 'event'
     | 'NumberFormat'
     | 'ColorScale'
-    | 'RowIdFieldSelect'; // Row id field specialized select
+    | 'ToggleButtons'
+    | 'RowIdFieldSelect' // Row id field specialized select
+    | 'DataProviderSelector'; // Row id field specialized select
   bindable?: boolean;
   hideLabel?: boolean;
 }
@@ -236,18 +239,18 @@ export type JsonSchemaToTs<T extends JSONSchema7> = T extends {
       [K in keyof T['properties']]?: JsonSchemaToTs<NonNullable<T['properties']>[K]>;
     }
   : T extends { type: 'array'; items?: JSONSchema7 }
-  ? T['items'] extends undefined
-    ? unknown[]
-    : JsonSchemaToTs<NonNullable<T['items']>>[]
-  : T extends { type: 'string' }
-  ? string
-  : T extends { type: 'number' | 'integer' }
-  ? number
-  : T extends { type: 'boolean' }
-  ? boolean
-  : T extends { type: 'null' }
-  ? null
-  : unknown;
+    ? T['items'] extends undefined
+      ? unknown[]
+      : JsonSchemaToTs<NonNullable<T['items']>>[]
+    : T extends { type: 'string' }
+      ? string
+      : T extends { type: 'number' | 'integer' }
+        ? number
+        : T extends { type: 'boolean' }
+          ? boolean
+          : T extends { type: 'null' }
+            ? null
+            : unknown;
 
 export type InferParameterType<T extends PropValueType> = T extends {
   type: 'object' | 'array';
@@ -360,7 +363,7 @@ export type ScopeMetaField = {
       props?: Record<string, ScopeMetaPropField>;
     }
   | {
-      kind: 'query' | 'local';
+      kind: 'query' | 'action' | 'local';
     }
 );
 
@@ -372,6 +375,11 @@ export type RuntimeEvents = {
     prop: string;
     value: React.SetStateAction<unknown>;
   };
+  editorNodeDataUpdated: {
+    nodeId: NodeId;
+    prop: string;
+    value: any;
+  };
   pageStateUpdated: {
     pageState: Record<string, unknown>;
     globalScopeMeta: ScopeMeta;
@@ -381,7 +389,7 @@ export type RuntimeEvents = {
   };
   screenUpdate: {};
   ready: {};
-  pageNavigationRequest: { pageNodeId: NodeId };
+  pageNavigationRequest: { pageName: string };
   vmUpdated: { vm: ApplicationVm };
 };
 
@@ -480,3 +488,68 @@ export interface ApplicationVm {
   scopes: { [id in string]?: RuntimeScope };
   bindingScopes: { [id in string]?: string };
 }
+
+export interface IndexPaginationModel {
+  start: number;
+  pageSize: number;
+}
+
+export interface CursorPaginationModel {
+  cursor: string | null;
+  pageSize: number;
+}
+
+export interface FilterModelItem {
+  field: string;
+  operator: string;
+  value: unknown;
+}
+
+export type LogicOperator = 'and' | 'or';
+
+export interface FilterModel {
+  items: FilterModelItem[];
+  logicOperator: LogicOperator;
+}
+
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortItem {
+  field: string;
+  sort: SortDirection;
+}
+
+export type SortModel = SortItem[];
+
+export type PaginationMode = 'index' | 'cursor';
+
+export type PaginationModel<M extends PaginationMode = PaginationMode> = M extends 'cursor'
+  ? CursorPaginationModel
+  : IndexPaginationModel;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export interface GetRecordsParams<R, P extends PaginationMode> {
+  paginationModel: PaginationModel<P>;
+  filterModel: FilterModel;
+  sortModel: SortModel;
+}
+
+export interface GetRecordsResult<R, P extends PaginationMode> {
+  records: R[];
+  hasNextPage?: boolean;
+  totalCount?: number;
+  cursor?: P extends 'cursor' ? string | null : undefined;
+}
+
+export interface ToolpadDataProviderBase<
+  R extends Record<string, unknown> = {},
+  P extends PaginationMode = 'index',
+> {
+  paginationMode?: P;
+  getRecords: (params: GetRecordsParams<R, P>) => Promise<GetRecordsResult<R, P>>;
+  deleteRecord?: (id: string | number) => Promise<void>;
+  updateRecord?: (id: string | number, record: Partial<R>) => Promise<R | void>;
+  createRecord?: (record: R) => Promise<R>;
+}
+
+export type NodeHashes = Record<NodeId, number | undefined>;

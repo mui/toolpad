@@ -12,9 +12,9 @@ spec:
           props:
             value:
               $$jsExpression: |
-                `message: ${hello.data.message}`
+                `my email: ${getMySession.data.user.email}`
   queries:
-    - name: hello
+    - name: getMySession
       query:
-        function: hello
+        function: getMySession
         kind: local

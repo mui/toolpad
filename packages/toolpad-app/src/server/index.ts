@@ -62,7 +62,6 @@ async function createDevHandler(project: ToolpadProject) {
   ]);
 
   const mainThreadRpcChannel = new MessageChannel();
-
   const worker = new Worker(appServerPath, {
     workerData: {
       toolpadDevMode: project.options.toolpadDevMode,
@@ -234,6 +233,7 @@ async function createEditorHandler(
   { toolpadDevMode = false }: EditorHandlerParams,
 ): Promise<AppHandler> {
   const router = express.Router();
+  let viteApp: ViteDevServer | undefined;
 
   const transformIndexHtml = (html: string) => {
     return html.replace(
@@ -245,8 +245,6 @@ async function createEditorHandler(
       `,
     );
   };
-
-  let viteApp: ViteDevServer | undefined;
 
   if (toolpadDevMode) {
     // eslint-disable-next-line no-console
@@ -326,8 +324,14 @@ async function createToolpadHandler({
 
   let editorHandler: AppHandler | undefined;
   if (dev) {
-    editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
-    router.use(editorBasename, editorHandler.handler);
+    if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+      router.use('/_toolpad', (req, res) => {
+        res.redirect(`${project.options.base}/editor${req.url}`);
+      });
+    } else {
+      editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
+      router.use(editorBasename, editorHandler.handler);
+    }
   }
 
   return {
@@ -395,9 +399,6 @@ export interface RunEditorOptions {
 }
 
 export async function runEditor(appUrl: string, options: RunEditorOptions = {}) {
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
-
   let appRootUrl;
   try {
     appRootUrl = await fetchAppUrl(appUrl);
@@ -411,6 +412,17 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
 
     process.exit(1);
   }
+
+  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.yellow('warn')}  - The editor command is deprecated and will be removed in the future, please visit ${chalk.cyan(`${appRootUrl}/editor`)}`,
+    );
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
 
   const app = express();
 

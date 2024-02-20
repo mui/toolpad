@@ -54,7 +54,17 @@ export default defineConfig((options) => [
     tsconfig: './tsconfig.runtime.json',
     sourcemap: true,
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/runtime'))],
-    external: [/.*\.(svg|png|jpe?g|gif|ico|webp)$/],
+    external: [/.*\?worker/],
+    // publicDir: 'public',
+    loader: {
+      '.svg': 'copy',
+      '.png': 'copy',
+      '.jpg': 'copy',
+      '.jpeg': 'copy',
+      '.gif': 'copy',
+      '.ico': 'copy',
+      '.webp': 'copy',
+    },
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('runtime: build successful');

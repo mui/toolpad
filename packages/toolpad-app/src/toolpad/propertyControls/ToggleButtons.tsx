@@ -1,4 +1,5 @@
 import {
+  Box,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
@@ -30,7 +31,7 @@ function SelectPropEditor({ label, propType, value, onChange, disabled }: Editor
 
   return (
     <PropertyControl propType={propType}>
-      <div>
+      <Box sx={{ my: 0.5 }}>
         <Typography variant="body2">{label}</Typography>
         <PropControlToggleButtonGroup
           color="primary"
@@ -46,7 +47,7 @@ function SelectPropEditor({ label, propType, value, onChange, disabled }: Editor
             </ToggleButton>
           ))}
         </PropControlToggleButtonGroup>
-      </div>
+      </Box>
     </PropertyControl>
   );
 }

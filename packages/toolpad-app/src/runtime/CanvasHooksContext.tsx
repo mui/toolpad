@@ -17,6 +17,7 @@ export interface CanvasHooks {
     componentConfig: ComponentConfig,
     elm: Element | undefined,
   ) => () => void;
+  overlayRef?: (elm: HTMLDivElement) => void;
 }
 
 export const CanvasHooksContext = React.createContext<CanvasHooks>({});

@@ -13,5 +13,8 @@ export async function setPageHidden(page: Page, hidden = true) {
 
   await page.locator(':root').evaluate(setHidden, hidden);
 
-  await page.frameLocator('iframe').locator(':root').evaluate(setHidden, hidden);
+  for (const iframe of await page.locator('iframe').all()) {
+    // eslint-disable-next-line no-await-in-loop
+    await iframe.frameLocator(':scope').locator(':root').evaluate(setHidden, hidden);
+  }
 }

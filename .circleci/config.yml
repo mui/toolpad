@@ -26,6 +26,11 @@ commands:
         description: 'Set to true if you intend to use any browser (e.g. with playwright).'
 
     steps:
+      - restore_cache:
+          name: Restore pnpm Package Cache
+          keys:
+            - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -36,6 +41,8 @@ commands:
           steps:
             # See https://stackoverflow.com/a/73411601
             - run: corepack enable --install-directory ~/bin
+
+      - run: pnpm config set store-dir .pnpm-store
 
       - when:
           condition: << parameters.browsers >>
@@ -64,6 +71,12 @@ commands:
             - run:
                 name: Install playwright browsers
                 command: pnpm playwright install --with-deps
+
+            - save_cache:
+                name: Save pnpm Package Cache
+                key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+                paths:
+                  - .pnpm-store
 
             - save_cache:
                 name: Save playwright cache

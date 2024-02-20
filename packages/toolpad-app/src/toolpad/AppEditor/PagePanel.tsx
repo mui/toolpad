@@ -48,21 +48,21 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
       <Divider />
 
       <PanelGroup autoSaveId="toolpad-page-panel" direction="vertical">
-        <Panel minSize={10} defaultSize={30} maxSize={75} id={'pages-explorer'}>
+        <Panel id="pages-explorer" order={1} minSize={10} defaultSize={30}>
           <PagesExplorer />
         </Panel>
         {currentPageNode && !appDom.isCodePage(currentPageNode) ? (
           <React.Fragment>
             <PanelResizeHandle />
-            <Panel minSize={25} maxSize={90} id={'hierarchy-explorer'}>
+            <Panel id="hierarchy-explorer" order={2} minSize={25} maxSize={90}>
               <PageHierarchyExplorer />
             </Panel>
             <PanelResizeHandle />
-            <Panel id={'queries-explorer'} minSize={10} defaultSize={25} maxSize={90}>
+            <Panel id="queries-explorer" order={3} minSize={10} defaultSize={25} maxSize={90}>
               <QueriesExplorer />
             </Panel>
             <PanelResizeHandle />
-            <Panel id={'actions-explorer'} minSize={10} defaultSize={25} maxSize={90}>
+            <Panel id="actions-explorer" order={4} minSize={10} defaultSize={25} maxSize={90}>
               <ActionsExplorer />
             </Panel>
           </React.Fragment>

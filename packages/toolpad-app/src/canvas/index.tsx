@@ -4,7 +4,7 @@ import { throttle } from 'lodash-es';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { FlowDirection, SlotType } from '@mui/toolpad-core';
 import { update } from '@mui/toolpad-utils/immutability';
-import ToolpadApp, { IS_RENDERED_IN_CANVAS } from '../runtime/ToolpadApp';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import { queryClient } from '../runtime/api';
 import { AppCanvasState, NodeInfo, PageViewState, SlotsState } from '../types';
 import {
@@ -12,8 +12,8 @@ import {
   getRelativeOuterRect,
   rectContainsPoint,
 } from '../utils/geometry';
-import { CanvasHooks, CanvasHooksContext } from '../runtime/CanvasHooksContext';
 import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
+import { AppHostContext, ToolpadApp, CanvasHooks, CanvasHooksContext } from '../runtime';
 
 const handleScreenUpdate = throttle(
   () => {
@@ -23,7 +23,7 @@ const handleScreenUpdate = throttle(
   { trailing: true },
 );
 
-function updateNodeInfo(nodeInfo: NodeInfo, rootElm: Element): NodeInfo {
+export function updateNodeInfo(nodeInfo: NodeInfo, rootElm: Element): NodeInfo {
   const nodeElm = rootElm.querySelector(`[data-toolpad-node-id="${nodeInfo.nodeId}"]`);
 
   if (!nodeElm) {
@@ -80,7 +80,7 @@ export interface AppCanvasProps {
 
 export default function AppCanvas({ basename, state: initialState }: AppCanvasProps) {
   const [state, setState] = React.useState<AppCanvasState>(initialState);
-  const [readyBridge, setReadyBridge] = React.useState<ToolpadBridge>();
+  const [readyBridge, setReadyBridge] = React.useState<ToolpadBridge | undefined>();
 
   const appRootRef = React.useRef<HTMLDivElement>();
   const appRootCleanupRef = React.useRef<() => void>();
@@ -202,7 +202,9 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
     };
   }, [savedNodes]);
 
-  if (IS_RENDERED_IN_CANVAS) {
+  const appHost = useNonNullableContext(AppHostContext);
+
+  if (appHost.isCanvas) {
     return readyBridge ? (
       <CanvasHooksContext.Provider value={editorHooks}>
         <CanvasEventsContext.Provider value={readyBridge.canvasEvents}>

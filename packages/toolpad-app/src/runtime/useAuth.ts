@@ -1,5 +1,8 @@
 import * as React from 'react';
 import * as appDom from '@mui/toolpad-core/appDom';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { AppHostContext } from './AppHostContext';
 
 const AUTH_API_PATH = '/api/auth';
 
@@ -9,6 +12,10 @@ const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
 const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
 export type AuthProvider = 'github' | 'google' | 'azure-ad' | 'credentials';
+
+function isResponseJSON(response: Response): boolean {
+  return response.headers.get('content-type')?.includes('application/json') || false;
+}
 
 export interface AuthSession {
   user: {
@@ -46,10 +53,13 @@ export const AuthContext = React.createContext<AuthPayload>({
 interface UseAuthInput {
   dom: appDom.RenderTree;
   basename: string;
-  isRenderedInCanvas?: boolean;
+  signInPagePath: string;
 }
 
-export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInput): AuthPayload {
+export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPayload {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const authProviders = React.useMemo(() => {
     const app = appDom.getApp(dom);
     const authProviderConfigs = app.attributes.authentication?.providers ?? [];
@@ -70,7 +80,9 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
           'Content-Type': 'application/json',
         },
       });
-      csrfToken = (await csrfResponse.json())?.csrfToken;
+      if (isResponseJSON(csrfResponse)) {
+        csrfToken = (await csrfResponse.json())?.csrfToken;
+      }
     } catch (error) {
       console.error((error as Error).message);
     }
@@ -99,8 +111,10 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
     setSession(null);
     setIsSigningOut(false);
 
-    window.location.replace(`${basename}${AUTH_SIGNIN_PATH}`);
-  }, [basename, getCsrfToken]);
+    if (location.pathname !== signInPagePath) {
+      navigate(signInPagePath);
+    }
+  }, [basename, getCsrfToken, location.pathname, navigate, signInPagePath]);
 
   const getSession = React.useCallback(async () => {
     setIsSigningIn(true);
@@ -114,7 +128,11 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
           'Content-Type': 'application/json',
         },
       });
-      setSession(await sessionResponse.json());
+      if (isResponseJSON(sessionResponse)) {
+        setSession(await sessionResponse.json());
+      } else {
+        signOut();
+      }
     } catch (error) {
       console.error((error as Error).message);
       signOut();
@@ -157,11 +175,13 @@ export function useAuth({ dom, basename, isRenderedInCanvas = true }: UseAuthInp
     [basename, getCsrfToken, signOut],
   );
 
+  const appHost = useNonNullableContext(AppHostContext);
+
   React.useEffect(() => {
-    if (!isRenderedInCanvas && hasAuthentication) {
+    if (hasAuthentication && !appHost.isCanvas) {
       getSession();
     }
-  }, [getCsrfToken, getSession, hasAuthentication, isRenderedInCanvas]);
+  }, [getCsrfToken, getSession, hasAuthentication, appHost.isCanvas]);
 
   return {
     session,

@@ -8,6 +8,8 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 test.use({
   ignoreConsoleErrors: [
     /Failed to load resource: the server responded with a status of 401 \(Unauthorized\)/,
+    /NetworkError when attempting to fetch resource./,
+    /The operation was aborted./,
   ],
 });
 
@@ -41,7 +43,7 @@ test('Must be authenticated with valid domain to access app', async ({ page, req
   // Sign in with valid domain
   await tryCredentialsSignIn(page, 'mui', 'mui');
   await expect(page).toHaveURL(/\/prod\/pages\/mypage/);
-  await expect(page.getByText('message: hello world')).toBeVisible();
+  await expect(page.getByText('my email: test@mui.com')).toBeVisible();
 
   // Is not redirected when authenticated
   await page.goto('/prod/pages/mypage');

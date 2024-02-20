@@ -19,6 +19,10 @@ const MONOREPO_PACKAGES = {
 };
 
 export default withDocsInfra({
+  experimental: {
+    workerThreads: true,
+    cpus: 3,
+  },
   transpilePackages: ['@mui/monorepo', '@mui/x-charts'],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
@@ -81,6 +85,7 @@ export default withDocsInfra({
       },
     };
   },
+  distDir: 'export',
   // Next.js provides a `defaultPathMap` argument, we could simplify the logic.
   // However, we don't in order to prevent any regression in the `findPages()` method.
   exportPathMap: () => {
@@ -111,12 +116,18 @@ export default withDocsInfra({
 
     return map;
   },
-  // redirects only take effect in the development, not production (because of `next export`).
-  redirects: async () => [
-    {
-      source: '/',
-      destination: '/toolpad/',
-      permanent: false,
-    },
-  ],
+  // Used to signal we run yarn build
+  ...(process.env.NODE_ENV === 'production'
+    ? {
+        output: 'export',
+      }
+    : {
+        redirects: async () => [
+          {
+            source: '/',
+            destination: '/toolpad/',
+            permanent: false,
+          },
+        ],
+      }),
 });

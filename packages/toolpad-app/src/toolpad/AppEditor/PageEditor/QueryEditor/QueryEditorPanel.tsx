@@ -173,10 +173,7 @@ export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
   const { dom } = useAppState();
   const projectApi = useProjectApi();
 
-  const { data: runtimeConfig, status: runtimeConfigFetchStatus } = projectApi.useQuery(
-    'getRuntimeConfig',
-    [],
-  );
+  const { data: runtimeConfig } = projectApi.useSuspenseQuery('getRuntimeConfig', []);
 
   const connectionId =
     appDom.deref(saved ? saved?.attributes?.connectionId : draft?.attributes?.connectionId) ?? null;
@@ -213,27 +210,25 @@ export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
   return dataSourceId && dataSource && queryEditorContext ? (
     <ConnectionContextProvider value={queryEditorContext}>
       <Box sx={{ height: '100%', p: 0, overflow: 'hidden' }}>
-        {draft && runtimeConfigFetchStatus === 'success' ? (
-          <dataSource.QueryEditor
-            connectionParams={connectionParams}
-            value={draft}
-            globalScope={pageState}
-            globalScopeMeta={globalScopeMeta}
-            execApi={execPrivate}
-            runtimeConfig={runtimeConfig}
-            settingsTab={
-              <QuerySettingsTab
-                {...{
-                  draft,
-                  liveEnabled,
-                  pageState,
-                  globalScopeMeta,
-                  jsBrowserRuntime,
-                }}
-              />
-            }
-          />
-        ) : null}
+        <dataSource.QueryEditor
+          connectionParams={connectionParams}
+          value={draft}
+          globalScope={pageState}
+          globalScopeMeta={globalScopeMeta}
+          execApi={execPrivate}
+          runtimeConfig={runtimeConfig}
+          settingsTab={
+            <QuerySettingsTab
+              {...{
+                draft,
+                liveEnabled,
+                pageState,
+                globalScopeMeta,
+                jsBrowserRuntime,
+              }}
+            />
+          }
+        />
       </Box>
     </ConnectionContextProvider>
   ) : (

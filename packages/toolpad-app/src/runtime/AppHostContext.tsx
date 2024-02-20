@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+export interface RouterProps {
+  children?: React.ReactNode;
+}
+
 export interface AppHost {
   isPreview: boolean;
   isCustomServer: boolean;

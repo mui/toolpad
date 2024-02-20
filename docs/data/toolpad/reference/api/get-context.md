@@ -33,14 +33,26 @@ a `ServerContext` containing information on the context the backend function was
 
 ### ServerContext
 
-This described a certain context under which a backend function was called.
+This describes a certain context under which a backend function was called.
 
 **Properties**
 
-| Name        | Type                                    | Description                                       |
-| :---------- | :-------------------------------------- | :------------------------------------------------ |
-| `cookies`   | `Record<string, string>`                | A dictionary mapping cookie name to cookie value. |
-| `setCookie` | `(name: string, value: string) => void` | Use to set a cookie `name` with `value`.          |
+| Name        | Type                                         | Description                                                                  |
+| :---------- | :------------------------------------------- | :--------------------------------------------------------------------------- |
+| `cookies`   | `Record<string, string>`                     | A dictionary mapping cookie name to cookie value.                            |
+| `setCookie` | `(name: string, value: string) => void`      | Use to set a cookie `name` with `value`.                                     |
+| `session`   | `{ user: ServerContextSessionUser } \| null` | Get current [authenticated](/toolpad/concepts/authentication/) session data. |
+
+### ServerContextSessionUser
+
+**Properties**
+
+| Name      | Type             | Description                                                 |
+| :-------- | :--------------- | :---------------------------------------------------------- |
+| `name?`   | `string \| null` | Logged-in user name.                                        |
+| `email?`  | `string \| null` | Logged-in user email.                                       |
+| `avatar?` | `string \| null` | Logged-in user avatar image URL.                            |
+| `roles`   | `string[]`       | Logged-in user [roles](/toolpad/concepts/rbac/) in Toolpad. |
 
 ## Usage
 

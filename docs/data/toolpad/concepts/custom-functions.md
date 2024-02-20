@@ -174,3 +174,16 @@ export async function getData() {
   return api.getData(token);
 }
 ```
+
+### Get the current authenticated session with `context.session`
+
+If your Toolpad app has [authentication](/toolpad/concepts/authentication/) enabled, you can get data from the authenticated session, such as the logged-in user's `email`, `name` or `avatar`. Example:
+
+```jsx
+import { getContext } from '@mui/toolpad/server';
+
+export async function getCurrentUserEmail() {
+  const { session } = getContext();
+  return session?.user.email;
+}
+```

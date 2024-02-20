@@ -29,7 +29,6 @@ export class ToolpadRuntime {
   }
 
   async waitForPageReady() {
-    await this.page.waitForTimeout(1000);
     await this.page.waitForSelector('[data-testid="page-ready-marker"]', {
       state: 'attached',
     });

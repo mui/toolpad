@@ -81,10 +81,10 @@ export default function EditableTreeItem({
       handleCancel();
       return;
     }
+
     if (onEdit) {
       onEdit(itemNameInput);
     }
-    setItemNameInput('');
     setIsInternalEditing(false);
   }, [handleCancel, itemNameInput, newItemValidationResult.isValid, onEdit]);
 

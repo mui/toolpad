@@ -55,7 +55,6 @@ commands:
       - run:
           name: Install js dependencies
           command: pnpm install
-
       - when:
           condition: << parameters.browsers >>
           steps:

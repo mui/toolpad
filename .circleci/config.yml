@@ -5,6 +5,10 @@ defaults: &defaults
   resource_class: medium
   docker:
     - image: cimg/node:18.17.1
+  environment:
+    # Keep in sync with "Save playwright cache"
+    PLAYWRIGHT_BROWSERS_PATH: /tmp/pw-browsers
+
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.

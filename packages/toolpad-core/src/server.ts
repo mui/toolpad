@@ -1,4 +1,4 @@
-/// <reference path="./serverModules.d.ts" />
+/// <reference path="../public/serverModules.d.ts" />
 
 import { TOOLPAD_FUNCTION } from './constants';
 import {

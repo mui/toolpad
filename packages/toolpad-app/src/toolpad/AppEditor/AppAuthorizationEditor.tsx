@@ -40,15 +40,33 @@ import { updateArray } from '@mui/toolpad-utils/immutability';
 import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
+import AzureIcon from '../../components/icons/AzureIcon';
+import { UpgradeAlert } from './UpgradeAlert';
 
-const AUTH_PROVIDERS = new Map([
-  ['github', { name: 'GitHub', Icon: GitHubIcon }],
-  ['google', { name: 'Google', Icon: GoogleIcon }],
+interface AuthProviderOption {
+  name: string;
+  icon: React.ReactNode;
+  hasRoles: boolean;
+}
+
+const AUTH_PROVIDER_OPTIONS = new Map<string, AuthProviderOption>([
+  ['github', { name: 'GitHub', icon: <GitHubIcon fontSize="small" />, hasRoles: false }],
+  ['google', { name: 'Google', icon: <GoogleIcon fontSize="small" />, hasRoles: false }],
+  [
+    'azure-ad',
+    {
+      name: 'Azure AD',
+      icon: <AzureIcon />,
+      hasRoles: true,
+    },
+  ],
 ]);
 
 export function AppAuthenticationEditor() {
   const { dom } = useAppState();
   const appState = useAppStateApi();
+  const plan = appDom.getPlan(dom);
+  const isPaidPlan = plan !== undefined && plan !== 'free';
 
   const handleAuthProvidersChange = React.useCallback(
     (event: SelectChangeEvent<appDom.AuthProvider[]>) => {
@@ -123,16 +141,18 @@ export function AppAuthenticationEditor() {
           fullWidth
           renderValue={(selected) =>
             selected
-              .map((selectedValue) => AUTH_PROVIDERS.get(selectedValue)?.name ?? '')
+              .filter((selectedValue) => AUTH_PROVIDER_OPTIONS.has(selectedValue))
+              .map((selectedValue) => AUTH_PROVIDER_OPTIONS.get(selectedValue)?.name ?? '')
               .join(', ')
           }
         >
-          {[...AUTH_PROVIDERS].map(([value, { name, Icon }]) => (
-            <MenuItem key={value} value={value}>
+          {[...AUTH_PROVIDER_OPTIONS].map(([value, { name, icon, hasRoles }]) => (
+            <MenuItem key={value} value={value} disabled={hasRoles && !isPaidPlan}>
               <Stack direction="row" alignItems="center">
                 <Checkbox checked={authProviders.indexOf(value as appDom.AuthProvider) > -1} />
-                <Icon fontSize="small" />
-                <Typography ml={1}>{name}</Typography>
+                {icon}
+                <Typography mx={1}>{name}</Typography>
+                {hasRoles && !isPaidPlan ? <UpgradeAlert feature={name} hideAction /> : null}
               </Stack>
             </MenuItem>
           ))}
@@ -143,11 +163,12 @@ export function AppAuthenticationEditor() {
       </FormControl>
       <Alert severity="info" sx={{ mt: 1 }}>
         Certain environment variables must be set for authentication providers to work.{' '}
-        <Link href="/" target="_blank">
+        <Link href="https://mui.com/toolpad/concepts/authentication" target="_blank">
           Learn how to set up authentication
         </Link>
         .
       </Alert>
+
       <Typography variant="subtitle1" mt={2}>
         Required email domains
       </Typography>
@@ -162,6 +183,20 @@ export function AppAuthenticationEditor() {
           placeholder="example.com"
         />
       ))}
+      {!isPaidPlan ? (
+        <UpgradeAlert
+          type="error"
+          feature="Using authentication with a few specific providers (like Azure Active Directory)"
+          sx={{ position: 'absolute', bottom: (theme) => theme.spacing(4) }}
+        />
+      ) : (
+        <UpgradeAlert
+          type="warning"
+          warning="You are using features that are not covered by our MIT License. You will have to buy a license to use them in production."
+          hideAction
+          sx={{ position: 'absolute', bottom: (theme) => theme.spacing(4) }}
+        />
+      )}
     </Stack>
   );
 }
@@ -435,12 +470,199 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
     </div>
   );
 }
+
+interface RoleMapping {
+  role: string;
+  providerRoles: string;
+}
+
+interface RoleMappingRow extends RoleMapping {
+  id: string;
+}
+
+export function AppRoleMappingsEditor({
+  roleEnabledActiveAuthProviderOptions,
+  onRowUpdateError,
+}: {
+  roleEnabledActiveAuthProviderOptions: [string, AuthProviderOption][];
+  onRowUpdateError: (error: Error) => void;
+}) {
+  const { dom } = useAppState();
+  const appState = useAppStateApi();
+
+  const [activeAuthProvider, setAuthProvider] = React.useState<appDom.AuthProvider | null>(
+    (roleEnabledActiveAuthProviderOptions[0]?.[0] as appDom.AuthProvider) ?? null,
+  );
+
+  const handleAuthProviderChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { value: provider } = event.target;
+
+      setAuthProvider(provider as appDom.AuthProvider);
+    },
+    [],
+  );
+
+  const updateRoleMapping = React.useCallback(
+    (role: string, providerRoles: string) => {
+      if (!activeAuthProvider) {
+        return;
+      }
+
+      appState.update((draft) => {
+        const app = appDom.getApp(draft);
+
+        const activeAuthProviderConfig = app.attributes?.authentication?.providers?.find(
+          (providerConfig) => providerConfig.provider === activeAuthProvider,
+        );
+
+        draft = appDom.setNodeNamespacedProp(draft, app, 'attributes', 'authentication', {
+          ...app.attributes?.authentication,
+          providers: [
+            ...(app.attributes?.authentication?.providers ?? []).filter(
+              (providerConfig) => providerConfig.provider !== activeAuthProvider,
+            ),
+            {
+              ...activeAuthProviderConfig,
+              provider: activeAuthProvider,
+              roles: [
+                ...(activeAuthProviderConfig?.roles ?? []).filter(
+                  (roleMapping) => roleMapping.target !== role,
+                ),
+                {
+                  source: (providerRoles || role)
+                    .split(',')
+                    .map((updatedRole) => updatedRole.trim()),
+                  target: role,
+                },
+              ],
+            },
+          ],
+        });
+
+        return draft;
+      });
+    },
+    [activeAuthProvider, appState],
+  );
+
+  const roleMappingsRows = React.useMemo<RoleMappingRow[]>(() => {
+    if (!activeAuthProvider) {
+      return [];
+    }
+
+    const appNode = appDom.getApp(dom);
+    const authorization = appNode.attributes.authorization;
+    const roles = authorization?.roles ?? [];
+
+    const authentication = appNode.attributes.authentication;
+    const roleMappings = activeAuthProvider
+      ? authentication?.providers?.find(
+          (providerConfig) => providerConfig.provider === activeAuthProvider,
+        )?.roles ?? []
+      : [];
+
+    const existingRows =
+      roles?.map((role) => {
+        const targetRoleMapping = roleMappings.find(
+          (roleMapping) => roleMapping.target === role.name,
+        );
+
+        return {
+          id: role.name,
+          role: role.name,
+          providerRoles: targetRoleMapping ? targetRoleMapping.source.join(', ') : role.name,
+        };
+      }) ?? [];
+
+    return existingRows;
+  }, [activeAuthProvider, dom]);
+
+  const roleMappingsColumns = React.useMemo<GridColDef[]>(() => {
+    return [
+      {
+        field: 'role',
+        headerName: 'Role',
+        editable: false,
+        flex: 0.4,
+      },
+      {
+        field: 'providerRoles',
+        headerName: 'Provider roles',
+        editable: true,
+        flex: 1,
+      },
+    ];
+  }, []);
+
+  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+
+  const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
+    setRowModesModel(newRowModesModel);
+  };
+
+  const processRowUpdate = (newRow: GridRowModel<RoleMappingRow>): RoleMappingRow => {
+    updateRoleMapping(newRow.id, newRow.providerRoles);
+
+    return { ...newRow, providerRoles: newRow.providerRoles || newRow.role };
+  };
+
+  return (
+    <React.Fragment>
+      <TextField
+        label="Authentication provider"
+        id="auth-provider"
+        value={activeAuthProvider ?? undefined}
+        onChange={handleAuthProviderChange}
+        fullWidth
+        select
+        sx={{ mt: 2 }}
+      >
+        {roleEnabledActiveAuthProviderOptions.map(([value, { name }]) => (
+          <MenuItem key={value} value={value}>
+            {name}
+          </MenuItem>
+        ))}
+      </TextField>
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <div
+        style={{ height: 350, width: '100%' }}
+        onKeyDown={(event) => {
+          if (Object.keys(rowModesModel).length > 0) {
+            // Avoid the escape key from closing a dialog this grid is rendered in
+            event.stopPropagation();
+          }
+        }}
+      >
+        <DataGrid
+          rows={roleMappingsRows}
+          columns={roleMappingsColumns}
+          hideFooter
+          editMode="row"
+          rowModesModel={rowModesModel}
+          onRowModesModelChange={handleRowModesModelChange}
+          processRowUpdate={processRowUpdate}
+          onProcessRowUpdateError={onRowUpdateError}
+          autoHeight
+          localeText={{
+            noRowsLabel: activeAuthProvider ? 'No roles defined' : 'No provider selected',
+          }}
+        />
+      </div>
+    </React.Fragment>
+  );
+}
+
 export interface AppAuthorizationDialogProps {
   open: boolean;
   onClose: () => void;
 }
 
 export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizationDialogProps) {
+  const { dom } = useAppState();
+  const plan = appDom.getPlan(dom);
+  const isPaidPlan = plan !== undefined && plan !== 'free';
+
   const [activeTab, setActiveTab] = React.useState<'authentication' | 'roles' | 'users'>(
     'authentication',
   );
@@ -459,6 +681,19 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
     setErrorSnackbarMessage('');
   }, []);
 
+  const roleEnabledActiveAuthProviderOptions = React.useMemo(() => {
+    const appNode = appDom.getApp(dom);
+
+    const authProviders = (appNode.attributes.authentication?.providers ?? [])
+      .filter((providerConfig) => AUTH_PROVIDER_OPTIONS.has(providerConfig.provider))
+      .map((providerConfig) => providerConfig.provider);
+
+    return [...AUTH_PROVIDER_OPTIONS].filter(
+      ([optionKey, { hasRoles }]) =>
+        hasRoles && authProviders.includes(optionKey as appDom.AuthProvider),
+    );
+  }, [dom]);
+
   return (
     <React.Fragment>
       <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -471,19 +706,46 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
             >
               <Tab label="Authentication" value="authentication" sx={{ px: 2 }} />
               <Tab label="Roles" value="roles" sx={{ px: 2 }} />
+              {roleEnabledActiveAuthProviderOptions.length > 0 ? (
+                <Tab label="Role mappings" value="roleMappings" sx={{ px: 2 }} />
+              ) : null}
             </TabList>
           </Box>
-          <DialogContent sx={{ minHeight: 460 }}>
+          <DialogContent sx={{ minHeight: 480 }}>
             <TabPanel disableGutters value="authentication">
               <AppAuthenticationEditor />
             </TabPanel>
-            <TabPanel disableGutters value="roles">
-              <Typography variant="body2">
-                Define the roles for your application. You can configure your pages to be accessible
-                to specific roles only.
-              </Typography>
-              <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
-            </TabPanel>
+
+            <React.Fragment>
+              <TabPanel disableGutters value="roles">
+                {isPaidPlan ? (
+                  <React.Fragment>
+                    <Typography variant="body2">
+                      Define the roles for your application. You can configure your pages to be
+                      accessible to specific roles only.
+                    </Typography>
+                    <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
+                  </React.Fragment>
+                ) : (
+                  <UpgradeAlert type="error" feature="Role based access control" />
+                )}
+              </TabPanel>
+              <TabPanel disableGutters value="roleMappings">
+                {isPaidPlan ? (
+                  <React.Fragment>
+                    <Typography variant="body2">
+                      Define mappings from authentication provider roles to Toolpad roles.
+                    </Typography>
+                    <AppRoleMappingsEditor
+                      onRowUpdateError={handleRowUpdateError}
+                      roleEnabledActiveAuthProviderOptions={roleEnabledActiveAuthProviderOptions}
+                    />
+                  </React.Fragment>
+                ) : (
+                  <UpgradeAlert feature="Role mapping" />
+                )}
+              </TabPanel>
+            </React.Fragment>
           </DialogContent>
         </TabContext>
         <DialogActions>

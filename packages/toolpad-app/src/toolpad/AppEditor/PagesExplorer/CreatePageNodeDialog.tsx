@@ -60,6 +60,9 @@ export default function CreatePageDialog({ open, onClose, ...props }: CreatePage
             attributes: {
               title: name,
               display: 'shell',
+              authorization: {
+                allowAll: true,
+              },
             },
           });
           const appNode = appDom.getApp(dom);

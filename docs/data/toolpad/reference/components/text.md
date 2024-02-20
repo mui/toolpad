@@ -1,10 +1,10 @@
-<!-- This file has been auto-generated using `pnpm docs:build:api`. -->
+<!-- ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`. -->
 
 # Text
 
 <p class="description">API docs for the Toolpad Text component.</p>
 
-The Text component lets you display text. Text can be rendered in multiple forms: plain, as a link, or as markdown. It's rendered using MUI [Typography](https://mui.com/material-ui/react-typography/).
+The Text component lets you display text. Text can be rendered in multiple forms: plain, as a link, or as markdown. It's rendered using Material UI [Typography](https://mui.com/material-ui/react-typography/).
 
 ## Properties
 
@@ -16,4 +16,4 @@ The Text component lets you display text. Text can be rendered in multiple forms
 | <span class="prop-name">openInNewTab</span> | <span class="prop-type">boolean</span> | <span class="prop-default">false</span>         | Clicking the link should open a new tab.                                                                                                                                                                                                                                             |
 | <span class="prop-name">variant</span>      | <span class="prop-type">string</span>  | <span class="prop-default">"body1"</span>       | The Material UI typography [variant](https://mui.com/material-ui/customization/typography/#variants) that is used to display the text.                                                                                                                                               |
 | <span class="prop-name">loading</span>      | <span class="prop-type">boolean</span> | <span class="prop-default">false</span>         | Displays a loading animation instead of the text. Can be used when the content is not available yet.                                                                                                                                                                                 |
-| <span class="prop-name">sx</span>           | <span class="prop-type">object</span>  |                                                 | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |
+| <span class="prop-name">sx</span>           | <span class="prop-type">object</span>  |                                                 | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |

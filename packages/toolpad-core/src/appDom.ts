@@ -38,10 +38,13 @@ export function compareFractionalIndex(index1: string, index2: string): number {
   return index1 > index2 ? 1 : -1;
 }
 
-export type AuthProvider = 'github' | 'google';
+type ToolpadPlan = 'free' | 'pro' | undefined;
+
+export type AuthProvider = 'github' | 'google' | 'azure-ad' | 'credentials';
 
 export interface AuthProviderConfig {
-  provider: AuthProvider;
+  readonly provider: AuthProvider;
+  readonly roles?: { source: string[]; target: string }[];
 }
 
 export interface ConnectionStatus {
@@ -65,6 +68,7 @@ export interface AppNode extends AppDomNodeBase {
   readonly type: 'app';
   readonly parentId: null;
   readonly attributes: {
+    readonly plan?: ToolpadPlan;
     readonly authentication?: {
       readonly providers?: AuthProviderConfig[];
       readonly restrictedDomains?: string[];
@@ -1094,6 +1098,9 @@ export function createDefaultDom(): AppDom {
     attributes: {
       title: 'Page 1',
       display: 'shell',
+      authorization: {
+        allowAll: true,
+      },
     },
   });
 
@@ -1179,4 +1186,20 @@ export function getPageTitle(node: PageNode): string {
 
 export function isCodePage(node: PageNode): boolean {
   return !!node.attributes.codeFile;
+}
+
+export function getPlan(dom: AppDom): ToolpadPlan {
+  const appNode = getApp(dom);
+  return appNode.attributes.plan;
+}
+
+export function getPageForAlias(dom: AppDom, alias: string): string | null {
+  const app = getApp(dom);
+  const pages = getChildNodes(dom, app).pages;
+  for (const page of pages) {
+    if (page.attributes.alias?.includes(alias)) {
+      return page.name;
+    }
+  }
+  return null;
 }

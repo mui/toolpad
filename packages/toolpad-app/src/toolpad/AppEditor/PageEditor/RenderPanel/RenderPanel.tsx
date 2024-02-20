@@ -3,7 +3,8 @@ import { styled } from '@mui/material';
 import { NodeHashes, NodeId } from '@mui/toolpad-core';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '@mui/toolpad-core/appDom';
-import EditorCanvasHost from '../EditorCanvasHost';
+import EditorCanvasHostLegacy from '../EditorCanvasHost';
+import EditorCanvasHostInline from '../EditorCanvasHostInline';
 import { getNodeHashes, useAppState, useAppStateApi, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
@@ -11,6 +12,10 @@ import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 import { getBindingType } from '../../../../runtime/bindings';
 import createRuntimeState from '../../../../runtime/createRuntimeState';
 import { RuntimeState } from '../../../../runtime';
+
+const EditorCanvasHost = process.env.EXPERIMENTAL_INLINE_CANVAS
+  ? EditorCanvasHostInline
+  : EditorCanvasHostLegacy;
 
 const classes = {
   view: 'Toolpad_View',

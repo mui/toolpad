@@ -5,6 +5,10 @@ defaults: &defaults
   resource_class: medium
   docker:
     - image: cimg/node:18.17.1
+  environment:
+    # Keep in sync with "Save playwright cache"
+    PLAYWRIGHT_BROWSERS_PATH: /tmp/pw-browsers
+
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
 # are working on providing this feature back with appropriate security measures.
@@ -23,11 +27,6 @@ commands:
         description: 'Set to true if you intend to use any browser (e.g. with playwright).'
 
     steps:
-      - restore_cache:
-          name: Restore pnpm Package Cache
-          keys:
-            - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
-
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -66,17 +65,7 @@ commands:
             - run:
                 name: Install playwright browsers
                 command: pnpm playwright install --with-deps
-                environment:
-                  PLAYWRIGHT_BROWSERS_PATH: /tmp/pw-browsers
 
-      - save_cache:
-          name: Save pnpm Package Cache
-          key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
-          paths:
-            - node_modules
-      - when:
-          condition: << parameters.browsers >>
-          steps:
             - save_cache:
                 name: Save playwright cache
                 key: v5-playwright-{{ arch }}-{{ checksum "/tmp/playwright_info.json" }}

@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.49/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  alias:
+    - sP_2TKM
+  title: Protected Page
+  displayName: Protected Page
+  content:
+    - component: Text
+      name: text
+      props:
+        value: Only authenticated users can see me.

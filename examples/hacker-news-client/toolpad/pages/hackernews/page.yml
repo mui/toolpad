@@ -10,21 +10,27 @@ spec:
         function: getStories
         kind: local
   content:
-    - component: Text
-      name: text2
-      layout:
-        columnSize: 1
+    - component: Container
+      name: container
+      children:
+        - component: Text
+          name: text2
+          layout:
+            columnSize: 1
+          props:
+            value: ' Hacker News'
+            variant: h4
       props:
-        value: Hacker news reader
-        variant: h2
+        sx:
+          background: '#FF6600'
     - component: List
       name: list
-      layout:
-        columnSize: 1
       props:
         itemCount:
           $$jsExpression: stories.data.length
         disablePadding: true
+        sx:
+          background: '#F6F6EF'
         renderItem:
           $$template:
             - component: PageRow
@@ -49,5 +55,7 @@ spec:
                           $$jsExpression: >
                             `${stories.data[i].score} by ${stories.data[i].by} |
                             ${stories.data[i].descendants} comments`
+      layout:
+        columnSize: 1
   alias:
     - sR_fqKE

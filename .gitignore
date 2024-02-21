@@ -62,5 +62,4 @@ test-results
 /test/regressions/screenshots/**
 
 # vale downloaded config
-.github/styles/*
-!.github/styles/Blog
+.github/styles/

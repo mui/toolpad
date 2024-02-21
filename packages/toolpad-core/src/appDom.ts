@@ -6,6 +6,7 @@ import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/too
 import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { ExactEntriesOf, Maybe } from '@mui/toolpad-utils/types';
 import { omit, update, updateOrCreate } from '@mui/toolpad-utils/immutability';
+import { get } from 'node:http';
 import type {
   NodeId,
   NodeReference,
@@ -829,8 +830,10 @@ export function spreadNode<Child extends AppDomNode>(dom: AppDom, node: Child) {
 
   let draft = dom;
   if (parent && parentProp && isElement(node)) {
-    for (const child of getDescendants(draft, node)) {
-      draft = setNodeParent(draft, child, parent.id, parentProp);
+    for (const child of getChildNodes(draft, node).children) {
+      const parentIndex = getNewParentIndexBeforeNode(draft, node, parentProp);
+
+      draft = setNodeParent(draft, child, parent.id, parentProp, parentIndex);
     }
     draft = removeNode(draft, node.id);
   }

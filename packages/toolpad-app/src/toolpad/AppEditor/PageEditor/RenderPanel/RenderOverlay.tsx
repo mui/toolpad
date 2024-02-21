@@ -24,6 +24,7 @@ import {
   PAGE_COLUMN_COMPONENT_ID,
   isFormComponent,
   FORM_COMPONENT_ID,
+  getElementNodeComponentId,
 } from '../../../../runtime/toolpadComponents';
 import {
   getRectanglePointActiveEdge,
@@ -1449,23 +1450,30 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const parent = appDom.getParent(dom, node);
 
         const isPageNode = appDom.isPage(node);
+        const isElementNode = appDom.isElement(node);
 
         const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
-        // @TODO: Improve solution for resizing from top, it's still not a great UX
-        // const nodeParentProp = node.parentProp;
-        // const isFirstChild =
-        //   parent && appDom.isElement(parent) && nodeParentProp
-        //     ? appDom.getNodeFirstChild(dom, parent, nodeParentProp)?.id === node.id
-        //     : false;
+        const nodeParentProp = node.parentProp;
+        const isFirstChild =
+          parent && appDom.isElement(parent) && nodeParentProp
+            ? appDom.getNodeFirstChild(dom, parent, nodeParentProp)?.id === node.id
+            : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
         const isHovered = hoveredNodeId === node.id;
 
         const isHorizontallyResizable = isPageRowChild || isPageColumnChild;
+
+        const nodeComponentId = isElementNode ? getElementNodeComponentId(node) : null;
+
+        // @TODO: Enable vertical resizing for all component types when there is a better solution for adjusting size of other elements in same row
         const isVerticallyResizable =
-          appDom.isElement(node) && !isPageRow(node) && !isPageColumn(node);
+          isElementNode &&
+          !isPageRow(node) &&
+          !isPageColumn(node) &&
+          (nodeComponentId === 'Chart' || nodeComponentId === 'DataGrid');
 
         const isResizing = Boolean(draggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;
@@ -1494,8 +1502,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   ...(isVerticallyResizable
                     ? [
                         RECTANGLE_EDGE_BOTTOM as RectangleEdge,
-                        // @TODO: Improve solution for resizing from top, it's still not a great UX
-                        // ...(!isFirstChild ? [RECTANGLE_EDGE_TOP as RectangleEdge] : []),
+                        ...(!isFirstChild ? [RECTANGLE_EDGE_TOP as RectangleEdge] : []),
                       ]
                     : []),
                 ]}

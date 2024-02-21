@@ -831,7 +831,6 @@ export function spreadNode<Child extends AppDomNode>(dom: AppDom, node: Child) {
   if (parent && parentProp && isElement(node)) {
     for (const child of getChildNodes(draft, node).children) {
       const parentIndex = getNewParentIndexBeforeNode(draft, node, parentProp);
-
       draft = setNodeParent(draft, child, parent.id, parentProp, parentIndex);
     }
     draft = removeNode(draft, node.id);

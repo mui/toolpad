@@ -6,7 +6,6 @@ import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/too
 import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
 import { ExactEntriesOf, Maybe } from '@mui/toolpad-utils/types';
 import { omit, update, updateOrCreate } from '@mui/toolpad-utils/immutability';
-import { get } from 'node:http';
 import type {
   NodeId,
   NodeReference,

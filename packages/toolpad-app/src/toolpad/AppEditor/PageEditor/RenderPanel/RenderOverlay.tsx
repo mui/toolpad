@@ -1455,11 +1455,12 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
         const isPageRowChild = parent ? appDom.isElement(parent) && isPageRow(parent) : false;
         const isPageColumnChild = parent ? appDom.isElement(parent) && isPageColumn(parent) : false;
 
-        const nodeParentProp = node.parentProp;
-        const isFirstChild =
-          parent && appDom.isElement(parent) && nodeParentProp
-            ? appDom.getNodeFirstChild(dom, parent, nodeParentProp)?.id === node.id
-            : false;
+        // @TODO: Improve solution for resizing from top, it's still not a great UX
+        // const nodeParentProp = node.parentProp;
+        // const isFirstChild =
+        //   parent && appDom.isElement(parent) && nodeParentProp
+        //     ? appDom.getNodeFirstChild(dom, parent, nodeParentProp)?.id === node.id
+        //     : false;
 
         const isSelected = selectedNode && !newNode ? selectedNode.id === node.id : false;
         const isHovered = hoveredNodeId === node.id;
@@ -1468,7 +1469,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
 
         const nodeComponentId = isElementNode ? getElementNodeComponentId(node) : null;
 
-        // @TODO: Enable vertical resizing for all component types when there is a better solution for adjusting size of other elements in same row
+        // @TODO: Enable vertical resizing for all component types when there is a better solution for adjusting size of other elements in same row after resizing
         const isVerticallyResizable =
           isElementNode &&
           !isPageRow(node) &&
@@ -1502,7 +1503,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
                   ...(isVerticallyResizable
                     ? [
                         RECTANGLE_EDGE_BOTTOM as RectangleEdge,
-                        ...(!isFirstChild ? [RECTANGLE_EDGE_TOP as RectangleEdge] : []),
+                        // @TODO: Improve solution for resizing from top, it's still not a great UX
+                        // ...(!isFirstChild ? [RECTANGLE_EDGE_TOP as RectangleEdge] : []),
                       ]
                     : []),
                 ]}

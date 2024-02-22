@@ -35,6 +35,7 @@ import {
 } from '@mui/x-data-grid';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
+import PasswordIcon from '@mui/icons-material/Password';
 import { TabContext, TabList } from '@mui/lab';
 import { updateArray } from '@mui/toolpad-utils/immutability';
 import * as appDom from '@mui/toolpad-core/appDom';
@@ -58,6 +59,14 @@ const AUTH_PROVIDER_OPTIONS = new Map<string, AuthProviderOption>([
       name: 'Azure AD',
       icon: <AzureIcon />,
       hasRoles: true,
+    },
+  ],
+  [
+    'credentials',
+    {
+      name: 'Credentials',
+      icon: <PasswordIcon fontSize="small" />,
+      hasRoles: false,
     },
   ],
 ]);

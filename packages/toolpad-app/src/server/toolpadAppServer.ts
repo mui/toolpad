@@ -5,7 +5,6 @@ import * as express from 'express';
 import serializeJavascript from 'serialize-javascript';
 import { ToolpadProject } from './localMode';
 import { asyncHandler } from '../utils/express';
-import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 import { createRpcServer } from './runtimeRpcServer';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
@@ -53,15 +52,6 @@ export async function createProdHandler(project: ToolpadProject) {
   const handler = express.Router();
 
   handler.use(express.static(project.getAppOutputFolder(), { index: false }));
-
-  // Allow static assets, block everything else
-  handler.use((req, res, next) => {
-    if (checkBasicAuthHeader(req.headers.authorization ?? null)) {
-      next();
-      return;
-    }
-    basicAuthUnauthorized(res);
-  });
 
   const hasAuthentication = await getRequireAuthentication(project);
   if (hasAuthentication) {

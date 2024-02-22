@@ -19,7 +19,7 @@ test.use({
     cmd: 'start',
     env: {
       TOOLPAD_AUTH_SECRET: 'donttellanyone',
-      NODE_ENV: 'test',
+      MOCK_AUTH_CREDENTIALS: '1',
     },
   },
 });

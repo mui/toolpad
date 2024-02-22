@@ -142,7 +142,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
   const credentialsProvider = CredentialsProvider({
     name: 'Credentials',
     async authorize({ username, password }) {
-      if (process.env.NODE_ENV !== 'test') {
+      if (process.env.MOCK_AUTH_CREDENTIALS) {
         // @TODO: Eventually can deprecate old environment variable names (TOOLPAD_BASIC_AUTH...)
         const authUsername =
           process.env.TOOLPAD_AUTH_USERNAME ?? process.env.TOOLPAD_BASIC_AUTH_USER;

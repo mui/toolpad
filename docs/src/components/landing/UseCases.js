@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Link from 'docs/src/modules/components/Link';
+import { Link } from '@mui/docs/Link';
 import PropTypes from 'prop-types';
 import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';

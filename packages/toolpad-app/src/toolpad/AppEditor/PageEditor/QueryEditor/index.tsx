@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { NodeId } from '@mui/toolpad-core';
-import { Stack, Chip, Tab, IconButton } from '@mui/material';
+import { Stack, Chip, Tab, IconButton, LinearProgress } from '@mui/material';
 import { LoadingButton, TabList, TabContext, TabPanel } from '@mui/lab';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CircleIcon from '@mui/icons-material/Circle';
@@ -297,7 +297,9 @@ export default function QueryEditor() {
                   overflow: 'hidden',
                 }}
               >
-                <QueryEditorPanel draft={query.draft} saved={query.saved} />
+                <React.Suspense fallback={<LinearProgress />}>
+                  <QueryEditorPanel draft={query.draft} saved={query.saved} />
+                </React.Suspense>
               </TabPanel>
             );
           }

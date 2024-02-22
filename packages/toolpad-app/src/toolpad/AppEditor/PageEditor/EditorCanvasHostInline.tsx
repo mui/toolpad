@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled } from '@mui/material';
+import { styled, useEventCallback } from '@mui/material';
 import { NodeHashes, RuntimeEvents } from '@mui/toolpad-core';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
@@ -20,6 +20,7 @@ import { rectContainsPoint } from '../../../utils/geometry';
 import { queryClient } from '../../../runtime/api';
 import { PageViewState } from '../../../types';
 import { updateNodeInfo } from '../../../canvas';
+import { useAppStateApi } from '../../AppState';
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -90,15 +91,38 @@ export default function EditorCanvasHost({
 
   const [portal, setPortal] = React.useState<HTMLElement | null>(null);
 
-  const handleIframeLoad = React.useCallback<React.ReactEventHandler<HTMLIFrameElement>>(
-    (event) => {
-      invariant(event.currentTarget.contentDocument, 'iframe contentDocument is not available');
-      const root = event.currentTarget.contentDocument.getElementById('root');
-      invariant(root, 'root element not found');
-      setPortal(root);
-    },
-    [],
-  );
+  const appStateApi = useAppStateApi();
+
+  const handleIframeLoad = useEventCallback<React.ReactEventHandler<HTMLIFrameElement>>((event) => {
+    invariant(event.currentTarget.contentDocument, 'iframe contentDocument is not available');
+    const root = event.currentTarget.contentDocument.getElementById('root');
+    invariant(root, 'root element not found');
+
+    const iframeWindow = event.currentTarget.contentWindow;
+    invariant(iframeWindow, 'Iframe not attached');
+
+    const handleKeyDown = (keyDownEvent: KeyboardEvent) => {
+      const isZ = !!keyDownEvent.key && keyDownEvent.key.toLowerCase() === 'z';
+
+      const undoShortcut = isZ && (keyDownEvent.metaKey || keyDownEvent.ctrlKey);
+      const redoShortcut = undoShortcut && keyDownEvent.shiftKey;
+
+      if (redoShortcut) {
+        keyDownEvent.preventDefault();
+        appStateApi.redo();
+      } else if (undoShortcut) {
+        keyDownEvent.preventDefault();
+        appStateApi.undo();
+      }
+    };
+
+    iframeWindow.addEventListener('keydown', handleKeyDown);
+    iframeWindow.addEventListener('unload', () => {
+      iframeWindow.removeEventListener('keydown', handleKeyDown);
+    });
+
+    setPortal(root);
+  });
 
   const viewState = React.useRef<PageViewState>({ nodes: {} });
 
@@ -217,7 +241,21 @@ export default function EditorCanvasHost({
     <CanvasRoot className={className}>
       <CanvasFrame
         name="data-toolpad-canvas"
-        srcDoc={`<!DOCTYPE html><div id="root"></div>`}
+        srcDoc={`
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+              />
+            </head>
+            <body className="notranslate">
+              <div id="root"></div>
+            </body>
+          </html>
+        `}
         onLoad={handleIframeLoad}
       />
       {page && portal

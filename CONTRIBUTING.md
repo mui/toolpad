@@ -62,7 +62,7 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
 1. Make sure to start the build in watch mode again and the run the app with
 
    ```bash
-   pnpm toolpad dev examples/qr-generator --dev
+   pnpm toolpad dev examples/qr-generator/toolpad --dev
    ```
 
 ### Linking Toolpad in a folder on your system (advanced)
@@ -110,13 +110,13 @@ pnpm install
 
    1. Replace `<your-local-toolpad-monorepo>` with the path to the toolpad monorepo on your file system. Make sure to keep `portal:`.
 
-   1. In order to use `portal:` dependencies, we will need to use pnpm 2. So start by running
+   1. In order to use `portal:` dependencies, we will need to use yarn 2. So start by running
 
       ```bash
-      pnpm set version berry
+      yarn set version berry
       ```
 
-      and add to the `.pnpmrc.yml`:
+      and add to the `.yarnrc.yml`:
 
       ```yaml
       nodeLinker: node-modules
@@ -125,13 +125,13 @@ pnpm install
    1. then run
 
       ```bash
-      pnpm install
+      yarn install
       ```
 
 1. Run start toolpad in dev mode:
 
    ```bash
-   pnpm dev
+   yarn dev
    ```
 
 </details>

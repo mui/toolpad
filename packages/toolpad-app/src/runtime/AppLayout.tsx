@@ -197,69 +197,65 @@ export function AppLayout({
       ) : null}
       <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>
         {hasHeader ? (
-          <AppBar
-            position="fixed"
-            color="transparent"
-            sx={{
-              boxShadow: 'none',
-              pointerEvents: 'none',
-            }}
-          >
-            {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
-            <Toolbar variant="dense">
-              <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
-                {session?.user && !isSigningIn ? (
-                  <React.Fragment>
-                    <Button
-                      color="inherit"
-                      onClick={handleOpenUserMenu}
-                      sx={{
-                        pointerEvents: 'auto',
-                      }}
-                    >
-                      <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
-                        {session.user.name || session.user.email}
-                      </Typography>
-                      <Tooltip title="User settings">
-                        <Avatar
-                          alt={session.user.name || session.user.email}
-                          src={session.user.image}
-                          imgProps={{
-                            referrerPolicy: 'no-referrer',
-                          }}
-                          sx={{
-                            bgcolor: theme.palette.secondary.main,
-                            width: 32,
-                            height: 32,
-                          }}
-                        />
-                      </Tooltip>
-                    </Button>
-                    <Menu
-                      sx={{ mt: '45px' }}
-                      id="menu-appbar-user"
-                      anchorEl={anchorElUser}
-                      anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                      }}
-                      keepMounted
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right',
-                      }}
-                      open={Boolean(anchorElUser)}
-                      onClose={handleCloseUserMenu}
-                    >
-                      <MenuItem onClick={handleSignOut}>
-                        <ListItemText>Sign out</ListItemText>
-                      </MenuItem>
-                    </Menu>
-                  </React.Fragment>
-                ) : null}
-              </Stack>
-            </Toolbar>
-          </AppBar>
+          <React.Fragment>
+            <AppBar
+              position="fixed"
+              color="inherit"
+              sx={{
+                boxShadow: 'none',
+              }}
+            >
+              {clipped ? <Box sx={{ height: PREVIEW_HEADER_HEIGHT }} /> : null}
+              <Toolbar variant="dense">
+                <Stack flex={1} direction="row" alignItems="center" justifyContent="end">
+                  {session?.user && !isSigningIn ? (
+                    <React.Fragment>
+                      <Button color="inherit" onClick={handleOpenUserMenu}>
+                        <Typography variant="body2" sx={{ mr: 2, textTransform: 'none' }}>
+                          {session.user.name || session.user.email}
+                        </Typography>
+                        <Tooltip title="User settings">
+                          <Avatar
+                            alt={session.user.name || session.user.email}
+                            src={session.user.image}
+                            imgProps={{
+                              referrerPolicy: 'no-referrer',
+                            }}
+                            sx={{
+                              bgcolor: theme.palette.secondary.main,
+                              width: 32,
+                              height: 32,
+                            }}
+                          />
+                        </Tooltip>
+                      </Button>
+                      <Menu
+                        sx={{ mt: '45px' }}
+                        id="menu-appbar-user"
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                          vertical: 'top',
+                          horizontal: 'right',
+                        }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
+                      >
+                        <MenuItem onClick={handleSignOut}>
+                          <ListItemText>Sign out</ListItemText>
+                        </MenuItem>
+                      </Menu>
+                    </React.Fragment>
+                  ) : null}
+                </Stack>
+              </Toolbar>
+            </AppBar>
+            <Toolbar variant="dense" />
+          </React.Fragment>
         ) : null}
         {children}
       </Box>

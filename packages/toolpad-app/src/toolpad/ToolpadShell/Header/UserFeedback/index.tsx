@@ -24,8 +24,7 @@ import { DOCUMENTATION_URL, VERSION_CHECK_INTERVAL } from '../../../../constants
 import { useProjectApi } from '../../../../projectApi';
 import type { PackageManager } from '../../../../server/versionInfo';
 
-const REPORT_BUG_URL =
-  'https://github.com/mui/mui-toolpad/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml';
+const REPORT_BUG_URL = 'https://github.com/mui/mui-toolpad/issues/new/choose';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
 const SUPPORT_URL = 'https://mui.com/toolpad/getting-started/support';
 interface SnippetProps {

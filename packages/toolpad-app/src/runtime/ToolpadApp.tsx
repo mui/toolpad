@@ -34,11 +34,7 @@ import {
   JsExpressionAttrValue,
   ComponentConfig,
 } from '@mui/toolpad-core';
-import {
-  createGlobalState,
-  useAssertedContext,
-  useNonNullableContext,
-} from '@mui/toolpad-utils/react';
+import { useAssertedContext, useNonNullableContext } from '@mui/toolpad-utils/react';
 import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
 import { set as setObjectPath } from 'lodash-es';
 import { QueryClientProvider, useMutation } from '@tanstack/react-query';
@@ -97,13 +93,11 @@ import { AuthContext, useAuth, AuthSession } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
 import { AppHost, AppHostContext } from './AppHostContext';
+import { componentsStore, pageComponentsStore } from './globalState';
 
 const browserJsRuntime = getBrowserRuntime();
 
 export type PageComponents = Partial<Record<string, React.ComponentType>>;
-
-export const componentsStore = createGlobalState<ToolpadComponents>({});
-export const pageComponentsStore = createGlobalState<PageComponents>({});
 
 const Pre = styled('pre')(({ theme }) => ({
   margin: 0,
@@ -1400,8 +1394,6 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
   const dom = useDomContext();
   const { children = [], queries = [] } = appDom.getChildNodes(dom, page);
 
-  usePageTitle(appDom.getPageTitle(page));
-
   const location = useLocation();
   const components = useComponents();
 
@@ -1662,7 +1654,8 @@ export function ToolpadAppProvider({
     (window as any).toggleDevtools = () => toggleDevtools();
   }, [toggleDevtools]);
 
-  const authContext = useAuth({ dom, basename, signInPagePath: `${basename}/signin` });
+  const authContext = useAuth({ dom, basename, signInPagePath: '/signin' });
+
   const appHost = useNonNullableContext(AppHostContext);
   const showPreviewHeader = shouldShowPreviewHeader(appHost);
 
@@ -1673,34 +1666,32 @@ export function ToolpadAppProvider({
   return (
     <RuntimeApiContext.Provider value={runtimeApi}>
       <UseDataProviderContext.Provider value={useDataProvider}>
-        <AppThemeProvider dom={dom}>
-          <CssBaseline enableColorScheme />
-          {showPreviewHeader ? <PreviewHeader basename={basename} /> : null}
-          <AppRoot
-            ref={rootRef}
-            sx={{
-              paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
-            }}
-          >
-            <ComponentsContextProvider value={components}>
-              <DomContext.Provider value={dom}>
-                <ErrorBoundary FallbackComponent={AppError}>
-                  <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
-                    <React.Suspense fallback={<AppLoading />}>
-                      <QueryClientProvider client={queryClient}>
-                        <AuthContext.Provider value={authContext}>{children}</AuthContext.Provider>
-                        {showDevtools ? (
-                          <ReactQueryDevtoolsProduction initialIsOpen={false} />
-                        ) : null}
-                      </QueryClientProvider>
-                    </React.Suspense>
-                  </ResetNodeErrorsKeyProvider>
-                </ErrorBoundary>
-              </DomContext.Provider>
-            </ComponentsContextProvider>
-            <EditorOverlay ref={canvasHooks.overlayRef} id={HTML_ID_EDITOR_OVERLAY} />
-          </AppRoot>
-        </AppThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <ComponentsContextProvider value={components}>
+            <DomContext.Provider value={dom}>
+              <AuthContext.Provider value={authContext}>
+                <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
+                  <AppThemeProvider dom={dom}>
+                    <CssBaseline enableColorScheme />
+                    {showPreviewHeader ? <PreviewHeader basename={basename} /> : null}
+                    <AppRoot
+                      ref={rootRef}
+                      sx={{
+                        paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
+                      }}
+                    >
+                      <ErrorBoundary FallbackComponent={AppError}>
+                        <React.Suspense fallback={<AppLoading />}>{children}</React.Suspense>
+                      </ErrorBoundary>
+                      <EditorOverlay ref={canvasHooks.overlayRef} id={HTML_ID_EDITOR_OVERLAY} />
+                    </AppRoot>
+                  </AppThemeProvider>
+                </ResetNodeErrorsKeyProvider>
+              </AuthContext.Provider>
+              {showDevtools ? <ReactQueryDevtoolsProduction initialIsOpen={false} /> : null}
+            </DomContext.Provider>
+          </ComponentsContextProvider>
+        </QueryClientProvider>
       </UseDataProviderContext.Provider>
     </RuntimeApiContext.Provider>
   );
@@ -1711,6 +1702,29 @@ export interface ToolpadAppProps {
   basename: string;
   state: RuntimeState;
   apiUrl?: string;
+}
+
+export function ToolpadAppRoutes(props: ToolpadAppProps) {
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <ToolpadAppProvider {...props}>
+            <Outlet />
+          </ToolpadAppProvider>
+        }
+      >
+        <Route path="/signin" Component={SignInPage} />
+        <Route path="/" Component={PagesLayoutRoute}>
+          <Route path="/pages/:pageName" Component={PageRoute} />
+          <Route path="/pages" Component={DefaultPageRoute} />
+          <Route path="/" Component={DefaultPageRoute} />
+          <Route path="*" Component={PageNotFound} />
+        </Route>
+      </Route>
+    </Routes>
+  );
 }
 
 export default function ToolpadApp(props: ToolpadAppProps) {

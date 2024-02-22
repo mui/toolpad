@@ -120,7 +120,7 @@ export class ToolpadEditor {
     await this.page.mouse.move(
       sourceBoundingBox!.x + sourceBoundingBox!.width / 2,
       sourceBoundingBox!.y + sourceBoundingBox!.height / 2,
-      { steps: 10 },
+      { steps },
     );
 
     await this.page.mouse.down();
@@ -153,7 +153,7 @@ export class ToolpadEditor {
       moveTargetX = pageRootBoundingBox!.x + pageRootBoundingBox!.width / 2;
     }
     if (!moveTargetY) {
-      moveTargetY = pageRootBoundingBox!.y + pageRootBoundingBox!.height / 2;
+      moveTargetY = pageRootBoundingBox!.y + pageRootBoundingBox!.height + 12;
     }
 
     const sourceLocator = this.getComponentCatalogItem(componentName);

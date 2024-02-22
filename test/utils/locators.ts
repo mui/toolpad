@@ -1,9 +1,11 @@
 import { Page, Locator, expect } from '../playwright/test';
 
+type BoundingBox = NonNullable<Awaited<ReturnType<Locator['boundingBox']>>>;
+
 export async function waitForBoundingBox(
   locator: Locator,
 ): Promise<Pick<DOMRect, 'x' | 'y' | 'width' | 'height'>> {
-  let boundingBox;
+  let boundingBox: BoundingBox | null = null;
   await expect(async () => {
     boundingBox = await locator.boundingBox();
     expect(boundingBox).toBeTruthy();

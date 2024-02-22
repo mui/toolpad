@@ -11,7 +11,6 @@
 # 2023
 /toolpad/getting-started/quickstart/ /toolpad/getting-started/first-app/ 301
 /toolpad/schema-reference/ /toolpad/reference/file-schema/ 301
-/toolpad/getting-started/configuration/ /toolpad/how-to-guides/basic-auth/ 301
 /toolpad/connecting-to-datasources/queries/ /toolpad/concepts/queries/ 301
 /toolpad/connecting-to-datasources/http-requests/ /toolpad/concepts/http-requests/ 301
 /toolpad/connecting-to-datasources/custom-functions/ /toolpad/concepts/custom-functions/ 301

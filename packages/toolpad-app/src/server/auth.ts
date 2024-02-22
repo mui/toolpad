@@ -172,9 +172,9 @@ export function createAuthHandler(project: ToolpadProject): Router {
         if (username === 'test' && password === 'test') {
           return { id: 'test', name: 'Miss Test', email: 'test@example.com', roles: [] };
         }
-
-        return null;
       }
+
+      return null;
     },
   });
 

@@ -159,6 +159,8 @@ export class ToolpadEditor {
     const sourceLocator = this.getComponentCatalogItem(componentName);
     await expect(sourceLocator).toBeVisible();
 
+    await sourceLocator.hover();
+
     await this.dragTo(sourceLocator, moveTargetX!, moveTargetY!, hasDrop, steps);
 
     await style.evaluate((elm) => elm.parentNode?.removeChild(elm));

@@ -143,21 +143,6 @@ export function createAuthHandler(project: ToolpadProject): Router {
     name: 'Credentials',
     async authorize({ username, password }) {
       if (process.env.MOCK_AUTH_CREDENTIALS) {
-        // @TODO: Eventually can deprecate old environment variable names (TOOLPAD_BASIC_AUTH...)
-        const authUsername =
-          process.env.TOOLPAD_AUTH_USERNAME ?? process.env.TOOLPAD_BASIC_AUTH_USER;
-        const authPassword =
-          process.env.TOOLPAD_AUTH_PASSWORD ?? process.env.TOOLPAD_BASIC_AUTH_PASSWORD;
-
-        if (
-          authUsername &&
-          authPassword &&
-          username === authUsername &&
-          password === authPassword
-        ) {
-          return { id: 'user', name: 'User', email: 'user@mui.com', roles: [] };
-        }
-      } else {
         if (username === 'admin' && password === 'admin') {
           return {
             id: 'admin',
@@ -171,6 +156,21 @@ export function createAuthHandler(project: ToolpadProject): Router {
         }
         if (username === 'test' && password === 'test') {
           return { id: 'test', name: 'Miss Test', email: 'test@example.com', roles: [] };
+        }
+      } else {
+        // @TODO: Eventually can deprecate old environment variable names (TOOLPAD_BASIC_AUTH...)
+        const authUsername =
+          process.env.TOOLPAD_AUTH_USERNAME ?? process.env.TOOLPAD_BASIC_AUTH_USER;
+        const authPassword =
+          process.env.TOOLPAD_AUTH_PASSWORD ?? process.env.TOOLPAD_BASIC_AUTH_PASSWORD;
+
+        if (
+          authUsername &&
+          authPassword &&
+          username === authUsername &&
+          password === authPassword
+        ) {
+          return { id: 'user', name: 'User', email: 'user@mui.com', roles: [] };
         }
       }
 

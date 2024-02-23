@@ -1475,7 +1475,8 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
           !isPageRow(node) &&
           !isPageColumn(node) &&
           (nodeComponentId === 'Chart' ||
-            nodeComponentId === 'DataGrid');
+            nodeComponentId === 'DataGrid' ||
+            nodeComponentId === 'Spacer');
 
         const isResizing = Boolean(draggedEdge);
         const isResizingNode = isResizing && node.id === draggedNodeId;

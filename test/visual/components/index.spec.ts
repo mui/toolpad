@@ -3,7 +3,7 @@ import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { expect, test } from '../../playwright/localTest';
-import { clickCenter } from '../../utils/locators';
+import { clickCenter, waitForBoundingBox } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -112,6 +112,67 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
   );
 
   await argosScreenshot('resize-grid');
+});
+
+test('resizing element heights', async ({ page, argosScreenshot }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPage('grids');
+
+  await editorModel.waitForOverlay();
+
+  const appCanvasBoundingBox = await editorModel.appCanvas.locator('body').boundingBox();
+
+  const screenshotConfig = {
+    clip: appCanvasBoundingBox || undefined,
+  };
+
+  const firstGrid = editorModel.appCanvas.getByRole('grid').nth(0);
+
+  await clickCenter(page, firstGrid);
+  await argosScreenshot('vertical-resize-before', screenshotConfig);
+
+  const firstGridBoundingBox = await waitForBoundingBox(firstGrid);
+
+  await page.mouse.move(
+    firstGridBoundingBox!.x + firstGridBoundingBox!.width / 2,
+    firstGridBoundingBox!.y + firstGridBoundingBox!.height - 4,
+    { steps: 10 },
+  );
+
+  await page.mouse.down();
+
+  await page.mouse.move(
+    firstGridBoundingBox!.x + firstGridBoundingBox!.width / 2,
+    firstGridBoundingBox!.y + firstGridBoundingBox!.height + 100,
+    { steps: 10 },
+  );
+
+  await page.mouse.up();
+
+  const thirdGrid = editorModel.appCanvas.getByRole('grid').nth(2);
+
+  await clickCenter(page, thirdGrid);
+
+  const thirdGridBoundingBox = await waitForBoundingBox(thirdGrid);
+
+  await page.mouse.move(
+    thirdGridBoundingBox!.x + thirdGridBoundingBox!.width / 2,
+    thirdGridBoundingBox!.y + thirdGridBoundingBox!.height - 4,
+    { steps: 10 },
+  );
+
+  await page.mouse.down();
+
+  await page.mouse.move(
+    thirdGridBoundingBox!.x + thirdGridBoundingBox!.width / 2,
+    thirdGridBoundingBox!.y + thirdGridBoundingBox!.height + 100,
+    { steps: 10 },
+  );
+
+  await page.mouse.up();
+
+  await clickCenter(page, firstGrid);
+  await argosScreenshot('vertical-resize-after', screenshotConfig);
 });
 
 test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {

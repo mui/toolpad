@@ -104,15 +104,18 @@ export default function ExplorerHeader({
           placeholder={`${searchLabelText}…`}
         />
       ) : (
-        <ExplorerHeaderTitle
-          variant="body2"
-          sx={{
-            mx: 0.5,
-            my: 0.5,
-          }}
-        >
-          {headerText}
-        </ExplorerHeaderTitle>
+        <React.Fragment>
+          {headerIcon}
+          <ExplorerHeaderTitle
+            variant="body2"
+            sx={{
+              mx: 0.5,
+              my: 0.5,
+            }}
+          >
+            {headerText}
+          </ExplorerHeaderTitle>
+        </React.Fragment>
       )}
       {onSearch && searchLabelText && !hasPersistentSearch ? (
         <Tooltip title={searchLabelText}>

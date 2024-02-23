@@ -163,19 +163,17 @@ export function ToolpadEditorRoutes({ appUrl }: ToolpadEditorRoutesProps) {
         <ErrorBoundary fallbackRender={ErrorFallback}>
           <React.Suspense fallback={<FullPageLoader />}>
             <QueryClientProvider client={queryClient}>
-              <ProjectProvider url={appUrl}>
-                <BrowserRouter basename={basename}>
-                  <AppProvider appUrl={appUrl}>
-                    <EditorShell>
-                      <Routes>
-                        {GLOBAL_FUNCTIONS_FEATURE_FLAG ? (
-                          <Route path={APP_FUNCTIONS_ROUTE} element={<FunctionsEditor />} />
-                        ) : null}
-                        <Route path="/*" element={<AppEditor />} />
-                      </Routes>
-                    </EditorShell>
-                  </AppProvider>
-                </BrowserRouter>
+              <ProjectProvider url={appUrl} fallback={<FullPageLoader />}>
+                <AppProvider appUrl={appUrl}>
+                  <EditorShell>
+                    <Routes>
+                      {FEATURE_FLAG_GLOBAL_FUNCTIONS ? (
+                        <Route path={APP_FUNCTIONS_ROUTE} element={<FunctionsEditor />} />
+                      ) : null}
+                      <Route path="*" element={<AppEditor />} />
+                    </Routes>
+                  </EditorShell>
+                </AppProvider>
               </ProjectProvider>
             </QueryClientProvider>
           </React.Suspense>

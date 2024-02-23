@@ -27,6 +27,8 @@ import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
 import { ensureSuffix } from '@mui/toolpad-utils/strings';
 import { NodeId } from '@mui/toolpad-core';
+import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import OpenCodeEditorButton from '../OpenCodeEditor';
 import FlexFill from '../../components/FlexFill';
@@ -37,8 +39,6 @@ import {
   serializeFunctionId,
 } from '../../toolpadDataSources/local/shared';
 import { LocalPrivateApi } from '../../toolpadDataSources/local/types';
-import usePageTitle from '../../utils/usePageTitle';
-import * as appDom from '../../appDom';
 import { useProjectApi } from '../../projectApi';
 import ExplorerHeader from '../AppEditor/ExplorerHeader';
 import EditableTreeItem, { EditableTreeItemProps } from '../../components/EditableTreeItem';

@@ -2,7 +2,6 @@ import * as appDom from '@mui/toolpad-core/appDom';
 
 export const PAGE_ROW_COMPONENT_ID = 'PageRow';
 export const PAGE_COLUMN_COMPONENT_ID = 'PageColumn';
-export const SPACER_COMPONENT_ID = 'Spacer';
 export const STACK_COMPONENT_ID = 'Stack';
 export const FORM_COMPONENT_ID = 'Form';
 

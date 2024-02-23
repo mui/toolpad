@@ -71,7 +71,6 @@ const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
   ['PageRow', TableRowsIcon],
   ['PageColumn', ViewColumnIcon],
   ['Metric', TagIcon],
-  ['Spacer', SpaceBarIcon],
 ]);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';

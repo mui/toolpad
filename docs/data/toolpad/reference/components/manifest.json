@@ -74,10 +74,6 @@
           "pathname": "/toolpad/reference/components/select"
         },
         {
-          "title": "Spacer",
-          "pathname": "/toolpad/reference/components/spacer"
-        },
-        {
           "title": "Stack",
           "pathname": "/toolpad/reference/components/stack"
         },

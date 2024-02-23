@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { test } from '../../playwright/localTest';
+import { expect, test } from '../../playwright/localTest';
 import { clickCenter } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -55,6 +55,7 @@ test('building layouts', async ({ page, argosScreenshot }) => {
 
   await editorModel.dragNewComponentToCanvas('FullWidth');
 
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
   await argosScreenshot('building-layout-1');
 
   const firstFullWidthBoundingBox = await getNthFullWidthBoundingBox(0);
@@ -66,6 +67,7 @@ test('building layouts', async ({ page, argosScreenshot }) => {
     firstFullWidthBoundingBox!.y + firstFullWidthBoundingBox!.height / 2,
   );
 
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
   await argosScreenshot('building-layout-2');
 
   const secondFullWidthBoundingBox = await getNthFullWidthBoundingBox(1);
@@ -79,6 +81,7 @@ test('building layouts', async ({ page, argosScreenshot }) => {
     1,
   );
 
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
   await argosScreenshot('building-layout-3');
 });
 

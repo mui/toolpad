@@ -73,29 +73,28 @@ interface TooltipRadioProps extends RadioProps {
   inputProps?: RadioProps['inputProps'];
 }
 
-const TooltipRadio = React.forwardRef<HTMLButtonElement, TooltipRadioProps>(function TooltipRadio(
-  props,
-  ref,
-) {
-  const {
-    'aria-labelledby': ariaLabelledBy,
-    'aria-label': ariaLabel,
-    inputProps,
-    ...other
-  } = props;
+const TooltipRadio = React.forwardRef<HTMLButtonElement, TooltipRadioProps>(
+  function TooltipRadio(props, ref) {
+    const {
+      'aria-labelledby': ariaLabelledBy,
+      'aria-label': ariaLabel,
+      inputProps,
+      ...other
+    } = props;
 
-  return (
-    <Radio
-      ref={ref}
-      {...other}
-      inputProps={{
-        ...inputProps,
-        'aria-labelledby': ariaLabelledBy,
-        'aria-label': ariaLabel,
-      }}
-    />
-  );
-});
+    return (
+      <Radio
+        ref={ref}
+        {...other}
+        inputProps={{
+          ...inputProps,
+          'aria-labelledby': ariaLabelledBy,
+          'aria-label': ariaLabel,
+        }}
+      />
+    );
+  },
+);
 
 export interface ColorToolProps {
   label?: string;

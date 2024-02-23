@@ -1,10 +1,10 @@
 import { TextField } from '@mui/material';
 import * as React from 'react';
-import { AppDom, PageNode, setNodeNamespacedProp } from '../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useDomApi } from '../AppState';
 
 interface PageTitleEditorProps {
-  node: PageNode;
+  node: appDom.PageNode;
 }
 
 function validateInput(input: string) {
@@ -16,7 +16,7 @@ function validateInput(input: string) {
 
 export default function PageTitleEditor({ node }: PageTitleEditorProps) {
   const domApi = useDomApi();
-  const [pageTitleInput, setPageTitleInput] = React.useState(node.attributes.title);
+  const [pageTitleInput, setPageTitleInput] = React.useState(appDom.getPageTitle(node));
 
   const handlePageTitleChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => setPageTitleInput(event.target.value),
@@ -24,8 +24,8 @@ export default function PageTitleEditor({ node }: PageTitleEditorProps) {
   );
 
   const handleCommit = React.useCallback(() => {
-    domApi.update((appDom: AppDom) =>
-      setNodeNamespacedProp(appDom, node, 'attributes', 'title', pageTitleInput),
+    domApi.update((dom: appDom.AppDom) =>
+      appDom.setNodeNamespacedProp(dom, node, 'attributes', 'title', pageTitleInput),
     );
   }, [node, pageTitleInput, domApi]);
 

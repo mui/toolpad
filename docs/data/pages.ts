@@ -3,10 +3,12 @@ import componentsManifest from './toolpad/reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {
-    pathname: '/toolpad/getting-started',
+    pathname: '/toolpad/getting-started-group',
+    title: 'Getting Started',
     children: [
-      { pathname: '/toolpad/getting-started/overview' },
+      { pathname: '/toolpad/getting-started', title: 'Overview' },
       { pathname: '/toolpad/getting-started/installation' },
+      { pathname: '/toolpad/getting-started/why-toolpad', title: 'Why Toolpad?' },
       { pathname: '/toolpad/getting-started/first-app', title: 'Build your first app' },
       {
         pathname: '/toolpad/examples-group',
@@ -19,6 +21,10 @@ const pages: MuiPage[] = [
         ],
       },
       { pathname: '/toolpad/getting-started/roadmap' },
+      {
+        pathname: '/toolpad/getting-started/support',
+        title: 'Support',
+      },
     ],
   },
   {
@@ -29,8 +35,8 @@ const pages: MuiPage[] = [
         title: 'Building UI',
       },
       {
-        pathname: '/toolpad/concepts/queries-',
-        title: 'Queries',
+        pathname: '/toolpad/concepts/connecting-to-data',
+        title: 'Connecting to data',
         children: [
           {
             pathname: '/toolpad/concepts/queries',
@@ -51,8 +57,11 @@ const pages: MuiPage[] = [
         ],
       },
       {
-        pathname: '/toolpad/concepts/managing-state',
-        title: 'Managing state',
+        pathname: '/toolpad/concepts/data-binding',
+        title: 'Data binding',
+      },
+      {
+        pathname: '/toolpad/concepts/event-handling',
       },
       {
         pathname: '/toolpad/concepts/file-structure',
@@ -68,7 +77,32 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/concepts/theming',
       },
       {
-        pathname: '/toolpad/concepts/display-mode',
+        pathname: '/toolpad/concepts/page-properties',
+      },
+      {
+        pathname: '/toolpad/concepts/authorization',
+        title: 'Authorization',
+        children: [
+          {
+            pathname: '/toolpad/concepts/authentication',
+            title: 'Authentication',
+          },
+          {
+            pathname: '/toolpad/concepts/rbac',
+            title: 'Role-based access control',
+          },
+        ],
+      },
+      { pathname: '/toolpad/concepts/custom-server' },
+    ],
+  },
+  {
+    pathname: '/toolpad/components',
+    children: [
+      { pathname: '/toolpad/components/button' },
+      {
+        pathname: '/toolpad/components/datagrid',
+        title: 'Data Grid',
       },
     ],
   },
@@ -128,7 +162,7 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/how-to-guides/embed-pages',
-            title: 'Embed a Toolpad page',
+            title: 'Embedding Toolpad pages',
           },
           {
             pathname: '/toolpad/how-to-guides/basic-auth',
@@ -178,6 +212,10 @@ const pages: MuiPage[] = [
               {
                 title: 'createFunction',
                 pathname: '/toolpad/reference/api/create-function',
+              },
+              {
+                title: 'createHandler',
+                pathname: '/toolpad/reference/api/create-handler',
               },
               {
                 title: 'getContext',

@@ -3,7 +3,7 @@ import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { FrameLocator, Page, test, expect } from '../../playwright/localTest';
-import clickCenter from '../../utils/clickCenter';
+import { clickCenter } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -41,15 +41,17 @@ async function waitForComponents(page: Page, frame: Page | FrameLocator = page) 
 }
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture-basic'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });
 
 test('rendering components in the app runtime', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('components');
+  await runtimeModel.goToPage('components');
 
   await waitForComponents(page);
 });
@@ -63,7 +65,7 @@ test('rendering components in the app editor', async ({ page }) => {
 
 test('select component behavior', async ({ page }) => {
   const runtimeModel = new ToolpadRuntime(page);
-  await runtimeModel.gotoPage('select');
+  await runtimeModel.goToPage('select');
 
   const optionsSelect = page.getByRole('combobox', { name: /select with options/ });
   await optionsSelect.scrollIntoViewIfNeeded();

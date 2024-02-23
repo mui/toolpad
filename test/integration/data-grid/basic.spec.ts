@@ -1,21 +1,23 @@
 import * as path from 'path';
 import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import { test, expect, Locator } from '../../playwright/localTest';
-import clickCenter from '../../utils/clickCenter';
+import { test, expect } from '../../playwright/localTest';
+import { clickCenter, cellLocator } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture-basic'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });
 
 test('Column prop updates are not lost on drag interactions', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  editorModel.goToPageById('331kqzd');
+  editorModel.goToPage('page1');
 
   await editorModel.waitForOverlay();
 
@@ -24,6 +26,9 @@ test('Column prop updates are not lost on drag interactions', async ({ page }) =
   // Change the "Avatar" column type from "link" to "boolean"
 
   const firstGridLocator = canvasGridLocator.first();
+
+  // Wait for data to load so that datagrid bounding box is stable
+  await expect(editorModel.pageRoot.getByText('Todd Breitenberg')).toBeVisible();
 
   await clickCenter(page, firstGridLocator);
 
@@ -51,15 +56,9 @@ test('Column prop updates are not lost on drag interactions', async ({ page }) =
   ).toBeVisible();
 });
 
-function cellLocator(gridLocator: Locator, rowIndex: number, collIndex: number) {
-  return gridLocator
-    .locator(`[aria-rowindex="${rowIndex}"]`)
-    .locator(`[aria-colindex="${collIndex}"]`);
-}
-
 test('Date columns', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
-  editorModel.goToPageById('h0FFFmL');
+  editorModel.goToPage('dateColumns');
 
   await editorModel.waitForOverlay();
 
@@ -70,4 +69,5 @@ test('Date columns', async ({ page }) => {
   await expect(cellLocator(canvasGridLocator, 2, 3)).toHaveText('Invalid Date');
   await expect(cellLocator(canvasGridLocator, 2, 4)).toHaveText('Invalid Date');
   await expect(cellLocator(canvasGridLocator, 2, 5)).toHaveText('1/1/1970');
+  await expect(cellLocator(canvasGridLocator, 2, 6)).toHaveText('1/1/1970');
 });

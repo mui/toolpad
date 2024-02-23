@@ -1,7 +1,8 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.44/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  id: Tysc6w5
   title: serialization
   display: shell
   queries:
@@ -17,6 +18,10 @@ spec:
       query:
         function: invalidError
         kind: local
+    - name: someNonJson
+      query:
+        function: functions.ts#someNonJson
+        kind: local
   content:
     - component: Text
       name: text
@@ -25,7 +30,7 @@ spec:
       props:
         value:
           $$jsExpression: |
-            `Circlular property: ${circularData.data.a}`
+            `Circular property: ${circularData.data.a.a.a.msg}`
     - component: Text
       name: text1
       layout:
@@ -43,3 +48,16 @@ spec:
         value:
           $$jsExpression: |
             `Invalid error: ${invalidError.error?.message}`
+    - component: Text
+      name: text3
+      props:
+        value:
+          $$jsExpression: |
+            `Some Date object: ${someNonJson.data.date.toISOString()}`
+    - component: Text
+      name: text4
+      props:
+        value:
+          $$jsExpression: >
+            `Some RegExp: "${someNonJson.data.regexp.source}"
+            ${someNonJson.data.regexp.flags}`

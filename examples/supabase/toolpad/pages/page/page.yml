@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: page
+spec:
+  title: Supabase example
+  queries:
+    - name: query
+      query:
+        function: supabase.ts#default
+        kind: local
+  content:
+    - component: List
+      name: list
+      props:
+        renderItem:
+          $$template:
+            - component: PageRow
+              name: pageRow
+              props:
+                justifyContent: start
+              children:
+                - component: PageColumn
+                  name: pageColumn
+                  layout:
+                    columnSize: 1.2040938643407977
+                  children:
+                    - component: Text
+                      name: text
+                      props:
+                        mode: markdown
+                        value:
+                          $$jsExpression: |
+                            `### ${query.data[i].name}`
+                      layout:
+                        columnSize: 1.400990099009901
+                        verticalAlign: end
+                    - component: Text
+                      name: text2
+                      props:
+                        mode: markdown
+                        value:
+                          $$jsExpression: |
+                            `** ${query.data[i].description} **`
+                      layout:
+                        verticalAlign: start
+                    - component: Text
+                      name: text4
+                      props:
+                        mode: markdown
+                        value:
+                          $$jsExpression: |
+                            `Date added: ${query.data[i].date_added}`
+                      layout:
+                        columnSize: 1
+                        verticalAlign: center
+                    - component: PageRow
+                      name: pageRow1
+                      props:
+                        justifyContent: start
+                      children:
+                        - component: PageColumn
+                          name: pageColumn1
+                          layout:
+                            columnSize: 1
+                          children:
+                            - component: PageRow
+                              name: pageRow3
+                              props:
+                                justifyContent: start
+                              children:
+                                - component: Text
+                                  name: text1
+                                  layout:
+                                    columnSize: 1
+                                    verticalAlign: center
+                                  props:
+                                    mode: markdown
+                                    value:
+                                      $$jsExpression: >
+                                        `Quantity left:
+                                        ${query.data[i].quantity}`
+                                - component: Text
+                                  name: text3
+                                  layout:
+                                    verticalAlign: center
+                                  props:
+                                    value:
+                                      $$jsExpression: |
+                                        `Price: $${query.data[i].price}`
+                                    mode: text
+                            - component: PageRow
+                              name: pageRow2
+                              props:
+                                justifyContent: start
+                              children:
+                                - component: Text
+                                  name: text5
+                                  layout:
+                                    columnSize: 1
+                                    verticalAlign: center
+                                  props:
+                                    mode: markdown
+                                    value:
+                                      $$jsExpression: >
+                                        `Average rating: ${query.data[i].rating}`
+                                - component: Checkbox
+                                  name: checkbox
+                                  props:
+                                    label: Offer discount?
+                - component: Image
+                  name: image
+                  props:
+                    src:
+                      $$jsExpression: |
+                        query.data[i].image
+                    width: 200
+                    height: 200
+                  layout:
+                    columnSize: 0.7959061356592024
+                    horizontalAlign: center
+        itemCount: 10
+  display: standalone

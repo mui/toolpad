@@ -10,7 +10,9 @@ import { createRpcServer } from './runtimeRpcServer';
 import { createRpcHandler } from './rpc';
 import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import createRuntimeState from '../runtime/createRuntimeState';
-import type { RuntimeConfig, RuntimeState } from '../types';
+import type { RuntimeConfig } from '../types';
+import type { RuntimeState } from '../runtime';
+import { createAuthHandler, createRequireAuthMiddleware, getRequireAuthentication } from './auth';
 
 export interface PostProcessHtmlParams {
   config: RuntimeConfig;
@@ -60,6 +62,14 @@ export async function createProdHandler(project: ToolpadProject) {
     }
     basicAuthUnauthorized(res);
   });
+
+  const hasAuthentication = await getRequireAuthentication(project);
+  if (hasAuthentication) {
+    const authHandler = createAuthHandler(project);
+    handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
+
+    handler.use(await createRequireAuthMiddleware(project));
+  }
 
   handler.use('/api/data', project.dataManager.createDataHandler());
 

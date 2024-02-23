@@ -23,6 +23,6 @@ In order to provide a customised styling to the components used in your pages, y
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-3.png", "alt": "Add sx prop", "caption": "Adding custom styles via the sx prop", "aspectRatio": 2.5 }}
 
-Once you click on the `sx` prop, add style overrides in the JSON editor. Any value that is accepted by the MUI System [sx](https://mui.com/system/getting-started/the-sx-prop/) prop is acceptable here.
+Once you click on the `sx` prop, add style overrides in the JSON editor. Any value that is accepted by the MUI System [sx](https://mui.com/system/getting-started/the-sx-prop/) prop is acceptable here.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-4.png", "alt": "Add custom styles", "caption": "Styling the Image component" }}

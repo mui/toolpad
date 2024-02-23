@@ -2,30 +2,28 @@
 
 <p class="description">A basic Toolpad application that can be used to turn any text or URL into a QR code.</p>
 
-<a href="https://mui-toolpad-qr-generator-production.up.railway.app/prod/" target="_blank">
-  <img src="https://mui.com/static/toolpad/docs/examples/qr-generator.png" alt="QR generator" style="aspect-ratio: 1.8" width="100%">
+<a href="https://mui-toolpad-qr-generator-production.up.railway.app/prod/pages/qrcode" target="_blank">
+  <img src="https://mui.com/static/toolpad/docs/examples/qr-generator.png" alt="QR generator" style="aspect-ratio: 575/318;" width="1440">
 </a>
 
 ## Check out the live app
 
-[Open example](https://mui-toolpad-qr-generator-production.up.railway.app/prod/)
+[Open example](https://mui-toolpad-qr-generator-production.up.railway.app/prod/pages/qrcode)
 
-## How to use
+## How to run
 
-Download the example [or clone the repo](https://github.com/mui/mui-toolpad):
-
-<!-- #default-branch-switch -->
+Use `create-toolpad-app` to bootstrap the example:
 
 ```bash
-curl https://codeload.github.com/mui/mui-toolpad/tar.gz/master | tar -xz --strip=2  mui-toolpad-master/examples/qr-generator
-cd qr-generator
+npx create-toolpad-app@latest --example qr-generator
 ```
 
-Install it and run:
+```bash
+yarn create toolpad-app --example qr-generator
+```
 
 ```bash
-npm install
-npm run dev
+pnpm create toolpad-app --example qr-generator
 ```
 
 or:

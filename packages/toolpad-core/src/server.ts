@@ -1,4 +1,4 @@
-/// <reference path="./serverModules.d.ts" />
+/// <reference path="../public/serverModules.d.ts" />
 
 import { TOOLPAD_FUNCTION } from './constants';
 import {
@@ -118,8 +118,10 @@ export function getContext(): ServerContext {
 
 export const TOOLPAD_DATA_PROVIDER_MARKER = Symbol.for('TOOLPAD_DATA_PROVIDER_MARKER');
 
-export interface ToolpadDataProvider<R, P extends PaginationMode = 'index'>
-  extends ToolpadDataProviderBase<R, P> {
+export interface ToolpadDataProvider<
+  R extends Record<string, unknown>,
+  P extends PaginationMode = 'index',
+> extends ToolpadDataProviderBase<R, P> {
   [TOOLPAD_DATA_PROVIDER_MARKER]: true;
 }
 
@@ -128,15 +130,16 @@ export interface ToolpadDataProvider<R, P extends PaginationMode = 'index'>
  *
  * Demos:
  *
- * - [Data Providers](https://mui.com/toolpad/concepts/data-providers/)
+ * - [Data providers](https://mui.com/toolpad/concepts/data-providers/)
  *
  * API:
  *
  * - [`createDataProvider` API](https://mui.com/toolpad/reference/api/create-data-provider/)
  *
  */
-export function createDataProvider<R, P extends PaginationMode = 'index'>(
-  input: ToolpadDataProviderBase<R, P>,
-): ToolpadDataProvider<R, P> {
+export function createDataProvider<
+  R extends Record<string, unknown>,
+  P extends PaginationMode = 'index',
+>(input: ToolpadDataProviderBase<R, P>): ToolpadDataProvider<R, P> {
   return Object.assign(input, { [TOOLPAD_DATA_PROVIDER_MARKER]: true as const });
 }

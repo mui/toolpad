@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as ReactIs from 'react-is';
-import { Emitter } from './events';
 
 /**
  * Like `Array.prototype.join`, but for React nodes.
@@ -22,40 +21,6 @@ export function interleave(items: React.ReactNode[], separator: React.ReactNode)
   }
 
   return <React.Fragment>{result}</React.Fragment>;
-}
-
-/**
- * Create a shared state to be used across the application. Returns a useState hook that
- * is synchronized on the same state between all instances where it is called.
- */
-export function createGlobalState<T = undefined>(initialValue: T) {
-  const emitter = new Emitter<{ change: {} }>();
-
-  let result: [T, React.Dispatch<React.SetStateAction<T>>];
-
-  const setState: React.Dispatch<React.SetStateAction<T>> = (newValue) => {
-    const updateValue =
-      typeof newValue === 'function' ? (newValue as (newValue: T) => T)(result[0]) : newValue;
-
-    if (updateValue !== result[0]) {
-      result = [updateValue, setState];
-      emitter.emit('change', {});
-    }
-  };
-
-  result = [initialValue, setState];
-
-  const subscribe = (cb: () => void) => emitter.subscribe('change', cb);
-
-  const getSnapshot = () => result;
-
-  return function useGlobalState() {
-    return React.useSyncExternalStore<[T, React.Dispatch<React.SetStateAction<T>>]>(
-      subscribe,
-      getSnapshot,
-      getSnapshot,
-    );
-  };
 }
 
 /**
@@ -109,4 +74,56 @@ export function useTraceUpdates<P extends object>(prefix: string, props: P) {
 
     prev.current = props;
   });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function getComponentDisplayName(Component: React.ComponentType<any> | string) {
+  if (typeof Component === 'string') {
+    return Component || 'Unknown';
+  }
+
+  return Component.displayName || Component.name;
+}
+
+/**
+ * Create a shared state to be used across the application. Returns a useState hook that
+ * is synchronized on the same state between all instances where it is called.
+ */
+export function createGlobalState<T>(initialState: T) {
+  let state = initialState;
+  const listeners: Array<(state: T) => void> = [];
+
+  const subscribe = (cb: (state: T) => void) => {
+    listeners.push(cb);
+    return () => {
+      const index = listeners.indexOf(cb);
+      listeners.splice(index, 1);
+    };
+  };
+
+  const getState = () => {
+    return state;
+  };
+
+  const setState = (newState: T | ((oldValue: T) => T)) => {
+    state = typeof newState === 'function' ? (newState as Function)(state) : newState;
+    listeners.forEach((cb) => cb(state));
+  };
+
+  const useValue = () => {
+    return React.useSyncExternalStore(subscribe, getState);
+  };
+
+  const useState = () => {
+    const value = useValue();
+    return [value, setState];
+  };
+
+  return {
+    getState,
+    setState,
+    useValue,
+    useState,
+    subscribe,
+  };
 }

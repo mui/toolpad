@@ -8,11 +8,13 @@ import {
   PropValueType,
   ExecFetchResult,
   ScopeMeta,
+  NodeHashes,
 } from '@mui/toolpad-core';
 import { PaletteMode } from '@mui/material';
-import type * as appDom from './appDom';
-import type { Awaitable, Maybe, WithControlledProp } from './utils/types';
+import type { Awaitable, Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
+import type * as appDom from '@mui/toolpad-core/appDom';
 import type { Rectangle } from './utils/geometry';
+import type { RuntimeState } from './runtime';
 
 // These are set at runtime and passed to the browser.
 // Do not add secrets
@@ -89,8 +91,7 @@ export type ConnectionParamsEditor<P = {}> = React.FC<ConnectionEditorProps<P>>;
 
 export type Methods = Record<string, (...args: any[]) => Awaitable<any>>;
 
-export interface QueryEditorProps<C, Q, A extends Methods = {}>
-  extends WithControlledProp<appDom.QueryNode<Q>> {
+export interface QueryEditorProps<C, Q, A extends Methods = {}> {
   connectionParams: Maybe<C>;
   execApi: <K extends keyof A>(
     query: K,
@@ -98,17 +99,15 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}>
   ) => Promise<Awaited<ReturnType<A[K]>>>;
   globalScope: Record<string, any>;
   globalScopeMeta: ScopeMeta;
-  onChange: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
+  value: appDom.QueryNode<Q>;
+  onSave?: (newNode: appDom.QueryNode<Q>) => void;
+  settingsTab?: React.ReactNode;
+  onChange?: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;
   runtimeConfig: RuntimeConfig;
 }
 
 export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;
-
-export interface ConnectionStatus {
-  timestamp: number;
-  error?: string;
-}
 
 export interface ExecFetchFn<Q, R extends ExecFetchResult> {
   (fetchQuery: Q, params: Record<string, string>): Promise<R>;
@@ -179,22 +178,6 @@ export interface AppTheme {
   'palette.secondary.main'?: string;
 }
 
-export type NodeHashes = Record<NodeId, number | undefined>;
-
-/**
- * Defines all the data needed to render the runtime.
- * While the dom is optimized for storage and editing. It isn't the ideal format used to render the application
- * `RuntimeData` will hold all data to render a toolpad app and will contain things like:
- * - precompile assets, like code component modules
- * - precompiled expressions
- * - datastructures optimized for rendering with less processing required
- * - ...
- */
-export interface RuntimeState {
-  // We start out with just the rendertree. The ultimate goal will be to move things out of this tree
-  dom: appDom.RenderTree;
-}
-
 export interface AppCanvasState extends RuntimeState {
   savedNodes: NodeHashes;
 }
@@ -212,9 +195,12 @@ export type ProjectEvents = {
   envChanged: {};
   // Functions or datasources have been updated
   functionsChanged: {};
+  // Pagesmanifest has changed
+  pagesManifestChanged: {};
 };
 
 export interface ToolpadProjectOptions {
+  toolpadDevMode: boolean;
   dev: boolean;
   externalUrl?: string;
   base: string;

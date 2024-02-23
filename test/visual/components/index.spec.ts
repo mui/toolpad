@@ -3,13 +3,15 @@ import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { test } from '../../playwright/localTest';
-import clickCenter from '../../utils/clickCenter';
+import { clickCenter } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });
@@ -17,18 +19,18 @@ test.use({
 test('rendering components in the app runtime', async ({ page, argosScreenshot }) => {
   const runtimeModel = new ToolpadRuntime(page);
 
-  await runtimeModel.gotoPage('components');
+  await runtimeModel.goToPage('components');
   await runtimeModel.waitForPageReady();
   await argosScreenshot('components', { fullPage: true });
 
-  await runtimeModel.gotoPage('text');
+  await runtimeModel.goToPage('text');
   await runtimeModel.waitForPageReady();
   await argosScreenshot('text', { fullPage: true });
 });
 
 test('rendering components in the app editor', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPage('components');
 
   await editorModel.waitForOverlay();
 
@@ -40,9 +42,49 @@ test('rendering components in the app editor', async ({ page, argosScreenshot })
   await argosScreenshot('with-selection');
 });
 
+test('building layouts', async ({ page, argosScreenshot }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPage('blank');
+
+  await editorModel.waitForOverlay();
+
+  const getNthFullWidthBoundingBox = (
+    n: number,
+  ): Promise<{ x: number; y: number; width: number; height: number } | null> =>
+    editorModel.appCanvas.getByText('fullwidth').nth(n).boundingBox();
+
+  await editorModel.dragNewComponentToCanvas('FullWidth');
+
+  await argosScreenshot('building-layout-1');
+
+  const firstFullWidthBoundingBox = await getNthFullWidthBoundingBox(0);
+
+  // Place inside right of first element
+  await editorModel.dragNewComponentToCanvas(
+    'FullWidth',
+    firstFullWidthBoundingBox!.x + (2 / 3) * firstFullWidthBoundingBox!.width,
+    firstFullWidthBoundingBox!.y + firstFullWidthBoundingBox!.height / 2,
+  );
+
+  await argosScreenshot('building-layout-2');
+
+  const secondFullWidthBoundingBox = await getNthFullWidthBoundingBox(1);
+
+  // Place outside right of second element
+  await editorModel.dragNewComponentToCanvas(
+    'FullWidth',
+    secondFullWidthBoundingBox!.x + secondFullWidthBoundingBox!.width + 12,
+    secondFullWidthBoundingBox!.y + secondFullWidthBoundingBox!.height / 2,
+    true,
+    1,
+  );
+
+  await argosScreenshot('building-layout-3');
+});
+
 test('showing grid while resizing elements', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById('5YDOftB');
+  await editorModel.goToPage('rows');
 
   await editorModel.waitForOverlay();
 
@@ -71,7 +113,7 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
 
 test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goToPageById('8ixPqyI');
+  await editorModel.goToPage('dragdrop');
 
   await editorModel.waitForOverlay();
 
@@ -100,6 +142,8 @@ test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
     boundingBox.y + (2 / 3) * boundingBox.height,
   ];
 
+  // Check all direction previews when dragging over component
+
   const inputBoundingBox = await editorModel.appCanvas.locator('input').boundingBox();
 
   await editorModel.dragNewComponentToCanvas(
@@ -124,6 +168,37 @@ test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
   });
   await argosScreenshot('drop-preview-bottom', screenshotConfig);
 
+  // Check top, left and right previews when dragging outside component
+
+  await page.mouse.move(
+    inputBoundingBox!.x + inputBoundingBox!.width / 2,
+    inputBoundingBox!.y - 12,
+    {
+      steps: 10,
+    },
+  );
+  await argosScreenshot('drop-preview-outside-top', screenshotConfig);
+
+  await page.mouse.move(
+    inputBoundingBox!.x - 12,
+    inputBoundingBox!.y + inputBoundingBox!.height / 2,
+    {
+      steps: 1,
+    },
+  );
+  await argosScreenshot('drop-preview-outside-left', screenshotConfig);
+
+  await page.mouse.move(
+    inputBoundingBox!.x + inputBoundingBox!.width + 12,
+    inputBoundingBox!.y + inputBoundingBox!.height / 2,
+    {
+      steps: 1,
+    },
+  );
+  await argosScreenshot('drop-preview-outside-right', screenshotConfig);
+
+  // Check preview when dragging inside empty container
+
   const containerDropAreaBoundingBox = await editorModel.appCanvas
     .getByText('Drop component here')
     .boundingBox();
@@ -136,6 +211,8 @@ test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {
     },
   );
   await argosScreenshot('container-drop-preview-empty', screenshotConfig);
+
+  // Check all direction previews when dragging over component inside container
 
   const containerButtonBoundingBox = await editorModel.appCanvas
     .getByText('contained')

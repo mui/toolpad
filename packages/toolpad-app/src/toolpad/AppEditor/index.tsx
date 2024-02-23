@@ -51,15 +51,15 @@ function FileEditor() {
   const currentViewContent = React.useMemo(() => {
     switch (currentView.kind) {
       case 'page': {
-        if (currentView.nodeId) {
-          return <PageEditor nodeId={currentView.nodeId} />;
+        if (currentView.name) {
+          return <PageEditor name={currentView.name} />;
         }
         return <NoPageFound />;
       }
       default:
         return <NoPageFound />;
     }
-  }, [currentView.kind, currentView.nodeId]);
+  }, [currentView.kind, currentView.name]);
 
   return <AppEditorShell>{currentViewContent}</AppEditorShell>;
 }

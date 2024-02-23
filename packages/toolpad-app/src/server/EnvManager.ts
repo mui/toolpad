@@ -4,14 +4,21 @@ import * as dotenv from 'dotenv';
 import { Emitter } from '@mui/toolpad-utils/events';
 import chalk from 'chalk';
 import { truncate } from '@mui/toolpad-utils/strings';
+import { Awaitable } from '@mui/toolpad-utils/types';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
-import { Awaitable } from '../utils/types';
 
 interface IToolpadProject {
   options: ToolpadProjectOptions;
   events: Emitter<ProjectEvents>;
   getRoot(): string;
   invalidateQueries(): void;
+}
+
+/**
+ * Get file path for the env file.
+ */
+function getEnvFilePath() {
+  return path.resolve(process.cwd(), '.env');
 }
 
 /**
@@ -54,7 +61,7 @@ export default class EnvManager {
   }
 
   private loadEnvFile() {
-    const envFilePath = this.getEnvFilePath();
+    const envFilePath = getEnvFilePath();
     this.resetEnv();
     const { parsed = {} } = dotenv.config({ path: envFilePath, override: true });
     this.values = parsed;
@@ -67,19 +74,12 @@ export default class EnvManager {
     );
   }
 
-  /**
-   * Get file path for the env file.
-   */
-  getEnvFilePath() {
-    return path.resolve(this.project.getRoot(), '.env');
-  }
-
   private initWatcher() {
     if (!this.project.options.dev) {
       return;
     }
 
-    this.watcher = chokidar.watch([this.getEnvFilePath()], {
+    this.watcher = chokidar.watch([getEnvFilePath()], {
       usePolling: true,
       ignoreInitial: true,
     });
@@ -98,5 +98,10 @@ export default class EnvManager {
 
   async getDeclaredValues(): Promise<Record<string, string>> {
     return this.values;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getEnv() {
+    return process.env;
   }
 }

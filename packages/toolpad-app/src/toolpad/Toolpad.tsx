@@ -7,6 +7,7 @@ import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import AppEditor from './AppEditor';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ThemeProvider } from '../ThemeContext';
@@ -14,9 +15,12 @@ import { APP_FUNCTIONS_ROUTE } from '../routes';
 import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
-import { GLOBAL_FUNCTIONS_FEATURE_FLAG } from '../constants';
 import FunctionsEditor from './FunctionsEditor';
+import { FEATURE_FLAG_GLOBAL_FUNCTIONS } from '../constants';
 import { ProjectProvider } from '../project';
+import AppAuthorizationDialog from './AppEditor/AppAuthorizationEditor';
+import { ToolpadAppRoutes } from '../runtime/ToolpadApp';
+import { RuntimeState } from '../runtime';
 
 const Centered = styled('div')({
   height: '100%',
@@ -50,7 +54,7 @@ function ErrorFallback({ error }: FallbackProps) {
   return <FullPageError error={error} />;
 }
 
-function getAppSaveState(appState: AppState): React.ReactNode {
+function renderAppSaveState(appState: AppState): React.ReactNode {
   if (appState.saveDomError) {
     return (
       <Tooltip title="Error while saving">
@@ -85,18 +89,30 @@ function EditorShell({ children }: EditorShellProps) {
 
   const location = useLocation();
 
-  const shellProps = React.useMemo(() => {
+  const previewPath: string | null = React.useMemo(() => {
     const currentView = getViewFromPathname(location.pathname);
+    if (!currentView) {
+      return null;
+    }
+    const currentPageName = currentView?.kind === 'page' ? currentView.name : null;
+    return currentPageName ? `${appState.appUrl}/pages/${currentPageName}` : appState.appUrl;
+  }, [appState.appUrl, location.pathname]);
 
-    if (currentView) {
-      const currentPageId = currentView?.kind === 'page' ? currentView.nodeId : null;
+  const {
+    value: authorizationDialogOpen,
+    setTrue: handleAuthorizationDialogOpen,
+    setFalse: handleAuthorizationDialogClose,
+  } = useBoolean(false);
 
-      const previewPath = currentPageId
-        ? `${appState.appUrl}/pages/${currentPageId}`
-        : appState.appUrl;
-
-      return {
-        actions: (
+  return (
+    <ToolpadShell
+      navigation={
+        <Stack sx={{ ml: 3 }}>
+          <Button onClick={handleAuthorizationDialogOpen}>Authorization</Button>
+        </Stack>
+      }
+      actions={
+        previewPath ? (
           <Stack direction="row" gap={1} alignItems="center">
             <Button
               variant="outlined"
@@ -109,15 +125,17 @@ function EditorShell({ children }: EditorShellProps) {
               Preview
             </Button>
           </Stack>
-        ),
-        status: getAppSaveState(appState),
-      };
-    }
-
-    return {};
-  }, [appState, location.pathname]);
-
-  return <ToolpadShell {...shellProps}>{children}</ToolpadShell>;
+        ) : null
+      }
+      status={renderAppSaveState(appState)}
+    >
+      {children}
+      <AppAuthorizationDialog
+        open={authorizationDialogOpen}
+        onClose={handleAuthorizationDialogClose}
+      />
+    </ToolpadShell>
+  );
 }
 
 const queryClient = new QueryClient({
@@ -131,12 +149,11 @@ const queryClient = new QueryClient({
   },
 });
 
-export interface ToolpadProps {
-  basename: string;
+export interface ToolpadEditorRoutesProps {
   appUrl: string;
 }
 
-export default function Toolpad({ appUrl, basename }: ToolpadProps) {
+export function ToolpadEditorRoutes({ appUrl }: ToolpadEditorRoutesProps) {
   return (
     <ThemeProvider>
       {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
@@ -165,5 +182,34 @@ export default function Toolpad({ appUrl, basename }: ToolpadProps) {
         </ErrorBoundary>
       </Box>
     </ThemeProvider>
+  );
+}
+
+export interface ToolpadEditorProps {
+  basename: string;
+  state: RuntimeState;
+}
+
+export function ToolpadEditor({ basename, state }: ToolpadEditorProps) {
+  return (
+    <BrowserRouter basename={basename}>
+      <Routes>
+        <Route path="/editor/*" element={<ToolpadEditorRoutes appUrl={basename} />} />
+        <Route path="/*" element={<ToolpadAppRoutes basename={basename} state={state} />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+export interface ToolpadEditorLegacyProps {
+  basename: string;
+  appUrl: string;
+}
+
+export default function ToolpadEditorLegacy({ basename, appUrl }: ToolpadEditorLegacyProps) {
+  return (
+    <BrowserRouter basename={basename}>
+      <ToolpadEditorRoutes appUrl={appUrl} />
+    </BrowserRouter>
   );
 }

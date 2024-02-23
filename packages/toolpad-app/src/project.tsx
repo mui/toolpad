@@ -1,5 +1,5 @@
 import { Emitter } from '@mui/toolpad-utils/events';
-import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import * as React from 'react';
 import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import invariant from 'invariant';
@@ -51,7 +51,13 @@ function createProject(url: string, serializedManifest: string, queryClient: Que
   });
 
   const dispose = () => {
-    ws.close();
+    if (ws.readyState === ws.OPEN) {
+      ws.close();
+    } else {
+      ws.onopen = () => {
+        ws.close();
+      };
+    }
     unsubExternalChange();
     unsubFunctionsChanged();
   };
@@ -69,32 +75,37 @@ type Project = Awaited<ReturnType<typeof createProject>>;
 
 const ProjectContext = React.createContext<Project | undefined>(undefined);
 
-export interface ProjectProps {
+export interface ProjectProviderProps {
   url: string;
   children: React.ReactNode;
+  fallback: React.ReactNode;
 }
 
-export function ProjectProvider({ url, children }: ProjectProps) {
-  const { data: manifest } = useQuery(['app-dev-manifest', url], () => fetchAppDevManifest(url), {
-    suspense: true,
+export function ProjectProvider({ url, children, fallback }: ProjectProviderProps) {
+  const { data: manifest } = useSuspenseQuery({
+    queryKey: ['app-dev-manifest', url],
+    queryFn: () => fetchAppDevManifest(url),
   });
 
   invariant(manifest, "manifest should be defined, we're using suspense");
 
   const queryClient = useQueryClient();
 
-  const project = React.useMemo(
-    () => createProject(url, manifest, queryClient),
-    [url, manifest, queryClient],
-  );
+  const [project, setProject] = React.useState<Project | undefined>();
 
   React.useEffect(() => {
+    const newProject = createProject(url, manifest, queryClient);
+    setProject(newProject);
     return () => {
-      project.dispose();
+      newProject.dispose();
     };
-  }, [project]);
+  }, [url, manifest, queryClient]);
 
-  return <ProjectContext.Provider value={project}>{children}</ProjectContext.Provider>;
+  return (
+    <ProjectContext.Provider value={project}>
+      {project ? children : fallback}
+    </ProjectContext.Provider>
+  );
 }
 
 export function useProject() {

@@ -49,9 +49,11 @@ Describes the capabilities of the data provider.
 
 **Properties**
 
-| Name               | Type              | Description                                              |
-| :----------------- | :---------------- | :------------------------------------------------------- |
-| `paginationModel?` | `PaginationModel` | The pagination model that describes the requested slice. |
+| Name               | Type                                        | Description                                                                   |
+| :----------------- | :------------------------------------------ | :---------------------------------------------------------------------------- |
+| `paginationModel?` | `PaginationModel`                           | The pagination model that describes the requested slice.                      |
+| `filterModel`      | `FilterModel`                               | The filtering model that describes the serverside filter applied to the data. |
+| `sortModel`        | `{ field: string; sort: 'asc' \| 'desc'}[]` | The sort model that describes the desired ordering of the result set.         |
 
 ### PaginationModel
 
@@ -75,6 +77,15 @@ Describes the capabilities of the data provider.
 | :--------- | :------- | :---------------------------------------------------------------------- |
 | `cursor`   | `number` | The cursor addressing the requested slice. `null` for the initial page. |
 | `pageSize` | `number` | The length of the requested slice.                                      |
+
+### FilterModel
+
+**Properties**
+
+| Name            | Type                                                    | Description                                                                                     |
+| :-------------- | :------------------------------------------------------ | :---------------------------------------------------------------------------------------------- |
+| `logicOperator` | `'and' \| 'or'`                                         | The operator that is applied to the filtering operation.                                        |
+| `items`         | `{ field: string; operator: string; value: unknown }[]` | The constituents of the filter, each describes an operation applied to a field in the data set. |
 
 ### GetRecordsResult
 

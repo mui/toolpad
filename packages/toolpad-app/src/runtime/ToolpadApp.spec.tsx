@@ -16,17 +16,18 @@ import { LiveBindings, RuntimeEvents } from '@mui/toolpad-core';
 import { CanvasEventsContext } from '@mui/toolpad-core/runtime';
 import { Emitter } from '@mui/toolpad-utils/events';
 import { test, expect, afterEach } from 'vitest';
-import * as appDom from '../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import createRuntimeState from './createRuntimeState';
 import ToolpadApp from './ToolpadApp';
+import { AppHost, AppHostContext } from './AppHostContext';
 
 afterEach(cleanup);
-
-const COMPONENTS = {};
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
+
+const appHost: AppHost = { isPreview: false, isCustomServer: false, isCanvas: false };
 
 function renderPage(
   initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom,
@@ -35,7 +36,7 @@ function renderPage(
   let dom = appDom.createDom();
   const root = appDom.getNode(dom, dom.root, 'app');
   const page = appDom.createNode(dom, 'page', {
-    name: 'Page',
+    name: 'thePage',
     attributes: {
       title: '',
     },
@@ -44,13 +45,15 @@ function renderPage(
 
   dom = initPage(dom, page);
 
-  window.history.replaceState({}, 'Test page', `/toolpad/pages/${page.id}`);
+  window.history.replaceState({}, 'Test page', `/toolpad/pages/thePage`);
 
   const state = createRuntimeState({ dom });
 
   return render(
     <CanvasEventsContext.Provider value={canvasEvents}>
-      <ToolpadApp extraComponents={COMPONENTS} state={state} basename="toolpad" />
+      <AppHostContext.Provider value={appHost}>
+        <ToolpadApp state={state} basename="toolpad" />
+      </AppHostContext.Provider>
     </CanvasEventsContext.Provider>,
   );
 }

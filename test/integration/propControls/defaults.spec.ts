@@ -2,13 +2,15 @@ import * as path from 'path';
 import * as url from 'url';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
-import clickCenter from '../../utils/clickCenter';
+import { clickCenter } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
-  localAppConfig: {
+  projectConfig: {
     template: path.resolve(currentDirectory, './fixture-defaults'),
+  },
+  localAppConfig: {
     cmd: 'dev',
   },
 });

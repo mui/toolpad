@@ -3,9 +3,10 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import * as appDom from '@mui/toolpad-core/appDom';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
 import { CanvasHooksContext } from './CanvasHooksContext';
-import * as appDom from '../appDom';
-import api from './api';
+import { RuntimeApiContext } from './api';
 
 export type UseDataQueryConfig = Pick<
   UseQueryOptions<any, unknown, unknown, any[]>,
@@ -42,20 +43,20 @@ export function useDataQuery(
 
   const isNodeAvailableOnServer: boolean = savedNodes ? !!savedNodes[node.id] : true;
 
+  const runtimeApi = useNonNullableContext(RuntimeApiContext);
+
   const {
     isLoading,
     isFetching,
     error: fetchError,
     data: responseData = EMPTY_OBJECT,
     refetch,
-  } = useQuery(
-    [pageName, queryName, params],
-    () => api.methods.execQuery(pageName, queryName, params),
-    {
-      ...options,
-      enabled: isNodeAvailableOnServer && enabled,
-    },
-  );
+  } = useQuery({
+    queryKey: [pageName, queryName, params],
+    queryFn: () => runtimeApi.methods.execQuery(pageName, queryName, params),
+    ...options,
+    enabled: isNodeAvailableOnServer && enabled,
+  });
 
   const { data, error: apiError } = responseData;
 

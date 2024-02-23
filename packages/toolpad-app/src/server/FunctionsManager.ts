@@ -17,11 +17,13 @@ import {
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { ToolpadDataProviderIntrospection } from '@mui/toolpad-core/runtime';
 import * as url from 'node:url';
+import type { GridRowId } from '@mui/x-data-grid';
+import invariant from 'invariant';
+import { Awaitable } from '@mui/toolpad-utils/types';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
-import { createWorker as createDevWorker } from './functionsDevWorker';
+import * as functionsRuntime from './functionsRuntime';
 import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
-import { Awaitable } from '../utils/types';
 import { format } from '../utils/prettier';
 import { compilerOptions } from './functionsShared';
 
@@ -29,8 +31,7 @@ export interface CreateDataProviderOptions {
   paginationMode: PaginationMode;
 }
 
-import.meta.url ??= url.pathToFileURL(__filename).toString();
-const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
+const currentDirectory = url.fileURLToPath(new URL('.', String(import.meta.url)));
 
 async function createDefaultFunction(filePath: string): Promise<string> {
   const result = await format(
@@ -102,7 +103,6 @@ interface IToolpadProject {
   options: ToolpadProjectOptions;
   events: Emitter<ProjectEvents>;
   getRoot(): string;
-  getToolpadFolder(): string;
   getOutputFolder(): string;
   envManager: EnvManager;
   invalidateQueries(): void;
@@ -113,8 +113,6 @@ export default class FunctionsManager {
 
   private buildErrors: esbuild.Message[] = [];
 
-  private devWorker: ReturnType<typeof createDevWorker>;
-
   private extractedTypes: Awaitable<IntrospectionResult> | undefined;
 
   private extractTypesWorker: Piscina | undefined;
@@ -123,11 +121,10 @@ export default class FunctionsManager {
 
   constructor(project: IToolpadProject) {
     this.project = project;
-    this.devWorker = createDevWorker(process.env);
   }
 
   private getResourcesFolder(): string {
-    return path.join(this.project.getToolpadFolder(), './resources');
+    return path.join(this.project.getRoot(), './resources');
   }
 
   private getFunctionsFile(): string {
@@ -144,7 +141,7 @@ export default class FunctionsManager {
   }
 
   private async migrateLegacy() {
-    const legacyQueriesFile = path.resolve(this.project.getToolpadFolder(), 'queries.ts');
+    const legacyQueriesFile = path.resolve(this.project.getRoot(), 'queries.ts');
     if (await fileExists(legacyQueriesFile)) {
       const functionsFile = this.getFunctionsFile();
       await fs.mkdir(path.dirname(functionsFile), { recursive: true });
@@ -172,7 +169,7 @@ export default class FunctionsManager {
   private async extractTypes() {
     if (!this.extractTypesWorker) {
       this.extractTypesWorker = new Piscina({
-        filename: path.join(currentDirectory, 'functionsTypesWorker.js'),
+        filename: path.resolve(currentDirectory, '../cli/functionsTypesWorker.mjs'),
       });
     }
 
@@ -224,7 +221,9 @@ export default class FunctionsManager {
       bundle: true,
       metafile: true,
       outdir: this.getFunctionsOutputFolder(),
+      outExtension: { '.js': '.mjs' },
       platform: 'node',
+      format: 'esm',
       packages: 'external',
       target: 'es2022',
       tsconfigRaw: JSON.stringify({ compilerOptions }),
@@ -252,26 +251,10 @@ export default class FunctionsManager {
     resourcesWatcher.on('unlink', reinitializeWatcher);
   }
 
-  private async createRuntimeWorkerWithEnv() {
-    const oldWorker = this.devWorker;
-    this.devWorker = createDevWorker(process.env);
-
-    await oldWorker.terminate();
-
-    this.project.invalidateQueries();
-  }
-
   async start() {
     if (this.project.options.dev) {
       await this.migrateLegacy();
-
       await this.startWatchingFunctionFiles();
-
-      this.project.events.subscribe('envChanged', async () => {
-        await this.createRuntimeWorkerWithEnv();
-      });
-
-      await this.createRuntimeWorkerWithEnv();
     }
   }
 
@@ -295,11 +278,7 @@ export default class FunctionsManager {
   }
 
   async dispose() {
-    await Promise.all([
-      this.disposeBuildcontext(),
-      this.devWorker.terminate(),
-      this.extractTypesWorker?.destroy(),
-    ]);
+    await Promise.all([this.disposeBuildcontext(), this.extractTypesWorker?.destroy()]);
   }
 
   async getBuiltOutputFilePath(fileName: string): Promise<string> {
@@ -315,7 +294,7 @@ export default class FunctionsManager {
 
     const outputFilePath = path.resolve(
       this.getFunctionsOutputFolder(),
-      `${path.basename(fileName, '.ts')}.js`,
+      `${path.basename(fileName, '.ts')}.mjs`,
     );
 
     return outputFilePath;
@@ -326,7 +305,6 @@ export default class FunctionsManager {
     name: string,
     parameters: Record<string, unknown>,
   ): Promise<ExecFetchResult<unknown>> {
-    const outputFilePath = await this.getBuiltOutputFilePath(fileName);
     const extractedTypes = await this.introspect();
 
     if (extractedTypes.error) {
@@ -344,7 +322,17 @@ export default class FunctionsManager {
       ? [{ parameters }]
       : handler.parameters.map(([parameterName]) => parameters[parameterName]);
 
-    const data = await this.devWorker.execute(outputFilePath, name, executeParams);
+    return this.execFunction(fileName, name, executeParams);
+  }
+
+  async execFunction(
+    fileName: string,
+    name: string,
+    parameters: unknown[],
+  ): Promise<ExecFetchResult<unknown>> {
+    const outputFilePath = await this.getBuiltOutputFilePath(fileName);
+
+    const data = await functionsRuntime.execute(outputFilePath, name, parameters);
 
     return { data };
   }
@@ -388,7 +376,13 @@ export default class FunctionsManager {
     exportName: string = 'default',
   ): Promise<ToolpadDataProviderIntrospection> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
-    return this.devWorker.introspectDataProvider(fullPath, exportName);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    return {
+      paginationMode: dataProvider.paginationMode,
+      hasDeleteRecord: !!dataProvider.deleteRecord,
+      hasUpdateRecord: !!dataProvider.updateRecord,
+      hasCreateRecord: !!dataProvider.createRecord,
+    };
   }
 
   async getDataProviderRecords<R, P extends PaginationMode>(
@@ -397,6 +391,41 @@ export default class FunctionsManager {
     params: GetRecordsParams<R, P>,
   ): Promise<GetRecordsResult<R, P>> {
     const fullPath = await this.getBuiltOutputFilePath(fileName);
-    return this.devWorker.getDataProviderRecords(fullPath, exportName, params);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    return dataProvider.getRecords(params);
+  }
+
+  async deleteDataProviderRecord(
+    fileName: string,
+    exportName: string,
+    id: GridRowId,
+  ): Promise<void> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    invariant(dataProvider.deleteRecord, 'DataProvider does not support deleteRecord');
+    return dataProvider.deleteRecord(id);
+  }
+
+  async updateDataProviderRecord(
+    fileName: string,
+    exportName: string,
+    id: GridRowId,
+    values: Record<string, unknown>,
+  ): Promise<void> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    invariant(dataProvider.updateRecord, 'DataProvider does not support updateRecord');
+    return dataProvider.updateRecord(id, values);
+  }
+
+  async createDataProviderRecord(
+    fileName: string,
+    exportName: string,
+    values: Record<string, unknown>,
+  ): Promise<void> {
+    const fullPath = await this.getBuiltOutputFilePath(fileName);
+    const dataProvider = await functionsRuntime.loadDataProvider(fullPath, exportName);
+    invariant(dataProvider.createRecord, 'DataProvider does not support createRecord');
+    return dataProvider.createRecord(values);
   }
 }

@@ -5,7 +5,7 @@ import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
-import * as appDom from '../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { DomView } from '../../../utils/domView';
@@ -130,14 +130,12 @@ function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.Elem
 }
 
 export default function HierarchyExplorer() {
-  const { dom } = useAppState();
-  const { currentView } = useAppState();
+  const { dom, currentView } = useAppState();
   const appStateApi = useAppStateApi();
   const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
 
-  const currentPageId = currentView?.nodeId;
-  const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
-  const selectedDomNodeId = (currentView as Extract<DomView, { kind: 'page' }>)?.selectedNodeId;
+  const currentPageNode = currentView?.name ? appDom.getPageByName(dom, currentView.name) : null;
+  const selectedDomNodeId = currentView?.selectedNodeId;
 
   const selectedNodeAncestorIds = React.useMemo(() => {
     if (!selectedDomNodeId) {

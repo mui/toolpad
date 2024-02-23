@@ -14,6 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 interface ExplorerHeaderProps {
   headerText: string;
+  headerIcon?: React.ReactNode;
   createLabelText?: string;
   onCreate?: React.MouseEventHandler<HTMLButtonElement>;
   searchLabelText?: string;
@@ -35,6 +36,7 @@ const ExplorerHeaderTitle = styled(Typography)(({ theme }) => ({
 
 export default function ExplorerHeader({
   headerText,
+  headerIcon,
   onCreate,
   onSearch,
   createLabelText,

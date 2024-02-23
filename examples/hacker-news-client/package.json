@@ -1,0 +1,14 @@
+{
+  "name": "hacker-news-client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad dev",
+    "build": "toolpad build",
+    "start": "toolpad start"
+  },
+  "dependencies": {
+    "@mui/toolpad": "^0.1.50",
+    "axios": "^1.4.0"
+  }
+}

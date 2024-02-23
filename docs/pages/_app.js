@@ -5,23 +5,26 @@ import { loadCSS } from 'fg-loadcss/src/loadCSS';
 import NextHead from 'next/head';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
+import { LicenseInfo } from '@mui/x-data-grid-pro';
 import PageContext from 'docs/src/modules/components/PageContext';
 import GoogleAnalytics from 'docs/src/modules/components/GoogleAnalytics';
 import { ThemeProvider } from 'docs/src/modules/components/ThemeContext';
 import { CodeVariantProvider } from 'docs/src/modules/utils/codeVariant';
 import { CodeCopyProvider } from 'docs/src/modules/utils/CodeCopy';
-import { UserLanguageProvider } from 'docs/src/modules/utils/i18n';
 import DocsStyledEngineProvider from 'docs/src/modules/utils/StyledEngineProvider';
 import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 import toolpadPkgJson from '@mui/toolpad/package.json';
+import { DocsProvider } from '@mui/docs/DocsProvider';
 import pages from '../data/pages';
+import config from '../config';
 
 const clientSideEmotionCache = createEmotionCache();
 
 let reloadInterval;
+LicenseInfo.setLicenseKey(process.env.NEXT_PUBLIC_MUI_LICENSE);
 
 // Avoid infinite loop when "Upload on reload" is set in the Chrome sw dev tools.
 function lazyReload() {
@@ -172,7 +175,7 @@ function AppWrapper(props) {
         <meta name="mui:productId" content={productId} />
         <meta name="mui:productCategoryId" content={productCategoryId} />
       </NextHead>
-      <UserLanguageProvider defaultUserLanguage={pageProps.userLanguage}>
+      <DocsProvider config={config} defaultUserLanguage={pageProps.userLanguage}>
         <CodeCopyProvider>
           <CodeVariantProvider>
             <PageContext.Provider value={pageContextValue}>
@@ -185,7 +188,7 @@ function AppWrapper(props) {
             </PageContext.Provider>
           </CodeVariantProvider>
         </CodeCopyProvider>
-      </UserLanguageProvider>
+      </DocsProvider>
     </React.Fragment>
   );
 }

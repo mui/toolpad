@@ -3,7 +3,7 @@ import { Box, BoxProps } from '@mui/material';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
-const SPACER_MINIMUM_HEIGHT = 20; // pixels
+const SPACER_MINIMUM_HEIGHT = 60; // pixels
 
 function Spacer(props: BoxProps) {
   return <Box {...props} height="100%" minHeight={SPACER_MINIMUM_HEIGHT} />;

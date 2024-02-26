@@ -34,9 +34,9 @@ Toolpad is also present on Discord, you can connect with other Toolpad users and
 Please note that we a have a single Discord server for all MUI products and you should post in the Toolpad channel.
 :::
 
-### Stack Overflow
+### Stack Overflow
 
-Stack Overflow contains a wealth of information about MUI products. Toolpad is a new product and you can start by [posting a question](https://stackoverflow.com/questions/tagged/toolpad) to get help from community experts as well as MUI maintainers.
+Stack Overflow contains a wealth of information about MUI products. Toolpad is a new product and you can start by [posting a question](https://stackoverflow.com/questions/tagged/toolpad) to get help from community experts as well as MUI maintainers.
 
 ### Social media
 

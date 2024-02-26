@@ -1,6 +1,7 @@
 import { setTimeout } from 'timers/promises';
 import { expect, FrameLocator, Locator, Page } from '@playwright/test';
 import { gotoIfNotCurrent } from './shared';
+import { waitForBoundingBox } from '../utils/locators';
 
 class CreateComponentDialog {
   readonly page: Page;
@@ -119,7 +120,7 @@ export class ToolpadEditor {
     await this.page.mouse.move(
       sourceBoundingBox!.x + sourceBoundingBox!.width / 2,
       sourceBoundingBox!.y + sourceBoundingBox!.height / 2,
-      { steps: 10 },
+      { steps },
     );
 
     await this.page.mouse.down();
@@ -146,21 +147,19 @@ export class ToolpadEditor {
 
     await this.componentCatalog.hover();
 
-    let pageRootBoundingBox;
-    await expect(async () => {
-      pageRootBoundingBox = await this.pageRoot.boundingBox();
-      expect(pageRootBoundingBox).toBeTruthy();
-    }).toPass();
+    const pageRootBoundingBox = await waitForBoundingBox(this.pageRoot);
 
     if (!moveTargetX) {
       moveTargetX = pageRootBoundingBox!.x + pageRootBoundingBox!.width / 2;
     }
     if (!moveTargetY) {
-      moveTargetY = pageRootBoundingBox!.y + pageRootBoundingBox!.height / 2;
+      moveTargetY = pageRootBoundingBox!.y + pageRootBoundingBox!.height + 12;
     }
 
     const sourceLocator = this.getComponentCatalogItem(componentName);
     await expect(sourceLocator).toBeVisible();
+
+    await sourceLocator.hover();
 
     await this.dragTo(sourceLocator, moveTargetX!, moveTargetY!, hasDrop, steps);
 

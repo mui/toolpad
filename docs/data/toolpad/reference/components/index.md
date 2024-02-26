@@ -20,6 +20,7 @@
 - [PageRow](/toolpad/reference/components/page-row/)
 - [Paper](/toolpad/reference/components/paper/)
 - [Select](/toolpad/reference/components/select/)
+- [Spacer](/toolpad/reference/components/spacer/)
 - [Stack](/toolpad/reference/components/stack/)
 - [Tabs](/toolpad/reference/components/tabs/)
 - [Text](/toolpad/reference/components/text/)

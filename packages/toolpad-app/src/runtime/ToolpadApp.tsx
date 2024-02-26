@@ -442,10 +442,8 @@ function getQueryConfigBindings({ enabled, refetchInterval }: appDom.QueryNode['
 }
 
 function isBindableProp(componentConfig: ComponentConfig<any>, propName: string) {
-  const isResizableHeightProp = propName === componentConfig.resizableHeightProp;
   const argType = componentConfig.argTypes?.[propName];
   return (
-    !isResizableHeightProp &&
     argType?.control?.bindable !== false &&
     argType?.type !== 'template' &&
     argType?.type !== 'event'
@@ -1195,6 +1193,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             display: 'flex',
             alignItems: boundLayoutProps.verticalAlign,
             justifyContent: boundLayoutProps.horizontalAlign,
+            height: node.layout?.height ?? componentConfig.defaultLayoutHeight,
+            minHeight: '100%',
           }}
           ref={nodeRef}
           data-toolpad-node-id={nodeId}

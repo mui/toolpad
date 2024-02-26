@@ -5,6 +5,7 @@ import {
   FORM_COMPONENT_ID,
   PAGE_COLUMN_COMPONENT_ID,
   PAGE_ROW_COMPONENT_ID,
+  SPACER_COMPONENT_ID,
   STACK_COMPONENT_ID,
 } from '../../runtime/toolpadComponents';
 import { useProject } from '../../project';
@@ -114,6 +115,10 @@ export const INTERNAL_COMPONENTS = new Map<string, ToolpadComponentDefinition>([
     },
   ],
   [FORM_COMPONENT_ID, { displayName: 'Form', builtIn: 'Form', synonyms: [] }],
+  [
+    SPACER_COMPONENT_ID,
+    { displayName: 'Spacer', builtIn: 'Spacer', synonyms: ['margin', 'blank', 'empty', 'void'] },
+  ],
   [
     'Password',
     {

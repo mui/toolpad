@@ -57,7 +57,6 @@ export function deleteOrphanedLayoutNodes(
       if (
         lastContainerChild.parentProp &&
         parentParent.parentIndex &&
-        moveTargetNodeId !== parentParent.id &&
         moveTargetNodeId !== lastContainerChild.id
       ) {
         if (
@@ -86,6 +85,10 @@ export function deleteOrphanedLayoutNodes(
               'columnSize',
               parent.layout?.columnSize || 1,
             );
+          }
+
+          if (isPageColumn(lastContainerChild) && appDom.isPage(parentParent)) {
+            updatedDom = appDom.spreadNode(updatedDom, lastContainerChild);
           }
 
           orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];

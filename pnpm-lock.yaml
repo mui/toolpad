@@ -55,8 +55,8 @@ importers:
         specifier: 1.5.4
         version: 1.5.4
       '@mui/monorepo':
-        specifier: https://github.com/michaldudak/material-ui.git#npm-publishing%2Fmarkdown
-        version: github.com/michaldudak/material-ui/6b43d3e13922fd4fa54d30666155acc3d2c10028
+        specifier: https://github.com/mui/material-ui.git#5e4e18a10085b7e65955ca11ba6c93c838003e0c
+        version: github.com/mui/material-ui/5e4e18a10085b7e65955ca11ba6c93c838003e0c
       '@mui/x-charts':
         specifier: 6.19.5
         version: 6.19.5(@mui/material@5.15.10)(@mui/system@5.15.9)(react-dom@18.2.0)(react@18.2.0)
@@ -211,8 +211,8 @@ importers:
         specifier: 5.15.10
         version: 5.15.10(@mui/material@5.15.10)(react@18.2.0)
       '@mui/internal-markdown':
-        specifier: https://pkg.csb.dev/mui/material-ui/commit/6b43d3e1/@mui/internal-markdown
-        version: '@pkg.csb.dev/mui/material-ui/commit/6b43d3e1/@mui/internal-markdown'
+        specifier: ^1.0.0
+        version: 1.0.0
       '@mui/joy':
         specifier: 5.0.0-beta.28
         version: 5.0.0-beta.28(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(react-dom@18.2.0)(react@18.2.0)
@@ -226,8 +226,8 @@ importers:
         specifier: ^5.15.11
         version: 5.15.11(@emotion/cache@11.11.0)(@emotion/server@11.11.0)(@mui/material@5.15.10)(next@13.5.6)(react@18.2.0)
       '@mui/monorepo':
-        specifier: https://github.com/michaldudak/material-ui.git#npm-publishing%2Fmarkdown
-        version: github.com/michaldudak/material-ui/6b43d3e13922fd4fa54d30666155acc3d2c10028
+        specifier: https://github.com/mui/material-ui.git#5e4e18a10085b7e65955ca11ba6c93c838003e0c
+        version: github.com/mui/material-ui/5e4e18a10085b7e65955ca11ba6c93c838003e0c
       '@mui/styles':
         specifier: 5.15.10
         version: 5.15.10(react@18.2.0)
@@ -1500,7 +1500,7 @@ packages:
     resolution: {integrity: sha512-TPJ6O7gVC2rlQH2hvQGRH273G1xdoloCj9Pc07Q7JbIZYDi+Sv5gaE2fu+r5E7qK4zyt6vj0FbZaZTRU5C3OMA==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
-      '@babel/core': ^7.23.9
+      '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.23.9
       '@babel/helper-plugin-utils': 7.22.5
@@ -1638,7 +1638,7 @@ packages:
   /@docsearch/react@3.5.2(@algolia/client-search@4.22.1)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.13.0):
     resolution: {integrity: sha512-9Ahcrs5z2jq/DcAvYtvlqEBHImbm4YJI8M9y0x6Tqg598P40HTEkX7hsMcIuThI+hTFxRGZ9hll0Wygm2yEjng==}
     peerDependencies:
-      '@types/react': ^18.2.55
+      '@types/react': '>= 16.8.0 < 19.0.0'
       react: '>= 16.8.0 < 19.0.0'
       react-dom: '>= 16.8.0 < 19.0.0'
       search-insights: '>= 1 < 3'
@@ -2386,7 +2386,7 @@ packages:
   /@fast-csv/format@4.3.5:
     resolution: {integrity: sha512-8iRn6QF3I8Ak78lNAa+Gdl5MJJBM5vRHivFtMRUWINdevNo00K7OXxS2PshawLKTejVwieIlPmK5YlLu6w4u8A==}
     dependencies:
-      '@types/node': 18.19.18
+      '@types/node': 14.18.63
       lodash.escaperegexp: 4.1.2
       lodash.isboolean: 3.0.3
       lodash.isequal: 4.5.0
@@ -2688,6 +2688,15 @@ packages:
       '@babel/runtime': 7.23.9
       '@mui/material': 5.15.10(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
+    dev: false
+
+  /@mui/internal-markdown@1.0.0:
+    resolution: {integrity: sha512-jbj1XYQZN5Jqphq9K/Tyt42v/eRPmXEZzAYOHbsvHfFo9XnMC2OKJAsYOwpXGVmZQpvkg1z9vA55gOe6ceTW/w==}
+    dependencies:
+      '@babel/runtime': 7.23.9
+      lodash: 4.17.21
+      marked: 5.1.2
+      prismjs: 1.29.0
     dev: false
 
   /@mui/joy@5.0.0-beta.28(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(react-dom@18.2.0)(react@18.2.0):
@@ -4522,12 +4531,6 @@ packages:
 
   /@types/node@14.18.63:
     resolution: {integrity: sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ==}
-    dev: false
-
-  /@types/node@18.19.18:
-    resolution: {integrity: sha512-80CP7B8y4PzZF0GWx15/gVWRrB5y/bIjNI84NK3cmQJu0WZwvmj2WMA5LcofQFVfLqqCSp545+U2LsrVzX36Zg==}
-    dependencies:
-      undici-types: 5.26.5
     dev: false
 
   /@types/node@20.11.16:
@@ -15381,19 +15384,8 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  '@pkg.csb.dev/mui/material-ui/commit/6b43d3e1/@mui/internal-markdown':
-    resolution: {tarball: https://pkg.csb.dev/mui/material-ui/commit/6b43d3e1/@mui/internal-markdown}
-    name: '@mui/internal-markdown'
-    version: 1.0.0
-    dependencies:
-      '@babel/runtime': 7.23.9
-      lodash: 4.17.21
-      marked: 5.1.2
-      prismjs: 1.29.0
-    dev: false
-
-  github.com/michaldudak/material-ui/6b43d3e13922fd4fa54d30666155acc3d2c10028:
-    resolution: {tarball: https://codeload.github.com/michaldudak/material-ui/tar.gz/6b43d3e13922fd4fa54d30666155acc3d2c10028}
+  github.com/mui/material-ui/5e4e18a10085b7e65955ca11ba6c93c838003e0c:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/5e4e18a10085b7e65955ca11ba6c93c838003e0c}
     name: '@mui/monorepo'
     version: 5.15.11
     requiresBuild: true

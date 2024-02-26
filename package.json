@@ -98,10 +98,10 @@
   "engines": {
     "npm": "please-use-yarn",
     "node": ">=18",
-    "pnpm": "8.15.3"
+    "pnpm": "8.15.4"
   },
   "resolutions": {
     "google-auth-library": "*"
   },
-  "packageManager": "pnpm@8.15.3"
+  "packageManager": "pnpm@8.15.4"
 }

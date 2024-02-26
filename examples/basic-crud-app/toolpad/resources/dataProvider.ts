@@ -97,7 +97,8 @@ export default createDataProvider({
     const highestId = records.reduce((maxId, record) => Math.max(maxId, record.id), 0);
     // Assign a new unique id to the new record
     const newRecord = { ...data, id: highestId + 1 };
-    return records.push(newRecord);
+    records.push(newRecord);
+    return newRecord;
   },
 
   async updateRecord(id: number, data: Omit<Customer, 'id'>) {

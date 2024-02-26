@@ -939,7 +939,6 @@ function useDataProviderDataGridProps(
     rowModesModel,
     onRowModesModelChange: (model) => setRowModesModel(model),
     processRowUpdate: handleProcessRowUpdate,
-    onProcessRowUpdateError: (error) => console.log('fsdkh', error),
     onRowEditStart: handleRowEditStart,
     onRowEditStop: handleRowEditStop,
     slots: {

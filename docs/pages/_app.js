@@ -18,7 +18,8 @@ import findActivePage from 'docs/src/modules/utils/findActivePage';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 import toolpadPkgJson from '@mui/toolpad/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
-import pages from '../data/pages';
+import { pages as toolpadStudioPages } from '../data/toolpad/studio/pages';
+import { pages as toolpadPages } from '../data/toolpad/pages';
 import config from '../config';
 
 const clientSideEmotionCache = createEmotionCache();
@@ -148,13 +149,27 @@ function AppWrapper(props) {
   }
 
   const pageContextValue = React.useMemo(() => {
-    const { activePage, activePageParents } = findActivePage(pages, router.pathname);
+    let productIdentifier;
+    let pages = [];
 
-    const productIdentifier = {
-      metadata: '',
-      name: 'Toolpad',
-      versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
-    };
+    if (productId === 'toolpad') {
+      productIdentifier = {
+        metadata: '',
+        name: 'Toolpad',
+        versions: [{ text: `v0.0.1`, current: true }],
+      };
+      pages = toolpadPages;
+    }
+    if (productId === 'toolpad-studio') {
+      productIdentifier = {
+        metadata: '',
+        name: 'Toolpad Studio',
+        versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
+      };
+      pages = toolpadStudioPages;
+    }
+
+    const { activePage, activePageParents } = findActivePage(pages, router.pathname);
 
     return {
       activePage,

@@ -1,4 +1,4 @@
-import ROUTES from '../../../src/route';
+import ROUTES from '../../../../src/route';
 
 const marquee = {
   title: 'Stay in the loop',

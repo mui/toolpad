@@ -4,7 +4,7 @@ import * as React from 'react';
 import { GetStaticProps } from 'next';
 import SchemaReference, {
   SchemaReferenceProps,
-} from '../../../../src/modules/components/SchemaReference';
+} from '../../../../../src/modules/components/SchemaReference';
 
 export const getStaticProps: GetStaticProps<SchemaReferenceProps> = async () => {
   const schemaFile = path.join(process.cwd(), './schemas/v1/definitions.json');

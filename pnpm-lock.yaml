@@ -55,8 +55,8 @@ importers:
         specifier: 1.5.4
         version: 1.5.4
       '@mui/monorepo':
-        specifier: github:mui/material-ui#36bb1aa7f35b4b9d527716a5907e9be38d78ffd7
-        version: github.com/mui/material-ui/36bb1aa7f35b4b9d527716a5907e9be38d78ffd7
+        specifier: github:bharatkashyap/material-ui#aae1c33e6cc03bb6c517e08e61c140015f916339
+        version: github.com/bharatkashyap/material-ui/aae1c33e6cc03bb6c517e08e61c140015f916339
       '@mui/x-charts':
         specifier: 6.19.4
         version: 6.19.4(@mui/material@5.15.10)(@mui/system@5.15.9)(react-dom@18.2.0)(react@18.2.0)
@@ -15366,6 +15366,24 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
+  github.com/bharatkashyap/material-ui/aae1c33e6cc03bb6c517e08e61c140015f916339:
+    resolution: {tarball: https://codeload.github.com/bharatkashyap/material-ui/tar.gz/aae1c33e6cc03bb6c517e08e61c140015f916339}
+    name: '@mui/monorepo'
+    version: 5.15.11
+    requiresBuild: true
+    dependencies:
+      '@googleapis/sheets': 5.0.5
+      '@slack/bolt': 3.17.1
+      execa: 8.0.1
+      google-auth-library: 9.4.2
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - encoding
+      - supports-color
+      - utf-8-validate
+    dev: true
+
   github.com/mui/material-ui/36bb1aa7f35b4b9d527716a5907e9be38d78ffd7:
     resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/36bb1aa7f35b4b9d527716a5907e9be38d78ffd7}
     name: '@mui/monorepo'
@@ -15382,3 +15400,4 @@ packages:
       - encoding
       - supports-color
       - utf-8-validate
+    dev: false

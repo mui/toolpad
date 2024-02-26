@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.50/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: grids
+  display: shell
+  content:
+    - component: PageRow
+      name: pageRow
+      props:
+        justifyContent: start
+      children:
+        - component: PageColumn
+          name: pageColumn
+          layout:
+            columnSize: 1
+          children:
+            - component: DataGrid
+              name: dataGrid
+              layout:
+                columnSize: 1
+                height: 120
+              props:
+                rows:
+                  - id: one
+                columns:
+                  - field: id
+                    type: string
+            - component: DataGrid
+              name: dataGrid2
+              props:
+                rows:
+                  - id: two
+                columns:
+                  - field: id
+                    type: string
+              layout:
+                height: 120
+        - component: DataGrid
+          name: dataGrid1
+          props:
+            rows:
+              - id: three
+            columns:
+              - field: id
+                type: string
+  alias:
+    - Dh9u36B

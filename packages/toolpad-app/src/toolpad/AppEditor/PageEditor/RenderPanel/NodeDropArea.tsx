@@ -177,6 +177,8 @@ export default function NodeDropArea({
   const isPageNode = appDom.isPage(node);
   const isPageChild = dropAreaNodeParent ? appDom.isPage(dropAreaNodeParent) : false;
 
+  const isPageRowNode = appDom.isElement(node) && isPageRow(node);
+
   const isPageChildElement = isPageChild && appDom.isElement(node) && !isPageRow(node);
   const isPageRowChild = dropAreaNodeParent
     ? appDom.isElement(dropAreaNodeParent) && isPageRow(dropAreaNodeParent)
@@ -242,7 +244,7 @@ export default function NodeDropArea({
       }
 
       // Is dragging over left, is page row and child of the page
-      if (dropAreaNodeParent && appDom.isElement(node) && isPageRow(node) && isPageChild) {
+      if (dropAreaNodeParent && isPageRowNode && isPageChild) {
         return null;
       }
     }
@@ -252,13 +254,11 @@ export default function NodeDropArea({
       if (
         dropAreaNodeParent &&
         dropAreaNodeParent.id === dragOverNodeId &&
-        pageAwareParentProp === dragOverSlotParentProp &&
-        !parentProp
+        (pageAwareParentProp === dragOverSlotParentProp || !parentProp)
       ) {
         const parentLastChild =
-          pageAwareParentProp &&
-          (appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent))
-            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, pageAwareParentProp)
+          appDom.isPage(dropAreaNodeParent) || appDom.isElement(dropAreaNodeParent)
+            ? appDom.getNodeLastChild(dom, dropAreaNodeParent, pageAwareParentProp || 'children')
             : null;
 
         const isParentLastChild = parentLastChild ? node.id === parentLastChild.id : false;
@@ -266,7 +266,7 @@ export default function NodeDropArea({
         const parentSlots = dropAreaNodeParentInfo?.slots || null;
 
         const parentFlowDirection =
-          parentSlots && pageAwareParentProp && parentSlots[pageAwareParentProp]?.flowDirection;
+          parentSlots && parentSlots[pageAwareParentProp || 'children']?.flowDirection;
 
         return parentFlowDirection && isParentLastChild
           ? getChildNodeHighlightedZone(parentFlowDirection)
@@ -298,18 +298,19 @@ export default function NodeDropArea({
       ? dragOverZone
       : null;
   }, [
-    dropAreaNodeParent,
-    dom,
     dragOverZone,
     availableDropZones,
     isPageNode,
     parentProp,
     isEmptySlot,
+    dropAreaNodeParent,
+    dom,
+    isPageChild,
     node,
     dragOverNodeId,
     dragOverSlotParentProp,
     isPageRowChild,
-    isPageChild,
+    isPageRowNode,
     dropAreaNodeParentInfo?.slots,
     dropAreaNodeChildNodes,
   ]);

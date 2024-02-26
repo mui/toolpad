@@ -47,7 +47,7 @@ export default defineConfig((options) => [
   {
     entry: ['src/exports/*.ts', 'src/exports/*.tsx'],
     format: ['esm'],
-    dts: true,
+    experimentalDts: true,
     silent: true,
     clean: !options.watch,
     outDir: 'dist/exports',

@@ -17,19 +17,34 @@
       "default": "./dist/events.js"
     },
     "./*": {
-      "types": "./dist/*.d.ts",
-      "require": "./dist/*.cjs",
-      "default": "./dist/*.js"
+      "require": {
+        "types": "./dist/*.d.cts",
+        "default": "./dist/*.cjs"
+      },
+      "default": {
+        "types": "./dist/*.d.ts",
+        "default": "./dist/*.js"
+      }
     },
     "./hooks/useBoolean": {
-      "types": "./dist/hooks/useBoolean.d.ts",
-      "require": "./dist/hooks/useBoolean.cjs",
-      "default": "./dist/hooks/useBoolean.js"
+      "require": {
+        "types": "./dist/hooks/useBoolean.d.cts",
+        "default": "./dist/hooks/useBoolean.cjs"
+      },
+      "default": {
+        "types": "./dist/hooks/useBoolean.d.ts",
+        "default": "./dist/hooks/useBoolean.js"
+      }
     },
     "./hooks/*": {
-      "types": "./dist/hooks/*.d.ts",
-      "require": "./dist/hooks/*.cjs",
-      "default": "./dist/hooks/*.js"
+      "require": {
+        "types": "./dist/hooks/*.d.cts",
+        "default": "./dist/hooks/*.cjs"
+      },
+      "default": {
+        "types": "./dist/hooks/*.d.ts",
+        "default": "./dist/hooks/*.js"
+      }
     }
   },
   "files": [

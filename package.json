@@ -81,12 +81,14 @@
     "yarn-deduplicate": "6.0.2"
   },
   "dependencies": {
+    "@microsoft/api-extractor": "^7.41.0",
     "archiver": "6.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.3.0",
     "eslint-import-resolver-exports": "1.0.0-beta.5",
     "inquirer": "9.2.13",
     "lodash": "4.17.21",
+    "react-query": "^3.39.3",
     "semver": "7.5.4",
     "tsup": "8.0.1",
     "tsx": "4.7.1",

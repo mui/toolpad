@@ -1,4 +1,3 @@
-import { spawnSync } from 'child_process';
 import * as fs from 'fs/promises';
 import path from 'path';
 import { defineConfig, Options } from 'tsup';
@@ -21,14 +20,9 @@ function cleanFolderOnFailure(folder: string): EsbuildPlugin {
 export default defineConfig({
   entry: ['src/*{.ts,.tsx}'],
   format: ['esm'],
-  dts: false,
+  experimentalDts: true,
   silent: true,
   sourcemap: true,
   splitting: true,
   esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
-  async onSuccess() {
-    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
-    // eslint-disable-next-line no-console
-    console.log('build successful');
-  },
 });

@@ -1,6 +1,5 @@
 import * as fs from 'fs/promises';
 import path from 'path';
-import { spawnSync } from 'child_process';
 import { defineConfig, Options } from 'tsup';
 
 type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
@@ -25,14 +24,9 @@ export default defineConfig((options) => ({
     '!src/**/*.spec.*', // Avoid building tests
   ],
   format: ['esm', 'cjs'],
-  dts: false,
+  experimentalDts: true,
   silent: true,
   clean: !options.watch,
   sourcemap: true,
   esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
-  async onSuccess() {
-    // eslint-disable-next-line no-console
-    console.log('build successful');
-    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
-  },
 }));

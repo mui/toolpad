@@ -77,7 +77,7 @@ The CLI scaffolds a Next.js project with all Toolpad features set up
    }
    ```
 
-   In your browser open the page http://localhost:3000/hello-world and verify that it shows “Hello world!”
+In your browser open the page http://localhost:3000/hello-world and verify that it shows "Hello World!"
 
 5. Now we will add our first data provider. Copy the sample CSV file (insert link) to the project root and add the following
 
@@ -103,10 +103,9 @@ The CLI scaffolds a Next.js project with all Toolpad features set up
    <aside>
    ❕ Add live demo here of the above
    Break down each line that was added and explain what it does.
-
    </aside>
 
-6. This is great, but we’d also like to visualize this data
+6. This is great, but we'd also like to visualise this data:
 
    ```tsx
    import * as React from 'react';
@@ -141,7 +140,7 @@ The CLI scaffolds a Next.js project with all Toolpad features set up
 
    Now both the data grid and the chart display the CSV data
 
-7. Wouldn’t it be nice if the chart would also show the data that is displayed in the grid as it is filtered?
+7. Wouldn't it be nice if the chart also displayed the data in the grid as it was filtered?
 
    ```tsx
    import * as React from 'react';

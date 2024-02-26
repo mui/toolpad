@@ -68,13 +68,13 @@ We will add RBAC to the DataSources so that you can enforce it at the data level
 import { createDataProviderGoogleSheets } from '@mui/toolpad-data-google-sheets'
 
 const dataSource = createDataProviderGoogleSheets({
-	clientId: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  sheet: 'my-sheet',
-  authorization: {
-    getRows: ['admin', 'guest'],
-    createRow: ['admin']
-  }
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    sheet: 'my-sheet',
+    authorization: {
+        getRows: ['admin', 'guest'],
+        createRow: ['admin']
+    }
 })
 
 ...

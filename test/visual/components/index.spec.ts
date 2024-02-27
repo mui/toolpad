@@ -56,6 +56,7 @@ test('building layouts', async ({ page, argosScreenshot }) => {
   await editorModel.dragNewComponentToCanvas('FullWidth');
 
   await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
+  await expect(page.getByLabel('All changes saved!')).toBeVisible();
   await argosScreenshot('building-layout-1');
 
   const firstFullWidthBoundingBox = await getNthFullWidthBoundingBox(0);
@@ -68,6 +69,7 @@ test('building layouts', async ({ page, argosScreenshot }) => {
   );
 
   await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
+  await expect(page.getByLabel('All changes saved!')).toBeVisible();
   await argosScreenshot('building-layout-2');
 
   const secondFullWidthBoundingBox = await getNthFullWidthBoundingBox(1);
@@ -82,6 +84,7 @@ test('building layouts', async ({ page, argosScreenshot }) => {
   );
 
   await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
+  await expect(page.getByLabel('All changes saved!')).toBeVisible();
   await argosScreenshot('building-layout-3');
 });
 

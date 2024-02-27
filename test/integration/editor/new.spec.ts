@@ -1,7 +1,7 @@
 import path from 'path';
 import invariant from 'invariant';
 import { fileExists, folderExists } from '@mui/toolpad-utils/fs';
-import { test, expect } from '../../playwright/localTest';
+import { test, expect, Locator } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 
 test.use({
@@ -29,7 +29,8 @@ test('can place new components from catalog', async ({ page }) => {
 
   await expect(canvasInputLocator).toHaveCount(1);
   await expect(canvasInputLocator).toBeVisible();
-  expect(await page.getByLabel('Node name').inputValue()).toBe('textField');
+
+  await expect(editorModel.componentEditor.getByText('textField')).toBeVisible();
 
   // Drag in a second component
 
@@ -62,27 +63,39 @@ test('can create/delete page', async ({ page, localApp }) => {
   await editorModel.goto();
 
   await editorModel.createPage('someOtherPage');
+  await editorModel.createPage('andOneMorePage');
 
-  const pageMenuItem = editorModel.getExplorerItem('someOtherPage');
-  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/someOtherPage');
+  const deletePageFromExplorer = async (pageMenuItem: Locator) => {
+    await pageMenuItem.hover();
+
+    await pageMenuItem.getByRole('button', { name: 'Open page explorer menu' }).click();
+
+    await page.getByRole('menuitem', { name: 'Delete' }).click();
+
+    await page
+      .getByRole('dialog', { name: 'Confirm' })
+      .getByRole('button', { name: 'Delete' })
+      .click();
+  };
+
+  // Delete another page
+
+  const anotherPageMenuItem = editorModel.getExplorerItem('someOtherPage');
+  await deletePageFromExplorer(anotherPageMenuItem);
+  await expect(anotherPageMenuItem).toBeHidden();
+
+  // Delete current page
+
+  const currentPageMenuItem = editorModel.getExplorerItem('andOneMorePage');
+  const pageFolder = path.resolve(localApp.dir, './toolpad/pages/andOneMorePage');
   const pageFile = path.resolve(pageFolder, './page.yml');
 
-  await expect(pageMenuItem).toBeVisible();
+  await expect(currentPageMenuItem).toBeVisible();
   await expect.poll(async () => folderExists(pageFolder)).toBe(true);
   await expect.poll(async () => fileExists(pageFile)).toBe(true);
 
-  await pageMenuItem.hover();
-
-  await pageMenuItem.getByRole('button', { name: 'Open page explorer menu' }).click();
-
-  await page.getByRole('menuitem', { name: 'Delete' }).click();
-
-  await page
-    .getByRole('dialog', { name: 'Confirm' })
-    .getByRole('button', { name: 'Delete' })
-    .click();
-
-  await expect(pageMenuItem).toBeHidden();
+  await deletePageFromExplorer(currentPageMenuItem);
+  await expect(currentPageMenuItem).toBeHidden();
 
   await expect.poll(async () => folderExists(pageFolder)).toBe(false);
 });

@@ -20,17 +20,17 @@ import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import { BindableAttrEntries, BindableAttrValue, ExecFetchResult } from '@mui/toolpad-core';
 import { useBrowserJsRuntime } from '@mui/toolpad-core/jsBrowserRuntime';
 import { serializeError, errorFrom } from '@mui/toolpad-utils/errors';
+import { Maybe } from '@mui/toolpad-utils/types';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';
 import { QueryEditorProps } from '../../types';
 import { isSaveDisabled, validation } from '../../utils/forms';
 import lazyComponent from '../../utils/lazyComponent';
-import { Maybe } from '../../utils/types';
 import QueryInputPanel from '../QueryInputPanel';
 import useFetchPrivate from '../useFetchPrivate';
 import useQueryPreview from '../useQueryPreview';
-import * as appDom from '../../appDom';
 import {
   SqlConnectionStatus,
   SqlConnectionParams,
@@ -76,7 +76,10 @@ function getConnectionStatusColor(response: SqlConnectionStatus) {
   return response.status;
 }
 
-function withDefaults(value: Maybe<SqlConnectionParams>, defaultPort: number): SqlConnectionParams {
+function withDefaults(
+  value: Maybe<Partial<SqlConnectionParams>>,
+  defaultPort: number,
+): SqlConnectionParams {
   return {
     host: '',
     user: '',
@@ -92,7 +95,7 @@ export function ConnectionParamsInput({
   onChange,
   defaultPort,
 }: SqlConnectionEditorProps<SqlConnectionParams>) {
-  const { handleSubmit, register, formState, reset, watch } = useForm({
+  const { handleSubmit, register, formState, reset, watch } = useForm<SqlConnectionParams>({
     defaultValues: withDefaults(value, defaultPort),
     reValidateMode: 'onChange',
     mode: 'all',
@@ -115,7 +118,7 @@ export function ConnectionParamsInput({
 
   const handleTestConnection = React.useCallback(() => {
     setConnectionStatus({ status: 'connecting' });
-    fetchPrivate({ kind: 'connectionStatus', params: values })
+    fetchPrivate({ kind: 'connectionStatus', params: withDefaults(values, defaultPort) })
       .then((response) => {
         setConnectionStatus(response.data);
       })
@@ -123,7 +126,7 @@ export function ConnectionParamsInput({
         const error = serializeError(errorFrom(rawError));
         setConnectionStatus({ status: 'error', error: error.message });
       });
-  }, [fetchPrivate, values, setConnectionStatus]);
+  }, [fetchPrivate, values, defaultPort]);
 
   const statusIcon = getConnectionStatusIcon(connectionStatus);
 
@@ -200,7 +203,7 @@ export function QueryEditor({
 
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
-      setInput((existing) => ({ ...existing, params: newParams }));
+      setInput?.((existing) => ({ ...existing, params: newParams }));
     },
     [setInput],
   );
@@ -233,16 +236,16 @@ export function QueryEditor({
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <PanelGroup autoSaveId="toolpad-sql-panel" direction="horizontal">
-      <Panel defaultSizePercentage={50}>
-        <PanelGroup direction="vertical">
-          <Panel defaultSizePercentage={85}>
+    <PanelGroup autoSaveId="toolpad/sql-panel" direction="horizontal">
+      <Panel id="sql-query-left" defaultSize={50}>
+        <PanelGroup autoSaveId="toolpad/sql/params-tools-split" direction="vertical">
+          <Panel defaultSize={85}>
             <QueryInputPanel onRunPreview={handleRunPreview}>
               <Box sx={{ flex: 1, minHeight: 0 }}>
                 <MonacoEditor
                   value={input.attributes.query.sql}
                   onChange={(newValue) =>
-                    setInput((existing) => appDom.setQueryProp(existing, 'sql', newValue))
+                    setInput?.((existing) => appDom.setQueryProp(existing, 'sql', newValue))
                   }
                   language="sql"
                 />
@@ -257,7 +260,7 @@ export function QueryEditor({
               }}
             />
           </PanelResizeHandle>
-          <Panel defaultSizePercentage={15}>
+          <Panel defaultSize={15}>
             <Box sx={{ p: 2, height: '100%', overflow: 'auto' }}>
               <Typography>Parameters</Typography>
               <ParametersEditor
@@ -272,7 +275,7 @@ export function QueryEditor({
           </Panel>
         </PanelGroup>
       </Panel>
-      <Panel defaultSizePercentage={50}>
+      <Panel id="sql-query-right" defaultSize={50}>
         <Box
           sx={{
             height: '100%',

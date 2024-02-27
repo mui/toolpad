@@ -50,6 +50,9 @@ export function createRpcServer(project: ToolpadProject) {
     getRuntimeConfig: createMethod<typeof project.getRuntimeConfig>(({ params }) => {
       return project.getRuntimeConfig(...params);
     }),
+    getComponents: createMethod<typeof project.getComponentsManifest>(({ params }) => {
+      return project.getComponentsManifest(...params);
+    }),
   } satisfies MethodResolvers;
 }
 

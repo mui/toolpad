@@ -1,3 +1,5 @@
+import title from 'title';
+
 /**
  * Makes the first letter of [str] uppercase.
  * Not locale aware.
@@ -170,4 +172,18 @@ export function indent(text: string, length = 2): string {
  */
 export function isValidJsIdentifier(base: string): boolean {
   return /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(base);
+}
+
+export function guessTitle(str: string): string {
+  // Replace snake_case with space
+  str = str.replace(/[_-]/g, ' ');
+  // Split camelCase
+  str = str.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+  // Split acronyms
+  str = str.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+  // Split numbers
+  str = str.replace(/([a-zA-Z])(\d+)/g, '$1 $2');
+  str = str.replace(/(\d+)([a-zA-Z])/g, '$1 $2');
+
+  return title(str);
 }

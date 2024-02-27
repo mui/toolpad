@@ -72,7 +72,13 @@ function JsonPropEditor({ label, propType, value, onChange, disabled }: EditorPr
   return (
     <React.Fragment>
       <PropertyControl propType={propType}>
-        <Button variant="outlined" color="inherit" fullWidth onClick={() => setDialogOpen(true)}>
+        <Button
+          variant="outlined"
+          color="inherit"
+          sx={{ my: 0.5 }}
+          fullWidth
+          onClick={() => setDialogOpen(true)}
+        >
           {label}
         </Button>
       </PropertyControl>

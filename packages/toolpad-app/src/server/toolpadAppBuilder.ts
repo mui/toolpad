@@ -1,28 +1,33 @@
 import * as path from 'path';
 import * as url from 'node:url';
+import * as fs from 'fs';
 import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@mui/toolpad-utils/strings';
-import type { ComponentEntry } from './localMode';
+import * as appDom from '@mui/toolpad-core/appDom';
+import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
-import * as appDom from '../appDom';
 import { pathToNodeImportSpecifier } from '../utils/paths';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
 
-import.meta.url ??= url.pathToFileURL(__filename).toString();
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
+const pkgJsonContent = fs.readFileSync(path.resolve(currentDirectory, '../../package.json'), {
+  encoding: 'utf-8',
+});
+const pkgJson = JSON.parse(pkgJsonContent);
+const TOOLPAD_BUILD = process.env.GIT_SHA1?.slice(0, 7) || 'dev';
+
 const MAIN_ENTRY = '/main.tsx';
-const CANVAS_ENTRY = '/canvas.tsx';
+const EDITOR_ENTRY = '/editor.tsx';
+const FALLBACK_MODULES = [
+  '@mui/material',
+  '@mui/icons-material',
+  '@mui/x-data-grid',
+  '@mui/x-charts',
+];
 
-export interface GetHtmlContentParams {
-  canvas: boolean;
-  base: string;
-}
-
-export function getHtmlContent({ canvas, base }: GetHtmlContentParams) {
-  const entryPoint = canvas ? CANVAS_ENTRY : MAIN_ENTRY;
-  const devtoolsSrc = `${base}/__toolpad_dev__/reactDevtools/bootstrap.global.js`;
+function getHtmlContent(entry: string) {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -36,49 +41,53 @@ export function getHtmlContent({ canvas, base }: GetHtmlContentParams) {
       </head>
       <body>
         <div id="root"></div>
-
-        ${
-          canvas
-            ? `
-              <script>
-                // Add the data-toolpad-canvas attribute to the canvas iframe element
-                if (window.frameElement?.dataset.toolpadCanvas) {
-                  var script = document.createElement('script');
-                  script.src = ${JSON.stringify(devtoolsSrc)};
-                  document.write(script.outerHTML);
-                }
-              </script>
-            `
-            : ''
-        }
     
         <!-- __TOOLPAD_SCRIPTS__ -->
 
-        <script type="module" src=${JSON.stringify(entryPoint)}></script>
+        <script type="module" src=${JSON.stringify(entry)}></script>
       </body>
     </html>
   `;
 }
 
-interface ToolpadVitePluginParams {
-  base: string;
+export function getAppHtmlContent() {
+  return getHtmlContent(MAIN_ENTRY);
 }
 
-function toolpadVitePlugin({ base }: ToolpadVitePluginParams): Plugin {
+export function getEditorHtmlContent() {
+  return getHtmlContent(EDITOR_ENTRY);
+}
+
+function toolpadVitePlugin(): Plugin {
   return {
     name: 'toolpad',
 
-    async resolveId(id) {
+    async resolveId(id, parent) {
       if (id.endsWith('.html')) {
         return id;
+      }
+      const hasFallback = FALLBACK_MODULES.some(
+        (moduleName) => moduleName === id || id.startsWith(`${moduleName}/`),
+      );
+      if (hasFallback) {
+        const [userMod, fallbackMod] = await Promise.all([
+          this.resolve(id, parent),
+          this.resolve(id, currentDirectory),
+        ]);
+        return userMod || fallbackMod;
       }
       return null;
     },
 
     async load(id) {
-      if (id.endsWith('.html')) {
+      if (id.endsWith('index.html')) {
         // production build only
-        return getHtmlContent({ canvas: false, base });
+        return getAppHtmlContent();
+      }
+
+      if (id.endsWith('editor.html')) {
+        // production build only
+        return getEditorHtmlContent();
       }
       return null;
     },
@@ -135,6 +144,7 @@ function toolpadVitePlugin({ base }: ToolpadVitePluginParams): Plugin {
 }
 
 export interface CreateViteConfigParams {
+  toolpadDevMode: boolean;
   outDir: string;
   root: string;
   dev: boolean;
@@ -143,9 +153,11 @@ export interface CreateViteConfigParams {
   plugins?: Plugin[];
   getComponents: () => Promise<ComponentEntry[]>;
   loadDom: () => Promise<appDom.AppDom>;
+  getPagesManifest: () => Promise<PagesManifest>;
 }
 
 export async function createViteConfig({
+  toolpadDevMode,
   outDir,
   root,
   dev,
@@ -154,18 +166,23 @@ export async function createViteConfig({
   plugins = [],
   getComponents,
   loadDom,
+  getPagesManifest,
 }: CreateViteConfigParams) {
   const mode = dev ? 'development' : 'production';
 
-  const getEntryPoint = (isCanvas: boolean) => {
+  const getEntryPoint = (target: 'prod' | 'dev' | 'editor') => {
+    const isCanvas = target === 'dev';
+    const isEditor = target === 'editor';
+
     const componentsId = 'virtual:toolpad-files:components.tsx';
     const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
 
     return `
-import { init, setComponents } from '@mui/toolpad/runtime';
+import { init, setComponents } from '@mui/toolpad/entrypoint';
 import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@mui/toolpad/canvas'` : ''}
+${isEditor ? `import ToolpadEditor from '@mui/toolpad/editor'` : ''}
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
@@ -173,6 +190,7 @@ setComponents(components, pageComponents);
 
 init({
   ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
+  ${isEditor ? `ToolpadApp: ToolpadEditor,` : ''}
   base: ${JSON.stringify(base)},
   initialState,
 })
@@ -229,7 +247,7 @@ if (import.meta.hot) {
     for (const page of pages) {
       const codeFile = page.attributes.codeFile;
       if (codeFile) {
-        const importPath = path.resolve(root, `./pages/${page.name}`, codeFile);
+        const importPath = path.resolve(root, `./pages/${page.name}/page`);
         const relativeImportPath = path.relative(root, importPath);
         const importSpec = `toolpad-user-project:${pathToNodeImportSpecifier(relativeImportPath)}`;
         imports.set(page.name, importSpec);
@@ -256,10 +274,12 @@ if (import.meta.hot) {
   };
 
   const virtualFiles = new Map<string, VirtualFileContent>([
-    ['main.tsx', getEntryPoint(false)],
-    ['canvas.tsx', getEntryPoint(true)],
+    ['main.tsx', getEntryPoint('prod')],
+    ['dev.tsx', getEntryPoint('dev')],
+    ['editor.tsx', getEntryPoint('editor')],
     ['components.tsx', await createComponentsFile()],
     ['page-components.tsx', await createPageComponentsFile()],
+    ['pages-manifest.json', JSON.stringify(await getPagesManifest(), null, 2)],
   ]);
 
   const virtualToolpadFiles = viteVirtualPlugin(virtualFiles, 'toolpad-files');
@@ -275,8 +295,15 @@ if (import.meta.hot) {
       mode,
       build: {
         outDir,
+        emptyOutDir: true,
         chunkSizeWarningLimit: Infinity,
         rollupOptions: {
+          input: {
+            index: path.resolve(currentDirectory, './index.html'),
+            ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+              ? { editor: path.resolve(currentDirectory, './editor.html') }
+              : {}),
+          },
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
               return;
@@ -287,6 +314,7 @@ if (import.meta.hot) {
       },
       envFile: false,
       resolve: {
+        dedupe: FALLBACK_MODULES,
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
@@ -299,12 +327,33 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            replacement: 'virtual:toolpad-files:main.tsx',
+            // eslint-disable-next-line no-nested-ternary
+            replacement: process.env.EXPERIMENTAL_INLINE_CANVAS
+              ? 'virtual:toolpad-files:main.tsx'
+              : dev
+                ? 'virtual:toolpad-files:dev.tsx'
+                : 'virtual:toolpad-files:main.tsx',
           },
           {
-            find: CANVAS_ENTRY,
-            replacement: 'virtual:toolpad-files:canvas.tsx',
+            find: '@mui/toolpad',
+            replacement: toolpadDevMode
+              ? // load source
+                path.resolve(currentDirectory, '../../src/exports')
+              : // load compiled
+                path.resolve(currentDirectory, '../exports'),
           },
+          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+            ? [
+                {
+                  find: EDITOR_ENTRY,
+                  replacement: 'virtual:toolpad-files:editor.tsx',
+                },
+                {
+                  find: 'vm',
+                  replacement: 'vm-browserify',
+                },
+              ]
+            : []),
         ],
       },
       server: {
@@ -313,73 +362,34 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
+        force: !process.env.EXPERIMENTAL_INLINE_CANVAS && toolpadDevMode ? true : undefined,
         include: [
-          '@emotion/cache',
-          '@emotion/react',
-          '@mui/icons-material',
-          '@mui/icons-material/ArrowDropDownRounded',
-          '@mui/icons-material/DarkMode',
-          '@mui/icons-material/Edit',
-          '@mui/icons-material/Error',
-          '@mui/icons-material/HelpOutlined',
-          '@mui/icons-material/LightMode',
-          '@mui/icons-material/OpenInNew',
-          '@mui/icons-material/SettingsBrightnessOutlined',
-          '@mui/lab',
-          '@mui/material',
-          '@mui/material/CircularProgress',
-          '@mui/material/Button',
-          '@mui/material/colors',
-          '@mui/material/styles',
-          '@mui/material/useMediaQuery',
-          '@mui/utils',
-          '@mui/utils/useEventCallback',
-          '@mui/x-data-grid-pro',
-          '@mui/x-date-pickers/AdapterDayjs',
-          '@mui/x-date-pickers/DesktopDatePicker',
-          '@mui/x-date-pickers/LocalizationProvider',
-          '@mui/x-license-pro',
-          '@tanstack/react-query',
-          '@tanstack/react-query-devtools/build/modern/production.js',
-          'dayjs',
-          'dayjs/locale/en',
-          'dayjs/locale/fr',
-          'dayjs/locale/nl',
-          'fractional-indexing',
-          'invariant',
-          'lodash-es',
-          'markdown-to-jsx',
-          'nanoid/non-secure',
-          'prop-types',
-          'react',
-          'react-dom',
-          'react-dom/client',
-          'react-error-boundary',
-          'react-hook-form',
-          'react-is',
-          'react-router-dom',
-          'react/jsx-dev-runtime',
-          'react/jsx-runtime',
-          'recharts',
-          'superjson',
-          'zod',
-        ],
-        exclude: [
-          '@mui/toolpad-core',
-          '@mui/toolpad/browser',
-          '@mui/toolpad/runtime',
-          '@mui/toolpad/canvas',
+          ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad > ${moduleName}`),
+          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+            ? [
+                'perf-cascade',
+                'monaco-editor',
+                'monaco-editor/esm/vs/basic-languages/javascript/javascript',
+                'monaco-editor/esm/vs/basic-languages/typescript/typescript',
+                'monaco-editor/esm/vs/basic-languages/markdown/markdown',
+              ]
+            : []),
         ],
       },
       appType: 'custom',
       logLevel: 'info',
-      root,
-      plugins: [virtualToolpadFiles, react(), toolpadVitePlugin({ base }), ...plugins],
+      root: currentDirectory,
+      plugins: [toolpadVitePlugin(), virtualToolpadFiles, react(), ...plugins],
       base,
       define: {
         'process.env.NODE_ENV': `'${mode}'`,
         'process.env.BASE_URL': `'${base}'`,
         'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
+        'process.env.TOOLPAD_VERSION': JSON.stringify(pkgJson.version),
+        'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),
+        'process.env.EXPERIMENTAL_INLINE_CANVAS': JSON.stringify(
+          process.env.EXPERIMENTAL_INLINE_CANVAS,
+        ),
       },
     } satisfies InlineConfig,
   };
@@ -389,6 +399,7 @@ export interface ToolpadBuilderParams {
   outDir: string;
   getComponents: () => Promise<ComponentEntry[]>;
   loadDom: () => Promise<appDom.AppDom>;
+  getPagesManifest: () => Promise<PagesManifest>;
   root: string;
   base: string;
 }
@@ -397,15 +408,18 @@ export async function buildApp({
   root,
   base,
   getComponents,
+  getPagesManifest,
   loadDom,
   outDir,
 }: ToolpadBuilderParams) {
   const { viteConfig } = await createViteConfig({
+    toolpadDevMode: false,
     dev: false,
     root,
     base,
     outDir,
     getComponents,
+    getPagesManifest,
     loadDom,
   });
   const vite = await import('vite');

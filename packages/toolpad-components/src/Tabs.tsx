@@ -30,7 +30,7 @@ function Tabs({ value, onChange, tabs, defaultValue }: TabsProps) {
 }
 
 export default createBuiltin(Tabs, {
-  helperText: 'The Material UI [Tabs](https://mui.com/material-ui/react-tabs/) component.',
+  helperText: 'The Material UI [Tabs](https://mui.com/material-ui/react-tabs/) component.',
   layoutDirection: 'horizontal',
   argTypes: {
     value: {

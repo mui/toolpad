@@ -2,10 +2,10 @@ import { parentPort, workerData, MessagePort } from 'worker_threads';
 import invariant from 'invariant';
 import type { Plugin } from 'vite';
 import { createRpcClient } from '@mui/toolpad-utils/workerRpc';
-import { getHtmlContent, createViteConfig } from './toolpadAppBuilder';
+import type * as appDom from '@mui/toolpad-core/appDom';
+import { createViteConfig, getAppHtmlContent, getEditorHtmlContent } from './toolpadAppBuilder';
 import type { RuntimeConfig } from '../types';
-import type * as appDom from '../appDom';
-import type { ComponentEntry } from './localMode';
+import type { ComponentEntry, PagesManifest } from './localMode';
 import createRuntimeState from '../runtime/createRuntimeState';
 import { postProcessHtml } from './toolpadAppServer';
 
@@ -15,9 +15,10 @@ export type WorkerRpc = {
   notifyReady: () => Promise<void>;
   loadDom: () => Promise<appDom.AppDom>;
   getComponents: () => Promise<ComponentEntry[]>;
+  getPagesManifest: () => Promise<PagesManifest>;
 };
 
-const { notifyReady, loadDom, getComponents } = createRpcClient<WorkerRpc>(
+const { notifyReady, loadDom, getComponents, getPagesManifest } = createRpcClient<WorkerRpc>(
   workerData.mainThreadRpcPort,
 );
 
@@ -34,7 +35,7 @@ export interface ToolpadAppDevServerParams {
   customServer: boolean;
 }
 
-function devServerPlugin({ config, base }: ToolpadAppDevServerParams): Plugin {
+function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
   return {
     name: 'toolpad-dev-server',
 
@@ -45,7 +46,9 @@ function devServerPlugin({ config, base }: ToolpadAppDevServerParams): Plugin {
           try {
             const dom = await loadDom();
 
-            const template = getHtmlContent({ canvas: true, base });
+            const template = process.env.EXPERIMENTAL_INLINE_CANVAS
+              ? getEditorHtmlContent()
+              : getAppHtmlContent();
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 
@@ -65,6 +68,7 @@ function devServerPlugin({ config, base }: ToolpadAppDevServerParams): Plugin {
 }
 
 export interface AppViteServerConfig extends ToolpadAppDevServerParams {
+  toolpadDevMode: boolean;
   port: number;
   mainThreadRpcPort: MessagePort;
 }
@@ -75,6 +79,7 @@ export async function main({ port, ...config }: AppViteServerConfig) {
     dev: true,
     plugins: [devServerPlugin(config)],
     getComponents,
+    getPagesManifest,
     loadDom,
   });
 

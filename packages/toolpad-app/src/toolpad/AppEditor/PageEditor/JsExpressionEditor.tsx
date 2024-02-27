@@ -3,7 +3,7 @@ import jsonToTs from 'json-to-ts';
 import { Skeleton, styled, SxProps } from '@mui/material';
 import { ScopeMeta } from '@mui/toolpad-core';
 import { getCircularReplacer, replaceRecursive } from '@mui/toolpad-utils/json';
-import { WithControlledProp } from '../../../utils/types';
+import { WithControlledProp } from '@mui/toolpad-utils/types';
 import lazyComponent from '../../../utils/lazyComponent';
 import ElementContext from '../ElementContext';
 

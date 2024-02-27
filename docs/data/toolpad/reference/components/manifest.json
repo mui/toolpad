@@ -1,5 +1,5 @@
 {
-  "//": "This file has been auto-generated using `yarn docs:build:api`.",
+  "//": "ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`.",
   "pages": [
     {
       "pathname": "/toolpad/reference/components",
@@ -72,6 +72,10 @@
         {
           "title": "Select",
           "pathname": "/toolpad/reference/components/select"
+        },
+        {
+          "title": "Spacer",
+          "pathname": "/toolpad/reference/components/spacer"
         },
         {
           "title": "Stack",

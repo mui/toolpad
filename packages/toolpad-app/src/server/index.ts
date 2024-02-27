@@ -10,7 +10,6 @@ import prettyBytes from 'pretty-bytes';
 import type { ViteDevServer } from 'vite';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@mui/toolpad-utils/http';
-// eslint-disable-next-line import/extensions
 import openBrowser from 'react-dev-utils/openBrowser.js';
 import chalk from 'chalk';
 import { serveRpc } from '@mui/toolpad-utils/workerRpc';
@@ -28,8 +27,11 @@ import { createRpcHandler } from './rpc';
 import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
+import { createAuthHandler, createRequireAuthMiddleware, getRequireAuthentication } from './auth';
 
-import.meta.url ??= url.pathToFileURL(__filename).toString();
+// crypto must be polyfilled to use @auth/core in Node 18 or lower
+globalThis.crypto ??= (await import('node:crypto')) as Crypto;
+
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const DEFAULT_PORT = 3000;
@@ -60,9 +62,9 @@ async function createDevHandler(project: ToolpadProject) {
   ]);
 
   const mainThreadRpcChannel = new MessageChannel();
-
   const worker = new Worker(appServerPath, {
     workerData: {
+      toolpadDevMode: project.options.toolpadDevMode,
       outDir: project.getAppOutputFolder(),
       base: project.options.base,
       config: runtimeConfig,
@@ -91,7 +93,8 @@ async function createDevHandler(project: ToolpadProject) {
   serveRpc<WorkerRpc>(mainThreadRpcChannel.port2, {
     notifyReady: async () => resolveReadyPromise?.(),
     loadDom: async () => project.loadDom(),
-    getComponents: async () => project.getComponents(),
+    getComponents: async () => project.getComponentsManifest(),
+    getPagesManifest: async () => project.getPagesManifest(),
   });
 
   project.events.on('componentsListChanged', () => {
@@ -100,11 +103,6 @@ async function createDevHandler(project: ToolpadProject) {
 
   const rpcServer = createProjectRpcServer(project);
   handler.use('/__toolpad_dev__/rpc', createRpcHandler(rpcServer));
-
-  handler.use(
-    '/__toolpad_dev__/reactDevtools',
-    express.static(path.resolve(currentDirectory, '../../dist/reactDevtools')),
-  );
 
   handler.use(
     '/__toolpad_dev__/manifest.json',
@@ -117,10 +115,19 @@ async function createDevHandler(project: ToolpadProject) {
     }),
   );
 
+  const hasAuthentication = await getRequireAuthentication(project);
+  if (hasAuthentication) {
+    const authHandler = createAuthHandler(project);
+    handler.use('/api/auth', express.urlencoded({ extended: true }), authHandler);
+
+    handler.use(await createRequireAuthMiddleware(project));
+  }
+
   handler.use('/api/data', project.dataManager.createDataHandler());
   const runtimeRpcServer = createRuntimeRpcServer(project);
 
   handler.use('/api/runtime-rpc', createRpcHandler(runtimeRpcServer));
+
   handler.use(
     (req, res, next) => {
       // Stall the request until the dev server is ready
@@ -226,6 +233,7 @@ async function createEditorHandler(
   { toolpadDevMode = false }: EditorHandlerParams,
 ): Promise<AppHandler> {
   const router = express.Router();
+  let viteApp: ViteDevServer | undefined;
 
   const transformIndexHtml = (html: string) => {
     return html.replace(
@@ -237,8 +245,6 @@ async function createEditorHandler(
       `,
     );
   };
-
-  let viteApp: ViteDevServer | undefined;
 
   if (toolpadDevMode) {
     // eslint-disable-next-line no-console
@@ -288,7 +294,8 @@ async function createToolpadHandler({
 }: ToolpadHandlerConfig): Promise<AppHandler> {
   const editorBasename = '/_toolpad';
 
-  const project = await initProject({ dev, dir, externalUrl, base });
+  const project = await initProject({ toolpadDevMode, dev, dir, externalUrl, base });
+  await project.checkPlan();
   await project.start();
 
   const router = express.Router();
@@ -312,12 +319,19 @@ async function createToolpadHandler({
   router.use(express.static(publicPath, { index: false }));
 
   const appHandler = await createToolpadAppHandler(project);
+
   router.use(project.options.base, appHandler.handler);
 
   let editorHandler: AppHandler | undefined;
   if (dev) {
-    editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
-    router.use(editorBasename, editorHandler.handler);
+    if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+      router.use('/_toolpad', (req, res) => {
+        res.redirect(`${project.options.base}/editor${req.url}`);
+      });
+    } else {
+      editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
+      router.use(editorBasename, editorHandler.handler);
+    }
   }
 
   return {
@@ -385,9 +399,6 @@ export interface RunEditorOptions {
 }
 
 export async function runEditor(appUrl: string, options: RunEditorOptions = {}) {
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
-
   let appRootUrl;
   try {
     appRootUrl = await fetchAppUrl(appUrl);
@@ -401,6 +412,17 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
 
     process.exit(1);
   }
+
+  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.yellow('warn')}  - The editor command is deprecated and will be removed in the future, please visit ${chalk.cyan(`${appRootUrl}/editor`)}`,
+    );
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')}  - starting Toolpad editor...`);
 
   const app = express();
 

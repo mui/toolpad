@@ -37,12 +37,13 @@ import { createProvidedContext } from '@mui/toolpad-utils/react';
 import { TabContext, TabList } from '@mui/lab';
 import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
 import { errorFrom } from '@mui/toolpad-utils/errors';
+import useLatest from '@mui/toolpad-utils/hooks/useLatest';
+import { WithControlledProp, Maybe } from '@mui/toolpad-utils/types';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
-import useLatest from '../../utils/useLatest';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';
 import GlobalScopeExplorer from './GlobalScopeExplorer';
-import { WithControlledProp, Maybe } from '../../utils/types';
 
 import { tryFormatExpression } from '../../utils/prettier';
 import useShortcut from '../../utils/useShortcut';
@@ -51,7 +52,6 @@ import useUnsavedChangesConfirm from '../hooks/useUnsavedChangesConfirm';
 import TabPanel from '../../components/TabPanel';
 
 import { useAppState } from '../AppState';
-import * as appDom from '../../appDom';
 import { getBindingType, getBindingValue } from '../../runtime/bindings';
 
 import { useProjectApi } from '../../projectApi';
@@ -252,7 +252,18 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
     </Stack>
   );
 
-  return hasEnv ? (
+  const envBindingEditor = (
+    <EnvBindingEditor
+      value={(value as EnvAttrValue)?.$$env ? (value as EnvAttrValue) : null}
+      onChange={onChange}
+    />
+  );
+
+  if (!hasEnv) {
+    return jsExpressionBindingEditor;
+  }
+
+  return (
     <TabContext value={activeTab}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <TabList onChange={handleTabChange} aria-label="Choose action kind ">
@@ -267,14 +278,9 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
         </Box>
       </TabPanel>
       <TabPanel value="env" disableGutters>
-        <EnvBindingEditor
-          value={(value as EnvAttrValue)?.$$env ? (value as EnvAttrValue) : null}
-          onChange={onChange}
-        />
+        {envBindingEditor}
       </TabPanel>
     </TabContext>
-  ) : (
-    jsExpressionBindingEditor
   );
 }
 
@@ -365,8 +371,7 @@ function NavigationActionEditor({ value, onChange }: NavigationActionEditorProps
   const handlePageChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const pageName = event.target.value;
-      const pageId = appDom.getNodeIdByName(dom, pageName);
-      const page = pageId ? appDom.getNode(dom, pageId) : null;
+      const page = appDom.getPageByName(dom, pageName);
 
       const defaultActionParameters =
         page && appDom.isPage(page) ? getDefaultActionParameters(page) : {};
@@ -531,8 +536,11 @@ export function BindingEditorDialog<V>({
         (input as JsExpressionAttrValue).$$jsExpression,
         data!,
       );
+      // Remove trailing spaces, newline characters for cleanliness and
+      // trailing semicolons since they introduce crashes while evaluation
+      const cleanedExpression = jsExpression.trim().replace(/;*$/, '');
       newValue = {
-        $$jsExpression: jsExpression,
+        $$jsExpression: cleanedExpression,
       };
     }
 
@@ -650,8 +658,8 @@ export function BindingEditor<V>({
       aria-label={`Bind property "${label}"`}
       checked={hasBinding}
       disabled={disabled}
-      icon={<AddLinkIcon />}
-      checkedIcon={<LinkIcon />}
+      icon={<AddLinkIcon fontSize="inherit" />}
+      checkedIcon={<LinkIcon fontSize="inherit" />}
       onClick={handleOpen}
       color={error ? 'error' : undefined}
       sx={{ visibility: hidden ? 'hidden' : 'visible' }}

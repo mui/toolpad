@@ -5,12 +5,13 @@ import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import { BindableAttrValue, PropBindableAttrValue } from '@mui/toolpad-core';
+import { BindableAttrValue, EnvAttrValue, PropBindableAttrValue } from '@mui/toolpad-core';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce, throttle } from 'lodash-es';
 import { Emitter } from '@mui/toolpad-utils/events';
+import { guessTitle } from '@mui/toolpad-utils/strings';
 import { errorFrom } from '@mui/toolpad-utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
 import { execa } from 'execa';
@@ -23,7 +24,8 @@ import {
   readJsonFile,
 } from '@mui/toolpad-utils/fs';
 import { z } from 'zod';
-import * as appDom from '../appDom';
+import { Awaitable } from '@mui/toolpad-utils/types';
+import * as appDom from '@mui/toolpad-core/appDom';
 import insecureHash from '../utils/insecureHash';
 import {
   Page,
@@ -40,6 +42,9 @@ import {
   Theme,
   themeSchema,
   API_VERSION,
+  applicationSchema,
+  Application,
+  envBindingSchema,
 } from './schema';
 import { format, resolvePrettierConfig } from '../utils/prettier';
 import {
@@ -54,11 +59,10 @@ import type {
   ToolpadProjectOptions,
   CodeEditorFileType,
 } from '../types';
-import { Awaitable } from '../utils/types';
 import EnvManager from './EnvManager';
 import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
-import { VERSION_CHECK_INTERVAL } from '../constants';
+import { UPGRADE_URL, VERSION_CHECK_INTERVAL } from '../constants';
 import DataManager from './DataManager';
 import { PAGE_COLUMN_COMPONENT_ID, PAGE_ROW_COMPONENT_ID } from '../runtime/toolpadComponents';
 import packageInfo from '../packageInfo';
@@ -75,6 +79,10 @@ invariant(
 
 function getThemeFile(root: string): string {
   return path.join(root, './theme.yml');
+}
+
+function getApplicationFile(root: string): string {
+  return path.join(root, './application.yml');
 }
 
 function getComponentsFolder(root: string): string {
@@ -109,43 +117,16 @@ function getAppOutputFolder(root: string) {
   return path.join(getOutputFolder(root), 'app');
 }
 
-type ComponentsContent = Record<string, { code: string }>;
-
 export interface ComponentEntry {
   name: string;
   path: string;
 }
 
-async function getComponents(root: string): Promise<ComponentEntry[]> {
-  const componentsFolder = getComponentsFolder(root);
-  const entries = (await readMaybeDir(componentsFolder)) || [];
-  const result = entries.map((entry) => {
-    if (entry.isFile()) {
-      const fileName = entry.name;
-      const componentName = entry.name.replace(/\.tsx$/, '');
-      const filePath = path.resolve(componentsFolder, fileName);
-      return { name: componentName, path: filePath };
-    }
-    return null;
-  });
-  return result.filter(Boolean);
-}
-
-async function loadCodeComponentsFromFiles(root: string): Promise<ComponentsContent> {
-  const components = await getComponents(root);
-  const resultEntries = await Promise.all(
-    components.map(async (component): Promise<[string, { code: string }]> => {
-      const content = await fs.readFile(component.path, { encoding: 'utf-8' });
-      return [component.name, { code: content }];
-    }),
-  );
-
-  return Object.fromEntries(resultEntries);
-}
+export type ComponentsManifest = ComponentEntry[];
 
 async function loadPagesFromFiles(root: string): Promise<PagesContent> {
   const pagesFolder = getPagesFolder(root);
-  const entries = (await readMaybeDir(pagesFolder)) || [];
+  const entries = await readMaybeDir(pagesFolder);
   const resultEntries = await Promise.all(
     entries.map(async (entry): Promise<[string, Page] | null> => {
       if (entry.isDirectory()) {
@@ -191,8 +172,6 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
 
         for (const extension of extensions) {
           if (pageDirEntries.has(`page${extension}`)) {
-            const codeFileName = `./page${extension}`;
-
             return [
               pageName,
               {
@@ -200,7 +179,7 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
                 kind: 'page',
                 spec: {
                   id: pageName,
-                  unstable_codeFile: codeFileName,
+                  unstable_codeFile: true,
                 },
               } satisfies Page,
             ];
@@ -215,18 +194,20 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
   return Object.fromEntries(resultEntries.filter(Boolean));
 }
 
-async function loadThemeFromFile(root: string): Promise<Theme | null> {
-  const themeFilePath = getThemeFile(root);
-  const content = await readMaybeFile(themeFilePath);
+async function loadObjectFromFile<T extends z.ZodType>(
+  filePath: string,
+  schema: T,
+): Promise<z.infer<T> | null> {
+  const content = await readMaybeFile(filePath);
   if (content) {
     const parsedFile = yaml.parse(content);
-    const result = themeSchema.safeParse(parsedFile);
+    const result = schema.safeParse(parsedFile);
     if (result.success) {
       return result.data;
     }
 
     console.error(
-      `${chalk.red('error')} - Failed to read theme ${chalk.cyan(themeFilePath)}. ${fromZodError(
+      `${chalk.red('error')} - Failed to read theme ${chalk.cyan(filePath)}. ${fromZodError(
         result.error,
       )}`,
     );
@@ -234,6 +215,16 @@ async function loadThemeFromFile(root: string): Promise<Theme | null> {
     return null;
   }
   return null;
+}
+
+async function loadThemeFromFile(root: string): Promise<Theme | null> {
+  const themeFilePath = getThemeFile(root);
+  return loadObjectFromFile(themeFilePath, themeSchema);
+}
+
+async function loadApplicationFromFile(root: string): Promise<Application | null> {
+  const applicationFilePath = getApplicationFile(root);
+  return loadObjectFromFile(applicationFilePath, applicationSchema);
 }
 
 async function createDefaultCodeComponent(name: string, filePath: string): Promise<string> {
@@ -302,58 +293,6 @@ async function initGitignore(root: string) {
   }
 }
 
-async function writeCodeComponentsToFiles(
-  componentsFolder: string,
-  components: ComponentsContent,
-): Promise<void> {
-  await Promise.all(
-    Object.entries(components).map(async ([componentName, content]) => {
-      const filePath = getComponentFilePath(componentsFolder, componentName);
-      await writeFileRecursive(filePath, content.code, { encoding: 'utf-8' });
-    }),
-  );
-}
-
-function mergeComponentsContentIntoDom(
-  dom: appDom.AppDom,
-  componentsContent: ComponentsContent,
-): appDom.AppDom {
-  const rootNode = appDom.getApp(dom);
-  const { codeComponents: codeComponentNodes = [] } = appDom.getChildNodes(dom, rootNode);
-  const names = new Set([
-    ...Object.keys(componentsContent),
-    ...codeComponentNodes.map((node) => node.name),
-  ]);
-
-  for (const name of names) {
-    const content: { code: string } | undefined = componentsContent[name];
-    const codeComponentNode = codeComponentNodes.find((node) => node.name === name);
-    if (content) {
-      if (codeComponentNode) {
-        dom = appDom.setNodeNamespacedProp(
-          dom,
-          codeComponentNode,
-          'attributes',
-          'code',
-          content.code,
-        );
-      } else {
-        const newNode = appDom.createNode(dom, 'codeComponent', {
-          name,
-          attributes: {
-            code: content.code,
-          },
-        });
-        dom = appDom.addNode(dom, newNode, rootNode, 'codeComponents');
-      }
-    } else if (codeComponentNode) {
-      dom = appDom.removeNode(dom, codeComponentNode.id);
-    }
-  }
-
-  return dom;
-}
-
 function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppDom {
   const themeFileSpec = themeFile.spec;
   const app = appDom.getApp(dom);
@@ -366,6 +305,26 @@ function mergeThemeIntoAppDom(dom: appDom.AppDom, themeFile: Theme): appDom.AppD
     app,
     'themes',
   );
+  return dom;
+}
+
+function mergeApplicationIntoDom(dom: appDom.AppDom, applicationFile: Application): appDom.AppDom {
+  const applicationFileSpec = applicationFile.spec;
+  const app = appDom.getApp(dom);
+
+  dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'plan', applicationFileSpec?.plan);
+
+  dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'authentication', {
+    ...applicationFileSpec?.authentication,
+  });
+
+  dom = appDom.setNodeNamespacedProp(dom, app, 'attributes', 'authorization', {
+    ...applicationFileSpec?.authorization,
+    roles: applicationFileSpec?.authorization?.roles?.map((role) =>
+      typeof role === 'string' ? { name: role } : role,
+    ),
+  });
+
   return dom;
 }
 
@@ -509,6 +468,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       apiVersion: API_VERSION,
       kind: 'page',
       spec: {
+        displayName: node.attributes.displayName,
         alias: node.attributes.alias,
         title: node.attributes.title,
         parameters: undefinedWhenEmpty(
@@ -518,6 +478,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
         display: node.attributes.display,
         unstable_codeFile: node.attributes.codeFile,
+        authorization: node.attributes.authorization,
       },
     } satisfies Page;
   }
@@ -557,6 +518,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
       name: node.name,
       layout: undefinedWhenEmpty({
         columnSize: node.layout?.columnSize,
+        height: node.layout?.height,
         horizontalAlign: stringOnly(node.layout?.horizontalAlign),
         verticalAlign: stringOnly(node.layout?.verticalAlign),
       }),
@@ -690,12 +652,14 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
   let fragment = appDom.createFragment('page', {
     name: pageName,
     attributes: {
+      displayName: pageFileSpec.displayName,
       // Convert deprecated id to alias
       alias: pageFileSpec.id ? [pageFileSpec.id] : pageFileSpec.alias,
       title: pageFileSpec.title,
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
       codeFile: pageFileSpec.unstable_codeFile || undefined,
+      authorization: pageFileSpec.authorization || undefined,
     },
   });
 
@@ -752,7 +716,14 @@ function mergePageIntoDom(dom: appDom.AppDom, pageName: string, pageFile: Page):
   return dom;
 }
 
-function optimizePageElement(element: ElementType): ElementType {
+function optimizePageElement(
+  element: ElementType,
+  isPageChild = false,
+): ElementType | ElementType[] {
+  if (isPageChild && element.component === PAGE_COLUMN_COMPONENT_ID) {
+    return (element.children || []).flatMap((child) => optimizePageElement(child, true));
+  }
+
   const isLayoutElement = (possibleLayoutElement: ElementType): boolean =>
     possibleLayoutElement.component === PAGE_ROW_COMPONENT_ID ||
     possibleLayoutElement.component === PAGE_COLUMN_COMPONENT_ID;
@@ -773,7 +744,7 @@ function optimizePageElement(element: ElementType): ElementType {
 
   return {
     ...element,
-    children: element.children && element.children.map(optimizePageElement),
+    children: element.children && element.children.flatMap((child) => optimizePageElement(child)),
   };
 }
 
@@ -782,7 +753,7 @@ function optimizePage(page: Page): Page {
     ...page,
     spec: {
       ...page.spec,
-      content: page.spec?.content?.map(optimizePageElement),
+      content: page.spec?.content?.flatMap((element) => optimizePageElement(element, true)),
     },
   };
 }
@@ -831,6 +802,19 @@ function extractThemeFromDom(dom: appDom.AppDom): Theme | null {
   return null;
 }
 
+function extractApplicationFromDom(dom: appDom.AppDom): Application | null {
+  const rootNode = appDom.getApp(dom);
+  return {
+    apiVersion: API_VERSION,
+    kind: 'application',
+    spec: {
+      plan: rootNode.attributes.plan,
+      authentication: rootNode.attributes.authentication,
+      authorization: rootNode.attributes.authorization,
+    },
+  };
+}
+
 function getSchemaUrl(obj: string) {
   return `https://raw.githubusercontent.com/mui/mui-toolpad/v${packageInfo.version}/docs/schemas/v1/definitions.json#properties/${obj}`;
 }
@@ -857,11 +841,21 @@ async function writeThemeFile(root: string, theme: Theme | null) {
   }
 }
 
+async function writeApplicationFile(root: string, application: Application | null) {
+  const applicationFilePath = getApplicationFile(root);
+  if (application) {
+    await updateYamlFile(applicationFilePath, application);
+  } else {
+    await fs.rm(applicationFilePath, { recursive: true, force: true });
+  }
+}
+
 async function writeDomToDisk(root: string, dom: appDom.AppDom): Promise<void> {
   const { pages: pagesContent } = extractPagesFromDom(dom);
   await Promise.all([
     writePagesToFiles(root, pagesContent),
     writeThemeFile(root, extractThemeFromDom(dom)),
+    writeApplicationFile(root, extractApplicationFromDom(dom)),
   ]);
 }
 
@@ -884,44 +878,41 @@ export type ProjectFolderEntry = {
 };
 
 interface ToolpadProjectFolder {
+  application: Application | null;
   pages: Record<string, Page>;
-  components: Record<string, { code: string }>;
   theme: Theme | null;
 }
 
 async function readProjectFolder(root: string): Promise<ToolpadProjectFolder> {
-  const [componentsContent, pagesContent, theme] = await Promise.all([
-    loadCodeComponentsFromFiles(root),
+  const [pagesContent, theme, application] = await Promise.all([
     loadPagesFromFiles(root),
     loadThemeFromFile(root),
+    loadApplicationFromFile(root),
   ]);
 
   return {
+    application,
     pages: pagesContent,
-    components: componentsContent,
     theme,
   };
 }
 
-async function writeProjectFolder(
-  root: string,
-  folder: ToolpadProjectFolder,
-  writeComponents: boolean = false,
-): Promise<void> {
-  await writePagesToFiles(root, folder.pages);
-  await writeThemeFile(root, folder.theme);
-  if (writeComponents) {
-    const componentsFolder = getComponentsFolder(root);
-    await writeCodeComponentsToFiles(componentsFolder, folder.components);
-  }
+async function writeProjectFolder(root: string, folder: ToolpadProjectFolder): Promise<void> {
+  await Promise.all([
+    writePagesToFiles(root, folder.pages),
+    writeThemeFile(root, folder.theme),
+    writeApplicationFile(root, folder.application),
+  ]);
 }
 
 function projectFolderToAppDom(projectFolder: ToolpadProjectFolder): appDom.AppDom {
   let dom = appDom.createDom();
   dom = mergePagesIntoDom(dom, projectFolder.pages);
-  dom = mergeComponentsContentIntoDom(dom, projectFolder.components);
   if (projectFolder.theme) {
     dom = mergeThemeIntoAppDom(dom, projectFolder.theme);
+  }
+  if (projectFolder.application) {
+    dom = mergeApplicationIntoDom(dom, projectFolder.application);
   }
   return dom;
 }
@@ -930,7 +921,7 @@ async function loadProjectFolder(root: string): Promise<ToolpadProjectFolder> {
   return readProjectFolder(root);
 }
 
-export async function loadDomFromDisk(root: string): Promise<appDom.AppDom> {
+async function loadDomFromDisk(root: string): Promise<appDom.AppDom> {
   const projectFolder = await loadProjectFolder(root);
 
   return projectFolderToAppDom(projectFolder);
@@ -939,8 +930,8 @@ export async function loadDomFromDisk(root: string): Promise<appDom.AppDom> {
 function getDomFilePatterns(root: string) {
   return [
     path.resolve(root, './pages/*/page.yml'),
-    path.resolve(root, './components'),
-    path.resolve(root, './components/*.*'),
+    path.resolve(root, './theme.yml'),
+    path.resolve(root, './application.yml'),
   ];
 }
 /**
@@ -959,9 +950,51 @@ async function calculateDomFingerprint(root: string): Promise<number> {
   return insecureHash(JSON.stringify(mtimes));
 }
 
-function getCodeComponentsFingerprint(dom: appDom.AppDom) {
-  const { codeComponents = [] } = appDom.getChildNodes(dom, appDom.getApp(dom));
-  return codeComponents.map(({ name }) => name).join('|');
+function findEnvBindings(obj: unknown): EnvAttrValue[] {
+  if (Array.isArray(obj)) {
+    return obj.flatMap((item) => findEnvBindings(item));
+  }
+
+  if (obj && typeof obj === 'object') {
+    try {
+      return [envBindingSchema.parse(obj)];
+    } catch {
+      return Object.values(obj).flatMap((value) => findEnvBindings(value));
+    }
+  }
+
+  return [];
+}
+
+export function getRequiredEnvVars(dom: appDom.AppDom): Set<string> {
+  const allVars = Object.values(dom.nodes)
+    .flatMap((node) => findEnvBindings(node))
+    .map((binding) => binding.$$env);
+
+  return new Set(allVars);
+}
+
+interface PaidFeature {
+  id: string;
+  label: string;
+}
+
+function detectPaidFeatures(application: Application): PaidFeature[] | null {
+  if (!application.spec || !application.spec.authorization) {
+    return null;
+  }
+
+  const hasRoles = Boolean(application?.spec?.authorization?.roles);
+  const hasAzureActiveDirectory = application?.spec?.authentication?.providers?.some(
+    (elems) => elems.provider === 'azure-ad',
+  );
+  const paidFeatures = [
+    hasRoles ? { id: 'roles', label: 'Role based access control' } : undefined,
+    hasAzureActiveDirectory
+      ? { id: 'azure-ad', label: 'Azure AD authentication provider' }
+      : undefined,
+  ].filter(Boolean) as PaidFeature[];
+  return paidFeatures.length > 0 ? paidFeatures : null;
 }
 
 class ToolpadProject {
@@ -974,8 +1007,6 @@ class ToolpadProject {
   private domAndFingerprintLock = new Lock();
 
   options: ToolpadProjectOptions;
-
-  private codeComponentsFingerprint: null | string = null;
 
   envManager: EnvManager;
 
@@ -990,6 +1021,10 @@ class ToolpadProject {
   private lastVersionCheck = 0;
 
   private pendingVersionCheck: Promise<VersionInfo> | undefined;
+
+  private componentsManifestPromise: Promise<ComponentsManifest> | undefined;
+
+  private pagesManifestPromise: Promise<PagesManifest> | undefined;
 
   constructor(root: string, options: ToolpadProjectOptions) {
     invariant(
@@ -1027,7 +1062,7 @@ class ToolpadProject {
 
     const updateDomFromExternal = debounce(() => {
       this.domAndFingerprintLock.use(async () => {
-        const [dom, fingerprint] = await this.loadDomAndFingerprint();
+        const [, fingerprint] = await this.loadDomAndFingerprint();
         const newFingerprint = await calculateDomFingerprint(this.root);
         if (fingerprint !== newFingerprint) {
           // eslint-disable-next-line no-console
@@ -1038,14 +1073,6 @@ class ToolpadProject {
           ]);
           this.events.emit('change', {});
           this.events.emit('externalChange', {});
-
-          const newCodeComponentsFingerprint = getCodeComponentsFingerprint(dom);
-          if (this.codeComponentsFingerprint !== newCodeComponentsFingerprint) {
-            this.codeComponentsFingerprint = newCodeComponentsFingerprint;
-            if (this.codeComponentsFingerprint !== null) {
-              this.events.emit('componentsListChanged', {});
-            }
-          }
         }
       });
     }, 100);
@@ -1059,6 +1086,44 @@ class ToolpadProject {
     chokidar.watch(getDomFilePatterns(this.root), watchOptions).on('all', () => {
       updateDomFromExternal();
     });
+
+    const handleComponentFileChange = async () => {
+      const oldManifest = await this.componentsManifestPromise;
+      this.componentsManifestPromise = this.buildComponentsManifest();
+      const newManifest = await this.componentsManifestPromise;
+      if (JSON.stringify(oldManifest) !== JSON.stringify(newManifest)) {
+        this.events.emit('componentsListChanged', {});
+      }
+    };
+
+    chokidar
+      .watch(
+        [path.resolve(this.root, './components'), path.resolve(this.root, './components/*.*')],
+        watchOptions,
+      )
+      .on('add', handleComponentFileChange)
+      .on('addDir', handleComponentFileChange)
+      .on('unlink', handleComponentFileChange)
+      .on('unlinkDir', handleComponentFileChange);
+
+    const handlePageFileChange = async () => {
+      const oldManifest = await this.pagesManifestPromise;
+      this.pagesManifestPromise = buildPagesManifest(this.root);
+      const newManifest = await this.pagesManifestPromise;
+      if (JSON.stringify(oldManifest) !== JSON.stringify(newManifest)) {
+        this.events.emit('pagesManifestChanged', {});
+      }
+    };
+
+    chokidar
+      .watch(
+        [path.resolve(this.root, './pages'), path.resolve(this.root, './pages/*/page.*')],
+        watchOptions,
+      )
+      .on('add', handlePageFileChange)
+      .on('addDir', handlePageFileChange)
+      .on('unlink', handlePageFileChange)
+      .on('unlinkDir', handlePageFileChange);
   }
 
   private async loadDomAndFingerprint() {
@@ -1088,7 +1153,7 @@ class ToolpadProject {
   }
 
   alertOnMissingVariablesInDom(dom: appDom.AppDom) {
-    const requiredVars = appDom.getRequiredEnvVars(dom);
+    const requiredVars = getRequiredEnvVars(dom);
     const missingVars = Array.from(requiredVars).filter(
       (key) => typeof process.env[key] === 'undefined',
     );
@@ -1110,6 +1175,31 @@ class ToolpadProject {
 
     // Only alert once per missing variable
     this.alertedMissingVars = new Set(missingVars);
+  }
+
+  async checkPlan() {
+    const [dom] = await this.loadDomAndFingerprint();
+
+    const application = extractApplicationFromDom(dom);
+    if (!application || !application.spec) {
+      return;
+    }
+
+    if (!application.spec.plan || application.spec.plan === 'free') {
+      const paidFeatures = detectPaidFeatures(application);
+      if (paidFeatures) {
+        throw new Error(
+          `You are using ${chalk.bgBlue(paidFeatures.map((feature) => feature.label))} which ${paidFeatures.length > 1 ? 'are paid features' : 'is a paid feature'}. To continue using Toolpad, upgrade your plan or remove this feature. Learn more at ${chalk.cyan(UPGRADE_URL)}.`,
+        );
+      }
+    } else {
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.yellow(
+          'warn',
+        )}  - You are using features that ${chalk.bold('are not covered under our MIT License')}. You will have to buy a license to use them in production.`,
+      );
+    }
   }
 
   async start() {
@@ -1147,8 +1237,26 @@ class ToolpadProject {
     return dom;
   }
 
-  async getComponents(): Promise<ComponentEntry[]> {
-    return getComponents(this.getRoot());
+  async buildComponentsManifest(): Promise<ComponentsManifest> {
+    const componentsFolder = getComponentsFolder(this.getRoot());
+    const entries = (await readMaybeDir(componentsFolder)) || [];
+    const result = entries.map((entry) => {
+      if (entry.isFile()) {
+        const fileName = entry.name;
+        const componentName = entry.name.replace(/\.tsx$/, '');
+        const filePath = path.resolve(componentsFolder, fileName);
+        return { name: componentName, path: filePath };
+      }
+      return null;
+    });
+    return result.filter(Boolean);
+  }
+
+  async getComponentsManifest(): Promise<ComponentsManifest> {
+    if (!this.componentsManifestPromise) {
+      this.componentsManifestPromise = this.buildComponentsManifest();
+    }
+    return this.componentsManifestPromise;
   }
 
   async writeDomToDisk(newDom: appDom.AppDom) {
@@ -1277,6 +1385,13 @@ class ToolpadProject {
       return null;
     }
   }
+
+  async getPagesManifest(): Promise<PagesManifest> {
+    if (!this.pagesManifestPromise) {
+      this.pagesManifestPromise = buildPagesManifest(this.root);
+    }
+    return this.pagesManifestPromise;
+  }
 }
 
 export type { ToolpadProject };
@@ -1294,6 +1409,7 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   const dir = resolveProjectDir(dirInput);
 
   const resolvedConfig: ToolpadProjectOptions = {
+    toolpadDevMode: false,
     dev: false,
     base: '/prod',
     customServer: false,
@@ -1305,4 +1421,84 @@ export async function initProject({ dir: dirInput, ...config }: InitProjectOptio
   await project.init();
 
   return project;
+}
+
+const basePagesManifestEntrySchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+  legacy: z.boolean().optional(),
+});
+
+export interface PagesManifestEntry extends z.infer<typeof basePagesManifestEntrySchema> {
+  children: PagesManifestEntry[];
+}
+
+const pagesManifestEntrySchema: z.ZodType<PagesManifestEntry> = basePagesManifestEntrySchema.extend(
+  {
+    children: z.array(z.lazy(() => pagesManifestEntrySchema)),
+  },
+);
+
+const pagesManifestSchema = z.object({
+  pages: z.array(pagesManifestEntrySchema),
+});
+
+export type PagesManifest = z.infer<typeof pagesManifestSchema>;
+
+async function buildPagesManifest(root: string): Promise<PagesManifest> {
+  const pagesFolder = getPagesFolder(root);
+  const pageDirs = await readMaybeDir(pagesFolder);
+  const pages = (
+    await Promise.all(
+      pageDirs.map(async (page) => {
+        if (page.isDirectory()) {
+          const pagePath = path.resolve(pagesFolder, page.name);
+          const title = guessTitle(page.name);
+
+          const extensions = ['.tsx', '.jsx'];
+
+          for (const extension of extensions) {
+            const pageFilePath = path.resolve(pagePath, `page${extension}`);
+
+            // eslint-disable-next-line no-await-in-loop
+            const stat = await fs.stat(pageFilePath).catch(() => null);
+            if (stat?.isFile()) {
+              return [
+                {
+                  slug: page.name,
+                  title,
+                  children: [],
+                },
+              ];
+            }
+          }
+
+          const pageFilePath = path.resolve(pagePath, 'page.yml');
+
+          const stat = await fs.stat(pageFilePath).catch(() => null);
+          if (stat?.isFile()) {
+            return [
+              {
+                slug: page.name,
+                title,
+                legacy: true,
+                children: [],
+              },
+            ];
+          }
+        }
+
+        return [];
+      }),
+    )
+  ).flat();
+
+  pages.sort((page1, page2) => page1.title.localeCompare(page2.title));
+
+  return { pages };
+}
+
+export async function loadDom(root: string) {
+  const resolvedRoot = resolveProjectDir(root);
+  return loadDomFromDisk(resolvedRoot);
 }

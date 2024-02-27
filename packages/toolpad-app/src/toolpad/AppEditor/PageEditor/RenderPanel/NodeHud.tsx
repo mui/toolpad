@@ -3,7 +3,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopy from '@mui/icons-material/ContentCopy';
 import { IconButton, styled, Tooltip } from '@mui/material';
-import * as appDom from '../../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import {
   absolutePositionCss,
   Rectangle,
@@ -11,6 +11,7 @@ import {
   RECTANGLE_EDGE_BOTTOM,
   RECTANGLE_EDGE_LEFT,
   RECTANGLE_EDGE_RIGHT,
+  RECTANGLE_EDGE_TOP,
 } from '../../../../utils/geometry';
 
 const HINT_POSITION_TOP = 'top';
@@ -84,7 +85,10 @@ const SelectionHintWrapper = styled('div', {
     zIndex: 1000,
     ...(hintPosition === HINT_POSITION_TOP
       ? { top: 0, transform: 'translate(0, -100%)' }
-      : { bottom: 0, transform: 'translate(0, 100%)' }),
+      : {
+          bottom: 0,
+          transform: 'translate(0, 100%)',
+        }),
   },
 }));
 
@@ -122,6 +126,15 @@ const DraggableEdge = styled('div', {
     dynamicStyles = {
       cursor: 'ns-resize',
       bottom: -10,
+      height: 22,
+      left: 0,
+      width: '100%',
+    };
+  }
+  if (edge === RECTANGLE_EDGE_TOP) {
+    dynamicStyles = {
+      cursor: 'ns-resize',
+      top: -10,
       height: 22,
       left: 0,
       width: '100%',
@@ -177,7 +190,10 @@ export default function NodeHud({
   isHoverable = true,
   isHovered = false,
 }: NodeHudProps) {
-  const hintPosition = rect.y > HUD_HEIGHT ? HINT_POSITION_TOP : HINT_POSITION_BOTTOM;
+  let hintPosition: HintPosition = HINT_POSITION_BOTTOM;
+  if (rect.y > HUD_HEIGHT) {
+    hintPosition = HINT_POSITION_TOP;
+  }
 
   const interactiveNodeClipPath = React.useMemo(
     () =>

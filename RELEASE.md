@@ -3,7 +3,7 @@
 1. Generate a new version using:
 
    ```bash
-   yarn release:version
+   pnpm release:version
    ```
 
    This command will bump the version in every package of the project.
@@ -11,7 +11,7 @@
 1. Generate the changelog using:
 
    ```bash
-   yarn release:changelog
+   pnpm release:changelog
    ```
 
    Running this command requires a [GitHub personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with the `public_repo` scope.
@@ -38,10 +38,10 @@
    1. Run
 
    ```bash
-   npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke
+   npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke --use-pnpm
    cd smoke
-   yarn add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@mui/toolpad -S
-   yarn && yarn dev
+   pnpm add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@mui/toolpad -S
+   pnpm dedupe && pnpm dev
    ```
 
    And verify the editor works
@@ -59,13 +59,13 @@
    1. Publish to `npm`
 
       ```bash
-      yarn release:publish
+      pnpm release:publish
       ```
 
       If you've created a prerelease, then instead use
 
       ```bash
-      yarn release:publish-canary
+      pnpm release:publish-canary
       ```
 
 1. Publish the documentation. The documentation must be updated on the `docs-latest` branch.

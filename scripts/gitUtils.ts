@@ -6,7 +6,7 @@ export async function updateToBranch(dependency: string, repo: string, branch: s
   // eslint-disable-next-line no-console
   console.log(`Updating "${repo}" to branch "${branch}"...`);
 
-  await $`pnpm update -r ${dependency}@github:${repo}#${encodeURIComponent(branch)}`;
+  await $`pnpm update -r "${dependency}@github:${repo}#${encodeURIComponent(branch)}"`;
 }
 
 export async function dedupe() {

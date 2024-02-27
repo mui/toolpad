@@ -113,7 +113,11 @@ function DatePicker({
     [onFormInputChange],
   );
 
-  const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot, () => 'en');
+  const adapterLocale = React.useSyncExternalStore(
+    subscribeLocaleLoader,
+    getSnapshot,
+    () => undefined,
+  );
 
   const value = React.useMemo(
     () => (typeof valueProp === 'string' ? dayjs(valueProp) : valueProp),

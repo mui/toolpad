@@ -6,7 +6,7 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/studio/getting-started-group',
     title: 'Getting Started',
     children: [
-      { pathname: '/toolpad/studio/getting-started', title: 'Overview' },
+      { pathname: '/toolpad/studio/getting-started/', title: 'Overview' },
       { pathname: '/toolpad/studio/getting-started/installation' },
       { pathname: '/toolpad/studio/getting-started/why-toolpad', title: 'Why Toolpad?' },
       { pathname: '/toolpad/studio/getting-started/first-app', title: 'Build your first app' },

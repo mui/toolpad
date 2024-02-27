@@ -1,3 +1,3 @@
-import { updateGithubDependency } from './gitUtils';
+import { updateGithubDependencyToLatestCommit } from './gitUtils';
 
-updateGithubDependency('@mui/monorepo', 'mui/material-ui');
+updateGithubDependencyToLatestCommit('@mui/monorepo', 'mui/material-ui');

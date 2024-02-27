@@ -7,6 +7,14 @@ export async function updateGithubDependency(
   repo: string,
   branch: string = 'master',
 ) {
+  await $`pnpm update -r ${dependency}@github:${repo}#${encodeURIComponent(branch)}`;
+}
+
+export async function updateGithubDependencyToLatestCommit(
+  dependency: string,
+  repo: string,
+  branch: string = 'master',
+) {
   const url = new URL(`https://api.github.com/repos/${repo}/commits`);
   url.searchParams.set('sha', branch);
   url.searchParams.set('per_page', '1');
@@ -25,7 +33,7 @@ export async function updateGithubDependency(
   // eslint-disable-next-line no-console
   console.log(`Updating "${repo}" to latest commit ${latestCommit}...`);
 
-  await $`pnpm update -r ${dependency}@github:${repo}#${latestCommit}`;
+  await updateGithubDependency(dependency, repo, latestCommit);
 
   // eslint-disable-next-line no-console
   console.log(`Deduping...`);

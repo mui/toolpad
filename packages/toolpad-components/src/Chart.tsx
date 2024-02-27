@@ -58,10 +58,9 @@ interface ChartProps extends BoxProps {
   data?: ChartData;
   loading?: boolean;
   error?: Error | string;
-  height: number;
 }
 
-function Chart({ data = [], loading, error, height, sx }: ChartProps) {
+function Chart({ data = [], loading, error, sx }: ChartProps) {
   const hasData =
     data.length > 0 &&
     data.some((dataSeries) => (dataSeries.data ? dataSeries.data.length > 0 : false));
@@ -171,7 +170,7 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
   const firstDataSeries = chartSeries[0];
 
   return (
-    <Box sx={{ ...sx, position: 'relative', minHeight: height, width: '100%' }} aria-busy={loading}>
+    <Box sx={{ ...sx, position: 'relative', height: '100%', width: '100%' }} aria-busy={loading}>
       {displayError ? <ErrorOverlay error={displayError} /> : null}
       {loading && !error ? (
         <div
@@ -189,7 +188,6 @@ function Chart({ data = [], loading, error, height, sx }: ChartProps) {
       {isDataVisible ? (
         <ResponsiveChartContainer
           series={chartSeries}
-          height={height}
           xAxis={[
             {
               id: 'x',
@@ -252,7 +250,8 @@ export default createBuiltin(Chart, {
   loadingProp: 'loading',
   loadingPropSource: ['data'],
   errorProp: 'error',
-  resizableHeightProp: 'height',
+  defaultLayoutHeight: 360,
+  minimumLayoutHeight: 100,
   argTypes: {
     data: {
       helperText: 'The data to be displayed.',
@@ -287,12 +286,6 @@ export default createBuiltin(Chart, {
         },
       },
       control: { type: 'ChartData', bindable: false },
-    },
-    height: {
-      helperText: 'The height of the chart.',
-      type: 'number',
-      default: 300,
-      minimum: 100,
     },
     sx: {
       helperText: SX_PROP_HELPER_TEXT,

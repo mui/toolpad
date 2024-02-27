@@ -547,7 +547,6 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   dataProviderId?: string;
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
-  height?: number;
   rowIdField?: string;
   error?: Error | string;
   selection?: Selection | null;
@@ -1067,7 +1066,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
     columns: columnsProp,
     rows: rowsProp,
-    height: heightProp,
     rowIdField: rowIdFieldProp,
     error: errorProp,
     selection,
@@ -1075,6 +1073,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     hideToolbar,
     rowsSource,
     dataProviderId,
+    sx,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -1243,54 +1242,48 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
-      <div
-        ref={ref}
-        style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            inset: '0 0 0 0',
-          }}
-        >
-          <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
-            <SetActionResultContext.Provider value={setActionResult}>
-              <DataGridPro
-                apiRef={apiRef}
-                slots={{
-                  ...dataProviderSlots,
-                  loadingOverlay: SkeletonLoadingOverlay,
-                  noRowsOverlay: NoRowsOverlay,
-                  toolbar: hideToolbar ? null : dataProviderSlots?.toolbar,
-                }}
-                slotProps={{
-                  noRowsOverlay: {
-                    error: rowLoadingError,
-                  } as any,
-                  ...dataProviderSlotProps,
-                }}
-                onColumnResize={handleResize}
-                onColumnOrderChange={handleColumnOrderChange}
-                rows={rows}
-                columns={renderedColumns}
-                key={gridKey}
-                getRowId={getRowId}
-                onRowSelectionModelChange={onSelectionModelChange}
-                rowSelectionModel={selectionModel}
-                initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
-                {...props}
-                {...dataProviderProps}
-              />
-            </SetActionResultContext.Provider>
-          </ErrorBoundary>
-        </div>
+      <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
+        <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
+          <SetActionResultContext.Provider value={setActionResult}>
+            <DataGridPro
+              apiRef={apiRef}
+              slots={{
+                ...dataProviderSlots,
+                loadingOverlay: SkeletonLoadingOverlay,
+                noRowsOverlay: NoRowsOverlay,
+                toolbar: hideToolbar ? null : dataProviderSlots?.toolbar,
+              }}
+              slotProps={{
+                noRowsOverlay: {
+                  error: rowLoadingError,
+                } as any,
+                ...dataProviderSlotProps,
+              }}
+              onColumnResize={handleResize}
+              onColumnOrderChange={handleColumnOrderChange}
+              rows={rows}
+              columns={renderedColumns}
+              key={gridKey}
+              getRowId={getRowId}
+              onRowSelectionModelChange={onSelectionModelChange}
+              rowSelectionModel={selectionModel}
+              initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
+              {...props}
+              {...dataProviderProps}
+              sx={{
+                height: '100%',
+                visibility: errorProp ? 'hidden' : 'visible',
+              }}
+            />
+          </SetActionResultContext.Provider>
+        </ErrorBoundary>
 
         <ActionResultOverlay
           result={actionResult}
           onClose={() => setActionResult(null)}
           apiRef={apiRef}
         />
-      </div>
+      </Box>
     </LicenseInfoProvider>
   );
 });
@@ -1301,7 +1294,8 @@ export default createBuiltin(DataGridComponent, {
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
-  resizableHeightProp: 'height',
+  defaultLayoutHeight: 360,
+  minimumLayoutHeight: 100,
   argTypes: {
     rowsSource: {
       helperText: 'Defines how rows are provided to the grid.',
@@ -1381,12 +1375,6 @@ export default createBuiltin(DataGridComponent, {
       type: 'string',
       enum: ['compact', 'standard', 'comfortable'],
       default: 'compact',
-    },
-    height: {
-      helperText: 'The height of the data grid.',
-      type: 'number',
-      default: 350,
-      minimum: 100,
     },
     loading: {
       helperText:

@@ -42,7 +42,6 @@ function shouldRenderControl<P extends object>(
   propTypeDef: ArgTypeDefinition<P>,
   propName: keyof P,
   props: P,
-  componentConfig: ComponentConfig<P>,
 ) {
   if (propTypeDef.type === 'element' || propTypeDef.type === 'template') {
     return (
@@ -58,10 +57,6 @@ function shouldRenderControl<P extends object>(
 
   if (typeof propTypeDef.visible === 'function') {
     return propTypeDef.visible(props);
-  }
-
-  if (componentConfig.resizableHeightProp && propName === componentConfig.resizableHeightProp) {
-    return false;
   }
 
   return true;
@@ -141,7 +136,7 @@ function ComponentPropsEditor<P extends object>({
             {category}:
           </Typography>
           {argTypeEntries.map(([propName, propTypeDef]) =>
-            propTypeDef && shouldRenderControl(propTypeDef, propName, props, componentConfig) ? (
+            propTypeDef && shouldRenderControl(propTypeDef, propName, props) ? (
               <div key={propName} className={classes.control}>
                 <NodeAttributeEditor
                   node={node}

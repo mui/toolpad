@@ -18,8 +18,8 @@ import findActivePage from 'docs/src/modules/utils/findActivePage';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 import toolpadPkgJson from '@mui/toolpad/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
-import toolpadStudioPages from '../data/toolpad/studio/pages';
-import toolpadPages from '../data/toolpad/pages';
+import toolpadStudioPages from '../data/toolpad/pages';
+import toolpadPages from '../data/pages';
 import config from '../config';
 
 const clientSideEmotionCache = createEmotionCache();

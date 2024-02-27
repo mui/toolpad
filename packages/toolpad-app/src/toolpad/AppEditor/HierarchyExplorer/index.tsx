@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material';
 import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import * as appDom from '../../../appDom';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { DomView } from '../../../utils/domView';
@@ -136,8 +136,7 @@ export default function HierarchyExplorer() {
   const appStateApi = useAppStateApi();
   const [expandedDomNodeIds, setExpandedDomNodeIds] = React.useState<string[]>([]);
 
-  const currentPageId = currentView?.name ? appDom.getNodeIdByName(dom, currentView?.name) : null;
-  const currentPageNode = currentPageId ? appDom.getNode(dom, currentPageId, 'page') : null;
+  const currentPageNode = currentView?.name ? appDom.getPageByName(dom, currentView.name) : null;
   const selectedDomNodeId = currentView?.selectedNodeId;
 
   const selectedNodeAncestorIds = React.useMemo(() => {

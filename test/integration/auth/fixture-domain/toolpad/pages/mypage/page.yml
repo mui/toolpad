@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: page
+spec:
+  id: 5q1xd0t
+  title: Page
+  content:
+    - component: PageRow
+      name: pageRow
+      children:
+        - component: Text
+          name: typography
+          props:
+            value:
+              $$jsExpression: |
+                `my email: ${getMySession.data.user.email}`
+  queries:
+    - name: getMySession
+      query:
+        function: getMySession
+        kind: local

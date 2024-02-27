@@ -16,9 +16,9 @@ import invariant from 'invariant';
 import InputAdornment from '@mui/material/InputAdornment';
 import AccountCircle from '@mui/icons-material/Search';
 import { uncapitalize } from '@mui/toolpad-utils/strings';
+import * as appDom from '@mui/toolpad-core/appDom';
 import ComponentCatalogItem from './ComponentCatalogItem';
 import CreateCodeComponentNodeDialog from '../../PagesExplorer/CreateCodeComponentNodeDialog';
-import * as appDom from '../../../../appDom';
 import { useAppState } from '../../../AppState';
 import { usePageEditorApi } from '../PageEditorProvider';
 import { useToolpadComponents } from '../../toolpadComponents';
@@ -32,6 +32,10 @@ interface FutureComponentSpec {
 
 const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Map', { url: 'https://github.com/mui/mui-toolpad/issues/864', displayName: 'Map' }],
+  [
+    'Pie Chart',
+    { url: 'https://github.com/mui/mui-toolpad/issues/2615', displayName: 'Pie Chart' },
+  ],
   ['Drawer', { url: 'https://github.com/mui/mui-toolpad/issues/1540', displayName: 'Drawer' }],
   ['Html', { url: 'https://github.com/mui/mui-toolpad/issues/1311', displayName: 'Html' }],
   ['Icon', { url: 'https://github.com/mui/mui-toolpad/issues/83', displayName: 'Icon' }],
@@ -40,11 +44,11 @@ const FUTURE_COMPONENTS = new Map<string, FutureComponentSpec>([
   ['Radio', { url: 'https://github.com/mui/mui-toolpad/issues/744', displayName: 'Radio' }],
 ]);
 
-const WIDTH_COLLAPSED = 40;
+const COMPONENT_CATALOG_WIDTH_COLLAPSED = 40;
 
 const ComponentCatalogRoot = styled('div')({
   position: 'relative',
-  width: WIDTH_COLLAPSED + 1,
+  width: COMPONENT_CATALOG_WIDTH_COLLAPSED + 1,
   height: '100%',
   zIndex: 1,
   overflow: 'visible',
@@ -89,7 +93,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     [openStart, setOpenStart],
   );
 
-  const toolpadComponents = useToolpadComponents(dom);
+  const toolpadComponents = useToolpadComponents();
 
   const handleDragStart = (componentType: string) => (event: React.DragEvent<HTMLElement>) => {
     const def = toolpadComponents[componentType];
@@ -354,7 +358,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              width: WIDTH_COLLAPSED,
+              width: COMPONENT_CATALOG_WIDTH_COLLAPSED,
             }}
           >
             <Box sx={{ mt: 2 }}>{openStart ? <ArrowLeftIcon /> : <ArrowRightIcon />}</Box>

@@ -8,7 +8,10 @@ export interface PageRowProps {
   children?: React.ReactNode;
 }
 
-function PageRow({ layoutColumnSizes = [], gap, children }: PageRowProps) {
+const PageRow = React.forwardRef(function PageRow(
+  { layoutColumnSizes = [], gap, children, ...props }: PageRowProps,
+  ref,
+) {
   const gridAutoColumns = layoutColumnSizes.reduce(
     (acc, layoutColumnSize) => `${acc}${`${acc && ' '}minmax(0, ${layoutColumnSize || 1}fr)`}`,
     '',
@@ -16,17 +19,19 @@ function PageRow({ layoutColumnSizes = [], gap, children }: PageRowProps) {
 
   return (
     <Box
+      ref={ref}
       sx={{
         gap,
         display: 'grid',
         gridAutoFlow: 'column',
         gridAutoColumns,
       }}
+      {...props}
     >
       {children}
     </Box>
   );
-}
+});
 
 export default createBuiltin(PageRow, {
   helperText: 'A page row component.',

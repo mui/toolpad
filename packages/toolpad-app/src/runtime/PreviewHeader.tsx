@@ -15,9 +15,11 @@ import {
   popoverClasses,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import { useMatch } from 'react-router-dom';
+import { Link, useMatch } from 'react-router-dom';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { IS_CUSTOM_SERVER, PREVIEW_HEADER_HEIGHT } from './constants';
+import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { PREVIEW_HEADER_HEIGHT } from './constants';
+import { AppHostContext } from './AppHostContext';
 
 interface CopyToClipboardButtonProps extends IconButtonProps {
   content: string;
@@ -104,7 +106,10 @@ function CodeView({ children }: CodeViewProps) {
   );
 }
 
-function OpenInEditorButton({ children = 'Open in editor', ...props }: ButtonProps) {
+function OpenInEditorButton<C extends React.ElementType>({
+  children = 'Open in editor',
+  ...props
+}: ButtonProps<C>) {
   return (
     <Button color="inherit" size="small" startIcon={<EditIcon />} {...props}>
       {children}
@@ -178,13 +183,35 @@ export default function PreviewHeader({ basename }: PreviewHeaderProps) {
 
   const theme = useTheme();
 
-  return (
+  const appContext = useNonNullableContext(AppHostContext);
+
+  let action: React.ReactNode = null;
+
+  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+    action = (
+      <OpenInEditorButton
+        component={Link}
+        to={activePage ? `/editor/app/pages/${activePage}` : '/editor/app'}
+      />
+    );
+  } else if (appContext) {
+    action = appContext.isCustomServer ? (
+      <CustomServerInstructions basename={basename} />
+    ) : (
+      <OpenInEditorButton
+        component="a"
+        href={activePage ? `/_toolpad/app/pages/${activePage}` : '/_toolpad/app'}
+      />
+    );
+  }
+
+  return appContext ? (
     <Box
       sx={{
         position: 'fixed',
         width: '100%',
         height: PREVIEW_HEADER_HEIGHT,
-        zIndex: theme.zIndex.drawer + 1,
+        zIndex: theme.zIndex.drawer + 2,
       }}
     >
       <Alert
@@ -192,21 +219,12 @@ export default function PreviewHeader({ basename }: PreviewHeaderProps) {
         sx={{
           borderRadius: 0,
         }}
-        action={
-          IS_CUSTOM_SERVER ? (
-            <CustomServerInstructions basename={basename} />
-          ) : (
-            <OpenInEditorButton
-              component="a"
-              href={activePage ? `/_toolpad/app/pages/${activePage}` : '/_toolpad/app'}
-            />
-          )
-        }
+        action={action}
       >
         <Typography variant="body2">
           This is a preview version of the application, not suitable for production.
         </Typography>
       </Alert>
     </Box>
-  );
+  ) : null;
 }

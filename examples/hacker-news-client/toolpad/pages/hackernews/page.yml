@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.50/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: Default page
+  queries:
+    - name: stories
+      query:
+        function: getStories
+        kind: local
+  content:
+    - component: Container
+      name: container
+      children:
+        - component: Text
+          name: text2
+          layout:
+            columnSize: 1
+          props:
+            value: ' Hacker News'
+            variant: h4
+      props:
+        sx:
+          background: '#FF6600'
+    - component: List
+      name: list
+      props:
+        itemCount:
+          $$jsExpression: stories.data.length
+        disablePadding: true
+        sx:
+          background: '#F6F6EF'
+        renderItem:
+          $$template:
+            - component: PageRow
+              name: pageRow1
+              children:
+                - component: PageColumn
+                  name: pageColumn
+                  layout:
+                    columnSize: 1
+                  children:
+                    - component: Text
+                      name: text
+                      props:
+                        value:
+                          $$jsExpression: >
+                            `[**${stories.data[i].title}**](${stories.data[i].url})`
+                        mode: markdown
+                    - component: Text
+                      name: text1
+                      props:
+                        value:
+                          $$jsExpression: >
+                            `${stories.data[i].score} by ${stories.data[i].by} |
+                            ${stories.data[i].descendants} comments`
+      layout:
+        columnSize: 1
+  alias:
+    - sR_fqKE

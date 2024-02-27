@@ -11,10 +11,10 @@ import {
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import { NodeId } from '@mui/toolpad-core';
-import * as appDom from '../../../appDom';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
-import useBoolean from '../../../utils/useBoolean';
 import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';
 
 export interface UrlQueryEditorProps {
@@ -67,15 +67,21 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
 
   const handleButtonClick = React.useCallback(() => {
     appStateApi.setView({
+      ...currentView,
       kind: 'page',
       name: page.name,
-      view: { kind: 'pageParameters' },
+      pageParametersDialogOpen: true,
     });
-  }, [appStateApi, page.name]);
+  }, [appStateApi, page.name, currentView]);
 
   const handleDialogClose = React.useCallback(() => {
-    appStateApi.setView({ kind: 'page', name: page.name });
-  }, [appStateApi, page.name]);
+    appStateApi.setView({
+      ...currentView,
+      kind: 'page',
+      name: page.name,
+      pageParametersDialogOpen: false,
+    });
+  }, [appStateApi, page.name, currentView]);
 
   const { handleCloseWithUnsavedChanges } = useUnsavedChangesConfirm({
     hasUnsavedChanges,
@@ -90,7 +96,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [domApi, handleDialogClose, input, page]);
 
   React.useEffect(() => {
-    if (currentView.kind === 'page' && currentView.view?.kind === 'pageParameters') {
+    if (currentView.kind === 'page' && currentView.pageParametersDialogOpen) {
       openDialog();
     } else {
       closeDialog();
@@ -98,7 +104,7 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
   }, [closeDialog, currentView, openDialog]);
 
   return (
-    <React.Fragment>
+    <div>
       <Button color="inherit" startIcon={<AddIcon />} onClick={handleButtonClick}>
         Add page parameters
       </Button>
@@ -135,6 +141,6 @@ export default function UrlQueryEditor({ pageNodeId }: UrlQueryEditorProps) {
           </Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
+    </div>
   );
 }

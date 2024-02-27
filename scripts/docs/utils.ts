@@ -24,7 +24,7 @@ export async function writePrettifiedFile(
     );
   }
 
-  await fs.writeFile(filename, prettier.format(data, { ...prettierConfig, filepath: filename }), {
-    encoding: 'utf8',
-  });
+  const content = await prettier.format(data, { ...prettierConfig, filepath: filename });
+
+  await fs.writeFile(filename, content, { encoding: 'utf8' });
 }

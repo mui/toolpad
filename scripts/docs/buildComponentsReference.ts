@@ -6,7 +6,8 @@ import * as builtins from '@mui/toolpad-components';
 import * as toolpadCore from '@mui/toolpad-core';
 import { escapeCell, writePrettifiedFile } from './utils';
 
-const AUTO_GENERATED_WARNING = 'This file has been auto-generated using `yarn docs:build:api`.';
+const AUTO_GENERATED_WARNING =
+  'ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`.';
 
 const currentDirectory = __dirname;
 const projectRoot = path.resolve(currentDirectory, '..', '..');
@@ -26,7 +27,7 @@ async function writePageFile(mdFilePath: string) {
 
 import * as React from 'react';
 import MarkdownDocs from '@mui/monorepo/docs/src/modules/components/MarkdownDocs';
-import * as pageProps from '${relativeMdPath}?@mui/markdown';
+import * as pageProps from '${relativeMdPath}?muiMarkdown';
 
 export default function Page() {
   return <MarkdownDocs {...pageProps} />;

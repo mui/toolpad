@@ -15,6 +15,7 @@ import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
 import { getObjectKey } from '@mui/toolpad-utils/objectKey';
 import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
+import * as appDom from '@mui/toolpad-core/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {
@@ -32,7 +33,6 @@ import { usePrivateQuery } from '../context';
 import QueryInputPanel from '../QueryInputPanel';
 import useQueryPreview from '../useQueryPreview';
 import useFetchPrivate from '../useFetchPrivate';
-import * as appDom from '../../appDom';
 
 const EMPTY_ROWS: any[] = [];
 
@@ -81,7 +81,7 @@ function QueryEditor({
 
   const handleSpreadsheetChange = React.useCallback(
     (event: React.SyntheticEvent<Element, Event>, newValue: GoogleDriveFile | null) => {
-      setInput((existing) => {
+      setInput?.((existing) => {
         existing = appDom.setQueryProp(existing, 'sheetName', null);
         existing = appDom.setQueryProp(existing, 'spreadsheetId', newValue?.id ?? null);
         return existing;
@@ -92,7 +92,7 @@ function QueryEditor({
 
   const handleSheetChange = React.useCallback(
     (event: React.SyntheticEvent<Element, Event>, newValue: GoogleSheet | null) => {
-      setInput((existing) =>
+      setInput?.((existing) =>
         appDom.setQueryProp(existing, 'sheetName', newValue?.properties?.title ?? null),
       );
     },
@@ -101,14 +101,14 @@ function QueryEditor({
 
   const handleRangeChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'ranges', event.target.value));
+      setInput?.((existing) => appDom.setQueryProp(existing, 'ranges', event.target.value));
     },
     [setInput],
   );
 
   const handleTransformChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setInput((existing) => appDom.setQueryProp(existing, 'headerRow', event.target.checked));
+      setInput?.((existing) => appDom.setQueryProp(existing, 'headerRow', event.target.checked));
     },
     [setInput],
   );
@@ -140,8 +140,8 @@ function QueryEditor({
   const previewGridKey = React.useMemo(() => getObjectKey(columns), [columns]);
 
   return (
-    <PanelGroup autoSaveId="toolpad-google-sheets-panel" direction="horizontal">
-      <Panel defaultSizePercentage={50}>
+    <PanelGroup autoSaveId="toolpad/google-sheets-panel" direction="horizontal">
+      <Panel id="google-sheets-query-config" defaultSize={50}>
         <QueryInputPanel onRunPreview={handleRunPreview}>
           <Stack direction="column" gap={2} sx={{ px: 3, pt: 1 }}>
             <Autocomplete
@@ -203,7 +203,7 @@ function QueryEditor({
         </QueryInputPanel>
       </Panel>
       <PanelResizeHandle />
-      <Panel defaultSizePercentage={50}>
+      <Panel id="google-sheets-query-response" defaultSize={50}>
         <Box
           sx={{
             height: '100%',

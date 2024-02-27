@@ -1,5 +1,12 @@
 import { describe, test, expect } from 'vitest';
-import { findImports, capitalize, uncapitalize, pascalCase, camelCase } from './strings';
+import {
+  findImports,
+  capitalize,
+  uncapitalize,
+  pascalCase,
+  camelCase,
+  guessTitle,
+} from './strings';
 
 describe('findImports', () => {
   test('finds all imports', () => {
@@ -85,5 +92,21 @@ describe('camelCase', () => {
     [[''], ''],
   ])('should convert %p to %p', (got, expected) => {
     expect(camelCase(...got)).toEqual(expected);
+  });
+});
+
+describe('guessTitle', () => {
+  test.each([
+    ['camelCaseExample', 'Camel Case Example'],
+    ['snake_case_example', 'Snake Case Example'],
+    ['kebab-case-example', 'Kebab Case Example'],
+    ['ACRONYMExample', 'Acronym Example'],
+    ['helloACRONYMExample', 'Hello Acronym Example'],
+    ['HelloACRONYMExample', 'Hello Acronym Example'],
+    ['example123', 'Example 123'],
+    ['example123Wat', 'Example 123 Wat'],
+    ['example123more456', 'Example 123 More 456'],
+  ])('should split %p into %p', (got, expected) => {
+    expect(guessTitle(got)).toEqual(expected);
   });
 });

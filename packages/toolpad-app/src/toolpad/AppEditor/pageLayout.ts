@@ -1,11 +1,11 @@
 import { NodeId } from '@mui/toolpad-core';
+import * as appDom from '@mui/toolpad-core/appDom';
 import {
   getElementNodeComponentId,
   isPageColumn,
   isPageLayoutComponent,
   isPageRow,
 } from '../../runtime/toolpadComponents';
-import * as appDom from '../../appDom';
 
 export function deleteOrphanedLayoutNodes(
   domBeforeChange: appDom.AppDom,
@@ -57,7 +57,6 @@ export function deleteOrphanedLayoutNodes(
       if (
         lastContainerChild.parentProp &&
         parentParent.parentIndex &&
-        moveTargetNodeId !== parentParent.id &&
         moveTargetNodeId !== lastContainerChild.id
       ) {
         if (
@@ -86,6 +85,10 @@ export function deleteOrphanedLayoutNodes(
               'columnSize',
               parent.layout?.columnSize || 1,
             );
+          }
+
+          if (isPageColumn(lastContainerChild) && appDom.isPage(parentParent)) {
+            updatedDom = appDom.spreadNode(updatedDom, lastContainerChild);
           }
 
           orphanedLayoutNodeIds = [...orphanedLayoutNodeIds, parent.id];

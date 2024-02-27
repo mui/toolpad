@@ -1,4 +1,10 @@
-import { Stack, SxProps } from '@mui/material';
+import {
+  Stack,
+  SxProps,
+  inputBaseClasses,
+  formLabelClasses,
+  typographyClasses,
+} from '@mui/material';
 import * as React from 'react';
 import {
   BindableAttrValue,
@@ -8,7 +14,7 @@ import {
   ScopeMeta,
   EnvAttrValue,
 } from '@mui/toolpad-core';
-import { WithControlledProp } from '../../../utils/types';
+import { WithControlledProp } from '@mui/toolpad-utils/types';
 import { getBindingType } from '../../../runtime/bindings';
 import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
 
@@ -83,7 +89,17 @@ export default function BindableEditor<V>({
   const hasBinding = value && valueBindingType !== 'const';
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={sx}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      justifyContent="space-between"
+      sx={{
+        [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
+        [`& .${formLabelClasses.root}`]: { fontSize: 12 },
+        [`& .${typographyClasses.root}`]: { fontSize: 12 },
+        ...sx,
+      }}
+    >
       <React.Fragment>
         {renderControl({
           label,

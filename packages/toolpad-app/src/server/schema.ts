@@ -215,6 +215,7 @@ const baseElementSchema = z.object({
         .number()
         .optional()
         .describe('The width this element takes up, expressed in terms of columns on the page.'),
+      height: z.number().optional().describe('The height this element takes up, in pixels.'),
     })
     .optional()
     .describe('Layout properties for this element.'),
@@ -256,9 +257,66 @@ elementSchema = baseElementSchema
   })
   .describe('The instance of a component. Used to build user interfaces in pages.');
 
+export const applicationSchema = toolpadObjectSchema(
+  'application',
+  z.object({
+    plan: z.enum(['free', 'pro']).optional().describe('The plan for this application.'),
+    authentication: z
+      .object({
+        providers: z
+          .array(
+            z.object({
+              provider: z
+                .enum(['github', 'google', 'azure-ad', 'credentials'])
+                .describe('Unique identifier for this authentication provider.'),
+              roles: z
+                .array(
+                  z.object({
+                    source: z
+                      .array(z.string())
+                      .describe('Authentication provider roles to be mapped from.'),
+                    target: z.string().describe('Toolpad role to be mapped to.'),
+                  }),
+                )
+                .optional()
+                .describe('Role mapping definition for this authentication provider.'),
+            }),
+          )
+          .optional()
+          .describe('Authentication providers to use.'),
+        restrictedDomains: z
+          .array(z.string())
+          .optional()
+          .describe('Valid email patterns for the authenticated user.'),
+      })
+      .optional()
+      .describe('Authentication configuration for this application.'),
+    authorization: z
+      .object({
+        roles: z
+          .array(
+            z.union([
+              z.string(),
+              z.object({
+                name: z.string().describe('The name of the role.'),
+                description: z.string().optional().describe('A description of the role.'),
+              }),
+            ]),
+          )
+          .optional()
+          .describe('Available roles for this application. These can be assigned to users.'),
+      })
+      .optional()
+      .describe('Authorization configuration for this application.'),
+  }),
+);
+
+export type Application = z.infer<typeof applicationSchema>;
+
 export const pageSchema = toolpadObjectSchema(
   'page',
   z.object({
+    displayName: z.string().optional().describe('Page name to display in the UI.'),
     id: z
       .string()
       .optional()
@@ -277,8 +335,18 @@ export const pageSchema = toolpadObjectSchema(
       .array(elementSchema)
       .optional()
       .describe('The content of the page. This defines the UI.'),
-    unstable_codeFile: z
-      .string()
+    authorization: z
+      .object({
+        allowAll: z.boolean().optional().describe('Allow all users to access this page.'),
+        allowedRoles: z
+          .array(z.string())
+          .optional()
+          .describe('Roles that are allowed to access this page.'),
+      })
+      .optional()
+      .describe('Authorization configuration for this page.'),
+    unstable_codeFile: z.coerce
+      .boolean()
       .optional()
       .describe('The content of the page as JSX. Experimental, do not use!.'),
     display: z
@@ -331,6 +399,7 @@ export type Theme = z.infer<typeof themeSchema>;
 
 export const META = {
   schemas: {
+    Application: applicationSchema,
     Page: pageSchema,
     Theme: themeSchema,
   },

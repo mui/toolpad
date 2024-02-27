@@ -11,6 +11,7 @@ module.exports = {
       webpack: {
         config: path.join(__dirname, './eslintWebpackResolverConfig.js'),
       },
+      exports: {},
     },
   },
   extends: [
@@ -73,6 +74,13 @@ module.exports = {
         skipShapeProps: true,
       },
     ],
+    'import/no-unresolved': [
+      'error',
+      {
+        // https://github.com/import-js/eslint-plugin-import/issues/1739
+        ignore: ['\\.md\\?muiMarkdown$'],
+      },
+    ],
     'import/no-restricted-paths': [
       'error',
       {
@@ -81,11 +89,7 @@ module.exports = {
             // Don't leak the internal runtime abstraction. It's on its way to be moved towards a separate package
             target: './packages/toolpad-app/src/runtime',
             from: './packages/toolpad-app/src/',
-            except: [
-              './runtime',
-              // TODO: move ./src/appDom to ./src/runtime/appDom
-              './appDom',
-            ],
+            except: ['./runtime'],
           },
         ],
       },
@@ -95,7 +99,12 @@ module.exports = {
     {
       files: ['examples/**/*'],
       rules: {
+        // We use it for demonstration purposes
         'no-console': 'off',
+        // Personal preference
+        'no-underscore-dangle': 'off',
+        // no node_modules in examples as they are not installed
+        'import/no-unresolved': 'off',
       },
     },
     {
@@ -121,7 +130,6 @@ module.exports = {
         'packages/toolpad-app/src/components/**/*',
         'packages/toolpad-app/src/toolpad/**/*',
         'packages/toolpad-app/src/runtime/**/*',
-        'packages/toolpad-app/reactDevtools/**/*',
       ],
       excludedFiles: ['*.spec.ts', '*.spec.tsx'],
       rules: {

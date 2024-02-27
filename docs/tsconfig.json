@@ -12,6 +12,6 @@
     "noImplicitAny": true,
     "jsx": "preserve"
   },
-  "include": ["docs-env.d.ts", "pages/**/*", "src/**/*", "data/**/*"],
+  "include": ["docs-env.d.ts", "pages/**/*", "src/**/*", "data/**/*", "next.config.mjs"],
   "exclude": ["docs/.next", "docs/export"]
 }

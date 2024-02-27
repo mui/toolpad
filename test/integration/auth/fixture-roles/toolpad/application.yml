@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: application
+spec:
+  plan: pro
+  authentication:
+    providers: [{ provider: credentials, roles: [{ source: [mock-admin, god], target: admin }] }]
+  authorization:
+    roles:
+      - name: admin
+        description: 'A very important person.'

@@ -1,9 +1,9 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.49/docs/schemas/v1/definitions.json#properties/Page
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.50/docs/schemas/v1/definitions.json#properties/Page
 
 apiVersion: v1
 kind: page
 spec:
-  title: Employees
+  title: Customers
   content:
     - component: PageRow
       name: pageRow13
@@ -399,5 +399,5 @@ spec:
             $$jsExpression: |
               customersGrid.selection.id
       mode: mutation
-  display: standalone
-  displayName: Admin App(no data providers))
+  display: shell
+  displayName: Admin App(form based)

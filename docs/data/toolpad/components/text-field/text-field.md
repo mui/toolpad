@@ -35,15 +35,15 @@ A name is needed when a textfield is part of a form component. It is used to sho
 
 ## Appearance
 
-The TextField component has some appearance related props supported in Toolpad. Let's look at each of these below:
+The TextField component supports below mentioned appearance related props in Toolpad:
 
 ### label
 
-A label that describes the content of the textfield. Eg: Enter name.
+A label that describes the content of the textfield e.g. Enter name.
 
 ### variant
 
-The variant property supports three different options: outlined (default), filled and standard. Outlined is for low-emphasis while filled is a high-emphasis input. Standard is used for less-pronounced actions that ensure user remains focused on the main content.
+The variant property supports three different options: outlined (default), filled, and standard. Outlined is for low-emphasis while filled is a high-emphasis input. Standard is used for less-pronounced actions that ensure user remains focused on the main content.
 
 {{"demo": "TextFieldVariant.js", "hideToolbar": true}}
 

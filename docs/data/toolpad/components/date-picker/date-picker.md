@@ -37,15 +37,15 @@ A name is needed when a textfield is part of a form component. It is used to sho
 
 ## Appearance
 
-The DatePicker component has some appearance related props supported in Toolpad. Let's look at each of these below:
+The DatePicker component supports below mentioned appearance related props in Toolpad:
 
 ### label
 
-A label that describes the content of the datepicker. Eg: Enter date.
+A label that describes the content of the datepicker e.g. Enter date.
 
 ### variant
 
-The variant property supports three different options: outlined (default), filled and standard. Outlined is for low-emphasis while Filled is a high-emphasis input. Standard is used for less-pronounced actions that ensure user remains focused on the main content.
+The variant property supports three different options: outlined (default), filled, and standard. Outlined is for low-emphasis while Filled is a high-emphasis input. Standard is used for less-pronounced actions that ensure user remains focused on the main content.
 
 {{"demo": "DatePickerVariant.js", "hideToolbar": true}}
 

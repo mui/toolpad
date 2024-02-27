@@ -7,7 +7,6 @@ const TOOLPAD_PROPS1 = {
   variant: 'outlined',
   label: 'MM/dd/yyyy',
   format: 'MM/dd/yyyy',
-  // defaultValue: '2017-05-24',
 };
 
 const TOOLPAD_PROPS2 = {

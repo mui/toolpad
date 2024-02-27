@@ -1,4 +1,4 @@
-# Pages
+# Building Pages
 
 <p class="description">Toolpad provides a default dashboard layout that contains navigation and and authentication controls</p>
 

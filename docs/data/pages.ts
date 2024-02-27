@@ -11,15 +11,18 @@ const pages: MuiPage[] = [
   },
 
   {
-    pathname: '/toolpad/pages',
-    title: 'Pages',
+    pathname: '/toolpad/building-pages',
+    title: 'Building Pages',
   },
   {
-    pathname: '/toolpad/data',
-    title: 'Data',
+    pathname: '/toolpad/using-data',
+    title: 'Using data',
     children: [
-      { pathname: '/toolpad/data/providers', title: 'Data Providers' },
-      { pathname: '/toolpad/data/connecting-to-components', title: 'Connecting to Components' },
+      { pathname: '/toolpad/using-data/data-providers', title: 'Data Providers' },
+      {
+        pathname: '/toolpad/using-data/connecting-to-components',
+        title: 'Connecting to Components',
+      },
     ],
   },
   {

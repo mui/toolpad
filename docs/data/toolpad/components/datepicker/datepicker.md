@@ -78,7 +78,7 @@ isRequired is useful when the action can't be perfomed without a user provided d
 
 ### isInvalid
 
-???
+If isInvalid is set to true it will show an error no matter what the input is.
 
 ## API
 

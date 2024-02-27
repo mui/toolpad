@@ -1,7 +1,7 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
 import componentsManifest from './reference/components/manifest.json';
 
-export const pages: MuiPage[] = [
+const pages: MuiPage[] = [
   {
     pathname: '/toolpad/studio/getting-started-group',
     title: 'Getting Started',
@@ -228,3 +228,5 @@ export const pages: MuiPage[] = [
     ],
   },
 ];
+
+export default pages;

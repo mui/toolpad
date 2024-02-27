@@ -1,6 +1,6 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
 
-export const pages: MuiPage[] = [
+const pages: MuiPage[] = [
   {
     pathname: '/toolpad/getting-started',
     title: 'Getting Started',
@@ -39,3 +39,5 @@ export const pages: MuiPage[] = [
     title: 'Roadmap',
   },
 ];
+
+export default pages;

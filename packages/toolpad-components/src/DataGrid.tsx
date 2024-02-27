@@ -701,6 +701,13 @@ function useDataProviderDataGridProps(
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
     }
+    if (draftRow && params.reason === GridRowEditStopReasons.escapeKeyDown) {
+      setRowModesModel({
+        ...rowModesModel,
+        [draftRow.id]: { mode: GridRowModes.View, ignoreModifications: true },
+      });
+      setDraftRow(null);
+    }
   };
 
   const handleRowEditStart: GridEventListener<'rowEditStart'> = (params, event) => {
@@ -791,7 +798,9 @@ function useDataProviderDataGridProps(
               'Edit action should be unavailable when dataProvider.updateRecord is not defined',
             );
             let newRecord = await dataProvider.updateRecord(id, values);
-            invariant(newRecord?.[idField], 'Record returned by updateRecord must have an id');
+            if (!newRecord?.[idField]) {
+              console.warn('Record returned by updateRecord must have an id');
+            }
             newRecord ??= newRow;
             setActionResult({ action, id: newRecord[idField] as GridRowId });
             return newRecord;

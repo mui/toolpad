@@ -5,8 +5,8 @@ import { Stack } from '@mui/material';
 export default function BasicButton() {
   return (
     <Stack spacing={2} direction="row" alignItems="center">
-      <TextField variant= "outlined" size= "small" disabled label= "Disabled" />
-      <TextField variant= "outlined" size= "small" label= "Active"  />
+      <TextField variant="outlined" size="small" disabled label="Disabled" />
+      <TextField variant="outlined" size="small" label="Active" />
     </Stack>
   );
 }

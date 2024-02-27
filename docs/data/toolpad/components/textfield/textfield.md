@@ -1,6 +1,6 @@
 # Textfield
 
-<p class="description">Learn about the textfield component and it's usage in Toolpad.</p>
+<p class="description">Learn about the textfield component and its usage in Toolpad.</p>
 
 ## Demo
 
@@ -10,7 +10,7 @@ TextField is a text input component. It takes user input and provides the value 
 
 ## Usage
 
-It is one of the most used input component. The video below uses some props to demonstrate it's usage.
+It is one of the most used input component. The video below uses some props to demonstrate its usage.
 
 <video controls width="100%" height="auto" style="contain" alt="textfield">
   <source src="/static/toolpad/docs/components/textfield/textfield.mp4" type="video/mp4">

@@ -1,6 +1,6 @@
 # List
 
-<p class="description">Learn about the list component and it's usage in Toolpad.</p>
+<p class="description">Learn about the list component and its usage in Toolpad.</p>
 
 ## Demo
 

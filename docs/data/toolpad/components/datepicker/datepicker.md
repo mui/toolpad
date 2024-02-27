@@ -1,6 +1,6 @@
 # DatePicker
 
-<p class="description">Learn about the datepicker component and it's usage in Toolpad.</p>
+<p class="description">Learn about the datepicker component and its usage in Toolpad.</p>
 
 ## Demo
 

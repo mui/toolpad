@@ -14,7 +14,7 @@ Follow these steps to create a new data provider:
 A data provider that iterates over a static list could look as follows:
 
 ```tsx
-import { createDataProvider } from '@mui/toolpad-core/server';
+import { createDataProvider } from '@mui/toolpad-studio-core/server';
 import DATA from './movies.json';
 
 export default createDataProvider({

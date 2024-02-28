@@ -44,12 +44,18 @@ export default withDocsInfra({
           ...config.resolve.alias,
           docs: path.resolve(MONOREPO_PATH, './docs'),
           ...MONOREPO_PACKAGES,
-          '@mui/toolpad-components': path.resolve(
+          '@mui/toolpad-studio-components': path.resolve(
             currentDirectory,
-            '../packages/toolpad-components/src',
+            '../packages/toolpad-studio-components/src',
           ),
-          '@mui/toolpad-core': path.resolve(currentDirectory, '../packages/toolpad-core/src'),
-          '@mui/toolpad-utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
+          '@mui/toolpad-studio-core': path.resolve(
+            currentDirectory,
+            '../packages/toolpad-studio-core/src',
+          ),
+          '@mui/toolpad-studio-utils': path.resolve(
+            currentDirectory,
+            '../packages/toolpad-studio-utils/src',
+          ),
         },
       },
       module: {

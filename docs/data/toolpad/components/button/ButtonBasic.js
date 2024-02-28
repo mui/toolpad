@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button } from '@mui/toolpad-components';
+import { Button } from '@mui/toolpad-studio-components';
 
 const TOOLPAD_PROPS = {
   variant: 'contained',

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import {
   Alert,
+  CircularProgress,
   InputBase,
   InputBaseProps,
   Popover,
@@ -17,6 +18,7 @@ export interface EditableTreeItemProps extends Omit<TreeItemProps, 'label'> {
   isEditing?: boolean;
   onEdit?: (newItemName: string) => void | Promise<void>;
   onCancel?: () => void | Promise<void>;
+  isLoading?: boolean;
   validateItemName?: (newItemName: string) => { isValid: boolean; errorMessage?: string };
   inputProps?: Omit<
     InputBaseProps,
@@ -34,6 +36,7 @@ export default function EditableTreeItem({
   isEditing: isExternalEditing = false,
   onEdit,
   onCancel,
+  isLoading = false,
   inputProps,
   sx,
   ...rest
@@ -76,20 +79,20 @@ export default function EditableTreeItem({
     }
   }, [onCancel, suggestedNewItemName]);
 
-  const handleConfirm = React.useCallback(() => {
-    if (!itemNameInput || !newItemValidationResult.isValid) {
+  const handleConfirm = React.useCallback(async () => {
+    if (!itemNameInput || !newItemValidationResult.isValid || isLoading) {
       handleCancel();
       return;
     }
 
     if (onEdit) {
-      onEdit(itemNameInput);
+      await onEdit(itemNameInput);
     }
     setIsInternalEditing(false);
-  }, [handleCancel, itemNameInput, newItemValidationResult.isValid, onEdit]);
+  }, [handleCancel, isLoading, itemNameInput, newItemValidationResult.isValid, onEdit]);
 
   const handleChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setItemNameInput(event.target.value);
+    setItemNameInput(event.target.value.replaceAll(/[^a-zA-Z0-9]/g, ''));
   }, []);
 
   const handleFocus = React.useCallback((event: React.FocusEvent<HTMLInputElement>) => {
@@ -138,6 +141,8 @@ export default function EditableTreeItem({
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
               fullWidth
+              disabled={isLoading}
+              endAdornment={isLoading ? <CircularProgress size={14} /> : null}
               sx={{
                 ...(inputProps?.sx || {}),
                 ...labelTextSx,
@@ -165,7 +170,13 @@ export default function EditableTreeItem({
         ) : (
           <Typography
             variant="body2"
-            sx={{ fontWeight: 'inherit', flexGrow: 1, ...labelTextSx }}
+            sx={{
+              fontWeight: 'inherit',
+              flexGrow: 1,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              ...labelTextSx,
+            }}
             noWrap
           >
             {labelText}

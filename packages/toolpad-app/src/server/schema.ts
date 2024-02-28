@@ -215,6 +215,7 @@ const baseElementSchema = z.object({
         .number()
         .optional()
         .describe('The width this element takes up, expressed in terms of columns on the page.'),
+      height: z.number().optional().describe('The height this element takes up, in pixels.'),
     })
     .optional()
     .describe('Layout properties for this element.'),

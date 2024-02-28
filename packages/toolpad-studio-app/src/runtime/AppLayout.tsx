@@ -100,7 +100,7 @@ function AppPagesNavigation({
             fontFamily: theme.typography.fontFamily,
           }}
         >
-          MUI Toolpad
+          MUI Toolpad Studio
         </Box>
       </MuiLink>
       <List component="nav" sx={{ px: 2 }} aria-labelledby={navListSubheaderId}>

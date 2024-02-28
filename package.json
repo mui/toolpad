@@ -33,12 +33,14 @@
     "toolpad": "node --enable-source-maps packages/toolpad-app/cli.mjs",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
     "update-monorepo": "tsx ./scripts/updateMonorepo.ts",
+    "monorepo:update": "tsx ./scripts/updateMonorepo.ts",
+    "monorepo:canary": "tsx ./scripts/canaryMonorepo.ts",
     "check-changes": "git add -A && git diff --exit-code --staged",
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },
   "devDependencies": {
     "@argos-ci/core": "1.5.4",
-    "@mui/monorepo": "github:mui/material-ui#7faab118953050eec27e119a53070d2994b70476",
+    "@mui/monorepo": "github:mui/material-ui#8bdcff4a75e0e77137bc3df44560413f2c4241a7",
     "@mui/x-charts": "6.19.5",
     "@next/eslint-plugin-next": "14.1.0",
     "@playwright/test": "1.41.2",

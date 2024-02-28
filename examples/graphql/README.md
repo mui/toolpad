@@ -3,7 +3,7 @@
 <p class="description">An app that shows latest 100 stargezers' info for any GitHub repository.</p>
 
 <a href="https://mui-toolpad-graphql-production.up.railway.app/prod/pages/page" target="_blank">
-  <img src="https://mui.com/static/toolpad/marketing/graphql.png" alt="Toolpad example app using graphQL API" style="aspect-ratio: 687/376;" width="1434">
+  <img src="https://mui.com/static/toolpad/marketing/graphql.png" alt="Toolpad Studio example app using graphQL API" style="aspect-ratio: 687/376;" width="1434">
 </a>
 
 ## Check out the live app
@@ -19,11 +19,11 @@ npx create-toolpad-app@latest --example graphql
 ```
 
 ```bash
-yarn create toolpad-app --example graphql
+yarn create toolpad-studio-app --example graphql
 ```
 
 ```bash
-pnpm create toolpad-app --example graphql
+pnpm create toolpad-studio-app --example graphql
 ```
 
 or:
@@ -32,11 +32,11 @@ or:
 
 ## What's inside
 
-A Toolpad app that shows how to:
+A Toolpad Studio app that shows how to:
 
 - call a graphQL API using custom functions
 - use data grid, metric and textField components
-- work with secrets in Toolpad
+- work with secrets in Toolpad Studio
 
 ## The source
 

@@ -1,12 +1,12 @@
 # Custom server with Next.js
 
-<p class="description">A demonstration of how to integrate Toolpad applications with a Next.js application in a custom server.</p>
+<p class="description">A demonstration of how to integrate Toolpad Studio applications with a Next.js application in a custom server.</p>
 
 ## Demo
 
-https://github.com/prakhargupta1/mui-toolpad/assets/92228082/0805f682-b481-4f41-b59c-5a96e51b5203
+https://github.com/prakhargupta1/mui-toolpad-studio/assets/92228082/0805f682-b481-4f41-b59c-5a96e51b5203
 
-Example showcasing custom server integration of Toolpad apps. [The docs](https://mui.com/toolpad/concepts/custom-server/).
+Example showcasing custom server integration of Toolpad Studio apps. [The docs](https://mui.com/toolpad-studio/concepts/custom-server/).
 
 ## How to run
 
@@ -17,11 +17,11 @@ npx create-toolpad-app@latest --example custom-server-nextjs
 ```
 
 ```bash
-yarn create toolpad-app --example custom-server-nextjs
+yarn create toolpad-studio-app --example custom-server-nextjs
 ```
 
 ```bash
-pnpm create toolpad-app --example custom-server-nextjs
+pnpm create toolpad-studio-app --example custom-server-nextjs
 ```
 
 or:

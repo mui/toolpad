@@ -49,9 +49,9 @@ lerna-debug.log
 
 dist/
 
-packages/toolpad-app/public/web_modules
-packages/toolpad-app/public/runtime
-packages/toolpad-app/public/typings.json
+packages/toolpad-studio-app/public/web_modules
+packages/toolpad-studio-app/public/runtime
+packages/toolpad-studio-app/public/typings.json
 examples/*/yarn.lock
 
 test-results

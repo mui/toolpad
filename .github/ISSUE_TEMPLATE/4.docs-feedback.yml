@@ -19,7 +19,7 @@ body:
     attributes:
       label: Related page
       description: Which page of the documentation is this about?
-      placeholder: https://mui.com/toolpad/
+      placeholder: https://mui.com/toolpad-studio/
     validations:
       required: true
   - type: dropdown

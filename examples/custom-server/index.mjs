@@ -1,29 +1,48 @@
-import { createHandler } from '@mui/toolpad';
-import express from 'express';
+import { BindableAttrValue } from '@mui/toolpad-studio-core';
+import { ensureSuffix } from '@mui/toolpad-studio-utils/strings';
+import { Maybe } from '@mui/toolpad-studio-utils/types';
+import { Authentication, RestConnectionParams } from './types';
+import type { RuntimeConfig } from '../../types';
 
-const app = express();
+export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
 
-app.get('/', (req, res) => {
-  res.set('Content-Type', 'text/html');
-  res.send(`
-    <html>
-      <body>  
-        👋 This is a <a href="https://mui.com/toolpad/concepts/custom-server/">custom server</a>,
-        it hosts to a <a href="/my-app">Toolpad application</a>.
-      </body>
-    </html>
-  `);
-});
+export function getAuthenticationHeaders(auth: Maybe<Authentication>): [string, string][] {
+  if (!auth) {
+    return [];
+  }
 
-// Initialize the Toolpad handler. Make sure to pass the base path
-const { handler } = await createHandler({
-  dev: process.env.NODE_ENV === 'development',
-  base: '/my-app',
-});
+  switch (auth.type) {
+    case 'basic':
+      return [
+        [
+          'Authorization',
+          `Basic ${Buffer.from(`${auth.user}:${auth.password}`, 'utf-8').toString('base64')}`
+        ]
+      ];
+    case 'bearerToken':
+      return [['Authorization', `Bearer ${auth.token}`]];
+    case 'apiKey':
+      return [[auth.header, auth.key]];
+    default:
+      throw new Error(`Unsupported authentication type "${(auth as Authentication).type}"`);
+  }
+}
 
-// Use the handler in your application
-app.use('/my-app', handler);
+export function parseBaseUrl(baseUrl: string): URL {
+  const parsedBase = new URL(baseUrl);
+  parsedBase.pathname = ensureSuffix(parsedBase.pathname, '/');
+  parsedBase.search = '';
+  parsedBase.hash = '';
+  return parsedBase;
+}
 
-const server = app.listen(3001, () => {
-  console.log(`Listening on http://localhost:${server.address().port}`);
-});
+export function getDefaultUrl(
+  config: RuntimeConfig,
+  connection?: RestConnectionParams | null
+): BindableAttrValue<string> {
+  const baseUrl = connection?.baseUrl;
+
+  return baseUrl
+    ? ''
+    : new URL('/static/movies.json', config.externalUrl || window.location.href).href;
+}

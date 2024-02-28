@@ -4,8 +4,8 @@ pnpm-lock.yaml
 /docs/export
 /docs/schemas
 /packages/**/dist
-/packages/toolpad-app/.next
-/packages/toolpad-app/public
+/packages/toolpad-studio-app/.next
+/packages/toolpad-studio-app/public
 
 /examples/*/toolpad.yml
 

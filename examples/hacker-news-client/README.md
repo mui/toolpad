@@ -1,6 +1,6 @@
 # Hacker News client
 
-<p class="description">Toolpad application that demonstrates writing an alternative (simplified) [Hacker News](https://news.ycombinator.com/news) client.</p>
+<p class="description">Toolpad Studio application that demonstrates writing an alternative (simplified) [Hacker News](https://news.ycombinator.com/news) client.</p>
 
 ## How to run
 
@@ -11,11 +11,11 @@ npx create-toolpad-app@latest --example hacker-news-client
 ```
 
 ```bash
-yarn create toolpad-app --example hacker-news-client
+yarn create toolpad-studio-app --example hacker-news-client
 ```
 
 ```bash
-pnpm create toolpad-app --example hacker-news-client
+pnpm create toolpad-studio-app --example hacker-news-client
 ```
 
 or:
@@ -24,7 +24,7 @@ or:
 
 ## What's inside
 
-A Toolpad app that shows how to:
+A Toolpad Studio app that shows how to:
 
 - chain REST API calls
 - use the List component

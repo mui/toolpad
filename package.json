@@ -6,7 +6,7 @@
   "repository": "https://github.com/mui/mui-toolpad.git",
   "private": true,
   "bin": {
-    "toolpad": "./dist/index.js"
+    "toolpad-studio": "./dist/index.js"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -24,13 +24,13 @@
     "release:build": "lerna run --ignore docs --stream build",
     "release:version": "lerna version --exact --no-changelog --no-push --no-git-tag-version",
     "release:publish": "pnpm dedupe && pnpm release:build && pnpm publish --recursive --tag latest",
-    "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
-    "test:build": "lerna run build --scope @mui/toolpad-core --scope @mui/toolpad-components --stream",
+    "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad-studio",
+    "test:build": "lerna run build --scope @mui/toolpad-studio-core --scope @mui/toolpad-studio-components --stream",
     "test:integration": "rimraf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
     "test:argos": "node ./scripts/pushArgos.mjs",
     "test": "lerna run test",
     "check-types": "lerna run check-types",
-    "toolpad": "node --enable-source-maps packages/toolpad-app/cli.mjs",
+    "toolpad-studio": "node --enable-source-maps packages/toolpad-studio-app/cli.mjs",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
     "update-monorepo": "tsx ./scripts/updateMonorepo.ts",
     "check-changes": "git add -A && git diff --exit-code --staged",

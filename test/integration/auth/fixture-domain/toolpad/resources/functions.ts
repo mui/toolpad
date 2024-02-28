@@ -1,4 +1,4 @@
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@mui/toolpad-studio/server';
 
 export async function getMySession() {
   const context = getContext();

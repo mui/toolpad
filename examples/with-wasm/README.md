@@ -1,6 +1,6 @@
 # With WASM
 
-<p class="description">A basic Toolpad application that demonstrates integrating with WASM modules.</p>
+<p class="description">A basic Toolpad Studio application that demonstrates integrating with WASM modules.</p>
 
 <a target="_blank">
   <img src="https://mui.com/static/toolpad/marketing/with-wasm.png" alt="Toolpad example app with WASM modules" style="aspect-ratio: 687/379;" width="1433">
@@ -15,11 +15,11 @@ npx create-toolpad-app@latest --example with-wasm
 ```
 
 ```bash
-yarn create toolpad-app --example with-wasm
+yarn create toolpad-studio-app --example with-wasm
 ```
 
 ```bash
-pnpm create toolpad-app --example with-wasm
+pnpm create toolpad-studio-app --example with-wasm
 ```
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/with-wasm)

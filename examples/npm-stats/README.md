@@ -19,11 +19,11 @@ npx create-toolpad-app@latest --example npm-stats
 ```
 
 ```bash
-yarn create toolpad-app --example npm-stats
+yarn create toolpad-studio-app --example npm-stats
 ```
 
 ```bash
-pnpm create toolpad-app --example npm-stats
+pnpm create toolpad-studio-app --example npm-stats
 ```
 
 or:
@@ -32,9 +32,9 @@ or:
 
 ## What's inside
 
-This app demonstrates the following capabilities of Toolpad:
+This app demonstrates the following capabilities of Toolpad Studio:
 
-1. How to use a thrid party REST API to fetch data to a Toolpad app.
+1. How to use a thrid party REST API to fetch data to a Toolpad Studio app.
 2. How to use custom components like charts.
 3. How to use pre-built MUI components like Date Picker.
 4. How to transform data.

@@ -18,5 +18,5 @@
     "types": ["node"],
     "paths": {}
   },
-  "include": ["./test", "packages/toolpad-utils/src/http.ts"]
+  "include": ["./test", "packages/toolpad-studio-utils/src/http.ts"]
 }

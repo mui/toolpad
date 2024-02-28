@@ -1,4 +1,4 @@
-import { createDataProvider } from '@mui/toolpad/server';
+import { createDataProvider } from '@mui/toolpad-studio/server';
 
 const DATA = Array.from({ length: 100_000 }, (_, id) => ({ id, name: `Index item ${id}` }));
 

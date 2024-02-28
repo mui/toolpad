@@ -6,12 +6,12 @@ import path from 'path';
 import yargs from 'yargs';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom } from '@mui/toolpad-studio-utils/errors';
 import { execaCommand } from 'execa';
 import { satisfies } from 'semver';
-import { readJsonFile } from '@mui/toolpad-utils/fs';
+import { readJsonFile } from '@mui/toolpad-studio-utils/fs';
 import invariant from 'invariant';
-import { bashResolvePath } from '@mui/toolpad-utils/cli';
+import { bashResolvePath } from '@mui/toolpad-studio-utils/cli';
 import { PackageJson } from './packageType';
 import { downloadAndExtractExample } from './examples';
 
@@ -111,7 +111,9 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Creating Toolpad project in ${chalk.blue(absolutePath)}`);
+  console.log(
+    `${chalk.blue('info')} - Creating Toolpad Studio project in ${chalk.blue(absolutePath)}`,
+  );
   // eslint-disable-next-line no-console
   console.log();
 
@@ -119,12 +121,12 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
     name: path.basename(absolutePath),
     version: '0.1.0',
     scripts: {
-      dev: 'toolpad dev',
-      build: 'toolpad build',
-      start: 'toolpad start',
+      dev: 'toolpad-studio dev',
+      build: 'toolpad-studio build',
+      start: 'toolpad-studio start',
     },
     dependencies: {
-      '@mui/toolpad': 'latest',
+      '@mui/toolpad-studio': 'latest',
     },
   };
 
@@ -147,7 +149,7 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
     console.log();
 
     const installVerb = packageManager === 'yarn' ? 'add' : 'install';
-    const command = `${packageManager} ${installVerb} @mui/toolpad`;
+    const command = `${packageManager} ${installVerb} @mui/toolpad-studio`;
     await execaCommand(command, { stdio: 'inherit', cwd: absolutePath });
 
     // eslint-disable-next-line no-console
@@ -183,7 +185,7 @@ const run = async () => {
     .usage('$0 [path] [options]')
     .positional('path', {
       type: 'string',
-      describe: 'The path where the Toolpad project directory will be created',
+      describe: 'The path where the Toolpad Studio project directory will be created',
     })
     .option('install', {
       type: 'boolean',

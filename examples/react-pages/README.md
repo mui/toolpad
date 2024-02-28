@@ -11,11 +11,11 @@ npx create-toolpad-app@latest --example react-pages
 ```
 
 ```bash
-yarn create toolpad-app --example react-pages
+yarn create toolpad-studio-app --example react-pages
 ```
 
 ```bash
-pnpm create toolpad-app --example react-pages
+pnpm create toolpad-studio-app --example react-pages
 ```
 
 or:

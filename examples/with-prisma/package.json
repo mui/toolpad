@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "toolpad dev",
-    "build": "toolpad build",
-    "start": "toolpad start",
+    "dev": "toolpad-studio dev",
+    "build": "toolpad-studio build",
+    "start": "toolpad-studio start",
     "prisma": "prisma"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.50",
+    "@mui/toolpad-studio": "0.1.50",
     "@prisma/client": "5.9.1",
     "qrcode": "^1.5.3"
   },

@@ -86,8 +86,8 @@
       "matchManagers": ["github-actions"]
     },
     {
-      "groupName": "Update @mui/toolpad in examples",
-      "matchPackageNames": ["@mui/toolpad"],
+      "groupName": "Update @mui/toolpad-studio in examples",
+      "matchPackageNames": ["@mui/toolpad-studio"],
       "matchFiles": ["examples/*/package.json"],
       "schedule": ["at any time"],
       "automerge": true

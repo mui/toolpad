@@ -16,7 +16,7 @@ import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
-import toolpadPkgJson from '@mui/toolpad/package.json';
+import toolpadPkgJson from '@mui/toolpad-studio/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
 import { mapTranslations } from '@mui/docs/i18n';
 import pages from '../data/pages';

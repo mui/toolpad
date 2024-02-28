@@ -2,7 +2,7 @@
 
 # PageColumn
 
-<p class="description">API docs for the Toolpad PageColumn component.</p>
+<p class="description">API docs for the Toolpad Studio PageColumn component.</p>
 
 A page column component.
 

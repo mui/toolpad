@@ -2,7 +2,7 @@
 
 # Container
 
-<p class="description">API docs for the Toolpad Container component.</p>
+<p class="description">API docs for the Toolpad Studio Container component.</p>
 
 The Material UI [Container](https://mui.com/material-ui/react-container/).
 

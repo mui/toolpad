@@ -2,7 +2,7 @@
 
 # DatePicker
 
-<p class="description">API docs for the Toolpad DatePicker component.</p>
+<p class="description">API docs for the Toolpad Studio DatePicker component.</p>
 
 The MUI X [Date Picker](https://mui.com/x/react-date-pickers/date-picker/) component.
 
@@ -22,4 +22,5 @@ The date picker lets the user select a date.
 | <span class="prop-name">fullWidth</span>    | <span class="prop-type">boolean</span> |                                              | Whether the button should occupy all available horizontal space.                                                                                                                                                                                                                     |
 | <span class="prop-name">disabled</span>     | <span class="prop-type">boolean</span> |                                              | The date picker is disabled.                                                                                                                                                                                                                                                         |
 | <span class="prop-name">isRequired</span>   | <span class="prop-type">boolean</span> | <span class="prop-default">false</span>      | Whether the input is required to have a value.                                                                                                                                                                                                                                       |
+| <span class="prop-name">isInvalid</span>    | <span class="prop-type">boolean</span> | <span class="prop-default">false</span>      | Whether the input value is invalid.                                                                                                                                                                                                                                                  |
 | <span class="prop-name">sx</span>           | <span class="prop-type">object</span>  |                                              | The [`sx` prop](https://mui.com/system/getting-started/the-sx-prop/) is used for defining custom styles that have access to the theme. All MUI System properties are available via the `sx` prop. In addition, the `sx` prop allows you to specify any other CSS rules you may need. |

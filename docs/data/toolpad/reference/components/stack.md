@@ -2,7 +2,7 @@
 
 # Stack
 
-<p class="description">API docs for the Toolpad Stack component.</p>
+<p class="description">API docs for the Toolpad Studio Stack component.</p>
 
 The Material UI [Stack](https://mui.com/material-ui/react-stack/) component.
 

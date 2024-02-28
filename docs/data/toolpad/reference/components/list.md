@@ -2,7 +2,7 @@
 
 # List
 
-<p class="description">API docs for the Toolpad List component.</p>
+<p class="description">API docs for the Toolpad Studio List component.</p>
 
 A list component.
 

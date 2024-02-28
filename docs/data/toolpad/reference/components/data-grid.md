@@ -2,7 +2,7 @@
 
 # DataGrid
 
-<p class="description">API docs for the Toolpad DataGrid component.</p>
+<p class="description">API docs for the Toolpad Studio DataGrid component.</p>
 
 The MUI X [Data Grid](https://mui.com/x/react-data-grid/) component.
 

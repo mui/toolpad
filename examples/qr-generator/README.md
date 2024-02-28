@@ -19,11 +19,11 @@ npx create-toolpad-app@latest --example qr-generator
 ```
 
 ```bash
-yarn create toolpad-studio-app --example qr-generator
+yarn create toolpad-app --example qr-generator
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example qr-generator
+pnpm create toolpad-app --example qr-generator
 ```
 
 or:

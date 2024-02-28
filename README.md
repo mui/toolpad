@@ -44,9 +44,9 @@ Run:
 ```bash
 npx create-toolpad-app@latest my-toolpad-studio-app
 # or
-yarn create toolpad-studio-app my-toolpad-studio-app
+yarn create toolpad-app my-toolpad-studio-app
 # or
-pnpm create toolpad-studio-app my-toolpad-studio-app
+pnpm create toolpad-app my-toolpad-studio-app
 ```
 
 ## Documentation

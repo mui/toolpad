@@ -19,11 +19,11 @@ npx create-toolpad-app@latest  --example charts
 ```
 
 ```bash
-yarn create toolpad-studio-app --example charts
+yarn create toolpad-app --example charts
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example charts
+pnpm create toolpad-app --example charts
 ```
 
 ## What's inside

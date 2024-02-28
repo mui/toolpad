@@ -17,9 +17,9 @@ npx create-toolpad-app@latest --example google-sheet
 ```
 
 ```bash
-yarn create toolpad-studio-app --example google-sheet
+yarn create toolpad-app --example google-sheet
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example google-sheet
+pnpm create toolpad-app --example google-sheet
 ```

@@ -23,11 +23,11 @@ npx create-toolpad-app@latest --example auth-github
 ```
 
 ```bash
-yarn create toolpad-studio-app --example auth-github
+yarn create toolpad-app --example auth-github
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example auth-github
+pnpm create toolpad-app --example auth-github
 ```
 
 or:

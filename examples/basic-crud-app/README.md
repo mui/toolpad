@@ -19,11 +19,11 @@ npx create-toolpad-app@latest --example basic-crud-app
 ```
 
 ```bash
-yarn create toolpad-studio-app --example basic-crud-app
+yarn create toolpad-app --example basic-crud-app
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example basic-crud-app
+pnpm create toolpad-app --example basic-crud-app
 ```
 
 or:

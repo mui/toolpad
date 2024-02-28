@@ -17,11 +17,11 @@ npx create-toolpad-app@latest --example custom-server
 ```
 
 ```bash
-yarn create toolpad-studio-app --example custom-server
+yarn create toolpad-app --example custom-server
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example custom-server
+pnpm create toolpad-app --example custom-server
 ```
 
 or:

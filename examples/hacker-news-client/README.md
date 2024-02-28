@@ -11,11 +11,11 @@ npx create-toolpad-app@latest --example hacker-news-client
 ```
 
 ```bash
-yarn create toolpad-studio-app --example hacker-news-client
+yarn create toolpad-app --example hacker-news-client
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example hacker-news-client
+pnpm create toolpad-app --example hacker-news-client
 ```
 
 or:

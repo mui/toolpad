@@ -19,11 +19,11 @@ npx create-toolpad-app@latest --example npm-stats
 ```
 
 ```bash
-yarn create toolpad-studio-app --example npm-stats
+yarn create toolpad-app --example npm-stats
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example npm-stats
+pnpm create toolpad-app --example npm-stats
 ```
 
 or:

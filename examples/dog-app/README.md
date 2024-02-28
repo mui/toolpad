@@ -19,11 +19,11 @@ npx create-toolpad-app@latest --example dog-app
 ```
 
 ```bash
-yarn create toolpad-studio-app --example dog-app
+yarn create toolpad-app --example dog-app
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example dog-app
+pnpm create toolpad-app --example dog-app
 ```
 
 or:

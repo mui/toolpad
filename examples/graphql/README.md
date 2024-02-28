@@ -19,11 +19,11 @@ npx create-toolpad-app@latest --example graphql
 ```
 
 ```bash
-yarn create toolpad-studio-app --example graphql
+yarn create toolpad-app --example graphql
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example graphql
+pnpm create toolpad-app --example graphql
 ```
 
 or:

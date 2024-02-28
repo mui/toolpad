@@ -10,9 +10,9 @@ You can create a new project interactively by running:
 ```bash
 npx create-toolpad-app@latest
 # or
-yarn create toolpad-studio-app
+yarn create toolpad-app
 # or
-pnpm create toolpad-studio-app
+pnpm create toolpad-app
 ```
 
 You will be asked for the name of your project

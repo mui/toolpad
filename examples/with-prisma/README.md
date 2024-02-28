@@ -15,11 +15,11 @@ npx create-toolpad-app@latest --example with-prisma
 ```
 
 ```bash
-yarn create toolpad-studio-app --example with-prisma
+yarn create toolpad-app --example with-prisma
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example with-prisma
+pnpm create toolpad-app --example with-prisma
 ```
 
 ## What's inside

@@ -19,11 +19,11 @@ npx create-toolpad-app@latest --example supabase
 ```
 
 ```bash
-yarn create toolpad-studio-app --example supabase
+yarn create toolpad-app --example supabase
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example supabase
+pnpm create toolpad-app --example supabase
 ```
 
 ## What's inside

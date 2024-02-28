@@ -15,11 +15,11 @@ npx create-toolpad-app@latest --example with-wasm
 ```
 
 ```bash
-yarn create toolpad-studio-app --example with-wasm
+yarn create toolpad-app --example with-wasm
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example with-wasm
+pnpm create toolpad-app --example with-wasm
 ```
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/with-wasm)

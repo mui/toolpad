@@ -19,11 +19,11 @@ npx create-toolpad-app@latest --example with-prisma-data-provider
 ```
 
 ```bash
-yarn create toolpad-studio-app --example with-prisma-data-provider
+yarn create toolpad-app --example with-prisma-data-provider
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example with-prisma-data-provider
+pnpm create toolpad-app --example with-prisma-data-provider
 ```
 
 ## What's inside

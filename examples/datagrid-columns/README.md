@@ -17,11 +17,11 @@ npx create-toolpad-app@latest --example datagrid-columns
 ```
 
 ```bash
-yarn create toolpad-studio-app --example datagrid-columns
+yarn create toolpad-app --example datagrid-columns
 ```
 
 ```bash
-pnpm create toolpad-studio-app --example datagrid-columns
+pnpm create toolpad-app --example datagrid-columns
 ```
 
 or:

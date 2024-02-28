@@ -69,7 +69,7 @@ function getSnapshot() {
 
 export interface DatePickerProps
   extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue' | 'name'>,
-    Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'> {
+    Pick<FormInputComponentProps, 'name' | 'isRequired'> {
   value?: string;
   onChange: (newValue: string | null) => void;
   label?: string;
@@ -87,7 +87,6 @@ function DatePicker({
   value: valueProp,
   defaultValue: defaultValueProp,
   isRequired,
-  isInvalid,
   ...rest
 }: DatePickerProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string | null>({
@@ -97,7 +96,7 @@ function DatePicker({
     onChange,
     defaultValue: defaultValueProp,
     emptyValue: null,
-    validationProps: { isRequired, isInvalid },
+    validationProps: { isRequired },
   });
 
   const handleChange = React.useMemo(

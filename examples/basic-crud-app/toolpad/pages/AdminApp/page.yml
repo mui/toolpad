@@ -242,7 +242,6 @@ spec:
                                       $$jsExpression: |
                                         customersGrid.selection.email
                                     isRequired: true
-                                    isInvalid: false
                                     fullWidth: true
                                     name: email
             - component: Text
@@ -352,7 +351,6 @@ spec:
                                   props:
                                     label: Email
                                     isRequired: true
-                                    isInvalid: false
                                     fullWidth: true
                                     name: email
                                     placeholder: xyz@gmail.com

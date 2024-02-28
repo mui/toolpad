@@ -38,19 +38,19 @@
   },
   "devDependencies": {
     "@argos-ci/core": "1.5.4",
-    "@mui/monorepo": "github:mui/material-ui#c434322eccab4d5cea72535d5e46e1e9e76a69a8",
-    "@mui/x-charts": "6.19.4",
+    "@mui/monorepo": "github:mui/material-ui#7faab118953050eec27e119a53070d2994b70476",
+    "@mui/x-charts": "6.19.5",
     "@next/eslint-plugin-next": "14.1.0",
     "@playwright/test": "1.41.2",
     "@testing-library/react": "14.2.1",
     "@types/archiver": "6.0.2",
     "@types/gtag.js": "0.0.19",
-    "@types/node": "20.11.19",
+    "@types/node": "20.11.20",
     "@types/rimraf": "3.0.2",
-    "@typescript-eslint/eslint-plugin": "7.0.1",
-    "@typescript-eslint/parser": "7.0.1",
+    "@typescript-eslint/eslint-plugin": "7.0.2",
+    "@typescript-eslint/parser": "7.0.2",
     "chalk": "5.3.0",
-    "eslint": "8.56.0",
+    "eslint": "8.57.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "17.1.0",
     "eslint-config-prettier": "9.1.0",
@@ -72,7 +72,7 @@
     "prettier": "3.2.5",
     "pretty-quick": "4.0.0",
     "react-inspector": "6.0.2",
-    "recharts": "2.12.0",
+    "recharts": "2.12.1",
     "regenerator-runtime": "0.14.1",
     "rimraf": "5.0.5",
     "typescript": "5.3.3",
@@ -98,10 +98,10 @@
   "engines": {
     "npm": "please-use-yarn",
     "node": ">=18",
-    "pnpm": "8.15.3"
+    "pnpm": "8.15.4"
   },
   "resolutions": {
     "google-auth-library": "*"
   },
-  "packageManager": "pnpm@8.15.3"
+  "packageManager": "pnpm@8.15.4"
 }

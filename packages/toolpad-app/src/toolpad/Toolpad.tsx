@@ -15,6 +15,7 @@ import { APP_FUNCTIONS_ROUTE } from '../routes';
 import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
+import FunctionsEditor from './FunctionsEditor';
 import { FEATURE_FLAG_GLOBAL_FUNCTIONS } from '../constants';
 import { ProjectProvider } from '../project';
 import AppAuthorizationDialog from './AppEditor/AppAuthorizationEditor';
@@ -167,7 +168,7 @@ export function ToolpadEditorRoutes({ appUrl }: ToolpadEditorRoutesProps) {
                   <EditorShell>
                     <Routes>
                       {FEATURE_FLAG_GLOBAL_FUNCTIONS ? (
-                        <Route path={APP_FUNCTIONS_ROUTE} element={<div />} />
+                        <Route path={APP_FUNCTIONS_ROUTE} element={<FunctionsEditor />} />
                       ) : null}
                       <Route path="*" element={<AppEditor />} />
                     </Routes>

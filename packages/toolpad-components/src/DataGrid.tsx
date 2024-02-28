@@ -217,16 +217,29 @@ function SkeletonLoadingOverlay() {
 
   const rowsCount = apiRef.current.getRowsCount();
 
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    // The `subscribeEvent` method will automatically unsubscribe in the cleanup function of the `useEffect`.
+    return apiRef.current.subscribeEvent('scrollPositionChange', (params) => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollLeft = params.left;
+      }
+    });
+  }, [apiRef]);
+
   return rowsCount > 0 ? (
     <LinearProgress />
   ) : (
     <div
+      ref={scrollRef}
       style={{
         display: 'grid',
         gridTemplateColumns: `${columns
           .map(({ computedWidth }) => `${computedWidth}px`)
           .join(' ')} 1fr`,
         gridAutoRows: `${rowHeight}px`,
+        overflowX: 'hidden',
       }}
     >
       {children}
@@ -547,7 +560,6 @@ interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows'
   dataProviderId?: string;
   rows?: GridRowsProp;
   columns?: SerializableGridColumns;
-  height?: number;
   rowIdField?: string;
   error?: Error | string;
   selection?: Selection | null;
@@ -701,11 +713,12 @@ function useDataProviderDataGridProps(
     // Blurring the cell shouldn't end edit mode
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
-      setRowModesModel({});
-      setDraftRow(null);
     }
-    if (params.reason === GridRowEditStopReasons.escapeKeyDown) {
-      setRowModesModel({});
+    if (draftRow && params.reason === GridRowEditStopReasons.escapeKeyDown) {
+      setRowModesModel({
+        ...rowModesModel,
+        [draftRow.id]: { mode: GridRowModes.View, ignoreModifications: true },
+      });
       setDraftRow(null);
     }
   };
@@ -784,6 +797,7 @@ function useDataProviderDataGridProps(
               throw new Error('No record returned by createRecord');
             }
 
+            invariant(newRecord[idField], 'Record returned by createRecord must have an id');
             setActionResult({ action, id: newRecord[idField] as GridRowId });
             return newRecord;
           } catch (error) {
@@ -797,6 +811,9 @@ function useDataProviderDataGridProps(
               'Edit action should be unavailable when dataProvider.updateRecord is not defined',
             );
             let newRecord = await dataProvider.updateRecord(id, values);
+            if (!newRecord?.[idField]) {
+              console.warn('Record returned by updateRecord must have an id');
+            }
             newRecord ??= newRow;
             setActionResult({ action, id: newRecord[idField] as GridRowId });
             return newRecord;
@@ -839,7 +856,7 @@ function useDataProviderDataGridProps(
               aria-label={`Save updates to ${isDraft ? 'new row' : `row with id "${id}"`}`}
               disabled={rowIsUpdating}
               onClick={async () => {
-                apiRef.current.stopRowEditMode({ id });
+                setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
               }}
             >
               {rowIsUpdating ? <CircularProgress size={16} /> : <SaveIcon fontSize="inherit" />}
@@ -850,8 +867,11 @@ function useDataProviderDataGridProps(
               aria-label="Cancel updates"
               disabled={rowIsUpdating}
               onClick={() => {
+                setRowModesModel({
+                  ...rowModesModel,
+                  [id]: { mode: GridRowModes.View, ignoreModifications: true },
+                });
                 setDraftRow(null);
-                apiRef.current.stopRowEditMode({ id, ignoreModifications: true });
               }}
             >
               <CloseIcon fontSize="inherit" />
@@ -864,7 +884,7 @@ function useDataProviderDataGridProps(
             <IconButton
               key="update"
               onClick={() => {
-                apiRef.current.startRowEditMode({ id });
+                setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
               }}
               size="small"
               aria-label={`Edit row with id "${id}"`}
@@ -885,7 +905,7 @@ function useDataProviderDataGridProps(
 
       return result;
     };
-  }, [apiRef, dataProvider, isEditing, refetch, rowModesModel, rowUpdating]);
+  }, [dataProvider, isEditing, refetch, rowModesModel, rowUpdating]);
 
   const rows = React.useMemo<GridRowsProp>(() => {
     let rowData = data?.records ?? [];
@@ -951,12 +971,12 @@ function useDataProviderDataGridProps(
         createDisabled: !!isEditing,
         onCreateClick: () => {
           const draftRowId = crypto.randomUUID();
-          setDraftRow({ id: draftRowId, [DRAFT_ROW_MARKER]: true });
           const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
           const firstVisibleFieldIndex = visibleFields.findIndex((field) => field !== idField);
           const fieldToFocus =
             firstVisibleFieldIndex >= 0 ? visibleFields[firstVisibleFieldIndex] : undefined;
           const colIndex = firstVisibleFieldIndex >= 0 ? firstVisibleFieldIndex : 0;
+          setDraftRow({ id: draftRowId, [DRAFT_ROW_MARKER]: true });
           setRowModesModel((oldModel) => ({
             ...oldModel,
             [draftRowId]: { mode: GridRowModes.Edit, fieldToFocus },
@@ -1068,7 +1088,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   {
     columns: columnsProp,
     rows: rowsProp,
-    height: heightProp,
     rowIdField: rowIdFieldProp,
     error: errorProp,
     selection,
@@ -1076,6 +1095,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     hideToolbar,
     rowsSource,
     dataProviderId,
+    sx,
     ...props
   }: ToolpadDataGridProps,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -1244,54 +1264,48 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
-      <div
-        ref={ref}
-        style={{ height: heightProp, minHeight: '100%', width: '100%', position: 'relative' }}
-      >
-        <div
-          style={{
-            position: 'absolute',
-            inset: '0 0 0 0',
-          }}
-        >
-          <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
-            <SetActionResultContext.Provider value={setActionResult}>
-              <DataGridPro
-                apiRef={apiRef}
-                slots={{
-                  ...dataProviderSlots,
-                  loadingOverlay: SkeletonLoadingOverlay,
-                  noRowsOverlay: NoRowsOverlay,
-                  toolbar: hideToolbar ? null : dataProviderSlots?.toolbar,
-                }}
-                slotProps={{
-                  noRowsOverlay: {
-                    error: rowLoadingError,
-                  } as any,
-                  ...dataProviderSlotProps,
-                }}
-                onColumnResize={handleResize}
-                onColumnOrderChange={handleColumnOrderChange}
-                rows={rows}
-                columns={renderedColumns}
-                key={gridKey}
-                getRowId={getRowId}
-                onRowSelectionModelChange={onSelectionModelChange}
-                rowSelectionModel={selectionModel}
-                initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
-                {...props}
-                {...dataProviderProps}
-              />
-            </SetActionResultContext.Provider>
-          </ErrorBoundary>
-        </div>
+      <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
+        <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
+          <SetActionResultContext.Provider value={setActionResult}>
+            <DataGridPro
+              apiRef={apiRef}
+              slots={{
+                ...dataProviderSlots,
+                loadingOverlay: SkeletonLoadingOverlay,
+                noRowsOverlay: NoRowsOverlay,
+                toolbar: hideToolbar ? null : dataProviderSlots?.toolbar,
+              }}
+              slotProps={{
+                noRowsOverlay: {
+                  error: rowLoadingError,
+                } as any,
+                ...dataProviderSlotProps,
+              }}
+              onColumnResize={handleResize}
+              onColumnOrderChange={handleColumnOrderChange}
+              rows={rows}
+              columns={renderedColumns}
+              key={gridKey}
+              getRowId={getRowId}
+              onRowSelectionModelChange={onSelectionModelChange}
+              rowSelectionModel={selectionModel}
+              initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
+              {...props}
+              {...dataProviderProps}
+              sx={{
+                height: '100%',
+                visibility: errorProp ? 'hidden' : 'visible',
+              }}
+            />
+          </SetActionResultContext.Provider>
+        </ErrorBoundary>
 
         <ActionResultOverlay
           result={actionResult}
           onClose={() => setActionResult(null)}
           apiRef={apiRef}
         />
-      </div>
+      </Box>
     </LicenseInfoProvider>
   );
 });
@@ -1302,7 +1316,8 @@ export default createBuiltin(DataGridComponent, {
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',
-  resizableHeightProp: 'height',
+  defaultLayoutHeight: 360,
+  minimumLayoutHeight: 100,
   argTypes: {
     rowsSource: {
       helperText: 'Defines how rows are provided to the grid.',
@@ -1382,12 +1397,6 @@ export default createBuiltin(DataGridComponent, {
       type: 'string',
       enum: ['compact', 'standard', 'comfortable'],
       default: 'compact',
-    },
-    height: {
-      helperText: 'The height of the data grid.',
-      type: 'number',
-      default: 350,
-      minimum: 100,
     },
     loading: {
       helperText:

@@ -1,0 +1,114 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.50/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: Customers
+  content:
+    - component: PageRow
+      name: pageRow13
+      children:
+        - component: PageColumn
+          name: pageColumn2
+          layout:
+            columnSize: 1
+          children:
+            - component: PageRow
+              name: pageRow3
+              props:
+                justifyContent: start
+              children:
+                - component: Image
+                  name: image1
+                  layout:
+                    columnSize: 0.13695090439276486
+                    verticalAlign: end
+                  props:
+                    src: https://iili.io/HoCHfyv.png
+                    width: 70
+                    height: 40
+                - component: Text
+                  name: typography3
+                  layout:
+                    columnSize: 1.8630490956072352
+                    horizontalAlign: center
+                  props:
+                    value: Acme corp. admin app
+                    variant: h3
+            - component: Text
+              name: typography4
+              props:
+                value: This page shows how to use data providers with the data grid in Toolpad.
+            - component: Text
+              name: typography1
+              props:
+                value: Customer list
+                variant: h4
+              layout:
+                columnSize: 1.6131934032983508
+                horizontalAlign: center
+            - component: DataGrid
+              name: customersGrid
+              props:
+                rows:
+                  $$jsExpression: |
+                    getCustomers.data
+                columns:
+                  [
+                    { field: id, type: number },
+                    { field: name, type: string },
+                    { field: account_creation_date, type: date },
+                    { field: country_of_residence, type: string },
+                    { field: phone_number, type: number },
+                    { field: email, type: string },
+                    { field: address, type: string },
+                    { field: gender, type: string },
+                  ]
+                height: 416
+                rowsSource: dataProvider
+                dataProviderId: dataProvider.ts:default
+  queries:
+    - name: getCustomers
+      enabled: true
+      query:
+        function: getCustomers
+        kind: local
+      parameters:
+        - name: name
+          value: hi
+    - name: addCustomer
+      mode: mutation
+      query:
+        function: addCustomer
+        kind: local
+      parameters:
+        - name: values
+          value:
+            $$jsExpression: |
+              addCustomerForm.value
+    - name: updateCustomer
+      mode: mutation
+      query:
+        function: updateCustomer
+        kind: local
+      parameters:
+        - name: id
+          value:
+            $$jsExpression: |
+              customersGrid.selection?.id
+        - name: values
+          value:
+            $$jsExpression: |
+              updateCustomerForm.value
+    - name: deleteCustomer
+      mode: mutation
+      query:
+        function: deleteCustomer
+        kind: local
+      parameters:
+        - name: id
+          value:
+            $$jsExpression: |
+              customersGrid.selection.id
+  display: shell
+  displayName: Editable datagrid through data providers

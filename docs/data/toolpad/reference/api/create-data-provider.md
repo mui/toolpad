@@ -89,11 +89,12 @@ Describes the capabilities of the data provider.
 
 ### GetRecordsResult
 
-| Name          | Type             | Description                                                                                                                                   |
-| :------------ | :--------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
-| `records`     | `any[]`          | The start index of the requested slice requested slice.                                                                                       |
-| `totalCount?` | `number`         | The length of the requested slice.                                                                                                            |
-| `cursor?`     | `string \| null` | Used when `paginationMode` is set to `cursor`. It addresses the next page in the collection. Pass `null` to signal the end of the collection. |
+| Name           | Type             | Description                                                                                                                                                    |
+| :------------- | :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `records`      | `any[]`          | The start index of the requested slice requested slice.                                                                                                        |
+| `totalCount?`  | `number`         | The length of the requested slice.                                                                                                                             |
+| `cursor?`      | `string \| null` | Used when `paginationMode` is set to `cursor`. It addresses the next page in the collection. Pass `null` to signal the end of the collection.                  |
+| `hasNextPage?` | `boolean`        | You can use this property instead of `totalCount` to signal that more pages are available. This comes in handy when it's not possible to fetch an exact count. |
 
 ## Usage
 

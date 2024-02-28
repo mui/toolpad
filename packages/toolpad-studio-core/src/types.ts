@@ -408,7 +408,7 @@ export interface ComponentConfig<P extends object = Record<string, unknown>> {
    */
   errorPropSource?: (keyof P & string)[];
   /**
-   * Designates a property as "the error property". If Toolpad detects an error
+   * Designates a property as "the error property". If Toolpad Studio detects an error
    * on any of the inputs, it will forward it to this property.
    */
   errorProp?: keyof P & string;

@@ -35,7 +35,8 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
   });
 }
 
-test(
+// @TODO: Unskip once toolpad-studio is released for the first time
+test.skip(
   'create-toolpad-app can bootstrap a Toolpad Studio app',
   async () => {
     testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-'));

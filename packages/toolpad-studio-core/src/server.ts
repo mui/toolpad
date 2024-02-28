@@ -111,7 +111,7 @@ export type { ServerContext };
 export function getContext(): ServerContext {
   const ctx = getServerContext();
   if (!ctx) {
-    throw new Error('getContext() must be called from within a Toolpad function.');
+    throw new Error('getContext() must be called from within a Toolpad Studio function.');
   }
   return ctx;
 }

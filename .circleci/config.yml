@@ -1,7 +1,7 @@
 version: 2.1
 
 defaults: &defaults
-  working_directory: /tmp/mui-toolpad-studio
+  working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
     - image: cimg/node:18.17.1

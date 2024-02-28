@@ -64,7 +64,7 @@ function Header({ navigation, actions, status, enableUserFeedback = true }: Head
                     fontFamily: theme.typography.fontFamily,
                   }}
                 >
-                  MUI Toolpad Studio
+                  Toolpad Studio
                 </Box>
               </Link>
             </Tooltip>

@@ -1,107 +1,91 @@
-import * as React from "react";
-import { styled } from "@mui/material";
-import usePageTitle from "@mui/toolpad-studio-utils/hooks/usePageTitle";
-import * as appDom from "@mui/toolpad-studio-core/appDom";
-import {
-  Panel,
-  PanelGroup,
-  PanelResizeHandle,
-} from "../../../components/resizablePanels";
-import RenderPanel from "./RenderPanel";
-import { PageEditorProvider } from "./PageEditorProvider";
-import ComponentPanel from "./ComponentPanel";
-import { useAppState } from "../../AppState";
-import ComponentCatalog from "./ComponentCatalog";
-import NotFoundEditor from "../NotFoundEditor";
-import useUndoRedo from "../../hooks/useUndoRedo";
-import QueryEditor from "./QueryEditor";
+import * as path from 'path';
+import * as url from 'url';
+import * as fs from 'fs/promises';
+import invariant from 'invariant';
+import { folderExists } from '@mui/toolpad-studio-utils/fs';
+import { getTemporaryDir, runEditor, test, expect } from '../../playwright/localTest';
+import { expectBasicRuntimeTests, expectBasicRuntimeContentTests } from '../backend-basic/shared';
+import { using } from '../../utils/resources';
+import { ToolpadEditor } from '../../models/ToolpadEditor';
 
-const classes = {
-  renderPanel: "Toolpad_RenderPanel",
-};
+const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
-const PageEditorRoot = styled("div")({
-  width: "100%",
-  height: "100%",
-  overflow: "hidden",
-  display: "flex",
-  flexDirection: "row",
-  [`& .${classes.renderPanel}`]: {
-    flex: 1,
+test.use({
+  projectConfig: {
+    template: path.resolve(currentDirectory, '../backend-basic/fixture'),
+  },
+  customServerConfig: {
+    dev: true,
+    env: {
+      SECRET_BAZ: 'Some baz secret',
+    },
   },
 });
 
-interface PageEditorContentProps {
-  node: appDom.PageNode;
-}
-
-function PageEditorContent({ node }: PageEditorContentProps) {
-  usePageTitle(`${appDom.getPageTitle(node)} | Toolpad Studio editor`);
-  const { currentView } = useAppState();
-  const showQuery =
-    currentView.kind === "page" &&
-    currentView.view?.kind === "query" &&
-    currentView.queryPanel?.queryTabs;
-
-  return (
-    <PageEditorProvider key={node.id} nodeId={node.id}>
-      <PanelGroup autoSaveId="toolpad/editor-panel-split" direction="vertical">
-        <Panel order={1} id="editor">
-          <PanelGroup
-            autoSaveId="editor/component-panel-split"
-            direction="horizontal"
-          >
-            <Panel id="page-editor" defaultSize={75} minSize={50} maxSize={80}>
-              <PageEditorRoot>
-                {appDom.isCodePage(node) ? null : <ComponentCatalog />}
-                <RenderPanel className={classes.renderPanel} />
-              </PageEditorRoot>
-            </Panel>
-            <PanelResizeHandle />
-            <Panel
-              id="component-panel"
-              defaultSize={25}
-              maxSize={50}
-              minSize={20}
-            >
-              <ComponentPanel />
-            </Panel>
-          </PanelGroup>
-        </Panel>
-        <PanelResizeHandle />
-
-        {showQuery ? (
-          <Panel
-            minSize={10}
-            maxSize={90}
-            defaultSize={35}
-            order={2}
-            id="query-panel"
-          >
-            <QueryEditor />
-          </Panel>
-        ) : null}
-      </PanelGroup>
-    </PageEditorProvider>
-  );
-}
-
-interface PageEditorProps {
-  name: string;
-}
-
-export default function PageEditor({ name }: PageEditorProps) {
-  const { dom } = useAppState();
-  const pageNode = React.useMemo(
-    () => appDom.getPageByName(dom, name),
-    [dom, name],
+test('custom server development mode', async ({ context, customServer, page }) => {
+  invariant(
+    customServer,
+    'test must be configured with `customServerConfig`. Add `test.use({ customServerConfig: ... })`',
   );
 
-  useUndoRedo();
+  await context.addCookies([
+    { name: 'MY_TOOLPAD_COOKIE', value: 'foo-bar-baz', domain: 'localhost', path: '/' },
+  ]);
 
-  return pageNode ? (
-    <PageEditorContent node={pageNode} />
-  ) : (
-    <NotFoundEditor message={`Non-existing Page "${name}"`} />
+  await page.goto(customServer.url);
+
+  await expectBasicRuntimeTests(page);
+});
+
+test('standalone editor', async ({ context, customServer, page }) => {
+  invariant(
+    customServer,
+    'test must be configured with `customServerConfig`. Add `test.use({ customServerConfig: ... })`',
   );
-}
+
+  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
+    await context.addCookies([
+      { name: 'MY_TOOLPAD_COOKIE', value: 'foo-bar-baz', domain: 'localhost', path: '/' },
+    ]);
+
+    await page.goto(`${customServer.url}/editor`);
+    const editorModel = new ToolpadEditor(page);
+    await editorModel.waitForOverlay();
+
+    await expectBasicRuntimeContentTests(editorModel.appCanvas);
+
+    const pageFolder = path.resolve(customServer.dir, './toolpad/pages/helloWorld');
+    await expect(await folderExists(pageFolder)).toBe(false);
+    await editorModel.createPage('helloWorld');
+
+    await expect.poll(async () => folderExists(pageFolder)).toBe(true);
+  } else {
+    await using(await getTemporaryDir(), async (editorDir) => {
+      await context.addCookies([
+        { name: 'MY_TOOLPAD_COOKIE', value: 'foo-bar-baz', domain: 'localhost', path: '/' },
+      ]);
+
+      await using(
+        await runEditor({
+          cwd: editorDir.path,
+          appUrl: customServer.url,
+        }),
+        async (editor) => {
+          await page.goto(`${editor.url}/_toolpad`);
+          const editorModel = new ToolpadEditor(page);
+          await editorModel.waitForOverlay();
+
+          await expectBasicRuntimeContentTests(editorModel.appCanvas);
+
+          const pageFolder = path.resolve(customServer.dir, './toolpad/pages/helloWorld');
+          await expect(await folderExists(pageFolder)).toBe(false);
+          await editorModel.createPage('helloWorld');
+
+          await expect.poll(async () => folderExists(pageFolder)).toBe(true);
+
+          await expect(await fs.readdir(editorDir.path)).toEqual([]);
+        },
+      );
+    });
+  }
+});

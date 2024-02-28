@@ -1,6 +1,23 @@
-import { ToolpadComponents } from '@mui/toolpad-studio-core';
-import { createGlobalState } from '@mui/toolpad-studio-utils/react';
-import { type PageComponents } from './ToolpadApp';
+/**
+ * Toolpad data provider file.
+ * See: https://mui.com/toolpad-studio/concepts/data-providers/
+ */
 
-export const componentsStore = createGlobalState<ToolpadComponents>({});
-export const pageComponentsStore = createGlobalState<PageComponents>({});
+import { createDataProvider } from '@mui/toolpad-studio/server';
+import prisma from '../prisma';
+
+export default createDataProvider({
+  async getRecords({ paginationModel: { start, pageSize } }) {
+    const [userRecords, totalCount] = await Promise.all([
+      prisma.user.findMany({
+        skip: start,
+        take: pageSize,
+      }),
+      prisma.user.count(),
+    ]);
+    return {
+      records: userRecords,
+      totalCount,
+    };
+  },
+});

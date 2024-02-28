@@ -73,10 +73,6 @@ Disabled property shows the state of the component so that end user is aware tha
 
 isRequired is useful when the action can't be perfomed without a user provided text value.
 
-### isInvalid
-
-If isInvalid is set to true it will show an error no matter what the input is.
-
 ### minLength
 
 A validation check on the minimum length of the input.

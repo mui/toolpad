@@ -76,10 +76,6 @@ isRequired is useful when the action can't be perfomed without a user provided d
   Your browser does not support the video tag.
 </video>
 
-### isInvalid
-
-If isInvalid is set to true it will show an error no matter what the input is.
-
 ## API
 
 See the documentation below for a complete reference to all props available to the datepicker component in Toolpad.

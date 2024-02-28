@@ -43,7 +43,7 @@ export type Props = Omit<FormControlLabelProps, 'control' | 'onChange'> &
     error?: unknown;
     fullWidth: boolean;
     mode: 'checkBox' | 'switch';
-  } & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'> &
+  } & Pick<FormInputComponentProps, 'name' | 'isRequired'> &
   SwitchProps;
 
 function Checkbox({ ...rest }: Props) {
@@ -52,7 +52,7 @@ function Checkbox({ ...rest }: Props) {
     name: rest.name,
     label: rest.label,
     onChange: rest.onChange,
-    validationProps: { isRequired: rest.isRequired, isInvalid: rest.isInvalid },
+    validationProps: { isRequired: rest.isRequired },
   });
 
   const handleChange = React.useCallback(

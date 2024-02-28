@@ -21,7 +21,7 @@ export type FilePickerProps = MuiTextFieldProps & {
   value: FullFile[];
   onChange: (files: FullFile[]) => void;
   label?: string;
-} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
+} & Pick<FormInputComponentProps, 'name' | 'isRequired'>;
 
 const readFile = async (file: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -40,20 +40,13 @@ const readFile = async (file: Blob): Promise<string> => {
   });
 };
 
-function FilePicker({
-  multiple,
-  value,
-  onChange,
-  isRequired,
-  isInvalid,
-  ...rest
-}: FilePickerProps) {
+function FilePicker({ multiple, value, onChange, isRequired, ...rest }: FilePickerProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<FullFile[]>({
     name: rest.name,
     label: rest.label,
     value,
     onChange,
-    validationProps: { isRequired, isInvalid },
+    validationProps: { isRequired },
   });
 
   const handleChange = async (changeEvent: React.ChangeEvent<HTMLInputElement>) => {

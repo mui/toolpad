@@ -12,7 +12,7 @@
         "../packages/toolpad-studio-utils/src/*.ts"
       ]
     },
-    "module": "CommonJS",
+    "module": "ESNext",
     "noEmit": true,
     "esModuleInterop": true,
     "moduleResolution": "node",

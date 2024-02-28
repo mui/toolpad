@@ -1,0 +1,659 @@
+{
+  "type": "object",
+  "properties": {
+    "Application": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "v1",
+          "description": "Defines the version of this object. Used in determining compatibility between Toolpad \"application\" objects."
+        },
+        "kind": {
+          "type": "string",
+          "const": "application",
+          "description": "Describes the nature of this Toolpad \"application\" object."
+        },
+        "spec": {
+          "type": "object",
+          "properties": {
+            "plan": {
+              "type": "string",
+              "enum": ["free", "pro"],
+              "description": "The plan for this application."
+            },
+            "authentication": {
+              "type": "object",
+              "properties": {
+                "providers": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "provider": {
+                        "type": "string",
+                        "enum": ["github", "google", "azure-ad", "credentials"],
+                        "description": "Unique identifier for this authentication provider."
+                      },
+                      "roles": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "source": {
+                              "type": "array",
+                              "items": { "type": "string" },
+                              "description": "Authentication provider roles to be mapped from."
+                            },
+                            "target": {
+                              "type": "string",
+                              "description": "Toolpad role to be mapped to."
+                            }
+                          },
+                          "required": ["source", "target"],
+                          "additionalProperties": false
+                        },
+                        "description": "Role mapping definition for this authentication provider."
+                      }
+                    },
+                    "required": ["provider"],
+                    "additionalProperties": false
+                  },
+                  "description": "Authentication providers to use."
+                },
+                "restrictedDomains": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Valid email patterns for the authenticated user."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Authentication configuration for this application."
+            },
+            "authorization": {
+              "type": "object",
+              "properties": {
+                "roles": {
+                  "type": "array",
+                  "items": {
+                    "anyOf": [
+                      { "type": "string" },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "The name of the role."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "A description of the role."
+                          }
+                        },
+                        "required": ["name"],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "description": "Available roles for this application. These can be assigned to users."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Authorization configuration for this application."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Defines the shape of this \"application\" object"
+        }
+      },
+      "required": ["apiVersion", "kind"],
+      "additionalProperties": false
+    },
+    "Page": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "v1",
+          "description": "Defines the version of this object. Used in determining compatibility between Toolpad \"page\" objects."
+        },
+        "kind": {
+          "type": "string",
+          "const": "page",
+          "description": "Describes the nature of this Toolpad \"page\" object."
+        },
+        "spec": {
+          "type": "object",
+          "properties": {
+            "displayName": {
+              "type": "string",
+              "description": "Page name to display in the UI."
+            },
+            "id": {
+              "type": "string",
+              "description": "Serves as a canonical id of the page. Deprecated: use an alias instead."
+            },
+            "alias": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Page name aliases."
+            },
+            "title": {
+              "type": "string",
+              "description": "Title for this page."
+            },
+            "parameters": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/NameStringValuePair" },
+              "description": "Parameters for the page. These can be set inside of the url query string."
+            },
+            "queries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "A name for the query"
+                  },
+                  "enabled": {
+                    "anyOf": [
+                      { "type": "boolean" },
+                      { "$ref": "#/definitions/JsExpressionBinding" },
+                      { "$ref": "#/definitions/EnvBinding" }
+                    ],
+                    "description": "Activates or deactivates the query. When deactivated the data won't be loaded when the page opens."
+                  },
+                  "parameters": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": { "type": "string", "description": "The name" },
+                        "value": {
+                          "anyOf": [
+                            {},
+                            { "$ref": "#/definitions/JsExpressionBinding" },
+                            { "$ref": "#/definitions/EnvBinding" }
+                          ],
+                          "description": "The value"
+                        }
+                      },
+                      "required": ["name"],
+                      "additionalProperties": false,
+                      "description": "A name/value pair."
+                    },
+                    "description": "Parameters to pass to this query."
+                  },
+                  "mode": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "const": "query",
+                        "description": "Fetch automatically when the page opens"
+                      },
+                      {
+                        "type": "string",
+                        "const": "mutation",
+                        "description": "Fetch on manual action only"
+                      }
+                    ],
+                    "description": "How to fetch this query."
+                  },
+                  "query": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "rest",
+                            "description": "Designates this object as a fetch query."
+                          },
+                          "url": {
+                            "anyOf": [
+                              { "type": "string" },
+                              { "$ref": "#/definitions/JsExpressionBinding" },
+                              { "$ref": "#/definitions/EnvBinding" }
+                            ],
+                            "description": "The URL of the request"
+                          },
+                          "method": {
+                            "type": "string",
+                            "description": "The request method."
+                          },
+                          "headers": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/definitions/BindableNameStringValue"
+                            },
+                            "description": "Extra request headers."
+                          },
+                          "searchParams": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/definitions/BindableNameStringValue"
+                            },
+                            "description": "Extra url query parameters."
+                          },
+                          "body": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "kind": { "type": "string", "const": "raw" },
+                                  "content": {
+                                    "anyOf": [
+                                      { "type": "string" },
+                                      {
+                                        "$ref": "#/definitions/JsExpressionBinding"
+                                      },
+                                      { "$ref": "#/definitions/EnvBinding" }
+                                    ]
+                                  },
+                                  "contentType": { "type": "string" }
+                                },
+                                "required": ["kind", "content", "contentType"],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "kind": {
+                                    "type": "string",
+                                    "const": "urlEncoded"
+                                  },
+                                  "content": {
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/definitions/BindableNameStringValue"
+                                    }
+                                  }
+                                },
+                                "required": ["kind", "content"],
+                                "additionalProperties": false
+                              }
+                            ],
+                            "description": "The request body."
+                          },
+                          "transformEnabled": {
+                            "type": "boolean",
+                            "description": "Run a custom transformer on the response."
+                          },
+                          "transform": {
+                            "type": "string",
+                            "description": "The custom transformer to run when enabled."
+                          },
+                          "response": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "kind": { "type": "string", "const": "raw" }
+                                },
+                                "required": ["kind"],
+                                "additionalProperties": false,
+                                "description": "Don't interpret this body at all."
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "kind": { "type": "string", "const": "json" }
+                                },
+                                "required": ["kind"],
+                                "additionalProperties": false,
+                                "description": "Interpret the fetch response as JSON"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "kind": { "type": "string", "const": "csv" },
+                                  "headers": {
+                                    "type": "boolean",
+                                    "description": "First row contains headers"
+                                  }
+                                },
+                                "required": ["kind", "headers"],
+                                "additionalProperties": false,
+                                "description": "Interpret the fetch response as CSV"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "kind": { "type": "string", "const": "xml" }
+                                },
+                                "required": ["kind"],
+                                "additionalProperties": false,
+                                "description": "Interpret the fetch response as XML"
+                              }
+                            ],
+                            "description": "How to parse the response."
+                          }
+                        },
+                        "required": ["kind"],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "local",
+                            "description": "Designates this object as a local function query."
+                          },
+                          "function": {
+                            "type": "string",
+                            "description": "The function to be executed on the backend by this query."
+                          }
+                        },
+                        "required": ["kind"],
+                        "additionalProperties": false
+                      }
+                    ],
+                    "description": "Query definition"
+                  },
+                  "transform": {
+                    "type": "string",
+                    "description": "Transformation to run on the response"
+                  },
+                  "transformEnabled": {
+                    "type": "boolean",
+                    "description": "Enable the transformation"
+                  },
+                  "refetchInterval": {
+                    "type": "number",
+                    "description": "Interval to rerun this query at"
+                  },
+                  "cacheTime": {
+                    "type": "number",
+                    "description": "Time to cache before refetching"
+                  }
+                },
+                "required": ["name"],
+                "additionalProperties": false
+              },
+              "description": "Queries that are used by the page. These will load data when the page opens."
+            },
+            "content": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/Element" },
+              "description": "The content of the page. This defines the UI."
+            },
+            "authorization": {
+              "type": "object",
+              "properties": {
+                "allowAll": {
+                  "type": "boolean",
+                  "description": "Allow all users to access this page."
+                },
+                "allowedRoles": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Roles that are allowed to access this page."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Authorization configuration for this page."
+            },
+            "unstable_codeFile": {
+              "type": "boolean",
+              "description": "The content of the page as JSX. Experimental, do not use!."
+            },
+            "display": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "standalone",
+                  "description": "Hide the Toolpad chrome and just display the content of the page"
+                },
+                {
+                  "type": "string",
+                  "const": "shell",
+                  "description": "Show Toolpad header and navigation."
+                }
+              ],
+              "description": "Display mode of the page. This can also be set at runtime with the toolpad-display query parameter"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Defines the shape of this \"page\" object"
+        }
+      },
+      "required": ["apiVersion", "kind"],
+      "additionalProperties": false
+    },
+    "Theme": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "const": "v1",
+          "description": "Defines the version of this object. Used in determining compatibility between Toolpad \"theme\" objects."
+        },
+        "kind": {
+          "type": "string",
+          "const": "theme",
+          "description": "Describes the nature of this Toolpad \"theme\" object."
+        },
+        "spec": {
+          "type": "object",
+          "properties": {
+            "options": {
+              "type": "object",
+              "properties": {
+                "palette": {
+                  "type": "object",
+                  "properties": {
+                    "mode": { "type": "string", "enum": ["light", "dark"] },
+                    "primary": {
+                      "$ref": "#/definitions/SimplePaletteColorOptions"
+                    },
+                    "secondary": {
+                      "$ref": "#/definitions/SimplePaletteColorOptions"
+                    }
+                  },
+                  "additionalProperties": true
+                }
+              },
+              "additionalProperties": true,
+              "description": "The ThemeOptions object that gets fed into MUI's createTheme function."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Defines the shape of this \"theme\" object"
+        }
+      },
+      "required": ["apiVersion", "kind"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["Application", "Page", "Theme"],
+  "additionalProperties": false,
+  "definitions": {
+    "JsExpressionBinding": {
+      "type": "object",
+      "properties": {
+        "$$jsExpression": {
+          "type": "string",
+          "description": "The expression to be evaluated."
+        }
+      },
+      "required": ["$$jsExpression"],
+      "additionalProperties": false,
+      "description": "A binding that evaluates an expression and returns the result."
+    },
+    "EnvBinding": {
+      "type": "object",
+      "properties": {
+        "$$env": {
+          "type": "string",
+          "description": "The name of an environment variable."
+        }
+      },
+      "required": ["$$env"],
+      "additionalProperties": false,
+      "description": "An environment variable."
+    },
+    "JsExpressionAction": {
+      "type": "object",
+      "properties": {
+        "$$jsExpressionAction": {
+          "type": "string",
+          "description": "The code to be executed."
+        }
+      },
+      "required": ["$$jsExpressionAction"],
+      "additionalProperties": false,
+      "description": "A javascript expression to be executed when this action is triggered."
+    },
+    "NavigationAction": {
+      "type": "object",
+      "properties": {
+        "$$navigationAction": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "type": "string",
+              "description": "The page that is being navigated to"
+            },
+            "parameters": {
+              "type": "object",
+              "additionalProperties": {
+                "anyOf": [
+                  {},
+                  { "$ref": "#/definitions/JsExpressionBinding" },
+                  { "$ref": "#/definitions/EnvBinding" }
+                ]
+              },
+              "description": "Parameters to pass when navigating to this page"
+            }
+          },
+          "required": ["page", "parameters"],
+          "additionalProperties": false
+        }
+      },
+      "required": ["$$navigationAction"],
+      "additionalProperties": false,
+      "description": "A navigation from one page to another, optionally passing parameters to the next page."
+    },
+    "BindableProp": {
+      "anyOf": [
+        { "type": "string" },
+        { "type": "number" },
+        { "type": "boolean" },
+        { "type": "null" },
+        { "type": "array", "items": { "$ref": "#/definitions/BindableProp" } },
+        {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/BindableProp" }
+        },
+        { "$ref": "#/definitions/JsExpressionBinding" },
+        { "$ref": "#/definitions/EnvBinding" },
+        { "$ref": "#/definitions/JsExpressionAction" },
+        { "$ref": "#/definitions/NavigationAction" },
+        { "$ref": "#/definitions/Template" }
+      ]
+    },
+    "Element": {
+      "type": "object",
+      "properties": {
+        "component": {
+          "type": "string",
+          "description": "The component that this element was based on."
+        },
+        "name": {
+          "type": "string",
+          "description": "a name for this component, which is used to reference it inside bindings."
+        },
+        "layout": {
+          "type": "object",
+          "properties": {
+            "horizontalAlign": {
+              "type": "string",
+              "description": "Lays out the element along the horizontal axis."
+            },
+            "verticalAlign": {
+              "type": "string",
+              "description": "Lays out the element along the vertical axis."
+            },
+            "columnSize": {
+              "type": "number",
+              "description": "The width this element takes up, expressed in terms of columns on the page."
+            },
+            "height": {
+              "type": "number",
+              "description": "The height this element takes up, in pixels."
+            }
+          },
+          "additionalProperties": false,
+          "description": "Layout properties for this element."
+        },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Element" },
+          "description": "The children of this element."
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/BindableProp" },
+          "description": "The properties to configure this instance of the component."
+        }
+      },
+      "required": ["component", "name"],
+      "additionalProperties": false,
+      "description": "The instance of a component. Used to build user interfaces in pages."
+    },
+    "Template": {
+      "type": "object",
+      "properties": {
+        "$$template": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Element" },
+          "description": "The subtree, that describes the UI to be rendered by the template."
+        }
+      },
+      "required": ["$$template"],
+      "additionalProperties": false,
+      "description": "Describes a fragment of Toolpad elements, to be used as a template."
+    },
+    "NameStringValuePair": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name" },
+        "value": { "type": "string", "description": "The value" }
+      },
+      "required": ["name", "value"],
+      "additionalProperties": false,
+      "description": "a name/value pair with a string value."
+    },
+    "BindableNameStringValue": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name" },
+        "value": {
+          "anyOf": [
+            { "type": "string" },
+            { "$ref": "#/definitions/JsExpressionBinding" },
+            { "$ref": "#/definitions/EnvBinding" }
+          ],
+          "description": "The value"
+        }
+      },
+      "required": ["name", "value"],
+      "additionalProperties": false,
+      "description": "A name/value pair where the value is dynamically bindable to strings."
+    },
+    "SimplePaletteColorOptions": {
+      "type": "object",
+      "properties": {
+        "main": { "type": "string" },
+        "light": { "type": "string" },
+        "dark": { "type": "string" },
+        "contrastText": { "type": "string" }
+      },
+      "required": ["main"],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

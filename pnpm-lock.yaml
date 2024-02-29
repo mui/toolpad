@@ -15402,8 +15402,8 @@ packages:
       - utf-8-validate
     dev: true
 
-  github.com/mui/material-ui/5e4e18a10085b7e65955ca11ba6c93c838003e0c:
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/5e4e18a10085b7e65955ca11ba6c93c838003e0c}
+  github.com/mui/material-ui/8bdcff4a75e0e77137bc3df44560413f2c4241a7:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/8bdcff4a75e0e77137bc3df44560413f2c4241a7}
     name: '@mui/monorepo'
     version: 5.15.11
     requiresBuild: true

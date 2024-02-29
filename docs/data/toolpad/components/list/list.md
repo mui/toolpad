@@ -2,14 +2,6 @@
 
 <p class="description">Learn about the list component and its usage in Toolpad.</p>
 
-## Demo
-
-List makes it easy to configure a recurring pattern of data.
-
-<!---
-Add demo
--->
-
 ## Usage
 
 A List is an essential component in an application. It had one key property that makes it usable:

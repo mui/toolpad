@@ -4,6 +4,7 @@ import { Box, Typography } from '@mui/material';
 import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
 import * as appDom from '@mui/toolpad-core/appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
@@ -22,12 +23,9 @@ function CustomTreeItem(props: CustomTreeItemProps) {
   const { dom } = useAppState();
   const appStateApi = useAppStateApi();
 
-  const [domNodeEditable, setDomNodeEditable] = React.useState(false);
   const { label, node, ...other } = props;
 
-  const handleStopEditing = React.useCallback(() => {
-    setDomNodeEditable(false);
-  }, []);
+  const { value: domNodeEditing, setFalse: stopDomNodeEditing } = useBoolean(false);
 
   const existingNames = React.useMemo(() => appDom.getExistingNamesForNode(dom, node), [dom, node]);
 
@@ -84,10 +82,10 @@ function CustomTreeItem(props: CustomTreeItemProps) {
           {children}
         </Box>
       )}
-      isEditing={domNodeEditable}
+      isEditing={domNodeEditing}
       onEdit={handleNameSave}
       suggestedNewItemName={node.name}
-      onCancel={handleStopEditing}
+      onCancel={stopDomNodeEditing}
       validateItemName={validateEditableNodeName}
       {...other}
     />

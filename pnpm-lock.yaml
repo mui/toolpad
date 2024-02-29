@@ -226,8 +226,8 @@ importers:
         specifier: ^5.15.11
         version: 5.15.11(@emotion/cache@11.11.0)(@emotion/server@11.11.0)(@mui/material@5.15.11)(next@13.5.6)(react@18.2.0)
       '@mui/monorepo':
-        specifier: github:mui/material-ui#5e4e18a10085b7e65955ca11ba6c93c838003e0c
-        version: github.com/mui/material-ui/5e4e18a10085b7e65955ca11ba6c93c838003e0c
+        specifier: github:mui/material-ui#8bdcff4a75e0e77137bc3df44560413f2c4241a7
+        version: github.com/mui/material-ui/8bdcff4a75e0e77137bc3df44560413f2c4241a7
       '@mui/styles':
         specifier: 5.15.11
         version: 5.15.11(react@18.2.0)

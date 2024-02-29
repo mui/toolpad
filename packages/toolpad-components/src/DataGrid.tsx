@@ -217,16 +217,29 @@ function SkeletonLoadingOverlay() {
 
   const rowsCount = apiRef.current.getRowsCount();
 
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    // The `subscribeEvent` method will automatically unsubscribe in the cleanup function of the `useEffect`.
+    return apiRef.current.subscribeEvent('scrollPositionChange', (params) => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollLeft = params.left;
+      }
+    });
+  }, [apiRef]);
+
   return rowsCount > 0 ? (
     <LinearProgress />
   ) : (
     <div
+      ref={scrollRef}
       style={{
         display: 'grid',
         gridTemplateColumns: `${columns
           .map(({ computedWidth }) => `${computedWidth}px`)
           .join(' ')} 1fr`,
         gridAutoRows: `${rowHeight}px`,
+        overflowX: 'hidden',
       }}
     >
       {children}

@@ -21,7 +21,7 @@ interface AutocompleteProps
       MuiAutocompleteProps<AutocompleteOption, false, false, false>,
       'renderInput' | 'value' | 'onChange'
     >,
-    Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'> {
+    Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength'> {
   value: AutocompleteValue;
   onChange: (newValue: AutocompleteValue) => void;
   label?: string;
@@ -38,7 +38,6 @@ function Autocomplete({
   isRequired,
   minLength,
   maxLength,
-  isInvalid,
   sx,
   ...rest
 }: AutocompleteProps) {
@@ -49,7 +48,7 @@ function Autocomplete({
     onChange,
     emptyValue: null,
     defaultValue,
-    validationProps: { isRequired, minLength, maxLength, isInvalid },
+    validationProps: { isRequired, minLength, maxLength },
   });
 
   const getValue = React.useCallback((selection: AutocompleteOption | null): AutocompleteValue => {

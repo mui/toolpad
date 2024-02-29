@@ -33,6 +33,8 @@
     "toolpad": "node --enable-source-maps packages/toolpad-app/cli.mjs",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
     "update-monorepo": "tsx ./scripts/updateMonorepo.ts",
+    "monorepo:update": "tsx ./scripts/updateMonorepo.ts",
+    "monorepo:canary": "tsx ./scripts/canaryMonorepo.ts",
     "check-changes": "git add -A && git diff --exit-code --staged",
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },

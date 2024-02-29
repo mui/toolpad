@@ -20,7 +20,7 @@ export type SelectProps = Omit<TextFieldProps, 'value' | 'onChange'> & {
   label?: string;
   defaultValue: string;
   options: (string | SelectOption)[];
-} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>;
+} & Pick<FormInputComponentProps, 'name' | 'isRequired'>;
 
 function Select({
   options,
@@ -30,7 +30,6 @@ function Select({
   sx,
   defaultValue,
   isRequired,
-  isInvalid,
   ...rest
 }: SelectProps) {
   const { onFormInputChange, formInputError, renderFormInput } = useFormInput<string>({
@@ -39,7 +38,7 @@ function Select({
     value,
     onChange,
     defaultValue,
-    validationProps: { isRequired, isInvalid },
+    validationProps: { isRequired },
   });
 
   const id = React.useId();

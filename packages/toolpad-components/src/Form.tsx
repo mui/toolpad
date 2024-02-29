@@ -178,7 +178,6 @@ export interface FormInputComponentProps {
   isRequired: boolean;
   minLength: number;
   maxLength: number;
-  isInvalid: boolean;
 }
 
 interface UseFormInputInput<V> {
@@ -188,9 +187,7 @@ interface UseFormInputInput<V> {
   onChange: (newValue: V) => void;
   emptyValue?: V;
   defaultValue?: V;
-  validationProps: Partial<
-    Pick<FormInputComponentProps, 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>
-  >;
+  validationProps: Partial<Pick<FormInputComponentProps, 'isRequired' | 'minLength' | 'maxLength'>>;
 }
 
 interface UseFormInputPayload<V> {
@@ -208,7 +205,7 @@ export function useFormInput<V>({
   defaultValue,
   validationProps,
 }: UseFormInputInput<V>): UseFormInputPayload<V> {
-  const { isRequired, minLength, maxLength, isInvalid } = validationProps;
+  const { isRequired, minLength, maxLength } = validationProps;
 
   const { form, fieldValues } = React.useContext(FormContext);
 
@@ -302,14 +299,13 @@ export function useFormInput<V>({
                 message: `${formInputDisplayName} must have no more than ${maxLength} characters.`,
               },
             }),
-            validate: () => !isInvalid || `${formInputDisplayName} is invalid.`,
           }}
           render={() => element}
         />
       ) : (
         element
       ),
-    [form, formInputDisplayName, formInputName, isInvalid, isRequired, maxLength, minLength],
+    [form, formInputDisplayName, formInputName, isRequired, maxLength, minLength],
   );
 
   return {
@@ -345,7 +341,7 @@ export function withComponentForm<P extends Record<string, any>>(
 }
 
 export const FORM_INPUT_ARG_TYPES: BuiltinArgTypeDefinitions<
-  Pick<FormInputComponentProps, 'name' | 'isRequired' | 'isInvalid'>
+  Pick<FormInputComponentProps, 'name' | 'isRequired'>
 > = {
   name: {
     helperText: 'Name of this input. Used as a reference in form data.',
@@ -354,13 +350,6 @@ export const FORM_INPUT_ARG_TYPES: BuiltinArgTypeDefinitions<
   isRequired: {
     label: 'Required',
     helperText: 'Whether the input is required to have a value.',
-    type: 'boolean',
-    default: false,
-    category: 'validation',
-  },
-  isInvalid: {
-    label: 'Invalid',
-    helperText: 'Whether the input value is invalid.',
     type: 'boolean',
     default: false,
     category: 'validation',

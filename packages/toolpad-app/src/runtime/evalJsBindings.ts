@@ -171,12 +171,12 @@ export default function evalJsBindings(
     if (expression) {
       const computed = computationStatuses.get(expression);
       if (computed) {
-        if (computed.result) {
+        if (!computed.result) {
+          throw new Error(`Cycle detected "${scopePath}"`);
+        } else if (!computed.result.error) {
           // From cache
           return computed.result;
         }
-
-        throw new Error(`Cycle detected "${scopePath}"`);
       }
 
       // use null to mark as "computing"

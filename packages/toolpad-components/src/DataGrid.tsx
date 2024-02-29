@@ -1266,6 +1266,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     <LicenseInfoProvider info={LICENSE_INFO}>
       <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
         <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
+          {errorProp ? <ErrorOverlay error={errorProp} /> : null}
           <SetActionResultContext.Provider value={setActionResult}>
             <DataGridPro
               apiRef={apiRef}

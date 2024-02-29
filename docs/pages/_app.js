@@ -153,15 +153,16 @@ function AppWrapper(props) {
     let productIdentifier;
     let pages = [];
 
-    if (productId === 'toolpad') {
+    if (productCategoryId === 'toolpad') {
+      if(productId === 'core') {
       productIdentifier = {
         metadata: '',
-        name: 'Toolpad',
+        name: 'Toolpad Core',
         versions: [{ text: `v0.0.1`, current: true }],
       };
       pages = toolpadPages;
     }
-    if (productId === 'toolpad-studio') {
+    if (productId === 'studio') {
       productIdentifier = {
         metadata: '',
         name: 'Toolpad Studio',
@@ -169,6 +170,7 @@ function AppWrapper(props) {
       };
       pages = toolpadStudioPages;
     }
+  }
 
     const { activePage, activePageParents } = findActivePage(pages, router.pathname);
 

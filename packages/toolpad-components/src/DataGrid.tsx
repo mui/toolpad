@@ -217,16 +217,29 @@ function SkeletonLoadingOverlay() {
 
   const rowsCount = apiRef.current.getRowsCount();
 
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    // The `subscribeEvent` method will automatically unsubscribe in the cleanup function of the `useEffect`.
+    return apiRef.current.subscribeEvent('scrollPositionChange', (params) => {
+      if (scrollRef.current) {
+        scrollRef.current.scrollLeft = params.left;
+      }
+    });
+  }, [apiRef]);
+
   return rowsCount > 0 ? (
     <LinearProgress />
   ) : (
     <div
+      ref={scrollRef}
       style={{
         display: 'grid',
         gridTemplateColumns: `${columns
           .map(({ computedWidth }) => `${computedWidth}px`)
           .join(' ')} 1fr`,
         gridAutoRows: `${rowHeight}px`,
+        overflowX: 'hidden',
       }}
     >
       {children}
@@ -700,11 +713,12 @@ function useDataProviderDataGridProps(
     // Blurring the cell shouldn't end edit mode
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
       event.defaultMuiPrevented = true;
-      setRowModesModel({});
-      setDraftRow(null);
     }
-    if (params.reason === GridRowEditStopReasons.escapeKeyDown) {
-      setRowModesModel({});
+    if (draftRow && params.reason === GridRowEditStopReasons.escapeKeyDown) {
+      setRowModesModel({
+        ...rowModesModel,
+        [draftRow.id]: { mode: GridRowModes.View, ignoreModifications: true },
+      });
       setDraftRow(null);
     }
   };
@@ -783,6 +797,7 @@ function useDataProviderDataGridProps(
               throw new Error('No record returned by createRecord');
             }
 
+            invariant(newRecord[idField], 'Record returned by createRecord must have an id');
             setActionResult({ action, id: newRecord[idField] as GridRowId });
             return newRecord;
           } catch (error) {
@@ -796,6 +811,9 @@ function useDataProviderDataGridProps(
               'Edit action should be unavailable when dataProvider.updateRecord is not defined',
             );
             let newRecord = await dataProvider.updateRecord(id, values);
+            if (!newRecord?.[idField]) {
+              console.warn('Record returned by updateRecord must have an id');
+            }
             newRecord ??= newRow;
             setActionResult({ action, id: newRecord[idField] as GridRowId });
             return newRecord;
@@ -838,7 +856,7 @@ function useDataProviderDataGridProps(
               aria-label={`Save updates to ${isDraft ? 'new row' : `row with id "${id}"`}`}
               disabled={rowIsUpdating}
               onClick={async () => {
-                apiRef.current.stopRowEditMode({ id });
+                setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
               }}
             >
               {rowIsUpdating ? <CircularProgress size={16} /> : <SaveIcon fontSize="inherit" />}
@@ -849,8 +867,11 @@ function useDataProviderDataGridProps(
               aria-label="Cancel updates"
               disabled={rowIsUpdating}
               onClick={() => {
+                setRowModesModel({
+                  ...rowModesModel,
+                  [id]: { mode: GridRowModes.View, ignoreModifications: true },
+                });
                 setDraftRow(null);
-                apiRef.current.stopRowEditMode({ id, ignoreModifications: true });
               }}
             >
               <CloseIcon fontSize="inherit" />
@@ -863,7 +884,7 @@ function useDataProviderDataGridProps(
             <IconButton
               key="update"
               onClick={() => {
-                apiRef.current.startRowEditMode({ id });
+                setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
               }}
               size="small"
               aria-label={`Edit row with id "${id}"`}
@@ -884,7 +905,7 @@ function useDataProviderDataGridProps(
 
       return result;
     };
-  }, [apiRef, dataProvider, isEditing, refetch, rowModesModel, rowUpdating]);
+  }, [dataProvider, isEditing, refetch, rowModesModel, rowUpdating]);
 
   const rows = React.useMemo<GridRowsProp>(() => {
     let rowData = data?.records ?? [];
@@ -950,12 +971,12 @@ function useDataProviderDataGridProps(
         createDisabled: !!isEditing,
         onCreateClick: () => {
           const draftRowId = crypto.randomUUID();
-          setDraftRow({ id: draftRowId, [DRAFT_ROW_MARKER]: true });
           const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
           const firstVisibleFieldIndex = visibleFields.findIndex((field) => field !== idField);
           const fieldToFocus =
             firstVisibleFieldIndex >= 0 ? visibleFields[firstVisibleFieldIndex] : undefined;
           const colIndex = firstVisibleFieldIndex >= 0 ? firstVisibleFieldIndex : 0;
+          setDraftRow({ id: draftRowId, [DRAFT_ROW_MARKER]: true });
           setRowModesModel((oldModel) => ({
             ...oldModel,
             [draftRowId]: { mode: GridRowModes.Edit, fieldToFocus },

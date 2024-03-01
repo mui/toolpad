@@ -22,6 +22,7 @@ interface OpenCodeEditorButtonProps extends ButtonProps {
   fileType: CodeEditorFileType;
   onSuccess?: () => void;
   iconButton?: boolean;
+  actionText?: string;
 }
 
 interface MissingEditorDialogProps {
@@ -73,6 +74,7 @@ export default function OpenCodeEditorButton({
   fileType,
   iconButton,
   onSuccess,
+  actionText = 'Open',
   disabled,
   ...rest
 }: OpenCodeEditorButtonProps) {
@@ -109,8 +111,16 @@ export default function OpenCodeEditorButton({
           </IconButton>
         </Tooltip>
       ) : (
-        <LoadingButton disabled={disabled || busy} onClick={handleClick} loading={busy} {...rest}>
-          Open
+        <LoadingButton
+          disabled={disabled || busy}
+          onClick={handleClick}
+          loading={busy}
+          startIcon={
+            rest.variant === 'outlined' ? <CodeIcon fontSize="inherit" color="primary" /> : null
+          }
+          {...rest}
+        >
+          {actionText}
         </LoadingButton>
       )}
       <MissingEditorDialog open={missingEditorDialog} onClose={setMissingEditorDialog} />

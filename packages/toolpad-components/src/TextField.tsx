@@ -22,7 +22,7 @@ export type TextFieldProps = Omit<MuiTextFieldProps, 'value' | 'onChange'> & {
   alignItems?: BoxProps['alignItems'];
   justifyContent?: BoxProps['justifyContent'];
   password?: boolean;
-} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength' | 'isInvalid'>;
+} & Pick<FormInputComponentProps, 'name' | 'isRequired' | 'minLength' | 'maxLength'>;
 
 function TextField({
   defaultValue,
@@ -31,7 +31,6 @@ function TextField({
   isRequired,
   minLength,
   maxLength,
-  isInvalid,
   password,
   ...rest
 }: TextFieldProps) {
@@ -42,7 +41,7 @@ function TextField({
     onChange,
     emptyValue: '',
     defaultValue,
-    validationProps: { isRequired, minLength, maxLength, isInvalid },
+    validationProps: { isRequired, minLength, maxLength },
   });
 
   const handleChange = React.useCallback(

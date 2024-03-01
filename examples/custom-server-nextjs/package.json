@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development node index.mjs",
-    "build": "toolpad-studio build --base /my-toolpad-studio && next build",
+    "build": "toolpad-studio build --base /my-toolpad-studio-app && next build",
     "start": "node index.mjs",
-    "edit": "toolpad-studio editor http://localhost:3001/my-toolpad-studio"
+    "edit": "toolpad-studio editor http://localhost:3001/my-toolpad-studio-app"
   },
   "dependencies": {
     "@mui/toolpad-studio": "0.1.50",

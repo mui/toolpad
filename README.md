@@ -42,11 +42,11 @@ MUI Toolpad Studio is in its beta stages of development. Feel free to run this 
 Run:
 
 ```bash
-npx create-toolpad-app@latest my-toolpad-studio
+npx create-toolpad-app@latest my-toolpad-studio-app
 # or
-yarn create toolpad-app my-toolpad-studio
+yarn create toolpad-app my-toolpad-studio-app
 # or
-pnpm create toolpad-app my-toolpad-studio
+pnpm create toolpad-app my-toolpad-studio-app
 ```
 
 ## Documentation

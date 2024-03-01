@@ -267,7 +267,7 @@ export const applicationSchema = toolpadObjectSchema(
           .array(
             z.object({
               provider: z
-                .enum(['github', 'google', 'azure-ad', 'credentials'])
+                .enum(['github', 'google', 'azure-ad', 'firebase', 'credentials'])
                 .describe('Unique identifier for this authentication provider.'),
               roles: z
                 .array(

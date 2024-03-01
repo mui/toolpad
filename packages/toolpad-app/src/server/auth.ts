@@ -3,6 +3,7 @@ import { Auth } from '@auth/core';
 import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import AzureADProvider from '@auth/core/providers/azure-ad';
+import { FirestoreAdapter } from '@auth/firebase-adapter';
 import CredentialsProvider from '@auth/core/providers/credentials';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
@@ -163,6 +164,8 @@ export function createAuthHandler(project: ToolpadProject): Router {
     },
   });
 
+  const firebaseAdapter = FirestoreAdapter();
+
   const authConfig: AuthConfig = {
     basePath: `${base}/api/auth`,
     pages: {
@@ -172,6 +175,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
       verifyRequest: base,
     },
     providers: [githubProvider, googleProvider, azureADProvider, credentialsProvider],
+    adapter: firebaseAdapter,
     secret: process.env.TOOLPAD_AUTH_SECRET,
     trustHost: true,
     callbacks: {

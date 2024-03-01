@@ -11,7 +11,7 @@ import { createDataProvider } from '@mui/toolpad/server';
 ## Description
 
 ```jsx
-import { createDataProvider } from '@mui/toolpad-studio-core/server';
+import { createDataProvider } from '@mui/toolpad-studio-runtime/server';
 import DATA from './movies.json';
 
 export default createDataProvider({

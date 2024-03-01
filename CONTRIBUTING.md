@@ -97,13 +97,13 @@ pnpm install
        "start": "toolpad-studio start --dev"
      },
      "dependencies": {
-       "@mui/toolpad-studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-app"
+       "@mui/toolpad-studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio"
      },
      "resolutions": {
-       "@mui/toolpad-studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-app",
-       "@mui/toolpad-studio-core": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-core",
+       "@mui/toolpad-studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio",
+       "@mui/toolpad-studio-runtime": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-runtime",
        "@mui/toolpad-studio-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-components",
-       "@mui/toolpad-studio-utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-utils"
+       "@mui/toolpad-utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"
      }
    }
    ```

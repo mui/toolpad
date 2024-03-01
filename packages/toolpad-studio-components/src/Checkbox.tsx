@@ -1,4 +1,4 @@
-import { createComponent } from '@mui/toolpad-studio-core';
+import { createComponent } from '@mui/toolpad-studio-runtime';
 import * as React from 'react';
 import {
   FormControlLabel,
@@ -10,7 +10,7 @@ import {
   Switch as MuiSwitch,
   SwitchProps,
 } from '@mui/material';
-import { errorFrom } from '@mui/toolpad-studio-utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import ErrorIcon from '@mui/icons-material/Error';
 import type { CheckboxProps as MuiCheckBoxProps } from '@mui/material/Checkbox';
 import type { FormControlLabelProps } from '@mui/material/FormControlLabel';

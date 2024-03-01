@@ -1,4 +1,4 @@
-import { ArgTypeDefinition, ComponentConfig, createComponent } from '@mui/toolpad-studio-core';
+import { ArgTypeDefinition, ComponentConfig, createComponent } from '@mui/toolpad-studio-runtime';
 
 export type BuiltinArgTypeDefinition<P extends object, K extends keyof P> = ArgTypeDefinition<
   P,

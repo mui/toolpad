@@ -8,9 +8,9 @@ import {
   TextareaAutosize,
   SxProps,
 } from '@mui/material';
-import { useNode } from '@mui/toolpad-studio-core';
+import { useNode } from '@mui/toolpad-studio-runtime';
 import ErrorIcon from '@mui/icons-material/Error';
-import { errorFrom } from '@mui/toolpad-studio-utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 

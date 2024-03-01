@@ -48,14 +48,11 @@ export default withDocsInfra({
             currentDirectory,
             '../packages/toolpad-studio-components/src',
           ),
-          '@mui/toolpad-studio-core': path.resolve(
+          '@mui/toolpad-studio-runtime': path.resolve(
             currentDirectory,
-            '../packages/toolpad-studio-core/src',
+            '../packages/toolpad-studio-runtime/src',
           ),
-          '@mui/toolpad-studio-utils': path.resolve(
-            currentDirectory,
-            '../packages/toolpad-studio-utils/src',
-          ),
+          '@mui/toolpad-utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
         },
       },
       module: {

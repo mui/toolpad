@@ -1,6 +1,6 @@
 import { SxProps, Typography, styled, Tooltip } from '@mui/material';
 import * as React from 'react';
-import { errorFrom } from '@mui/toolpad-studio-utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import ErrorIcon from '@mui/icons-material/Error';
 
 const OverlayRoot = styled('div')(({ theme }) => ({

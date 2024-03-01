@@ -10,8 +10,11 @@ module.exports = {
         __dirname,
         './packages/toolpad-studio-components/src',
       ),
-      '@mui/toolpad-studio-core': path.resolve(__dirname, './packages/toolpad-studio-core/src'),
-      '@mui/toolpad-studio-utils': path.resolve(__dirname, './packages/toolpad-studio-utils/src'),
+      '@mui/toolpad-studio-runtime': path.resolve(
+        __dirname,
+        './packages/toolpad-studio-runtime/src',
+      ),
+      '@mui/toolpad-utils': path.resolve(__dirname, './packages/toolpad-utils/src'),
       docs: path.resolve(__dirname, './node_modules/@mui/monorepo/docs'),
     },
     extensions: ['.js', '.ts', '.tsx', '.d.ts'],

@@ -6,12 +6,12 @@ import path from 'path';
 import yargs from 'yargs';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import { errorFrom } from '@mui/toolpad-studio-utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import { execaCommand } from 'execa';
 import { satisfies } from 'semver';
-import { readJsonFile } from '@mui/toolpad-studio-utils/fs';
+import { readJsonFile } from '@mui/toolpad-utils/fs';
 import invariant from 'invariant';
-import { bashResolvePath } from '@mui/toolpad-studio-utils/cli';
+import { bashResolvePath } from '@mui/toolpad-utils/cli';
 import { PackageJson } from './packageType';
 import { downloadAndExtractExample } from './examples';
 

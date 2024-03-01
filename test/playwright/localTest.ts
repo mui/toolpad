@@ -16,7 +16,7 @@ import { asyncDisposeSymbol, using } from '../utils/resources';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
-const CLI_CMD = path.resolve(currentDirectory, '../../packages/toolpad-studio-app/cli.mjs');
+const CLI_CMD = path.resolve(currentDirectory, '../../packages/toolpad-studio/cli.mjs');
 
 const PROJECT_ROOT = path.resolve(currentDirectory, '../../');
 

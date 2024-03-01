@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TemplateRenderer } from '@mui/toolpad-studio-core';
+import { TemplateRenderer } from '@mui/toolpad-studio-runtime';
 import { Box, List as MuiList, ListItem, SxProps, Skeleton, Stack } from '@mui/material';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin from './createBuiltin';

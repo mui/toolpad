@@ -1,9 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { kebabCase } from 'lodash';
-import type { ComponentConfig } from '@mui/toolpad-studio-core';
+import type { ComponentConfig } from '@mui/toolpad-studio-runtime';
 import * as builtins from '@mui/toolpad-studio-components';
-import * as toolpadCore from '@mui/toolpad-studio-core';
+import * as toolpadCore from '@mui/toolpad-studio-runtime';
 import { escapeCell, writePrettifiedFile } from './utils';
 
 const AUTO_GENERATED_WARNING =

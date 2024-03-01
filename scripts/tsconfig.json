@@ -2,14 +2,16 @@
   "compilerOptions": {
     "paths": {
       "@mui/toolpad-studio-components": ["../packages/toolpad-studio-components/src/index.tsx"],
-      "@mui/toolpad-studio-core": ["../packages/toolpad-studio-core/src/index.tsx"],
-      "@mui/toolpad-studio-core/numberFormat": [
-        "../packages/toolpad-studio-core/src/numberFormat.tsx"
+      "@mui/toolpad-studio-runtime": ["../packages/toolpad-studio-runtime/src/index.tsx"],
+      "@mui/toolpad-studio-runtime/numberFormat": [
+        "../packages/toolpad-studio-runtime/src/numberFormat.tsx"
       ],
-      "@mui/toolpad-studio-core/dateFormat": ["../packages/toolpad-studio-core/src/dateFormat.tsx"],
-      "@mui/toolpad-studio-utils/*": [
-        "../packages/toolpad-studio-utils/src/*.tsx",
-        "../packages/toolpad-studio-utils/src/*.ts"
+      "@mui/toolpad-studio-runtime/dateFormat": [
+        "../packages/toolpad-studio-runtime/src/dateFormat.tsx"
+      ],
+      "@mui/toolpad-utils/*": [
+        "../packages/toolpad-utils/src/*.tsx",
+        "../packages/toolpad-utils/src/*.ts"
       ]
     },
     "module": "ESNext",

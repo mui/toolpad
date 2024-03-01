@@ -19,7 +19,7 @@ import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
 import { ChartsLegend } from '@mui/x-charts/ChartsLegend';
 import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
 import { ChartsAxisHighlight } from '@mui/x-charts/ChartsAxisHighlight';
-import { errorFrom } from '@mui/toolpad-studio-utils/errors';
+import { errorFrom } from '@mui/toolpad-utils/errors';
 import createBuiltin from './createBuiltin';
 import ErrorOverlay from './components/ErrorOverlay';
 import { SX_PROP_HELPER_TEXT } from './constants';

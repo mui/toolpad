@@ -4,7 +4,7 @@
   "devDependencies": {
     "@mui/material": "5.15.11",
     "@mui/toolpad-studio": "workspace:*",
-    "@mui/toolpad-studio-utils": "workspace:*",
+    "@mui/toolpad-utils": "workspace:*",
     "express": "4.18.2",
     "get-port": "7.0.0",
     "invariant": "2.2.4",

@@ -154,23 +154,23 @@ function AppWrapper(props) {
     let pages = [];
 
     if (productCategoryId === 'toolpad') {
-      if(productId === 'core') {
-      productIdentifier = {
-        metadata: '',
-        name: 'Toolpad Core',
-        versions: [{ text: `v0.0.1`, current: true }],
-      };
-      pages = toolpadPages;
+      if (productId === 'toolpad-core') {
+        productIdentifier = {
+          metadata: '',
+          name: 'Toolpad Core',
+          versions: [{ text: `v0.0.1`, current: true }],
+        };
+        pages = toolpadPages;
+      }
+      if (productId === 'toolpad-studio') {
+        productIdentifier = {
+          metadata: '',
+          name: 'Toolpad Studio',
+          versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
+        };
+        pages = toolpadStudioPages;
+      }
     }
-    if (productId === 'studio') {
-      productIdentifier = {
-        metadata: '',
-        name: 'Toolpad Studio',
-        versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
-      };
-      pages = toolpadStudioPages;
-    }
-  }
 
     const { activePage, activePageParents } = findActivePage(pages, router.pathname);
 

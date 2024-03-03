@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@argos-ci/core": "1.5.4",
-    "@mui/monorepo": "github:bharatkashyap/material-ui#0f8d8b1fd120410ae5cd767247e8d5345183320f",
+    "@mui/monorepo": "github:bharatkashyap/material-ui#b258cf2d28fcfdf53f5f26a88240d48ce9205749",
     "@mui/x-charts": "6.19.5",
     "@next/eslint-plugin-next": "14.1.0",
     "@playwright/test": "1.41.2",

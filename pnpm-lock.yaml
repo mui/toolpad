@@ -55,8 +55,8 @@ importers:
         specifier: 1.5.4
         version: 1.5.4
       '@mui/monorepo':
-        specifier: github:bharatkashyap/material-ui#0f8d8b1fd120410ae5cd767247e8d5345183320f
-        version: github.com/bharatkashyap/material-ui/0f8d8b1fd120410ae5cd767247e8d5345183320f
+        specifier: github:bharatkashyap/material-ui#b258cf2d28fcfdf53f5f26a88240d48ce9205749
+        version: github.com/bharatkashyap/material-ui/b258cf2d28fcfdf53f5f26a88240d48ce9205749
       '@mui/x-charts':
         specifier: 6.19.5
         version: 6.19.5(@mui/material@5.15.11)(@mui/system@5.15.11)(react-dom@18.2.0)(react@18.2.0)
@@ -15384,8 +15384,8 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  github.com/bharatkashyap/material-ui/0f8d8b1fd120410ae5cd767247e8d5345183320f:
-    resolution: {tarball: https://codeload.github.com/bharatkashyap/material-ui/tar.gz/0f8d8b1fd120410ae5cd767247e8d5345183320f}
+  github.com/bharatkashyap/material-ui/b258cf2d28fcfdf53f5f26a88240d48ce9205749:
+    resolution: {tarball: https://codeload.github.com/bharatkashyap/material-ui/tar.gz/b258cf2d28fcfdf53f5f26a88240d48ce9205749}
     name: '@mui/monorepo'
     version: 5.15.11
     requiresBuild: true

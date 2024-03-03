@@ -73,6 +73,11 @@
       "allowedVersions": "< 2.0.0"
     },
     {
+      "groupName": "Next.js",
+      "matchPackageNames": ["next", "^@next/"],
+      "description": "Restricted to a Node.js version that's unsupported on codesandboxci"
+    },
+    {
       "groupName": "superjson",
       "matchPackageNames": ["superjson"],
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"

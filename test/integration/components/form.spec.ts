@@ -120,7 +120,6 @@ test('validates form data', async ({ page }) => {
 
   await expect(page.getByText('name must have at least 3 characters.')).toBeVisible();
   await expect(page.getByText('date is required.')).toBeVisible();
-  await expect(page.getByText('option is invalid.')).toBeVisible();
   await expect(page.getByText('outside must have no more than 3 characters.')).toBeVisible();
   await expect(page.getByText('country is required.')).toBeVisible();
 });

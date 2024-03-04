@@ -1,5 +1,86 @@
 # Changelog
 
+## v0.1.51
+
+<!-- generated comparing v0.1.50..master -->
+
+_Mar 4, 2024_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+This release contains mostly bug fixes and improvements to the docs, eamples and stability. It will be the last release of @mui/toolpad before we rename the package to @toolpad/studio.
+
+- &#8203;<!-- 32 -->Add list, datepicker and textfield component guides (#2827) @prakhargupta1
+- &#8203;<!-- 31 -->Isolate Next.js in renovatebot @Janpot
+- &#8203;<!-- 30 -->Lock file maintenance (#3263) @renovate[bot]
+- &#8203;<!-- 29 -->Update monorepo (#3259) @Janpot
+- &#8203;<!-- 28 -->Remove isInvalid prop from all components (#3260) @apedroferreira
+- &#8203;<!-- 27 -->Global functions explorer and header (#2690) @apedroferreira
+- &#8203;<!-- 26 -->Add scroll fixes to DataGrid skeleton loading (#3257) @Janpot
+- &#8203;<!-- 25 -->Image error overlay fixes (#3256) @Janpot
+- &#8203;<!-- 24 -->Stabilize visual regression tests (#3253) @Janpot
+- &#8203;<!-- 23 -->Add some missing docs for the hasNextPage property (#3255) @Janpot
+- &#8203;<!-- 22 -->Add a data providers CRUD page to basic crud app example (#3211) @prakhargupta1
+- &#8203;<!-- 21 -->Fix and improve resizing in editor (incl. Add Spacer component) (#2818) @apedroferreira
+- &#8203;<!-- 20 -->Make building layout visual tests more stable (#3237) @apedroferreira
+- &#8203;<!-- 19 -->Update CONTRIBUTING.md (#3114) @apedroferreira
+- &#8203;<!-- 18 -->Show loading indicator when runtime config is loading in query editor (#3169) @Janpot
+- &#8203;<!-- 17 -->Fix unintentional page rows being created (#3221) @apedroferreira
+- &#8203;<!-- 16 -->Prevent app header from covering page elements (#3220) @apedroferreira
+- &#8203;<!-- 15 -->chore(deps): bump @mui/toolpad to 0.1.50 (#3219) @renovate[bot]
+- &#8203;<!-- 14 -->Update CHANGELOG.md (typo) @apedroferreira
+- &#8203;<!-- 13 -->[code-infra] Use the @mui/internal-markdown package (#3235) @michaldudak
+- &#8203;<!-- 12 -->[code-infra] Bump monorepo (#3232) @Janpot
+- &#8203;<!-- 11 -->[code-infra] Remove pnpm cache on CircleCI (#3133) @Janpot
+- &#8203;<!-- 10 -->[code-infra] Disable renovatebot semantic commits (#3224) @Janpot
+- &#8203;<!-- 09 -->[code-infra] Use `experimental.cpus` to control amount of export workers in Next.js (#3222) @Janpot
+- &#8203;<!-- 08 -->[core] Fix infinite loop in inline canvas mode (#3265) @Janpot
+- &#8203;<!-- 07 -->[core] add engines field to @mui/toolpad package.json (#3254) @JerryWu1234
+- &#8203;<!-- 06 -->[DataGrid] fix errors not showing up in the rows area (#3264) @Janpot
+- &#8203;<!-- 05 -->[docs] Prefer https links @oliviertassinari
+- &#8203;<!-- 04 -->[docs-infra] Fixes for vale-action with shared config (#3234) @bharatkashyap
+- &#8203;<!-- 03 -->[docs-infra] Fix Stack Overflow breaking space @oliviertassinari
+- &#8203;<!-- 02 -->[docs-infra] Add vale for style-guide lint on docs (#3178) @bharatkashyap
+- &#8203;<!-- 01 -->[examples] Hacker News client example (#2170) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @michaldudak, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
+## v0.1.50
+
+<!-- generated comparing v0.1.49..master -->
+
+_Feb 15, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Move editor canvas inline, add authenticated session data to server context, fix bugs in drag-and-drop, data grid and editable tree items, improve project setup documentation and add authentication examples for Google and GitHub.
+
+- &#8203;<!-- 32 -->Show save/discard for created record when updateRecords is unavailable (#3215) @Janpot
+- &#8203;<!-- 31 -->Add documentation about installing Toolpad in an existing project (#3214) @Janpot
+- &#8203;<!-- 30 -->Reroute "open in editor" link in app preview (#3207) @Janpot
+- &#8203;<!-- 29 -->Add authentication examples (#3135) @apedroferreira
+- &#8203;<!-- 28 -->Make sure the inline canvas uses the correct font (#3208) @Janpot
+- &#8203;<!-- 27 -->Remove semicolon from jsx (#3210) @iamsaumya
+- &#8203;<!-- 26 -->Fix vm shim in the editor (#3189) @Janpot
+- &#8203;<!-- 25 -->Remove second usePageTitle from RenderedLowCodePage (#3204) @iamsaumya
+- &#8203;<!-- 24 -->Create predictably named test directories (#3194) @Janpot
+- &#8203;<!-- 23 -->Fix test for code components under new editor runtime (#3193) @Janpot
+- &#8203;<!-- 22 -->Correct test urls for canvas tests (#3192) @Janpot
+- &#8203;<!-- 21 -->Fix undo/redo in new canvas implementation (#3191) @Janpot
+- &#8203;<!-- 20 -->Add authenticated session to app server context (#3157) @apedroferreira
+- &#8203;<!-- 12 -->Fix editable tree item bugs (#3187) @apedroferreira
+- &#8203;<!-- 11 -->Fix project loading several times (#3188) @Janpot
+- &#8203;<!-- 10 -->Add pie chart future component (#3185) @Janpot
+- &#8203;<!-- 09 -->Fix drag-and-drop when dragging outside components (#3177) @apedroferreira
+- &#8203;<!-- 06 -->[code-infra] Deprecate usage of the next export command (#3217) @Janpot
+- &#8203;<!-- 05 -->[core] Fix link to issue template @oliviertassinari
+- &#8203;<!-- 04 -->[core] Add canvas mode that doesn't rely on vite (#3171) @Janpot
+- &#8203;<!-- 03 -->[core] Define routes statically (#3176) @Janpot
+- &#8203;<!-- 02 -->[docs] Fix typo @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix spelling of GitHub @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @iamsaumya, @Janpot, @oliviertassinari, @renovate[bot]
+
 ## v0.1.49
 
 <!-- generated comparing v0.1.48..master -->
@@ -13,20 +94,12 @@ A big thanks to the 5 contributors who made this release possible. Here are some
 - Miscellaneous bug fixes and maintenance work.
 
 - &#8203;<!-- 26 -->Authentication fixes/improvements (#3174) @apedroferreira
-- &#8203;<!-- 25 -->chore(deps): bump mui core (#3175) @renovate[bot]
 - &#8203;<!-- 24 -->Add isCanvas into app host context (#3170) @Janpot
 - &#8203;<!-- 23 -->Fix a few react-resizable-panels warnings (#3173) @Janpot
 - &#8203;<!-- 22 -->Improve package layout (#3148) @Janpot
 - &#8203;<!-- 21 -->Add authorization docs (#3067) @apedroferreira
 - &#8203;<!-- 20 -->Authentication/authorization tests (#3056) @apedroferreira
 - &#8203;<!-- 19 -->Update renovate.json @Janpot
-- &#8203;<!-- 18 -->chore(deps): bump dependencies (#3163) @renovate[bot]
-- &#8203;<!-- 17 -->chore(deps): bump dependencies (major) (#3166) @renovate[bot]
-- &#8203;<!-- 16 -->chore(deps): bump devdependencies (#3160) @renovate[bot]
-- &#8203;<!-- 15 -->chore(deps): bump github/codeql-action action to v3.24.0 (#3164) @renovate[bot]
-- &#8203;<!-- 14 -->chore(deps): bump pnpm to 8.15.1 (#3162) @renovate[bot]
-- &#8203;<!-- 13 -->chore(deps): bump playwright (#3161) @renovate[bot]
-- &#8203;<!-- 12 -->chore(deps): bump @mui/monorepo digest to 3c445c6 (#3159) @renovate[bot]
 - &#8203;<!-- 11 -->fix: "Unexpected token ';'" in expressions with trailing ';' (#3147) @bharatkashyap
 - &#8203;<!-- 10 -->Lock file maintenance (#3150) @renovate[bot]
 - &#8203;<!-- 09 -->Add stronger warning to the auto generated files to avoid hand-editing (#3146) @Janpot

@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [":semanticCommitsDisabled"],
   "automerge": false,
   "commitMessageAction": "Bump",
   "commitMessageExtra": "to {{newValue}}",
@@ -72,10 +73,9 @@
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "next",
-      "matchPackageNames": ["next"],
-      "allowedVersions": "<= 13.4.19",
-      "description": "https://github.com/mui/mui-toolpad/pull/2739"
+      "groupName": "Next.js",
+      "matchPackageNames": ["next", "^@next/"],
+      "description": "Restricted to a Node.js version that's unsupported on codesandboxci"
     },
     {
       "groupName": "superjson",

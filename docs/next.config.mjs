@@ -12,13 +12,17 @@ const withDocsInfra = require('@mui/monorepo/docs/nextConfigDocsInfra');
 const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
 
+const WORKSPACE_ROOT = path.resolve(currentDirectory, '../');
 const MONOREPO_PATH = path.resolve(currentDirectory, '../node_modules/@mui/monorepo');
 const MONOREPO_PACKAGES = {
   '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
-  '@mui/markdown': path.resolve(MONOREPO_PATH, './packages/markdown'),
 };
 
 export default withDocsInfra({
+  experimental: {
+    workerThreads: true,
+    cpus: 3,
+  },
   transpilePackages: ['@mui/monorepo', '@mui/x-charts'],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
@@ -56,12 +60,13 @@ export default withDocsInfra({
             test: /\.md$/,
             oneOf: [
               {
-                resourceQuery: /@mui\/markdown/,
+                resourceQuery: /muiMarkdown/,
                 use: [
                   options.defaultLoaders.babel,
                   {
-                    loader: require.resolve('@mui/monorepo/packages/markdown/loader'),
+                    loader: require.resolve('@mui/internal-markdown/loader'),
                     options: {
+                      workspaceRoot: WORKSPACE_ROOT,
                       env: {
                         SOURCE_CODE_REPO: options.config.env.SOURCE_CODE_REPO,
                         LIB_VERSION: options.config.env.LIB_VERSION,
@@ -81,6 +86,7 @@ export default withDocsInfra({
       },
     };
   },
+  distDir: 'export',
   // Next.js provides a `defaultPathMap` argument, we could simplify the logic.
   // However, we don't in order to prevent any regression in the `findPages()` method.
   exportPathMap: () => {
@@ -111,12 +117,18 @@ export default withDocsInfra({
 
     return map;
   },
-  // redirects only take effect in the development, not production (because of `next export`).
-  redirects: async () => [
-    {
-      source: '/',
-      destination: '/toolpad/',
-      permanent: false,
-    },
-  ],
+  // Used to signal we run yarn build
+  ...(process.env.NODE_ENV === 'production'
+    ? {
+        output: 'export',
+      }
+    : {
+        redirects: async () => [
+          {
+            source: '/',
+            destination: '/toolpad/',
+            permanent: false,
+          },
+        ],
+      }),
 });

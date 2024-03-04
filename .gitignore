@@ -60,3 +60,4 @@ test-results
 .yarn-playwright-cache
 
 /test/regressions/screenshots/**
+

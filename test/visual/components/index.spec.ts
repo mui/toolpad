@@ -2,8 +2,8 @@ import * as path from 'path';
 import * as url from 'url';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
-import { test } from '../../playwright/localTest';
-import { clickCenter } from '../../utils/locators';
+import { expect, test } from '../../playwright/localTest';
+import { clickCenter, waitForBoundingBox } from '../../utils/locators';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -30,7 +30,7 @@ test('rendering components in the app runtime', async ({ page, argosScreenshot }
 
 test('rendering components in the app editor', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
-  await editorModel.goto();
+  await editorModel.goToPage('components');
 
   await editorModel.waitForOverlay();
 
@@ -40,6 +40,52 @@ test('rendering components in the app editor', async ({ page, argosScreenshot })
 
   await clickCenter(page, image);
   await argosScreenshot('with-selection');
+});
+
+test('building layouts', async ({ page, argosScreenshot }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPage('blank');
+
+  await editorModel.waitForOverlay();
+
+  const getNthFullWidthBoundingBox = (
+    n: number,
+  ): Promise<{ x: number; y: number; width: number; height: number } | null> =>
+    editorModel.appCanvas.getByText('fullwidth').nth(n).boundingBox();
+
+  await editorModel.dragNewComponentToCanvas('FullWidth');
+
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
+  await expect(page.getByLabel('All changes saved!')).toBeVisible();
+  await argosScreenshot('building-layout-1');
+
+  const firstFullWidthBoundingBox = await getNthFullWidthBoundingBox(0);
+
+  // Place inside right of first element
+  await editorModel.dragNewComponentToCanvas(
+    'FullWidth',
+    firstFullWidthBoundingBox!.x + (2 / 3) * firstFullWidthBoundingBox!.width,
+    firstFullWidthBoundingBox!.y + firstFullWidthBoundingBox!.height / 2,
+  );
+
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
+  await expect(page.getByLabel('All changes saved!')).toBeVisible();
+  await argosScreenshot('building-layout-2');
+
+  const secondFullWidthBoundingBox = await getNthFullWidthBoundingBox(1);
+
+  // Place outside right of second element
+  await editorModel.dragNewComponentToCanvas(
+    'FullWidth',
+    secondFullWidthBoundingBox!.x + secondFullWidthBoundingBox!.width + 12,
+    secondFullWidthBoundingBox!.y + secondFullWidthBoundingBox!.height / 2,
+    true,
+    1,
+  );
+
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toBeVisible();
+  await expect(page.getByLabel('All changes saved!')).toBeVisible();
+  await argosScreenshot('building-layout-3');
 });
 
 test('showing grid while resizing elements', async ({ page, argosScreenshot }) => {
@@ -69,6 +115,67 @@ test('showing grid while resizing elements', async ({ page, argosScreenshot }) =
   );
 
   await argosScreenshot('resize-grid');
+});
+
+test('resizing element heights', async ({ page, argosScreenshot }) => {
+  const editorModel = new ToolpadEditor(page);
+  await editorModel.goToPage('grids');
+
+  await editorModel.waitForOverlay();
+
+  const appCanvasBoundingBox = await editorModel.appCanvas.locator('body').boundingBox();
+
+  const screenshotConfig = {
+    clip: appCanvasBoundingBox || undefined,
+  };
+
+  const firstGrid = editorModel.appCanvas.getByRole('grid').nth(0);
+
+  await clickCenter(page, firstGrid);
+  await argosScreenshot('vertical-resize-before', screenshotConfig);
+
+  const firstGridBoundingBox = await waitForBoundingBox(firstGrid);
+
+  await page.mouse.move(
+    firstGridBoundingBox!.x + firstGridBoundingBox!.width / 2,
+    firstGridBoundingBox!.y + firstGridBoundingBox!.height - 4,
+    { steps: 10 },
+  );
+
+  await page.mouse.down();
+
+  await page.mouse.move(
+    firstGridBoundingBox!.x + firstGridBoundingBox!.width / 2,
+    firstGridBoundingBox!.y + firstGridBoundingBox!.height + 100,
+    { steps: 10 },
+  );
+
+  await page.mouse.up();
+
+  const thirdGrid = editorModel.appCanvas.getByRole('grid').nth(2);
+
+  await clickCenter(page, thirdGrid);
+
+  const thirdGridBoundingBox = await waitForBoundingBox(thirdGrid);
+
+  await page.mouse.move(
+    thirdGridBoundingBox!.x + thirdGridBoundingBox!.width / 2,
+    thirdGridBoundingBox!.y + thirdGridBoundingBox!.height - 4,
+    { steps: 10 },
+  );
+
+  await page.mouse.down();
+
+  await page.mouse.move(
+    thirdGridBoundingBox!.x + thirdGridBoundingBox!.width / 2,
+    thirdGridBoundingBox!.y + thirdGridBoundingBox!.height + 100,
+    { steps: 10 },
+  );
+
+  await page.mouse.up();
+
+  await clickCenter(page, firstGrid);
+  await argosScreenshot('vertical-resize-after', screenshotConfig);
 });
 
 test('showing drag-and-drop previews', async ({ page, argosScreenshot }) => {

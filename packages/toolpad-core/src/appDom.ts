@@ -125,6 +125,7 @@ export interface ElementNode<P = any> extends AppDomNodeBase {
     readonly horizontalAlign?: BoxProps['justifyContent'];
     readonly verticalAlign?: BoxProps['alignItems'];
     readonly columnSize?: number;
+    readonly height?: number;
   };
 }
 
@@ -822,6 +823,22 @@ export function moveNode<Parent extends AppDomNode, Child extends AppDomNode>(
   return setNodeParent(dom, node, parent.id, parentProp, parentIndex);
 }
 
+export function spreadNode<Child extends AppDomNode>(dom: AppDom, node: Child) {
+  const parent = getParent(dom, node);
+  const parentProp = node.parentProp;
+
+  let draft = dom;
+  if (parent && parentProp && isElement(node)) {
+    for (const child of getChildNodes(draft, node).children) {
+      const parentIndex = getNewParentIndexBeforeNode(draft, node, parentProp);
+      draft = setNodeParent(draft, child, parent.id, parentProp, parentIndex);
+    }
+    draft = removeNode(draft, node.id);
+  }
+
+  return draft;
+}
+
 export function nodeExists(dom: AppDom, nodeId: NodeId): boolean {
   return !!getMaybeNode(dom, nodeId);
 }
@@ -1025,8 +1042,18 @@ export function duplicateNode(
     throw new Error(`Node "${node.id}" can't be duplicated, it must have a parent`);
   }
 
-  const fragment = cloneFragment(dom, node.id);
-  return addFragment(dom, fragment, parent.id, parentProp);
+  if (isElement(node)) {
+    const fragment = cloneFragment(dom, node.id);
+    return addFragment(
+      dom,
+      fragment,
+      parent.id,
+      parentProp,
+      getNewParentIndexAfterNode(dom, node, parentProp),
+    );
+  }
+
+  return dom;
 }
 
 const RENDERTREE_NODES = ['app', 'page', 'element', 'query', 'mutation', 'theme'] as const;

@@ -1,5 +1,5 @@
 // Replace with
-//   /// <reference path="@mui/markdown"/>
+//   /// <reference path="@mui/internal-markdown"/>
 // after https://github.com/mui/material-ui/pull/37240 gets merged.
 /// <reference path="./modules.d.ts"/>
 

@@ -224,8 +224,11 @@ function useApplicationVm(onUpdate: (registry: ApplicationVm) => void) {
     if (scheduledUpdate) {
       return;
     }
-    scheduledUpdate = Promise.resolve().then(() => {
+    scheduledUpdate = Promise.resolve().then(async () => {
       onUpdate(vm);
+      // We seem to be hitting https://github.com/facebook/react/issues/24650
+      // In the pageEditorReducer unless we schedule the next one in a new microtask
+      await Promise.resolve();
       scheduledUpdate = undefined;
     });
   };
@@ -442,10 +445,8 @@ function getQueryConfigBindings({ enabled, refetchInterval }: appDom.QueryNode['
 }
 
 function isBindableProp(componentConfig: ComponentConfig<any>, propName: string) {
-  const isResizableHeightProp = propName === componentConfig.resizableHeightProp;
   const argType = componentConfig.argTypes?.[propName];
   return (
-    !isResizableHeightProp &&
     argType?.control?.bindable !== false &&
     argType?.type !== 'template' &&
     argType?.type !== 'event'
@@ -1195,6 +1196,8 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
             display: 'flex',
             alignItems: boundLayoutProps.verticalAlign,
             justifyContent: boundLayoutProps.horizontalAlign,
+            height: node.layout?.height ?? componentConfig.defaultLayoutHeight,
+            minHeight: '100%',
           }}
           ref={nodeRef}
           data-toolpad-node-id={nodeId}

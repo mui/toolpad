@@ -33,26 +33,28 @@
     "toolpad": "node --enable-source-maps packages/toolpad-app/cli.mjs",
     "jsonSchemas": "tsx ./scripts/docs/generateJsonSchemas.ts",
     "update-monorepo": "tsx ./scripts/updateMonorepo.ts",
+    "monorepo:update": "tsx ./scripts/updateMonorepo.ts",
+    "monorepo:canary": "tsx ./scripts/canaryMonorepo.ts",
     "check-changes": "git add -A && git diff --exit-code --staged",
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },
   "devDependencies": {
     "@argos-ci/core": "1.5.4",
-    "@mui/monorepo": "github:mui/material-ui#36bb1aa7f35b4b9d527716a5907e9be38d78ffd7",
-    "@mui/x-charts": "6.19.4",
+    "@mui/monorepo": "github:mui/material-ui#910a9dc8dda6be590a9624d18421243a37c267b8",
+    "@mui/x-charts": "6.19.5",
     "@next/eslint-plugin-next": "14.1.0",
-    "@playwright/test": "1.41.2",
+    "@playwright/test": "1.42.1",
     "@testing-library/react": "14.2.1",
     "@types/archiver": "6.0.2",
     "@types/gtag.js": "0.0.19",
-    "@types/node": "20.11.19",
+    "@types/node": "20.11.20",
     "@types/rimraf": "3.0.2",
-    "@typescript-eslint/eslint-plugin": "7.0.1",
-    "@typescript-eslint/parser": "7.0.1",
+    "@typescript-eslint/eslint-plugin": "7.0.2",
+    "@typescript-eslint/parser": "7.0.2",
     "chalk": "5.3.0",
-    "eslint": "8.56.0",
+    "eslint": "8.57.0",
     "eslint-config-airbnb": "19.0.4",
-    "eslint-config-airbnb-typescript": "17.1.0",
+    "eslint-config-airbnb-typescript": "18.0.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-import-resolver-webpack": "0.13.8",
     "eslint-plugin-filenames": "1.3.2",
@@ -72,7 +74,7 @@
     "prettier": "3.2.5",
     "pretty-quick": "4.0.0",
     "react-inspector": "6.0.2",
-    "recharts": "2.12.0",
+    "recharts": "2.12.1",
     "regenerator-runtime": "0.14.1",
     "rimraf": "5.0.5",
     "typescript": "5.3.3",
@@ -81,7 +83,7 @@
     "yarn-deduplicate": "6.0.2"
   },
   "dependencies": {
-    "archiver": "6.0.1",
+    "archiver": "7.0.0",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.3.0",
     "eslint-import-resolver-exports": "1.0.0-beta.5",
@@ -98,10 +100,10 @@
   "engines": {
     "npm": "please-use-yarn",
     "node": ">=18",
-    "pnpm": "8.15.3"
+    "pnpm": "8.15.4"
   },
   "resolutions": {
     "google-auth-library": "*"
   },
-  "packageManager": "pnpm@8.15.3"
+  "packageManager": "pnpm@8.15.4"
 }

@@ -13,7 +13,7 @@ TextField is a text input component. It takes user input and provides the value 
 It is one of the most used input component. The video below uses some props to demonstrate its usage.
 
 <video controls width="100%" height="auto" style="contain" alt="textfield">
-  <source src="/static/toolpad/docs/components/textfield/textfield.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/components/textfield/textfield.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 

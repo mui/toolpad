@@ -71,7 +71,7 @@ This can lead to a significant problem when it comes to the long-term maintainab
 
 Addressing the problems mentioned above leads to a better developer experience. Toolpad solves them in the following ways:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/getting-started/why-toolpad/why-toolpad.png", "alt": "How Toolpad fits in your codebase", "caption": "How Toolpad fits in your workflow", "zoom": true }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/why-toolpad/why-toolpad.png", "alt": "How Toolpad fits in your codebase", "caption": "How Toolpad fits in your workflow", "zoom": true }}
 
 ### Drag-and-drop builder
 

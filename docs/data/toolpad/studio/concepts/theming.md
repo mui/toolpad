@@ -5,7 +5,7 @@
 ## Adding a global theme
 
 <video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
-  <source src="/static/toolpad/docs/concepts/theming/theme-1.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/concepts/theming/theme-1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -21,8 +21,8 @@
 
 In order to provide a customised styling to the components used in your pages, you can use style overrides via the **sx** prop in the **Inspector.**
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-3.png", "alt": "Add sx prop", "caption": "Adding custom styles via the sx prop", "aspectRatio": 2.5 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/theming/theme-3.png", "alt": "Add sx prop", "caption": "Adding custom styles via the sx prop", "aspectRatio": 2.5 }}
 
 Once you click on the `sx` prop, add style overrides in the JSON editor. Any value that is accepted by the MUI System [sx](https://mui.com/system/getting-started/the-sx-prop/) prop is acceptable here.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/theming/theme-4.png", "alt": "Add custom styles", "caption": "Styling the Image component" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/theming/theme-4.png", "alt": "Add custom styles", "caption": "Styling the Image component" }}

@@ -6,7 +6,7 @@
 
 1. Set the [display mode](/toolpad/concepts/page-properties/#display-mode) on the page to be embedded to **No shell**
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/embed-page/no-shell.png", "alt": "No shell display mode", "caption": "Set display mode to no shell", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/embed-page/no-shell.png", "alt": "No shell display mode", "caption": "Set display mode to no shell", "indent": 1 }}
 
 2. Deploy the Toolpad application
 

@@ -4,9 +4,9 @@
 
 Toolpad is file-system based, which means that an app's entire configuration is stored in files within your project. You can inspect and edit them from your IDE. You'll also use your own tools to author custom functions and components. This is how the project structure looks like in the file-system:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/file-structure/fresh.png", "alt": "Fresh Toolpad app", "caption": "File structure of a fresh Toolpad app with a single page", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/file-structure/fresh.png", "alt": "Fresh Toolpad app", "caption": "File structure of a fresh Toolpad app with a single page", "indent": 1 }}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/file-structure/after.png", "alt": "Complex Toolpad app", "caption": "File structure of an app having 2 pages, 1 custom component and 1 function", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/file-structure/after.png", "alt": "Complex Toolpad app", "caption": "File structure of an app having 2 pages, 1 custom component and 1 function", "indent": 1 }}
 
 You'll notice there is a **toolpad** folder that contains these files. All files relevant to a Toolpad project are contained within this folder. Let's take a closer look at it:
 

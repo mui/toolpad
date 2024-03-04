@@ -4,11 +4,11 @@
 
 You can configure a Toolpad application so that users have to sign in with specific authentication providers in order to access it.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/sign-in-page.png", "alt": "Toolpad sign-in page", "caption": "Toolpad sign-in page", "indent": 1, "aspectRatio": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/authorization/sign-in-page.png", "alt": "Toolpad sign-in page", "caption": "Toolpad sign-in page", "indent": 1, "aspectRatio": 1 }}
 
 Authentication settings can be accessed through the **Authorization** option in the app editor header.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/authentication-settings.png", "alt": "Authentication settings", "caption": "Authentication settings", "indent": 1, "aspectRatio": 6 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/authorization/authentication-settings.png", "alt": "Authentication settings", "caption": "Authentication settings", "indent": 1, "aspectRatio": 6 }}
 
 ## Authentication secret
 
@@ -45,7 +45,7 @@ Take a look at the following official instructions to [create a GitHub OAuth app
 
 In the GitHub OAuth app settings screen, in the **Authorization callback URL** option, use the production path of your application followed by `/api/auth/callback/github`, as in `https://mui.com/api/auth/callback/github`.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/github-callback-url.png", "alt": "GitHub callback URL configuration", "caption": "GitHub callback URL configuration", "zoom": false, "width": 460 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/authorization/github-callback-url.png", "alt": "GitHub callback URL configuration", "caption": "GitHub callback URL configuration", "zoom": false, "width": 460 }}
 
 ### Google
 
@@ -58,7 +58,7 @@ Take a look at the following official instructions to [create a Google OAuth cli
 
 In the Google OAuth client settings screen, under the **Authorized redirect URIs** option, make sure to include the production path of your application followed by `/api/auth/callback/google`, as in `https://mui.com/api/auth/callback/google`.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/google-redirect-url.png", "alt": "Google redirect URIs configuration", "caption": "Google redirect URIs configuration", "zoom": false, "width": 460 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/authorization/google-redirect-url.png", "alt": "Google redirect URIs configuration", "caption": "Google redirect URIs configuration", "zoom": false, "width": 460 }}
 
 ### Azure Active Directory (now Entra ID)
 
@@ -80,7 +80,7 @@ Follow these steps to configure your Azure AD client and get the necessary envir
 
 3. When registering your application, under the **Redirect URI** option, make sure to include the production path of your application followed by `/api/auth/callback/azure-ad`, as in `https://mui.com/api/auth/callback/azure-ad`.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/azure-ad-redirect-url.png", "alt": "Azure AD redirect URI configuration", "caption": "Azure AD redirect URI configuration", "aspectRatio": 6 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/authorization/azure-ad-redirect-url.png", "alt": "Azure AD redirect URI configuration", "caption": "Azure AD redirect URI configuration", "aspectRatio": 6 }}
 
 4. Once your application has been created, go to its page in **App registrations** where you can find the client and tenant IDs under the **Overview** option in the left-side menu.
 

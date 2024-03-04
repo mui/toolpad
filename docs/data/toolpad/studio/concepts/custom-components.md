@@ -16,7 +16,7 @@ In case it doesn't open, check [troubleshoot missing editor](https://mui.com/too
 :::
 
 <video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
-  <source src="/static/toolpad/docs/concepts/custom-components/custom-component-creation.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/concepts/custom-components/custom-component-creation.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -49,14 +49,14 @@ export default createComponent(HelloWorld, {
 
 The props defined in the `argTypes` object are available as editable properties when inspecting the custom component:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/custom-components/custom-component-props.png", "alt": "Custom component props ", "caption": "Props of our custom component" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/custom-components/custom-component-props.png", "alt": "Custom component props ", "caption": "Props of our custom component" }}
 
 ## Component Library
 
 Custom components become available in the component library, alongside an option to create a new one.
 To use a custom component, drag it from the Component Library into the canvas. The component will be available under the **Custom Components** section.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/custom-components/library.png", "alt": "Custom components ", "caption": "Custom components in the library"}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/custom-components/library.png", "alt": "Custom components ", "caption": "Custom components in the library"}}
 
 :::info
 You can look at more detailed guides of creating custom components in the how-to guides section:

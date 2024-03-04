@@ -10,7 +10,7 @@ Toolpad uses `react-query` internally to run queries and actions. Look into [its
 
 Queries allow you to bring backend data to your Toolpad page. They are called automatically on page load, so that data is available as state on the page as soon as the user interacts with it. Toolpad will cache and regularly refresh the data. This means that your backend function will be called more than once. Queries are not suitable for backend functions that modify data. You can modify the following settings for queries:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/query-settings.png", "alt": "Query settings", "caption": "Settings for queries", "indent": 1, "aspectRatio": 6}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/connecting-to-data/query-settings.png", "alt": "Query settings", "caption": "Settings for queries", "indent": 1, "aspectRatio": 6}}
 
 - **`Mode`**
 

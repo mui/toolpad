@@ -6,7 +6,7 @@
 
 By default, you can connect any JSON data to a Toolpad data grid and it will attempt to guess each column's type display it appropriately:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/customize-datagrid/datagrid.png", "alt": "Data grid with data", "caption": "The default data grid showing multiple data types", "aspectRatio": 3 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/datagrid.png", "alt": "Data grid with data", "caption": "The default data grid showing multiple data types", "aspectRatio": 3 }}
 
 ## Customizing cell rendering
 
@@ -64,16 +64,16 @@ The `OrderIdChip` component should appear in our component library on saving:
 
 1. Select the data grid and choose the **columns** property in the inspector:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/customize-datagrid/columns.png", "alt": "Customize data grid columns", "caption": "The columns editor", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/columns.png", "alt": "Customize data grid columns", "caption": "The columns editor", "indent": 1 }}
 
 2. Choose **Order ID** and change its type to be `codeComponent`:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/customize-datagrid/code-component-column.png", "alt": "Code component column", "caption": "Setting the column type", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/code-component-column.png", "alt": "Code component column", "caption": "Setting the column type", "indent": 1 }}
 
 3. Choose the `OrderIdChip` column in the select menu for custom component:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/customize-datagrid/order-id-column.png", "alt": "Custom component selector", "caption": "Choosing the custom component we created", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/order-id-column.png", "alt": "Custom component selector", "caption": "Choosing the custom component we created", "indent": 1 }}
 
 4. That's it! We have the desired functionality:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/customize-datagrid/chip-column.gif", "alt": "Custom chip inside data grid", "caption": "Using our custom component in the data grid", "indent": 1, "aspectRatio": 3 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/chip-column.gif", "alt": "Custom chip inside data grid", "caption": "Using our custom component in the data grid", "indent": 1, "aspectRatio": 3 }}

@@ -4,7 +4,7 @@
 
 We can create a custom component to display any geographical map, like so:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/map/component.png", "alt": "Map component", "caption": "The map component"}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/custom-components/map/component.png", "alt": "Map component", "caption": "The map component"}}
 
 ## Creating the component
 
@@ -12,7 +12,7 @@ We can create a custom component to display any geographical map, like so:
 
 1. To get started creating this, hover over the component library and click on the **Create** button in the **Custom Components** section.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/create-custom.png", "alt": "Create custom component", "caption": "Create a custom component", "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/custom-components/create-custom.png", "alt": "Create custom component", "caption": "Create a custom component", "zoom": false }}
 
 2. A dialog box appears asking you to name it. Name it "Map".
 
@@ -20,11 +20,11 @@ We can create a custom component to display any geographical map, like so:
    You can use any name, as long as it is unique and complies with the [rules of naming](https://react.dev/learn/your-first-component) components in React
    :::
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/map/display-name.png", "alt": "Name custom component", "caption": "Naming a custom component", "zoom": false, "width": 300 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/custom-components/map/display-name.png", "alt": "Name custom component", "caption": "Naming a custom component", "zoom": false, "width": 300 }}
 
 3. A snackbar appears acknowledging the successful creation of the component. A starter file is created in `toolpad/components`. Use the **Open** button to open this file in your code editor:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/map/snackbar-open.png", "alt": "Open custom component", "caption": "Open the custom component", "zoom": false, "width": 400 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/custom-components/map/snackbar-open.png", "alt": "Open custom component", "caption": "Open the custom component", "zoom": false, "width": 400 }}
 
 ### In the code editor
 
@@ -118,10 +118,10 @@ export default createComponent(Leaflet, {
 
 2. **MapDisplay** is now available as a custom component in the component library:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/map/in-library.png", "alt": "map component in library", "caption": "The map component appears in the component library", "width": 300, "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/custom-components/map/in-library.png", "alt": "map component in library", "caption": "The map component appears in the component library", "width": 300, "zoom": false }}
 
 ## Using the component
 
 1. Drag two of the map components on the canvas and select the first one. In the inspector, you'll see both the `label` and `value` properties available as bindable properties.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/how-to-guides/custom-components/map/components.png", "alt": "Use map components with numbers and labels", "caption": "Using the map component", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/custom-components/map/components.png", "alt": "Use map components with numbers and labels", "caption": "Using the map component", "indent": 1 }}

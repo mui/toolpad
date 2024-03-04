@@ -7,7 +7,7 @@ Toolpad functions are great to bring some backend state to the page, but they fa
 Follow these steps to create a new data provider:
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
-  <source src="/static/toolpad/docs/concepts/data-providers/data-provider-1.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/concepts/data-providers/data-provider-1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -26,7 +26,7 @@ export default createDataProvider({
 ```
 
    <video controls width="auto" height="100%" style="contain" alt="component-library">
-  <source src="/static/toolpad/docs/concepts/data-providers/data-provider-2.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/concepts/data-providers/data-provider-2.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -101,13 +101,13 @@ For example, this could print the following if the corresponding column filters 
 Now the data grid filter UI will be hooked up to your backend function in the data provider.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
-  <source src="/static/toolpad/docs/concepts/data-providers/filtering.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/concepts/data-providers/filtering.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 Uncheck the column option "filterable" if you want to disable filtering for a certain column:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-filterable.png", "alt": "Disable filterable", "caption": "Disable filterable", "zoom": false, "width": 320 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/data-providers/disable-filterable.png", "alt": "Disable filterable", "caption": "Disable filterable", "zoom": false, "width": 320 }}
 
 ## Sorting
 
@@ -130,13 +130,13 @@ Depending on which column has been set to sort by, this will result in:
 Now the data grid sorting UI will be hooked up to your backend function in the data provider.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
-  <source src="/static/toolpad/docs/concepts/data-providers/sorting.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/concepts/data-providers/sorting.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 Uncheck the column option "sortable" if you want to disable sorting for a certain column:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-sortable.png", "alt": "Disable sortable", "caption": "Disable sortable", "zoom": false, "width": 325 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/data-providers/disable-sortable.png", "alt": "Disable sortable", "caption": "Disable sortable", "zoom": false, "width": 325 }}
 
 ## Row editing
 
@@ -157,13 +157,13 @@ export default createDataProvider({
 When this method is available in the data provider, each row will have an edit button. This edit button brings the row in edit mode. To commit the changes press the save button on the row that is in edit mode. To discard the changes use the cancel button.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
-  <source src="/static/toolpad/docs/concepts/data-providers/editing.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/concepts/data-providers/editing.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
 You can disable the editing functionality for specific columns by unchecking the **Editable** option in the column definition.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-providers/disable-editable.png", "alt": "Disable editable", "caption": "Disable editable", "zoom": false, "width": 308 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/data-providers/disable-editable.png", "alt": "Disable editable", "caption": "Disable editable", "zoom": false, "width": 308 }}
 
 ## Row creation
 
@@ -184,7 +184,7 @@ export default createDataProvider({
 After you make this method available in the data provider, an "Add record" button will appear in the data grid toolbar. Click this button and a new editable row appears at the top of the grid. Fill in the values and click the "Save" button to finish creating the row. You'll have to return the newly created row from the `createRecord` method so that the grid can update accordingly.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
-  <source src="/static/toolpad/docs/concepts/data-providers/creating.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/concepts/data-providers/creating.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -206,7 +206,7 @@ export default createDataProvider({
 
 When a data provider contains a `deleteRecord` method, each row will have a delete button. When the user clicks that delete button, the delete method will be called with the id of that row and after successful deletion, the data will be reloaded.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/connecting-to-data/data-providers-delete.png", "alt": "Data provider delete", "caption": "Delete action in data provider" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/connecting-to-data/data-providers-delete.png", "alt": "Data provider delete", "caption": "Delete action in data provider" }}
 
 ## API
 

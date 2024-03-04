@@ -7,7 +7,7 @@
 To access the list of available Toolpad components, hover your cursor over the vertical bar labeled **Component library** to expand it.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
-  <source src="/static/toolpad/docs/concepts/building-ui/component-library.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/concepts/building-ui/component-library.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -19,7 +19,7 @@ Toolpad has many [built-in components](/toolpad/reference/components/) and we ar
 
 Each component has a set of properties that you can tweak in the **inspector panel** on the right. To view the page structure, and select or rename components, use the **page hierarchy explorer** on the bottom-left.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-1.png", "alt": "Toolpad panels", "caption": "Inspector panel and page hierarchy explorer" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/building-ui/canvas-1.png", "alt": "Toolpad panels", "caption": "Inspector panel and page hierarchy explorer" }}
 
 Below are the step-by-step instructions on adding, moving, deleting and resizing a component in Toolpad:
 
@@ -30,7 +30,7 @@ Below are the step-by-step instructions on adding, moving, deleting and resizing
 5. To delete a component, click the bin icon in the overlay. You can also press the <kbd class="key">Backspace</kbd> key while the component is selected.
 6. Components can be horizontally resized within the grid boundaries:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-8.png", "alt": "Resize component", "caption": "Resizing components along columns", "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/building-ui/canvas-8.png", "alt": "Resize component", "caption": "Resizing components along columns", "zoom": false }}
 
 Binding dynamic values to these properties is explained in the [data binding](/toolpad/concepts/data-binding/) section.
 
@@ -40,10 +40,10 @@ Binding dynamic values to these properties is explained in the [data binding](/t
 
 Toolpad canvas uses a grid layout where you can use rows to position components:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-6.png", "alt": "Canvas grid row", "caption": "Canvas grid rows", "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/building-ui/canvas-6.png", "alt": "Canvas grid row", "caption": "Canvas grid rows", "zoom": false }}
 
 #### Columns
 
 Or place them in a dedicated column besides other components:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/building-ui/canvas-7.png", "alt": "Canvas grid columns", "caption": "Canvas grid columns", "zoom": false }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/building-ui/canvas-7.png", "alt": "Canvas grid columns", "caption": "Canvas grid columns", "zoom": false }}

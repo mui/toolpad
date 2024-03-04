@@ -4,7 +4,7 @@
 
 Each property of component that may be bound to data present on the page is surrounded by a **Binding** button, which you can click to initiate data binding.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-binding/binding-button.png", "alt": "Binding button", "caption": "The binding button", "zoom": false, "width": 300 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/data-binding/binding-button.png", "alt": "Binding button", "caption": "The binding button", "zoom": false, "width": 300 }}
 
 You can write JavaScript expressions in the editor which opens up.
 
@@ -20,14 +20,14 @@ The evaluated value of the binding will be visible to you in the editor.
 
 You can change the format of a value like:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/data-binding/data-transform.png", "alt": "Data transformation", "caption": "Data transformation", "zoom": true}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/data-binding/data-transform.png", "alt": "Data transformation", "caption": "Data transformation", "zoom": true}}
 
 ### Template strings
 
 You can write strings inside backticks (`) to write embedded expressions and multiline text. These can be used to read values from other components.
 
 <video controls width="100%" height="auto" style="contain" alt="button-onclick-js-expression">
-  <source src="/static/toolpad/docs/components/button/button-usage.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/components/button/button-usage.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 

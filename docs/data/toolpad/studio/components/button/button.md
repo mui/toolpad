@@ -18,7 +18,7 @@ You can write any valid JS that you want to execute on the click of button. It c
 Below video shows how on a button click, the user input can be shown on a page in a text field component:
 
 <video controls width="100%" height="auto" style="contain" alt="button-onclick-js-expression">
-  <source src="/static/toolpad/docs/components/button/button-usage.mp4" type="video/mp4">
+  <source src="/static/toolpad/docs/studio/components/button/button-usage.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
@@ -26,7 +26,7 @@ Below video shows how on a button click, the user input can be shown on a page i
 
 From this tab, you can configure to move from one page to the other in a Toolpad app.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/components/button/onclick-navigation.png", "alt": "Navigating to a page on button click", "caption": "Navigating to a page on button click", "indent": 1}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/components/button/onclick-navigation.png", "alt": "Navigating to a page on button click", "caption": "Navigating to a page on button click", "indent": 1}}
 
 :::info
 Form component also has a button whose default action is submitting the form.

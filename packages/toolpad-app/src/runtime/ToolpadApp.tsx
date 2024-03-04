@@ -224,8 +224,11 @@ function useApplicationVm(onUpdate: (registry: ApplicationVm) => void) {
     if (scheduledUpdate) {
       return;
     }
-    scheduledUpdate = Promise.resolve().then(() => {
+    scheduledUpdate = Promise.resolve().then(async () => {
       onUpdate(vm);
+      // We seem to be hitting https://github.com/facebook/react/issues/24650
+      // In the pageEditorReducer unless we schedule the next one in a new microtask
+      await Promise.resolve();
       scheduledUpdate = undefined;
     });
   };

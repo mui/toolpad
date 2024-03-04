@@ -184,7 +184,7 @@ interface UseFormInputInput<V> {
   name: string;
   label?: string;
   value?: V;
-  onChange: (newValue: V) => void;
+  onChange?: (newValue: V) => void;
   emptyValue?: V;
   defaultValue?: V;
   validationProps: Partial<Pick<FormInputComponentProps, 'isRequired' | 'minLength' | 'maxLength'>>;
@@ -224,7 +224,7 @@ export function useFormInput<V>({
   const previousDefaultValueRef = React.useRef(defaultValue);
   React.useEffect(() => {
     if (form && defaultValue !== previousDefaultValueRef.current) {
-      onChange(defaultValue as V);
+      onChange?.(defaultValue as V);
       form.setValue(formInputName, defaultValue);
       previousDefaultValueRef.current = defaultValue;
     }
@@ -235,10 +235,10 @@ export function useFormInput<V>({
   React.useEffect(() => {
     if (form) {
       if (!fieldValues[formInputName] && defaultValue && isInitialForm) {
-        onChange((defaultValue || emptyValue) as V);
+        onChange?.((defaultValue || emptyValue) as V);
         form.setValue(formInputName, defaultValue || emptyValue);
       } else if (value !== fieldValues[formInputName]) {
-        onChange(fieldValues[formInputName] || emptyValue);
+        onChange?.(fieldValues[formInputName] || emptyValue);
       }
     }
   }, [defaultValue, emptyValue, fieldValues, form, isInitialForm, formInputName, onChange, value]);
@@ -274,7 +274,7 @@ export function useFormInput<V>({
           shouldTouch: true,
         });
       }
-      onChange(newValue);
+      onChange?.(newValue);
     },
     [form, formInputName, onChange],
   );

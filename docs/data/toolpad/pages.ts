@@ -105,8 +105,8 @@ const pages: MuiPage[] = [
         title: 'Data Grid',
       },                            
       { pathname: '/toolpad/studio/components/list' },
-      { pathname: '/toolpad/studio/components/date-picker', title: 'DatePicker' },
-      { pathname: '/toolpad/studio/components/text-field', title: 'TextField' },      
+      { pathname: '/toolpad/studio/components/date-picker', title: 'Date Picker' },
+      { pathname: '/toolpad/studio/components/text-field', title: 'Text Field' },      
     ],
   },
   {

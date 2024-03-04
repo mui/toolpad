@@ -109,7 +109,11 @@ export default function CardGrid() {
         <Grid container spacing={5} sx={{ mt: { xs: 1, sm: 4 } }}>
           <Grid xs={12} md={6}>
             <ImageContainer noLinkStyle href="/toolpad/examples/npm-stats/">
-              <Img src="/static/toolpad/docs/studio/examples/npm-stats.png" width="2880" height="1592" />
+              <Img
+                src="/static/toolpad/docs/studio/examples/npm-stats.png"
+                width="2880"
+                height="1592"
+              />
             </ImageContainer>
             <ContentCard
               icon={<DashboardRoundedIcon fontSize="small" color="primary" />}

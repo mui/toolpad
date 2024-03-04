@@ -10,6 +10,7 @@ A big thanks to the 8 contributors who made this release possible. Here are some
 
 This release contains mostly bug fixes and improvements to the docs, eamples and stability. It will be the last release of @mui/toolpad before we rename the package to @toolpad/studio.
 
+- &#8203;<!-- 32 -->Add list, datepicker and textfield component guides (#2827) @prakhargupta1
 - &#8203;<!-- 31 -->Isolate Next.js in renovatebot @Janpot
 - &#8203;<!-- 30 -->Lock file maintenance (#3263) @renovate[bot]
 - &#8203;<!-- 29 -->Update monorepo (#3259) @Janpot

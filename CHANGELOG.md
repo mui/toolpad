@@ -8,7 +8,7 @@ _Mar 4, 2024_
 
 A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
 
-This release contains mostly bug fixes and improvements to the docs, eamples and stability. This will be the last release of @mui/toolpad before we rename the package to @toolpad/studio.
+This release contains mostly bug fixes and improvements to the docs, eamples and stability. It will be the last release of @mui/toolpad before we rename the package to @toolpad/studio.
 
 - &#8203;<!-- 31 -->Isolate Next.js in renovatebot @Janpot
 - &#8203;<!-- 30 -->Lock file maintenance (#3263) @renovate[bot]

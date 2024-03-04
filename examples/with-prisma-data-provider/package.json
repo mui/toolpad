@@ -9,7 +9,7 @@
     "prisma": "prisma"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.50",
+    "@mui/toolpad": "0.1.51",
     "@prisma/client": "5.9.1",
     "qrcode": "^1.5.3"
   },

@@ -71,7 +71,7 @@ export interface DatePickerProps
   extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue' | 'name'>,
     Pick<FormInputComponentProps, 'name' | 'isRequired'> {
   value?: string;
-  onChange: (newValue: string | null) => void;
+  onChange?: (newValue: string | null) => void;
   label?: string;
   format: string;
   fullWidth: boolean;
@@ -112,7 +112,11 @@ function DatePicker({
     [onFormInputChange],
   );
 
-  const adapterLocale = React.useSyncExternalStore(subscribeLocaleLoader, getSnapshot);
+  const adapterLocale = React.useSyncExternalStore(
+    subscribeLocaleLoader,
+    getSnapshot,
+    () => undefined,
+  );
 
   const value = React.useMemo(
     () => (typeof valueProp === 'string' ? dayjs(valueProp) : valueProp),

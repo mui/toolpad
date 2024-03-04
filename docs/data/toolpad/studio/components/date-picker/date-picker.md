@@ -1,4 +1,4 @@
-# DatePicker
+# Date Picker
 
 <p class="description">Learn about the datepicker component and its usage in Toolpad.</p>
 
@@ -80,4 +80,4 @@ isRequired is useful when the action can't be perfomed without a user provided d
 
 See the documentation below for a complete reference to all props available to the datepicker component in Toolpad.
 
-- [`<datepicker />`](/toolpad/reference/components/date-picker/#properties)
+- [`<datepicker />`](/toolpad/studio/reference/components/date-picker/#properties)

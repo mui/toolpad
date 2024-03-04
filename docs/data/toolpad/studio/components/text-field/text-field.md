@@ -1,4 +1,4 @@
-# Textfield
+# Text Field
 
 <p class="description">Learn about the textfield component and its usage in Toolpad.</p>
 
@@ -85,4 +85,4 @@ A validation check on the maximum length of the input.
 
 See the documentation below for a complete reference to all props available to the textfield component in Toolpad.
 
-- [`<textfield />`](/toolpad/reference/components/text-field/#properties)
+- [`<textfield />`](/toolpad/studio/reference/components/text-field/#properties)

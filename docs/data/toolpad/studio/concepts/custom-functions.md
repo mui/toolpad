@@ -93,7 +93,7 @@ export const example = createFunction(
 
 This will make the `value` property available in the query editor. You can pass a value, or bind this to the page state:
 
-This API is now deprecated, and will be removed from a future version of Toolpad. Find more details in the `createFunction` [reference](/toolpad/reference/api/create-function/) section.
+This API is now deprecated, and will be removed from a future version of Toolpad. Find more details in the `createFunction` [reference](/toolpad/studio/reference/api/create-function/) section.
 :::
 
 ## Secrets handling

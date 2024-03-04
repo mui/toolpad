@@ -22,7 +22,7 @@ In case it doesn't open, check [troubleshoot missing editor](https://mui.com/too
 
 ## Add component code
 
-Toolpad exposes a [`createComponent`](https://mui.com/toolpad/reference/api/create-component/) function. This is used to signal to Toolpad which are the components that can be imported and how it should interpret the properties.
+Toolpad exposes a [`createComponent`](https://mui.com/toolpad/studio/reference/api/create-component/) function. This is used to signal to Toolpad which are the components that can be imported and how it should interpret the properties.
 
 ```jsx
 import * as React from 'react';
@@ -67,5 +67,5 @@ You can look at more detailed guides of creating custom components in the how-to
   :::
 
 :::info
-Detailed documentation on the API is available in the reference section for [`createComponent`](/toolpad/reference/api/create-component/).
+Detailed documentation on the API is available in the reference section for [`createComponent`](/toolpad/studio/reference/api/create-component/).
 :::

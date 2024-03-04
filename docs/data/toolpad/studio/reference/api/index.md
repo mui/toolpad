@@ -4,8 +4,8 @@
 
 ## Functions
 
-- [createComponent](/toolpad/reference/api/create-component/)
-- [createDataProvider](/toolpad/reference/api/create-data-provider/)
-- [createFunction](/toolpad/reference/api/create-function/)
-- [createHandler](/toolpad/reference/api/create-handler/)
-- [getContext](/toolpad/reference/api/get-context/)
+- [createComponent](/toolpad/studio/reference/api/create-component/)
+- [createDataProvider](/toolpad/studio/reference/api/create-data-provider/)
+- [createFunction](/toolpad/studio/reference/api/create-function/)
+- [createHandler](/toolpad/studio/reference/api/create-handler/)
+- [getContext](/toolpad/studio/reference/api/get-context/)

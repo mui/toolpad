@@ -60,4 +60,4 @@ Button supports states like loading and disabled to share the state of the compo
 
 See the documentation below for a complete reference to all props available to the button component in Toolpad.
 
-- [`<button />`](/toolpad/reference/components/button/#properties)
+- [`<button />`](/toolpad/studio/reference/components/button/#properties)

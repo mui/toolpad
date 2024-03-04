@@ -56,5 +56,5 @@ Now you can use the corresponding commands to interact with Toolpad in the custo
 | `yarn edit`                                              | This runs the Toolpad standalone editor and connects it to your custom server. You can now edit the application and the changes will be reflected in the Toolpad project folder of the custom server. |
 
 :::info
-Detailed documentation on the API is available in the reference section for [`createHandler`](/toolpad/reference/api/create-handler/).
+Detailed documentation on the API is available in the reference section for [`createHandler`](/toolpad/studio/reference/api/create-handler/).
 :::

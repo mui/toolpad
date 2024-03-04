@@ -11,7 +11,7 @@ Toolpad is file-system based, which means that an app's entire configuration is 
 You'll notice there is a **toolpad** folder that contains these files. All files relevant to a Toolpad project are contained within this folder. Let's take a closer look at it:
 
 - **components** contains your custom react components. These show in the component library in Toolpad and can be used to build UI.
-- **pages** folder stores configuration(.yaml) of all pages of the app in separate folders. You can check a page file specification [schema](/toolpad/reference/file-schema/#file-Page). You'll notice it has a query object, it shows the configuration of HTTP request query. It can be edited directly from this file but in most cases, you'll edit it from the visual query builder.
+- **pages** folder stores configuration(.yaml) of all pages of the app in separate folders. You can check a page file specification [schema](/toolpad/studio/reference/file-schema/#file-Page). You'll notice it has a query object, it shows the configuration of HTTP request query. It can be edited directly from this file but in most cases, you'll edit it from the visual query builder.
 - **resources** stores .ts code of functions that were created using [custom function](/toolpad/concepts/custom-functions/).
 
 Components and resources folders are created when you create your first custom component or function respectively.

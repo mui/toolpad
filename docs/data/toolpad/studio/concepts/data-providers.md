@@ -212,4 +212,4 @@ When a data provider contains a `deleteRecord` method, each row will have a dele
 
 See the documentation below for a complete reference to all of the functions and interfaces mentioned in this page.
 
-- [`createDataProvider`](/toolpad/reference/api/create-data-provider/)
+- [`createDataProvider`](/toolpad/studio/reference/api/create-data-provider/)

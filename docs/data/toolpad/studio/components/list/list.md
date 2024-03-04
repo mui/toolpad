@@ -27,4 +27,4 @@ There is a predefined padding that can be enabled or disabled. It is a boolean.
 
 See the documentation below for a complete reference to all props available to the list component in Toolpad.
 
-- [`<list />`](/toolpad/reference/components/list/#properties)
+- [`<list />`](/toolpad/studio/reference/components/list/#properties)

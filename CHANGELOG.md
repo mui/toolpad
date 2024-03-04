@@ -1,5 +1,50 @@
 # Changelog
 
+## v0.1.51
+
+<!-- generated comparing v0.1.50..master -->
+
+_Mar 4, 2024_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+This release contains mostly bug fixes and improvements to the docs, eamples and stability. It will be the last release of @mui/toolpad before we rename the package to @toolpad/studio.
+
+- &#8203;<!-- 32 -->Add list, datepicker and textfield component guides (#2827) @prakhargupta1
+- &#8203;<!-- 31 -->Isolate Next.js in renovatebot @Janpot
+- &#8203;<!-- 30 -->Lock file maintenance (#3263) @renovate[bot]
+- &#8203;<!-- 29 -->Update monorepo (#3259) @Janpot
+- &#8203;<!-- 28 -->Remove isInvalid prop from all components (#3260) @apedroferreira
+- &#8203;<!-- 27 -->Global functions explorer and header (#2690) @apedroferreira
+- &#8203;<!-- 26 -->Add scroll fixes to DataGrid skeleton loading (#3257) @Janpot
+- &#8203;<!-- 25 -->Image error overlay fixes (#3256) @Janpot
+- &#8203;<!-- 24 -->Stabilize visual regression tests (#3253) @Janpot
+- &#8203;<!-- 23 -->Add some missing docs for the hasNextPage property (#3255) @Janpot
+- &#8203;<!-- 22 -->Add a data providers CRUD page to basic crud app example (#3211) @prakhargupta1
+- &#8203;<!-- 21 -->Fix and improve resizing in editor (incl. Add Spacer component) (#2818) @apedroferreira
+- &#8203;<!-- 20 -->Make building layout visual tests more stable (#3237) @apedroferreira
+- &#8203;<!-- 19 -->Update CONTRIBUTING.md (#3114) @apedroferreira
+- &#8203;<!-- 18 -->Show loading indicator when runtime config is loading in query editor (#3169) @Janpot
+- &#8203;<!-- 17 -->Fix unintentional page rows being created (#3221) @apedroferreira
+- &#8203;<!-- 16 -->Prevent app header from covering page elements (#3220) @apedroferreira
+- &#8203;<!-- 15 -->chore(deps): bump @mui/toolpad to 0.1.50 (#3219) @renovate[bot]
+- &#8203;<!-- 14 -->Update CHANGELOG.md (typo) @apedroferreira
+- &#8203;<!-- 13 -->[code-infra] Use the @mui/internal-markdown package (#3235) @michaldudak
+- &#8203;<!-- 12 -->[code-infra] Bump monorepo (#3232) @Janpot
+- &#8203;<!-- 11 -->[code-infra] Remove pnpm cache on CircleCI (#3133) @Janpot
+- &#8203;<!-- 10 -->[code-infra] Disable renovatebot semantic commits (#3224) @Janpot
+- &#8203;<!-- 09 -->[code-infra] Use `experimental.cpus` to control amount of export workers in Next.js (#3222) @Janpot
+- &#8203;<!-- 08 -->[core] Fix infinite loop in inline canvas mode (#3265) @Janpot
+- &#8203;<!-- 07 -->[core] add engines field to @mui/toolpad package.json (#3254) @JerryWu1234
+- &#8203;<!-- 06 -->[DataGrid] fix errors not showing up in the rows area (#3264) @Janpot
+- &#8203;<!-- 05 -->[docs] Prefer https links @oliviertassinari
+- &#8203;<!-- 04 -->[docs-infra] Fixes for vale-action with shared config (#3234) @bharatkashyap
+- &#8203;<!-- 03 -->[docs-infra] Fix Stack Overflow breaking space @oliviertassinari
+- &#8203;<!-- 02 -->[docs-infra] Add vale for style-guide lint on docs (#3178) @bharatkashyap
+- &#8203;<!-- 01 -->[examples] Hacker News client example (#2170) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @michaldudak, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
 ## v0.1.50
 
 <!-- generated comparing v0.1.49..master -->

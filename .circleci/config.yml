@@ -155,7 +155,7 @@ jobs:
     resource_class: 'large'
     parallelism: 2
     docker:
-      - image: mcr.microsoft.com/playwright:v1.41.2-focal
+      - image: mcr.microsoft.com/playwright:v1.42.1-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

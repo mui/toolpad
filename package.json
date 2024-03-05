@@ -43,7 +43,7 @@
     "@mui/monorepo": "github:bharatkashyap/material-ui#b258cf2d28fcfdf53f5f26a88240d48ce9205749",
     "@mui/x-charts": "6.19.5",
     "@next/eslint-plugin-next": "14.1.0",
-    "@playwright/test": "1.41.2",
+    "@playwright/test": "1.42.1",
     "@testing-library/react": "14.2.1",
     "@types/archiver": "6.0.2",
     "@types/gtag.js": "0.0.19",
@@ -83,7 +83,7 @@
     "yarn-deduplicate": "6.0.2"
   },
   "dependencies": {
-    "archiver": "6.0.1",
+    "archiver": "7.0.0",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.3.0",
     "eslint-import-resolver-exports": "1.0.0-beta.5",

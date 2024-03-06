@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DatePicker } from '@mui/toolpad-components';
+import { DatePicker } from '@mui/toolpad-studio-components';
 import { Stack } from '@mui/material';
 
 export default function BasicButton() {

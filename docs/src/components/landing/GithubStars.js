@@ -7,6 +7,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import ROUTES from '../../route';
 
 export default function GithubStars() {
+  const FALLBACK_STAR_COUNT = 700;
   const [fetching, setFetching] = React.useState(true);
   const [stars, setStars] = React.useState(0);
   const theme = useTheme();
@@ -15,11 +16,15 @@ export default function GithubStars() {
     setFetching(true);
     const response = await fetch('https://api.github.com/repos/mui/mui-toolpad');
     const data = await response.json();
+    console.log(data)
     setFetching(false);
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && data.stargazers_count) {
       localStorage.setItem('mui-toolpad-stars', `${Date.now()}_${data.stargazers_count}`);
+      setStars(data.stargazers_count);
     }
-    setStars(data.stargazers_count);
+    else {
+      setStars(FALLBACK_STAR_COUNT);
+    }
   }, []);
 
   React.useEffect(() => {

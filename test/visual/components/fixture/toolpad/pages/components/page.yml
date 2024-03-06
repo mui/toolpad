@@ -124,5 +124,12 @@ spec:
         height: 100
         src:
           $$jsExpression: veryLongIdentifierThatResultsInLongErrorMessage.nonExisting
+    - component: DataGrid
+      name: dataGrid2
+      layout:
+        height: 160
+      props:
+        rows:
+          $$jsExpression: nonExisting
   alias:
     - f703ps3

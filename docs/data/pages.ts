@@ -100,10 +100,10 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/components',
     children: [
       { pathname: '/toolpad/components/button' },
-      {
-        pathname: '/toolpad/components/datagrid',
-        title: 'Data Grid',
-      },
+      { pathname: '/toolpad/components/data-grid', title: 'DataGrid' },
+      { pathname: '/toolpad/components/list' },
+      { pathname: '/toolpad/components/date-picker', title: 'DatePicker' },
+      { pathname: '/toolpad/components/text-field', title: 'TextField' },
     ],
   },
   {

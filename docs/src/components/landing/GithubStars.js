@@ -15,8 +15,7 @@ export default function GithubStars() {
   const fetchStars = React.useCallback(async () => {
     setFetching(true);
     const response = await fetch('https://api.github.com/repos/mui/mui-toolpad');
-    const data = await response.json();
-    console.log(data)
+    const data = await response.json();    
     setFetching(false);
     if (typeof window !== 'undefined') {
       localStorage.setItem('mui-toolpad-stars', `${Date.now()}_${data.stargazers_count}`);          

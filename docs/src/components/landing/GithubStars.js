@@ -18,13 +18,11 @@ export default function GithubStars() {
     const data = await response.json();
     console.log(data)
     setFetching(false);
-    if (typeof window !== 'undefined' && data.stargazers_count) {
-      localStorage.setItem('mui-toolpad-stars', `${Date.now()}_${data.stargazers_count}`);
-      setStars(data.stargazers_count);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mui-toolpad-stars', `${Date.now()}_${data.stargazers_count}`);          
     }
-    else {
-      setStars(FALLBACK_STAR_COUNT);
-    }
+    setStars(data.stargazers_count ?? FALLBACK_STAR_COUNT);
+    
   }, []);
 
   React.useEffect(() => {

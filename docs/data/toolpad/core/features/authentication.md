@@ -2,7 +2,7 @@
 
 <p class="description">Toolpad provides working authentication out of the box, with support for multiple providers</p>
 
-## Setup MUI authentication pages
+## Setup authentication pages
 
 ```tsx
 // app/auth/[page]/page.tsx
@@ -36,7 +36,7 @@ import { getAuthPages } from '@mui/toolpad/auth'
 
 </aside>
 
-We will create an authorization context
+Will create an authorization context
 
 ```tsx
 // app/layout.tsx
@@ -51,7 +51,7 @@ export default function Layout() {
 }
 ```
 
-We will create a component that you can wrap around your page to make it only accessible for specific users.
+Will create a component that you can wrap around your page to make it only accessible for specific users.
 
 ```tsx
 // app/hr/page.tsx
@@ -62,7 +62,7 @@ export default function Auth() {
 }
 ```
 
-We will add RBAC to the DataSources so that you can enforce it at the data level. In the following examples, only users with the `admin` role will be able to update the sheet through the grid. But users with the `guest` role will be able to view:
+Will add RBAC to the DataSources so that you can enforce it at the data level. In the following examples, only users with the `admin` role will be able to update the sheet through the grid. But users with the `guest` role will be able to view:
 
 ```tsx
 import { createDataProviderGoogleSheets } from '@mui/toolpad-data-google-sheets'

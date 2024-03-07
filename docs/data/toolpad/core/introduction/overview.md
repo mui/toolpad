@@ -83,7 +83,7 @@ The CLI scaffolds a Next.js project with all Toolpad features set up
 
 In your browser open the page http://localhost:3000/hello-world and verify that it shows "Hello World!"
 
-5. Now we will add our first data provider. Copy the sample CSV file (insert link) to the project root and add the following
+5. Now to add our first data provider. Copy the sample CSV file (insert link) to the project root and add the following
 
    ```tsx
    import * as React from 'react';

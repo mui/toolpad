@@ -38,7 +38,7 @@ const sharedDataSource = useSharedDataProvider(dataProvider, {
 Find more details in the [connecting to components](/toolpad/data/connecting-to-components/) page
 :::
 
-## Server side data providers
+## Server-side data providers
 
 ```tsx
 // ./pages/api/myDataProvider.ts

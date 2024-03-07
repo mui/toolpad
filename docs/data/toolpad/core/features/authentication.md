@@ -32,11 +32,11 @@ import { getAuthPages } from '@mui/toolpad/auth'
 ## RBAC (🌟)
 
 <aside>
-❓ More research and benchmarks needed to shape an API that is flexible and ergonomic for the 90% use-case. This proposal is just to give an idea of the concept
+❓ More research and benchmarks needed to shape an API that is flexible and ergonomic for the 90% use case. This proposal is just to give an idea of the concept
 
 </aside>
 
-Will create an authorization context
+An authorization context can be created:
 
 ```tsx
 // app/layout.tsx

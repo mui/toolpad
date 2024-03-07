@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import ROUTES from '../../route';
@@ -74,7 +75,7 @@ export default function GithubStars() {
           sx={{ mt: stars ? 0.1 : 0, mr: stars ? 0.5 : 0 }}
           fontSize="small"
         />
-        {fetching ? '...' : stars}
+        {fetching ? <CircularProgress size={16} sx={{ ml: 0.25, mt: 0.1 }} /> : stars}
       </Box>
     </Button>
   );

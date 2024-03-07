@@ -69,5 +69,5 @@ Argument types describe the type and constraints of custom component properties.
 ## Usage
 
 :::info
-See [custom components](/toolpad/concepts/custom-components/)
+See [custom components](/toolpad/studio/concepts/custom-components/)
 :::

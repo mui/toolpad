@@ -30,7 +30,7 @@ export default function Home() {
   return (
     <BrandingCssVarsProvider>
       <Head
-        title="MUI Toolpad: Low-code admin builder"
+        title="Toolpad: Low-code admin builder"
         description="Build apps with Material UI components, connect to data sources, APIs and build your internal tools 10x faster. Open-source and powered by MUI."
         card="/static/toolpad/marketing/toolpad-og.jpg"
       />

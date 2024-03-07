@@ -30,7 +30,7 @@ The following features are currently planned to be included within this scope:
 
 - ### Authorization
 
-  Features allowing you to grant conditional access to pages based on user roles are part of this proposed paid plan. Read more about this feature on [authorization](/toolpad/concepts/rbac/).
+  Features allowing you to grant conditional access to pages based on user roles are part of this proposed paid plan. Read more about this feature on [authorization](/toolpad/studio/concepts/rbac/).
 
 ## How to upgrade
 

@@ -53,7 +53,7 @@ function MissingEditorDialog({ open, onClose }: MissingEditorDialogProps) {
           <code>$EDITOR</code> environment variable. <br />
           Check the{' '}
           <Link
-            href="https://mui.com/toolpad/how-to-guides/editor-path/"
+            href="https://mui.com/toolpad/studio/how-to-guides/editor-path/"
             target="_blank"
             rel="noopener"
           >

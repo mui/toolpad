@@ -163,7 +163,7 @@ export function AppAuthenticationEditor() {
       </FormControl>
       <Alert severity="info" sx={{ mt: 1 }}>
         Certain environment variables must be set for authentication providers to work.{' '}
-        <Link href="https://mui.com/toolpad/concepts/authentication" target="_blank">
+        <Link href="https://mui.com/toolpad/studio/concepts/authentication" target="_blank">
           Learn how to set up authentication
         </Link>
         .

@@ -1,6 +1,10 @@
-# Getting Started
+---
+title: Overview
+---
 
-<p class="description">Learn the fundamentals of building with Toolpad by creating a small application.</p>
+# Toolpad - Overview
+
+<p class="description">Learn the fundamentals of building with Toolpad Core by creating a small application.</p>
 
 ## Installation
 

@@ -43,5 +43,5 @@ createCustomer.call();
 in the `onClick` binding of a Button component.
 
 :::info
-See the [event handling](/toolpad/concepts/event-handling/) section for more details
+See the [event handling](/toolpad/studio/concepts/event-handling/) section for more details
 :::

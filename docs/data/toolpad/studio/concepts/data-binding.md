@@ -32,5 +32,5 @@ You can write strings inside backticks (`) to write embedded expressions and mul
 </video>
 
 :::info
-Event handler props like onClick, runs the piece of code written in the binding editor. Read more on this in the [event handling](/toolpad/concepts/event-handling/) section.
+Event handler props like onClick, runs the piece of code written in the binding editor. Read more on this in the [event handling](/toolpad/studio/concepts/event-handling/) section.
 :::

@@ -1,5 +1,5 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import componentsManifest from './studio/reference/components/manifest.json';
+import componentsManifest from './reference/components/manifest.json';
 
 const pages: MuiPage[] = [
   {

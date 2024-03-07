@@ -91,4 +91,4 @@ toolpad start --base /foo
 
 Detailed, step-by-step instructions are available for the following services:
 
-- [Render](/toolpad/how-to-guides/render-deploy/)
+- [Render](/toolpad/studio/how-to-guides/render-deploy/)

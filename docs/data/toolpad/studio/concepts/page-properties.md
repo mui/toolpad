@@ -30,7 +30,7 @@ You can override this setting for any page using the `toolpad-display` query par
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/page-properties/display-mode-override.png", "alt": "No shell display mode ", "caption": "Overriding the display mode", "indent": 1}}
 
 :::info
-See the how-to guide on [how to embed Toolpad pages](/toolpad/how-to-guides/embed-pages/) using the display mode property.
+See the how-to guide on [how to embed Toolpad pages](/toolpad/studio/how-to-guides/embed-pages/) using the display mode property.
 :::
 
 ## Page parameters

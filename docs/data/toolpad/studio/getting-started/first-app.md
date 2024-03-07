@@ -39,7 +39,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
    The Toolpad application editor opens automatically in your browser.
 
    :::info
-   Refer the [installation](/toolpad/getting-started/installation/) docs for more details on installing.
+   Refer the [installation](/toolpad/studio/getting-started/installation/) docs for more details on installing.
    :::
 
 ### Assemble the UI

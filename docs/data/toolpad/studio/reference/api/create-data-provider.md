@@ -99,5 +99,5 @@ Describes the capabilities of the data provider.
 ## Usage
 
 :::info
-See [data providers](/toolpad/concepts/data-providers/)
+See [data providers](/toolpad/studio/concepts/data-providers/)
 :::

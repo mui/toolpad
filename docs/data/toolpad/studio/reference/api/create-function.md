@@ -3,7 +3,7 @@
 <p class="description">Provide backend function that loads data on the page.</p>
 
 :::warning
-The `createFunction` API is deprecated and will be removed in a future version. You can now use functions directly without needing to wrap them inside `createFunction` - See [custom functions](/toolpad/concepts/custom-functions/) for examples.
+The `createFunction` API is deprecated and will be removed in a future version. You can now use functions directly without needing to wrap them inside `createFunction` - See [custom functions](/toolpad/studio/concepts/custom-functions/) for examples.
 :::
 
 ## Import
@@ -63,5 +63,5 @@ this describes the type of the parameter that will be passed to the custom funct
 ## Usage
 
 :::info
-See [custom functions](/toolpad/concepts/custom-functions/)
+See [custom functions](/toolpad/studio/concepts/custom-functions/)
 :::

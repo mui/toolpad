@@ -12,7 +12,7 @@ The steps below explain how to create and use a custom component in Toolpad.
 1. In the snackbar that appears, click the **Open** button. Your code editor will open with the newly created component.
 
 :::info
-In case it doesn't open, check [troubleshoot missing editor](https://mui.com/toolpad/how-to-guides/editor-path/).
+In case it doesn't open, check [troubleshoot missing editor](https://mui.com/toolpad/studio/how-to-guides/editor-path/).
 :::
 
 <video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
@@ -61,8 +61,8 @@ To use a custom component, drag it from the Component Library into the canvas. T
 :::info
 You can look at more detailed guides of creating custom components in the how-to guides section:
 
-- [Map](/toolpad/how-to-guides/map-display/)
-- [Cube](/toolpad/how-to-guides/cube-component/)
+- [Map](/toolpad/studio/how-to-guides/map-display/)
+- [Cube](/toolpad/studio/how-to-guides/cube-component/)
 
   :::
 

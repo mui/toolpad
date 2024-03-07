@@ -19,7 +19,7 @@ Suppose we want to display only the first eight characters of the Order ID in a 
 We'll create a custom component to achieve this.
 
 :::info
-Follow the how-to guide on [creating a custom component](/toolpad/concepts/custom-components/) if you want to learn more.
+Follow the how-to guide on [creating a custom component](/toolpad/studio/concepts/custom-components/) if you want to learn more.
 :::
 
 A custom component that renders inside the data grid receives a `params` object as a prop, containing the following values:

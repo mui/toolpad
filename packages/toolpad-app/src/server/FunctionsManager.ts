@@ -57,7 +57,7 @@ async function createDefaultDataProvider(
     `
     /**
      * Toolpad data provider file.
-     * See: https://mui.com/toolpad/concepts/data-providers/
+     * See: https://mui.com/toolpad/studio/concepts/data-providers/
      */
 
     import { createDataProvider } from '@mui/toolpad/server';

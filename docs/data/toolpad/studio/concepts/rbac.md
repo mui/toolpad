@@ -8,7 +8,7 @@ Role-based access control will be a paid feature of Toolpad very soon, so it's o
 
 You can configure pages in a Toolpad application so that users must have certain roles within specific authentication providers in order to access them.
 
-Before using these features, make sure that you have [authentication](/toolpad/concepts/authentication/) enabled for the authenticated providers you are using.
+Before using these features, make sure that you have [authentication](/toolpad/studio/concepts/authentication/) enabled for the authenticated providers you are using.
 
 ## Defining roles
 

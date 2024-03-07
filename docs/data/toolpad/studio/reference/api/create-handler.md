@@ -50,5 +50,5 @@ This is the return value from the `createHandler` function.
 ## Usage
 
 :::info
-See [custom functions](/toolpad/concepts/custom-server/)
+See [custom functions](/toolpad/studio/concepts/custom-server/)
 :::

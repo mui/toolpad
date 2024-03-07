@@ -1,5 +1,5 @@
 name: Feature request 💄
-description: Suggest a new idea for MUI Toolpad.
+description: Suggest a new idea for Toolpad.
 labels: ['status: waiting for maintainer']
 body:
   - type: markdown

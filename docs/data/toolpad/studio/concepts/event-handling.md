@@ -31,7 +31,7 @@ You can call single or multiple queries sequentially to fetch data on the page o
 </video>
 
 :::info
-See the [deleting data grid row](/toolpad/how-to-guides/delete-datagrid-row/) guide for a detailed usage example.
+See the [deleting data grid row](/toolpad/studio/how-to-guides/delete-datagrid-row/) guide for a detailed usage example.
 :::
 
 ### Using console options
@@ -47,7 +47,7 @@ Custom functions allow you to write custom code in your editor. You can write a 
 
 It is also possible to navigate to a different page of the app when an event occurs.
 
-The binding editor for navigation actions allows you to select which page to go to, as well as set values for any [page parameters](/toolpad/concepts/page-properties/#page-parameters) that the target page supports.
+The binding editor for navigation actions allows you to select which page to go to, as well as set values for any [page parameters](/toolpad/studio/concepts/page-properties/#page-parameters) that the target page supports.
 
 You may also bind the page parameter values to the page state of the source page.
 

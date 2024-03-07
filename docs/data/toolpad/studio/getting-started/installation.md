@@ -107,5 +107,5 @@ pnpm run toolpad:dev
 When you run this command, Toolpad will automatically initialize a new application in the **./my-toolpad-app** folder.
 
 :::info
-To integrate a Toolpad application in an existing server, you can follow the custom server [integration guide](/toolpad/concepts/custom-server/).
+To integrate a Toolpad application in an existing server, you can follow the custom server [integration guide](/toolpad/studio/concepts/custom-server/).
 :::

@@ -101,7 +101,7 @@ export type { ServerContext };
  *
  * Demos:
  *
- * - [Custom Functions](https://mui.com/toolpad/concepts/custom-functions/#request-context/)
+ * - [Custom Functions](https://mui.com/toolpad/studio/concepts/custom-functions/#request-context/)
  *
  * API:
  *
@@ -130,7 +130,7 @@ export interface ToolpadDataProvider<
  *
  * Demos:
  *
- * - [Data providers](https://mui.com/toolpad/concepts/data-providers/)
+ * - [Data providers](https://mui.com/toolpad/studio/concepts/data-providers/)
  *
  * API:
  *

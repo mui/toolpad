@@ -19,8 +19,9 @@ import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl'
 import toolpadPkgJson from '@mui/toolpad/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
 import { mapTranslations } from '@mui/docs/i18n';
-import toolpadStudioPages from '../data/toolpad/pages';
-import toolpadPages from '../data/pages';
+import toolpadStudioPages from '../data/toolpad/studio/pages';
+import toolpadCorePages from '../data/toolpad/core/pages';
+
 import config from '../config';
 
 const clientSideEmotionCache = createEmotionCache();
@@ -184,7 +185,7 @@ function AppWrapper(props) {
           name: 'Toolpad Core',
           versions: [{ text: `v0.0.1`, current: true }],
         };
-        pages = toolpadPages;
+        pages = toolpadCorePages;
       }
     } else if (productCategoryId === 'toolpad') {
       if (productId === 'toolpad-core') {
@@ -193,7 +194,7 @@ function AppWrapper(props) {
           name: 'Toolpad Core',
           versions: [{ text: `v0.0.1`, current: true }],
         };
-        pages = toolpadPages;
+        pages = toolpadCorePages;
       } else if (productId === 'toolpad-studio') {
         productIdentifier = {
           metadata: '',

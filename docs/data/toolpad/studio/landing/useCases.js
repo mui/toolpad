@@ -17,7 +17,7 @@ const useCases = {
       description:
         'Provide the stakeholders with simple apps to manage their daily operations. You can quickly build an app on Toolpad by calling APIs or writing custom functions. Your app remains secure as the code never leaves your network, and you can securely deploy it to any service you choose.',
       action: {
-        href: '/toolpad/examples/qr-generator/',
+        href: '/toolpad/studio/examples/qr-generator/',
         label: 'View example',
       },
     },
@@ -28,7 +28,7 @@ const useCases = {
       description:
         'Enable your teams to quickly view and manage customer orders, queries, and refunds by creating admin apps that gather data from third-party APIs providers like Stripe, Twilio, Zendesk, etc. Toolpad allows end users to create, read, update, or delete records.',
       action: {
-        href: '/toolpad/examples/basic-crud-app/',
+        href: '/toolpad/studio/examples/basic-crud-app/',
         label: 'View example',
       },
     },
@@ -39,7 +39,7 @@ const useCases = {
       description:
         'Build BI dashboards to slice and dice any metric across various dimensions. Further, use them to monitor KPIs, track business goals, and identify trends and opportunities. Toolpad allows you to combine data from multiple sources and bind it by writing JavaScript anywhere.',
       action: {
-        href: '/toolpad/examples/npm-stats/',
+        href: '/toolpad/studio/examples/npm-stats/',
         label: 'View example',
       },
     },

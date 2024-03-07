@@ -162,8 +162,8 @@ export default function Hero() {
           ]}
         >
           <IconImage width={28} height={28} loading="eager" name="product-toolpad" />
-          <Box component="span" sx={{ ml: 1, mr: 1 }}>
-            MUI Toolpad
+          <Box component="span" sx={{ ml: 0.5, mr: 1 }}>
+            Toolpad
           </Box>
           <Chip
             label="Introducing the Beta version"

@@ -24,7 +24,7 @@ Rows property requires an array of data to show inside the data grid. It can be 
 ### Columns
 
 Columns property is used to configure the columns to be displayed. Choose a column and you'll get a pop-up window to configure its header name, width, alignment and data type.
-From the `type` drop down you can also [customize a column](/toolpad/how-to-guides/customize-datagrid/).
+From the `type` drop down you can also [customize a column](/toolpad/studio/how-to-guides/customize-datagrid/).
 
 <video controls width="100%" height="auto" style="contain" alt="datagrid-columns">
   <source src="/static/toolpad/docs/studio/components/datagrid/datagrid_column.mp4" type="video/mp4">
@@ -37,7 +37,7 @@ Id field property is used to identify which column contains the id column. By de
 
 ### Selection
 
-This property shows the currently selected row or `null` in case no row has been selected. It is available to be bound to take any action on the selected row like [deleting a row](/toolpad/how-to-guides/delete-datagrid-row/) from data grid.
+This property shows the currently selected row or `null` in case no row has been selected. It is available to be bound to take any action on the selected row like [deleting a row](/toolpad/studio/how-to-guides/delete-datagrid-row/) from data grid.
 
 <video controls width="100%" height="auto" style="contain" alt="datagrid-selection">
   <source src="/static/toolpad/docs/studio/components/datagrid/datagrid_selection.mp4" type="video/mp4">
@@ -46,7 +46,7 @@ This property shows the currently selected row or `null` in case no row has been
 
 ### Loading
 
-Loading property is used to to inform the user when the data is being prepared. It can be [bound to](/toolpad/how-to-guides/delete-datagrid-row/#configure-loading-states-optional) React query properties like isFetching, isLoading.
+Loading property is used to to inform the user when the data is being prepared. It can be [bound to](/toolpad/studio/how-to-guides/delete-datagrid-row/#configure-loading-states-optional) React query properties like isFetching, isLoading.
 
 <video controls width="100%" height="auto" style="contain" alt="datagrid-loading">
   <source src="/static/toolpad/docs/studio/components/datagrid/datagrid_loading.mp4" type="video/mp4">

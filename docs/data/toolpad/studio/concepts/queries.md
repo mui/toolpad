@@ -1,14 +1,14 @@
 # Connecting to data
 
-<p class="description">Be it a database table or an external API, Toolpad offers mechanisms to bring server-side data to the page as well as make mutations to external data sources. </p>
+<p class="description">Be it a database table or an external API, Toolpad Studio offers mechanisms to bring server-side data to the page as well as make mutations to external data sources. </p>
 
 :::info
-Toolpad uses `react-query` internally to run queries and actions. Look into [its documentation](https://tanstack.com/query/latest/docs/framework/react/guides/queries) for more details on query objects.
+Toolpad Studio uses `react-query` internally to run queries and actions. Look into [its documentation](https://tanstack.com/query/latest/docs/framework/react/guides/queries) for more details on query objects.
 :::
 
 ## Queries
 
-Queries allow you to bring backend data to your Toolpad page. They are called automatically on page load, so that data is available as state on the page as soon as the user interacts with it. Toolpad will cache and regularly refresh the data. This means that your backend function will be called more than once. Queries are not suitable for backend functions that modify data. You can modify the following settings for queries:
+Queries allow you to bring backend data to your Toolpad Studio page. They are called automatically on page load, so that data is available as state on the page as soon as the user interacts with it. Toolpad Studio will cache and regularly refresh the data. This means that your backend function will be called more than once. Queries are not suitable for backend functions that modify data. You can modify the following settings for queries:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/connecting-to-data/query-settings.png", "alt": "Query settings", "caption": "Settings for queries", "indent": 1, "aspectRatio": 6}}
 

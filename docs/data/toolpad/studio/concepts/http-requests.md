@@ -63,7 +63,7 @@ You can define these in the interface available in the HTTP Request query editor
 
 ### Secrets
 
-As Toolpad HTTP requests are running server-side, they can make use of the available secrets that are stored in environment variables. The mechanism works similar by defining a parameter and instead of binding it to a UI value, bind it to an environment variable. Whenever the request executes, Toolpad will feed the value of the environment variable to the parameter.
+As Toolpad Studio HTTP requests are running server-side, they can make use of the available secrets that are stored in environment variables. The mechanism works similar by defining a parameter and instead of binding it to a UI value, bind it to an environment variable. Whenever the request executes, Toolpad Studio will feed the value of the environment variable to the parameter.
 
 <video controls width="auto" height="100%" style="contain" alt="custom-function">
   <source src="/static/toolpad/docs/studio/concepts/connecting-to-data/secrets.mp4" type="video/mp4">

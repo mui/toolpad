@@ -1,10 +1,10 @@
 # Building UI
 
-<p class="description">Toolpad allows you to build your frontends fast so you can concentrate on writing logic.</p>
+<p class="description">Toolpad Studio allows you to build your frontends fast so you can concentrate on writing logic.</p>
 
 ## Component Library
 
-To access the list of available Toolpad components, hover your cursor over the vertical bar labeled **Component library** to expand it.
+To access the list of available Toolpad Studio components, hover your cursor over the vertical bar labeled **Component library** to expand it.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/building-ui/component-library.mp4" type="video/mp4">
@@ -13,15 +13,15 @@ To access the list of available Toolpad components, hover your cursor over the v
 
 ---
 
-Toolpad has many [built-in components](/toolpad/studio/reference/components/) and we are always adding more. To make it easier for us to understand what to add next, please [upvote](https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D) the components you need, or open a [feature request](https://github.com/mui/mui-toolpad/issues/new/choose).
+Toolpad Studio has many [built-in components](/toolpad/studio/reference/components/) and we are always adding more. To make it easier for us to understand what to add next, please [upvote](https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D) the components you need, or open a [feature request](https://github.com/mui/mui-toolpad/issues/new/choose).
 
 ## Using components
 
 Each component has a set of properties that you can tweak in the **inspector panel** on the right. To view the page structure, and select or rename components, use the **page hierarchy explorer** on the bottom-left.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/building-ui/canvas-1.png", "alt": "Toolpad panels", "caption": "Inspector panel and page hierarchy explorer" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/building-ui/canvas-1.png", "alt": "Toolpad Studio panels", "caption": "Inspector panel and page hierarchy explorer" }}
 
-Below are the step-by-step instructions on adding, moving, deleting and resizing a component in Toolpad:
+Below are the step-by-step instructions on adding, moving, deleting and resizing a component in Toolpad Studio:
 
 1. Open the component library and drag a component over the canvas.
 2. The canvas will highlight the location where the component can be dropped. Release the mouse to drop it.
@@ -38,7 +38,7 @@ Binding dynamic values to these properties is explained in the [data binding](/t
 
 #### Rows
 
-Toolpad canvas uses a grid layout where you can use rows to position components:
+Toolpad Studio canvas uses a grid layout where you can use rows to position components:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/building-ui/canvas-6.png", "alt": "Canvas grid row", "caption": "Canvas grid rows", "zoom": false }}
 

@@ -1,16 +1,16 @@
 # Data Grid
 
-<p class="description">Learn about how to use data grids in Toolpad.</p>
+<p class="description">Learn about how to use data grids in Toolpad Studio.</p>
 
 ## Demo
 
-Toolpad builds on top of the [MUI X Data Grid](https://mui.com/x/react-data-grid/) to add faster customisation and integration with your internal tools.
+Toolpad Studio builds on top of the [MUI X Data Grid](https://mui.com/x/react-data-grid/) to add faster customisation and integration with your internal tools.
 
 {{"demo": "DataGrid.js", "hideToolbar": true, "bg": "inline"}}
 
 ## Usage
 
-A Data Grid is an essential component in an internal application. The following properties make it usable to work alongside other Toolpad components, queries, data providers.
+A Data Grid is an essential component in an internal application. The following properties make it usable to work alongside other Toolpad Studio components, queries, data providers.
 
 ### Rows
 
@@ -75,6 +75,6 @@ This prop is used to show – or hide – the toolbar from the data grid. The fo
 
 ## API
 
-See the documentation below for a complete reference to all props available to the datagrid component in Toolpad.
+See the documentation below for a complete reference to all props available to the datagrid component in Toolpad Studio.
 
 - [`<datagrid />`](/toolpad/studio/reference/components/data-grid/)

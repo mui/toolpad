@@ -1,9 +1,9 @@
 # Connecting to databases
 
-<p class="description">Toolpad allows you to connect to any database, fast.</p>
+<p class="description">Toolpad Studio allows you to connect to any database, fast.</p>
 
 We can write a custom function to connect to any database that we need to.
-We can focus on writing database queries, while the data fetching and displaying is handled by Toolpad.
+We can focus on writing database queries, while the data fetching and displaying is handled by Toolpad Studio.
 
 ## Connecting to MySQL
 

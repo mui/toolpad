@@ -66,7 +66,7 @@ We can add a delete button to a data grid connected to any REST API, like so:
 2. This adds a loading state to the button whenever the query is running.
 
    :::info
-   Head to the reference section for a detailed guide on the [Button component](/toolpad/studio/reference/components/button/) props exposed by Toolpad
+   Head to the reference section for a detailed guide on the [Button component](/toolpad/studio/reference/components/button/) props exposed by Toolpad Studio
    :::
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/delete-grid-row/loading-button-running.png", "alt": "Delete button loading state", "caption": "The delete button in a loading state", "indent": 1 }}

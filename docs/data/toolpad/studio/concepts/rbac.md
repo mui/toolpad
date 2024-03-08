@@ -1,12 +1,12 @@
 # Role-based access control
 
-<p class="description">Restrict pages in Toolpad application to users with certain roles only.</p>
+<p class="description">Restrict pages in Toolpad Studio application to users with certain roles only.</p>
 
 :::warning
-Role-based access control will be a paid feature of Toolpad very soon, so it's only available for free for a limited time.
+Role-based access control will be a paid feature of Toolpad Studio very soon, so it's only available for free for a limited time.
 :::
 
-You can configure pages in a Toolpad application so that users must have certain roles within specific authentication providers in order to access them.
+You can configure pages in a Toolpad Studio application so that users must have certain roles within specific authentication providers in order to access them.
 
 Before using these features, make sure that you have [authentication](/toolpad/studio/concepts/authentication/) enabled for the authenticated providers you are using.
 
@@ -26,9 +26,9 @@ You can change this for any individual page in the editor screen, under the **Pa
 
 ## Authorization providers
 
-In order for Toolpad users to have roles, you need to have those roles configured in the authentication provider they sign in with. Each authentication provider has its own configuration settings for roles.
+In order for Toolpad Studio users to have roles, you need to have those roles configured in the authentication provider they sign in with. Each authentication provider has its own configuration settings for roles.
 
-Not all available authentication providers in Toolpad support roles, so you must use one that does if you want to use this feature.
+Not all available authentication providers in Toolpad Studio support roles, so you must use one that does if you want to use this feature.
 
 ### Azure Active Directory (now Entra ID)
 
@@ -42,10 +42,10 @@ Follow these steps to assign roles to users in an Azure AD application:
 
 ## Role mapping
 
-By default, Toolpad will expect an exact match between the names of your Toolpad roles and the roles in the authentication provider being used.
+By default, Toolpad Studio will expect an exact match between the names of your Toolpad Studio roles and the roles in the authentication provider being used.
 
-If you don't want these to match, you can assign each Toolpad role to one or more provider roles under the **Role mappings** tab in the Authorization options in the editor.
+If you don't want these to match, you can assign each Toolpad Studio role to one or more provider roles under the **Role mappings** tab in the Authorization options in the editor.
 
-To assign more than one provider role to a Toolpad role, you can separate the values with commas under the **Provider role** column (as in `viewer, editor, admin`).
+To assign more than one provider role to a Toolpad Studio role, you can separate the values with commas under the **Provider role** column (as in `viewer, editor, admin`).
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/authorization/role-mapping-settings.png", "alt": "Role mapping settings", "caption": "Role mapping settings", "indent": 1, "aspectRatio": 6 }}

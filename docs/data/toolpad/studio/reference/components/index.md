@@ -1,6 +1,6 @@
 # Index
 
-<p class="description">This page contains an index to the available components in Toolpad.</p>
+<p class="description">This page contains an index to the available components in Toolpad Studio.</p>
 
 ## Components
 

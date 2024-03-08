@@ -1,6 +1,6 @@
 # List
 
-<p class="description">Learn about the list component and its usage in Toolpad.</p>
+<p class="description">Learn about the list component and its usage in Toolpad Studio.</p>
 
 ## Usage
 
@@ -25,6 +25,6 @@ There is a predefined padding that can be enabled or disabled. It is a boolean.
 
 ## API
 
-See the documentation below for a complete reference to all props available to the list component in Toolpad.
+See the documentation below for a complete reference to all props available to the list component in Toolpad Studio.
 
 - [`<list />`](/toolpad/studio/reference/components/list/#properties)

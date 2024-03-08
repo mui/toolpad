@@ -1,9 +1,9 @@
 ---
-title: Toolpad docs - Home
+title: Toolpad Studio docs - Home
 ---
 
-# Toolpad
+# Toolpad Studio
 
-<p class="description">Toolpad docs</p>
+<p class="description">Toolpad Studio docs</p>
 
 Low code tool, for developers, powered by MUI.

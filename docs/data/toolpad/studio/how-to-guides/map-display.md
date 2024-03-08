@@ -1,6 +1,6 @@
 # Create a map component
 
-<p class="description">You can extend Toolpad with custom code components.</p>
+<p class="description">You can extend Toolpad Studio with custom code components.</p>
 
 We can create a custom component to display any geographical map, like so:
 
@@ -8,7 +8,7 @@ We can create a custom component to display any geographical map, like so:
 
 ## Creating the component
 
-### In the Toolpad editor
+### In the Toolpad Studio editor
 
 1. To get started creating this, hover over the component library and click on the **Create** button in the **Custom Components** section.
 
@@ -114,7 +114,7 @@ export default createComponent(Leaflet, {
 });
 ```
 
-`label` and `value` are the props that we will make available for binding in the Toolpad editor.
+`label` and `value` are the props that we will make available for binding in the Toolpad Studio editor.
 
 2. **MapDisplay** is now available as a custom component in the component library:
 

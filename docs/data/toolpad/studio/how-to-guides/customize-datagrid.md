@@ -1,16 +1,16 @@
 # Customize data grids
 
-<p class="description">Toolpad is built to allow extensibility as a first-class citizen.</p>
+<p class="description">Toolpad Studio is built to allow extensibility as a first-class citizen.</p>
 
 ## Default behavior
 
-By default, you can connect any JSON data to a Toolpad data grid and it will attempt to guess each column's type display it appropriately:
+By default, you can connect any JSON data to a Toolpad Studio data grid and it will attempt to guess each column's type display it appropriately:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/datagrid.png", "alt": "Data grid with data", "caption": "The default data grid showing multiple data types", "aspectRatio": 3 }}
 
 ## Customizing cell rendering
 
-However, if the default column options are not sufficient, Toolpad allows you to customize your data grid with custom components, using the powerful features of the <a href="https://mui.com/x/react-data-grid/">MUI X Data Grid</a>.
+However, if the default column options are not sufficient, Toolpad Studio allows you to customize your data grid with custom components, using the powerful features of the <a href="https://mui.com/x/react-data-grid/">MUI X Data Grid</a>.
 
 ### Creating a custom component
 

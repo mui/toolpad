@@ -1,6 +1,6 @@
 # Date Picker
 
-<p class="description">Learn about the datepicker component and its usage in Toolpad.</p>
+<p class="description">Learn about the datepicker component and its usage in Toolpad Studio.</p>
 
 ## Demo
 
@@ -37,7 +37,7 @@ A name is needed when a textfield is part of a form component. It is used to sho
 
 ## Appearance
 
-The DatePicker component supports below mentioned appearance related props in Toolpad:
+The DatePicker component supports below mentioned appearance related props in Toolpad Studio:
 
 ### label
 
@@ -78,6 +78,6 @@ isRequired is useful when the action can't be perfomed without a user provided d
 
 ## API
 
-See the documentation below for a complete reference to all props available to the datepicker component in Toolpad.
+See the documentation below for a complete reference to all props available to the datepicker component in Toolpad Studio.
 
 - [`<datepicker />`](/toolpad/studio/reference/components/date-picker/#properties)

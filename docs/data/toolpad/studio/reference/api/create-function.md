@@ -26,11 +26,11 @@ You can define parameters to bind to page state. The actual values for these par
 
 - `resolver` a function that returns data. The data will be made available on the page as soon as it loads.
 
-- `config` An object describing the capabilities of this backend function within Toolpad. See [FunctionConfig](#functionconfig)
+- `config` An object describing the capabilities of this backend function within Toolpad Studio. See [FunctionConfig](#functionconfig)
 
 ## Returns
 
-a function that is recognizable by Toolpad
+a function that is recognizable by Toolpad Studio
 
 ## Types
 

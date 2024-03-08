@@ -1,8 +1,8 @@
 # Installation
 
-<p class="description">Setup Toolpad to run on your own machine.</p>
+<p class="description">Setup Toolpad Studio to run on your own machine.</p>
 
-## Create a Toolpad app
+## Create a Toolpad Studio app
 
 Start by opening a terminal and `cd` into a folder you'd like to create your application in.
 Then run the command:
@@ -23,9 +23,9 @@ pnpm create toolpad-app my-toolpad-app
 
 </codeblock>
 
-This will run the `create-toolpad-app` CLI which initializes the directory `./my-toolpad-app` with a Toolpad application.
+This will run the `create-toolpad-app` CLI which initializes the directory `./my-toolpad-app` with a Toolpad Studio application.
 
-## Run the Toolpad editor
+## Run the Toolpad Studio editor
 
 Change the current working directory to the application folder:
 
@@ -51,9 +51,9 @@ pnpm run dev
 
 </codeblock>
 
-This starts the development server on port `3000` or the first available port after that and opens the browser to the Toolpad editor.
+This starts the development server on port `3000` or the first available port after that and opens the browser to the Toolpad Studio editor.
 
-## Install Toolpad in an existing project
+## Install Toolpad Studio in an existing project
 
 Start by installing the required dependencies:
 
@@ -104,8 +104,8 @@ pnpm run toolpad:dev
 
 </codeblock>
 
-When you run this command, Toolpad will automatically initialize a new application in the **./my-toolpad-app** folder.
+When you run this command, Toolpad Studio will automatically initialize a new application in the **./my-toolpad-app** folder.
 
 :::info
-To integrate a Toolpad application in an existing server, you can follow the custom server [integration guide](/toolpad/studio/concepts/custom-server/).
+To integrate a Toolpad Studio application in an existing server, you can follow the custom server [integration guide](/toolpad/studio/concepts/custom-server/).
 :::

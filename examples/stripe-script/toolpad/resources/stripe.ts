@@ -4,7 +4,7 @@
  */
 
 import Stripe from 'stripe';
-import { createDataProvider } from '@mui/toolpad-studio/server';
+import { createDataProvider } from '@toolpad/studio/server';
 
 const initStripe = () => {
   if (!process.env.STRIPE_TOKEN) {

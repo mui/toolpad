@@ -1,5 +1,5 @@
-import { BindableAttrValue } from '@mui/toolpad-studio-runtime';
-import { hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { BindableAttrValue } from '@toolpad/studio-runtime';
+import { hasOwnProperty } from '@toolpad/utils/collections';
 
 type BindingType =
   | 'const'

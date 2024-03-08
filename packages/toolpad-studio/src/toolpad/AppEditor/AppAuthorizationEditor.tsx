@@ -36,8 +36,8 @@ import {
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 import { TabContext, TabList } from '@mui/lab';
-import { updateArray } from '@mui/toolpad-utils/immutability';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { updateArray } from '@toolpad/utils/immutability';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
 import AzureIcon from '../../components/icons/AzureIcon';

@@ -32,7 +32,7 @@ We can create a custom component to display any geographical map, like so:
 
 ```tsx
 import * as React from 'react';
-import { createComponent } from '@mui/toolpad/browser';
+import { createComponent } from '@toolpad/studio/browser';
 import * as L from 'leaflet';
 
 export interface LeafletProps {

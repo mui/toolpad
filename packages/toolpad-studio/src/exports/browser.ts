@@ -1,1 +1,1 @@
-export * from '@mui/toolpad-studio-runtime/browser';
+export * from '@toolpad/studio-runtime/browser';

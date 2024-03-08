@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Fade, styled } from '@mui/material';
-import { NodeHashes } from '@mui/toolpad-studio-runtime';
+import { NodeHashes } from '@toolpad/studio-runtime';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';

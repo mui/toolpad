@@ -1,5 +1,5 @@
-import { ExecFetchResult } from '@mui/toolpad-studio-runtime';
-import { Maybe } from '@mui/toolpad-utils/types';
+import { ExecFetchResult } from '@toolpad/studio-runtime';
+import { Maybe } from '@toolpad/utils/types';
 import { ServerDataSource } from '../../types';
 import { LocalQuery, LocalConnectionParams, LocalPrivateApi } from './types';
 import { parseLegacyFunctionId } from './shared';

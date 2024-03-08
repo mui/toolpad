@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { listen } from '@mui/toolpad-utils/http';
+import { listen } from '@toolpad/utils/http';
 import { describe, test, expect } from 'vitest';
 import { createHarLog, withHarInstrumentation } from './har';
 import { streamToString } from '../utils/streams';

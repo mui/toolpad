@@ -1,5 +1,5 @@
 import { Typography, Divider, Box, SxProps } from '@mui/material';
-import { ScopeMeta, ScopeMetaField } from '@mui/toolpad-studio-runtime';
+import { ScopeMeta, ScopeMetaField } from '@toolpad/studio-runtime';
 import * as React from 'react';
 import ObjectInspector from '../../components/ObjectInspector';
 

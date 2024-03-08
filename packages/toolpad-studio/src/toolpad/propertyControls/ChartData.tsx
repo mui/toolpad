@@ -15,19 +15,19 @@ import {
   Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { CHART_DATA_SERIES_KINDS, type ChartDataSeries } from '@mui/toolpad-studio-components';
-import { useBrowserJsRuntime } from '@mui/toolpad-studio-runtime/jsBrowserRuntime';
+import { CHART_DATA_SERIES_KINDS, type ChartDataSeries } from '@toolpad/studio-components';
+import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { BindableAttrValue } from '@mui/toolpad-studio-runtime';
+import { BindableAttrValue } from '@toolpad/studio-runtime';
 import ScatterPlotIcon from '@mui/icons-material/ScatterPlot';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import LegendToggleIcon from '@mui/icons-material/LegendToggle';
-import { evaluateBindable } from '@mui/toolpad-studio-runtime/jsRuntime';
+import { evaluateBindable } from '@toolpad/studio-runtime/jsRuntime';
 import { blueberryTwilightPalette } from '@mui/x-charts/colorPalettes';
-import { updateArray, remove } from '@mui/toolpad-utils/immutability';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { updateArray, remove } from '@toolpad/utils/immutability';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';

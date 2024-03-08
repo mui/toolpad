@@ -1,6 +1,6 @@
 import { SxProps, TextField } from '@mui/material';
 import * as React from 'react';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useAppState, useDomApi } from '../AppState';
 import { useNodeNameValidation } from './PagesExplorer/validation';
 import { useProjectApi } from '../../projectApi';

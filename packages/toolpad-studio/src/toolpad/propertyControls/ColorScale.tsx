@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ColorScale, ColorScaleStop } from '@mui/toolpad-studio-components';
+import { ColorScale, ColorScaleStop } from '@toolpad/studio-components';
 import {
   Box,
   Stack,

@@ -1,5 +1,5 @@
-import { NodeId } from '@mui/toolpad-studio-runtime';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { NodeId } from '@toolpad/studio-runtime';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import {
   getElementNodeComponentId,
   isPageColumn,

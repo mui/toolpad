@@ -34,7 +34,7 @@ Using the `value` prop, we can create a custom component like the following:
 import * as React from 'react';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
-import { createComponent } from '@mui/toolpad/browser';
+import { createComponent } from '@toolpad/studio/browser';
 
 export interface OrderIdChipProps {
   value: string;

@@ -26,10 +26,10 @@ import {
   inferColumns,
   SerializableGridColumn,
   SerializableGridColumns,
-} from '@mui/toolpad-studio-components';
-import { generateUniqueString } from '@mui/toolpad-utils/strings';
-import { NumberFormatEditor } from '@mui/toolpad-studio-runtime/numberFormat';
-import { DateFormatEditor } from '@mui/toolpad-studio-runtime/dateFormat';
+} from '@toolpad/studio-components';
+import { generateUniqueString } from '@toolpad/utils/strings';
+import { NumberFormatEditor } from '@toolpad/studio-runtime/numberFormat';
+import { DateFormatEditor } from '@toolpad/studio-runtime/dateFormat';
 import type { EditorProps } from '../../types';
 import { ToolpadComponentDefinition, useToolpadComponents } from '../AppEditor/toolpadComponents';
 import PropertyControl from '../../components/PropertyControl';

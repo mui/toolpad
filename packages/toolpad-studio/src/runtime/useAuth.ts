@@ -1,6 +1,6 @@
 import * as React from 'react';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
-import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import * as appDom from '@toolpad/studio-runtime/appDom';
+import { useNonNullableContext } from '@toolpad/utils/react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppHostContext } from './AppHostContext';
 

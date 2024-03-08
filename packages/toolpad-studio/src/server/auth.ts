@@ -7,9 +7,9 @@ import CredentialsProvider from '@auth/core/providers/credentials';
 import { AuthConfig, TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
 import chalk from 'chalk';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
-import { adaptRequestFromExpressToFetch } from '@mui/toolpad-utils/httpApiAdapters';
-import { getUserToken } from '@mui/toolpad-studio-runtime/auth';
+import * as appDom from '@toolpad/studio-runtime/appDom';
+import { adaptRequestFromExpressToFetch } from '@toolpad/utils/httpApiAdapters';
+import { getUserToken } from '@toolpad/studio-runtime/auth';
 import { asyncHandler } from '../utils/express';
 import type { ToolpadProject } from './localMode';
 

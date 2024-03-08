@@ -1,4 +1,4 @@
-# @mui/toolpad-studio
+# @toolpad/studio
 
 Low-code tool, powered by MUI
 
@@ -7,7 +7,7 @@ Low-code tool, powered by MUI
 Install the package in your project directory with:
 
 ```bash
-npm install @mui/toolpad-studio
+npm install @toolpad/studio
 ```
 
 ## Documentation

@@ -14,9 +14,9 @@ import {
   inputBaseClasses,
 } from '@mui/material';
 import { TabContext } from '@mui/lab';
-import { BindableAttrValue, LiveBinding, ScopeMeta } from '@mui/toolpad-studio-runtime';
-import { useServerJsRuntime } from '@mui/toolpad-studio-runtime/jsServerRuntime';
-import { Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
+import { BindableAttrValue, LiveBinding, ScopeMeta } from '@toolpad/studio-runtime';
+import { useServerJsRuntime } from '@toolpad/studio-runtime/jsServerRuntime';
+import { Maybe, WithControlledProp } from '@toolpad/utils/types';
 import { Body, RawBody, UrlEncodedBody } from './types';
 import {
   useEvaluateLiveBinding,

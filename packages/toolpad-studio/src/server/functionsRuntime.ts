@@ -1,9 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import {
-  TOOLPAD_DATA_PROVIDER_MARKER,
-  ToolpadDataProvider,
-} from '@mui/toolpad-studio-runtime/server';
+import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@toolpad/studio-runtime/server';
 import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import * as crypto from 'crypto';

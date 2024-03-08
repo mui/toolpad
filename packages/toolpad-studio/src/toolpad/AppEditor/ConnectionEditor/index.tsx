@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Box, Container, Stack, Typography } from '@mui/material';
-import { NodeId } from '@mui/toolpad-studio-runtime';
+import { NodeId } from '@toolpad/studio-runtime';
 import invariant from 'invariant';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { ConnectionEditorProps, ClientDataSource } from '../../../types';
 import { useAppState, useDomApi } from '../../AppState';
 import dataSources from '../../../toolpadDataSources/client';

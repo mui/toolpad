@@ -4,8 +4,8 @@ import ts from 'typescript';
 import { glob } from 'glob';
 import chalk from 'chalk';
 import type { JSONSchema7, JSONSchema7TypeName, JSONSchema7Type } from 'json-schema';
-import { asArray } from '@mui/toolpad-utils/collections';
-import { PrimitiveValueType } from '@mui/toolpad-studio-runtime';
+import { asArray } from '@toolpad/utils/collections';
+import { PrimitiveValueType } from '@toolpad/studio-runtime';
 import { compilerOptions } from './functionsShared';
 
 export interface ReturnTypeIntrospectionResult {

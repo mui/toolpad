@@ -10,9 +10,9 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import { NodeId } from '@mui/toolpad-studio-runtime';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { NodeId } from '@toolpad/studio-runtime';
+import useBoolean from '@toolpad/utils/hooks/useBoolean';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import MapEntriesEditor from '../../../components/MapEntriesEditor';
 import useUnsavedChangesConfirm from '../../hooks/useUnsavedChangesConfirm';

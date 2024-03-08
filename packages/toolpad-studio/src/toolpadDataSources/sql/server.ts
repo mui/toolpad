@@ -1,4 +1,4 @@
-import { serializeError, errorFrom } from '@mui/toolpad-utils/errors';
+import { serializeError, errorFrom } from '@toolpad/utils/errors';
 import { ServerDataSource } from '../../types';
 import { SqlServerProps, SqlPrivateQuery, SqlConnectionStatus } from './types';
 

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Box, BoxProps, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import { useNode } from '@mui/toolpad-studio-runtime';
-import { equalProperties } from '@mui/toolpad-utils/collections';
+import { useNode } from '@toolpad/studio-runtime';
+import { equalProperties } from '@toolpad/utils/collections';
 import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin, { BuiltinArgTypeDefinitions } from './createBuiltin';

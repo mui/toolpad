@@ -12,9 +12,9 @@ Quickly build internal tools. MUI Toolpad Studio is a self-hosted low-code inte
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
 
 <!--
-[![npm latest package](https://img.shields.io/npm/v/@mui/toolpad-studio/latest.svg)](https://www.npmjs.com/package/@mui/toolpad-studio)
-[![npm next package](https://img.shields.io/npm/v/@mui/toolpad-studio/next.svg)](https://www.npmjs.com/package/@mui/toolpad-studio@beta)
-[![npm downloads](https://img.shields.io/npm/dm/@mui/toolpad-studio.svg)](https://www.npmjs.com/package/@mui/toolpad-studio)
+[![npm latest package](https://img.shields.io/npm/v/@toolpad/studio/latest.svg)](https://www.npmjs.com/package/@toolpad/studio)
+[![npm next package](https://img.shields.io/npm/v/@toolpad/studio/next.svg)](https://www.npmjs.com/package/@toolpad/studio@beta)
+[![npm downloads](https://img.shields.io/npm/dm/@toolpad/studio.svg)](https://www.npmjs.com/package/@toolpad/studio)
 -->
 
 [![CircleCI](https://circleci.com/gh/mui/mui-toolpad/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)

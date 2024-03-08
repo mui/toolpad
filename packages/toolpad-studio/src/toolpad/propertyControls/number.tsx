@@ -1,5 +1,5 @@
 import { TextField } from '@mui/material';
-import { NumberValueType } from '@mui/toolpad-studio-runtime';
+import { NumberValueType } from '@toolpad/studio-runtime';
 import * as React from 'react';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';

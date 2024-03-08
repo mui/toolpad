@@ -1,4 +1,4 @@
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom } from '@toolpad/utils/errors';
 import { TOOLPAD_LOADING_MARKER } from './jsRuntime';
 import { BindingEvaluationResult, JsRuntime } from './types';
 

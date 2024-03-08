@@ -1,4 +1,4 @@
-import { PropValueType } from '@mui/toolpad-studio-runtime';
+import { PropValueType } from '@toolpad/studio-runtime';
 import { GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { EditorProps } from '../../types';

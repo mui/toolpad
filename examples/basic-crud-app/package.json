@@ -8,6 +8,6 @@
     "start": "toolpad-studio start"
   },
   "dependencies": {
-    "@mui/toolpad-studio": "0.1.51"
+    "@toolpad/studio": "0.1.51"
   }
 }

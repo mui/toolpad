@@ -10,12 +10,12 @@ import {
   Box,
 } from '@mui/material';
 import * as React from 'react';
-import { inferColumns, parseColumns } from '@mui/toolpad-studio-components';
+import { inferColumns, parseColumns } from '@toolpad/studio-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import { UseQueryResult } from '@tanstack/react-query';
-import { getObjectKey } from '@mui/toolpad-utils/objectKey';
-import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { getObjectKey } from '@toolpad/utils/objectKey';
+import useDebounced from '@toolpad/utils/hooks/useDebounced';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {

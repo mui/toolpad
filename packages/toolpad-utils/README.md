@@ -1,4 +1,4 @@
-# @mui/toolpad-studio-runtime
+# @toolpad/studio-runtime
 
 Low-code tool, powered by MUI
 
@@ -7,7 +7,7 @@ Low-code tool, powered by MUI
 Install the package in your project directory with:
 
 ```bash
-npm install @mui/toolpad-studio-runtime
+npm install @toolpad/studio-runtime
 ```
 
 ## Documentation

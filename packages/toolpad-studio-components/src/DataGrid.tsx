@@ -52,7 +52,7 @@ import {
   FilterModel,
   SortModel,
   PaginationModel,
-} from '@mui/toolpad-studio-runtime';
+} from '@toolpad/studio-runtime';
 import {
   Box,
   debounce,
@@ -74,22 +74,19 @@ import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import { getObjectKey } from '@mui/toolpad-utils/objectKey';
-import { errorFrom } from '@mui/toolpad-utils/errors';
-import { hasImageExtension } from '@mui/toolpad-utils/path';
+import { getObjectKey } from '@toolpad/utils/objectKey';
+import { errorFrom } from '@toolpad/utils/errors';
+import { hasImageExtension } from '@toolpad/utils/path';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { useNonNullableContext } from '@toolpad/utils/react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import invariant from 'invariant';
 import {
   NumberFormat,
   createFormat as createNumberFormat,
-} from '@mui/toolpad-studio-runtime/numberFormat';
-import {
-  DateFormat,
-  createFormat as createDateFormat,
-} from '@mui/toolpad-studio-runtime/dateFormat';
-import useLatest from '@mui/toolpad-utils/hooks/useLatest';
+} from '@toolpad/studio-runtime/numberFormat';
+import { DateFormat, createFormat as createDateFormat } from '@toolpad/studio-runtime/dateFormat';
+import useLatest from '@toolpad/utils/hooks/useLatest';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay, { ErrorContent } from './components/ErrorOverlay';

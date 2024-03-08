@@ -1,5 +1,5 @@
-import { Emitter } from '@mui/toolpad-utils/events';
-import type { RuntimeEvents } from '@mui/toolpad-studio-runtime';
+import { Emitter } from '@toolpad/utils/events';
+import type { RuntimeEvents } from '@toolpad/studio-runtime';
 import { TOOLPAD_BRIDGE_GLOBAL } from '../constants';
 import type { AppCanvasState, PageViewState } from '../types';
 

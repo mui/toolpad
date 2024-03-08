@@ -1,4 +1,4 @@
-import getComponentDisplayName from '@mui/toolpad-utils/react';
+import getComponentDisplayName from '@toolpad/utils/react';
 import { TOOLPAD_COMPONENT } from './constants';
 import { ArgTypeDefinition, ComponentConfig, PropValueType, ToolpadComponent } from './types';
 

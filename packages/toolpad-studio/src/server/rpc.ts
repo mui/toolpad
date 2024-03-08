@@ -3,9 +3,9 @@ import * as superjson from 'superjson';
 import express from 'express';
 import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
-import { hasOwnProperty } from '@mui/toolpad-utils/collections';
-import { errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { withContext, createServerContext } from '@mui/toolpad-studio-runtime/serverRuntime';
+import { hasOwnProperty } from '@toolpad/utils/collections';
+import { errorFrom, serializeError } from '@toolpad/utils/errors';
+import { withContext, createServerContext } from '@toolpad/studio-runtime/serverRuntime';
 import { asyncHandler } from '../utils/express';
 
 export interface Method<P extends any[] = any[], R = any> {

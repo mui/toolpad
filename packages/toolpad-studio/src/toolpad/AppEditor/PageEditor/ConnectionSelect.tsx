@@ -1,9 +1,9 @@
 import { TextField, MenuItem, SxProps } from '@mui/material';
 import * as React from 'react';
-import { NodeId } from '@mui/toolpad-studio-runtime';
-import { asArray } from '@mui/toolpad-utils/collections';
-import { Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { NodeId } from '@toolpad/studio-runtime';
+import { asArray } from '@toolpad/utils/collections';
+import { Maybe, WithControlledProp } from '@toolpad/utils/types';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useAppState } from '../../AppState';
 import dataSources from '../../../toolpadDataSources/client';
 

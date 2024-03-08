@@ -10,10 +10,10 @@ import {
   inputBaseClasses,
 } from '@mui/material';
 import * as React from 'react';
-import { BindableAttrValue, LiveBinding } from '@mui/toolpad-studio-runtime';
-import { useBrowserJsRuntime } from '@mui/toolpad-studio-runtime/jsBrowserRuntime';
+import { BindableAttrValue, LiveBinding } from '@toolpad/studio-runtime';
+import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
 import invariant from 'invariant';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { usePageEditorState } from '../PageEditorProvider';
 import dataSources from '../../../../toolpadDataSources/client';
 import { useEvaluateLiveBinding } from '../../useEvaluateLiveBinding';

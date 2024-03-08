@@ -1,5 +1,5 @@
-import { ExecFetchResult } from '@mui/toolpad-studio-runtime';
-import type { Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
+import { ExecFetchResult } from '@toolpad/studio-runtime';
+import type { Maybe, WithControlledProp } from '@toolpad/utils/types';
 
 export interface SqlConnectionParams {
   host: string;

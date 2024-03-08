@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ToolpadComponent } from '@mui/toolpad-studio-runtime';
+import { ToolpadComponent } from '@toolpad/studio-runtime';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   FORM_COMPONENT_ID,

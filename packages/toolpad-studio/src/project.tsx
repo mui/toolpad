@@ -1,7 +1,7 @@
-import { Emitter } from '@mui/toolpad-utils/events';
+import { Emitter } from '@toolpad/utils/events';
 import { QueryClient, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import * as React from 'react';
-import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { useNonNullableContext } from '@toolpad/utils/react';
 import invariant from 'invariant';
 import { ProjectEvents } from './types';
 import { ServerDefinition } from './server/projectRpcServer';

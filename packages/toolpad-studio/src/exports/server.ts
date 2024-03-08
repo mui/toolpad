@@ -1,1 +1,1 @@
-export * from '@mui/toolpad-studio-runtime/server';
+export * from '@toolpad/studio-runtime/server';

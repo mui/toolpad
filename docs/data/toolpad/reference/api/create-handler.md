@@ -5,7 +5,7 @@
 ## Import
 
 ```jsx
-import { createHandler } from '@mui/toolpad';
+import { createHandler } from '@toolpad/studio';
 ```
 
 ## Description

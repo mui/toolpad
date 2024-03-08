@@ -12,11 +12,11 @@ import {
   cleanup,
 } from '@testing-library/react';
 import 'vitest-dom/extend-expect';
-import { LiveBindings, RuntimeEvents } from '@mui/toolpad-studio-runtime';
-import { CanvasEventsContext } from '@mui/toolpad-studio-runtime/runtime';
-import { Emitter } from '@mui/toolpad-utils/events';
+import { LiveBindings, RuntimeEvents } from '@toolpad/studio-runtime';
+import { CanvasEventsContext } from '@toolpad/studio-runtime/runtime';
+import { Emitter } from '@toolpad/utils/events';
 import { test, expect, afterEach } from 'vitest';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import createRuntimeState from './createRuntimeState';
 import ToolpadApp from './ToolpadApp';
 import { AppHost, AppHostContext } from './AppHostContext';

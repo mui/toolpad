@@ -1,5 +1,5 @@
 {
-  "name": "@mui/toolpad-studio-runtime",
+  "name": "@toolpad/studio-runtime",
   "version": "0.1.51",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
@@ -44,7 +44,7 @@
   "dependencies": {
     "@auth/core": "0.25.1",
     "@mui/material": "5.15.11",
-    "@mui/toolpad-utils": "workspace:*",
+    "@toolpad/utils": "workspace:*",
     "@tanstack/react-query": "5.18.1",
     "@types/json-schema": "7.0.15",
     "@webcontainer/env": "1.1.0",

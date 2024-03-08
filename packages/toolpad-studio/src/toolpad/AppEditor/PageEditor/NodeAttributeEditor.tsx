@@ -5,10 +5,10 @@ import {
   BindableAttrValue,
   RuntimeScope,
   ScopeMeta,
-} from '@mui/toolpad-studio-runtime';
+} from '@toolpad/studio-runtime';
 import { Alert, Box, SxProps } from '@mui/material';
-import { useBrowserJsRuntime } from '@mui/toolpad-studio-runtime/jsBrowserRuntime';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useDomApi } from '../../AppState';
 import BindableEditor from './BindableEditor';
 import { usePageEditorState } from './PageEditorProvider';

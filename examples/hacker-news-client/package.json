@@ -1,14 +1,15 @@
-{
-  "name": "hacker-news-client",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "toolpad-studio dev",
-    "build": "toolpad-studio build",
-    "start": "toolpad-studio start"
-  },
-  "dependencies": {
-    "@mui/toolpad-studio": "^0.1.51",
-    "axios": "^1.4.0"
-  }
-}
+# @toolpad/studio
+
+Low-code tool, powered by MUI
+
+## Installation
+
+Install the package in your project directory with:
+
+```bash
+npm install @toolpad/studio
+```
+
+## Documentation
+
+[The documentation](./docs)

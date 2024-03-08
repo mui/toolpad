@@ -1,4 +1,4 @@
-import { hasOwnProperty } from '@mui/toolpad-utils/collections';
+import { hasOwnProperty } from '@toolpad/utils/collections';
 import { BindableAttrValue, BindingEvaluationResult, JsRuntime } from './types';
 
 export const TOOLPAD_LOADING_MARKER = '__TOOLPAD_LOADING_MARKER__';

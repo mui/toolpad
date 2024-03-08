@@ -1,7 +1,7 @@
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Tab, Box, styled, Typography, Link } from '@mui/material';
 import * as React from 'react';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import PageOptionsPanel from './PageOptionsPanel';
 import ComponentEditor from './ComponentEditor';
 import ThemeEditor from './ThemeEditor';

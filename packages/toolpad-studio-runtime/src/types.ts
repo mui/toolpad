@@ -1,6 +1,6 @@
 import type * as React from 'react';
-import type { Branded } from '@mui/toolpad-utils/types';
-import type { SerializedError } from '@mui/toolpad-utils/errors';
+import type { Branded } from '@toolpad/utils/types';
+import type { SerializedError } from '@toolpad/utils/errors';
 import type { JSONSchema7 } from 'json-schema';
 import type { TOOLPAD_COMPONENT } from './constants';
 

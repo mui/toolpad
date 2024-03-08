@@ -3,13 +3,13 @@
 <p class="description">Support reading contextual information in backend functions.</p>
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 ```
 
 ## Description
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 import { parseAuth } from '../../src/lib/auth';
 
 export async function myBackendFunction() {

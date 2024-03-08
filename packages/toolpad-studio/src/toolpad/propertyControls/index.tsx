@@ -1,5 +1,5 @@
-import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@mui/toolpad-studio-runtime';
-import { createProvidedContext } from '@mui/toolpad-utils/react';
+import { ArgTypeDefinition, ArgControlSpec, PropValueType } from '@toolpad/studio-runtime';
+import { createProvidedContext } from '@toolpad/utils/react';
 import string from './string';
 import boolean from './boolean';
 import number from './number';

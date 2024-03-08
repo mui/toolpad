@@ -73,7 +73,7 @@ export async function getAnimals(
 Toolpad also provides a `createFunction` API to be able to define your parameters when creating custom functions:
 
 ```jsx
-import { createFunction } from '@mui/toolpad/server';
+import { createFunction } from '@toolpad/studio/server';
 
 export const example = createFunction(
   async ({ parameters }) => {
@@ -142,7 +142,7 @@ When you run Toolpad in an authenticated context it may be useful to be able to 
 ### Access cookies with `context.cookies`
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 import { parseAuth } from '../../src/lib/auth';
 
 export async function myBackendFunction() {
@@ -157,7 +157,7 @@ export async function myBackendFunction() {
 You can also use the context to set a cookie, which can subsequently be used in other backend functions called from your Toolpad application. Example:
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 import * as api from './myApi';
 
 const MY_COOKIE_NAME = 'MY_AUTH_TOKEN';
@@ -180,7 +180,7 @@ export async function getData() {
 If your Toolpad app has [authentication](/toolpad/concepts/authentication/) enabled, you can get data from the authenticated session, such as the logged-in user's `email`, `name` or `avatar`. Example:
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 
 export async function getCurrentUserEmail() {
   const { session } = getContext();

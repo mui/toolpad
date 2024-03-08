@@ -8,9 +8,9 @@ import {
   ArgTypeDefinitions,
   ComponentConfig,
   LiveBinding,
-} from '@mui/toolpad-studio-runtime';
-import { ExactEntriesOf } from '@mui/toolpad-utils/types';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+} from '@toolpad/studio-runtime';
+import { ExactEntriesOf } from '@toolpad/utils/types';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import NodeAttributeEditor from './NodeAttributeEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { useToolpadComponent } from '../toolpadComponents';

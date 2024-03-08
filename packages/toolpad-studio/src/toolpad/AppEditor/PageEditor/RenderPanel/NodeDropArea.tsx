@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { styled } from '@mui/material';
 import Typography from '@mui/material/Typography';
 
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { FlowDirection } from '../../../../types';
 import {
   absolutePositionCss,

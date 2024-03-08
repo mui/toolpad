@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { NodeHashes, NodeId } from '@mui/toolpad-studio-runtime';
+import { NodeHashes, NodeId } from '@toolpad/studio-runtime';
 import useEventCallback from '@mui/utils/useEventCallback';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import EditorCanvasHostLegacy from '../EditorCanvasHost';
 import EditorCanvasHostInline from '../EditorCanvasHostInline';
 import { getNodeHashes, useAppState, useAppStateApi, useDomApi } from '../../../AppState';

@@ -1,10 +1,10 @@
 import * as path from 'path';
 import * as chokidar from 'chokidar';
 import * as dotenv from 'dotenv';
-import { Emitter } from '@mui/toolpad-utils/events';
+import { Emitter } from '@toolpad/utils/events';
 import chalk from 'chalk';
-import { truncate } from '@mui/toolpad-utils/strings';
-import { Awaitable } from '@mui/toolpad-utils/types';
+import { truncate } from '@toolpad/utils/strings';
+import { Awaitable } from '@toolpad/utils/types';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 
 interface IToolpadProject {

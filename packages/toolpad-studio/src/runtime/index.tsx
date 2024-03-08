@@ -1,4 +1,4 @@
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom } from '@toolpad/utils/errors';
 import { createApi } from './api';
 
 export function createRemoteFunction(functionFile: string, functionName: string) {

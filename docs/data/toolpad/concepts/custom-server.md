@@ -16,7 +16,7 @@ The following code illustrates how it works:
 
 ```tsx
 // ./server.mjs
-import { createHandler } from '@mui/toolpad';
+import { createHandler } from '@toolpad/studio';
 import express from 'express';
 
 const app = express();

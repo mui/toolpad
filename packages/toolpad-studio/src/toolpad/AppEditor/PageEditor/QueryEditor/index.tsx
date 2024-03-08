@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { NodeId } from '@mui/toolpad-studio-runtime';
+import { NodeId } from '@toolpad/studio-runtime';
 import { Stack, Chip, Tab, IconButton, LinearProgress } from '@mui/material';
 import { LoadingButton, TabList, TabContext, TabPanel } from '@mui/lab';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CircleIcon from '@mui/icons-material/Circle';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useAppState, useAppStateApi } from '../../../AppState';
 import { usePageEditorState } from '../PageEditorProvider';
 import QueryIcon from '../../QueryIcon';

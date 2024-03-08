@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { Emitter } from '@mui/toolpad-utils/events';
+import { Emitter } from '@toolpad/utils/events';
 import * as ReactIs from 'react-is';
-import { hasOwnProperty } from '@mui/toolpad-utils/collections';
-import { createProvidedContext } from '@mui/toolpad-utils/react';
+import { hasOwnProperty } from '@toolpad/utils/collections';
+import { createProvidedContext } from '@toolpad/utils/react';
 import { Stack } from '@mui/material';
 import { RuntimeEvents, ToolpadComponents, ToolpadComponent, ArgTypeDefinition } from './types';
 import { TOOLPAD_COMPONENT } from './constants';

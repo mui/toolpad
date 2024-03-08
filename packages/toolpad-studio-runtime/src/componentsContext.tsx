@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { createProvidedContext } from '@mui/toolpad-utils/react';
+import { createProvidedContext } from '@toolpad/utils/react';
 import { ToolpadComponents } from './types';
 import { createToolpadComponentThatThrows } from './runtime';
 

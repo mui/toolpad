@@ -1,4 +1,4 @@
-import { JsRuntime } from '@mui/toolpad-studio-runtime';
+import { JsRuntime } from '@toolpad/studio-runtime';
 
 export default async function applyTransform(
   jsRuntime: JsRuntime,

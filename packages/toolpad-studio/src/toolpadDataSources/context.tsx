@@ -1,6 +1,6 @@
 import { UseQueryResult } from '@tanstack/react-query';
-import { NodeId } from '@mui/toolpad-studio-runtime';
-import { createProvidedContext } from '@mui/toolpad-utils/react';
+import { NodeId } from '@toolpad/studio-runtime';
+import { createProvidedContext } from '@toolpad/utils/react';
 import { useProjectApi } from '../projectApi';
 import { UseQueryFnOptions } from '../rpcClient';
 

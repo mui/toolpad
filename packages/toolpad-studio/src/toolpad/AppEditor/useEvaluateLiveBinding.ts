@@ -4,10 +4,10 @@ import {
   BindableAttrValues,
   JsRuntime,
   LiveBinding,
-} from '@mui/toolpad-studio-runtime';
+} from '@toolpad/studio-runtime';
 import * as React from 'react';
-import { evaluateBindable } from '@mui/toolpad-studio-runtime/jsRuntime';
-import { mapValues } from '@mui/toolpad-utils/collections';
+import { evaluateBindable } from '@toolpad/studio-runtime/jsRuntime';
+import { mapValues } from '@toolpad/utils/collections';
 
 function evaluateBindableAttrEntries(
   jsRuntime: JsRuntime,

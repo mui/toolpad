@@ -1,6 +1,6 @@
 import type express from 'express';
 import { JWT, getToken } from '@auth/core/jwt';
-import { adaptRequestFromExpressToFetch } from '@mui/toolpad-utils/httpApiAdapters';
+import { adaptRequestFromExpressToFetch } from '@toolpad/utils/httpApiAdapters';
 
 export async function getUserToken(req: express.Request): Promise<JWT | null> {
   let token = null;

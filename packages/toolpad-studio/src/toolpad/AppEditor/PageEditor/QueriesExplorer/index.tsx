@@ -1,6 +1,6 @@
 import * as React from 'react';
 import clsx from 'clsx';
-import { NodeId } from '@mui/toolpad-studio-runtime';
+import { NodeId } from '@toolpad/studio-runtime';
 import invariant from 'invariant';
 import {
   styled,
@@ -18,8 +18,8 @@ import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import useBoolean from '@toolpad/utils/hooks/useBoolean';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import dataSources from '../../../../toolpadDataSources/client';
 import QueryIcon from '../../QueryIcon';
 import { useAppState, useAppStateApi } from '../../../AppState';

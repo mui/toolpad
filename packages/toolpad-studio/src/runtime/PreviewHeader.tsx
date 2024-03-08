@@ -17,7 +17,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import { Link, useMatch } from 'react-router-dom';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { useNonNullableContext } from '@toolpad/utils/react';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { AppHostContext } from './AppHostContext';
 
@@ -166,7 +166,7 @@ function CustomServerInstructions({ basename }: CustomServerInstructionsProps) {
             This application is running under a custom server. Run the standalone Toolpad Studio
             editor to make changes to this application.
           </Typography>
-          <CodeView>{`npx @mui/toolpad-studio editor ${appUrl}`}</CodeView>
+          <CodeView>{`npx @toolpad/studio editor ${appUrl}`}</CodeView>
         </Box>
       </Popover>
     </React.Fragment>

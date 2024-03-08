@@ -32,14 +32,14 @@ import {
   BindableAttrValue,
   NavigationAction,
   EnvAttrValue,
-} from '@mui/toolpad-studio-runtime';
-import { createProvidedContext } from '@mui/toolpad-utils/react';
+} from '@toolpad/studio-runtime';
+import { createProvidedContext } from '@toolpad/utils/react';
 import { TabContext, TabList } from '@mui/lab';
-import useDebounced from '@mui/toolpad-utils/hooks/useDebounced';
-import { errorFrom } from '@mui/toolpad-utils/errors';
-import useLatest from '@mui/toolpad-utils/hooks/useLatest';
-import { WithControlledProp, Maybe } from '@mui/toolpad-utils/types';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import useDebounced from '@toolpad/utils/hooks/useDebounced';
+import { errorFrom } from '@toolpad/utils/errors';
+import useLatest from '@toolpad/utils/hooks/useLatest';
+import { WithControlledProp, Maybe } from '@toolpad/utils/types';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { JsExpressionEditor } from './PageEditor/JsExpressionEditor';
 import JsonView from '../../components/JsonView';
 import { useEvaluateLiveBinding } from './useEvaluateLiveBinding';

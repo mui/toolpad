@@ -1,11 +1,11 @@
 import * as React from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { BindableAttrEntries } from '@mui/toolpad-studio-runtime';
+import { BindableAttrEntries } from '@toolpad/studio-runtime';
 import { Alert, Box, Divider, Stack, Tab } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { TabContext, TabList } from '@mui/lab';
-import { useBrowserJsRuntime } from '@mui/toolpad-studio-runtime/jsBrowserRuntime';
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
+import { errorFrom } from '@toolpad/utils/errors';
 
 import { useQuery } from '@tanstack/react-query';
 import Grid2 from '@mui/material/Unstable_Grid2/Grid2';

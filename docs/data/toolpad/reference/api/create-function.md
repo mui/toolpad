@@ -9,7 +9,7 @@ The `createFunction` API is deprecated and will be removed in a future version. 
 ## Import
 
 ```jsx
-import { createFunction } from '@mui/toolpad/server';
+import { createFunction } from '@toolpad/studio/server';
 ```
 
 ## Description

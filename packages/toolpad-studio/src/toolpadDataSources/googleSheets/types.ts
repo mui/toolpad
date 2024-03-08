@@ -1,6 +1,6 @@
 import { sheets_v4 } from '@googleapis/sheets';
 import { drive_v3 } from '@googleapis/drive';
-import { ExecFetchResult } from '@mui/toolpad-studio-runtime';
+import { ExecFetchResult } from '@toolpad/studio-runtime';
 
 export type GoogleSheetsConnectionParams = {
   refresh_token?: string | null;

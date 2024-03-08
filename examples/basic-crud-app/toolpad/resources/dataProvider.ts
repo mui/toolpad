@@ -3,7 +3,7 @@
  * See: https://mui.com/toolpad-studio/concepts/data-providers/
  */
 
-import { createDataProvider } from '@mui/toolpad-studio/server';
+import { createDataProvider } from '@toolpad/studio/server';
 
 let nextId = 1;
 function generateId(): number {

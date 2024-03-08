@@ -1,5 +1,5 @@
 {
-  "name": "@mui/toolpad-studio-components",
+  "name": "@toolpad/studio-components",
   "version": "0.1.51",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
@@ -42,8 +42,8 @@
     "@mui/icons-material": "5.15.11",
     "@mui/lab": "5.0.0-alpha.166",
     "@mui/material": "5.15.11",
-    "@mui/toolpad-studio-runtime": "workspace:*",
-    "@mui/toolpad-utils": "workspace:*",
+    "@toolpad/studio-runtime": "workspace:*",
+    "@toolpad/utils": "workspace:*",
     "@mui/x-charts": "6.19.5",
     "@mui/x-data-grid-pro": "6.19.6",
     "@mui/x-date-pickers": "6.19.6",

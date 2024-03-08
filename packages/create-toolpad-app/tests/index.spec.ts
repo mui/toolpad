@@ -35,7 +35,7 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
   });
 }
 
-// @TODO: Unskip once @mui/toolpad-studio is released for the first time.
+// @TODO: Unskip once @toolpad/studio is released for the first time.
 test.skip(
   'create-toolpad-app can bootstrap a Toolpad Studio app',
   async () => {
@@ -54,7 +54,7 @@ test.skip(
     expect(packageJson).toEqual(
       expect.objectContaining({
         dependencies: expect.objectContaining({
-          '@mui/toolpad-studio': expect.any(String),
+          '@toolpad/studio': expect.any(String),
         }),
         scripts: expect.objectContaining({
           build: 'toolpad-studio build',

@@ -1,25 +1,25 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { Emitter } from '@mui/toolpad-utils/events';
+import { Emitter } from '@toolpad/utils/events';
 import * as esbuild from 'esbuild';
-import { ensureSuffix, indent } from '@mui/toolpad-utils/strings';
+import { ensureSuffix, indent } from '@toolpad/utils/strings';
 import * as chokidar from 'chokidar';
 import chalk from 'chalk';
 import { glob } from 'glob';
-import { writeFileRecursive, fileExists, readJsonFile } from '@mui/toolpad-utils/fs';
+import { writeFileRecursive, fileExists, readJsonFile } from '@toolpad/utils/fs';
 import Piscina from 'piscina';
 import {
   ExecFetchResult,
   GetRecordsParams,
   GetRecordsResult,
   PaginationMode,
-} from '@mui/toolpad-studio-runtime';
-import { errorFrom } from '@mui/toolpad-utils/errors';
-import { ToolpadDataProviderIntrospection } from '@mui/toolpad-studio-runtime/runtime';
+} from '@toolpad/studio-runtime';
+import { errorFrom } from '@toolpad/utils/errors';
+import { ToolpadDataProviderIntrospection } from '@toolpad/studio-runtime/runtime';
 import * as url from 'node:url';
 import type { GridRowId } from '@mui/x-data-grid';
 import invariant from 'invariant';
-import { Awaitable } from '@mui/toolpad-utils/types';
+import { Awaitable } from '@toolpad/utils/types';
 import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import * as functionsRuntime from './functionsRuntime';
@@ -60,7 +60,7 @@ async function createDefaultDataProvider(
      * See: https://mui.com/toolpad-studio/concepts/data-providers/
      */
 
-    import { createDataProvider } from '@mui/toolpad-studio/server';
+    import { createDataProvider } from '@toolpad/studio/server';
 
     export default createDataProvider({
       ${options.paginationMode === 'cursor' ? 'paginationMode: "cursor",' : ''}

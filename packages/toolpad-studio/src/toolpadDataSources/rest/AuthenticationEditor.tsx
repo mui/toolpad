@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Grid, MenuItem, Stack, TextField } from '@mui/material';
-import { Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
+import { Maybe, WithControlledProp } from '@toolpad/utils/types';
 import { ApiKeyAuth, Authentication, BasicAuth, BearerTokenAuth } from './types';
 
 interface AuthMethodEditorProps<T> extends WithControlledProp<T> {

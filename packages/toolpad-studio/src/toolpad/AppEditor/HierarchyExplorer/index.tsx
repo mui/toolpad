@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { NodeId } from '@mui/toolpad-studio-runtime';
+import { NodeId } from '@toolpad/studio-runtime';
 import { Box, Typography } from '@mui/material';
 import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import useBoolean from '@toolpad/utils/hooks/useBoolean';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { DomView } from '../../../utils/domView';

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom } from '@toolpad/utils/errors';
 
 export interface UseQueryPreviewOptions<R> {
   onPreview?: (result: R) => void;

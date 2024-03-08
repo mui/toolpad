@@ -1,7 +1,7 @@
 import Button from '@mui/material/Button';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ToolpadComponents } from '@mui/toolpad-studio-runtime';
+import { ToolpadComponents } from '@toolpad/studio-runtime';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';

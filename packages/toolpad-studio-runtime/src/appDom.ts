@@ -2,10 +2,10 @@ import { nanoid } from 'nanoid/non-secure';
 import { generateKeyBetween } from 'fractional-indexing';
 import invariant from 'invariant';
 import type { BoxProps, ThemeOptions as MuiThemeOptions } from '@mui/material';
-import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@mui/toolpad-utils/strings';
-import { mapProperties, mapValues, hasOwnProperty } from '@mui/toolpad-utils/collections';
-import { ExactEntriesOf, Maybe } from '@mui/toolpad-utils/types';
-import { omit, update, updateOrCreate } from '@mui/toolpad-utils/immutability';
+import { guessTitle, pascalCase, removeDiacritics, uncapitalize } from '@toolpad/utils/strings';
+import { mapProperties, mapValues, hasOwnProperty } from '@toolpad/utils/collections';
+import { ExactEntriesOf, Maybe } from '@toolpad/utils/types';
+import { omit, update, updateOrCreate } from '@toolpad/utils/immutability';
 import type {
   NodeId,
   NodeReference,

@@ -5,19 +5,15 @@ import * as yaml from 'yaml';
 import invariant from 'invariant';
 import openEditor from 'open-editor';
 import chalk from 'chalk';
-import {
-  BindableAttrValue,
-  EnvAttrValue,
-  PropBindableAttrValue,
-} from '@mui/toolpad-studio-runtime';
+import { BindableAttrValue, EnvAttrValue, PropBindableAttrValue } from '@toolpad/studio-runtime';
 import { fromZodError } from 'zod-validation-error';
 import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce, throttle } from 'lodash-es';
-import { Emitter } from '@mui/toolpad-utils/events';
-import { guessTitle } from '@mui/toolpad-utils/strings';
-import { errorFrom } from '@mui/toolpad-utils/errors';
-import { filterValues, hasOwnProperty, mapValues } from '@mui/toolpad-utils/collections';
+import { Emitter } from '@toolpad/utils/events';
+import { guessTitle } from '@toolpad/utils/strings';
+import { errorFrom } from '@toolpad/utils/errors';
+import { filterValues, hasOwnProperty, mapValues } from '@toolpad/utils/collections';
 import { execa } from 'execa';
 import {
   writeFileRecursive,
@@ -26,10 +22,10 @@ import {
   updateYamlFile,
   fileExists,
   readJsonFile,
-} from '@mui/toolpad-utils/fs';
+} from '@toolpad/utils/fs';
 import { z } from 'zod';
-import { Awaitable } from '@mui/toolpad-utils/types';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { Awaitable } from '@toolpad/utils/types';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import insecureHash from '../utils/insecureHash';
 import {
   Page,
@@ -238,7 +234,7 @@ async function createDefaultCodeComponent(name: string, filePath: string): Promi
     `
   import * as React from 'react';
   import { Typography } from '@mui/material';
-  import { createComponent } from '@mui/toolpad-studio/browser';
+  import { createComponent } from '@toolpad/studio/browser';
   
   export interface ${propTypeId} {
     msg: string;

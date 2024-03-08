@@ -15,7 +15,7 @@ import {
   Snackbar,
   Toolbar,
 } from '@mui/material';
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom } from '@toolpad/utils/errors';
 import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -23,12 +23,12 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import JavascriptIcon from '@mui/icons-material/Javascript';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
+import useBoolean from '@toolpad/utils/hooks/useBoolean';
 import { useQuery } from '@tanstack/react-query';
-import { ensureSuffix } from '@mui/toolpad-utils/strings';
-import { NodeId } from '@mui/toolpad-studio-runtime';
-import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { ensureSuffix } from '@toolpad/utils/strings';
+import { NodeId } from '@toolpad/studio-runtime';
+import usePageTitle from '@toolpad/utils/hooks/usePageTitle';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import OpenCodeEditorButton from '../OpenCodeEditor';
 import FlexFill from '../../components/FlexFill';

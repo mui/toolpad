@@ -1,4 +1,4 @@
-import { FlowDirection } from '@mui/toolpad-studio-runtime';
+import { FlowDirection } from '@toolpad/studio-runtime';
 
 export interface Rectangle {
   x: number;

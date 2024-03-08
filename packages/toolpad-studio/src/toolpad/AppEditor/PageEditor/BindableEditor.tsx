@@ -13,8 +13,8 @@ import {
   JsRuntime,
   ScopeMeta,
   EnvAttrValue,
-} from '@mui/toolpad-studio-runtime';
-import { WithControlledProp } from '@mui/toolpad-utils/types';
+} from '@toolpad/studio-runtime';
+import { WithControlledProp } from '@toolpad/utils/types';
 import { getBindingType } from '../../../runtime/bindings';
 import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
 

@@ -9,10 +9,10 @@ import {
   ExecFetchResult,
   ScopeMeta,
   NodeHashes,
-} from '@mui/toolpad-studio-runtime';
+} from '@toolpad/studio-runtime';
 import { PaletteMode } from '@mui/material';
-import type { Awaitable, Maybe, WithControlledProp } from '@mui/toolpad-utils/types';
-import type * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import type { Awaitable, Maybe, WithControlledProp } from '@toolpad/utils/types';
+import type * as appDom from '@toolpad/studio-runtime/appDom';
 import type { Rectangle } from './utils/geometry';
 import type { RuntimeState } from './runtime';
 

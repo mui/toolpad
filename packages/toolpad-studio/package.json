@@ -1,5 +1,5 @@
 {
-  "name": "@mui/toolpad-studio",
+  "name": "@toolpad/studio",
   "version": "0.1.51",
   "license": "MIT",
   "bin": {
@@ -52,9 +52,9 @@
     "@mui/lab": "5.0.0-alpha.166",
     "@mui/material": "5.15.11",
     "@mui/system": "5.15.11",
-    "@mui/toolpad-studio-components": "workspace:*",
-    "@mui/toolpad-studio-runtime": "workspace:*",
-    "@mui/toolpad-utils": "workspace:*",
+    "@toolpad/studio-components": "workspace:*",
+    "@toolpad/studio-runtime": "workspace:*",
+    "@toolpad/utils": "workspace:*",
     "@mui/types": "7.2.13",
     "@mui/utils": "5.15.11",
     "@mui/x-charts": "6.19.5",

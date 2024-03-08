@@ -9,23 +9,19 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
-import { inferColumns, parseColumns } from '@mui/toolpad-studio-components';
+import { inferColumns, parseColumns } from '@toolpad/studio-components';
 import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import SyncIcon from '@mui/icons-material/Sync';
-import { getObjectKey } from '@mui/toolpad-utils/objectKey';
-import {
-  BindableAttrEntries,
-  BindableAttrValue,
-  ExecFetchResult,
-} from '@mui/toolpad-studio-runtime';
-import { useBrowserJsRuntime } from '@mui/toolpad-studio-runtime/jsBrowserRuntime';
-import { serializeError, errorFrom } from '@mui/toolpad-utils/errors';
-import { Maybe } from '@mui/toolpad-utils/types';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { getObjectKey } from '@toolpad/utils/objectKey';
+import { BindableAttrEntries, BindableAttrValue, ExecFetchResult } from '@toolpad/studio-runtime';
+import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
+import { serializeError, errorFrom } from '@toolpad/utils/errors';
+import { Maybe } from '@toolpad/utils/types';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { useEvaluateLiveBindingEntries } from '../../toolpad/AppEditor/useEvaluateLiveBinding';

@@ -18,7 +18,7 @@ import {
 import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import invariant from 'invariant';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
+import useBoolean from '@toolpad/utils/hooks/useBoolean';
 import useMenu from '../../../../utils/useMenu';
 import { DOCUMENTATION_URL, VERSION_CHECK_INTERVAL } from '../../../../constants';
 import { useProjectApi } from '../../../../projectApi';
@@ -63,7 +63,7 @@ function FeedbackMenuItemLink({ href, children }: FeedbackMenuItemLinkProps) {
 }
 
 function getUpgradeMessage(packageManager: PackageManager | null): string {
-  const pkgName = '@mui/toolpad-studio';
+  const pkgName = '@toolpad/studio';
   switch (packageManager) {
     case 'yarn':
       return `yarn add ${pkgName}`;

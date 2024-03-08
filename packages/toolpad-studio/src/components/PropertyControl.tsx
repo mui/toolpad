@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { PropValueType } from '@mui/toolpad-studio-runtime';
+import { PropValueType } from '@toolpad/studio-runtime';
 import MarkdownTooltip from './MarkdownTooltip';
 
 export interface PropertyControlProps {

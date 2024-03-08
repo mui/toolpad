@@ -4,7 +4,7 @@ import {
   BindableAttrValue,
   ScopeMeta,
   LiveBinding,
-} from '@mui/toolpad-studio-runtime';
+} from '@toolpad/studio-runtime';
 import {
   Box,
   Button,
@@ -25,8 +25,8 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
-import { createServerJsRuntime } from '@mui/toolpad-studio-runtime/jsServerRuntime';
-import { Maybe } from '@mui/toolpad-utils/types';
+import { createServerJsRuntime } from '@toolpad/studio-runtime/jsServerRuntime';
+import { Maybe } from '@toolpad/utils/types';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../components/resizablePanels';
 import { ClientDataSource, ConnectionEditorProps, QueryEditorProps } from '../../types';
 import {

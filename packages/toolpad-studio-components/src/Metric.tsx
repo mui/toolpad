@@ -5,7 +5,7 @@ import {
   createFormat,
   NUMBER_FORMAT_SCHEMA,
   FormattedNumber,
-} from '@mui/toolpad-studio-runtime/numberFormat';
+} from '@toolpad/studio-runtime/numberFormat';
 import createBuiltin from './createBuiltin';
 
 export interface ColorScaleStop {

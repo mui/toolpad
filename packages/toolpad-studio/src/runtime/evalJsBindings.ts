@@ -1,5 +1,5 @@
-import { BindingEvaluationResult, JsRuntime } from '@mui/toolpad-studio-runtime';
-import { mapValues } from '@mui/toolpad-utils/collections';
+import { BindingEvaluationResult, JsRuntime } from '@toolpad/studio-runtime';
+import { mapValues } from '@toolpad/utils/collections';
 // TODO: remove these lodash-es imports
 // eslint-disable-next-line no-restricted-imports
 import { setWith, clone, set as setObjectPath } from 'lodash-es';

@@ -27,7 +27,7 @@ Toolpad exposes a [`createComponent`](https://mui.com/toolpad/reference/api/crea
 ```jsx
 import * as React from 'react';
 import { Typography } from '@mui/material';
-import { createComponent } from '@mui/toolpad/browser';
+import { createComponent } from '@toolpad/studio/browser';
 
 export interface HelloWorldProps {
   msg: string;

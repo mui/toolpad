@@ -25,7 +25,7 @@
     "release:version": "lerna version --exact --no-changelog --no-push --no-git-tag-version",
     "release:publish": "pnpm dedupe && pnpm release:build && pnpm publish --recursive --tag latest",
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
-    "test:build": "lerna run build --scope @mui/toolpad-studio-runtime --scope @mui/toolpad-studio-components --stream",
+    "test:build": "lerna run build --scope @toolpad/studio-runtime --scope @toolpad/studio-components --stream",
     "test:integration": "rimraf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
     "test:argos": "node ./scripts/pushArgos.mjs",
     "test": "lerna run test",
@@ -103,7 +103,8 @@
     "pnpm": "8.15.4"
   },
   "resolutions": {
-    "google-auth-library": "*"
+    "google-auth-library": "*",
+    "nx": "17.2.6"
   },
   "packageManager": "pnpm@8.15.4"
 }

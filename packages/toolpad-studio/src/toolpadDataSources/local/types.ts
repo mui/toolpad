@@ -1,8 +1,4 @@
-import {
-  BindableAttrValue,
-  ExecFetchResult,
-  PrimitiveValueType,
-} from '@mui/toolpad-studio-runtime';
+import { BindableAttrValue, ExecFetchResult, PrimitiveValueType } from '@toolpad/studio-runtime';
 import type { IntrospectionResult } from '../../server/functionsTypesWorker';
 
 export interface LocalConnectionParams {}

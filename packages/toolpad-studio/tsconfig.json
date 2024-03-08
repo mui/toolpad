@@ -2,17 +2,15 @@
   "compilerOptions": {
     "paths": {
       // TODO: remove when typescript module resolution supports package exports. (v5.0 with moduleResolution: 'bundler')
-      "@mui/toolpad-studio-runtime": ["../toolpad-studio-runtime/dist"],
-      "@mui/toolpad-studio-runtime/runtime": ["../toolpad-studio-runtime/dist/runtime"],
-      "@mui/toolpad-studio-runtime/jsRuntime": ["../toolpad-studio-runtime/dist/jsRuntime"],
-      "@mui/toolpad-studio-runtime/jsBrowserRuntime": [
+      "@toolpad/studio-runtime": ["../toolpad-studio-runtime/dist"],
+      "@toolpad/studio-runtime/runtime": ["../toolpad-studio-runtime/dist/runtime"],
+      "@toolpad/studio-runtime/jsRuntime": ["../toolpad-studio-runtime/dist/jsRuntime"],
+      "@toolpad/studio-runtime/jsBrowserRuntime": [
         "../toolpad-studio-runtime/dist/jsBrowserRuntime"
       ],
-      "@mui/toolpad-studio-runtime/jsServerRuntime": [
-        "../toolpad-studio-runtime/dist/jsServerRuntime"
-      ],
-      "@mui/toolpad-studio-runtime/numberFormat": ["../toolpad-studio-runtime/dist/numberFormat"],
-      "@mui/toolpad-utils/*": ["../toolpad-utils/dist/*"]
+      "@toolpad/studio-runtime/jsServerRuntime": ["../toolpad-studio-runtime/dist/jsServerRuntime"],
+      "@toolpad/studio-runtime/numberFormat": ["../toolpad-studio-runtime/dist/numberFormat"],
+      "@toolpad/utils/*": ["../toolpad-utils/dist/*"]
     },
     "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],

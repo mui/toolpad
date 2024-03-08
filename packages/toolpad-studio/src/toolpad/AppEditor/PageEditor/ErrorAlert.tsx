@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Alert, AlertTitle, IconButton, Collapse, Box, SxProps } from '@mui/material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { indent } from '@mui/toolpad-utils/strings';
+import { indent } from '@toolpad/utils/strings';
 import Pre from '../../../components/Pre';
 
 export interface ErrorAlertProps {

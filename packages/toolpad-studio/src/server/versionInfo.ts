@@ -1,7 +1,7 @@
 import * as path from 'path';
 import latestVersion from 'latest-version';
 import * as semver from 'semver';
-import { fileExists } from '@mui/toolpad-utils/fs';
+import { fileExists } from '@toolpad/utils/fs';
 import pkg from '../../package.json';
 
 export type PackageManager = 'npm' | 'yarn' | 'pnpm';
@@ -36,7 +36,7 @@ export interface VersionInfo {
 }
 
 export async function checkVersion(root: string): Promise<VersionInfo> {
-  const pkgName = '@mui/toolpad-studio';
+  const pkgName = '@toolpad/studio';
   const [latest, packageManager] = await Promise.all([
     latestVersion(pkgName),
     detectPackageManager(root),

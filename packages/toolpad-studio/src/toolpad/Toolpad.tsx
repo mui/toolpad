@@ -7,7 +7,7 @@ import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import SyncIcon from '@mui/icons-material/Sync';
 import SyncProblemIcon from '@mui/icons-material/SyncProblem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
+import useBoolean from '@toolpad/utils/hooks/useBoolean';
 import AppEditor from './AppEditor';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ThemeProvider } from '../ThemeContext';

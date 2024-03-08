@@ -1,4 +1,4 @@
-import { createHandler } from '@mui/toolpad-studio';
+import { createHandler } from '@toolpad/studio';
 import next from 'next';
 import * as url from 'url';
 import express from 'express';

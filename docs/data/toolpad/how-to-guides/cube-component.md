@@ -39,7 +39,7 @@ We can use any package available on `npm` to extend our Toolpad application. Thi
    ```jsx
    import * as React from 'react';
    import { Canvas, useFrame } from '@react-three/fiber';
-   import { createComponent } from '@mui/toolpad/browser';
+   import { createComponent } from '@toolpad/studio/browser';
 
    function Box({ position, color }) {
      // This reference gives us direct access to the THREE.Mesh object

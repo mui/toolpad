@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button } from '@mui/toolpad-studio-components';
+import { Button } from '@toolpad/studio-components';
 import { Stack } from '@mui/material';
 
 export default function BasicButton() {

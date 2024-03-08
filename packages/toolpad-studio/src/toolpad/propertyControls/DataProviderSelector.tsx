@@ -19,12 +19,12 @@ import {
   Radio,
   FormHelperText,
 } from '@mui/material';
-import { errorFrom } from '@mui/toolpad-utils/errors';
+import { errorFrom } from '@toolpad/utils/errors';
 import AddIcon from '@mui/icons-material/Add';
 import { useMutation } from '@tanstack/react-query';
 import { LoadingButton } from '@mui/lab';
-import { generateUniqueString } from '@mui/toolpad-utils/strings';
-import { PaginationMode } from '@mui/toolpad-studio-runtime';
+import { generateUniqueString } from '@toolpad/utils/strings';
+import { PaginationMode } from '@toolpad/studio-runtime';
 import { Stack } from '@mui/system';
 import { EditorProps } from '../../types';
 import { useProjectApi } from '../../projectApi';

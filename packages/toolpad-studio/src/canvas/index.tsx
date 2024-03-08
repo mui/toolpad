@@ -1,10 +1,10 @@
 import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
-import { CanvasEventsContext } from '@mui/toolpad-studio-runtime/runtime';
-import { FlowDirection, SlotType } from '@mui/toolpad-studio-runtime';
-import { update } from '@mui/toolpad-utils/immutability';
-import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { CanvasEventsContext } from '@toolpad/studio-runtime/runtime';
+import { FlowDirection, SlotType } from '@toolpad/studio-runtime';
+import { update } from '@toolpad/utils/immutability';
+import { useNonNullableContext } from '@toolpad/utils/react';
 import { queryClient } from '../runtime/api';
 import { AppCanvasState, NodeInfo, PageViewState, SlotsState } from '../types';
 import {

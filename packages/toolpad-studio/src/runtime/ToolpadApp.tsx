@@ -33,9 +33,9 @@ import {
   ApplicationVm,
   JsExpressionAttrValue,
   ComponentConfig,
-} from '@mui/toolpad-studio-runtime';
-import { useAssertedContext, useNonNullableContext } from '@mui/toolpad-utils/react';
-import { mapProperties, mapValues } from '@mui/toolpad-utils/collections';
+} from '@toolpad/studio-runtime';
+import { useAssertedContext, useNonNullableContext } from '@toolpad/utils/react';
+import { mapProperties, mapValues } from '@toolpad/utils/collections';
 import { set as setObjectPath } from 'lodash-es';
 import { QueryClientProvider, useMutation } from '@tanstack/react-query';
 import {
@@ -57,16 +57,16 @@ import {
   NodeRuntimeWrapper,
   ResetNodeErrorsKeyProvider,
   UseDataProviderContext,
-} from '@mui/toolpad-studio-runtime/runtime';
+} from '@toolpad/studio-runtime/runtime';
 import ErrorIcon from '@mui/icons-material/Error';
-import { getBrowserRuntime } from '@mui/toolpad-studio-runtime/jsBrowserRuntime';
-import * as builtIns from '@mui/toolpad-studio-components';
-import { errorFrom } from '@mui/toolpad-utils/errors';
-import useBoolean from '@mui/toolpad-utils/hooks/useBoolean';
-import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
+import { getBrowserRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
+import * as builtIns from '@toolpad/studio-components';
+import { errorFrom } from '@toolpad/utils/errors';
+import useBoolean from '@toolpad/utils/hooks/useBoolean';
+import usePageTitle from '@toolpad/utils/hooks/usePageTitle';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { RuntimeState } from './types';
 import { getBindingType, getBindingValue } from './bindings';
 import {

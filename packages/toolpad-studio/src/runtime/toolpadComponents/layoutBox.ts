@@ -1,5 +1,5 @@
 import { BoxProps } from '@mui/material';
-import { ArgTypeDefinition } from '@mui/toolpad-studio-runtime';
+import { ArgTypeDefinition } from '@toolpad/studio-runtime';
 
 export const LAYOUT_DIRECTION_HORIZONTAL = 'horizontal';
 export const LAYOUT_DIRECTION_VERTICAL = 'vertical';

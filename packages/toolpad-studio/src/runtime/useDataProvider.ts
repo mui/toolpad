@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { UseDataProviderHook } from '@mui/toolpad-studio-runtime/runtime';
+import { UseDataProviderHook } from '@toolpad/studio-runtime/runtime';
 import { useQuery } from '@tanstack/react-query';
 import invariant from 'invariant';
-import { ToolpadDataProviderBase } from '@mui/toolpad-studio-runtime';
+import { ToolpadDataProviderBase } from '@toolpad/studio-runtime';
 import type { GridRowId } from '@mui/x-data-grid';
-import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import { useNonNullableContext } from '@toolpad/utils/react';
 import { RuntimeApiContext } from './api';
 
 export const useDataProvider: UseDataProviderHook = (id) => {

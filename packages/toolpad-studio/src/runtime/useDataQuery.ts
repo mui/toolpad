@@ -3,8 +3,8 @@
 import { GridRowsProp } from '@mui/x-data-grid-pro';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
-import { useNonNullableContext } from '@mui/toolpad-utils/react';
+import * as appDom from '@toolpad/studio-runtime/appDom';
+import { useNonNullableContext } from '@toolpad/utils/react';
 import { CanvasHooksContext } from './CanvasHooksContext';
 import { RuntimeApiContext } from './api';
 

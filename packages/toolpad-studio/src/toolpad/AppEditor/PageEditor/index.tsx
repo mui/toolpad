@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import usePageTitle from '@mui/toolpad-utils/hooks/usePageTitle';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import usePageTitle from '@toolpad/utils/hooks/usePageTitle';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { Panel, PanelGroup, PanelResizeHandle } from '../../../components/resizablePanels';
 import RenderPanel from './RenderPanel';
 import { PageEditorProvider } from './PageEditorProvider';

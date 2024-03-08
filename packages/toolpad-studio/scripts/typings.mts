@@ -12,7 +12,7 @@ const LIBS = [
   { name: 'react' },
   { name: 'react-dom' },
   { name: '@mui/material' },
-  { name: '@mui/toolpad-studio-runtime' },
+  { name: '@toolpad/studio-runtime' },
   { name: '@mui/x-date-pickers' },
   { name: '@mui/x-date-pickers-pro' },
   { name: '@mui/x-data-grid' },

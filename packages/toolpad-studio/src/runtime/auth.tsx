@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { asArray } from '@mui/toolpad-utils/collections';
+import { asArray } from '@toolpad/utils/collections';
 import { Box } from '@mui/material';
 import { AuthContext } from './useAuth';
 

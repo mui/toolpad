@@ -1,4 +1,4 @@
-import { createServerJsRuntime } from '@mui/toolpad-studio-runtime/jsServerRuntime';
+import { createServerJsRuntime } from '@toolpad/studio-runtime/jsServerRuntime';
 import { describe, test, expect } from 'vitest';
 
 async function evalExpression(expression: string, globalScope: Record<string, unknown> = {}) {

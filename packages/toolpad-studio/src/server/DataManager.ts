@@ -1,11 +1,11 @@
-import { NodeId, ExecFetchResult } from '@mui/toolpad-studio-runtime';
-import { withContext, createServerContext } from '@mui/toolpad-studio-runtime/serverRuntime';
-import { createServerJsRuntime } from '@mui/toolpad-studio-runtime/jsServerRuntime';
+import { NodeId, ExecFetchResult } from '@toolpad/studio-runtime';
+import { withContext, createServerContext } from '@toolpad/studio-runtime/serverRuntime';
+import { createServerJsRuntime } from '@toolpad/studio-runtime/jsServerRuntime';
 import express, { Router } from 'express';
 import cors from 'cors';
 import invariant from 'invariant';
-import { errorFrom, serializeError, SerializedError } from '@mui/toolpad-utils/errors';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { errorFrom, serializeError, SerializedError } from '@toolpad/utils/errors';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import type { RuntimeConfig, Methods, ServerDataSource, ToolpadProjectOptions } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import applyTransform from '../toolpadDataSources/applyTransform';

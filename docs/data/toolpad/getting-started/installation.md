@@ -60,15 +60,15 @@ Start by installing the required dependencies:
 <codeblock storageKey="package-manager">
 
 ```bash npm
-pnpm install -S @mui/toolpad
+pnpm install -S @toolpad/studio
 ```
 
 ```bash yarn
-yarn add @mui/toolpad
+yarn add @toolpad/studio
 ```
 
 ```bash pnpm
-pnpm add @mui/toolpad
+pnpm add @toolpad/studio
 ```
 
 </codeblock>

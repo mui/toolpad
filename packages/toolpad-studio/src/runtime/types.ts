@@ -1,4 +1,4 @@
-import type * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import type * as appDom from '@toolpad/studio-runtime/appDom';
 
 /**
  * Defines all the data needed to render the runtime.

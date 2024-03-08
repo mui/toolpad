@@ -35,7 +35,7 @@ This will use the local version of Toolpad Studio as built in the monorepo. This
 
    **Note:** It's important to note the difference between `pnpm toolpad-studio dev` and the `--dev` parameter. The first instruction runs Toolpad Studio in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.
 
-If your application has dependencies other than `@mui/toolpad-studio`, you have to temporarily add it to the workspace:
+If your application has dependencies other than `@toolpad/studio`, you have to temporarily add it to the workspace:
 
 1. update `pnpm-workspace.yaml` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode` this would be:
 
@@ -97,13 +97,13 @@ pnpm install
        "start": "toolpad-studio start --dev"
      },
      "dependencies": {
-       "@mui/toolpad-studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio"
+       "@toolpad/studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio"
      },
      "resolutions": {
-       "@mui/toolpad-studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio",
-       "@mui/toolpad-studio-runtime": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-runtime",
-       "@mui/toolpad-studio-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-components",
-       "@mui/toolpad-utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"
+       "@toolpad/studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio",
+       "@toolpad/studio-runtime": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-runtime",
+       "@toolpad/studio-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-components",
+       "@toolpad/utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"
      }
    }
    ```
@@ -201,15 +201,15 @@ Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn
 
 2. In the codesandbox UI, on the right panel, locate and expand the "Packages (6)" section.
 
-3. Right click the link named `@mui/toolpad-studio` and copy the address
+3. Right click the link named `@toolpad/studio` and copy the address
 
    ![Copy CodeSandbox CI package link](contributing/codesandbox-ci-package-link.png)
 
-4. In your `package.json`, for the `@mui/toolpad-studio` dependency, replace the version with aforementioned link. e.g.
+4. In your `package.json`, for the `@toolpad/studio` dependency, replace the version with aforementioned link. e.g.
 
    ```json
    "dependencies": {
-      "@mui/toolpad-studio": "https://pkg.csb.dev/mui/mui-toolpad/commit/<commit>/@mui/toolpad-studio"
+      "@toolpad/studio": "https://pkg.csb.dev/mui/mui-toolpad/commit/<commit>/@toolpad/studio"
    }
    ```
 

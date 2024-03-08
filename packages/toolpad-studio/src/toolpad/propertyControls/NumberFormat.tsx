@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NumberFormat, NumberFormatEditor } from '@mui/toolpad-studio-runtime/numberFormat';
+import { NumberFormat, NumberFormatEditor } from '@toolpad/studio-runtime/numberFormat';
 import type { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 

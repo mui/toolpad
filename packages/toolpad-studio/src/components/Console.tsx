@@ -1,7 +1,7 @@
 import { darken, lighten, styled, SxProps } from '@mui/material';
 import clsx from 'clsx';
 import * as React from 'react';
-import { interleave } from '@mui/toolpad-utils/react';
+import { interleave } from '@toolpad/utils/react';
 import ObjectInspector from './ObjectInspector';
 
 export interface LogEntry {

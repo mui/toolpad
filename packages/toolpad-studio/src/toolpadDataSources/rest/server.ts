@@ -4,13 +4,13 @@ import {
   BindableAttrValue,
   BindableAttrValues,
   JsRuntime,
-} from '@mui/toolpad-studio-runtime';
+} from '@toolpad/studio-runtime';
 import fetch, { RequestInit, Response, Headers } from 'node-fetch';
-import { createServerJsRuntime } from '@mui/toolpad-studio-runtime/jsServerRuntime';
-import { SerializedError, errorFrom, serializeError } from '@mui/toolpad-utils/errors';
-import { evaluateBindable } from '@mui/toolpad-studio-runtime/jsRuntime';
-import { removePrefix } from '@mui/toolpad-utils/strings';
-import { Maybe } from '@mui/toolpad-utils/types';
+import { createServerJsRuntime } from '@toolpad/studio-runtime/jsServerRuntime';
+import { SerializedError, errorFrom, serializeError } from '@toolpad/utils/errors';
+import { evaluateBindable } from '@toolpad/studio-runtime/jsRuntime';
+import { removePrefix } from '@toolpad/utils/strings';
+import { Maybe } from '@toolpad/utils/types';
 import { withHarInstrumentation, createHarLog } from '../../server/har';
 import { ServerDataSource } from '../../types';
 import {

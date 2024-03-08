@@ -1,6 +1,6 @@
-import { ComponentConfig, NodeHashes } from '@mui/toolpad-studio-runtime';
+import { ComponentConfig, NodeHashes } from '@toolpad/studio-runtime';
 import * as React from 'react';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 
 export interface NavigateToPage {
   (name: string, pageParameters?: Record<string, string>): void;

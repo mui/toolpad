@@ -1,4 +1,4 @@
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import { RuntimeState } from './types';
 
 export interface CreateRuntimeStateParams {

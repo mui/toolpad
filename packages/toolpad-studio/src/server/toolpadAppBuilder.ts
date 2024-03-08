@@ -3,8 +3,8 @@ import * as url from 'node:url';
 import * as fs from 'fs';
 import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import { indent } from '@mui/toolpad-utils/strings';
-import * as appDom from '@mui/toolpad-studio-runtime/appDom';
+import { indent } from '@toolpad/utils/strings';
+import * as appDom from '@toolpad/studio-runtime/appDom';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import { pathToNodeImportSpecifier } from '../utils/paths';
@@ -117,7 +117,7 @@ function toolpadStudioVitePlugin(): Plugin {
         }
 
         return `
-          import { createRemoteFunction } from '@mui/toolpad-studio/runtime';
+          import { createRemoteFunction } from '@toolpad/studio/runtime';
 
           const functionFile = ${JSON.stringify(codeFile)};
 
@@ -178,11 +178,11 @@ export async function createViteConfig({
     const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
 
     return `
-import { init, setComponents } from '@mui/toolpad-studio/entrypoint';
+import { init, setComponents } from '@toolpad/studio/entrypoint';
 import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
-${isCanvas ? `import AppCanvas from '@mui/toolpad-studio/canvas'` : ''}
-${isEditor ? `import ToolpadEditor from '@mui/toolpad-studio/editor'` : ''}
+${isCanvas ? `import AppCanvas from '@toolpad/studio/canvas'` : ''}
+${isEditor ? `import ToolpadEditor from '@toolpad/studio/editor'` : ''}
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
@@ -335,7 +335,7 @@ if (import.meta.hot) {
                 : 'virtual:toolpad-files:main.tsx',
           },
           {
-            find: '@mui/toolpad-studio',
+            find: '@toolpad/studio',
             replacement: toolpadDevMode
               ? // load source
                 path.resolve(currentDirectory, '../../src/exports')
@@ -364,7 +364,7 @@ if (import.meta.hot) {
       optimizeDeps: {
         force: !process.env.EXPERIMENTAL_INLINE_CANVAS && toolpadDevMode ? true : undefined,
         include: [
-          ...FALLBACK_MODULES.map((moduleName) => `@mui/toolpad-studio > ${moduleName}`),
+          ...FALLBACK_MODULES.map((moduleName) => `@toolpad/studio > ${moduleName}`),
           ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
             ? [
                 'perf-cascade',

@@ -1,6 +1,6 @@
-import { BindableAttrValue, ExecFetchResult } from '@mui/toolpad-studio-runtime';
+import { BindableAttrValue, ExecFetchResult } from '@toolpad/studio-runtime';
 import type { Har } from 'har-format';
-import { Maybe } from '@mui/toolpad-utils/types';
+import { Maybe } from '@toolpad/utils/types';
 
 interface AuthenticationBase {
   type: 'basic' | 'bearerToken' | 'apiKey';

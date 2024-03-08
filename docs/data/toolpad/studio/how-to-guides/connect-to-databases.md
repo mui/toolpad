@@ -37,7 +37,7 @@ export async function getData(order_id: number) {
 }
 ```
 
-If our queries don't rely on parameters, we may even use a `.sql` file stored in the file system so that we can keep them organised:
+If your queries don't rely on parameters, you may even use a `.sql` file stored in the file system so that you can keep them organised:
 
 ```ts
 import * as fs from 'fs/promises';
@@ -53,11 +53,11 @@ export async function getData() {
 }
 ```
 
-Keep in mind that you can run any SQL query on our database through these custom functions.
+Keep in mind that you can run any SQL query on your database through these custom functions.
 
 ### Using SSH tunnels (optional)
 
-Instead of connecting directly, you may want to create an SSH tunnel to connect to our database. We can modify our function a bit to make this happen:
+Instead of connecting directly, you may want to create an SSH tunnel to connect to your database. You can modify your function a bit to make this happen:
 
 ```ts
 import mysql from 'mysql2/promise';

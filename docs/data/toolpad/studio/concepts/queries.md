@@ -24,7 +24,7 @@ Queries allow you to bring backend data to your Toolpad Studio page. They are ca
 
   You can use this option to enable or disable the query from running
 
-Queries may be programatically re-fetched via the `refetch` function available on these query objects. For example, for a query named `getOrders`, we can add
+Queries may be programatically re-fetched via the `refetch` function available on these query objects. For example, for a query named `getOrders`, you can add
 
 ```js
 getOrders.refetch();

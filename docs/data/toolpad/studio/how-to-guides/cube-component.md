@@ -2,7 +2,7 @@
 
 <p class="description">You can extend Toolpad Studio with custom code components, including from external packages.</p>
 
-We can use any package available on `npm` to extend our Toolpad Studio application. This guide will render a cube using [`@react-three/fiber`](https://www.npmjs.com/package/@react-three/fiber):
+You can use any package available on `npm` to extend your Toolpad Studio application. This guide will render a cube using [`@react-three/fiber`](https://www.npmjs.com/package/@react-three/fiber):
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/custom-components/cube/component.png", "alt": "Cube component", "caption": "The cube component" }}
 

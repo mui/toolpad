@@ -21,6 +21,6 @@
    <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq"></iframe>
    ```
 
-   we can embed a Toolpad Studio page, like so:
+   you can embed a Toolpad Studio page, like so:
 
     <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq?toolpad-display=standalone" loading="lazy" style="display: block; margin: auto"></iframe>

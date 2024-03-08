@@ -406,7 +406,7 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
     console.error(
       `${chalk.red('error')} - No Toolpad application found running under ${chalk.cyan(appUrl)}\n` +
         `        Find more information about running a custom server at ${chalk.cyan(
-          'https://mui.com/toolpad/concepts/custom-server/',
+          'https://mui.com/toolpad/studio/concepts/custom-server/',
         )}`,
     );
 

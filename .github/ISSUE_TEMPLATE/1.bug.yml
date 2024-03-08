@@ -1,5 +1,5 @@
 name: Bug report 🐛
-description: Create a bug report for MUI Toolpad.
+description: Create a bug report for Toolpad.
 labels: ['status: waiting for maintainer']
 body:
   - type: markdown

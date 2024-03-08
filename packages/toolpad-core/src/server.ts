@@ -53,7 +53,7 @@ type MaybeLegacyParametersDefinition = PropValueType & {
 
 /**
  * @deprecated Directly export a function instead. This will be removed in a future release.
- * See: https://mui.com/toolpad/reference/api/create-function/
+ * See: https://mui.com/toolpad/studio/reference/api/create-function/
  * Use this to define a function that will load the data for a Toolpad query.
  * You can define parameters for the function in the configuration object.
  * These parameters will be available in the Toolpad editor when creating a query and can be bound to page state.
@@ -101,11 +101,11 @@ export type { ServerContext };
  *
  * Demos:
  *
- * - [Custom Functions](https://mui.com/toolpad/concepts/custom-functions/#request-context/)
+ * - [Custom Functions](https://mui.com/toolpad/studio/concepts/custom-functions/#request-context/)
  *
  * API:
  *
- * - [`getContext` API](https://mui.com/toolpad/reference/api/get-context)
+ * - [`getContext` API](https://mui.com/toolpad/studio/reference/api/get-context)
  *
  */
 export function getContext(): ServerContext {
@@ -130,11 +130,11 @@ export interface ToolpadDataProvider<
  *
  * Demos:
  *
- * - [Data providers](https://mui.com/toolpad/concepts/data-providers/)
+ * - [Data providers](https://mui.com/toolpad/studio/concepts/data-providers/)
  *
  * API:
  *
- * - [`createDataProvider` API](https://mui.com/toolpad/reference/api/create-data-provider/)
+ * - [`createDataProvider` API](https://mui.com/toolpad/studio/reference/api/create-data-provider/)
  *
  */
 export function createDataProvider<

@@ -3,7 +3,7 @@
 <p class="description">An app that shows dog images based on selected breeds or sub-breeds.</p>
 
 <a href="https://mui-toolpad-dog-app-production.up.railway.app/prod/pages/page" target="_blank">
-  <img src="https://mui.com/static/toolpad/docs/getting-started/first-app/step-13.png" alt="An app that shows dog images based on selected breeds or sub-breeds." style="aspect-ratio: 360/199;" width="1440">
+  <img src="https://mui.com/static/toolpad/docs/studio/getting-started/first-app/step-13.png" alt="An app that shows dog images based on selected breeds or sub-breeds." style="aspect-ratio: 360/199;" width="1440">
 </a>
 
 ## Check out the live app

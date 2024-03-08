@@ -13,7 +13,7 @@ const currentDirectory = __dirname;
 const projectRoot = path.resolve(currentDirectory, '..', '..');
 const prettierConfigPath = path.resolve(projectRoot, 'prettier.config.js');
 const docsRoot = path.resolve(projectRoot, 'docs');
-const absolutePathRoot = '/toolpad/reference/components';
+const absolutePathRoot = '/toolpad/studio/reference/components';
 const componentDocsRoot = path.resolve(docsRoot, `data${absolutePathRoot}`);
 const componentPagesRoot = path.resolve(docsRoot, `pages${absolutePathRoot}`);
 

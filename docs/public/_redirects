@@ -36,5 +36,15 @@
 /toolpad/reference/components/datagrid/ /toolpad/reference/components/data-grid/ 301
 /toolpad/getting-started/overview/ /toolpad/getting-started/ 301
 
+# 2024
+
+# Separate Studio and Core
+/toolpad/getting-started/* /toolpad/studio/getting-started/:splat 301
+/toolpad/examples/* /toolpad/studio/examples/:splat 301
+/toolpad/concepts/* /toolpad/studio/concepts/:splat 301
+/toolpad/components/* /toolpad/studio/components/:splat 301
+/toolpad/how-to-guides/* /toolpad/studio/how-to-guides/:splat 301
+/toolpad/reference/* /toolpad/studio/reference/:splat 301
+
 # Create separate namespace on https://mui.com
 / /toolpad/

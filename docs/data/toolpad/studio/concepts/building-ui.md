@@ -21,7 +21,7 @@ Each component has a set of properties that you can tweak in the **inspector pan
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/building-ui/canvas-1.png", "alt": "Toolpad Studio panels", "caption": "Inspector panel and page hierarchy explorer" }}
 
-Below are the step-by-step instructions on adding, moving, deleting and resizing a component in Toolpad Studio:
+Below are the step-by-step instructions on adding, moving, deleting, and resizing a component in Toolpad Studio:
 
 1. Open the component library and drag a component over the canvas.
 2. The canvas will highlight the location where the component can be dropped. Release the mouse to drop it.

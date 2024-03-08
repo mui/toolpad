@@ -6,7 +6,6 @@ settings:
 
 overrides:
   google-auth-library: '*'
-  nx: 17.2.6
 
 importers:
 
@@ -3570,7 +3569,7 @@ packages:
   /@nx/devkit@18.0.7(nx@17.2.6):
     resolution: {integrity: sha512-Xm+o4pbSNQ5YL0LJk4Gfbws0qIZhqa7H8I6z7rRQuxP9tqei7Q+cTaI4WJG7Y5l8lbgzScM4WeW2sGMvLFtITA==}
     peerDependencies:
-      nx: 17.2.6
+      nx: '>= 16 <= 18'
     dependencies:
       '@nrwl/devkit': 18.0.7(nx@17.2.6)
       ejs: 3.1.9

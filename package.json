@@ -103,8 +103,7 @@
     "pnpm": "8.15.4"
   },
   "resolutions": {
-    "google-auth-library": "*",
-    "nx": "17.2.6"
+    "google-auth-library": "*"
   },
   "packageManager": "pnpm@8.15.4"
 }

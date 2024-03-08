@@ -34,16 +34,16 @@ Describes the custom component.
 
 **Properties**
 
-| Name                   | Type                                   | Description                                                                                                                                                     |
-| :--------------------- | :------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `helperText?`          | `string`                               | A short explanatory text that'll be shown in the editor UI when this component is referenced. May contain Markdown.                                             |
-| `errorProp?`           | `string`                               | Designates a property as "the error property". If Toolpad Studio detects an error on any of the inputs, it will forward it to this property.                    |
-| `errorPropSource?`     | `string[]`                             | Configures which properties result in propagating error state to `errorProp`.                                                                                   |
-| `loadingProp?`         | `string`                               | Designates a property as "the loading property". If Toolpad Studio detects any of the inputs is still loading it will set this property to `true`.              |
-| `loadingPropSource?`   | `string[]`                             | Configures which properties result in propagating loading state to `loadingProp`.                                                                               |
-| `layoutDirection?`     | `'vertical' \| 'horizontal' \| 'both'` | Enables controlling the alignment of the component container box.                                                                                               |
-| `resizableHeightProp?` | `string`                               | Designates a property as "the resizable height property". If Toolpad Studio detects any vertical resizing of the component it will forward it to this property. |
-| `argTypes?`            | `{ [name: string]: ArgumentType }`     | Describes the individual properties for this component. See [ArgumentType](#argumenttype).                                                                      |
+| Name                   | Type                                   | Description                                                                                                                                                   |
+| :--------------------- | :------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `helperText?`          | `string`                               | A short explanatory text that'll be shown in the editor UI when this component is referenced. May contain Markdown.                                           |
+| `errorProp?`           | `string`                               | Designates a property as the error property. If Toolpad Studio detects an error on any of the inputs, it will forward it to this property.                    |
+| `errorPropSource?`     | `string[]`                             | Configures which properties result in propagating error state to `errorProp`.                                                                                 |
+| `loadingProp?`         | `string`                               | Designates a property as the loading property. If Toolpad Studio detects any of the inputs is still loading it will set this property to `true`.              |
+| `loadingPropSource?`   | `string[]`                             | Configures which properties result in propagating loading state to `loadingProp`.                                                                             |
+| `layoutDirection?`     | `'vertical' \| 'horizontal' \| 'both'` | Enables controlling the alignment of the component container box.                                                                                             |
+| `resizableHeightProp?` | `string`                               | Designates a property as the resizable height property. If Toolpad Studio detects any vertical resizing of the component it will forward it to this property. |
+| `argTypes?`            | `{ [name: string]: ArgumentType }`     | Describes the individual properties for this component. See [ArgumentType](#argumenttype).                                                                    |
 
 ### ArgumentType
 

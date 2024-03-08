@@ -408,7 +408,7 @@ export interface ComponentConfig<P extends object = Record<string, unknown>> {
    */
   errorPropSource?: (keyof P & string)[];
   /**
-   * Designates a property as "the error property". If Toolpad Studio detects an error
+   * Designates a property as the error property. If Toolpad Studio detects an error
    * on any of the inputs, it will forward it to this property.
    */
   errorProp?: keyof P & string;
@@ -417,7 +417,7 @@ export interface ComponentConfig<P extends object = Record<string, unknown>> {
    */
   loadingPropSource?: (keyof P & string)[];
   /**
-   * Designates a property as "the loading property". If Toolpad Studio detects any of the
+   * Designates a property as the loading property. If Toolpad Studio detects any of the
    * inputs is still loading it will set this property to `true`.
    */
   loadingProp?: keyof P & string;

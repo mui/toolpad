@@ -51,7 +51,7 @@ You get the following response:
 
 To be really useful, you need to connect these queries with data present on your page. You can do so by creating **parameters.**
 
-All function arguments will be available in the query editor to bind state to. Make sure to annotate them correctly with their typescript types. Toolpad Studio uses this information to present you with correctly typed databinding controls. For example:
+All function arguments will be available in the query editor to bind state to. Make sure to annotate them correctly with their TypeScript types. Toolpad Studio uses this information to present you with correctly typed databinding controls. For example:
 
 ```jsx
 export async function getAnimals(

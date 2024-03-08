@@ -28,10 +28,10 @@ If you think you've found a bug in the codebase, or you have an idea for a new f
 
 ### Discord
 
-Toolpad Studio is also present on Discord, you can connect with other Toolpad Studio users and get help from the community. To join, simply click on this [Discord server](https://mui.com/r/discord/) and follow the instructions. We look forward to seeing you there!
+Toolpad Studio is also present on Discord, you can connect with other Toolpad Studio users and get help from the community. To join, simply click on this [Discord server](https://mui.com/r/discord/) and follow the instructions. Looking forward to seeing you there!
 
 :::warning
-Please note that we a have a single Discord server for all MUI products and you should post in the Toolpad Studio channel.
+Please note that there is a single Discord server for all MUI products and you should post in the Toolpad Studio channel.
 :::
 
 ### Stack Overflow

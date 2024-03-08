@@ -2,14 +2,14 @@
 
 <p class="description">Toolpad Studio allows you to connect to any database, fast.</p>
 
-We can write a custom function to connect to any database that we need to.
-We can focus on writing database queries, while the data fetching and displaying is handled by Toolpad Studio.
+You can write a custom function to connect to any database that you need to.
+You can focus on writing database queries, while the data fetching and displaying is handled by Toolpad Studio.
 
 ## Connecting to MySQL
 
 ### Custom function
 
-Inside `/resources/functions.ts`, we can create a custom function:
+Inside `/resources/functions.ts`, you can create a custom function:
 
 ```ts
 import mysql from 'mysql2/promise';
@@ -53,11 +53,11 @@ export async function getData() {
 }
 ```
 
-Keep in mind that we can run any SQL query on our database through these custom functions.
+Keep in mind that you can run any SQL query on our database through these custom functions.
 
 ### Using SSH tunnels (optional)
 
-Instead of connecting directly, we may want to create an SSH tunnel to connect to our database. We can modify our function a bit to make this happen:
+Instead of connecting directly, you may want to create an SSH tunnel to connect to our database. We can modify our function a bit to make this happen:
 
 ```ts
 import mysql from 'mysql2/promise';

@@ -2,7 +2,7 @@
 
 <p class="description">You can add a delete functionality to the data grid in minutes.</p>
 
-We can add a delete button to a data grid connected to any REST API, like so:
+You can add a delete button to a data grid connected to any REST API, like so:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/delete-grid-row/delete-button.png", "alt": "Data grid with delete", "caption": "A data grid with a Delete button" }}
 
@@ -12,9 +12,9 @@ We can add a delete button to a data grid connected to any REST API, like so:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/delete-grid-row/add-delete-query.png", "alt": "Adding an HTTP Request query", "caption": "Adding an HTTP Request query", "indent": 1 }}
 
-2. Since this is a destructive action, it's important that we set the **mode** of this query to manual. Select **Only fetch on manual action** in the mode menu.
+2. Since this is a destructive action, it's important that you set the **mode** of this query to manual. Select **Only fetch on manual action** in the mode menu.
 
-3. To add the `id` in the request URL, we can add an `id` parameter to the query and bind it to the following JavaScript expression:
+3. To add the `id` in the request URL, you can add an `id` parameter to the query and bind it to the following JavaScript expression:
 
    ```js
    dataGrid.selection?.['ID'];
@@ -22,7 +22,7 @@ We can add a delete button to a data grid connected to any REST API, like so:
 
    `dataGrid.selection` contains the selected row on runtime, and the 'ID' field contains the `id` needed to be passed in the endpoint
 
-4. We can then bind the request URL to the following JavaScript expression:
+4. You can then bind the request URL to the following JavaScript expression:
 
    ```js
    `https://<API-BASE-URL>/customers/${parameters.id}`;
@@ -49,7 +49,7 @@ We can add a delete button to a data grid connected to any REST API, like so:
 
 2. Assuming that we have a `getOrders` query which fetches the orders, create another **Button** labelled "Refresh"
 
-3. We can re-fetch queries set to **automatic** mode through a `refetch` function available on each query object set to the automatic mode.
+3. You can re-fetch queries set to **automatic** mode through a `refetch` function available on each query object set to the automatic mode.
 
 4. Bind the `onClick` event of the Refresh button to the following JavaScript expression action:
 

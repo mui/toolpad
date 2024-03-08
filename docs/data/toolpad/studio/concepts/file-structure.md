@@ -17,5 +17,5 @@ You'll notice there is a **toolpad** folder that contains these files. All files
 Components and resources folders are created when you create your first custom component or function respectively.
 
 :::info
-The **.generated** folder contains build output of Toolpad Studio. You shouldn't check this in your version control system and it contains all the artifacts required for Toolpad Studio to run your application. This folder gets generated when you run `toolpad build` and needs to be present when you run `toolpad start`.
+The **.generated** folder contains build output of Toolpad Studio. You shouldn't check this in your version control system and it contains all the artifacts required for Toolpad Studio to run your application. This folder gets generated when you run `toolpad-studio build` and needs to be present when you run `toolpad-studio start`.
 :::

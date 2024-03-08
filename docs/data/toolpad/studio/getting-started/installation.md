@@ -79,27 +79,27 @@ Then you'll have to add the toolpad scripts to yur `package.json`:
 // ./package.json
 ...
   "scripts": {
-    "toolpad:dev": "toolpad dev ./my-toolpad-app",
-    "toolpad:build": "toolpad build ./my-toolpad-app",
-    "toolpad:start": "toolpad start ./my-toolpad-app"
+    "toolpad-studio:dev": "toolpad-studio dev ./my-toolpad-app",
+    "toolpad-studio:build": "toolpad-studio build ./my-toolpad-app",
+    "toolpad-studio:start": "toolpad-studio start ./my-toolpad-app"
   }
 ...
 ```
 
-Now you can start your toolpad application using one of the commands:
+Now you can start your Toolpad Studio application using one of the commands:
 
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npm run toolpad:dev
+npm run toolpad-studio:dev
 ```
 
 ```bash yarn
-yarn toolpad:dev
+yarn toolpad-studio:dev
 ```
 
 ```bash pnpm
-pnpm run toolpad:dev
+pnpm run toolpad-studio:dev
 ```
 
 </codeblock>

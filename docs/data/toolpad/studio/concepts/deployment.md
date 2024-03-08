@@ -10,9 +10,9 @@
 
 ```json
  "scripts": {
-   "dev": "toolpad dev"
-   "build": "toolpad build"
-   "start": "toolpad start"
+   "dev": "toolpad-studio dev"
+   "build": "toolpad-studio build"
+   "start": "toolpad-studio start"
  }
 ```
 
@@ -69,7 +69,7 @@ yarn start
 If you want to listen on a specific port you can change the start script to:
 
 ```json
-  "start": "toolpad start -p 1234"
+  "start": "toolpad-studio start -p 1234"
 ```
 
 ## Custom base path
@@ -77,14 +77,14 @@ If you want to listen on a specific port you can change the start script to:
 Toolpad Studio applications can run under a custom base path. Use the `--base` CLI parameter to set a base under which the Toolpad Studio application is hosted.
 
 ```bash
-toolpad dev --base /foo
+toolpad-studio dev --base /foo
 ```
 
 Now the Toolpad Studio application is accessible under `http://localhost:3000/foo`. The `--base` parameter must be supplied to the `build` command. A build always has one specific base path:
 
 ```bash
-toolpad build --base /foo
-toolpad start --base /foo
+toolpad-studio build --base /foo
+toolpad-studio start --base /foo
 ```
 
 ## Detailed guides

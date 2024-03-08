@@ -40,8 +40,8 @@ To run the custom server you'll have to update the scripts in your your package.
   "scripts": {
     "dev": "NODE_ENV=development node ./server.mjs",
     "start": "NODE_ENV=production node ./server.mjs",
-    "build": "toolpad build --base /my-app",
-    "edit": "toolpad editor http://localhost:3001/my-app"
+    "build": "toolpad-studio build --base /my-app",
+    "edit": "toolpad-studio editor http://localhost:3001/my-app"
   }
 }
 ```
@@ -50,8 +50,8 @@ Now you can use the corresponding commands to interact with Toolpad Studio in th
 
 | command &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                                                                                                                                                                                                         |
 | :------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `yarn dev`                                               | Run the custom server in dev mode. Similar to opening the application preview when running `toolpad dev`                                                                                                            |
-| `yarn start`                                             | Running the Toolpad Studio application in production mode. The application must still be built first with `toolpad build`. Make sure to supply the correct base path.                                               |
+| `yarn dev`                                               | Run the custom server in dev mode. Similar to opening the application preview when running `toolpad-studio dev`                                                                                                     |
+| `yarn start`                                             | Running the Toolpad Studio application in production mode. The application must still be built first with `toolpad-studio build`. Make sure to supply the correct base path.                                        |
 | `yarn build`                                             | Builds the application for production purposes. Note that you must supply the correct base path                                                                                                                     |
 | `yarn edit`                                              | This runs the Toolpad Studio standalone editor and connects it to your custom server. You can now edit the application and the changes will be reflected in the Toolpad Studio project folder of the custom server. |
 

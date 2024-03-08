@@ -37,7 +37,7 @@ export async function getData(order_id: number) {
 }
 ```
 
-If your queries don't rely on parameters, you may even use a `.sql` file stored in the file system so that you can keep them organised:
+If your queries don't rely on parameters, you may even use a `.sql` file stored in the file system so that you can keep them organized:
 
 ```ts
 import * as fs from 'fs/promises';

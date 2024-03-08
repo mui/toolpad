@@ -73,7 +73,7 @@ pnpm add @toolpad/studio
 
 </codeblock>
 
-Then you'll have to add the Toolpad Studio scripts to yur `package.json`:
+Then you'll have to add the Toolpad Studio scripts to your `package.json`:
 
 ```json
 // ./package.json

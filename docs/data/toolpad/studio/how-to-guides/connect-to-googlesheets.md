@@ -4,7 +4,7 @@
 
 You can write a custom function to read or write data from a Google sheet. We'll use [google-auth-library](https://www.npmjs.com/package/google-auth-library) and [googleapis](https://www.npmjs.com/package/googleapis) packages for this.
 
-There are many ways to authenticate Google APIs as mentioned in `google-auth-library`. We'll use JWTs (JSON Web Tokens) as we are creating a server based application.
+There are many ways to authenticate Google APIs as mentioned in `google-auth-library`. Let's use JWTs (JSON Web Tokens), as we are creating a server based application.
 
 <video controls width="100%" height="auto" style="contain" alt="google-sheet-app">
   <source src="/static/toolpad/docs/studio/examples/google-sheet.mp4" type="video/mp4">
@@ -36,7 +36,7 @@ export async function fetchList() {
 }
 ```
 
-Now in Toolpad Studio editor, Click on `Add Query` and choose Custom function. You should be able to see the function `fetchList` that we created.
+Now in Toolpad Studio editor, Click on `Add Query` and choose Custom function. You should be able to see the function `fetchList` that you created.
 Then drag a Select component on the canvas and bind it with the above query to show the list of accessible files to the end user.
 
 Now we'll create another function `fetchSheet` to show the details of a chosen sheet.

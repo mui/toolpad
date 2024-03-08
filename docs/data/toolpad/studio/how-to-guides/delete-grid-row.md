@@ -2,19 +2,19 @@
 
 <p class="description">You can add a delete functionality to the data grid in minutes.</p>
 
-We can add a delete button to a data grid connected to any REST API, like so:
+You can add a delete button to a data grid connected to any REST API, like so:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/delete-grid-row/delete-button.png", "alt": "Data grid with delete", "caption": "A data grid with a Delete button" }}
 
 ## Adding a delete query
 
-1. First, we must add a query to delete a row. For this example, we're using an API which allows sending `DELETE` requests to `/customers/id`, so we can go ahead with creating an HTTP Request query.
+1. First, you must add a query to delete a row. For this example, we're using an API which allows sending `DELETE` requests to `/customers/id`, so you can go ahead with creating an HTTP Request query.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/delete-grid-row/add-delete-query.png", "alt": "Adding an HTTP Request query", "caption": "Adding an HTTP Request query", "indent": 1 }}
 
-2. Since this is a destructive action, it's important that we set the **mode** of this query to manual. Select **Only fetch on manual action** in the mode menu.
+2. Since this is a destructive action, it's important that you set the **mode** of this query to manual. Select **Only fetch on manual action** in the mode menu.
 
-3. To add the `id` in the request URL, we can add an `id` parameter to the query and bind it to the following JavaScript expression:
+3. To add the `id` in the request URL, you can add an `id` parameter to the query and bind it to the following JavaScript expression:
 
    ```js
    dataGrid.selection?.['ID'];
@@ -22,7 +22,7 @@ We can add a delete button to a data grid connected to any REST API, like so:
 
    `dataGrid.selection` contains the selected row on runtime, and the 'ID' field contains the `id` needed to be passed in the endpoint
 
-4. We can then bind the request URL to the following JavaScript expression:
+4. You can then bind the request URL to the following JavaScript expression:
 
    ```js
    `https://<API-BASE-URL>/customers/${parameters.id}`;
@@ -45,11 +45,11 @@ We can add a delete button to a data grid connected to any REST API, like so:
 
 ## Adding a refresh button
 
-1. We want to be able to refresh our orders data once we've performed our delete operation.
+1. You want to be able to refresh our orders data once we've performed our delete operation.
 
-2. Assuming that we have a `getOrders` query which fetches the orders, create another **Button** labelled "Refresh"
+2. Assuming that you have a `getOrders` query which fetches the orders, create another **Button** labelled "Refresh"
 
-3. We can re-fetch queries set to **automatic** mode through a `refetch` function available on each query object set to the automatic mode.
+3. You can re-fetch queries set to **automatic** mode through a `refetch` function available on each query object set to the automatic mode.
 
 4. Bind the `onClick` event of the Refresh button to the following JavaScript expression action:
 
@@ -59,7 +59,7 @@ We can add a delete button to a data grid connected to any REST API, like so:
 
 ## Configure loading states (Optional)
 
-1. If we want to show some feedback to our users when a query is running, we can bind the `isLoading` and `isFetching` states of our queries to the `loading` props of our buttons. For example,
+1. If you want to show some feedback to our users when a query is running, you can bind the `isLoading` and `isFetching` states of our queries to the `loading` props of our buttons. For example,
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/delete-grid-row/loading-button.png", "alt": "Delete button loading state binding", "caption": "Binding the loading prop of the delete button", "indent": 1 }}
 

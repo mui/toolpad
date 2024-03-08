@@ -77,7 +77,11 @@ export default function SignInPage() {
         'There was an error with your authentication provider configuration.',
       );
     } else if (authError === 'MissingSecretError') {
-      setErrorSnackbarMessage('Missing secret for authentication. Please provide a secret.');
+      setErrorSnackbarMessage(
+        'Missing secret for authentication. Please provide the TOOLPAD_AUTH_SECRET environment variable.',
+      );
+    } else if (authError === 'CredentialsSignin') {
+      setErrorSnackbarMessage('Invalid credentials.');
     } else if (authError) {
       setErrorSnackbarMessage('An authentication error occurred.');
     }

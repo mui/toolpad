@@ -21,7 +21,7 @@ test.use({
     cmd: 'start',
     env: {
       TOOLPAD_AUTH_SECRET: 'donttellanyone',
-      NODE_ENV: 'test',
+      MOCK_AUTH_CREDENTIALS: '1',
     },
   },
 });
@@ -32,7 +32,7 @@ test('Must be authenticated with valid domain to access app', async ({ page, req
   await expect(page).toHaveURL(/\/prod\/signin/);
 
   // Access is blocked to API route
-  const res = await request.post('/prod/api/data/page/hello');
+  const res = await request.post('/prod/api/data/page/getMySession');
   expect(res.status()).toBe(401);
 
   // Sign in with invalid domain

@@ -32,7 +32,9 @@ async function getAuthProviders(
 
 export async function getRequireAuthentication(project: ToolpadProject): Promise<boolean> {
   const authProviders = await getAuthProviders(project);
-  return authProviders.length > 0;
+
+  // @TODO: Eventually can deprecate old basic auth setup and remove the TOOLPAD_BASIC_AUTH_USER check
+  return authProviders.length > 0 || !!process.env.TOOLPAD_BASIC_AUTH_USER;
 }
 
 function getMappedRoles(
@@ -140,23 +142,36 @@ export function createAuthHandler(project: ToolpadProject): Router {
   const credentialsProvider = CredentialsProvider({
     name: 'Credentials',
     async authorize({ username, password }) {
-      if (process.env.NODE_ENV !== 'test') {
-        throw new Error('Credentials authentication provider can only be used in test mode.');
-      }
+      if (process.env.MOCK_AUTH_CREDENTIALS) {
+        if (username === 'admin' && password === 'admin') {
+          return {
+            id: 'admin',
+            name: 'Lord Admin',
+            email: 'admin@example.com',
+            roles: ['mock-admin'],
+          };
+        }
+        if (username === 'mui' && password === 'mui') {
+          return { id: 'mui', name: 'Mr. MUI 2024', email: 'test@mui.com', roles: [] };
+        }
+        if (username === 'test' && password === 'test') {
+          return { id: 'test', name: 'Miss Test', email: 'test@example.com', roles: [] };
+        }
+      } else {
+        // @TODO: Eventually can deprecate old environment variable names (TOOLPAD_BASIC_AUTH...)
+        const authUsername =
+          process.env.TOOLPAD_AUTH_USERNAME ?? process.env.TOOLPAD_BASIC_AUTH_USER;
+        const authPassword =
+          process.env.TOOLPAD_AUTH_PASSWORD ?? process.env.TOOLPAD_BASIC_AUTH_PASSWORD;
 
-      if (username === 'admin' && password === 'admin') {
-        return {
-          id: 'admin',
-          name: 'Lord Admin',
-          email: 'admin@example.com',
-          roles: ['mock-admin'],
-        };
-      }
-      if (username === 'mui' && password === 'mui') {
-        return { id: 'mui', name: 'Mr. MUI 2024', email: 'test@mui.com', roles: [] };
-      }
-      if (username === 'test' && password === 'test') {
-        return { id: 'test', name: 'Miss Test', email: 'test@example.com', roles: [] };
+        if (
+          authUsername &&
+          authPassword &&
+          username === authUsername &&
+          password === authPassword
+        ) {
+          return { id: 'user', name: 'User', email: 'user@mui.com', roles: [] };
+        }
       }
 
       return null;

@@ -28,7 +28,7 @@ Please make sure to keep this secret safe and do not share it with anyone!
 
 ## Authentication providers
 
-In the authentication settings, you can set up one or more authentication providers for users to be able to sign in with, such as GitHub and Google.
+In the authentication settings, you can set up one or more authentication providers for users to be able to sign in with, such as GitHub and Google, or a username/password combination.
 
 If any authentication providers are set, only authenticated users are able to access your Toolpad application.
 
@@ -87,6 +87,15 @@ Follow these steps to configure your Azure AD client and get the necessary envir
 5. Go to **Certificates & secrets** and use the option **New client secret** to generate a client secret.
 
 With the Azure AD provider, only existing users of your Azure AD application will be able to sign in.
+
+### Credentials (username and password)
+
+| Variable                | Description                        |
+| :---------------------- | :--------------------------------- |
+| `TOOLPAD_AUTH_USERNAME` | Username to be entered to sign in. |
+| `TOOLPAD_AUTH_PASSWORD` | Password to be entered to sign in. |
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/concepts/authorization/credentials.png", "alt": "Credentials authentication", "caption": "Credentials authentication", "aspectRatio": 6 }}
 
 ## Restricted domains
 

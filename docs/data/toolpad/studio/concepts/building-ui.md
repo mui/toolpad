@@ -13,7 +13,7 @@ To access the list of available Toolpad Studio components, hover your cursor ove
 
 ---
 
-Toolpad Studio has many [built-in components](/toolpad/studio/reference/components/) and we are always adding more. To make it easier for us to understand what to add next, please [upvote](https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D) the components you need, or open a [feature request](https://github.com/mui/mui-toolpad/issues/new/choose).
+Toolpad Studio has many [built-in components](/toolpad/studio/reference/components/), and more are continuously being added. To make it easier for us to understand what to add next, please [upvote](https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D) the components you need, or open a [feature request](https://github.com/mui/mui-toolpad/issues/new/choose).
 
 ## Using components
 

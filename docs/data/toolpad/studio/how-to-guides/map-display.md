@@ -114,7 +114,7 @@ export default createComponent(Leaflet, {
 });
 ```
 
-`label` and `value` are the props that we will make available for binding in the Toolpad Studio editor.
+`label` and `value` are the props that you will make available for binding in the Toolpad Studio editor.
 
 2. **MapDisplay** is now available as a custom component in the component library:
 

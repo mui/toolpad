@@ -34,7 +34,7 @@ Form component also has a button whose default action is submitting the form.
 
 ## Appearance
 
-The Button component has multiple variations supported in Toolpad Studio. Let's look at each of these below.
+The Button component has multiple variations supported in Toolpad Studio, which can be seen below.
 
 ### `variant`
 

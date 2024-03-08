@@ -107,7 +107,7 @@ You can use any package available on `npm` to extend your Toolpad Studio applica
    });
    ```
 
-`positionX`, `positionY`, `positionZ` and `color` are the props that we will make available for binding in the Toolpad Studio editor.
+`positionX`, `positionY`, `positionZ` and `color` are the props that you will make available for binding in the Toolpad Studio editor.
 
 2. **Cube** will now be available as a custom component in the component library:
 

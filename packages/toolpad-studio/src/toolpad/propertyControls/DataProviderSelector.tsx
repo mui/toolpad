@@ -36,7 +36,7 @@ import OpenCodeEditorButton from '../OpenCodeEditor';
 import type { CreateDataProviderOptions } from '../../server/FunctionsManager';
 
 const PAGINATION_DOCUMENTATION_URL =
-  'https://mui.com/toolpad-studio/concepts/data-providers/#pagination';
+  'https://mui.com/toolpad/studio/concepts/data-providers/#pagination';
 
 function useFunctionsIntrospectQuery() {
   const projectApi = useProjectApi();

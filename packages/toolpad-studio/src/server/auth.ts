@@ -58,7 +58,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
   if (!process.env.TOOLPAD_AUTH_SECRET) {
     console.error(
       `\n${chalk.red(
-        'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at https://mui.com/toolpad-studio/concepts/authentication/#authentication-secret',
+        'Missing secret for authentication. Please provide a secret in the TOOLPAD_AUTH_SECRET environment variable. Read more at https://mui.com/toolpad/studio/concepts/authentication/#authentication-secret',
       )}\n`,
     );
   }

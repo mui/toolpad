@@ -26,7 +26,7 @@ import type { PackageManager } from '../../../../server/versionInfo';
 
 const REPORT_BUG_URL = 'https://github.com/mui/mui-toolpad/issues/new/choose';
 const FEATURE_REQUEST_URL = 'https://github.com/mui/mui-toolpad/issues';
-const SUPPORT_URL = 'https://mui.com/toolpad-studio/getting-started/support';
+const SUPPORT_URL = 'https://mui.com/toolpad/studio/getting-started/support';
 interface SnippetProps {
   children: string;
 }

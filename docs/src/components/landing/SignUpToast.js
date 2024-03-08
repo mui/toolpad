@@ -67,7 +67,7 @@ export default function NewsletterToast() {
               fontWeight={500}
               sx={{ ml: 1, mr: 2 }}
             >
-              You have signed up for MUI Toolpad updates.
+              You have signed up for Toolpad updates.
             </Typography>
           </div>
           <IconButton aria-hidden size="small" onClick={() => setHidden(true)} aria-label="close">

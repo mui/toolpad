@@ -94,7 +94,7 @@ export default function PageOptionsPanel() {
             <Typography variant="inherit">
               Control how the app shell is displayed in the final application. Read more in the{' '}
               <Link
-                href="https://mui.com/toolpad-studio/concepts/page-properties/#display-mode"
+                href="https://mui.com/toolpad/studio/concepts/page-properties/#display-mode"
                 target="_blank"
                 rel="noopener"
               >

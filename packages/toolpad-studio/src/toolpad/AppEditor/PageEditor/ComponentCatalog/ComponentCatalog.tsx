@@ -240,7 +240,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
                         <Typography variant="inherit">
                           Expand Toolpad Studio with your own React components.{' '}
                           <Link
-                            href="https://mui.com/toolpad-studio/concepts/custom-components"
+                            href="https://mui.com/toolpad/studio/concepts/custom-components"
                             target="_blank"
                             rel="noopener"
                           >

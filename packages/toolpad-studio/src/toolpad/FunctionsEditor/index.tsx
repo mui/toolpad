@@ -459,7 +459,7 @@ export default function FunctionsEditor() {
                     directly from your file system.
                   </Typography>
                   <Link
-                    href="https://mui.com/toolpad-studio/concepts/custom-functions"
+                    href="https://mui.com/toolpad/studio/concepts/custom-functions"
                     target="_blank"
                     rel="noopener"
                     textAlign="center"

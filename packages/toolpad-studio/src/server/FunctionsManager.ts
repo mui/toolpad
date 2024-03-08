@@ -56,8 +56,8 @@ async function createDefaultDataProvider(
   const result = await format(
     `
     /**
-     * Toolpad Studio data provider file.
-     * See: https://mui.com/toolpad-studio/concepts/data-providers/
+     * Toolpad data provider file.
+     * See: https://mui.com/toolpad/studio/concepts/data-providers/
      */
 
     import { createDataProvider } from '@toolpad/studio/server';

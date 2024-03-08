@@ -14,7 +14,7 @@ However, if the default column options are not sufficient, Toolpad Studio allows
 
 ### Creating a custom component
 
-Suppose you want to display only the first eight characters of the Order ID in a `<Chip>`, and show the full text on hover, in a `<Tooltip>`.
+Suppose we want to display only the first eight characters of the Order ID in a `<Chip>`, and show the full text on hover, in a `<Tooltip>`.
 
 We'll create a custom component to achieve this.
 
@@ -28,7 +28,7 @@ A custom component that renders inside the data grid receives a `params` object 
 - `row`: the value of the entire row
 - `field`: the name of the field for that specific column
 
-Using the `value` prop, you can create a custom component like the following:
+Using the `value` prop, we can create a custom component like the following:
 
 ```jsx
 import * as React from 'react';
@@ -72,7 +72,7 @@ The `OrderIdChip` component should appear in our component library on saving:
 
 3. Choose the `OrderIdChip` column in the select menu for custom component:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/order-id-column.png", "alt": "Custom component selector", "caption": "Choosing the custom component you created", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/order-id-column.png", "alt": "Custom component selector", "caption": "Choosing the custom component we created", "indent": 1 }}
 
 4. That's it! We have the desired functionality:
 

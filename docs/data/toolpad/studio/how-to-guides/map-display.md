@@ -2,7 +2,7 @@
 
 <p class="description">You can extend Toolpad Studio with custom code components.</p>
 
-You can create a custom component to display any geographical map, like so:
+We can create a custom component to display any geographical map, like so:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/custom-components/map/component.png", "alt": "Map component", "caption": "The map component"}}
 

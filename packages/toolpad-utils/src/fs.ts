@@ -130,3 +130,91 @@ export async function fileReplaceAll(
   const updatedFileContent = queriesFileContent.replaceAll(searchValue, () => replaceValue);
   await fs.writeFile(filePath, updatedFileContent);
 }
+
+export interface ReturnCompareFoldersOption {
+  name: string;
+  type: 'file' | 'folder';
+}
+
+export async function compareSameLayerFolder(sourcePath: string, targetPath: string) {
+  try {
+    const list: ReturnCompareFoldersOption[] = [];
+    await handle(sourcePath, targetPath, list);
+    return list;
+  } catch (err) {
+    if (errorFrom(err).code === 'ENOENT') {
+      return [];
+    }
+    throw err;
+  }
+  async function handle(
+    folderPathSource: string,
+    folderPathTarget: string,
+    sameList: ReturnCompareFoldersOption[],
+  ) {
+    const [source, target] = await Promise.all([
+      readMaybeDir(folderPathSource),
+      readMaybeDir(folderPathTarget),
+    ]);
+    if (source.length > 0 && target.length > 0) {
+      const [sourceList, targetList] = await Promise.all([
+        Promise.all(
+          source.map(async (item: Dirent) => {
+            const filePath = path.join(folderPathSource, item.name);
+            return (await fileExists(filePath)) ? item : null;
+          }),
+        ),
+        Promise.all(
+          target.map(async (item: Dirent) => {
+            const filePath = path.join(folderPathTarget, item.name);
+            return (await fileExists(filePath)) ? item : null;
+          }),
+        ),
+      ]);
+      const sourceFileList = sourceList.filter(Boolean) as Dirent[];
+      const targetFileList = targetList.filter(Boolean) as Dirent[];
+
+      sourceFileList.forEach((file) => {
+        if (targetFileList.some((f) => f.name === file.name)) {
+          sameList.push({
+            name: file.name,
+            type: 'file',
+          });
+        }
+      });
+    }
+
+    const [sourceDirList, targetDirList] = await Promise.all([
+      Promise.all(
+        source.map(async (item: Dirent) => {
+          const dirPath = path.join(folderPathSource, item.name);
+          return (await folderExists(dirPath)) ? item : null;
+        }),
+      ),
+      Promise.all(
+        target.map(async (item: Dirent) => {
+          const dirPath = path.join(folderPathTarget, item.name);
+          return (await folderExists(dirPath)) ? item : null;
+        }),
+      ),
+    ]);
+    const sourceDir = sourceDirList.filter(Boolean) as Dirent[];
+    const targetDir = targetDirList.filter(Boolean) as Dirent[];
+    sourceDir.forEach((folder) => {
+      if (targetDir.some((f) => f.name === folder.name)) {
+        sameList.push({
+          name: folder.name,
+          type: 'folder',
+        });
+      }
+    });
+
+    await Promise.all(
+      sourceDir.map(async (folder) => {
+        const subFolder1 = path.join(folderPathSource, folder.name);
+        const subFolder2 = path.join(folderPathTarget, folder.name);
+        await handle(subFolder1, subFolder2, sameList);
+      }),
+    );
+  }
+}

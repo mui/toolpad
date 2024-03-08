@@ -6,7 +6,7 @@
 
 https://github.com/prakhargupta1/mui-toolpad/assets/92228082/0805f682-b481-4f41-b59c-5a96e51b5203
 
-Example showcasing custom server integration of Toolpad Studio apps. [The docs](https://mui.com/toolpad-studio/concepts/custom-server/).
+Example showcasing custom server integration of Toolpad Studio apps. [The docs](https://mui.com/toolpad/studio/concepts/custom-server/).
 
 ## How to run
 

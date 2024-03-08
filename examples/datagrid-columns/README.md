@@ -6,7 +6,7 @@
   <img src="https://mui.com/static/toolpad/marketing/datagrid-columns.png" alt="Toolpad Studio app showcasing data grid columns customization" style="aspect-ratio: 1.8;" width="100%">
 </a>
 
-Example showcasing adding a code component as a data grid column. [The docs](https://mui.com/toolpad-studio/building-ui/data-grid-component/#configuring-columns).
+Example showcasing adding a code component as a data grid column. [The docs](https://mui.com/toolpad/studio/building-ui/data-grid-component/#configuring-columns).
 
 ## How to run
 

@@ -51,7 +51,7 @@ pnpm create toolpad-app my-toolpad-studio-app
 
 ## Documentation
 
-Check out our [documentation](https://mui.com/toolpad-studio/getting-started/).
+Check out our [documentation](https://mui.com/toolpad/studio/getting-started/).
 
 ## Examples
 
@@ -70,7 +70,7 @@ The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly update
 
 ## Roadmap
 
-Future plans and high-priority features and enhancements can be found in our [roadmap](https://mui.com/toolpad-studio/getting-started/roadmap/).
+Future plans and high-priority features and enhancements can be found in our [roadmap](https://mui.com/toolpad/studio/getting-started/roadmap/).
 
 ## License
 

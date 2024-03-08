@@ -2,7 +2,7 @@
 
 <p class="description">A demonstration of how to integrate Toolpad Studio applications into your servers programmatically.</p>
 
-Example showcasing custom server integration of Toolpad Studio apps. [The docs](https://mui.com/toolpad-studio/concepts/custom-server/).
+Example showcasing custom server integration of Toolpad Studio apps. [The docs](https://mui.com/toolpad/studio/concepts/custom-server/).
 
 <a target="_blank">
   <img src="https://mui.com/static/toolpad/marketing/custom-server.png" alt="Custom server" style="aspect-ratio: 131/88;" width="524">

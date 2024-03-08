@@ -1,6 +1,6 @@
 /**
  * Toolpad Studio data provider file.
- * See: https://mui.com/toolpad-studio/concepts/data-providers/
+ * See: https://mui.com/toolpad/studio/concepts/data-providers/
  */
 
 import Stripe from 'stripe';

@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "0.1.51",
+  "version": "0.1.52",
   "private": true,
   "author": "MUI Toolpad",
   "license": "MIT",
@@ -33,9 +33,9 @@
     "@mui/material-nextjs": "^5.15.11",
     "@mui/monorepo": "github:mui/material-ui#910a9dc8dda6be590a9624d18421243a37c267b8",
     "@mui/styles": "5.15.11",
-    "@toolpad/studio": "workspace:*",
     "@mui/utils": "5.15.11",
     "@mui/x-data-grid-pro": "6.19.6",
+    "@toolpad/studio": "workspace:*",
     "@trendmicro/react-interpolate": "0.5.5",
     "@types/lodash": "4.14.202",
     "@types/react-dom": "18.2.18",

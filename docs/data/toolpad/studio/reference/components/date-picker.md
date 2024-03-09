@@ -2,7 +2,7 @@
 
 # DatePicker
 
-<p class="description">API docs for the Toolpad DatePicker component.</p>
+<p class="description">API docs for the Toolpad Studio DatePicker component.</p>
 
 The MUI X [Date Picker](https://mui.com/x/react-date-pickers/date-picker/) component.
 

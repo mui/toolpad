@@ -2,7 +2,7 @@
 
 # Paper
 
-<p class="description">API docs for the Toolpad Paper component.</p>
+<p class="description">API docs for the Toolpad Studio Paper component.</p>
 
 The Material UI [Paper](https://mui.com/material-ui/react-paper/) component.
 

@@ -1,6 +1,6 @@
 # Theming
 
-<p class="description">Toolpad allows you to add your custom theme to your app, or customize individual component styles.</p>
+<p class="description">Toolpad Studio allows you to add your custom theme to your app, or customize individual component styles.</p>
 
 ## Adding a global theme
 

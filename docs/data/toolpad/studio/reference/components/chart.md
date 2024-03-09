@@ -2,7 +2,7 @@
 
 # Chart
 
-<p class="description">API docs for the Toolpad Chart component.</p>
+<p class="description">API docs for the Toolpad Studio Chart component.</p>
 
 A chart component.
 

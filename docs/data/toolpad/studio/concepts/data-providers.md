@@ -2,7 +2,7 @@
 
 <p class="description">Bring tabular data to the frontend with server-side pagination and filtering.</p>
 
-Toolpad functions are great to bring some backend state to the page, but they fall short when it comes to offering pagination and filtering capabilities from the server. Toolpad offers a special construct to enable this use case: Data providers. Data providers abstract server-side collections. They could be database tables, REST APIs, or any data that represents a set of records that share a common interface. Data providers are defined as server-side objects and can be directly connected to a data grid to make it fully interactive.
+Toolpad Studio functions are great to bring some backend state to the page, but they fall short when it comes to offering pagination and filtering capabilities from the server. Toolpad Studio offers a special construct to enable this use case: Data providers. Data providers abstract server-side collections. They could be database tables, REST APIs, or any data that represents a set of records that share a common interface. Data providers are defined as server-side objects and can be directly connected to a data grid to make it fully interactive.
 
 Follow these steps to create a new data provider:
 
@@ -14,7 +14,7 @@ Follow these steps to create a new data provider:
 A data provider that iterates over a static list could look as follows:
 
 ```tsx
-import { createDataProvider } from '@mui/toolpad-core/server';
+import { createDataProvider } from '@toolpad/studio-runtime/server';
 import DATA from './movies.json';
 
 export default createDataProvider({
@@ -55,7 +55,7 @@ export default createDataProvider({
 
 This is the strategy where your data is paginated by when it returns data based on a cursor and a page size. The `getRecords` method will receive `cursor` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. You indicate the cursor of the next page with a `cursor` property in the result. Pass `null` to signal the end of the collection. You can enable Cursor based pagination by setting `paginationMode` to `'cursor'`.
 
-The `cursor` property of the `paginationModel` is `null` when Toolpad fetches the initial page. Any result set returned from the `getRecords` function must be accompanied with a `cursor` property, a string which contains a reference to the next page. This value will be passed as the `cursor` parameter in the `paginationModel` when fetching the subsequent page. Return `null` for this value to indicate the end of the sequence.
+The `cursor` property of the `paginationModel` is `null` when Toolpad Studio fetches the initial page. Any result set returned from the `getRecords` function must be accompanied with a `cursor` property, a string which contains a reference to the next page. This value will be passed as the `cursor` parameter in the `paginationModel` when fetching the subsequent page. Return `null` for this value to indicate the end of the sequence.
 
 ```tsx
 export default createDataProvider({
@@ -76,7 +76,7 @@ export default createDataProvider({
 
 ## Filtering
 
-Toolpad data sources support server-side filtering. You can implement a server-side filter by reading the `filterModel` property that is passed to the `getRecords` function. This model contains an `items` property and a `logicOperator`. By combining them you can achieve complex serverside filters.
+Toolpad Studio data sources support server-side filtering. You can implement a server-side filter by reading the `filterModel` property that is passed to the `getRecords` function. This model contains an `items` property and a `logicOperator`. By combining them you can achieve complex serverside filters.
 
 ```tsx
 export default createDataProvider({
@@ -111,7 +111,7 @@ Uncheck the column option "filterable" if you want to disable filtering for a ce
 
 ## Sorting
 
-Toolpad data sources support server-side sorting. To achieve this you'll have to consume the `sortModel` property that is passed to the `getRecords` method:
+Toolpad Studio data sources support server-side sorting. To achieve this you'll have to consume the `sortModel` property that is passed to the `getRecords` method:
 
 ```tsx
 export default createDataProvider({

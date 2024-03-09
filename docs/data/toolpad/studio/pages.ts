@@ -8,7 +8,7 @@ const pages: MuiPage[] = [
     children: [
       { pathname: '/toolpad/studio/getting-started', title: 'Overview' },
       { pathname: '/toolpad/studio/getting-started/installation' },
-      { pathname: '/toolpad/studio/getting-started/why-toolpad', title: 'Why Toolpad?' },
+      { pathname: '/toolpad/studio/getting-started/why-toolpad', title: 'Why Toolpad Studio?' },
       { pathname: '/toolpad/studio/getting-started/first-app', title: 'Build your first app' },
       {
         pathname: '/toolpad/studio/examples-group',
@@ -165,7 +165,7 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/studio/how-to-guides/embed-pages',
-            title: 'Embedding Toolpad pages',
+            title: 'Embedding Toolpad Studio pages',
           },
           {
             pathname: '/toolpad/studio/how-to-guides/basic-auth',

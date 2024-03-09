@@ -1,8 +1,8 @@
 # Custom components
 
-<p class="description">You can bring your own custom components inside the Toolpad editor.</p>
+<p class="description">You can bring your own custom components inside the Toolpad Studio editor.</p>
 
-The steps below explain how to create and use a custom component in Toolpad.
+The steps below explain how to create and use a custom component in Toolpad Studio.
 
 ## Create component
 
@@ -22,12 +22,12 @@ In case it doesn't open, check [troubleshoot missing editor](https://mui.com/too
 
 ## Add component code
 
-Toolpad exposes a [`createComponent`](https://mui.com/toolpad/studio/reference/api/create-component/) function. This is used to signal to Toolpad which are the components that can be imported and how it should interpret the properties.
+Toolpad Studio exposes a [`createComponent`](https://mui.com/toolpad/studio/reference/api/create-component/) function. This is used to signal to Toolpad Studio which are the components that can be imported and how it should interpret the properties.
 
 ```jsx
 import * as React from 'react';
 import { Typography } from '@mui/material';
-import { createComponent } from '@mui/toolpad/browser';
+import { createComponent } from '@toolpad/studio/browser';
 
 export interface HelloWorldProps {
   msg: string;

@@ -2,7 +2,7 @@
 
 # Form
 
-<p class="description">API docs for the Toolpad Form component.</p>
+<p class="description">API docs for the Toolpad Studio Form component.</p>
 
 A form component.
 

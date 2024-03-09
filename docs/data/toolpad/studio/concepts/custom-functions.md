@@ -1,8 +1,8 @@
 # Custom Functions
 
-<p class="description">These offer a fast way to bring your existing functions to a Toolpad page.</p>
+<p class="description">These offer a fast way to bring your existing functions to a Toolpad Studio page.</p>
 
-The most powerful way of bringing data into Toolpad is through your own code. You can define functions inside `toolpad/resources` and use them when creating a query of this type. The following video shows how you can use this feature to read data from PostgreSQL.
+The most powerful way of bringing data into Toolpad Studio is through your own code. You can define functions inside `toolpad/resources` and use them when creating a query of this type. The following video shows how you can use this feature to read data from PostgreSQL.
 
 <video controls width="auto" height="100%" style="contain" alt="custom-function">
   <source src="/static/toolpad/docs/studio/concepts/connecting-to-data/postgres.mp4" type="video/mp4">
@@ -23,7 +23,7 @@ The most powerful way of bringing data into Toolpad is through your own code. Yo
 
 <ul>
 <li style="list-style-type: none">
-Toolpad custom functions run fully server-side in Node. For example, if you change the content of the above example to:
+Toolpad Studio custom functions run fully server-side in Node. For example, if you change the content of the above example to:
 
 ```jsx
 export async function example() {
@@ -51,7 +51,7 @@ You get the following response:
 
 To be really useful, you need to connect these queries with data present on your page. You can do so by creating **parameters.**
 
-All function arguments will be available in the query editor to bind state to. Make sure to annotate them correctly with their typescript types. Toolpad uses this information to present you with correctly typed databinding controls. For example:
+All function arguments will be available in the query editor to bind state to. Make sure to annotate them correctly with their TypeScript types. Toolpad Studio uses this information to present you with correctly typed databinding controls. For example:
 
 ```jsx
 export async function getAnimals(
@@ -70,10 +70,10 @@ export async function getAnimals(
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/connecting-to-data/query-9.png", "alt": "Controls for custom function parameters", "caption": "Controls for custom function parameters", "indent": 1,  "aspectRatio": 6}}
 
 :::info
-Toolpad also provides a `createFunction` API to be able to define your parameters when creating custom functions:
+Toolpad Studio also provides a `createFunction` API to be able to define your parameters when creating custom functions:
 
 ```jsx
-import { createFunction } from '@mui/toolpad/server';
+import { createFunction } from '@toolpad/studio/server';
 
 export const example = createFunction(
   async ({ parameters }) => {
@@ -93,12 +93,12 @@ export const example = createFunction(
 
 This will make the `value` property available in the query editor. You can pass a value, or bind this to the page state:
 
-This API is now deprecated, and will be removed from a future version of Toolpad. Find more details in the `createFunction` [reference](/toolpad/studio/reference/api/create-function/) section.
+This API is now deprecated, and will be removed from a future version of Toolpad Studio. Find more details in the `createFunction` [reference](/toolpad/studio/reference/api/create-function/) section.
 :::
 
 ## Secrets handling
 
-Toolpad has access to the environment variables defined in the `.env` file at the root of the project.
+Toolpad Studio has access to the environment variables defined in the `.env` file at the root of the project.
 
 You can even directly use the environment variables when defining custom functions, as you normally would when writing backend code. For example:
 
@@ -137,12 +137,12 @@ You can then use this function on your page:
 
 ## Request context
 
-When you run Toolpad in an authenticated context it may be useful to be able to access authentication information in backend functions. For this purpose we offer the `getContext` API which allows you to inspect the cookies of the request that initiated the backend function.
+When you run Toolpad Studio in an authenticated context it may be useful to be able to access authentication information in backend functions. For this purpose we offer the `getContext` API which allows you to inspect the cookies of the request that initiated the backend function.
 
 ### Access cookies with `context.cookies`
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 import { parseAuth } from '../../src/lib/auth';
 
 export async function myBackendFunction() {
@@ -154,10 +154,10 @@ export async function myBackendFunction() {
 
 ### Write cookies with `context.setCookie`
 
-You can also use the context to set a cookie, which can subsequently be used in other backend functions called from your Toolpad application. Example:
+You can also use the context to set a cookie, which can subsequently be used in other backend functions called from your Toolpad Studio application. Example:
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 import * as api from './myApi';
 
 const MY_COOKIE_NAME = 'MY_AUTH_TOKEN';
@@ -177,10 +177,10 @@ export async function getData() {
 
 ### Get the current authenticated session with `context.session`
 
-If your Toolpad app has [authentication](/toolpad/studio/concepts/authentication/) enabled, you can get data from the authenticated session, such as the logged-in user's `email`, `name` or `avatar`. Example:
+If your Toolpad Studio app has [authentication](/toolpad/studio/concepts/authentication/) enabled, you can get data from the authenticated session, such as the logged-in user's `email`, `name` or `avatar`. Example:
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 
 export async function getCurrentUserEmail() {
   const { session } = getContext();

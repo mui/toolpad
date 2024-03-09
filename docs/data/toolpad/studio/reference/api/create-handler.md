@@ -1,11 +1,11 @@
 # createHandler API
 
-<p class="description">Run Toolpad applications programmatically in a custom server.</p>
+<p class="description">Run Toolpad Studio applications programmatically in a custom server.</p>
 
 ## Import
 
 ```jsx
-import { createHandler } from '@mui/toolpad';
+import { createHandler } from '@toolpad/studio';
 ```
 
 ## Description
@@ -20,7 +20,7 @@ const toolpad = await createHandler(config);
 
 ## Returns
 
-A `Promise` for a Toolpad application object exposing a handler which you can attach to a node.js http server. See [Handler](#handler)
+A `Promise` for a Toolpad Studio application object exposing a handler which you can attach to a node.js http server. See [Handler](#handler)
 
 ## Types
 
@@ -30,11 +30,11 @@ This describes the behavior of the custom handler.
 
 **Properties**
 
-| Name   | Type      | Description                                                                                                                                                       |
-| :----- | :-------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `base` | `string`  | Base path under which the handler will be hosted.                                                                                                                 |
-| `dev`  | `boolean` | Run the handler in dev mode. Only in this mode can the standalone editor be attached.                                                                             |
-| `dir`  | `string`  | The directory under which the Toolpad application definition will be stored. By default will be the `./toolpad` folder relative to the current working directory. |
+| Name   | Type      | Description                                                                                                                                                              |
+| :----- | :-------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base` | `string`  | Base path under which the handler will be hosted.                                                                                                                        |
+| `dev`  | `boolean` | Run the handler in dev mode. Only in this mode can the standalone editor be attached.                                                                                    |
+| `dir`  | `string`  | The directory under which the Toolpad Studio application definition will be stored. By default will be the `./toolpad` folder relative to the current working directory. |
 
 ### Handler
 

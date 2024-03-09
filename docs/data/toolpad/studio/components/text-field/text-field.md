@@ -1,6 +1,6 @@
 # Text Field
 
-<p class="description">Learn about the textfield component and its usage in Toolpad.</p>
+<p class="description">Learn about the textfield component and its usage in Toolpad Studio.</p>
 
 ## Demo
 
@@ -35,7 +35,7 @@ A name is needed when a textfield is part of a form component. It is used to sho
 
 ## Appearance
 
-The TextField component supports below mentioned appearance related props in Toolpad:
+The TextField component supports below mentioned appearance related props in Toolpad Studio:
 
 ### label
 
@@ -83,6 +83,6 @@ A validation check on the maximum length of the input.
 
 ## API
 
-See the documentation below for a complete reference to all props available to the textfield component in Toolpad.
+See the documentation below for a complete reference to all props available to the textfield component in Toolpad Studio.
 
 - [`<textfield />`](/toolpad/studio/reference/components/text-field/#properties)

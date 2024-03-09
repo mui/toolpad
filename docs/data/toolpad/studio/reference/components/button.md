@@ -2,7 +2,7 @@
 
 # Button
 
-<p class="description">API docs for the Toolpad Button component.</p>
+<p class="description">API docs for the Toolpad Studio Button component.</p>
 
 The Material UI [Button](https://mui.com/material-ui/react-button/) component.
 

@@ -2,7 +2,7 @@
 
 # Image
 
-<p class="description">API docs for the Toolpad Image component.</p>
+<p class="description">API docs for the Toolpad Studio Image component.</p>
 
 The Image component lets you display images.
 

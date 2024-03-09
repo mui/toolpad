@@ -1,11 +1,11 @@
 # GitHub Authentication
 
-<p class="description">An app that shows how to set up GitHub authentication in Toolpad.</p>
+<p class="description">An app that shows how to set up GitHub authentication in Toolpad Studio.</p>
 
-Example showcasing how to set up GitHub authentication in a Toolpad app. [The docs](https://mui.com/toolpad/concepts/authentication/).
+Example showcasing how to set up GitHub authentication in a Toolpad Studio app. [The docs](https://mui.com/toolpad/studio/concepts/authentication/).
 
 <a target="_blank">
-  <img src="https://mui.com/static/toolpad/marketing/auth-github.png" alt="GitHub Authentication" style="aspect-ratio: 131/88;" width="524">
+  <img src="https://mui.com/static/toolpad-studio/marketing/auth-github.png" alt="GitHub Authentication" style="aspect-ratio: 131/88;" width="524">
 </a>
 
 ## How to run
@@ -13,8 +13,8 @@ Example showcasing how to set up GitHub authentication in a Toolpad app. [The do
 To use this example, you need to set the environment variables shown in [.env.example](.env.example).
 To get those values, please:
 
-- Follow [this section](https://mui.com/toolpad/concepts/authentication/#authentication-secret) on how to create an authentication secret.
-- Set up your own GitHub OAuth app by following [these instructions](https://mui.com/toolpad/concepts/authentication/#github).
+- Follow [this section](https://mui.com/toolpad/studio/concepts/authentication/#authentication-secret) on how to create an authentication secret.
+- Set up your own GitHub OAuth app by following [these instructions](https://mui.com/toolpad/studio/concepts/authentication/#github).
 
 Then, use `create-toolpad-app` to bootstrap the example:
 

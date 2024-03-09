@@ -1,6 +1,6 @@
-# Embedding Toolpad pages
+# Embedding Toolpad Studio pages
 
-<p class="description">Toolpad pages can be embedded anywhere you want to use them.</p>
+<p class="description">Toolpad Studio pages can be embedded anywhere you want to use them.</p>
 
 ## Using an `iframe`
 
@@ -8,7 +8,7 @@
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/embed-page/no-shell.png", "alt": "No shell display mode", "caption": "Set display mode to no shell", "indent": 1 }}
 
-2. Deploy the Toolpad application
+2. Deploy the Toolpad Studio application
 
    :::info
    See the tutorial on [deploying to Render](/toolpad/studio/how-to-guides/render-deploy/) for more details
@@ -21,6 +21,6 @@
    <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq"></iframe>
    ```
 
-   we can embed a Toolpad page, like so:
+   you can embed a Toolpad Studio page, like so:
 
     <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq?toolpad-display=standalone" loading="lazy" style="display: block; margin: auto"></iframe>

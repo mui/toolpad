@@ -2,7 +2,7 @@
 
 # Checkbox
 
-<p class="description">API docs for the Toolpad Checkbox component.</p>
+<p class="description">API docs for the Toolpad Studio Checkbox component.</p>
 
 ## Properties
 

@@ -1,17 +1,17 @@
 # Build your first app
 
-<p class="description">Learn the fundamentals of building with Toolpad by creating a small application.</p>
+<p class="description">Learn the fundamentals of building with Toolpad Studio by creating a small application.</p>
 
-This guide will walk you through the process of creating a small Toolpad application.
+This guide will walk you through the process of creating a small Toolpad Studio application.
 You'll use the MUI X Data Grid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api/).
 When you click on the name of a breed, a random photo of the breed will be displayed using the Material UI Image component.
 
 ## Purpose
 
-This guide is intended to introduce you to the fundamentals of building with Toolpad.
+This guide is intended to introduce you to the fundamentals of building with Toolpad Studio.
 By the end, you should be able to:
 
-- set up a new Toolpad app
+- set up a new Toolpad Studio app
 - navigate through your workspace
 - design a page and connect its data
 
@@ -36,7 +36,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
    npm run dev
    ```
 
-   The Toolpad application editor opens automatically in your browser.
+   The Toolpad Studio application editor opens automatically in your browser.
 
    :::info
    Refer the [installation](/toolpad/studio/getting-started/installation/) docs for more details on installing.
@@ -46,7 +46,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 1. Hover over the component library and drag a **Data Grid** component into the canvas. Now repeat the process and drag an **Image** component as well. When you're done, the canvas should look like this:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-1.png", "alt": "Toolpad editor", "caption": "The Toolpad editor with components dragged", "indent": 1  }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-1.png", "alt": "Toolpad Studio editor", "caption": "The Toolpad Studio editor with components dragged", "indent": 1  }}
 
 ### Fetch data
 
@@ -148,4 +148,4 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-13.png", "alt": "Preview of app", "caption": "The preview of our application", "indent": 1  }}
 
-2. That's it! Feel free to browse through the rest of the documentation to know more about what you can do with Toolpad.
+2. That's it! Feel free to browse through the rest of the documentation to know more about what you can do with Toolpad Studio.

@@ -1,16 +1,16 @@
 # Create a 3D cube component
 
-<p class="description">You can extend Toolpad with custom code components, including from external packages.</p>
+<p class="description">You can extend Toolpad Studio with custom code components, including from external packages.</p>
 
-We can use any package available on `npm` to extend our Toolpad application. This guide will render a cube using [`@react-three/fiber`](https://www.npmjs.com/package/@react-three/fiber):
+You can use any package available on `npm` to extend your Toolpad Studio application. This guide will render a cube using [`@react-three/fiber`](https://www.npmjs.com/package/@react-three/fiber):
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/custom-components/cube/component.png", "alt": "Cube component", "caption": "The cube component" }}
 
 ## Creating the component
 
-### In the Toolpad editor
+### In the Toolpad Studio editor
 
-1. To get started creating this, add the requisite libraries to your Toolpad app, using
+1. To get started creating this, add the requisite libraries to your Toolpad Studio app, using
 
    ```bash
    yarn add three @react-three/fiber
@@ -39,7 +39,7 @@ We can use any package available on `npm` to extend our Toolpad application. Thi
    ```jsx
    import * as React from 'react';
    import { Canvas, useFrame } from '@react-three/fiber';
-   import { createComponent } from '@mui/toolpad/browser';
+   import { createComponent } from '@toolpad/studio/browser';
 
    function Box({ position, color }) {
      // This reference gives us direct access to the THREE.Mesh object
@@ -107,7 +107,7 @@ We can use any package available on `npm` to extend our Toolpad application. Thi
    });
    ```
 
-`positionX`, `positionY`, `positionZ` and `color` are the props that we will make available for binding in the Toolpad editor.
+`positionX`, `positionY`, `positionZ` and `color` are the props that you will make available for binding in the Toolpad Studio editor.
 
 2. **Cube** will now be available as a custom component in the component library:
 

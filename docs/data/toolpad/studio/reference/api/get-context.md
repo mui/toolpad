@@ -3,13 +3,13 @@
 <p class="description">Support reading contextual information in backend functions.</p>
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 ```
 
 ## Description
 
 ```jsx
-import { getContext } from '@mui/toolpad/server';
+import { getContext } from '@toolpad/studio/server';
 import { parseAuth } from '../../src/lib/auth';
 
 export async function myBackendFunction() {
@@ -19,7 +19,7 @@ export async function myBackendFunction() {
 }
 ```
 
-Within backend functions, you can call `getContext` to get access to the request context that resulted in calling this backend function. This is useful if you are running Toolpad in an authenticated context and want to reuse access tokens available in a cookie.
+Within backend functions, you can call `getContext` to get access to the request context that resulted in calling this backend function. This is useful if you are running Toolpad Studio in an authenticated context and want to reuse access tokens available in a cookie.
 
 ## Parameters
 
@@ -47,12 +47,12 @@ This describes a certain context under which a backend function was called.
 
 **Properties**
 
-| Name      | Type             | Description                                                        |
-| :-------- | :--------------- | :----------------------------------------------------------------- |
-| `name?`   | `string \| null` | Logged-in user name.                                               |
-| `email?`  | `string \| null` | Logged-in user email.                                              |
-| `avatar?` | `string \| null` | Logged-in user avatar image URL.                                   |
-| `roles`   | `string[]`       | Logged-in user [roles](/toolpad/studio/concepts/rbac/) in Toolpad. |
+| Name      | Type             | Description                                                               |
+| :-------- | :--------------- | :------------------------------------------------------------------------ |
+| `name?`   | `string \| null` | Logged-in user name.                                                      |
+| `email?`  | `string \| null` | Logged-in user email.                                                     |
+| `avatar?` | `string \| null` | Logged-in user avatar image URL.                                          |
+| `roles`   | `string[]`       | Logged-in user [roles](/toolpad/studio/concepts/rbac/) in Toolpad Studio. |
 
 ## Usage
 

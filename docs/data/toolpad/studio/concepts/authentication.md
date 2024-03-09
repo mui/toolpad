@@ -1,10 +1,10 @@
 # Authentication
 
-<p class="description">Restrict a Toolpad application to authenticated users only, under certain authentication providers.</p>
+<p class="description">Restrict a Toolpad Studio application to authenticated users only, under certain authentication providers.</p>
 
-You can configure a Toolpad application so that users have to sign in with specific authentication providers in order to access it.
+You can configure a Toolpad Studio application so that users have to sign in with specific authentication providers in order to access it.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/authorization/sign-in-page.png", "alt": "Toolpad sign-in page", "caption": "Toolpad sign-in page", "indent": 1, "aspectRatio": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/authorization/sign-in-page.png", "alt": "Toolpad Studio sign-in page", "caption": "Toolpad Studio sign-in page", "indent": 1, "aspectRatio": 1 }}
 
 Authentication settings can be accessed through the **Authorization** option in the app editor header.
 
@@ -30,7 +30,7 @@ Please make sure to keep this secret safe and do not share it with anyone!
 
 In the authentication settings, you can set up one or more authentication providers for users to be able to sign in with, such as GitHub and Google.
 
-If any authentication providers are set, only authenticated users are able to access your Toolpad application.
+If any authentication providers are set, only authenticated users are able to access your Toolpad Studio application.
 
 Each authentication provider has its own configuration options, to be set with certain environment variables.
 
@@ -63,7 +63,7 @@ In the Google OAuth client settings screen, under the **Authorized redirect URIs
 ### Azure Active Directory (now Entra ID)
 
 :::warning
-The Azure AD authentication provider will be a paid feature of Toolpad very soon, so it's only available for free for a limited time.
+The Azure AD authentication provider will be a paid feature of Toolpad Studio very soon, so it's only available for free for a limited time.
 :::
 
 | environment variable name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                                |

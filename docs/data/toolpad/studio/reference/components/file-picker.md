@@ -2,7 +2,7 @@
 
 # FilePicker
 
-<p class="description">API docs for the Toolpad FilePicker component.</p>
+<p class="description">API docs for the Toolpad Studio FilePicker component.</p>
 
 File Picker component.
 It allows users to take select and read files.

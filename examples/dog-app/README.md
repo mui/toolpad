@@ -32,9 +32,9 @@ or:
 
 ## What's inside
 
-A basic Toolpad app that shows how to call an API and work with data grid and image component.
+A basic Toolpad Studio app that shows how to call an API and work with data grid and image component.
 
-To build this app step-by-step, visit the [docs](https://mui.com/toolpad/getting-started/first-app/#building-your-first-application).
+To build this app step-by-step, visit the [docs](https://mui.com/toolpad/studio/getting-started/first-app/#building-your-first-application).
 
 ## The source
 

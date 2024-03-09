@@ -2,7 +2,7 @@
 
 # PageRow
 
-<p class="description">API docs for the Toolpad PageRow component.</p>
+<p class="description">API docs for the Toolpad Studio PageRow component.</p>
 
 A page row component.
 

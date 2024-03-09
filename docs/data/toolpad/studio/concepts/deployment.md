@@ -1,6 +1,6 @@
 # Deployment
 
-<p class="description">Deploying a Toolpad app is like deploying any other React/Node application.</p>
+<p class="description">Deploying a Toolpad Studio app is like deploying any other React/Node application.</p>
 
 ## Pre-requisites
 
@@ -10,9 +10,9 @@
 
 ```json
  "scripts": {
-   "dev": "toolpad dev"
-   "build": "toolpad build"
-   "start": "toolpad start"
+   "dev": "toolpad-studio dev"
+   "build": "toolpad-studio build"
+   "start": "toolpad-studio start"
  }
 ```
 
@@ -34,7 +34,7 @@ yarn
 
 ## Build step
 
-This command will create an optimized production build for the Toolpad app and will output the generated files:
+This command will create an optimized production build for the Toolpad Studio app and will output the generated files:
 
 <codeblock storageKey="package-manager">
 
@@ -69,22 +69,22 @@ yarn start
 If you want to listen on a specific port you can change the start script to:
 
 ```json
-  "start": "toolpad start -p 1234"
+  "start": "toolpad-studio start -p 1234"
 ```
 
 ## Custom base path
 
-Toolpad applications can run under a custom base path. Use the `--base` CLI parameter to set a base under which the Toolpad application is hosted.
+Toolpad Studio applications can run under a custom base path. Use the `--base` CLI parameter to set a base under which the Toolpad Studio application is hosted.
 
 ```bash
-toolpad dev --base /foo
+toolpad-studio dev --base /foo
 ```
 
-Now the Toolpad application is accessible under `http://localhost:3000/foo`. The `--base` parameter must be supplied to the `build` command. A build always has one specific base path:
+Now the Toolpad Studio application is accessible under `http://localhost:3000/foo`. The `--base` parameter must be supplied to the `build` command. A build always has one specific base path:
 
 ```bash
-toolpad build --base /foo
-toolpad start --base /foo
+toolpad-studio build --base /foo
+toolpad-studio start --base /foo
 ```
 
 ## Detailed guides

@@ -33,7 +33,7 @@
     "@mui/material-nextjs": "^5.15.11",
     "@mui/monorepo": "github:mui/material-ui#910a9dc8dda6be590a9624d18421243a37c267b8",
     "@mui/styles": "5.15.11",
-    "@mui/toolpad": "workspace:*",
+    "@toolpad/studio": "workspace:*",
     "@mui/utils": "5.15.11",
     "@mui/x-data-grid-pro": "6.19.6",
     "@trendmicro/react-interpolate": "0.5.5",

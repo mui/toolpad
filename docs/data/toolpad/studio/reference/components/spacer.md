@@ -2,7 +2,7 @@
 
 # Spacer
 
-<p class="description">API docs for the Toolpad Spacer component.</p>
+<p class="description">API docs for the Toolpad Studio Spacer component.</p>
 
 Spacer component.
 It allows for creating space between elements.

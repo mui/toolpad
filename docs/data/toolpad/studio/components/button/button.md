@@ -1,6 +1,6 @@
 # Button
 
-<p class="description">Learn about the button component and it's usage in Toolpad.</p>
+<p class="description">Learn about the button component and it's usage in Toolpad Studio.</p>
 
 ## Demo
 
@@ -24,7 +24,7 @@ Below video shows how on a button click, the user input can be shown on a page i
 
 ### Navigation
 
-From this tab, you can configure to move from one page to the other in a Toolpad app.
+From this tab, you can configure to move from one page to the other in a Toolpad Studio app.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/components/button/onclick-navigation.png", "alt": "Navigating to a page on button click", "caption": "Navigating to a page on button click", "indent": 1}}
 
@@ -34,7 +34,7 @@ Form component also has a button whose default action is submitting the form.
 
 ## Appearance
 
-The Button component has multiple variations supported in Toolpad. Let's look at each of these below.
+The Button component has multiple variations supported in Toolpad Studio, which can be seen below.
 
 ### `variant`
 
@@ -43,7 +43,7 @@ The variant property supports three different options: contained (default), outl
 
 ### `color`
 
-The color property has two options: primary (default) and secondary. These take input from the global theme that you set in Toolpad from the theme tab.
+The color property has two options: primary (default) and secondary. These take input from the global theme that you set in Toolpad Studio from the theme tab.
 {{"demo": "ButtonColor.js", "hideToolbar": true}}
 
 ### `size`
@@ -58,6 +58,6 @@ Button supports states like loading and disabled to share the state of the compo
 
 ## API
 
-See the documentation below for a complete reference to all props available to the button component in Toolpad.
+See the documentation below for a complete reference to all props available to the button component in Toolpad Studio.
 
 - [`<button />`](/toolpad/studio/reference/components/button/#properties)

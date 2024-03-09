@@ -2,7 +2,7 @@
 
 ## Display mode
 
-<p class="description">Toolpad apps allow for a display mode configurable per-page.</p>
+<p class="description">Toolpad Studio apps allow for a display mode configurable per-page.</p>
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/page-properties/display-mode.png", "alt": "Display mode property ", "caption": "Display mode page property", "zoom": false, "width": 300 }}
 
@@ -30,12 +30,12 @@ You can override this setting for any page using the `toolpad-display` query par
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/page-properties/display-mode-override.png", "alt": "No shell display mode ", "caption": "Overriding the display mode", "indent": 1}}
 
 :::info
-See the how-to guide on [how to embed Toolpad pages](/toolpad/studio/how-to-guides/embed-pages/) using the display mode property.
+See the how-to guide on [how to embed Toolpad Studio pages](/toolpad/studio/how-to-guides/embed-pages/) using the display mode property.
 :::
 
 ## Page parameters
 
-Page parameters allow you to pass external data into the Toolpad page state via the URL query parameters.
+Page parameters allow you to pass external data into the Toolpad Studio page state via the URL query parameters.
 
 <video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
   <source src="/static/toolpad/docs/studio/concepts/page-properties/page-parameter-1.mp4" type="video/mp4">

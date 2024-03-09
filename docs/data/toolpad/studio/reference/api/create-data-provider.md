@@ -5,13 +5,13 @@
 ## Import
 
 ```jsx
-import { createDataProvider } from '@mui/toolpad/server';
+import { createDataProvider } from '@toolpad/studio/server';
 ```
 
 ## Description
 
 ```jsx
-import { createDataProvider } from '@mui/toolpad-core/server';
+import { createDataProvider } from '@toolpad/studio-runtime/server';
 import DATA from './movies.json';
 
 export default createDataProvider({
@@ -22,7 +22,7 @@ export default createDataProvider({
 });
 ```
 
-Data providers expose collections to the Toolpad frontend. They are server-side data structures that abstract the loading and manipulation of a backend collection of records of similar shape. They can be directly connected to data grids to display the underlying data.
+Data providers expose collections to the Toolpad Studio frontend. They are server-side data structures that abstract the loading and manipulation of a backend collection of records of similar shape. They can be directly connected to data grids to display the underlying data.
 
 ## Parameters
 
@@ -30,7 +30,7 @@ Data providers expose collections to the Toolpad frontend. They are server-side 
 
 ## Returns
 
-An object that is recognized by Toolpad as a data provider and which is made available to the front-end.
+An object that is recognized by Toolpad Studio as a data provider and which is made available to the front-end.
 
 ## Types
 

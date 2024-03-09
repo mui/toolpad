@@ -2,7 +2,7 @@
 
 # Metric
 
-<p class="description">API docs for the Toolpad Metric component.</p>
+<p class="description">API docs for the Toolpad Studio Metric component.</p>
 
 The Metric component can be used to display a single numerical value. it supports multiple numerical formats such as bytes, currency, percentage... It also supports conditional formatting to adapt the color based on the numerical value.
 

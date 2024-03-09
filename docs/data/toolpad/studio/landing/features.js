@@ -44,21 +44,21 @@ const features = {
       title: 'MUI component libraries',
       wip: true,
       description:
-        'Access the full suite of pre-built MUI components, including both Material UI and MUI X—or bring your own custom components to your Toolpad app.',
+        'Access the full suite of pre-built MUI components, including both Material UI and MUI X—or bring your own custom components to your Toolpad Studio app.',
     },
     {
       icon: <GppGoodIcon fontSize="small" color="primary" />,
       title: 'Self-host for security',
       wip: false,
       description:
-        'Host Toolpad on your own infrastructure to keep full control over where your data goes. In the future, we will provide airgapping guarantees.',
+        'Host Toolpad Studio on your own infrastructure to keep full control over where your data goes. In the future, we will provide airgapping guarantees.',
     },
     {
       icon: <FormatColorFillRoundedIcon fontSize="small" color="primary" />,
       title: 'Custom theming',
       wip: true,
       description:
-        "Write CSS in Toolpad to manage the finer details. Import styles or define them locally to take full control of your app's theme.",
+        "Write CSS in Toolpad Studio to manage the finer details. Import styles or define them locally to take full control of your app's theme.",
     },
   ],
 };

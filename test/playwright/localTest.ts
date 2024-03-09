@@ -16,7 +16,7 @@ import { asyncDisposeSymbol, using } from '../utils/resources';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
-const CLI_CMD = path.resolve(currentDirectory, '../../packages/toolpad-app/cli.mjs');
+const CLI_CMD = path.resolve(currentDirectory, '../../packages/toolpad-studio/cli.mjs');
 
 const PROJECT_ROOT = path.resolve(currentDirectory, '../../');
 
@@ -37,16 +37,16 @@ interface SetupContext {
 }
 
 interface ProjectConfig {
-  // Template to be used as the starting point of the project folder toolpad is running in
+  // Template to be used as the starting point of the project folder Toolpad Studio is running in
   // This will copied to the temporary folder
   template?: string;
   setup?: (ctx: SetupContext) => Promise<void>;
 }
 
 interface LocalAppConfig {
-  // Command to start toolpad with
+  // Command to start Toolpad Studio with
   cmd?: 'start' | 'dev';
-  // Run toolpad editor app in local dev mode
+  // Run Toolpad Studio editor app in local dev mode
   toolpadDev?: boolean;
   // Extra environment variables when running Toolpad
   env?: Record<string, string>;

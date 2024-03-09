@@ -1,10 +1,10 @@
 # Roadmap
 
-<p class="description">Find out about our plans for Toolpad.</p>
+<p class="description">Find out about our plans for Toolpad Studio.</p>
 
-## Toolpad roadmap
+## Toolpad Studio roadmap
 
-To learn more about our plans for Toolpad, visit the [public roadmap](https://github.com/orgs/mui/projects/9).
+To learn more about our plans for Toolpad Studio, visit the [public roadmap](https://github.com/orgs/mui/projects/9).
 
 :::warning
 We operate in a dynamic environment, so things are subject to change.
@@ -21,7 +21,7 @@ To learn more about our plans for Material UI in general, visit the [global roa
 
 ## Paid Plan
 
-A few features in Toolpad are proposed to be placed under a paid plan. These:
+A few features in Toolpad Studio are proposed to be placed under a paid plan. These:
 
 - will not be covered under the free-forever MIT license
 - will require the purchase of a paid license to use in production

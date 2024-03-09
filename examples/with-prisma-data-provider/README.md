@@ -1,6 +1,6 @@
 # With Prisma and data providers
 
-<p class="description">A basic Toolpad application that demonstrates how to use data providers with Prisma.</p>
+<p class="description">A basic Toolpad Studio application that demonstrates how to use data providers with Prisma.</p>
 
 <a href="https://mui-toolpad-with-prisma-data-provider-production.up.railway.app/prod/pages/crud" target="_blank">
   <img src="https://mui.com/static/toolpad/marketing/with-prisma-data-provider.png" alt="Data provider example with Prisma ORM" style="aspect-ratio: 25/13;" width="1435">
@@ -30,7 +30,7 @@ pnpm create toolpad-app --example with-prisma-data-provider
 
 This app demonstrates the following capabilities of Toolpad:
 
-1. Reusing your models in Toolpad UI.
+1. Reusing your models in Toolpad Studio UI.
 2. Using a Data Grid, Button and a text input component.
 3. Leveraging data providers to support pagination.
 

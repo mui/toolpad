@@ -1,16 +1,16 @@
 # Customize data grids
 
-<p class="description">Toolpad is built to allow extensibility as a first-class citizen.</p>
+<p class="description">Toolpad Studio is built to allow extensibility as a first-class citizen.</p>
 
 ## Default behavior
 
-By default, you can connect any JSON data to a Toolpad data grid and it will attempt to guess each column's type display it appropriately:
+By default, you can connect any JSON data to a Toolpad Studio data grid and it will attempt to guess each column's type display it appropriately:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/datagrid.png", "alt": "Data grid with data", "caption": "The default data grid showing multiple data types", "aspectRatio": 3 }}
 
 ## Customizing cell rendering
 
-However, if the default column options are not sufficient, Toolpad allows you to customize your data grid with custom components, using the powerful features of the <a href="https://mui.com/x/react-data-grid/">MUI X Data Grid</a>.
+However, if the default column options are not sufficient, Toolpad Studio allows you to customize your data grid with custom components, using the powerful features of the <a href="https://mui.com/x/react-data-grid/">MUI X Data Grid</a>.
 
 ### Creating a custom component
 
@@ -28,13 +28,13 @@ A custom component that renders inside the data grid receives a `params` object 
 - `row`: the value of the entire row
 - `field`: the name of the field for that specific column
 
-Using the `value` prop, we can create a custom component like the following:
+Using the `value` prop, you can create a custom component like the following:
 
 ```jsx
 import * as React from 'react';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
-import { createComponent } from '@mui/toolpad/browser';
+import { createComponent } from '@toolpad/studio/browser';
 
 export interface OrderIdChipProps {
   value: string;
@@ -72,7 +72,7 @@ The `OrderIdChip` component should appear in our component library on saving:
 
 3. Choose the `OrderIdChip` column in the select menu for custom component:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/order-id-column.png", "alt": "Custom component selector", "caption": "Choosing the custom component we created", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/customize-datagrid/order-id-column.png", "alt": "Custom component selector", "caption": "Choosing the custom component you created", "indent": 1 }}
 
 4. That's it! We have the desired functionality:
 

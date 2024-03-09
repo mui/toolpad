@@ -1,6 +1,6 @@
 # Hacker News client
 
-<p class="description">Toolpad application that demonstrates writing an alternative (simplified) [Hacker News](https://news.ycombinator.com/news) client.</p>
+<p class="description">Toolpad Studio application that demonstrates writing an alternative (simplified) [Hacker News](https://news.ycombinator.com/news) client.</p>
 
 ## How to run
 
@@ -24,7 +24,7 @@ or:
 
 ## What's inside
 
-A Toolpad app that shows how to:
+A Toolpad Studio app that shows how to:
 
 - chain REST API calls
 - use the List component

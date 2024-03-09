@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.1.52
+
+<!-- generated comparing v0.1.51..master -->
+
+_Mar 9, 2024_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Preparing the repository and documentation for an upcoming change to Toolpad: the low-code features will live in `@toolpad/studio`, while components, functions and utilies for building dashboards and internal tools will live in `@toolpad/core`!
+
+- &#8203;<!-- 3 -->Rename Toolpad to Toolpad Studio (#3238) @apedroferreira
+- &#8203;<!-- 2 -->[docs] Split Toolpad into Studio and Core (#3250) @bharatkashyap
+- &#8203;<!-- 1 -->[website] Add star count fallback (#3278) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap
+
 ## v0.1.51
 
 <!-- generated comparing v0.1.50..master -->

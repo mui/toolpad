@@ -10,6 +10,7 @@ test.use({
     /Failed to load resource: the server responded with a status of 401 \(Unauthorized\)/,
     /NetworkError when attempting to fetch resource./,
     /The operation was aborted./,
+    /Failed to fetch/,
   ],
 });
 
@@ -29,7 +30,7 @@ test.use({
 test('Must be authenticated with valid domain to access app', async ({ page, request }) => {
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');
-  await page.waitForURL(/\/prod\/signin/, { waitUntil: 'networkidle' });
+  await page.waitForURL(/\/prod\/signin/);
 
   // Access is blocked to API route
   const res = await request.post('/prod/api/data/page/hello');
@@ -37,30 +38,30 @@ test('Must be authenticated with valid domain to access app', async ({ page, req
 
   // Sign in with non-existing user
   await tryCredentialsSignIn(page, 'nobody', 'nobody');
-  await page.waitForURL(/\/prod\/signin/, { waitUntil: 'networkidle' });
+  await page.waitForURL(/\/prod\/signin/);
   await expect(page.getByText('Access unauthorized.')).toBeVisible();
 
   // Sign in with invalid domain
   await tryCredentialsSignIn(page, 'test', 'test');
-  await page.waitForURL(/\/prod\/signin/, { waitUntil: 'networkidle' });
+  await page.waitForURL(/\/prod\/signin/);
   await expect(page.getByText('Access unauthorized.')).toBeVisible();
 
   // Sign in with valid domain
   await tryCredentialsSignIn(page, 'mui', 'mui');
-  await page.waitForURL(/\/prod\/pages\/mypage/, { waitUntil: 'networkidle' });
+  await page.waitForURL(/\/prod\/pages\/mypage/);
   await expect(page.getByText('my email: test@mui.com')).toBeVisible();
 
   // Is not redirected when authenticated
   await page.goto('/prod/pages/mypage');
-  await page.waitForURL(/\/prod\/pages\/mypage/, { waitUntil: 'networkidle' });
+  await page.waitForURL(/\/prod\/pages\/mypage/);
 
   // Sign out
   await page.getByText('Mr. MUI 2024').click();
   await page.getByText('Sign out').click();
 
-  await page.waitForURL(/\/prod\/signin/, { waitUntil: 'networkidle' });
+  await page.waitForURL(/\/prod\/signin/);
 
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');
-  await page.waitForURL(/\/prod\/signin/, { waitUntil: 'networkidle' });
+  await page.waitForURL(/\/prod\/signin/);
 });

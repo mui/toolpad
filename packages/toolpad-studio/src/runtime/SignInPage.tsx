@@ -70,7 +70,7 @@ export default function SignInPage() {
   React.useEffect(() => {
     const authError = urlParams.get(AUTH_ERROR_URL_PARAM);
 
-    if (authError === 'AuthorizedCallbackError') {
+    if (authError === 'AuthorizedCallbackError' || authError === 'CredentialsSignin') {
       setErrorSnackbarMessage('Access unauthorized.');
     } else if (authError === 'CallbackRouteError') {
       setErrorSnackbarMessage(

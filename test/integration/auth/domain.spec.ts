@@ -26,7 +26,7 @@ test.use({
   },
 });
 
-test('Must be authenticated with valid domain to access app', async ({ page, request }) => {
+test.only('Must be authenticated with valid domain to access app', async ({ page, request }) => {
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');
   await expect(page).toHaveURL(/\/prod\/signin/);
@@ -34,6 +34,11 @@ test('Must be authenticated with valid domain to access app', async ({ page, req
   // Access is blocked to API route
   const res = await request.post('/prod/api/data/page/hello');
   expect(res.status()).toBe(401);
+
+  // Sign in with non-existing user
+  await tryCredentialsSignIn(page, 'nobody', 'nobody');
+  await expect(page).toHaveURL(/\/prod\/signin/);
+  await expect(page.getByText('Access unauthorized.')).toBeVisible();
 
   // Sign in with invalid domain
   await tryCredentialsSignIn(page, 'test', 'test');

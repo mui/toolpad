@@ -63,18 +63,14 @@
       "allowedVersions": "< 3.0.0"
     },
     {
-      "groupName": "tsx",
-      "matchPackageNames": ["tsx"],
-      "description": "Investigating problems with importing X charts under node.js with tsx"
-    },
-    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
     },
     {
       "groupName": "Next.js",
-      "matchPackageNames": ["next", "^@next/"],
+      "matchPackageNames": ["next"],
+      "matchPackagePatterns": ["^@next/"],
       "description": "Restricted to a Node.js version that's unsupported on codesandboxci"
     },
     {

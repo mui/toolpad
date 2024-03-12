@@ -35,8 +35,9 @@ async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecA
   });
 }
 
-test(
-  'create-toolpad-app can bootstrap a Toolpad app',
+// @TODO: Unskip once @toolpad/studio is released for the first time.
+test.skip(
+  'create-toolpad-app can bootstrap a Toolpad Studio app',
   async () => {
     testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-'));
     cp = execa(cliPath, [testDir], {
@@ -53,12 +54,12 @@ test(
     expect(packageJson).toEqual(
       expect.objectContaining({
         dependencies: expect.objectContaining({
-          '@mui/toolpad': expect.any(String),
+          '@toolpad/studio': expect.any(String),
         }),
         scripts: expect.objectContaining({
-          build: 'toolpad build',
-          dev: 'toolpad dev',
-          start: 'toolpad start',
+          build: 'toolpad-studio build',
+          dev: 'toolpad-studio dev',
+          start: 'toolpad-studio start',
         }),
       }),
     );

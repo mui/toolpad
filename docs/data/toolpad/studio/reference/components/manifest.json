@@ -1,0 +1,99 @@
+{
+  "//": "ATTENTION: DO NOT EDIT! This file has been auto-generated using `pnpm docs:build:api`.",
+  "pages": [
+    {
+      "pathname": "/toolpad/studio/reference/components",
+      "title": "Index"
+    },
+    {
+      "pathname": "/toolpad/studio/reference/components/components-group",
+      "subheader": "Components",
+      "children": [
+        {
+          "title": "Autocomplete",
+          "pathname": "/toolpad/studio/reference/components/autocomplete"
+        },
+        {
+          "title": "Button",
+          "pathname": "/toolpad/studio/reference/components/button"
+        },
+        {
+          "title": "Chart",
+          "pathname": "/toolpad/studio/reference/components/chart"
+        },
+        {
+          "title": "Checkbox",
+          "pathname": "/toolpad/studio/reference/components/checkbox"
+        },
+        {
+          "title": "Container",
+          "pathname": "/toolpad/studio/reference/components/container"
+        },
+        {
+          "title": "DataGrid",
+          "pathname": "/toolpad/studio/reference/components/data-grid"
+        },
+        {
+          "title": "DatePicker",
+          "pathname": "/toolpad/studio/reference/components/date-picker"
+        },
+        {
+          "title": "FilePicker",
+          "pathname": "/toolpad/studio/reference/components/file-picker"
+        },
+        {
+          "title": "Form",
+          "pathname": "/toolpad/studio/reference/components/form"
+        },
+        {
+          "title": "Image",
+          "pathname": "/toolpad/studio/reference/components/image"
+        },
+        {
+          "title": "List",
+          "pathname": "/toolpad/studio/reference/components/list"
+        },
+        {
+          "title": "Metric",
+          "pathname": "/toolpad/studio/reference/components/metric"
+        },
+        {
+          "title": "PageColumn",
+          "pathname": "/toolpad/studio/reference/components/page-column"
+        },
+        {
+          "title": "PageRow",
+          "pathname": "/toolpad/studio/reference/components/page-row"
+        },
+        {
+          "title": "Paper",
+          "pathname": "/toolpad/studio/reference/components/paper"
+        },
+        {
+          "title": "Select",
+          "pathname": "/toolpad/studio/reference/components/select"
+        },
+        {
+          "title": "Spacer",
+          "pathname": "/toolpad/studio/reference/components/spacer"
+        },
+        {
+          "title": "Stack",
+          "pathname": "/toolpad/studio/reference/components/stack"
+        },
+        {
+          "title": "Tabs",
+          "pathname": "/toolpad/studio/reference/components/tabs"
+        },
+        {
+          "title": "Text",
+          "pathname": "/toolpad/studio/reference/components/text"
+        },
+        {
+          "title": "TextField",
+          "pathname": "/toolpad/studio/reference/components/text-field"
+        }
+      ]
+    }
+  ]
+}

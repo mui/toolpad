@@ -1,10 +1,10 @@
 /**
- * Toolpad data provider file.
- * See: https://mui.com/toolpad/concepts/data-providers/
+ * Toolpad Studio data provider file.
+ * See: https://mui.com/toolpad/studio/concepts/data-providers/
  */
 
 import Stripe from 'stripe';
-import { createDataProvider } from '@mui/toolpad/server';
+import { createDataProvider } from '@toolpad/studio/server';
 
 const initStripe = () => {
   if (!process.env.STRIPE_TOKEN) {

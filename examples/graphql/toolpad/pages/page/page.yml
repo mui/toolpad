@@ -47,7 +47,7 @@ spec:
                         horizontalAlign: start
                         verticalAlign: center
                       props:
-                        defaultValue: mui-toolpad
+                        defaultValue: mui-toolpad-studio
         - component: Metric
           name: metric1
           layout:

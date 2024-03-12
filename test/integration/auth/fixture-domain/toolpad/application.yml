@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: application
+spec:
+  authentication:
+    providers: [{ provider: credentials }]
+    restrictedDomains:
+      - mui.com

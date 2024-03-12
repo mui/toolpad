@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [":semanticCommitsDisabled"],
   "automerge": false,
   "commitMessageAction": "Bump",
   "commitMessageExtra": "to {{newValue}}",
@@ -10,6 +11,10 @@
   "labels": ["dependencies"],
   "stopUpdatingLabel": "on hold",
   "packageRules": [
+    {
+      "matchDepTypes": ["peerDependencies"],
+      "rangeStrategy": "widen"
+    },
     {
       "groupName": "dependencies",
       "matchManagers": ["npm"],
@@ -29,6 +34,11 @@
       "groupName": "MUI X",
       "matchPackagePatterns": ["^@mui/x-"],
       "schedule": ["at any time"]
+    },
+    {
+      "groupName": "MUI Monorepo",
+      "matchPackagePatterns": ["@mui/monorepo"],
+      "schedule": ["on sunday before 6:00am"]
     },
     {
       "groupName": "playwright",
@@ -63,15 +73,9 @@
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "prettier",
-      "matchPackageNames": ["prettier", "pretty-quick"],
-      "description": "prettier made breaking changes in v3, pretty-quick needs to catch up before we can upgrade. https://github.com/azz/pretty-quick/issues/164"
-    },
-    {
-      "groupName": "next",
-      "matchPackageNames": ["next"],
-      "allowedVersions": "<= 13.4.19",
-      "description": "https://github.com/mui/mui-toolpad/pull/2739"
+      "groupName": "Next.js",
+      "matchPackageNames": ["next", "^@next/"],
+      "description": "Restricted to a Node.js version that's unsupported on codesandboxci"
     },
     {
       "groupName": "superjson",
@@ -87,8 +91,8 @@
       "matchManagers": ["github-actions"]
     },
     {
-      "groupName": "Update @mui/toolpad in examples",
-      "matchPackageNames": ["@mui/toolpad"],
+      "groupName": "Update @toolpad/studio in examples",
+      "matchPackageNames": ["@toolpad/studio"],
       "matchFiles": ["examples/*/package.json"],
       "schedule": ["at any time"],
       "automerge": true

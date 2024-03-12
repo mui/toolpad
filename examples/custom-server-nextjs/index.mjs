@@ -1,4 +1,4 @@
-import { createHandler } from '@mui/toolpad';
+import { createHandler } from '@toolpad/studio';
 import next from 'next';
 import * as url from 'url';
 import express from 'express';
@@ -10,9 +10,9 @@ const dev = process.env.NODE_ENV === 'development';
 // Create the host application
 const app = express();
 
-// Initialize the Toolpad handler. Make sure to pass the base path
-const { handler } = await createHandler({ dev, base: '/my-toolpad-app' });
-app.use('/my-toolpad-app', handler);
+// Initialize the Toolpad Studio handler. Make sure to pass the base path
+const { handler } = await createHandler({ dev, base: '/my-toolpad-studio-app' });
+app.use('/my-toolpad-studio-app', handler);
 
 // Initialize the Next.js app, basePath is set in next.config.mjs
 const nextApp = next({ dev, dir: currentDirectory });

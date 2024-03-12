@@ -1,7 +1,9 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.50/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  title: Employees
+  title: Customers
   content:
     - component: PageRow
       name: pageRow13
@@ -240,7 +242,6 @@ spec:
                                       $$jsExpression: |
                                         customersGrid.selection.email
                                     isRequired: true
-                                    isInvalid: false
                                     fullWidth: true
                                     name: email
             - component: Text
@@ -350,7 +351,6 @@ spec:
                                   props:
                                     label: Email
                                     isRequired: true
-                                    isInvalid: false
                                     fullWidth: true
                                     name: email
                                     placeholder: xyz@gmail.com
@@ -397,4 +397,5 @@ spec:
             $$jsExpression: |
               customersGrid.selection.id
       mode: mutation
-  display: standalone
+  display: shell
+  displayName: Admin App(form based)

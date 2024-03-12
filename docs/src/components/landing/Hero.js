@@ -92,14 +92,17 @@ function TypingAnimation({ wordIndex, setWordIndex }) {
         setLetterIndex(letterIndex + 1);
       }, LETTER_DELAY);
     } else {
-      timer = setTimeout(() => {
-        const nextIndex = (wordIndex + 1) % words.length;
-        setWordIndex(nextIndex);
-        setFullText(words[nextIndex]);
-        setText('');
-        setLetterIndex(0);
-        count.current += 1;
-      }, 2 * FRAME_DELAY - (count.current ? LETTER_DELAY * fullText.length : 0));
+      timer = setTimeout(
+        () => {
+          const nextIndex = (wordIndex + 1) % words.length;
+          setWordIndex(nextIndex);
+          setFullText(words[nextIndex]);
+          setText('');
+          setLetterIndex(0);
+          count.current += 1;
+        },
+        2 * FRAME_DELAY - (count.current ? LETTER_DELAY * fullText.length : 0),
+      );
     }
     return () => clearTimeout(timer);
   }, [letterIndex, wordIndex, fullText, text, setWordIndex]);
@@ -159,8 +162,8 @@ export default function Hero() {
           ]}
         >
           <IconImage width={28} height={28} loading="eager" name="product-toolpad" />
-          <Box component="span" sx={{ ml: 1, mr: 1 }}>
-            MUI Toolpad
+          <Box component="span" sx={{ ml: 0.5, mr: 1 }}>
+            Toolpad
           </Box>
           <Chip
             label="Introducing the Beta version"

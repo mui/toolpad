@@ -24,7 +24,7 @@ test.use({
   },
 });
 
-test.only('Must be authenticated with valid domain to access app', async ({ page, request }) => {
+test('Must be authenticated with valid domain to access app', async ({ page, request }) => {
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');
   await page.waitForURL(/\/prod\/signin/);

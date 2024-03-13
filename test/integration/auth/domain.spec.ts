@@ -58,6 +58,7 @@ test('Must be authenticated with valid domain to access app', async ({ page, req
 
   await page.waitForURL(/\/prod\/signin/);
 
+  // Must wait for network to be idle or next CSRF request fails with "Failed to fetch" on the next sign out, probably interrupts itself somehow
   await page.waitForLoadState('networkidle');
 
   // Is redirected when unauthenticated

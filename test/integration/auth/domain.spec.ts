@@ -8,9 +8,6 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 test.use({
   ignoreConsoleErrors: [
     /Failed to load resource: the server responded with a status of 401 \(Unauthorized\)/,
-    /NetworkError when attempting to fetch resource./,
-    /The operation was aborted./,
-    /Failed to fetch/,
   ],
 });
 
@@ -60,6 +57,8 @@ test('Must be authenticated with valid domain to access app', async ({ page, req
   await page.getByText('Sign out').click();
 
   await page.waitForURL(/\/prod\/signin/);
+
+  await page.waitForLoadState('networkidle');
 
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');

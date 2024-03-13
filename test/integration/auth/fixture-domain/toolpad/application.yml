@@ -5,3 +5,4 @@ spec:
     providers: [{ provider: credentials }]
     restrictedDomains:
       - mui.com
+  authorization: {}

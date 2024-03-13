@@ -279,9 +279,16 @@ export async function createRequireAuthMiddleware(project: ToolpadProject) {
 
     const isPageRequest = req.get('sec-fetch-dest') === 'document';
     const signInPath = `${base}/signin`;
+    const editorPath = `${base}/editor`;
+
+    const requestPath = req.originalUrl.split('?')[0];
 
     let isAuthorized = true;
-    if ((!project.options.dev || isPageRequest) && req.originalUrl.split('?')[0] !== signInPath) {
+    if (
+      (!project.options.dev || isPageRequest) &&
+      !requestPath.startsWith(signInPath) &&
+      !requestPath.startsWith(editorPath)
+    ) {
       const token = await getUserToken(req);
       if (!token) {
         isAuthorized = false;

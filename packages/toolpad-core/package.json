@@ -61,7 +61,6 @@
     "rollup": "^4.13.0",
     "rollup-plugin-node-globals": "^1.4.0"
   },
-  "typings": "./index.d.ts",
   "publishConfig": {
     "access": "public",
     "directory": "build"

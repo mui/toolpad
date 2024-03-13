@@ -16,7 +16,7 @@ out/
 build
 
 # typescript
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # misc
 .DS_Store
@@ -61,3 +61,4 @@ test-results
 
 /test/regressions/screenshots/**
 
+size-snapshot.json

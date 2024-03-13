@@ -24,7 +24,7 @@ test.use({
   },
 });
 
-test('Must be authenticated with valid domain to access app', async ({ page, request }) => {
+test.only('Must be authenticated with valid domain to access app', async ({ page, request }) => {
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');
   await page.waitForURL(/\/prod\/signin/);
@@ -58,8 +58,8 @@ test('Must be authenticated with valid domain to access app', async ({ page, req
 
   await page.waitForURL(/\/prod\/signin/);
 
-  // Must wait for network to be idle or next CSRF request fails with "Failed to fetch", somehow due to the ongoing requests
-  await page.waitForLoadState('networkidle');
+  // Wait for page content to render so that next CSRF request does not collide with ongoing auth requests
+  await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible();
 
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');

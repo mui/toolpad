@@ -1,22 +1,18 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "es2020",
     "module": "esnext",
-    "target": "es5",
-    "lib": ["es2020", "dom"],
-    "jsx": "preserve",
-    "moduleResolution": "node",
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "noEmit": true,
-    "experimentalDecorators": true,
-    "baseUrl": "./",
-    "allowSyntheticDefaultImports": true,
-    "noErrorTruncation": false,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "./dist",
     "allowJs": true,
-    "paths": {},
+    "pretty": true,
+    "preserveWatchOutput": true,
     "types": ["node", "react"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/index.js"],
-  "exclude": ["build"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/index.ts"],
+  "exclude": ["dist"]
 }

@@ -535,11 +535,11 @@ importers:
         specifier: 6.19.6
         version: 6.19.6(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)
       '@mui/x-date-pickers':
-        specifier: 6.19.6
-        version: 6.19.6(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
+        specifier: 6.19.7
+        version: 6.19.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
       '@mui/x-date-pickers-pro':
-        specifier: 6.19.6
-        version: 6.19.6(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
+        specifier: 6.19.7
+        version: 6.19.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
       '@mui/x-tree-view':
         specifier: 6.17.0
         version: 6.17.0(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)
@@ -860,8 +860,8 @@ importers:
         specifier: 6.19.6
         version: 6.19.6(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)
       '@mui/x-date-pickers':
-        specifier: 6.19.6
-        version: 6.19.6(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
+        specifier: 6.19.7
+        version: 6.19.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
       '@mui/x-license-pro':
         specifier: 6.10.2
         version: 6.10.2(@types/react@18.2.65)(react@18.2.0)
@@ -3190,8 +3190,8 @@ packages:
       - '@types/react'
     dev: false
 
-  /@mui/x-date-pickers-pro@6.19.6(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-6TwlGgAGE0TMIrfYaOrGhh79YyHDKt9ze22irPBOwz7IQeJ6vnGLzE1KJ+ddklQjaGtN9X7O++55r8mfs3mLSA==}
+  /@mui/x-date-pickers-pro@6.19.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-KpYNZIx3zp1yXKkeGKkIBj4PFWutFKBBwQLJxMp/PDyl8uZSeB3P8Rd9tlqvFZ+k+vksP7q+S3GvAlIa3GwKNQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@emotion/react': ^11.9.0
@@ -3234,7 +3234,7 @@ packages:
       '@mui/material': 5.15.12(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.65)(react-dom@18.2.0)(react@18.2.0)
       '@mui/system': 5.15.12(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.65)(react@18.2.0)
       '@mui/utils': 5.15.12(@types/react@18.2.65)(react@18.2.0)
-      '@mui/x-date-pickers': 6.19.6(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/x-date-pickers': 6.19.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
       '@mui/x-license-pro': 6.10.2(@types/react@18.2.65)(react@18.2.0)
       clsx: 2.1.0
       dayjs: 1.11.10
@@ -3246,8 +3246,8 @@ packages:
       - '@types/react'
     dev: false
 
-  /@mui/x-date-pickers@6.19.6(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-QW9AFcPi0vLpkUhmquhhyhLaBvB0AZJuu3NTrE173qNKx3Z3n51aCLY9bc7c6i4ltZMMsVRHlvzQjsve04TC8A==}
+  /@mui/x-date-pickers@6.19.7(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@mui/material@5.15.12)(@mui/system@5.15.12)(@types/react@18.2.65)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-BCTOQjAuyU29Ymd2FJrHHdRh0U6Qve7MsthdrD2jjaMaR8ou455JuxsNTQUGSpiMkGHWOMVq+B8N1EBcSYH63g==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@emotion/react': ^11.9.0

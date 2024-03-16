@@ -63,7 +63,7 @@ This lack of a unified reference point within the codebase can compromise its sc
 ### Cheaper developer tooling
 
 When developers use low-code or no-code tools, they frequently sacrifice their autonomy and become restricted by the options provided by the tool.
-The introduction of a black-box element prevents access to the high-quality tools developers are used to when working with pro-code, e.g. Git for version control.
+The introduction of a black-box element prevents access to the high-quality tools developers are used to when working with pro-code, for example Git for version control.
 
 This can lead to a significant problem when it comes to the long-term maintainability of internal tools, as it becomes challenging to adapt, extend, or customize them to meet evolving needs.
 

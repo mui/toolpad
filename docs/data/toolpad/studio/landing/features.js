@@ -44,7 +44,7 @@ const features = {
       title: 'MUI component libraries',
       wip: true,
       description:
-        'Access the full suite of pre-built MUI components, including both Material UI and MUI X—or bring your own custom components to your Toolpad Studio app.',
+        'Access the full suite of pre-built MUI components, including both Material UI and MUI X—or bring your own custom components to your Toolpad Studio app.',
     },
     {
       icon: <GppGoodIcon fontSize="small" color="primary" />,

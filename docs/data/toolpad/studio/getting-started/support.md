@@ -14,7 +14,7 @@ Toolpad Studio uses GitHub issues to track bug reports and feature requests.
 
 If you think you've found a bug in the codebase, or you have an idea for a new feature, please [search the issues on GitHub](https://github.com/mui/mui-toolpad/issues?utf8=%E2%9C%93&q=is%3Aopen+is%3Aclosed) before opening a new one, to ensure you're not creating a duplicate.
 
-- [Open an issue on MUI Toolpad Studio](https://github.com/mui/mui-toolpad/issues/new/choose) for issues or feature requests.
+- [Open an issue on Toolpad Studio](https://github.com/mui/mui-toolpad/issues/new/choose) for issues or feature requests.
 - [Start a GitHub discussion](https://github.com/mui/mui-toolpad/discussions) for a broad topic. Here you can engage with the team and the discussion would likely result in one or more GitHub issues.
 
 #### New issue guidelines

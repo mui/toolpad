@@ -15,7 +15,7 @@ yarn create toolpad-app
 pnpm create toolpad-app
 ```
 
-You will be asked for the name of your project
+You then need to provide the name of your project:
 
 ```bash
 ✔ Enter the name of your project:

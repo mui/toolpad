@@ -86,12 +86,12 @@ export default createBuiltin(FormWrappedTextField, {
       default: '',
     },
     label: {
-      helperText: 'A label that describes the content of the text field. e.g. "First name".',
+      helperText: 'A label that describes the content of the text field, for example "First name".',
       type: 'string',
     },
     variant: {
       helperText:
-        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
+        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
       type: 'string',
       enum: ['outlined', 'filled', 'standard'],
       default: 'outlined',

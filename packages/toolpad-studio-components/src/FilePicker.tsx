@@ -103,7 +103,8 @@ export default createBuiltin(FormWrappedFilePicker, {
       },
     },
     label: {
-      helperText: 'A label that describes the content of the FilePicker. e.g. "Profile Image".',
+      helperText:
+        'A label that describes the content of the FilePicker, for example "Profile Image".',
       type: 'string',
     },
     multiple: {

@@ -22,7 +22,7 @@
 
 Toolpad Studio understands the `$EDITOR` environment variable. Make sure you can open your editor of choice from the command line. Then provide the command in the `$EDITOR` environment variable. You can use a `.env` file in the root of your project to set the variable.
 
-e.g. for webstorm, make sure to [install the CLI command](https://www.jetbrains.com/help/webstorm/working-with-the-ide-features-from-command-line.html#standalone) in the `PATH` variable, then declare the webstorm command:
+For example with WebStorm, make sure to [install the CLI command](https://www.jetbrains.com/help/webstorm/working-with-the-ide-features-from-command-line.html#standalone) in the `PATH` variable, then declare the WebStorm command:
 
 ```bash
 # ./.env

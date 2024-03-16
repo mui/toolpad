@@ -229,7 +229,7 @@ export default function Hero() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
             <SvgMuiLogo width={20} />
             <Typography color="text.secondary" fontWeight="medium" variant="body2">
-              Powered by Material UI
+              Powered by Material&nbsp;UI
             </Typography>
           </Box>
         </Box>

@@ -68,7 +68,7 @@
     "@types/express": "4.17.21",
     "@types/invariant": "2.2.37",
     "@types/prettier": "2.7.3",
-    "@types/react": "18.2.65",
+    "@types/react": "18.2.66",
     "@types/react-is": "18.2.4",
     "@types/title": "3.4.3"
   }

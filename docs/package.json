@@ -31,7 +31,7 @@
     "@mui/lab": "5.0.0-alpha.168",
     "@mui/material": "5.15.13",
     "@mui/material-nextjs": "^5.15.11",
-    "@mui/monorepo": "github:mui/material-ui#33c8b918c7fca909eb4abdd573852499d0fb1d30",
+    "@mui/monorepo": "github:mui/material-ui#b57951355a60566aeafc88c9aa49c7f198968b3c",
     "@mui/styles": "5.15.13",
     "@mui/utils": "5.15.13",
     "@mui/x-data-grid-pro": "6.19.6",

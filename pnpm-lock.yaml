@@ -207,6 +207,12 @@ importers:
       '@emotion/styled':
         specifier: 11.11.0
         version: 11.11.0(@emotion/react@11.11.3)(@types/react@18.2.66)(react@18.2.0)
+      '@mui/base':
+        specifier: 5.0.0-beta.39
+        version: 5.0.0-beta.39(@types/react@18.2.66)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/docs':
+        specifier: https://pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs
+        version: '@pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs(@mui/base@5.0.0-beta.39)(@mui/icons-material@5.15.13)(@mui/material@5.15.13)(@mui/system@5.15.13)(next@13.5.6)(react@18.2.0)'
       '@mui/icons-material':
         specifier: 5.15.13
         version: 5.15.13(@mui/material@5.15.13)(react@18.2.0)
@@ -15439,6 +15445,36 @@ packages:
 
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+    dev: false
+
+  '@pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs(@mui/base@5.0.0-beta.39)(@mui/icons-material@5.15.13)(@mui/material@5.15.13)(@mui/system@5.15.13)(next@13.5.6)(react@18.2.0)':
+    resolution: {tarball: https://pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs}
+    id: '@pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs'
+    name: '@mui/docs'
+    version: 5.15.13
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      '@mui/base': workspace:^
+      '@mui/icons-material': workspace:^
+      '@mui/material': workspace:^
+      '@mui/system': workspace:^
+      '@types/react': ^17.0.0 || ^18.0.0
+      next: ^13.5.1
+      react: ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.24.0
+      '@mui/base': 5.0.0-beta.39(@types/react@18.2.66)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/icons-material': 5.15.13(@mui/material@5.15.13)(react@18.2.0)
+      '@mui/material': 5.15.13(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/system': 5.15.13(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(react@18.2.0)
+      clsx: 2.1.0
+      next: 13.5.6(@babel/core@7.23.9)(react-dom@18.2.0)(react@18.2.0)
+      nprogress: 0.2.0
+      prop-types: 15.8.1
+      react: 18.2.0
     dev: false
 
   github.com/mui/material-ui/b57951355a60566aeafc88c9aa49c7f198968b3c:

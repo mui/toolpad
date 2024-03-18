@@ -2,6 +2,10 @@
 
 <p class="description">Toolpad Studio application that demonstrates writing an alternative (simplified) [Hacker News](https://news.ycombinator.com/news) client.</p>
 
+<a target="_blank">
+  <img src="https://mui.com/static/toolpad/marketing/hackernews-client.png" alt="Toolpad Studio app that shows a hacker news client" style="aspect-ratio: 687/581;" width="475">
+</a>
+
 ## How to run
 
 Use `create-toolpad-app` to bootstrap the example:

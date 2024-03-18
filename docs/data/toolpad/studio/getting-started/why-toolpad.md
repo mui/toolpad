@@ -75,7 +75,7 @@ Addressing the problems mentioned above leads to a better developer experience. 
 
 ### Drag-and-drop builder
 
-Toolpad Studio works as a drag-and-drop UI builder and uses MUI's own Material UI components. Material UI includes all of the foundational components required for internal use cases. Toolpad Studio currently supports [18 of them](https://mui.com/toolpad/reference/components/), and more are continuously being added.
+Toolpad Studio works as a drag-and-drop UI builder and uses MUI's own Material UI components. Material UI includes all of the foundational components required for internal use cases. Toolpad Studio currently supports [many of them](https://mui.com/toolpad/reference/components/), and more are continuously being added.
 
 Toolpad Studio supports adding any number of custom React components for other use cases. The drag-and-drop builder enables you to quickly assemble a minimum viable UI that's endlessly customizable, ensuring the best of both worlds: speed _and_ flexibility.
 

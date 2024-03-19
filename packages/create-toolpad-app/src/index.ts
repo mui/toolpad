@@ -36,7 +36,7 @@ function getPackageManager(): PackageManager {
       return 'npm';
     }
   }
-  return 'yarn';
+  return 'pnpm';
 }
 
 // From https://github.com/vercel/next.js/blob/canary/packages/create-next-app/helpers/is-folder-empty.ts
@@ -161,6 +161,333 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   }
 };
 
+// Bootstrap a new Next.js project in the given directory
+// with the following file structure:
+// src/
+// 	app/
+//   api/
+//     auth/
+//       [...nextauth]/
+//         route.ts
+//   auth/
+//     [...path]/
+//       page.tsx
+//   (dashboard)/
+//     page/
+//       page.tsx
+//     layout.tsx
+//   layout.tsx
+// theme.ts
+// next.config.mjs
+// package.json
+
+const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
+  // eslint-disable-next-line no-console
+  console.log();
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.blue('info')} - Creating Toolpad Core project in ${chalk.blue(absolutePath)}`,
+  );
+  // eslint-disable-next-line no-console
+  console.log();
+
+  const packageJson: PackageJson = {
+    name: path.basename(absolutePath),
+    version: '0.1.0',
+    scripts: {
+      dev: 'next dev',
+      build: 'next build',
+      start: 'next start',
+      lint: 'next lint',
+    },
+    dependencies: {
+      react: '^18',
+      'react-dom': '^18',
+      next: '14.1.3',
+      '@mui/material': '^5',
+      '@mui/icons-material': '^5',
+      '@emotion/react': '^11',
+      '@emotion/styled': '^11',
+      '@mui/material-nextjs': '^5',
+      '@emotion/cache': '^11',
+    },
+    devDependencies: {
+      typescript: '^5',
+      '@types/node': '^20',
+      '@types/react': '^18',
+      '@types/react-dom': '^18',
+      eslint: '^8',
+      'eslint-config-next': '14.1.3',
+    },
+  };
+
+  const DEFAULT_GENERATED_GITIGNORE_FILE = '.gitignore';
+
+  await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
+
+  await fs.copyFile(
+    path.resolve(__dirname, `./gitignoreTemplate`),
+    path.join(absolutePath, DEFAULT_GENERATED_GITIGNORE_FILE),
+  );
+
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.blue('info')} - Installing dependencies`);
+  // eslint-disable-next-line no-console
+  console.log();
+
+  const installVerb = 'install';
+  const command = `${packageManager} ${installVerb}`;
+  await execaCommand(command, { stdio: 'inherit', cwd: absolutePath });
+
+  // Create the `app` directory
+  await fs.mkdir(path.join(absolutePath, 'app'));
+  // Create the `api` directory inside the `app` directory
+  await fs.mkdir(path.join(absolutePath, 'app', 'api'));
+  // Create the `auth` directory inside the `api` directory
+  await fs.mkdir(path.join(absolutePath, 'app', 'api', 'auth'));
+  // Create the `[...nextAuth]` directory inside the `auth` directory
+  await fs.mkdir(path.join(absolutePath, 'app', 'api', 'auth', '[...nextAuth]'));
+  // Create the `route.ts` file inside the `[...nextAuth]` directory
+  await fs.writeFile(
+    path.join(absolutePath, 'app', 'api', 'auth', '[...nextAuth]', 'route.ts'),
+    '',
+  );
+  // Create the `auth` directory inside the `app` directory
+  await fs.mkdir(path.join(absolutePath, 'app', 'auth'));
+  // Create the `[...path]` directory inside the `auth` directory
+  await fs.mkdir(path.join(absolutePath, 'app', 'auth', '[...path]'));
+  // Create the `page.tsx` file inside the `[...path]` directory
+  await fs.writeFile(path.join(absolutePath, 'app', 'auth', '[...path]', 'page.tsx'), '');
+  // Create the `(dashboard)` directory inside the `app` directory
+  await fs.mkdir(path.join(absolutePath, 'app', '(dashboard)'));
+  // Create the `page` directory inside the `(dashboard)` directory
+  await fs.mkdir(path.join(absolutePath, 'app', '(dashboard)', 'page'));
+  const pageContent = `
+  import { Typography } from "@mui/material";
+
+  export default function Home() {
+    return (
+      <main>
+        <div>
+          <Typography variant="h6" color="grey.800">
+            Customize <code>page.tsx</code> to begin.
+          </Typography>
+        </div>
+      </main>
+    );
+  }
+  `;
+  // Create the `page.tsx` file inside the `page` directory
+  await fs.writeFile(
+    path.join(absolutePath, 'app', '(dashboard)', 'page', 'page.tsx'),
+    pageContent,
+  );
+
+  const dashboardLayoutContent = `
+  import * as React from "react";
+  import {
+    AppBar,
+    Badge,
+    Box,
+    Container,
+    Divider,
+    Drawer,
+    IconButton,
+    List,
+    ListItemButton,
+    ListItemIcon,
+    Toolbar,
+  } from "@mui/material";
+
+  import HomeIcon from "@mui/icons-material/Home";
+  import SettingsIcon from "@mui/icons-material/Settings";
+  import NotificationsIcon from "@mui/icons-material/Notifications";
+
+  export default function Layout({ children }) {
+    return (
+      <Box sx={{ display: "flex" }}>
+        <AppBar position="absolute">
+          <Toolbar sx={{ justifyContent: "flex-end" }}>
+            <IconButton color="inherit">
+              <Badge badgeContent={4} color="secondary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Drawer variant="permanent" anchor="left">
+          <Toolbar
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              px: [1],
+            }}
+          ></Toolbar>
+          <Divider />
+          <List component="nav">
+            <ListItemButton>
+              <ListItemIcon>
+                <HomeIcon />
+              </ListItemIcon>
+            </ListItemButton>
+            <ListItemButton>
+              <ListItemIcon>
+                <SettingsIcon />
+              </ListItemIcon>
+            </ListItemButton>
+          </List>
+        </Drawer>
+        <Box
+          component={"main"}
+          sx={{ flexGrow: 1, height: "100vh", overflow: "auto" }}
+        >
+          <Toolbar />
+          <Container maxWidth="lg">{children}</Container>
+        </Box>
+      </Box>
+    );
+  }
+`;
+  // Create the `layout.tsx` file inside the `(dashboard)` directory
+  await fs.writeFile(
+    path.join(absolutePath, 'app', '(dashboard)', 'layout.tsx'),
+    dashboardLayoutContent,
+  );
+
+  const rootLayoutContent = `
+  import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
+  import { ThemeProvider } from '@mui/material/styles';
+  import theme from '../theme';
+  
+    export default function RootLayout(props) {
+      const { children } = props;
+      return (
+        <html lang="en">
+          <body>
+            <AppRouterCacheProvider>
+            <ThemeProvider theme={theme}>
+                {children}
+              </ThemeProvider>
+            </AppRouterCacheProvider>
+          </body>
+        </html>
+      );
+    }
+    `;
+  // Write the content of the `layout.tsx` file
+  await fs.writeFile(path.join(absolutePath, 'app', 'layout.tsx'), rootLayoutContent);
+
+  const themeContent = `    
+  "use client";
+  import { Roboto } from "next/font/google";
+  import { createTheme } from "@mui/material/styles";
+  
+  const roboto = Roboto({
+    weight: ["300", "400", "500", "700"],
+    subsets: ["latin"],
+    display: "swap",
+  });
+  
+  const theme = createTheme({
+    typography: {
+      fontFamily: roboto.style.fontFamily,
+    },
+    components: {
+      MuiAppBar: {
+        styleOverrides: {
+          root: {
+            boxShadow: "none",
+          },
+        },
+      },
+      MuiList: {
+        styleOverrides: {
+          root: {
+            padding: 0,
+          },
+        },
+      },
+      MuiListItemIcon: {
+        styleOverrides: {
+          root: {
+            minWidth: "28px",
+          },
+        },
+      },
+    },
+  });
+  
+  export default theme;
+  `;
+
+  // Create the `theme.ts` file in the root directory
+  await fs.writeFile(path.join(absolutePath, 'theme.ts'), themeContent);
+
+  const nextTypes = `/// <reference types="next" />
+  /// <reference types="next/image-types/global" />
+  
+  // NOTE: This file should not be edited
+  // see https://nextjs.org/docs/basic-features/typescript for more information.
+  `;
+  // Create the `next-env.d.ts` file in the root directory
+  await fs.writeFile(path.join(absolutePath, 'next-env.d.ts'), nextTypes);
+
+  const nextConfigContent = `
+  /** @type {import('next').NextConfig} */
+  const nextConfig = {};
+  export default nextConfig;
+  `;
+  // Create the `next.config.mjs` file in the root directory
+  await fs.writeFile(path.join(absolutePath, 'next.config.mjs'), nextConfigContent);
+
+  const eslintConfigContent = `{    
+      "extends": "next/core-web-vitals"        
+  }
+  `;
+  // Create the `.eslintrc.json` file in the root directory
+  await fs.writeFile(path.join(absolutePath, '.eslintrc.json'), eslintConfigContent);
+
+  const tsConfigContent = `{
+    "compilerOptions": {
+      "lib": ["dom", "dom.iterable", "esnext"],
+      "allowJs": true,
+      "skipLibCheck": true,
+      "strict": true,
+      "noEmit": true,
+      "esModuleInterop": true,
+      "module": "esnext",
+      "moduleResolution": "bundler",
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "jsx": "preserve",
+      "incremental": true,
+      "plugins": [
+        {
+          "name": "next"
+        }
+      ],
+      "paths": {
+        "@/*": ["./*"]
+      }
+    },
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "exclude": ["node_modules"]
+  }
+  `;
+  // Create the `tsconfig.json` file in the root directory
+  await fs.writeFile(path.join(absolutePath, 'tsconfig.json'), tsConfigContent);
+
+  // eslint-disable-next-line no-console
+  console.log();
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.green('success')} - Created Toolpad Core project at ${chalk.blue(absolutePath)}`,
+  );
+  // eslint-disable-next-line no-console
+  console.log();
+};
+
 // Run the CLI interaction with Inquirer.js
 const run = async () => {
   const pkgJson: PackageJson = (await readJsonFile(
@@ -187,6 +514,11 @@ const run = async () => {
       type: 'string',
       describe: 'The path where the Toolpad Studio project directory will be created',
     })
+    .option('core', {
+      type: 'boolean',
+      describe: 'Create a new project with Toolpad Core',
+      default: false,
+    })
     .option('install', {
       type: 'boolean',
       describe: 'Install dependencies',
@@ -197,11 +529,11 @@ const run = async () => {
       describe:
         'The name of one of the available examples. See https://github.com/mui/mui-toolpad/tree/master/examples.',
     })
-
     .help().argv;
 
   const pathArg = args._?.[0] as string;
   const installFlag = args.install as boolean;
+  const coreFlag = args.core as boolean;
 
   if (pathArg) {
     const pathValidOrError = await validatePath(pathArg);
@@ -233,6 +565,8 @@ const run = async () => {
 
   if (args.example) {
     await downloadAndExtractExample(absolutePath, args.example);
+  } else if (coreFlag) {
+    await scaffoldCoreProject(absolutePath);
   } else {
     await scaffoldProject(absolutePath, installFlag);
   }

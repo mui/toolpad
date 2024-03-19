@@ -303,7 +303,7 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   import SettingsIcon from "@mui/icons-material/Settings";
   import NotificationsIcon from "@mui/icons-material/Notifications";
 
-  export default function Layout({ children }) {
+  export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
       <Box sx={{ display: "flex" }}>
         <AppBar position="absolute">
@@ -360,8 +360,8 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   import { ThemeProvider } from '@mui/material/styles';
   import theme from '../theme';
   
-    export default function RootLayout(props) {
-      const { children } = props;
+  
+    export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {      
       return (
         <html lang="en">
           <body>
@@ -435,7 +435,17 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
 
   const nextConfigContent = `
   /** @type {import('next').NextConfig} */
-  const nextConfig = {};
+  const nextConfig = {  
+    async redirects() {
+      return [
+        {
+          source: '/',
+          destination: '/page',
+          permanent: true,
+        },
+      ]
+    },  
+  };
   export default nextConfig;
   `;
   // Create the `next.config.mjs` file in the root directory

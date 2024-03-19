@@ -2,8 +2,20 @@
  * @vitest-environment jsdom
  */
 
-import { test, expect } from 'vitest';
+import * as React from 'react';
+import { describe, test, expect, afterEach } from 'vitest';
+import { render, cleanup, screen } from '@testing-library/react';
+import { createTheme } from '@mui/material/styles';
+import AppProvider from './AppProvider';
 
-test('placeholder test', async () => {
-  expect(1).toBe(1);
+afterEach(cleanup);
+
+describe('AppProvider', () => {
+  test('renders content correctly', async () => {
+    const theme = createTheme();
+
+    render(<AppProvider theme={theme}>hello</AppProvider>);
+
+    expect(screen.getByText('hello')).toBeTruthy();
+  });
 });

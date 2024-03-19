@@ -161,26 +161,6 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   }
 };
 
-// Bootstrap a new Next.js project in the given directory
-// with the following file structure:
-// src/
-// 	app/
-//   api/
-//     auth/
-//       [...nextauth]/
-//         route.ts
-//   auth/
-//     [...path]/
-//       page.tsx
-//   (dashboard)/
-//     page/
-//       page.tsx
-//     layout.tsx
-//   layout.tsx
-// theme.ts
-// next.config.mjs
-// package.json
-
 const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   // eslint-disable-next-line no-console
   console.log();

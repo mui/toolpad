@@ -1,16 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es2020",
+    "allowJs": true,
+    "isolatedModules": true,
     "module": "esnext",
     "moduleResolution": "bundler",
-    "isolatedModules": true,
     "noEmit": false,
-    "rootDir": "src",
     "outDir": "./dist",
-    "allowJs": true,
     "pretty": true,
     "preserveWatchOutput": true,
+    "rootDir": "src",
+    "target": "es2020",
     "types": ["node", "react"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/index.ts"],

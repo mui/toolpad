@@ -69,7 +69,7 @@
     "format-util": "1.0.5",
     "globby": "14.0.1",
     "jsdom": "24.0.0",
-    "lerna": "7.4.2",
+    "lerna": "8.1.2",
     "markdownlint-cli2": "0.12.1",
     "prettier": "3.2.5",
     "pretty-quick": "4.0.0",
@@ -98,12 +98,13 @@
     "zod-to-json-schema": "3.22.4"
   },
   "engines": {
-    "npm": "please-use-yarn",
+    "npm": "please-use-pnpm",
     "node": ">=18",
-    "pnpm": "8.15.4"
+    "pnpm": "8.15.5"
   },
   "resolutions": {
-    "google-auth-library": "*"
+    "google-auth-library": "*",
+    "nx": "17.3.1"
   },
-  "packageManager": "pnpm@8.15.4"
+  "packageManager": "pnpm@8.15.5+sha256.4b4efa12490e5055d59b9b9fc9438b7d581a6b7af3b5675eb5c5f447cee1a589"
 }

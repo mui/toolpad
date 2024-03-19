@@ -1,10 +1,10 @@
 {
   "name": "@toolpad/core",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "keywords": [
     "toolpad"
   ],
-  "description": "Toolpad helps you build admin dashboards fast.",
+  "description": "Build dashboards fast.",
   "repository": {
     "type": "git",
     "url": "https://github.com/mui/mui-toolpad.git",

@@ -79,11 +79,6 @@
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
     },
     {
-      "groupName": "vitest-fail-on-console",
-      "matchPackageNames": ["vitest-fail-on-console"],
-      "description": "Blocked on a bug https://github.com/thomasbrodusch/vitest-fail-on-console/issues/18"
-    },
-    {
       "matchDepTypes": ["action"],
       "pinDigests": true
     },

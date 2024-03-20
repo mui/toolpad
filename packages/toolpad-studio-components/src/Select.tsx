@@ -127,13 +127,13 @@ export default createBuiltin(FormWrappedSelect, {
       default: '',
     },
     label: {
-      helperText: 'A label that describes the option that can be selected. e.g. "Country".',
+      helperText: 'A label that describes the option that can be selected, for example "Country".',
       type: 'string',
       default: '',
     },
     variant: {
       helperText:
-        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
+        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
       type: 'string',
       enum: ['outlined', 'filled', 'standard'],
       default: 'outlined',

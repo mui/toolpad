@@ -36,7 +36,7 @@ This app demonstrates the following capabilities of Toolpad Studio:
 
 1. How to use a thrid party REST API to fetch data to a Toolpad Studio app.
 2. How to use custom components like charts.
-3. How to use pre-built MUI components like Date Picker.
+3. How to use pre-built Material UI components like the MUI X Date Picker.
 4. How to transform data.
 
 ## The source

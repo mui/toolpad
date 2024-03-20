@@ -304,7 +304,7 @@ declare namespace PackageJsonTypes {
     /**
 		If your package only allows one version of a given dependency, and you'd like to enforce the same behavior as `yarn install --flat` on the command-line, set this to `true`.
 
-		Note that if your `package.json` contains `"flat": true` and other packages depend on yours (e.g. you are building a library rather than an app), those other packages will also need `"flat": true` in their `package.json` or be installed with `yarn install --flat` on the command-line.
+		Note that if your `package.json` contains `"flat": true` and other packages depend on yours (for example you are building a library rather than an app), those other packages will also need `"flat": true` in their `package.json` or be installed with `yarn install --flat` on the command-line.
 		*/
     flat?: boolean;
 

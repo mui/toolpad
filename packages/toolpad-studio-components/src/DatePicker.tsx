@@ -159,7 +159,7 @@ const FormWrappedDatePicker = withComponentForm(DatePicker);
 
 export default createBuiltin(FormWrappedDatePicker, {
   helperText:
-    'The MUI X [Date Picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
+    'The [MUI X Date Picker](https://mui.com/x/react-date-pickers/date-picker/) component.\n\nThe date picker lets the user select a date.',
   argTypes: {
     value: {
       helperText: 'The currently selected date.',
@@ -170,7 +170,7 @@ export default createBuiltin(FormWrappedDatePicker, {
     },
     format: {
       helperText:
-        'The [format](https://day.js.org/docs/en/display/format) of the date in the UI. The value for the bindings will always be in the `YYYY-MM-DD` format. Leave empty to let the end-user locale define the format.',
+        'The [format](https://day.js.org/docs/en/display/format) of the date in the UI. The value for the bindings is always be in the `YYYY-MM-DD` format. Leave empty to let the end-user locale define the format.',
 
       type: 'string',
       default: '',
@@ -181,7 +181,8 @@ export default createBuiltin(FormWrappedDatePicker, {
       default: '',
     },
     label: {
-      helperText: 'A label that describes the content of the date picker. e.g. "Arrival date".',
+      helperText:
+        'A label that describes the content of the date picker, for example "Arrival date".',
       type: 'string',
     },
     name: {
@@ -190,7 +191,7 @@ export default createBuiltin(FormWrappedDatePicker, {
     },
     variant: {
       helperText:
-        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
+        'One of the available Material UI TextField [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `outlined`, `filled` or `standard`',
       type: 'string',
       enum: ['outlined', 'filled', 'standard'],
       default: 'outlined',

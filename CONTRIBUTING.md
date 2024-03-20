@@ -2,7 +2,7 @@
 
 ## Local development
 
-If you would like to hack on MUI Toolpad Studio or want to run the latest version, you can follow these steps:
+If you would like to hack on Toolpad Studio or want to run the latest version, you can follow these steps:
 
 _If you're looking into contributing to the docs, follow the [instructions](#building-and-running-the-documentation) down below_
 
@@ -37,7 +37,7 @@ This will use the local version of Toolpad Studio as built in the monorepo. This
 
 If your application has dependencies other than `@toolpad/studio`, you have to temporarily add it to the workspace:
 
-1. update `pnpm-workspace.yaml` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode` this would be:
+1. update `pnpm-workspace.yaml` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. For example `examples/qr-generator` which has a dependency on `qrcode` this would be:
 
    ```yaml
    packages:

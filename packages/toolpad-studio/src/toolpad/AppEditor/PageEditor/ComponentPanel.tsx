@@ -66,7 +66,7 @@ export default function ComponentPanel({ className }: ComponentPanelProps) {
         </TabPanel>
         <TabPanel value="theme" className={classes.panel}>
           <Typography className={classes.themesDocsLink} variant="body2">
-            Customize the app with a Material UI theme. Read more about theming in the{' '}
+            Customize the app with a Material&nbsp;UI theme. Read more about theming in the{' '}
             <Link
               href="https://mui.com/toolpad/studio/concepts/theming/"
               target="_blank"

@@ -130,7 +130,7 @@ const rowHeaders = {
   ),
   'Custom themes': <ColumnHead label="Custom themes" />,
   // Components
-  Components: <ColumnHead label="Components" tooltip={'Material UI components'} />,
+  Components: <ColumnHead label="Components" tooltip={'Material UI components'} />,
   'Custom components': (
     <ColumnHead
       label="Custom components"

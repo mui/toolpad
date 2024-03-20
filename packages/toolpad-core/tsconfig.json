@@ -10,9 +10,10 @@
     "pretty": true,
     "preserveWatchOutput": true,
     "rootDir": "src",
+    "skipLibCheck": true,
     "target": "es2020",
-    "types": ["node", "react"]
+    "types": ["react", "node"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/index.ts"],
-  "exclude": ["dist"]
+  "exclude": ["dist", "src/**/*.spec.*"]
 }

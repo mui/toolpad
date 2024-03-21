@@ -43,7 +43,7 @@ export default createBuiltin(Tabs, {
       label: 'Default active tab',
       type: 'string',
       default: 'tab-one',
-      helperText: 'The tab which will be active by default.',
+      helperText: 'The tab which is active by default.',
     },
     tabs: {
       type: 'array',

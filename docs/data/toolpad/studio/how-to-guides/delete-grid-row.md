@@ -47,7 +47,7 @@ You can add a delete button to a data grid connected to any REST API, like so:
 
 1. We want to be able to refresh our orders data once we've performed our delete operation.
 
-2. Assuming that we have a `getOrders` query which fetches the orders, create another **Button** labelled "Refresh"
+2. Assuming that we have a `getOrders` query which fetches the orders, create another **Button** labeled "Refresh"
 
 3. You can re-fetch queries set to **automatic** mode through a `refetch` function available on each query object set to the automatic mode.
 

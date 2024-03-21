@@ -36,7 +36,7 @@ The data provider supports two styles of pagination. Index based, and cursor bas
 
 ### Index based
 
-This is the strategy where your data is paginated by when it returns data based on a page number and page size. The `getRecords` method will receive `page` and `pageSize` values in it `paginationModel` parameter and returns a set of records representing the page. Index based pagination is the default but you can explicitly enable this by setting `paginationMode` to `'index'`.
+This is the strategy where your data is paginated by returning data based on a start index and a page size. The `getRecords` method receives `start` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. Index based pagination is the default but you can explicitly enable this by setting `paginationMode` to `'index'`.
 
 ```tsx
 export default createDataProvider({

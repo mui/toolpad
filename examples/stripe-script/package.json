@@ -8,8 +8,8 @@
     "start": "toolpad-studio start"
   },
   "dependencies": {
-    "@toolpad/studio": "0.1.51",
-    "archiver": "6.0.1",
+    "@toolpad/studio": "0.1.52",
+    "archiver": "7.0.1",
     "stripe": "^14.14.0"
   }
 }

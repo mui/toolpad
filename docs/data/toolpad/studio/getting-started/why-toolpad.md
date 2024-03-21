@@ -63,7 +63,7 @@ This lack of a unified reference point within the codebase can compromise its sc
 ### Cheaper developer tooling
 
 When developers use low-code or no-code tools, they frequently sacrifice their autonomy and become restricted by the options provided by the tool.
-The introduction of a black-box element prevents access to the high-quality tools developers are used to when working with pro-code, e.g. Git for version control.
+The introduction of a black-box element prevents access to the high-quality tools developers are used to when working with pro-code, for example Git for version control.
 
 This can lead to a significant problem when it comes to the long-term maintainability of internal tools, as it becomes challenging to adapt, extend, or customize them to meet evolving needs.
 
@@ -75,7 +75,7 @@ Addressing the problems mentioned above leads to a better developer experience. 
 
 ### Drag-and-drop builder
 
-Toolpad Studio works as a drag-and-drop UI builder and uses MUI's own Material UI components. Material UI includes all of the foundational components required for internal use cases. Toolpad Studio currently supports 16 of them, and more are continuously being added.
+Toolpad Studio works as a drag-and-drop UI builder and uses MUI's own Material UI components. Material UI includes all of the foundational components required for internal use cases. Toolpad Studio currently supports [many of them](https://mui.com/toolpad/reference/components/), and more are continuously being added.
 
 Toolpad Studio supports adding any number of custom React components for other use cases. The drag-and-drop builder enables you to quickly assemble a minimum viable UI that's endlessly customizable, ensuring the best of both worlds: speed _and_ flexibility.
 

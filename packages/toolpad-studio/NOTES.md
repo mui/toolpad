@@ -8,11 +8,11 @@ What I usually don't like about low-code tools **as a developer**:
 - I like to be able to use source control to track history, versions and use branching.
 - I like to be able to generate code to save time on more complex projects.
 - I like an easy way of sharing code. (is there anything easier than copy+pasting text?)
-- I like to be able to run locally and offline. (e.g. I'd like to work on the train)
+- I like to be able to run locally and offline. (for example I'd like to work on the train)
 
 ## Authentication
 
-User management is hard and labour intensive to get right, especially in the beginning. Can we get away with just promoting an authentication proxy? And/or provide a list of user/pwds for basic auth?
+User management is hard and labor intensive to get right, especially in the beginning. Can we get away with just promoting an authentication proxy? And/or provide a list of user/pwds for basic auth?
 
 - https://github.com/pomerium/pomerium
 - https://github.com/buzzfeed/sso
@@ -28,7 +28,7 @@ Do we need a DB to keep state? What are the pro's and cons of using a DB vs, let
 ## Security
 
 - Even though it's meant for internal applications, a user that has no editing rights shouldn't be able to run arbitrary queries, even by spoofing HTTP requests. Meaning: in "viewer mode", the frontend should not be able to execute arbitrary SQL queries by responding to raw requests that don't contain an access token that specifically allows this.
-- For database queries, interpollation **MUST** always use native escaping features (e.g. send queries like `SELECT * FROM table WHERE col = ?;`)
+- For database queries, interpollation **MUST** always use native escaping features (for example send queries like `SELECT * FROM table WHERE col = ?;`)
 
 ## Simplicity enables flexibility
 

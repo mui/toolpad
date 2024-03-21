@@ -39,7 +39,7 @@ The TextField component supports below mentioned appearance related props in Too
 
 ### label
 
-A label that describes the content of the textfield e.g. Enter name.
+A label that describes the content of the textfield, for example "Enter name".
 
 ### variant
 

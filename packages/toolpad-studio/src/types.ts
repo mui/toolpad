@@ -185,7 +185,7 @@ export interface AppCanvasState extends RuntimeState {
 export type ProjectEvents = {
   // a change in the DOM
   change: {};
-  // a change in the DOM caused by an external action (e.g. user editing a file outside of toolpad)
+  // a change in the DOM caused by an external action (for example user editing a file outside of toolpad)
   externalChange: {};
   // a component has been added or removed
   componentsListChanged: {};

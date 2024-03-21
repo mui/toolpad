@@ -27,7 +27,7 @@ export default createBuiltin(Button, {
     },
     variant: {
       helperText:
-        'One of the available Material UI Button [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `contained`, `outlined` or `text`',
+        'One of the available Material UI Button [variants](https://mui.com/material-ui/react-button/#basic-button). Possible values are `contained`, `outlined` or `text`',
       type: 'string',
       enum: ['contained', 'outlined', 'text'],
       default: 'contained',

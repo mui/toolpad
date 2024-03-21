@@ -14,7 +14,7 @@ Below props makes it usable:
 
 ### format
 
-The [format](https://day.js.org/docs/en/display/format) of the date in the UI. The value for the bindings will always be in the YYYY-MM-DD format. Leave empty to let the end-user locale define the format.
+The [format](https://day.js.org/docs/en/display/format) of the date in the UI. The value for the bindings is always be in the YYYY-MM-DD format. Leave empty to let the end-user locale define the format.
 
 {{"demo": "DatePickerFormat.js", "hideToolbar": true}}
 
@@ -41,7 +41,7 @@ The DatePicker component supports below mentioned appearance related props in To
 
 ### label
 
-A label that describes the content of the datepicker e.g. Enter date.
+A label that describes the content of the datepicker, for example "Enter date".
 
 ### variant
 

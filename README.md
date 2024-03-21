@@ -1,13 +1,13 @@
 <!-- markdownlint-disable-next-line -->
 <p align="center">
-  <a href="https://mui.com/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/logo.svg" alt="MUI Toolpad Studio logo"></a>
+  <a href="https://mui.com/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/logo.svg" alt="Toolpad Studio logo"></a>
 </p>
 
-<h1 align="center">MUI Toolpad Studio</h1>
+<h1 align="center">Toolpad Studio</h1>
 
 <div align="center">
 
-Quickly build internal tools. MUI Toolpad Studio is a self-hosted low-code internal tools builder designed to extend the [MUI](https://mui.com/) React components. It's designed for developers of all trades who want to save time building internal applications.
+Quickly build internal tools. Toolpad Studio is a self-hosted low-code internal tools builder designed to extend the [MUI](https://mui.com/) React components. It's designed for developers of all trades who want to save time building internal applications.
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
 
@@ -35,7 +35,7 @@ A [big change](https://github.com/mui/mui-toolpad/discussions/1748) is coming: w
 
 ## Notice
 
-MUI Toolpad Studio is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.
+Toolpad Studio is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.
 
 ## Quick setup locally
 
@@ -70,7 +70,7 @@ The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly update
 
 ## Roadmap
 
-Future plans and high-priority features and enhancements can be found in our [roadmap](https://mui.com/toolpad/studio/getting-started/roadmap/).
+Future plans and high-priority features and enhancements can be found in the [roadmap](https://mui.com/toolpad/studio/getting-started/roadmap/).
 
 ## License
 

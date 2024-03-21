@@ -156,7 +156,7 @@ const ISO_8601_FULL = /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?(([+-]\d{2
 
 function isValidDateTime(input: string) {
   // The Date constructor is too permissive for validating dates, so we need to use a regex
-  // e.g. `new Date('Foo bar 0')` results in a valid date
+  // for example `new Date('Foo bar 0')` results in a valid date
   if (ISO_8601_FULL.test(input) && !Number.isNaN(Date.parse(input))) {
     return !Number.isNaN(Date.parse(input));
   }
@@ -165,7 +165,7 @@ function isValidDateTime(input: string) {
 
 function isValidDate(input: string) {
   // The Date constructor is too permissive for validating dates, so we need to use a regex
-  // e.g. `new Date('Foo bar 0')` results in a valid date
+  // for example `new Date('Foo bar 0')` results in a valid date
   if (ISO_8601.test(input) && !Number.isNaN(Date.parse(input))) {
     return !Number.isNaN(Date.parse(input));
   }
@@ -1314,7 +1314,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
 export default createBuiltin(DataGridComponent, {
   helperText:
-    'The MUI X [Data Grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
+    'The [MUI X Data Grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',

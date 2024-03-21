@@ -98,7 +98,7 @@
     "zod-to-json-schema": "3.22.4"
   },
   "engines": {
-    "npm": "please-use-yarn",
+    "npm": "please-use-pnpm",
     "node": ">=18",
     "pnpm": "8.15.4"
   },

@@ -505,7 +505,7 @@ importers:
         specifier: 5.15.11
         version: 5.15.11(@emotion/cache@11.11.0)(@mui/material@5.15.14)(@types/react@18.2.67)(next@13.5.6)(react@18.2.0)
       next:
-        specifier: ^13.5.6
+        specifier: 13.5.6
         version: 13.5.6(@babel/core@7.23.9)(react-dom@18.2.0)(react@18.2.0)
       react:
         specifier: 18.2.0
@@ -515,10 +515,10 @@ importers:
         version: 18.2.0(react@18.2.0)
     devDependencies:
       '@types/react':
-        specifier: ^18.2.67
+        specifier: 18.2.67
         version: 18.2.67
       '@types/react-dom':
-        specifier: ^18.2.22
+        specifier: 18.2.22
         version: 18.2.22
 
   packages/toolpad-studio:

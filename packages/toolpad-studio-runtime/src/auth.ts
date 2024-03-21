@@ -14,8 +14,6 @@ interface SessionUser {
 export type Session = { user: SessionUser } | null;
 
 export async function getSession(req: express.Request): Promise<Session | null> {
-  const request = adaptRequestFromExpressToFetch(req);
-
   const session = null;
   if (process.env.TOOLPAD_AUTH_SECRET) {
     const firebaseAdapter = FirestoreAdapter();
@@ -40,6 +38,8 @@ export async function getSession(req: express.Request): Promise<Session | null> 
         }
       );
     }
+
+    const request = adaptRequestFromExpressToFetch(req);
 
     // @TODO: Library types are wrong as salt should not be required, remove once fixed
     // Github discussion: https://github.com/nextauthjs/next-auth/discussions/9133

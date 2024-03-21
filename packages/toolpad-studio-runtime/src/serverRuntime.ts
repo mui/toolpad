@@ -3,7 +3,7 @@ import { IncomingMessage, ServerResponse } from 'node:http';
 import * as cookie from 'cookie';
 import { isWebContainer } from '@webcontainer/env';
 import type express from 'express';
-import { getSession, type Session } from './auth';
+import { getSession, Session } from './auth';
 
 export interface ServerContext {
   /**

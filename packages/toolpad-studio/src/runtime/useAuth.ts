@@ -11,7 +11,7 @@ const AUTH_CSRF_PATH = `${AUTH_API_PATH}/csrf`;
 const AUTH_SIGNIN_PATH = `${AUTH_API_PATH}/signin`;
 const AUTH_SIGNOUT_PATH = `${AUTH_API_PATH}/signout`;
 
-export type AuthProvider = 'github' | 'google' | 'azure-ad' | 'firebase' | 'credentials';
+export type AuthProvider = 'github' | 'google' | 'azure-ad' | 'credentials';
 
 function isResponseJSON(response: Response): boolean {
   return response.headers.get('content-type')?.includes('application/json') || false;

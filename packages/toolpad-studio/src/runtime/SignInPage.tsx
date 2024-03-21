@@ -244,36 +244,6 @@ export default function SignInPage() {
                   Sign in with Azure AD
                 </LoadingButton>
               ) : null}
-              {authProviders.includes('firebase') ? (
-                <LoadingButton
-                  variant="contained"
-                  onClick={handleSignIn('firebase')}
-                  startIcon={
-                    <img
-                      alt="Firebase logo"
-                      loading="lazy"
-                      height="18"
-                      width="18"
-                      src="https://authjs.dev/img/providers/firebase.svg"
-                      style={{ marginLeft: '2px', marginRight: '2px' }}
-                    />
-                  }
-                  loading={isSigningIn && latestSelectedProvider === 'firebase'}
-                  disabled={isSigningIn}
-                  loadingPosition="start"
-                  size="large"
-                  fullWidth
-                  sx={{
-                    backgroundColor: '#fff',
-                    color: '#000',
-                    '&:hover': {
-                      color: theme.palette.primary.contrastText,
-                    },
-                  }}
-                >
-                  Sign in with Firebase
-                </LoadingButton>
-              ) : null}
               {authProviders.includes('credentials') ? (
                 <React.Fragment>
                   {authProviders.length > 1 ? (

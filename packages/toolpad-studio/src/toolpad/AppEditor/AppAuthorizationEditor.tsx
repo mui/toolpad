@@ -41,7 +41,6 @@ import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
 import AzureIcon from '../../components/icons/AzureIcon';
-import FirebaseIcon from '../../components/icons/FirebaseIcon';
 import { UpgradeAlert } from './UpgradeAlert';
 
 interface AuthProviderOption {
@@ -59,14 +58,6 @@ const AUTH_PROVIDER_OPTIONS = new Map<string, AuthProviderOption>([
       name: 'Azure AD',
       icon: <AzureIcon />,
       hasRoles: true,
-    },
-  ],
-  [
-    'firebase',
-    {
-      name: 'Firebase',
-      icon: <FirebaseIcon />,
-      hasRoles: false,
     },
   ],
 ]);
@@ -195,7 +186,7 @@ export function AppAuthenticationEditor() {
       {!isPaidPlan ? (
         <UpgradeAlert
           type="error"
-          feature="Using authentication with a few specific providers (Azure AD, Firebase)"
+          feature="Using authentication with a few specific providers (Azure AD)"
           sx={{ position: 'absolute', bottom: (theme) => theme.spacing(4) }}
         />
       ) : (

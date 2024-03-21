@@ -974,7 +974,7 @@ export function getRequiredEnvVars(dom: appDom.AppDom): Set<string> {
   return new Set(allVars);
 }
 
-const PRO_AUTH_PROVIDERS = ['azure-ad', 'firebase'];
+const PRO_AUTH_PROVIDERS = ['azure-ad'];
 
 interface PaidFeature {
   id: string;

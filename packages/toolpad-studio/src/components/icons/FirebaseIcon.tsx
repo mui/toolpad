@@ -2,9 +2,10 @@ import * as React from 'react';
 
 interface FirebaseIconProps {
   height?: number;
+  color?: string;
 }
 
-export default function FirebaseIcon({ height = 18 }: FirebaseIconProps) {
+export default function FirebaseIcon({ height = 18, color = 'currentColor' }: FirebaseIconProps) {
   return (
     <svg
       height={height}
@@ -53,7 +54,7 @@ export default function FirebaseIcon({ height = 18 }: FirebaseIconProps) {
                           <path
                             d="M6.84386044,121.329674 L25.4078319,3.18241769 C25.9211214,-0.0568288873 30.2840824,-0.824018866 31.823951,2.07425439 L50.9867602,37.7059667 L58.600555,23.2146005 C59.189165,22.0849984 60.360174,21.3760986 61.637518,21.3760986 C62.9148621,21.3760986 64.0858711,22.0849984 64.6744811,23.2146005 L116.345627,121.329674 L6.84386044,121.329674 Z"
                             id="_Path_"
-                            fill="#FFA000"
+                            fill={color}
                             fillRule="nonzero"
                           />
                           <g id="_Group_4" transform="translate(0.000000, 30.119310)">
@@ -68,7 +69,7 @@ export default function FirebaseIcon({ height = 18 }: FirebaseIconProps) {
                             />
                             <polygon
                               id="Shape"
-                              fill="#F57C00"
+                              fill={color}
                               fillRule="nonzero"
                               points="70.8339555 45.1789654 50.901212 7.58665646 6.84386044 91.2103641"
                             />
@@ -94,7 +95,7 @@ export default function FirebaseIcon({ height = 18 }: FirebaseIconProps) {
                             id="_Group_6"
                             transform="translate(3.421930, 7.387755)"
                             fillRule="nonzero"
-                            fill="#FFCA28"
+                            fill={color}
                           >
                             <path
                               d="M109.501767,90.6420753 L95.3007566,3.09717436 C95.0881903,1.8336295 94.1871042,0.793214154 92.9637772,0.398842606 C91.7404502,0.00447105695 90.3985249,0.321792836 89.4834752,1.22182108 L0,90.6420753 L49.5324399,118.346158 C52.6494331,120.051158 56.4245926,120.051158 59.5415858,118.346158 L109.501767,90.6420753 Z"
@@ -112,7 +113,7 @@ export default function FirebaseIcon({ height = 18 }: FirebaseIconProps) {
                         <path
                           d="M66.3854462,148.181324 C63.2684531,149.886324 59.4932935,149.886324 56.3763003,148.181324 L6.92940869,120.562484 L6.84386044,121.329674 L56.3763003,149.033757 C59.4932935,150.738757 63.2684531,150.738757 66.3854462,149.033757 L116.345627,121.329674 L116.260079,120.562484 L66.3854462,148.181324 Z"
                           id="_Path_3"
-                          fill="#A52714"
+                          fill={color}
                           fillRule="nonzero"
                           opacity="0.2"
                         />

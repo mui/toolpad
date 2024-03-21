@@ -129,7 +129,13 @@ export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPa
         },
       });
       if (isResponseJSON(sessionResponse)) {
-        setSession(await sessionResponse.json());
+        const currentSession = await sessionResponse.json();
+
+        setSession(currentSession);
+
+        if (!currentSession) {
+          signOut();
+        }
       } else {
         signOut();
       }

@@ -10,7 +10,7 @@ import { OAuthConfig } from '@auth/core/providers';
 import chalk from 'chalk';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import { adaptRequestFromExpressToFetch } from '@toolpad/utils/httpApiAdapters';
-import { getUserToken } from '@toolpad/studio-runtime/auth';
+import { getSession } from '@toolpad/studio-runtime/auth';
 import { asyncHandler } from '../utils/express';
 import type { ToolpadProject } from './localMode';
 
@@ -235,12 +235,9 @@ export function createAuthHandler(project: ToolpadProject): Router {
 
         return token;
       },
-      // @TODO: Types for session callback are broken as it says token does not exist but it does
-      // Github issue: https://github.com/nextauthjs/next-auth/issues/9437
-      // @ts-ignore
       session({ session, token }) {
         if (session.user) {
-          session.user.roles = token.roles ?? [];
+          session.user.roles = token?.roles ?? [];
         }
 
         return session;
@@ -293,8 +290,8 @@ export async function createRequireAuthMiddleware(project: ToolpadProject) {
       !requestPath.startsWith(signInPath) &&
       !requestPath.startsWith(editorPath)
     ) {
-      const token = await getUserToken(req);
-      if (!token) {
+      const session = await getSession(req);
+      if (!session) {
         isAuthorized = false;
       }
     }

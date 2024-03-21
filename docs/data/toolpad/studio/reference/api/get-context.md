@@ -37,13 +37,13 @@ This describes a certain context under which a backend function was called.
 
 **Properties**
 
-| Name        | Type                                         | Description                                                                         |
-| :---------- | :------------------------------------------- | :---------------------------------------------------------------------------------- |
-| `cookies`   | `Record<string, string>`                     | A dictionary mapping cookie name to cookie value.                                   |
-| `setCookie` | `(name: string, value: string) => void`      | Use to set a cookie `name` with `value`.                                            |
-| `session`   | `{ user: ServerContextSessionUser } \| null` | Get current [authenticated](/toolpad/studio/concepts/authentication/) session data. |
+| Name        | Type                                    | Description                                                                         |
+| :---------- | :-------------------------------------- | :---------------------------------------------------------------------------------- |
+| `cookies`   | `Record<string, string>`                | A dictionary mapping cookie name to cookie value.                                   |
+| `setCookie` | `(name: string, value: string) => void` | Use to set a cookie `name` with `value`.                                            |
+| `session`   | `{ user: SessionUser } \| null`         | Get current [authenticated](/toolpad/studio/concepts/authentication/) session data. |
 
-### ServerContextSessionUser
+### SessionUser
 
 **Properties**
 

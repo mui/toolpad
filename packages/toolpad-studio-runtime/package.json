@@ -42,7 +42,8 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@auth/core": "0.25.1",
+    "@auth/core": "0.27.0",
+    "@auth/firebase-adapter": "1.4.0",
     "@mui/material": "5.15.13",
     "@tanstack/react-query": "5.18.1",
     "@toolpad/utils": "workspace:*",

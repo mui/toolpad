@@ -3,14 +3,7 @@ import { IncomingMessage, ServerResponse } from 'node:http';
 import * as cookie from 'cookie';
 import { isWebContainer } from '@webcontainer/env';
 import type express from 'express';
-import { getUserToken } from './auth';
-
-interface ServerContextSessionUser {
-  name?: string | null;
-  email?: string | null;
-  avatar?: string | null;
-  roles?: string[];
-}
+import { getSession, type Session } from './auth';
 
 export interface ServerContext {
   /**
@@ -24,7 +17,7 @@ export interface ServerContext {
   /**
    * Data about current authenticated session.
    */
-  session: { user: ServerContextSessionUser } | null;
+  session: Session;
 }
 
 const contextStore = new AsyncLocalStorage<ServerContext>();
@@ -39,15 +32,7 @@ export async function createServerContext(
 ): Promise<ServerContext> {
   const cookies = cookie.parse(req.headers.cookie || '');
 
-  const token = await getUserToken(req as express.Request);
-  const session = token && {
-    user: {
-      name: token.name,
-      email: token.email,
-      avatar: token.picture,
-      roles: token.roles,
-    },
-  };
+  const session = await getSession(req as express.Request);
 
   return {
     cookies,

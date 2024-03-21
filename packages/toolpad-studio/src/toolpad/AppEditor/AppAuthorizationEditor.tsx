@@ -66,7 +66,7 @@ const AUTH_PROVIDER_OPTIONS = new Map<string, AuthProviderOption>([
     {
       name: 'Firebase',
       icon: <FirebaseIcon />,
-      hasRoles: true,
+      hasRoles: false,
     },
   ],
 ]);

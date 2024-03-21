@@ -170,19 +170,14 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   console.log();
 
   const rootLayoutContent = `  
-  import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-  import { ThemeProvider } from '@mui/material/styles';
+  import { AppProvider } from '@toolpad/core';
   import theme from '../theme';
   
   export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {      
     return (
       <html lang="en">
         <body>
-          <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-              {children}
-            </ThemeProvider>
-          </AppRouterCacheProvider>
+          <AppProvider theme={theme}>{children}</AppProvider>
         </body>
       </html>
     );
@@ -404,11 +399,11 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
       react: '^18',
       'react-dom': '^18',
       next: '^14',
+      '@toolpad/core': 'latest',
       '@mui/material': '^5',
       '@mui/icons-material': '^5',
       '@emotion/react': '^11',
       '@emotion/styled': '^11',
-      '@mui/material-nextjs': '^5',
       '@emotion/cache': '^11',
     },
     devDependencies: {

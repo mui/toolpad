@@ -13,10 +13,10 @@ node_modules
 out/
 
 # production
-/build
+build
 
 # typescript
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # misc
 .DS_Store
@@ -60,6 +60,7 @@ test-results
 .yarn-playwright-cache
 
 /test/regressions/screenshots/**
+
 # vale downloaded config
 .github/styles/Google
 .github/styles/MUI

@@ -140,6 +140,7 @@ module.exports = {
       // Starting small, we will progressively expand this to more packages.
       files: [
         // 'packages/create-toolpad-app/**/*',
+        // 'packages/toolpad-core/**/*',
         // 'packages/toolpad-studio/**/*',
         // 'packages/toolpad-studio/**/*',
         'packages/toolpad-utils/**/*',

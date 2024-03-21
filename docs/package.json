@@ -34,7 +34,7 @@
     "@mui/monorepo": "github:mui/material-ui#b57951355a60566aeafc88c9aa49c7f198968b3c",
     "@mui/styles": "5.15.14",
     "@mui/utils": "5.15.14",
-    "@mui/x-data-grid-pro": "6.19.6",
+    "@mui/x-data-grid-pro": "6.19.8",
     "@toolpad/studio": "workspace:*",
     "@trendmicro/react-interpolate": "0.5.5",
     "@types/lodash": "4.14.202",

@@ -13,10 +13,10 @@ node_modules
 out/
 
 # production
-/build
+build
 
 # typescript
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # misc
 .DS_Store
@@ -49,9 +49,9 @@ lerna-debug.log
 
 dist/
 
-packages/toolpad-app/public/web_modules
-packages/toolpad-app/public/runtime
-packages/toolpad-app/public/typings.json
+packages/toolpad-studio/public/web_modules
+packages/toolpad-studio/public/runtime
+packages/toolpad-studio/public/typings.json
 examples/*/yarn.lock
 
 test-results
@@ -61,3 +61,7 @@ test-results
 
 /test/regressions/screenshots/**
 
+# vale downloaded config
+.github/styles/Google
+.github/styles/MUI
+.github/styles/.vale-config

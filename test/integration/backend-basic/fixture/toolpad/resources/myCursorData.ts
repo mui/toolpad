@@ -1,4 +1,4 @@
-import { createDataProvider } from '@mui/toolpad/server';
+import { createDataProvider } from '@toolpad/studio/server';
 
 const DATA = Array.from({ length: 1_000 }, (_, id) => ({ id, name: `Cursor item ${id}` }));
 

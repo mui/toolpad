@@ -2,7 +2,7 @@
 
 ## Local development
 
-If you would like to hack on MUI Toolpad or want to run the latest version, you can follow these steps:
+If you would like to hack on Toolpad Studio or want to run the latest version, you can follow these steps:
 
 _If you're looking into contributing to the docs, follow the [instructions](#building-and-running-the-documentation) down below_
 
@@ -13,7 +13,7 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 
 ### Running apps inside the monorepo (recommended)
 
-This will use the local version of Toolpad as built in the monorepo. This is recommended when your app is in a folder inside of the monorepo. You may even decide to temporarily move your app into the monorepo.
+This will use the local version of Toolpad Studio as built in the monorepo. This is recommended when your app is in a folder inside of the monorepo. You may even decide to temporarily move your app into the monorepo.
 
 1. Install dependencies:
 
@@ -27,17 +27,17 @@ This will use the local version of Toolpad as built in the monorepo. This is rec
    pnpm dev
    ```
 
-1. Run Toolpad
+1. Run Toolpad Studio
 
    ```bash
-   pnpm toolpad dev test/integration/backend-basic/fixture/toolpad --dev
+   pnpm toolpad-studio dev test/integration/backend-basic/fixture/toolpad --dev
    ```
 
-   **Note:** It's important to note the difference between `pnpm toolpad dev` and the `--dev` parameter. The first instruction runs Toolpad in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.
+   **Note:** It's important to note the difference between `pnpm toolpad-studio dev` and the `--dev` parameter. The first instruction runs Toolpad Studio in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.
 
-If your application has dependencies other than `@mui/toolpad`, you have to temporarily add it to the workspace:
+If your application has dependencies other than `@toolpad/studio`, you have to temporarily add it to the workspace:
 
-1. update `pnpm-workspace.yaml` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. e.g. for `examples/qr-generator` which has a dependency on `qrcode` this would be:
+1. update `pnpm-workspace.yaml` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. For example `examples/qr-generator` which has a dependency on `qrcode` this would be:
 
    ```yaml
    packages:
@@ -62,15 +62,15 @@ If your application has dependencies other than `@mui/toolpad`, you have to temp
 1. Make sure to start the build in watch mode again and the run the app with
 
    ```bash
-   pnpm toolpad dev examples/qr-generator/toolpad --dev
+   pnpm toolpad-studio dev examples/qr-generator/toolpad --dev
    ```
 
-### Linking Toolpad in a folder on your system (advanced)
+### Linking Toolpad Studio in a folder on your system (advanced)
 
 <details>
 <summary>Expand instructions</summary>
 
-In some cases you may want to link local toolpad into a project on your laptop.
+In some cases you may want to link local Toolpad Studio app into a project on your laptop.
 
 1. Install dependencies:
 
@@ -84,7 +84,7 @@ pnpm install
    pnpm dev
    ```
 
-1. In another folder, start a toolpad project using:
+2. In another folder, start a Toolpad Studio project using:
 
    ```json
    {
@@ -92,25 +92,25 @@ pnpm install
      "version": "1.0.0",
      "license": "MIT",
      "scripts": {
-       "dev": "toolpad dev --dev",
-       "build": "toolpad build --dev",
-       "start": "toolpad start --dev"
+       "dev": "toolpad-studio dev --dev",
+       "build": "toolpad-studio build --dev",
+       "start": "toolpad-studio start --dev"
      },
      "dependencies": {
-       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app"
+       "@toolpad/studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio"
      },
      "resolutions": {
-       "@mui/toolpad": "portal:<your-local-toolpad-monorepo>/packages/toolpad-app",
-       "@mui/toolpad-core": "portal:<your-local-toolpad-monorepo>/packages/toolpad-core",
-       "@mui/toolpad-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-components",
-       "@mui/toolpad-utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"
+       "@toolpad/studio": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio",
+       "@toolpad/studio-runtime": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-runtime",
+       "@toolpad/studio-components": "portal:<your-local-toolpad-monorepo>/packages/toolpad-studio-components",
+       "@toolpad/utils": "portal:<your-local-toolpad-monorepo>/packages/toolpad-utils"
      }
    }
    ```
 
-   1. Replace `<your-local-toolpad-monorepo>` with the path to the toolpad monorepo on your file system. Make sure to keep `portal:`.
+   1. Replace `<your-local-toolpad-studio-monorepo>` with the path to the Toolpad Studio monorepo on your file system. Make sure to keep `portal:`.
 
-   1. In order to use `portal:` dependencies, we will need to use yarn 2. So start by running
+   2. In order to use `portal:` dependencies, we will need to use yarn 2. So start by running
 
       ```bash
       yarn set version berry
@@ -122,13 +122,13 @@ pnpm install
       nodeLinker: node-modules
       ```
 
-   1. then run
+   3. then run
 
       ```bash
       yarn install
       ```
 
-1. Run start toolpad in dev mode:
+3. Run start toolpad-studio in dev mode:
 
    ```bash
    yarn dev
@@ -147,7 +147,7 @@ The playwright tests can be run in one of two modes:
    pnpm test:integration --project chromium
    ```
 
-2. Toolpad in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_NEXT_DEV` environment variable (slower)
+2. Start Toolpad Studio in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_NEXT_DEV` environment variable (slower)
 
    ```bash
    pnpm dev
@@ -190,26 +190,26 @@ Use the `--ui` flag to run the tests interactively.
 - Run it on your project of choice
 
   ```bash
-  pnpm toolpad dev /path/to/my/toolpad/project
+  pnpm toolpad-studio dev /path/to/my/toolpad/studio/project
   ```
 
 ## Using CodeSandbox CI
 
-Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad package for ever pull request. To use the package from the pull request, take the following steps:
+Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad Studio package for ever pull request. To use the package from the pull request, take the following steps:
 
 1. In the GitHub PR checks, locate the ci/codesandbox check and make sure it has successfully finished building. Click on "details" to open the CodeSandbox CI user interface.
 
 2. In the codesandbox UI, on the right panel, locate and expand the "Packages (6)" section.
 
-3. Right click the link named `@mui/toolpad` and copy the address
+3. Right click the link named `@toolpad/studio` and copy the address
 
    ![Copy CodeSandbox CI package link](contributing/codesandbox-ci-package-link.png)
 
-4. In your `package.json`, for the `@mui/toolpad` dependency, replace the version with aforementioned link. e.g.
+4. In your `package.json`, for the `@toolpad/studio` dependency, replace the version with aforementioned link. e.g.
 
    ```json
    "dependencies": {
-      "@mui/toolpad": "https://pkg.csb.dev/mui/mui-toolpad/commit/<commit>/@mui/toolpad"
+      "@toolpad/studio": "https://pkg.csb.dev/mui/mui-toolpad/commit/<commit>/@toolpad/studio"
    }
    ```
 
@@ -219,7 +219,7 @@ Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn
    pnpm --force
    ```
 
-You'll now be able to explore your project with the Toolpad version from the GitHub PR.
+You'll now be able to explore your project with the Toolpad Studio version from the GitHub PR.
 
 ## Sending a pull request
 

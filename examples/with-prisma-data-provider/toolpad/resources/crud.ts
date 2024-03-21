@@ -1,9 +1,9 @@
 /**
- * Toolpad data provider file.
- * See: https://mui.com/toolpad/concepts/data-providers/
+ * Toolpad Studio data provider file.
+ * See: https://mui.com/toolpad/studio/concepts/data-providers/
  */
 
-import { createDataProvider } from '@mui/toolpad/server';
+import { createDataProvider } from '@toolpad/studio/server';
 import prisma from '../prisma';
 
 function parseOperator(operator: string) {

@@ -7,12 +7,12 @@
         "apiVersion": {
           "type": "string",
           "const": "v1",
-          "description": "Defines the version of this object. Used in determining compatibility between Toolpad \"application\" objects."
+          "description": "Defines the version of this object. Used in determining compatibility between Toolpad Studio \"application\" objects."
         },
         "kind": {
           "type": "string",
           "const": "application",
-          "description": "Describes the nature of this Toolpad \"application\" object."
+          "description": "Describes the nature of this Toolpad Studio \"application\" object."
         },
         "spec": {
           "type": "object",
@@ -47,7 +47,7 @@
                             },
                             "target": {
                               "type": "string",
-                              "description": "Toolpad role to be mapped to."
+                              "description": "Toolpad Studio role to be mapped to."
                             }
                           },
                           "required": ["source", "target"],
@@ -115,12 +115,12 @@
         "apiVersion": {
           "type": "string",
           "const": "v1",
-          "description": "Defines the version of this object. Used in determining compatibility between Toolpad \"page\" objects."
+          "description": "Defines the version of this object. Used in determining compatibility between Toolpad Studio \"page\" objects."
         },
         "kind": {
           "type": "string",
           "const": "page",
-          "description": "Describes the nature of this Toolpad \"page\" object."
+          "description": "Describes the nature of this Toolpad Studio \"page\" object."
         },
         "spec": {
           "type": "object",
@@ -404,12 +404,12 @@
                 {
                   "type": "string",
                   "const": "standalone",
-                  "description": "Hide the Toolpad chrome and just display the content of the page"
+                  "description": "Hide the Toolpad Studio chrome and just display the content of the page"
                 },
                 {
                   "type": "string",
                   "const": "shell",
-                  "description": "Show Toolpad header and navigation."
+                  "description": "Show Toolpad Studio header and navigation."
                 }
               ],
               "description": "Display mode of the page. This can also be set at runtime with the toolpad-display query parameter"
@@ -428,12 +428,12 @@
         "apiVersion": {
           "type": "string",
           "const": "v1",
-          "description": "Defines the version of this object. Used in determining compatibility between Toolpad \"theme\" objects."
+          "description": "Defines the version of this object. Used in determining compatibility between Toolpad Studio \"theme\" objects."
         },
         "kind": {
           "type": "string",
           "const": "theme",
-          "description": "Describes the nature of this Toolpad \"theme\" object."
+          "description": "Describes the nature of this Toolpad Studio \"theme\" object."
         },
         "spec": {
           "type": "object",
@@ -614,7 +614,7 @@
       },
       "required": ["$$template"],
       "additionalProperties": false,
-      "description": "Describes a fragment of Toolpad elements, to be used as a template."
+      "description": "Describes a fragment of Toolpad Studio elements, to be used as a template."
     },
     "NameStringValuePair": {
       "type": "object",

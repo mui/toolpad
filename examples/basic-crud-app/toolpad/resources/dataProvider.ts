@@ -1,9 +1,9 @@
 /**
- * Toolpad data provider file.
- * See: https://mui.com/toolpad/concepts/data-providers/
+ * Toolpad Studio data provider file.
+ * See: https://mui.com/toolpad/studio/concepts/data-providers/
  */
 
-import { createDataProvider } from '@mui/toolpad/server';
+import { createDataProvider } from '@toolpad/studio/server';
 
 let nextId = 1;
 function generateId(): number {

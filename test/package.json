@@ -1,11 +1,11 @@
 {
-  "name": "@mui/toolpad-tests",
+  "name": "@toolpad/studio-tests",
   "private": true,
   "devDependencies": {
-    "@mui/material": "5.15.11",
-    "@mui/toolpad": "workspace:*",
-    "@mui/toolpad-utils": "workspace:*",
-    "express": "4.18.2",
+    "@mui/material": "5.15.13",
+    "@toolpad/studio": "workspace:*",
+    "@toolpad/utils": "workspace:*",
+    "express": "4.18.3",
     "get-port": "7.0.0",
     "invariant": "2.2.4",
     "react": "18.2.0",

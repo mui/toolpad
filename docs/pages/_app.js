@@ -16,10 +16,12 @@ import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
-import toolpadPkgJson from '@mui/toolpad/package.json';
+import toolpadPkgJson from '@toolpad/studio/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
 import { mapTranslations } from '@mui/docs/i18n';
-import pages from '../data/pages';
+import toolpadStudioPages from '../data/toolpad/studio/pages';
+import toolpadCorePages from '../data/toolpad/core/pages';
+
 import config from '../config';
 
 const clientSideEmotionCache = createEmotionCache();
@@ -149,13 +151,61 @@ function AppWrapper(props) {
   }
 
   const pageContextValue = React.useMemo(() => {
-    const { activePage, activePageParents } = findActivePage(pages, router.pathname);
+    let productIdentifier;
+    let pages = [];
 
-    const productIdentifier = {
-      metadata: '',
-      name: 'Toolpad',
-      versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
-    };
+    /*
+     * Backwards compatibility with older versions of getProductInfoFromUrl
+     * which returned
+     *  {
+     *    productCategoryId: 'null',
+     *    productId: 'toolpad',
+     *  }
+     * for all Toolpad pages.
+     * ̃ Note:
+     *    `productCategoryId` is the string 'null' and not null.
+     *    See: https://github.com/mui/material-ui/blob/master/docs/src/modules/utils/getProductInfoFromUrl.ts#L29
+     */
+
+    if (productCategoryId === 'null') {
+      const secondFolder = pathnameToLanguage(router.asPath)?.canonicalAsServer?.replace(
+        /^\/+[^/]+\/([^/]+)\/.*/,
+        '$1',
+      );
+      if (secondFolder === 'studio') {
+        productIdentifier = {
+          metadata: '',
+          name: 'Toolpad Studio',
+          versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
+        };
+        pages = toolpadStudioPages;
+      } else {
+        productIdentifier = {
+          metadata: '',
+          name: 'Toolpad Core',
+          versions: [{ text: `v0.0.1`, current: true }],
+        };
+        pages = toolpadCorePages;
+      }
+    } else if (productCategoryId === 'toolpad') {
+      if (productId === 'toolpad-core') {
+        productIdentifier = {
+          metadata: '',
+          name: 'Toolpad Core',
+          versions: [{ text: `v0.0.1`, current: true }],
+        };
+        pages = toolpadCorePages;
+      } else if (productId === 'toolpad-studio') {
+        productIdentifier = {
+          metadata: '',
+          name: 'Toolpad Studio',
+          versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
+        };
+        pages = toolpadStudioPages;
+      }
+    }
+
+    const { activePage, activePageParents } = findActivePage(pages, router.pathname);
 
     return {
       activePage,
@@ -165,7 +215,7 @@ function AppWrapper(props) {
       productId,
       productCategoryId,
     };
-  }, [router.pathname, productId, productCategoryId]);
+  }, [router.asPath, router.pathname, productId, productCategoryId]);
 
   return (
     <React.Fragment>

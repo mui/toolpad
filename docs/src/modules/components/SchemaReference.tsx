@@ -479,7 +479,7 @@ function JsonSchemaDisplay({ name, hash, schema, idPrefix = '' }: JsonSchemaDisp
   );
 }
 
-const description = 'An exhaustive reference for the Toolpad file formats.';
+const description = 'An exhaustive reference for the Toolpad Studio file formats.';
 
 export default function SchemaReference(props: SchemaReferenceProps) {
   const { definitions, disableAd, location } = props;
@@ -498,7 +498,7 @@ export default function SchemaReference(props: SchemaReferenceProps) {
     {
       text: 'Definitions',
       hash: 'definitions',
-      introduction: `These are shared definitions used throughout Toolpad files.`,
+      introduction: `These are shared definitions used throughout Toolpad Studio files.`,
       children: Object.entries(definitions.definitions || {}).map(([name, content]) => ({
         text: name,
         hash: `definition-${name}`,

@@ -87,8 +87,8 @@ module.exports = {
         zones: [
           {
             // Don't leak the internal runtime abstraction. It's on its way to be moved towards a separate package
-            target: './packages/toolpad-app/src/runtime',
-            from: './packages/toolpad-app/src/',
+            target: './packages/toolpad-studio/src/runtime',
+            from: './packages/toolpad-studio/src/',
             except: ['./runtime'],
           },
         ],
@@ -110,11 +110,11 @@ module.exports = {
     {
       files: [
         'packages/create-toolpad-app/**/*',
-        'packages/toolpad/**/*',
-        'packages/toolpad-app/**/*',
+        'packages/toolpad-studio/**/*',
+        'packages/toolpad-studio/**/*',
         'packages/toolpad-utils/**/*',
-        'packages/toolpad-core/**/*',
-        'packages/toolpad-components/**/*',
+        'packages/toolpad-studio-runtime/**/*',
+        'packages/toolpad-studio-components/**/*',
       ],
       excludedFiles: ['tsup.config.ts', '*.spec.ts', '*.spec.tsx', 'vitest.config.ts'],
       rules: {
@@ -127,9 +127,9 @@ module.exports = {
          * Basically all code that is guaranteed being bundled for the client side and never used on serverside code
          * can be dev dependencies to reduce the size of the published package
          */
-        'packages/toolpad-app/src/components/**/*',
-        'packages/toolpad-app/src/toolpad/**/*',
-        'packages/toolpad-app/src/runtime/**/*',
+        'packages/toolpad-studio/src/components/**/*',
+        'packages/toolpad-studio/src/toolpad/**/*',
+        'packages/toolpad-studio/src/runtime/**/*',
       ],
       excludedFiles: ['*.spec.ts', '*.spec.tsx'],
       rules: {
@@ -140,18 +140,19 @@ module.exports = {
       // Starting small, we will progressively expand this to more packages.
       files: [
         // 'packages/create-toolpad-app/**/*',
-        // 'packages/toolpad/**/*',
-        // 'packages/toolpad-app/**/*',
-        'packages/toolpad-utils/**/*',
         // 'packages/toolpad-core/**/*',
-        // 'packages/toolpad-components/**/*',
+        // 'packages/toolpad-studio/**/*',
+        // 'packages/toolpad-studio/**/*',
+        'packages/toolpad-utils/**/*',
+        // 'packages/toolpad-studio-runtime/**/*',
+        // 'packages/toolpad-studio-components/**/*',
       ],
       rules: {
         '@typescript-eslint/no-explicit-any': ['error'],
       },
     },
     {
-      files: ['packages/toolpad-app/pages/**/*'],
+      files: ['packages/toolpad-studio/pages/**/*'],
       rules: {
         // The pattern is useful to type Next.js pages
         'react/function-component-definition': 'off',

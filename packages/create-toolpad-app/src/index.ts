@@ -7,7 +7,7 @@ import yargs from 'yargs';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { errorFrom } from '@toolpad/utils/errors';
-import { execaCommand } from 'execa';
+import { execa } from 'execa';
 import { satisfies } from 'semver';
 import { readJsonFile } from '@toolpad/utils/fs';
 import invariant from 'invariant';
@@ -36,7 +36,7 @@ function getPackageManager(): PackageManager {
       return 'npm';
     }
   }
-  return 'pnpm';
+  return 'npm';
 }
 
 // From https://github.com/vercel/next.js/blob/canary/packages/create-next-app/helpers/is-folder-empty.ts
@@ -91,7 +91,7 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
     if (await isFolderEmpty(absolutePath)) {
       return true;
     }
-    return `${chalk.red('error')} - The directory at ${chalk.blue(
+    return `${chalk.red('error')} - The directory at ${chalk.cyan(
       absolutePath,
     )} contains files that could conflict. Either use a new directory, or remove conflicting files.`;
   } catch (rawError: unknown) {
@@ -112,7 +112,7 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   console.log();
   // eslint-disable-next-line no-console
   console.log(
-    `${chalk.blue('info')} - Creating Toolpad Studio project in ${chalk.blue(absolutePath)}`,
+    `${chalk.cyan('info')} - Creating Toolpad Studio project in ${chalk.cyan(absolutePath)}`,
   );
   // eslint-disable-next-line no-console
   console.log();
@@ -132,11 +132,11 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
   const DEFAULT_GENERATED_GITIGNORE_FILE = '.gitignore';
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Initializing package.json file`);
+  console.log(`${chalk.cyan('info')} - Initializing package.json file`);
   await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
 
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Initializing .gitignore file`);
+  console.log(`${chalk.cyan('info')} - Initializing .gitignore file`);
   await fs.copyFile(
     path.resolve(__dirname, `./gitignoreTemplate`),
     path.join(absolutePath, DEFAULT_GENERATED_GITIGNORE_FILE),
@@ -144,13 +144,11 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
   if (installFlag) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')} - Installing dependencies`);
+    console.log(`${chalk.cyan('info')} - Installing dependencies`);
     // eslint-disable-next-line no-console
     console.log();
 
-    const installVerb = packageManager === 'yarn' ? 'add' : 'install';
-    const command = `${packageManager} ${installVerb} @toolpad/studio`;
-    await execaCommand(command, { stdio: 'inherit', cwd: absolutePath });
+    await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
 
     // eslint-disable-next-line no-console
     console.log();
@@ -166,105 +164,32 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   console.log();
   // eslint-disable-next-line no-console
   console.log(
-    `${chalk.blue('info')} - Creating Toolpad Core project in ${chalk.blue(absolutePath)}`,
+    `${chalk.cyan('info')} - Creating Toolpad Core project in ${chalk.cyan(absolutePath)}`,
   );
   // eslint-disable-next-line no-console
   console.log();
 
-  const packageJson: PackageJson = {
-    name: path.basename(absolutePath),
-    version: '0.1.0',
-    scripts: {
-      dev: 'next dev',
-      build: 'next build',
-      start: 'next start',
-      lint: 'next lint',
-    },
-    dependencies: {
-      react: '^18',
-      'react-dom': '^18',
-      next: '14.1.3',
-      '@mui/material': '^5',
-      '@mui/icons-material': '^5',
-      '@emotion/react': '^11',
-      '@emotion/styled': '^11',
-      '@mui/material-nextjs': '^5',
-      '@emotion/cache': '^11',
-    },
-    devDependencies: {
-      typescript: '^5',
-      '@types/node': '^20',
-      '@types/react': '^18',
-      '@types/react-dom': '^18',
-      eslint: '^8',
-      'eslint-config-next': '14.1.3',
-    },
-  };
-
-  const DEFAULT_GENERATED_GITIGNORE_FILE = '.gitignore';
-
-  await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
-
-  await fs.copyFile(
-    path.resolve(__dirname, `./gitignoreTemplate`),
-    path.join(absolutePath, DEFAULT_GENERATED_GITIGNORE_FILE),
-  );
-
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Installing dependencies`);
-  // eslint-disable-next-line no-console
-  console.log();
-
-  const installVerb = 'install';
-  const command = `${packageManager} ${installVerb}`;
-  await execaCommand(command, { stdio: 'inherit', cwd: absolutePath });
-
-  // Create the `app` directory
-  await fs.mkdir(path.join(absolutePath, 'app'));
-  // Create the `api` directory inside the `app` directory
-  await fs.mkdir(path.join(absolutePath, 'app', 'api'));
-  // Create the `auth` directory inside the `api` directory
-  await fs.mkdir(path.join(absolutePath, 'app', 'api', 'auth'));
-  // Create the `[...nextAuth]` directory inside the `auth` directory
-  await fs.mkdir(path.join(absolutePath, 'app', 'api', 'auth', '[...nextAuth]'));
-  // Create the `route.ts` file inside the `[...nextAuth]` directory
-  await fs.writeFile(
-    path.join(absolutePath, 'app', 'api', 'auth', '[...nextAuth]', 'route.ts'),
-    '',
-  );
-  // Create the `auth` directory inside the `app` directory
-  await fs.mkdir(path.join(absolutePath, 'app', 'auth'));
-  // Create the `[...path]` directory inside the `auth` directory
-  await fs.mkdir(path.join(absolutePath, 'app', 'auth', '[...path]'));
-  // Create the `page.tsx` file inside the `[...path]` directory
-  await fs.writeFile(path.join(absolutePath, 'app', 'auth', '[...path]', 'page.tsx'), '');
-  // Create the `(dashboard)` directory inside the `app` directory
-  await fs.mkdir(path.join(absolutePath, 'app', '(dashboard)'));
-  // Create the `page` directory inside the `(dashboard)` directory
-  await fs.mkdir(path.join(absolutePath, 'app', '(dashboard)', 'page'));
-  const pageContent = `
-  import { Typography } from "@mui/material";
-
-  export default function Home() {
+  const rootLayoutContent = `  
+  import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
+  import { ThemeProvider } from '@mui/material/styles';
+  import theme from '../theme';
+  
+  export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {      
     return (
-      <main>
-        <div>
-          <Typography variant="h6" color="grey.800">
-            Customize <code>page.tsx</code> to begin.
-          </Typography>
-        </div>
-      </main>
+      <html lang="en">
+        <body>
+          <AppRouterCacheProvider>
+          <ThemeProvider theme={theme}>
+              {children}
+            </ThemeProvider>
+          </AppRouterCacheProvider>
+        </body>
+      </html>
     );
   }
-  `;
-  // Create the `page.tsx` file inside the `page` directory
-  await fs.writeFile(
-    path.join(absolutePath, 'app', '(dashboard)', 'page', 'page.tsx'),
-    pageContent,
-  );
+    `;
 
-  const dashboardLayoutContent = `
-  import * as React from "react";
+  const dashboardLayoutContent = `    
   import {
     AppBar,
     Badge,
@@ -328,38 +253,57 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
       </Box>
     );
   }
-`;
-  // Create the `layout.tsx` file inside the `(dashboard)` directory
-  await fs.writeFile(
-    path.join(absolutePath, 'app', '(dashboard)', 'layout.tsx'),
-    dashboardLayoutContent,
-  );
+  `;
 
-  const rootLayoutContent = `
-  import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter';
-  import { ThemeProvider } from '@mui/material/styles';
-  import theme from '../theme';
-  
-  
-    export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {      
-      return (
-        <html lang="en">
-          <body>
-            <AppRouterCacheProvider>
-            <ThemeProvider theme={theme}>
-                {children}
-              </ThemeProvider>
-            </AppRouterCacheProvider>
-          </body>
-        </html>
-      );
-    }
-    `;
-  // Write the content of the `layout.tsx` file
-  await fs.writeFile(path.join(absolutePath, 'app', 'layout.tsx'), rootLayoutContent);
+  const rootPageContent = `
+  import Link from "next/link";
+  import { Button, Container, Typography, Box } from "@mui/material";
 
-  const themeContent = `    
-  "use client";
+  export default function Home() {
+    return (
+      <Container>
+        <Box sx={{ my: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Welcome to{" "}
+            <Link href="https://mui.com/toolpad/core/introduction">
+              Toolpad Core!
+            </Link>
+          </Typography>
+
+          <Typography variant="body1">
+            Get started by editing <code>(dashboard)/page/page.tsx</code>
+          </Typography>
+
+          <Box sx={{ mt: 2 }}>
+            <Link href="/page">
+              <Button variant="contained" color="primary">
+                Go to Page
+              </Button>
+            </Link>
+          </Box>
+        </Box>
+      </Container>
+    );
+  }
+  `;
+
+  const dashboardPageContent = `
+  import { Typography, Container } from "@mui/material";
+  export default function Home() {
+    return (
+      <main>
+        <Container sx={{ mx: 4 }}>
+          <Typography variant="h6" color="grey.800">
+            Dashboard content!
+          </Typography>
+        </Container>
+      </main>
+    );
+  }
+  `;
+
+  const themeContent = `
+  "use client"
   import { Roboto } from "next/font/google";
   import { createTheme } from "@mui/material/styles";
   
@@ -401,42 +345,23 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   export default theme;
   `;
 
-  // Create the `theme.ts` file in the root directory
-  await fs.writeFile(path.join(absolutePath, 'theme.ts'), themeContent);
-
-  const nextTypes = `/// <reference types="next" />
-  /// <reference types="next/image-types/global" />
-  
-  // NOTE: This file should not be edited
-  // see https://nextjs.org/docs/basic-features/typescript for more information.
+  const eslintConfigContent = `{    
+    "extends": "next/core-web-vitals"        
+  }
   `;
-  // Create the `next-env.d.ts` file in the root directory
-  await fs.writeFile(path.join(absolutePath, 'next-env.d.ts'), nextTypes);
+
+  const nextTypesContent = `/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/basic-features/typescript for more information.
+  `;
 
   const nextConfigContent = `
   /** @type {import('next').NextConfig} */
-  const nextConfig = {  
-    async redirects() {
-      return [
-        {
-          source: '/',
-          destination: '/page',
-          permanent: true,
-        },
-      ]
-    },  
-  };
+  const nextConfig = {};
   export default nextConfig;
   `;
-  // Create the `next.config.mjs` file in the root directory
-  await fs.writeFile(path.join(absolutePath, 'next.config.mjs'), nextConfigContent);
-
-  const eslintConfigContent = `{    
-      "extends": "next/core-web-vitals"        
-  }
-  `;
-  // Create the `.eslintrc.json` file in the root directory
-  await fs.writeFile(path.join(absolutePath, '.eslintrc.json'), eslintConfigContent);
 
   const tsConfigContent = `{
     "compilerOptions": {
@@ -465,14 +390,224 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
     "exclude": ["node_modules"]
   }
   `;
-  // Create the `tsconfig.json` file in the root directory
-  await fs.writeFile(path.join(absolutePath, 'tsconfig.json'), tsConfigContent);
+
+  const packageJson: PackageJson = {
+    name: path.basename(absolutePath),
+    version: '0.1.0',
+    scripts: {
+      dev: 'next dev',
+      build: 'next build',
+      start: 'next start',
+      lint: 'next lint',
+    },
+    dependencies: {
+      react: '^18',
+      'react-dom': '^18',
+      next: '^14',
+      '@mui/material': '^5',
+      '@mui/icons-material': '^5',
+      '@emotion/react': '^11',
+      '@emotion/styled': '^11',
+      '@mui/material-nextjs': '^5',
+      '@emotion/cache': '^11',
+    },
+    devDependencies: {
+      typescript: '^5',
+      '@types/node': '^20',
+      '@types/react': '^18',
+      '@types/react-dom': '^18',
+      eslint: '^8',
+      'eslint-config-next': '^14',
+    },
+  };
+
+  const gitignoreTemplate = `
+  # Logs
+  logs
+  *.log
+  npm-debug.log*
+  yarn-debug.log*
+  yarn-error.log*
+  lerna-debug.log*
+  .pnpm-debug.log*
+  
+  # Diagnostic reports (https://nodejs.org/api/report.html)
+  report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+  
+  # Runtime data
+  pids
+  *.pid
+  *.seed
+  *.pid.lock
+  
+  # Directory for instrumented libs generated by jscoverage/JSCover
+  lib-cov
+  
+  # Coverage directory used by tools like istanbul
+  coverage
+  *.lcov
+  
+  # nyc test coverage
+  .nyc_output
+  
+  # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+  .grunt
+  
+  # Bower dependency directory (https://bower.io/)
+  bower_components
+  
+  # node-waf configuration
+  .lock-wscript
+  
+  # Compiled binary addons (https://nodejs.org/api/addons.html)
+  build/Release
+  
+  # Dependency directories
+  node_modules/
+  jspm_packages/
+  
+  # Snowpack dependency directory (https://snowpack.dev/)
+  web_modules/
+  
+  # TypeScript cache
+  *.tsbuildinfo
+  
+  # Optional npm cache directory
+  .npm
+  
+  # Optional eslint cache
+  .eslintcache
+  
+  # Optional stylelint cache
+  .stylelintcache
+  
+  # Microbundle cache
+  .rpt2_cache/
+  .rts2_cache_cjs/
+  .rts2_cache_es/
+  .rts2_cache_umd/
+  
+  # Optional REPL history
+  .node_repl_history
+  
+  # Output of 'npm pack'
+  *.tgz
+  
+  # Yarn Integrity file
+  .yarn-integrity
+  
+  # dotenv environment variable files
+  .env
+  .env.development.local
+  .env.test.local
+  .env.production.local
+  .env.local
+  
+  # parcel-bundler cache (https://parceljs.org/)
+  .cache
+  .parcel-cache
+  
+  # Next.js build output
+  .next
+  out
+  
+  # Nuxt.js build / generate output
+  .nuxt
+  dist
+  
+  # Gatsby files
+  .cache/
+  # Comment in the public line in if your project uses Gatsby and not Next.js
+  # https://nextjs.org/blog/next-9-1#public-directory-support
+  # public
+  
+  # vuepress build output
+  .vuepress/dist
+  
+  # vuepress v2.x temp and cache directory
+  .temp
+  .cache
+  
+  # Docusaurus cache and generated files
+  .docusaurus
+  
+  # Serverless directories
+  .serverless/
+  
+  # FuseBox cache
+  .fusebox/
+  
+  # DynamoDB Local files
+  .dynamodb/
+  
+  # TernJS port file
+  .tern-port
+  
+  # Stores VSCode versions used for testing VSCode extensions
+  .vscode-test
+  
+  # yarn v2
+  .yarn/cache
+  .yarn/unplugged
+  .yarn/build-state.yml
+  .yarn/install-state.gz
+  `;
+
+  // Define all files to be created up front
+  const files = new Map([
+    ['app/api/auth/[...nextAuth]/route.ts', { content: '' }],
+    ['app/auth/[...path]/page.tsx', { content: '' }],
+    ['app/(dashboard)/page/page.tsx', { content: dashboardPageContent }],
+    ['app/(dashboard)/layout.tsx', { content: dashboardLayoutContent }],
+    ['app/layout.tsx', { content: rootLayoutContent }],
+    ['app/page.tsx', { content: rootPageContent }],
+    ['theme.ts', { content: themeContent }],
+    ['next-env.d.ts', { content: nextTypesContent }],
+    ['next.config.mjs', { content: nextConfigContent }],
+    ['.eslintrc.json', { content: eslintConfigContent }],
+    ['tsconfig.json', { content: tsConfigContent }],
+    ['package.json', { content: JSON.stringify(packageJson, null, 2) }],
+    ['.gitignore', { content: gitignoreTemplate }],
+    // ...
+  ]);
+
+  // Get all directories and deduplicate
+  const dirs = new Set(Array.from(files.keys(), (filePath) => path.dirname(filePath)));
+
+  // Create directories, use recursive option to create parent directories
+  try {
+    await Promise.all(
+      Array.from(dirs, (dirPath) =>
+        fs.mkdir(path.join(absolutePath, dirPath), { recursive: true }),
+      ),
+    );
+  } catch (error: any) {
+    // error.code === 'EEXIST' means the directory already exists, this is fine.
+    const maybeError: Error = error;
+    if (maybeError?.code !== 'EEXIST') {
+      throw error;
+    }
+  }
+
+  // Write all the files
+  await Promise.all(
+    Array.from(files.entries(), ([filePath, { content }]) =>
+      fs.writeFile(path.join(absolutePath, filePath), content),
+    ),
+  );
+
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.cyan('info')} - Installing dependencies`);
+  // eslint-disable-next-line no-console
+  console.log();
+
+  await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
 
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
   console.log(
-    `${chalk.green('success')} - Created Toolpad Core project at ${chalk.blue(absolutePath)}`,
+    `${chalk.green('success')} - Created Toolpad Core project at ${chalk.cyan(absolutePath)}`,
   );
   // eslint-disable-next-line no-console
   console.log();

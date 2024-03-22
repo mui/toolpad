@@ -78,9 +78,6 @@ importers:
       '@types/node':
         specifier: 20.11.28
         version: 20.11.28
-      '@types/rimraf':
-        specifier: 3.0.2
-        version: 3.0.2
       '@typescript-eslint/eslint-plugin':
         specifier: 7.2.0
         version: 7.2.0(@typescript-eslint/parser@7.2.0)(eslint@8.57.0)(typescript@5.4.2)
@@ -174,9 +171,6 @@ importers:
       vitest-fail-on-console:
         specifier: 0.5.1
         version: 0.5.1(jsdom@24.0.0)
-      yarn-deduplicate:
-        specifier: 6.0.2
-        version: 6.0.2
 
   docs:
     dependencies:
@@ -830,9 +824,6 @@ importers:
       '@types/pg':
         specifier: 8.11.2
         version: 8.11.2
-      '@types/prettier':
-        specifier: 2.7.3
-        version: 2.7.3
       '@types/react':
         specifier: 18.2.66
         version: 18.2.66
@@ -1034,9 +1025,6 @@ importers:
       '@types/invariant':
         specifier: 2.2.37
         version: 2.2.37
-      '@types/prettier':
-        specifier: 2.7.3
-        version: 2.7.3
       '@types/react':
         specifier: 18.2.66
         version: 18.2.66
@@ -5041,10 +5029,6 @@ packages:
       pg-types: 4.0.2
     dev: true
 
-  /@types/prettier@2.7.3:
-    resolution: {integrity: sha512-+68kP9yzs4LMp7VNh8gdzMSPZFL44MLGqiHWvttYJe+6qnuVr4Ek9wSBQoveqY/r+LwjCcU29kNVkidwim+kYA==}
-    dev: true
-
   /@types/promise.allsettled@1.0.6:
     resolution: {integrity: sha512-wA0UT0HeT2fGHzIFV9kWpYz5mdoyLxKrTgMdZQM++5h6pYAFH73HXcQhefg24nD1yivUFEn5KU+EF4b+CXJ4Wg==}
 
@@ -5138,13 +5122,6 @@ packages:
 
   /@types/retry@0.12.0:
     resolution: {integrity: sha512-wWKOClTTiizcZhXnPY4wikVAwmdYHp8q6DmC+EJUzAMsycb7HB32Kh9RN4+0gExjmPmZSAQjgURXIGATPegAvA==}
-
-  /@types/rimraf@3.0.2:
-    resolution: {integrity: sha512-F3OznnSLAUxFrCEu/L5PY8+ny8DtcFRjx7fZZ9bycvXRi3KPTRS9HOitGZwvPg0juRhXFWIeKX58cnX5YqLohQ==}
-    dependencies:
-      '@types/glob': 8.1.0
-      '@types/node': 20.11.28
-    dev: true
 
   /@types/scheduler@0.16.8:
     resolution: {integrity: sha512-WZLiwShhwLRmeV6zH+GkbOFT6Z6VklCItrDioxUnv+u4Ll+8vKeFySoFyK/0ctcRpOmwAicELfmys1sDc/Rw+A==}
@@ -6928,11 +6905,6 @@ packages:
     engines: {node: '>= 0.8'}
     dependencies:
       delayed-stream: 1.0.0
-
-  /commander@10.0.1:
-    resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
-    engines: {node: '>=14'}
-    dev: true
 
   /commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
@@ -15909,17 +15881,6 @@ packages:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
-
-  /yarn-deduplicate@6.0.2:
-    resolution: {integrity: sha512-Efx4XEj82BgbRJe5gvQbZmEO7pU5DgHgxohYZp98/+GwPqdU90RXtzvHirb7hGlde0sQqk5G3J3Woyjai8hVqA==}
-    engines: {node: '>=v14', yarn: '>=1 <2'}
-    hasBin: true
-    dependencies:
-      '@yarnpkg/lockfile': 1.1.0
-      commander: 10.0.1
-      semver: 7.5.4
-      tslib: 2.6.2
-    dev: true
 
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}

@@ -570,19 +570,9 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   const dirs = new Set(Array.from(files.keys(), (filePath) => path.dirname(filePath)));
 
   // Create directories, use recursive option to create parent directories
-  try {
-    await Promise.all(
-      Array.from(dirs, (dirPath) =>
-        fs.mkdir(path.join(absolutePath, dirPath), { recursive: true }),
-      ),
-    );
-  } catch (error: any) {
-    // error.code === 'EEXIST' means the directory already exists, this is fine.
-    const maybeError: Error = error;
-    if (maybeError?.code !== 'EEXIST') {
-      throw error;
-    }
-  }
+  await Promise.all(
+    Array.from(dirs, (dirPath) => fs.mkdir(path.join(absolutePath, dirPath), { recursive: true })),
+  );
 
   // Write all the files
   await Promise.all(

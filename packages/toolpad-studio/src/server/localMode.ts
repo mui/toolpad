@@ -974,6 +974,8 @@ export function getRequiredEnvVars(dom: appDom.AppDom): Set<string> {
   return new Set(allVars);
 }
 
+const PRO_AUTH_PROVIDERS = ['azure-ad'];
+
 interface PaidFeature {
   id: string;
   label: string;
@@ -985,13 +987,13 @@ function detectPaidFeatures(application: Application): PaidFeature[] | null {
   }
 
   const hasRoles = Boolean(application?.spec?.authorization?.roles);
-  const hasAzureActiveDirectory = application?.spec?.authentication?.providers?.some(
-    (elems) => elems.provider === 'azure-ad',
+  const hasProAuthProvider = application?.spec?.authentication?.providers?.some((elems) =>
+    PRO_AUTH_PROVIDERS.includes(elems.provider),
   );
   const paidFeatures = [
-    hasRoles ? { id: 'roles', label: 'Role based access control' } : undefined,
-    hasAzureActiveDirectory
-      ? { id: 'azure-ad', label: 'Azure AD authentication provider' }
+    hasRoles ? { id: 'roles', label: 'Role-based access control' } : undefined,
+    hasProAuthProvider
+      ? { id: 'pro-auth-provider', label: 'Some of your active authentication providers' }
       : undefined,
   ].filter(Boolean) as PaidFeature[];
   return paidFeatures.length > 0 ? paidFeatures : null;

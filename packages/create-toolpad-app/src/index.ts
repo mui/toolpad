@@ -159,16 +159,13 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   }
 };
 
-const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
-  // eslint-disable-next-line no-console
-  console.log();
-  // eslint-disable-next-line no-console
-  console.log(
-    `${chalk.cyan('info')} - Creating Toolpad Core project in ${chalk.cyan(absolutePath)}`,
-  );
-  // eslint-disable-next-line no-console
-  console.log();
+interface GenerateCoreProjectOptions {
+  name: string;
+}
 
+function generateCoreProject(
+  options: GenerateCoreProjectOptions,
+): Map<string, { content: string }> {
   const rootLayoutContent = `  
   import { AppProvider } from '@toolpad/core';
   import theme from '../theme';
@@ -387,7 +384,7 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   `;
 
   const packageJson: PackageJson = {
-    name: path.basename(absolutePath),
+    name: path.basename(options.name),
     version: '0.1.0',
     scripts: {
       dev: 'next dev',
@@ -549,7 +546,7 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   `;
 
   // Define all files to be created up front
-  const files = new Map([
+  return new Map([
     ['app/api/auth/[...nextAuth]/route.ts', { content: '' }],
     ['app/auth/[...path]/page.tsx', { content: '' }],
     ['app/(dashboard)/page/page.tsx', { content: dashboardPageContent }],
@@ -565,7 +562,12 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
     ['.gitignore', { content: gitignoreTemplate }],
     // ...
   ]);
+}
 
+async function writeCoreFiles(
+  absolutePath: string,
+  files: Map<string, { content: string }>,
+): Promise<void> {
   // Get all directories and deduplicate
   const dirs = new Set(Array.from(files.keys(), (filePath) => path.dirname(filePath)));
 
@@ -580,6 +582,19 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
       fs.writeFile(path.join(absolutePath, filePath), content),
     ),
   );
+}
+
+const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
+  // eslint-disable-next-line no-console
+  console.log();
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.cyan('info')} - Creating Toolpad Core project in ${chalk.cyan(absolutePath)}`,
+  );
+  // eslint-disable-next-line no-console
+  console.log();
+  const files = generateCoreProject({ name: path.basename(absolutePath) });
+  await writeCoreFiles(absolutePath, files);
 
   // eslint-disable-next-line no-console
   console.log(`${chalk.cyan('info')} - Installing dependencies`);

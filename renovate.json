@@ -79,11 +79,6 @@
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
     },
     {
-      "groupName": "lerna",
-      "matchPackageNames": ["lerna"],
-      "description": "https://github.com/mui/mui-toolpad/pull/3298#pullrequestreview-1942844389"
-    },
-    {
       "matchDepTypes": ["action"],
       "pinDigests": true
     },

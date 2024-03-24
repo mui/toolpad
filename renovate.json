@@ -68,9 +68,9 @@
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "Next.js",
+      "groupName": "Unsupported engines",
       "matchPackageNames": ["next"],
-      "matchPackagePatterns": ["^@next/"],
+      "matchPackagePatterns": ["^@next/", "^@typescript-eslint/"],
       "description": "Restricted to a Node.js version that's unsupported on codesandboxci"
     },
     {

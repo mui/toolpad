@@ -60,7 +60,7 @@ Start by installing the required dependencies:
 <codeblock storageKey="package-manager">
 
 ```bash npm
-pnpm install -S @toolpad/studio
+npm install -S @toolpad/studio
 ```
 
 ```bash yarn

@@ -29,6 +29,11 @@
       "allowedVersions": "< 2.0.0"
     },
     {
+      "groupName": "eslint",
+      "matchPackageNames": ["eslint"],
+      "matchPackagePatterns": ["^eslint-", "^@eslint/", "^@eslint-"]
+    },
+    {
       "groupName": "React",
       "matchPackageNames": ["react", "react-dom", "react-is", "react-test-renderer"]
     },

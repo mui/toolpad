@@ -233,7 +233,6 @@ async function createDefaultCodeComponent(name: string, filePath: string): Promi
   const result = await format(
     `
   import * as React from 'react';
-  import { Typography } from '@mui/material';
   import { createComponent } from '@toolpad/studio/browser';
   
   export interface ${propTypeId} {
@@ -242,7 +241,7 @@ async function createDefaultCodeComponent(name: string, filePath: string): Promi
   
   function ${componentId}({ msg }: ${propTypeId}) {
     return (
-      <Typography>{msg}</Typography>
+      <div>{msg}</div>
     );
   }
 

@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@toolpad/studio": "0.1.53",
-    "express": "4.18.2"
+    "express": "4.19.2"
   },
   "devDependencies": {}
 }

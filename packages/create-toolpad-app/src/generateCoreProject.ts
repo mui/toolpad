@@ -23,8 +23,8 @@ export default function generateCoreProject(
   }
     `;
 
-  const dashboardLayoutContent = `    
-  import {
+  const dashboardLayoutContent = `
+    import {
     AppBar,
     Badge,
     Box,
@@ -42,7 +42,9 @@ export default function generateCoreProject(
   import SettingsIcon from "@mui/icons-material/Settings";
   import NotificationsIcon from "@mui/icons-material/Notifications";
 
-  export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
+  export default function Layout({
+    children,
+  }: Readonly<{ children: React.ReactNode }>) {
     return (
       <Box sx={{ display: "flex" }}>
         <AppBar position="absolute">
@@ -65,7 +67,7 @@ export default function generateCoreProject(
           ></Toolbar>
           <Divider />
           <List component="nav">
-            <ListItemButton>
+            <ListItemButton LinkComponent={"a"} href="/">
               <ListItemIcon>
                 <HomeIcon />
               </ListItemIcon>

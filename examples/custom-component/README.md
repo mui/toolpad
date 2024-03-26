@@ -26,7 +26,7 @@ or:
 
 This app demonstrates the following capabilities of Toolpad Studio:
 
-1. Creating custom react components
+1. Creating custom React components
 
 ## The source
 

@@ -26,7 +26,6 @@ Toolpad Studio exposes a [`createComponent`](https://mui.com/toolpad/studio/refe
 
 ```jsx
 import * as React from 'react';
-import { Typography } from '@mui/material';
 import { createComponent } from '@toolpad/studio/browser';
 
 export interface HelloWorldProps {
@@ -34,7 +33,7 @@ export interface HelloWorldProps {
 }
 
 function HelloWorld({ msg }: HelloWorldProps) {
-  return <Typography>{msg}</Typography>;
+  return <div>{msg}</div>;
 }
 
 export default createComponent(HelloWorld, {

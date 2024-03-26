@@ -1,12 +1,12 @@
 import path from 'path';
 import { PackageJson } from './packageType';
 
-interface GenerateCoreProjectOptions {
+interface GenerateProjectOptions {
   name: string;
 }
 
-export default function generateCoreProject(
-  options: GenerateCoreProjectOptions,
+export default function generateProject(
+  options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
   const rootLayoutContent = `  
   import { AppProvider } from '@toolpad/core';

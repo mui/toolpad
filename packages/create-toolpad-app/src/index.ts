@@ -13,8 +13,8 @@ import { readJsonFile } from '@toolpad/utils/fs';
 import invariant from 'invariant';
 import { bashResolvePath } from '@toolpad/utils/cli';
 import { PackageJson } from './packageType';
-import generateCoreProject from './generateCoreProject';
-import writeCoreFiles from './writeCoreFiles';
+import generateProject from './generateProject';
+import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
@@ -170,8 +170,8 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   );
   // eslint-disable-next-line no-console
   console.log();
-  const files = generateCoreProject({ name: path.basename(absolutePath) });
-  await writeCoreFiles(absolutePath, files);
+  const files = generateProject({ name: path.basename(absolutePath) });
+  await writeFiles(absolutePath, files);
 
   // eslint-disable-next-line no-console
   console.log(`${chalk.cyan('info')} - Installing dependencies`);

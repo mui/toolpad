@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs/promises';
 
-export default async function writeCoreFiles(
+export default async function writeFiles(
   absolutePath: string,
   files: Map<string, { content: string }>,
 ): Promise<void> {

@@ -469,6 +469,10 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   });
 }
 
+function getNarrowedColType(type?: string): GridColType | undefined {
+  return (type && type in DEFAULT_COLUMN_TYPES ? type : undefined) as GridColType | undefined;
+}
+
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map(({ type: colType, ...column }) => {
     const isIdColumn = column.field === 'id';
@@ -476,6 +480,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
     if (isIdColumn) {
       return {
         ...column,
+        type: getNarrowedColType(colType),
         editable: false,
         hide: true,
         renderCell: ({ row, value }) => (row[DRAFT_ROW_MARKER] ? '' : value),
@@ -524,11 +529,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
       };
     }
 
-    const type = (colType && colType in DEFAULT_COLUMN_TYPES ? colType : undefined) as
-      | GridColType
-      | undefined;
-
-    return { ...baseColumn, ...column, type };
+    return { ...baseColumn, ...column, type: getNarrowedColType(colType) };
   });
 }
 
@@ -1268,6 +1269,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
     return result;
   }, [columns, getProviderActions]);
+
+  console.log(renderedColumns);
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>

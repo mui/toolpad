@@ -27,8 +27,8 @@ import EditableTreeItem, { EditableTreeItemProps } from '../../../../components/
 import NodeMenu from '../../NodeMenu';
 import ExplorerHeader from '../../ExplorerHeader';
 
-const CollapseIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
-const ExpandIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const CollapseIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const ExpandIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
 
 const classes = {
   treeItemMenuButton: 'Toolpad__QueryListItem',

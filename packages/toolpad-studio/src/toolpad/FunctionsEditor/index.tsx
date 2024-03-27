@@ -44,8 +44,8 @@ import ExplorerHeader from '../AppEditor/ExplorerHeader';
 import EditableTreeItem, { EditableTreeItemProps } from '../../components/EditableTreeItem';
 import { scrollIntoViewIfNeeded } from '../../utils/dom';
 
-const CollapseIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
-const ExpandIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const CollapseIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const ExpandIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
 
 const fileTreeItemClasses = generateUtilityClasses('FileTreeItem', ['actionButton', 'handlerItem']);
 

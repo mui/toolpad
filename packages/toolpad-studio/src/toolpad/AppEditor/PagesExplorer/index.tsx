@@ -19,8 +19,8 @@ import EditableTreeItem, { EditableTreeItemProps } from '../../../components/Edi
 import { scrollIntoViewIfNeeded } from '../../../utils/dom';
 import ExplorerHeader from '../ExplorerHeader';
 
-const CollapseIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
-const ExpandIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const CollapseIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const ExpandIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
 
 const PagesExplorerRoot = styled(Stack)({
   height: '100%',

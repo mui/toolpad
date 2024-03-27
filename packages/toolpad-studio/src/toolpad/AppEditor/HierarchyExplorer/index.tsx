@@ -13,8 +13,8 @@ import { removePageLayoutNode } from '../pageLayout';
 import EditableTreeItem from '../../../components/EditableTreeItem';
 import ExplorerHeader from '../ExplorerHeader';
 
-const CollapseIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
-const ExpandIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const CollapseIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const ExpandIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
 
 export interface CustomTreeItemProps extends TreeItemProps {
   ref?: React.RefObject<HTMLLIElement>;

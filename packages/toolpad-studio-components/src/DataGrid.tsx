@@ -1270,8 +1270,6 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     return result;
   }, [columns, getProviderActions]);
 
-  console.log(renderedColumns);
-
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>

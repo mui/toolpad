@@ -14,7 +14,6 @@
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
-    "deduplicate": "node scripts/deduplicate.mjs",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs",
     "docs:dev": "pnpm --filter docs dev",
     "docs:build": "pnpm --filter docs build",
@@ -40,15 +39,14 @@
   },
   "devDependencies": {
     "@argos-ci/core": "1.5.5",
-    "@mui/monorepo": "github:mui/material-ui#b57951355a60566aeafc88c9aa49c7f198968b3c",
-    "@mui/x-charts": "6.19.5",
-    "@next/eslint-plugin-next": "14.1.3",
+    "@mui/monorepo": "github:mui/material-ui#0102a9579628d48d784511a562b7b72f0f51847e",
+    "@mui/x-charts": "6.19.8",
+    "@next/eslint-plugin-next": "14.1.4",
     "@playwright/test": "1.42.1",
     "@testing-library/react": "14.2.1",
     "@types/archiver": "6.0.2",
     "@types/gtag.js": "0.0.19",
     "@types/node": "20.11.28",
-    "@types/rimraf": "3.0.2",
     "@typescript-eslint/eslint-plugin": "7.2.0",
     "@typescript-eslint/parser": "7.2.0",
     "chalk": "5.3.0",
@@ -79,8 +77,7 @@
     "rimraf": "5.0.5",
     "typescript": "5.4.2",
     "vitest-dom": "0.1.1",
-    "vitest-fail-on-console": "0.5.1",
-    "yarn-deduplicate": "6.0.2"
+    "vitest-fail-on-console": "0.5.1"
   },
   "dependencies": {
     "archiver": "7.0.0",
@@ -98,12 +95,12 @@
     "zod-to-json-schema": "3.22.4"
   },
   "engines": {
-    "npm": "please-use-yarn",
+    "npm": "please-use-pnpm",
     "node": ">=18",
-    "pnpm": "8.15.4"
+    "pnpm": "8.15.5"
   },
   "resolutions": {
     "google-auth-library": "*"
   },
-  "packageManager": "pnpm@8.15.4"
+  "packageManager": "pnpm@8.15.5"
 }

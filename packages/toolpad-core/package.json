@@ -1,0 +1,74 @@
+{
+  "name": "@toolpad/core",
+  "version": "0.1.53",
+  "keywords": [
+    "toolpad"
+  ],
+  "description": "Build dashboards fast.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mui/mui-toolpad.git",
+    "directory": "packages/toolpad-core"
+  },
+  "bugs": {
+    "url": "https://github.com/mui/mui-toolpad/issues"
+  },
+  "author": "Toolpad Team",
+  "homepage": "https://github.com/mui/mui-toolpad#readme",
+  "license": "MIT",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "require": "./dist/*.cjs",
+      "default": "./dist/*.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check-types": "tsup && tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@emotion/cache": "11.11.0",
+    "@emotion/react": "11.11.4",
+    "@emotion/styled": "11.11.0",
+    "@mui/icons-material": "5.15.14",
+    "@mui/material": "5.15.14",
+    "@mui/material-nextjs": "5.15.11",
+    "next": "13.5.6",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.67",
+    "@types/react-dom": "18.2.22"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.15.14",
+    "@types/react": "^18.2.67",
+    "next": "^13.5.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

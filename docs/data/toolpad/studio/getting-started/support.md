@@ -40,11 +40,11 @@ Stack Overflow contains a wealth of information about MUI products. Toolpad Stu
 
 ### Social media
 
-Toolpad Studio has a growing presence on [Twitter](https://twitter.com/MUI_Toolpad Studio).
+Toolpad Studio has a growing presence on [Twitter/X](https://twitter.com/MUI_Toolpad).
 You can use it to share what you're working on and connect with other developers.
 
 Please keep in mind that we don't actively monitor direct messages on the company's social media accounts, so this is _not_ a good way to get in touch with us directly.
 
 ### Direct email
 
-If email is your thing, the team can be directly reached out at toolpad@mui.com.
+If email is your thing, the team can be directly reached at toolpad@mui.com.

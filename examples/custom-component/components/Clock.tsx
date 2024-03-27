@@ -6,10 +6,10 @@ function getCurrentTime() {
 }
 
 export interface ClockProps {
-  msg: string;
+  label: string;
 }
 
-function Clock({ msg }: ClockProps) {
+function Clock({ label }: ClockProps) {
   const [time, setTime] = React.useState(() => getCurrentTime());
 
   React.useEffect(() => {
@@ -21,14 +21,14 @@ function Clock({ msg }: ClockProps) {
 
   return (
     <div>
-      {msg}: {time}
+      {label}: {time}
     </div>
   );
 }
 
 export default createComponent(Clock, {
   argTypes: {
-    msg: {
+    label: {
       type: 'string',
       default: 'Current time',
     },

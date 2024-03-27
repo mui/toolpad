@@ -890,9 +890,9 @@ importers:
       '@mui/x-date-pickers':
         specifier: 7.0.0
         version: 7.0.0(@mui/material@5.15.14)(@types/react@18.2.66)(dayjs@1.11.10)(react-dom@18.2.0)(react@18.2.0)
-      '@mui/x-license-pro':
-        specifier: 6.10.2
-        version: 6.10.2(@types/react@18.2.66)(react@18.2.0)
+      '@mui/x-license':
+        specifier: 7.0.0
+        version: 7.0.0(@types/react@18.2.66)(react@18.2.0)
       '@tanstack/react-query':
         specifier: 5.18.1
         version: 5.18.1(react@18.2.0)
@@ -3861,19 +3861,6 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       react-transition-group: 4.4.5(react-dom@18.2.0)(react@18.2.0)
-    transitivePeerDependencies:
-      - '@types/react'
-    dev: false
-
-  /@mui/x-license-pro@6.10.2(@types/react@18.2.66)(react@18.2.0):
-    resolution: {integrity: sha512-Baw3shilU+eHgU+QYKNPFUKvfS5rSyNJ98pQx02E0gKA22hWp/XAt88K1qUfUMPlkPpvg/uci6gviQSSLZkuKw==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      react: ^17.0.0 || ^18.0.0
-    dependencies:
-      '@babel/runtime': 7.24.0
-      '@mui/utils': 5.15.14(@types/react@18.2.66)(react@18.2.0)
-      react: 18.2.0
     transitivePeerDependencies:
       - '@types/react'
     dev: false

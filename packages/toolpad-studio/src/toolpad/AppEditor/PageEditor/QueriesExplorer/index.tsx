@@ -13,7 +13,7 @@ import {
   Paper,
   SxProps,
 } from '@mui/material';
-import { TreeView, treeItemClasses } from '@mui/x-tree-view';
+import { SimpleTreeView, treeItemClasses } from '@mui/x-tree-view';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -349,10 +349,10 @@ function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
         onCreate={handleCreateClick}
         createLabelText={`Create new ${nodeName}`}
       />
-      <TreeView
+      <SimpleTreeView
         aria-label={`${nodeName} explorer`}
-        defaultExpanded={[`:queries`]}
-        selected={
+        defaultExpandedItems={[`:queries`]}
+        selectedItems={
           currentView.kind === 'page' && currentView.view?.kind === 'query'
             ? currentView.view.nodeId
             : ''
@@ -369,7 +369,7 @@ function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
         {nodes.map((node) => (
           <DataTreeItem
             key={node.id}
-            nodeId={node.id}
+            itemId={node.id}
             toolpadNodeId={node.id}
             aria-level={1}
             aria-label={node.name}
@@ -383,7 +383,7 @@ function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
             validateItemName={validateName}
           />
         ))}
-      </TreeView>
+      </SimpleTreeView>
     </Stack>
   );
 }

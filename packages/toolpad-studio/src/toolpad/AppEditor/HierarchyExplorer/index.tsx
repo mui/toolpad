@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NodeId } from '@toolpad/studio-runtime';
 import { Box, Typography } from '@mui/material';
-import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
+import { SimpleTreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@toolpad/utils/hooks/useBoolean';
@@ -212,15 +212,15 @@ export default function HierarchyExplorer() {
   return (
     <React.Fragment>
       <ExplorerHeader headerText="Page hierarchy" />
-      <TreeView
+      <SimpleTreeView
         aria-label="Page hierarchy explorer"
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-        expanded={Array.from(expandedDomNodeIdSet)}
-        selected={selectedDomNodeId}
-        onNodeSelect={handleNodeSelect}
-        onNodeFocus={handleNodeFocus}
-        onNodeToggle={handleNodeToggle}
+        expandedItems={Array.from(expandedDomNodeIdSet)}
+        selectedItems={selectedDomNodeId}
+        onSelectedItemsChange={handleNodeSelect}
+        onItemFocus={handleNodeFocus}
+        onExpandedItemsChange={handleNodeToggle}
         onKeyDown={handleKeyDown}
         sx={{
           flexGrow: 1,
@@ -233,7 +233,7 @@ export default function HierarchyExplorer() {
         {rootChildren.map((childNode) => (
           <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
         ))}
-      </TreeView>
+      </SimpleTreeView>
     </React.Fragment>
   );
 }

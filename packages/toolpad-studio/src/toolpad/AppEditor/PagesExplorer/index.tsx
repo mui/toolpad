@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled, Box, IconButton, Stack, Tooltip } from '@mui/material';
-import { TreeView, treeItemClasses } from '@mui/x-tree-view';
+import { SimpleTreeView, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -347,13 +347,13 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         onCreate={handleOpenCreateNewPage}
         createLabelText="Create new page"
       />
-      <TreeView
+      <SimpleTreeView
         ref={pagesTreeRef}
         aria-label="Pages explorer"
-        selected={activePage ? [activePage.id] : []}
-        onNodeSelect={handleSelect}
-        expanded={expanded}
-        onNodeToggle={handleToggle}
+        selectedItems={activePage ? [activePage.id] : []}
+        onSelectedItemsChange={handleSelect}
+        expandedItems={expanded}
+        onExpandedItemsChange={handleToggle}
         multiSelect
         defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
@@ -364,7 +364,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       >
         {isCreateNewPageOpen ? (
           <EditableTreeItem
-            nodeId="::create::"
+            itemId="::create::"
             isEditing
             suggestedNewItemName={nextProposedName}
             onEdit={handleCreateNewCommit}
@@ -375,7 +375,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         {alphabeticSortedPages.map((page) => (
           <PagesExplorerTreeItem
             key={page.id}
-            nodeId={page.id}
+            itemId={page.id}
             toolpadNodeId={page.id}
             labelText={page.name}
             title={appDom.getPageDisplayName(page)}
@@ -385,7 +385,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             validateItemName={validatePageName}
           />
         ))}
-      </TreeView>
+      </SimpleTreeView>
     </PagesExplorerRoot>
   );
 }

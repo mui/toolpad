@@ -492,7 +492,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
       const format = createNumberFormat(column.numberFormat);
       baseColumn = {
         ...baseColumn,
-        valueFormatter: ({ value }) => format.format(value),
+        valueFormatter: (value: any) => format.format(value),
       };
     }
 
@@ -500,7 +500,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
       const format = createDateFormat(column.dateFormat);
       baseColumn = {
         ...baseColumn,
-        valueFormatter: ({ value }) => {
+        valueFormatter: (value: any) => {
           try {
             return format.format(value);
           } catch {
@@ -514,7 +514,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
       const format = createDateFormat(column.dateTimeFormat);
       baseColumn = {
         ...baseColumn,
-        valueFormatter: ({ value }) => {
+        valueFormatter: (value: any) => {
           try {
             return format.format(value);
           } catch {

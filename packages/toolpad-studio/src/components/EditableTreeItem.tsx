@@ -183,16 +183,13 @@ export default function EditableTreeItem({
           </Typography>
         ),
       )}
-      sx={
-        isEditing
-          ? {
-              ...sx,
-              '> .MuiTreeItem-content': {
-                backgroundColor: alpha(theme.palette.primary.main, 0.2),
-              },
-            }
-          : sx
-      }
+      sx={{
+        ...sx,
+        '> .MuiTreeItem-content': {
+          padding: 0,
+          backgroundColor: isEditing ? alpha(theme.palette.primary.main, 0.2) : undefined,
+        },
+      }}
     />
   );
 }

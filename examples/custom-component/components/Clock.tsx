@@ -1,18 +1,24 @@
 import * as React from 'react';
 import { createComponent } from '@toolpad/studio/browser';
 
+function getCurrentTime() {
+  return new Date().toLocaleTimeString();
+}
+
 export interface ClockProps {
   msg: string;
 }
 
 function Clock({ msg }: ClockProps) {
-  const [time, setTime] = React.useState(() => new Date().toLocaleTimeString());
+  const [time, setTime] = React.useState(() => getCurrentTime());
+
   React.useEffect(() => {
     const interval = setInterval(() => {
-      setTime(new Date().toLocaleTimeString());
+      setTime(getCurrentTime());
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
   return (
     <div>
       {msg}: {time}

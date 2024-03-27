@@ -37,7 +37,7 @@ declare module '@mui/material/styles/createTypography' {
   }
 }
 
-declare module '@mui/material/Chip' {
+declare module '@mui/material' {
   interface ChipPropsColorOverrides {
     grey: true;
   }

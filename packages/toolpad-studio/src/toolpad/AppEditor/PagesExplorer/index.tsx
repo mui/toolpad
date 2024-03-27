@@ -19,6 +19,9 @@ import EditableTreeItem, { EditableTreeItemProps } from '../../../components/Edi
 import { scrollIntoViewIfNeeded } from '../../../utils/dom';
 import ExplorerHeader from '../ExplorerHeader';
 
+const CollapseIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const ExpandIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+
 const PagesExplorerRoot = styled(Stack)({
   height: '100%',
   width: '100%',
@@ -58,7 +61,7 @@ interface StyledTreeItemProps extends EditableTreeItemProps {
 
 function PagesExplorerTreeItem(props: StyledTreeItemProps) {
   const {
-    nodeId,
+    itemId,
     labelIcon,
     labelText,
     title,
@@ -78,11 +81,11 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
   const handleRenameConfirm = React.useCallback(
     (updatedName: string) => {
       if (onRenameNode) {
-        onRenameNode(nodeId as NodeId, updatedName);
+        onRenameNode(itemId as NodeId, updatedName);
         stopEditing();
       }
     },
-    [nodeId, onRenameNode, stopEditing],
+    [itemId, onRenameNode, stopEditing],
   );
 
   const validateEditablePageName = React.useCallback(
@@ -97,7 +100,7 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
 
   return (
     <StyledEditableTreeItem
-      nodeId={nodeId}
+      itemId={itemId}
       labelText={labelText}
       renderLabel={(children) => (
         <Tooltip title={title} placement="right" disableInteractive>
@@ -355,8 +358,8 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         expandedItems={expanded}
         onExpandedItemsChange={handleToggle}
         multiSelect
-        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        // TODO: This belongs as a default property in the theme
+        slots={{ collapseIcon: CollapseIcon, expandIcon: ExpandIcon }}
         sx={{
           overflow: 'auto',
           scrollbarGutter: 'stable',

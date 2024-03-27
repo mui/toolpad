@@ -16,7 +16,7 @@ import {
   Toolbar,
 } from '@mui/material';
 import { errorFrom } from '@toolpad/utils/errors';
-import { TreeView, treeItemClasses, TreeItem } from '@mui/x-tree-view';
+import { treeItemClasses, TreeItem, SimpleTreeView } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AddIcon from '@mui/icons-material/Add';
@@ -44,6 +44,9 @@ import ExplorerHeader from '../AppEditor/ExplorerHeader';
 import EditableTreeItem, { EditableTreeItemProps } from '../../components/EditableTreeItem';
 import { scrollIntoViewIfNeeded } from '../../utils/dom';
 
+const CollapseIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const ExpandIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+
 const fileTreeItemClasses = generateUtilityClasses('FileTreeItem', ['actionButton', 'handlerItem']);
 
 const FileTreeItemRoot = styled(EditableTreeItem)(({ theme }) => ({
@@ -57,7 +60,7 @@ const FileTreeItemRoot = styled(EditableTreeItem)(({ theme }) => ({
     },
   },
 
-  [`& .${treeItemClasses.group}`]: {
+  [`& .${treeItemClasses.groupTransition}`]: {
     borderLeft: `1px solid ${alpha(theme.palette.text.primary, 0.2)}`,
     position: 'relative',
     left: '-2px',
@@ -84,7 +87,7 @@ interface HandlerFileTreeItemProps extends EditableTreeItemProps {
 
 function HandlerFileTreeItem({
   file,
-  nodeId,
+  itemId,
   validateItemName,
   onRename,
   ...other
@@ -114,7 +117,7 @@ function HandlerFileTreeItem({
   return (
     <FileTreeItemRoot
       key={file.name}
-      nodeId={nodeId}
+      itemId={itemId}
       labelText={labelText}
       renderLabel={(children) => (
         <React.Fragment>
@@ -141,7 +144,7 @@ function HandlerFileTreeItem({
           <TreeItem
             className={fileTreeItemClasses.handlerItem}
             key={handler.name}
-            nodeId={serializeFunctionId({ file: file.name, handler: handler.name })}
+            itemId={serializeFunctionId({ file: file.name, handler: handler.name })}
             label={handler.name}
           />
         );
@@ -190,10 +193,13 @@ export default function FunctionsEditor() {
   });
 
   const handleSelectFunction = React.useCallback(
-    (_event: React.SyntheticEvent, nodeId: string) => {
-      const parsed = parseFunctionId(nodeId);
+    (_event: React.SyntheticEvent, itemId: string | null) => {
+      if (!itemId) {
+        return;
+      }
+      const parsed = parseFunctionId(itemId);
       if (parsed.handler) {
-        setSelectedHandler(nodeId);
+        setSelectedHandler(itemId);
       }
     },
     [setSelectedHandler],
@@ -329,14 +335,14 @@ export default function FunctionsEditor() {
                 onSearch={handleSearch}
                 hasPersistentSearch
               />
-              <TreeView
+              <SimpleTreeView
                 ref={handlerTreeRef}
-                selected={selectedNodeId}
-                onNodeSelect={handleSelectFunction}
-                defaultCollapseIcon={<ExpandMoreIcon />}
-                defaultExpandIcon={<ChevronRightIcon />}
-                expanded={expanded}
-                onNodeToggle={(_event, nodeIds) => setExpanded(nodeIds)}
+                selectedItems={selectedNodeId}
+                onSelectedItemsChange={handleSelectFunction}
+                // TODO: This belongs as a default property in the theme
+                slots={{ collapseIcon: CollapseIcon, expandIcon: ExpandIcon }}
+                expandedItems={expanded}
+                onExpandedItemsChange={(_event, itemIds) => setExpanded(itemIds)}
                 sx={{
                   px: 1,
                   overflow: 'auto',
@@ -345,7 +351,7 @@ export default function FunctionsEditor() {
               >
                 {isCreateNewHandlerOpen ? (
                   <EditableTreeItem
-                    nodeId="::create::"
+                    itemId="::create::"
                     isEditing
                     suggestedNewItemName={nextProposedName}
                     onEdit={handleCreateNewCommit}
@@ -363,7 +369,7 @@ export default function FunctionsEditor() {
                 {functionFiles.map((file) => (
                   <HandlerFileTreeItem
                     key={file.name}
-                    nodeId={serializeFunctionId({ file: file.name })}
+                    itemId={serializeFunctionId({ file: file.name })}
                     file={file}
                     validateItemName={validateFileName}
                     onRename={handleFileRename}
@@ -389,12 +395,12 @@ export default function FunctionsEditor() {
 
                 {introspection.isLoading ? (
                   <React.Fragment>
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled nodeId="::loading::" label={<Skeleton />} />
+                    <TreeItem disabled itemId="::loading::" label={<Skeleton />} />
+                    <TreeItem disabled itemId="::loading::" label={<Skeleton />} />
+                    <TreeItem disabled itemId="::loading::" label={<Skeleton />} />
                   </React.Fragment>
                 ) : null}
-              </TreeView>
+              </SimpleTreeView>
               {introspection.error ? (
                 <Box
                   sx={{

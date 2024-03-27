@@ -457,6 +457,7 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
           return true;
         }}
         slots={{
+          // @ts-expect-error https://github.com/mui/mui-toolpad/pull/3310#issuecomment-2023043453
           toolbar: RolesToolbar,
         }}
         slotProps={{

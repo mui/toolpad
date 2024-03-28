@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled, Box, IconButton, Stack, Tooltip } from '@mui/material';
-import { TreeView, treeItemClasses } from '@mui/x-tree-view';
+import { SimpleTreeView, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -18,6 +18,9 @@ import { useProjectApi } from '../../../projectApi';
 import EditableTreeItem, { EditableTreeItemProps } from '../../../components/EditableTreeItem';
 import { scrollIntoViewIfNeeded } from '../../../utils/dom';
 import ExplorerHeader from '../ExplorerHeader';
+
+const CollapseIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const ExpandIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
 
 const PagesExplorerRoot = styled(Stack)({
   height: '100%',
@@ -58,7 +61,7 @@ interface StyledTreeItemProps extends EditableTreeItemProps {
 
 function PagesExplorerTreeItem(props: StyledTreeItemProps) {
   const {
-    nodeId,
+    itemId,
     labelIcon,
     labelText,
     title,
@@ -78,11 +81,11 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
   const handleRenameConfirm = React.useCallback(
     (updatedName: string) => {
       if (onRenameNode) {
-        onRenameNode(nodeId as NodeId, updatedName);
+        onRenameNode(itemId as NodeId, updatedName);
         stopEditing();
       }
     },
-    [nodeId, onRenameNode, stopEditing],
+    [itemId, onRenameNode, stopEditing],
   );
 
   const validateEditablePageName = React.useCallback(
@@ -97,7 +100,7 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
 
   return (
     <StyledEditableTreeItem
-      nodeId={nodeId}
+      itemId={itemId}
       labelText={labelText}
       renderLabel={(children) => (
         <Tooltip title={title} placement="right" disableInteractive>
@@ -347,16 +350,16 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         onCreate={handleOpenCreateNewPage}
         createLabelText="Create new page"
       />
-      <TreeView
+      <SimpleTreeView
         ref={pagesTreeRef}
         aria-label="Pages explorer"
-        selected={activePage ? [activePage.id] : []}
-        onNodeSelect={handleSelect}
-        expanded={expanded}
-        onNodeToggle={handleToggle}
+        selectedItems={activePage ? [activePage.id] : []}
+        onSelectedItemsChange={handleSelect}
+        expandedItems={expanded}
+        onExpandedItemsChange={handleToggle}
         multiSelect
-        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
+        // TODO: This belongs as a default property in the theme
+        slots={{ collapseIcon: CollapseIcon, expandIcon: ExpandIcon }}
         sx={{
           overflow: 'auto',
           scrollbarGutter: 'stable',
@@ -364,7 +367,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
       >
         {isCreateNewPageOpen ? (
           <EditableTreeItem
-            nodeId="::create::"
+            itemId="::create::"
             isEditing
             suggestedNewItemName={nextProposedName}
             onEdit={handleCreateNewCommit}
@@ -375,7 +378,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
         {alphabeticSortedPages.map((page) => (
           <PagesExplorerTreeItem
             key={page.id}
-            nodeId={page.id}
+            itemId={page.id}
             toolpadNodeId={page.id}
             labelText={page.name}
             title={appDom.getPageDisplayName(page)}
@@ -385,7 +388,7 @@ export default function PagesExplorer({ className }: PagesExplorerProps) {
             validateItemName={validatePageName}
           />
         ))}
-      </TreeView>
+      </SimpleTreeView>
     </PagesExplorerRoot>
   );
 }

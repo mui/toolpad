@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NodeId } from '@toolpad/studio-runtime';
-import { Box, Typography } from '@mui/material';
-import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
+import { Box, Typography, styled } from '@mui/material';
+import { SimpleTreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@toolpad/utils/hooks/useBoolean';
@@ -12,6 +12,9 @@ import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
 import EditableTreeItem from '../../../components/EditableTreeItem';
 import ExplorerHeader from '../ExplorerHeader';
+
+const CollapseIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+const ExpandIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
 
 export interface CustomTreeItemProps extends TreeItemProps {
   ref?: React.RefObject<HTMLLIElement>;
@@ -100,7 +103,7 @@ function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.Elem
 
   if (children.length > 0) {
     return (
-      <CustomTreeItem nodeId={root.id} node={root}>
+      <CustomTreeItem itemId={root.id} node={root}>
         {children.map((childNode) => (
           <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
         ))}
@@ -110,12 +113,12 @@ function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.Elem
   if (renderItem.length > 0) {
     return (
       <CustomTreeItem
-        nodeId={root.id}
+        itemId={root.id}
         node={root}
         label={<Typography variant="body2">{root.name}</Typography>}
       >
         <TreeItem
-          nodeId={`${root.id}-renderItem`}
+          itemId={`${root.id}-renderItem`}
           label={<Typography variant="body2">renderItem</Typography>}
         >
           {renderItem.map((childNode) => (
@@ -126,7 +129,7 @@ function RecursiveSubTree({ dom, root }: { dom: appDom.AppDom; root: appDom.Elem
     );
   }
 
-  return <CustomTreeItem nodeId={root.id} node={root} />;
+  return <CustomTreeItem itemId={root.id} node={root} />;
 }
 
 export default function HierarchyExplorer() {
@@ -156,14 +159,17 @@ export default function HierarchyExplorer() {
   }, [dom, currentPageNode]);
 
   const handleNodeSelect = React.useCallback(
-    (event: React.SyntheticEvent, nodeId: string) => {
-      appStateApi.selectNode(nodeId as NodeId);
+    (event: React.SyntheticEvent, itemIds: string | null) => {
+      if (!itemIds) {
+        return;
+      }
+      appStateApi.selectNode(itemIds as NodeId);
     },
     [appStateApi],
   );
 
   const handleNodeFocus = React.useCallback(
-    (event: React.SyntheticEvent, nodeId: string) => {
+    (event: React.SyntheticEvent | null, nodeId: string) => {
       appStateApi.hoverNode(nodeId as NodeId);
     },
     [appStateApi],
@@ -212,15 +218,15 @@ export default function HierarchyExplorer() {
   return (
     <React.Fragment>
       <ExplorerHeader headerText="Page hierarchy" />
-      <TreeView
+      <SimpleTreeView
         aria-label="Page hierarchy explorer"
-        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-        expanded={Array.from(expandedDomNodeIdSet)}
-        selected={selectedDomNodeId}
-        onNodeSelect={handleNodeSelect}
-        onNodeFocus={handleNodeFocus}
-        onNodeToggle={handleNodeToggle}
+        // TODO: This belongs as a default property in the theme
+        slots={{ collapseIcon: CollapseIcon, expandIcon: ExpandIcon }}
+        expandedItems={Array.from(expandedDomNodeIdSet)}
+        selectedItems={selectedDomNodeId}
+        onSelectedItemsChange={handleNodeSelect}
+        onItemFocus={handleNodeFocus}
+        onExpandedItemsChange={handleNodeToggle}
         onKeyDown={handleKeyDown}
         sx={{
           flexGrow: 1,
@@ -233,7 +239,7 @@ export default function HierarchyExplorer() {
         {rootChildren.map((childNode) => (
           <RecursiveSubTree key={childNode.id} dom={dom} root={childNode} />
         ))}
-      </TreeView>
+      </SimpleTreeView>
     </React.Fragment>
   );
 }

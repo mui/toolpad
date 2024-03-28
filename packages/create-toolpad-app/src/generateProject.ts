@@ -24,9 +24,7 @@ export default function generateProject(
     `;
 
   const dashboardLayoutContent = `
-    import {
-    Layout
-  } from "@toolpad/core";
+  import { DashboardLayout } from '@toolpad/core/layout';
 
   export default function Layout({
     children,

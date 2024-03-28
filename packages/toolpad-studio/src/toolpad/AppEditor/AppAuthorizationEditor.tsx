@@ -38,6 +38,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import { TabContext, TabList } from '@mui/lab';
 import { updateArray } from '@toolpad/utils/immutability';
 import * as appDom from '@toolpad/studio-runtime/appDom';
+import invariant from 'invariant';
 import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
 import AzureIcon from '../../components/icons/AzureIcon';
@@ -201,12 +202,14 @@ export function AppAuthenticationEditor() {
   );
 }
 
-interface RolesToolbarProps {
-  addNewRoleDisabled: boolean;
-  onAddNewRole: () => void;
+interface RolesToolbarProps extends React.ComponentProps<typeof GridToolbarContainer> {
+  addNewRoleDisabled?: boolean;
+  onAddNewRole?: () => void;
 }
 
 function RolesToolbar({ addNewRoleDisabled, onAddNewRole }: RolesToolbarProps) {
+  invariant(typeof addNewRoleDisabled === 'boolean', 'addNewRoleDisabled is required in slotProps');
+  invariant(typeof onAddNewRole === 'function', 'onAddNewRole is required in slotProps');
   return (
     <GridToolbarContainer>
       <Button
@@ -457,7 +460,6 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
           return true;
         }}
         slots={{
-          // @ts-expect-error https://github.com/mui/mui-toolpad/pull/3310#issuecomment-2023043453
           toolbar: RolesToolbar,
         }}
         slotProps={{

@@ -17,18 +17,18 @@ function cleanFolderOnFailure(folder: string): EsbuildPlugin {
   };
 }
 
-const getBaseConfig = (options: Options): Options => ({
+const getBaseConfig = (): Options => ({
   format: ['esm'],
   dts: true,
   silent: true,
-  clean: !options.watch,
+  clean: true,
   sourcemap: true,
 });
 
-export default defineConfig((options) => [
+export default defineConfig(() => [
   {
     entry: ['src/index.ts', 'src/AppProvider/index.ts'],
-    ...getBaseConfig(options),
+    ...getBaseConfig(),
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
@@ -37,7 +37,7 @@ export default defineConfig((options) => [
   },
   {
     entry: ['src/layout/index.ts'],
-    ...getBaseConfig(options),
+    ...getBaseConfig(),
     outDir: 'dist/layout',
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/layout'))],
     esbuildOptions(buildOptions) {

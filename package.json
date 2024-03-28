@@ -43,10 +43,10 @@
     "@mui/x-charts": "7.0.0",
     "@next/eslint-plugin-next": "14.1.4",
     "@playwright/test": "1.42.1",
-    "@testing-library/react": "14.2.1",
+    "@testing-library/react": "14.2.2",
     "@types/archiver": "6.0.2",
     "@types/gtag.js": "0.0.19",
-    "@types/node": "20.11.28",
+    "@types/node": "20.11.30",
     "@typescript-eslint/eslint-plugin": "7.2.0",
     "@typescript-eslint/parser": "7.2.0",
     "chalk": "5.3.0",
@@ -75,9 +75,9 @@
     "recharts": "2.12.3",
     "regenerator-runtime": "0.14.1",
     "rimraf": "5.0.5",
-    "typescript": "5.4.2",
+    "typescript": "5.4.3",
     "vitest-dom": "0.1.1",
-    "vitest-fail-on-console": "0.5.1"
+    "vitest-fail-on-console": "0.6.3"
   },
   "dependencies": {
     "archiver": "7.0.0",

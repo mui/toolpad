@@ -240,7 +240,11 @@ export default function NodeHud({
         ) : null}
       </NodeHudWrapper>
       {isSelected ? (
-        <SelectionHintWrapper style={absolutePositionCss(rect)} hintPosition={hintPosition}>
+        <SelectionHintWrapper
+          style={absolutePositionCss(rect)}
+          hintPosition={hintPosition}
+          data-testid="node-hud-selection"
+        >
           <div
             draggable
             data-testid="node-hud-tag"

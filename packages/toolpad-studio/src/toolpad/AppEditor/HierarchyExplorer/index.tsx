@@ -1,9 +1,7 @@
 import * as React from 'react';
 import { NodeId } from '@toolpad/studio-runtime';
-import { Box, Typography, styled } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { SimpleTreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@toolpad/utils/hooks/useBoolean';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
@@ -12,9 +10,6 @@ import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
 import EditableTreeItem from '../../../components/EditableTreeItem';
 import ExplorerHeader from '../ExplorerHeader';
-
-const CollapseIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
-const ExpandIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
 
 export interface CustomTreeItemProps extends TreeItemProps {
   ref?: React.RefObject<HTMLLIElement>;
@@ -220,8 +215,6 @@ export default function HierarchyExplorer() {
       <ExplorerHeader headerText="Page hierarchy" />
       <SimpleTreeView
         aria-label="Page hierarchy explorer"
-        // TODO: This belongs as a default property in the theme
-        slots={{ collapseIcon: CollapseIcon, expandIcon: ExpandIcon }}
         expandedItems={Array.from(expandedDomNodeIdSet)}
         selectedItems={selectedDomNodeId}
         onSelectedItemsChange={handleNodeSelect}

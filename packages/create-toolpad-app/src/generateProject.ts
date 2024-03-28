@@ -30,7 +30,7 @@ export default function generateProject(
     children,
   }: Readonly<{ children: React.ReactNode }>) {
     return (
-      <Layout>{children}</Layout>
+      <DashboardLayout>{children}</DashboardLayout>
     );
   }
   `;

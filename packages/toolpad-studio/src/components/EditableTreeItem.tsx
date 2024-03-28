@@ -185,8 +185,10 @@ export default function EditableTreeItem({
       )}
       sx={{
         ...sx,
+        paddingLeft: theme.spacing(0.5),
         '> .MuiTreeItem-content': {
           padding: theme.spacing(0, 0.5),
+          gap: theme.spacing(0.5),
           backgroundColor: isEditing ? alpha(theme.palette.primary.main, 0.2) : undefined,
         },
       }}

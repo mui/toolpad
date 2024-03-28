@@ -1,19 +1,50 @@
 import * as React from 'react';
+import clsx from 'clsx';
 import { NodeId } from '@toolpad/studio-runtime';
-import { Box, Typography } from '@mui/material';
-import { TreeView, TreeItem, TreeItemProps } from '@mui/x-tree-view';
+import { Box, Typography, IconButton, SxProps, styled } from '@mui/material';
+import { TreeView, TreeItem, TreeItemProps, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@toolpad/utils/hooks/useBoolean';
 import * as appDom from '@toolpad/studio-runtime/appDom';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import invariant from 'invariant';
 import { useAppState, useDomApi, useAppStateApi } from '../../AppState';
 import { ComponentIcon } from '../PageEditor/ComponentCatalog/ComponentCatalogItem';
 import { DomView } from '../../../utils/domView';
 import { removePageLayoutNode } from '../pageLayout';
-import EditableTreeItem from '../../../components/EditableTreeItem';
+import EditableTreeItem, { EditableTreeItemProps } from '../../../components/EditableTreeItem';
 import ExplorerHeader from '../ExplorerHeader';
+import NodeMenu from '../NodeMenu';
 
-export interface CustomTreeItemProps extends TreeItemProps {
+const classes = {
+  treeItemMenuButton: 'Toolpad__HierarchyListItem',
+  treeItemMenuOpen: 'Toolpad__HierarchyListItemMenuOpen',
+};
+
+const StyledTreeItem = styled(EditableTreeItem)({
+  [`& .${classes.treeItemMenuButton}`]: {
+    visibility: 'hidden',
+  },
+  [`
+  & .${treeItemClasses.content}:hover .${classes.treeItemMenuButton},
+      & .${classes.treeItemMenuOpen}
+    `]: {
+    visibility: 'visible',
+  },
+});
+
+interface StyledTreeItemProps extends TreeItemProps, EditableTreeItemProps {
+  labelTextSx?: SxProps;
+  labelIconId?: string;
+  labelIconSx?: SxProps;
+  createLabelText?: string;
+  deleteLabelText?: string;
+  renameLabelText?: string;
+  duplicateLabelText?: string;
+}
+
+export interface CustomTreeItemProps extends StyledTreeItemProps {
   ref?: React.RefObject<HTMLLIElement>;
   node: appDom.ElementNode;
 }
@@ -23,9 +54,20 @@ function CustomTreeItem(props: CustomTreeItemProps) {
   const { dom } = useAppState();
   const appStateApi = useAppStateApi();
 
-  const { label, node, ...other } = props;
+  const {
+    label,
+    node,
+    renameLabelText = 'Rename',
+    duplicateLabelText = 'Duplicate',
+    deleteLabelText = 'Delete',
+    ...other
+  } = props;
 
-  const { value: domNodeEditing, setFalse: stopDomNodeEditing } = useBoolean(false);
+  const {
+    value: domNodeEditing,
+    setTrue: startDomNodeEditing,
+    setFalse: stopDomNodeEditing,
+  } = useBoolean(false);
 
   const existingNames = React.useMemo(() => appDom.getExistingNamesForNode(dom, node), [dom, node]);
 
@@ -47,8 +89,41 @@ function CustomTreeItem(props: CustomTreeItemProps) {
   const handleNameSave = React.useCallback(
     (newName: string) => {
       domApi.setNodeName(node.id, newName);
+      stopDomNodeEditing();
     },
-    [domApi, node.id],
+    [domApi, node.id, stopDomNodeEditing],
+  );
+
+  const handleNodeDelete = React.useCallback(
+    (nodeId: NodeId) => {
+      domApi.update((draft) => {
+        const toRemove = appDom.getNode(draft, nodeId);
+        if (appDom.isElement(toRemove)) {
+          draft = removePageLayoutNode(draft, toRemove);
+        }
+
+        return draft;
+      });
+    },
+    [domApi],
+  );
+
+  const handleNodeDuplicate = React.useCallback(
+    (nodeId: NodeId) => {
+      const currentNode = appDom.getNode(dom, nodeId);
+
+      invariant(
+        node.parentId && node.parentProp,
+        'Duplication should never be called on nodes that are not placed in the dom',
+      );
+
+      domApi.update((draft) => {
+        draft = appDom.duplicateNode(draft, currentNode);
+
+        return draft;
+      });
+    },
+    [dom, domApi, node.parentId, node.parentProp],
   );
 
   const handleNodeHover = React.useCallback(
@@ -63,7 +138,7 @@ function CustomTreeItem(props: CustomTreeItemProps) {
   }, [appStateApi]);
 
   return (
-    <EditableTreeItem
+    <StyledTreeItem
       key={node.id}
       labelText={node.name}
       renderLabel={(children) => (
@@ -80,6 +155,29 @@ function CustomTreeItem(props: CustomTreeItemProps) {
             sx={{ marginRight: 1, fontSize: 18, opacity: 0.5 }}
           />
           {children}
+          {node.id ? (
+            <NodeMenu
+              renderButton={({ buttonProps, menuProps }) => (
+                <IconButton
+                  className={clsx(classes.treeItemMenuButton, {
+                    [classes.treeItemMenuOpen]: menuProps.open,
+                  })}
+                  aria-label="Open hierarchy menu"
+                  size="small"
+                  {...buttonProps}
+                >
+                  <MoreVertIcon fontSize="inherit" />
+                </IconButton>
+              )}
+              nodeId={node.id}
+              renameLabelText={renameLabelText}
+              duplicateLabelText={duplicateLabelText}
+              deleteLabelText={deleteLabelText}
+              onRenameNode={startDomNodeEditing}
+              onDuplicateNode={handleNodeDuplicate}
+              onDeleteNode={handleNodeDelete}
+            />
+          ) : null}
         </Box>
       )}
       isEditing={domNodeEditing}

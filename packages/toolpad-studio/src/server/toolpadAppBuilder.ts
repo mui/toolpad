@@ -343,6 +343,7 @@ if (import.meta.hot) {
       server: {
         fs: {
           allow: [root, path.resolve(currentDirectory, '../../../../')],
+          cachedChecks: false,
         },
       },
       optimizeDeps: {

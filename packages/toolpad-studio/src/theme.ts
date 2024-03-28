@@ -1,14 +1,10 @@
 import ArrowDropDownRounded from '@mui/icons-material/ArrowDropDownRounded';
-import { styled, tooltipClasses } from '@mui/material';
+import { tooltipClasses } from '@mui/material';
 import { createTheme, ThemeOptions, Theme, alpha } from '@mui/material/styles';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 import type {} from '@mui/x-data-grid-pro/themeAugmentation';
 import type {} from '@mui/x-tree-view/themeAugmentation';
-
-const CollapseIcon = styled(ExpandMoreIcon)({ fontSize: '0.9rem', opacity: 0.5 });
-const ExpandIcon = styled(ChevronRightIcon)({ fontSize: '0.9rem', opacity: 0.5 });
+import { CollapseIcon, ExpandIcon } from './components/icons/treeView';
 
 declare module '@mui/material/styles/createPalette' {
   interface ColorRange {

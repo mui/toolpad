@@ -350,7 +350,7 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
 
 const INVALID_DATE = new Date(NaN);
 
-const dateValueGetter: GridValueGetter<any, any, any, any> = (value): Date | undefined => {
+const dateValueGetter: GridValueGetter = (value: any): Date | undefined => {
   if (value === null || value === undefined || value === '') {
     return undefined;
   }

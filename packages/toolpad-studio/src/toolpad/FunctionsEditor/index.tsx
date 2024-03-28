@@ -395,9 +395,9 @@ export default function FunctionsEditor() {
 
                 {introspection.isLoading ? (
                   <React.Fragment>
-                    <TreeItem disabled itemId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled itemId="::loading::" label={<Skeleton />} />
-                    <TreeItem disabled itemId="::loading::" label={<Skeleton />} />
+                    <TreeItem disabled itemId="loading-1" label={<Skeleton />} />
+                    <TreeItem disabled itemId="loading-2" label={<Skeleton />} />
+                    <TreeItem disabled itemId="loading-3" label={<Skeleton />} />
                   </React.Fragment>
                 ) : null}
               </SimpleTreeView>

@@ -3,15 +3,16 @@
   "compilerOptions": {
     "allowJs": true,
     "isolatedModules": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "noEmit": false,
+    "noEmit": true,
     "outDir": "./dist",
     "pretty": true,
     "preserveWatchOutput": true,
     "rootDir": "src",
     "skipLibCheck": true,
-    "target": "es2020",
+    "target": "esnext",
     "types": ["react", "node"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/index.ts"],

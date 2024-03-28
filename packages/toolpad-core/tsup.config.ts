@@ -1,6 +1,5 @@
 import * as fs from 'fs/promises';
 import path from 'path';
-import { spawnSync } from 'child_process';
 import { defineConfig, Options } from 'tsup';
 
 type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
@@ -18,20 +17,37 @@ function cleanFolderOnFailure(folder: string): EsbuildPlugin {
   };
 }
 
-export default defineConfig((options) => ({
-  entry: [
-    'src/*{.ts,.tsx}',
-    '!src/**/*.spec.*', // Avoid building tests
-  ],
-  format: ['esm', 'cjs'],
-  dts: false,
+const getBaseConfig = (options: Options): Options => ({
+  format: ['esm'],
+  dts: true,
   silent: true,
   clean: !options.watch,
   sourcemap: true,
-  esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
-  async onSuccess() {
-    // eslint-disable-next-line no-console
-    console.log('build successful');
-    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
+});
+
+export default defineConfig((options) => [
+  {
+    entry: ['src/index.ts', 'src/AppProvider/index.ts'],
+    ...getBaseConfig(options),
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
+    async onSuccess() {
+      // eslint-disable-next-line no-console
+      console.log('main: build successful');
+    },
   },
-}));
+  {
+    entry: ['src/layout/index.ts'],
+    ...getBaseConfig(options),
+    outDir: 'dist/layout',
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/layout'))],
+    esbuildOptions(buildOptions) {
+      buildOptions.banner = {
+        js: '"use client";',
+      };
+    },
+    async onSuccess() {
+      // eslint-disable-next-line no-console
+      console.log('layout: build successful');
+    },
+  },
+]);

@@ -112,7 +112,7 @@
     }
   ],
   "postUpdateOptions": ["pnpmDedupe"],
-  "prConcurrentLimit": 30,
+  "prConcurrentLimit": 15,
   "prHourlyLimit": 0,
   "rangeStrategy": "bump",
   "schedule": "on sunday before 6:00am",

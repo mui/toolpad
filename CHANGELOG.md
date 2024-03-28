@@ -1,5 +1,34 @@
 # Changelog
 
+## v0.1.53
+
+<!-- generated comparing v0.1.52..master -->
+
+_Mar 22, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Very early first version of @toolpad/core, fix examples, and documentation fixes and updates.
+
+- &#8203;<!-- 16 -->Remove deprecated dependencies (#3313) @Janpot
+- &#8203;<!-- 15 -->Remove lerna isolation (#3312) @Janpot
+- &#8203;<!-- 14 -->Toolpad core project setup (#3291) @apedroferreira
+- &#8203;<!-- 13 -->isolate lerna in renovatebot @Janpot
+- &#8203;<!-- 12 -->Remove renovatebot vitest-fail-on-console exception @Janpot
+- &#8203;<!-- 11 -->Fix flaky authentication test: Wait for network idle in tests again (#3290) @apedroferreira
+- &#8203;<!-- 10 -->Fix flaky auth test with console error "Failed to fetch" (#3287) @apedroferreira
+- &#8203;<!-- 09 -->Update renovate.json @Janpot
+- &#8203;<!-- 08 -->[code-infra] Update renove.json (#3288) @Janpot
+- &#8203;<!-- 07 -->[core] Lower the frequency of no-response action runs (#3302) @michaldudak
+- &#8203;<!-- 06 -->[core] Use Circle CI context @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Fix support link (#3306) @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Link blog post from examples overview page and some minor edits. (#3299) @prakhargupta1
+- &#8203;<!-- 03 -->[docs] Fix Vale error @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Fix some Vale errors (#3293) @oliviertassinari
+- &#8203;<!-- 01 -->[examples] @toolpad/studio@0.1.51 doesn't exist @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @michaldudak, @oliviertassinari, @prakhargupta1
+
 ## v0.1.52
 
 <!-- generated comparing v0.1.51..master -->

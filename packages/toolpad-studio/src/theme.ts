@@ -1,6 +1,9 @@
 import ArrowDropDownRounded from '@mui/icons-material/ArrowDropDownRounded';
 import { tooltipClasses } from '@mui/material';
 import { createTheme, ThemeOptions, Theme, alpha } from '@mui/material/styles';
+import type {} from '@mui/x-data-grid/themeAugmentation';
+import type {} from '@mui/x-data-grid-pro/themeAugmentation';
+import type {} from '@mui/x-tree-view/themeAugmentation';
 
 declare module '@mui/material/styles/createPalette' {
   interface ColorRange {

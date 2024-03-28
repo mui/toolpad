@@ -1,7 +1,7 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import { NodeId } from '@toolpad/studio-runtime';
-import { Box, Typography, styled, IconButton, SxProps, styled } from '@mui/material';
+import { Box, Typography, styled, IconButton, SxProps } from '@mui/material';
 import { SimpleTreeView, TreeItem, TreeItemProps, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';

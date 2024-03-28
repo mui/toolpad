@@ -129,12 +129,16 @@ test('resizing element heights', async ({ page, argosScreenshot }) => {
     clip: appCanvasBoundingBox || undefined,
   };
 
-  const firstGrid = editorModel.appCanvas.getByRole('grid').nth(0);
+  const firstGrid = editorModel.appCanvas.getByRole('grid').nth(0).locator('xpath=..');
 
   await clickCenter(page, firstGrid);
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toHaveText('dataGrid');
+
   await argosScreenshot('vertical-resize-before', screenshotConfig);
 
-  const firstGridBoundingBox = await waitForBoundingBox(firstGrid);
+  const firstGridBoundingBox = await waitForBoundingBox(
+    editorModel.appCanvas.getByTestId('node-hud-selection'),
+  );
 
   await page.mouse.move(
     firstGridBoundingBox!.x + firstGridBoundingBox!.width / 2,
@@ -152,11 +156,14 @@ test('resizing element heights', async ({ page, argosScreenshot }) => {
 
   await page.mouse.up();
 
-  const thirdGrid = editorModel.appCanvas.getByRole('grid').nth(2);
+  const thirdGrid = editorModel.appCanvas.getByRole('grid').nth(2).locator('xpath=..');
 
   await clickCenter(page, thirdGrid);
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toHaveText('dataGrid1');
 
-  const thirdGridBoundingBox = await waitForBoundingBox(thirdGrid);
+  const thirdGridBoundingBox = await waitForBoundingBox(
+    editorModel.appCanvas.getByTestId('node-hud-selection'),
+  );
 
   await page.mouse.move(
     thirdGridBoundingBox!.x + thirdGridBoundingBox!.width / 2,
@@ -175,6 +182,8 @@ test('resizing element heights', async ({ page, argosScreenshot }) => {
   await page.mouse.up();
 
   await clickCenter(page, firstGrid);
+  await expect(editorModel.appCanvas.getByTestId('node-hud-tag')).toHaveText('dataGrid');
+
   await argosScreenshot('vertical-resize-after', screenshotConfig);
 });
 

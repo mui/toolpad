@@ -18,6 +18,7 @@ export default defineConfig({
     emptyOutDir: true,
   },
   resolve: {
+    dedupe: ['@mui/material'],
     alias: {
       vm: 'vm-browserify',
     },

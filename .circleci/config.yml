@@ -4,7 +4,7 @@ default-job: &default-job
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:18.17.1
+    - image: cimg/node:18.19.1
   environment:
     # Keep in sync with "Save playwright cache"
     PLAYWRIGHT_BROWSERS_PATH: /tmp/pw-browsers
@@ -90,7 +90,8 @@ jobs:
       - run:
           name: Check for duplicated packages
           command: |
-            if [[ $(git diff --name-status master | grep pnpm.lock) == "" ]];
+            # #default-branch-switch
+            if [[ $(git diff --name-status master | grep -E 'pnpm-workspace\.yaml|pnpm-lock.yaml|package\.json') == "" ]];
             then
                 echo "no changes to dependencies detected, skipping..."
             else

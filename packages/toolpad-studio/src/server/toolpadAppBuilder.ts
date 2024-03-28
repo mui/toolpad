@@ -20,12 +20,6 @@ const TOOLPAD_BUILD = process.env.GIT_SHA1?.slice(0, 7) || 'dev';
 
 const MAIN_ENTRY = '/main.tsx';
 const EDITOR_ENTRY = '/editor.tsx';
-const FALLBACK_MODULES = [
-  '@mui/material',
-  '@mui/icons-material',
-  '@mui/x-data-grid',
-  '@mui/x-charts',
-];
 
 function getHtmlContent(entry: string) {
   return `
@@ -62,19 +56,9 @@ function toolpadStudioVitePlugin(): Plugin {
   return {
     name: 'toolpad-studio',
 
-    async resolveId(id, parent) {
+    async resolveId(id) {
       if (id.endsWith('.html')) {
         return id;
-      }
-      const hasFallback = FALLBACK_MODULES.some(
-        (moduleName) => moduleName === id || id.startsWith(`${moduleName}/`),
-      );
-      if (hasFallback) {
-        const [userMod, fallbackMod] = await Promise.all([
-          this.resolve(id, parent),
-          this.resolve(id, currentDirectory),
-        ]);
-        return userMod || fallbackMod;
       }
       return null;
     },
@@ -314,7 +298,6 @@ if (import.meta.hot) {
       },
       envFile: false,
       resolve: {
-        dedupe: FALLBACK_MODULES,
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
@@ -364,7 +347,6 @@ if (import.meta.hot) {
       optimizeDeps: {
         force: !process.env.EXPERIMENTAL_INLINE_CANVAS && toolpadDevMode ? true : undefined,
         include: [
-          ...FALLBACK_MODULES.map((moduleName) => `@toolpad/studio > ${moduleName}`),
           ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
             ? [
                 'perf-cascade',

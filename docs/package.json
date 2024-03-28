@@ -22,7 +22,7 @@
     "@date-io/date-fns-jalali": "3.0.0",
     "@docsearch/react": "3.6.0",
     "@emotion/cache": "11.11.0",
-    "@emotion/react": "11.11.4",
+    "@emotion/react": "11.11.3",
     "@emotion/server": "11.11.0",
     "@emotion/styled": "11.11.0",
     "@mui/icons-material": "5.15.14",

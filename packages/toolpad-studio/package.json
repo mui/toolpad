@@ -43,7 +43,7 @@
   "dependencies": {
     "@auth/core": "0.25.1",
     "@emotion/cache": "11.11.0",
-    "@emotion/react": "11.11.4",
+    "@emotion/react": "11.11.3",
     "@emotion/server": "11.11.0",
     "@emotion/styled": "11.11.0",
     "@googleapis/drive": "8.7.0",

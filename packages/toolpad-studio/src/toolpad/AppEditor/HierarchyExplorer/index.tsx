@@ -1,7 +1,7 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import { NodeId } from '@toolpad/studio-runtime';
-import { Box, Typography, styled, IconButton, SxProps } from '@mui/material';
+import { Box, Typography, styled, IconButton } from '@mui/material';
 import { SimpleTreeView, TreeItem, TreeItemProps, treeItemClasses } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -29,25 +29,13 @@ const StyledTreeItem = styled(EditableTreeItem)({
   [`& .${classes.treeItemMenuButton}`]: {
     visibility: 'hidden',
   },
-  [`
-  & .${treeItemClasses.content}:hover .${classes.treeItemMenuButton},
-      & .${classes.treeItemMenuOpen}
-    `]: {
-    visibility: 'visible',
-  },
+  [`& .${treeItemClasses.content}:hover .${classes.treeItemMenuButton}, & .${classes.treeItemMenuOpen}`]:
+    {
+      visibility: 'visible',
+    },
 });
 
-interface StyledTreeItemProps extends TreeItemProps, EditableTreeItemProps {
-  labelTextSx?: SxProps;
-  labelIconId?: string;
-  labelIconSx?: SxProps;
-  createLabelText?: string;
-  deleteLabelText?: string;
-  renameLabelText?: string;
-  duplicateLabelText?: string;
-}
-
-export interface CustomTreeItemProps extends StyledTreeItemProps {
+interface CustomTreeItemProps extends TreeItemProps, EditableTreeItemProps {
   ref?: React.RefObject<HTMLLIElement>;
   node: appDom.ElementNode;
 }
@@ -57,14 +45,7 @@ function CustomTreeItem(props: CustomTreeItemProps) {
   const { dom } = useAppState();
   const appStateApi = useAppStateApi();
 
-  const {
-    label,
-    node,
-    renameLabelText = 'Rename',
-    duplicateLabelText = 'Duplicate',
-    deleteLabelText = 'Delete',
-    ...other
-  } = props;
+  const { label, node, ...other } = props;
 
   const {
     value: domNodeEditing,
@@ -173,9 +154,6 @@ function CustomTreeItem(props: CustomTreeItemProps) {
                 </IconButton>
               )}
               nodeId={node.id}
-              renameLabelText={renameLabelText}
-              duplicateLabelText={duplicateLabelText}
-              deleteLabelText={deleteLabelText}
               onRenameNode={startDomNodeEditing}
               onDuplicateNode={handleNodeDuplicate}
               onDeleteNode={handleNodeDelete}

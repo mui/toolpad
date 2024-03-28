@@ -11,7 +11,7 @@ import { glob } from 'glob';
 import * as chokidar from 'chokidar';
 import { debounce, throttle } from 'lodash-es';
 import { Emitter } from '@toolpad/utils/events';
-import { guessTitle } from '@toolpad/utils/strings';
+import { guessTitle, isValidJsIdentifier } from '@toolpad/utils/strings';
 import { errorFrom } from '@toolpad/utils/errors';
 import { filterValues, hasOwnProperty, mapValues } from '@toolpad/utils/collections';
 import { execa } from 'execa';
@@ -1238,14 +1238,15 @@ class ToolpadProject {
 
   async buildComponentsManifest(): Promise<ComponentsManifest> {
     const componentsFolder = getComponentsFolder(this.getRoot());
-    const entries = (await readMaybeDir(componentsFolder)) || [];
-    const result = entries.map((entry) => {
-      if (entry.isFile()) {
-        const fileName = entry.name;
-        const componentName = entry.name.replace(/\.tsx$/, '');
+    const entries = await glob(['*.tsx'], { cwd: componentsFolder });
+    const result = entries.map((fileName) => {
+      const componentName = fileName.replace(/\.tsx$/, '');
+      if (isValidJsIdentifier(componentName)) {
         const filePath = path.resolve(componentsFolder, fileName);
         return { name: componentName, path: filePath };
       }
+      // eslint-disable-next-line no-console
+      console.log(`Invalid component name: ${componentName}`);
       return null;
     });
     return result.filter(Boolean);

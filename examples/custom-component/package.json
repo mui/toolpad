@@ -1,0 +1,13 @@
+{
+  "name": "custom-component",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad-studio dev .",
+    "build": "toolpad-studio build .",
+    "start": "toolpad-studio start ."
+  },
+  "dependencies": {
+    "@toolpad/studio": "0.1.53"
+  }
+}

@@ -11,7 +11,6 @@ import useBoolean from '@toolpad/utils/hooks/useBoolean';
 import AppEditor from './AppEditor';
 import ErrorAlert from './AppEditor/PageEditor/ErrorAlert';
 import { ThemeProvider } from '../ThemeContext';
-import { APP_FUNCTIONS_ROUTE } from '../routes';
 import ToolpadShell from './ToolpadShell';
 import { getViewFromPathname } from '../utils/domView';
 import AppProvider, { AppState, useAppStateContext } from './AppState';
@@ -168,7 +167,7 @@ export function ToolpadEditorRoutes({ appUrl }: ToolpadEditorRoutesProps) {
                   <EditorShell>
                     <Routes>
                       {FEATURE_FLAG_GLOBAL_FUNCTIONS ? (
-                        <Route path={APP_FUNCTIONS_ROUTE} element={<FunctionsEditor />} />
+                        <Route path="/app/functions" element={<FunctionsEditor />} />
                       ) : null}
                       <Route path="*" element={<AppEditor />} />
                     </Routes>

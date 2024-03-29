@@ -171,7 +171,7 @@ export default function EditorCanvasHost({
               });
             }
 
-            return { nodes, appRoot };
+            return { nodes };
           },
           getViewCoordinates: (clientX: number, clientY: number) => {
             const rect = appRoot.getBoundingClientRect();

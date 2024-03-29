@@ -171,7 +171,7 @@ export default function EditorCanvasHost({
               });
             }
 
-            return { nodes };
+            return { nodes, appRoot };
           },
           getViewCoordinates: (clientX: number, clientY: number) => {
             const rect = appRoot.getBoundingClientRect();
@@ -184,6 +184,7 @@ export default function EditorCanvasHost({
             queryClient.invalidateQueries();
           },
           update: () => {},
+          scrollComponent: () => {},
         }),
       } satisfies ToolpadBridge;
 

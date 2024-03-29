@@ -79,7 +79,6 @@ test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) 
   await expect(queryEditor).toBeVisible();
 
   const urlInput = queryEditor.getByLabel('url', { exact: true });
-  await urlInput.click();
   await urlInput.fill('http://foo.bar');
 
   await argosScreenshot('rest-editor', {

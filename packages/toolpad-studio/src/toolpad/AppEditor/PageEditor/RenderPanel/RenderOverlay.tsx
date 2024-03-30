@@ -1164,7 +1164,7 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     if (!selectedNode) {
       return;
     }
-    bridge?.canvasCommands.scrollComponent(selectedNode?.id as string);
+    bridge?.canvasCommands.scrollComponent(selectedNode.id as string);
   }, [bridge?.canvasCommands, selectedNode]);
 
   React.useEffect(() => {

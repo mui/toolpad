@@ -157,7 +157,7 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
       }
       invariant(appRootRef.current, 'App root not found');
       const canvasNode = appRootRef.current.querySelector(`[data-node-id='${nodeId}']`);
-      canvasNode?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'end' });
+      canvasNode?.scrollIntoView({ behavior: 'instant', block: 'end', inline: 'end' });
     });
 
     setCommandHandler(bridge.canvasCommands, 'getViewCoordinates', (clientX, clientY) => {

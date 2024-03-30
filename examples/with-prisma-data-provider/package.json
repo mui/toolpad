@@ -10,14 +10,14 @@
   },
   "dependencies": {
     "@toolpad/studio": "0.1.53",
-    "@prisma/client": "5.9.1",
+    "@prisma/client": "5.11.0",
     "qrcode": "^1.5.3"
   },
   "devDependencies": {
-    "@types/node": "^20.11.28",
+    "@types/node": "^20.11.30",
     "@types/qrcode": "^1.5.5",
     "prisma": "^5.11.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.3"
   }
 }

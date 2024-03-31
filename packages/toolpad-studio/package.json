@@ -146,7 +146,7 @@
     "@types/node-fetch": "2.6.11",
     "@types/pg": "8.11.4",
     "@types/react": "18.2.73",
-    "@types/react-dom": "18.2.22",
+    "@types/react-dom": "18.2.23",
     "@types/react-is": "18.2.4",
     "@types/semver": "7.5.8",
     "@types/serialize-javascript": "5.0.4",

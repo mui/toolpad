@@ -2,14 +2,22 @@ import { Page, Locator, expect } from '../playwright/test';
 
 type BoundingBox = NonNullable<Awaited<ReturnType<Locator['boundingBox']>>>;
 
-export async function getCenter(locator: Locator) {
-  let targetBoundingBox: BoundingBox | null = null;
+export async function waitForBoundingBox(
+  locator: Locator,
+): Promise<Pick<DOMRect, 'x' | 'y' | 'width' | 'height'>> {
+  let boundingBox: BoundingBox | null = null;
   await expect(async () => {
-    targetBoundingBox = await locator.boundingBox();
-    expect(targetBoundingBox).toBeTruthy();
-    expect(targetBoundingBox!.width).toBeGreaterThan(0);
-    expect(targetBoundingBox!.height).toBeGreaterThan(0);
+    boundingBox = await locator.boundingBox();
+    expect(boundingBox).toBeTruthy();
+    expect(boundingBox!.width).toBeGreaterThan(0);
+    expect(boundingBox!.height).toBeGreaterThan(0);
   }).toPass();
+
+  return boundingBox!;
+}
+
+export async function getCenter(locator: Locator) {
+  const targetBoundingBox = await waitForBoundingBox(locator);
 
   return {
     x: targetBoundingBox!.x + targetBoundingBox!.width / 2,

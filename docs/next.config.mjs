@@ -12,10 +12,10 @@ const withDocsInfra = require('@mui/monorepo/docs/nextConfigDocsInfra');
 const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
 
+const WORKSPACE_ROOT = path.resolve(currentDirectory, '../');
 const MONOREPO_PATH = path.resolve(currentDirectory, '../node_modules/@mui/monorepo');
 const MONOREPO_PACKAGES = {
   '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
-  '@mui/markdown': path.resolve(MONOREPO_PATH, './packages/markdown'),
 };
 
 export default withDocsInfra({
@@ -44,12 +44,15 @@ export default withDocsInfra({
           ...config.resolve.alias,
           docs: path.resolve(MONOREPO_PATH, './docs'),
           ...MONOREPO_PACKAGES,
-          '@mui/toolpad-components': path.resolve(
+          '@toolpad/studio-components': path.resolve(
             currentDirectory,
-            '../packages/toolpad-components/src',
+            '../packages/toolpad-studio-components/src',
           ),
-          '@mui/toolpad-core': path.resolve(currentDirectory, '../packages/toolpad-core/src'),
-          '@mui/toolpad-utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
+          '@toolpad/studio-runtime': path.resolve(
+            currentDirectory,
+            '../packages/toolpad-studio-runtime/src',
+          ),
+          '@toolpad/utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
         },
       },
       module: {
@@ -60,12 +63,13 @@ export default withDocsInfra({
             test: /\.md$/,
             oneOf: [
               {
-                resourceQuery: /@mui\/markdown/,
+                resourceQuery: /muiMarkdown/,
                 use: [
                   options.defaultLoaders.babel,
                   {
-                    loader: require.resolve('@mui/monorepo/packages/markdown/loader'),
+                    loader: require.resolve('@mui/internal-markdown/loader'),
                     options: {
+                      workspaceRoot: WORKSPACE_ROOT,
                       env: {
                         SOURCE_CODE_REPO: options.config.env.SOURCE_CODE_REPO,
                         LIB_VERSION: options.config.env.LIB_VERSION,

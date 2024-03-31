@@ -1,4 +1,4 @@
-import { createHandler } from '@mui/toolpad';
+import { createHandler } from '@toolpad/studio';
 import express from 'express';
 import * as path from 'path';
 

@@ -40,7 +40,7 @@
    ```bash
    npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke --use-pnpm
    cd smoke
-   pnpm add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@mui/toolpad -S
+   pnpm add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@toolpad/studio -S
    pnpm dedupe && pnpm dev
    ```
 

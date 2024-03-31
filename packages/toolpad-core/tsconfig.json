@@ -1,16 +1,19 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "allowJs": true,
+    "isolatedModules": true,
     "module": "esnext",
     "moduleResolution": "bundler",
-    "alwaysStrict": true,
-    "rootDir": "src",
-    "outDir": "dist",
-    "declaration": true,
-    "target": "ES2020",
-    "skipLibCheck": true,
+    "noEmit": false,
+    "outDir": "./dist",
     "pretty": true,
-    "preserveWatchOutput": true
+    "preserveWatchOutput": true,
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "target": "es2020",
+    "types": ["react", "node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "public/serverModules.d.ts", "typings/**/*.d.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/index.ts"],
+  "exclude": ["dist", "src/**/*.spec.*"]
 }

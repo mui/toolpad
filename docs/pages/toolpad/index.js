@@ -14,9 +14,9 @@ import UseCases from '../../src/components/landing/UseCases';
 import CardGrid from '../../src/components/landing/CardGrid';
 import Pricing from '../../src/components/landing/PricingTable';
 import Marquee from '../../src/components/landing/Marquee';
-import features from '../../data/toolpad/landing/features';
-import useCases from '../../data/toolpad/landing/useCases';
-import marquee from '../../data/toolpad/landing/marquee';
+import features from '../../data/toolpad/studio/landing/features';
+import useCases from '../../data/toolpad/studio/landing/useCases';
+import marquee from '../../data/toolpad/studio/landing/marquee';
 import {
   Headline,
   plans,
@@ -24,14 +24,14 @@ import {
   rowHeaders,
   communityData,
   commercialData,
-} from '../../data/toolpad/landing/pricing';
+} from '../../data/toolpad/studio/landing/pricing';
 
 export default function Home() {
   return (
     <BrandingCssVarsProvider>
       <Head
-        title="MUI Toolpad: Low-code admin builder"
-        description="Build apps with Material UI components, connect to data sources, APIs and build your internal tools 10x faster. Open-source and powered by MUI."
+        title="Toolpad: Low-code admin builder"
+        description="Build apps with Material UI components, connect to data sources, APIs and build your internal tools 10x faster. Open-source and powered by MUI."
         card="/static/toolpad/marketing/toolpad-og.jpg"
       />
       <NoSsr>

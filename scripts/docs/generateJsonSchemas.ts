@@ -3,7 +3,7 @@ import * as path from 'path';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import * as z from 'zod';
 import * as prettier from 'prettier';
-import { META } from '../../packages/toolpad-app/src/server/schema';
+import { META } from '../../packages/toolpad-studio/src/server/schema';
 
 const currentDirectory = __dirname;
 const SCHEMA_DIR = path.resolve(currentDirectory, '../../docs/schemas/v1/');

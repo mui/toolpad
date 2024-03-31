@@ -1,6 +1,6 @@
 import path from 'path';
 import invariant from 'invariant';
-import { fileExists, folderExists } from '@mui/toolpad-utils/fs';
+import { fileExists, folderExists } from '@toolpad/utils/fs';
 import { test, expect, Locator } from '../../playwright/localTest';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 

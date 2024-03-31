@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "alwaysStrict": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": true,
+    "target": "ES2020",
+    "skipLibCheck": true,
+    "pretty": true,
+    "preserveWatchOutput": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "public/serverModules.d.ts", "typings/**/*.d.ts"]
+}

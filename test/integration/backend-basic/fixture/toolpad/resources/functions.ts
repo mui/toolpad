@@ -1,4 +1,4 @@
-import { createFunction, getContext } from '@mui/toolpad/server';
+import { createFunction, getContext } from '@toolpad/studio/server';
 import rawText from './raw.txt';
 import rawSql from './raw.sql';
 

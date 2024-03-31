@@ -1,9 +1,9 @@
-# Charts in Toolpad
+# Charts in Toolpad Studio
 
-<p class="description">A Toolpad app that shows how to use charts to build an analytics dashboard.</p>
+<p class="description">A Toolpad Studio app that shows how to use charts to build an analytics dashboard.</p>
 
 <a href="https://mui-toolpad-charts-production.up.railway.app/prod/pages/page" target="_blank">
-  <img src="https://mui.com/static/toolpad/marketing/charts.png" alt="Charts in Toolpad" style="aspect-ratio: 575/317;" width="1433">
+  <img src="https://mui.com/static/toolpad/marketing/charts.png" alt="Charts in Toolpad Studio" style="aspect-ratio: 575/317;" width="1433">
 </a>
 
 ## Check out the live app
@@ -28,7 +28,7 @@ pnpm create toolpad-app --example charts
 
 ## What's inside
 
-This app demonstrates the following capabilities of Toolpad:
+This app demonstrates the following capabilities of Toolpad Studio:
 
 1. Usage of the four types of charts.
 

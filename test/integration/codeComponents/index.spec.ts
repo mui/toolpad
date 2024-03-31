@@ -41,7 +41,7 @@ test('can create new custom components', async ({ page, localApp }) => {
   await fs.writeFile(
     newComponentPath,
     `import * as React from 'react';
-import { createComponent } from '@mui/toolpad/browser';
+import { createComponent } from '@toolpad/studio/browser';
 import { Inspector } from 'react-inspector';
 
 interface MyInspectorProps {

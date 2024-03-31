@@ -48,7 +48,7 @@ function SelectOptionsPropEditor({
     return null;
   }, [editingIndex, value]);
 
-  const switchErrorState = React.useCallback(
+  const validateOptionValue = React.useCallback(
     (inputValue: string) => {
       const errorState = value.some((item) =>
         typeof item !== 'string' ? item.value === inputValue : item === inputValue,
@@ -62,18 +62,9 @@ function SelectOptionsPropEditor({
     [value],
   );
 
-  const validateOptionValue = React.useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>) => {
-      const inputText = (event.target as HTMLInputElement).value;
-
-      switchErrorState(inputText);
-    },
-    [switchErrorState],
-  );
-
   const handleOptionTextInput = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      validateOptionValue(event);
+      validateOptionValue((event.target as HTMLInputElement).value);
       if (event.key === 'Enter') {
         const inputText = (event.target as HTMLInputElement).value;
         if (optionErrorMessage || !inputText) {
@@ -111,7 +102,7 @@ function SelectOptionsPropEditor({
     (newOption: string | SelectOption) => {
       const newOptionValue = (typeof newOption !== 'string' && newOption.value) ?? newOption;
 
-      switchErrorState(newOptionValue as string);
+      validateOptionValue(newOptionValue as string);
 
       if (typeof newOption === 'object') {
         if (!newOption.label) {
@@ -121,7 +112,7 @@ function SelectOptionsPropEditor({
 
       onChange(value.map((option, i) => (i === editingIndex ? newOption : option)));
     },
-    [editingIndex, onChange, value, switchErrorState],
+    [editingIndex, onChange, value, validateOptionValue],
   );
 
   const handleEditOptionsDialogClose = React.useCallback(() => {

@@ -49,8 +49,10 @@ function SelectOptionsPropEditor({
   }, [editingIndex, value]);
 
   const switchErrorState = React.useCallback(
-    (callback: (value: string | SelectOption, index: number) => boolean) => {
-      const errorState = value.some(callback);
+    (inputValue: string) => {
+      const errorState = value.some((item) =>
+        typeof item !== 'string' ? item.value === inputValue : item === inputValue,
+      );
       if (errorState) {
         setOptionErrorMessage('Must not have duplicate values');
       } else {
@@ -64,9 +66,7 @@ function SelectOptionsPropEditor({
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       const inputText = (event.target as HTMLInputElement).value;
 
-      switchErrorState((item) =>
-        typeof item !== 'string' ? item.value === inputText : item === inputText,
-      );
+      switchErrorState(inputText);
     },
     [switchErrorState],
   );
@@ -111,9 +111,7 @@ function SelectOptionsPropEditor({
     (newOption: string | SelectOption) => {
       const newOptionValue = (typeof newOption !== 'string' && newOption.value) ?? newOption;
 
-      switchErrorState((item) =>
-        typeof item !== 'string' ? item.value === newOptionValue : item === newOptionValue,
-      );
+      switchErrorState(newOptionValue as string);
 
       if (typeof newOption === 'object') {
         if (!newOption.label) {

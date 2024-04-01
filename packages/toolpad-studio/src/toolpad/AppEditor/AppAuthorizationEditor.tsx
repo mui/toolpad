@@ -187,7 +187,7 @@ export function AppAuthenticationEditor() {
       {!isPaidPlan ? (
         <UpgradeAlert
           type="error"
-          feature="Using authentication with a few specific providers (like Azure Active Directory)"
+          feature="Using authentication with a few specific providers (Azure AD)"
           sx={{ position: 'absolute', bottom: (theme) => theme.spacing(4) }}
         />
       ) : (

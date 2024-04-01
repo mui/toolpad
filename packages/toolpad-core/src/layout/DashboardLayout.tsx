@@ -20,7 +20,6 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import {
   Notifications as NotificationsIcon,
-  AccountCircle as AccountCircleIcon,
   Mail as MailIcon,
   Inbox as InboxIcon,
 } from '@mui/icons-material';

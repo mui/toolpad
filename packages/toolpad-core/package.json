@@ -44,7 +44,7 @@
   "dependencies": {
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.4",
-    "@emotion/styled": "11.11.0",
+    "@emotion/styled": "11.11.5",
     "@mui/icons-material": "5.15.14",
     "@mui/material": "^5.15.14",
     "@mui/material-nextjs": "5.15.11",

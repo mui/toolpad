@@ -110,11 +110,11 @@ module.exports = {
     {
       files: [
         'packages/create-toolpad-app/**/*',
+        'packages/toolpad-core/**/*',
         'packages/toolpad-studio/**/*',
-        'packages/toolpad-studio/**/*',
-        'packages/toolpad-utils/**/*',
-        'packages/toolpad-studio-runtime/**/*',
         'packages/toolpad-studio-components/**/*',
+        'packages/toolpad-studio-runtime/**/*',
+        'packages/toolpad-utils/**/*',
       ],
       excludedFiles: ['tsup.config.ts', '*.spec.ts', '*.spec.tsx', 'vitest.config.ts'],
       rules: {

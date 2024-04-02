@@ -29,22 +29,21 @@ export default defineConfig((options) => [
   {
     entry: ['src/index.ts', 'src/AppProvider/index.ts'],
     ...getBaseConfig(options),
-    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('main: build successful');
     },
   },
   {
-    entry: ['src/layout/index.ts'],
+    entry: ['src/layout/index.ts', 'src/layout/*/index.ts'],
     ...getBaseConfig(options),
-    outDir: 'dist/layout',
     esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/layout'))],
     esbuildOptions(buildOptions) {
       buildOptions.banner = {
         js: '"use client";',
       };
     },
+    outDir: 'dist/layout',
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('layout: build successful');

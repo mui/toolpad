@@ -15,6 +15,6 @@
     "target": "esnext",
     "types": ["react", "node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/index.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "typings/**/*.d.ts"],
   "exclude": ["dist", "src/**/*.spec.*"]
 }

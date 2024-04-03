@@ -25,28 +25,29 @@ const getBaseConfig = (options: Options): Options => ({
   sourcemap: true,
 });
 
-export default defineConfig((options) => [
+export default defineConfig((options: Options) => [
   {
-    entry: ['src/index.ts', 'src/AppProvider/index.ts'],
+    entry: ['src/index.ts'],
     ...getBaseConfig(options),
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
     async onSuccess() {
       // eslint-disable-next-line no-console
       console.log('main: build successful');
     },
   },
   {
-    entry: ['src/layout/index.ts', 'src/layout/*/index.ts'],
+    entry: ['src/client/index.ts', 'src/client/*/index.ts'],
     ...getBaseConfig(options),
-    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/layout'))],
+    esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist/client'))],
     esbuildOptions(buildOptions) {
       buildOptions.banner = {
         js: '"use client";',
       };
     },
-    outDir: 'dist/layout',
+    outDir: 'dist/client',
     async onSuccess() {
       // eslint-disable-next-line no-console
-      console.log('layout: build successful');
+      console.log('client: build successful');
     },
   },
 ]);

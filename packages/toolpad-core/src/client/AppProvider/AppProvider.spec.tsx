@@ -14,7 +14,11 @@ describe('AppProvider', () => {
   test('renders content correctly', async () => {
     const theme = createTheme();
 
-    render(<AppProvider theme={theme}>hello</AppProvider>);
+    render(
+      <AppProvider theme={theme} navigation={[]}>
+        hello
+      </AppProvider>,
+    );
 
     expect(screen.getByText('hello')).toBeTruthy();
   });

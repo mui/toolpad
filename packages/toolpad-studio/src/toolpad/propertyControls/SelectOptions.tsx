@@ -53,11 +53,7 @@ function SelectOptionsPropEditor({
       const errorState = value.some((item) =>
         typeof item !== 'string' ? item.value === inputValue : item === inputValue,
       );
-      if (errorState) {
-        setOptionErrorMessage('Must not have duplicate values');
-      } else {
-        setOptionErrorMessage('');
-      }
+      setOptionErrorMessage(errorState ? "Must not have duplicate values!" : "")
     },
     [value],
   );

@@ -2,6 +2,10 @@
 
 <p class="description">You can add a delete functionality to the data grid in minutes.</p>
 
+:::info
+In case of data providers, visit [deleting a row](/toolpad/studio/concepts/data-providers/#deleting-rows).
+:::
+
 You can add a delete button to a data grid connected to any REST API, like so:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/delete-grid-row/delete-button.png", "alt": "Data grid with delete", "caption": "A data grid with a Delete button" }}

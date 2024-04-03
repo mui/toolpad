@@ -16,7 +16,7 @@ describe('AppProvider', () => {
 
     render(
       <AppProvider theme={theme} navigation={[]}>
-        hello
+        Hello world
       </AppProvider>,
     );
 

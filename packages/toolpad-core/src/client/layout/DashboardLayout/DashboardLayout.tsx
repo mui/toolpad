@@ -48,7 +48,7 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 
-  const [collapsedSidebarItemIds, setCollapsedSidebarItemIds] = React.useState<string[]>(
+  const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState<string[]>(
     navigation
       .map((navigationSection) =>
         navigationSection.routes
@@ -63,7 +63,7 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
 
   const handleSidebarItemClick = React.useCallback(
     (itemId: string) => () => {
-      setCollapsedSidebarItemIds((previousValue) =>
+      setExpandedSidebarItemIds((previousValue) =>
         previousValue.includes(itemId)
           ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
           : [...previousValue, itemId],
@@ -130,7 +130,7 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
               >
                 {navigationSection.routes.map((route) => {
                   const itemId = `${navigationSection.title}:${route.label}`;
-                  const isNestedNavigationExpanded = collapsedSidebarItemIds.includes(itemId);
+                  const isNestedNavigationExpanded = expandedSidebarItemIds.includes(itemId);
 
                   const nestedNavigationCollapseIcon = isNestedNavigationExpanded ? (
                     <ExpandLessIcon />

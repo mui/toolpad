@@ -123,7 +123,7 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
               <List
                 aria-labelledby={navigationSection.title}
                 subheader={
-                  <ListSubheader id={navigationSection.title}>
+                  <ListSubheader component="div" id={navigationSection.title}>
                     {navigationSection.title}
                   </ListSubheader>
                 }

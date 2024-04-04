@@ -1,4 +1,4 @@
 export interface Branding {
-  name: string;
-  logo: React.ReactNode;
+  name?: string;
+  logo?: React.ReactNode;
 }

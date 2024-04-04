@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { describe, test, expect, afterEach } from 'vitest';
-import { render, cleanup, screen } from '@testing-library/react';
+import { render, cleanup } from '@testing-library/react';
 import { createTheme } from '@mui/material/styles';
 import AppProvider from './AppProvider';
 
@@ -14,12 +14,12 @@ describe('AppProvider', () => {
   test('renders content correctly', async () => {
     const theme = createTheme();
 
-    render(
+    const { getByText } = render(
       <AppProvider theme={theme} navigation={[]}>
         Hello world
       </AppProvider>,
     );
 
-    expect(screen.getByText('hello')).toBeTruthy();
+    expect(getByText('Hello world')).toBeTruthy();
   });
 });

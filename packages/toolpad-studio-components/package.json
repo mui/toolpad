@@ -39,25 +39,25 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/icons-material": "5.15.14",
-    "@mui/lab": "5.0.0-alpha.169",
-    "@mui/material": "5.15.14",
-    "@mui/x-charts": "6.19.8",
-    "@mui/x-data-grid-pro": "6.19.8",
-    "@mui/x-date-pickers": "6.19.8",
-    "@mui/x-license-pro": "6.10.2",
-    "@tanstack/react-query": "5.18.1",
+    "@mui/icons-material": "5.15.15",
+    "@mui/lab": "5.0.0-alpha.170",
+    "@mui/material": "5.15.15",
+    "@mui/x-charts": "7.1.0",
+    "@mui/x-data-grid-pro": "7.1.0",
+    "@mui/x-date-pickers": "7.1.0",
+    "@mui/x-license": "7.0.0",
+    "@tanstack/react-query": "5.28.9",
     "@toolpad/studio-runtime": "workspace:*",
     "@toolpad/utils": "workspace:*",
     "dayjs": "1.11.10",
     "invariant": "2.2.4",
-    "markdown-to-jsx": "7.4.1",
-    "react-error-boundary": "4.0.12",
-    "react-hook-form": "7.50.0"
+    "markdown-to-jsx": "7.4.5",
+    "react-error-boundary": "4.0.13",
+    "react-hook-form": "7.51.2"
   },
   "devDependencies": {
     "@types/invariant": "2.2.37",
-    "@types/react": "18.2.66",
+    "@types/react": "18.2.73",
     "react": "18.2.0"
   },
   "peerDependencies": {

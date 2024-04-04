@@ -10,6 +10,6 @@
   "dependencies": {
     "@toolpad/studio": "0.1.53",
     "archiver": "7.0.1",
-    "stripe": "^14.14.0"
+    "stripe": "^14.23.0"
   }
 }

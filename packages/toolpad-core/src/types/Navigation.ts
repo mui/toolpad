@@ -1,13 +1,13 @@
-interface Route {
+export interface NavigationRoute {
   label: string;
   path?: string;
   icon: React.ReactNode;
-  routes?: (Omit<Route, 'routes'> & { path: string })[];
+  routes?: (Omit<NavigationRoute, 'routes'> & { path: string })[];
 }
 
-interface NavigationSection {
+export interface NavigationSection {
   title: string;
-  routes: Route[];
+  routes: NavigationRoute[];
 }
 
 export type Navigation = NavigationSection[];

@@ -9,7 +9,7 @@ export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
   const rootLayoutContent = `  
-  import { AppProvider } from '@toolpad/core';
+  import AppProvider from "@toolpad/core/client/AppProvider";
   import DashboardIcon from "@mui/icons-material/Dashboard";
   import type { Navigation } from "@toolpad/core";
   import theme from '../theme';
@@ -19,8 +19,8 @@ export default function generateProject(
       title: "Main items",
       routes: [
         {
-          label: "Dashboard",
-          path: "/dashboard",
+          label: "Page",
+          path: "/page",
           icon: <DashboardIcon />,
         },
       ],
@@ -32,7 +32,7 @@ export default function generateProject(
       <html lang="en">
         <body>
         <AppProvider theme={theme} navigation={NAVIGATION}>
-          {props.children}
+          {children}
         </AppProvider>
         </body>
       </html>
@@ -41,7 +41,7 @@ export default function generateProject(
     `;
 
   const dashboardLayoutContent = `
-  import { DashboardLayout } from '@toolpad/core/layout';
+  import { DashboardLayout } from "@toolpad/core/client/layout";
 
   export default function Layout({
     children,
@@ -158,6 +158,7 @@ export default function generateProject(
         styleOverrides: {
           root: {
             borderWidth: 1,
+            borderStyle: "solid",
             borderColor: baseTheme.palette.divider,
             boxShadow: "none",
           },

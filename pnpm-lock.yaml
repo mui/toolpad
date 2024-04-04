@@ -205,8 +205,8 @@ importers:
         specifier: 5.0.0-beta.40
         version: 5.0.0-beta.40(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)
       '@mui/docs':
-        specifier: https://pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs
-        version: '@pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(next@13.5.6)(react@18.2.0)'
+        specifier: 5.15.14
+        version: 5.15.14(@mui/material@5.15.15)(next@13.5.6)(react-dom@18.2.0)(react@18.2.0)
       '@mui/icons-material':
         specifier: 5.15.15
         version: 5.15.15(@mui/material@5.15.15)(react@18.2.0)
@@ -2488,6 +2488,31 @@ packages:
 
   /@mui/core-downloads-tracker@5.15.15:
     resolution: {integrity: sha512-aXnw29OWQ6I5A47iuWEI6qSSUfH6G/aCsW9KmW3LiFqr7uXZBK4Ks+z8G+qeIub8k0T5CMqlT2q0L+ZJTMrqpg==}
+
+  /@mui/docs@5.15.14(@mui/material@5.15.15)(next@13.5.6)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-bTI9ZcOGr6Yemh/Oru/nveDHy/sXSW2eeBPWC3K9bdQcs4FHFd7P5LdFGiLZI5MLa2yBpBR96G6OQUlKSLjJdw==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      '@mui/material': ^5.15.14
+      '@types/react': ^17.0.0 || ^18.0.0
+      next: ^13.5.1
+      react: ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.24.1
+      '@mui/base': 5.0.0-beta.40(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/material': 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/utils': 5.15.14(@types/react@18.2.73)(react@18.2.0)
+      clsx: 2.1.0
+      next: 13.5.6(@babel/core@7.24.3)(react-dom@18.2.0)(react@18.2.0)
+      nprogress: 0.2.0
+      prop-types: 15.8.1
+      react: 18.2.0
+    transitivePeerDependencies:
+      - react-dom
+    dev: false
 
   /@mui/icons-material@5.15.15(@mui/material@5.15.15)(@types/react@18.2.73)(react@18.2.0):
     resolution: {integrity: sha512-kkeU/pe+hABcYDH6Uqy8RmIsr2S/y5bP2rp+Gat4CcRjCcVne6KudS1NrZQhUCRysrTDCAhcbcf9gt+/+pGO2g==}
@@ -15334,35 +15359,6 @@ packages:
 
   /zod@3.22.4:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
-    dev: false
-
-  '@pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(next@13.5.6)(react@18.2.0)':
-    resolution: {tarball: https://pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs}
-    id: '@pkg.csb.dev/mui/material-ui/commit/37466089/@mui/docs'
-    name: '@mui/docs'
-    version: 5.15.13
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      '@mui/base': workspace:^
-      '@mui/icons-material': workspace:^
-      '@mui/material': workspace:^
-      '@mui/system': workspace:^
-      '@types/react': ^17.0.0 || ^18.0.0
-      next: ^13.5.1
-      react: ^17.0.0 || ^18.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-    dependencies:
-      '@babel/runtime': 7.24.1
-      '@mui/base': 5.0.0-beta.40(@types/react@18.2.73)(react-dom@18.2.0)(react@18.2.0)
-      '@mui/icons-material': 5.15.15(@mui/material@5.15.15)(react@18.2.0)
-      '@mui/material': 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(react-dom@18.2.0)(react@18.2.0)
-      clsx: 2.1.0
-      next: 13.5.6(@babel/core@7.24.3)(react-dom@18.2.0)(react@18.2.0)
-      nprogress: 0.2.0
-      prop-types: 15.8.1
-      react: 18.2.0
     dev: false
 
   github.com/mui/material-ui/e1d94d5ce097815bcd738352e69bb43ce03bd266:

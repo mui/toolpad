@@ -24,9 +24,9 @@ export interface NodeMenuProps {
 export default function NodeMenu({
   nodeId,
   renderButton,
-  renameLabelText,
-  deleteLabelText,
-  duplicateLabelText,
+  renameLabelText = 'Rename',
+  deleteLabelText = 'Delete',
+  duplicateLabelText = 'Duplicate',
   onRenameNode,
   onDeleteNode,
   onDuplicateNode,

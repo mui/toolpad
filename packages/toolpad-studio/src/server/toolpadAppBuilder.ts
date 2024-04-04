@@ -298,6 +298,7 @@ if (import.meta.hot) {
       },
       envFile: false,
       resolve: {
+        dedupe: ['@mui/material'],
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
@@ -342,6 +343,7 @@ if (import.meta.hot) {
       server: {
         fs: {
           allow: [root, path.resolve(currentDirectory, '../../../../')],
+          cachedChecks: false,
         },
       },
       optimizeDeps: {

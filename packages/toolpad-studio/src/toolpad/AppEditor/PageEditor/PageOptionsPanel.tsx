@@ -19,7 +19,7 @@ import { usePageEditorState } from './PageEditorProvider';
 import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import PageTitleEditor from '../PageTitleEditor';
-import { UpgradeAlert } from '../UpgradeAlert';
+import PaidBadge from './PaidBadge';
 import PageDisplayNameEditor from '../PageDisplayNameEditor';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
@@ -79,14 +79,14 @@ export default function PageOptionsPanel() {
 
   return (
     <Stack spacing={2} alignItems="stretch" data-testid="page-editor">
-      <Typography variant="subtitle1">Page:</Typography>
+      <Typography variant="subtitle1">Page</Typography>
       <div>
         <NodeNameEditor node={page} />
         <PageDisplayNameEditor node={page} />
         <PageTitleEditor node={page} />
       </div>
       <div>
-        <Typography variant="body2">Display mode:</Typography>
+        <Typography variant="overline">Display mode</Typography>
         <Tooltip
           arrow
           placement="left-start"
@@ -122,8 +122,28 @@ export default function PageOptionsPanel() {
         </Tooltip>
       </div>
       <div>
-        <Typography variant="body2">Authorization:</Typography>
-        {isPaidPlan ? (
+        <Typography variant="overline" component={'p'}>
+          Authorization
+          {!isPaidPlan ? null : (
+            <PaidBadge
+              helpText={
+                <Typography variant="inherit">
+                  Only available in paid plans.{' '}
+                  <Link
+                    href="https://mui.com/toolpad/studio/concepts/custom-components"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Learn more
+                  </Link>
+                  .
+                </Typography>
+              }
+            />
+          )}
+        </Typography>
+
+        {!isPaidPlan ? (
           <React.Fragment>
             <FormControlLabel
               control={<Checkbox checked={allowAll} onChange={handleAllowAllChange} />}
@@ -142,14 +162,12 @@ export default function PageOptionsPanel() {
               )}
             />
           </React.Fragment>
-        ) : (
-          <UpgradeAlert type="info" feature="Role based access control" variant="inline" />
-        )}
+        ) : null}
       </div>
       {appDom.isCodePage(page) ? null : (
         <div>
           <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
-          <Typography variant="overline">Page State:</Typography>
+          <Typography variant="overline">Page State</Typography>
           <UrlQueryEditor pageNodeId={pageNodeId} />
         </div>
       )}

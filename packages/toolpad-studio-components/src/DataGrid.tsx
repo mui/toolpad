@@ -8,7 +8,6 @@ import {
   gridColumnsTotalWidthSelector,
   gridColumnPositionsSelector,
   GridRowSelectionModel,
-  GridValueFormatterParams,
   GridColDef,
   useGridApiRef,
   GridRenderCellParams,
@@ -416,7 +415,7 @@ function CustomColumn({ params }: CustomColumnProps) {
 
 export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   json: {
-    valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
+    valueFormatter: (value) => JSON.stringify(value),
   },
   date: {
     valueGetter: dateValueGetter,

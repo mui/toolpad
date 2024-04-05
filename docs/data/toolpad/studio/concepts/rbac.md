@@ -3,7 +3,7 @@
 <p class="description">Restrict pages in Toolpad Studio application to users with certain roles only.</p>
 
 :::warning
-Role-based access control will be a paid feature of Toolpad Studio very soon, so it's only available for free for a limited time.
+Role-based access control is a paid feature of Toolpad Studio.
 :::
 
 You can configure pages in a Toolpad Studio application so that users must have certain roles within specific authentication providers in order to access them.

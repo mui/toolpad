@@ -130,7 +130,7 @@ export default function PageOptionsPanel() {
                 <Typography variant="inherit">
                   Only available in paid plans.{' '}
                   <Link
-                    href="https://mui.com/toolpad/studio/concepts/custom-components"
+                    href="https://mui.com/toolpad/studio/concepts/rbac/"
                     target="_blank"
                     rel="noopener"
                   >

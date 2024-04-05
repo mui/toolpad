@@ -3,5 +3,11 @@
 apiVersion: v1
 kind: page
 spec:
-  id: L7RS8Ol
   title: Default page
+  alias:
+    - L7RS8Ol
+  content:
+    - component: codeComponent.CustomDataGrid
+      name: customDataGrid
+      props:
+        rows: null

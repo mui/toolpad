@@ -122,9 +122,9 @@ export default function PageOptionsPanel() {
         </Tooltip>
       </div>
       <div>
-        <Typography variant="overline" component={'p'}>
+        <Typography variant="overline">
           Authorization
-          {!isPaidPlan ? null : (
+          {isPaidPlan ? null : (
             <PaidBadge
               helpText={
                 <Typography variant="inherit">
@@ -143,7 +143,7 @@ export default function PageOptionsPanel() {
           )}
         </Typography>
 
-        {!isPaidPlan ? (
+        {isPaidPlan ? (
           <React.Fragment>
             <FormControlLabel
               control={<Checkbox checked={allowAll} onChange={handleAllowAllChange} />}

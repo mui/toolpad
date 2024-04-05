@@ -14,15 +14,15 @@ function ProBadge({ helpText }: ProBadgeProps) {
           height: '1em',
           width: '1em',
           verticalAlign: 'middle',
-          marginLeft: '0.3em',
-          marginBottom: '0.08em',
+          marginLeft: '0.5em',
+          marginBottom: '0.1em',
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
           backgroundImage: 'url(/pro.svg)',
         }}
       />
       <HelpTooltipIcon
-        iconSx={{ verticalAlign: 'bottom', marginLeft: '0.4em' }}
+        iconSx={{ verticalAlign: 'middle', marginLeft: '0.3em', marginBottom: '0.1em' }}
         helpText={helpText}
       />
     </React.Fragment>

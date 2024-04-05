@@ -61,13 +61,13 @@
     "prettier": "3.2.5",
     "react-is": "18.2.0",
     "title": "3.5.3",
-    "yaml": "2.3.4",
+    "yaml": "2.4.1",
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
     "@types/express": "4.17.21",
     "@types/invariant": "2.2.37",
-    "@types/react": "18.2.66",
+    "@types/react": "18.2.73",
     "@types/react-is": "18.2.4",
     "@types/title": "3.4.3"
   }

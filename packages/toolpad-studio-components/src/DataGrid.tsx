@@ -8,9 +8,7 @@ import {
   gridColumnsTotalWidthSelector,
   gridColumnPositionsSelector,
   GridRowSelectionModel,
-  GridValueFormatterParams,
   GridColDef,
-  GridValueGetterParams,
   useGridApiRef,
   GridRenderCellParams,
   useGridRootProps,
@@ -37,11 +35,14 @@ import {
   GridEventListener,
   GridRowEditStopReasons,
   GridRowEditStartReasons,
+  GridValueGetter,
+  GridToolbarProps,
+  GridColType,
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
   Unstable_LicenseInfoProviderProps as LicenseInfoProviderProps,
-} from '@mui/x-license-pro';
+} from '@mui/x-license';
 import * as React from 'react';
 import {
   useNode,
@@ -348,7 +349,7 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
 
 const INVALID_DATE = new Date(NaN);
 
-function dateValueGetter({ value }: GridValueGetterParams<any, any>): Date | undefined {
+const dateValueGetter: GridValueGetter = (value: any): Date | undefined => {
   if (value === null || value === undefined || value === '') {
     return undefined;
   }
@@ -374,7 +375,7 @@ function dateValueGetter({ value }: GridValueGetterParams<any, any>): Date | und
   // It's fine if this turns out to be an invalid date, the user wanted a date column, if the data can't be parsed as a date
   // it should just show as such
   return INVALID_DATE;
-}
+};
 
 function ComponentErrorFallback({ error }: FallbackProps) {
   return (
@@ -414,7 +415,7 @@ function CustomColumn({ params }: CustomColumnProps) {
 
 export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   json: {
-    valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
+    valueFormatter: (value) => JSON.stringify(value),
   },
   date: {
     valueGetter: dateValueGetter,
@@ -442,8 +443,9 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
 export interface SerializableGridColumn
   extends Pick<
     GridColDef,
-    'field' | 'type' | 'align' | 'width' | 'headerName' | 'sortable' | 'filterable' | 'editable'
+    'field' | 'align' | 'width' | 'headerName' | 'sortable' | 'filterable' | 'editable'
   > {
+  type?: string;
   numberFormat?: NumberFormat;
   dateFormat?: DateFormat;
   dateTimeFormat?: DateFormat;
@@ -466,40 +468,43 @@ export function inferColumns(rows: GridRowsProp): SerializableGridColumns {
   });
 }
 
+function getNarrowedColType(type?: string): GridColType | undefined {
+  return (type && type in DEFAULT_COLUMN_TYPES ? type : undefined) as GridColType | undefined;
+}
+
 export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
-  return columns.map((column) => {
+  return columns.map(({ type: colType, ...column }) => {
     const isIdColumn = column.field === 'id';
 
     if (isIdColumn) {
       return {
         ...column,
+        type: getNarrowedColType(colType),
         editable: false,
         hide: true,
         renderCell: ({ row, value }) => (row[DRAFT_ROW_MARKER] ? '' : value),
       };
     }
 
-    let baseColumn: Omit<SerializableGridColumn, 'field'> = { editable: true };
+    let baseColumn: Omit<GridColDef, 'field'> = { editable: true };
 
-    if (column.type) {
-      baseColumn = { ...baseColumn, ...CUSTOM_COLUMN_TYPES[column.type] };
+    if (colType) {
+      baseColumn = { ...baseColumn, ...CUSTOM_COLUMN_TYPES[colType], ...column };
     }
 
-    if (column.type === 'number' && column.numberFormat) {
+    if (colType === 'number' && column.numberFormat) {
       const format = createNumberFormat(column.numberFormat);
-      return {
+      baseColumn = {
         ...baseColumn,
-        ...column,
-        valueFormatter: ({ value }) => format.format(value),
+        valueFormatter: (value: any) => format.format(value),
       };
     }
 
-    if (column.type === 'date') {
+    if (colType === 'date') {
       const format = createDateFormat(column.dateFormat);
-      return {
+      baseColumn = {
         ...baseColumn,
-        ...column,
-        valueFormatter: ({ value }) => {
+        valueFormatter: (value: any) => {
           try {
             return format.format(value);
           } catch {
@@ -509,12 +514,11 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
       };
     }
 
-    if (column.type === 'dateTime') {
+    if (colType === 'dateTime') {
       const format = createDateFormat(column.dateTimeFormat);
-      return {
+      baseColumn = {
         ...baseColumn,
-        ...column,
-        valueFormatter: ({ value }) => {
+        valueFormatter: (value: any) => {
           try {
             return format.format(value);
           } catch {
@@ -524,9 +528,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
       };
     }
 
-    const type = column.type && column.type in DEFAULT_COLUMN_TYPES ? column.type : undefined;
-
-    return { ...baseColumn, ...column, type };
+    return { ...baseColumn, ...column, type: getNarrowedColType(colType) };
   });
 }
 
@@ -603,7 +605,7 @@ function DeleteAction({ id, dataProvider, refetch }: DeleteActionProps) {
   );
 }
 
-interface EditToolbarProps {
+interface EditToolbarProps extends GridToolbarProps {
   hasCreateButton?: boolean;
   createDisabled?: boolean;
   onCreateClick?: () => void;
@@ -991,11 +993,13 @@ function useDataProviderDataGridProps(
   };
 }
 
-interface NoRowsOverlayProps extends React.ComponentProps<typeof GridNoRowsOverlay> {
-  error: Error;
+type NoRowsOverlayProps = React.ComponentProps<typeof GridNoRowsOverlay>;
+
+interface NoRowsOverlayPropsX extends NoRowsOverlayProps {
+  error?: Error | null;
 }
 
-function NoRowsOverlay(props: NoRowsOverlayProps) {
+function NoRowsOverlay(props: NoRowsOverlayPropsX) {
   if (props.error) {
     return <ErrorContent sx={{ height: '100%' }} error={props.error} />;
   }

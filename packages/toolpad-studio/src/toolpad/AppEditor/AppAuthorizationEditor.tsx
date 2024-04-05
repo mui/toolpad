@@ -38,6 +38,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import { TabContext, TabList } from '@mui/lab';
 import { updateArray } from '@toolpad/utils/immutability';
 import * as appDom from '@toolpad/studio-runtime/appDom';
+import invariant from 'invariant';
 import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
 import AzureIcon from '../../components/icons/AzureIcon';
@@ -186,7 +187,7 @@ export function AppAuthenticationEditor() {
       {!isPaidPlan ? (
         <UpgradeAlert
           type="error"
-          feature="Using authentication with a few specific providers (like Azure Active Directory)"
+          feature="Using authentication with a few specific providers (Azure AD)"
           sx={{ position: 'absolute', bottom: (theme) => theme.spacing(4) }}
         />
       ) : (
@@ -201,12 +202,14 @@ export function AppAuthenticationEditor() {
   );
 }
 
-interface RolesToolbarProps {
-  addNewRoleDisabled: boolean;
-  onAddNewRole: () => void;
+interface RolesToolbarProps extends React.ComponentProps<typeof GridToolbarContainer> {
+  addNewRoleDisabled?: boolean;
+  onAddNewRole?: () => void;
 }
 
 function RolesToolbar({ addNewRoleDisabled, onAddNewRole }: RolesToolbarProps) {
+  invariant(typeof addNewRoleDisabled === 'boolean', 'addNewRoleDisabled is required in slotProps');
+  invariant(typeof onAddNewRole === 'function', 'onAddNewRole is required in slotProps');
   return (
     <GridToolbarContainer>
       <Button

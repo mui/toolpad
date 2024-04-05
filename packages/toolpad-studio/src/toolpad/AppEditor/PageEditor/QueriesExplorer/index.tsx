@@ -13,11 +13,9 @@ import {
   Paper,
   SxProps,
 } from '@mui/material';
-import { TreeView, treeItemClasses } from '@mui/x-tree-view';
+import { SimpleTreeView, treeItemClasses } from '@mui/x-tree-view';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import useBoolean from '@toolpad/utils/hooks/useBoolean';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import dataSources from '../../../../toolpadDataSources/client';
@@ -62,7 +60,7 @@ interface StyledTreeItemProps extends EditableTreeItemProps {
 
 function DataTreeItem(props: StyledTreeItemProps) {
   const {
-    nodeId,
+    itemId,
     labelText,
     labelTextSx,
     labelIconSx,
@@ -86,11 +84,11 @@ function DataTreeItem(props: StyledTreeItemProps) {
   const handleRenameConfirm = React.useCallback(
     (updatedName: string) => {
       if (onRenameNode) {
-        onRenameNode(nodeId as NodeId, updatedName);
+        onRenameNode(itemId as NodeId, updatedName);
         stopEditing();
       }
     },
-    [nodeId, onRenameNode, stopEditing],
+    [itemId, onRenameNode, stopEditing],
   );
 
   const validateEditableQueryName = React.useCallback(
@@ -109,18 +107,18 @@ function DataTreeItem(props: StyledTreeItemProps) {
   }, [onSelectNode, toolpadNodeId]);
 
   const queryCreationMode = React.useMemo(() => {
-    if (props.nodeId === ':query') {
+    if (props.itemId === ':query') {
       return 'query';
     }
-    if (props.nodeId === ':mutation') {
+    if (props.itemId === ':mutation') {
       return 'mutation';
     }
     return undefined;
-  }, [props.nodeId]);
+  }, [props.itemId]);
 
   return (
     <StyledTreeItem
-      nodeId={nodeId}
+      itemId={itemId}
       labelText={labelText}
       renderLabel={(children) => (
         <Box sx={{ display: 'flex', alignItems: 'center' }} onClick={handleClick}>
@@ -349,16 +347,14 @@ function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
         onCreate={handleCreateClick}
         createLabelText={`Create new ${nodeName}`}
       />
-      <TreeView
+      <SimpleTreeView
         aria-label={`${nodeName} explorer`}
-        defaultExpanded={[`:queries`]}
-        selected={
+        defaultExpandedItems={[`:queries`]}
+        selectedItems={
           currentView.kind === 'page' && currentView.view?.kind === 'query'
             ? currentView.view.nodeId
             : ''
         }
-        defaultCollapseIcon={<ExpandMoreIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
-        defaultExpandIcon={<ChevronRightIcon sx={{ fontSize: '0.9rem', opacity: 0.5 }} />}
         sx={{
           flexGrow: 1,
           maxWidth: 400,
@@ -369,7 +365,7 @@ function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
         {nodes.map((node) => (
           <DataTreeItem
             key={node.id}
-            nodeId={node.id}
+            itemId={node.id}
             toolpadNodeId={node.id}
             aria-level={1}
             aria-label={node.name}
@@ -383,7 +379,7 @@ function Explorer({ nodes, setAnchorEl, nodeName, headerText }: ExplorerProps) {
             validateItemName={validateName}
           />
         ))}
-      </TreeView>
+      </SimpleTreeView>
     </Stack>
   );
 }

@@ -143,7 +143,7 @@ export default function PageOptionsPanel() {
             />
           </React.Fragment>
         ) : (
-          <UpgradeAlert feature="Role based access control" hideAction />
+          <UpgradeAlert type="info" feature="Role based access control" variant="inline" />
         )}
       </div>
       {appDom.isCodePage(page) ? null : (

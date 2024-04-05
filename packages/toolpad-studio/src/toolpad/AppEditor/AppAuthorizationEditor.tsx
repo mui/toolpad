@@ -153,7 +153,7 @@ export function AppAuthenticationEditor() {
                 <Checkbox checked={authProviders.indexOf(value as appDom.AuthProvider) > -1} />
                 {icon}
                 <Typography mx={1}>{name}</Typography>
-                {hasRoles && !isPaidPlan ? <UpgradeAlert feature={name} hideAction /> : null}
+                {hasRoles && !isPaidPlan ? <UpgradeAlert type="warning" feature={name} /> : null}
               </Stack>
             </MenuItem>
           ))}
@@ -186,7 +186,7 @@ export function AppAuthenticationEditor() {
       ))}
       {!isPaidPlan ? (
         <UpgradeAlert
-          type="error"
+          type="info"
           feature="Using authentication with a few specific providers (Azure AD)"
           sx={{ position: 'absolute', bottom: (theme) => theme.spacing(4) }}
         />
@@ -194,7 +194,6 @@ export function AppAuthenticationEditor() {
         <UpgradeAlert
           type="warning"
           warning="You are using features that are not covered by our MIT License. You will have to buy a license to use them in production."
-          hideAction
           sx={{ position: 'absolute', bottom: (theme) => theme.spacing(4) }}
         />
       )}
@@ -730,7 +729,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
                     <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
                   </React.Fragment>
                 ) : (
-                  <UpgradeAlert type="error" feature="Role based access control" />
+                  <UpgradeAlert type="info" feature="Role based access control" />
                 )}
               </TabPanel>
               <TabPanel disableGutters value="roleMappings">
@@ -745,7 +744,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
                     />
                   </React.Fragment>
                 ) : (
-                  <UpgradeAlert feature="Role mapping" />
+                  <UpgradeAlert type="info" feature="Role mapping" />
                 )}
               </TabPanel>
             </React.Fragment>

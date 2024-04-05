@@ -5,12 +5,6 @@ import { LicenseInfo } from '@mui/x-license';
 
 LicenseInfo.setLicenseKey('LICENSE_KEY');
 
-const ROWS = [
-  { id: 1, name: 'John', age: 30 },
-  { id: 2, name: 'Jane', age: 36 },
-  { id: 3, name: 'John', age: 40 },
-];
-
 export interface CustomDataGridProps {
   rows: any[];
 }
@@ -33,6 +27,6 @@ function CustomDataGrid({ rows }: CustomDataGridProps) {
 
 export default createComponent(CustomDataGrid, {
   argTypes: {
-    rows: { type: 'array', defaultValue: ROWS },
+    rows: { type: 'array', defaultValue: [] },
   },
 });

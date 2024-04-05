@@ -10,4 +10,13 @@ spec:
     - component: codeComponent.CustomDataGrid
       name: customDataGrid
       props:
-        rows: null
+        rows:
+          - id: 1
+            name: John
+            age: 31
+          - id: 2
+            name: Jane
+            age: 36
+          - id: 3
+            name: John
+            age: 40

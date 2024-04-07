@@ -31,7 +31,7 @@
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.15.15",
     "@mui/material-nextjs": "^5.15.11",
-    "@mui/monorepo": "github:mui/material-ui#e1d94d5ce097815bcd738352e69bb43ce03bd266",
+    "@mui/monorepo": "github:mui/material-ui#f3cb496c999acbc8f19533e38df20be12e56d059",
     "@mui/styles": "5.15.15",
     "@mui/utils": "5.15.14",
     "@mui/x-data-grid-pro": "7.1.1",
@@ -97,7 +97,7 @@
     "cpy-cli": "5.0.0",
     "cross-fetch": "4.0.0",
     "gm": "1.25.0",
-    "typescript": "5.4.3",
+    "typescript": "5.4.4",
     "typescript-to-proptypes": "2.2.1"
   }
 }

@@ -69,7 +69,7 @@
     },
     {
       "groupName": "Unsupported engines",
-      "matchPackageNames": ["next"],
+      "matchPackageNames": ["next", "eslint"],
       "matchPackagePatterns": ["^@next/", "^@typescript-eslint/"],
       "description": "Restricted to a Node.js version that's unsupported on codesandboxci"
     },

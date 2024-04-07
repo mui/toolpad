@@ -70,7 +70,7 @@
     {
       "groupName": "Unsupported engines",
       "matchPackageNames": ["next", "eslint"],
-      "matchPackagePatterns": ["^@next/", "^@typescript-eslint/"],
+      "matchPackagePatterns": ["^@next/", "^@typescript-eslint/", "^@argos-ci/"],
       "description": "Restricted to a Node.js version that's unsupported on codesandboxci"
     },
     {

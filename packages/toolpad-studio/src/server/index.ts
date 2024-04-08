@@ -134,11 +134,11 @@ async function createDevHandler(project: ToolpadProject) {
       readyPromise.then(next, next);
     },
     createProxyMiddleware({
-      logLevel: 'silent',
       ws: true,
       target: {
         host: 'localhost',
         port: devPort,
+        path: project.options.base,
       },
     }),
   );

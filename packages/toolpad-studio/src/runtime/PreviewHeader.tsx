@@ -187,23 +187,12 @@ export default function PreviewHeader({ basename }: PreviewHeaderProps) {
 
   let action: React.ReactNode = null;
 
-  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
-    action = (
-      <OpenInEditorButton
-        component={Link}
-        to={activePage ? `/editor/app/pages/${activePage}` : '/editor/app'}
-      />
-    );
-  } else if (appContext) {
-    action = appContext.isCustomServer ? (
-      <CustomServerInstructions basename={basename} />
-    ) : (
-      <OpenInEditorButton
-        component="a"
-        href={activePage ? `/_toolpad/app/pages/${activePage}` : '/_toolpad/app'}
-      />
-    );
-  }
+  action = (
+    <OpenInEditorButton
+      component={Link}
+      to={activePage ? `/editor/app/pages/${activePage}` : '/editor/app'}
+    />
+  );
 
   return appContext ? (
     <Box

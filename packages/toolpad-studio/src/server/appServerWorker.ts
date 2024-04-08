@@ -46,9 +46,7 @@ function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
           try {
             const dom = await loadDom();
 
-            const template = process.env.EXPERIMENTAL_INLINE_CANVAS
-              ? getEditorHtmlContent()
-              : getAppHtmlContent();
+            const template = getEditorHtmlContent();
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 

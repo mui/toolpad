@@ -308,7 +308,6 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            // eslint-disable-next-line no-nested-ternary
             replacement: 'virtual:toolpad-files:main.tsx',
           },
           {

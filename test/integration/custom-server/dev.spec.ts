@@ -1,11 +1,9 @@
 import * as path from 'path';
 import * as url from 'url';
-import * as fs from 'fs/promises';
 import invariant from 'invariant';
 import { folderExists } from '@toolpad/utils/fs';
-import { getTemporaryDir, runEditor, test, expect } from '../../playwright/localTest';
+import { test, expect } from '../../playwright/localTest';
 import { expectBasicRuntimeTests, expectBasicRuntimeContentTests } from '../backend-basic/shared';
-import { using } from '../../utils/resources';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));

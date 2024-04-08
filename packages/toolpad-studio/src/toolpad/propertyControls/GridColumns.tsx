@@ -247,6 +247,38 @@ function GridColumnEditor({
         label="Editable"
       />
 
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.groupable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                groupable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Groupable"
+      />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.aggregable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                aggregable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Aggregable"
+      />
+
       <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
         {editedColumn.type === 'number' ? (
           <NumberFormatEditor

@@ -1676,7 +1676,7 @@ export function ToolpadAppProvider({
                 <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                   <AppThemeProvider dom={dom}>
                     <CssBaseline enableColorScheme />
-                    {showPreviewHeader ? <PreviewHeader basename={basename} /> : null}
+                    {showPreviewHeader ? <PreviewHeader /> : null}
                     <AppRoot
                       ref={rootRef}
                       sx={{

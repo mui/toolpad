@@ -434,7 +434,6 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
   app.use(
     pathname,
     createProxyMiddleware({
-      logLevel: 'silent',
       ws: true,
       target: origin,
     }),

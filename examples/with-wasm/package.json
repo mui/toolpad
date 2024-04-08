@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "asc my-wasm-module.ts -o my-wasm-module.wasm && toolpad dev",
-    "build": "asc my-wasm-module.ts -o my-wasm-module.wasm && toolpad build",
-    "start": "toolpad start"
+    "dev": "asc my-wasm-module.ts -o my-wasm-module.wasm && toolpad-studio dev",
+    "build": "asc my-wasm-module.ts -o my-wasm-module.wasm && toolpad-studio build",
+    "start": "toolpad-studio start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.51"
+    "@toolpad/studio": "0.1.53"
   },
   "devDependencies": {
-    "assemblyscript": "0.27.24"
+    "assemblyscript": "0.27.26"
   }
 }

@@ -1,10 +1,22 @@
 {
-  "name": "@mui/toolpad-core",
-  "version": "0.1.51",
-  "description": "Build MUI apps quickly",
-  "author": "MUI Toolpad team",
+  "name": "@toolpad/core",
+  "version": "0.1.53",
+  "keywords": [
+    "toolpad"
+  ],
+  "description": "Build dashboards fast.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mui/mui-toolpad.git",
+    "directory": "packages/toolpad-core"
+  },
+  "bugs": {
+    "url": "https://github.com/mui/mui-toolpad/issues"
+  },
+  "author": "Toolpad Team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "license": "MIT",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
@@ -12,68 +24,47 @@
     "./package.json": "./package.json",
     ".": {
       "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js"
     },
     "./*": {
       "types": "./dist/*.d.ts",
+      "require": "./dist/*.cjs",
       "default": "./dist/*.js"
-    },
-    "./server": {
-      "types": "./dist/server.d.ts",
-      "default": "./dist/server.js"
     }
   },
   "files": [
-    "dist",
-    "public",
-    "server",
-    "browser"
+    "dist"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mui/mui-toolpad.git"
-  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit"
-  },
-  "bugs": {
-    "url": "https://github.com/mui/mui-toolpad/issues"
+    "check-types": "tsup && tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
-    "@auth/core": "0.25.1",
-    "@mui/material": "5.15.11",
-    "@mui/toolpad-utils": "workspace:*",
-    "@tanstack/react-query": "5.18.1",
-    "@types/json-schema": "7.0.15",
-    "@webcontainer/env": "1.1.0",
-    "cookie": "0.6.0",
-    "fractional-indexing": "3.2.0",
-    "invariant": "2.2.4",
-    "nanoid": "5.0.5",
-    "quickjs-emscripten": "0.27.0",
-    "react-error-boundary": "4.0.12",
-    "react-is": "18.2.0"
+    "@emotion/react": "11.11.4",
+    "@mui/material": "5.15.15",
+    "@mui/material-nextjs": "5.15.11",
+    "next": "13.5.6",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@types/cookie": "0.6.0",
-    "@types/express": "4.17.21",
-    "@types/invariant": "2.2.37",
-    "@types/react": "18.2.58",
-    "@types/react-is": "18.2.4",
-    "concurrently": "8.2.2"
+    "@types/react": "18.2.74",
+    "@types/react-dom": "18.2.24"
   },
   "peerDependencies": {
-    "react": "^18.0.0",
-    "vm-browserify": "^1.1.2"
-  },
-  "peerDependenciesMeta": {
-    "vm-browserify": {
-      "optional": true
-    }
+    "@emotion/react": "^11.11.4",
+    "@mui/material": "^5.15.14",
+    "@types/react": "^18.2.70",
+    "next": "^13.5.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

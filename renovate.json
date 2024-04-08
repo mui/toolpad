@@ -63,24 +63,25 @@
       "allowedVersions": "< 3.0.0"
     },
     {
-      "groupName": "tsx",
-      "matchPackageNames": ["tsx"],
-      "description": "Investigating problems with importing X charts under node.js with tsx"
-    },
-    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "Next.js",
-      "matchPackageNames": ["next", "^@next/"],
+      "groupName": "Unsupported engines",
+      "matchPackageNames": ["next", "eslint"],
+      "matchPackagePatterns": ["^@next/", "^@typescript-eslint/", "^@argos-ci/"],
       "description": "Restricted to a Node.js version that's unsupported on codesandboxci"
     },
     {
       "groupName": "superjson",
       "matchPackageNames": ["superjson"],
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
+    },
+    {
+      "groupName": "Auth.js",
+      "matchPackageNames": ["@auth/core"],
+      "description": "Breaking change in https://github.com/nextauthjs/next-auth/issues/10289"
     },
     {
       "matchDepTypes": ["action"],
@@ -91,8 +92,8 @@
       "matchManagers": ["github-actions"]
     },
     {
-      "groupName": "Update @mui/toolpad in examples",
-      "matchPackageNames": ["@mui/toolpad"],
+      "groupName": "Update @toolpad/studio in examples",
+      "matchPackageNames": ["@toolpad/studio"],
       "matchFiles": ["examples/*/package.json"],
       "schedule": ["at any time"],
       "automerge": true

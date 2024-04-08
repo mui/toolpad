@@ -1,0 +1,69 @@
+{
+  "name": "@toolpad/studio-components",
+  "version": "0.1.53",
+  "description": "Build MUI apps quickly",
+  "author": "MUI Toolpad team",
+  "homepage": "https://github.com/mui/mui-toolpad#readme",
+  "license": "MIT",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./Button": {
+      "types": "./dist/Button.d.ts",
+      "default": "./dist/Button.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mui/mui-toolpad.git"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "check-types": "tsup && tsc --noEmit"
+  },
+  "bugs": {
+    "url": "https://github.com/mui/mui-toolpad/issues"
+  },
+  "dependencies": {
+    "@mui/icons-material": "5.15.15",
+    "@mui/lab": "5.0.0-alpha.170",
+    "@mui/material": "5.15.15",
+    "@mui/x-charts": "7.1.1",
+    "@mui/x-data-grid-pro": "7.1.1",
+    "@mui/x-date-pickers": "7.1.1",
+    "@mui/x-license": "7.1.1",
+    "@tanstack/react-query": "5.29.0",
+    "@toolpad/studio-runtime": "workspace:*",
+    "@toolpad/utils": "workspace:*",
+    "dayjs": "1.11.10",
+    "invariant": "2.2.4",
+    "markdown-to-jsx": "7.4.6",
+    "react-error-boundary": "4.0.13",
+    "react-hook-form": "7.51.2"
+  },
+  "devDependencies": {
+    "@types/invariant": "2.2.37",
+    "@types/react": "18.2.74",
+    "react": "18.2.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

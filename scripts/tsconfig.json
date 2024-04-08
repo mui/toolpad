@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
     "paths": {
-      "@mui/toolpad-components": ["../packages/toolpad-components/src/index.tsx"],
-      "@mui/toolpad-core": ["../packages/toolpad-core/src/index.tsx"],
-      "@mui/toolpad-core/numberFormat": ["../packages/toolpad-core/src/numberFormat.tsx"],
-      "@mui/toolpad-core/dateFormat": ["../packages/toolpad-core/src/dateFormat.tsx"],
-      "@mui/toolpad-utils/*": [
+      "@toolpad/studio-components": ["../packages/toolpad-studio-components/src/index.tsx"],
+      "@toolpad/studio-runtime": ["../packages/toolpad-studio-runtime/src/index.tsx"],
+      "@toolpad/studio-runtime/numberFormat": [
+        "../packages/toolpad-studio-runtime/src/numberFormat.tsx"
+      ],
+      "@toolpad/studio-runtime/dateFormat": [
+        "../packages/toolpad-studio-runtime/src/dateFormat.tsx"
+      ],
+      "@toolpad/utils/*": [
         "../packages/toolpad-utils/src/*.tsx",
         "../packages/toolpad-utils/src/*.ts"
       ]

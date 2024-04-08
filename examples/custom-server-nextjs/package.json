@@ -4,18 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "NODE_ENV=development node index.mjs",
-    "build": "toolpad build --base /my-toolpad-app && next build",
+    "build": "toolpad-studio build --base /my-toolpad-studio-app && next build",
     "start": "node index.mjs",
-    "edit": "toolpad editor http://localhost:3001/my-toolpad-app"
+    "edit": "toolpad-studio editor http://localhost:3001/my-toolpad-studio-app"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.51",
-    "express": "4.18.2",
-    "next": "14.1.1",
+    "@toolpad/studio": "0.1.53",
+    "express": "4.19.2",
+    "next": "14.1.4",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@types/react": "18.2.58"
+    "@types/react": "18.2.74"
   }
 }

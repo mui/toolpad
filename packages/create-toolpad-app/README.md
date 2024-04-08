@@ -1,7 +1,7 @@
 # Create Toolpad App
 
-The simplest method to start with Toolpad is by using `create-toolpad-app`.
-This CLI tool enables you to quickly start building a new Toolpad application, with everything already set up.
+The simplest method to start with Toolpad Studio is by using `create-toolpad-app`.
+This CLI tool enables you to quickly start building a new Toolpad Studio application, with everything already set up.
 
 ## Interactive
 
@@ -15,10 +15,10 @@ yarn create toolpad-app
 pnpm create toolpad-app
 ```
 
-You will be asked for the name of your project
+You then need to provide the name of your project:
 
 ```bash
 ✔ Enter the name of your project:
 ```
 
-Enter the name to install the necessary types/dependencies and create a new Toolpad project.
+Enter the name to install the necessary types/dependencies and create a new Toolpad Studio project.

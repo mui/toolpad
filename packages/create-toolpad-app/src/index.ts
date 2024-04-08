@@ -6,13 +6,15 @@ import path from 'path';
 import yargs from 'yargs';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import { errorFrom } from '@mui/toolpad-utils/errors';
-import { execaCommand } from 'execa';
+import { errorFrom } from '@toolpad/utils/errors';
+import { execa } from 'execa';
 import { satisfies } from 'semver';
-import { readJsonFile } from '@mui/toolpad-utils/fs';
+import { readJsonFile } from '@toolpad/utils/fs';
 import invariant from 'invariant';
-import { bashResolvePath } from '@mui/toolpad-utils/cli';
+import { bashResolvePath } from '@toolpad/utils/cli';
 import { PackageJson } from './packageType';
+import generateProject from './generateProject';
+import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
@@ -36,7 +38,7 @@ function getPackageManager(): PackageManager {
       return 'npm';
     }
   }
-  return 'yarn';
+  return 'npm';
 }
 
 // From https://github.com/vercel/next.js/blob/canary/packages/create-next-app/helpers/is-folder-empty.ts
@@ -91,7 +93,7 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
     if (await isFolderEmpty(absolutePath)) {
       return true;
     }
-    return `${chalk.red('error')} - The directory at ${chalk.blue(
+    return `${chalk.red('error')} - The directory at ${chalk.cyan(
       absolutePath,
     )} contains files that could conflict. Either use a new directory, or remove conflicting files.`;
   } catch (rawError: unknown) {
@@ -111,7 +113,9 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Creating Toolpad project in ${chalk.blue(absolutePath)}`);
+  console.log(
+    `${chalk.cyan('info')} - Creating Toolpad Studio project in ${chalk.cyan(absolutePath)}`,
+  );
   // eslint-disable-next-line no-console
   console.log();
 
@@ -119,22 +123,22 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
     name: path.basename(absolutePath),
     version: '0.1.0',
     scripts: {
-      dev: 'toolpad dev',
-      build: 'toolpad build',
-      start: 'toolpad start',
+      dev: 'toolpad-studio dev',
+      build: 'toolpad-studio build',
+      start: 'toolpad-studio start',
     },
     dependencies: {
-      '@mui/toolpad': 'latest',
+      '@toolpad/studio': 'latest',
     },
   };
 
   const DEFAULT_GENERATED_GITIGNORE_FILE = '.gitignore';
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Initializing package.json file`);
+  console.log(`${chalk.cyan('info')} - Initializing package.json file`);
   await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
 
   // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')} - Initializing .gitignore file`);
+  console.log(`${chalk.cyan('info')} - Initializing .gitignore file`);
   await fs.copyFile(
     path.resolve(__dirname, `./gitignoreTemplate`),
     path.join(absolutePath, DEFAULT_GENERATED_GITIGNORE_FILE),
@@ -142,13 +146,11 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
 
   if (installFlag) {
     // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')} - Installing dependencies`);
+    console.log(`${chalk.cyan('info')} - Installing dependencies`);
     // eslint-disable-next-line no-console
     console.log();
 
-    const installVerb = packageManager === 'yarn' ? 'add' : 'install';
-    const command = `${packageManager} ${installVerb} @mui/toolpad`;
-    await execaCommand(command, { stdio: 'inherit', cwd: absolutePath });
+    await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
 
     // eslint-disable-next-line no-console
     console.log();
@@ -157,6 +159,35 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
     // eslint-disable-next-line no-console
     console.log();
   }
+};
+
+const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
+  // eslint-disable-next-line no-console
+  console.log();
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.cyan('info')} - Creating Toolpad Core project in ${chalk.cyan(absolutePath)}`,
+  );
+  // eslint-disable-next-line no-console
+  console.log();
+  const files = generateProject({ name: path.basename(absolutePath) });
+  await writeFiles(absolutePath, files);
+
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.cyan('info')} - Installing dependencies`);
+  // eslint-disable-next-line no-console
+  console.log();
+
+  await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
+
+  // eslint-disable-next-line no-console
+  console.log();
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.green('success')} - Created Toolpad Core project at ${chalk.cyan(absolutePath)}`,
+  );
+  // eslint-disable-next-line no-console
+  console.log();
 };
 
 // Run the CLI interaction with Inquirer.js
@@ -183,7 +214,12 @@ const run = async () => {
     .usage('$0 [path] [options]')
     .positional('path', {
       type: 'string',
-      describe: 'The path where the Toolpad project directory will be created',
+      describe: 'The path where the Toolpad Studio project directory will be created',
+    })
+    .option('core', {
+      type: 'boolean',
+      describe: 'Create a new project with Toolpad Core',
+      default: false,
     })
     .option('install', {
       type: 'boolean',
@@ -195,11 +231,11 @@ const run = async () => {
       describe:
         'The name of one of the available examples. See https://github.com/mui/mui-toolpad/tree/master/examples.',
     })
-
     .help().argv;
 
   const pathArg = args._?.[0] as string;
   const installFlag = args.install as boolean;
+  const coreFlag = args.core as boolean;
 
   if (pathArg) {
     const pathValidOrError = await validatePath(pathArg);
@@ -231,6 +267,8 @@ const run = async () => {
 
   if (args.example) {
     await downloadAndExtractExample(absolutePath, args.example);
+  } else if (coreFlag) {
+    await scaffoldCoreProject(absolutePath);
   } else {
     await scaffoldProject(absolutePath, installFlag);
   }

@@ -2,7 +2,8 @@ import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded';
+import CircularProgress from '@mui/material/CircularProgress';
+import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import ROUTES from '../../route';
 
@@ -16,16 +17,19 @@ export default function GithubStars() {
     const response = await fetch('https://api.github.com/repos/mui/mui-toolpad');
     const data = await response.json();
     setFetching(false);
-    if (typeof window !== 'undefined') {
+    if (response.status !== 200) {
+      console.error('Failed to fetch stars count', data);
+    }
+    if (typeof window !== 'undefined' && data.stargazers_count) {
       localStorage.setItem('mui-toolpad-stars', `${Date.now()}_${data.stargazers_count}`);
     }
-    setStars(data.stargazers_count);
+    setStars(data.stargazers_count ?? '');
   }, []);
 
   React.useEffect(() => {
     const cached = localStorage.getItem('mui-toolpad-stars');
-    if (cached && Date.now() - parseFloat(cached.split('_')[0]) < 1000 * 60 * 60) {
-      setStars(parseFloat(cached.split('_')[1]));
+    if (cached && Date.now() - parseFloat(cached.split('_')?.[0]) < 1000 * 60 * 60) {
+      setStars(cached.split('_')?.[1] ? parseFloat(cached.split('_')?.[1]) : '');
       setFetching(false);
     } else {
       fetchStars();
@@ -55,7 +59,7 @@ export default function GithubStars() {
       }}
       startIcon={<GitHubIcon />}
     >
-      Stars
+      Star
       <Box
         sx={{
           display: 'flex',
@@ -67,8 +71,11 @@ export default function GithubStars() {
           }),
         }}
       >
-        <StarRateRoundedIcon fontSize="small" />
-        {fetching ? '...' : stars}
+        <StarBorderOutlinedIcon
+          sx={{ mt: stars ? 0.1 : 0, mr: stars ? 0.5 : 0 }}
+          fontSize="small"
+        />
+        {fetching ? <CircularProgress size={16} sx={{ ml: 0.25, mt: 0.1 }} /> : stars}
       </Box>
     </Button>
   );

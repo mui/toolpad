@@ -1,20 +1,20 @@
 <!-- markdownlint-disable-next-line -->
 <p align="center">
-  <a href="https://mui.com/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/logo.svg" alt="MUI Toolpad logo"></a>
+  <a href="https://mui.com/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/logo.svg" alt="Toolpad Studio logo"></a>
 </p>
 
-<h1 align="center">MUI Toolpad</h1>
+<h1 align="center">Toolpad Studio</h1>
 
 <div align="center">
 
-Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal tools builder designed to extend the [MUI](https://mui.com/) React components. It's designed for developers of all trades who want to save time building internal applications.
+Quickly build internal tools. Toolpad Studio is a self-hosted low-code internal tools builder designed to extend the [MUI](https://mui.com/) React components. It's designed for developers of all trades who want to save time building internal applications.
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
 
 <!--
-[![npm latest package](https://img.shields.io/npm/v/@mui/toolpad/latest.svg)](https://www.npmjs.com/package/@mui/toolpad)
-[![npm next package](https://img.shields.io/npm/v/@mui/toolpad/next.svg)](https://www.npmjs.com/package/@mui/toolpad@beta)
-[![npm downloads](https://img.shields.io/npm/dm/@mui/toolpad.svg)](https://www.npmjs.com/package/@mui/toolpad)
+[![npm latest package](https://img.shields.io/npm/v/@toolpad/studio/latest.svg)](https://www.npmjs.com/package/@toolpad/studio)
+[![npm next package](https://img.shields.io/npm/v/@toolpad/studio/next.svg)](https://www.npmjs.com/package/@toolpad/studio@beta)
+[![npm downloads](https://img.shields.io/npm/dm/@toolpad/studio.svg)](https://www.npmjs.com/package/@toolpad/studio)
 -->
 
 [![CircleCI](https://circleci.com/gh/mui/mui-toolpad/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)
@@ -27,7 +27,7 @@ Quickly build internal tools. MUI Toolpad is a self-hosted low-code internal to
 
 ## We are making some changes
 
-A [big change](https://github.com/mui/mui-toolpad/discussions/1748) is coming: we're making Toolpad focus much more on integrating with your IDE while providing the ease of building UI fast with a drag and drop.
+A [big addition](https://github.com/mui/mui-toolpad/discussions/3311) is happening. We're working on Toolpad Core, a framework approach to internal tools. Through high-level components and data management interfaces, we aim to revamp the app building experience that involves tabular data. It will be tightly integrated with MUI X and Core libraries, and would act as your go to framework for admin dashboards and CRUD apps!
 
 ## Product walkthrough
 
@@ -35,27 +35,27 @@ A [big change](https://github.com/mui/mui-toolpad/discussions/1748) is coming: w
 
 ## Notice
 
-MUI Toolpad is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.
+Toolpad Studio is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.
 
 ## Quick setup locally
 
 Run:
 
 ```bash
-npx create-toolpad-app@latest my-toolpad-app
+npx create-toolpad-app@latest my-toolpad-studio-app
 # or
-yarn create toolpad-app my-toolpad-app
+yarn create toolpad-app my-toolpad-studio-app
 # or
-pnpm create toolpad-app my-toolpad-app
+pnpm create toolpad-app my-toolpad-studio-app
 ```
 
 ## Documentation
 
-Check out our [documentation](https://mui.com/toolpad/getting-started/).
+Check out our [documentation](https://mui.com/toolpad/studio/getting-started/).
 
 ## Examples
 
-Check out our [mui-public](https://github.com/mui/mui-public) repo to see how a Toolpad app looks in production.
+Check out our [mui-public](https://github.com/mui/mui-public) repo to see how a Toolpad Studio app looks in production.
 
 ## Contributing
 
@@ -70,7 +70,7 @@ The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly update
 
 ## Roadmap
 
-Future plans and high-priority features and enhancements can be found in our [roadmap](https://mui.com/toolpad/getting-started/roadmap/).
+Future plans and high-priority features and enhancements can be found in the [roadmap](https://mui.com/toolpad/studio/getting-started/roadmap/).
 
 ## License
 

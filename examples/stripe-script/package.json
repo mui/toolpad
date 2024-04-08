@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "toolpad dev",
-    "build": "toolpad build",
-    "start": "toolpad start"
+    "dev": "toolpad-studio dev",
+    "build": "toolpad-studio build",
+    "start": "toolpad-studio start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.51",
-    "archiver": "7.0.0",
-    "stripe": "^14.14.0"
+    "@toolpad/studio": "0.1.53",
+    "archiver": "7.0.1",
+    "stripe": "^14.24.0"
   }
 }

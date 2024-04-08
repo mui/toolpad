@@ -1,4 +1,4 @@
-import { createDataProvider } from '@mui/toolpad/server';
+import { createDataProvider } from '@toolpad/studio/server';
 
 let nextId = 0;
 function createRecord(values = {}) {

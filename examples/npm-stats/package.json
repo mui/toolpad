@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "toolpad dev",
-    "build": "toolpad build",
-    "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad start"
+    "dev": "toolpad-studio dev",
+    "build": "toolpad-studio build",
+    "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad-studio start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.51"
+    "@toolpad/studio": "0.1.53"
   }
 }

@@ -1,13 +1,17 @@
 version: 2.1
 
-defaults: &defaults
+default-job: &default-job
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:18.17.1
+    - image: cimg/node:18.19.1
   environment:
     # Keep in sync with "Save playwright cache"
     PLAYWRIGHT_BROWSERS_PATH: /tmp/pw-browsers
+
+default-context: &default-context
+  context:
+    - org-global
 
 # CircleCI has disabled the cache across forks for security reasons.
 # Following their official statement, it was a quick solution, they
@@ -24,7 +28,7 @@ commands:
       browsers:
         type: boolean
         default: false
-        description: 'Set to true if you intend to use any browser (e.g. with playwright).'
+        description: 'Set to true if you intend to use any browser (for example with playwright).'
 
     steps:
       - when:
@@ -76,7 +80,7 @@ commands:
 
 jobs:
   checkout:
-    <<: *defaults
+    <<: *default-job
     steps:
       - checkout
       - install_js
@@ -86,7 +90,8 @@ jobs:
       - run:
           name: Check for duplicated packages
           command: |
-            if [[ $(git diff --name-status master | grep pnpm.lock) == "" ]];
+            # #default-branch-switch
+            if [[ $(git diff --name-status master | grep -E 'pnpm-workspace\.yaml|pnpm-lock.yaml|package\.json') == "" ]];
             then
                 echo "no changes to dependencies detected, skipping..."
             else
@@ -94,7 +99,7 @@ jobs:
             fi
 
   test_lint:
-    <<: *defaults
+    <<: *default-job
     steps:
       - checkout
       - install_js
@@ -108,7 +113,7 @@ jobs:
           name: Lint Markdown
           command: pnpm markdownlint
   test_types:
-    <<: *defaults
+    <<: *default-job
     steps:
       - checkout
       - install_js
@@ -116,7 +121,7 @@ jobs:
           name: Check Typescript types
           command: pnpm check-types
   test_static:
-    <<: *defaults
+    <<: *default-job
     steps:
       - checkout
       - install_js
@@ -137,7 +142,7 @@ jobs:
             pnpm check-changes
 
   test_unit:
-    <<: *defaults
+    <<: *default-job
 
     steps:
       - checkout
@@ -151,11 +156,11 @@ jobs:
           command: pnpm test
 
   test_integration:
-    <<: *defaults
+    <<: *default-job
     resource_class: 'large'
     parallelism: 2
     docker:
-      - image: mcr.microsoft.com/playwright:v1.42.1-focal
+      - image: mcr.microsoft.com/playwright:v1.43.0-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
@@ -183,19 +188,25 @@ jobs:
 workflows:
   pipeline:
     jobs:
-      - checkout
+      - checkout:
+          <<: *default-context
       - test_lint:
+          <<: *default-context
           requires:
             - checkout
       - test_types:
+          <<: *default-context
           requires:
             - checkout
       - test_static:
+          <<: *default-context
           requires:
             - checkout
       - test_unit:
+          <<: *default-context
           requires:
             - checkout
       - test_integration:
+          <<: *default-context
           requires:
             - checkout

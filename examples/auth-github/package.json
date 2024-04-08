@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "toolpad dev",
-    "build": "toolpad build",
-    "start": "toolpad start"
+    "dev": "toolpad-studio dev",
+    "build": "toolpad-studio build",
+    "start": "toolpad-studio start"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.51"
+    "@toolpad/studio": "0.1.53"
   }
 }

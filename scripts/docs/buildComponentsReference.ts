@@ -1,9 +1,9 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { kebabCase } from 'lodash';
-import type { ComponentConfig } from '@mui/toolpad-core';
-import * as builtins from '@mui/toolpad-components';
-import * as toolpadCore from '@mui/toolpad-core';
+import type { ComponentConfig } from '@toolpad/studio-runtime';
+import * as builtins from '@toolpad/studio-components';
+import * as toolpadCore from '@toolpad/studio-runtime';
 import { escapeCell, writePrettifiedFile } from './utils';
 
 const AUTO_GENERATED_WARNING =
@@ -13,7 +13,7 @@ const currentDirectory = __dirname;
 const projectRoot = path.resolve(currentDirectory, '..', '..');
 const prettierConfigPath = path.resolve(projectRoot, 'prettier.config.js');
 const docsRoot = path.resolve(projectRoot, 'docs');
-const absolutePathRoot = '/toolpad/reference/components';
+const absolutePathRoot = '/toolpad/studio/reference/components';
 const componentDocsRoot = path.resolve(docsRoot, `data${absolutePathRoot}`);
 const componentPagesRoot = path.resolve(docsRoot, `pages${absolutePathRoot}`);
 
@@ -60,7 +60,7 @@ export async function buildComponentsReference() {
           '',
           `# ${name}`,
           '',
-          `<p class="description">API docs for the Toolpad ${name} component.</p>`,
+          `<p class="description">API docs for the Toolpad Studio ${name} component.</p>`,
           '',
           config.helperText,
           '',

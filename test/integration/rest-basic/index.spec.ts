@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import * as url from 'url';
 import invariant from 'invariant';
-import { fileReplaceAll } from '@mui/toolpad-utils/fs';
+import { fileReplaceAll } from '@toolpad/utils/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
@@ -79,7 +79,6 @@ test('rest editor basics', async ({ page, context, localApp, argosScreenshot }) 
   await expect(queryEditor).toBeVisible();
 
   const urlInput = queryEditor.getByLabel('url', { exact: true });
-  await urlInput.click();
   await urlInput.fill('http://foo.bar');
 
   await argosScreenshot('rest-editor', {

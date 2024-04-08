@@ -1,9 +1,9 @@
 # QR Code generator
 
-<p class="description">A basic Toolpad application that can be used to turn any text or URL into a QR code.</p>
+<p class="description">A basic Toolpad Studio application that can be used to turn any text or URL into a QR code.</p>
 
 <a href="https://mui-toolpad-qr-generator-production.up.railway.app/prod/pages/qrcode" target="_blank">
-  <img src="https://mui.com/static/toolpad/docs/examples/qr-generator.png" alt="QR generator" style="aspect-ratio: 575/318;" width="1440">
+  <img src="https://mui.com/static/toolpad/docs/studio/examples/qr-generator.png" alt="QR generator" style="aspect-ratio: 575/318;" width="1440">
 </a>
 
 ## Check out the live app
@@ -32,7 +32,7 @@ or:
 
 ## What's inside
 
-This app demonstrates the following capabilities of Toolpad:
+This app demonstrates the following capabilities of Toolpad Studio:
 
 1. Using a custom function that takes parameters.
 2. Importing an external npm package.

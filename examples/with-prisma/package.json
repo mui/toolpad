@@ -3,21 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "toolpad dev",
-    "build": "toolpad build",
-    "start": "toolpad start",
+    "dev": "toolpad-studio dev",
+    "build": "toolpad-studio build",
+    "start": "toolpad-studio start",
     "prisma": "prisma"
   },
   "dependencies": {
-    "@mui/toolpad": "0.1.51",
-    "@prisma/client": "5.9.1",
+    "@toolpad/studio": "0.1.53",
+    "@prisma/client": "5.12.1",
     "qrcode": "^1.5.3"
   },
   "devDependencies": {
-    "@types/node": "^20.11.20",
+    "@types/node": "^20.12.5",
     "@types/qrcode": "^1.5.5",
-    "prisma": "^5.10.2",
+    "prisma": "^5.12.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.4"
   }
 }

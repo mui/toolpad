@@ -3,7 +3,7 @@ import invariant from 'invariant';
 import type { Plugin } from 'vite';
 import { createRpcClient } from '@toolpad/utils/workerRpc';
 import type * as appDom from '@toolpad/studio-runtime/appDom';
-import { createViteConfig, getAppHtmlContent, getEditorHtmlContent } from './toolpadAppBuilder';
+import { createViteConfig, getEditorHtmlContent } from './toolpadAppBuilder';
 import type { RuntimeConfig } from '../types';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import createRuntimeState from '../runtime/createRuntimeState';

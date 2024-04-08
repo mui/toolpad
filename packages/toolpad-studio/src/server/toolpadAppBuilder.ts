@@ -44,7 +44,7 @@ function getHtmlContent(entry: string) {
   `;
 }
 
-export function getAppHtmlContent() {
+function getAppHtmlContent() {
   return getHtmlContent(MAIN_ENTRY);
 }
 

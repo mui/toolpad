@@ -427,7 +427,7 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
   const app = express();
 
   const editorBasename = '/_toolpad';
-  const { pathname, origin } = new URL(appRootUrl);
+  const { pathname } = new URL(appRootUrl);
 
   const editorHandler = await createEditorHandler(pathname, options);
 
@@ -435,7 +435,7 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
     pathname,
     createProxyMiddleware({
       ws: true,
-      target: origin,
+      target: appRootUrl,
     }),
   );
 

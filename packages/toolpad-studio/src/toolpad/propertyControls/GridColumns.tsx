@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Chip,
   FormControlLabel,
   IconButton,
   List,
@@ -16,6 +17,7 @@ import {
   TextFieldProps,
   TextFieldVariants,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -340,7 +342,29 @@ function GridColumnEditor({
           />
         </React.Fragment>
       ) : (
-        <Box>Grouping/aggregation</Box>
+        <Typography variant="body2">
+          Grouping/aggregation
+          <Tooltip title="Only available in paid plans. Click to learn more.">
+            <Chip
+              variant="outlined"
+              color="primary"
+              component={'a'}
+              href="https://mui.com/toolpad/studio/components/data-grid/#grouping"
+              target="_blank"
+              rel="noopener"
+              sx={{
+                height: '1.5rem',
+                fontSize: 'inherit',
+                verticalAlign: 'inherit',
+                mx: '0.2rem',
+                '& :hover': {
+                  cursor: 'pointer',
+                },
+              }}
+              label="Pro"
+            />
+          </Tooltip>
+        </Typography>
       )}
     </Stack>
   );

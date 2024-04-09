@@ -1,8 +1,9 @@
 import {
+  Chip,
   Stack,
+  Tooltip,
   Typography,
   Divider,
-  Tooltip,
   Link,
   ToggleButtonGroup,
   ToggleButton,
@@ -20,7 +21,6 @@ import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import PageTitleEditor from '../PageTitleEditor';
 import PageDisplayNameEditor from '../PageDisplayNameEditor';
-import HelpTooltipIcon from '../../../components/HelpTooltipIcon';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
   { value: 'shell', label: 'App shell' },
@@ -123,25 +123,35 @@ export default function PageOptionsPanel() {
       </div>
       <div>
         <Typography variant="overline">
-          Authorization
-          {isPaidPlan ? null : (
-            <HelpTooltipIcon
-              iconSx={{ verticalAlign: 'middle', marginLeft: '0.3em', marginBottom: '0.1em' }}
-              helpText={
+          Authorization{' '}
+          {!isPaidPlan ? (
+            <Tooltip
+              title={
                 <Typography variant="inherit">
-                  Only available in paid plans.{' '}
-                  <Link
-                    href="https://mui.com/toolpad/studio/concepts/rbac/"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    Learn more
-                  </Link>
-                  .
+                  Only available in paid plans. Click to learn more.
                 </Typography>
               }
-            />
-          )}
+            >
+              <Chip
+                variant="outlined"
+                color="primary"
+                component={'a'}
+                href="https://mui.com/toolpad/studio/concepts/rbac/"
+                target="_blank"
+                rel="noopener"
+                sx={{
+                  height: '1.5rem',
+                  fontSize: 'inherit',
+                  verticalAlign: 'inherit',
+                  mx: '0.2rem',
+                  '& :hover': {
+                    cursor: 'pointer',
+                  },
+                }}
+                label="Pro"
+              />
+            </Tooltip>
+          ) : null}
         </Typography>
 
         {isPaidPlan ? (

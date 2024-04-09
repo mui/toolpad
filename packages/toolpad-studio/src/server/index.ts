@@ -1,13 +1,11 @@
 import * as path from 'path';
 import { IncomingMessage, createServer } from 'http';
-import * as fs from 'fs/promises';
 import { Worker, MessageChannel } from 'worker_threads';
 import express from 'express';
 import getPort from 'get-port';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@toolpad/utils/collections';
 import prettyBytes from 'pretty-bytes';
-import type { ViteDevServer } from 'vite';
 import { WebSocket, WebSocketServer } from 'ws';
 import { listen } from '@toolpad/utils/http';
 import openBrowser from 'react-dev-utils/openBrowser.js';
@@ -24,7 +22,6 @@ import type {
   WorkerRpc,
 } from './appServerWorker';
 import { createRpcHandler } from './rpc';
-import { APP_URL_WINDOW_PROPERTY } from '../constants';
 import { createRpcServer as createProjectRpcServer } from './projectRpcServer';
 import { createRpcServer as createRuntimeRpcServer } from './runtimeRpcServer';
 import { createAuthHandler, createRequireAuthMiddleware, getRequireAuthentication } from './auth';
@@ -224,67 +221,6 @@ export async function createHandler({
   };
 }
 
-interface EditorHandlerParams {
-  toolpadDevMode?: boolean;
-}
-
-async function createEditorHandler(
-  appUrl: string,
-  { toolpadDevMode = false }: EditorHandlerParams,
-): Promise<AppHandler> {
-  const router = express.Router();
-  let viteApp: ViteDevServer | undefined;
-
-  const transformIndexHtml = (html: string) => {
-    return html.replace(
-      '<!-- __TOOLPAD_SCRIPTS__ -->',
-
-      `<script>window[${JSON.stringify(APP_URL_WINDOW_PROPERTY)}] = ${JSON.stringify(
-        appUrl,
-      )}</script>
-      `,
-    );
-  };
-
-  if (toolpadDevMode) {
-    // eslint-disable-next-line no-console
-    console.log(`${chalk.blue('info')}  - Running Toolpad Studio editor in dev mode`);
-
-    const vite = await import('vite');
-    viteApp = await vite.createServer({
-      configFile: path.resolve(currentDirectory, '../../src/toolpad/vite.config.mts'),
-      root: path.resolve(currentDirectory, '../../src/toolpad'),
-      server: { middlewareMode: true },
-      plugins: [
-        {
-          name: 'toolpad:transform-index-html',
-          transformIndexHtml,
-        },
-      ],
-    });
-
-    router.use('/', viteApp.middlewares);
-  } else {
-    router.use(
-      '/',
-      express.static(path.resolve(currentDirectory, '../../dist/editor'), { index: false }),
-      asyncHandler(async (req, res) => {
-        const htmlFilePath = path.resolve(currentDirectory, '../../dist/editor/index.html');
-        let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
-        html = transformIndexHtml(html);
-        res.setHeader('Content-Type', 'text/html').status(200).end(html);
-      }),
-    );
-  }
-
-  return {
-    handler: router,
-    async dispose() {
-      await viteApp?.close();
-    },
-  };
-}
-
 async function createToolpadHandler({
   dev,
   externalUrl,
@@ -324,14 +260,9 @@ async function createToolpadHandler({
 
   let editorHandler: AppHandler | undefined;
   if (dev) {
-    if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
-      router.use('/_toolpad', (req, res) => {
-        res.redirect(`${project.options.base}/editor${req.url}`);
-      });
-    } else {
-      editorHandler = await createEditorHandler(project.options.base, { toolpadDevMode });
-      router.use(editorBasename, editorHandler.handler);
-    }
+    router.use('/_toolpad', (req, res) => {
+      res.redirect(`${project.options.base}/editor${req.url}`);
+    });
   }
 
   return {
@@ -393,12 +324,7 @@ async function fetchAppUrl(appUrl: string): Promise<string> {
   return new URL(appBase, appUrl).toString();
 }
 
-export interface RunEditorOptions {
-  port?: number;
-  toolpadDevMode?: boolean;
-}
-
-export async function runEditor(appUrl: string, options: RunEditorOptions = {}) {
+export async function runEditor(appUrl: string) {
   let appRootUrl;
   try {
     appRootUrl = await fetchAppUrl(appUrl);
@@ -413,43 +339,9 @@ export async function runEditor(appUrl: string, options: RunEditorOptions = {}) 
     process.exit(1);
   }
 
-  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
-    // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.yellow('warn')}  - The editor command is deprecated and will be removed in the future, please visit ${chalk.cyan(`${appRootUrl}/editor`)}`,
-    );
-    return;
-  }
-
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.blue('info')}  - starting Toolpad Studio editor...`);
-
-  const app = express();
-
-  const editorBasename = '/_toolpad';
-  const { pathname, origin } = new URL(appRootUrl);
-
-  const editorHandler = await createEditorHandler(pathname, options);
-
-  app.use(
-    pathname,
-    createProxyMiddleware({
-      logLevel: 'silent',
-      ws: true,
-      target: origin,
-    }),
-  );
-
-  app.use(editorBasename, editorHandler.handler);
-
-  const port = options.port || (await getPort({ port: getPreferredPorts(DEFAULT_PORT) }));
-  const server = await listen(app, port);
-
   // eslint-disable-next-line no-console
   console.log(
-    `${chalk.green('ready')} - Toolpad Studio editor ready on ${chalk.cyan(
-      `http://localhost:${server.port}${editorBasename}`,
-    )}`,
+    `${chalk.yellow('warn')}  - The editor command is deprecated and will be removed in the future, please visit ${chalk.cyan(`${appRootUrl}/editor`)}`,
   );
 }
 

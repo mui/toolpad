@@ -12,7 +12,6 @@
     "lint": "prettier --check .",
     "fix": "prettier --write .",
     "build:cli": "tsup",
-    "build:editor": "vite build ./src/toolpad",
     "build:typings": "tsx ./scripts/typings.mts",
     "dev:cli": "tsup --watch",
     "dev:typings": "pnpm build:typings",

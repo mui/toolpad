@@ -201,6 +201,62 @@ function GridColumnEditor({
         ))}
       </TextField>
 
+      <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
+        {editedColumn.type === 'number' ? (
+          <NumberFormatEditor
+            disabled={disabled}
+            value={editedColumn.numberFormat}
+            onChange={(numberFormat) => handleColumnChange({ ...editedColumn, numberFormat })}
+          />
+        ) : null}
+
+        {editedColumn.type === 'date' ? (
+          <DateFormatEditor
+            disabled={disabled}
+            disableTimeFormat
+            value={editedColumn.dateFormat}
+            onChange={(dateFormat) => {
+              handleColumnChange({ ...editedColumn, dateFormat });
+            }}
+          />
+        ) : null}
+
+        {editedColumn.type === 'dateTime' ? (
+          <DateFormatEditor
+            disabled={disabled}
+            value={editedColumn.dateTimeFormat}
+            onChange={(dateTimeFormat) => {
+              handleColumnChange({ ...editedColumn, dateTimeFormat });
+            }}
+          />
+        ) : null}
+
+        {editedColumn.type === 'codeComponent' ? (
+          <TextField
+            select
+            required
+            fullWidth
+            label="Custom component"
+            value={editedColumn.codeComponent ?? ''}
+            disabled={disabled}
+            error={!editedColumn.codeComponent}
+            helperText={editedColumn.codeComponent ? undefined : 'Please select a component'}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                codeComponent: event.target.value,
+              })
+            }
+          >
+            {codeComponents.map(({ displayName }) => (
+              <MenuItem key={displayName} value={displayName}>
+                {displayName}
+              </MenuItem>
+            ))}
+          </TextField>
+        ) : null}
+      </Box>
+
       <FormControlLabel
         control={
           <Checkbox
@@ -283,63 +339,9 @@ function GridColumnEditor({
             label="Aggregable"
           />
         </React.Fragment>
-      ) : null}
-
-      <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
-        {editedColumn.type === 'number' ? (
-          <NumberFormatEditor
-            disabled={disabled}
-            value={editedColumn.numberFormat}
-            onChange={(numberFormat) => handleColumnChange({ ...editedColumn, numberFormat })}
-          />
-        ) : null}
-
-        {editedColumn.type === 'date' ? (
-          <DateFormatEditor
-            disabled={disabled}
-            disableTimeFormat
-            value={editedColumn.dateFormat}
-            onChange={(dateFormat) => {
-              handleColumnChange({ ...editedColumn, dateFormat });
-            }}
-          />
-        ) : null}
-
-        {editedColumn.type === 'dateTime' ? (
-          <DateFormatEditor
-            disabled={disabled}
-            value={editedColumn.dateTimeFormat}
-            onChange={(dateTimeFormat) => {
-              handleColumnChange({ ...editedColumn, dateTimeFormat });
-            }}
-          />
-        ) : null}
-
-        {editedColumn.type === 'codeComponent' ? (
-          <TextField
-            select
-            required
-            fullWidth
-            label="Custom component"
-            value={editedColumn.codeComponent ?? ''}
-            disabled={disabled}
-            error={!editedColumn.codeComponent}
-            helperText={editedColumn.codeComponent ? undefined : 'Please select a component'}
-            onChange={(event) =>
-              handleColumnChange({
-                ...editedColumn,
-                codeComponent: event.target.value,
-              })
-            }
-          >
-            {codeComponents.map(({ displayName }) => (
-              <MenuItem key={displayName} value={displayName}>
-                {displayName}
-              </MenuItem>
-            ))}
-          </TextField>
-        ) : null}
-      </Box>
+      ) : (
+        <Box>Grouping/aggregation</Box>
+      )}
     </Stack>
   );
 }

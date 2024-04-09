@@ -23,23 +23,23 @@ import {
   UrlEncodedBody,
 } from './types';
 import applyTransform from '../applyTransform';
-import { HTTP_NO_BODY, getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
+import { HTTP_NO_BODY, getAuthenticationHeaders, parseBaseUrl } from './shared';
 import type { IToolpadProject } from '../server';
 
 async function loadEnvFile(project: IToolpadProject) {
   return project.envManager.getDeclaredValues();
 }
 
-function resolveBindable(
+function resolveBindable<T>(
   jsRuntime: JsRuntime,
-  bindable: BindableAttrValue<string>,
+  bindable: BindableAttrValue<T>,
   scope: Record<string, unknown>,
-): any {
+): T {
   const { value, error } = evaluateBindable(jsRuntime, bindable, scope);
   if (error) {
     throw error;
   }
-  return value;
+  return value as T;
 }
 
 function resolveBindableEntries(
@@ -149,8 +149,7 @@ async function execBase(
     parameters: Object.fromEntries(resolvedParams),
   };
 
-  const runtimeConfig = await project.getRuntimeConfig();
-  const urlvalue = fetchQuery.url || getDefaultUrl(runtimeConfig, connection);
+  const urlvalue = fetchQuery.url ?? '';
   const resolvedUrl = resolveBindable(jsRuntime, urlvalue, queryScope);
   const resolvedSearchParams = resolveBindableEntries(
     jsRuntime,

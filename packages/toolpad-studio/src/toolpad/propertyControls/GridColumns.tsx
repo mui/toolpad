@@ -348,7 +348,7 @@ function GridColumnEditor({
             <Chip
               variant="outlined"
               color="primary"
-              component={'a'}
+              component="a"
               href="https://mui.com/toolpad/studio/components/data-grid/#grouping"
               target="_blank"
               rel="noopener"
@@ -357,10 +357,8 @@ function GridColumnEditor({
                 fontSize: 'inherit',
                 verticalAlign: 'inherit',
                 mx: '0.2rem',
-                '& :hover': {
-                  cursor: 'pointer',
-                },
               }}
+              clickable
               label="Pro"
             />
           </Tooltip>

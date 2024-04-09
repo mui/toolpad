@@ -100,6 +100,8 @@ const LICENSE_INFO: MuiLicenseInfo = {
   key: process.env.TOOLPAD_BUNDLED_MUI_X_LICENSE,
 };
 
+const IS_PRO_PLAN = process.env.TOOLPAD_PLAN === 'pro';
+
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
 const SetActionResultContext = React.createContext<((result: ActionResult) => void) | undefined>(
@@ -1303,6 +1305,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               onRowSelectionModelChange={onSelectionModelChange}
               rowSelectionModel={selectionModel}
               initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
+              disableAggregation={!IS_PRO_PLAN}
+              disableRowGrouping={!IS_PRO_PLAN}
               {...props}
               {...dataProviderProps}
               sx={{

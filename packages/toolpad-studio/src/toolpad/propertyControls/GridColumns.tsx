@@ -37,6 +37,8 @@ import PropertyControl from '../../components/PropertyControl';
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 
+const IS_PRO_PLAN = process.env.TOOLPAD_PLAN === 'pro';
+
 type GridAlignment = SerializableGridColumn['align'];
 
 const COLUMN_TYPES: string[] = [
@@ -247,37 +249,41 @@ function GridColumnEditor({
         label="Editable"
       />
 
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={editedColumn.groupable ?? true}
-            disabled={disabled}
-            onChange={(event) =>
-              handleColumnChange({
-                ...editedColumn,
-                groupable: event.target.checked,
-              })
+      {IS_PRO_PLAN ? (
+        <React.Fragment>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={editedColumn.groupable ?? true}
+                disabled={disabled}
+                onChange={(event) =>
+                  handleColumnChange({
+                    ...editedColumn,
+                    groupable: event.target.checked,
+                  })
+                }
+              />
             }
+            label="Groupable"
           />
-        }
-        label="Groupable"
-      />
 
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={editedColumn.aggregable ?? true}
-            disabled={disabled}
-            onChange={(event) =>
-              handleColumnChange({
-                ...editedColumn,
-                aggregable: event.target.checked,
-              })
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={editedColumn.aggregable ?? true}
+                disabled={disabled}
+                onChange={(event) =>
+                  handleColumnChange({
+                    ...editedColumn,
+                    aggregable: event.target.checked,
+                  })
+                }
+              />
             }
+            label="Aggregable"
           />
-        }
-        label="Aggregable"
-      />
+        </React.Fragment>
+      ) : null}
 
       <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
         {editedColumn.type === 'number' ? (

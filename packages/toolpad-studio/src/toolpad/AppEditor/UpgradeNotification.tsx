@@ -23,7 +23,7 @@ export function UpgradeAlert({ sx, type, action, message }: UpgradeAlertProps) {
         action ? (
           <Button
             variant="text"
-            sx={{ fontSize: 'inherit' }}
+            size="small"
             href={UPGRADE_URL}
             target="_blank"
             rel="noopener"

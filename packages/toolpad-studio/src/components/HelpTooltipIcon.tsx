@@ -4,12 +4,13 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 export interface HelpTooltipIconProps extends Omit<TooltipProps, 'title' | 'children'> {
   helpText: React.ReactNode;
+  iconSx?: React.CSSProperties;
 }
 
-export default function HelpTooltipIcon({ helpText, ...props }: HelpTooltipIconProps) {
+export default function HelpTooltipIcon({ helpText, iconSx, ...props }: HelpTooltipIconProps) {
   return (
     <Tooltip {...props} title={helpText}>
-      <HelpOutlineIcon sx={{ color: 'text.secondary' }} />
+      <HelpOutlineIcon sx={{ ...iconSx, color: 'text.secondary' }} />
     </Tooltip>
   );
 }

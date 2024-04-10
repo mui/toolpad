@@ -485,7 +485,7 @@ function GridColumnsPropEditor({
           horizontal: 'left',
         }}
       >
-        <Box sx={{ minWidth: 300, p: 2 }}>
+        <Box sx={{ minWidth: 300, p: 2 }} aria-label="Column editor">
           {editedColumn ? (
             <React.Fragment>
               <IconButton aria-label="Back" onClick={() => setEditedIndex(null)}>

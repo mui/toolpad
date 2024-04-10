@@ -1034,6 +1034,9 @@ importers:
       '@toolpad/utils':
         specifier: workspace:*
         version: link:../packages/toolpad-utils
+      '@types/invariant':
+        specifier: 2.2.37
+        version: 2.2.37
       express:
         specifier: 4.19.2
         version: 4.19.2

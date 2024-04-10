@@ -53,7 +53,13 @@ export function UpgradeAlert({
   );
 }
 
-export function UpgradeChip({ feature, warning }: { feature?: string; warning?: string }) {
+export interface UpgradeChipProps {
+  sx?: SxProps;
+  feature?: string;
+  warning?: string;
+}
+
+export function UpgradeChip({ sx, feature, warning }: UpgradeChipProps) {
   let message = `This feature requires a paid plan.`;
 
   if (warning) {
@@ -71,14 +77,10 @@ export function UpgradeChip({ feature, warning }: { feature?: string; warning?: 
         href={UPGRADE_URL}
         target="_blank"
         rel="noopener"
+        size="small"
         clickable
-        sx={{
-          height: '1.5rem',
-          fontSize: 'inherit',
-          verticalAlign: 'inherit',
-          mx: '0.2rem',
-        }}
         label="Pro"
+        sx={sx}
       />
     </Tooltip>
   );

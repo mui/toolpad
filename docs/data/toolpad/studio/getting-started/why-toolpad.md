@@ -95,7 +95,8 @@ Similar to any Node.js application, you have the flexibility to self-host a Tool
 
 ### Collaborate as programmers
 
-The single source of truth for Toolpad applications is stored in plain YAML files. This means your whole Toolpad application is stored the same way you store your other code. You are therefore free to use whichever source control system you like and collaborate with your team members as you are used to from your other developer workflows.
+Toolpad apps use YAML files as their source of truth.
+This means you can store your entire Toolpad app the same way you store your other code, so you can continue to use the source control systems and developer workflows that you prefer.
 
 
 ## How is Toolpad Studio different from other tools?

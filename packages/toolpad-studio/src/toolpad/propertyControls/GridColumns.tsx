@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Chip,
   FormControlLabel,
   IconButton,
   List,
@@ -38,6 +37,7 @@ import { ToolpadComponentDefinition, useToolpadComponents } from '../AppEditor/t
 import PropertyControl from '../../components/PropertyControl';
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
+import { UpgradeChip } from '../AppEditor/UpgradeNotification';
 
 type GridAlignment = SerializableGridColumn['align'];
 
@@ -345,24 +345,10 @@ function GridColumnEditor({
       ) : (
         <Typography variant="body2">
           Grouping/aggregation
-          <Tooltip title="Only available in paid plans. Click to learn more.">
-            <Chip
-              variant="outlined"
-              color="primary"
-              component="a"
-              href="https://mui.com/toolpad/studio/components/data-grid/#grouping"
-              target="_blank"
-              rel="noopener"
-              sx={{
-                height: '1.5rem',
-                fontSize: 'inherit',
-                verticalAlign: 'inherit',
-                mx: '0.2rem',
-              }}
-              clickable
-              label="Pro"
-            />
-          </Tooltip>
+          <UpgradeChip
+            sx={{ ml: 1 }}
+            url="https://mui.com/toolpad/studio/components/data-grid/#grouping"
+          />
         </Typography>
       )}
     </Stack>

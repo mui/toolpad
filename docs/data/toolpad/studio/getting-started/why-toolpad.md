@@ -51,7 +51,7 @@ Low-code tools can be hard to extend. When the tool can't handle a particular ta
 
 This lack of flexibility often results in being stuck or having to write custom code inside these apps and storing the business logic within their configuration files.
 
-Would it be great if the tool would use code in your filesystem as the source of truth?
+Wouldn't it be great if the tool would use code in your filesystem as the source of truth?
 
 ### Duplication of logic
 
@@ -94,13 +94,10 @@ Similar to any Node.js application, you have the flexibility to self-host a Tool
 
 Like any Node.js app, you can self-host a Toolpad Studio app on your own server or any hosting provider of your choice (such as AWS, Render, Railway, or Heroku). Toolpad Studio does not lock you into its cloud hosting.
 
-### Seamless collaboration
+### Collaborate as programmers
 
-The Toolpad Studio application configuration is saved in YAML files, which can be conveniently added to Git or any preferred version control tool for collaborative maintenance. Maintaining a private code repository is a fundamental practice for enhancing the security of user data. This eliminates the need to create new collaboration mechanisms for engineers, as the existing tools can be effectively leveraged.
-
-### Trust and safety
-
-While organizations make every effort to protect highly sensitive data and conduct thorough vendor due diligence and compliance assessments, data breaches continue to be a significant concern. Toolpad Studio ensures that you can maintain control over your data, helping to address this issue.
+The single source of truth for Toolpad applications are stored in plain YAML files. This means your whole Toolpad application is stored the same way you store your code. You are therefore free to use whichever source control system you like and collaborate with your team memebrs as you would on the rest of your code.
+This also allows for storing the Toolpad project in the same repository as your other code and version, stage, test and deploy it together. Thus eliminating split brain situations between your applications.
 
 ## How is Toolpad Studio different from other tools?
 

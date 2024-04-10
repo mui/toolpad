@@ -90,6 +90,6 @@ See the [Render documentation](https://docs.render.com/node-version) on Node ver
 
 That's it! We're up and running in a few minutes.
 
-Make changes, push to GitHub, and your app will automatically redeploy each time.
+Make changes, push to GitHub, and your app will automatically redeploy each time. Like Render, you can deploy to any hosting provider of your choice.
 
 Check out the Render documentation for more advanced settings, like adding [environment variables](https://docs.render.com/configure-environment-variables) to your app.

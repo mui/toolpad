@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppHostProvider } from '@toolpad/studio-runtime/runtime';
+import { AppHostProvider } from '@toolpad/studio-runtime';
 import { DataGrid } from '@toolpad/studio-components';
 
 const ROWS = [
@@ -27,6 +27,7 @@ const COLUMNS = [
 ];
 
 export default function BasicDataGrid() {
+  console.log(AppHostProvider);
   return (
     <AppHostProvider>
       <DataGrid rows={ROWS} columns={COLUMNS} height={300} density="compact" />

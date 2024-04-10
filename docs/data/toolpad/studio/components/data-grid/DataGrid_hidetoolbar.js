@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppHostProvider } from '@toolpad/studio-runtime/runtime';
+import { AppHostProvider } from '@toolpad/studio-runtime';
 import { DataGrid } from '@toolpad/studio-components';
 
 const ROWS = [

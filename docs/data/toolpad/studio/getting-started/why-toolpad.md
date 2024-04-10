@@ -92,7 +92,6 @@ Toolpad Studio empowers you with total control over the entire development lifec
 
 Similar to any Node.js application, you have the flexibility to self-host a Toolpad Studio app on your own server or select a hosting provider that suits your needs, whether it's AWS, Render, Railway, or Heroku. Toolpad Studio does not confine you to its cloud hosting, ensuring you have the freedom to choose the hosting solution that best aligns with your preferences and requirements.
 
-Like any Node.js app, you can self-host a Toolpad Studio app on your own server or any hosting provider of your choice (such as AWS, Render, Railway, or Heroku). Toolpad Studio does not lock you into its cloud hosting.
 
 ### Collaborate as programmers
 

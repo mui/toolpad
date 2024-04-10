@@ -51,7 +51,7 @@ Low-code tools can be hard to extend. When the tool can't handle a particular ta
 
 This lack of flexibility often results in being stuck or having to write custom code inside these apps and storing the business logic within their configuration files.
 
-Wouldn't it be great if the tool would use code in your filesystem as the source of truth?
+Wouldn't it be great if the tool used code in your filesystem as its source of truth?
 
 ### Duplication of logic
 

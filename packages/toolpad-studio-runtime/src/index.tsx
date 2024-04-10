@@ -24,7 +24,7 @@ export {
   ResetNodeErrorsKeyProvider,
 } from './runtime';
 
-export { type AppHost, AppHostProvider, useAppHost } from './AppHost';
+export { type AppHost, queryClient, AppHostProvider, useAppHost } from './AppHost';
 
 export type FlowDirection = 'row' | 'column' | 'row-reverse' | 'column-reverse';
 

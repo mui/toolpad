@@ -3,7 +3,17 @@ import { useNonNullableContext } from '@toolpad/utils/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToolpadPlan } from './appDom';
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      networkMode: 'always',
+    },
+    mutations: {
+      networkMode: 'always',
+    },
+  },
+});
 
 export interface AppHost {
   isPreview: boolean;

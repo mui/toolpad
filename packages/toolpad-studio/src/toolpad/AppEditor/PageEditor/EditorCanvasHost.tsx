@@ -6,6 +6,7 @@ import {
   CanvasEventsContext,
   AppHostProvider,
   useAppHost,
+  queryClient,
 } from '@toolpad/studio-runtime';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
@@ -21,7 +22,6 @@ import { RuntimeState } from '../../../runtime';
 import { RenderedPage, ToolpadAppProvider } from '../../../runtime/ToolpadApp';
 import { CanvasHooks, CanvasHooksContext } from '../../../runtime/CanvasHooksContext';
 import { rectContainsPoint } from '../../../utils/geometry';
-import { queryClient } from '../../../runtime/api';
 import { PageViewState } from '../../../types';
 import { updateNodeInfo } from '../../../canvas';
 import { useAppStateApi } from '../../AppState';

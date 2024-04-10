@@ -1,9 +1,14 @@
 import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
-import { FlowDirection, SlotType, useAppHost, CanvasEventsContext } from '@toolpad/studio-runtime';
+import {
+  queryClient,
+  FlowDirection,
+  SlotType,
+  useAppHost,
+  CanvasEventsContext,
+} from '@toolpad/studio-runtime';
 import { update } from '@toolpad/utils/immutability';
-import { queryClient } from '../runtime/api';
 import { AppCanvasState, NodeInfo, PageViewState, SlotsState } from '../types';
 import {
   getRelativeBoundingRect,

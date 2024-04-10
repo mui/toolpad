@@ -1,6 +1,6 @@
 import {
-  DataGridProProps,
-  DataGridPro,
+  DataGridPremiumProps,
+  DataGridPremium,
   GridColumnResizeParams,
   GridRowsProp,
   GridColumnOrderChangeParams,
@@ -38,7 +38,7 @@ import {
   GridValueGetter,
   GridToolbarProps,
   GridColType,
-} from '@mui/x-data-grid-pro';
+} from '@mui/x-data-grid-premium';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
   MuiLicenseInfo,
@@ -53,6 +53,7 @@ import {
   FilterModel,
   SortModel,
   PaginationModel,
+  useAppHost,
 } from '@toolpad/studio-runtime';
 import {
   Box,
@@ -441,7 +442,15 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
 export interface SerializableGridColumn
   extends Pick<
     GridColDef,
-    'field' | 'align' | 'width' | 'headerName' | 'sortable' | 'filterable' | 'editable'
+    | 'field'
+    | 'align'
+    | 'width'
+    | 'headerName'
+    | 'sortable'
+    | 'filterable'
+    | 'editable'
+    | 'groupable'
+    | 'aggregable'
   > {
   type?: string;
   numberFormat?: NumberFormat;
@@ -558,7 +567,7 @@ interface Selection {
   id?: any;
 }
 
-interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
+interface ToolpadDataGridProps extends Omit<DataGridPremiumProps, 'columns' | 'rows' | 'error'> {
   rowsSource?: 'prop' | 'dataProvider';
   dataProviderId?: string;
   rows?: GridRowsProp;
@@ -630,7 +639,7 @@ function EditToolbar({ hasCreateButton, onCreateClick, createDisabled }: EditToo
   );
 }
 
-interface DataProviderDataGridProps extends Partial<DataGridProProps> {
+interface DataProviderDataGridProps extends Partial<DataGridPremiumProps> {
   rowLoadingError?: unknown;
   getActions?: GridActionsColDef['getActions'];
 }
@@ -1267,12 +1276,15 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     return result;
   }, [columns, getProviderActions]);
 
+  const appHost = useAppHost();
+  const isProPlan = appHost.plan === 'pro';
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
         <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
           <SetActionResultContext.Provider value={setActionResult}>
-            <DataGridPro
+            <DataGridPremium
               apiRef={apiRef}
               slots={{
                 ...dataProviderSlots,
@@ -1295,6 +1307,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               onRowSelectionModelChange={onSelectionModelChange}
               rowSelectionModel={selectionModel}
               initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
+              disableAggregation={!isProPlan}
+              disableRowGrouping={!isProPlan}
               {...props}
               {...dataProviderProps}
               sx={{

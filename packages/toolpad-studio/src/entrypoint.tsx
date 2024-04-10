@@ -5,6 +5,7 @@ import { AppHostProvider, ToolpadComponents } from '@toolpad/studio-runtime';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';
+import { ToolpadPlan } from '@toolpad/studio-runtime/appDom';
 import { RuntimeState } from './runtime/types';
 import {
   ToolpadApp as RuntimeToolpadApp,
@@ -14,6 +15,8 @@ import {
 } from './runtime';
 
 const IS_PREVIEW = process.env.NODE_ENV !== 'production';
+
+const TOOLPAD_PLAN = process.env.TOOLPAD_PLAN as ToolpadPlan;
 
 const cache = createCache({
   key: 'css',
@@ -46,7 +49,7 @@ function Root({ ToolpadApp, initialState, base }: RootProps) {
       <CacheProvider value={cache}>
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
-        <AppHostProvider isPreview={IS_PREVIEW} plan={process.env.TOOLPAD_PLAN ?? 'free'}>
+        <AppHostProvider isPreview={IS_PREVIEW} plan={TOOLPAD_PLAN}>
           <ToolpadApp basename={base} state={initialState} />
         </AppHostProvider>
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />

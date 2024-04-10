@@ -7,18 +7,16 @@ import { SxProps, Theme } from '@mui/system';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { UPGRADE_URL } from '../../constants';
 
-export function UpgradeNotification({
+export function UpgradeAlert({
   type,
   feature,
   warning,
-  variant,
   action,
   sx,
 }: {
   type?: AlertColor;
   feature?: string;
   warning?: string;
-  variant?: 'alert' | 'chip';
   action?: boolean;
   sx?: SxProps<Theme>;
 }) {
@@ -31,50 +29,57 @@ export function UpgradeNotification({
     message = `${feature} requires a paid plan.`;
   }
 
-  if (variant === 'alert') {
-    return (
-      <Alert
-        severity={type ?? 'info'}
-        sx={{ '.MuiAlert-action': { pt: 0 }, ...sx }}
-        action={
-          action ? (
-            <Button
-              variant="text"
-              sx={{ fontSize: 'inherit' }}
-              href={UPGRADE_URL}
-              target="_blank"
-              rel="noopener"
-              endIcon={<OpenInNewIcon fontSize="small" />}
-            >
-              Upgrade
-            </Button>
-          ) : null
-        }
-      >
-        {message}
-      </Alert>
-    );
+  return (
+    <Alert
+      severity={type ?? 'info'}
+      sx={{ '.MuiAlert-action': { pt: 0 }, ...sx }}
+      action={
+        action ? (
+          <Button
+            variant="text"
+            sx={{ fontSize: 'inherit' }}
+            href={UPGRADE_URL}
+            target="_blank"
+            rel="noopener"
+            endIcon={<OpenInNewIcon fontSize="small" />}
+          >
+            Upgrade
+          </Button>
+        ) : null
+      }
+    >
+      {message}
+    </Alert>
+  );
+}
+
+export function UpgradeChip({ feature, warning }: { feature?: string; warning?: string }) {
+  let message = `This feature requires a paid plan.`;
+
+  if (warning) {
+    message = warning;
   }
-  if (variant === 'chip') {
-    return (
-      <Tooltip title={`${message} Click to learn more.`}>
-        <Chip
-          variant="outlined"
-          color="primary"
-          component="a"
-          href={UPGRADE_URL}
-          target="_blank"
-          rel="noopener"
-          clickable
-          sx={{
-            height: '1.5rem',
-            fontSize: 'inherit',
-            verticalAlign: 'inherit',
-            mx: '0.2rem',
-          }}
-          label="Pro"
-        />
-      </Tooltip>
-    );
+  if (feature) {
+    message = `${feature} requires a paid plan.`;
   }
+  return (
+    <Tooltip title={`${message} Click to learn more.`}>
+      <Chip
+        variant="outlined"
+        color="primary"
+        component="a"
+        href={UPGRADE_URL}
+        target="_blank"
+        rel="noopener"
+        clickable
+        sx={{
+          height: '1.5rem',
+          fontSize: 'inherit',
+          verticalAlign: 'inherit',
+          mx: '0.2rem',
+        }}
+        label="Pro"
+      />
+    </Tooltip>
+  );
 }

@@ -20,7 +20,7 @@ import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import PageTitleEditor from '../PageTitleEditor';
 import PageDisplayNameEditor from '../PageDisplayNameEditor';
-import { UpgradeNotification } from '../UpgradeNotification';
+import { UpgradeChip } from '../UpgradeNotification';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
   { value: 'shell', label: 'App shell' },
@@ -123,8 +123,7 @@ export default function PageOptionsPanel() {
       </div>
       <div>
         <Typography variant="overline">
-          Authorization{' '}
-          {!isPaidPlan ? <UpgradeNotification variant="chip" feature="Authorization" /> : null}
+          Authorization {!isPaidPlan ? <UpgradeChip feature="Authorization" /> : null}
         </Typography>
 
         {isPaidPlan ? (

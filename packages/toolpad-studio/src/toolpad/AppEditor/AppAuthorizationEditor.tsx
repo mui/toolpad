@@ -42,7 +42,7 @@ import invariant from 'invariant';
 import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
 import AzureIcon from '../../components/icons/AzureIcon';
-import { UpgradeNotification } from './UpgradeNotification';
+import { UpgradeAlert } from './UpgradeNotification';
 
 interface AuthProviderOption {
   name: string;
@@ -153,9 +153,7 @@ export function AppAuthenticationEditor() {
                 <Checkbox checked={authProviders.indexOf(value as appDom.AuthProvider) > -1} />
                 {icon}
                 <Typography mx={1}>{name}</Typography>
-                {hasRoles && !isPaidPlan ? (
-                  <UpgradeNotification variant="alert" type="warning" feature={name} />
-                ) : null}
+                {hasRoles && !isPaidPlan ? <UpgradeAlert type="warning" feature={name} /> : null}
               </Stack>
             </MenuItem>
           ))}
@@ -188,15 +186,13 @@ export function AppAuthenticationEditor() {
       ))}
       <div style={{ position: 'absolute', bottom: 0 }}>
         {!isPaidPlan ? (
-          <UpgradeNotification
-            variant="alert"
+          <UpgradeAlert
             type="info"
             feature="Using authentication with a few specific providers (Azure AD)"
             action
           />
         ) : (
-          <UpgradeNotification
-            variant="alert"
+          <UpgradeAlert
             type="warning"
             warning="You are using features that are not covered by our MIT License. You will have to buy a license to use them in production."
           />
@@ -734,11 +730,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
                     <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
                   </React.Fragment>
                 ) : (
-                  <UpgradeNotification
-                    variant="alert"
-                    type="info"
-                    feature="Role based access control"
-                  />
+                  <UpgradeAlert type="info" feature="Role based access control" />
                 )}
               </TabPanel>
               <TabPanel disableGutters value="roleMappings">
@@ -753,7 +745,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
                     />
                   </React.Fragment>
                 ) : (
-                  <UpgradeNotification variant="alert" type="info" feature="Role mapping" />
+                  <UpgradeAlert type="info" feature="Role mapping" />
                 )}
               </TabPanel>
             </React.Fragment>

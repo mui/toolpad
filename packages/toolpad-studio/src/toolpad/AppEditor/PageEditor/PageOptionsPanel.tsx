@@ -124,7 +124,9 @@ export default function PageOptionsPanel() {
       <div>
         <Typography variant="overline">
           Authorization
-          {!isPaidPlan ? <UpgradeChip feature="Authorization" sx={{ ml: 1 }} /> : null}
+          {!isPaidPlan ? (
+            <UpgradeChip message="Authorization requires a paid plan." sx={{ ml: 1 }} />
+          ) : null}
         </Typography>
 
         {isPaidPlan ? (

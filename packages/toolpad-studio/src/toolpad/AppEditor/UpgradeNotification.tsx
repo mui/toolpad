@@ -55,26 +55,22 @@ export function UpgradeAlert({
 
 export interface UpgradeChipProps {
   sx?: SxProps;
-  feature?: string;
-  warning?: string;
+  message?: string;
+  url?: string;
 }
 
-export function UpgradeChip({ sx, feature, warning }: UpgradeChipProps) {
-  let message = `This feature requires a paid plan.`;
-
-  if (warning) {
-    message = warning;
-  }
-  if (feature) {
-    message = `${feature} requires a paid plan.`;
-  }
+export function UpgradeChip({
+  sx,
+  message = `This feature requires a paid plan.`,
+  url = UPGRADE_URL,
+}: UpgradeChipProps) {
   return (
     <Tooltip title={`${message} Click to learn more.`}>
       <Chip
         variant="outlined"
         color="primary"
         component="a"
-        href={UPGRADE_URL}
+        href={url}
         target="_blank"
         rel="noopener"
         size="small"

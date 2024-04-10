@@ -24,7 +24,6 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {
   DataGrid,
   GridActionsCellItem,
@@ -44,7 +43,6 @@ import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
 import AzureIcon from '../../components/icons/AzureIcon';
 import { UpgradeAlert } from './UpgradeNotification';
-import { UPGRADE_URL } from '../../constants';
 
 interface AuthProviderOption {
   name: string;
@@ -193,18 +191,7 @@ export function AppAuthenticationEditor() {
           <UpgradeAlert
             type="info"
             message="Using authentication with a few specific providers (Azure AD) requires a paid plan."
-            action={
-              <Button
-                variant="text"
-                sx={{ fontSize: 'inherit' }}
-                href={UPGRADE_URL}
-                target="_blank"
-                rel="noopener"
-                endIcon={<OpenInNewIcon fontSize="small" />}
-              >
-                Upgrade
-              </Button>
-            }
+            action
           />
         ) : (
           <UpgradeAlert

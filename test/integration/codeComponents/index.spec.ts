@@ -61,12 +61,10 @@ export default createComponent(MyInspector, {
     { encoding: 'utf-8' },
   );
 
-  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
-    // vite causes a reload when we're creating new custom components
-    // See https://github.com/vitejs/vite/issues/12912
-    await page.locator('[data-testid="page-ready-marker"]').isHidden();
-    await editorModel.waitForOverlay();
-  }
+  // vite causes a reload when we're creating new custom components
+  // See https://github.com/vitejs/vite/issues/12912
+  await page.locator('[data-testid="page-ready-marker"]').isHidden();
+  await editorModel.waitForOverlay();
 
   await editorModel.componentCatalog.hover();
   await expect(editorModel.getComponentCatalogItem('MyInspector')).toBeVisible();

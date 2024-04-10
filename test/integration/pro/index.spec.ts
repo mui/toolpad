@@ -16,7 +16,7 @@ test.use({
   },
 });
 
-test.only('pro app', async ({ page, argosScreenshot }) => {
+test('pro app', async ({ page, argosScreenshot }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPage('basic');
 

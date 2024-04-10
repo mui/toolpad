@@ -53,6 +53,10 @@ Loading property is used to to inform the user when the data is being prepared. 
   Your browser does not support the video tag.
 </video>
 
+### Grouping and aggregating (PRO)
+
+When you use the [Toolpad pro plan](/), the DataGrid gains grouping and aggregating capabilities. You can turn this off for individual columns.
+
 ## Appearance
 
 ### `density`

@@ -1,6 +1,11 @@
 import * as React from 'react';
 import { styled, useEventCallback } from '@mui/material';
-import { NodeHashes, RuntimeEvents } from '@toolpad/studio-runtime';
+import {
+  NodeHashes,
+  RuntimeEvents,
+  CanvasEventsContext,
+  AppHostProvider,
+} from '@toolpad/studio-runtime';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import * as ReactDOM from 'react-dom';
@@ -9,11 +14,9 @@ import { update } from '@toolpad/utils/immutability';
 import { throttle } from 'lodash-es';
 import invariant from 'invariant';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import { CanvasEventsContext } from '@toolpad/studio-runtime/runtime';
 import { createCommands, type ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import { useProject } from '../../../project';
 import { RuntimeState } from '../../../runtime';
-import { AppHost, AppHostContext } from '../../../runtime/AppHostContext';
 import { RenderedPage, ToolpadAppProvider } from '../../../runtime/ToolpadApp';
 import { CanvasHooks, CanvasHooksContext } from '../../../runtime/CanvasHooksContext';
 import { rectContainsPoint } from '../../../utils/geometry';
@@ -67,12 +70,6 @@ const CanvasFrame = styled('iframe')({
   width: '100%',
   height: '100%',
 });
-
-const appHost: AppHost = {
-  isPreview: true,
-  isCustomServer: false,
-  isCanvas: true,
-};
 
 export default function EditorCanvasHost({
   pageName,
@@ -263,11 +260,11 @@ export default function EditorCanvasHost({
             <Overlay container={portal}>
               <CanvasHooksContext.Provider value={canvasHooks}>
                 <CanvasEventsContext.Provider value={canvasEvents}>
-                  <AppHostContext.Provider value={appHost}>
+                  <AppHostProvider isCanvas isPreview>
                     <ToolpadAppProvider rootRef={onAppRoot} basename={base} state={runtimeState}>
                       <RenderedPage page={page} />
                     </ToolpadAppProvider>
-                  </AppHostContext.Provider>
+                  </AppHostProvider>
                 </CanvasEventsContext.Provider>
               </CanvasHooksContext.Provider>
             </Overlay>,

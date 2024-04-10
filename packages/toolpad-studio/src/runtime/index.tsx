@@ -21,8 +21,6 @@ export { default as ToolpadApp, RenderedPage, type ToolpadAppProps } from './Too
 
 export { componentsStore, pageComponentsStore } from './globalState';
 
-export { AppHostContext, type AppHost } from './AppHostContext';
-
 export { CanvasHooksContext, type CanvasHooks } from './CanvasHooksContext';
 
 export { type RuntimeState } from './types';

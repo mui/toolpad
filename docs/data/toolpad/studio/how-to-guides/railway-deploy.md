@@ -2,15 +2,15 @@
 
 <p class="description">You can host and share your Toolpad Studio apps on Railway in a few minutes, for free.</p>
 
-In this guide, we'll deploy the [qr-generator](https://github.com/mui/mui-toolpad/tree/master/examples/qr-generator) example from Toolpad repository.
+This guide walks you throught the deployment of [qr-generator](https://github.com/mui/mui-toolpad/tree/master/examples/qr-generator) example from the Toolpad repository.
 
 ## Prerequisites
 
 - A [Railway](https://railway.app/) account
 - A [GitHub](https://github.com) account
-- A Github repository containing Toolpad Studio app. Check out [pushing Toolpad Studio app to GitHub](/toolpad/studio/how-to-guides/render-deploy/#pushing-your-toolpad-studio-app-to-github) for this step.
+- A GitHub repository containing Toolpad Studio app. Check out [pushing Toolpad Studio app to GitHub](/toolpad/studio/how-to-guides/render-deploy/#pushing-your-toolpad-studio-app-to-github) for this step.
 
-## Creating a new service on Railway
+## Creating a new app on Railway
 
 1. From your Railway dashboard, click on **New Project** from the top-right corner and choose **Deploy from GitHub repo** form the drop-down.
 
@@ -20,9 +20,9 @@ In this guide, we'll deploy the [qr-generator](https://github.com/mui/mui-toolpa
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/choose-repository.png", "alt": "Choosing the repository", "caption": "Choosing the repository", "indent": 1 }}
 
-3. Select the repository and click **Deploy Now**. The deployment process will start. Railway can guess that you are deploying a Node app.
+3. Select the repository and click **Deploy Now**. Railway can guess that you are deploying a Node app.
 
-4. The default build may fail as some config changes will be required. On the deployment screen, you'll see four tabs, navigate to the **Settings** tab and update the root directory as shown below.
+4. The default build may fail as some config changes are required. On the deployment screen, you'll see four tabs, navigate to the **Settings** tab and update the root directory as shown below.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/configure-root-directory.png", "alt": "Configuring the root directory", "caption": "Configuring the root directory", "indent": 1 }}
 
@@ -30,7 +30,7 @@ In this guide, we'll deploy the [qr-generator](https://github.com/mui/mui-toolpa
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/generate-domain.png", "alt": "Generating a public URL", "caption": "Generating a public URL", "indent": 1 }}
 
-6. The build and start commands commands will be set to
+6. The build and start commands commands are set to
 
    ```bash
    $ npm run build
@@ -43,9 +43,9 @@ In this guide, we'll deploy the [qr-generator](https://github.com/mui/mui-toolpa
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/add-port-as-a-variable.png", "alt": "Adding port as a variable", "caption": "Adding PORT as a variable", "indent": 1 }}
 
-7. Once this is successfully complete, you can access your Toolpad Studio app from the public URL available on the card.
+8. Once this is successfully complete, you can access your Toolpad Studio app from the public URL available on the card.
 
-That's it! We're up and running with a [live app](https://mui-toolpad-qr-generator-production.up.railway.app/prod/pages/qrcode).
+That's it! The app is up and [running](https://mui-toolpad-qr-generator-production.up.railway.app/prod/pages/qrcode).
 
 Make changes, push to GitHub, and your app will automatically redeploy each time. Like Railway, you can deploy to any hosting provider of your choice.
 

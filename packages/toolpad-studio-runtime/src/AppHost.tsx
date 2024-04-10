@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { useNonNullableContext } from '@toolpad/utils/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToolpadPlan } from './appDom';
 
 const queryClient = new QueryClient();
 
 export interface AppHost {
   isPreview: boolean;
   isCanvas: boolean;
-  plan: string;
+  plan: ToolpadPlan;
 }
 
 export const AppHostContext = React.createContext<AppHost | null>(null);

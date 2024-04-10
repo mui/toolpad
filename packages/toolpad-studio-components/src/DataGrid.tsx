@@ -41,7 +41,7 @@ import {
 } from '@mui/x-data-grid-pro';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
-  Unstable_LicenseInfoProviderProps as LicenseInfoProviderProps,
+  MuiLicenseInfo,
 } from '@mui/x-license';
 import * as React from 'react';
 import {
@@ -95,8 +95,6 @@ import ErrorOverlay, { ErrorContent } from './components/ErrorOverlay';
 const DRAFT_ROW_MARKER = Symbol('draftRow');
 
 const ACTIONS_COLUMN_FIELD = '___actions___';
-
-type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
 const LICENSE_INFO: MuiLicenseInfo = {
   key: process.env.TOOLPAD_BUNDLED_MUI_X_LICENSE,

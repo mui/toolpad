@@ -1,13 +1,6 @@
 import { Emitter } from '@toolpad/utils/events';
 import type { RuntimeEvents } from '@toolpad/studio-runtime';
-import { TOOLPAD_BRIDGE_GLOBAL } from '../constants';
 import type { AppCanvasState, PageViewState } from '../types';
-
-declare global {
-  interface Window {
-    [TOOLPAD_BRIDGE_GLOBAL]?: ToolpadBridge | ((bridge: ToolpadBridge) => void);
-  }
-}
 
 const COMMAND_HANDLERS = Symbol('hidden property to hold the command handlers');
 
@@ -97,13 +90,5 @@ const bridge: ToolpadBridge | null = isRenderedInCanvas
 bridge?.canvasEvents.on('ready', () => {
   canvasIsReady = true;
 });
-
-if (bridge) {
-  if (typeof window[TOOLPAD_BRIDGE_GLOBAL] === 'function') {
-    window[TOOLPAD_BRIDGE_GLOBAL](bridge);
-  }
-
-  window[TOOLPAD_BRIDGE_GLOBAL] = bridge;
-}
 
 export { bridge };

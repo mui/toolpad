@@ -50,8 +50,8 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@types/react": "18.2.73",
-    "@types/react-dom": "18.2.23"
+    "@types/react": "18.2.74",
+    "@types/react-dom": "18.2.24"
   },
   "peerDependencies": {
     "@emotion/react": "^11.11.4",

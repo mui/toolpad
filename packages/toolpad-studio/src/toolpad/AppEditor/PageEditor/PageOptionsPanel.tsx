@@ -1,5 +1,4 @@
 import {
-  Chip,
   Stack,
   Tooltip,
   Typography,
@@ -21,6 +20,7 @@ import UrlQueryEditor from './UrlQueryEditor';
 import NodeNameEditor from '../NodeNameEditor';
 import PageTitleEditor from '../PageTitleEditor';
 import PageDisplayNameEditor from '../PageDisplayNameEditor';
+import { UpgradeNotification } from '../UpgradeNotification';
 
 const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] = [
   { value: 'shell', label: 'App shell' },
@@ -124,34 +124,7 @@ export default function PageOptionsPanel() {
       <div>
         <Typography variant="overline">
           Authorization{' '}
-          {!isPaidPlan ? (
-            <Tooltip
-              title={
-                <Typography variant="inherit">
-                  Only available in paid plans. Click to learn more.
-                </Typography>
-              }
-            >
-              <Chip
-                variant="outlined"
-                color="primary"
-                component={'a'}
-                href="https://mui.com/toolpad/studio/concepts/rbac/"
-                target="_blank"
-                rel="noopener"
-                sx={{
-                  height: '1.5rem',
-                  fontSize: 'inherit',
-                  verticalAlign: 'inherit',
-                  mx: '0.2rem',
-                  '& :hover': {
-                    cursor: 'pointer',
-                  },
-                }}
-                label="Pro"
-              />
-            </Tooltip>
-          ) : null}
+          {!isPaidPlan ? <UpgradeNotification variant="chip" feature="Authorization" /> : null}
         </Typography>
 
         {isPaidPlan ? (

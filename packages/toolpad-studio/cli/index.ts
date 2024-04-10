@@ -48,7 +48,7 @@ interface EditorOptions {
 }
 
 async function editorCommand({ dev: toolpadDevMode, ...args }: EditorOptions) {
-  await runEditor(args.url, { toolpadDevMode, ...args });
+  await runEditor(args.url);
 }
 
 interface BuildOptions {

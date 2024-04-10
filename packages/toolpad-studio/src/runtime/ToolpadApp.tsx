@@ -81,7 +81,7 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { HTML_ID_EDITOR_OVERLAY, PREVIEW_HEADER_HEIGHT } from './constants';
+import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { useDataQuery, UseFetch } from './useDataQuery';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
@@ -1676,7 +1676,7 @@ export function ToolpadAppProvider({
                 <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                   <AppThemeProvider dom={dom}>
                     <CssBaseline enableColorScheme />
-                    {showPreviewHeader ? <PreviewHeader basename={basename} /> : null}
+                    {showPreviewHeader ? <PreviewHeader /> : null}
                     <AppRoot
                       ref={rootRef}
                       sx={{
@@ -1686,7 +1686,7 @@ export function ToolpadAppProvider({
                       <ErrorBoundary FallbackComponent={AppError}>
                         <React.Suspense fallback={<AppLoading />}>{children}</React.Suspense>
                       </ErrorBoundary>
-                      <EditorOverlay ref={canvasHooks.overlayRef} id={HTML_ID_EDITOR_OVERLAY} />
+                      <EditorOverlay ref={canvasHooks.overlayRef} />
                     </AppRoot>
                   </AppThemeProvider>
                 </ResetNodeErrorsKeyProvider>

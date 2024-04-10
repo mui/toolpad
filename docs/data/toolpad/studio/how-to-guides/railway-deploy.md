@@ -47,6 +47,6 @@ This guide walks you throught the deployment of [qr-generator](https://github.co
 
 That's it! The app is up and [running](https://mui-toolpad-qr-generator-production.up.railway.app/prod/pages/qrcode).
 
-Make changes, push to GitHub, and your app will automatically redeploy each time. Like Railway, you can deploy to any hosting provider of your choice.
+Make changes, push to GitHub, and your app automatically redeploys each time. Like Railway, you can deploy to any hosting provider of your choice.
 
 Check out the Railway documentation for more advanced settings, like adding [variables](https://docs.railway.app/guides/variables) to your app.

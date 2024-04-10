@@ -46,7 +46,7 @@ function Root({ ToolpadApp, initialState, base }: RootProps) {
       <CacheProvider value={cache}>
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
-        <AppHostProvider isPreview={IS_PREVIEW}>
+        <AppHostProvider isPreview={IS_PREVIEW} plan={process.env.TOOLPAD_PLAN ?? 'free'}>
           <ToolpadApp basename={base} state={initialState} />
         </AppHostProvider>
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />

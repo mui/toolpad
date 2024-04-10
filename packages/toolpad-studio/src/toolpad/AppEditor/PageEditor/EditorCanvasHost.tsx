@@ -5,6 +5,7 @@ import {
   RuntimeEvents,
   CanvasEventsContext,
   AppHostProvider,
+  useAppHost,
 } from '@toolpad/studio-runtime';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
@@ -234,6 +235,8 @@ export default function EditorCanvasHost({
 
   const page = appDom.getPageByName(runtimeState.dom, pageName);
 
+  const appHost = useAppHost();
+
   return (
     <CanvasRoot className={className}>
       <CanvasFrame
@@ -260,7 +263,7 @@ export default function EditorCanvasHost({
             <Overlay container={portal}>
               <CanvasHooksContext.Provider value={canvasHooks}>
                 <CanvasEventsContext.Provider value={canvasEvents}>
-                  <AppHostProvider isCanvas isPreview>
+                  <AppHostProvider {...appHost} isCanvas isPreview>
                     <ToolpadAppProvider rootRef={onAppRoot} basename={base} state={runtimeState}>
                       <RenderedPage page={page} />
                     </ToolpadAppProvider>

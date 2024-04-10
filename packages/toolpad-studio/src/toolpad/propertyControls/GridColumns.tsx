@@ -32,14 +32,12 @@ import {
 import { generateUniqueString } from '@toolpad/utils/strings';
 import { NumberFormatEditor } from '@toolpad/studio-runtime/numberFormat';
 import { DateFormatEditor } from '@toolpad/studio-runtime/dateFormat';
+import { useAppHost } from '@toolpad/studio-runtime';
 import type { EditorProps } from '../../types';
 import { ToolpadComponentDefinition, useToolpadComponents } from '../AppEditor/toolpadComponents';
 import PropertyControl from '../../components/PropertyControl';
-
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
-
-const IS_PRO_PLAN = process.env.TOOLPAD_PLAN === 'pro';
 
 type GridAlignment = SerializableGridColumn['align'];
 
@@ -135,6 +133,9 @@ function GridColumnEditor({
       handleColumnChange({ ...editedColumn, field: event.target.value });
     },
   });
+
+  const appHost = useAppHost();
+  const isProPlan = appHost.plan === 'pro';
 
   return (
     <Stack gap={1} py={1}>
@@ -307,7 +308,7 @@ function GridColumnEditor({
         label="Editable"
       />
 
-      {IS_PRO_PLAN ? (
+      {isProPlan ? (
         <React.Fragment>
           <FormControlLabel
             control={

@@ -53,6 +53,7 @@ import {
   FilterModel,
   SortModel,
   PaginationModel,
+  useAppHost,
 } from '@toolpad/studio-runtime';
 import {
   Box,
@@ -99,8 +100,6 @@ const ACTIONS_COLUMN_FIELD = '___actions___';
 const LICENSE_INFO: MuiLicenseInfo = {
   key: process.env.TOOLPAD_BUNDLED_MUI_X_LICENSE,
 };
-
-const IS_PRO_PLAN = process.env.TOOLPAD_PLAN === 'pro';
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
@@ -1277,6 +1276,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     return result;
   }, [columns, getProviderActions]);
 
+  const appHost = useAppHost();
+  const isProPlan = appHost.plan === 'pro';
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
@@ -1305,8 +1307,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               onRowSelectionModelChange={onSelectionModelChange}
               rowSelectionModel={selectionModel}
               initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
-              disableAggregation={!IS_PRO_PLAN}
-              disableRowGrouping={!IS_PRO_PLAN}
+              disableAggregation={!isProPlan}
+              disableRowGrouping={!isProPlan}
               {...props}
               {...dataProviderProps}
               sx={{

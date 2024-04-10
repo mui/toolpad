@@ -1,52 +1,24 @@
 import * as React from 'react';
 import Alert, { AlertColor } from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
-import { SxProps, Theme } from '@mui/system';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { SxProps } from '@mui/system';
+
 import { UPGRADE_URL } from '../../constants';
 
-export function UpgradeAlert({
-  type,
-  feature,
-  warning,
-  action,
-  sx,
-}: {
+export interface UpgradeAlertProps {
+  sx?: SxProps;
   type?: AlertColor;
-  feature?: string;
-  warning?: string;
-  action?: boolean;
-  sx?: SxProps<Theme>;
-}) {
-  let message = `This feature requires a paid plan.`;
+  action?: React.ReactNode;
+  message?: string;
+}
 
-  if (warning) {
-    message = warning;
-  }
-  if (feature) {
-    message = `${feature} requires a paid plan.`;
-  }
-
+export function UpgradeAlert({ sx, type, action, message }: UpgradeAlertProps) {
   return (
     <Alert
       severity={type ?? 'info'}
       sx={{ '.MuiAlert-action': { pt: 0 }, ...sx }}
-      action={
-        action ? (
-          <Button
-            variant="text"
-            sx={{ fontSize: 'inherit' }}
-            href={UPGRADE_URL}
-            target="_blank"
-            rel="noopener"
-            endIcon={<OpenInNewIcon fontSize="small" />}
-          >
-            Upgrade
-          </Button>
-        ) : null
-      }
+      action={action ?? null}
     >
       {message}
     </Alert>

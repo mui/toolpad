@@ -24,6 +24,7 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {
   DataGrid,
   GridActionsCellItem,
@@ -43,6 +44,7 @@ import { useAppState, useAppStateApi } from '../AppState';
 import TabPanel from '../../components/TabPanel';
 import AzureIcon from '../../components/icons/AzureIcon';
 import { UpgradeAlert } from './UpgradeNotification';
+import { UPGRADE_URL } from '../../constants';
 
 interface AuthProviderOption {
   name: string;
@@ -153,7 +155,9 @@ export function AppAuthenticationEditor() {
                 <Checkbox checked={authProviders.indexOf(value as appDom.AuthProvider) > -1} />
                 {icon}
                 <Typography mx={1}>{name}</Typography>
-                {hasRoles && !isPaidPlan ? <UpgradeAlert type="warning" feature={name} /> : null}
+                {hasRoles && !isPaidPlan ? (
+                  <UpgradeAlert type="warning" message={`${name} requires a paid plan.`} />
+                ) : null}
               </Stack>
             </MenuItem>
           ))}
@@ -188,13 +192,24 @@ export function AppAuthenticationEditor() {
         {!isPaidPlan ? (
           <UpgradeAlert
             type="info"
-            feature="Using authentication with a few specific providers (Azure AD)"
-            action
+            message="Using authentication with a few specific providers (Azure AD) requires a paid plan."
+            action={
+              <Button
+                variant="text"
+                sx={{ fontSize: 'inherit' }}
+                href={UPGRADE_URL}
+                target="_blank"
+                rel="noopener"
+                endIcon={<OpenInNewIcon fontSize="small" />}
+              >
+                Upgrade
+              </Button>
+            }
           />
         ) : (
           <UpgradeAlert
             type="warning"
-            warning="You are using features that are not covered by our MIT License. You will have to buy a license to use them in production."
+            message="You are using features that are not covered by our MIT License. You will have to buy a license to use them in production."
           />
         )}
       </div>
@@ -730,7 +745,10 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
                     <AppRolesEditor onRowUpdateError={handleRowUpdateError} />
                   </React.Fragment>
                 ) : (
-                  <UpgradeAlert type="info" feature="Role based access control" />
+                  <UpgradeAlert
+                    type="info"
+                    message="Role based access control requires a paid plan."
+                  />
                 )}
               </TabPanel>
               <TabPanel disableGutters value="roleMappings">
@@ -745,7 +763,7 @@ export default function AppAuthorizationDialog({ open, onClose }: AppAuthorizati
                     />
                   </React.Fragment>
                 ) : (
-                  <UpgradeAlert type="info" feature="Role mapping" />
+                  <UpgradeAlert type="info" message="Role mapping requires a paid plan." />
                 )}
               </TabPanel>
             </React.Fragment>

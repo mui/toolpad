@@ -27,7 +27,6 @@ const COLUMNS = [
 ];
 
 export default function BasicDataGrid() {
-  console.log(AppHostProvider);
   return (
     <AppHostProvider>
       <DataGrid rows={ROWS} columns={COLUMNS} height={300} density="compact" />

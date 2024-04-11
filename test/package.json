@@ -5,6 +5,7 @@
     "@mui/material": "5.15.15",
     "@toolpad/studio": "workspace:*",
     "@toolpad/utils": "workspace:*",
+    "@types/invariant": "2.2.37",
     "express": "4.19.2",
     "get-port": "7.1.0",
     "invariant": "2.2.4",

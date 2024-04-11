@@ -1,0 +1,15 @@
+{
+  "name": "datagrid-premium",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "toolpad-studio dev .",
+    "build": "toolpad-studio build .",
+    "start": "toolpad-studio start ."
+  },
+  "dependencies": {
+    "@mui/x-data-grid-premium": "^7.1.1",
+    "@mui/x-license": "^7.1.1",
+    "@toolpad/studio": "0.1.53"
+  }
+}

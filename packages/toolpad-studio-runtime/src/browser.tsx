@@ -1,3 +1,4 @@
+import * as React from 'react';
 import getComponentDisplayName from '@toolpad/utils/react';
 import { TOOLPAD_COMPONENT } from './constants';
 import { ArgTypeDefinition, ComponentConfig, PropValueType, ToolpadComponent } from './types';

@@ -3,7 +3,6 @@
     "paths": {
       // TODO: remove when typescript module resolution supports package exports. (v5.0 with moduleResolution: 'bundler')
       "@toolpad/studio-runtime": ["../toolpad-studio-runtime/dist"],
-      "@toolpad/studio-runtime/runtime": ["../toolpad-studio-runtime/dist/runtime"],
       "@toolpad/studio-runtime/jsRuntime": ["../toolpad-studio-runtime/dist/jsRuntime"],
       "@toolpad/studio-runtime/jsBrowserRuntime": [
         "../toolpad-studio-runtime/dist/jsBrowserRuntime"

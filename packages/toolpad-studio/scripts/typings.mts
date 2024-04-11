@@ -16,7 +16,7 @@ const LIBS = [
   { name: '@mui/x-date-pickers' },
   { name: '@mui/x-date-pickers-pro' },
   { name: '@mui/x-data-grid' },
-  { name: '@mui/x-data-grid-pro' },
+  { name: '@mui/x-data-grid-premium' },
   { name: 'dayjs' },
   // TODO: we need to analyze imports of the definition files and include those libs automatically
   { name: 'csstype' },

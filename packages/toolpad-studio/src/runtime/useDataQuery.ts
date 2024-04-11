@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-import { GridRowsProp } from '@mui/x-data-grid-pro';
+import { GridRowsProp } from '@mui/x-data-grid-premium';
 import * as React from 'react';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import * as appDom from '@toolpad/studio-runtime/appDom';

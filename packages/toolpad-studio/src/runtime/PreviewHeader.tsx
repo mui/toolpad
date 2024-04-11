@@ -2,9 +2,8 @@ import * as React from 'react';
 import { Button, Typography, Box, useTheme, Alert, ButtonProps } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { Link, useMatch } from 'react-router-dom';
-import { useNonNullableContext } from '@toolpad/utils/react';
+import { useAppHost } from '@toolpad/studio-runtime';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
-import { AppHostContext } from './AppHostContext';
 
 function OpenInEditorButton<C extends React.ElementType>({
   children = 'Open in editor',
@@ -23,7 +22,7 @@ export default function PreviewHeader() {
 
   const theme = useTheme();
 
-  const appContext = useNonNullableContext(AppHostContext);
+  const appContext = useAppHost();
 
   let action: React.ReactNode = null;
 

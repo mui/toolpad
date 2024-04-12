@@ -41,9 +41,9 @@ This guide walks you through the deployment of a [qr-generator](https://github.c
 
    by default. You can leave this unchanged.
 
-7. Now a floating Deploy button will be shown on the top. Click it and the build starts.
+7. A floating **Deploy** button appears on the canvas.. Click it and the build starts.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/deploy.png", "alt": "Generating a public URL", "caption": "Generating a public URL", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/deploy.png", "alt": "Deploy app", "caption": "Deploy app", "indent": 1 }}
 
 8. Once this is successfully complete, you can access your Toolpad Studio app from the public URL available on the card.
 
@@ -56,3 +56,5 @@ Check out the Railway documentation for more advanced settings, like adding [var
 ### Common Pitfalls
 
 1. Sometimes the build may fail as your app could be in a different directory. To configure the right path, navigate to the **Settings** tab and update the root directory.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/setting-root-directory.png", "alt": "Updating the root directory", "caption": "Updating the root directory", "indent": 1 }}

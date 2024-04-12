@@ -13,9 +13,9 @@ import {
   GetRecordsParams,
   GetRecordsResult,
   PaginationMode,
+  ToolpadDataProviderIntrospection,
 } from '@toolpad/studio-runtime';
 import { errorFrom } from '@toolpad/utils/errors';
-import { ToolpadDataProviderIntrospection } from '@toolpad/studio-runtime/runtime';
 import * as url from 'node:url';
 import type { GridRowId } from '@mui/x-data-grid';
 import invariant from 'invariant';

@@ -39,16 +39,17 @@
   },
   "devDependencies": {
     "@argos-ci/core": "1.5.5",
-    "@mui/monorepo": "github:mui/material-ui#e1d94d5ce097815bcd738352e69bb43ce03bd266",
-    "@mui/x-charts": "7.1.0",
+    "@mui/monorepo": "github:mui/material-ui#f3cb496c999acbc8f19533e38df20be12e56d059",
+    "@mui/x-charts": "7.1.1",
     "@next/eslint-plugin-next": "14.1.4",
-    "@playwright/test": "1.42.1",
+    "@playwright/test": "1.43.0",
     "@testing-library/react": "14.2.2",
     "@types/archiver": "6.0.2",
     "@types/gtag.js": "0.0.19",
-    "@types/node": "20.12.2",
-    "@typescript-eslint/eslint-plugin": "7.2.0",
-    "@typescript-eslint/parser": "7.2.0",
+    "@types/invariant": "2.2.37",
+    "@types/node": "20.12.5",
+    "@typescript-eslint/eslint-plugin": "7.6.0",
+    "@typescript-eslint/parser": "7.6.0",
     "chalk": "5.3.0",
     "eslint": "8.57.0",
     "eslint-config-airbnb": "19.0.4",
@@ -68,27 +69,29 @@
     "globby": "14.0.1",
     "jsdom": "24.0.0",
     "lerna": "7.4.2",
-    "markdownlint-cli2": "0.12.1",
+    "markdownlint-cli2": "0.13.0",
     "prettier": "3.2.5",
     "pretty-quick": "4.0.0",
     "react-inspector": "6.0.2",
-    "recharts": "2.12.3",
+    "recharts": "2.12.4",
     "regenerator-runtime": "0.14.1",
     "rimraf": "5.0.5",
-    "typescript": "5.4.3",
+    "typescript": "5.4.4",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.6.3"
   },
   "dependencies": {
+    "@types/lodash": "4.17.0",
     "archiver": "7.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.4.1",
     "eslint-import-resolver-exports": "1.0.0-beta.5",
     "inquirer": "9.2.17",
+    "invariant": "2.2.4",
     "lodash": "4.17.21",
     "semver": "7.6.0",
     "tsup": "8.0.2",
-    "tsx": "4.7.1",
+    "tsx": "4.7.2",
     "vitest": "1.4.0",
     "yargs": "17.7.2",
     "zod": "3.22.4",
@@ -97,10 +100,10 @@
   "engines": {
     "npm": "please-use-pnpm",
     "node": ">=18",
-    "pnpm": "8.15.5"
+    "pnpm": "8.15.6"
   },
   "resolutions": {
     "google-auth-library": "*"
   },
-  "packageManager": "pnpm@8.15.5"
+  "packageManager": "pnpm@8.15.6"
 }

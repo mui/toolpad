@@ -44,7 +44,7 @@ function getHtmlContent(entry: string) {
   `;
 }
 
-export function getAppHtmlContent() {
+function getAppHtmlContent() {
   return getHtmlContent(MAIN_ENTRY);
 }
 
@@ -154,6 +154,9 @@ export async function createViteConfig({
 }: CreateViteConfigParams) {
   const mode = dev ? 'development' : 'production';
 
+  const initialDom = await loadDom();
+  const plan = appDom.getPlan(initialDom);
+
   const getEntryPoint = (target: 'prod' | 'dev' | 'editor') => {
     const isCanvas = target === 'dev';
     const isEditor = target === 'editor';
@@ -167,6 +170,37 @@ import components from ${JSON.stringify(componentsId)};
 import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@toolpad/studio/canvas'` : ''}
 ${isEditor ? `import ToolpadEditor from '@toolpad/studio/editor'` : ''}
+
+// importing monaco to get around module ordering issues in esbuild
+import 'monaco-editor';
+
+window.MonacoEnvironment = {
+  getWorker: async (_, label) => {
+    // { type: 'module' } is supported in firefox but behind feature flag:
+    // you have to enable it manually via about:config and set dom.workers.modules.enabled to true.
+    if (label === 'typescript') {
+      const { default: TsWorker } = await import('monaco-editor/esm/vs/language/typescript/ts.worker?worker');
+      return new TsWorker();
+    }
+    if (label === 'json') {
+      const { default: JsonWorker } = await import('monaco-editor/esm/vs/language/json/json.worker?worker');
+      return new JsonWorker();
+    }
+    if (label === 'html') {
+      const { default: HtmlWorker } = await import('monaco-editor/esm/vs/language/html/html.worker?worker');
+      return new HtmlWorker();
+    }
+    if (label === 'css') {
+      const { default: CssWorker } = await import('monaco-editor/esm/vs/language/css/css.worker?worker');
+      return new CssWorker();
+    }
+    if (label === 'editorWorkerService') {
+      const { default: EditorWorker } = await import('monaco-editor/esm/vs/editor/editor.worker?worker');
+      return new EditorWorker();
+    }
+    throw new Error(\`Failed to resolve worker with label "\${label}"\`);
+  },
+} as monaco.Environment;
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
@@ -259,7 +293,6 @@ if (import.meta.hot) {
 
   const virtualFiles = new Map<string, VirtualFileContent>([
     ['main.tsx', getEntryPoint('prod')],
-    ['dev.tsx', getEntryPoint('dev')],
     ['editor.tsx', getEntryPoint('editor')],
     ['components.tsx', await createComponentsFile()],
     ['page-components.tsx', await createPageComponentsFile()],
@@ -284,9 +317,7 @@ if (import.meta.hot) {
         rollupOptions: {
           input: {
             index: path.resolve(currentDirectory, './index.html'),
-            ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
-              ? { editor: path.resolve(currentDirectory, './editor.html') }
-              : {}),
+            ...(dev ? { editor: path.resolve(currentDirectory, './editor.html') } : {}),
           },
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
@@ -311,12 +342,7 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            // eslint-disable-next-line no-nested-ternary
-            replacement: process.env.EXPERIMENTAL_INLINE_CANVAS
-              ? 'virtual:toolpad-files:main.tsx'
-              : dev
-                ? 'virtual:toolpad-files:dev.tsx'
-                : 'virtual:toolpad-files:main.tsx',
+            replacement: 'virtual:toolpad-files:main.tsx',
           },
           {
             find: '@toolpad/studio',
@@ -326,7 +352,7 @@ if (import.meta.hot) {
               : // load compiled
                 path.resolve(currentDirectory, '../exports'),
           },
-          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+          ...(dev
             ? [
                 {
                   find: EDITOR_ENTRY,
@@ -347,9 +373,8 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
-        force: !process.env.EXPERIMENTAL_INLINE_CANVAS && toolpadDevMode ? true : undefined,
         include: [
-          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+          ...(dev
             ? [
                 'perf-cascade',
                 'monaco-editor',
@@ -371,9 +396,7 @@ if (import.meta.hot) {
         'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
         'process.env.TOOLPAD_VERSION': JSON.stringify(pkgJson.version),
         'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),
-        'process.env.EXPERIMENTAL_INLINE_CANVAS': JSON.stringify(
-          process.env.EXPERIMENTAL_INLINE_CANVAS,
-        ),
+        'process.env.TOOLPAD_PLAN': JSON.stringify(plan),
       },
     } satisfies InlineConfig,
   };

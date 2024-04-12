@@ -51,7 +51,7 @@ Low-code tools can be hard to extend. When the tool can't handle a particular ta
 
 This lack of flexibility often results in being stuck or having to write custom code inside these apps and storing the business logic within their configuration files.
 
-Would it be great if the tool would use code in your filesystem as the source of truth?
+Wouldn't it be great if the tool used code in your filesystem as its source of truth?
 
 ### Duplication of logic
 
@@ -92,15 +92,10 @@ Toolpad Studio empowers you with total control over the entire development lifec
 
 Similar to any Node.js application, you have the flexibility to self-host a Toolpad Studio app on your own server or select a hosting provider that suits your needs, whether it's AWS, Render, Railway, or Heroku. Toolpad Studio does not confine you to its cloud hosting, ensuring you have the freedom to choose the hosting solution that best aligns with your preferences and requirements.
 
-Like any Node.js app, you can self-host a Toolpad Studio app on your own server or any hosting provider of your choice (such as AWS, Render, Railway, or Heroku). Toolpad Studio does not lock you into its cloud hosting.
+### Collaborate as programmers
 
-### Seamless collaboration
-
-The Toolpad Studio application configuration is saved in YAML files, which can be conveniently added to Git or any preferred version control tool for collaborative maintenance. Maintaining a private code repository is a fundamental practice for enhancing the security of user data. This eliminates the need to create new collaboration mechanisms for engineers, as the existing tools can be effectively leveraged.
-
-### Trust and safety
-
-While organizations make every effort to protect highly sensitive data and conduct thorough vendor due diligence and compliance assessments, data breaches continue to be a significant concern. Toolpad Studio ensures that you can maintain control over your data, helping to address this issue.
+Toolpad apps use YAML files as their source of truth.
+This means you can store your entire Toolpad app the same way you store your other code, so you can continue to use the source control systems and developer workflows that you prefer.
 
 ## How is Toolpad Studio different from other tools?
 

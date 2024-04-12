@@ -44,7 +44,7 @@ function getHtmlContent(entry: string) {
   `;
 }
 
-export function getAppHtmlContent() {
+function getAppHtmlContent() {
   return getHtmlContent(MAIN_ENTRY);
 }
 
@@ -153,6 +153,9 @@ export async function createViteConfig({
   getPagesManifest,
 }: CreateViteConfigParams) {
   const mode = dev ? 'development' : 'production';
+
+  const initialDom = await loadDom();
+  const plan = appDom.getPlan(initialDom);
 
   const getEntryPoint = (target: 'prod' | 'dev' | 'editor') => {
     const isCanvas = target === 'dev';
@@ -290,7 +293,6 @@ if (import.meta.hot) {
 
   const virtualFiles = new Map<string, VirtualFileContent>([
     ['main.tsx', getEntryPoint('prod')],
-    ['dev.tsx', getEntryPoint('dev')],
     ['editor.tsx', getEntryPoint('editor')],
     ['components.tsx', await createComponentsFile()],
     ['page-components.tsx', await createPageComponentsFile()],
@@ -315,9 +317,7 @@ if (import.meta.hot) {
         rollupOptions: {
           input: {
             index: path.resolve(currentDirectory, './index.html'),
-            ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
-              ? { editor: path.resolve(currentDirectory, './editor.html') }
-              : {}),
+            ...(dev ? { editor: path.resolve(currentDirectory, './editor.html') } : {}),
           },
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
@@ -342,12 +342,7 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            // eslint-disable-next-line no-nested-ternary
-            replacement: process.env.EXPERIMENTAL_INLINE_CANVAS
-              ? 'virtual:toolpad-files:main.tsx'
-              : dev
-                ? 'virtual:toolpad-files:dev.tsx'
-                : 'virtual:toolpad-files:main.tsx',
+            replacement: 'virtual:toolpad-files:main.tsx',
           },
           {
             find: '@toolpad/studio',
@@ -357,7 +352,7 @@ if (import.meta.hot) {
               : // load compiled
                 path.resolve(currentDirectory, '../exports'),
           },
-          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+          ...(dev
             ? [
                 {
                   find: EDITOR_ENTRY,
@@ -378,9 +373,8 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
-        force: !process.env.EXPERIMENTAL_INLINE_CANVAS && toolpadDevMode ? true : undefined,
         include: [
-          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+          ...(dev
             ? [
                 'perf-cascade',
                 'monaco-editor',
@@ -402,9 +396,7 @@ if (import.meta.hot) {
         'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
         'process.env.TOOLPAD_VERSION': JSON.stringify(pkgJson.version),
         'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),
-        'process.env.EXPERIMENTAL_INLINE_CANVAS': JSON.stringify(
-          process.env.EXPERIMENTAL_INLINE_CANVAS,
-        ),
+        'process.env.TOOLPAD_PLAN': JSON.stringify(plan),
       },
     } satisfies InlineConfig,
   };

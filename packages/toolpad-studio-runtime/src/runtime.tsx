@@ -238,4 +238,12 @@ export interface UseDataProviderHook {
   ): UseDataProviderHookResult<R, P>;
 }
 
-export const UseDataProviderContext = React.createContext<UseDataProviderHook | null>(null);
+const DEFAULT_DATA_PROVIDER_HOOK: UseDataProviderHook = (id) => ({
+  dataProvider: null,
+  isLoading: false,
+  error: id ? new Error("This environment doesn't support data providers") : undefined,
+});
+
+export const UseDataProviderContext = React.createContext<UseDataProviderHook>(
+  DEFAULT_DATA_PROVIDER_HOOK,
+);

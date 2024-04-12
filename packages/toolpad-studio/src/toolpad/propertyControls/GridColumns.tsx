@@ -16,6 +16,7 @@ import {
   TextFieldProps,
   TextFieldVariants,
   Tooltip,
+  Typography,
 } from '@mui/material';
 import * as React from 'react';
 import AddIcon from '@mui/icons-material/Add';
@@ -30,12 +31,13 @@ import {
 import { generateUniqueString } from '@toolpad/utils/strings';
 import { NumberFormatEditor } from '@toolpad/studio-runtime/numberFormat';
 import { DateFormatEditor } from '@toolpad/studio-runtime/dateFormat';
+import { useAppHost } from '@toolpad/studio-runtime';
 import type { EditorProps } from '../../types';
 import { ToolpadComponentDefinition, useToolpadComponents } from '../AppEditor/toolpadComponents';
 import PropertyControl from '../../components/PropertyControl';
-
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
+import { UpgradeChip } from '../AppEditor/UpgradeNotification';
 
 type GridAlignment = SerializableGridColumn['align'];
 
@@ -132,6 +134,9 @@ function GridColumnEditor({
     },
   });
 
+  const appHost = useAppHost();
+  const isProPlan = appHost.plan === 'pro';
+
   return (
     <Stack gap={1} py={1}>
       <TextField {...fieldInput} />
@@ -199,54 +204,6 @@ function GridColumnEditor({
         ))}
       </TextField>
 
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={editedColumn.sortable ?? true}
-            disabled={disabled}
-            onChange={(event) =>
-              handleColumnChange({
-                ...editedColumn,
-                sortable: event.target.checked,
-              })
-            }
-          />
-        }
-        label="Sortable"
-      />
-
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={editedColumn.filterable ?? true}
-            disabled={disabled}
-            onChange={(event) =>
-              handleColumnChange({
-                ...editedColumn,
-                filterable: event.target.checked,
-              })
-            }
-          />
-        }
-        label="Filterable"
-      />
-
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={editedColumn.editable ?? true}
-            disabled={disabled}
-            onChange={(event) =>
-              handleColumnChange({
-                ...editedColumn,
-                editable: event.target.checked,
-              })
-            }
-          />
-        }
-        label="Editable"
-      />
-
       <Box sx={{ ml: 1, pl: 1, borderLeft: 1, borderColor: 'divider' }}>
         {editedColumn.type === 'number' ? (
           <NumberFormatEditor
@@ -302,6 +259,98 @@ function GridColumnEditor({
           </TextField>
         ) : null}
       </Box>
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.sortable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                sortable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Sortable"
+      />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.filterable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                filterable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Filterable"
+      />
+
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={editedColumn.editable ?? true}
+            disabled={disabled}
+            onChange={(event) =>
+              handleColumnChange({
+                ...editedColumn,
+                editable: event.target.checked,
+              })
+            }
+          />
+        }
+        label="Editable"
+      />
+
+      {isProPlan ? (
+        <React.Fragment>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={editedColumn.groupable ?? true}
+                disabled={disabled}
+                onChange={(event) =>
+                  handleColumnChange({
+                    ...editedColumn,
+                    groupable: event.target.checked,
+                  })
+                }
+              />
+            }
+            label="Groupable"
+          />
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={editedColumn.aggregable ?? true}
+                disabled={disabled}
+                onChange={(event) =>
+                  handleColumnChange({
+                    ...editedColumn,
+                    aggregable: event.target.checked,
+                  })
+                }
+              />
+            }
+            label="Aggregable"
+          />
+        </React.Fragment>
+      ) : (
+        <Typography variant="body2">
+          Grouping/aggregation
+          <UpgradeChip
+            sx={{ ml: 1 }}
+            url="https://mui.com/toolpad/studio/components/data-grid/#grouping"
+          />
+        </Typography>
+      )}
     </Stack>
   );
 }
@@ -422,7 +471,7 @@ function GridColumnsPropEditor({
           horizontal: 'left',
         }}
       >
-        <Box sx={{ minWidth: 300, p: 2 }}>
+        <Box sx={{ minWidth: 300, p: 2 }} aria-label="Column editor">
           {editedColumn ? (
             <React.Fragment>
               <IconButton aria-label="Back" onClick={() => setEditedIndex(null)}>

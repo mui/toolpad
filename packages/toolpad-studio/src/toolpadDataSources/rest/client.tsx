@@ -38,7 +38,7 @@ import {
   ResponseType,
   IntrospectionResult,
 } from './types';
-import { getAuthenticationHeaders, getDefaultUrl, parseBaseUrl } from './shared';
+import { getAuthenticationHeaders, parseBaseUrl } from './shared';
 import BindableEditor, {
   RenderControlParams,
 } from '../../toolpad/AppEditor/PageEditor/BindableEditor';
@@ -278,7 +278,6 @@ function QueryEditor({
   connectionParams: rawConnectionParams,
   value: input,
   settingsTab,
-  runtimeConfig,
 }: QueryEditorProps<RestConnectionParams, FetchQuery>) {
   const appStateApi = useAppStateApi();
   const { currentView } = useAppState();
@@ -286,9 +285,8 @@ function QueryEditor({
 
   const connectionParams = isBrowserSide ? null : rawConnectionParams;
   const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
-  // input.attributes.query.url will be reset when it's empty
-  const urlValue: BindableAttrValue<string> =
-    input.attributes.query.url ?? getDefaultUrl(runtimeConfig, connectionParams);
+
+  const urlValue: BindableAttrValue<string> = input.attributes.query.url ?? '';
 
   const introspection = usePrivateQuery<FetchPrivateQuery, IntrospectionResult>(
     {
@@ -714,6 +712,7 @@ function QueryEditor({
 function getInitialQueryValue(): FetchQuery {
   return {
     method: 'GET',
+    url: 'https://raw.githubusercontent.com/mui/mui-toolpad/master/public/movies.json',
     headers: [],
     browser: false,
   };

@@ -1,8 +1,6 @@
-import { BindableAttrValue } from '@toolpad/studio-runtime';
 import { ensureSuffix } from '@toolpad/utils/strings';
 import { Maybe } from '@toolpad/utils/types';
-import { Authentication, RestConnectionParams } from './types';
-import type { RuntimeConfig } from '../../types';
+import { Authentication } from './types';
 
 export const HTTP_NO_BODY = new Set(['GET', 'HEAD']);
 
@@ -34,15 +32,4 @@ export function parseBaseUrl(baseUrl: string): URL {
   parsedBase.search = '';
   parsedBase.hash = '';
   return parsedBase;
-}
-
-export function getDefaultUrl(
-  config: RuntimeConfig,
-  connection?: RestConnectionParams | null,
-): BindableAttrValue<string> {
-  const baseUrl = connection?.baseUrl;
-
-  return baseUrl
-    ? ''
-    : new URL('/static/movies.json', config.externalUrl || window.location.href).href;
 }

@@ -10,6 +10,6 @@
   "dependencies": {
     "@mui/x-data-grid-premium": "^7.1.1",
     "@mui/x-license": "^7.1.1",
-    "@toolpad/studio": "0.1.53"
+    "@toolpad/studio": "0.1.54"
   }
 }

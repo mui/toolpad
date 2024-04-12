@@ -1,95 +1,67 @@
-# Deploy to Render
+# Deploy to GCP
 
-<p class="description">You can host and share your Toolpad Studio apps on Render in a few minutes, for free.</p>
+<p class="description">You can host and share your Toolpad Studio apps on Google Cloud Platform (GCP) in a few minutes, for free.</p>
+
+GCP offers an ecosystem of products to help you build, manage and scale any web service. This guide uses [Cloud Run](https://cloud.google.com/run) and [Cloud Build](https://cloud.google.com/build) to deploy a [qr-generator](https://github.com/Prakhar-org/qr-generator) Toolpad Studio example from a GitHub repository.
 
 ## Prerequisites
 
-- A [Render](https://render.com) account
+- A [GCP](https://console.cloud.google.com/) account
 - A [GitHub](https://github.com) account
+- A GitHub repository containing your Toolpad Studio app. Check out [pushing your Toolpad Studio app to GitHub](/toolpad/studio/how-to-guides/render-deploy/#pushing-your-toolpad-studio-app-to-github) for this step.
 
-## Pushing your Toolpad Studio app to GitHub
+## Setting a new app on GCP
 
-1. With a GitHub account, you can create a new repository using the **+** button available in the header menu, followed by **New repository**. Then, select an appropriate name:
+1. Login in to Google Cloud console and from the header bar choose the project where you want to setup the web service.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/tutorials/deploy-render/render-github-new.png", "alt": "GitHub new repo ", "caption": "Creating a new GitHub repository", "indent": 1, "aspectRatio": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/choose-project.png", "alt": "Choose project", "caption": "Choosing the project to setup the web service", "indent": 1 }}
 
-2. If the Toolpad Studio app is not currently a Git repository, you can run
+2. From the navigation menu icon, click on **Cloud Run**.
 
-   ```bash
-   git init
-   ```
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/navigate-to-cloud-run.png", "alt": "Navigate to cloud run", "caption": "Navigate to cloud run", "indent": 1}}
 
-   to initialise it.
+3. Click on **Create Service** to setup your web app.
 
-3. You can set the newly created repository on GitHub as the remote for your locally running Toolpad Studio app, using:
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/create-service.png", "alt": "Create Cloud Run service", "caption": "Create Cloud Run service", "indent": 1}}
 
-   ```bash
-   git remote add origin <REPOSITORY-URL>
-   ```
+4. In the Create service UI, choose **Continuously deploy from a repository** and give a name to your service from **Service name** input. Further click on **Setup with cloud build** button.
 
-   Replace `<REPOSITORY-URL>` with the URL of the repository you just created on GitHub.
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/setup-run-service.png", "alt": "Configuring Cloud Run service", "caption": "Configuring Cloud Run service", "indent": 1 }}
 
-4. Once you are done making changes to your Toolpad Studio app, verify that you are on the `main` branch, commit these changes and push them to GitHub.
+5. This opens a drawer menu, from the drop-down, choose the repository that contains your Toolpad Studio app and click Next.
 
-   ```bash
-   git add .
-   git commit -m "pushing a new version"
-   git push origin main
-   ```
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/choose-repository.png", "alt": "Choose repository", "caption": "Choose respository", "indent": 1 }}
 
-## Creating a new app on Render
+6. The branch input shows `main` by default and it can remain unchanged. From the radio buttons, choose the second option as we want to deploy a Node.js app. The other configurations can be kept unchanged. Click **Save**.
 
-1. With a Render account, you can create a new **Web Service**:
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/build-type.png", "alt": "Choosing branch and build type", "caption": "Choosing branch and build type", "indent": 1 }}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/tutorials/deploy-render/render-start.png", "alt": "Render new web service ", "caption": "Creating a new Render Web Service", "indent": 1 }}
+7. With the drawer closed, on the Cloud Run setup UI, choose **Allow unauntheticated invocations** to create a public app that needs no authentication and scroll down.
 
-2. Depending on whether the visibility of the GitHub repository is set to private or public, you will need to either connect your GitHub account to Render, or paste in the URL of the repository you created above:
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/back-to-cloud-run.png", "alt": "Select allow unauntheticated invocations", "caption": "Select allow unauntheticated invocations", "indent": 1}}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/tutorials/deploy-render/render-connect-github.png", "alt": "GitHub new repo ", "caption": "Connecting GitHub to Render", "indent": 1, "aspectRatio": 2 }}
+8. The last step is to click on 'Container(s), Volumes, Networking, Security' carrot. The first input **Container port** needs to be updated to 3000. Click the **Create** button to start the service.
 
-3. If using a private repository, you need to search for and select the repository you intend to deploy once connected to GitHub:
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/set-container-port.png", "alt": "Set contianer port", "caption": "Set contianer port", "indent": 1}}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/tutorials/deploy-render/render-search.png", "alt": "GitHub repo on Render ", "caption": "Connecting your GitHub repository", "indent": 1, "aspectRatio": 1.5}}
+9. The next screen shows that the deployment is in progress and the build is being prepared, it can take 3-5 minutes. You can click on the **logs** link (pending state) to see the live build logs in Cloud Build UI.
 
-4. With the repository selected, you can advance to deployment configuration. Render can guess that you are deploying a Node app. Set the name which will appear in the URL of your deployed app, like `<APP-NAME>.onrender.com`:
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/deployment.png", "alt": "Deployment in progress", "caption": "Deployment in progress", "indent": 1}}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/tutorials/deploy-render/render-config-start.png", "alt": "Render deployment config ", "caption": "Setting the deployment configuration", "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/build-logs.png", "alt": "Build logs", "caption": "Build logs", "indent": 1}}
 
-5. The build and start commands will be set to
+10. Once this is successfully complete, go back to the Cloud Run page and access your Toolpad Studio app from the created URL .
 
-   ```bash
-   $ yarn; yarn build
-   $ yarn start
-   ```
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/build-complete.png", "alt": "GCP deployment complete", "caption": "Deployed successfully", "indent": 1 }}
 
-   by default. You can leave this unchanged.
+That's it! We're up and [running](https://my-app-gfqudrpoaq-uc.a.run.app/prod/pages/qrcode) in a few minutes. Make changes, push to GitHub, and your app will automatically redeploy each time.
 
-6. Select an appropriate instance type for your deployment.
+## Common pitfalls
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/tutorials/deploy-render/render-config-commands.png", "alt": "Render deployment commands and plan ", "caption": "Setting deployment commands and choosing an instance type", "indent": 1 }}
+1. GCP chooses NPM as the default package manager, you might have to change it. Check out [Building a Node.js application ](https://cloud.google.com/docs/buildpacks/nodejs) for more.
 
-7. Select **Create Web Service** to trigger the deployment. You will be redirected to the streaming logs of the in-progress deployment.
+2. You might have to enable account permissions and APIs within the Google Cloud console. These are the security measures that GCP puts in place. For instance, this deployment required enabling a few GCP services from the Cloud Build Settings UI.
 
-8. Render.com uses `14.7.0` as the default Node version. Toolpad Studio requires version `18.17.1` as the minimum Node version. You can change the default by setting a `NODE_VERSION` environment variable for your deployment:
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/pitfall.png", "alt": "Enable GCP service", "caption": "Enable GCP service", "indent": 1 }}
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/tutorials/deploy-render/node-version.png", "alt": "Set NODE_VERSION ", "caption": "Overriding the default Node version", "indent": 1, "aspectRatio": 3 }}
-
-<ul style="list-style-type: none">
-<li>
-
-:::info
-See the [Render documentation](https://docs.render.com/node-version) on Node versions for more information.
-:::
-
-</li>
-</ul>
-
-8. Once this is successfully complete, you can access your Toolpad Studio app on `<APP-NAME>.onrender.com`.
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/tutorials/deploy-render/render-complete.png", "alt": "Render deployment complete ", "caption": "Deployed successfully", "indent": 1 }}
-
-That's it! We're up and running in a few minutes.
-
-Make changes, push to GitHub, and your app will automatically redeploy each time.
-
-Check out the Render documentation for more advanced settings, like adding [environment variables](https://docs.render.com/configure-environment-variables) to your app.
+In case, you encounter issues, you can check [Deploy a Node.js service to Cloud Run](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-nodejs-service) quickstart guide from Google.

@@ -51,7 +51,7 @@
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-render/render-search.png", "alt": "GitHub repo on Render ", "caption": "Connecting your GitHub repository", "indent": 1, "aspectRatio": 1.5}}
 
-4. With the repository selected, you can advance to deployment configuration. Render can guess that you are deploying a Node app. Set the name which you want to appear in the URL of your deployed app, like `<APP-NAME>.onrender.com`:
+4. With the repository selected, you can advance to deployment configuration. Render can guess that you are deploying a Node app. Set the name which should appear in the URL of your deployed app, like `<APP-NAME>.onrender.com`:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-render/render-config-start.png", "alt": "Render deployment config ", "caption": "Setting the deployment configuration", "indent": 1 }}
 

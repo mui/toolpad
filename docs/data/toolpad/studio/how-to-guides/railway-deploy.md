@@ -2,13 +2,13 @@
 
 <p class="description">You can host and share your Toolpad Studio apps on Railway in a few minutes, for free.</p>
 
-This guide walks you throught the deployment of [qr-generator](https://github.com/mui/mui-toolpad/tree/master/examples/qr-generator) example from the Toolpad repository.
+This guide walks you throught the deployment of the [qr-generator](https://github.com/mui/mui-toolpad/tree/master/examples/qr-generator) example from the Toolpad repository.
 
 ## Prerequisites
 
 - A [Railway](https://railway.app/) account
 - A [GitHub](https://github.com) account
-- A GitHub repository containing Toolpad Studio app. Check out [pushing Toolpad Studio app to GitHub](/toolpad/studio/how-to-guides/render-deploy/#pushing-your-toolpad-studio-app-to-github) for this step.
+- A GitHub repository containing your Toolpad Studio app. Check out [pushing your Toolpad Studio app to GitHub](/toolpad/studio/how-to-guides/render-deploy/#pushing-your-toolpad-studio-app-to-github) for this step.
 
 ## Creating a new app on Railway
 
@@ -26,7 +26,7 @@ This guide walks you throught the deployment of [qr-generator](https://github.co
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/configure-root-directory.png", "alt": "Configuring the root directory", "caption": "Configuring the root directory", "indent": 1 }}
 
-5. Scroll down and click on **Generate Domain** to create a public URL, you can also create a custom URL.
+5. Scroll down and click on **Generate Domain** to create a public URL. You can also create a custom URL.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/generate-domain.png", "alt": "Generating a public URL", "caption": "Generating a public URL", "indent": 1 }}
 
@@ -39,7 +39,7 @@ This guide walks you throught the deployment of [qr-generator](https://github.co
 
    by default. You can leave this unchanged.
 
-7. Toolpad Studio apps run on PORT 3000, navigate to the Variables tab add a PORT variable and set its value to 3000.
+7. Toolpad Studio apps run on port 3000, so navigate to the **Variables** tab to add a `PORT` variable and set its value to 3000.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-railway/add-port-as-a-variable.png", "alt": "Adding port as a variable", "caption": "Adding PORT as a variable", "indent": 1 }}
 

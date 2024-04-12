@@ -154,6 +154,9 @@ export async function createViteConfig({
 }: CreateViteConfigParams) {
   const mode = dev ? 'development' : 'production';
 
+  const initialDom = await loadDom();
+  const plan = appDom.getPlan(initialDom);
+
   const getEntryPoint = (target: 'prod' | 'dev' | 'editor') => {
     const isCanvas = target === 'dev';
     const isEditor = target === 'editor';
@@ -362,6 +365,7 @@ if (import.meta.hot) {
         'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
         'process.env.TOOLPAD_VERSION': JSON.stringify(pkgJson.version),
         'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),
+        'process.env.TOOLPAD_PLAN': JSON.stringify(plan),
       },
     } satisfies InlineConfig,
   };

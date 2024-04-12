@@ -63,7 +63,7 @@ In the Google OAuth client settings screen, under the **Authorized redirect URIs
 ### Azure Active Directory (now Entra ID)
 
 :::warning
-The Azure AD authentication provider will be a paid feature of Toolpad Studio very soon, so it's only available for free for a limited time.
+The Azure AD authentication provider is a paid feature of Toolpad Studio.
 :::
 
 | environment variable name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                                |

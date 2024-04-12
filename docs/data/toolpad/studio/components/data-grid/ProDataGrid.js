@@ -28,14 +28,8 @@ const COLUMNS = [
 
 export default function BasicDataGrid() {
   return (
-    <AppHostProvider>
-      <DataGrid
-        rows={ROWS}
-        columns={COLUMNS}
-        height={300}
-        density="compact"
-        hideToolbar
-      />
+    <AppHostProvider plan="pro">
+      <DataGrid rows={ROWS} columns={COLUMNS} height={300} />
     </AppHostProvider>
   );
 }

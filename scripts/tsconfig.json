@@ -19,6 +19,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "allowImportingTsExtensions": true,
+    "strict": true,
     "jsx": "react"
   }
 }

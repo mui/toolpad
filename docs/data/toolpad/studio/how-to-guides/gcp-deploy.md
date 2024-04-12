@@ -2,7 +2,7 @@
 
 <p class="description">You can host and share your Toolpad Studio apps on Google Cloud Platform (GCP) in a few minutes, for free.</p>
 
-GCP offers an ecosystem of products to help you build, manage and scale any web service. This guide uses [Cloud Run](https://cloud.google.com/run) and [Cloud Build](https://cloud.google.com/build) to deploy a [qr-generator](https://github.com/Prakhar-org/qr-generator) Toolpad Studio example from a GitHub repository.
+GCP offers an ecosystem of products to help you build, manage, and scale any web service. This guide uses [Cloud Run](https://cloud.google.com/run) and [Cloud Build](https://cloud.google.com/build) to deploy a [qr-generator](https://github.com/Prakhar-org/qr-generator) Toolpad Studio example from a GitHub repository.
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ GCP offers an ecosystem of products to help you build, manage and scale any web 
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/choose-repository.png", "alt": "Choose repository", "caption": "Choose respository", "indent": 1 }}
 
-6. The branch input shows `main` by default and it can remain unchanged. From the radio buttons, choose the second option as we want to deploy a Node.js app. The other configurations can be kept unchanged. Click **Save**.
+6. The branch input shows `main` by default and it can remain unchanged. From the radio buttons, choose the second option as it is a a Node.js app. The other configurations can be kept unchanged. Click **Save**.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/build-type.png", "alt": "Choosing branch and build type", "caption": "Choosing branch and build type", "indent": 1 }}
 
@@ -54,14 +54,16 @@ GCP offers an ecosystem of products to help you build, manage and scale any web 
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/build-complete.png", "alt": "GCP deployment complete", "caption": "Deployed successfully", "indent": 1 }}
 
-That's it! We're up and [running](https://my-app-gfqudrpoaq-uc.a.run.app/prod/pages/qrcode) in a few minutes. Make changes, push to GitHub, and your app will automatically redeploy each time.
+That's it! The app is up and [running](https://my-app-gfqudrpoaq-uc.a.run.app/prod/pages/qrcode) in a few minutes. Make changes, push to GitHub, and your app automatically redeploys each time.
 
 ## Common pitfalls
 
-1. GCP chooses NPM as the default package manager, you might have to change it. Check out [Building a Node.js application ](https://cloud.google.com/docs/buildpacks/nodejs) for more.
+1. GCP chooses npm as the default package manager, you might have to change it. Check out [Building a Node.js application](https://cloud.google.com/docs/buildpacks/nodejs) for more.
 
 2. You might have to enable account permissions and APIs within the Google Cloud console. These are the security measures that GCP puts in place. For instance, this deployment required enabling a few GCP services from the Cloud Build Settings UI.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/pitfall.png", "alt": "Enable GCP service", "caption": "Enable GCP service", "indent": 1 }}
+
+3. You may have to update your root directory in Build context directory input in 6.
 
 In case, you encounter issues, you can check [Deploy a Node.js service to Cloud Run](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-nodejs-service) quickstart guide from Google.

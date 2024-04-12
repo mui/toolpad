@@ -44,45 +44,6 @@ Adds groupable and aggregable columns for the Premium data grid, a faster editor
 
 All contributors of this release in alphabetical order: @asif-choudhari, @bharatkashyap, @HazzazBinFaiz, @Janpot, @michaldudak, @oliviertassinari, @prakhargupta1, @renovate[bot]
 
-<!-- generated comparing v0.1.53..master -->
-
-_Apr 12, 2024_
-
-A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
-
-Adds groupable and aggregable columns for the Premium data grid, a faster editor for Toolpad Studio, and introduces Toolpad Core under `--core` on the CLI! Plus a new custom components example, multiple documentation updates and bug fixes.
-
-- &#8203;<!-- 30 -->Update renovate.json @Janpot
-- &#8203;<!-- 29 -->Update renovate.json @Janpot
-- &#8203;<!-- 28 -->Add RFC to readme (#3353) @prakhargupta1
-- &#8203;<!-- 27 -->Move TreeView icons into the theme (#3337) @Janpot
-- &#8203;<!-- 26 -->Lock file maintenance (#3351) @renovate[bot]
-- &#8203;<!-- 25 -->Fix screenshot flakeyness (#3341) @Janpot
-- &#8203;<!-- 24 -->Add rename, duplicate and delete for Page Hierarchy (#3336) @asif-choudhari
-- &#8203;<!-- 23 -->Upgrade vite (#3340) @Janpot
-- &#8203;<!-- 22 -->Add custom component example (#3329) @Janpot
-- &#8203;<!-- 21 -->Fix dedupe check (#3330) @Janpot
-- &#8203;<!-- 20 -->Fix crash when components folder contains a tsconfig (#3327) @Janpot
-- &#8203;<!-- 19 -->Allow OPTIONS method in HTTP queries (#3308) @Janpot
-- &#8203;<!-- 18 -->Remove fallback modules (#3326) @Janpot
-- &#8203;<!-- 17 -->Update Node.js in circleci (#3324) @Janpot
-- &#8203;<!-- 16 -->Update renovate.json @Janpot
-- &#8203;<!-- 15 -->Update renovate.json @Janpot
-- &#8203;<!-- 14 -->Fix typo : use npm instead of pnpm in instruction (#3323) @HazzazBinFaiz
-- &#8203;<!-- 13 -->[cli] Introduce `--core` (#3304) @bharatkashyap
-- &#8203;<!-- 12 -->[code-infra] Use @mui/docs from npm (#3301) @michaldudak
-- &#8203;<!-- 11 -->[code-infra] Fix prettier in scripts (#3382) @Janpot
-- &#8203;<!-- 10 -->[core] Make inline canvas the default (#3370) @Janpot
-- &#8203;<!-- 09 -->[core] Remove deprecated usage of LicenseInfo (#3372) @Janpot
-- &#8203;<!-- 08 -->[core] Continue rename of Toolpad @oliviertassinari
-- &#8203;<!-- 07 -->[DataGrid] Add support for groupable and aggregable columns (#3369) @Janpot
-- &#8203;<!-- 06 -->[docs] Improve the writing on the "why Toolpad" doc (#3377) @Janpot
-- &#8203;<!-- 05 -->[docs] Update delete-grid-row.md (#3354) @prakhargupta1
-- &#8203;<!-- 04 -->[docs] remove redirect to component reference (#3356) @Janpot
-- &#8203;<!-- 03 -->[examples] Premium grid example (#3360) @Janpot
-- &#8203;<!-- 02 -->[queries] Remove locally hosted demo data (#3374) @Janpot
-- &#8203;<!-- 01 -->[ui] Add a chip to indicate pro features (#3358) @bharatkashyap
-
 ## v0.1.53
 
 <!-- generated comparing v0.1.52..master -->

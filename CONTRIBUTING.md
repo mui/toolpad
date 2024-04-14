@@ -13,7 +13,9 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 
 ### Running apps inside the monorepo (recommended)
 
-This will use the local version of Toolpad Studio as built in the monorepo. This is recommended when your app is in a folder inside of the monorepo. You may even decide to temporarily move your app into the monorepo.
+This uses the local version of Toolpad Studio as built in the mono-repository.
+This is recommended when your app is in a folder inside of the mono-repository.
+You may even decide to temporarily move your app into the mono-repository.
 
 1. Install dependencies:
 
@@ -21,7 +23,7 @@ This will use the local version of Toolpad Studio as built in the monorepo. This
    pnpm install
    ```
 
-1. Run the build in watch mode
+1. Run the build-in watch mode
 
    ```bash
    pnpm dev
@@ -37,7 +39,8 @@ This will use the local version of Toolpad Studio as built in the monorepo. This
 
 If your application has dependencies other than `@toolpad/studio`, you have to temporarily add it to the workspace:
 
-1. update `pnpm-workspace.yaml` (in the workspace root, not in your app), add your app folder to `workspaces.packages`. For example `examples/qr-generator` which has a dependency on `qrcode` this would be:
+1. update `pnpm-workspace.yaml` (in the workspace root, not in your app), add your app folder to `workspaces.packages`.
+   For example; `examples/qr-generator` which has a dependency on `qrcode` this would be:
 
    ```yaml
    packages:

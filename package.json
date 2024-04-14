@@ -100,10 +100,10 @@
   "engines": {
     "npm": "please-use-pnpm",
     "node": ">=18",
-    "pnpm": "8.15.6"
+    "pnpm": "8.15.7"
   },
   "resolutions": {
     "google-auth-library": "*"
   },
-  "packageManager": "pnpm@8.15.6"
+  "packageManager": "pnpm@8.15.7"
 }

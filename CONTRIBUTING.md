@@ -23,7 +23,7 @@ You may even decide to temporarily move your app into the mono-repository.
    pnpm install
    ```
 
-1. Run the build-in watch mode
+1. Run the built-in watch mode
 
    ```bash
    pnpm dev

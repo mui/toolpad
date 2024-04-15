@@ -1,6 +1,6 @@
 # With WASM
 
-<p class="description">A basic Toolpad application that demonstrates integrating with WASM modules.</p>
+<p class="description">A basic Toolpad Studio application that demonstrates integrating with WASM modules.</p>
 
 <a target="_blank">
   <img src="https://mui.com/static/toolpad/marketing/with-wasm.png" alt="Toolpad example app with WASM modules" style="aspect-ratio: 687/379;" width="1433">

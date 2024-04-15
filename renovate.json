@@ -63,11 +63,6 @@
       "allowedVersions": "< 3.0.0"
     },
     {
-      "groupName": "tsx",
-      "matchPackageNames": ["tsx"],
-      "description": "Investigating problems with importing X charts under node.js with tsx"
-    },
-    {
       "groupName": "core-js",
       "matchPackageNames": ["core-js"],
       "allowedVersions": "< 2.0.0"
@@ -86,8 +81,8 @@
       "matchManagers": ["github-actions"]
     },
     {
-      "groupName": "Update @mui/toolpad in examples",
-      "matchPackageNames": ["@mui/toolpad"],
+      "groupName": "Update @toolpad/studio in examples",
+      "matchPackageNames": ["@toolpad/studio"],
       "matchFiles": ["examples/*/package.json"],
       "schedule": ["at any time"],
       "automerge": true

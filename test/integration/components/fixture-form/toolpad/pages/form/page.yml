@@ -45,9 +45,6 @@ spec:
                           - option 1
                           - option 2
                           - option 3
-                        isInvalid:
-                          $$jsExpression: |
-                            select.value === "option 1"
                     - component: FilePicker
                       name: filePicker
                       props:

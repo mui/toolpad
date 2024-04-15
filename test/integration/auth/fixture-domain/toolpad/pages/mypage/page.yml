@@ -1,20 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.52/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  id: 5q1xd0t
   title: Page
   content:
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: Text
-          name: typography
-          props:
-            value:
-              $$jsExpression: |
-                `my email: ${getMySession.data.user.email}`
+    - component: Text
+      name: typography
+      layout:
+        columnSize: 1
+      props:
+        value:
+          $$jsExpression: "`my email: ${getMySession.data?.user.email ?? ''}`"
   queries:
     - name: getMySession
       query:
         function: getMySession
         kind: local
+  alias:
+    - 5q1xd0t

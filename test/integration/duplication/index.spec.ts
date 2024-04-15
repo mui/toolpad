@@ -23,11 +23,7 @@ test('duplication', async ({ page }) => {
     const duplicateMenuItem = page.getByRole('menuitem', { name: 'Duplicate' });
     await duplicateMenuItem.click();
 
-    if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
-      await page.waitForURL(/\/prod\/editor\/app\/pages\/[^/]+$/);
-    } else {
-      await page.waitForURL(/\/_toolpad\/app\/pages\/[^/]+$/);
-    }
+    await page.waitForURL(/\/prod\/editor\/app\/pages\/[^/]+$/);
 
     const button = editorModel.appCanvas.getByRole('button', { name: 'hello world' });
     await expect(button).toBeVisible();

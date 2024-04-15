@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as url from 'url';
 import invariant from 'invariant';
-import { fileReplace } from '@mui/toolpad-utils/fs';
+import { fileReplace } from '@toolpad/utils/fs';
 import { test, expect } from '../../playwright/localTest';
 import { ToolpadRuntime } from '../../models/ToolpadRuntime';
 import { ToolpadEditor } from '../../models/ToolpadEditor';
@@ -245,16 +245,16 @@ test('data providers', async ({ page }) => {
 
   await clickCenter(page, grid1);
 
-  await grid1.getByRole('button', { name: 'Go to next page' }).click();
+  await editorModel.appCanvas.getByRole('button', { name: 'Go to next page' }).nth(0).click();
   await expect(grid1.getByText('Index item 100')).toBeVisible();
 
   await clickCenter(page, grid2);
 
-  await grid2.getByRole('button', { name: 'Go to next page' }).click();
+  await editorModel.appCanvas.getByRole('button', { name: 'Go to next page' }).nth(1).click();
   await expect(grid2.getByText('Cursor item 100')).toBeVisible();
   await expect(grid2.getByText('Cursor item 0')).not.toBeVisible();
 
-  await grid2.getByRole('combobox', { name: 'Rows per page:' }).click();
+  await editorModel.appCanvas.getByRole('combobox', { name: 'Rows per page:' }).nth(1).click();
   await editorModel.appCanvas.getByRole('option', { name: '25', exact: true }).click();
 
   await expect(grid2.getByText('Cursor item 0')).toBeVisible();
@@ -272,7 +272,9 @@ test('data providers crud', async ({ page }) => {
 
   await clickCenter(page, grid);
 
-  await grid.getByRole('button', { name: 'Delete row with id "5"', exact: true }).click();
+  await editorModel.appCanvas
+    .getByRole('button', { name: 'Delete row with id "5"', exact: true })
+    .click();
 
   await expect(
     editorModel.appCanvas.getByText('Record deleted successfully', { exact: true }),
@@ -280,19 +282,25 @@ test('data providers crud', async ({ page }) => {
 
   await expect(grid.getByText('Index item 5')).not.toBeVisible();
 
-  await grid.getByRole('button', { name: 'Edit row with id "7"', exact: true }).click();
+  await editorModel.appCanvas
+    .getByRole('button', { name: 'Edit row with id "7"', exact: true })
+    .click();
 
   await cellLocator(grid, 8, 1).getByRole('textbox').fill('edited');
 
-  await grid.getByRole('button', { name: 'Cancel updates', exact: true }).click();
+  await editorModel.appCanvas.getByRole('button', { name: 'Cancel updates', exact: true }).click();
 
   await expect(cellLocator(grid, 8, 1)).toHaveText('Index item 7');
 
-  await grid.getByRole('button', { name: 'Edit row with id "7"', exact: true }).click();
+  await editorModel.appCanvas
+    .getByRole('button', { name: 'Edit row with id "7"', exact: true })
+    .click();
 
   await cellLocator(grid, 8, 1).getByRole('textbox').fill('edited');
 
-  await grid.getByRole('button', { name: 'Save updates to row with id "7"', exact: true }).click();
+  await editorModel.appCanvas
+    .getByRole('button', { name: 'Save updates to row with id "7"', exact: true })
+    .click();
 
   await expect(
     editorModel.appCanvas.getByText('Record updated successfully', { exact: true }),
@@ -300,16 +308,23 @@ test('data providers crud', async ({ page }) => {
 
   await expect(cellLocator(grid, 8, 1)).toHaveText('edited');
 
-  await expect(grid.getByRole('button', { name: 'Cancel updates', exact: true })).not.toBeVisible();
   await expect(
-    grid.getByRole('button', { name: 'Save updates to row with id "7"', exact: true }),
+    editorModel.appCanvas.getByRole('button', { name: 'Cancel updates', exact: true }),
+  ).not.toBeVisible();
+  await expect(
+    editorModel.appCanvas.getByRole('button', {
+      name: 'Save updates to row with id "7"',
+      exact: true,
+    }),
   ).not.toBeVisible();
 
-  await grid.getByRole('button', { name: 'Add record', exact: true }).click();
+  await editorModel.appCanvas.getByRole('button', { name: 'Add record', exact: true }).click();
 
   await cellLocator(grid, 2, 1).getByRole('textbox').fill('created');
 
-  await grid.getByRole('button', { name: 'Save updates to new row', exact: true }).click();
+  await editorModel.appCanvas
+    .getByRole('button', { name: 'Save updates to new row', exact: true })
+    .click();
 
   await expect(
     editorModel.appCanvas.getByText('New record created successfully', { exact: true }),
@@ -319,7 +334,7 @@ test('data providers crud', async ({ page }) => {
 
   await expect(cellLocator(grid, 102, 1)).toHaveText('created');
 
-  await grid.getByRole('button', { name: 'Add record', exact: true }).click();
+  await editorModel.appCanvas.getByRole('button', { name: 'Add record', exact: true }).click();
 
   await page.keyboard.press('Escape');
 

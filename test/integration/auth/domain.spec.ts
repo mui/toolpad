@@ -29,33 +29,41 @@ test.use({
 test('Must be authenticated with valid domain to access app', async ({ page, request }) => {
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');
-  await expect(page).toHaveURL(/\/prod\/signin/);
+  await page.waitForURL(/\/prod\/signin/);
 
   // Access is blocked to API route
   const res = await request.post('/prod/api/data/page/hello');
   expect(res.status()).toBe(401);
 
+  // Sign in with non-existing user
+  await tryCredentialsSignIn(page, 'nobody', 'nobody');
+  await page.waitForURL(/\/prod\/signin/);
+  await expect(page.getByText('Access unauthorized.')).toBeVisible();
+
   // Sign in with invalid domain
   await tryCredentialsSignIn(page, 'test', 'test');
-  await expect(page).toHaveURL(/\/prod\/signin/);
+  await page.waitForURL(/\/prod\/signin/);
   await expect(page.getByText('Access unauthorized.')).toBeVisible();
 
   // Sign in with valid domain
   await tryCredentialsSignIn(page, 'mui', 'mui');
-  await expect(page).toHaveURL(/\/prod\/pages\/mypage/);
+  await page.waitForURL(/\/prod\/pages\/mypage/);
   await expect(page.getByText('my email: test@mui.com')).toBeVisible();
 
   // Is not redirected when authenticated
   await page.goto('/prod/pages/mypage');
-  await expect(page).toHaveURL(/\/prod\/pages\/mypage/);
+  await page.waitForURL(/\/prod\/pages\/mypage/);
 
   // Sign out
   await page.getByText('Mr. MUI 2024').click();
   await page.getByText('Sign out').click();
 
-  await expect(page).toHaveURL(/\/prod\/signin/);
+  await page.waitForURL(/\/prod\/signin/);
+
+  // Must wait for network to be idle or next CSRF request fails with "Failed to fetch", somehow due to the ongoing requests
+  await page.waitForLoadState('networkidle');
 
   // Is redirected when unauthenticated
   await page.goto('/prod/pages/mypage');
-  await expect(page).toHaveURL(/\/prod\/signin/);
+  await page.waitForURL(/\/prod\/signin/);
 });

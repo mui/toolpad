@@ -46,7 +46,7 @@ yarn dev
 ```
 
 ```bash pnpm
-pnpm run dev
+pnpm dev
 ```
 
 </codeblock>
@@ -99,7 +99,7 @@ yarn toolpad-studio:dev
 ```
 
 ```bash pnpm
-pnpm run toolpad-studio:dev
+pnpm toolpad-studio:dev
 ```
 
 </codeblock>

@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-import { NoSsr } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import type { Theme } from '@emotion/react';
@@ -22,17 +20,11 @@ export default function AppProvider({
   navigation,
 }: AppProviderProps) {
   return (
-    <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-      <ThemeProvider theme={theme}>
-        {/* CssBaseline kickstarts an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        <BrandingContext.Provider value={branding}>
-          <NavigationContext.Provider value={navigation}>
-            {/* @TODO: Can probably remove NoSsr once we have non CSS-in-JS solution. */}
-            <NoSsr>{children}</NoSsr>
-          </NavigationContext.Provider>
-        </BrandingContext.Provider>
-      </ThemeProvider>
-    </AppRouterCacheProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <BrandingContext.Provider value={branding}>
+        <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
+      </BrandingContext.Provider>
+    </ThemeProvider>
   );
 }

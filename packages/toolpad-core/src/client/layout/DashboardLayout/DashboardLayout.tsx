@@ -1,27 +1,22 @@
 import * as React from 'react';
-import {
-  AppBar,
-  Box,
-  Collapse,
-  Container,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
-  Stack,
-  Toolbar,
-  Typography,
-} from '@mui/material';
-// Must use named imports or app crashes when the component is imported in a Next.js app
-// eslint-disable-next-line no-restricted-imports
-import { ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Collapse from '@mui/material/Collapse';
+import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
+import Stack from '@mui/material/Stack';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/system';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import ToolpadLogo from './ToolpadLogo';
 import NavigationContext from '../../context/NavigationContext';
 import BrandingContext from '../../context/BrandingContext';
@@ -43,8 +38,6 @@ interface DashboardLayoutProps {
 }
 
 export default function DashboardLayout({ children, hideTitle = false }: DashboardLayoutProps) {
-  const pathname = usePathname();
-
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 
@@ -54,7 +47,8 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
         navigationSection.routes
           .filter(
             (route) =>
-              !!route.routes && route.routes.some((nestedRoute) => nestedRoute.path === pathname),
+              !!route.routes &&
+              route.routes.some((nestedRoute) => nestedRoute.path === window.location.pathname),
           )
           .map((route) => `${navigationSection.title}:${route.label}`),
       )
@@ -82,7 +76,7 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
         }}
       >
         <Toolbar>
-          <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+          <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
             <Stack direction="row" alignItems="center">
               <LogoBox>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoBox>
               {!hideTitle ? (
@@ -91,7 +85,7 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
                 </Typography>
               ) : null}
             </Stack>
-          </Link>
+          </a>
           <Box sx={{ flexGrow: 1 }} />
           {/* <Stack>
             <IconButton
@@ -141,7 +135,7 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
                   const listItem = (
                     <ListItem sx={{ py: 0 }}>
                       <ListItemButton
-                        selected={pathname === route.path}
+                        selected={window.location.pathname === route.path}
                         onClick={handleSidebarItemClick(itemId)}
                       >
                         <ListItemIcon>{route.icon}</ListItemIcon>
@@ -154,12 +148,9 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
                   return (
                     <React.Fragment key={route.label}>
                       {route.path ? (
-                        <Link
-                          href={route.path}
-                          style={{ color: 'inherit', textDecoration: 'none' }}
-                        >
+                        <a href={route.path} style={{ color: 'inherit', textDecoration: 'none' }}>
                           {listItem}
-                        </Link>
+                        </a>
                       ) : (
                         listItem
                       )}
@@ -167,16 +158,18 @@ export default function DashboardLayout({ children, hideTitle = false }: Dashboa
                         <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                           <List sx={{ pl: 4, pr: 2 }}>
                             {route.routes.map((nestedRoute) => (
-                              <Link
+                              <a
                                 key={nestedRoute.label}
                                 href={nestedRoute.path}
                                 style={{ color: 'inherit', textDecoration: 'none' }}
                               >
-                                <ListItemButton selected={pathname === nestedRoute.path}>
+                                <ListItemButton
+                                  selected={window.location.pathname === nestedRoute.path}
+                                >
                                   <ListItemIcon>{nestedRoute.icon}</ListItemIcon>
                                   <ListItemText primary={nestedRoute.label} />
                                 </ListItemButton>
-                              </Link>
+                              </a>
                             ))}
                           </List>
                         </Collapse>

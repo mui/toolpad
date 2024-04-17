@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as url from 'url';
 import * as fs from 'fs/promises';
 import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@toolpad/studio-runtime/server';
 import * as z from 'zod';
@@ -6,7 +7,8 @@ import { fromZodError } from 'zod-validation-error';
 import * as crypto from 'crypto';
 
 async function loadExports(filePath: string): Promise<Map<string, unknown>> {
-  const fullPath = path.resolve(filePath);
+  const fullPath = url.pathToFileURL(path.resolve(filePath));
+  console.log(fullPath);
   const content = await fs.readFile(fullPath, 'utf-8');
   const hash = crypto.createHash('md5').update(content).digest('hex');
   const exports = await import(`${fullPath}?${hash}`);

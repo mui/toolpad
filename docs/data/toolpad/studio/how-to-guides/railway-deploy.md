@@ -2,7 +2,7 @@
 
 <p class="description">You can host and share your Toolpad Studio apps on Railway in a few minutes, for free.</p>
 
-This guide walks you through the deployment of a [qr-generator](https://github.com/Prakhar-org/qr-generator) example from a GitHub repository.
+This guide walks you through the deployment of a Toolpad Studio app from a GitHub repository.
 
 ## Prerequisites
 
@@ -47,9 +47,7 @@ This guide walks you through the deployment of a [qr-generator](https://github.c
 
 8. Once this is successfully complete, you can access your Toolpad Studio app from the public URL available on the card.
 
-That's it! The app is up and [running](https://qr-generator-production-ccf4.up.railway.app/prod/pages/qrcode).
-
-Make changes, push to GitHub, and your app automatically redeploys each time. Like Railway, you can deploy to any hosting provider of your choice.
+That's it! The app is up and running. Make changes, push to GitHub, and your app automatically redeploys each time. Like Railway, you can deploy to any hosting provider of your choice.
 
 Check out the Railway documentation for more advanced settings, like adding [variables](https://docs.railway.app/guides/variables) to your app.
 

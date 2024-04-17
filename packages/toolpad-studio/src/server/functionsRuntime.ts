@@ -7,10 +7,11 @@ import { fromZodError } from 'zod-validation-error';
 import * as crypto from 'crypto';
 
 async function loadExports(filePath: string): Promise<Map<string, unknown>> {
-  const fullPath = url.pathToFileURL(path.resolve(filePath));
-  const content = await fs.readFile(fullPath, 'utf-8');
+  const importFileUrl = url.pathToFileURL(path.resolve(filePath));
+  const content = await fs.readFile(importFileUrl, 'utf-8');
   const hash = crypto.createHash('md5').update(content).digest('hex');
-  const exports = await import(`${fullPath}?${hash}`);
+  importFileUrl.searchParams.set('hash', hash);
+  const exports = await import(importFileUrl.href);
   return new Map(Object.entries(exports));
 }
 

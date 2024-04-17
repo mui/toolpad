@@ -20,7 +20,7 @@ export default withDocsInfra({
     workerThreads: true,
     cpus: 3,
   },
-  transpilePackages: ['@mui/monorepo', '@mui/x-charts'],
+  transpilePackages: ['@mui/monorepo', '@mui/x-charts', '@mui/docs'],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
   env: {
@@ -116,7 +116,7 @@ export default withDocsInfra({
 
     return map;
   },
-  // Used to signal we run yarn build
+  // Used to signal we run pnpm build
   ...(process.env.NODE_ENV === 'production'
     ? {
         output: 'export',

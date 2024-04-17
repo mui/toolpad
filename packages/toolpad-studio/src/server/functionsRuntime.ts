@@ -8,7 +8,6 @@ import * as crypto from 'crypto';
 
 async function loadExports(filePath: string): Promise<Map<string, unknown>> {
   const fullPath = url.pathToFileURL(path.resolve(filePath));
-  console.log(fullPath);
   const content = await fs.readFile(fullPath, 'utf-8');
   const hash = crypto.createHash('md5').update(content).digest('hex');
   const exports = await import(`${fullPath}?${hash}`);

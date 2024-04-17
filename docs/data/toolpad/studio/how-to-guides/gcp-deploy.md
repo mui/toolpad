@@ -2,7 +2,7 @@
 
 <p class="description">You can host and share your Toolpad Studio apps on Google Cloud Platform (GCP) in a few minutes, for free.</p>
 
-GCP offers an ecosystem of products to help you build, manage, and scale any web service. This guide uses [Cloud Run](https://cloud.google.com/run) and [Cloud Build](https://cloud.google.com/build) to deploy a [qr-generator](https://github.com/mui/mui-toolpad/tree/master/examples/qr-generator) Toolpad Studio example from a GitHub repository.
+GCP offers an ecosystem of products to help you build, manage, and scale any web service. This guide uses [Cloud Run](https://cloud.google.com/run) and [Cloud Build](https://cloud.google.com/build) to deploy a Toolpad Studio app from a GitHub repository.
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ GCP offers an ecosystem of products to help you build, manage, and scale any web
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/choose-repository.png", "alt": "Choose repository", "caption": "Choose respository", "indent": 1 }}
 
-6. The branch input shows `main` by default and it can remain unchanged. From the radio buttons, choose the second option as it is a a Node.js app. The other configurations can be kept unchanged. Click **Save**.
+6. The branch input shows `main` by default and it can remain unchanged. From the radio buttons, choose the second option as it is a Node.js app. The other configurations can be kept unchanged. Click **Save**.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/build-type.png", "alt": "Choosing branch and build type", "caption": "Choosing branch and build type", "indent": 1 }}
 
@@ -40,7 +40,7 @@ GCP offers an ecosystem of products to help you build, manage, and scale any web
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/back-to-cloud-run.png", "alt": "Select allow unauntheticated invocations", "caption": "Select allow unauntheticated invocations", "indent": 1}}
 
-8. The last step is to click on 'Container(s), Volumes, Networking, Security' carrot. The first input **Container port** needs to be updated to 3000. Click the **Create** button to start the service.
+8. The last step is to expand the 'Container(s), Volumes, Networking, Security' caret. The first input **Container port** needs to be updated to 3000. Click the **Create** button to start the service.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/deploy-gcp/set-container-port.png", "alt": "Set contianer port", "caption": "Set contianer port", "indent": 1}}
 

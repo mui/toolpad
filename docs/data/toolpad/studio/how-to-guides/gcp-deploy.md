@@ -66,4 +66,4 @@ That's it! The app is up and running in a few minutes. Make changes, push to Git
 
 3. You may have to update your root directory in Build context directory input in 6.
 
-In case, you encounter issues, you can check [Deploy a Node.js service to Cloud Run](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-nodejs-service) quickstart guide from Google.
+In case you need more information, you can check [Deploy a Node.js service to Cloud Run](https://cloud.google.com/run/docs/quickstarts/build-and-deploy/deploy-nodejs-service) quickstart guide from Google.

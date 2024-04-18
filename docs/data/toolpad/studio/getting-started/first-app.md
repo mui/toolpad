@@ -2,9 +2,8 @@
 
 <p class="description">Learn the fundamentals of building with Toolpad Studio by creating a small application.</p>
 
-This guide will walk you through the process of creating a small Toolpad Studio application.
-You'll use the MUI X Data Grid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api/).
-When you click on the name of a breed, a random photo of the breed will be displayed using the Material UI Image component.
+This guide walks you through the process of creating a basic [dog app](https://mui-toolpad-dog-app-production.up.railway.app/prod/pages/page) that uses the MUI X Data Grid component to display a list of dog breeds from the [Dog API](https://dog.ceo/dog-api/).
+When you click on the name of a breed, a random photo of the breed is displayed using the Material UI Image component.
 
 ## Purpose
 
@@ -44,7 +43,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 ### Assemble the UI
 
-1. Hover over the component library and drag a **Data Grid** component into the canvas. Now repeat the process and drag an **Image** component as well. When you're done, the canvas should look like this:
+1. Hover over the component library and drag a **Data Grid** component into the canvas. Now repeat the process and drag an **Image** component. When you're done, the canvas should look like this:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-1.png", "alt": "Toolpad Studio editor", "caption": "The Toolpad Studio editor with components dragged", "indent": 1  }}
 
@@ -54,18 +53,18 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-2.png", "alt":"Choose REST API", "caption":"The Add query menu", "zoom": false  }}
 
-2. We'll be using the [dog API](https://dog.ceo/dog-api/) for this tutorial. Set
+2. You are using the [dog API](https://dog.ceo/dog-api/) for this tutorial. Set
 
    ```html
    https://dog.ceo/api/breeds/list/all
    ```
 
-   as the **URL**. Click the **Run** button to inspect the result of this request, and expand the `message` object in the response. If all went well, it will look like this:
+   as the **URL**. Click the **Run** button to inspect the result of this request, and expand the `message` object in the response. It looks like this:
 
 {{"component": "modules/components/DocsImage.tsx", "src":"/static/toolpad/docs/studio/getting-started/first-app/step-3.png", "alt": "Fetch URL", "caption": "The dog API response", "indent": 1  }}
 
 3. To transform the response
-   according to our needs, we choose the **Transform** tab and enable the **Transform
+   according to your needs, choose the **Transform** tab and enable the **Transform
    response** option. Write the JavaScript expression:
 
    ```js
@@ -76,11 +75,11 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-4.png", "alt": "Transform response", "caption": "The dog API response transformed", "indent": 1  }}
 
-5. Click on **Save** to save the query, and then rename it to `dogQuery` by double clicking on it in the explorer.
+4. Click on **Save** to save the query, and then rename it to `dogQuery` by double clicking on it in the explorer.
 
 ### Bind data to UI
 
-1. Next, we will bind this data to components on the page. Click the **Data Grid** component to select it.
+1. To bind this data to components on the page, click the **Data Grid** component to select it.
 
 1. Find the **rows** property in the inspector. Notice that there's a small **Bind** button to its right. Properties with this button next to them can be bound to state available on the page:
 
@@ -94,19 +93,19 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
    dogQuery.data;
    ```
 
-   save the binding and close the binding editor.
+   Save the binding and close the binding editor.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-6.png", "alt": "dogQuery.data", "caption": "The binding editor", "indent": 1  }}
 
-5. If all went well, the Data Grid will now display the data from our query:
+5. The Data Grid now displays the data from the `dogQuery`:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-7.png", "alt": "Connected data", "caption": "The data grid with bound data", "indent": 1  }}
 
 ### Make the app interactive
 
-1. Now, we can make this app interactive by displaying a random image of the selected breed. We'll create another query which reacts to the selection inside the Data Grid component.
+1. Now, you can make this app interactive by displaying a random image of the selected breed. For this, create another query which reacts to the selection inside the Data Grid component.
 
-2. Create another query of the **REST API** type. From the binding button next to URL input, bind the query **URL** to the following JavaScript expression:
+2. Create another query of the **REST API** type. From the binding button next to the URL input, bind the query **URL** to the following JavaScript expression:
 
    <!-- prettier-ignore -->
    ```js
@@ -126,7 +125,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
    dataGrid.selection?.[0] ?? 'akita'
    ```
 
-   This will use the selected value from the Data Grid, and default to the "akita" breed when no row has been selected.
+   This uses the selected value from the Data Grid, and default to the "akita" breed when no row has been selected.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-9.png", "alt": "Breed binding", "caption": "Binding breed to the selected value", "indent": 1  }}
 
@@ -142,7 +141,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 ### Preview the app
 
-1. Click on the **Preview** button on the top to see a preview of what your app will look like when deployed:
+1. Click on the **Preview** button on the top to see a preview of what your app looks like when deployed:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-13.png", "alt": "Preview of app", "caption": "The preview of our application", "indent": 1  }}
 

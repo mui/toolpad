@@ -10,9 +10,9 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
-import DashboardLayout from './DashboardLayout';
 import BrandingContext from '../../context/BrandingContext';
 import NavigationContext from '../../context/NavigationContext';
+import { DashboardLayout } from './DashboardLayout';
 
 afterEach(cleanup);
 

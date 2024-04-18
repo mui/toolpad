@@ -6,7 +6,7 @@ import * as React from 'react';
 import { describe, test, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { createTheme } from '@mui/material/styles';
-import AppProvider from './AppProvider';
+import { AppProvider } from './AppProvider';
 
 afterEach(cleanup);
 

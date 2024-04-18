@@ -2,9 +2,11 @@
   "name": "@toolpad/core",
   "version": "0.1.53",
   "keywords": [
+    "react",
+    "mui",
     "toolpad"
   ],
-  "description": "Build dashboards fast.",
+  "description": "Dashboard framework powered by MUI.",
   "repository": {
     "type": "git",
     "url": "https://github.com/mui/mui-toolpad.git",
@@ -16,27 +18,22 @@
   "author": "Toolpad Team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "license": "MIT",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./*": {
-      "types": "./dist/*/index.d.ts",
-      "import": "./dist/*/index.js"
-    }
-  },
+  "main": "./src/index.ts",
   "files": [
-    "dist"
+    "AppProvider/",
+    "layout/",
+    "node/AppProvider/",
+    "node/layout/"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit",
+    "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
+    "build:node": "node ../../scripts/build.mjs node",
+    "build:stable": "node ../../scripts/build.mjs stable",
+    "build:copy-files": "node ../../scripts/copyFiles.mjs",
+    "build:types": "tsc -b tsconfig.build.json",
+    "prebuild": "rimraf build tsconfig.build.tsbuildinfo",
+    "dev": "pnpm build:stable --watch & pnpm build:types --watch",
+    "check-types": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
@@ -47,8 +44,29 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.24.1",
+    "@babel/core": "^7.24.4",
+    "@babel/node": "^7.23.9",
+    "@babel/plugin-transform-class-properties": "^7.18.6",
+    "@babel/plugin-transform-object-assign": "^7.24.1",
+    "@babel/plugin-transform-object-rest-spread": "^7.20.7",
+    "@babel/plugin-transform-private-methods": "^7.18.6",
+    "@babel/plugin-transform-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-react-constant-elements": "^7.24.1",
+    "@babel/plugin-transform-runtime": "^7.24.3",
+    "@babel/preset-env": "^7.24.4",
+    "@babel/preset-react": "^7.24.1",
+    "@babel/preset-typescript": "^7.24.1",
+    "@babel/register": "^7.23.7",
     "@types/react": "18.2.73",
-    "@types/react-dom": "18.2.23"
+    "@types/react-dom": "18.2.23",
+    "babel-loader": "^9.1.3",
+    "babel-plugin-istanbul": "^6.1.1",
+    "babel-plugin-macros": "^3.1.0",
+    "babel-plugin-module-resolver": "^5.0.0",
+    "babel-plugin-optimize-clsx": "^2.6.2",
+    "babel-plugin-react-remove-properties": "^0.3.0",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24"
   },
   "peerDependencies": {
     "@emotion/react": "^11",
@@ -60,8 +78,21 @@
     "react": "^18",
     "react-dom": "^18"
   },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
+    "@emotion/react": {
+      "optional": true
+    },
+    "@emotion/styled": {
+      "optional": true
+    }
+  },
+  "sideEffects": false,
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "build"
   },
   "engines": {
     "node": ">=18"

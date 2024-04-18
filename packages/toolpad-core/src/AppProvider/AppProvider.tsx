@@ -4,7 +4,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import type { Theme } from '@emotion/react';
 import BrandingContext from '../context/BrandingContext';
 import NavigationContext from '../context/NavigationContext';
-import { Branding, Navigation } from '../../types';
+import type { Branding } from '../types/Branding.types';
+import type { Navigation } from '../types/Navigation.types';
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -13,12 +14,7 @@ interface AppProviderProps {
   navigation: Navigation;
 }
 
-export default function AppProvider({
-  children,
-  theme,
-  branding = null,
-  navigation,
-}: AppProviderProps) {
+export function AppProvider({ children, theme, branding = null, navigation }: AppProviderProps) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

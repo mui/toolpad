@@ -1,3 +1,2 @@
-export * from './Branding';
-
-export * from './Navigation';
+export type * from './Branding.types';
+export type * from './Navigation.types';

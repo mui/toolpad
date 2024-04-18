@@ -17,9 +17,9 @@ import Typography from '@mui/material/Typography';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/system';
-import ToolpadLogo from './ToolpadLogo';
 import NavigationContext from '../../context/NavigationContext';
 import BrandingContext from '../../context/BrandingContext';
+import ToolpadLogo from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320;
 
@@ -37,7 +37,7 @@ interface DashboardLayoutProps {
   hideTitle?: boolean;
 }
 
-export default function DashboardLayout({ children, hideTitle = false }: DashboardLayoutProps) {
+export function DashboardLayout({ children, hideTitle = false }: DashboardLayoutProps) {
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 

@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as url from 'node:url';
 import { createRequire } from 'module';
 import { glob } from 'glob';
+import resolvePackagePath from 'resolve-package-path';
 
 const require = createRequire(import.meta.url);
 
@@ -21,7 +22,6 @@ const LIBS = [
   // TODO: we need to analyze imports of the definition files and include those libs automatically
   { name: 'csstype' },
   { name: 'react-transition-group' },
-  { name: '@mui/base' },
   { name: '@mui/types' },
   { name: '@mui/system' },
   { name: '@mui/utils' },
@@ -36,7 +36,12 @@ async function main() {
     await Promise.all(
       LIBS.map(async ({ name }) => {
         const files: { filename: string; moduleId: string }[] = [];
-        const resolvedPkg = require.resolve(`${name}/package.json`);
+        const resolvedPkg = resolvePackagePath(name, currentDirectory);
+
+        if (!resolvedPkg) {
+          throw new Error(`Failed to resolve module "${name}"`);
+        }
+
         const pkgJson = JSON.parse(await fs.readFile(resolvedPkg, { encoding: 'utf-8' }));
         const pkgDir = path.dirname(resolvedPkg);
 

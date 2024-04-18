@@ -32,7 +32,7 @@
     "@mui/joy": "5.0.0-beta.32",
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.15.15",
-    "@mui/material-nextjs": "^5.15.11",
+    "@mui/material-nextjs": "5.15.11",
     "@mui/monorepo": "github:mui/material-ui#f3cb496c999acbc8f19533e38df20be12e56d059",
     "@mui/styles": "5.15.15",
     "@mui/utils": "5.15.14",

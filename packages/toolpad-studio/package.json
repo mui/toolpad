@@ -158,6 +158,7 @@
     "eslint-plugin-import": "2.29.1",
     "formidable": "3.5.1",
     "react-transition-group": "4.4.5",
+    "resolve-package-path": "4.0.3",
     "webpack": "5.91.0"
   },
   "typings": "./index.d.ts",

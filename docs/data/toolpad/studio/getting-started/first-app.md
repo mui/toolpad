@@ -106,11 +106,20 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 1. Now, we can make this app interactive by displaying a random image of the selected breed. We'll create another query which reacts to the selection inside the Data Grid component.
 
-2. Create another query of the **REST API** type and add a `breed` parameter in the **Parameters** section on the right:
+2. Create another query of the **REST API** type. From the binding button next to URL input, bind the query **URL** to the following JavaScript expression:
+
+   <!-- prettier-ignore -->
+   ```js
+   `https://dog.ceo/api/breed/${parameters.breed}/images/random`
+   ```
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-10.png", "alt": "URL binding", "caption": "Binding the URL to a JavaScript expression", "indent": 1 }}
+
+3. Next step is to create a `breed` parameter in the **Parameters** section on the right:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-8.png", "alt": "Breed parameter", "caption": "Editing imageQuery", "indent": 1  }}
 
-2. Click on the **Bind** button next to the breed parameter value, and add the following JavaScript expression in the binding editor:
+4. Click on the **Bind** button next to the breed parameter value, and add the following JavaScript expression in the binding editor:
 
    <!-- prettier-ignore -->
    ```jsx
@@ -121,30 +130,19 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-9.png", "alt": "Breed binding", "caption": "Binding breed to the selected value", "indent": 1  }}
 
-3. Then bind the query **URL** to the following JavaScript expression:
-
-   <!-- prettier-ignore -->
-   ```js
-   `https://dog.ceo/api/breed/${parameters.breed}/images/random`
-   ```
-
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-10.png", "alt": "URL binding", "caption": "Binding the URL to a JavaScript expression", "indent": 1 }}
-
-4. Save the binding and close the binding editor. Save the query and exit the query editor.
-
-5. Rename the query to `imageQuery` by double clicking on it in the queries explorer.
+5. Save the binding and close the binding editor. Rename the query to `imageQuery`, save it and close the query explorer.
 
 6. In the canvas select the **Image** component to view its properties in the inspector. Click on the **Bind** button next to the `src` prop to open the binding editor, and bind it to `imageQuery.data.message`.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-11.png", "alt": "Bind image src to Java", "caption": "Binding the Image src to the query response", "indent": 1  }}
 
-6. Try selecting different rows in the data grid to see the image update to a random image of the selected breed.
+7. Try selecting different rows in the data grid to see the image update to a random image of the selected breed.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-12.png", "alt": "Image changes based on selection", "caption": "The image changing based on the selected row", "indent": 1  }}
 
 ### Preview the app
 
-1. Click on the **Preview** button to see a preview of what your app will look like when deployed:
+1. Click on the **Preview** button on the top to see a preview of what your app will look like when deployed:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/getting-started/first-app/step-13.png", "alt": "Preview of app", "caption": "The preview of our application", "indent": 1  }}
 

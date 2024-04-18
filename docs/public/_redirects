@@ -3,14 +3,14 @@
 
 # Legacy redirection
 # 2022
-/toolpad/getting-started/setup/ /toolpad/getting-started/ 301
-/toolpad/getting-started/tutorial/ /toolpad/getting-started/ 301
+/toolpad/getting-started/setup/ /toolpad/studio/getting-started/ 301
+/toolpad/getting-started/tutorial/ /toolpad/studio/getting-started/ 301
 /toolpad/data-fetching/rest/ /toolpad/studio/concepts/http-requests/ 301
-/toolpad/data-fetching/google-sheets/ /toolpad/how-to-guides/connect-to-googlesheets/ 301
+/toolpad/data-fetching/google-sheets/ /toolpad/studio/how-to-guides/connect-to-googlesheets/ 301
 
 # 2023
-/toolpad/getting-started/quickstart/ /toolpad/getting-started/first-app/ 301
-/toolpad/schema-reference/ /toolpad/reference/file-schema/ 301
+/toolpad/getting-started/quickstart/ /toolpad/studio/getting-started/first-app/ 301
+/toolpad/schema-reference/ /toolpad/studio/reference/file-schema/ 301
 /toolpad/getting-started/configuration/ /toolpad/studio/how-to-guides/basic-auth/ 301
 /toolpad/connecting-to-datasources/queries/ /toolpad/studio/concepts/queries/ 301
 /toolpad/connecting-to-datasources/http-requests/ /toolpad/studio/concepts/http-requests/ 301
@@ -24,17 +24,17 @@
 /toolpad/data-binding/binding-state/ /toolpad/studio/concepts/data-binding/ 301
 /toolpad/data-binding/event-handling/ /toolpad/studio/concepts/event-handling/ 301
 /toolpad/deployment/ /toolpad/studio/concepts/deployment/ 301
-/toolpad/examples/admin-app/ /toolpad/examples/basic-crud-app/ 301
+/toolpad/examples/admin-app/ /toolpad/studio/examples/basic-crud-app/ 301
 /toolpad/concepts/connecting-to-data/ /toolpad/studio/concepts/queries/ 301
 /toolpad/how-to-guides/connect-to-datasource/ /toolpad/studio/how-to-guides/connect-to-databases/ 301
 /toolpad/tutorials/render-deploy/ /toolpad/studio/how-to-guides/render-deploy/ 301
-/toolpad/examples/overview/ /toolpad/examples/ 301
+/toolpad/examples/overview/ /toolpad/studio/examples/ 301
 /toolpad/how-to-guides/number-display/ /toolpad/studio/how-to-guides/map-display/ 301
-/toolpad/support/support/ /toolpad/getting-started/support/ 301
+/toolpad/support/support/ /toolpad/studio/getting-started/support/ 301
 /toolpad/concepts/display-mode/ /toolpad/studio/concepts/page-properties/#display-mode 301
 /toolpad/concepts/managing-state/ /toolpad/studio/concepts/event-handling/ 301
-/toolpad/reference/components/datagrid/ /toolpad/reference/components/data-grid/ 301
-/toolpad/getting-started/overview/ /toolpad/getting-started/ 301
+/toolpad/reference/components/datagrid/ /toolpad/studio/reference/components/data-grid/ 301
+/toolpad/getting-started/overview/ /toolpad/studio/getting-started/ 301
 
 # 2024
 

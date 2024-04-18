@@ -12,22 +12,23 @@ import {
   cleanup,
 } from '@testing-library/react';
 import 'vitest-dom/extend-expect';
-import { LiveBindings, RuntimeEvents } from '@toolpad/studio-runtime';
-import { CanvasEventsContext } from '@toolpad/studio-runtime/runtime';
+import {
+  LiveBindings,
+  RuntimeEvents,
+  CanvasEventsContext,
+  AppHostProvider,
+} from '@toolpad/studio-runtime';
 import { Emitter } from '@toolpad/utils/events';
 import { test, expect, afterEach } from 'vitest';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import createRuntimeState from './createRuntimeState';
 import ToolpadApp from './ToolpadApp';
-import { AppHost, AppHostContext } from './AppHostContext';
 
 afterEach(cleanup);
 
 // More sensible default for these tests
 const waitFor: typeof waitForOrig = (waiter, options) =>
   waitForOrig(waiter, { timeout: 10000, ...options });
-
-const appHost: AppHost = { isPreview: false, isCustomServer: false, isCanvas: false };
 
 function renderPage(
   initPage: (dom: appDom.AppDom, page: appDom.PageNode) => appDom.AppDom,
@@ -51,9 +52,9 @@ function renderPage(
 
   return render(
     <CanvasEventsContext.Provider value={canvasEvents}>
-      <AppHostContext.Provider value={appHost}>
+      <AppHostProvider>
         <ToolpadApp state={state} basename="toolpad" />
-      </AppHostContext.Provider>
+      </AppHostProvider>
     </CanvasEventsContext.Provider>,
   );
 }

@@ -43,7 +43,7 @@ export type DomView = {
   pageParametersDialogOpen?: boolean;
 };
 
-const PREFIX = process.env.EXPERIMENTAL_INLINE_CANVAS ? '/editor' : '';
+const PREFIX = '/editor';
 
 export function getPathnameFromView(view: DomView): string {
   switch (view.kind) {

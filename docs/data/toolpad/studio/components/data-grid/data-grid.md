@@ -71,7 +71,13 @@ Takes three options: `compact`, `standard` and `comfortable`. The first two are 
 
 This prop is used to show – or hide – the toolbar from the data grid. The following Data Grid is rendered along with the toolbar, by setting `hideToolbar` to `true`:
 
-{{"demo": "DataGrid_hidetoolbar.js", "bg": "inline"}}
+{{"demo": "DataGrid_hidetoolbar.js", "hideToolbar": true, "bg": "inline"}}
+
+### Grouping and aggregating (PRO)
+
+When you use the [Toolpad pro plan](/), the DataGrid gains grouping and aggregating capabilities. You can turn this off for individual columns.
+
+{{"demo": "ProDataGrid.js", "hideToolbar": true, "bg": "inline"}}
 
 ## API
 

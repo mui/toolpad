@@ -14,16 +14,13 @@ const { findPages } = require('./src/modules/utils/find');
 
 const WORKSPACE_ROOT = path.resolve(currentDirectory, '../');
 const MONOREPO_PATH = path.resolve(currentDirectory, '../node_modules/@mui/monorepo');
-const MONOREPO_PACKAGES = {
-  '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
-};
 
 export default withDocsInfra({
   experimental: {
     workerThreads: true,
     cpus: 3,
   },
-  transpilePackages: ['@mui/monorepo', '@mui/x-charts'],
+  transpilePackages: ['@mui/monorepo', '@mui/x-charts', '@mui/docs'],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
   env: {
@@ -43,7 +40,6 @@ export default withDocsInfra({
         alias: {
           ...config.resolve.alias,
           docs: path.resolve(MONOREPO_PATH, './docs'),
-          ...MONOREPO_PACKAGES,
           '@toolpad/studio-components': path.resolve(
             currentDirectory,
             '../packages/toolpad-studio-components/src',
@@ -120,7 +116,7 @@ export default withDocsInfra({
 
     return map;
   },
-  // Used to signal we run yarn build
+  // Used to signal we run pnpm build
   ...(process.env.NODE_ENV === 'production'
     ? {
         output: 'export',

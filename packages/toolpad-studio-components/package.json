@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/studio-components",
-  "version": "0.1.53",
+  "version": "0.1.54",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -42,22 +42,22 @@
     "@mui/icons-material": "5.15.15",
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.15.15",
-    "@mui/x-charts": "7.1.0",
-    "@mui/x-data-grid-pro": "7.1.0",
-    "@mui/x-date-pickers": "7.1.0",
-    "@mui/x-license": "7.0.0",
-    "@tanstack/react-query": "5.28.9",
+    "@mui/x-charts": "7.2.0",
+    "@mui/x-data-grid-premium": "7.2.0",
+    "@mui/x-date-pickers": "7.2.0",
+    "@mui/x-license": "7.2.0",
+    "@tanstack/react-query": "5.29.2",
     "@toolpad/studio-runtime": "workspace:*",
     "@toolpad/utils": "workspace:*",
     "dayjs": "1.11.10",
     "invariant": "2.2.4",
-    "markdown-to-jsx": "7.4.5",
+    "markdown-to-jsx": "7.4.7",
     "react-error-boundary": "4.0.13",
-    "react-hook-form": "7.51.2"
+    "react-hook-form": "7.51.3"
   },
   "devDependencies": {
     "@types/invariant": "2.2.37",
-    "@types/react": "18.2.73",
+    "@types/react": "18.2.78",
     "react": "18.2.0"
   },
   "peerDependencies": {

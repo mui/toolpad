@@ -9,7 +9,7 @@ export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
   const rootLayoutContent = `  
-  import AppProvider from "@toolpad/core/client/AppProvider";
+  import { AppProvider } from '@toolpad/core/AppProvider';
   import DashboardIcon from "@mui/icons-material/Dashboard";
   import type { Navigation } from "@toolpad/core";
   import theme from '../theme';
@@ -41,7 +41,7 @@ export default function generateProject(
     `;
 
   const dashboardLayoutContent = `
-  import { DashboardLayout } from "@toolpad/core/client/layout";
+  import { DashboardLayout } from '@toolpad/core/layout';
 
   export default function Layout({
     children,

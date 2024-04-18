@@ -7,6 +7,7 @@ import { fromZodError } from 'zod-validation-error';
 import * as crypto from 'crypto';
 
 async function loadExports(filePath: string): Promise<Map<string, unknown>> {
+  // Need a valid file URL on Windows for the dynamic import()
   const importFileUrl = url.pathToFileURL(path.resolve(filePath));
   const content = await fs.readFile(importFileUrl, 'utf-8');
   const hash = crypto.createHash('md5').update(content).digest('hex');

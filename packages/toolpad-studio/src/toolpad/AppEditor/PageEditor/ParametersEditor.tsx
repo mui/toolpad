@@ -16,7 +16,8 @@ export interface StringRecordEntriesEditorProps
   autoFocus?: boolean;
   sx?: SxProps;
   jsRuntime: JsRuntime;
-  env?: Record<string, string>;
+  env?: Record<string, string | undefined>;
+  declaredEnvKeys?: string[];
   disabled?: boolean;
 }
 
@@ -34,6 +35,7 @@ export default function ParametersEditor({
   disabled,
   globalScopeMeta,
   env,
+  declaredEnvKeys,
 }: StringRecordEntriesEditorProps) {
   const fieldInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -94,6 +96,7 @@ export default function ParametersEditor({
               }
               disabled={disabled}
               env={env}
+              declaredEnvKeys={declaredEnvKeys}
             />
 
             <IconButton

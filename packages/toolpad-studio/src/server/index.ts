@@ -3,7 +3,7 @@ import { IncomingMessage, createServer } from 'http';
 import { Worker, MessageChannel } from 'worker_threads';
 import express from 'express';
 import getPort from 'get-port';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { legacyCreateProxyMiddleware as createProxyMiddleware } from 'http-proxy-middleware';
 import { mapValues } from '@toolpad/utils/collections';
 import prettyBytes from 'pretty-bytes';
 import { WebSocket, WebSocketServer } from 'ws';

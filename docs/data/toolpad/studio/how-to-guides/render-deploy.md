@@ -11,9 +11,7 @@
 
 1. With a GitHub account, you can create a new repository using the **+** button available in the header menu, followed by **New repository**. Then, select an appropriate name:
 
-
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-render/render-github-new.png", "alt": "GitHub new repo ", "caption": "Creating a new GitHub repository", "indent": 1, "aspectRatio": 1 }}
-
 
 2. If the Toolpad Studio app is not currently a Git repository, you can run
 
@@ -43,12 +41,9 @@
 
 1. With a Render account, you can create a new **Web Service**:
 
-
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-render/render-start.png", "alt": "Render new web service ", "caption": "Creating a new Render Web Service", "indent": 1 }}
 
-
 2. Depending on whether the visibility of the GitHub repository is set to private or public, you need to either connect your GitHub account to Render, or paste in the URL of the repository you created above:
-
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-render/render-connect-github.png", "alt": "GitHub new repo ", "caption": "Connecting GitHub to Render", "indent": 1, "aspectRatio": 2 }}
 
@@ -56,12 +51,9 @@
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-render/render-search.png", "alt": "GitHub repo on Render ", "caption": "Connecting your GitHub repository", "indent": 1, "aspectRatio": 1.5}}
 
-
 4. With the repository selected, you can advance to deployment configuration. Render can guess that you are deploying a Node app. Set the name which should appear in the URL of your deployed app, like `<APP-NAME>.onrender.com`:
 
-
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-render/render-config-start.png", "alt": "Render deployment config ", "caption": "Setting the deployment configuration", "indent": 1 }}
-
 
 5. The build and start commands are set to
 
@@ -74,14 +66,11 @@
 
 6. Select an appropriate instance type for your deployment.
 
-
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-render/render-config-commands.png", "alt": "Render deployment commands and plan ", "caption": "Setting deployment commands and choosing an instance type", "indent": 1 }}
-
 
 7. Select **Create Web Service** to trigger the deployment and it redirects you to the streaming logs of the in-progress deployment.
 
 8. Render.com uses `14.7.0` as the default Node version. Toolpad Studio requires version `18.17.1` as the minimum Node version. You can change the default by setting a `NODE_VERSION` environment variable for your deployment:
-
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-render/node-version.png", "alt": "Set NODE_VERSION ", "caption": "Overriding the default Node version", "indent": 1, "aspectRatio": 3 }}
 
@@ -97,9 +86,7 @@ See the [Render documentation](https://docs.render.com/node-version) on Node ver
 
 8. Once this is successfully complete, you can access your Toolpad Studio app on `<APP-NAME>.onrender.com`.
 
-
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/how-to-guides/deploy-render/render-complete.png", "alt": "Render deployment complete ", "caption": "Deployed successfully", "indent": 1 }}
-
 
 That's it! We're up and running in a few minutes.
 

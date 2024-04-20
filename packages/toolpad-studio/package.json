@@ -12,10 +12,7 @@
     "lint": "prettier --check .",
     "fix": "prettier --write .",
     "build:cli": "tsup",
-    "build:typings": "tsx ./scripts/typings.mts",
     "dev:cli": "tsup --watch",
-    "dev:typings": "pnpm build:typings",
-    "waitForApp": "tsx ./scripts/waitForApp.mts",
     "check-types": "tsup && tsc --noEmit",
     "test": "vitest run"
   },
@@ -71,7 +68,6 @@
     "@vitejs/plugin-react": "4.2.1",
     "@webcontainer/env": "1.1.1",
     "abort-controller": "3.0.0",
-    "arg": "5.0.2",
     "basic-auth": "2.0.1",
     "chalk": "5.3.0",
     "chokidar": "3.6.0",
@@ -158,7 +154,6 @@
     "eslint-plugin-import": "2.29.1",
     "formidable": "3.5.1",
     "react-transition-group": "4.4.5",
-    "resolve-package-path": "4.0.3",
     "webpack": "5.91.0"
   },
   "typings": "./index.d.ts",

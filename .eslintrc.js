@@ -1,6 +1,6 @@
 const baseline = require('@mui/monorepo/.eslintrc');
-const lodash = require('lodash');
 const path = require('path');
+const lodash = require('lodash');
 
 const ALLOWED_LODASH_METHODS = new Set(['throttle', 'debounce', 'set']);
 

@@ -481,8 +481,8 @@ importers:
         version: 10.3.0
     devDependencies:
       '@types/eslint':
-        specifier: 8.56.9
-        version: 8.56.9
+        specifier: 8.56.10
+        version: 8.56.10
       '@typescript-eslint/parser':
         specifier: 7.6.0
         version: 7.6.0(eslint@8.57.0)(typescript@5.4.5)
@@ -4247,11 +4247,11 @@ packages:
   /@types/eslint-scope@3.7.7:
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
     dependencies:
-      '@types/eslint': 8.56.9
+      '@types/eslint': 8.56.10
       '@types/estree': 1.0.5
 
-  /@types/eslint@8.56.9:
-    resolution: {integrity: sha512-W4W3KcqzjJ0sHg2vAq9vfml6OhsJ53TcUjUqfzzZf/EChUtwspszj/S0pzMxnfRcO55/iGq47dscXw71Fxc4Zg==}
+  /@types/eslint@8.56.10:
+    resolution: {integrity: sha512-Shavhk87gCtY2fhXDctcfS3e6FdxWkCx1iUZ9eEUbh7rTqlZT0/IzOkCOVt0fCjcFuZ9FPYfuezTBImfHCDBGQ==}
     dependencies:
       '@types/estree': 1.0.5
       '@types/json-schema': 7.0.15
@@ -4435,7 +4435,7 @@ packages:
   /@types/react-dev-utils@9.0.15:
     resolution: {integrity: sha512-JSZZtC8f5FD3FvlT8F6dPojPH6u0f+E/+g9DqXgQo/7GvCdPYiK+Q+mMajZClqH/f5SjyYop7v6uiLyfgnyLQA==}
     dependencies:
-      '@types/eslint': 8.56.9
+      '@types/eslint': 8.56.10
       '@types/express': 4.17.21
       '@types/html-webpack-plugin': 3.2.9
       '@types/node': 20.12.7

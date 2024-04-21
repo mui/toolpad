@@ -86,7 +86,7 @@
     "cross-env": "7.0.3",
     "dotenv-cli": "7.4.1",
     "eslint-import-resolver-exports": "1.0.0-beta.5",
-    "inquirer": "9.2.18",
+    "inquirer": "9.2.19",
     "invariant": "2.2.4",
     "lodash": "4.17.21",
     "semver": "7.6.0",

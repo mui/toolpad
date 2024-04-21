@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@toolpad/studio": "0.1.54",
-    "@supabase/supabase-js": "2.42.3"
+    "@supabase/supabase-js": "2.42.5"
   }
 }

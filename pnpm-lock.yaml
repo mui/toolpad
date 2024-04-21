@@ -67,8 +67,8 @@ importers:
         specifier: 7.3.0
         version: 7.3.0(@mui/material@5.15.15)(react-dom@18.2.0)(react@18.2.0)
       '@next/eslint-plugin-next':
-        specifier: 14.2.1
-        version: 14.2.1
+        specifier: 14.2.2
+        version: 14.2.2
       '@playwright/test':
         specifier: 1.43.1
         version: 1.43.1
@@ -3254,8 +3254,8 @@ packages:
     resolution: {integrity: sha512-qsHJle3GU3CmVx7pUoXcghX4sRN+vINkbLdH611T8ZlsP//grzqVW87BSUgOZeSAD4q7ZdZicdwNe/20U2janA==}
     dev: false
 
-  /@next/eslint-plugin-next@14.2.1:
-    resolution: {integrity: sha512-Fp+mthEBjkn8r9qd6o4JgxKp0IDEzW0VYHD8ZC05xS5/lFNwHKuOdr2kVhWG7BQCO9L6eeepshM1Wbs2T+LgSg==}
+  /@next/eslint-plugin-next@14.2.2:
+    resolution: {integrity: sha512-q+Ec2648JtBpKiu/FSJm8HAsFXlNvioHeBCbTP12T1SGcHYwhqHULSfQgFkPgHDu3kzNp2Kem4J54bK4rPQ5SQ==}
     dependencies:
       glob: 10.3.10
     dev: true

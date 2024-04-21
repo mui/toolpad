@@ -755,8 +755,8 @@ importers:
         specifier: 18.2.0
         version: 18.2.0
       react-resizable-panels:
-        specifier: 2.0.16
-        version: 2.0.16(react-dom@18.2.0)(react@18.2.0)
+        specifier: 2.0.18
+        version: 2.0.18(react-dom@18.2.0)(react@18.2.0)
       react-router-dom:
         specifier: 6.22.3
         version: 6.22.3(react-dom@18.2.0)(react@18.2.0)
@@ -12403,8 +12403,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /react-resizable-panels@2.0.16(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-UrnxmTZaTnbCl/xIOX38ig35RicqGfLuqt2x5fytpNlQvCRuxyXZwIBEhmF+pmrEGxfajyXFBoCplNxLvhF0CQ==}
+  /react-resizable-panels@2.0.18(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-rKagCW6C8tTjWRq5jNsASsi4TB2a+IixL9++0G1+kPgAgvULPVf7kE0VbHysC3wdvcGYMa70O46C9YpG7CCkeA==}
     peerDependencies:
       react: ^16.14.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0

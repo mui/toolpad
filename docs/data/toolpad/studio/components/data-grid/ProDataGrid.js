@@ -26,7 +26,7 @@ const COLUMNS = [
   { field: 'Location', type: 'string' },
 ];
 
-export default function BasicDataGrid() {
+export default function ProDataGrid() {
   return (
     <AppHostProvider plan="pro">
       <DataGrid rows={ROWS} columns={COLUMNS} height={300} />

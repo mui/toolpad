@@ -1,3 +1,4 @@
+/* eslint-disable filenames/match-exported */
 import * as React from 'react';
 import { AppHostProvider } from '@toolpad/studio-runtime';
 import { DataGrid } from '@toolpad/studio-components';
@@ -26,6 +27,7 @@ const COLUMNS = [
   { field: 'Location', type: 'string' },
 ];
 
+// TODO fix name
 export default function BasicDataGrid() {
   return (
     <AppHostProvider>

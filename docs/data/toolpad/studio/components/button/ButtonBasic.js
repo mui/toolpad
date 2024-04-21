@@ -6,6 +6,6 @@ const TOOLPAD_PROPS = {
   content: 'Hello World',
 };
 
-export default function BasicButton() {
+export default function ButtonBasic() {
   return <Button {...TOOLPAD_PROPS} />;
 }

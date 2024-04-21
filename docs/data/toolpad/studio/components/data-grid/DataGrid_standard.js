@@ -26,7 +26,9 @@ const COLUMNS = [
   { field: 'Location', type: 'string' },
 ];
 
-export default function BasicDataGrid() {
+// TODO fix me
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export default function DataGrid_standard() {
   return (
     <AppHostProvider>
       <DataGrid rows={ROWS} columns={COLUMNS} height={300} density="standard" />

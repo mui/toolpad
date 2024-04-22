@@ -34,6 +34,11 @@
       "matchPackagePatterns": ["^eslint-", "^@eslint/", "^@eslint-"]
     },
     {
+      "groupName": "Next.js",
+      "matchPackageNames": ["next"],
+      "matchPackagePatterns": ["^@next/"]
+    },
+    {
       "groupName": "React",
       "matchPackageNames": ["react", "react-dom", "react-is", "react-test-renderer"]
     },
@@ -91,6 +96,10 @@
     {
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
+    },
+    {
+      "groupName": "Typings",
+      "matchPackagePatterns": ["^@types/"]
     },
     {
       "groupName": "Update @toolpad/studio in examples",

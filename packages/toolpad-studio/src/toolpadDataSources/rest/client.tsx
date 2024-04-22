@@ -311,7 +311,11 @@ function QueryEditor({
     [appStateApi],
   );
 
-  const env = React.useMemo(() => introspection?.data?.env, [introspection]);
+  const env = React.useMemo(() => introspection?.data?.env ?? {}, [introspection?.data?.env]);
+  const declaredEnvKeys = React.useMemo(
+    () => introspection?.data?.declaredEnvKeys ?? [],
+    [introspection?.data?.declaredEnvKeys],
+  );
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       appStateApi.updateQueryDraft((draft) => ({
@@ -650,6 +654,7 @@ function QueryEditor({
                     liveValue={paramsEditorLiveValue}
                     jsRuntime={jsServerRuntime}
                     env={env}
+                    declaredEnvKeys={declaredEnvKeys}
                   />
                 </TabPanel>
               </TabContext>

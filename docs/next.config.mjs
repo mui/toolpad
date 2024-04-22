@@ -20,7 +20,12 @@ export default withDocsInfra({
     workerThreads: true,
     cpus: 3,
   },
-  transpilePackages: ['@mui/monorepo', '@mui/x-charts', '@mui/docs'],
+  transpilePackages: [
+    '@mui/monorepo',
+    // TODO, those shouldn't be needed in the first place
+    '@mui/x-charts', // Fix ESM module support https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
+    '@mui/docs', // Fix trailingSlash support https://github.com/mui/mui-toolpad/pull/3301#issuecomment-2054213837
+  ],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
   env: {

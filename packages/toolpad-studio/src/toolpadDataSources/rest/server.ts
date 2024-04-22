@@ -21,14 +21,11 @@ import {
   RawBody,
   RestConnectionParams,
   UrlEncodedBody,
+  IntrospectionResult,
 } from './types';
 import applyTransform from '../applyTransform';
 import { HTTP_NO_BODY, getAuthenticationHeaders, parseBaseUrl } from './shared';
 import type { IToolpadProject } from '../server';
-
-async function loadEnvFile(project: IToolpadProject) {
-  return project.envManager.getDeclaredValues();
-}
 
 function resolveBindable<T>(
   jsRuntime: JsRuntime,
@@ -229,8 +226,10 @@ export default function createDatasource(
     async execPrivate(connection: Maybe<RestConnectionParams>, query: FetchPrivateQuery) {
       switch (query.kind) {
         case 'introspection': {
-          const env = await loadEnvFile(project);
-          return { env };
+          return {
+            env: process.env,
+            declaredEnvKeys: await project.envManager.getDeclaredKeys(),
+          } satisfies IntrospectionResult;
         }
         case 'debugExec':
           return execBase(project, connection, query.query, query.params);

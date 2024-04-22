@@ -18,7 +18,7 @@
     },
     {
       "groupName": "Examples",
-      "matchFileNames": ["examples/**"],
+      "matchFileNames": ["examples/**"]
     },
     {
       "matchDepTypes": ["peerDependencies"],

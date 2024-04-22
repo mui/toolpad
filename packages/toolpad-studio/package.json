@@ -98,7 +98,7 @@
     "markdown-to-jsx": "7.4.7",
     "mime": "4.0.1",
     "monaco-editor": "0.47.0",
-    "mysql2": "3.9.4",
+    "mysql2": "3.9.7",
     "nanoid": "5.0.7",
     "node-fetch": "2.7.0",
     "node-fetch-har": "1.0.1",

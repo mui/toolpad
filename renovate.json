@@ -12,6 +12,15 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
+      "groupName": "Typings",
+      "matchPackagePatterns": ["^@types/"],
+      "description": "At the top so other rules can overwrite it"
+    },
+    {
+      "groupName": "Examples",
+      "matchFileNames": ["examples/**"],
+    },
+    {
       "matchDepTypes": ["peerDependencies"],
       "rangeStrategy": "widen"
     },
@@ -96,10 +105,6 @@
     {
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
-    },
-    {
-      "groupName": "Typings",
-      "matchPackagePatterns": ["^@types/"]
     },
     {
       "groupName": "Update @toolpad/studio in examples",

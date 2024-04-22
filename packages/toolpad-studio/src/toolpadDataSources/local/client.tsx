@@ -6,9 +6,8 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
 import { errorFrom } from '@toolpad/utils/errors';
-
 import { useQuery } from '@tanstack/react-query';
-import Grid2 from '@mui/material/Unstable_Grid2/Grid2';
+import Grid2 from '@mui/material/Unstable_Grid2';
 import TabPanel from '../../components/TabPanel';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';

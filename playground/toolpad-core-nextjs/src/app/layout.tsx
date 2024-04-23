@@ -7,42 +7,16 @@ import theme from './theme';
 
 const NAVIGATION: Navigation = [
   {
-    title: 'Primary items',
+    title: 'Main items',
     items: [
       {
-        label: 'Dashboard1',
+        label: 'Dashboard',
         path: '/dashboard',
         icon: <DashboardIcon />,
       },
       {
-        label: 'Orders1',
-        icon: <ShoppingCartIcon />,
-        items: [
-          {
-            label: 'Nested Orders 1',
-            path: '/dashboard/orders1/nested1',
-            icon: <ShoppingCartIcon />,
-          },
-          {
-            label: 'Nested Orders 2',
-            path: '/dashboard/orders1/nested2',
-            icon: <ShoppingCartIcon />,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Secondary items',
-    items: [
-      {
-        label: 'Dashboard 2',
-        path: '/dashboard2',
-        icon: <DashboardIcon />,
-      },
-      {
-        label: 'Orders2',
-        path: '/dashboard/orders2',
+        label: 'Orders',
+        path: '/dashboard/orders',
         icon: <ShoppingCartIcon />,
       },
     ],

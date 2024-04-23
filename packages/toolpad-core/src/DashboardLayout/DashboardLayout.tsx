@@ -17,9 +17,10 @@ import Typography from '@mui/material/Typography';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/system';
-import NavigationContext from '../../context/NavigationContext';
-import BrandingContext from '../../context/BrandingContext';
 import ToolpadLogo from './ToolpadLogo';
+import { BrandingContext, NavigationContext } from '../AppProvider';
+
+const IS_CLIENT = typeof window !== 'undefined';
 
 const DRAWER_WIDTH = 320;
 
@@ -41,16 +42,25 @@ export function DashboardLayout({ children, hideTitle = false }: DashboardLayout
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 
+  // Rerender once to update with client-side navigation
+  const [hasMounted, setHasMounted] = React.useState(false);
+  React.useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState<string[]>(
     navigation
       .map((navigationSection) =>
-        navigationSection.routes
+        navigationSection.items
           .filter(
-            (route) =>
-              !!route.routes &&
-              route.routes.some((nestedRoute) => nestedRoute.path === window.location.pathname),
+            (navigationItem) =>
+              !!navigationItem.items &&
+              IS_CLIENT &&
+              navigationItem.items.some(
+                (nestedNavigationItem) => nestedNavigationItem.path === window.location.pathname,
+              ),
           )
-          .map((route) => `${navigationSection.title}:${route.label}`),
+          .map((navigationItem) => `${navigationSection.title}:${navigationItem.label}`),
       )
       .flat(),
   );
@@ -122,8 +132,8 @@ export function DashboardLayout({ children, hideTitle = false }: DashboardLayout
                   </ListSubheader>
                 }
               >
-                {navigationSection.routes.map((route) => {
-                  const itemId = `${navigationSection.title}:${route.label}`;
+                {navigationSection.items.map((navigationItem) => {
+                  const itemId = `${navigationSection.title}:${navigationItem.label}`;
                   const isNestedNavigationExpanded = expandedSidebarItemIds.includes(itemId);
 
                   const nestedNavigationCollapseIcon = isNestedNavigationExpanded ? (
@@ -135,39 +145,50 @@ export function DashboardLayout({ children, hideTitle = false }: DashboardLayout
                   const listItem = (
                     <ListItem sx={{ py: 0 }}>
                       <ListItemButton
-                        selected={window.location.pathname === route.path}
+                        selected={
+                          IS_CLIENT &&
+                          hasMounted &&
+                          window.location.pathname === navigationItem.path
+                        }
                         onClick={handleSidebarItemClick(itemId)}
                       >
-                        <ListItemIcon>{route.icon}</ListItemIcon>
-                        <ListItemText primary={route.label} />
-                        {route.routes ? nestedNavigationCollapseIcon : null}
+                        <ListItemIcon>{navigationItem.icon}</ListItemIcon>
+                        <ListItemText primary={navigationItem.label} />
+                        {navigationItem.items ? nestedNavigationCollapseIcon : null}
                       </ListItemButton>
                     </ListItem>
                   );
 
                   return (
-                    <React.Fragment key={route.label}>
-                      {route.path ? (
-                        <a href={route.path} style={{ color: 'inherit', textDecoration: 'none' }}>
+                    <React.Fragment key={navigationItem.label}>
+                      {navigationItem.path ? (
+                        <a
+                          href={navigationItem.path}
+                          style={{ color: 'inherit', textDecoration: 'none' }}
+                        >
                           {listItem}
                         </a>
                       ) : (
                         listItem
                       )}
-                      {route.routes ? (
+                      {hasMounted && navigationItem.items ? (
                         <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                           <List sx={{ pl: 4, pr: 2 }}>
-                            {route.routes.map((nestedRoute) => (
+                            {navigationItem.items.map((nestedNavigationItem) => (
                               <a
-                                key={nestedRoute.label}
-                                href={nestedRoute.path}
+                                key={nestedNavigationItem.label}
+                                href={nestedNavigationItem.path}
                                 style={{ color: 'inherit', textDecoration: 'none' }}
                               >
                                 <ListItemButton
-                                  selected={window.location.pathname === nestedRoute.path}
+                                  selected={
+                                    IS_CLIENT &&
+                                    hasMounted &&
+                                    window.location.pathname === nestedNavigationItem.path
+                                  }
                                 >
-                                  <ListItemIcon>{nestedRoute.icon}</ListItemIcon>
-                                  <ListItemText primary={nestedRoute.label} />
+                                  <ListItemIcon>{nestedNavigationItem.icon}</ListItemIcon>
+                                  <ListItemText primary={nestedNavigationItem.label} />
                                 </ListItemButton>
                               </a>
                             ))}
@@ -182,7 +203,7 @@ export function DashboardLayout({ children, hideTitle = false }: DashboardLayout
           ))}
         </Box>
       </Drawer>
-      <Box component={'main'} sx={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
+      <Box component={'main'} sx={{ flexGrow: 1 }}>
         <Toolbar />
         <Container maxWidth="lg">{children}</Container>
       </Box>

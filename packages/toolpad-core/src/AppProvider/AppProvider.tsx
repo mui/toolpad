@@ -2,10 +2,29 @@ import * as React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import type { Theme } from '@emotion/react';
-import BrandingContext from '../context/BrandingContext';
-import NavigationContext from '../context/NavigationContext';
-import type { Branding } from '../types/Branding.types';
-import type { Navigation } from '../types/Navigation.types';
+
+export interface Branding {
+  name?: string;
+  logo?: React.ReactNode;
+}
+
+export interface NavigationItem {
+  label: string;
+  path?: string;
+  icon: React.ReactNode;
+  items?: (Omit<NavigationItem, 'items'> & { path: string })[];
+}
+
+export interface NavigationSection {
+  title: string;
+  items: NavigationItem[];
+}
+
+export type Navigation = NavigationSection[];
+
+export const BrandingContext = React.createContext<Branding | null>(null);
+
+export const NavigationContext = React.createContext<Navigation>([]);
 
 interface AppProviderProps {
   children: React.ReactNode;

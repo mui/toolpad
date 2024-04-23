@@ -10,9 +10,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
-import BrandingContext from '../../context/BrandingContext';
-import NavigationContext from '../../context/NavigationContext';
 import { DashboardLayout } from './DashboardLayout';
+import { BrandingContext, NavigationContext } from '../AppProvider';
 
 afterEach(cleanup);
 
@@ -45,7 +44,7 @@ describe('DashboardLayout', () => {
     const NAVIGATION = [
       {
         title: 'Main items',
-        routes: [
+        items: [
           {
             label: 'Dashboard',
             path: '/dashboard',
@@ -60,11 +59,11 @@ describe('DashboardLayout', () => {
       },
       {
         title: 'Analytics',
-        routes: [
+        items: [
           {
             label: 'Reports',
             icon: <BarChartIcon />,
-            routes: [
+            items: [
               {
                 label: 'Sales',
                 path: '/reports/sales',

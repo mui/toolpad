@@ -17,7 +17,7 @@ export default function generateProject(
   const NAVIGATION: Navigation = [
     {
       title: "Main items",
-      routes: [
+      items: [
         {
           label: "Page",
           path: "/page",
@@ -41,7 +41,7 @@ export default function generateProject(
     `;
 
   const dashboardLayoutContent = `
-  import { DashboardLayout } from '@toolpad/core/layout';
+  import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
   export default function Layout({
     children,
@@ -101,66 +101,30 @@ export default function generateProject(
 
   const themeContent = `
   "use client";
-  import { Inter } from "next/font/google";
   import { createTheme } from "@mui/material/styles";
 
-  const inter = Inter({
-    weight: ["300", "400", "500", "700"],
-    subsets: ["latin"],
-    display: "swap",
-  });
-
-  const baseTheme = createTheme({
-    palette: {
-      grey: {
-        50: "rgba(19, 35, 70, 0.05)",
-        100: "rgba(19, 35, 70, 0.1)",
-        200: "rgba(19, 35, 70, 0.2)",
-        300: "rgba(19, 35, 70, 0.3)",
-        400: "rgba(19, 35, 70, 0.4)",
-        500: "rgba(19, 35, 70, 0.5)",
-        600: "rgba(19, 35, 70, 0.6)",
-        700: "rgba(19, 35, 70, 0.7)",
-        800: "rgba(19, 35, 70, 0.8)",
-        900: "rgba(19, 35, 70, 0.9)",
-      },
-      divider: "rgba(19, 35, 70, 0.12)",
-      background: {
-        default: "#fbfcfe",
-      },
-      action: {
-        active: "rgba(19, 35, 70, 0.28)",
-        hover: "rgba(19, 35, 70, 0.04)",
-        hoverOpacity: 0.04,
-        selected: "rgba(66, 165, 245, 0.15)",
-        selectedOpacity: 0.15,
-        disabled: "rgba(19, 35, 70, 0.2)",
-        disabledBackground: "rgba(19, 35, 70, 0.12)",
-        disabledOpacity: 0.38,
-        focus: "rgba(19, 35, 70, 0.12)",
-        focusOpacity: 0.12,
-        activatedOpacity: 0.12,
-      },
-    },
-    typography: {
-      fontFamily: inter.style.fontFamily,
-    },
-  });
+  const baseTheme = createTheme();
 
   const theme = createTheme(baseTheme, {
+    palette: {
+      background: {
+        default: baseTheme.palette.grey['50'],
+      },
+    },
     typography: {
       h6: {
-        fontWeight: "700",
+        fontWeight: '700',
       },
     },
     components: {
       MuiAppBar: {
         styleOverrides: {
           root: {
-            borderWidth: 1,
+            borderWidth: 0,
+            borderBottomWidth: 1,            
             borderStyle: "solid",
             borderColor: baseTheme.palette.divider,
-            boxShadow: "none",
+            boxShadow: 'none',
           },
         },
       },
@@ -182,9 +146,9 @@ export default function generateProject(
       MuiListSubheader: {
         styleOverrides: {
           root: {
-            color: baseTheme.palette.grey["400"],
+            color: baseTheme.palette.grey['600'],
             fontSize: 12,
-            fontWeight: "700",
+            fontWeight: '700',
             height: 40,
             paddingLeft: 32,
           },
@@ -193,24 +157,22 @@ export default function generateProject(
       MuiListItemButton: {
         styleOverrides: {
           root: {
-            border: "1px solid rgba(0, 0, 0, 0)",
-            borderRadius: "8px",
-            "&.Mui-selected": {
-              border: "1px solid rgba(66, 165, 245, 0.3)",
-              "& .MuiListItemIcon-root": {
+            borderRadius: '8px',
+            '&.Mui-selected': {
+              '& .MuiListItemIcon-root': {
                 color: baseTheme.palette.primary.dark,
               },
-              "& .MuiTypography-root": {
+              '& .MuiTypography-root': {
                 color: baseTheme.palette.primary.dark,
               },
-              "& .MuiSvgIcon-root": {
+              '& .MuiSvgIcon-root': {
                 color: baseTheme.palette.primary.dark,
               },
-              "& .MuiTouchRipple-child": {
+              '& .MuiTouchRipple-child': {
                 backgroundColor: baseTheme.palette.primary.dark,
               },
             },
-            "& .MuiSvgIcon-root": {
+            '& .MuiSvgIcon-root': {
               color: baseTheme.palette.action.active,
             },
           },
@@ -219,8 +181,8 @@ export default function generateProject(
       MuiListItemText: {
         styleOverrides: {
           root: {
-            "& .MuiTypography-root": {
-              fontWeight: "500",
+            '& .MuiTypography-root': {
+              fontWeight: '500',
             },
           },
         },
@@ -228,16 +190,15 @@ export default function generateProject(
       MuiListItemIcon: {
         styleOverrides: {
           root: {
-            minWidth: "34px",
+            minWidth: '34px',
           },
         },
       },
       MuiDivider: {
         styleOverrides: {
           root: {
-            borderBottomWidth: 4,
-            borderColor: baseTheme.palette.grey["50"],
-            margin: "8px 16px 0",
+            borderBottomWidth: 2,
+            margin: '8px 16px 0',
           },
         },
       },

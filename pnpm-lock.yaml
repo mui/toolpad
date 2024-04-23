@@ -252,6 +252,9 @@ importers:
       '@mui/x-license':
         specifier: 7.2.0
         version: 7.2.0(react@18.2.0)
+      '@toolpad/core':
+        specifier: workspace:*
+        version: link:../packages/toolpad-core/build
       '@toolpad/studio':
         specifier: workspace:*
         version: link:../packages/toolpad-studio

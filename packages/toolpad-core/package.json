@@ -21,9 +21,9 @@
   "main": "./src/index.ts",
   "files": [
     "AppProvider/",
-    "layout/",
+    "DashboardLayout/",
     "node/AppProvider/",
-    "node/layout/"
+    "node/DashboardLayout/"
   ],
   "scripts": {
     "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",

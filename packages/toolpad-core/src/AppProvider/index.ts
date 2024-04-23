@@ -1,2 +1,2 @@
 'use client';
-export { AppProvider } from './AppProvider';
+export * from './AppProvider';

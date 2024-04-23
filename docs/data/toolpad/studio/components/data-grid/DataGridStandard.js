@@ -26,10 +26,10 @@ const COLUMNS = [
   { field: 'Location', type: 'string' },
 ];
 
-export default function ProDataGrid() {
+export default function DataGridStandard() {
   return (
-    <AppHostProvider plan="pro">
-      <DataGrid rows={ROWS} columns={COLUMNS} height={300} />
+    <AppHostProvider>
+      <DataGrid rows={ROWS} columns={COLUMNS} height={300} density="standard" />
     </AppHostProvider>
   );
 }

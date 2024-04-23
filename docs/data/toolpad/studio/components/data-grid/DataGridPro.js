@@ -26,12 +26,10 @@ const COLUMNS = [
   { field: 'Location', type: 'string' },
 ];
 
-// TODO fix me
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export default function DataGrid_standard() {
+export default function DataGridPro() {
   return (
-    <AppHostProvider>
-      <DataGrid rows={ROWS} columns={COLUMNS} height={300} density="standard" />
+    <AppHostProvider plan="pro">
+      <DataGrid rows={ROWS} columns={COLUMNS} height={300} />
     </AppHostProvider>
   );
 }

@@ -28,7 +28,7 @@ const COLUMNS = [
 
 // TODO fix me
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export default function DataGrid_hidetoolbar() {
+export default function DataGridHideToolbar() {
   return (
     <AppHostProvider>
       <DataGrid

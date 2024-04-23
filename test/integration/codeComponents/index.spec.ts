@@ -81,3 +81,11 @@ export default createComponent(MyInspector, {
 
   await expect(editorModel.appCanvas.getByText('Hello everyone!')).toBeVisible();
 });
+
+test('Can handle default values for controlled props', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.goToPage('page1');
+
+  const test1 = page.getByText('Output: Hello world!');
+  await expect(test1).toBeVisible();
+});

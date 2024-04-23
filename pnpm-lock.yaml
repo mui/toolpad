@@ -1407,14 +1407,9 @@ packages:
       '@babel/highlight': 7.24.2
       picocolors: 1.0.0
 
-  /@babel/compat-data@7.23.5:
-    resolution: {integrity: sha512-uU27kfDRlhfKl+w1U6vp16IuvSLtjAxdArVXPa9BvLkrr7CYIsxH5adpHObeAGY/41+syctUWOZ140a2Rvkgjw==}
-    engines: {node: '>=6.9.0'}
-
   /@babel/compat-data@7.24.4:
     resolution: {integrity: sha512-vg8Gih2MLK+kOkHJp4gBEIkyaIi00jgWot2D9QOmmfLC8jINSOzmCLta6Bvz/JSBCqnegV0L80jhxkol5GWNfQ==}
     engines: {node: '>=6.9.0'}
-    dev: true
 
   /@babel/core@7.24.4:
     resolution: {integrity: sha512-MBVlMXP+kkl5394RBLSxxk/iLTeVGuXTV3cIDXavPpMMqnSnt6apKgan/U8O3USWZCWZT/TbgfEpKa4uMgN4Dg==}
@@ -1465,7 +1460,7 @@ packages:
     resolution: {integrity: sha512-9JB548GZoQVmzrFgp8o7KxdgkTGm6xs9DW0o/Pim72UDjzr5ObUQ6ZzYPqA+g9OTS2bBQoctLJrky0RDCAWRgQ==}
     engines: {node: '>=6.9.0'}
     dependencies:
-      '@babel/compat-data': 7.23.5
+      '@babel/compat-data': 7.24.4
       '@babel/helper-validator-option': 7.23.5
       browserslist: 4.23.0
       lru-cache: 5.1.1
@@ -1540,18 +1535,11 @@ packages:
       '@babel/types': 7.24.0
     dev: true
 
-  /@babel/helper-module-imports@7.22.15:
-    resolution: {integrity: sha512-0pYVBnDKZO2fnSPCrgM/6WMc7eS20Fbok+0r88fp+YtWVLZrp4CkafFGIp+W0VKw4a22sgebPT99y+FDNMdP4w==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/types': 7.24.0
-
   /@babel/helper-module-imports@7.24.3:
     resolution: {integrity: sha512-viKb0F9f2s0BCS22QSF308z/+1YWKV/76mwt61NBzS5izMzDPwdq1pTrzf+Li3npBWX9KdQbkeCt1jSAM7lZqg==}
     engines: {node: '>=6.9.0'}
     dependencies:
       '@babel/types': 7.24.0
-    dev: true
 
   /@babel/helper-module-transforms@7.23.3(@babel/core@7.24.4):
     resolution: {integrity: sha512-7bBs4ED9OmswdfDzpz4MpWgSrV7FXlc3zIagvLFjS5H+Mk7Snr21vQ6QwrsoCGMfNC4e4LQPdoULEt4ykz0SRQ==}
@@ -1561,7 +1549,7 @@ packages:
     dependencies:
       '@babel/core': 7.24.4
       '@babel/helper-environment-visitor': 7.22.20
-      '@babel/helper-module-imports': 7.22.15
+      '@babel/helper-module-imports': 7.24.3
       '@babel/helper-simple-access': 7.22.5
       '@babel/helper-split-export-declaration': 7.22.6
       '@babel/helper-validator-identifier': 7.22.20
@@ -2408,7 +2396,7 @@ packages:
     dependencies:
       '@babel/core': 7.24.4
       '@babel/helper-annotate-as-pure': 7.22.5
-      '@babel/helper-module-imports': 7.22.15
+      '@babel/helper-module-imports': 7.24.3
       '@babel/helper-plugin-utils': 7.24.0
       '@babel/plugin-syntax-jsx': 7.24.1(@babel/core@7.24.4)
       '@babel/types': 7.24.0
@@ -2823,7 +2811,7 @@ packages:
   /@emotion/babel-plugin@11.11.0:
     resolution: {integrity: sha512-m4HEDZleaaCH+XgDDsPF15Ht6wTLsgDTeR3WYj9Q/k76JtWhrJjcP4+/XlG8LGT/Rol9qUfOIztXeA84ATpqPQ==}
     dependencies:
-      '@babel/helper-module-imports': 7.22.15
+      '@babel/helper-module-imports': 7.24.3
       '@babel/runtime': 7.24.4
       '@emotion/hash': 0.9.1
       '@emotion/memoize': 0.8.1
@@ -7674,7 +7662,7 @@ packages:
     peerDependencies:
       '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
     dependencies:
-      '@babel/compat-data': 7.23.5
+      '@babel/compat-data': 7.24.4
       '@babel/core': 7.24.4
       '@babel/helper-define-polyfill-provider': 0.6.2(@babel/core@7.24.4)
       semver: 6.3.1

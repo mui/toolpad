@@ -26,8 +26,6 @@ const COLUMNS = [
   { field: 'Location', type: 'string' },
 ];
 
-// TODO fix me
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function DataGridHideToolbar() {
   return (
     <AppHostProvider>

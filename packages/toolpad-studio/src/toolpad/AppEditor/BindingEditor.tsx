@@ -18,6 +18,7 @@ import {
   TextField,
   MenuItem,
   Autocomplete,
+  Link,
 } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import AddLinkIcon from '@mui/icons-material/AddLink';
@@ -267,7 +268,17 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
       </Box>
       <TabPanel value="jsExpression" disableGutters>
         <Box sx={{ my: 1 }}>
-          <Typography>Bind to a JavaScript expression.</Typography>
+          <Typography>
+            Bind to a JavaScript expression. Read more about binding in the{' '}
+            <Link
+              href="https://mui.com/toolpad/studio/concepts/data-binding/"
+              target="_blank"
+              rel="noopener"
+            >
+              docs
+            </Link>
+            .
+          </Typography>
           {jsExpressionBindingEditor}
         </Box>
       </TabPanel>
@@ -290,7 +301,17 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
 
   return (
     <Box sx={{ my: 1 }}>
-      <Typography>Run code when this event fires</Typography>
+      <Typography>
+        Run code when this event fires Read more in the{' '}
+        <Link
+          href="https://mui.com/toolpad/studio/concepts/event-handling/#js-expression-actions"
+          target="_blank"
+          rel="noopener"
+        >
+          docs
+        </Link>
+        .
+      </Typography>
       <Box
         sx={{
           my: 3,

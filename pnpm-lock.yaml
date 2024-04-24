@@ -214,8 +214,8 @@ importers:
         specifier: 5.0.0-beta.40
         version: 5.0.0-beta.40(@types/react@18.2.78)(react-dom@18.2.0)(react@18.2.0)
       '@mui/docs':
-        specifier: 6.0.0-alpha.4
-        version: 6.0.0-alpha.4(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(@mui/system@5.15.15)(next@14.2.1)(react@18.2.0)
+        specifier: 6.0.0-dev.240424162023-9968b4889d
+        version: 6.0.0-dev.240424162023-9968b4889d(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(@mui/system@5.15.15)(next@14.2.1)(react@18.2.0)
       '@mui/icons-material':
         specifier: 5.15.15
         version: 5.15.15(@mui/material@5.15.15)(react@18.2.0)
@@ -2516,8 +2516,8 @@ packages:
     resolution: {integrity: sha512-L73oG8sl6kk3iUzMETytfd9WQokMygaWJY1AAnhLusXcgBNBGIs3hwQh4CotElOIngis7yW5gsqhttoE5pFeig==}
     dev: false
 
-  /@mui/docs@6.0.0-alpha.4(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(@mui/system@5.15.15)(next@14.2.1)(react@18.2.0):
-    resolution: {integrity: sha512-8Ab3rNuQr6uum6XJD9KQxRFehfKxja+SxO9wq39yJcbiaSKAX9R4HfpZnSYIjzGaIdvvTRFGCqtG8WJPBkI2Qg==}
+  /@mui/docs@6.0.0-dev.240424162023-9968b4889d(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(@mui/system@5.15.15)(next@14.2.1)(react@18.2.0):
+    resolution: {integrity: sha512-F1K/DUvuJ5R18eG9K7m9zVfyC4qgujz7FjGyKdo/XGOfFUsKiKcEDg18DUN174mNqwc5MHCzo/sb9reP9V1K7w==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@mui/base': '*'

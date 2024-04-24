@@ -1,7 +1,7 @@
 import * as React from 'react';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { BindableAttrEntries } from '@toolpad/studio-runtime';
-import { Alert, Box, Divider, Stack, Tab } from '@mui/material';
+import { Alert, Box, Divider, Stack, Tab, Link, Typography } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
@@ -26,6 +26,7 @@ import BindableEditor from '../../toolpad/AppEditor/PageEditor/BindableEditor';
 import { getDefaultControl, usePropControlsContext } from '../../toolpad/propertyControls';
 import { parseLegacyFunctionId, serializeFunctionId, transformLegacyFunctionId } from './shared';
 import FunctionSelector from './FunctionSelector';
+import HelpTooltipIcon from '../../components/HelpTooltipIcon';
 
 const EMPTY_PARAMS: BindableAttrEntries = [];
 
@@ -241,6 +242,22 @@ function QueryEditor({
                 <Tab label="Config" value="config" />
                 <Tab label="Settings" value="settings" />
               </TabList>
+              <HelpTooltipIcon
+                iconSx={{ marginTop: 0.5, marginRight: 0.5 }}
+                helpText={
+                  <Typography variant="inherit">
+                    To configure a custom function, check out the{' '}
+                    <Link
+                      href="https://mui.com/toolpad/studio/concepts/custom-functions/"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      docs
+                    </Link>
+                    .
+                  </Typography>
+                }
+              />
             </Stack>
 
             <Divider />

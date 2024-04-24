@@ -302,7 +302,7 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
   return (
     <Box sx={{ my: 1 }}>
       <Typography>
-        Run code when this event fires Read more in the{' '}
+        Run code when this event fires. Read more in the{' '}
         <Link
           href="https://mui.com/toolpad/studio/concepts/event-handling/#js-expression-actions"
           target="_blank"

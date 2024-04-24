@@ -214,8 +214,8 @@ importers:
         specifier: 5.0.0-beta.40
         version: 5.0.0-beta.40(@types/react@18.2.78)(react-dom@18.2.0)(react@18.2.0)
       '@mui/docs':
-        specifier: 6.0.0-alpha.3
-        version: 6.0.0-alpha.3(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(@mui/system@5.15.15)(next@14.2.1)(react@18.2.0)
+        specifier: 6.0.0-alpha.4
+        version: 6.0.0-alpha.4(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(@mui/system@5.15.15)(next@14.2.1)(react@18.2.0)
       '@mui/icons-material':
         specifier: 5.15.15
         version: 5.15.15(@mui/material@5.15.15)(react@18.2.0)
@@ -2516,8 +2516,8 @@ packages:
     resolution: {integrity: sha512-L73oG8sl6kk3iUzMETytfd9WQokMygaWJY1AAnhLusXcgBNBGIs3hwQh4CotElOIngis7yW5gsqhttoE5pFeig==}
     dev: false
 
-  /@mui/docs@6.0.0-alpha.3(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(@mui/system@5.15.15)(next@14.2.1)(react@18.2.0):
-    resolution: {integrity: sha512-6iP5MElM1htTLrJXUi1Wc6I90ZideNSpuk2YBb6ZVqQ8r75DXPvYFyhSzsKc1yRrCIc0r/aVNGpTZdEub4R+Eg==}
+  /@mui/docs@6.0.0-alpha.4(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(@mui/system@5.15.15)(next@14.2.1)(react@18.2.0):
+    resolution: {integrity: sha512-8Ab3rNuQr6uum6XJD9KQxRFehfKxja+SxO9wq39yJcbiaSKAX9R4HfpZnSYIjzGaIdvvTRFGCqtG8WJPBkI2Qg==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@mui/base': '*'
@@ -2534,8 +2534,10 @@ packages:
       '@babel/runtime': 7.24.4
       '@mui/base': 5.0.0-beta.40(@types/react@18.2.78)(react-dom@18.2.0)(react@18.2.0)
       '@mui/icons-material': 5.15.15(@mui/material@5.15.15)(react@18.2.0)
+      '@mui/internal-markdown': 1.0.3
       '@mui/material': 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(react-dom@18.2.0)(react@18.2.0)
       '@mui/system': 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(react@18.2.0)
+      clipboard-copy: 4.0.1
       clsx: 2.1.0
       next: 14.2.1(@babel/core@7.24.4)(@playwright/test@1.43.1)(react-dom@18.2.0)(react@18.2.0)
       nprogress: 0.2.0
@@ -2578,6 +2580,15 @@ packages:
 
   /@mui/internal-markdown@1.0.1:
     resolution: {integrity: sha512-goTCzEbx0yxDbCU9ngHo02f5TBHwngF6RDM2ALqtgUsvNp14/lVU3OFytvpxcwjeSrrbVPEw4MSidYO8FnlUKQ==}
+    dependencies:
+      '@babel/runtime': 7.24.4
+      lodash: 4.17.21
+      marked: 5.1.2
+      prismjs: 1.29.0
+    dev: false
+
+  /@mui/internal-markdown@1.0.3:
+    resolution: {integrity: sha512-b+8T8S1raSuaOXaNyKiChyw1Lb/nEY1ITGsw6oygVLacsN6mZ7EB5cmvEbHA4EQiNwqCn7BgI9OoBTTr0GdZtg==}
     dependencies:
       '@babel/runtime': 7.24.4
       lodash: 4.17.21

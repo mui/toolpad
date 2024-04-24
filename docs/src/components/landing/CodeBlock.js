@@ -255,16 +255,19 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
           </TabList>
         </Box>
         {filenames.map((file, index) => (
-          <TabPanel
-            value={index.toString()}
-            key={index}
-            sx={{ m: 0, p: 0, flex: 1, minHeight: 0, overflow: 'auto' }}
-          >
+          <TabPanel value={index.toString()} key={index} sx={{ m: 0, p: 0, flex: 1, minHeight: 0 }}>
             <HighlightedCode
               copyButtonHidden
               code={code[index]}
               language="tsx"
               sx={{
+                width: '100%',
+                height: '100%',
+                '& .MuiCode-root': {
+                  width: '100%',
+                  height: '100%',
+                  overflow: 'auto',
+                },
                 '& pre': {
                   m: 0,
                   border: 'none',

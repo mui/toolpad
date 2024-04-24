@@ -121,7 +121,7 @@ export default function Hero() {
   const [frameIndex, setFrameIndex] = React.useState(0);
 
   const [pauseHeroAnimation, setPauseHeroAnimation] = React.useState(false);
-  /* 
+
   React.useEffect(() => {
     const loop = setInterval(() => {
       if (!pauseHeroAnimation) {
@@ -132,7 +132,7 @@ export default function Hero() {
       }
     }, FRAME_DELAY);
     return () => clearInterval(loop);
-  }, [pauseHeroAnimation, frameIndex, isLargerThanMd, isSmallerThanSm]); */
+  }, [pauseHeroAnimation, frameIndex, isLargerThanMd, isSmallerThanSm]);
 
   const fileIndex = React.useMemo(() => Math.floor(frameIndex / 2), [frameIndex]);
 

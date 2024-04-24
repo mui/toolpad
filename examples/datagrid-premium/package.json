@@ -8,8 +8,8 @@
     "start": "toolpad-studio start ."
   },
   "dependencies": {
-    "@mui/x-data-grid-premium": "^7.3.0",
-    "@mui/x-license": "^7.2.0",
+    "@mui/x-data-grid-premium": "https://pkg.csb.dev/mui/mui-x/commit/98807b03/@mui/x-data-grid-premium",
+    "@mui/x-license": "https://pkg.csb.dev/mui/mui-x/commit/98807b03/@mui/x-license",
     "@toolpad/studio": "0.1.54"
   }
 }

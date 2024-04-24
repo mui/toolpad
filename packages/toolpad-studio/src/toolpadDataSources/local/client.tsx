@@ -233,7 +233,15 @@ function QueryEditor({
       >
         <TabContext value={currentTab?.tabType ?? 'config'}>
           <Stack direction="column" gap={0}>
-            <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Stack
+              direction={'row'}
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                pr: 0.5,
+              }}
+            >
               <TabList
                 sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
                 onChange={(event, value) => handleTabTypeChange(value)}
@@ -243,7 +251,6 @@ function QueryEditor({
                 <Tab label="Settings" value="settings" />
               </TabList>
               <HelpTooltipIcon
-                iconSx={{ marginTop: 0.5, marginRight: 0.5 }}
                 helpText={
                   <Typography variant="inherit">
                     To configure a custom function, check out the{' '}

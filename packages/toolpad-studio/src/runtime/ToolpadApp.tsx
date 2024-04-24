@@ -478,9 +478,9 @@ function parseBindings(
       for (const [propName, argType] of Object.entries(argTypes)) {
         invariant(argType, `Missing argType for prop "${propName}"`);
 
-        const initializerId = argType.defaultValueProp
-          ? `${elm.id}.props.${argType.defaultValueProp}`
-          : undefined;
+        const initializerExpression = argType.defaultValueProp
+          ? `${elm.name}.${argType.defaultValueProp}`
+          : JSON.stringify(getArgTypeDefaultValue(argType));
 
         const propValue: BindableAttrValue<any> = elm.props?.[propName];
 
@@ -503,7 +503,7 @@ function parseBindings(
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,
-              initializer: initializerId,
+              initializer: initializerExpression,
             });
           } else {
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));

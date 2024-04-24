@@ -61,8 +61,8 @@ importers:
         specifier: 1.5.5
         version: 1.5.5
       '@mui/monorepo':
-        specifier: github:mui/material-ui#bbfb2cd742ed3aca3d0c8f6dc3e890ed4fc1d7f2
-        version: github.com/mui/material-ui/bbfb2cd742ed3aca3d0c8f6dc3e890ed4fc1d7f2
+        specifier: github:mui/material-ui#afffc2ffc3db1e6abf48f3b3e13a41e8b758f874
+        version: github.com/mui/material-ui/afffc2ffc3db1e6abf48f3b3e13a41e8b758f874
       '@mui/x-charts':
         specifier: 7.3.0
         version: 7.3.0(@mui/material@5.15.15)(react-dom@18.2.0)(react@18.2.0)
@@ -2512,8 +2512,8 @@ packages:
   /@mui/core-downloads-tracker@5.15.15:
     resolution: {integrity: sha512-aXnw29OWQ6I5A47iuWEI6qSSUfH6G/aCsW9KmW3LiFqr7uXZBK4Ks+z8G+qeIub8k0T5CMqlT2q0L+ZJTMrqpg==}
 
-  /@mui/core-downloads-tracker@6.0.0-alpha.3:
-    resolution: {integrity: sha512-L73oG8sl6kk3iUzMETytfd9WQokMygaWJY1AAnhLusXcgBNBGIs3hwQh4CotElOIngis7yW5gsqhttoE5pFeig==}
+  /@mui/core-downloads-tracker@6.0.0-alpha.4:
+    resolution: {integrity: sha512-azrhvrurLrfIZntnYVFfFrmKMZ4ZXvgouEvjeU1SmZSo56X9khgiFJ0ie1lzh9eoVYS2WneyykyyibptTv3g6w==}
     dev: false
 
   /@mui/docs@6.0.0-alpha.3(@mui/base@5.0.0-beta.40)(@mui/icons-material@5.15.15)(@mui/material@5.15.15)(@mui/system@5.15.15)(next@14.2.1)(react@18.2.0):
@@ -2606,8 +2606,8 @@ packages:
       '@emotion/react': 11.11.4(@types/react@18.2.78)(react@18.2.0)
       '@emotion/styled': 11.11.5(@emotion/react@11.11.4)(@types/react@18.2.78)(react@18.2.0)
       '@mui/base': 5.0.0-beta.42(react-dom@18.2.0)(react@18.2.0)
-      '@mui/core-downloads-tracker': 6.0.0-alpha.3
-      '@mui/system': 6.0.0-alpha.3(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(react@18.2.0)
+      '@mui/core-downloads-tracker': 6.0.0-alpha.4
+      '@mui/system': 6.0.0-alpha.4(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(react@18.2.0)
       '@mui/types': 7.2.14(@types/react@18.2.78)
       '@mui/utils': 6.0.0-alpha.3(react@18.2.0)
       clsx: 2.1.0
@@ -2966,8 +2966,8 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
 
-  /@mui/system@6.0.0-alpha.3(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(react@18.2.0):
-    resolution: {integrity: sha512-/UktEPqLfer6OSBLE3TI5EoDvLDtoBidGels9Fe66Pqox14WV12xllWdSbp6lSBU2jvk3fqodOfcFkzDZKB5Ug==}
+  /@mui/system@6.0.0-alpha.4(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(react@18.2.0):
+    resolution: {integrity: sha512-gtbh0Lhc/zYpN2XXwaTWkG4mFz1zdYxf3exhDQIDitV0WwsS+fjP0d7fdjC4mTshCWilUBMskbSVT2nZoF9XGA==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@emotion/react': ^11.5.0
@@ -3016,7 +3016,7 @@ packages:
         optional: true
     dependencies:
       '@babel/runtime': 7.24.4
-      '@types/prop-types': 15.7.12
+      '@types/prop-types': 15.7.11
       '@types/react': 18.2.78
       prop-types: 15.8.1
       react: 18.2.0
@@ -4530,8 +4530,12 @@ packages:
     resolution: {integrity: sha512-wA0UT0HeT2fGHzIFV9kWpYz5mdoyLxKrTgMdZQM++5h6pYAFH73HXcQhefg24nD1yivUFEn5KU+EF4b+CXJ4Wg==}
     dev: true
 
+  /@types/prop-types@15.7.11:
+    resolution: {integrity: sha512-ga8y9v9uyeiLdpKddhxYQkxNDrfvuPrlFb0N1qnZZByvcElJaXthF1UhvCh9TLWJBEHeNtdnbysW7Y6Uq8CVng==}
+
   /@types/prop-types@15.7.12:
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
+    dev: false
 
   /@types/qs@6.9.12:
     resolution: {integrity: sha512-bZcOkJ6uWrL0Qb2NAWKa7TBU+mJHPzhx9jjLL1KHF+XpzEcR7EXHvjbHlGtR/IsP1vyPrehuS6XqkmaePy//mg==}
@@ -4586,7 +4590,7 @@ packages:
   /@types/react@18.2.78:
     resolution: {integrity: sha512-qOwdPnnitQY4xKlKayt42q5W5UQrSHjgoXNVEtxeqdITJ99k4VXJOP3vt8Rkm9HmgJpH50UNU+rlqfkfWOqp0A==}
     dependencies:
-      '@types/prop-types': 15.7.12
+      '@types/prop-types': 15.7.11
       csstype: 3.1.3
 
   /@types/readdir-glob@1.1.5:
@@ -15076,10 +15080,10 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  github.com/mui/material-ui/bbfb2cd742ed3aca3d0c8f6dc3e890ed4fc1d7f2:
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/bbfb2cd742ed3aca3d0c8f6dc3e890ed4fc1d7f2}
+  github.com/mui/material-ui/afffc2ffc3db1e6abf48f3b3e13a41e8b758f874:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/afffc2ffc3db1e6abf48f3b3e13a41e8b758f874}
     name: '@mui/monorepo'
-    version: 6.0.0-alpha.3
+    version: 6.0.0-alpha.4
     requiresBuild: true
     dependencies:
       '@googleapis/sheets': 5.0.5

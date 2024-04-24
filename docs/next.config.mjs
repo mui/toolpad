@@ -14,13 +14,21 @@ const { findPages } = require('./src/modules/utils/find');
 
 const WORKSPACE_ROOT = path.resolve(currentDirectory, '../');
 const MONOREPO_PATH = path.resolve(currentDirectory, '../node_modules/@mui/monorepo');
+const MONOREPO_PACKAGES = {
+  '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
+};
 
 export default withDocsInfra({
   experimental: {
     workerThreads: true,
     cpus: 3,
   },
-  transpilePackages: ['@mui/monorepo', '@mui/x-charts', '@mui/docs'],
+  transpilePackages: [
+    '@mui/monorepo',
+    // TODO, those shouldn't be needed in the first place
+    '@mui/x-charts', // Fix ESM module support https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
+    '@mui/docs', // Fix trailingSlash support https://github.com/mui/mui-toolpad/pull/3301#issuecomment-2054213837
+  ],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
   env: {
@@ -35,11 +43,21 @@ export default withDocsInfra({
   webpack: (config, options) => {
     return {
       ...config,
+      resolveLoader: {
+        ...config.resolveLoader,
+        alias: {
+          ...config.resolveLoader.alias,
+          '@mui/internal-markdown/loader': require.resolve(
+            '@mui/monorepo/packages/markdown/loader',
+          ),
+        },
+      },
       resolve: {
         ...config.resolve,
         alias: {
           ...config.resolve.alias,
           docs: path.resolve(MONOREPO_PATH, './docs'),
+          ...MONOREPO_PACKAGES,
           '@toolpad/studio-components': path.resolve(
             currentDirectory,
             '../packages/toolpad-studio-components/src',
@@ -63,7 +81,7 @@ export default withDocsInfra({
                 use: [
                   options.defaultLoaders.babel,
                   {
-                    loader: require.resolve('@mui/internal-markdown/loader'),
+                    loader: '@mui/internal-markdown/loader',
                     options: {
                       workspaceRoot: WORKSPACE_ROOT,
                       env: {

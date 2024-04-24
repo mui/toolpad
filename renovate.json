@@ -12,6 +12,15 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
+      "groupName": "Typings",
+      "matchPackagePatterns": ["^@types/"],
+      "description": "At the top so other rules can overwrite it"
+    },
+    {
+      "groupName": "Examples",
+      "matchFileNames": ["examples/**"]
+    },
+    {
       "matchDepTypes": ["peerDependencies"],
       "rangeStrategy": "widen"
     },
@@ -32,6 +41,11 @@
       "groupName": "eslint",
       "matchPackageNames": ["eslint"],
       "matchPackagePatterns": ["^eslint-", "^@eslint/", "^@eslint-"]
+    },
+    {
+      "groupName": "Next.js",
+      "matchPackageNames": ["next"],
+      "matchPackagePatterns": ["^@next/"]
     },
     {
       "groupName": "React",

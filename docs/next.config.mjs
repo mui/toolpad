@@ -14,9 +14,19 @@ const { findPages } = require('./src/modules/utils/find');
 
 const WORKSPACE_ROOT = path.resolve(currentDirectory, '../');
 const MONOREPO_PATH = path.resolve(currentDirectory, '../node_modules/@mui/monorepo');
+const MONOREPO_PACKAGES = {
+  '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
+};
 
 export default withDocsInfra({
-  transpilePackages: ['@mui/monorepo', '@mui/x-charts', '@mui/docs'],
+  transpilePackages: [
+    // TODO, those shouldn't be needed in the first place
+    '@mui/monorepo', // Migrate everything to @mui/docs untile this dependency becomes obsolete
+    '@mui/x-charts', // Fix ESM module support https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
+    // Fix trailingSlash support https://github.com/mui/mui-toolpad/pull/3301#issuecomment-2054213837
+    // Migrate everything from @mui/monorepo to @mui/docs
+    '@mui/docs',
+  ],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
   env: {
@@ -36,6 +46,7 @@ export default withDocsInfra({
         alias: {
           ...config.resolve.alias,
           docs: path.resolve(MONOREPO_PATH, './docs'),
+          ...MONOREPO_PACKAGES,
           '@toolpad/studio-components': path.resolve(
             currentDirectory,
             '../packages/toolpad-studio-components/src',

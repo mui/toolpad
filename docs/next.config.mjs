@@ -21,7 +21,7 @@ const MONOREPO_PACKAGES = {
 export default withDocsInfra({
   transpilePackages: [
     // TODO, those shouldn't be needed in the first place
-    '@mui/monorepo', // Migrate everything to @mui/docs untile this dependency becomes obsolete
+    '@mui/monorepo', // Migrate everything to @mui/docs until the @mui/monorepo dependency becomes obsolete
     '@mui/x-charts', // Fix ESM module support https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
     // Fix trailingSlash support https://github.com/mui/mui-toolpad/pull/3301#issuecomment-2054213837
     // Migrate everything from @mui/monorepo to @mui/docs
@@ -41,6 +41,8 @@ export default withDocsInfra({
   webpack: (config, options) => {
     return {
       ...config,
+      // TODO, this shouldn't be needed in the first place
+      // Migrate everything from @mui/monorepo to @mui/docs and embed @mui/internal-markdown in @mui/docs
       resolveLoader: {
         ...config.resolveLoader,
         alias: {

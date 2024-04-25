@@ -86,13 +86,6 @@ export default function ExplorerHeader({
                 <SearchIcon fontSize="small" sx={{ mt: '-4px' }} />
               </InputAdornment>
             ) : null,
-            // endAdornment: searchTerm ? (
-            //   <InputAdornment position="end">
-            //     <IconButton onClick={handleClearSearch} edge="end">
-            //       <ClearIcon fontSize="small" />
-            //     </IconButton>
-            //   </InputAdornment>
-            // ) : null,
             sx: {
               fontSize: 14,
               borderRadius: 0,
@@ -126,7 +119,7 @@ export default function ExplorerHeader({
       ) : null}
       {onCreate && createLabelText ? (
         <Tooltip title={createLabelText}>
-          <IconButton aria-label={createLabelText} size="medium" onClick={onCreate}>
+          <IconButton aria-label={createLabelText} size="small" onClick={onCreate}>
             <AddIcon />
           </IconButton>
         </Tooltip>

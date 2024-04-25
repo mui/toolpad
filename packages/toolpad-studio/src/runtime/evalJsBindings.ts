@@ -200,7 +200,7 @@ export default function evalJsBindings(
 
     const initializer = binding.initializer;
     if (initializer) {
-      const result = evaluateBinding(initializer, scopePath);
+      const result = jsRuntime.evaluateExpression(initializer, proxiedScope);
       if (result) {
         return result;
       }

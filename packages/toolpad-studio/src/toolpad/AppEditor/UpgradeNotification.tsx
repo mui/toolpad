@@ -61,7 +61,7 @@ export function UpgradeChip({
         rel="noopener"
         size="small"
         clickable
-        label="Pro"
+        label="PRO"
         sx={sx}
       />
     </Tooltip>

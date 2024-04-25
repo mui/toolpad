@@ -26,7 +26,7 @@
     "@emotion/server": "11.11.0",
     "@emotion/styled": "11.11.5",
     "@mui/base": "5.0.0-beta.40",
-    "@mui/docs": "6.0.0-alpha.4",
+    "@mui/docs": "6.0.0-dev.240424162023-9968b4889d",
     "@mui/icons-material": "5.15.15",
     "@mui/internal-markdown": "^1.0.1",
     "@mui/joy": "5.0.0-beta.36",

@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { PrismaClient, Prisma } from '@prisma/client';
 
 // Reuse existing PrismaClient instance during development

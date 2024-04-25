@@ -105,9 +105,15 @@ module.exports = {
     },
     {
       files: ['examples/**/*'],
+      /**
+       * Examples are for demostration purposes and should not be considered as part of the library.
+       * They don't contain an eslint setup, so we don't want them to contain eslint directives
+       * We do however want to keep the rules in place to ensure the examples are following
+       * a reasonably similar code style as the library.
+       */
       rules: {
-        // We use it for demonstration purposes
         'no-console': 'off',
+        'no-underscore-dangle': 'off',
         // no node_modules in examples as they are not installed
         'import/no-unresolved': 'off',
       },

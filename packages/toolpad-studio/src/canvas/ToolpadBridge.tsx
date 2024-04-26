@@ -1,6 +1,6 @@
 import { Emitter } from '@toolpad/utils/events';
 import type { RuntimeEvents } from '@toolpad/studio-runtime';
-import type { AppCanvasState, PageViewState } from '../types';
+import type { PageViewState } from '../types';
 
 const COMMAND_HANDLERS = Symbol('hidden property to hold the command handlers');
 
@@ -51,7 +51,6 @@ export interface ToolpadBridge {
   canvasEvents: Emitter<RuntimeEvents>;
   // Commands executed from the editor, ran in the canvas
   canvasCommands: Commands<{
-    update(updates: AppCanvasState): void;
     getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
     getPageViewState(): PageViewState;
     isReady(): boolean;

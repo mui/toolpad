@@ -1,6 +1,6 @@
 <!-- markdownlint-disable-next-line -->
 <p align="center">
-  <a href="https://mui.com/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/logo.svg" alt="Toolpad Studio logo"></a>
+  <a href="https://mui.com/toolpad/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/branding/product-toolpad-light.svg" alt="Toolpad Studio logo"></a>
 </p>
 
 <h1 align="center">Toolpad Studio</h1>

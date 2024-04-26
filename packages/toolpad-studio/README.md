@@ -5,14 +5,18 @@
 
 <h1 align="center">Toolpad Studio</h1>
 
-This package is the GUI based, low-code admin builder offering from MUI. Drag-and-drop pre-built MUI components, connect to any datasource and build functional React apps quickly.
+Toolpad Studio is a self-hosted low-code admin builder designed to extend the [MUI](https://mui.com/) React components. It's for developers of all trades who want to save time building internal applications. Drag-and-drop from a catalogue of pre-built components, connect to any data source and build apps quickly.
 
 ## Installation
 
 Install the package in your project directory with:
 
 ```bash
-npm install @toolpad/studio
+npx create-toolpad-app@latest my-toolpad-studio-app
+# or
+yarn create toolpad-app my-toolpad-studio-app
+# or
+pnpm create toolpad-app my-toolpad-studio-app
 ```
 
 ## Documentation
@@ -21,7 +25,8 @@ Visit [https://mui.com/toolpad/studio/getting-started/](https://mui.com/toolpad/
 
 ## Examples
 
-Check out some [examples built using Toolpad Studio](https://mui.com/toolpad/studio/examples/).
+Check out our [mui-public](https://tools-public.onrender.com/prod/pages/OverviewPage) app to see how a Toolpad Studio app looks in production.
+Our documentation contains more [examples](https://mui.com/toolpad/studio/examples/) to help you get started.
 
 ## Changelog
 

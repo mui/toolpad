@@ -1,11 +1,14 @@
 import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
-import { CanvasEventsContext } from '@toolpad/studio-runtime/runtime';
-import { FlowDirection, SlotType } from '@toolpad/studio-runtime';
+import {
+  queryClient,
+  FlowDirection,
+  SlotType,
+  useAppHost,
+  CanvasEventsContext,
+} from '@toolpad/studio-runtime';
 import { update } from '@toolpad/utils/immutability';
-import { useNonNullableContext } from '@toolpad/utils/react';
-import { queryClient } from '../runtime/api';
 import { AppCanvasState, NodeInfo, PageViewState, SlotsState } from '../types';
 import {
   getRelativeBoundingRect,
@@ -13,7 +16,7 @@ import {
   rectContainsPoint,
 } from '../utils/geometry';
 import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
-import { AppHostContext, ToolpadApp, CanvasHooks, CanvasHooksContext } from '../runtime';
+import { ToolpadApp, CanvasHooks, CanvasHooksContext } from '../runtime';
 
 const handleScreenUpdate = throttle(
   () => {
@@ -210,7 +213,7 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
     };
   }, [savedNodes]);
 
-  const appHost = useNonNullableContext(AppHostContext);
+  const appHost = useAppHost();
 
   if (appHost.isCanvas) {
     return readyBridge ? (

@@ -37,7 +37,8 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
   globalScopeMeta: ScopeMeta;
-  env?: Record<string, string>;
+  env?: Record<string, string | undefined>;
+  declaredEnvKeys?: string[];
   sx?: SxProps;
 }
 
@@ -54,6 +55,7 @@ export default function BindableEditor<V>({
   globalScope = {},
   globalScopeMeta = {},
   env,
+  declaredEnvKeys,
   sx,
 }: BindableEditorProps<V>) {
   const propTypeControls = usePropControlsContext();
@@ -120,6 +122,7 @@ export default function BindableEditor<V>({
           hidden={!bindable}
           liveBinding={liveBinding}
           env={env}
+          declaredEnvKeys={declaredEnvKeys}
         />
       </React.Fragment>
     </Stack>

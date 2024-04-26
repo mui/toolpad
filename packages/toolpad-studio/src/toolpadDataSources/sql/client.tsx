@@ -10,7 +10,7 @@ import {
   Typography,
 } from '@mui/material';
 import { inferColumns, parseColumns } from '@toolpad/studio-components';
-import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
+import { DataGridPremium, GridColDef } from '@mui/x-data-grid-premium';
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -297,7 +297,7 @@ export function QueryEditor({
             </Box>
           ) : (
             <React.Fragment>
-              <DataGridPro
+              <DataGridPremium
                 sx={{ border: 'none', flex: 1 }}
                 columns={columns}
                 key={previewGridKey}

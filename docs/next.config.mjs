@@ -23,7 +23,12 @@ export default withDocsInfra({
     workerThreads: true,
     cpus: 3,
   },
-  transpilePackages: ['@mui/monorepo', '@mui/x-charts'],
+  transpilePackages: [
+    '@mui/monorepo',
+    // TODO, those shouldn't be needed in the first place
+    '@mui/x-charts', // Fix ESM module support https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
+    '@mui/docs', // Fix trailingSlash support https://github.com/mui/mui-toolpad/pull/3301#issuecomment-2054213837
+  ],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
   env: {
@@ -38,6 +43,15 @@ export default withDocsInfra({
   webpack: (config, options) => {
     return {
       ...config,
+      resolveLoader: {
+        ...config.resolveLoader,
+        alias: {
+          ...config.resolveLoader.alias,
+          '@mui/internal-markdown/loader': require.resolve(
+            '@mui/monorepo/packages/markdown/loader',
+          ),
+        },
+      },
       resolve: {
         ...config.resolve,
         alias: {
@@ -67,7 +81,7 @@ export default withDocsInfra({
                 use: [
                   options.defaultLoaders.babel,
                   {
-                    loader: require.resolve('@mui/internal-markdown/loader'),
+                    loader: '@mui/internal-markdown/loader',
                     options: {
                       workspaceRoot: WORKSPACE_ROOT,
                       env: {
@@ -120,7 +134,7 @@ export default withDocsInfra({
 
     return map;
   },
-  // Used to signal we run yarn build
+  // Used to signal we run pnpm build
   ...(process.env.NODE_ENV === 'production'
     ? {
         output: 'export',

@@ -12,12 +12,12 @@ Run
 
 <codeblock storageKey="package-manager">
 
-```bash pnpm
-pnpm dlx create-toolpad-app --core
-```
-
 ```bash yarn
 yarn create toolpad-app --core
+```
+
+```bash pnpm
+pnpm dlx create-toolpad-app --core
 ```
 
 </codeblock>
@@ -25,12 +25,16 @@ yarn create toolpad-app --core
 Follow the instructions of the CLI. After you conclude the installation process, change your working dir to the project and run
 <codeblock storageKey="package-manager">
 
-```bash pnpm
-pnpm run dev
+```bash npm
+npm run dev
 ```
 
 ```bash yarn
 yarn dev
+```
+
+```bash pnpm
+pnpm dev
 ```
 
 </codeblock>

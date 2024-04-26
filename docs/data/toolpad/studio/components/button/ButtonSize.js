@@ -20,7 +20,7 @@ const TOOLPAD_PROPS3 = {
   content: 'Large',
 };
 
-export default function BasicButton() {
+export default function ButtonSize() {
   return (
     <Stack spacing={2} direction="row" alignItems="center">
       <Button {...TOOLPAD_PROPS1} />

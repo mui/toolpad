@@ -96,8 +96,8 @@ export default class EnvManager {
     this.watcher.on('change', handleChange);
   }
 
-  async getDeclaredValues(): Promise<Record<string, string>> {
-    return this.values;
+  async getDeclaredKeys(): Promise<string[]> {
+    return Object.keys(this.values);
   }
 
   // eslint-disable-next-line class-methods-use-this

@@ -7,7 +7,6 @@ import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import { alpha } from '@mui/material/styles';
 import HighlightedCode from 'docs/src/modules/components/HighlightedCode';
-import MarkdownElement from 'docs/src/components/markdown/MarkdownElement';
 
 const code = [
   `
@@ -176,8 +175,6 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
         gridRowEnd: 2,
         minWidth: { xs: 'unset', sm: '50%', md: '200%', lg: 560 },
         maxHeight: { xs: 240, sm: 315, md: 420 },
-        overflowY: 'auto',
-        overflowX: 'inherit',
         position: { xs: 'relative', sm: 'absolute', md: 'relative' },
         bottom: { xs: 'unset', sm: 0, md: 'unset' },
         zIndex: 20,
@@ -187,6 +184,9 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
         backgroundColor: '#0F1924',
         backfaceVisibility: 'hidden',
         transition: 'all 0.3s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
         transform: appMode
           ? { xs: 'rotateY(180deg)', sm: 'unset', md: 'rotateY(180deg)' }
           : 'unset',
@@ -201,7 +201,6 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
           sx={(theme) => ({
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
             borderBottom: '1px solid',
             backgroundColor: (theme.vars || theme).palette.primaryDark[800],
             position: 'sticky',
@@ -256,28 +255,28 @@ export default function CodeBlock({ appMode, fileIndex, setFrameIndex }) {
           </TabList>
         </Box>
         {filenames.map((file, index) => (
-          <TabPanel
-            value={index.toString()}
-            key={index}
-            sx={{
-              m: 0,
-              p: 0,
-              '& pre': {
-                backgroundColor: '#0F1924',
-              },
-            }}
-          >
+          <TabPanel value={index.toString()} key={index} sx={{ m: 0, p: 0, flex: 1, minHeight: 0 }}>
             <HighlightedCode
               copyButtonHidden
-              component={MarkdownElement}
               code={code[index]}
               language="tsx"
               sx={{
-                p: 1.5,
-                fontSize: (theme) => ({
-                  xs: theme.typography.pxToRem(8.5),
-                  md: theme.typography.pxToRem(12),
-                }),
+                width: '100%',
+                height: '100%',
+                '& .MuiCode-root': {
+                  width: '100%',
+                  height: '100%',
+                  overflow: 'auto',
+                },
+                '& pre': {
+                  m: 0,
+                  border: 'none',
+                  maxHeight: 'fit-content',
+                  fontSize: (theme) => ({
+                    xs: theme.typography.pxToRem(8.5),
+                    md: theme.typography.pxToRem(12),
+                  }),
+                },
               }}
             />
           </TabPanel>

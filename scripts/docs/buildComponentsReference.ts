@@ -1,9 +1,10 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { kebabCase } from 'lodash';
+import kebabCase from 'lodash/kebabCase';
 import type { ComponentConfig } from '@toolpad/studio-runtime';
 import * as builtins from '@toolpad/studio-components';
 import * as toolpadCore from '@toolpad/studio-runtime';
+import invariant from 'invariant';
 import { escapeCell, writePrettifiedFile } from './utils';
 
 const AUTO_GENERATED_WARNING =
@@ -11,7 +12,6 @@ const AUTO_GENERATED_WARNING =
 
 const currentDirectory = __dirname;
 const projectRoot = path.resolve(currentDirectory, '..', '..');
-const prettierConfigPath = path.resolve(projectRoot, 'prettier.config.js');
 const docsRoot = path.resolve(projectRoot, 'docs');
 const absolutePathRoot = '/toolpad/studio/reference/components';
 const componentDocsRoot = path.resolve(docsRoot, `data${absolutePathRoot}`);
@@ -33,7 +33,6 @@ export default function Page() {
   return <MarkdownDocs {...pageProps} />;
 }
 `,
-    prettierConfigPath,
   );
 }
 
@@ -68,7 +67,9 @@ export async function buildComponentsReference() {
           '',
           '| Name | Type | Default | Description |',
           '|:-----|:-----|:--------|:------------|',
-          ...Object.entries(config.argTypes).map(([argName, argType]) => {
+          ...Object.entries(config.argTypes ?? {}).map(([argName, argType]) => {
+            invariant(argType, 'argType not found');
+            invariant(argType.type, 'argType type not found');
             const formattedName = `<span class="prop-name">${escapeCell(argName)}</span>`;
             const defaultValue = argType.default;
             const formattedType = `<span class="prop-type">${escapeCell(argType.type)}</span>`;
@@ -88,7 +89,7 @@ export async function buildComponentsReference() {
         ].join('\n');
 
         const mdFilePath = path.resolve(componentDocsRoot, `${slug}.md`);
-        await writePrettifiedFile(mdFilePath, md, prettierConfigPath);
+        await writePrettifiedFile(mdFilePath, md);
 
         await writePageFile(mdFilePath);
       }
@@ -108,7 +109,7 @@ export async function buildComponentsReference() {
   ].join('\n');
 
   const indexMdFilePath = path.resolve(componentDocsRoot, `index.md`);
-  await writePrettifiedFile(indexMdFilePath, indexMd, prettierConfigPath);
+  await writePrettifiedFile(indexMdFilePath, indexMd);
   await writePageFile(indexMdFilePath);
 
   const manifest = {
@@ -127,5 +128,5 @@ export async function buildComponentsReference() {
   };
 
   const configJsonPath = path.resolve(componentDocsRoot, `manifest.json`);
-  await writePrettifiedFile(configJsonPath, JSON.stringify(manifest, null, 2), prettierConfigPath);
+  await writePrettifiedFile(configJsonPath, JSON.stringify(manifest, null, 2));
 }

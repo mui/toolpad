@@ -61,12 +61,10 @@ export default createComponent(MyInspector, {
     { encoding: 'utf-8' },
   );
 
-  if (process.env.EXPERIMENTAL_INLINE_CANVAS) {
-    // vite causes a reload when we're creating new custom components
-    // See https://github.com/vitejs/vite/issues/12912
-    await page.locator('[data-testid="page-ready-marker"]').isHidden();
-    await editorModel.waitForOverlay();
-  }
+  // vite causes a reload when we're creating new custom components
+  // See https://github.com/vitejs/vite/issues/12912
+  await page.locator('[data-testid="page-ready-marker"]').isHidden();
+  await editorModel.waitForOverlay();
 
   await editorModel.componentCatalog.hover();
   await expect(editorModel.getComponentCatalogItem('MyInspector')).toBeVisible();
@@ -82,4 +80,12 @@ export default createComponent(MyInspector, {
   await jsonEditorDialog.getByRole('button', { name: 'save' }).click();
 
   await expect(editorModel.appCanvas.getByText('Hello everyone!')).toBeVisible();
+});
+
+test('Can handle default values for controlled props', async ({ page }) => {
+  const runtimeModel = new ToolpadRuntime(page);
+  await runtimeModel.goToPage('page1');
+
+  const test1 = page.getByText('Output: Hello world!');
+  await expect(test1).toBeVisible();
 });

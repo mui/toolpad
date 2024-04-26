@@ -46,6 +46,10 @@ npm run build
 yarn build
 ```
 
+```bash pnpm
+pnpm build
+```
+
 </codeblock>
 
 ## Start step

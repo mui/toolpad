@@ -37,7 +37,8 @@ The following features are currently planned to be included within this scope:
 Currently, accessing these features requires you to add the following to your `application.yml`:
 
 ```yml
-spec: { plan: pro }
+spec:
+  plan: pro
 ```
 
 :::info

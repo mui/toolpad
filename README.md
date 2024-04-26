@@ -27,7 +27,7 @@ Quickly build internal tools. Toolpad Studio is a self-hosted low-code internal 
 
 ## We are making some changes
 
-A [big change](https://github.com/mui/mui-toolpad/discussions/1748) is coming: we're making Toolpad Studio focus much more on integrating with your IDE while providing the ease of building UI fast with a drag and drop.
+A [big addition](https://github.com/mui/mui-toolpad/discussions/3311) is happening. We're working on Toolpad Core, a framework approach to internal tools. Through high-level components and data management interfaces, we aim to revamp the app building experience that involves tabular data. It will be tightly integrated with MUI X and Core libraries, and would act as your go to framework for admin dashboards and CRUD apps!
 
 ## Product walkthrough
 

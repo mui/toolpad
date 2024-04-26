@@ -18,6 +18,7 @@ import {
   TextField,
   MenuItem,
   Autocomplete,
+  Link,
 } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
 import AddLinkIcon from '@mui/icons-material/AddLink';
@@ -63,14 +64,12 @@ interface BindingEditorContext {
   label: string;
   globalScope: Record<string, unknown>;
   globalScopeMeta: ScopeMeta;
-  /**
-   * Serverside binding, use the QuickJs runtime to evaluate bindings
-   */
   jsRuntime: JsRuntime;
   disabled?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
-  env?: Record<string, string>;
+  env: Record<string, string | undefined>;
+  declaredEnvKeys: string[];
 }
 
 const [useBindingEditorContext, BindingEditorContextProvider] =
@@ -137,13 +136,10 @@ function JsExpressionPreview({ jsRuntime, input, globalScope }: JsExpressionPrev
 export interface EnvBindingEditorProps extends WithControlledProp<EnvAttrValue | null> {}
 
 export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
-  const context = useBindingEditorContext();
-  const envVarNames = Object.keys(context.env ?? {});
+  const { declaredEnvKeys, env } = useBindingEditorContext();
   const handleInputChange = React.useCallback(
     (event: React.SyntheticEvent, newValue: string | null) => {
-      onChange({
-        $$env: newValue || '',
-      });
+      onChange({ $$env: newValue || '' });
     },
     [onChange],
   );
@@ -153,7 +149,7 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
       <Typography>Assign to an environment variable</Typography>
       <Autocomplete
         freeSolo
-        options={envVarNames}
+        options={declaredEnvKeys}
         value={value?.$$env || ''}
         onInputChange={handleInputChange}
         renderInput={(params) => (
@@ -163,23 +159,25 @@ export function EnvBindingEditor({ value, onChange }: EnvBindingEditorProps) {
             sx={{ my: 3 }}
             label="Environment variable name"
             helperText={
-              value?.$$env && !envVarNames.includes(value.$$env)
+              value?.$$env && !declaredEnvKeys.includes(value.$$env)
                 ? 'Warning: This variable is not in your env file!'
                 : ''
             }
           />
         )}
       />
+      Value:
+      <JsonView sx={{ flex: 1 }} src={value?.$$env ? env[value?.$$env] : undefined} />
     </Box>
   );
 }
 
 function getValueBindingTab(value: Maybe<BindableAttrValue<any>>) {
-  if (value?.$$env) {
-    return 'env';
+  if (value?.$$env === undefined) {
+    return 'jsExpression';
   }
 
-  return 'jsExpression';
+  return 'env';
 }
 
 export interface ValueBindingEditorProps
@@ -207,6 +205,7 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
   const handleTabChange = (event: React.SyntheticEvent, newValue: BindableType) => {
     setActiveTab(newValue);
   };
+
   const jsExpressionBindingEditor = (
     <Stack direction="row" sx={{ height: 400, gap: 2, my: hasEnv ? 3 : 0 }}>
       <GlobalScopeExplorer sx={{ width: 250 }} value={globalScope} meta={globalScopeMeta} />
@@ -254,14 +253,10 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
 
   const envBindingEditor = (
     <EnvBindingEditor
-      value={(value as EnvAttrValue)?.$$env ? (value as EnvAttrValue) : null}
+      value={(value as EnvAttrValue)?.$$env !== undefined ? (value as EnvAttrValue) : null}
       onChange={onChange}
     />
   );
-
-  if (!hasEnv) {
-    return jsExpressionBindingEditor;
-  }
 
   return (
     <TabContext value={activeTab}>
@@ -273,7 +268,17 @@ export function ValueBindingEditor({ value, onChange, error }: ValueBindingEdito
       </Box>
       <TabPanel value="jsExpression" disableGutters>
         <Box sx={{ my: 1 }}>
-          <Typography>Bind to a JavaScript expression.</Typography>
+          <Typography>
+            Bind to a JavaScript expression. Read more about binding in the{' '}
+            <Link
+              href="https://mui.com/toolpad/studio/concepts/data-binding/"
+              target="_blank"
+              rel="noopener"
+            >
+              docs
+            </Link>
+            .
+          </Typography>
           {jsExpressionBindingEditor}
         </Box>
       </TabPanel>
@@ -296,7 +301,17 @@ function JsExpressionActionEditor({ value, onChange }: JsExpressionActionEditorP
 
   return (
     <Box sx={{ my: 1 }}>
-      <Typography>Run code when this event fires</Typography>
+      <Typography>
+        Run code when this event fires. Read more in the{' '}
+        <Link
+          href="https://mui.com/toolpad/studio/concepts/event-handling/#js-expression-actions"
+          target="_blank"
+          rel="noopener"
+        >
+          docs
+        </Link>
+        .
+      </Typography>
       <Box
         sx={{
           my: 3,
@@ -594,7 +609,8 @@ export function BindingEditorDialog<V>({
           <ValueBindingEditor
             error={error}
             value={
-              (input as JsExpressionAttrValue)?.$$jsExpression || (input as EnvAttrValue)?.$$env
+              (input as JsExpressionAttrValue)?.$$jsExpression !== undefined ||
+              (input as EnvAttrValue)?.$$env !== undefined
                 ? (input as JsExpressionAttrValue | EnvAttrValue)
                 : null
             }
@@ -629,7 +645,8 @@ export interface BindingEditorProps<V> extends WithControlledProp<BindableAttrVa
   hidden?: boolean;
   propType?: PropValueType;
   liveBinding?: LiveBinding;
-  env?: Record<string, string>;
+  env?: Record<string, string | undefined>;
+  declaredEnvKeys?: string[];
 }
 
 export function BindingEditor<V>({
@@ -644,6 +661,7 @@ export function BindingEditor<V>({
   onChange,
   liveBinding,
   env,
+  declaredEnvKeys,
 }: BindingEditorProps<V>) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = React.useCallback(() => setOpen(true), []);
@@ -700,9 +718,20 @@ export function BindingEditor<V>({
       disabled,
       propType,
       liveBinding,
-      env,
+      env: env ?? {},
+      declaredEnvKeys: declaredEnvKeys ?? [],
     }),
-    [disabled, env, globalScope, jsRuntime, label, liveBinding, propType, resolvedMeta],
+    [
+      disabled,
+      env,
+      globalScope,
+      jsRuntime,
+      label,
+      liveBinding,
+      propType,
+      resolvedMeta,
+      declaredEnvKeys,
+    ],
   );
 
   return (

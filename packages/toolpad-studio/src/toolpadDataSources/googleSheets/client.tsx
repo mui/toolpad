@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import * as React from 'react';
 import { inferColumns, parseColumns } from '@toolpad/studio-components';
-import { DataGridPro, GridColDef } from '@mui/x-data-grid-pro';
+import { DataGridPremium, GridColDef } from '@mui/x-data-grid-premium';
 import { UseQueryResult } from '@tanstack/react-query';
 import { getObjectKey } from '@toolpad/utils/objectKey';
 import useDebounced from '@toolpad/utils/hooks/useDebounced';
@@ -223,7 +223,7 @@ function QueryEditor({
               <Typography color="error">{preview?.error?.message}</Typography>
             </Box>
           ) : (
-            <DataGridPro
+            <DataGridPremium
               sx={{ border: 'none', flex: 1 }}
               columns={columns}
               key={previewGridKey}

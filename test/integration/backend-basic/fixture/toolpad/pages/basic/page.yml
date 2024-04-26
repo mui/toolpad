@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.44/docs/schemas/v1/definitions.json#properties/Page
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.54/docs/schemas/v1/definitions.json#properties/Page
 
 apiVersion: v1
 kind: page
@@ -45,6 +45,10 @@ spec:
         rows:
           $$jsExpression: |
             throws.data
+    - component: Container
+      name: container
+    - component: Chart
+      name: chart
     - component: Text
       name: typography3
       layout:
@@ -70,22 +74,29 @@ spec:
                 `echo, secret not in .env: ${echo.data.secrets.baz}`
     - component: Text
       name: text5
-      layout:
-        columnSize: 1
       props:
         value:
           $$jsExpression: |
             edited.data
-    - component: Button
-      name: button
       layout:
         columnSize: 1
+    - component: PageRow
+      name: pageRow
       props:
-        variant: outlined
-        size: medium
-        content: Run Manual Query
-        onClick:
-          $$jsExpressionAction: manualQuery.call()
+        justifyContent: start
+      children:
+        - component: Button
+          name: button
+          layout:
+            columnSize: 1
+          props:
+            variant: outlined
+            size: medium
+            content: Run Manual Query
+            onClick:
+              $$jsExpressionAction: manualQuery.call()
+        - component: DataGrid
+          name: dataGrid1
     - component: Text
       name: text1
       layout:
@@ -130,20 +141,20 @@ spec:
             ${propagatedLoading.isLoading}`
     - component: Text
       name: text6
-      layout:
-        columnSize: 1
       props:
         value:
           $$jsExpression: |
             `Raw text: ${getRawText.data}`
-    - component: Text
-      name: text7
       layout:
         columnSize: 1
+    - component: Text
+      name: text7
       props:
         value:
           $$jsExpression: |
             `my custom cookie: ${context.data.cookies.MY_TOOLPAD_COOKIE}`
+      layout:
+        columnSize: 1
     - component: Button
       name: button2
       props:
@@ -247,3 +258,4 @@ spec:
         kind: rest
         headers: []
         method: GET
+        searchParams: []

@@ -20,7 +20,7 @@ const TOOLPAD_PROPS3 = {
   variant: 'outlined',
 };
 
-export default function BasicButton() {
+export default function ButtonColor() {
   return (
     <Stack spacing={2} direction="row" alignItems="center">
       <Button {...TOOLPAD_PROPS1} />

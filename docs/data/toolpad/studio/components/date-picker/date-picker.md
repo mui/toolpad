@@ -6,7 +6,7 @@
 
 DatePicker is an input component. It takes user input and provides the value for further usage on the page.
 
-{{"demo": "DatePicker.js", "hideToolbar": true}}
+{{"demo": "DatePickerBasic.js", "hideToolbar": true}}
 
 ## Usage
 

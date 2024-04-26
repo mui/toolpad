@@ -14,7 +14,7 @@ const TOOLPAD_PROPS2 = {
   disabled: true,
 };
 
-export default function BasicButton() {
+export default function ButtonState() {
   return (
     <Stack spacing={2} direction="row" alignItems="center">
       <Button {...TOOLPAD_PROPS1} />

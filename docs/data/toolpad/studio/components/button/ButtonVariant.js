@@ -17,7 +17,7 @@ const TOOLPAD_PROPS3 = {
   content: 'Text',
 };
 
-export default function BasicButton() {
+export default function ButtonVariant() {
   return (
     <Stack spacing={2} direction="row" alignItems="center">
       <Button {...TOOLPAD_PROPS1} />

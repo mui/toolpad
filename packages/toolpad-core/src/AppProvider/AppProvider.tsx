@@ -8,19 +8,26 @@ export interface Branding {
   logo?: React.ReactNode;
 }
 
-export interface NavigationItem {
-  label: string;
-  path?: string;
-  icon: React.ReactNode;
-  items?: (Omit<NavigationItem, 'items'> & { path: string })[];
-}
-
-export interface NavigationSection {
+export interface NavigationPageItem {
+  kind?: 'page';
   title: string;
-  items: NavigationItem[];
+  path?: string;
+  icon?: React.ReactNode;
+  children?: Navigation;
 }
 
-export type Navigation = NavigationSection[];
+export interface NavigationSubheaderItem {
+  kind: 'header';
+  title: string;
+}
+
+export interface NavigationDividerItem {
+  kind: 'divider';
+}
+
+export type NavigationItem = NavigationPageItem | NavigationSubheaderItem | NavigationDividerItem;
+
+export type Navigation = NavigationItem[];
 
 export const BrandingContext = React.createContext<Branding | null>(null);
 

@@ -18,52 +18,61 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/system';
 import ToolpadLogo from './ToolpadLogo';
-import { BrandingContext, NavigationContext } from '../AppProvider';
+import { BrandingContext, Navigation, NavigationContext, NavigationPageItem } from '../AppProvider';
 
 const IS_CLIENT = typeof window !== 'undefined';
 
-const DRAWER_WIDTH = 320;
+const DEFAULT_DRAWER_WIDTH = 320;
 
 const LogoBox = styled('div')({
   position: 'relative',
   height: 40,
-  marginRight: 4,
   img: {
     maxHeight: 40,
   },
 });
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-  hideTitle?: boolean;
+interface DashboardSidebarSubNavigationProps {
+  subNavigation: Navigation;
+  depth?: number;
 }
 
-export function DashboardLayout({ children, hideTitle = false }: DashboardLayoutProps) {
-  const branding = React.useContext(BrandingContext);
-  const navigation = React.useContext(NavigationContext);
-
+function DashboardSidebarSubNavigation({
+  subNavigation,
+  depth = 0,
+}: DashboardSidebarSubNavigationProps) {
   // Rerender once to update with client-side navigation
   const [hasMounted, setHasMounted] = React.useState(false);
+
+  const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState<string[]>([]);
+
   React.useEffect(() => {
     setHasMounted(true);
-  }, []);
 
-  const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState<string[]>(
-    navigation
-      .map((navigationSection) =>
-        navigationSection.items
-          .filter(
-            (navigationItem) =>
-              !!navigationItem.items &&
-              IS_CLIENT &&
-              navigationItem.items.some(
-                (nestedNavigationItem) => nestedNavigationItem.path === window.location.pathname,
-              ),
-          )
-          .map((navigationItem) => `${navigationSection.title}:${navigationItem.label}`),
-      )
-      .flat(),
-  );
+    if (IS_CLIENT) {
+      const initialExpandedSidebarItemIds = subNavigation
+        .map((navigationItem, navigationItemIndex) => ({
+          navigationItem,
+          originalIndex: navigationItemIndex,
+        }))
+        .filter(
+          ({ navigationItem }) =>
+            (!navigationItem.kind || navigationItem.kind === 'page') &&
+            navigationItem.children &&
+            navigationItem.children.some(
+              (nestedNavigationItem) =>
+                (!nestedNavigationItem.kind || nestedNavigationItem.kind === 'page') &&
+                nestedNavigationItem.path === window.location.pathname,
+            ),
+        )
+        .map(
+          ({ navigationItem, originalIndex }) =>
+            `${(navigationItem as NavigationPageItem).title}-${depth}-${originalIndex}`,
+        );
+
+      setExpandedSidebarItemIds(initialExpandedSidebarItemIds);
+    }
+  }, [depth, subNavigation]);
 
   const handleSidebarItemClick = React.useCallback(
     (itemId: string) => () => {
@@ -77,6 +86,82 @@ export function DashboardLayout({ children, hideTitle = false }: DashboardLayout
   );
 
   return (
+    <List sx={{ mb: depth === 0 ? 2 : 1, pl: 2 * depth }}>
+      {subNavigation.map((navigationItem, navigationItemIndex) => {
+        if (navigationItem.kind === 'header') {
+          return (
+            <ListSubheader key={`subheader-${depth}-${navigationItemIndex}`} component="div">
+              {navigationItem.title}
+            </ListSubheader>
+          );
+        }
+
+        if (navigationItem.kind === 'divider') {
+          return <Divider key={`divider-${depth}-${navigationItemIndex}`} />;
+        }
+
+        const navigationItemId = `${navigationItem.title}-${depth}-${navigationItemIndex}`;
+
+        const isNestedNavigationExpanded = expandedSidebarItemIds.includes(navigationItemId);
+
+        const nestedNavigationCollapseIcon = isNestedNavigationExpanded ? (
+          <ExpandLessIcon />
+        ) : (
+          <ExpandMoreIcon />
+        );
+
+        const listItem = (
+          <ListItem>
+            <ListItemButton
+              selected={IS_CLIENT && hasMounted && window.location.pathname === navigationItem.path}
+              onClick={handleSidebarItemClick(navigationItemId)}
+            >
+              <ListItemIcon>{navigationItem.icon}</ListItemIcon>
+              <ListItemText primary={navigationItem.title} />
+              {navigationItem.children ? nestedNavigationCollapseIcon : null}
+            </ListItemButton>
+          </ListItem>
+        );
+
+        return (
+          <React.Fragment key={navigationItemId}>
+            {navigationItem.path ? (
+              <a href={navigationItem.path} style={{ color: 'inherit', textDecoration: 'none' }}>
+                {listItem}
+              </a>
+            ) : (
+              listItem
+            )}
+            {IS_CLIENT && hasMounted && navigationItem.children ? (
+              <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
+                <DashboardSidebarSubNavigation
+                  subNavigation={navigationItem.children}
+                  depth={depth + 1}
+                />
+              </Collapse>
+            ) : null}
+          </React.Fragment>
+        );
+      })}
+    </List>
+  );
+}
+
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+  sidebarWidth?: number;
+  hideTitle?: boolean;
+}
+
+export function DashboardLayout({
+  children,
+  sidebarWidth = DEFAULT_DRAWER_WIDTH,
+  hideTitle = false,
+}: DashboardLayoutProps) {
+  const branding = React.useContext(BrandingContext);
+  const navigation = React.useContext(NavigationContext);
+
+  return (
     <Box sx={{ display: 'flex' }}>
       <AppBar
         color="inherit"
@@ -88,7 +173,9 @@ export function DashboardLayout({ children, hideTitle = false }: DashboardLayout
         <Toolbar>
           <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
             <Stack direction="row" alignItems="center">
-              <LogoBox>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoBox>
+              <Box sx={{ mr: 1 }}>
+                <LogoBox>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoBox>
+              </Box>
               {!hideTitle ? (
                 <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
                   {branding?.name ?? 'Toolpad'}
@@ -114,96 +201,20 @@ export function DashboardLayout({ children, hideTitle = false }: DashboardLayout
       <Drawer
         variant="permanent"
         sx={{
-          width: DRAWER_WIDTH,
+          width: sidebarWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: DRAWER_WIDTH, boxSizing: 'border-box' },
+          [`& .MuiDrawer-paper`]: {
+            width: sidebarWidth,
+            boxSizing: 'border-box',
+          },
         }}
       >
         <Toolbar />
-        <Box component="nav" sx={{ overflow: 'auto' }}>
-          {navigation.map((navigationSection, navigationSectionIndex) => (
-            <React.Fragment key={navigationSection.title}>
-              {navigationSectionIndex > 0 ? <Divider /> : null}
-              <List
-                aria-labelledby={navigationSection.title}
-                subheader={
-                  <ListSubheader component="div" id={navigationSection.title}>
-                    {navigationSection.title}
-                  </ListSubheader>
-                }
-              >
-                {navigationSection.items.map((navigationItem) => {
-                  const itemId = `${navigationSection.title}:${navigationItem.label}`;
-                  const isNestedNavigationExpanded = expandedSidebarItemIds.includes(itemId);
-
-                  const nestedNavigationCollapseIcon = isNestedNavigationExpanded ? (
-                    <ExpandLessIcon />
-                  ) : (
-                    <ExpandMoreIcon />
-                  );
-
-                  const listItem = (
-                    <ListItem sx={{ py: 0 }}>
-                      <ListItemButton
-                        selected={
-                          IS_CLIENT &&
-                          hasMounted &&
-                          window.location.pathname === navigationItem.path
-                        }
-                        onClick={handleSidebarItemClick(itemId)}
-                      >
-                        <ListItemIcon>{navigationItem.icon}</ListItemIcon>
-                        <ListItemText primary={navigationItem.label} />
-                        {navigationItem.items ? nestedNavigationCollapseIcon : null}
-                      </ListItemButton>
-                    </ListItem>
-                  );
-
-                  return (
-                    <React.Fragment key={navigationItem.label}>
-                      {navigationItem.path ? (
-                        <a
-                          href={navigationItem.path}
-                          style={{ color: 'inherit', textDecoration: 'none' }}
-                        >
-                          {listItem}
-                        </a>
-                      ) : (
-                        listItem
-                      )}
-                      {hasMounted && navigationItem.items ? (
-                        <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
-                          <List sx={{ pl: 4, pr: 2 }}>
-                            {navigationItem.items.map((nestedNavigationItem) => (
-                              <a
-                                key={nestedNavigationItem.label}
-                                href={nestedNavigationItem.path}
-                                style={{ color: 'inherit', textDecoration: 'none' }}
-                              >
-                                <ListItemButton
-                                  selected={
-                                    IS_CLIENT &&
-                                    hasMounted &&
-                                    window.location.pathname === nestedNavigationItem.path
-                                  }
-                                >
-                                  <ListItemIcon>{nestedNavigationItem.icon}</ListItemIcon>
-                                  <ListItemText primary={nestedNavigationItem.label} />
-                                </ListItemButton>
-                              </a>
-                            ))}
-                          </List>
-                        </Collapse>
-                      ) : null}
-                    </React.Fragment>
-                  );
-                })}
-              </List>
-            </React.Fragment>
-          ))}
+        <Box component="nav" sx={{ overflow: 'auto', mt: navigation[0].kind === 'header' ? 1 : 2 }}>
+          <DashboardSidebarSubNavigation subNavigation={navigation} />
         </Box>
       </Drawer>
-      <Box component={'main'} sx={{ flexGrow: 1 }}>
+      <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />
         <Container maxWidth="lg">{children}</Container>
       </Box>

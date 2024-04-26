@@ -1,9 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
-import { CacheProvider } from '@emotion/react';
-import createCache from '@emotion/cache';
-import { createTheme, useTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -65,10 +61,18 @@ const theme = createTheme(baseTheme, {
         },
       },
     },
+    MuiListItem: {
+      styleOverrides: {
+        root: {
+          paddingTop: 0,
+          paddingBottom: 0,
+        },
+      },
+    },
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          borderRadius: '8px',
+          borderRadius: 8,
           '&.Mui-selected': {
             '& .MuiListItemIcon-root': {
               color: baseTheme.palette.primary.dark,
@@ -101,7 +105,7 @@ const theme = createTheme(baseTheme, {
     MuiListItemIcon: {
       styleOverrides: {
         root: {
-          minWidth: '34px',
+          minWidth: 34,
         },
       },
     },
@@ -109,7 +113,7 @@ const theme = createTheme(baseTheme, {
       styleOverrides: {
         root: {
           borderBottomWidth: 2,
-          margin: '8px 16px 0',
+          margin: '8px 16px',
         },
       },
     },
@@ -118,106 +122,59 @@ const theme = createTheme(baseTheme, {
 
 const NAVIGATION = [
   {
+    kind: 'header',
     title: 'Main items',
-    items: [
+  },
+  {
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
+  {
+    kind: 'divider',
+  },
+  {
+    kind: 'header',
+    title: 'Analytics',
+  },
+  {
+    title: 'Reports',
+    icon: <BarChartIcon />,
+    children: [
       {
-        label: 'Dashboard',
-        icon: <DashboardIcon />,
+        title: 'Sales',
+        icon: <DescriptionIcon />,
       },
       {
-        label: 'Orders',
-        icon: <ShoppingCartIcon />,
+        title: 'Traffic',
+        icon: <DescriptionIcon />,
       },
     ],
   },
   {
-    title: 'Analytics',
-    items: [
-      {
-        label: 'Reports',
-        icon: <BarChartIcon />,
-        items: [
-          {
-            label: 'Sales',
-            icon: <DescriptionIcon />,
-          },
-          {
-            label: 'Traffic',
-            icon: <DescriptionIcon />,
-          },
-        ],
-      },
-      {
-        label: 'Integrations',
-        icon: <LayersIcon />,
-      },
-    ],
+    title: 'Integrations',
+    icon: <LayersIcon />,
   },
 ];
 
-function DocsToolpadAppFrame({ children }) {
-  const docsTheme = useTheme();
-
-  const frameRef = React.useRef(null);
-  const [hasFrameContent, setHasFrameContent] = React.useState(false);
-
-  React.useEffect(() => {
-    if (frameRef.current) {
-      setHasFrameContent(true);
-    }
-  }, []);
-
-  const emotionCache = createCache({
-    key: 'dashboard-layout',
-    container: frameRef.current?.contentWindow.document.head,
-  });
-
-  return (
-    <iframe
-      ref={frameRef}
-      title="dashboard-layout"
-      height="600"
-      width="100%"
-      style={{
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: docsTheme.palette.grey['200'],
-        borderTopLeftRadius: '12px',
-        borderTopRightRadius: '12px',
-        marginBottom: '-9px',
-      }}
-    >
-      {hasFrameContent
-        ? ReactDOM.createPortal(
-            <CacheProvider value={emotionCache}>{children}</CacheProvider>,
-            frameRef.current.contentWindow.document.body,
-          )
-        : null}
-    </iframe>
-  );
-}
-
-DocsToolpadAppFrame.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
 export default function BasicDashboardLayout() {
   return (
-    <DocsToolpadAppFrame>
-      <AppProvider theme={theme} navigation={NAVIGATION}>
-        <DashboardLayout>
-          <Box
-            sx={{
-              py: 4,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
-            <Typography>Dashboard content goes here.</Typography>
-          </Box>
-        </DashboardLayout>
-      </AppProvider>
-    </DocsToolpadAppFrame>
+    <AppProvider theme={theme} navigation={NAVIGATION}>
+      <DashboardLayout>
+        <Box
+          sx={{
+            py: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Typography>Dashboard content goes here.</Typography>
+        </Box>
+      </DashboardLayout>
+    </AppProvider>
   );
 }

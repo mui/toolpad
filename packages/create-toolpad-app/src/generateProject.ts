@@ -16,14 +16,13 @@ export default function generateProject(
 
   const NAVIGATION: Navigation = [
     {
-      title: "Main items",
-      items: [
-        {
-          label: "Page",
-          path: "/page",
-          icon: <DashboardIcon />,
-        },
-      ],
+      kind: 'header',
+      title: 'Main items',
+    },
+    {
+      path: '/page',
+      title: 'Page',
+      icon: <DashboardIcon />,
     },
   ];
   
@@ -121,8 +120,8 @@ export default function generateProject(
         styleOverrides: {
           root: {
             borderWidth: 0,
-            borderBottomWidth: 1,            
-            borderStyle: "solid",
+            borderBottomWidth: 1,
+            borderStyle: 'solid',
             borderColor: baseTheme.palette.divider,
             boxShadow: 'none',
           },
@@ -154,10 +153,18 @@ export default function generateProject(
           },
         },
       },
+      MuiListItem: {
+        styleOverrides: {
+          root: {
+            paddingTop: 0,
+            paddingBottom: 0,
+          },
+        },
+      },
       MuiListItemButton: {
         styleOverrides: {
           root: {
-            borderRadius: '8px',
+            borderRadius: 8,
             '&.Mui-selected': {
               '& .MuiListItemIcon-root': {
                 color: baseTheme.palette.primary.dark,
@@ -190,7 +197,7 @@ export default function generateProject(
       MuiListItemIcon: {
         styleOverrides: {
           root: {
-            minWidth: '34px',
+            minWidth: 34,
           },
         },
       },
@@ -198,7 +205,7 @@ export default function generateProject(
         styleOverrides: {
           root: {
             borderBottomWidth: 2,
-            margin: '8px 16px 0',
+            margin: '8px 16px',
           },
         },
       },

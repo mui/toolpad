@@ -7,19 +7,18 @@ import theme from './theme';
 
 const NAVIGATION: Navigation = [
   {
+    kind: 'header',
     title: 'Main items',
-    items: [
-      {
-        label: 'Dashboard',
-        path: '/dashboard',
-        icon: <DashboardIcon />,
-      },
-      {
-        label: 'Orders',
-        path: '/dashboard/orders',
-        icon: <ShoppingCartIcon />,
-      },
-    ],
+  },
+  {
+    path: '/dashboard',
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    path: '/dashboard/orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
   },
 ];
 

@@ -11,7 +11,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import { DashboardLayout } from './DashboardLayout';
-import { BrandingContext, NavigationContext } from '../AppProvider';
+import { BrandingContext, Navigation, NavigationContext } from '../AppProvider';
 
 afterEach(cleanup);
 
@@ -41,47 +41,43 @@ describe('DashboardLayout', () => {
   });
 
   test('navigation works correctly', async () => {
-    const NAVIGATION = [
+    const NAVIGATION: Navigation = [
       {
+        kind: 'header',
         title: 'Main items',
-        items: [
+      },
+      {
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        title: 'Orders',
+        icon: <ShoppingCartIcon />,
+      },
+      {
+        kind: 'divider',
+      },
+      {
+        kind: 'header',
+        title: 'Analytics',
+      },
+      {
+        title: 'Reports',
+        icon: <BarChartIcon />,
+        children: [
           {
-            label: 'Dashboard',
-            path: '/dashboard',
-            icon: <DashboardIcon />,
+            title: 'Sales',
+            icon: <DescriptionIcon />,
           },
           {
-            label: 'Orders',
-            path: '/orders',
-            icon: <ShoppingCartIcon />,
+            title: 'Traffic',
+            icon: <DescriptionIcon />,
           },
         ],
       },
       {
-        title: 'Analytics',
-        items: [
-          {
-            label: 'Reports',
-            icon: <BarChartIcon />,
-            items: [
-              {
-                label: 'Sales',
-                path: '/reports/sales',
-                icon: <DescriptionIcon />,
-              },
-              {
-                label: 'Traffic',
-                path: '/reports/traffic',
-                icon: <DescriptionIcon />,
-              },
-            ],
-          },
-          {
-            label: 'Integrations',
-            path: '/integrations',
-            icon: <LayersIcon />,
-          },
-        ],
+        title: 'Integrations',
+        icon: <LayersIcon />,
       },
     ];
 

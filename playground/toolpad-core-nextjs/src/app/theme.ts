@@ -53,10 +53,18 @@ const theme = createTheme(baseTheme, {
         },
       },
     },
+    MuiListItem: {
+      styleOverrides: {
+        root: {
+          paddingTop: 0,
+          paddingBottom: 0,
+        },
+      },
+    },
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          borderRadius: '8px',
+          borderRadius: 8,
           '&.Mui-selected': {
             '& .MuiListItemIcon-root': {
               color: baseTheme.palette.primary.dark,
@@ -89,7 +97,7 @@ const theme = createTheme(baseTheme, {
     MuiListItemIcon: {
       styleOverrides: {
         root: {
-          minWidth: '34px',
+          minWidth: 34,
         },
       },
     },
@@ -97,7 +105,7 @@ const theme = createTheme(baseTheme, {
       styleOverrides: {
         root: {
           borderBottomWidth: 2,
-          margin: '8px 16px 0',
+          margin: '8px 16px',
         },
       },
     },

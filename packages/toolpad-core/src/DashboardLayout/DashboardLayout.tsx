@@ -24,7 +24,7 @@ const IS_CLIENT = typeof window !== 'undefined';
 
 const DEFAULT_DRAWER_WIDTH = 320;
 
-const LogoBox = styled('div')({
+const LogoContainer = styled('div')({
   position: 'relative',
   height: 40,
   img: {
@@ -174,7 +174,7 @@ export function DashboardLayout({
           <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
             <Stack direction="row" alignItems="center">
               <Box sx={{ mr: 1 }}>
-                <LogoBox>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoBox>
+                <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
               </Box>
               {!hideTitle ? (
                 <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>

@@ -4,6 +4,31 @@ const lodash = require('lodash');
 
 const ALLOWED_LODASH_METHODS = new Set(['throttle', 'debounce', 'set']);
 
+const noRestrictedImports = {
+  paths: [
+    {
+      name: '@mui/icons-material',
+      message: 'Use @mui/icons-material/<Icon> instead.',
+    },
+    {
+      name: 'lodash-es',
+      importNames: Object.keys(lodash).filter((key) => !ALLOWED_LODASH_METHODS.has(key)),
+      message:
+        'Avoid kitchensink libraries like lodash-es. We prefer a slightly more verbose, but more universally understood javascript style',
+    },
+    {
+      name: 'react-query',
+      message: 'deprecated package, use @tanstack/react-query instead.',
+    },
+  ],
+  patterns: [
+    {
+      group: ['lodash-es/*'],
+      message: 'Use `import { debounce } from "lodash-es";` instead.',
+    },
+  ],
+};
+
 module.exports = {
   ...baseline,
   settings: {
@@ -25,37 +50,11 @@ module.exports = {
    */
   rules: {
     ...baseline.rules,
-    'import/prefer-default-export': ['off'],
+    // TODO move to @mui/monorepo, codebase is moving away from default exports
+    'import/prefer-default-export': 'off',
     // TODO move rule into the main repo once it has upgraded
-    '@typescript-eslint/return-await': ['off'],
-
-    'no-restricted-imports': [
-      'error',
-      {
-        paths: [
-          {
-            name: '@mui/icons-material',
-            message: 'Use @mui/icons-material/<Icon> instead.',
-          },
-          {
-            name: 'lodash-es',
-            importNames: Object.keys(lodash).filter((key) => !ALLOWED_LODASH_METHODS.has(key)),
-            message:
-              'Avoid kitchensink libraries like lodash-es. We prefer a slightly more verbose, but more universally understood javascript style',
-          },
-          {
-            name: 'react-query',
-            message: 'deprecated package, use @tanstack/react-query instead.',
-          },
-        ],
-        patterns: [
-          {
-            group: ['lodash-es/*'],
-            message: 'Use `import { debounce } from "lodash-es";` instead.',
-          },
-        ],
-      },
-    ],
+    '@typescript-eslint/return-await': 'off',
+    'no-restricted-imports': ['error', noRestrictedImports],
     'no-restricted-syntax': [
       ...baseline.rules['no-restricted-syntax'].filter((rule) => {
         // Too opinionated for Toolpad
@@ -94,14 +93,26 @@ module.exports = {
         ],
       },
     ],
+    'material-ui/no-hardcoded-labels': 'off', // We are not really translating the docs/website anymore
   },
   overrides: [
+    ...baseline.overrides,
+    {
+      files: ['docs/src/modules/components/**/*.js'],
+      rules: {
+        'material-ui/no-hardcoded-labels': 'off',
+      },
+    },
     {
       files: ['examples/**/*'],
+      /**
+       * Examples are for demostration purposes and should not be considered as part of the library.
+       * They don't contain an eslint setup, so we don't want them to contain eslint directives
+       * We do however want to keep the rules in place to ensure the examples are following
+       * a reasonably similar code style as the library.
+       */
       rules: {
-        // We use it for demonstration purposes
         'no-console': 'off',
-        // Personal preference
         'no-underscore-dangle': 'off',
         // no node_modules in examples as they are not installed
         'import/no-unresolved': 'off',
@@ -158,13 +169,11 @@ module.exports = {
         'react/function-component-definition': 'off',
       },
     },
+    // TODO remove, fix this rule in the codebase
     {
-      // Disabling this rule for now:
-      // https://github.com/mui/material-ui/blob/9737bc85bb6960adb742e7709e9c3710c4b6cedd/.eslintrc.js#L359
-      files: ['packages/*/src/**/*{.ts,.tsx,.js}'],
-      excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx'],
+      files: ['**'],
       rules: {
-        'import/no-cycle': ['error', { ignoreExternal: true }],
+        'no-restricted-imports': ['error', noRestrictedImports],
       },
     },
   ],

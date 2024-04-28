@@ -163,8 +163,8 @@ importers:
         specifier: 6.0.2
         version: 6.0.2(react@18.2.0)
       recharts:
-        specifier: 2.12.5
-        version: 2.12.5(react-dom@18.2.0)(react@18.2.0)
+        specifier: 2.12.6
+        version: 2.12.6(react-dom@18.2.0)(react@18.2.0)
       regenerator-runtime:
         specifier: 0.14.1
         version: 0.14.1
@@ -758,8 +758,8 @@ importers:
         specifier: 6.22.3
         version: 6.22.3(react-dom@18.2.0)(react@18.2.0)
       recharts:
-        specifier: 2.12.5
-        version: 2.12.5(react-dom@18.2.0)(react@18.2.0)
+        specifier: 2.12.6
+        version: 2.12.6(react-dom@18.2.0)(react@18.2.0)
       semver:
         specifier: 7.6.0
         version: 7.6.0
@@ -12732,8 +12732,8 @@ packages:
     dependencies:
       decimal.js-light: 2.5.1
 
-  /recharts@2.12.5(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Cy+BkqrFIYTHJCyKHJEPvbHE2kVQEP6PKbOHJ8ztRGTAhvHuUnCwDaKVb13OwRFZ0QNUk1QvGTDdgWSMbuMtKw==}
+  /recharts@2.12.6(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-D+7j9WI+D0NHauah3fKHuNNcRK8bOypPW7os1DERinogGBGaHI7i6tQKJ0aUF3JXyBZ63dyfKIW2WTOPJDxJ8w==}
     engines: {node: '>=14'}
     peerDependencies:
       react: ^16.0.0 || ^17.0.0 || ^18.0.0

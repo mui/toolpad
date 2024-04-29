@@ -41,7 +41,7 @@
     "@argos-ci/core": "1.5.5",
     "@mui/monorepo": "github:mui/material-ui#2d02b940af272f6a344c7ed954fdf791a7269424",
     "@mui/x-charts": "7.3.1",
-    "@next/eslint-plugin-next": "14.2.1",
+    "@next/eslint-plugin-next": "14.2.3",
     "@playwright/test": "1.43.1",
     "@testing-library/react": "14.3.1",
     "@types/archiver": "6.0.2",

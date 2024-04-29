@@ -26,7 +26,7 @@ Make sure to [install Node.js](https://nodejs.org/en) on your system.
 1. Create a new application
 
    ```bash
-   npx create-toolpad-app dog-app
+   npx create-toolpad-app@latest dog-app
    ```
 
 1. Start the development server

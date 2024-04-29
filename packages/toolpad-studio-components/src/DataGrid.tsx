@@ -483,17 +483,15 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map(({ type: colType, ...column }) => {
     const isIdColumn = column.field === 'id';
 
+    let baseColumn: Omit<GridColDef, 'field'> = { editable: true };
+
     if (isIdColumn) {
-      return {
-        ...column,
-        type: getNarrowedColType(colType),
+      baseColumn = {
+        ...baseColumn,
         editable: false,
-        hide: true,
         renderCell: ({ row, value }) => (row[DRAFT_ROW_MARKER] ? '' : value),
       };
     }
-
-    let baseColumn: Omit<GridColDef, 'field'> = { editable: true };
 
     if (colType) {
       baseColumn = { ...baseColumn, ...CUSTOM_COLUMN_TYPES[colType], ...column };

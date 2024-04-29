@@ -43,6 +43,11 @@
       "matchPackagePatterns": ["^eslint-", "^@eslint/", "^@eslint-"]
     },
     {
+      "groupName": "stylis",
+      "matchPackageNames": ["stylis"],
+      "matchPackagePatterns": ["^stylis-"]
+    },
+    {
       "groupName": "Next.js",
       "matchPackageNames": ["next"],
       "matchPackagePatterns": ["^@next/"]

@@ -114,7 +114,7 @@
     "react-is": "18.2.0",
     "react-resizable-panels": "2.0.18",
     "react-router-dom": "6.22.3",
-    "recharts": "2.12.5",
+    "recharts": "2.12.6",
     "semver": "7.6.0",
     "serialize-javascript": "6.0.2",
     "superjson": "2.0.0",

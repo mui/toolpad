@@ -61,8 +61,8 @@ importers:
         specifier: 1.5.5
         version: 1.5.5
       '@mui/monorepo':
-        specifier: github:mui/material-ui#2d02b940af272f6a344c7ed954fdf791a7269424
-        version: github.com/mui/material-ui/2d02b940af272f6a344c7ed954fdf791a7269424
+        specifier: github:mui/material-ui#beef28264938138411e13e074dc4c60d498afbf8
+        version: github.com/mui/material-ui/beef28264938138411e13e074dc4c60d498afbf8
       '@mui/x-charts':
         specifier: 7.3.1
         version: 7.3.1(@mui/material@5.15.15)(react-dom@18.2.0)(react@18.2.0)
@@ -15087,10 +15087,10 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  github.com/mui/material-ui/2d02b940af272f6a344c7ed954fdf791a7269424:
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/2d02b940af272f6a344c7ed954fdf791a7269424}
+  github.com/mui/material-ui/beef28264938138411e13e074dc4c60d498afbf8:
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/beef28264938138411e13e074dc4c60d498afbf8}
     name: '@mui/monorepo'
-    version: 6.0.0-alpha.3
+    version: 6.0.0-alpha.4
     requiresBuild: true
     dependencies:
       '@googleapis/sheets': 5.0.5

@@ -26,10 +26,16 @@ const COLUMNS = [
   { field: 'Location', type: 'string' },
 ];
 
-export default function BasicDataGrid() {
+export default function DataGridHideToolbar() {
   return (
     <AppHostProvider>
-      <DataGrid rows={ROWS} columns={COLUMNS} height={300} density="compact" />
+      <DataGrid
+        rows={ROWS}
+        columns={COLUMNS}
+        height={300}
+        density="compact"
+        hideToolbar
+      />
     </AppHostProvider>
   );
 }

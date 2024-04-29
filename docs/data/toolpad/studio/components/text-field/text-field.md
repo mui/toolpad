@@ -6,7 +6,7 @@
 
 TextField is a text input component. It takes user input and provides the value for further usage on the page.
 
-{{"demo": "TextField.js", "hideToolbar": true}}
+{{"demo": "TextFieldBasic.js", "hideToolbar": true}}
 
 ## Usage
 

@@ -11,7 +11,6 @@ interface IToolpadProject {
   options: ToolpadProjectOptions;
   events: Emitter<ProjectEvents>;
   getRoot(): string;
-  invalidateQueries(): void;
 }
 
 /**
@@ -88,7 +87,6 @@ export default class EnvManager {
       this.loadEnvFile();
 
       this.project.events.emit('envChanged', {});
-      this.project.invalidateQueries();
     };
 
     this.watcher.on('add', handleChange);

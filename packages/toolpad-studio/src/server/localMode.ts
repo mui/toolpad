@@ -167,24 +167,6 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
             );
           }
         }
-
-        const extensions = ['.tsx', '.jsx'];
-
-        for (const extension of extensions) {
-          if (pageDirEntries.has(`page${extension}`)) {
-            return [
-              pageName,
-              {
-                apiVersion: API_VERSION,
-                kind: 'page',
-                spec: {
-                  id: pageName,
-                  unstable_codeFile: true,
-                },
-              } satisfies Page,
-            ];
-          }
-        }
       }
 
       return null;
@@ -476,7 +458,6 @@ function expandFromDom<N extends appDom.AppDomNode>(
         content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
         display: node.attributes.display,
-        unstable_codeFile: node.attributes.codeFile,
         authorization: node.attributes.authorization,
       },
     } satisfies Page;
@@ -657,7 +638,6 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
       title: pageFileSpec.title,
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
-      codeFile: pageFileSpec.unstable_codeFile || undefined,
       authorization: pageFileSpec.authorization || undefined,
     },
   });

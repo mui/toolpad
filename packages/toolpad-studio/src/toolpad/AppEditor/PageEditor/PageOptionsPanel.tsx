@@ -150,13 +150,11 @@ export default function PageOptionsPanel() {
           </React.Fragment>
         ) : null}
       </div>
-      {appDom.isCodePage(page) ? null : (
-        <div>
-          <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
-          <Typography variant="overline">Page State</Typography>
-          <UrlQueryEditor pageNodeId={pageNodeId} />
-        </div>
-      )}
+      <div>
+        <Divider variant="middle" sx={{ alignSelf: 'stretch' }} />
+        <Typography variant="overline">Page State</Typography>
+        <UrlQueryEditor pageNodeId={pageNodeId} />
+      </div>
     </Stack>
   );
 }

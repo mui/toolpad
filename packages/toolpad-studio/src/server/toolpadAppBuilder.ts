@@ -7,7 +7,6 @@ import { indent } from '@toolpad/utils/strings';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
-import { pathToNodeImportSpecifier } from '../utils/paths';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -75,55 +74,6 @@ function toolpadStudioVitePlugin(): Plugin {
       }
       return null;
     },
-
-    transform(code, id) {
-      if (/\/resources\//.test(id)) {
-        const codeFile = path.basename(id);
-
-        const functionExports = [];
-
-        const lines = code.split('\n');
-        for (let i = 0; i < lines.length; i += 1) {
-          const line = lines[i];
-          const lineNr = i + 1;
-          if (/\s*export\b/.test(line)) {
-            const match = line.match(/\s*export\s+async\s+function\s+([a-zA-Z0-9]+)\b/);
-
-            if (match) {
-              const functionName = match[1];
-              functionExports.push(functionName);
-            } else {
-              console.warn(
-                `Unsupported export at "${id}:${lineNr}". Only exports of the form "export async function foo(...) {" are supported.`,
-              );
-            }
-          }
-        }
-
-        return `
-          import { createRemoteFunction } from '@toolpad/studio/runtime';
-
-          const functionFile = ${JSON.stringify(codeFile)};
-
-          ${functionExports
-            .map(
-              (functionName) =>
-                `const __${functionName} = createRemoteFunction(functionFile, ${JSON.stringify(
-                  functionName,
-                )})`,
-            )
-            .join('\n')}
-
-          export {
-            ${functionExports
-              .map((functionName) => `__${functionName} as ${functionName}`)
-              .join(',\n')}
-          }
-        `;
-      }
-
-      return code;
-    },
   };
 }
 
@@ -162,12 +112,10 @@ export async function createViteConfig({
     const isEditor = target === 'editor';
 
     const componentsId = 'virtual:toolpad-files:components.tsx';
-    const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
 
     return `
 import { init, setComponents } from '@toolpad/studio/entrypoint';
 import components from ${JSON.stringify(componentsId)};
-import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@toolpad/studio/canvas'` : ''}
 ${isEditor ? `import ToolpadEditor from '@toolpad/studio/editor'` : ''}
 
@@ -204,7 +152,7 @@ window.MonacoEnvironment = {
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
-setComponents(components, pageComponents);
+setComponents(components);
 
 init({
   ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
@@ -216,13 +164,12 @@ init({
 if (import.meta.hot) {
   // TODO: investigate why this doesn't work, see https://github.com/vitejs/vite/issues/12912
   import.meta.hot.accept(
-    [${JSON.stringify(componentsId)}, ${JSON.stringify(pageComponentsId)}],
-    (newComponents, newPageComponents) => {
+    [${JSON.stringify(componentsId)}],
+    (newComponents) => {
     if (newComponents) {
       console.log('hot updating Toolpad Studio components')
       setComponents(
         newComponents ?? components,
-        newPageComponents ?? pageComponents
       );
     }
   });
@@ -255,47 +202,10 @@ if (import.meta.hot) {
     };
   };
 
-  const createPageComponentsFile = async () => {
-    const dom = await loadDom();
-    const appNode = appDom.getApp(dom);
-    const { pages = [] } = appDom.getChildNodes(dom, appNode);
-
-    const imports = new Map<string, string>();
-
-    for (const page of pages) {
-      const codeFile = page.attributes.codeFile;
-      if (codeFile) {
-        const importPath = path.resolve(root, `./pages/${page.name}/page`);
-        const relativeImportPath = path.relative(root, importPath);
-        const importSpec = `toolpad-user-project:${pathToNodeImportSpecifier(relativeImportPath)}`;
-        imports.set(page.name, importSpec);
-      }
-    }
-
-    const importLines = Array.from(
-      imports.entries(),
-      ([name, spec]) => `${name}: React.lazy(() => import(${JSON.stringify(spec)}))`,
-    );
-
-    const code = `
-      import * as React from 'react';
-      
-      export default {
-        ${importLines.join(',\n')}
-      }
-    `;
-
-    return {
-      code,
-      map: null,
-    };
-  };
-
   const virtualFiles = new Map<string, VirtualFileContent>([
     ['main.tsx', getEntryPoint('prod')],
     ['editor.tsx', getEntryPoint('editor')],
     ['components.tsx', await createComponentsFile()],
-    ['page-components.tsx', await createPageComponentsFile()],
     ['pages-manifest.json', JSON.stringify(await getPagesManifest(), null, 2)],
   ]);
 

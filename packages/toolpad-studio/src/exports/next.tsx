@@ -1,15 +1,16 @@
 'use server';
 
 import * as React from 'react';
-import { Emitter } from '@mui/toolpad-utils/events';
-import * as appDom from '@mui/toolpad-core/appDom';
+import { Emitter } from '@toolpad/utils/events';
+import * as appDom from '@toolpad/studio-runtime/appDom';
+import { IncomingMessage, ServerResponse } from 'http';
 import ToolpadAppClient from './next-client';
 import { getOutputFolder, loadDom, resolveProjectDir } from '../server/localMode';
 import createRuntimeState from '../runtime/createRuntimeState';
 import EnvManager from '../server/EnvManager';
 import FunctionsManager from '../server/FunctionsManager';
 import DataManager from '../server/DataManager';
-import type { ServerDefinition } from '../server/runtimeRpcServer';
+import { RuntimeConfig } from '../types';
 
 export interface ToolpadAppServerProps {
   base: string;
@@ -63,13 +64,31 @@ class ToolpadProject {
     }
     return this.dom;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this, @typescript-eslint/no-empty-function
+  async saveDom(dom: appDom.AppDom) {}
+
+  // eslint-disable-next-line class-methods-use-this
+  async getRuntimeConfig(): Promise<RuntimeConfig> {
+    return { externalUrl: '' };
+  }
+}
+
+interface RequestHandler {
+  (req: IncomingMessage, res: ServerResponse): Promise<void>;
+}
+
+function createHandler<T>(fn: (project: ToolpadProject) => T): RequestHandler {
+  return async (req, res) => {
+    const project = new ToolpadProject(props.dir, false);
+    return fn(project);
+  };
 }
 
 export async function ToolpadApp({ base, dir = './toolpad' }: ToolpadAppServerProps) {
   const project = new ToolpadProject(dir, false);
   const dom = await project.loadDom();
   const initialState = createRuntimeState({ dom });
-  const api: ServerDefinition = {};
 
   return <ToolpadAppClient basename={base} state={initialState} />;
 }

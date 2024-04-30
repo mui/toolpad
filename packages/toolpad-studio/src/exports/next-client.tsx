@@ -1,18 +1,13 @@
 'use client';
 
 import * as React from 'react';
+import { AppHostProvider } from '@toolpad/studio-runtime';
 import ToolpadApp, { ToolpadAppProps } from '../runtime/ToolpadApp';
-import { AppHostContext, AppHost } from '../runtime/AppHostContext';
-
-const appContext: AppHost = {
-  isPreview: false,
-  isCustomServer: true,
-};
 
 export default function ToolpadAppClient(props: ToolpadAppProps) {
   return (
-    <AppHostContext.Provider value={appContext}>
+    <AppHostProvider isPreview>
       <ToolpadApp {...props} />
-    </AppHostContext.Provider>
+    </AppHostProvider>
   );
 }

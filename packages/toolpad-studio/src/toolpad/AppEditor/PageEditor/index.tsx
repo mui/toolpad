@@ -46,7 +46,7 @@ function PageEditorContent({ node }: PageEditorContentProps) {
           <PanelGroup autoSaveId="editor/component-panel-split" direction="horizontal">
             <Panel id="page-editor" defaultSize={75} minSize={50} maxSize={80}>
               <PageEditorRoot>
-                {appDom.isCodePage(node) ? null : <ComponentCatalog />}
+                <ComponentCatalog />
                 <RenderPanel className={classes.renderPanel} />
               </PageEditorRoot>
             </Panel>

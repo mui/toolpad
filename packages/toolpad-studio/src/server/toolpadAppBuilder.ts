@@ -7,7 +7,6 @@ import { indent } from '@toolpad/utils/strings';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
-import { pathToNodeImportSpecifier } from '../utils/paths';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -74,55 +73,6 @@ function toolpadStudioVitePlugin(): Plugin {
         return getEditorHtmlContent();
       }
       return null;
-    },
-
-    transform(code, id) {
-      if (/\/resources\//.test(id)) {
-        const codeFile = path.basename(id);
-
-        const functionExports = [];
-
-        const lines = code.split('\n');
-        for (let i = 0; i < lines.length; i += 1) {
-          const line = lines[i];
-          const lineNr = i + 1;
-          if (/\s*export\b/.test(line)) {
-            const match = line.match(/\s*export\s+async\s+function\s+([a-zA-Z0-9]+)\b/);
-
-            if (match) {
-              const functionName = match[1];
-              functionExports.push(functionName);
-            } else {
-              console.warn(
-                `Unsupported export at "${id}:${lineNr}". Only exports of the form "export async function foo(...) {" are supported.`,
-              );
-            }
-          }
-        }
-
-        return `
-          import { createRemoteFunction } from '@toolpad/studio/runtime';
-
-          const functionFile = ${JSON.stringify(codeFile)};
-
-          ${functionExports
-            .map(
-              (functionName) =>
-                `const __${functionName} = createRemoteFunction(functionFile, ${JSON.stringify(
-                  functionName,
-                )})`,
-            )
-            .join('\n')}
-
-          export {
-            ${functionExports
-              .map((functionName) => `__${functionName} as ${functionName}`)
-              .join(',\n')}
-          }
-        `;
-      }
-
-      return code;
     },
   };
 }
@@ -256,21 +206,7 @@ if (import.meta.hot) {
   };
 
   const createPageComponentsFile = async () => {
-    const dom = await loadDom();
-    const appNode = appDom.getApp(dom);
-    const { pages = [] } = appDom.getChildNodes(dom, appNode);
-
     const imports = new Map<string, string>();
-
-    for (const page of pages) {
-      const codeFile = page.attributes.codeFile;
-      if (codeFile) {
-        const importPath = path.resolve(root, `./pages/${page.name}/page`);
-        const relativeImportPath = path.relative(root, importPath);
-        const importSpec = `toolpad-user-project:${pathToNodeImportSpecifier(relativeImportPath)}`;
-        imports.set(page.name, importSpec);
-      }
-    }
 
     const importLines = Array.from(
       imports.entries(),

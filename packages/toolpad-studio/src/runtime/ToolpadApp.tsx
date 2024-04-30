@@ -1451,13 +1451,7 @@ export interface RenderedPageProps {
 export function RenderedPage({ page }: RenderedPageProps) {
   const appHost = useAppHost();
 
-  let pageContent = page.attributes.codeFile ? (
-    <RenderedProCodePage page={page} />
-  ) : (
-    // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
-    // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-    <RenderedLowCodePage page={page} key={page.name} />
-  );
+  let pageContent = <RenderedLowCodePage page={page} key={page.name} />;
 
   if (!appHost.isCanvas) {
     pageContent = (

@@ -7,12 +7,7 @@ import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';
 import { ToolpadPlan } from '@toolpad/studio-runtime/appDom';
 import { RuntimeState } from './runtime/types';
-import {
-  ToolpadApp as RuntimeToolpadApp,
-  ToolpadAppProps,
-  componentsStore,
-  pageComponentsStore,
-} from './runtime';
+import { ToolpadApp as RuntimeToolpadApp, ToolpadAppProps, componentsStore } from './runtime';
 
 const IS_PREVIEW = process.env.NODE_ENV !== 'production';
 
@@ -29,12 +24,8 @@ cache.compat = true;
 /**
  * This allows us to hot update the components when a file is added/removed
  */
-export function setComponents(
-  newComponents: ToolpadComponents,
-  pageComponents: Record<string, React.ComponentType>,
-) {
+export function setComponents(newComponents: ToolpadComponents) {
   componentsStore.setState(newComponents);
-  pageComponentsStore.setState(pageComponents);
 }
 
 interface RootProps {

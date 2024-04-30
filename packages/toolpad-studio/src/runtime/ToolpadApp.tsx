@@ -92,11 +92,9 @@ import { RuntimeApiContext, createApi } from './api';
 import { AuthContext, useAuth, AuthSession } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
-import { componentsStore, pageComponentsStore } from './globalState';
+import { componentsStore } from './globalState';
 
 const browserJsRuntime = getBrowserRuntime();
-
-export type PageComponents = Partial<Record<string, React.ComponentType>>;
 
 const Pre = styled('pre')(({ theme }) => ({
   margin: 0,
@@ -1374,17 +1372,6 @@ function FetchNode({ node, page }: FetchNodeProps) {
     default:
       throw new Error(`Unrecognized fetch mode "${mode}"`);
   }
-}
-
-interface RenderedProCodePageProps {
-  page: appDom.PageNode;
-}
-
-function RenderedProCodePage({ page }: RenderedProCodePageProps) {
-  usePageTitle(appDom.getPageTitle(page));
-  const pageComponents = pageComponentsStore.useValue();
-  const PageComponent = pageComponents[page.name] ?? PageNotFound;
-  return <PageComponent />;
 }
 
 interface RenderedLowCodePageProps {

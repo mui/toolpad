@@ -112,12 +112,10 @@ export async function createViteConfig({
     const isEditor = target === 'editor';
 
     const componentsId = 'virtual:toolpad-files:components.tsx';
-    const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
 
     return `
 import { init, setComponents } from '@toolpad/studio/entrypoint';
 import components from ${JSON.stringify(componentsId)};
-import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@toolpad/studio/canvas'` : ''}
 ${isEditor ? `import ToolpadEditor from '@toolpad/studio/editor'` : ''}
 
@@ -154,7 +152,7 @@ window.MonacoEnvironment = {
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
-setComponents(components, pageComponents);
+setComponents(components);
 
 init({
   ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
@@ -166,13 +164,12 @@ init({
 if (import.meta.hot) {
   // TODO: investigate why this doesn't work, see https://github.com/vitejs/vite/issues/12912
   import.meta.hot.accept(
-    [${JSON.stringify(componentsId)}, ${JSON.stringify(pageComponentsId)}],
-    (newComponents, newPageComponents) => {
+    [${JSON.stringify(componentsId)}],
+    (newComponents) => {
     if (newComponents) {
       console.log('hot updating Toolpad Studio components')
       setComponents(
         newComponents ?? components,
-        newPageComponents ?? pageComponents
       );
     }
   });
@@ -205,33 +202,10 @@ if (import.meta.hot) {
     };
   };
 
-  const createPageComponentsFile = async () => {
-    const imports = new Map<string, string>();
-
-    const importLines = Array.from(
-      imports.entries(),
-      ([name, spec]) => `${name}: React.lazy(() => import(${JSON.stringify(spec)}))`,
-    );
-
-    const code = `
-      import * as React from 'react';
-      
-      export default {
-        ${importLines.join(',\n')}
-      }
-    `;
-
-    return {
-      code,
-      map: null,
-    };
-  };
-
   const virtualFiles = new Map<string, VirtualFileContent>([
     ['main.tsx', getEntryPoint('prod')],
     ['editor.tsx', getEntryPoint('editor')],
     ['components.tsx', await createComponentsFile()],
-    ['page-components.tsx', await createPageComponentsFile()],
     ['pages-manifest.json', JSON.stringify(await getPagesManifest(), null, 2)],
   ]);
 

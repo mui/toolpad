@@ -362,12 +362,12 @@ export const pageSchema = toolpadObjectSchema(
       ),
     maxWidth: z
       .union([
-        z.literal('none'),
         z.literal('xs'),
         z.literal('sm'),
         z.literal('md'),
         z.literal('lg'),
         z.literal('xl'),
+        z.literal('none'),
       ])
       .optional()
       .describe('Top level element of the page.'),

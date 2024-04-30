@@ -29,10 +29,10 @@ const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] =
 
 const PAGE_CONTAINER_WIDTH_OPTIONS: { value: appDom.ContainerWidth; label: string }[] = [
   { value: 'xs', label: 'xs' },
-  { value: 'xl', label: 'xl' },
   { value: 'sm', label: 'sm' },
   { value: 'md', label: 'md' },
   { value: 'lg', label: 'lg' },
+  { value: 'xl', label: 'xl' },
   { value: 'none', label: 'None' },
 ];
 
@@ -153,7 +153,7 @@ export default function PageOptionsPanel() {
         >
           <ToggleButtonGroup
             exclusive
-            value={page.attributes.maxWidth ?? 'xl'}
+            value={page.attributes.maxWidth ?? 'lg'}
             onChange={handleContainerModeChange}
             aria-label="Container mode"
             fullWidth

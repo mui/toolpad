@@ -1224,13 +1224,13 @@ interface PageRootProps {
 }
 
 const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRoot(
-  { children, maxWidth }: PageRootProps,
+  { children, maxWidth, ...props }: PageRootProps,
   ref,
 ) {
-  const containerMaxWidth = maxWidth === 'none' ? false : maxWidth ?? 'xl';
+  const containerMaxWidth = maxWidth === 'none' ? false : maxWidth ?? 'lg';
   return (
     <Container ref={ref} maxWidth={containerMaxWidth}>
-      <Stack data-testid="page-root" direction="column" sx={{ my: 2, gap: 1 }}>
+      <Stack data-testid="page-root" direction="column" sx={{ my: 2, gap: 1 }} {...props}>
         {children}
       </Stack>
     </Container>

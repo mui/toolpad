@@ -100,6 +100,8 @@ export type PageDisplayMode = 'standalone' | 'shell';
 
 export type ContainerWidth = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'none';
 
+export const DEFAULT_CONTAINER_WIDTH: ContainerWidth = 'lg';
+
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {

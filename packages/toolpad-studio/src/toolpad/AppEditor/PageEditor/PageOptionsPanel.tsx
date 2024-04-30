@@ -153,7 +153,7 @@ export default function PageOptionsPanel() {
         >
           <ToggleButtonGroup
             exclusive
-            value={page.attributes.maxWidth ?? 'lg'}
+            value={page.attributes.maxWidth ?? appDom.DEFAULT_CONTAINER_WIDTH}
             onChange={handleContainerModeChange}
             aria-label="Container mode"
             fullWidth

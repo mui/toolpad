@@ -26,14 +26,7 @@ invariant(
   'The dev server must be started with NODE_ENV=development',
 );
 
-export interface ToolpadAppDevServerParams {
-  outDir: string;
-  root: string;
-  base: string;
-  customServer: boolean;
-}
-
-function devServerPlugin({}: ToolpadAppDevServerParams): Plugin {
+function devServerPlugin(): Plugin {
   return {
     name: 'toolpad-dev-server',
 
@@ -62,7 +55,11 @@ function devServerPlugin({}: ToolpadAppDevServerParams): Plugin {
   };
 }
 
-export interface AppViteServerConfig extends ToolpadAppDevServerParams {
+export interface AppViteServerConfig {
+  outDir: string;
+  root: string;
+  base: string;
+  customServer: boolean;
   toolpadDevMode: boolean;
   port: number;
   mainThreadRpcPort: MessagePort;
@@ -72,7 +69,7 @@ export async function main({ port, ...config }: AppViteServerConfig) {
   const { reloadComponents, viteConfig } = await createViteConfig({
     ...config,
     dev: true,
-    plugins: [devServerPlugin(config)],
+    plugins: [devServerPlugin()],
     getComponents,
     getPagesManifest,
     loadDom,

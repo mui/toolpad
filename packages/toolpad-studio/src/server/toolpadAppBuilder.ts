@@ -140,6 +140,11 @@ export interface CreateViteConfigParams {
   getPagesManifest: () => Promise<PagesManifest>;
 }
 
+export interface CreateViteConfigResult {
+  reloadComponents: () => Promise<void>;
+  viteConfig: InlineConfig;
+}
+
 export async function createViteConfig({
   toolpadDevMode,
   outDir,
@@ -151,7 +156,7 @@ export async function createViteConfig({
   getComponents,
   loadDom,
   getPagesManifest,
-}: CreateViteConfigParams) {
+}: CreateViteConfigParams): Promise<CreateViteConfigResult> {
   const mode = dev ? 'development' : 'production';
 
   const initialDom = await loadDom();
@@ -398,7 +403,7 @@ if (import.meta.hot) {
         'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),
         'process.env.TOOLPAD_PLAN': JSON.stringify(plan),
       },
-    } satisfies InlineConfig,
+    },
   };
 }
 

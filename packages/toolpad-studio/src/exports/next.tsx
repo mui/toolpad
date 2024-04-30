@@ -78,12 +78,7 @@ interface RequestHandler {
   (req: IncomingMessage, res: ServerResponse): Promise<void>;
 }
 
-function createHandler<T>(fn: (project: ToolpadProject) => T): RequestHandler {
-  return async (req, res) => {
-    const project = new ToolpadProject(props.dir, false);
-    return fn(project);
-  };
-}
+function createHandler<T>(fn: (project: ToolpadProject) => T): RequestHandler {}
 
 export async function ToolpadApp({ base, dir = './toolpad' }: ToolpadAppServerProps) {
   const project = new ToolpadProject(dir, false);

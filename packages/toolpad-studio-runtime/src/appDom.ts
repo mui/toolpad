@@ -1210,10 +1210,6 @@ export function getPageTitle(node: PageNode): string {
   return node.attributes.title || getPageDisplayName(node);
 }
 
-export function isCodePage(node: PageNode): boolean {
-  return !!node.attributes.codeFile;
-}
-
 export function getPlan(dom: AppDom): ToolpadPlan {
   const appNode = getApp(dom);
   return appNode.attributes.plan ?? 'free';

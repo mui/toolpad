@@ -23,5 +23,6 @@ test('do not find content if you delete page of middle ', async ({ page }) => {
 
   await expect(pageMenuItem).toBeHidden();
   await expect(page.getByText('No pages in this app.')).toBeVisible();
-  await expect(page).toHaveURL('/_toolpad/app/pages');
+
+  await expect(page).toHaveURL('/prod/editor/app/pages');
 });

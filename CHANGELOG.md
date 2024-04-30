@@ -1,5 +1,240 @@
 # Changelog
 
+## v0.1.54
+
+<!-- generated comparing v0.1.53..master -->
+
+_Apr 12, 2024_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+Adds groupable and aggregable columns for the Premium data grid, a faster editor for Toolpad Studio, and introduces Toolpad Core under `--core` on the CLI! Plus a new custom components example, multiple documentation updates and bug fixes.
+
+- &#8203;<!-- 31 -->Update renovate.json @Janpot
+- &#8203;<!-- 30 -->Update renovate.json @Janpot
+- &#8203;<!-- 29 -->Add RFC to readme (#3353) @prakhargupta1
+- &#8203;<!-- 28 -->Move TreeView icons into the theme (#3337) @Janpot
+- &#8203;<!-- 27 -->Lock file maintenance (#3351) @renovate[bot]
+- &#8203;<!-- 26 -->Fix screenshot flakeyness (#3341) @Janpot
+- &#8203;<!-- 25 -->Add rename, duplicate and delete for Page Hierarchy (#3336) @asif-choudhari
+- &#8203;<!-- 24 -->Upgrade vite (#3340) @Janpot
+- &#8203;<!-- 23 -->Add custom component example (#3329) @Janpot
+- &#8203;<!-- 22 -->Fix dedupe check (#3330) @Janpot
+- &#8203;<!-- 21 -->Fix crash when components folder contains a tsconfig (#3327) @Janpot
+- &#8203;<!-- 20 -->Allow OPTIONS method in HTTP queries (#3308) @Janpot
+- &#8203;<!-- 19 -->Remove fallback modules (#3326) @Janpot
+- &#8203;<!-- 18 -->Update Node.js in circleci (#3324) @Janpot
+- &#8203;<!-- 17 -->Update renovate.json @Janpot
+- &#8203;<!-- 16 -->Update renovate.json @Janpot
+- &#8203;<!-- 15 -->Fix typo : use npm instead of pnpm in instruction (#3323) @HazzazBinFaiz
+- &#8203;<!-- 14 -->[cli] Introduce `--core` (#3304) @bharatkashyap
+- &#8203;<!-- 13 -->[code-infra] Use @mui/docs from npm (#3301) @michaldudak
+- &#8203;<!-- 12 -->[code-infra] Fix prettier in scripts (#3382) @Janpot
+- &#8203;<!-- 11 -->[core] Move Monaco setup outside of the library (#3206) @Janpot
+- &#8203;<!-- 10 -->[core] Make inline canvas the default (#3370) @Janpot
+- &#8203;<!-- 09 -->[core] Remove deprecated usage of LicenseInfo (#3372) @Janpot
+- &#8203;<!-- 08 -->[core] Continue rename of Toolpad @oliviertassinari
+- &#8203;<!-- 07 -->[DataGrid] Add support for groupable and aggregable columns (#3369) @Janpot
+- &#8203;<!-- 06 -->[docs] Improve the writing on the "why Toolpad" doc (#3377) @Janpot
+- &#8203;<!-- 05 -->[docs] Update delete-grid-row.md (#3354) @prakhargupta1
+- &#8203;<!-- 04 -->[docs] remove redirect to component reference (#3356) @Janpot
+- &#8203;<!-- 03 -->[examples] Premium grid example (#3360) @Janpot
+- &#8203;<!-- 02 -->[queries] Remove locally hosted demo data (#3374) @Janpot
+- &#8203;<!-- 01 -->[ui] Add a chip to indicate pro features (#3358) @bharatkashyap
+
+All contributors of this release in alphabetical order: @asif-choudhari, @bharatkashyap, @HazzazBinFaiz, @Janpot, @michaldudak, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
+## v0.1.53
+
+<!-- generated comparing v0.1.52..master -->
+
+_Mar 22, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Very early first version of @toolpad/core, fix examples, and documentation fixes and updates.
+
+- &#8203;<!-- 16 -->Remove deprecated dependencies (#3313) @Janpot
+- &#8203;<!-- 15 -->Remove lerna isolation (#3312) @Janpot
+- &#8203;<!-- 14 -->Toolpad core project setup (#3291) @apedroferreira
+- &#8203;<!-- 13 -->isolate lerna in renovatebot @Janpot
+- &#8203;<!-- 12 -->Remove renovatebot vitest-fail-on-console exception @Janpot
+- &#8203;<!-- 11 -->Fix flaky authentication test: Wait for network idle in tests again (#3290) @apedroferreira
+- &#8203;<!-- 10 -->Fix flaky auth test with console error "Failed to fetch" (#3287) @apedroferreira
+- &#8203;<!-- 09 -->Update renovate.json @Janpot
+- &#8203;<!-- 08 -->[code-infra] Update renove.json (#3288) @Janpot
+- &#8203;<!-- 07 -->[core] Lower the frequency of no-response action runs (#3302) @michaldudak
+- &#8203;<!-- 06 -->[core] Use Circle CI context @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Fix support link (#3306) @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Link blog post from examples overview page and some minor edits. (#3299) @prakhargupta1
+- &#8203;<!-- 03 -->[docs] Fix Vale error @oliviertassinari
+- &#8203;<!-- 02 -->[docs] Fix some Vale errors (#3293) @oliviertassinari
+- &#8203;<!-- 01 -->[examples] @toolpad/studio@0.1.51 doesn't exist @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @michaldudak, @oliviertassinari, @prakhargupta1
+
+## v0.1.52
+
+<!-- generated comparing v0.1.51..master -->
+
+_Mar 9, 2024_
+
+A big thanks to the 2 contributors who made this release possible. Here are some highlights ✨:
+
+Preparing the repository and documentation for an upcoming change to Toolpad: the low-code features will live in `@toolpad/studio`, while components, functions and utilies for building dashboards and internal tools will live in `@toolpad/core`!
+
+- &#8203;<!-- 3 -->Rename Toolpad to Toolpad Studio (#3238) @apedroferreira
+- &#8203;<!-- 2 -->[docs] Split Toolpad into Studio and Core (#3250) @bharatkashyap
+- &#8203;<!-- 1 -->[website] Add star count fallback (#3278) @bharatkashyap
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap
+
+## v0.1.51
+
+<!-- generated comparing v0.1.50..master -->
+
+_Mar 4, 2024_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+This release contains mostly bug fixes and improvements to the docs, eamples and stability.
+It will be the last release of @mui/toolpad before we rename the package to @toolpad/studio.
+
+- &#8203;<!-- 32 -->Add list, datepicker and textfield component guides (#2827) @prakhargupta1
+- &#8203;<!-- 31 -->Isolate Next.js in renovatebot @Janpot
+- &#8203;<!-- 30 -->Lock file maintenance (#3263) @renovate[bot]
+- &#8203;<!-- 29 -->Update monorepo (#3259) @Janpot
+- &#8203;<!-- 28 -->Remove isInvalid prop from all components (#3260) @apedroferreira
+- &#8203;<!-- 27 -->Global functions explorer and header (#2690) @apedroferreira
+- &#8203;<!-- 26 -->Add scroll fixes to DataGrid skeleton loading (#3257) @Janpot
+- &#8203;<!-- 25 -->Image error overlay fixes (#3256) @Janpot
+- &#8203;<!-- 24 -->Stabilize visual regression tests (#3253) @Janpot
+- &#8203;<!-- 23 -->Add some missing docs for the hasNextPage property (#3255) @Janpot
+- &#8203;<!-- 22 -->Add a data providers CRUD page to basic crud app example (#3211) @prakhargupta1
+- &#8203;<!-- 21 -->Fix and improve resizing in editor (incl. Add Spacer component) (#2818) @apedroferreira
+- &#8203;<!-- 20 -->Make building layout visual tests more stable (#3237) @apedroferreira
+- &#8203;<!-- 19 -->Update CONTRIBUTING.md (#3114) @apedroferreira
+- &#8203;<!-- 18 -->Show loading indicator when runtime config is loading in query editor (#3169) @Janpot
+- &#8203;<!-- 17 -->Fix unintentional page rows being created (#3221) @apedroferreira
+- &#8203;<!-- 16 -->Prevent app header from covering page elements (#3220) @apedroferreira
+- &#8203;<!-- 15 -->chore(deps): bump @mui/toolpad to 0.1.50 (#3219) @renovate[bot]
+- &#8203;<!-- 14 -->Update CHANGELOG.md (typo) @apedroferreira
+- &#8203;<!-- 13 -->[code-infra] Use the @mui/internal-markdown package (#3235) @michaldudak
+- &#8203;<!-- 12 -->[code-infra] Bump monorepo (#3232) @Janpot
+- &#8203;<!-- 11 -->[code-infra] Remove pnpm cache on CircleCI (#3133) @Janpot
+- &#8203;<!-- 10 -->[code-infra] Disable renovatebot semantic commits (#3224) @Janpot
+- &#8203;<!-- 09 -->[code-infra] Use `experimental.cpus` to control amount of export workers in Next.js (#3222) @Janpot
+- &#8203;<!-- 08 -->[core] Fix infinite loop in inline canvas mode (#3265) @Janpot
+- &#8203;<!-- 07 -->[core] add engines field to @mui/toolpad package.json (#3254) @JerryWu1234
+- &#8203;<!-- 06 -->[DataGrid] fix errors not showing up in the rows area (#3264) @Janpot
+- &#8203;<!-- 05 -->[docs] Prefer https links @oliviertassinari
+- &#8203;<!-- 04 -->[docs-infra] Fixes for vale-action with shared config (#3234) @bharatkashyap
+- &#8203;<!-- 03 -->[docs-infra] Fix Stack Overflow breaking space @oliviertassinari
+- &#8203;<!-- 02 -->[docs-infra] Add vale for style-guide lint on docs (#3178) @bharatkashyap
+- &#8203;<!-- 01 -->[examples] Hacker News client example (#2170) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @JerryWu1234, @michaldudak, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
+## v0.1.50
+
+<!-- generated comparing v0.1.49..master -->
+
+_Feb 15, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Move editor canvas inline, add authenticated session data to server context, fix bugs in drag-and-drop, data grid and editable tree items, improve project setup documentation and add authentication examples for Google and GitHub.
+
+- &#8203;<!-- 32 -->Show save/discard for created record when updateRecords is unavailable (#3215) @Janpot
+- &#8203;<!-- 31 -->Add documentation about installing Toolpad in an existing project (#3214) @Janpot
+- &#8203;<!-- 30 -->Reroute "open in editor" link in app preview (#3207) @Janpot
+- &#8203;<!-- 29 -->Add authentication examples (#3135) @apedroferreira
+- &#8203;<!-- 28 -->Make sure the inline canvas uses the correct font (#3208) @Janpot
+- &#8203;<!-- 27 -->Remove semicolon from jsx (#3210) @iamsaumya
+- &#8203;<!-- 26 -->Fix vm shim in the editor (#3189) @Janpot
+- &#8203;<!-- 25 -->Remove second usePageTitle from RenderedLowCodePage (#3204) @iamsaumya
+- &#8203;<!-- 24 -->Create predictably named test directories (#3194) @Janpot
+- &#8203;<!-- 23 -->Fix test for code components under new editor runtime (#3193) @Janpot
+- &#8203;<!-- 22 -->Correct test urls for canvas tests (#3192) @Janpot
+- &#8203;<!-- 21 -->Fix undo/redo in new canvas implementation (#3191) @Janpot
+- &#8203;<!-- 20 -->Add authenticated session to app server context (#3157) @apedroferreira
+- &#8203;<!-- 12 -->Fix editable tree item bugs (#3187) @apedroferreira
+- &#8203;<!-- 11 -->Fix project loading several times (#3188) @Janpot
+- &#8203;<!-- 10 -->Add pie chart future component (#3185) @Janpot
+- &#8203;<!-- 09 -->Fix drag-and-drop when dragging outside components (#3177) @apedroferreira
+- &#8203;<!-- 06 -->[code-infra] Deprecate usage of the next export command (#3217) @Janpot
+- &#8203;<!-- 05 -->[core] Fix link to issue template @oliviertassinari
+- &#8203;<!-- 04 -->[core] Add canvas mode that doesn't rely on vite (#3171) @Janpot
+- &#8203;<!-- 03 -->[core] Define routes statically (#3176) @Janpot
+- &#8203;<!-- 02 -->[docs] Fix typo @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix spelling of GitHub @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @iamsaumya, @Janpot, @oliviertassinari, @renovate[bot]
+
+## v0.1.49
+
+<!-- generated comparing v0.1.48..master -->
+
+_Feb 8, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- Adds **authentication and authorization** support with Google, GitHub, and Azure AD (_paid_), along with detailed documentation on how to get up and running.
+
+- Miscellaneous bug fixes and maintenance work.
+
+- &#8203;<!-- 26 -->Authentication fixes/improvements (#3174) @apedroferreira
+- &#8203;<!-- 24 -->Add isCanvas into app host context (#3170) @Janpot
+- &#8203;<!-- 23 -->Fix a few react-resizable-panels warnings (#3173) @Janpot
+- &#8203;<!-- 22 -->Improve package layout (#3148) @Janpot
+- &#8203;<!-- 21 -->Add authorization docs (#3067) @apedroferreira
+- &#8203;<!-- 20 -->Authentication/authorization tests (#3056) @apedroferreira
+- &#8203;<!-- 19 -->Update renovate.json @Janpot
+- &#8203;<!-- 11 -->fix: "Unexpected token ';'" in expressions with trailing ';' (#3147) @bharatkashyap
+- &#8203;<!-- 10 -->Lock file maintenance (#3150) @renovate[bot]
+- &#8203;<!-- 09 -->Add stronger warning to the auto generated files to avoid hand-editing (#3146) @Janpot
+- &#8203;<!-- 08 -->Add RBAC with Azure AD authentication provider (#3077) @apedroferreira
+- &#8203;<!-- 07 -->Run prettier (#3144) @Janpot
+- &#8203;<!-- 06 -->Update monorepo (#3134) @apedroferreira
+- &#8203;<!-- 05 -->[code-infra] Avoid aliasing to the monorepo dependencies (#3137) @Janpot
+- &#8203;<!-- 04 -->[core] [docs] Add warnings, docs and gating for paid features (#3156) @bharatkashyap
+- &#8203;<!-- 03 -->[core] Use non breaking spaces (#3145) @oliviertassinari
+- &#8203;<!-- 02 -->[core] Sync with main repo @oliviertassinari
+- &#8203;<!-- 01 -->[docs] Fix 301 link @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @renovate[bot]
+
+## 0.1.48
+
+<!-- generated comparing v0.1.47..master -->
+
+_Jan 26, 2024_
+
+Fixing a failed release
+
+## 0.1.47
+
+<!-- generated comparing v0.1.46..master -->
+
+_Jan 25, 2024_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Small improvements to documentation and examples, general cleanup and enhancements for more stability.
+
+- &#8203;<!-- 10 -->Improve portability of ToolpadApp (#3126) @Janpot
+- &#8203;<!-- 09 -->Run prettier on files after generating schema json (#3123) @Janpot
+- &#8203;<!-- 08 -->Add missing dependencies to the next.js example (#3124) @Janpot
+- &#8203;<!-- 07 -->Move App dom to Toolpad core (#3116) @Janpot
+- &#8203;<!-- 06 -->In the readme.md replaced product demo video with gif (#3069) @prakhargupta1
+- &#8203;<!-- 05 -->Remove old package.json (#3101) @Janpot
+- &#8203;<!-- 04 -->Adjust schedule for monorepo update (#3112) @Janpot
+- &#8203;<!-- 03 -->Make toolpad-core and toopad-components ESM only (#3099) @Janpot
+- &#8203;<!-- 02 -->Remove types and useBoolean proxy modules (#3088) @Janpot
+- &#8203;<!-- 01 -->[docs] `;` causes query to fail (#3119) @bharatkashyap
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @prakhargupta1
+
 ## 0.1.46
 
 <!-- generated comparing v0.1.45..master -->
@@ -94,7 +329,7 @@ _Dec 22, 2023_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-This week: a big overhaul to our query editor! Improved titles for pages in the sidebar. Support server-side row updates for the data grid.
+This week: a big overhaul to the query editor! Improved titles for pages in the sidebar. Support server-side row updates for the data grid.
 
 - &#8203;<!-- 15 -->Remove components from appDom (#3017) @Janpot
 - &#8203;<!-- 14 -->Introduce pagesManifest (#3016) @Janpot
@@ -185,7 +420,7 @@ Pages are now routed to by their name. Bug fixes.
 - &#8203;<!-- 04 -->Fix Date serialization in serverless functions (#2942) @Janpot
 - &#8203;<!-- 03 -->Link the latest 3 examples to the overview page (#2933) @prakhargupta1
 - &#8203;<!-- 02 -->[docs] Fix 404 regressions in the docs (#2939) @oliviertassinari
-- &#8203;<!-- 01 -->[Example] Run Next.js and Toolpad together (#2918) @Janpot
+- &#8203;<!-- 01 -->[examples] Run Next.js and Toolpad together (#2918) @Janpot
 
 All contributors of this release in alphabetical order: @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot]
 
@@ -346,7 +581,7 @@ Added new data providers feature. Improved UX around the pages explorer. Added n
 - &#8203;<!-- 06 -->Update monorepo (#2758) @apedroferreira
 - &#8203;<!-- 05 -->Simplify the editor RPC implementation (#2756) @Janpot
 - &#8203;<!-- 04 -->Allow integrating toolpad applications in a custom server (#2747) @Janpot
-- &#8203;<!-- 03 -->Move the perf cascade css file to the HarViewer component (#2755) @Janpot
+- &#8203;<!-- 03 -->Move the perf cascade CSS file to the HarViewer component (#2755) @Janpot
 - &#8203;<!-- 02 -->[core] Smoothen edges on the new Editable Tree component (#2778) @bharatkashyap
 - &#8203;<!-- 01 -->[core] Revert Next to v13.4.19 @oliviertassinari
 
@@ -419,7 +654,7 @@ Documentation improvements. Fix handling of dates in the data grid.
 - &#8203;<!-- 20 -->Update package.json (#2708) @JerryWu1234
 - &#8203;<!-- 19 -->Fix create-toolpad-app for absolute paths (#2682) @Janpot
 - &#8203;<!-- 18 -->Fix DataGrid date inferencing (#2706) @Janpot
-- &#8203;<!-- 17 -->fix it will be reset the value and fix 404 (#2693) @JerryWu1234
+- &#8203;<!-- 17 -->Fix reset the value and fix 404 (#2693) @JerryWu1234
 - &#8203;<!-- 16 -->Add with-wasm example (#2700) @Janpot
 - &#8203;<!-- 15 -->hoist documentation dependencies again (#2701) @Janpot
 - &#8203;<!-- 14 -->Memory optimizations (#2689) @Janpot
@@ -559,13 +794,13 @@ Add GraphQL example app, add descriptions to component docs, improve resizable p
 - &#8203;<!-- 13 -->Stall package updates for dependencies that require node 18 (#2533) @Janpot
 - &#8203;<!-- 12 -->Add more examples page (#2447) @prakhargupta1
 - &#8203;<!-- 11 -->React resizable panels (#2398) @Janpot
-- &#8203;<!-- 10 -->Make module exports compatible with node module resolution in typescript (#2522) @Janpot
+- &#8203;<!-- 10 -->Make module exports compatible with node module resolution in TypeScript (#2522) @Janpot
 - &#8203;<!-- 09 -->Require a helperText for builtin components and argTypes (#2456) @Janpot
 - &#8203;<!-- 08 -->Fix esbuild warning (#2521) @Janpot
 - &#8203;<!-- 07 -->Improve open code editor snackbar (#2520) @Janpot
 - &#8203;<!-- 06 -->Add graphQL example (#2471) @prakhargupta1
 - &#8203;<!-- 05 -->Update bug template to ask for specific environment (#2513) @Janpot
-- &#8203;<!-- 04 -->Add an explanation on why we use structuredClone in the canvas (#2514) @Janpot
+- &#8203;<!-- 04 -->Add an explanation on why the use of structuredClone in the canvas (#2514) @Janpot
 - &#8203;<!-- 03 -->Avoid single child layout containers (#2388) @apedroferreira
 - &#8203;<!-- 02 -->[docs] Add 'Miscellaneous' section to How-to guides (#2524) @bharatkashyap
 - &#8203;<!-- 01 -->[website] Fix typo (#2530) @bharatkashyap
@@ -592,7 +827,7 @@ Add support for reading cookies in custom functions, allow editing page title fr
 - &#8203;<!-- 07 -->[core] Upgrade monorepo (#2496) @bharatkashyap
 - &#8203;<!-- 06 -->[core] Fix confusing component nomenclature (#2479) @bharatkashyap
 - &#8203;<!-- 05 -->[core] Set GitHub Action top level permission @oliviertassinari
-- &#8203;<!-- 04 -->[core] Remove dead code html meta (#2476) @oliviertassinari
+- &#8203;<!-- 04 -->[core] Remove dead code HTML meta (#2476) @oliviertassinari
 - &#8203;<!-- 03 -->[docs] Cleanup (#2497) @bharatkashyap
 - &#8203;<!-- 02 -->[docs] Fix 301 reports in ahrefs @oliviertassinari
 - &#8203;<!-- 01 -->[Enhancement] Edit page title from page editor (#2480) @Kirera-Wainaina
@@ -624,7 +859,7 @@ Chart component improvements, add scrolling to pages in app sidebar, Windows fix
 - &#8203;<!-- 11 -->Remove some Next.js leftovers around monaco-editor (#2437) @Janpot
 - &#8203;<!-- 10 -->Improve rest test flakyness (#2438) @Janpot
 - &#8203;<!-- 09 -->Remove logging of RPC errors (#2410) @Janpot
-- &#8203;<!-- 08 -->Scope MUI X license to builtin components only (#2427) @Janpot
+- &#8203;<!-- 08 -->Scope MUI X license to builtin components only (#2427) @Janpot
 - &#8203;<!-- 07 -->Clean up worker communication with devserver (#2418) @Janpot
 - &#8203;<!-- 06 -->Add note about why we need usePolling (#2426) @Janpot
 - &#8203;<!-- 05 -->Adjust timeout and import node-fetch in create-toolpad-app test (#2414) (#2419) @Kirera-Wainaina
@@ -650,7 +885,7 @@ Performance improvements in resource usage and startup time. Improve the chart c
 - &#8203;<!-- 21 -->Components explorer improvements (#2397) @bharatkashyap
 - &#8203;<!-- 20 -->Improve docs (#2394) @prakhargupta1
 - &#8203;<!-- 19 -->Fix Windows EBUSY error when removing files during tests (#2401) @apedroferreira
-- &#8203;<!-- 18 -->it will delete old page while adding new page (#2171) @JerryWu1234
+- &#8203;<!-- 18 -->Delete old page while adding new page (#2171) @JerryWu1234
 - &#8203;<!-- 17 -->Avoid running the server in a separate process (#2381) @Janpot
 - &#8203;<!-- 16 -->Chart component improvements (#2343) @apedroferreira
 - &#8203;<!-- 15 -->Refactor deleting nodes (#2322) @apedroferreira
@@ -795,10 +1030,10 @@ Allow detecting parameters from types in function files, instead of having to ex
 - &#8203;<!-- 16 -->Isolate marked in renovatebot (#2237) @Janpot
 - &#8203;<!-- 15 -->Fix broken query editor when env vars are defined (#2231) @Janpot
 - &#8203;<!-- 14 -->Increase timeout when running integration tests in dev mode (#2222) @Janpot
-- &#8203;<!-- 13 -->Fix github rest call in triage label action (#2225) @Janpot
+- &#8203;<!-- 13 -->Fix GitHub rest call in triage label action (#2225) @Janpot
 - &#8203;<!-- 12 -->Add needs triage action (#2221) @Janpot
 - &#8203;<!-- 11 -->Reload queries when env changes (#2214) @Janpot
-- &#8203;<!-- 10 -->Example-4: NPM stats (#2151) @prakhargupta1
+- &#8203;<!-- 10 -->Example-4: npm stats (#2151) @prakhargupta1
 - &#8203;<!-- 09 -->Example-1: admin app (#2096) @prakhargupta1
 - &#8203;<!-- 08 -->Upgrade @mui/monorepo (#2212) @Janpot
 - &#8203;<!-- 07 -->Explore banning any types (#2201) @Janpot
@@ -933,7 +1168,7 @@ _May 24, 2023_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-Allow binding to environment variables, UI and docs improvements, bug fixes.
+Allow binding to environment variables, UI, and docs improvements, bug fixes.
 
 - &#8203;<!-- 13 -->Fix manual queries losing parameters when called (#2060) @bharatkashyap
 - &#8203;<!-- 12 -->Fix function parameters (#2056) @Janpot
@@ -1054,7 +1289,7 @@ Use page name as a routing alias, add a Form component, and replace Next.js API 
 
 - &#8203;<!-- 12 -->Add page name as an alias for routing in the runtime (#1925) @Janpot
 - &#8203;<!-- 11 -->Use correct command for opening vscode (#1931) @Janpot
-- &#8203;<!-- 10 -->Replace next api routes with express (#1920) @Janpot
+- &#8203;<!-- 10 -->Replace next API routes with express (#1920) @Janpot
 - &#8203;<!-- 09 -->Add link to open example in CodeSandbox (#1936) @Janpot
 - &#8203;<!-- 08 -->Fix: Local installation needs new resolution (#1932) @bharatkashyap
 - &#8203;<!-- 07 -->Fix: Use `nanonid/non-secure` instead of `cuid` (#1912) @bharatkashyap
@@ -1560,14 +1795,14 @@ Client-side functions, migration fixes, add sidebar to overview page, support vi
 - &#8203;<!-- 15 -->Add missing sucrase helper (#1360) @Janpot
 - &#8203;<!-- 14 -->Remove demo docker (#1369) @apedroferreira
 - &#8203;<!-- 13 -->Remove demo configuration from render.yaml (#1368) @apedroferreira
-- &#8203;<!-- 12 -->Move typescript to devDependencies (#1366) @Janpot
+- &#8203;<!-- 12 -->Move TypeScript to devDependencies (#1366) @Janpot
 - &#8203;<!-- 11 -->Remove sentry debug option (#1361) @Janpot
 - &#8203;<!-- 10 -->Fix yarn.lock @Janpot
 - &#8203;<!-- 09 -->Upgrade eslint (#1287) @Janpot
 - &#8203;<!-- 08 -->Fallback to visible captcha if invisible captcha fails (#1272) @apedroferreira
 - &#8203;<!-- 07 -->Refactor overview page (#1357) @Janpot
 - &#8203;<!-- 06 -->Fix migration to v3 (#1359) @Janpot
-- &#8203;<!-- 05 -->Run functions client side (#1325) @Janpot
+- &#8203;<!-- 05 -->Run functions client-side (#1325) @Janpot
 - &#8203;<!-- 04 -->Show IP address in log messages (#1350) @apedroferreira
 - &#8203;<!-- 03 -->Fix prettier script in CI (#1355) @Janpot
 - &#8203;<!-- 02 -->Automatic app names in demo (#1351) @apedroferreira
@@ -1657,7 +1892,7 @@ _Nov 2, 2022_
 
 A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
 
-Added new Data Grid column types, improved dev mode performance, support for pages, connections and components duplication, updated remaining documentation parts
+Added new Data Grid column types, improved dev mode performance, support for pages, connections, and components duplication, updated remaining documentation parts
 
 - &#8203;<!-- 22 -->Fix Elastic Search configuration (#1256) @apedroferreira
 - &#8203;<!-- 21 -->Provide accessible locators (#1264) @Janpot
@@ -1846,7 +2081,7 @@ _Sep 28, 2022_
 
 A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
 
-Add default data to DataGrid, Image and Select components, add optional Google Analytics integration and improve Windows compatibility.
+Add default data to DataGrid, Image, and Select components, add optional Google Analytics integration and improve Windows compatibility.
 
 - &#8203;<!-- 4 -->Add Google Analytics (#1049) @apedroferreira
 - &#8203;<!-- 3 -->[core] Add default data to DataGrid, Image, Select components (#1048) @bharatkashyap
@@ -1902,14 +2137,14 @@ Fixes and improvements all around, banner prompting to upgrade Toolpad
 - &#8203;<!-- 22 -->Unify RFC template using core version (#951) @bytasv
 - &#8203;<!-- 21 -->Make errors visible in the runtime (#946) @Janpot
 - &#8203;<!-- 20 -->Remove editor segment from route (#800) @Janpot
-- &#8203;<!-- 19 -->Preserve javascript semantics when dependencies fail (#948) @Janpot
+- &#8203;<!-- 19 -->Preserve JavaScript semantics when dependencies fail (#948) @Janpot
 - &#8203;<!-- 18 -->Rename parseError to errorFrom (#944) @Janpot
 - &#8203;<!-- 17 -->Fix node and jsdom tests interferring with each other (#939) @Janpot
 - &#8203;<!-- 16 -->Add components integration test (#938) @Janpot
 - &#8203;<!-- 15 -->Fix naive content-type sniffing implementation (#940) @Janpot
 - &#8203;<!-- 14 -->Format function source on save (#942) @Janpot
 - &#8203;<!-- 13 -->Allow recreating data grid columns from existing data (#914) @apedroferreira
-- &#8203;<!-- 12 -->Port MUI X renovate.json (#933) @Janpot
+- &#8203;<!-- 12 -->Port MUI X renovate.json (#933) @Janpot
 - &#8203;<!-- 11 -->Run yarn upgrade (#923) @apedroferreira
 - &#8203;<!-- 10 -->Try enabling renovate again (#913) @Janpot
 - &#8203;<!-- 09 -->Make sure to always assign the overlayroot (#915) @Janpot
@@ -1932,14 +2167,14 @@ _Sep 7, 2022_
 
 A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
 
-Landing page, configure body and headers in REST datasources, support bindable default values for inputs, improved save state display, minimum and maximum values for number props.
+Landing page, configure body and headers in REST datasources, support bindable default values for inputs, improved save state display, minimum, and maximum values for number props.
 
 - &#8203;<!-- 20 -->Support DatePicker examples in custom components (#903) @Janpot
 - &#8203;<!-- 19 -->Disable binding for layout props (#862) @apedroferreira
 - &#8203;<!-- 18 -->Update screen after every render (#896) @Janpot
 - &#8203;<!-- 17 -->Rest datasource configure bodies and headers (#721) @Janpot
 - &#8203;<!-- 16 -->Use PostgreSQL as displayName instead of Postgres (#894) @Janpot
-- &#8203;<!-- 15 -->Upgrade typescript across packages (#897) @Janpot
+- &#8203;<!-- 15 -->Upgrade TypeScript across packages (#897) @Janpot
 - &#8203;<!-- 14 -->Allow minimum and maximum value for component number props (#871) @apedroferreira
 - &#8203;<!-- 13 -->Fix typo in code (#883) @Janpot
 - &#8203;<!-- 12 -->Simplify deploy flow (#875) @Janpot
@@ -2070,7 +2305,7 @@ Add user feedback, add network panel to REST datasources, make network panel cle
 - &#8203;<!-- 04 -->Release script update (#731) @Janpot
 - &#8203;<!-- 03 -->Release workflow continuation (#728) @Janpot
 - &#8203;<!-- 02 -->Fixes to release action (#727) @Janpot
-- &#8203;<!-- 01 -->Add docker tag github action (#726) @Janpot
+- &#8203;<!-- 01 -->Add docker tag GitHub action (#726) @Janpot
 
 All contributors of this release in alphabetical order: @apedroferreira, @bytasv, @Janpot
 
@@ -2231,7 +2466,7 @@ Fixes for Firefox users. Resizable right-hand panel. Improve Google Sheets conne
 - &#8203;<!-- 12 -->Make sure the component properties panel overflows correctly (#587) @Janpot
 - &#8203;<!-- 11 -->Extract module loading logic from code components in the runtime (#586) @Janpot
 - &#8203;<!-- 10 -->Improve validity check for Google Sheets connection (#501) @bharatkashyap
-- &#8203;<!-- 09 -->Extract reusable code editor for TS modules (#584) @Janpot
+- &#8203;<!-- 09 -->Extract reusable code editor for TypeScript modules (#584) @Janpot
 - &#8203;<!-- 08 -->Add Tooltip explaining that a non-deployed app can't be opened (#582) @Janpot
 - &#8203;<!-- 07 -->setting editingTitle to false does not blur input (#580) @bharatkashyap
 - &#8203;<!-- 06 -->Disable view button on apps that aren't deployed yet (#581) @Janpot

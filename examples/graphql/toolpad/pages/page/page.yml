@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.52/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
@@ -58,51 +60,48 @@ spec:
                 queryStargazers.data.repository.stargazerCount
             label: Stargazers Count
             fullWidth: true
-    - component: PageRow
-      name: pageRow3
-      children:
-        - component: Text
-          name: text2
-          props:
-            value: ⭐️ ⭐️ ⭐️ Most recent 100 Stargazers ⭐️ ⭐️ ⭐️
-            variant: h6
-          layout:
-            horizontalAlign: center
-            verticalAlign: center
-    - component: PageRow
-      name: pageRow2
-      children:
-        - component: DataGrid
-          name: dataGrid
-          props:
-            rows:
-              $$jsExpression: >
-                queryStargazers.data.repository.stargazers.nodes.map((node) =>
-                ({
-                  ...node,
-                  followers: node.followersCount.totalCount,
-                }))
-            columns:
-              - field: name
-                type: string
-              - field: email
-                type: string
-              - field: company
-                type: json
-              - field: location
-                type: json
-              - field: bio
-                type: string
-                width: 215
-              - field: url
-                type: link
-                width: 136
-              - field: followers
-                type: number
-                width: 86
-              - field: createdAt
-                type: string
-            height: 572
+    - component: Text
+      name: text2
+      layout:
+        columnSize: 1
+        horizontalAlign: center
+        verticalAlign: center
+      props:
+        value: ⭐️ ⭐️ ⭐️ Most recent 100 Stargazers ⭐️ ⭐️ ⭐️
+        variant: h6
+    - component: DataGrid
+      name: dataGrid
+      layout:
+        columnSize: 1
+        height: 540
+      props:
+        rows:
+          $$jsExpression: |
+            queryStargazers.data.repository.stargazers.nodes.map((node) => ({
+              ...node,
+              followers: node.followersCount.totalCount,
+            }))
+        columns:
+          - field: name
+            type: string
+          - field: email
+            type: string
+          - field: company
+            type: json
+          - field: location
+            type: json
+          - field: bio
+            type: string
+            width: 215
+          - field: url
+            type: link
+            width: 136
+          - field: followers
+            type: number
+            width: 86
+          - field: createdAt
+            type: string
+        height: 572
   queries:
     - name: queryStargazers
       query:

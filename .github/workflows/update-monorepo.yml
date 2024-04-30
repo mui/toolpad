@@ -12,14 +12,14 @@ jobs:
       issues: write
     steps:
       - name: Set up Node.js ⚙️
-        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
         with:
           node-version: '18.x'
 
       - name: Setup yarn
         run: npm install -g yarn
 
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
 
       - name: Get latest monorepo commit
         run: echo "MONOREPO_LATEST_COMMIT=$(git ls-remote https://github.com/mui/material-ui master | awk '{print $1}')" >> $GITHUB_ENV

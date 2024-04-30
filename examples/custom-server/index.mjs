@@ -1,4 +1,4 @@
-import { createHandler } from '@mui/toolpad';
+import { createHandler } from '@toolpad/studio';
 import express from 'express';
 
 const app = express();
@@ -9,7 +9,7 @@ app.get('/', (req, res) => {
     <html>
       <body>  
         👋 This is a <a href="https://mui.com/toolpad/concepts/custom-server/">custom server</a>,
-        it hosts to a <a href="/my-app">Toolpad application</a>.
+        it hosts to a <a href="/my-app">Toolpad Studio application</a>.
       </body>
     </html>
   `);

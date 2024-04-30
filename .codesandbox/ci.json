@@ -4,9 +4,10 @@
   "node": "18",
   "packages": [
     "packages/create-toolpad-app",
-    "packages/toolpad-app",
-    "packages/toolpad-components",
     "packages/toolpad-core",
+    "packages/toolpad-studio",
+    "packages/toolpad-studio-components",
+    "packages/toolpad-studio-runtime",
     "packages/toolpad-utils"
   ],
   "silent": true

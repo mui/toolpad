@@ -10,13 +10,13 @@ import archiver from 'archiver';
 import * as url from 'url';
 import getPort from 'get-port';
 import * as execa from 'execa';
-import { PageScreenshotOptions, test as baseTest } from './test';
+import { PageScreenshotOptions, WorkerInfo, test as baseTest } from './test';
 import { waitForMatch } from '../utils/streams';
 import { asyncDisposeSymbol, using } from '../utils/resources';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
-const CLI_CMD = path.resolve(currentDirectory, '../../packages/toolpad-app/cli.mjs');
+const CLI_CMD = path.resolve(currentDirectory, '../../packages/toolpad-studio/cli.mjs');
 
 const PROJECT_ROOT = path.resolve(currentDirectory, '../../');
 
@@ -37,16 +37,16 @@ interface SetupContext {
 }
 
 interface ProjectConfig {
-  // Template to be used as the starting point of the project folder toolpad is running in
+  // Template to be used as the starting point of the project folder Toolpad Studio is running in
   // This will copied to the temporary folder
   template?: string;
   setup?: (ctx: SetupContext) => Promise<void>;
 }
 
 interface LocalAppConfig {
-  // Command to start toolpad with
+  // Command to start Toolpad Studio with
   cmd?: 'start' | 'dev';
-  // Run toolpad editor app in local dev mode
+  // Run Toolpad Studio editor app in local dev mode
   toolpadDev?: boolean;
   // Extra environment variables when running Toolpad
   env?: Record<string, string>;
@@ -58,9 +58,25 @@ interface LocalServerConfig {
   env?: Record<string, string>;
   base?: string;
 }
+export async function getTemporaryDir() {
+  const tmpDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
 
-export async function getTemporaryDir({ template, setup }: ProjectConfig = {}) {
-  const tmpTestDir = await fs.mkdtemp(path.resolve(currentDirectory, './tmp-'));
+  return {
+    path: tmpDir,
+    [asyncDisposeSymbol]: async () => {
+      await fs.rm(tmpDir, { recursive: true, maxRetries: 3, retryDelay: 1000 });
+    },
+  };
+}
+
+async function getTestFixtureTempDir(
+  workerInfo: WorkerInfo,
+  { template, setup }: ProjectConfig = {},
+) {
+  const tmpTestDir = path.resolve(currentDirectory, `./.tmp-test-dir-${workerInfo.parallelIndex}`);
+  // Clean up leftover from previous run, if necessary
+  await fs.rm(tmpTestDir, { recursive: true, force: true });
+  await fs.mkdir(tmpTestDir);
   // Each test runs in its own temporary folder to avoid race conditions when running tests in parallel.
   // It also avoids mutating the source code of the fixture while running the test.
   const projectDir = path.resolve(tmpTestDir, './fixture');
@@ -306,8 +322,8 @@ const test = baseTest.extend<
   customServerConfig: [undefined, { option: true, scope: 'worker' }],
   projectConfig: [undefined, { option: true, scope: 'worker' }],
   projectDir: [
-    async ({ projectConfig }, use) => {
-      await using(await getTemporaryDir(projectConfig), async (projectDir) => {
+    async ({ projectConfig }, use, workerInfo) => {
+      await using(await getTestFixtureTempDir(workerInfo, projectConfig), async (projectDir) => {
         await use(projectDir);
       });
     },

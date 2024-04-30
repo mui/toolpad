@@ -1,5 +1,3 @@
-// TODO: Create a @mui/toolpad-utils package to house utilities like this one?
-
 const weakMap = new WeakMap<object, string>();
 let nextId = 0;
 

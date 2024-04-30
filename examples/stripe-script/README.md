@@ -1,6 +1,6 @@
 # Stripe Script
 
-<p class="description">A Toolpad application that demonstrates running complex scripts.</p>
+<p class="description">A Toolpad Studio application that demonstrates running complex scripts.</p>
 
 ## Demo
 
@@ -32,7 +32,7 @@ The app involves the following workflow:
 
 1. List pending invoices from Stripe in a data grid component
 
-2. Use a script that downloads all invoices as a `.zip` file in Toolpad through a custom function
+2. Use a script that downloads all invoices as a `.zip` file in Toolpad Studio through a custom function
 
 3. Run the script on Button click to generate and display a download link
 

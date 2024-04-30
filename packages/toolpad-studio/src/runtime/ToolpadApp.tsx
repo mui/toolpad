@@ -1227,7 +1227,7 @@ const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRo
   { children, maxWidth }: PageRootProps,
   ref,
 ) {
-  const containerMaxWidth = maxWidth === 'none' ? false : maxWidth;
+  const containerMaxWidth = maxWidth === 'none' ? false : maxWidth ?? 'xl';
   return (
     <Container ref={ref} maxWidth={containerMaxWidth}>
       <Stack data-testid="page-root" direction="column" sx={{ my: 2, gap: 1 }}>

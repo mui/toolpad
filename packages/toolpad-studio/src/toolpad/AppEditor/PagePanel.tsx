@@ -51,7 +51,7 @@ export default function PagePanel({ className, sx }: ComponentPanelProps) {
         <Panel id="pages-explorer" order={1} minSize={10} defaultSize={25}>
           <PagesExplorer />
         </Panel>
-        {currentPageNode && !appDom.isCodePage(currentPageNode) ? (
+        {currentPageNode ? (
           <React.Fragment>
             <PanelResizeHandle />
             <Panel id="hierarchy-explorer" order={2} minSize={10} defaultSize={25} maxSize={90}>

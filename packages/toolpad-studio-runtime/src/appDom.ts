@@ -110,7 +110,6 @@ export interface PageNode extends AppDomNodeBase {
     readonly parameters?: [string, string][];
     readonly module?: string;
     readonly display?: PageDisplayMode;
-    readonly codeFile?: boolean;
     readonly displayName?: string;
     readonly maxWidth?: ContainerWidth;
     readonly authorization?: {
@@ -1214,10 +1213,6 @@ export function getPageDisplayName(node: PageNode): string {
 
 export function getPageTitle(node: PageNode): string {
   return node.attributes.title || getPageDisplayName(node);
-}
-
-export function isCodePage(node: PageNode): boolean {
-  return !!node.attributes.codeFile;
 }
 
 export function getPlan(dom: AppDom): ToolpadPlan {

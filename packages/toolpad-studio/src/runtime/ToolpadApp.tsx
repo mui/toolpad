@@ -92,11 +92,9 @@ import { RuntimeApiContext, createApi } from './api';
 import { AuthContext, useAuth, AuthSession } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
-import { componentsStore, pageComponentsStore } from './globalState';
+import { componentsStore } from './globalState';
 
 const browserJsRuntime = getBrowserRuntime();
-
-export type PageComponents = Partial<Record<string, React.ComponentType>>;
 
 const Pre = styled('pre')(({ theme }) => ({
   margin: 0,
@@ -1386,17 +1384,6 @@ function FetchNode({ node, page }: FetchNodeProps) {
   }
 }
 
-interface RenderedProCodePageProps {
-  page: appDom.PageNode;
-}
-
-function RenderedProCodePage({ page }: RenderedProCodePageProps) {
-  usePageTitle(appDom.getPageTitle(page));
-  const pageComponents = pageComponentsStore.useValue();
-  const PageComponent = pageComponents[page.name] ?? PageNotFound;
-  return <PageComponent />;
-}
-
 interface RenderedLowCodePageProps {
   page: appDom.PageNode;
 }
@@ -1469,13 +1456,7 @@ export interface RenderedPageProps {
 export function RenderedPage({ page }: RenderedPageProps) {
   const appHost = useAppHost();
 
-  let pageContent = page.attributes.codeFile ? (
-    <RenderedProCodePage page={page} />
-  ) : (
-    // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
-    // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-    <RenderedLowCodePage page={page} key={page.name} />
-  );
+  let pageContent = <RenderedLowCodePage page={page} key={page.name} />;
 
   if (!appHost.isCanvas) {
     pageContent = (

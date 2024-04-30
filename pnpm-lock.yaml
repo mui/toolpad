@@ -527,8 +527,8 @@ importers:
   packages/toolpad-studio:
     dependencies:
       '@auth/core':
-        specifier: 0.28.2
-        version: 0.28.2
+        specifier: 0.30.0
+        version: 0.30.0
       '@emotion/cache':
         specifier: 11.11.0
         version: 11.11.0
@@ -937,8 +937,8 @@ importers:
   packages/toolpad-studio-runtime:
     dependencies:
       '@auth/core':
-        specifier: 0.28.2
-        version: 0.28.2
+        specifier: 0.30.0
+        version: 0.30.0
       '@mui/material':
         specifier: 5.15.15
         version: 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
@@ -1238,8 +1238,8 @@ packages:
     engines: {node: '>=16.0.0'}
     dev: true
 
-  /@auth/core@0.28.2:
-    resolution: {integrity: sha512-Rlvu6yKa4bKbhQESMaEm6jHOY5ncIrsrQkC8tcwVQmf+cBLk7ReI9DIJS2O/WkIDoOwvM9PHiXTi5b+b/eyXxw==}
+  /@auth/core@0.30.0:
+    resolution: {integrity: sha512-8AE4m/nk+4EIiVCJwxZAsJeAQuzpEC8M8768mmKVn60CGDdupKQkVhxbRlm5Qh7eNRCoFFME+0DvtaX2aXrYaA==}
     peerDependencies:
       '@simplewebauthn/browser': ^9.0.1
       '@simplewebauthn/server': ^9.0.2

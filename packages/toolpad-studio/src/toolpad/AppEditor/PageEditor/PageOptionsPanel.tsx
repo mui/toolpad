@@ -27,6 +27,15 @@ const PAGE_DISPLAY_OPTIONS: { value: appDom.PageDisplayMode; label: string }[] =
   { value: 'standalone', label: 'No shell' },
 ];
 
+const PAGE_CONTAINER_WIDTH_OPTIONS: { value: appDom.ContainerWidth; label: string }[] = [
+  { value: 'xs', label: 'xs' },
+  { value: 'xl', label: 'xl' },
+  { value: 'sm', label: 'sm' },
+  { value: 'md', label: 'md' },
+  { value: 'lg', label: 'lg' },
+  { value: 'none', label: 'None' },
+];
+
 export default function PageOptionsPanel() {
   const { nodeId: pageNodeId } = usePageEditorState();
   const { dom } = useAppState();
@@ -37,10 +46,20 @@ export default function PageOptionsPanel() {
   const appNode = appDom.getApp(dom);
 
   const page = appDom.getNode(dom, pageNodeId, 'page');
+
   const handleDisplayModeChange = React.useCallback(
     (event: React.MouseEvent<HTMLElement>, newValue: appDom.PageDisplayMode) => {
       domApi.update((draft) =>
         appDom.setNodeNamespacedProp(draft, page, 'attributes', 'display', newValue),
+      );
+    },
+    [domApi, page],
+  );
+
+  const handleContainerModeChange = React.useCallback(
+    (event: React.MouseEvent<HTMLElement>, newValue: appDom.ContainerWidth) => {
+      domApi.update((draft) =>
+        appDom.setNodeNamespacedProp(draft, page, 'attributes', 'maxWidth', newValue),
       );
     },
     [domApi, page],
@@ -112,6 +131,34 @@ export default function PageOptionsPanel() {
             fullWidth
           >
             {PAGE_DISPLAY_OPTIONS.map((option) => {
+              return (
+                <ToggleButton key={option.value} value={option.value}>
+                  {option.label}
+                </ToggleButton>
+              );
+            })}
+          </ToggleButtonGroup>
+        </Tooltip>
+      </div>
+      <div>
+        <Typography variant="overline">Container width</Typography>
+        <Tooltip
+          arrow
+          placement="left-start"
+          title={
+            <Typography variant="inherit">
+              Set the maximum width of the top-level container.
+            </Typography>
+          }
+        >
+          <ToggleButtonGroup
+            exclusive
+            value={page.attributes.maxWidth ?? 'xl'}
+            onChange={handleContainerModeChange}
+            aria-label="Container mode"
+            fullWidth
+          >
+            {PAGE_CONTAINER_WIDTH_OPTIONS.map((option) => {
               return (
                 <ToggleButton key={option.value} value={option.value}>
                   {option.label}

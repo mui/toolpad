@@ -98,6 +98,8 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
 
 export type PageDisplayMode = 'standalone' | 'shell';
 
+export type ContainerWidth = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'none';
+
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
@@ -108,6 +110,7 @@ export interface PageNode extends AppDomNodeBase {
     readonly display?: PageDisplayMode;
     readonly codeFile?: boolean;
     readonly displayName?: string;
+    readonly maxWidth?: ContainerWidth;
     readonly authorization?: {
       readonly allowAll?: boolean;
       readonly allowedRoles?: string[];

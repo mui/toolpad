@@ -1,4 +1,4 @@
-import type { ServerDataSource, RuntimeConfig } from '../types';
+import type { ServerDataSource } from '../types';
 import postgres from './postgres/server';
 import mysql from './mysql/server';
 import rest from './rest/server';
@@ -10,7 +10,6 @@ import type EnvManager from '../server/EnvManager';
 export interface IToolpadProject {
   functionsManager: FunctionsManager;
   envManager: EnvManager;
-  getRuntimeConfig: () => Promise<RuntimeConfig>;
 }
 
 type ServerDataSources = {

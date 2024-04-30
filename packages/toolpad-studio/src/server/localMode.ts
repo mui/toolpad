@@ -53,12 +53,7 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
-import type {
-  RuntimeConfig,
-  ProjectEvents,
-  ToolpadProjectOptions,
-  CodeEditorFileType,
-} from '../types';
+import type { ProjectEvents, ToolpadProjectOptions, CodeEditorFileType } from '../types';
 import EnvManager from './EnvManager';
 import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
@@ -995,8 +990,6 @@ class ToolpadProject {
 
   dataManager: DataManager;
 
-  invalidateQueries: () => void;
-
   private alertedMissingVars = new Set<string>();
 
   private lastVersionCheck = 0;
@@ -1025,7 +1018,7 @@ class ToolpadProject {
     this.functionsManager = new FunctionsManager(this);
     this.dataManager = new DataManager(this);
 
-    this.invalidateQueries = throttle(
+    const invalidateQueries = throttle(
       () => {
         this.events.emit('queriesInvalidated', {});
       },
@@ -1034,6 +1027,9 @@ class ToolpadProject {
         leading: false,
       },
     );
+
+    this.events.on('functionsChanged', invalidateQueries);
+    this.events.on('envChanged', invalidateQueries);
   }
 
   private initWatcher() {
@@ -1331,17 +1327,6 @@ class ToolpadProject {
     const root = this.getRoot();
     const config = await resolvePrettierConfig(root);
     return config;
-  }
-
-  async getRuntimeConfig(): Promise<RuntimeConfig> {
-    // When these fail, you are likely trying to retrieve this information during the
-    // Toolpad Studio build. It's fundamentally wrong to use this information as it strictly holds
-    // information about the running Toolpad Studio instance.
-    invariant(this.options.externalUrl, 'External URL is not set');
-
-    return {
-      externalUrl: this.options.externalUrl,
-    };
   }
 
   async writeBuildInfo() {

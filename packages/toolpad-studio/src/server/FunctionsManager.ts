@@ -20,7 +20,6 @@ import * as url from 'node:url';
 import type { GridRowId } from '@mui/x-data-grid';
 import invariant from 'invariant';
 import { Awaitable } from '@toolpad/utils/types';
-import EnvManager from './EnvManager';
 import { ProjectEvents, ToolpadProjectOptions } from '../types';
 import * as functionsRuntime from './functionsRuntime';
 import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
@@ -104,8 +103,6 @@ interface IToolpadProject {
   events: Emitter<ProjectEvents>;
   getRoot(): string;
   getOutputFolder(): string;
-  envManager: EnvManager;
-  invalidateQueries(): void;
 }
 
 export default class FunctionsManager {
@@ -200,7 +197,6 @@ export default class FunctionsManager {
 
       this.buildErrors = args.errors;
 
-      this.project.invalidateQueries();
       this.project.events.emit('functionsChanged', {});
     };
 

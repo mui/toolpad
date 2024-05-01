@@ -35,7 +35,7 @@ See the how-to guide on [how to embed Toolpad Studio pages](/toolpad/studio/how-
 
 ## Max width
 
-Toolpad pages use a MUI [Container](https://mui.com/material-ui/react-container/) as their top-level element. You can control the maximum width of this container in the page properties.
+Toolpad pages use a Material UI [Container](https://mui.com/material-ui/react-container/) as their top-level element. You can control the maximum width of this container in the page properties.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/page-properties/max-width.png", "alt": "Page container max width", "caption": "Setting the maximum width of the page container", "zoom": false, "width": 306}}
 

@@ -173,8 +173,6 @@ export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
   const { dom } = useAppState();
   const projectApi = useProjectApi();
 
-  const { data: runtimeConfig } = projectApi.useSuspenseQuery('getRuntimeConfig', []);
-
   const connectionId =
     appDom.deref(saved ? saved?.attributes?.connectionId : draft?.attributes?.connectionId) ?? null;
 
@@ -216,7 +214,6 @@ export default function QueryEditorPanel({ draft, saved }: QueryEditorProps) {
           globalScope={pageState}
           globalScopeMeta={globalScopeMeta}
           execApi={execPrivate}
-          runtimeConfig={runtimeConfig}
           settingsTab={
             <QuerySettingsTab
               {...{

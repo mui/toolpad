@@ -19,7 +19,7 @@ export function createRemoteFunction(functionFile: string, functionName: string)
 
 export { default as ToolpadApp, RenderedPage, type ToolpadAppProps } from './ToolpadApp';
 
-export { componentsStore, pageComponentsStore } from './globalState';
+export { componentsStore } from './globalState';
 
 export { CanvasHooksContext, type CanvasHooks } from './CanvasHooksContext';
 

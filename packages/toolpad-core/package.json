@@ -48,13 +48,13 @@
     "@mui/icons-material": "5.15.15",
     "@mui/material": "5.15.15",
     "@mui/material-nextjs": "5.15.11",
-    "next": "14.2.1",
+    "next": "14.2.3",
     "react": "18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "18.2.78",
-    "@types/react-dom": "18.2.25"
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.0"
   },
   "peerDependencies": {
     "@emotion/react": "^11",

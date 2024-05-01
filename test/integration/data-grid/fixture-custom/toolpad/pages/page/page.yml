@@ -1,21 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.54/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  id: g1b3uhe
   title: page
   content:
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: DataGrid
-          name: dataGrid
-          props:
-            rows:
-              $$jsExpression: |
-                [{ hiddenField: true, customField: { test: "value" } }]
-            columns:
-              - type: codeComponent
-                field: customField
-                codeComponent: Test
-                width: 639
-            density: comfortable
+    - component: DataGrid
+      name: dataGrid
+      layout:
+        columnSize: 1
+      props:
+        rows:
+          $$jsExpression: |
+            [{ hiddenField: true, customField: { test: "value" } }]
+        columns:
+          - type: codeComponent
+            field: customField
+            codeComponent: Test
+            width: 639
+          - field: id
+            type: codeComponent
+            codeComponent: Debug
+        density: comfortable
+  alias:
+    - g1b3uhe

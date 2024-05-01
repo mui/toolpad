@@ -110,7 +110,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         base={appState.appUrl}
         savedNodes={savedNodes}
         pageName={page.name}
-        overlay={appDom.isCodePage(page) ? null : <RenderOverlay bridge={bridge} />}
+        overlay={<RenderOverlay bridge={bridge} />}
         onInit={handleInit}
       />
     </RenderPanelRoot>

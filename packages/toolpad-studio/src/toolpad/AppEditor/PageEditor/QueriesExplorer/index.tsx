@@ -12,6 +12,7 @@ import {
   Stack,
   Paper,
   SxProps,
+  Link,
 } from '@mui/material';
 import { SimpleTreeView, treeItemClasses } from '@mui/x-tree-view';
 import AddIcon from '@mui/icons-material/Add';
@@ -197,9 +198,29 @@ function CreatePopover({
     >
       <Paper sx={{ p: 2, maxWidth: 500 }}>
         <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
-          {createMode === 'query'
-            ? 'Make backend data available as state on the page'
-            : 'Run an action on the page'}
+          {createMode === 'query' ? (
+            <React.Fragment>
+              Make backend data available as state on the page. Read more in the{' '}
+              <Link
+                href="https://mui.com/toolpad/studio/concepts/queries/#queries"
+                target="_blank"
+                rel="noopener"
+              >
+                docs.
+              </Link>
+            </React.Fragment>
+          ) : (
+            <React.Fragment>
+              Run an action on the page. Read more in the{' '}
+              <Link
+                href="https://mui.com/toolpad/studio/concepts/queries/#actions"
+                target="_blank"
+                rel="noopener"
+              >
+                docs.
+              </Link>
+            </React.Fragment>
+          )}
         </Typography>
         <Stack direction="row" gap={1} display={'grid'} gridTemplateColumns={'1fr 1fr'}>
           {Object.keys(dataSources).map((dataSourceId) => {

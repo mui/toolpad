@@ -1,6 +1,6 @@
 import { Emitter } from '@toolpad/utils/events';
 import type { RuntimeEvents } from '@toolpad/studio-runtime';
-import type { AppCanvasState, PageViewState } from '../types';
+import type { PageViewState } from '../types';
 
 const COMMAND_HANDLERS = Symbol('hidden property to hold the command handlers');
 
@@ -51,9 +51,9 @@ export interface ToolpadBridge {
   canvasEvents: Emitter<RuntimeEvents>;
   // Commands executed from the editor, ran in the canvas
   canvasCommands: Commands<{
-    update(updates: AppCanvasState): void;
     getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
     getPageViewState(): PageViewState;
+    scrollComponent(nodeId: string): void;
     isReady(): boolean;
     invalidateQueries(): void;
   }>;
@@ -73,6 +73,9 @@ const bridge: ToolpadBridge | null = isRenderedInCanvas
         isReady: () => canvasIsReady,
         getPageViewState: () => {
           throw new Error('Not implemented');
+        },
+        scrollComponent: () => {
+          throw new Error('Not Implemented');
         },
         getViewCoordinates: () => {
           throw new Error('Not implemented');

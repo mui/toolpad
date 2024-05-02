@@ -19,15 +19,13 @@ const MONOREPO_PACKAGES = {
 };
 
 export default withDocsInfra({
-  experimental: {
-    workerThreads: true,
-    cpus: 3,
-  },
   transpilePackages: [
-    '@mui/monorepo',
     // TODO, those shouldn't be needed in the first place
+    '@mui/monorepo', // Migrate everything to @mui/docs until the @mui/monorepo dependency becomes obsolete
     '@mui/x-charts', // Fix ESM module support https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
-    '@mui/docs', // Fix trailingSlash support https://github.com/mui/mui-toolpad/pull/3301#issuecomment-2054213837
+    // Fix trailingSlash support https://github.com/mui/mui-toolpad/pull/3301#issuecomment-2054213837
+    // Migrate everything from @mui/monorepo to @mui/docs
+    '@mui/docs',
   ],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
@@ -43,6 +41,17 @@ export default withDocsInfra({
   webpack: (config, options) => {
     return {
       ...config,
+      // TODO, this shouldn't be needed in the first place
+      // Migrate everything from @mui/monorepo to @mui/docs and embed @mui/internal-markdown in @mui/docs
+      resolveLoader: {
+        ...config.resolveLoader,
+        alias: {
+          ...config.resolveLoader.alias,
+          '@mui/internal-markdown/loader': require.resolve(
+            '@mui/monorepo/packages/markdown/loader',
+          ),
+        },
+      },
       resolve: {
         ...config.resolve,
         alias: {
@@ -72,7 +81,7 @@ export default withDocsInfra({
                 use: [
                   options.defaultLoaders.babel,
                   {
-                    loader: require.resolve('@mui/internal-markdown/loader'),
+                    loader: '@mui/internal-markdown/loader',
                     options: {
                       workspaceRoot: WORKSPACE_ROOT,
                       env: {

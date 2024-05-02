@@ -1,12 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.1.54/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
-  id: 5h03vdu
   title: page
   display: shell
   content:
-    - component: PageRow
-      name: pageRow
-      children:
-        - component: codeComponent.MyBarChart
-          name: codeComponent_MyBarChart
+    - component: codeComponent.MyBarChart
+      name: codeComponent_MyBarChart
+      layout:
+        columnSize: 1
+  alias:
+    - 5h03vdu

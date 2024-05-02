@@ -8,28 +8,19 @@ import { asyncHandler } from '../utils/express';
 import { basicAuthUnauthorized, checkBasicAuthHeader } from './basicAuth';
 import { createRpcServer } from './runtimeRpcServer';
 import { createRpcHandler } from './rpc';
-import { RUNTIME_CONFIG_WINDOW_PROPERTY, INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
+import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import createRuntimeState from '../runtime/createRuntimeState';
-import type { RuntimeConfig } from '../types';
 import type { RuntimeState } from '../runtime';
 import { createAuthHandler, createRequireAuthMiddleware, getRequireAuthentication } from './auth';
 
 export interface PostProcessHtmlParams {
-  config: RuntimeConfig;
   initialState: RuntimeState;
 }
 
-export function postProcessHtml(
-  html: string,
-  { config, initialState }: PostProcessHtmlParams,
-): string {
-  const serializedConfig = serializeJavascript(config, { ignoreFunction: true });
+export function postProcessHtml(html: string, { initialState }: PostProcessHtmlParams): string {
   const serializedInitialState = serializeJavascript(initialState, { isJSON: true });
 
   const toolpadScripts = [
-    `<script>window[${JSON.stringify(
-      RUNTIME_CONFIG_WINDOW_PROPERTY,
-    )}] = ${serializedConfig}</script>`,
     `<script>window[${JSON.stringify(
       INITIAL_STATE_WINDOW_PROPERTY,
     )}] = ${serializedInitialState}</script>`,
@@ -80,15 +71,11 @@ export async function createProdHandler(project: ToolpadProject) {
     asyncHandler(async (req, res) => {
       const htmlFilePath = path.resolve(project.getAppOutputFolder(), './index.html');
 
-      const [runtimeConfig, dom] = await Promise.all([
-        project.getRuntimeConfig(),
-        project.loadDom(),
-      ]);
+      const [dom] = await Promise.all([project.loadDom()]);
 
       let html = await fs.readFile(htmlFilePath, { encoding: 'utf-8' });
 
       html = postProcessHtml(html, {
-        config: runtimeConfig,
         initialState: createRuntimeState({ dom }),
       });
 

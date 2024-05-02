@@ -6,7 +6,7 @@ import cors from 'cors';
 import invariant from 'invariant';
 import { errorFrom, serializeError, SerializedError } from '@toolpad/utils/errors';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import type { RuntimeConfig, Methods, ServerDataSource, ToolpadProjectOptions } from '../types';
+import type { Methods, ServerDataSource, ToolpadProjectOptions } from '../types';
 import serverDataSources from '../toolpadDataSources/server';
 import applyTransform from '../toolpadDataSources/applyTransform';
 import { asyncHandler } from '../utils/express';
@@ -29,7 +29,6 @@ interface IToolpadProject {
   saveDom(dom: appDom.AppDom): Promise<void>;
   functionsManager: FunctionsManager;
   envManager: EnvManager;
-  getRuntimeConfig: () => Promise<RuntimeConfig>;
 }
 
 /**

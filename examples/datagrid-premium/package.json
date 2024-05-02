@@ -8,7 +8,7 @@
     "start": "toolpad-studio start ."
   },
   "dependencies": {
-    "@mui/x-data-grid-premium": "^7.3.1",
+    "@mui/x-data-grid-premium": "^7.3.2",
     "@mui/x-license": "^7.2.0",
     "@toolpad/studio": "0.1.54"
   }

@@ -251,7 +251,7 @@ importers:
         version: 7.2.0(react@18.2.0)
       '@toolpad/core':
         specifier: workspace:*
-        version: link:../packages/toolpad-core/build
+        version: link:../packages/toolpad-core
       '@toolpad/studio':
         specifier: workspace:*
         version: link:../packages/toolpad-studio
@@ -592,7 +592,6 @@ importers:
       babel-plugin-transform-react-remove-prop-types:
         specifier: ^0.4.24
         version: 0.4.24
-    publishDirectory: build
 
   packages/toolpad-studio:
     dependencies:
@@ -1130,7 +1129,7 @@ importers:
         version: 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.2.78)(react@18.2.0)
       '@toolpad/core':
         specifier: workspace:*
-        version: link:../../packages/toolpad-core/build
+        version: link:../../packages/toolpad-core
       next:
         specifier: 14.1.4
         version: 14.1.4(react-dom@18.2.0)(react@18.2.0)

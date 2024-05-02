@@ -104,13 +104,15 @@ module.exports = {
       },
     },
     {
-      files: ['examples/**/*'],
       /**
+       * TODO move to @mui/monorepo
+       *
        * Examples are for demostration purposes and should not be considered as part of the library.
        * They don't contain an eslint setup, so we don't want them to contain eslint directives
        * We do however want to keep the rules in place to ensure the examples are following
        * a reasonably similar code style as the library.
        */
+      files: ['examples/**/*'],
       rules: {
         'no-console': 'off',
         'no-underscore-dangle': 'off',

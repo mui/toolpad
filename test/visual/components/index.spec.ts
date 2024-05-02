@@ -40,6 +40,9 @@ test('rendering components in the app editor', async ({ page, argosScreenshot })
 
   await clickCenter(page, image);
   await argosScreenshot('with-selection');
+
+  await page.getByRole('treeitem', { name: 'typography1' }).click();
+  await argosScreenshot('with-selection-scroll');
 });
 
 test('building layouts', async ({ page, argosScreenshot }) => {

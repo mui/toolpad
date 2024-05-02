@@ -53,6 +53,7 @@ export interface ToolpadBridge {
   canvasCommands: Commands<{
     getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
     getPageViewState(): PageViewState;
+    scrollComponent(nodeId: string): void;
     isReady(): boolean;
     invalidateQueries(): void;
   }>;
@@ -72,6 +73,9 @@ const bridge: ToolpadBridge | null = isRenderedInCanvas
         isReady: () => canvasIsReady,
         getPageViewState: () => {
           throw new Error('Not implemented');
+        },
+        scrollComponent: () => {
+          throw new Error('Not Implemented');
         },
         getViewCoordinates: () => {
           throw new Error('Not implemented');

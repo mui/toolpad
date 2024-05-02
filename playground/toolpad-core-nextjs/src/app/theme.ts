@@ -105,7 +105,8 @@ const theme = createTheme(baseTheme, {
       styleOverrides: {
         root: {
           borderBottomWidth: 2,
-          margin: '8px 16px',
+          marginLeft: '16px',
+          marginRight: '16px',
         },
       },
     },

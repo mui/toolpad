@@ -205,7 +205,8 @@ export default function generateProject(
         styleOverrides: {
           root: {
             borderBottomWidth: 2,
-            margin: '8px 16px',
+            marginLeft: '16px',
+            marginRight: '16px',
           },
         },
       },

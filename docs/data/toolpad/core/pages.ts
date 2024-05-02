@@ -110,8 +110,8 @@ const pages: MuiPage[] = [
         subheader: 'Components',
         children: [
           {
-            pathname: '/toolpad/core/api/dashboard',
-            title: 'Dashboard',
+            pathname: '/toolpad/core/api/dashboard-layout',
+            title: 'DashboardLayout',
           },
           {
             pathname: '/toolpad/core/api/data-grid',

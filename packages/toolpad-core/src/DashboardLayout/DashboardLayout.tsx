@@ -86,7 +86,7 @@ function DashboardSidebarSubNavigation({
   );
 
   return (
-    <List sx={{ mb: depth === 0 ? 2 : 1, pl: 2 * depth }}>
+    <List sx={{ mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
       {subNavigation.map((navigationItem, navigationItemIndex) => {
         if (navigationItem.kind === 'header') {
           return (
@@ -97,7 +97,14 @@ function DashboardSidebarSubNavigation({
         }
 
         if (navigationItem.kind === 'divider') {
-          return <Divider key={`divider-${depth}-${navigationItemIndex}`} />;
+          const nextItem = subNavigation[navigationItemIndex + 1];
+
+          return (
+            <Divider
+              key={`divider-${depth}-${navigationItemIndex}`}
+              sx={{ mt: 1, mb: nextItem.kind === 'header' ? 0 : 1 }}
+            />
+          );
         }
 
         const navigationItemId = `${navigationItem.title}-${depth}-${navigationItemIndex}`;
@@ -178,7 +185,7 @@ export function DashboardLayout({
               </Box>
               {!hideTitle ? (
                 <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
-                  {branding?.name ?? 'Toolpad'}
+                  {branding?.title ?? 'Toolpad'}
                 </Typography>
               ) : null}
             </Stack>
@@ -210,7 +217,7 @@ export function DashboardLayout({
         }}
       >
         <Toolbar />
-        <Box component="nav" sx={{ overflow: 'auto', mt: navigation[0].kind === 'header' ? 1 : 2 }}>
+        <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0].kind === 'header' ? 0 : 2 }}>
           <DashboardSidebarSubNavigation subNavigation={navigation} />
         </Box>
       </Drawer>

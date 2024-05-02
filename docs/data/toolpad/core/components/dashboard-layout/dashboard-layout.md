@@ -4,7 +4,7 @@
 
 ## Demo
 
-A DashboardLayout comes with a configurable header and sidebar with navigation.
+A DashboardLayout has a configurable header and sidebar with navigation.
 
 {{"demo": "DashboardLayoutBasic.js", "height": 500, "iframe": true}}
 
@@ -22,9 +22,9 @@ The `navigation` prop in the `AppProvider` allows for setting any type of naviga
 
 {{"demo": "DashboardLayoutNavigation.js", "height": 640, "iframe": true}}
 
-## API
+<!-- ## API
 
 See the documentation below for a complete reference to all of the props available to the components mentioned here.
 
-- [`<AppProvider />`](/toolpad/studio/reference/components/app-provider/#properties)
-- [`<DashboardLayout />`](/toolpad/studio/reference/components/dashboard-layout/#properties)
+- [`<AppProvider />`](/toolpad/core/reference/components/app-provider/#properties)
+- [`<DashboardLayout />`](/toolpad/core/reference/components/dashboard-layout/#properties) -->

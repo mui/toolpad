@@ -173,7 +173,7 @@ const NAVIGATION = [
     icon: <DescriptionIcon />,
   },
   {
-    title: 'Folder 3',
+    title: 'Folder 2',
     icon: <FolderIcon />,
     children: [
       {

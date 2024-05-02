@@ -4,7 +4,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import type { Theme } from '@emotion/react';
 
 export interface Branding {
-  name?: string;
+  title?: string;
   logo?: React.ReactNode;
 }
 

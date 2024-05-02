@@ -142,7 +142,6 @@ export default function AppCanvas({ basename, state }: AppCanvasProps) {
 
     setCommandHandler(bridge.canvasCommands, 'getPageViewState', () => {
       invariant(appRootRef.current, 'App root not found');
-
       let nodes = viewState.current.nodes;
 
       for (const [nodeId, nodeInfo] of Object.entries(nodes)) {
@@ -152,6 +151,15 @@ export default function AppCanvas({ basename, state }: AppCanvasProps) {
       }
 
       return { nodes };
+    });
+
+    setCommandHandler(bridge.canvasCommands, 'scrollComponent', (nodeId) => {
+      if (!nodeId) {
+        return;
+      }
+      invariant(appRootRef.current, 'App root not found');
+      const canvasNode = appRootRef.current.querySelector(`[data-node-id='${nodeId}']`);
+      canvasNode?.scrollIntoView({ behavior: 'instant', block: 'end', inline: 'end' });
     });
 
     setCommandHandler(bridge.canvasCommands, 'getViewCoordinates', (clientX, clientY) => {

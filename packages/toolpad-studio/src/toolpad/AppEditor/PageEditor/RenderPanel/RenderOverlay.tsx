@@ -1160,6 +1160,17 @@ export default function RenderOverlay({ bridge }: RenderOverlayProps) {
     };
   }, [handleNodeDragEnd]);
 
+  const scrollSelectedNode = React.useCallback(() => {
+    if (!selectedNode) {
+      return;
+    }
+    bridge?.canvasCommands.scrollComponent(selectedNode.id as string);
+  }, [bridge?.canvasCommands, selectedNode]);
+
+  React.useEffect(() => {
+    scrollSelectedNode();
+  }, [scrollSelectedNode]);
+
   const resizePreviewElementRef = React.useRef<HTMLDivElement | null>(null);
 
   const overlayGridRef = React.useRef<OverlayGridHandle>({

@@ -103,7 +103,6 @@ interface IToolpadProject {
   events: Emitter<ProjectEvents>;
   getRoot(): string;
   getOutputFolder(): string;
-  invalidateQueries(): void;
 }
 
 export default class FunctionsManager {
@@ -198,7 +197,6 @@ export default class FunctionsManager {
 
       this.buildErrors = args.errors;
 
-      this.project.invalidateQueries();
       this.project.events.emit('functionsChanged', {});
     };
 

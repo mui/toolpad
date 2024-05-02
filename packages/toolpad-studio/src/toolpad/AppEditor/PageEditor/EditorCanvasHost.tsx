@@ -7,6 +7,7 @@ import {
   AppHostProvider,
   useAppHost,
   queryClient,
+  NodeId,
 } from '@toolpad/studio-runtime';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
@@ -182,6 +183,13 @@ export default function EditorCanvasHost({
             queryClient.invalidateQueries();
           },
           update: () => {},
+          scrollComponent: (nodeId: NodeId) => {
+            if (!appRoot) {
+              return;
+            }
+            const node = appRoot.querySelector(`[data-node-id='${nodeId}']`);
+            node?.scrollIntoView({ behavior: 'instant', block: 'end', inline: 'end' });
+          },
         }),
       } satisfies ToolpadBridge;
 

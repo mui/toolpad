@@ -16,12 +16,6 @@ import type * as appDom from '@toolpad/studio-runtime/appDom';
 import type { Rectangle } from './utils/geometry';
 import type { RuntimeState } from './runtime';
 
-// These are set at runtime and passed to the browser.
-// Do not add secrets
-export interface RuntimeConfig {
-  externalUrl: string;
-}
-
 declare global {
   interface Error {
     code?: unknown;
@@ -104,7 +98,6 @@ export interface QueryEditorProps<C, Q, A extends Methods = {}> {
   settingsTab?: React.ReactNode;
   onChange?: React.Dispatch<React.SetStateAction<appDom.QueryNode<Q>>>;
   onCommit?: () => void;
-  runtimeConfig: RuntimeConfig;
 }
 
 export type QueryEditor<C, Q, A extends Methods> = React.FC<QueryEditorProps<C, Q, A>>;
@@ -202,7 +195,6 @@ export type ProjectEvents = {
 export interface ToolpadProjectOptions {
   toolpadDevMode: boolean;
   dev: boolean;
-  externalUrl?: string;
   base: string;
   customServer: boolean;
 }

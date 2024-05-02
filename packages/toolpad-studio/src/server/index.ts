@@ -52,11 +52,7 @@ async function createDevHandler(project: ToolpadProject) {
 
   const appServerPath = path.resolve(currentDirectory, '../cli/appServerWorker.mjs');
 
-  const [wsPort, devPort, runtimeConfig] = await Promise.all([
-    getPort(),
-    getPort(),
-    project.getRuntimeConfig(),
-  ]);
+  const [wsPort, devPort] = await Promise.all([getPort(), getPort()]);
 
   const mainThreadRpcChannel = new MessageChannel();
   const worker = new Worker(appServerPath, {
@@ -64,7 +60,6 @@ async function createDevHandler(project: ToolpadProject) {
       toolpadDevMode: project.options.toolpadDevMode,
       outDir: project.getAppOutputFolder(),
       base: project.options.base,
-      config: runtimeConfig,
       root: project.getRoot(),
       port: devPort,
       mainThreadRpcPort: mainThreadRpcChannel.port1,
@@ -198,7 +193,6 @@ export interface ToolpadHandlerConfig {
   dev: boolean;
   dir: string;
   base: string;
-  externalUrl: string;
   toolpadDevMode?: boolean;
 }
 
@@ -206,9 +200,8 @@ export async function createHandler({
   dev = false,
   dir = './toolpad',
   base = '/prod',
-  externalUrl = 'http://localhost:3000',
 }: ToolpadHandlerConfig): Promise<AppHandler> {
-  const project = await initProject({ dev, dir, externalUrl, base, customServer: true });
+  const project = await initProject({ dev, dir, base, customServer: true });
   await project.start();
 
   const appHandler = await createToolpadAppHandler(project);
@@ -223,14 +216,13 @@ export async function createHandler({
 
 async function createToolpadHandler({
   dev,
-  externalUrl,
   base,
   dir,
   toolpadDevMode,
 }: ToolpadHandlerConfig): Promise<AppHandler> {
   const editorBasename = '/_toolpad';
 
-  const project = await initProject({ toolpadDevMode, dev, dir, externalUrl, base });
+  const project = await initProject({ toolpadDevMode, dev, dir, base });
   await project.checkPlan();
   await project.start();
 
@@ -373,15 +365,12 @@ export async function runApp({
     }
   }
 
-  const externalUrl = process.env.TOOLPAD_EXTERNAL_URL || `http://localhost:${port}`;
-
   const server = await startToolpadServer({
     dev,
     base,
     dir,
     port,
     toolpadDevMode: !!process.env.TOOLPAD_NEXT_DEV || toolpadDevMode,
-    externalUrl,
   });
 
   const toolpadUrl = `http://localhost:${server.port}/`;

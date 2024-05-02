@@ -457,6 +457,7 @@ export interface SerializableGridColumn
   dateFormat?: DateFormat;
   dateTimeFormat?: DateFormat;
   codeComponent?: string;
+  visible?: boolean;
 }
 
 export type SerializableGridColumns = SerializableGridColumn[];
@@ -1277,6 +1278,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const appHost = useAppHost();
   const isProPlan = appHost.plan === 'pro';
 
+  const columnVisibilityModel = Object.fromEntries(
+    (columnsProp ?? []).map((column) => [column.field, column.visible ?? true]),
+  );
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
@@ -1304,7 +1309,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               getRowId={getRowId}
               onRowSelectionModelChange={onSelectionModelChange}
               rowSelectionModel={selectionModel}
-              initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
+              initialState={{
+                columns: { columnVisibilityModel },
+                pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] },
+              }}
               disableAggregation={!isProPlan}
               disableRowGrouping={!isProPlan}
               {...props}

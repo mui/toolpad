@@ -12,9 +12,5 @@
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.words": ["Toolpad"],
-  "circleci.persistedProjectSelection": [
-    "gh/bharatkashyap/mui-toolpad",
-    "gh/apedroferreira/mui-toolpad",
-    "gh/mui/mui-toolpad"
-  ]
+  "circleci.persistedProjectSelection": []
 }

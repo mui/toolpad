@@ -1034,31 +1034,35 @@ function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayPro
   let message: React.ReactNode = null;
   if (lastResult) {
     if (lastResult.action === 'create') {
-      message = lastResult.error ? (
-        `Failed to create a record, ${lastResult.error.message}`
-      ) : (
-        <React.Fragment>
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <Link
-            href="#"
-            color="inherit"
-            onClick={(event) => {
-              event.preventDefault();
-              const index = apiRef.current.getAllRowIds().indexOf(lastResult.id);
-              const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
-              const fieldToFocus: string | undefined = visibleFields[0];
-              if (index >= 0 && fieldToFocus) {
-                apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
-                apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
-              }
-            }}
-            aria-label="Go to new record"
-          >
-            New record
-          </Link>{' '}
-          created successfully
-        </React.Fragment>
-      );
+      if (lastResult.error) {
+        message = `Failed to create a record, ${lastResult.error.message}`;
+      } else {
+        const index = apiRef.current.getAllRowIds().indexOf(lastResult.id);
+        const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
+        const fieldToFocus: string | undefined = visibleFields[0];
+        if (index >= 0 && fieldToFocus) {
+          message = (
+            <React.Fragment>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <Link
+                href="#"
+                color="inherit"
+                onClick={(event) => {
+                  event.preventDefault();
+                  apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
+                  apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
+                }}
+                aria-label="Go to new record"
+              >
+                New record
+              </Link>{' '}
+              created successfully
+            </React.Fragment>
+          );
+        } else {
+          message = 'New record created successfully';
+        }
+      }
     } else if (lastResult.action === 'update') {
       message = lastResult.error
         ? `Failed to update a record, ${lastResult.error.message}`

@@ -290,6 +290,7 @@ function QueryEditor({
                   filePath={selectedFile ?? ''}
                   fileType="resource"
                   disableRipple
+                  disabled={!selectedFile}
                   sx={(theme) => ({
                     marginTop: theme.spacing(1),
                     marginLeft: theme.spacing(1),

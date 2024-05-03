@@ -1,30 +1,35 @@
 {
   "name": "@toolpad/core",
   "version": "0.1.54",
+  "author": "Toolpad Team",
+  "description": "Dashboard framework powered by MUI.",
+  "main": "./build/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./build/index.d.ts",
+      "default": "./build/index.js"
+    },
+    "./*": {
+      "types": "./build/*/index.d.ts",
+      "default": "./build/*/index.js"
+    }
+  },
   "keywords": [
     "react",
     "mui",
     "toolpad"
   ],
-  "description": "Dashboard framework powered by MUI.",
   "repository": {
     "type": "git",
     "url": "https://github.com/mui/mui-toolpad.git",
     "directory": "packages/toolpad-core"
   },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
-  "author": "Toolpad Team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
-  "license": "MIT",
-  "main": "./build/index.js",
-  "files": [
-    "build/AppProvider/",
-    "build/DashboardLayout/",
-    "build/node/AppProvider/",
-    "build/node/DashboardLayout/"
-  ],
   "scripts": {
     "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
     "build:node": "node ../../scripts/build.mjs node",
@@ -32,6 +37,7 @@
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
     "build:types": "tsc -b tsconfig.build.json",
     "prebuild": "rimraf build tsconfig.build.tsbuildinfo",
+    "pack": "echo fuckyu",
     "dev": "pnpm build:stable --watch & pnpm build:types --watch",
     "check-types": "tsc --noEmit",
     "test": "vitest run"
@@ -92,10 +98,17 @@
       "optional": true
     }
   },
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "files": [
+    "AppProvider/",
+    "DashboardLayout/",
+    "node/AppProvider/",
+    "node/DashboardLayout/"
+  ]
 }

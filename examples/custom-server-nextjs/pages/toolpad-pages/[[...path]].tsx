@@ -1,7 +1,5 @@
-import dynamic from 'next/dynamic';
 import * as React from 'react';
-
-const ToolpadAppClient = dynamic(() => import('@toolpad/studio/next-client'), { ssr: false });
+import ToolpadAppClient from '@toolpad/studio/next-client';
 
 export async function getServerSideProps() {
   const { default: project } = await import('../../toolpad-server');

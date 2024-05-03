@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 export default {
   webpack: (config) => {
+    config.resolve.fallback = { '@blitz/internal': false };
     config.externals.push({
       fsevents: 'commonjs fsevents',
       chokidar: 'commonjs chokidar',

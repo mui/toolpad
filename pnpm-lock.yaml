@@ -436,6 +436,9 @@ importers:
       chokidar:
         specifier: 3.5.3
         version: 3.5.3
+      esbuild:
+        specifier: 0.20.2
+        version: 0.20.2
       express:
         specifier: 4.19.2
         version: 4.19.2

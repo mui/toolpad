@@ -1,25 +1,10 @@
 import * as path from 'path';
 import * as url from 'url';
-import * as vm from 'node:vm';
 import * as fs from 'fs/promises';
 import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@toolpad/studio-runtime/server';
 import * as z from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import * as crypto from 'crypto';
-
-async function importExports(importFileUrl: string): Promise<Map<string, unknown>> {
-  // @ts-expect-error Only available in node 22
-  if (vm.constants?.USE_MAIN_CONTEXT_DEFAULT_LOADER) {
-    const script = new vm.Script(`import(${JSON.stringify(importFileUrl)})`, {
-      // @ts-expect-error Only available in node 22
-      importModuleDynamically: vm.constants.USE_MAIN_CONTEXT_DEFAULT_LOADER,
-    });
-    const exports = await script.runInNewContext();
-    return exports;
-  }
-
-  return import(importFileUrl);
-}
 
 async function loadExports(filePath: string): Promise<Map<string, unknown>> {
   // Need a valid file URL on Windows for the dynamic import()
@@ -27,7 +12,8 @@ async function loadExports(filePath: string): Promise<Map<string, unknown>> {
   const content = await fs.readFile(importFileUrl, 'utf-8');
   const hash = crypto.createHash('md5').update(content).digest('hex');
   importFileUrl.searchParams.set('hash', hash);
-  const exports = await importExports(importFileUrl.href);
+  // webpackIgnore: true is used to instruct webpack in Next.js to use the native import() function
+  const exports = await import(/* webpackIgnore: true */ importFileUrl.href);
   return new Map(Object.entries(exports));
 }
 

@@ -79,17 +79,7 @@ export interface CreateHandlerParams {
   base: string;
 }
 
-function getCurrentNodeVersion() {
-  const [major, minor, patch] = process.versions.node.split('.').map(Number);
-  return { major, minor, patch };
-}
-
 export function createApiHandler({ base, dir }: CreateHandlerParams): RequestHandler {
-  const { major } = getCurrentNodeVersion();
-  if (major < 22) {
-    throw new Error('Toolpad Studio requires Node.js 22 or higher');
-  }
-
   const project = new ToolpadProject(dir, false);
   const runtimeRpcServer = createRpcServer(project);
   const handler = createRpcHandler(runtimeRpcServer);

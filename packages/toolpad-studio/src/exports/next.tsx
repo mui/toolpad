@@ -4,7 +4,7 @@ import { Emitter } from '@toolpad/utils/events';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import { IncomingMessage, ServerResponse } from 'http';
 import express from 'express';
-import { getOutputFolder, loadDom, resolveProjectDir } from '../server/localMode';
+import { getOutputFolder, loadDom, resolveProjectDir, initProject } from '../server/localMode';
 import createRuntimeState from '../runtime/createRuntimeState';
 import EnvManager from '../server/EnvManager';
 import FunctionsManager from '../server/FunctionsManager';
@@ -75,12 +75,13 @@ export interface RequestHandler {
 }
 
 export interface CreateHandlerParams {
-  dir: string;
   base: string;
 }
 
-export function createApiHandler({ base, dir }: CreateHandlerParams): RequestHandler {
-  const project = new ToolpadProject(dir, false);
+export function createApiHandler(
+  project: ToolpadProject,
+  { base }: CreateHandlerParams,
+): RequestHandler {
   const runtimeRpcServer = createRpcServer(project);
   const handler = createRpcHandler(runtimeRpcServer);
   const x = express();
@@ -111,11 +112,10 @@ function cleanUndefinedProperties(obj: any) {
   return obj;
 }
 
-export async function getServerSideProps({ base, dir = './toolpad' }: CreateHandlerParams) {
-  const project = new ToolpadProject(dir, false);
+export async function getServerSideProps(project: ToolpadProject) {
   const dom = await project.loadDom();
   const state = createRuntimeState({ dom });
-  return cleanUndefinedProperties({ props: { basename: base, state } });
+  return cleanUndefinedProperties({ props: { state } });
 }
 
-// export { initProject };
+export { initProject };

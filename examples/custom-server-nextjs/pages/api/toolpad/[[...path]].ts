@@ -1,4 +1,5 @@
 import { createApiHandler } from '@toolpad/studio/next';
+import { getProject } from '../../../toolpad-server';
 
 export const config = {
   api: {
@@ -7,4 +8,6 @@ export const config = {
   },
 };
 
-export default createApiHandler({ dir: './toolpad', base: '/api/toolpad' });
+const project = await getProject();
+
+export default createApiHandler(project, { base: '/api/toolpad' });

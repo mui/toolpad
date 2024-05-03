@@ -1,19 +1,20 @@
 'use server';
 
-import * as React from 'react';
 import { Emitter } from '@toolpad/utils/events';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import { IncomingMessage, ServerResponse } from 'http';
-import ToolpadAppClient from './next-client';
+import express from 'express';
 import { getOutputFolder, loadDom, resolveProjectDir } from '../server/localMode';
 import createRuntimeState from '../runtime/createRuntimeState';
 import EnvManager from '../server/EnvManager';
 import FunctionsManager from '../server/FunctionsManager';
 import DataManager from '../server/DataManager';
-import { RuntimeConfig } from '../types';
+import { createRpcServer } from '../server/runtimeRpcServer';
+import { createRpcHandler } from '../server/rpc';
 
 export interface ToolpadAppServerProps {
   base: string;
+  apiUrl: string;
   dir: string;
 }
 
@@ -67,23 +68,64 @@ class ToolpadProject {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars, class-methods-use-this, @typescript-eslint/no-empty-function
   async saveDom(dom: appDom.AppDom) {}
-
-  // eslint-disable-next-line class-methods-use-this
-  async getRuntimeConfig(): Promise<RuntimeConfig> {
-    return { externalUrl: '' };
-  }
 }
 
-interface RequestHandler {
+export interface RequestHandler {
   (req: IncomingMessage, res: ServerResponse): Promise<void>;
 }
 
-function createHandler<T>(fn: (project: ToolpadProject) => T): RequestHandler {}
+export interface CreateHandlerParams {
+  dir: string;
+  base: string;
+}
 
-export async function ToolpadApp({ base, dir = './toolpad' }: ToolpadAppServerProps) {
+function getCurrentNodeVersion() {
+  const [major, minor, patch] = process.versions.node.split('.').map(Number);
+  return { major, minor, patch };
+}
+
+export function createApiHandler({ base, dir }: CreateHandlerParams): RequestHandler {
+  const { major } = getCurrentNodeVersion();
+  if (major < 22) {
+    throw new Error('Toolpad Studio requires Node.js 22 or higher');
+  }
+
+  const project = new ToolpadProject(dir, false);
+  const runtimeRpcServer = createRpcServer(project);
+  const handler = createRpcHandler(runtimeRpcServer);
+  const x = express();
+  x.use(base, handler);
+  return (req, res) => x(req, res);
+}
+
+// TODO: Make this obsolete
+function cleanUndefinedProperties(obj: any) {
+  if (Array.isArray(obj)) {
+    for (let i = obj.length - 1; i >= 0; i -= 1) {
+      const item = obj[i];
+      if (item === undefined) {
+        obj.splice(obj.indexOf(item), 1);
+      } else {
+        cleanUndefinedProperties(item);
+      }
+    }
+  } else if (obj && typeof obj === 'object') {
+    for (const key of Object.keys(obj)) {
+      if (obj[key] === undefined) {
+        delete obj[key];
+      } else {
+        cleanUndefinedProperties(obj[key]);
+      }
+    }
+  }
+  return obj;
+}
+
+export async function getServerSideProps({ base, dir = './toolpad' }: CreateHandlerParams) {
   const project = new ToolpadProject(dir, false);
   const dom = await project.loadDom();
-  const initialState = createRuntimeState({ dom });
-
-  return <ToolpadAppClient basename={base} state={initialState} />;
+  const state = createRuntimeState({ dom });
+  return cleanUndefinedProperties({ props: { basename: base, state } });
 }
+
+// export { initProject };

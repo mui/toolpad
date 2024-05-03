@@ -37,7 +37,6 @@
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
     "build:types": "tsc -b tsconfig.build.json",
     "prebuild": "rimraf build tsconfig.build.tsbuildinfo",
-    "pack": "echo fuckyu",
     "dev": "pnpm build:stable --watch & pnpm build:types --watch",
     "check-types": "tsc --noEmit",
     "test": "vitest run"

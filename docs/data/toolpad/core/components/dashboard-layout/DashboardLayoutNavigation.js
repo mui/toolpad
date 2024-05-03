@@ -90,7 +90,7 @@ const NAVIGATION = [
   },
 ];
 
-export default function NavigationDashboardLayout() {
+export default function DashboardLayoutNavigation() {
   return (
     <AppProvider theme={theme} navigation={NAVIGATION}>
       <DashboardLayout>

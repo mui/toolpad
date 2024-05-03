@@ -18,12 +18,12 @@
   "author": "Toolpad Team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "license": "MIT",
-  "main": "./src/index.ts",
+  "main": "./build/index.js",
   "files": [
-    "AppProvider/",
-    "DashboardLayout/",
-    "node/AppProvider/",
-    "node/DashboardLayout/"
+    "build/AppProvider/",
+    "build/DashboardLayout/",
+    "build/node/AppProvider/",
+    "build/node/DashboardLayout/"
   ],
   "scripts": {
     "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
@@ -92,7 +92,6 @@
       "optional": true
     }
   },
-  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },

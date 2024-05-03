@@ -217,7 +217,10 @@ export function DashboardLayout({
         }}
       >
         <Toolbar />
-        <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0].kind === 'header' ? 0 : 2 }}>
+        <Box
+          component="nav"
+          sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}
+        >
           <DashboardSidebarSubNavigation subNavigation={navigation} />
         </Box>
       </Drawer>

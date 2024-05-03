@@ -8,9 +8,9 @@ import { render, cleanup } from '@testing-library/react';
 import { createTheme } from '@mui/material/styles';
 import { AppProvider } from './AppProvider';
 
-afterEach(cleanup);
-
 describe('AppProvider', () => {
+  afterEach(cleanup);
+
   test('renders content correctly', async () => {
     const theme = createTheme();
 

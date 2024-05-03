@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { createTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -24,7 +23,7 @@ const BRANDING = {
   title: 'MUI',
 };
 
-export default function BrandingDashboardLayout() {
+export default function DashboardLayoutBranding() {
   return (
     <AppProvider theme={theme} navigation={NAVIGATION} branding={BRANDING}>
       <DashboardLayout>

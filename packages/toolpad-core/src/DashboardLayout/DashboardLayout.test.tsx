@@ -13,9 +13,9 @@ import LayersIcon from '@mui/icons-material/Layers';
 import { DashboardLayout } from './DashboardLayout';
 import { BrandingContext, Navigation, NavigationContext } from '../AppProvider';
 
-afterEach(cleanup);
-
 describe('DashboardLayout', () => {
+  afterEach(cleanup);
+
   test('renders content correctly', async () => {
     const { getByText } = render(<DashboardLayout>Hello world</DashboardLayout>);
 
@@ -24,7 +24,7 @@ describe('DashboardLayout', () => {
 
   test('renders branding correctly in header', async () => {
     const BRANDING = {
-      name: 'My Company',
+      title: 'My Company',
       logo: <img src="https://placehold.co/600x400" alt="Placeholder Logo" />,
     };
 
@@ -48,10 +48,12 @@ describe('DashboardLayout', () => {
       },
       {
         title: 'Dashboard',
+        path: '/dashboard',
         icon: <DashboardIcon />,
       },
       {
         title: 'Orders',
+        path: '/orders',
         icon: <ShoppingCartIcon />,
       },
       {
@@ -89,42 +91,39 @@ describe('DashboardLayout', () => {
 
     const navigation = getByRole('navigation');
 
-    const mainItemsList = navigation.querySelector('[aria-labelledby="Main items"]') as HTMLElement;
-    const analyticsList = navigation.querySelector('[aria-labelledby="Analytics"]') as HTMLElement;
-
     // Check list subheaders
 
-    expect(within(mainItemsList).getByText('Main items')).toBeTruthy();
-    expect(within(analyticsList).getByText('Analytics')).toBeTruthy();
+    expect(within(navigation).getByText('Main items')).toBeTruthy();
+    expect(within(navigation).getByText('Analytics')).toBeTruthy();
 
     // Check list items and their links
 
-    const mainItemsListDashboardItem = within(mainItemsList).getByText('Dashboard');
-    const mainItemsListOrdersItem = within(mainItemsList).getByText('Orders');
+    const dashboardItem = within(navigation).getByText('Dashboard');
+    const ordersItem = within(navigation).getByText('Orders');
 
-    expect(mainItemsListDashboardItem).toBeTruthy();
-    expect(mainItemsListOrdersItem).toBeTruthy();
+    expect(dashboardItem).toBeTruthy();
+    expect(ordersItem).toBeTruthy();
 
-    const mainItemsListDashboardItemLink = mainItemsListDashboardItem.closest('a') as HTMLElement;
-    expect(mainItemsListDashboardItemLink.getAttribute('href')).toBe('/dashboard');
-    const mainItemsListOrdersItemLink = mainItemsListOrdersItem.closest('a') as HTMLElement;
-    expect(mainItemsListOrdersItemLink.getAttribute('href')).toBe('/orders');
+    const dashboardItemLink = dashboardItem.closest('a') as HTMLElement;
+    expect(dashboardItemLink.getAttribute('href')).toBe('/dashboard');
+    const ordersItemLink = ordersItem.closest('a') as HTMLElement;
+    expect(ordersItemLink.getAttribute('href')).toBe('/orders');
 
-    const analyticsListReportsItem = within(analyticsList).getByText('Reports');
+    const reportsItem = within(navigation).getByText('Reports');
 
-    expect(analyticsListReportsItem).toBeTruthy();
-    expect(within(analyticsList).getByText('Integrations')).toBeTruthy();
+    expect(reportsItem).toBeTruthy();
+    expect(within(navigation).getByText('Integrations')).toBeTruthy();
 
-    expect(within(analyticsList).queryByText('Sales')).toBeNull();
-    expect(within(analyticsList).queryByText('Traffic')).toBeNull();
+    expect(within(navigation).queryByText('Sales')).toBeNull();
+    expect(within(navigation).queryByText('Traffic')).toBeNull();
 
     // Check nested list items
 
-    analyticsListReportsItem.click();
+    reportsItem.click();
 
     await waitFor(async () => {
-      expect(within(analyticsList).getByText('Sales')).toBeTruthy();
-      expect(within(analyticsList).getByText('Traffic')).toBeTruthy();
+      expect(within(navigation).getByText('Sales')).toBeTruthy();
+      expect(within(navigation).getByText('Traffic')).toBeTruthy();
     });
   });
 });

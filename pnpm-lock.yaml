@@ -542,8 +542,8 @@ importers:
         specifier: 11.11.5
         version: 11.11.5(@emotion/react@11.11.4)(@types/react@18.3.1)(react@18.2.0)
       '@googleapis/drive':
-        specifier: 8.7.0
-        version: 8.7.0
+        specifier: 8.8.0
+        version: 8.8.0
       '@googleapis/sheets':
         specifier: 5.0.5
         version: 5.0.5
@@ -2260,8 +2260,8 @@ packages:
     resolution: {integrity: sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==}
     dev: true
 
-  /@googleapis/drive@8.7.0:
-    resolution: {integrity: sha512-XAi6kfySIU4H3ivX2DpzTDce5UhNke5NxEWCL6tySEdcVqx+cmXJmkMqwfOAHJalEB5s9PPfdLBU29Xd5XlLSQ==}
+  /@googleapis/drive@8.8.0:
+    resolution: {integrity: sha512-EOZ9GZCOUdej9PJVnkai7qu5RPyFLYse8FlpgijzfnZPOACXWFf4XOFuAuMcMw4Zue8xPhAPHu1qYcy8u362Xw==}
     engines: {node: '>=12.0.0'}
     dependencies:
       googleapis-common: 7.2.0

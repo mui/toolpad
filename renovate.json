@@ -17,10 +17,6 @@
       "description": "At the top so other rules can overwrite it"
     },
     {
-      "groupName": "Examples",
-      "matchFileNames": ["examples/**"]
-    },
-    {
       "matchDepTypes": ["peerDependencies"],
       "rangeStrategy": "widen"
     },
@@ -55,6 +51,10 @@
     {
       "groupName": "Tanstack",
       "matchPackagePatterns": ["^@tanstack/"]
+    },
+    {
+      "groupName": "Google APIs",
+      "matchPackagePatterns": ["^@googleapis/"]
     },
     {
       "groupName": "React",
@@ -114,6 +114,10 @@
     {
       "groupName": "GitHub Actions",
       "matchManagers": ["github-actions"]
+    },
+    {
+      "groupName": "Examples",
+      "matchFileNames": ["examples/**"]
     },
     {
       "groupName": "Update @toolpad/studio in examples",

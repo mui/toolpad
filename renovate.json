@@ -36,7 +36,7 @@
     {
       "groupName": "eslint",
       "matchPackageNames": ["eslint"],
-      "matchPackagePatterns": ["^eslint-", "^@eslint/", "^@eslint-"]
+      "matchPackagePatterns": ["^eslint-", "^@eslint/", "^@eslint-", "^@typescript-eslint/"]
     },
     {
       "groupName": "stylis",

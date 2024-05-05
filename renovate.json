@@ -49,6 +49,15 @@
       "matchPackagePatterns": ["^@next/"]
     },
     {
+      "groupName": "zod",
+      "matchPackageNames": ["zod"],
+      "matchPackagePatterns": ["^zod-"]
+    },
+    {
+      "groupName": "react-router",
+      "matchPackageNames": ["react-router", "react-router-dom"],
+    },
+    {
       "groupName": "Tanstack",
       "matchPackagePatterns": ["^@tanstack/"]
     },

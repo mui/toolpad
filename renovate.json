@@ -53,6 +53,10 @@
       "matchPackagePatterns": ["^@next/"]
     },
     {
+      "groupName": "Tanstack",
+      "matchPackagePatterns": ["^@tanstack/"]
+    },
+    {
       "groupName": "React",
       "matchPackageNames": ["react", "react-dom", "react-is", "react-test-renderer"]
     },

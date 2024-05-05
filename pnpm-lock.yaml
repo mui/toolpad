@@ -179,7 +179,7 @@ importers:
         version: 0.1.1(vitest@1.5.2)
       vitest-fail-on-console:
         specifier: 0.6.3
-        version: 0.6.3(vite@5.2.10)(vitest@1.5.2)
+        version: 0.6.3(vite@5.2.11)(vitest@1.5.2)
 
   docs:
     dependencies:
@@ -612,7 +612,7 @@ importers:
         version: 9.0.15
       '@vitejs/plugin-react':
         specifier: 4.2.1
-        version: 4.2.1(vite@5.2.10)
+        version: 4.2.1(vite@5.2.11)
       '@webcontainer/env':
         specifier: 1.1.1
         version: 1.1.1
@@ -773,8 +773,8 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vite:
-        specifier: 5.2.10
-        version: 5.2.10(@types/node@20.12.8)
+        specifier: 5.2.11
+        version: 5.2.11(@types/node@20.12.8)
       vm-browserify:
         specifier: 1.1.2
         version: 1.1.2
@@ -4951,7 +4951,7 @@ packages:
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
 
-  /@vitejs/plugin-react@4.2.1(vite@5.2.10):
+  /@vitejs/plugin-react@4.2.1(vite@5.2.11):
     resolution: {integrity: sha512-oojO9IDc4nCUUi8qIR11KoQm0XFFLIwsRBwHRR4d/88IWghn1y6ckz/bJ8GHDCsYEJee8mDzqtJxh15/cisJNQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -4962,7 +4962,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.24.1(@babel/core@7.24.5)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.2.10(@types/node@20.12.8)
+      vite: 5.2.11(@types/node@20.12.8)
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -14551,7 +14551,7 @@ packages:
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.2.10(@types/node@20.12.8)
+      vite: 5.2.11(@types/node@20.12.8)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -14562,8 +14562,8 @@ packages:
       - supports-color
       - terser
 
-  /vite@5.2.10(@types/node@20.12.8):
-    resolution: {integrity: sha512-PAzgUZbP7msvQvqdSD+ErD5qGnSFiGOoWmV5yAKUEI0kdhjbH6nMWVyZQC/hSc4aXwc0oJ9aEdIiF9Oje0JFCw==}
+  /vite@5.2.11(@types/node@20.12.8):
+    resolution: {integrity: sha512-HndV31LWW05i1BLPMUCE1B9E9GFbOu1MbenhS58FuK6owSO5qHm7GiCotrNY1YE5rMeQSFBGmT5ZaLEjFizgiQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -14611,7 +14611,7 @@ packages:
       vitest: 1.5.2(@types/node@20.12.8)(jsdom@24.0.0)
     dev: true
 
-  /vitest-fail-on-console@0.6.3(vite@5.2.10)(vitest@1.5.2):
+  /vitest-fail-on-console@0.6.3(vite@5.2.11)(vitest@1.5.2):
     resolution: {integrity: sha512-h9XF3w+c83uM8uZP/F4NbxAnhpBngSYk9ywJuiOmihPXvmp1s7yifGcIlx+OZgCAV4IOL1zcy5dnT04q4MTTWg==}
     peerDependencies:
       vite: '>=4.5.2'
@@ -14619,7 +14619,7 @@ packages:
     dependencies:
       chalk: 5.3.0
       node-stdlib-browser: 1.2.0
-      vite: 5.2.10(@types/node@20.12.8)
+      vite: 5.2.11(@types/node@20.12.8)
       vitest: 1.5.2(@types/node@20.12.8)(jsdom@24.0.0)
     dev: true
 
@@ -14667,7 +14667,7 @@ packages:
       strip-literal: 2.1.0
       tinybench: 2.8.0
       tinypool: 0.8.4
-      vite: 5.2.10(@types/node@20.12.8)
+      vite: 5.2.11(@types/node@20.12.8)
       vite-node: 1.5.2(@types/node@20.12.8)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:

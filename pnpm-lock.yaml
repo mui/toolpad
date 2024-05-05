@@ -51,11 +51,11 @@ importers:
         specifier: 17.7.2
         version: 17.7.2
       zod:
-        specifier: 3.22.4
-        version: 3.22.4
+        specifier: 3.23.6
+        version: 3.23.6
       zod-to-json-schema:
         specifier: 3.22.5
-        version: 3.22.5(zod@3.22.4)
+        version: 3.22.5(zod@3.23.6)
     devDependencies:
       '@argos-ci/core':
         specifier: 1.5.5
@@ -794,11 +794,11 @@ importers:
         specifier: 17.7.2
         version: 17.7.2
       zod:
-        specifier: 3.22.4
-        version: 3.22.4
+        specifier: 3.23.6
+        version: 3.23.6
       zod-validation-error:
         specifier: 3.1.0
-        version: 3.1.0(zod@3.22.4)
+        version: 3.1.0(zod@3.23.6)
     devDependencies:
       '@types/babel__code-frame':
         specifier: 7.0.6
@@ -15183,25 +15183,25 @@ packages:
       readable-stream: 4.5.2
     dev: false
 
-  /zod-to-json-schema@3.22.5(zod@3.22.4):
+  /zod-to-json-schema@3.22.5(zod@3.23.6):
     resolution: {integrity: sha512-+akaPo6a0zpVCCseDed504KBJUQpEW5QZw7RMneNmKw+fGaML1Z9tUNLnHHAC8x6dzVRO1eB2oEMyZRnuBZg7Q==}
     peerDependencies:
       zod: ^3.22.4
     dependencies:
-      zod: 3.22.4
+      zod: 3.23.6
     dev: false
 
-  /zod-validation-error@3.1.0(zod@3.22.4):
+  /zod-validation-error@3.1.0(zod@3.23.6):
     resolution: {integrity: sha512-zujS6HqJjMZCsvjfbnRs7WI3PXN39ovTcY1n8a+KTm4kOH0ZXYsNiJkH1odZf4xZKMkBDL7M2rmQ913FCS1p9w==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       zod: ^3.18.0
     dependencies:
-      zod: 3.22.4
+      zod: 3.23.6
     dev: false
 
-  /zod@3.22.4:
-    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+  /zod@3.23.6:
+    resolution: {integrity: sha512-RTHJlZhsRbuA8Hmp/iNL7jnfc4nZishjsanDAfEY1QpDQZCahUp3xDzl+zfweE9BklxMUcgBgS1b7Lvie/ZVwA==}
     dev: false
 
   github.com/mui/material-ui/beef28264938138411e13e074dc4c60d498afbf8:

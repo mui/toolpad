@@ -126,7 +126,7 @@
     "yaml": "2.4.2",
     "yaml-diff-patch": "2.0.0",
     "yargs": "17.7.2",
-    "zod": "3.22.4",
+    "zod": "3.23.6",
     "zod-validation-error": "3.1.0"
   },
   "devDependencies": {

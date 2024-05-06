@@ -479,11 +479,11 @@ function getNarrowedColType(type?: string): GridColType | undefined {
   return (type && type in DEFAULT_COLUMN_TYPES ? type : undefined) as GridColType | undefined;
 }
 
-export function parseColumns(columns: SerializableGridColumns, isEditable?: boolean): GridColDef[] {
+export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map(({ type: colType, ...column }) => {
     const isIdColumn = column.field === 'id';
 
-    let baseColumn: Omit<GridColDef, 'field'> = { editable: isEditable };
+    let baseColumn: Omit<GridColDef, 'field'> = {};
 
     if (isIdColumn) {
       baseColumn = {
@@ -1244,8 +1244,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const columns: GridColDef[] = React.useMemo(
-    () => (columnsProp ? parseColumns(columnsProp, isRowUpdateModelAvailable) : []),
-    [columnsProp, isRowUpdateModelAvailable],
+    () => (columnsProp ? parseColumns(columnsProp) : []),
+    [columnsProp],
   );
 
   React.useEffect(() => {
@@ -1270,7 +1270,17 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   }, [nodeRuntime, rows]);
 
   const renderedColumns = React.useMemo<GridColDef[]>(() => {
-    const result = [...columns];
+    const mapEditableToColumns = columns.map((column) => {
+      if (column.editable || column.editable === false) {
+        return column;
+      }
+
+      column.editable = isRowUpdateModelAvailable;
+
+      return column;
+    });
+
+    const result = [...mapEditableToColumns];
 
     if (getProviderActions) {
       result.push({
@@ -1284,7 +1294,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     }
 
     return result;
-  }, [columns, getProviderActions]);
+  }, [columns, getProviderActions, isRowUpdateModelAvailable]);
 
   const appHost = useAppHost();
   const isProPlan = appHost.plan === 'pro';

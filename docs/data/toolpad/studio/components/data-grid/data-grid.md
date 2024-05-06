@@ -6,7 +6,7 @@
 
 Toolpad Studio builds on top of the [MUI X Data Grid](https://mui.com/x/react-data-grid/) to add faster customisation and integration with your internal tools.
 
-{{"demo": "DataGrid.js", "hideToolbar": true, "bg": "inline"}}
+{{"demo": "DataGridBasic.js", "hideToolbar": true, "bg": "inline"}}
 
 ## Usage
 
@@ -61,17 +61,23 @@ Takes three options: `compact`, `standard` and `comfortable`. The first two are 
 
 #### Compact
 
-{{"demo": "DataGrid.js", "hideToolbar": true, "bg": "inline"}}
+{{"demo": "DataGridBasic.js", "hideToolbar": true, "bg": "inline"}}
 
 #### Standard
 
-{{"demo": "DataGrid_standard.js", "hideToolbar": true, "bg": "inline"}}
+{{"demo": "DataGridStandard.js", "hideToolbar": true, "bg": "inline"}}
 
 ### `hideToolbar`
 
 This prop is used to show – or hide – the toolbar from the data grid. The following Data Grid is rendered along with the toolbar, by setting `hideToolbar` to `true`:
 
-{{"demo": "DataGrid_hidetoolbar.js", "bg": "inline"}}
+{{"demo": "DataGridHideToolbar.js", "hideToolbar": true, "bg": "inline"}}
+
+### Grouping and aggregating (PRO)
+
+When you use the [Toolpad pro plan](/), the DataGrid gains grouping and aggregating capabilities. You can turn this off for individual columns.
+
+{{"demo": "DataGridPro.js", "hideToolbar": true, "bg": "inline"}}
 
 ## API
 

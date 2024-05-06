@@ -3,8 +3,7 @@ import { styled } from '@mui/material';
 import { NodeHashes, NodeId } from '@toolpad/studio-runtime';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import EditorCanvasHostLegacy from '../EditorCanvasHost';
-import EditorCanvasHostInline from '../EditorCanvasHostInline';
+import EditorCanvasHost from '../EditorCanvasHost';
 import { getNodeHashes, useAppState, useAppStateApi, useDomApi } from '../../../AppState';
 import { usePageEditorApi, usePageEditorState } from '../PageEditorProvider';
 import RenderOverlay from './RenderOverlay';
@@ -12,10 +11,6 @@ import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 import { getBindingType } from '../../../../runtime/bindings';
 import createRuntimeState from '../../../../runtime/createRuntimeState';
 import { RuntimeState } from '../../../../runtime';
-
-const EditorCanvasHost = process.env.EXPERIMENTAL_INLINE_CANVAS
-  ? EditorCanvasHostInline
-  : EditorCanvasHostLegacy;
 
 const classes = {
   view: 'Toolpad_View',
@@ -115,7 +110,7 @@ export default function RenderPanel({ className }: RenderPanelProps) {
         base={appState.appUrl}
         savedNodes={savedNodes}
         pageName={page.name}
-        overlay={appDom.isCodePage(page) ? null : <RenderOverlay bridge={bridge} />}
+        overlay={<RenderOverlay bridge={bridge} />}
         onInit={handleInit}
       />
     </RenderPanelRoot>

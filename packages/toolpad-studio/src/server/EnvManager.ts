@@ -5,13 +5,12 @@ import { Emitter } from '@toolpad/utils/events';
 import chalk from 'chalk';
 import { truncate } from '@toolpad/utils/strings';
 import { Awaitable } from '@toolpad/utils/types';
-import { ProjectEvents, ToolpadProjectOptions } from '../types';
+import { ProjectEvents } from '../types';
 
 interface IToolpadProject {
-  options: ToolpadProjectOptions;
+  options: { dev: boolean };
   events: Emitter<ProjectEvents>;
   getRoot(): string;
-  invalidateQueries(): void;
 }
 
 /**
@@ -88,7 +87,6 @@ export default class EnvManager {
       this.loadEnvFile();
 
       this.project.events.emit('envChanged', {});
-      this.project.invalidateQueries();
     };
 
     this.watcher.on('add', handleChange);
@@ -96,8 +94,8 @@ export default class EnvManager {
     this.watcher.on('change', handleChange);
   }
 
-  async getDeclaredValues(): Promise<Record<string, string>> {
-    return this.values;
+  async getDeclaredKeys(): Promise<string[]> {
+    return Object.keys(this.values);
   }
 
   // eslint-disable-next-line class-methods-use-this

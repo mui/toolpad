@@ -9,22 +9,14 @@ export function escapeCell(value: string): string {
     .replace(/\r?\n/g, '<br />');
 }
 
-export async function writePrettifiedFile(
-  filename: string,
-  data: string,
-  prettierConfigPath: string,
-) {
-  const prettierConfig = await prettier.resolveConfig(filename, {
-    config: prettierConfigPath,
-  });
+export async function writePrettifiedFile(filepath: string, data: string) {
+  const prettierConfig = await prettier.resolveConfig(filepath);
 
-  if (prettierConfig === null) {
-    throw new Error(
-      `Could not resolve config for '${filename}' using prettier config path '${prettierConfigPath}'.`,
-    );
+  if (!prettierConfig) {
+    throw new Error(`Could not resolve config for '${filepath}'.`);
   }
 
-  const content = await prettier.format(data, { ...prettierConfig, filepath: filename });
+  const content = await prettier.format(data, { ...prettierConfig, filepath });
 
-  await fs.writeFile(filename, content, { encoding: 'utf8' });
+  await fs.writeFile(filepath, content, { encoding: 'utf8' });
 }

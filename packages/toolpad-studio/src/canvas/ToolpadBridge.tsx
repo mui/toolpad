@@ -1,13 +1,6 @@
 import { Emitter } from '@toolpad/utils/events';
 import type { RuntimeEvents } from '@toolpad/studio-runtime';
-import { TOOLPAD_BRIDGE_GLOBAL } from '../constants';
-import type { AppCanvasState, PageViewState } from '../types';
-
-declare global {
-  interface Window {
-    [TOOLPAD_BRIDGE_GLOBAL]?: ToolpadBridge | ((bridge: ToolpadBridge) => void);
-  }
-}
+import type { PageViewState } from '../types';
 
 const COMMAND_HANDLERS = Symbol('hidden property to hold the command handlers');
 
@@ -58,9 +51,9 @@ export interface ToolpadBridge {
   canvasEvents: Emitter<RuntimeEvents>;
   // Commands executed from the editor, ran in the canvas
   canvasCommands: Commands<{
-    update(updates: AppCanvasState): void;
     getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
     getPageViewState(): PageViewState;
+    scrollComponent(nodeId: string): void;
     isReady(): boolean;
     invalidateQueries(): void;
   }>;
@@ -81,6 +74,9 @@ const bridge: ToolpadBridge | null = isRenderedInCanvas
         getPageViewState: () => {
           throw new Error('Not implemented');
         },
+        scrollComponent: () => {
+          throw new Error('Not Implemented');
+        },
         getViewCoordinates: () => {
           throw new Error('Not implemented');
         },
@@ -97,13 +93,5 @@ const bridge: ToolpadBridge | null = isRenderedInCanvas
 bridge?.canvasEvents.on('ready', () => {
   canvasIsReady = true;
 });
-
-if (bridge) {
-  if (typeof window[TOOLPAD_BRIDGE_GLOBAL] === 'function') {
-    window[TOOLPAD_BRIDGE_GLOBAL](bridge);
-  }
-
-  window[TOOLPAD_BRIDGE_GLOBAL] = bridge;
-}
 
 export { bridge };

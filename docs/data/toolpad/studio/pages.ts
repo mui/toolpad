@@ -135,6 +135,14 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/studio/how-to-guides/render-deploy',
             title: 'Deploy to Render',
           },
+          {
+            pathname: '/toolpad/studio/how-to-guides/railway-deploy',
+            title: 'Deploy to Railway',
+          },
+          {
+            pathname: '/toolpad/studio/how-to-guides/gcp-deploy',
+            title: 'Deploy to Google Cloud',
+          },
         ],
       },
       {

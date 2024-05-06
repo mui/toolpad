@@ -1,22 +1,17 @@
 import Button from '@mui/material/Button';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ToolpadComponents } from '@toolpad/studio-runtime';
+import { AppHostProvider, ToolpadComponents } from '@toolpad/studio-runtime';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
 import { Box } from '@mui/material';
+import { ToolpadPlan } from '@toolpad/studio-runtime/appDom';
 import { RuntimeState } from './runtime/types';
-import {
-  AppHost,
-  AppHostContext,
-  ToolpadApp as RuntimeToolpadApp,
-  ToolpadAppProps,
-  componentsStore,
-  pageComponentsStore,
-} from './runtime';
+import { ToolpadApp as RuntimeToolpadApp, ToolpadAppProps, componentsStore } from './runtime';
 
 const IS_PREVIEW = process.env.NODE_ENV !== 'production';
-const IS_CUSTOM_SERVER = process.env.TOOLPAD_CUSTOM_SERVER === 'true';
+
+const TOOLPAD_PLAN = process.env.TOOLPAD_PLAN as ToolpadPlan;
 
 const cache = createCache({
   key: 'css',
@@ -29,12 +24,8 @@ cache.compat = true;
 /**
  * This allows us to hot update the components when a file is added/removed
  */
-export function setComponents(
-  newComponents: ToolpadComponents,
-  pageComponents: Record<string, React.ComponentType>,
-) {
+export function setComponents(newComponents: ToolpadComponents) {
   componentsStore.setState(newComponents);
-  pageComponentsStore.setState(pageComponents);
 }
 
 interface RootProps {
@@ -43,26 +34,15 @@ interface RootProps {
   ToolpadApp: React.ComponentType<ToolpadAppProps>;
 }
 
-const IS_RENDERED_IN_CANVAS =
-  typeof window === 'undefined'
-    ? false
-    : !!(window.frameElement as HTMLIFrameElement)?.dataset?.toolpadCanvas;
-
-const appHost: AppHost = {
-  isPreview: IS_PREVIEW,
-  isCustomServer: IS_CUSTOM_SERVER,
-  isCanvas: IS_RENDERED_IN_CANVAS,
-};
-
 function Root({ ToolpadApp, initialState, base }: RootProps) {
   return (
     <React.StrictMode>
       <CacheProvider value={cache}>
         {/* For some reason this helps with https://github.com/vitejs/vite/issues/12423 */}
         <Button sx={{ display: 'none' }} />
-        <AppHostContext.Provider value={appHost}>
+        <AppHostProvider isPreview={IS_PREVIEW} plan={TOOLPAD_PLAN}>
           <ToolpadApp basename={base} state={initialState} />
-        </AppHostContext.Provider>
+        </AppHostProvider>
         <Box data-testid="page-ready-marker" sx={{ display: 'none' }} />
       </CacheProvider>
     </React.StrictMode>

@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as url from 'url';
 import * as fs from 'fs/promises';
 import { TOOLPAD_DATA_PROVIDER_MARKER, ToolpadDataProvider } from '@toolpad/studio-runtime/server';
 import * as z from 'zod';
@@ -6,10 +7,14 @@ import { fromZodError } from 'zod-validation-error';
 import * as crypto from 'crypto';
 
 async function loadExports(filePath: string): Promise<Map<string, unknown>> {
-  const fullPath = path.resolve(filePath);
-  const content = await fs.readFile(fullPath, 'utf-8');
+  // Need a valid file URL on Windows for the dynamic import()
+  const importFileUrl = url.pathToFileURL(path.resolve(filePath));
+  const content = await fs.readFile(importFileUrl, 'utf-8');
   const hash = crypto.createHash('md5').update(content).digest('hex');
-  const exports = await import(`${fullPath}?${hash}`);
+  importFileUrl.searchParams.set('hash', hash);
+  // `webpackIgnore: true` is used to instruct webpack in Next.js to use the native import() function
+  // instead of trying to bundle the dynamic import() call
+  const exports = await import(/* webpackIgnore: true */ importFileUrl.href);
   return new Map(Object.entries(exports));
 }
 

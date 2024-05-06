@@ -1,6 +1,6 @@
 import {
-  DataGridProProps,
-  DataGridPro,
+  DataGridPremiumProps,
+  DataGridPremium,
   GridColumnResizeParams,
   GridRowsProp,
   GridColumnOrderChangeParams,
@@ -8,7 +8,6 @@ import {
   gridColumnsTotalWidthSelector,
   gridColumnPositionsSelector,
   GridRowSelectionModel,
-  GridValueFormatterParams,
   GridColDef,
   useGridApiRef,
   GridRenderCellParams,
@@ -39,10 +38,10 @@ import {
   GridValueGetter,
   GridToolbarProps,
   GridColType,
-} from '@mui/x-data-grid-pro';
+} from '@mui/x-data-grid-premium';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
-  Unstable_LicenseInfoProviderProps as LicenseInfoProviderProps,
+  MuiLicenseInfo,
 } from '@mui/x-license';
 import * as React from 'react';
 import {
@@ -54,6 +53,7 @@ import {
   FilterModel,
   SortModel,
   PaginationModel,
+  useAppHost,
 } from '@toolpad/studio-runtime';
 import {
   Box,
@@ -96,8 +96,6 @@ import ErrorOverlay, { ErrorContent } from './components/ErrorOverlay';
 const DRAFT_ROW_MARKER = Symbol('draftRow');
 
 const ACTIONS_COLUMN_FIELD = '___actions___';
-
-type MuiLicenseInfo = LicenseInfoProviderProps['info'];
 
 const LICENSE_INFO: MuiLicenseInfo = {
   key: process.env.TOOLPAD_BUNDLED_MUI_X_LICENSE,
@@ -416,7 +414,7 @@ function CustomColumn({ params }: CustomColumnProps) {
 
 export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
   json: {
-    valueFormatter: ({ value: cellValue }: GridValueFormatterParams) => JSON.stringify(cellValue),
+    valueFormatter: (value) => JSON.stringify(value),
   },
   date: {
     valueGetter: dateValueGetter,
@@ -444,7 +442,15 @@ export const CUSTOM_COLUMN_TYPES: Record<string, GridColTypeDef> = {
 export interface SerializableGridColumn
   extends Pick<
     GridColDef,
-    'field' | 'align' | 'width' | 'headerName' | 'sortable' | 'filterable' | 'editable'
+    | 'field'
+    | 'align'
+    | 'width'
+    | 'headerName'
+    | 'sortable'
+    | 'filterable'
+    | 'editable'
+    | 'groupable'
+    | 'aggregable'
   > {
   type?: string;
   numberFormat?: NumberFormat;
@@ -477,17 +483,15 @@ export function parseColumns(columns: SerializableGridColumns, isEditable?: bool
   return columns.map(({ type: colType, ...column }) => {
     const isIdColumn = column.field === 'id';
 
+    let baseColumn: Omit<GridColDef, 'field'> = { editable: true };
+
     if (isIdColumn) {
-      return {
-        ...column,
-        type: getNarrowedColType(colType),
+      baseColumn = {
+        ...baseColumn,
         editable: false,
-        hide: true,
         renderCell: ({ row, value }) => (row[DRAFT_ROW_MARKER] ? '' : value),
       };
     }
-
-    let baseColumn: Omit<GridColDef, 'field'> = { editable: isEditable };
 
     if (colType) {
       baseColumn = { ...baseColumn, ...CUSTOM_COLUMN_TYPES[colType], ...column };
@@ -561,7 +565,7 @@ interface Selection {
   id?: any;
 }
 
-interface ToolpadDataGridProps extends Omit<DataGridProProps, 'columns' | 'rows' | 'error'> {
+interface ToolpadDataGridProps extends Omit<DataGridPremiumProps, 'columns' | 'rows' | 'error'> {
   rowsSource?: 'prop' | 'dataProvider';
   dataProviderId?: string;
   rows?: GridRowsProp;
@@ -633,7 +637,7 @@ function EditToolbar({ hasCreateButton, onCreateClick, createDisabled }: EditToo
   );
 }
 
-interface DataProviderDataGridProps extends Partial<DataGridProProps> {
+interface DataProviderDataGridProps extends Partial<DataGridPremiumProps> {
   rowLoadingError?: unknown;
   getActions?: GridActionsColDef['getActions'];
 }
@@ -1030,31 +1034,35 @@ function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayPro
   let message: React.ReactNode = null;
   if (lastResult) {
     if (lastResult.action === 'create') {
-      message = lastResult.error ? (
-        `Failed to create a record, ${lastResult.error.message}`
-      ) : (
-        <React.Fragment>
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <Link
-            href="#"
-            color="inherit"
-            onClick={(event) => {
-              event.preventDefault();
-              const index = apiRef.current.getAllRowIds().indexOf(lastResult.id);
-              const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
-              const fieldToFocus: string | undefined = visibleFields[0];
-              if (index >= 0 && fieldToFocus) {
-                apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
-                apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
-              }
-            }}
-            aria-label="Go to new record"
-          >
-            New record
-          </Link>{' '}
-          created successfully
-        </React.Fragment>
-      );
+      if (lastResult.error) {
+        message = `Failed to create a record, ${lastResult.error.message}`;
+      } else {
+        const index = apiRef.current.getAllRowIds().indexOf(lastResult.id);
+        const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
+        const fieldToFocus: string | undefined = visibleFields[0];
+        if (index >= 0 && fieldToFocus) {
+          message = (
+            <React.Fragment>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <Link
+                href="#"
+                color="inherit"
+                onClick={(event) => {
+                  event.preventDefault();
+                  apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
+                  apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
+                }}
+                aria-label="Go to new record"
+              >
+                New record
+              </Link>{' '}
+              created successfully
+            </React.Fragment>
+          );
+        } else {
+          message = 'New record created successfully';
+        }
+      }
     } else if (lastResult.action === 'update') {
       message = lastResult.error
         ? `Failed to update a record, ${lastResult.error.message}`
@@ -1278,12 +1286,15 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     return result;
   }, [columns, getProviderActions]);
 
+  const appHost = useAppHost();
+  const isProPlan = appHost.plan === 'pro';
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
         <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
           <SetActionResultContext.Provider value={setActionResult}>
-            <DataGridPro
+            <DataGridPremium
               apiRef={apiRef}
               slots={{
                 ...dataProviderSlots,
@@ -1306,6 +1317,8 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               onRowSelectionModelChange={onSelectionModelChange}
               rowSelectionModel={selectionModel}
               initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
+              disableAggregation={!isProPlan}
+              disableRowGrouping={!isProPlan}
               {...props}
               {...dataProviderProps}
               sx={{
@@ -1327,7 +1340,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
 export default createBuiltin(DataGridComponent, {
   helperText:
-    'The [MUI X Data Grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
+    'The [MUI X Data Grid](https://mui.com/toolpad/studio/components/data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',

@@ -13,15 +13,14 @@ import {
   GetRecordsParams,
   GetRecordsResult,
   PaginationMode,
+  ToolpadDataProviderIntrospection,
 } from '@toolpad/studio-runtime';
 import { errorFrom } from '@toolpad/utils/errors';
-import { ToolpadDataProviderIntrospection } from '@toolpad/studio-runtime/runtime';
 import * as url from 'node:url';
 import type { GridRowId } from '@mui/x-data-grid';
 import invariant from 'invariant';
 import { Awaitable } from '@toolpad/utils/types';
-import EnvManager from './EnvManager';
-import { ProjectEvents, ToolpadProjectOptions } from '../types';
+import { ProjectEvents } from '../types';
 import * as functionsRuntime from './functionsRuntime';
 import type { ExtractTypesParams, IntrospectionResult } from './functionsTypesWorker';
 import { format } from '../utils/prettier';
@@ -100,12 +99,10 @@ function formatError(esbuildError: esbuild.Message): Error {
 }
 
 interface IToolpadProject {
-  options: ToolpadProjectOptions;
+  options: { dev: boolean };
   events: Emitter<ProjectEvents>;
   getRoot(): string;
   getOutputFolder(): string;
-  envManager: EnvManager;
-  invalidateQueries(): void;
 }
 
 export default class FunctionsManager {
@@ -200,7 +197,6 @@ export default class FunctionsManager {
 
       this.buildErrors = args.errors;
 
-      this.project.invalidateQueries();
       this.project.events.emit('functionsChanged', {});
     };
 

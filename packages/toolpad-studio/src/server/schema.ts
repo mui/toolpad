@@ -345,10 +345,6 @@ export const pageSchema = toolpadObjectSchema(
       })
       .optional()
       .describe('Authorization configuration for this page.'),
-    unstable_codeFile: z.coerce
-      .boolean()
-      .optional()
-      .describe('The content of the page as JSX. Experimental, do not use!.'),
     display: z
       .union([
         z

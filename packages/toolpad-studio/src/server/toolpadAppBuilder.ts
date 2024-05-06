@@ -7,7 +7,6 @@ import { indent } from '@toolpad/utils/strings';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
-import { pathToNodeImportSpecifier } from '../utils/paths';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -44,7 +43,7 @@ function getHtmlContent(entry: string) {
   `;
 }
 
-export function getAppHtmlContent() {
+function getAppHtmlContent() {
   return getHtmlContent(MAIN_ENTRY);
 }
 
@@ -75,55 +74,6 @@ function toolpadStudioVitePlugin(): Plugin {
       }
       return null;
     },
-
-    transform(code, id) {
-      if (/\/resources\//.test(id)) {
-        const codeFile = path.basename(id);
-
-        const functionExports = [];
-
-        const lines = code.split('\n');
-        for (let i = 0; i < lines.length; i += 1) {
-          const line = lines[i];
-          const lineNr = i + 1;
-          if (/\s*export\b/.test(line)) {
-            const match = line.match(/\s*export\s+async\s+function\s+([a-zA-Z0-9]+)\b/);
-
-            if (match) {
-              const functionName = match[1];
-              functionExports.push(functionName);
-            } else {
-              console.warn(
-                `Unsupported export at "${id}:${lineNr}". Only exports of the form "export async function foo(...) {" are supported.`,
-              );
-            }
-          }
-        }
-
-        return `
-          import { createRemoteFunction } from '@toolpad/studio/runtime';
-
-          const functionFile = ${JSON.stringify(codeFile)};
-
-          ${functionExports
-            .map(
-              (functionName) =>
-                `const __${functionName} = createRemoteFunction(functionFile, ${JSON.stringify(
-                  functionName,
-                )})`,
-            )
-            .join('\n')}
-
-          export {
-            ${functionExports
-              .map((functionName) => `__${functionName} as ${functionName}`)
-              .join(',\n')}
-          }
-        `;
-      }
-
-      return code;
-    },
   };
 }
 
@@ -140,6 +90,11 @@ export interface CreateViteConfigParams {
   getPagesManifest: () => Promise<PagesManifest>;
 }
 
+export interface CreateViteConfigResult {
+  reloadComponents: () => Promise<void>;
+  viteConfig: InlineConfig;
+}
+
 export async function createViteConfig({
   toolpadDevMode,
   outDir,
@@ -151,26 +106,58 @@ export async function createViteConfig({
   getComponents,
   loadDom,
   getPagesManifest,
-}: CreateViteConfigParams) {
+}: CreateViteConfigParams): Promise<CreateViteConfigResult> {
   const mode = dev ? 'development' : 'production';
+
+  const initialDom = await loadDom();
+  const plan = appDom.getPlan(initialDom);
 
   const getEntryPoint = (target: 'prod' | 'dev' | 'editor') => {
     const isCanvas = target === 'dev';
     const isEditor = target === 'editor';
 
     const componentsId = 'virtual:toolpad-files:components.tsx';
-    const pageComponentsId = 'virtual:toolpad-files:page-components.tsx';
 
     return `
 import { init, setComponents } from '@toolpad/studio/entrypoint';
 import components from ${JSON.stringify(componentsId)};
-import pageComponents from ${JSON.stringify(pageComponentsId)};
 ${isCanvas ? `import AppCanvas from '@toolpad/studio/canvas'` : ''}
 ${isEditor ? `import ToolpadEditor from '@toolpad/studio/editor'` : ''}
 
+// importing monaco to get around module ordering issues in esbuild
+import 'monaco-editor';
+
+window.MonacoEnvironment = {
+  getWorker: async (_, label) => {
+    // { type: 'module' } is supported in firefox but behind feature flag:
+    // you have to enable it manually via about:config and set dom.workers.modules.enabled to true.
+    if (label === 'typescript') {
+      const { default: TsWorker } = await import('monaco-editor/esm/vs/language/typescript/ts.worker?worker');
+      return new TsWorker();
+    }
+    if (label === 'json') {
+      const { default: JsonWorker } = await import('monaco-editor/esm/vs/language/json/json.worker?worker');
+      return new JsonWorker();
+    }
+    if (label === 'html') {
+      const { default: HtmlWorker } = await import('monaco-editor/esm/vs/language/html/html.worker?worker');
+      return new HtmlWorker();
+    }
+    if (label === 'css') {
+      const { default: CssWorker } = await import('monaco-editor/esm/vs/language/css/css.worker?worker');
+      return new CssWorker();
+    }
+    if (label === 'editorWorkerService') {
+      const { default: EditorWorker } = await import('monaco-editor/esm/vs/editor/editor.worker?worker');
+      return new EditorWorker();
+    }
+    throw new Error(\`Failed to resolve worker with label "\${label}"\`);
+  },
+} as monaco.Environment;
+
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
-setComponents(components, pageComponents);
+setComponents(components);
 
 init({
   ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
@@ -182,13 +169,12 @@ init({
 if (import.meta.hot) {
   // TODO: investigate why this doesn't work, see https://github.com/vitejs/vite/issues/12912
   import.meta.hot.accept(
-    [${JSON.stringify(componentsId)}, ${JSON.stringify(pageComponentsId)}],
-    (newComponents, newPageComponents) => {
+    [${JSON.stringify(componentsId)}],
+    (newComponents) => {
     if (newComponents) {
       console.log('hot updating Toolpad Studio components')
       setComponents(
         newComponents ?? components,
-        newPageComponents ?? pageComponents
       );
     }
   });
@@ -221,48 +207,10 @@ if (import.meta.hot) {
     };
   };
 
-  const createPageComponentsFile = async () => {
-    const dom = await loadDom();
-    const appNode = appDom.getApp(dom);
-    const { pages = [] } = appDom.getChildNodes(dom, appNode);
-
-    const imports = new Map<string, string>();
-
-    for (const page of pages) {
-      const codeFile = page.attributes.codeFile;
-      if (codeFile) {
-        const importPath = path.resolve(root, `./pages/${page.name}/page`);
-        const relativeImportPath = path.relative(root, importPath);
-        const importSpec = `toolpad-user-project:${pathToNodeImportSpecifier(relativeImportPath)}`;
-        imports.set(page.name, importSpec);
-      }
-    }
-
-    const importLines = Array.from(
-      imports.entries(),
-      ([name, spec]) => `${name}: React.lazy(() => import(${JSON.stringify(spec)}))`,
-    );
-
-    const code = `
-      import * as React from 'react';
-      
-      export default {
-        ${importLines.join(',\n')}
-      }
-    `;
-
-    return {
-      code,
-      map: null,
-    };
-  };
-
   const virtualFiles = new Map<string, VirtualFileContent>([
     ['main.tsx', getEntryPoint('prod')],
-    ['dev.tsx', getEntryPoint('dev')],
     ['editor.tsx', getEntryPoint('editor')],
     ['components.tsx', await createComponentsFile()],
-    ['page-components.tsx', await createPageComponentsFile()],
     ['pages-manifest.json', JSON.stringify(await getPagesManifest(), null, 2)],
   ]);
 
@@ -284,9 +232,7 @@ if (import.meta.hot) {
         rollupOptions: {
           input: {
             index: path.resolve(currentDirectory, './index.html'),
-            ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
-              ? { editor: path.resolve(currentDirectory, './editor.html') }
-              : {}),
+            ...(dev ? { editor: path.resolve(currentDirectory, './editor.html') } : {}),
           },
           onwarn(warning, warn) {
             if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
@@ -311,12 +257,7 @@ if (import.meta.hot) {
           },
           {
             find: MAIN_ENTRY,
-            // eslint-disable-next-line no-nested-ternary
-            replacement: process.env.EXPERIMENTAL_INLINE_CANVAS
-              ? 'virtual:toolpad-files:main.tsx'
-              : dev
-                ? 'virtual:toolpad-files:dev.tsx'
-                : 'virtual:toolpad-files:main.tsx',
+            replacement: 'virtual:toolpad-files:main.tsx',
           },
           {
             find: '@toolpad/studio',
@@ -326,7 +267,7 @@ if (import.meta.hot) {
               : // load compiled
                 path.resolve(currentDirectory, '../exports'),
           },
-          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+          ...(dev
             ? [
                 {
                   find: EDITOR_ENTRY,
@@ -347,9 +288,8 @@ if (import.meta.hot) {
         },
       },
       optimizeDeps: {
-        force: !process.env.EXPERIMENTAL_INLINE_CANVAS && toolpadDevMode ? true : undefined,
         include: [
-          ...(process.env.EXPERIMENTAL_INLINE_CANVAS && dev
+          ...(dev
             ? [
                 'perf-cascade',
                 'monaco-editor',
@@ -371,11 +311,9 @@ if (import.meta.hot) {
         'process.env.TOOLPAD_CUSTOM_SERVER': `'${JSON.stringify(customServer)}'`,
         'process.env.TOOLPAD_VERSION': JSON.stringify(pkgJson.version),
         'process.env.TOOLPAD_BUILD': JSON.stringify(TOOLPAD_BUILD),
-        'process.env.EXPERIMENTAL_INLINE_CANVAS': JSON.stringify(
-          process.env.EXPERIMENTAL_INLINE_CANVAS,
-        ),
+        'process.env.TOOLPAD_PLAN': JSON.stringify(plan),
       },
-    } satisfies InlineConfig,
+    },
   };
 }
 

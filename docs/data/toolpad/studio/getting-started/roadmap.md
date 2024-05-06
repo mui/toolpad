@@ -1,17 +1,17 @@
 # Roadmap
 
-<p class="description">Find out about our plans for Toolpad Studio.</p>
+<p class="description">Find out about the plans for Toolpad Studio.</p>
 
 ## Toolpad Studio roadmap
 
-To learn more about our plans for Toolpad Studio, visit the [public roadmap](https://github.com/orgs/mui/projects/9).
+To learn more about the plans for Toolpad Studio, visit the [public roadmap](https://github.com/orgs/mui/projects/9).
 
 :::warning
 We operate in a dynamic environment, so things are subject to change.
-The information provided is intended to outline the general direction, but is for informational purposes only.
+The information provided is intended to outline the general direction but is for informational purposes only.
 
-We may decide to add or remove items at any time, depending on our capability to deliver, while meeting our quality standards.
-The development, releases, and timing of any features or functionality remains at the sole discretion of MUI.
+We may decide to add or remove items at any time, depending on the capability to deliver, while meeting our quality standards.
+The development, releases, and timing of any features or functionality remain at the sole discretion of MUI.
 The roadmap does not represent a commitment, obligation, or promise to deliver at any time.
 :::
 
@@ -28,16 +28,17 @@ A few features in Toolpad Studio are proposed to be placed under a paid plan. Th
 
 The following features are currently planned to be included within this scope:
 
-- ### Authorization
+### Authorization
 
-  Features allowing you to grant conditional access to pages based on user roles are part of this proposed paid plan. Read more about this feature on [authorization](/toolpad/studio/concepts/rbac/).
+Features allowing you to grant conditional access to pages based on user roles are part of this proposed paid plan. Read more about this feature on [authorization](/toolpad/studio/concepts/rbac/).
 
-## How to upgrade
+### How to upgrade
 
 Currently, accessing these features requires you to add the following to your `application.yml`:
 
 ```yml
-spec: { plan: pro }
+spec:
+  plan: pro
 ```
 
 :::info

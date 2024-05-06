@@ -43,16 +43,26 @@ export default function NodeAttributeEditor<P extends object>({
 }: NodeAttributeEditorProps<P>) {
   const domApi = useDomApi();
 
+  const initialPropValue = (node as any)[namespace]?.[name];
+  const [propValue, setPropValue] = React.useState<BindableAttrValue<unknown> | null>(
+    initialPropValue,
+  );
+
+  React.useEffect(() => {
+    setPropValue(initialPropValue);
+  }, [initialPropValue]);
+
   const handlePropChange = React.useCallback(
     (newValue: BindableAttrValue<unknown> | null) => {
-      domApi.update((draft) =>
-        appDom.setNodeNamespacedProp(draft, node, namespace as any, name, newValue),
-      );
+      setPropValue(newValue);
+      React.startTransition(() => {
+        domApi.update((draft) =>
+          appDom.setNodeNamespacedProp(draft, node, namespace as any, name, newValue),
+        );
+      });
     },
     [node, namespace, name, domApi],
   );
-
-  const propValue: BindableAttrValue<unknown> | null = (node as any)[namespace]?.[name] ?? null;
 
   const bindingId = `${node.id}${namespace ? `.${namespace}` : ''}.${name}`;
   const { vm } = usePageEditorState();

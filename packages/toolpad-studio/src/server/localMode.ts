@@ -53,12 +53,7 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
-import type {
-  RuntimeConfig,
-  ProjectEvents,
-  ToolpadProjectOptions,
-  CodeEditorFileType,
-} from '../types';
+import type { ProjectEvents, ToolpadProjectOptions, CodeEditorFileType } from '../types';
 import EnvManager from './EnvManager';
 import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
@@ -109,7 +104,7 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
-function getOutputFolder(root: string) {
+export function getOutputFolder(root: string) {
   return path.join(root, '.generated');
 }
 
@@ -165,24 +160,6 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
                 result.error,
               )}`,
             );
-          }
-        }
-
-        const extensions = ['.tsx', '.jsx'];
-
-        for (const extension of extensions) {
-          if (pageDirEntries.has(`page${extension}`)) {
-            return [
-              pageName,
-              {
-                apiVersion: API_VERSION,
-                kind: 'page',
-                spec: {
-                  id: pageName,
-                  unstable_codeFile: true,
-                },
-              } satisfies Page,
-            ];
           }
         }
       }
@@ -476,7 +453,6 @@ function expandFromDom<N extends appDom.AppDomNode>(
         content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
         display: node.attributes.display,
-        unstable_codeFile: node.attributes.codeFile,
         authorization: node.attributes.authorization,
       },
     } satisfies Page;
@@ -657,7 +633,6 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
       title: pageFileSpec.title,
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
-      codeFile: pageFileSpec.unstable_codeFile || undefined,
       authorization: pageFileSpec.authorization || undefined,
     },
   });
@@ -973,6 +948,8 @@ export function getRequiredEnvVars(dom: appDom.AppDom): Set<string> {
   return new Set(allVars);
 }
 
+const PRO_AUTH_PROVIDERS = ['azure-ad'];
+
 interface PaidFeature {
   id: string;
   label: string;
@@ -984,13 +961,13 @@ function detectPaidFeatures(application: Application): PaidFeature[] | null {
   }
 
   const hasRoles = Boolean(application?.spec?.authorization?.roles);
-  const hasAzureActiveDirectory = application?.spec?.authentication?.providers?.some(
-    (elems) => elems.provider === 'azure-ad',
+  const hasProAuthProvider = application?.spec?.authentication?.providers?.some((elems) =>
+    PRO_AUTH_PROVIDERS.includes(elems.provider),
   );
   const paidFeatures = [
-    hasRoles ? { id: 'roles', label: 'Role based access control' } : undefined,
-    hasAzureActiveDirectory
-      ? { id: 'azure-ad', label: 'Azure AD authentication provider' }
+    hasRoles ? { id: 'roles', label: 'Role-based access control' } : undefined,
+    hasProAuthProvider
+      ? { id: 'pro-auth-provider', label: 'Some of your active authentication providers' }
       : undefined,
   ].filter(Boolean) as PaidFeature[];
   return paidFeatures.length > 0 ? paidFeatures : null;
@@ -1012,8 +989,6 @@ class ToolpadProject {
   functionsManager: FunctionsManager;
 
   dataManager: DataManager;
-
-  invalidateQueries: () => void;
 
   private alertedMissingVars = new Set<string>();
 
@@ -1043,7 +1018,7 @@ class ToolpadProject {
     this.functionsManager = new FunctionsManager(this);
     this.dataManager = new DataManager(this);
 
-    this.invalidateQueries = throttle(
+    const invalidateQueries = throttle(
       () => {
         this.events.emit('queriesInvalidated', {});
       },
@@ -1052,6 +1027,9 @@ class ToolpadProject {
         leading: false,
       },
     );
+
+    this.events.on('functionsChanged', invalidateQueries);
+    this.events.on('envChanged', invalidateQueries);
   }
 
   private initWatcher() {
@@ -1349,17 +1327,6 @@ class ToolpadProject {
     const root = this.getRoot();
     const config = await resolvePrettierConfig(root);
     return config;
-  }
-
-  async getRuntimeConfig(): Promise<RuntimeConfig> {
-    // When these fail, you are likely trying to retrieve this information during the
-    // Toolpad Studio build. It's fundamentally wrong to use this information as it strictly holds
-    // information about the running Toolpad Studio instance.
-    invariant(this.options.externalUrl, 'External URL is not set');
-
-    return {
-      externalUrl: this.options.externalUrl,
-    };
   }
 
   async writeBuildInfo() {

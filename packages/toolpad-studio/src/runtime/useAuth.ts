@@ -1,8 +1,7 @@
 import * as React from 'react';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import { useNonNullableContext } from '@toolpad/utils/react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AppHostContext } from './AppHostContext';
+import { useAppHost } from '@toolpad/studio-runtime';
 
 const AUTH_API_PATH = '/api/auth';
 
@@ -129,7 +128,13 @@ export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPa
         },
       });
       if (isResponseJSON(sessionResponse)) {
-        setSession(await sessionResponse.json());
+        const currentSession = await sessionResponse.json();
+
+        setSession(currentSession);
+
+        if (!currentSession) {
+          signOut();
+        }
       } else {
         signOut();
       }
@@ -175,7 +180,7 @@ export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPa
     [basename, getCsrfToken, signOut],
   );
 
-  const appHost = useNonNullableContext(AppHostContext);
+  const appHost = useAppHost();
 
   React.useEffect(() => {
     if (hasAuthentication && !appHost.isCanvas) {

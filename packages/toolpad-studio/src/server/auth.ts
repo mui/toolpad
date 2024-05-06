@@ -1,10 +1,10 @@
 import express, { Router } from 'express';
-import { Auth } from '@auth/core';
+import { Auth, AuthConfig } from '@auth/core';
 import GithubProvider, { GitHubEmail, GitHubProfile } from '@auth/core/providers/github';
 import GoogleProvider from '@auth/core/providers/google';
 import AzureADProvider from '@auth/core/providers/azure-ad';
 import CredentialsProvider from '@auth/core/providers/credentials';
-import { AuthConfig, TokenSet } from '@auth/core/types';
+import { TokenSet } from '@auth/core/types';
 import { OAuthConfig } from '@auth/core/providers';
 import chalk from 'chalk';
 import * as appDom from '@toolpad/studio-runtime/appDom';

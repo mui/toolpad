@@ -1,11 +1,14 @@
 import * as React from 'react';
 import invariant from 'invariant';
 import { throttle } from 'lodash-es';
-import { CanvasEventsContext } from '@toolpad/studio-runtime/runtime';
-import { FlowDirection, SlotType } from '@toolpad/studio-runtime';
+import {
+  queryClient,
+  FlowDirection,
+  SlotType,
+  useAppHost,
+  CanvasEventsContext,
+} from '@toolpad/studio-runtime';
 import { update } from '@toolpad/utils/immutability';
-import { useNonNullableContext } from '@toolpad/utils/react';
-import { queryClient } from '../runtime/api';
 import { AppCanvasState, NodeInfo, PageViewState, SlotsState } from '../types';
 import {
   getRelativeBoundingRect,
@@ -13,7 +16,7 @@ import {
   rectContainsPoint,
 } from '../utils/geometry';
 import { ToolpadBridge, bridge, setCommandHandler } from './ToolpadBridge';
-import { AppHostContext, ToolpadApp, CanvasHooks, CanvasHooksContext } from '../runtime';
+import { ToolpadApp, CanvasHooks, CanvasHooksContext } from '../runtime';
 
 const handleScreenUpdate = throttle(
   () => {
@@ -78,8 +81,7 @@ export interface AppCanvasProps {
   basename: string;
 }
 
-export default function AppCanvas({ basename, state: initialState }: AppCanvasProps) {
-  const [state, setState] = React.useState<AppCanvasState>(initialState);
+export default function AppCanvas({ basename, state }: AppCanvasProps) {
   const [readyBridge, setReadyBridge] = React.useState<ToolpadBridge | undefined>();
 
   const appRootRef = React.useRef<HTMLDivElement>();
@@ -140,7 +142,6 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
 
     setCommandHandler(bridge.canvasCommands, 'getPageViewState', () => {
       invariant(appRootRef.current, 'App root not found');
-
       let nodes = viewState.current.nodes;
 
       for (const [nodeId, nodeInfo] of Object.entries(nodes)) {
@@ -152,6 +153,15 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
       return { nodes };
     });
 
+    setCommandHandler(bridge.canvasCommands, 'scrollComponent', (nodeId) => {
+      if (!nodeId) {
+        return;
+      }
+      invariant(appRootRef.current, 'App root not found');
+      const canvasNode = appRootRef.current.querySelector(`[data-node-id='${nodeId}']`);
+      canvasNode?.scrollIntoView({ behavior: 'instant', block: 'end', inline: 'end' });
+    });
+
     setCommandHandler(bridge.canvasCommands, 'getViewCoordinates', (clientX, clientY) => {
       if (!appRootRef.current) {
         return null;
@@ -161,19 +171,6 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
         return { x: clientX - rect.x, y: clientY - rect.y };
       }
       return null;
-    });
-
-    setCommandHandler(bridge.canvasCommands, 'update', (newState) => {
-      // `update` will be called from the parent window. Since the canvas runs in an iframe, it's
-      // running in another javascript realm than the one this object was constructed in. This makes
-      // the MUI core `deepMerge` function fail. The `deepMerge` function uses `isPlainObject` which checks
-      // whether the object constructor property is the global `Object`.
-      // See https://github.com/mui/material-ui/blob/b935d3e8f48b5d54f6cd08154fe2f7aa035ab576/packages/mui-utils/src/deepmerge.ts#L2.
-      // Since different realms have different globals, this function erroneously marks it as not being a plain object.
-      // For now we've use structuredClone to make the `update` method behave as if it was built using
-      // `window.postMessage`, which we should probably move towards anyways at some point. structuredClone
-      // clones the object as if it was passed using `postMessage` and corrects the `constructor` property.
-      React.startTransition(() => setState(structuredClone(newState)));
     });
 
     setCommandHandler(bridge.canvasCommands, 'invalidateQueries', () => {
@@ -202,7 +199,7 @@ export default function AppCanvas({ basename, state: initialState }: AppCanvasPr
     };
   }, [savedNodes]);
 
-  const appHost = useNonNullableContext(AppHostContext);
+  const appHost = useAppHost();
 
   if (appHost.isCanvas) {
     return readyBridge ? (

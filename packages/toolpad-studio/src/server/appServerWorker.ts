@@ -3,8 +3,7 @@ import invariant from 'invariant';
 import type { Plugin } from 'vite';
 import { createRpcClient } from '@toolpad/utils/workerRpc';
 import type * as appDom from '@toolpad/studio-runtime/appDom';
-import { createViteConfig, getAppHtmlContent, getEditorHtmlContent } from './toolpadAppBuilder';
-import type { RuntimeConfig } from '../types';
+import { createViteConfig, getEditorHtmlContent } from './toolpadAppBuilder';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import createRuntimeState from '../runtime/createRuntimeState';
 import { postProcessHtml } from './toolpadAppServer';
@@ -27,15 +26,7 @@ invariant(
   'The dev server must be started with NODE_ENV=development',
 );
 
-export interface ToolpadAppDevServerParams {
-  outDir: string;
-  config: RuntimeConfig;
-  root: string;
-  base: string;
-  customServer: boolean;
-}
-
-function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
+function devServerPlugin(): Plugin {
   return {
     name: 'toolpad-dev-server',
 
@@ -46,14 +37,11 @@ function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
           try {
             const dom = await loadDom();
 
-            const template = process.env.EXPERIMENTAL_INLINE_CANVAS
-              ? getEditorHtmlContent()
-              : getAppHtmlContent();
+            const template = getEditorHtmlContent();
 
             let html = await viteServer.transformIndexHtml(req.url, template);
 
             html = postProcessHtml(html, {
-              config,
               initialState: createRuntimeState({ dom }),
             });
 
@@ -67,7 +55,11 @@ function devServerPlugin({ config }: ToolpadAppDevServerParams): Plugin {
   };
 }
 
-export interface AppViteServerConfig extends ToolpadAppDevServerParams {
+export interface AppViteServerConfig {
+  outDir: string;
+  root: string;
+  base: string;
+  customServer: boolean;
   toolpadDevMode: boolean;
   port: number;
   mainThreadRpcPort: MessagePort;
@@ -77,7 +69,7 @@ export async function main({ port, ...config }: AppViteServerConfig) {
   const { reloadComponents, viteConfig } = await createViteConfig({
     ...config,
     dev: true,
-    plugins: [devServerPlugin(config)],
+    plugins: [devServerPlugin()],
     getComponents,
     getPagesManifest,
     loadDom,

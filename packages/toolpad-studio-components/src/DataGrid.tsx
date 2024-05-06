@@ -1271,6 +1271,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   const renderedColumns = React.useMemo<GridColDef[]>(() => {
     const mapEditableToColumns = columns.map((column) => {
+      // Don't touch the existing columns with `editable` value, example: `id` column
       if (column.editable || column.editable === false) {
         return column;
       }

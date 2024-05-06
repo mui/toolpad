@@ -473,7 +473,7 @@ function getNarrowedColType(type?: string): GridColType | undefined {
   return (type && type in DEFAULT_COLUMN_TYPES ? type : undefined) as GridColType | undefined;
 }
 
-export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
+export function parseColumns(columns: SerializableGridColumns, isEditable?: boolean): GridColDef[] {
   return columns.map(({ type: colType, ...column }) => {
     const isIdColumn = column.field === 'id';
 
@@ -487,7 +487,7 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
       };
     }
 
-    let baseColumn: Omit<GridColDef, 'field'> = { editable: true };
+    let baseColumn: Omit<GridColDef, 'field'> = { editable: isEditable };
 
     if (colType) {
       baseColumn = { ...baseColumn, ...CUSTOM_COLUMN_TYPES[colType], ...column };
@@ -1126,6 +1126,9 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     setActionResult,
   );
 
+  const useDataProvider = useNonNullableContext(UseDataProviderContext);
+  const { dataProvider } = useDataProvider(dataProviderId || null);
+
   const nodeRuntime = useNode<ToolpadDataGridProps>();
 
   const handleResize = React.useMemo(
@@ -1227,9 +1230,14 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     [selection?.id],
   );
 
+  const isRowUpdateModelAvailable = React.useMemo(
+    () => !!dataProvider?.updateRecord,
+    [dataProviderProps],
+  );
+
   const columns: GridColDef[] = React.useMemo(
-    () => (columnsProp ? parseColumns(columnsProp) : []),
-    [columnsProp],
+    () => (columnsProp ? parseColumns(columnsProp, isRowUpdateModelAvailable) : []),
+    [columnsProp, isRowUpdateModelAvailable],
   );
 
   React.useEffect(() => {

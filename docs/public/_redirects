@@ -1,5 +1,5 @@
 # Avoid conflicts with the other Next.js apps hosted under https://mui.com/
-/toolpad/_next/* /_next/:splat 301
+/toolpad/_next/* /_next/:splat 200
 
 # Legacy redirection
 # 2022

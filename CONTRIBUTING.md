@@ -164,7 +164,7 @@ Use the `--ui` flag to run the tests interactively.
 1. If you haven't already, install the project dependencies using
 
    ```bash
-   pnpm
+   pnpm install
    ```
 
 1. To start the documentation application in dev mode run

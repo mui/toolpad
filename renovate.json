@@ -55,7 +55,7 @@
     },
     {
       "groupName": "react-router",
-      "matchPackageNames": ["react-router", "react-router-dom"],
+      "matchPackageNames": ["react-router", "react-router-dom"]
     },
     {
       "groupName": "Tanstack",

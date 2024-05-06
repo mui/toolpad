@@ -69,6 +69,7 @@ import usePageTitle from '@toolpad/utils/hooks/usePageTitle';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '@toolpad/studio-runtime/appDom';
+import useSsr from '@toolpad/utils/hooks/useSsr';
 import { RuntimeState } from './types';
 import { getBindingType, getBindingValue } from './bindings';
 import {
@@ -1710,13 +1711,8 @@ export function ToolpadAppRoutes(props: ToolpadAppProps) {
   );
 }
 
-const subscribe = () => () => {};
-const getSnapShot = () => false;
-const getServerSnapshot = () => true;
-const useIsSsr = () => React.useSyncExternalStore(subscribe, getSnapShot, getServerSnapshot);
-
 export default function ToolpadApp(props: ToolpadAppProps) {
-  const isSsr = useIsSsr();
+  const isSsr = useSsr();
   return isSsr ? null : (
     <BrowserRouter basename={props.basename}>
       <Routes>

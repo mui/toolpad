@@ -11,6 +11,5 @@
     "**/docs/public/_redirects": "plaintext"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
-  "cSpell.words": ["Toolpad"],
-  "circleci.persistedProjectSelection": []
+  "cSpell.words": ["Toolpad"]
 }

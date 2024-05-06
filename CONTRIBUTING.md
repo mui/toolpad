@@ -2,7 +2,7 @@
 
 ## Local development
 
-If you would like to hack on Toolpad Studio or want to run the latest version, you can follow these steps:
+If you would like to hack on Toolpad or want to run the latest version, you can follow these steps:
 
 _If you're looking into contributing to the docs, follow the [instructions](#building-and-running-the-documentation) down below_
 
@@ -11,7 +11,7 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 - git
 - node.js
 
-### Running apps inside the monorepo (recommended)
+### Running Toolpad Studio apps inside the monorepo (recommended)
 
 This uses the local version of Toolpad Studio as built in the mono-repository.
 This is recommended when your app is in a folder inside of the mono-repository.
@@ -139,6 +139,34 @@ pnpm install
 
 </details>
 
+### Developing on Toolpad Core
+
+This uses the local version of Toolpad Core as built in the mono-repository, and allows for quickly testing out changes and their results.
+
+Some application examples for different JavaScript frameworks (such as Next.js, Vite...) are present in the `playground` folder that can be used to quickly develop on Toolpad Core on a live application.
+
+1. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Run the built-in watch mode
+
+   ```bash
+   pnpm dev
+   ```
+
+3. Run any application in the `playground` folder in development mode, such as `toolpad-core-nextjs`
+
+   ```bash
+   cd playground/toolpad-core-nextjs
+   ```
+
+   ```bash
+   pnpm dev
+   ```
+
 ## Running integration tests
 
 The playwright tests can be run in one of two modes:
@@ -198,7 +226,7 @@ Use the `--ui` flag to run the tests interactively.
 
 ## Using CodeSandbox CI
 
-Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad Studio package for ever pull request. To use the package from the pull request, take the following steps:
+Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad Studio package for every pull request. To use the package from the pull request, take the following steps:
 
 1. In the GitHub PR checks, locate the ci/codesandbox check and make sure it has successfully finished building. Click on "details" to open the CodeSandbox CI user interface.
 

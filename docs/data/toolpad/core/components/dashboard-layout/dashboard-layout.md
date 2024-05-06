@@ -4,7 +4,7 @@
 
 ## Demo
 
-A DashboardLayout has a configurable header and sidebar with navigation.
+A Dashboard Layout has a configurable header and sidebar with navigation.
 
 {{"demo": "DashboardLayoutBasic.js", "height": 500, "iframe": true}}
 

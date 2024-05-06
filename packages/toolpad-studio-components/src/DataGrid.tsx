@@ -483,7 +483,7 @@ export function parseColumns(columns: SerializableGridColumns, isEditable?: bool
   return columns.map(({ type: colType, ...column }) => {
     const isIdColumn = column.field === 'id';
 
-    let baseColumn: Omit<GridColDef, 'field'> = { editable: true };
+    let baseColumn: Omit<GridColDef, 'field'> = { editable: isEditable };
 
     if (isIdColumn) {
       baseColumn = {

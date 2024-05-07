@@ -2743,7 +2743,7 @@ packages:
     resolution: {integrity: sha512-eFa8up2/8cZXLIpkafhaADTXSnl7IsUFCYenRWrARBz0/qZwcT0RBXpys0LJU4+WfPoF2ZG6ew6s2V6izMCwRA==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
-      '@babel/core': ^7.24.4
+      '@babel/core': ^7.0.0-0
     dependencies:
       '@babel/core': 7.24.4
       '@babel/helper-plugin-utils': 7.24.5
@@ -2875,7 +2875,7 @@ packages:
   /@docsearch/react@3.6.0(@algolia/client-search@4.23.3)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.13.0):
     resolution: {integrity: sha512-HUFut4ztcVNmqy9gp/wxNbC7pTOHhgVVkHVGCACTuLhUKUhKAF9KYHJtMiLUJxEqiFLQiuri1fWF8zqwM/cu1w==}
     peerDependencies:
-      '@types/react': 18.2.55
+      '@types/react': '>= 16.8.0 < 19.0.0'
       react: '>= 16.8.0 < 19.0.0'
       react-dom: '>= 16.8.0 < 19.0.0'
       search-insights: '>= 1 < 3'
@@ -3427,7 +3427,7 @@ packages:
   /@fast-csv/format@4.3.5:
     resolution: {integrity: sha512-8iRn6QF3I8Ak78lNAa+Gdl5MJJBM5vRHivFtMRUWINdevNo00K7OXxS2PshawLKTejVwieIlPmK5YlLu6w4u8A==}
     dependencies:
-      '@types/node': 18.19.32
+      '@types/node': 14.18.63
       lodash.escaperegexp: 4.1.2
       lodash.isboolean: 3.0.3
       lodash.isequal: 4.5.0
@@ -5732,12 +5732,6 @@ packages:
 
   /@types/node@14.18.63:
     resolution: {integrity: sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ==}
-    dev: false
-
-  /@types/node@18.19.32:
-    resolution: {integrity: sha512-2bkg93YBSDKk8DLmmHnmj/Rwr18TLx7/n+I23BigFwgexUJoMHZOd8X1OFxuF/W3NN0S2W2E5sVabI5CPinNvA==}
-    dependencies:
-      undici-types: 5.26.5
     dev: false
 
   /@types/node@20.12.8:

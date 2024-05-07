@@ -905,9 +905,15 @@ interface RenderedNodeContentProps {
   node: appDom.PageNode | appDom.ElementNode;
   childNodeGroups: appDom.NodeChildren<appDom.ElementNode>;
   Component: ToolpadComponent<any>;
+  staticProps?: Record<string, any>;
 }
 
-function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
+function RenderedNodeContent({
+  node,
+  childNodeGroups,
+  Component,
+  staticProps,
+}: RenderedNodeContentProps) {
   const { setControlledBinding } = React.useContext(SetBindingContext) ?? {};
   invariant(setControlledBinding, 'Node must be rendered in a RuntimeScoped context');
 
@@ -957,7 +963,10 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = getArgTypeDefaultValue(argType);
+        const defaultValue = getArgTypeDefaultValue(argType);
+        if (typeof defaultValue !== 'undefined') {
+          hookResult[propName] = getArgTypeDefaultValue(argType);
+        }
       }
     }
 
@@ -1082,13 +1091,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const props: Record<string, any> = React.useMemo(() => {
     return {
+      ...staticProps,
       ...boundProps,
       ...onChangeHandlers,
       ...eventHandlers,
       ...layoutElementProps,
       ...reactChildren,
     };
-  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
+  }, [staticProps, boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
   const previousProps = React.useRef<Record<string, any>>(props);
   const [hasSetInitialBindings, setHasSetInitialBindings] = React.useState(false);
@@ -1210,24 +1220,19 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 }
 
 interface PageRootProps {
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'none';
   children?: React.ReactNode;
 }
 
 const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRoot(
-  { children, ...props }: PageRootProps,
+  { children, maxWidth, ...props }: PageRootProps,
   ref,
 ) {
+  const containerMaxWidth =
+    maxWidth === 'none' ? false : maxWidth ?? appDom.DEFAULT_CONTAINER_WIDTH;
   return (
-    <Container ref={ref}>
-      <Stack
-        data-testid="page-root"
-        direction="column"
-        sx={{
-          my: 2,
-          gap: 1,
-        }}
-        {...props}
-      >
+    <Container ref={ref} maxWidth={containerMaxWidth}>
+      <Stack data-testid="page-root" direction="column" sx={{ my: 2, gap: 1 }} {...props}>
         {children}
       </Stack>
     </Container>
@@ -1239,6 +1244,11 @@ const PageRootComponent = createComponent(PageRoot, {
     children: {
       type: 'element',
       control: { type: 'slots' },
+    },
+    maxWidth: {
+      type: 'string',
+      enum: ['xs', 'sm', 'md', 'lg', 'xl', 'none'],
+      control: { type: 'ToggleButtons' },
     },
   },
 });
@@ -1414,6 +1424,13 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
 
   const applicationVm = useApplicationVm(onApplicationVmUpdate);
 
+  const pageProps = React.useMemo(
+    () => ({
+      maxWidth: page.attributes.maxWidth,
+    }),
+    [page.attributes.maxWidth],
+  );
+
   return (
     <ApplicationVmApiContext.Provider value={applicationVm}>
       <RuntimeScoped id={'global'} parseBindingsResult={parseBindingsResult} onUpdate={onUpdate}>
@@ -1421,6 +1438,7 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
           node={page}
           childNodeGroups={{ children }}
           Component={PageRootComponent}
+          staticProps={pageProps}
         />
         {queries.map((node) => (
           <FetchNode key={node.id} page={page} node={node} />

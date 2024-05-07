@@ -62,7 +62,7 @@ commands:
             pnpm --version
       - run:
           name: Install js dependencies
-          command: pnpm install --filter '!./playground/*'
+          command: pnpm install
       - when:
           condition: << parameters.browsers >>
           steps:

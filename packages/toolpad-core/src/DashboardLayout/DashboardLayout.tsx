@@ -16,7 +16,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { styled } from '@mui/system';
+import { styled } from '@mui/material';
 import ToolpadLogo from './ToolpadLogo';
 import { BrandingContext, Navigation, NavigationContext, NavigationPageItem } from '../AppProvider';
 

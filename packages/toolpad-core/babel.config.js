@@ -49,12 +49,6 @@ module.exports = function getBabelConfig(api) {
       },
     ],
     'babel-plugin-optimize-clsx',
-    // Need the following 3 proposals for all targets in .browserslistrc.
-    // With our usage the transpiled loose mode is equivalent to spec mode.
-    ['@babel/plugin-transform-class-properties', { loose: true }],
-    ['@babel/plugin-transform-private-methods', { loose: true }],
-    ['@babel/plugin-transform-private-property-in-object', { loose: true }],
-    ['@babel/plugin-transform-object-rest-spread', { loose: true }],
     [
       '@babel/plugin-transform-runtime',
       {

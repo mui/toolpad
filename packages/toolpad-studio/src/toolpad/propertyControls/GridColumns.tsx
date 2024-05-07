@@ -260,6 +260,24 @@ function GridColumnEditor({
         ) : null}
       </Box>
 
+      <Tooltip title="Initial visibility of this column.">
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={editedColumn.visible ?? true}
+              disabled={disabled}
+              onChange={(event) =>
+                handleColumnChange({
+                  ...editedColumn,
+                  visible: event.target.checked,
+                })
+              }
+            />
+          }
+          label="Visible"
+        />
+      </Tooltip>
+
       <FormControlLabel
         control={
           <Checkbox

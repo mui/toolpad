@@ -356,6 +356,17 @@ export const pageSchema = toolpadObjectSchema(
       .describe(
         'Display mode of the page. This can also be set at runtime with the toolpad-display query parameter',
       ),
+    maxWidth: z
+      .union([
+        z.literal('xs'),
+        z.literal('sm'),
+        z.literal('md'),
+        z.literal('lg'),
+        z.literal('xl'),
+        z.literal('none'),
+      ])
+      .optional()
+      .describe('Top level element of the page.'),
   }),
 );
 

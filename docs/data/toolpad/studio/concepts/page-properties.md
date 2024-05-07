@@ -27,11 +27,19 @@ You can override this setting for any page using the `toolpad-display` query par
 - `?toolpad-display=shell` - Same as App shell mode.
 - `?toolpad-display=standalone` - Same as No shell mode.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/page-properties/display-mode-override.png", "alt": "No shell display mode ", "caption": "Overriding the display mode", "indent": 1}}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/page-properties/display-mode-override.png", "alt": "No shell display mode", "caption": "Overriding the display mode", "indent": 1}}
 
 :::info
 See the how-to guide on [how to embed Toolpad Studio pages](/toolpad/studio/how-to-guides/embed-pages/) using the display mode property.
 :::
+
+## Max width
+
+Toolpad pages use a Material UI [Container](https://mui.com/material-ui/react-container/) as their top-level element. You can control the maximum width of this container in the page properties.
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/page-properties/max-width.png", "alt": "Page container max width", "caption": "Setting the maximum width of the page container", "zoom": false, "width": 306}}
+
+Available values are **xs**, **sm**, **md**, **lg**, **xl**, or **None** to conform to the available width in the window.
 
 ## Page parameters
 

@@ -101,10 +101,10 @@
   },
   "engines": {
     "node": ">=18",
-    "pnpm": "9.1.0"
+    "pnpm": "8.14.3"
   },
   "resolutions": {
     "google-auth-library": "*"
   },
-  "packageManager": "pnpm@9.1.0+sha256.22e36fba7f4880ecf749a5ca128b8435da085ecd49575e7fb9e64d6bf4fad394"
+  "packageManager": "pnpm@8.14.3+sha256.2d0363bb6c314daa67087ef07743eea1ba2e2d360c835e8fec6b5575e4ed9484"
 }

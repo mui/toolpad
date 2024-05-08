@@ -264,7 +264,7 @@ export function NumberFormatEditor({
             helperText={
               <React.Fragment>
                 ISO 4217 currency code. See the{' '}
-                <a target="_blank" href={CURRENCY_CODES_LIST_HELP_URL} rel="noopener noreferrer">
+                <a target="_blank" href={CURRENCY_CODES_LIST_HELP_URL} rel="noopener">
                   currency code list
                 </a>{' '}
                 for available values.

@@ -172,7 +172,7 @@ function CreateNewDataProviderDialog({
               <FormHelperText>
                 How is your backend data paginated? By index, or by cursor? Find more about
                 pagination modes in the{' '}
-                <a href={PAGINATION_DOCUMENTATION_URL} target="_blank" rel="noopener noreferrer">
+                <a href={PAGINATION_DOCUMENTATION_URL} target="_blank" rel="noopener">
                   documentation
                 </a>
                 .

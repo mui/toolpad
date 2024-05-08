@@ -101,7 +101,7 @@
   },
   "engines": {
     "node": ">=18",
-    "pnpm": "9.1.0"
+    "pnpm": "github:pnpm/pnpm.git#fd6cd2781716dd6c020474beae2f3a3da8493e6b"
   },
   "resolutions": {
     "google-auth-library": "*"

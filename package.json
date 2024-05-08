@@ -101,10 +101,10 @@
   },
   "engines": {
     "node": ">=18",
-    "pnpm": "github:pnpm/pnpm.git#fd6cd2781716dd6c020474beae2f3a3da8493e6b"
+    "pnpm": "8.15.8"
   },
   "resolutions": {
     "google-auth-library": "*"
   },
-  "packageManager": "pnpm@9.1.0+sha256.fd6cd2781716dd6c020474beae2f3a3da8493e6b"
+  "packageManager": "pnpm@8.15.8"
 }

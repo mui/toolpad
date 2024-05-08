@@ -12,11 +12,6 @@ Add max width option to page container, auto-scroll to selected elements, suppor
 
 - &#8203;<!-- 52 -->Add max width option to the page (#3484) @Janpot
 - &#8203;<!-- 51 -->Changes required for the React integration (#3493) @Janpot
-- &#8203;<!-- 50 -->Update renovate.json @Janpot
-- &#8203;<!-- 49 -->Update renovate.json @Janpot
-- &#8203;<!-- 48 -->Update renovate.json @Janpot
-- &#8203;<!-- 47 -->Update renovate.json @Janpot
-- &#8203;<!-- 46 -->Update renovate.json @Janpot
 - &#8203;<!-- 45 -->feat: add auto-scroll to canvas elements when selected from panel (#3344) @b4s36t4
 - &#8203;<!-- 44 -->Lock file maintenance Examples (#3486) @renovate[bot]
 - &#8203;<!-- 43 -->Lock file maintenance (#3485) @renovate[bot]
@@ -29,12 +24,9 @@ Add max width option to page container, auto-scroll to selected elements, suppor
 - &#8203;<!-- 36 -->Fix default value not initializing for controlled properties (#3445) @Janpot
 - &#8203;<!-- 35 -->Revert using published @mui/docs (#3440) @Janpot
 - &#8203;<!-- 34 -->Fix issues from trying MUI ESM branch (#3417) @Janpot
-- &#8203;<!-- 33 -->Update renovate.json @Janpot
-- &#8203;<!-- 32 -->Update renovate.json @Janpot
 - &#8203;<!-- 31 -->Fix environment binding preview (#3413) @Janpot
 - &#8203;<!-- 30 -->Use url.pathToFileURL to correctly resolve functions paths on windows (#3412) @Janpot
 - &#8203;<!-- 29 -->Remove renovate grouping (#3325) @Janpot
-- &#8203;<!-- 28 -->Update renovate.json @Janpot
 - &#8203;<!-- 27 -->Remove unsupported engines section from renovate (#3376) @Janpot
 - &#8203;<!-- 26 -->fix: Duplicate entry in `CHANGELOG.md` (#3388) @bharatkashyap
 - &#8203;<!-- 25 -->[code-infra] Closer sync with eslint config of codebase (#3441) @oliviertassinari

@@ -104,7 +104,7 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
-function getOutputFolder(root: string) {
+export function getOutputFolder(root: string) {
   return path.join(root, '.generated');
 }
 
@@ -453,6 +453,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
         content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
         display: node.attributes.display,
+        maxWidth: node.attributes.maxWidth,
         authorization: node.attributes.authorization,
       },
     } satisfies Page;
@@ -633,6 +634,7 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
       title: pageFileSpec.title,
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
+      maxWidth: pageFileSpec.maxWidth || undefined,
       authorization: pageFileSpec.authorization || undefined,
     },
   });

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -17,12 +18,63 @@ import Typography from '@mui/material/Typography';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material';
-import ToolpadLogo from './ToolpadLogo';
 import { BrandingContext, Navigation, NavigationContext, NavigationPageItem } from '../AppProvider';
 
 const IS_CLIENT = typeof window !== 'undefined';
 
 const DEFAULT_DRAWER_WIDTH = 320;
+
+const TOOLPAD_LOGO = (
+  <svg width={40} height={40} fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g mask="url(#a)">
+      <path d="M22.74 27.73v-7.6l6.64-3.79v7.6l-6.64 3.79Z" fill="#007FFF" />
+      <path d="M16.1 23.93v-7.59l6.64 3.8v7.59l-6.65-3.8Z" fill="#39F" />
+      <path d="m16.1 16.34 6.64-3.8 6.64 3.8-6.64 3.8-6.65-3.8Z" fill="#A5D8FF" />
+    </g>
+    <mask
+      id="b"
+      style={{
+        maskType: 'alpha',
+      }}
+      maskUnits="userSpaceOnUse"
+      x="8"
+      y="17"
+      width="14"
+      height="15"
+    >
+      <path
+        d="M8.5 22.3c0-1.05.56-2 1.46-2.53l3.75-2.14c.89-.5 1.98-.5 2.87 0l3.75 2.14a2.9 2.9 0 0 1 1.46 2.52v4.23c0 1.04-.56 2-1.46 2.52l-3.75 2.14c-.89.5-1.98.5-2.87 0l-3.75-2.14a2.9 2.9 0 0 1-1.46-2.52v-4.23Z"
+        fill="#D7DCE1"
+      />
+    </mask>
+    <g mask="url(#b)">
+      <path d="M15.14 32v-7.6l6.65-3.8v7.6L15.14 32Z" fill="#007FFF" />
+      <path d="M8.5 28.2v-7.6l6.64 3.8V32L8.5 28.2Z" fill="#39F" />
+      <path d="m8.5 20.6 6.64-3.79 6.65 3.8-6.65 3.8-6.64-3.8Z" fill="#A5D8FF" />
+    </g>
+    <mask
+      id="c"
+      style={{
+        maskType: 'alpha',
+      }}
+      maskUnits="userSpaceOnUse"
+      x="8"
+      y="4"
+      width="22"
+      height="20"
+    >
+      <path
+        d="M24.17 4.82a2.9 2.9 0 0 0-2.87 0L9.97 11.22a2.9 2.9 0 0 0-1.47 2.53v4.22c0 1.04.56 2 1.46 2.52l3.75 2.14c.89.5 1.98.5 2.87 0l11.33-6.42a2.9 2.9 0 0 0 1.47-2.52V9.48c0-1.04-.56-2-1.46-2.52l-3.75-2.14Z"
+        fill="#D7DCE1"
+      />
+    </mask>
+    <g mask="url(#c)">
+      <path d="M15.14 23.46v-7.6L29.38 7.8v7.59l-14.24 8.07Z" fill="#007FFF" />
+      <path d="M8.5 19.66v-7.6l6.64 3.8v7.6l-6.64-3.8Z" fill="#39F" />
+      <path d="M8.5 12.07 22.74 4l6.64 3.8-14.24 8.06-6.64-3.8Z" fill="#A5D8FF" />
+    </g>
+  </svg>
+);
 
 const LogoContainer = styled('div')({
   position: 'relative',
@@ -139,6 +191,7 @@ function DashboardSidebarSubNavigation({
             ) : (
               listItem
             )}
+
             {IS_CLIENT && hasMounted && navigationItem.children ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
@@ -154,13 +207,56 @@ function DashboardSidebarSubNavigation({
   );
 }
 
+DashboardSidebarSubNavigation.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * @ignore
+   */
+  depth: PropTypes.number,
+  /**
+   * @ignore
+   */
+  subNavigation: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({
+        children: PropTypes.arrayOf(
+          PropTypes.oneOfType([
+            PropTypes.object,
+            PropTypes.shape({
+              kind: PropTypes.oneOf(['header']).isRequired,
+              title: PropTypes.string.isRequired,
+            }),
+            PropTypes.shape({
+              kind: PropTypes.oneOf(['divider']).isRequired,
+            }),
+          ]).isRequired,
+        ),
+        icon: PropTypes.node,
+        kind: PropTypes.oneOf(['page']),
+        path: PropTypes.string,
+        title: PropTypes.string.isRequired,
+      }),
+      PropTypes.shape({
+        kind: PropTypes.oneOf(['header']).isRequired,
+        title: PropTypes.string.isRequired,
+      }),
+      PropTypes.shape({
+        kind: PropTypes.oneOf(['divider']).isRequired,
+      }),
+    ]).isRequired,
+  ).isRequired,
+} as any;
+
 interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebarWidth?: number;
   hideTitle?: boolean;
 }
 
-export function DashboardLayout({
+function DashboardLayout({
   children,
   sidebarWidth = DEFAULT_DRAWER_WIDTH,
   hideTitle = false,
@@ -181,7 +277,7 @@ export function DashboardLayout({
           <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
             <Stack direction="row" alignItems="center">
               <Box sx={{ mr: 1 }}>
-                <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
+                <LogoContainer>{branding?.logo ?? TOOLPAD_LOGO}</LogoContainer>
               </Box>
               {!hideTitle ? (
                 <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
@@ -192,17 +288,17 @@ export function DashboardLayout({
           </a>
           <Box sx={{ flexGrow: 1 }} />
           {/* <Stack>
-            <IconButton
-              size="large"
-              aria-label="Show new notifications"
-              color="inherit"
-              sx={{
-                border: (theme) => `1px solid ${theme.palette.divider}`,
-              }}
-            >
-              <NotificationsIcon />
-            </IconButton>
-          </Stack> */}
+               <IconButton
+                 size="large"
+                 aria-label="Show new notifications"
+                 color="inherit"
+                 sx={{
+                   border: (theme) => `1px solid ${theme.palette.divider}`,
+                 }}
+               >
+                 <NotificationsIcon />
+               </IconButton>
+              </Stack> */}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -231,3 +327,24 @@ export function DashboardLayout({
     </Box>
   );
 }
+
+DashboardLayout.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * @ignore
+   */
+  children: PropTypes.node,
+  /**
+   * @ignore
+   */
+  hideTitle: PropTypes.bool,
+  /**
+   * @ignore
+   */
+  sidebarWidth: PropTypes.number,
+} as any;
+
+export { DashboardLayout };

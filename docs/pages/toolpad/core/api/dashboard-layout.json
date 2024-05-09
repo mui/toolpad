@@ -1,0 +1,13 @@
+{
+  "props": {},
+  "name": "DashboardLayout",
+  "imports": ["import { DashboardLayout } from '@toolpad/core/src';"],
+  "classes": [],
+  "spread": true,
+  "themeDefaultProps": null,
+  "muiName": "DashboardLayout",
+  "filename": "/packages/toolpad-core/src/DashboardLayout/DashboardLayout.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/components/dashboard-layout/\">Dashboard Layout</a></li></ul>",
+  "cssComponent": false
+}

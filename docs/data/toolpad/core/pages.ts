@@ -62,6 +62,10 @@ const pages: MuiPage[] = [
     children: [
       { pathname: '/toolpad/core/components', title: 'All components' },
       {
+        pathname: '/toolpad/core/components/app-provider',
+        title: 'App Provider',
+      },
+      {
         pathname: '/toolpad/core/components/layout-group',
         subheader: 'Layout',
         children: [

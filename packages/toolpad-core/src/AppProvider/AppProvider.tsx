@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import type { Theme } from '@emotion/react';
@@ -40,7 +41,7 @@ interface AppProviderProps {
   navigation: Navigation;
 }
 
-export function AppProvider({ children, theme, branding = null, navigation }: AppProviderProps) {
+function AppProvider({ children, theme, branding = null, navigation }: AppProviderProps) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -50,3 +51,59 @@ export function AppProvider({ children, theme, branding = null, navigation }: Ap
     </ThemeProvider>
   );
 }
+
+AppProvider.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * @ignore
+   */
+  branding: PropTypes.shape({
+    logo: PropTypes.node,
+    title: PropTypes.string,
+  }),
+  /**
+   * @ignore
+   */
+  children: PropTypes.node,
+  /**
+   * @ignore
+   */
+  navigation: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({
+        children: PropTypes.arrayOf(
+          PropTypes.oneOfType([
+            PropTypes.object,
+            PropTypes.shape({
+              kind: PropTypes.oneOf(['header']).isRequired,
+              title: PropTypes.string.isRequired,
+            }),
+            PropTypes.shape({
+              kind: PropTypes.oneOf(['divider']).isRequired,
+            }),
+          ]).isRequired,
+        ),
+        icon: PropTypes.node,
+        kind: PropTypes.oneOf(['page']),
+        path: PropTypes.string,
+        title: PropTypes.string.isRequired,
+      }),
+      PropTypes.shape({
+        kind: PropTypes.oneOf(['header']).isRequired,
+        title: PropTypes.string.isRequired,
+      }),
+      PropTypes.shape({
+        kind: PropTypes.oneOf(['divider']).isRequired,
+      }),
+    ]).isRequired,
+  ).isRequired,
+  /**
+   * @ignore
+   */
+  theme: PropTypes.object.isRequired,
+} as any;
+
+export { AppProvider };

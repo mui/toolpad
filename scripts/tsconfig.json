@@ -12,6 +12,10 @@
       "@toolpad/utils/*": [
         "../packages/toolpad-utils/src/*.tsx",
         "../packages/toolpad-utils/src/*.ts"
+      ],
+      "@mui-internal/api-docs-builder": ["../node_modules/@mui/monorepo/packages/api-docs-builder"],
+      "@mui-internal/api-docs-builder/*": [
+        "../node_modules/@mui/monorepo/packages/api-docs-builder/*"
       ]
     },
     "module": "ESNext",

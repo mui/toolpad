@@ -36,7 +36,7 @@ export default function Page() {
   );
 }
 
-export async function buildComponentsReference() {
+export async function buildStudioComponentsReference() {
   await fs.rm(componentDocsRoot, { recursive: true, force: true });
   await fs.mkdir(componentDocsRoot, { recursive: true });
   await fs.rm(componentPagesRoot, { recursive: true, force: true });

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import MarkdownDocs from 'docs/src/modules/components/MarkdownDocsV2';
 import AppFrame from 'docs/src/modules/components/AppFrame';
-import * as pageProps from 'docs-toolpad/data/toolpad/core/components/dashboard-layout/core/dashboard-layout.md?@mui/markdown';
+import * as pageProps from 'docs-toolpad/data/toolpad/core/components/dashboard-layout/dashboard-layout.md?@mui/markdown';
 import mapApiPageTranslations from 'docs/src/modules/utils/mapApiPageTranslations';
 import DashboardLayoutApiJsonPageContent from '../../api/dashboard-layout.json';
 

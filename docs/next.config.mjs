@@ -56,7 +56,8 @@ export default withDocsInfra({
         ...config.resolve,
         alias: {
           ...config.resolve.alias,
-          docs: path.resolve(MONOREPO_PATH, './docs'),
+          'docs-toolpad': path.resolve(MONOREPO_PATH, './docs'),
+          docs: path.resolve(MONOREPO_PATH, './node_modules/@mui/monorepo/docs'),
           ...MONOREPO_PACKAGES,
           '@toolpad/studio-components': path.resolve(
             currentDirectory,

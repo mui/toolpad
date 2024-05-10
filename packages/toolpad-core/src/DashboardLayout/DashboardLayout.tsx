@@ -256,11 +256,9 @@ interface DashboardLayoutProps {
   hideTitle?: boolean;
 }
 
-function DashboardLayout({
-  children,
-  sidebarWidth = DEFAULT_DRAWER_WIDTH,
-  hideTitle = false,
-}: DashboardLayoutProps) {
+function DashboardLayout(props: DashboardLayoutProps) {
+  const { children, sidebarWidth = DEFAULT_DRAWER_WIDTH, hideTitle = false } = props;
+
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 

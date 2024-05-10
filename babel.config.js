@@ -17,6 +17,12 @@ module.exports = function getBabelConfig(api) {
 
   const defaultAlias = {
     '@toolpad/core': resolveAliasPath('./packages/toolpad-core/src'),
+    docs: resolveAliasPath('./node_modules/@mui/monorepo/docs'),
+    'docs-toolpad': resolveAliasPath('./docs'),
+    test: resolveAliasPath('./test'),
+    '@mui-internal/api-docs-builder': resolveAliasPath(
+      './node_modules/@mui/monorepo/packages/api-docs-builder',
+    ),
   };
 
   const presets = [

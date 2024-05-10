@@ -41,7 +41,9 @@ interface AppProviderProps {
   navigation: Navigation;
 }
 
-function AppProvider({ children, theme, branding = null, navigation }: AppProviderProps) {
+function AppProvider(props: AppProviderProps) {
+  const { children, theme, branding = null, navigation } = props;
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

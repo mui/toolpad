@@ -77,7 +77,7 @@ module.exports = {
       'error',
       {
         // https://github.com/import-js/eslint-plugin-import/issues/1739
-        ignore: ['\\.md\\?muiMarkdown$'],
+        ignore: ['\\?@mui/markdown$'],
       },
     ],
     'import/no-restricted-paths': [

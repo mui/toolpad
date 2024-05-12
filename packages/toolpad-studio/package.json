@@ -37,7 +37,7 @@
     }
   },
   "dependencies": {
-    "@auth/core": "0.30.0",
+    "@auth/core": "0.31.0",
     "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.4",
     "@emotion/server": "11.11.0",

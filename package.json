@@ -75,7 +75,7 @@
     "react-inspector": "6.0.2",
     "recharts": "2.12.6",
     "regenerator-runtime": "0.14.1",
-    "rimraf": "5.0.5",
+    "rimraf": "5.0.7",
     "typescript": "5.4.5",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.6.3"

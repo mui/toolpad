@@ -30,7 +30,7 @@ async function run(argv) {
   };
   const babelConfigPath = path.resolve(
     getWorkspaceRoot(),
-    './packages/toolpad-core/babel.config.js',
+    './babel.config.js',
   );
   const srcDir = path.resolve('./src');
   const extensions = ['.js', '.ts', '.tsx'];

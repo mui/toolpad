@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "scripts": {
-    "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
+    "build": "pnpm prebuild && pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
     "build:node": "node ../../scripts/build.mjs node",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
@@ -50,24 +50,8 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "@babel/cli": "7.24.1",
-    "@babel/core": "7.24.4",
-    "@babel/node": "7.23.9",
-    "@babel/plugin-transform-react-constant-elements": "7.24.1",
-    "@babel/plugin-transform-runtime": "7.24.3",
-    "@babel/preset-env": "7.24.4",
-    "@babel/preset-react": "7.24.1",
-    "@babel/preset-typescript": "7.24.1",
-    "@babel/register": "7.23.7",
     "@types/react": "18.3.1",
-    "@types/react-dom": "18.3.0",
-    "babel-loader": "9.1.3",
-    "babel-plugin-istanbul": "6.1.1",
-    "babel-plugin-macros": "3.1.0",
-    "babel-plugin-module-resolver": "5.0.0",
-    "babel-plugin-optimize-clsx": "2.6.2",
-    "babel-plugin-react-remove-properties": "0.3.0",
-    "babel-plugin-transform-react-remove-prop-types": "0.4.24"
+    "@types/react-dom": "18.3.0"
   },
   "peerDependencies": {
     "@mui/icons-material": "^5",
@@ -82,9 +66,6 @@
     "node": ">=18"
   },
   "files": [
-    "AppProvider/",
-    "DashboardLayout/",
-    "node/AppProvider/",
-    "node/DashboardLayout/"
+    "build"
   ]
 }

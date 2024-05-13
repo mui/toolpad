@@ -9,7 +9,7 @@
     "edit": "toolpad-studio editor http://localhost:3001/my-toolpad-studio-app"
   },
   "dependencies": {
-    "@toolpad/studio": "0.1.54",
+    "@toolpad/studio": "0.1.55",
     "express": "4.19.2",
     "next": "14.2.3",
     "react": "18.2.0",

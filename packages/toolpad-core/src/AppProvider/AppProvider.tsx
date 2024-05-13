@@ -2,6 +2,7 @@ import * as React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import type { Theme } from '@emotion/react';
+import { baseTheme } from '../themes';
 
 export interface Branding {
   title?: string;
@@ -35,12 +36,17 @@ export const NavigationContext = React.createContext<Navigation>([]);
 
 interface AppProviderProps {
   children: React.ReactNode;
-  theme: Theme;
+  theme?: Theme;
   branding?: Branding | null;
-  navigation: Navigation;
+  navigation?: Navigation;
 }
 
-export function AppProvider({ children, theme, branding = null, navigation }: AppProviderProps) {
+export function AppProvider({
+  children,
+  theme = baseTheme,
+  branding = null,
+  navigation = [],
+}: AppProviderProps) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

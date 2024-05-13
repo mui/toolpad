@@ -8,7 +8,6 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import theme from '../theme';
 
 const NAVIGATION = [
   {
@@ -52,7 +51,7 @@ const NAVIGATION = [
 
 export default function DashboardLayoutBasic() {
   return (
-    <AppProvider theme={theme} navigation={NAVIGATION}>
+    <AppProvider navigation={NAVIGATION}>
       <DashboardLayout>
         <Box
           sx={{

@@ -22,12 +22,12 @@ import { BrandingContext, Navigation, NavigationContext, NavigationPageItem } fr
 
 const IS_CLIENT = typeof window !== 'undefined';
 
-const DEFAULT_DRAWER_WIDTH = 320;
+const DRAWER_WIDTH = 320;
 
 const LogoContainer = styled('div')({
   position: 'relative',
   height: 40,
-  img: {
+  '& img': {
     maxHeight: 40,
   },
 });
@@ -156,15 +156,9 @@ function DashboardSidebarSubNavigation({
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  sidebarWidth?: number;
-  hideTitle?: boolean;
 }
 
-export function DashboardLayout({
-  children,
-  sidebarWidth = DEFAULT_DRAWER_WIDTH,
-  hideTitle = false,
-}: DashboardLayoutProps) {
+export function DashboardLayout({ children }: DashboardLayoutProps) {
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 
@@ -183,11 +177,9 @@ export function DashboardLayout({
               <Box sx={{ mr: 1 }}>
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
               </Box>
-              {!hideTitle ? (
-                <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
-                  {branding?.title ?? 'Toolpad'}
-                </Typography>
-              ) : null}
+              <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
+                {branding?.title ?? 'Toolpad'}
+              </Typography>
             </Stack>
           </a>
           <Box sx={{ flexGrow: 1 }} />
@@ -208,10 +200,10 @@ export function DashboardLayout({
       <Drawer
         variant="permanent"
         sx={{
-          width: sidebarWidth,
+          width: DRAWER_WIDTH,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: sidebarWidth,
+            width: DRAWER_WIDTH,
             boxSizing: 'border-box',
           },
         }}

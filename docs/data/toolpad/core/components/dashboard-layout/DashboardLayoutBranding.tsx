@@ -5,8 +5,9 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import type { Navigation, Branding } from '@toolpad/core';
 
-const NAVIGATION = [
+const NAVIGATION: Navigation = [
   {
     title: 'Dashboard',
     icon: <DashboardIcon />,
@@ -17,7 +18,7 @@ const NAVIGATION = [
   },
 ];
 
-const BRANDING = {
+const BRANDING: Branding = {
   logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
   title: 'MUI',
 };

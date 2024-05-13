@@ -21,6 +21,11 @@
       "rangeStrategy": "widen"
     },
     {
+      "groupName": "devDependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"]
+    },
+    {
       "groupName": "babel",
       "matchPackagePatterns": ["^@babel/", "^@types/babel"]
     },

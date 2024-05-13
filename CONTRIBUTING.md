@@ -139,34 +139,6 @@ pnpm install
 
 </details>
 
-### Developing on Toolpad Core
-
-This uses the local version of Toolpad Core as built in the mono-repository, and allows for quickly testing out changes and their results.
-
-Some application examples for different JavaScript frameworks (such as Next.js, Vite...) are present in the `playground` folder that can be used to quickly develop on Toolpad Core on a live application.
-
-1. Install dependencies:
-
-   ```bash
-   pnpm install
-   ```
-
-2. Run the built-in watch mode
-
-   ```bash
-   pnpm dev
-   ```
-
-3. Run any application in the `playground` folder in development mode, such as `toolpad-core-nextjs`
-
-   ```bash
-   cd playground/toolpad-core-nextjs
-   ```
-
-   ```bash
-   pnpm dev
-   ```
-
 ## Running integration tests
 
 The playwright tests can be run in one of two modes:

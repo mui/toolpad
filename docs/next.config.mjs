@@ -67,7 +67,6 @@ export default withDocsInfra({
             '../packages/toolpad-studio-runtime/src',
           ),
           '@toolpad/utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
-          '@toolpad/core': path.resolve(currentDirectory, '../packages/toolpad-core/src'),
         },
       },
       module: {

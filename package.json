@@ -73,7 +73,7 @@
     "prettier": "3.2.5",
     "pretty-quick": "4.0.0",
     "react-inspector": "6.0.2",
-    "recharts": "2.12.6",
+    "recharts": "2.12.7",
     "regenerator-runtime": "0.14.1",
     "rimraf": "5.0.7",
     "typescript": "5.4.5",

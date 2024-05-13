@@ -61,8 +61,8 @@ importers:
         specifier: 1.5.5
         version: 1.5.5
       '@mui/monorepo':
-        specifier: github:mui/material-ui#9bc4fc42959427246addfdf29db95847cc38e410
-        version: github.com/mui/material-ui/9bc4fc42959427246addfdf29db95847cc38e410(@opentelemetry/api@1.8.0)
+        specifier: github:mui/material-ui#6477d93ce61ab0e6b500b90e484129217eb6f5ec
+        version: github.com/mui/material-ui/6477d93ce61ab0e6b500b90e484129217eb6f5ec(@opentelemetry/api@1.8.0)
       '@mui/x-charts':
         specifier: 7.4.0
         version: 7.4.0(@mui/material@5.15.17)(react-dom@18.2.0)(react@18.2.0)
@@ -15338,11 +15338,11 @@ packages:
     resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
     dev: false
 
-  github.com/mui/material-ui/9bc4fc42959427246addfdf29db95847cc38e410(@opentelemetry/api@1.8.0):
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/9bc4fc42959427246addfdf29db95847cc38e410}
-    id: github.com/mui/material-ui/9bc4fc42959427246addfdf29db95847cc38e410
+  github.com/mui/material-ui/6477d93ce61ab0e6b500b90e484129217eb6f5ec(@opentelemetry/api@1.8.0):
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/6477d93ce61ab0e6b500b90e484129217eb6f5ec}
+    id: github.com/mui/material-ui/6477d93ce61ab0e6b500b90e484129217eb6f5ec
     name: '@mui/monorepo'
-    version: 5.15.17
+    version: 6.0.0-alpha.6
     requiresBuild: true
     dependencies:
       '@googleapis/sheets': 5.0.5

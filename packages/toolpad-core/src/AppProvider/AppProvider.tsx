@@ -11,10 +11,10 @@ interface AppProviderProps {
 
 export function AppProvider({ children, theme }: AppProviderProps) {
   return (
-      <ThemeProvider theme={theme}>
-        {/* CssBaseline kickstarts an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
+    <ThemeProvider theme={theme}>
+      {/* CssBaseline kickstarts an elegant, consistent, and simple baseline to build upon. */}
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
   );
 }

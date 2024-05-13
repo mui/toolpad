@@ -35,7 +35,7 @@
     "execa": "8.0.1",
     "inquirer": "9.2.20",
     "invariant": "2.2.4",
-    "semver": "7.6.0",
+    "semver": "7.6.2",
     "tar": "6.2.1",
     "yargs": "17.7.2"
   },

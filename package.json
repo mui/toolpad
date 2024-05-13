@@ -89,7 +89,7 @@
     "inquirer": "9.2.20",
     "invariant": "2.2.4",
     "lodash": "4.17.21",
-    "semver": "7.6.0",
+    "semver": "7.6.2",
     "tsup": "8.0.2",
     "tsx": "4.9.3",
     "vitest": "1.6.0",

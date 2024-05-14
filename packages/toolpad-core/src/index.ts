@@ -1,4 +1,3 @@
-/* eslint-disable import/export */
+export { AppProvider } from './AppProvider';
 
-export { default as AppProvider } from './AppProvider';
-export * from './AppProvider';
+export { DashboardLayout } from './DashboardLayout';

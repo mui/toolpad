@@ -4,9 +4,9 @@ title: Toolpad Core - Installation
 
 # Toolpad Core - Installation
 
-<p class="description">Instructions on setting up Toolpad Core in your project.</p>
+<p class="description">Learn how to install Toolpad Core in your local environment.</p>
 
-## Installation
+## Install instructions
 
 Run
 
@@ -45,22 +45,12 @@ yarn dev
 
 Visit **http://localhost:3000/** in your browser to open the application
 
-## Install Toolpad Core in an existing project
+## Options of the CLI
 
-Toolpad Core is a set of primitives and components designed to be used in existing projects. Simply add the dependency:
+- Do you want to enable authentication?
+  - select authentication method
+  - follow instructions at XYZ and paste the auth token (written to .env)
+- Do you want to enable RBAC
+- …?
 
-<codeblock storageKey="package-manager">
-
-```bash npm
-npm install -S @toolpad/core
-```
-
-```bash yarn
-yarn add @toolpad/core
-```
-
-```bash pnpm
-pnpm add @toolpad/core
-```
-
-</codeblock>
+The CLI scaffolds a Next.js project with all Toolpad features set up

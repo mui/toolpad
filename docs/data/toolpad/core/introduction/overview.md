@@ -1,21 +1,53 @@
 ---
-title: Toolpad Core - Overview
+title: Toolpad Overview
 ---
 
-# Toolpad Core - Overview
+# Toolpad
 
-<p class="description">A general, high-level description of Toolpad Core and its capabilites.</p>
+<p class="description">A framework to build full-stack apps, fast. It can be used as a Next.js starter, or integrated within an existing React project to build dashboards and internal tools. </p>
 
-## Introduction
+This framework leverages the existing suite of components offered by MUI, and ties them together with the most commonly-used backend integrations. Imagine a React dashboard template but with backend features like authentication, role-based access control and data fetching already included. It comes with the guarantee of MUI's enterprise-tested components, and the Toolpad team's focus on using the latest stable libraries, and prioritising razor-sharp performance.
 
-Toolpad Core is a set of open-sourced components and primitives to help you build full-stack applications fast. When you build an application with Toolpad Core, you get UI for **authentication**, **role-based access control**, **navigation**, **notifications** and others pre-made, along with primitives to connect to the server to read and mutate data. At the same time, you retain control of your codebase since the output is always 100% React.
+:::warning
+Toolpad Core application demo which contains all features
+:::
 
-## Key features
+## Overview
 
-- **Open-source**: Toolpad Core is open-sourced, which means the code is free for you to observe and inspect, forever!
+:::info
+Visit the [installation guide](/toolpad/core/installation/) to learn how to install the package correctly.
+:::
 
-- **Pure-code**: Toolpad Core **generates React**, not configuration files in `.yml` or `.json` - no attempt to lock you in to Toolpad Core. You are free to take the output and customize it as your own React app.
+Toolpad can be multiple things: a set of low-level primitives for common use-cases like state management across components; a Next.js starter with backend features like authentication baked-in. To sum up: it is a framework that integrates many disparate tools which otherwise require a lot of inefficient glue code to work together. The framework is accessible through a Command Line Interface (CLI) which generates starter code quickly based on features needed or example templates to be followed.
 
-- **Ecosystem**: Toolpad Core uses **Material UI components** to bootstrap pages for your app and provides **abstractions over the MUI X Data Grid and Charts** to create dashboards and internal tools fast.
+The framework follows the open-core model, with some features being available under the MIT license, and some being under a paid license.
 
-- **Extensibility**: Toolpad Core allows you to **bring in your own heavily customized Material UI components** to integrate with its primitives for server-side data reading and mutation.
+## MIT version (free forever)
+
+This version provides clean abstractions for all basic features that a user needs while building a simple admin tool or dashboard, such as building fetching and mutating server-side data and authentication for users with multiple OAuth providers.
+
+:::warning
+Toolpad Core application demo which contains only free features
+:::
+
+## Pro version
+
+The Pro version includes and extends the features available in the MIT version to support more complex use cases. It packs in support for integrating role-based access control with providers such as Azure Entra for unlimited users; unlimited audit logs for all actions performed, automatic notification management for authenticated users and more.
+
+:::warning
+Toolpad core application demo with paid features
+:::
+
+## Features
+
+- Built with and exclusively for React ⚛️
+- High performance 🚀
+- [Authentication](/)
+- [Data Providers](/)
+- [Filters](/)
+
+## Upcoming Features 🚧
+
+- [Role-based Access Control](/)
+- [Audit Logs](/)
+- [Notifications](/)

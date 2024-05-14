@@ -1,31 +1,37 @@
 ---
-title: Toolpad Core - Tutorial
+title: Tutorial
 ---
 
 # Toolpad Core - Tutorial
 
-<p class="description">Learn the fundamentals of building with Toolpad Core by creating a small application.</p>
+<p class="description">Tutorial</p>
 
-1. Use the following command to launch a basic project for this tutorial:
+## Steps to follow
 
-   ```bash yarn
-   yarn create toolpad-app --core
+1. Run:
+
+   ```bash
+   yarn create toolpad-app --tutorial my-first-project
    ```
 
-2. Install the packages necessary for this example
+   This will prompt for a project name and create a basic project for this tutorial
+
+2. Install the packages necessary for this example:
 
    ```bash
    yarn add -S @mui/x-data-grid @mui/x-charts @mui/toolpad-data-csv
    ```
 
-3. Run the following command to start the app in dev mode:
+3. Run:
 
    ```bash
    cd my-first-project
    yarn dev
    ```
 
-4. Add the following to `/app/hello-world/page.tsx`:
+   to start the app in dev mode
+
+4. Create a file `/app/hello-world/page.tsx` and add
 
    ```tsx
    import * as React from 'react';
@@ -58,10 +64,10 @@ title: Toolpad Core - Tutorial
    }
    ```
 
-   <aside>
-   ❕ Add live demo here of the above
+   :::warning
+   Add live demo here of the above
    Break down each line that was added and explain what it does.
-   </aside>
+   :::
 
 7. This is great, but we'd also like to visualise this data:
 
@@ -90,11 +96,10 @@ title: Toolpad Core - Tutorial
    }
    ```
 
-   <aside>
+   :::warning
    ❕ Add live demo here of the above
    Break down each line that was added and explain what it does.
-
-   </aside>
+   :::
 
    Now both the data grid and the chart display the CSV data
 
@@ -136,10 +141,9 @@ title: Toolpad Core - Tutorial
    }
    ```
 
-   <aside>
-   ❕ Add live demo here of the above
+   :::warning
+   Add live demo here of the above
    Break down each line that was added and explain what it does.
-
-   </aside>
+   :::
 
    This concludes the tutorial.

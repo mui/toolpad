@@ -2,7 +2,7 @@
 
 ## Local development
 
-If you would like to hack on Toolpad or want to run the latest version, you can follow these steps:
+If you would like to hack on Toolpad Studio or want to run the latest version, you can follow these steps:
 
 _If you're looking into contributing to the docs, follow the [instructions](#building-and-running-the-documentation) down below_
 
@@ -11,7 +11,7 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 - git
 - node.js
 
-### Running Toolpad Studio apps inside the monorepo (recommended)
+### Running apps inside the monorepo (recommended)
 
 This uses the local version of Toolpad Studio as built in the mono-repository.
 This is recommended when your app is in a folder inside of the mono-repository.
@@ -198,7 +198,7 @@ Use the `--ui` flag to run the tests interactively.
 
 ## Using CodeSandbox CI
 
-Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad Studio package for every pull request. To use the package from the pull request, take the following steps:
+Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn/sandboxes/ci). As a result of that we have a published Toolpad Studio package for ever pull request. To use the package from the pull request, take the following steps:
 
 1. In the GitHub PR checks, locate the ci/codesandbox check and make sure it has successfully finished building. Click on "details" to open the CodeSandbox CI user interface.
 

@@ -78,6 +78,7 @@
     "fast-glob": "^3.3.2",
     "format-util": "1.0.5",
     "fs-extra": "11.2.0",
+    "globby": "14.0.1",
     "jsdom": "24.0.0",
     "lerna": "7.4.2",
     "markdownlint-cli2": "0.13.0",

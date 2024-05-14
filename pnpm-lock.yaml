@@ -177,6 +177,9 @@ importers:
       fs-extra:
         specifier: 11.2.0
         version: 11.2.0
+      globby:
+        specifier: 14.0.1
+        version: 14.0.1
       jsdom:
         specifier: 24.0.0
         version: 24.0.0

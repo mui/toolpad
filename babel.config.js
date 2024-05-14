@@ -3,7 +3,7 @@ const productionPlugins = [
 ];
 
 module.exports = function getBabelConfig(api) {
-  const useCommonjs = api.env(['nodep']);
+  const useCommonjs = api.env(['node']);
 
   const presets = [
     [

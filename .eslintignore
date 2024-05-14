@@ -4,7 +4,6 @@ pnpm-lock.yaml
 /docs/export
 /docs/schemas
 /packages/**/dist
-/packages/**/build
 /packages/toolpad-studio/.next
 /packages/toolpad-studio/public
 

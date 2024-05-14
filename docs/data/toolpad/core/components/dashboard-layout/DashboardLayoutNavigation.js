@@ -6,8 +6,6 @@ import FolderIcon from '@mui/icons-material/Folder';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
-// @TODO: Have path examples, including nested paths, once navigation adapter is implemented
-
 const NAVIGATION = [
   {
     title: 'Item 1',

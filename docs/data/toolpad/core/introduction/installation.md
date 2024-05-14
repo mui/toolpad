@@ -8,7 +8,7 @@ title: Toolpad Core - Installation
 
 ## Install instructions
 
-Run
+1. Run the following command to start Toolpad Core:
 
 <codeblock storageKey="package-manager">
 
@@ -26,31 +26,31 @@ yarn create toolpad-app --core
 
 </codeblock>
 
-Follow the instructions of the CLI. After you conclude the installation process, change your working dir to the project and run
+2. Follow the instructions presented. Once the installation ends, run:
+
 <codeblock storageKey="package-manager">
 
 ```bash npm
+cd <project-name>
 npm run dev
 ```
 
 ```bash pnpm
+cd <project-name>
 pnpm run dev
 ```
 
 ```bash yarn
+cd <project-name>
 yarn dev
 ```
 
 </codeblock>
 
-Visit **http://localhost:3000/** in your browser to open the application
+3. Visit **http://localhost:3000/** in your browser to open the application
 
-## Options of the CLI
+4. `create-toolpad-app` will generate starter code for a Next.js app. The features included in the bootstrapped app will depend on the preference provided to the CLI:
 
-- Do you want to enable authentication?
-  - select authentication method
-  - follow instructions at XYZ and paste the auth token (written to .env)
-- Do you want to enable RBAC
-- …?
-
-The CLI scaffolds a Next.js project with all Toolpad features set up
+- Using the app/pages router
+- Using authentication
+- Using a data provider

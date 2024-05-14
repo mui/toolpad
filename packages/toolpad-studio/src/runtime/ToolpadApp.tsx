@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import {
   Stack,
@@ -67,6 +69,7 @@ import usePageTitle from '@toolpad/utils/hooks/usePageTitle';
 import invariant from 'invariant';
 import useEventCallback from '@mui/utils/useEventCallback';
 import * as appDom from '@toolpad/studio-runtime/appDom';
+import useSsr from '@toolpad/utils/hooks/useSsr';
 import { RuntimeState } from './types';
 import { getBindingType, getBindingValue } from './bindings';
 import {
@@ -92,11 +95,9 @@ import { RuntimeApiContext, createApi } from './api';
 import { AuthContext, useAuth, AuthSession } from './useAuth';
 import { RequireAuthorization } from './auth';
 import SignInPage from './SignInPage';
-import { componentsStore, pageComponentsStore } from './globalState';
+import { componentsStore } from './globalState';
 
 const browserJsRuntime = getBrowserRuntime();
-
-export type PageComponents = Partial<Record<string, React.ComponentType>>;
 
 const Pre = styled('pre')(({ theme }) => ({
   margin: 0,
@@ -478,9 +479,9 @@ function parseBindings(
       for (const [propName, argType] of Object.entries(argTypes)) {
         invariant(argType, `Missing argType for prop "${propName}"`);
 
-        const initializerId = argType.defaultValueProp
-          ? `${elm.id}.props.${argType.defaultValueProp}`
-          : undefined;
+        const initializerExpression = argType.defaultValueProp
+          ? `${elm.name}.${argType.defaultValueProp}`
+          : JSON.stringify(getArgTypeDefaultValue(argType));
 
         const propValue: BindableAttrValue<any> = elm.props?.[propName];
 
@@ -503,7 +504,7 @@ function parseBindings(
             controlled.add(bindingId);
             parsedBindingsMap.set(bindingId, {
               scopePath,
-              initializer: initializerId,
+              initializer: initializerExpression,
             });
           } else {
             parsedBindingsMap.set(bindingId, parseBinding(binding, { scopePath }));
@@ -904,9 +905,15 @@ interface RenderedNodeContentProps {
   node: appDom.PageNode | appDom.ElementNode;
   childNodeGroups: appDom.NodeChildren<appDom.ElementNode>;
   Component: ToolpadComponent<any>;
+  staticProps?: Record<string, any>;
 }
 
-function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeContentProps) {
+function RenderedNodeContent({
+  node,
+  childNodeGroups,
+  Component,
+  staticProps,
+}: RenderedNodeContentProps) {
   const { setControlledBinding } = React.useContext(SetBindingContext) ?? {};
   invariant(setControlledBinding, 'Node must be rendered in a RuntimeScoped context');
 
@@ -956,7 +963,10 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
       }
 
       if (typeof hookResult[propName] === 'undefined' && argType) {
-        hookResult[propName] = getArgTypeDefaultValue(argType);
+        const defaultValue = getArgTypeDefaultValue(argType);
+        if (typeof defaultValue !== 'undefined') {
+          hookResult[propName] = getArgTypeDefaultValue(argType);
+        }
       }
     }
 
@@ -1081,13 +1091,14 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 
   const props: Record<string, any> = React.useMemo(() => {
     return {
+      ...staticProps,
       ...boundProps,
       ...onChangeHandlers,
       ...eventHandlers,
       ...layoutElementProps,
       ...reactChildren,
     };
-  }, [boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
+  }, [staticProps, boundProps, eventHandlers, layoutElementProps, onChangeHandlers, reactChildren]);
 
   const previousProps = React.useRef<Record<string, any>>(props);
   const [hasSetInitialBindings, setHasSetInitialBindings] = React.useState(false);
@@ -1209,24 +1220,19 @@ function RenderedNodeContent({ node, childNodeGroups, Component }: RenderedNodeC
 }
 
 interface PageRootProps {
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'none';
   children?: React.ReactNode;
 }
 
 const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRoot(
-  { children, ...props }: PageRootProps,
+  { children, maxWidth, ...props }: PageRootProps,
   ref,
 ) {
+  const containerMaxWidth =
+    maxWidth === 'none' ? false : maxWidth ?? appDom.DEFAULT_CONTAINER_WIDTH;
   return (
-    <Container ref={ref}>
-      <Stack
-        data-testid="page-root"
-        direction="column"
-        sx={{
-          my: 2,
-          gap: 1,
-        }}
-        {...props}
-      >
+    <Container ref={ref} maxWidth={containerMaxWidth}>
+      <Stack data-testid="page-root" direction="column" sx={{ my: 2, gap: 1 }} {...props}>
         {children}
       </Stack>
     </Container>
@@ -1238,6 +1244,11 @@ const PageRootComponent = createComponent(PageRoot, {
     children: {
       type: 'element',
       control: { type: 'slots' },
+    },
+    maxWidth: {
+      type: 'string',
+      enum: ['xs', 'sm', 'md', 'lg', 'xl', 'none'],
+      control: { type: 'ToggleButtons' },
     },
   },
 });
@@ -1376,17 +1387,6 @@ function FetchNode({ node, page }: FetchNodeProps) {
   }
 }
 
-interface RenderedProCodePageProps {
-  page: appDom.PageNode;
-}
-
-function RenderedProCodePage({ page }: RenderedProCodePageProps) {
-  usePageTitle(appDom.getPageTitle(page));
-  const pageComponents = pageComponentsStore.useValue();
-  const PageComponent = pageComponents[page.name] ?? PageNotFound;
-  return <PageComponent />;
-}
-
 interface RenderedLowCodePageProps {
   page: appDom.PageNode;
 }
@@ -1424,6 +1424,13 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
 
   const applicationVm = useApplicationVm(onApplicationVmUpdate);
 
+  const pageProps = React.useMemo(
+    () => ({
+      maxWidth: page.attributes.maxWidth,
+    }),
+    [page.attributes.maxWidth],
+  );
+
   return (
     <ApplicationVmApiContext.Provider value={applicationVm}>
       <RuntimeScoped id={'global'} parseBindingsResult={parseBindingsResult} onUpdate={onUpdate}>
@@ -1431,6 +1438,7 @@ function RenderedLowCodePage({ page }: RenderedLowCodePageProps) {
           node={page}
           childNodeGroups={{ children }}
           Component={PageRootComponent}
+          staticProps={pageProps}
         />
         {queries.map((node) => (
           <FetchNode key={node.id} page={page} node={node} />
@@ -1451,13 +1459,7 @@ export interface RenderedPageProps {
 export function RenderedPage({ page }: RenderedPageProps) {
   const appHost = useAppHost();
 
-  let pageContent = page.attributes.codeFile ? (
-    <RenderedProCodePage page={page} />
-  ) : (
-    // Make sure the page itself remounts when the route changes. This make sure all pageBindings are reinitialized
-    // during first render. Fixes https://github.com/mui/mui-toolpad/issues/1050
-    <RenderedLowCodePage page={page} key={page.name} />
-  );
+  let pageContent = <RenderedLowCodePage page={page} key={page.name} />;
 
   if (!appHost.isCanvas) {
     pageContent = (
@@ -1728,7 +1730,8 @@ export function ToolpadAppRoutes(props: ToolpadAppProps) {
 }
 
 export default function ToolpadApp(props: ToolpadAppProps) {
-  return (
+  const isSsr = useSsr();
+  return isSsr ? null : (
     <BrowserRouter basename={props.basename}>
       <Routes>
         <Route

@@ -330,10 +330,6 @@ test('data providers crud', async ({ page }) => {
     editorModel.appCanvas.getByText('New record created successfully', { exact: true }),
   ).toBeVisible();
 
-  await editorModel.appCanvas.getByRole('link', { name: 'Go to new record' }).click();
-
-  await expect(cellLocator(grid, 102, 1)).toHaveText('created');
-
   await editorModel.appCanvas.getByRole('button', { name: 'Add record', exact: true }).click();
 
   await page.keyboard.press('Escape');

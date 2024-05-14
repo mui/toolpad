@@ -1,40 +1,40 @@
 # Avoid conflicts with the other Next.js apps hosted under https://mui.com/
-/toolpad/_next/* /_next/:splat 301
+/toolpad/_next/* /_next/:splat 200
 
 # Legacy redirection
 # 2022
-/toolpad/getting-started/setup/ /toolpad/getting-started/ 301
-/toolpad/getting-started/tutorial/ /toolpad/getting-started/ 301
-/toolpad/data-fetching/rest/ /toolpad/concepts/http-requests/ 301
-/toolpad/data-fetching/google-sheets/ /toolpad/how-to-guides/connect-to-googlesheets/ 301
+/toolpad/getting-started/setup/ /toolpad/studio/getting-started/ 301
+/toolpad/getting-started/tutorial/ /toolpad/studio/getting-started/ 301
+/toolpad/data-fetching/rest/ /toolpad/studio/concepts/http-requests/ 301
+/toolpad/data-fetching/google-sheets/ /toolpad/studio/how-to-guides/connect-to-googlesheets/ 301
 
 # 2023
-/toolpad/getting-started/quickstart/ /toolpad/getting-started/first-app/ 301
-/toolpad/schema-reference/ /toolpad/reference/file-schema/ 301
-/toolpad/getting-started/configuration/ /toolpad/how-to-guides/basic-auth/ 301
-/toolpad/connecting-to-datasources/queries/ /toolpad/concepts/queries/ 301
-/toolpad/connecting-to-datasources/http-requests/ /toolpad/concepts/http-requests/ 301
-/toolpad/connecting-to-datasources/custom-functions/ /toolpad/concepts/custom-functions/ 301
-/toolpad/building-ui/component-library/ /toolpad/concepts/building-ui/#component-library 301
-/toolpad/building-ui/canvas-and-inspector/ /toolpad/concepts/building-ui/#inspector 301
-/toolpad/building-ui/custom-components/ /toolpad/concepts/custom-components/ 301
-/toolpad/building-ui/data-grid-component/ /toolpad/how-to-guides/customize-datagrid/ 301
-/toolpad/building-ui/page-configuration/ /toolpad/concepts/page-properties/#page-parameters 301
-/toolpad/building-ui/theming/ /toolpad/concepts/theming/ 301
-/toolpad/data-binding/binding-state/ /toolpad/concepts/data-binding/ 301
-/toolpad/data-binding/event-handling/ /toolpad/concepts/event-handling/ 301
-/toolpad/deployment/ /toolpad/concepts/deployment/ 301
-/toolpad/examples/admin-app/ /toolpad/examples/basic-crud-app/ 301
-/toolpad/concepts/connecting-to-data/ /toolpad/concepts/queries/ 301
-/toolpad/how-to-guides/connect-to-datasource/ /toolpad/how-to-guides/connect-to-databases/ 301
-/toolpad/tutorials/render-deploy/ /toolpad/how-to-guides/render-deploy/ 301
-/toolpad/examples/overview/ /toolpad/examples/ 301
-/toolpad/how-to-guides/number-display/ /toolpad/how-to-guides/map-display/ 301
-/toolpad/support/support/ /toolpad/getting-started/support/ 301
-/toolpad/concepts/display-mode/ /toolpad/concepts/page-properties/#display-mode 301
-/toolpad/concepts/managing-state/ /toolpad/concepts/event-handling/ 301
-/toolpad/reference/components/datagrid/ /toolpad/reference/components/data-grid/ 301
-/toolpad/getting-started/overview/ /toolpad/getting-started/ 301
+/toolpad/getting-started/quickstart/ /toolpad/studio/getting-started/first-app/ 301
+/toolpad/schema-reference/ /toolpad/studio/reference/file-schema/ 301
+/toolpad/getting-started/configuration/ /toolpad/studio/how-to-guides/basic-auth/ 301
+/toolpad/connecting-to-datasources/queries/ /toolpad/studio/concepts/queries/ 301
+/toolpad/connecting-to-datasources/http-requests/ /toolpad/studio/concepts/http-requests/ 301
+/toolpad/connecting-to-datasources/custom-functions/ /toolpad/studio/concepts/custom-functions/ 301
+/toolpad/building-ui/component-library/ /toolpad/studio/concepts/building-ui/#component-library 301
+/toolpad/building-ui/canvas-and-inspector/ /toolpad/studio/concepts/building-ui/#inspector 301
+/toolpad/building-ui/custom-components/ /toolpad/studio/concepts/custom-components/ 301
+/toolpad/building-ui/data-grid-component/ /toolpad/studio/how-to-guides/customize-datagrid/ 301
+/toolpad/building-ui/page-configuration/ /toolpad/studio/concepts/page-properties/#page-parameters 301
+/toolpad/building-ui/theming/ /toolpad/studio/concepts/theming/ 301
+/toolpad/data-binding/binding-state/ /toolpad/studio/concepts/data-binding/ 301
+/toolpad/data-binding/event-handling/ /toolpad/studio/concepts/event-handling/ 301
+/toolpad/deployment/ /toolpad/studio/concepts/deployment/ 301
+/toolpad/examples/admin-app/ /toolpad/studio/examples/basic-crud-app/ 301
+/toolpad/concepts/connecting-to-data/ /toolpad/studio/concepts/queries/ 301
+/toolpad/how-to-guides/connect-to-datasource/ /toolpad/studio/how-to-guides/connect-to-databases/ 301
+/toolpad/tutorials/render-deploy/ /toolpad/studio/how-to-guides/render-deploy/ 301
+/toolpad/examples/overview/ /toolpad/studio/examples/ 301
+/toolpad/how-to-guides/number-display/ /toolpad/studio/how-to-guides/map-display/ 301
+/toolpad/support/support/ /toolpad/studio/getting-started/support/ 301
+/toolpad/concepts/display-mode/ /toolpad/studio/concepts/page-properties/#display-mode 301
+/toolpad/concepts/managing-state/ /toolpad/studio/concepts/event-handling/ 301
+/toolpad/reference/components/datagrid/ /toolpad/studio/reference/components/data-grid/ 301
+/toolpad/getting-started/overview/ /toolpad/studio/getting-started/ 301
 
 # 2024
 

@@ -14,6 +14,7 @@ import {
   Tab,
   TextField,
   Toolbar,
+  Link,
   Typography,
   Alert,
   styled,
@@ -62,6 +63,7 @@ import { createHarLog, mergeHar } from '../../utils/har';
 import useFetchPrivate from '../useFetchPrivate';
 import QueryPreview from '../QueryPreview';
 import { usePrivateQuery } from '../context';
+import HelpTooltipIcon from '../../components/HelpTooltipIcon';
 
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 
@@ -311,7 +313,11 @@ function QueryEditor({
     [appStateApi],
   );
 
-  const env = React.useMemo(() => introspection?.data?.env, [introspection]);
+  const env = React.useMemo(() => introspection?.data?.env ?? {}, [introspection?.data?.env]);
+  const declaredEnvKeys = React.useMemo(
+    () => introspection?.data?.declaredEnvKeys ?? [],
+    [introspection?.data?.declaredEnvKeys],
+  );
   const handleParamsChange = React.useCallback(
     (newParams: [string, BindableAttrValue<string>][]) => {
       appStateApi.updateQueryDraft((draft) => ({
@@ -485,7 +491,15 @@ function QueryEditor({
       <Panel id="rest-query-left" defaultSize={50} minSize={40} style={{ overflow: 'auto' }}>
         <TabContext value={currentTab?.tabType ?? 'config'}>
           <Stack direction="column" gap={0}>
-            <Stack direction={'row'} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Stack
+              direction={'row'}
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                pr: 0.5,
+              }}
+            >
               <TabList
                 sx={{ '& button': { fontSize: 12, fontWeight: 'normal' } }}
                 onChange={handleTabTypeChange}
@@ -494,6 +508,21 @@ function QueryEditor({
                 <Tab label="Config" value="config" />
                 <Tab label="Settings" value="settings" />
               </TabList>
+              <HelpTooltipIcon
+                helpText={
+                  <Typography variant="inherit">
+                    To configure a HTTP request, check out the{' '}
+                    <Link
+                      href="https://mui.com/toolpad/studio/concepts/http-requests/"
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      docs
+                    </Link>
+                    .
+                  </Typography>
+                }
+              />
             </Stack>
 
             <Divider />
@@ -650,6 +679,7 @@ function QueryEditor({
                     liveValue={paramsEditorLiveValue}
                     jsRuntime={jsServerRuntime}
                     env={env}
+                    declaredEnvKeys={declaredEnvKeys}
                   />
                 </TabPanel>
               </TabContext>

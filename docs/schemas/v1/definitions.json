@@ -363,10 +363,6 @@
               "additionalProperties": false,
               "description": "Authorization configuration for this page."
             },
-            "unstable_codeFile": {
-              "type": "boolean",
-              "description": "The content of the page as JSX. Experimental, do not use!."
-            },
             "display": {
               "anyOf": [
                 {
@@ -381,6 +377,11 @@
                 }
               ],
               "description": "Display mode of the page. This can also be set at runtime with the toolpad-display query parameter"
+            },
+            "maxWidth": {
+              "type": "string",
+              "enum": ["xs", "sm", "md", "lg", "xl", "none"],
+              "description": "Top level element of the page."
             }
           },
           "additionalProperties": false,

@@ -1,6 +1,6 @@
 # Connecting to data
 
-<p class="description">Be it a database table or an external API, Toolpad Studio offers mechanisms to bring server-side data to the page as well as make mutations to external data sources. </p>
+<p class="description">Be it a database table or an external API, Toolpad Studio offers mechanisms to read to – and write from – server-side data.</p>
 
 :::info
 Toolpad Studio uses `react-query` internally to run queries and actions. Look into [its documentation](https://tanstack.com/query/latest/docs/framework/react/guides/queries) for more details on query objects.

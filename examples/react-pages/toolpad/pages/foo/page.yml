@@ -1,4 +1,0 @@
-apiVersion: v1
-kind: page
-spec:
-  unstable_codeFile: ./page.tsx

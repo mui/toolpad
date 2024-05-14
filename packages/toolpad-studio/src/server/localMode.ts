@@ -53,12 +53,7 @@ import {
   ResponseType as AppDomRestResponseType,
 } from '../toolpadDataSources/rest/types';
 import { LocalQuery } from '../toolpadDataSources/local/types';
-import type {
-  RuntimeConfig,
-  ProjectEvents,
-  ToolpadProjectOptions,
-  CodeEditorFileType,
-} from '../types';
+import type { ProjectEvents, ToolpadProjectOptions, CodeEditorFileType } from '../types';
 import EnvManager from './EnvManager';
 import FunctionsManager, { CreateDataProviderOptions } from './FunctionsManager';
 import { VersionInfo, checkVersion } from './versionInfo';
@@ -109,7 +104,7 @@ function getComponentFilePath(componentsFolder: string, componentName: string): 
   return path.join(componentsFolder, `${componentName}.tsx`);
 }
 
-function getOutputFolder(root: string) {
+export function getOutputFolder(root: string) {
   return path.join(root, '.generated');
 }
 
@@ -165,24 +160,6 @@ async function loadPagesFromFiles(root: string): Promise<PagesContent> {
                 result.error,
               )}`,
             );
-          }
-        }
-
-        const extensions = ['.tsx', '.jsx'];
-
-        for (const extension of extensions) {
-          if (pageDirEntries.has(`page${extension}`)) {
-            return [
-              pageName,
-              {
-                apiVersion: API_VERSION,
-                kind: 'page',
-                spec: {
-                  id: pageName,
-                  unstable_codeFile: true,
-                },
-              } satisfies Page,
-            ];
           }
         }
       }
@@ -476,7 +453,7 @@ function expandFromDom<N extends appDom.AppDomNode>(
         content: undefinedWhenEmpty(expandChildren(children.children || [], dom)),
         queries: undefinedWhenEmpty(expandChildren(children.queries || [], dom)),
         display: node.attributes.display,
-        unstable_codeFile: node.attributes.codeFile,
+        maxWidth: node.attributes.maxWidth,
         authorization: node.attributes.authorization,
       },
     } satisfies Page;
@@ -657,7 +634,7 @@ function createPageDomFromPageFile(pageName: string, pageFile: Page): appDom.App
       title: pageFileSpec.title,
       parameters: pageFileSpec.parameters?.map(({ name, value }) => [name, value]) || [],
       display: pageFileSpec.display || undefined,
-      codeFile: pageFileSpec.unstable_codeFile || undefined,
+      maxWidth: pageFileSpec.maxWidth || undefined,
       authorization: pageFileSpec.authorization || undefined,
     },
   });
@@ -1015,8 +992,6 @@ class ToolpadProject {
 
   dataManager: DataManager;
 
-  invalidateQueries: () => void;
-
   private alertedMissingVars = new Set<string>();
 
   private lastVersionCheck = 0;
@@ -1045,7 +1020,7 @@ class ToolpadProject {
     this.functionsManager = new FunctionsManager(this);
     this.dataManager = new DataManager(this);
 
-    this.invalidateQueries = throttle(
+    const invalidateQueries = throttle(
       () => {
         this.events.emit('queriesInvalidated', {});
       },
@@ -1054,6 +1029,9 @@ class ToolpadProject {
         leading: false,
       },
     );
+
+    this.events.on('functionsChanged', invalidateQueries);
+    this.events.on('envChanged', invalidateQueries);
   }
 
   private initWatcher() {
@@ -1351,17 +1329,6 @@ class ToolpadProject {
     const root = this.getRoot();
     const config = await resolvePrettierConfig(root);
     return config;
-  }
-
-  async getRuntimeConfig(): Promise<RuntimeConfig> {
-    // When these fail, you are likely trying to retrieve this information during the
-    // Toolpad Studio build. It's fundamentally wrong to use this information as it strictly holds
-    // information about the running Toolpad Studio instance.
-    invariant(this.options.externalUrl, 'External URL is not set');
-
-    return {
-      externalUrl: this.options.externalUrl,
-    };
   }
 
   async writeBuildInfo() {

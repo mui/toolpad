@@ -457,6 +457,7 @@ export interface SerializableGridColumn
   dateFormat?: DateFormat;
   dateTimeFormat?: DateFormat;
   codeComponent?: string;
+  visible?: boolean;
 }
 
 export type SerializableGridColumns = SerializableGridColumn[];
@@ -483,17 +484,15 @@ export function parseColumns(columns: SerializableGridColumns): GridColDef[] {
   return columns.map(({ type: colType, ...column }) => {
     const isIdColumn = column.field === 'id';
 
+    let baseColumn: Omit<GridColDef, 'field'> = { editable: true };
+
     if (isIdColumn) {
-      return {
-        ...column,
-        type: getNarrowedColType(colType),
+      baseColumn = {
+        ...baseColumn,
         editable: false,
-        hide: true,
         renderCell: ({ row, value }) => (row[DRAFT_ROW_MARKER] ? '' : value),
       };
     }
-
-    let baseColumn: Omit<GridColDef, 'field'> = { editable: true };
 
     if (colType) {
       baseColumn = { ...baseColumn, ...CUSTOM_COLUMN_TYPES[colType], ...column };
@@ -1036,31 +1035,35 @@ function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayPro
   let message: React.ReactNode = null;
   if (lastResult) {
     if (lastResult.action === 'create') {
-      message = lastResult.error ? (
-        `Failed to create a record, ${lastResult.error.message}`
-      ) : (
-        <React.Fragment>
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <Link
-            href="#"
-            color="inherit"
-            onClick={(event) => {
-              event.preventDefault();
-              const index = apiRef.current.getAllRowIds().indexOf(lastResult.id);
-              const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
-              const fieldToFocus: string | undefined = visibleFields[0];
-              if (index >= 0 && fieldToFocus) {
-                apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
-                apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
-              }
-            }}
-            aria-label="Go to new record"
-          >
-            New record
-          </Link>{' '}
-          created successfully
-        </React.Fragment>
-      );
+      if (lastResult.error) {
+        message = `Failed to create a record, ${lastResult.error.message}`;
+      } else {
+        const index = apiRef.current.getAllRowIds().indexOf(lastResult.id);
+        const visibleFields = gridVisibleColumnFieldsSelector(apiRef);
+        const fieldToFocus: string | undefined = visibleFields[0];
+        if (index >= 0 && fieldToFocus) {
+          message = (
+            <React.Fragment>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <Link
+                href="#"
+                color="inherit"
+                onClick={(event) => {
+                  event.preventDefault();
+                  apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
+                  apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
+                }}
+                aria-label="Go to new record"
+              >
+                New record
+              </Link>{' '}
+              created successfully
+            </React.Fragment>
+          );
+        } else {
+          message = 'New record created successfully';
+        }
+      }
     } else if (lastResult.action === 'update') {
       message = lastResult.error
         ? `Failed to update a record, ${lastResult.error.message}`
@@ -1279,6 +1282,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   const appHost = useAppHost();
   const isProPlan = appHost.plan === 'pro';
 
+  const columnVisibilityModel = Object.fromEntries(
+    (columnsProp ?? []).map((column) => [column.field, column.visible ?? true]),
+  );
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
@@ -1306,7 +1313,10 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               getRowId={getRowId}
               onRowSelectionModelChange={onSelectionModelChange}
               rowSelectionModel={selectionModel}
-              initialState={{ pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] } }}
+              initialState={{
+                columns: { columnVisibilityModel },
+                pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] },
+              }}
               disableAggregation={!isProPlan}
               disableRowGrouping={!isProPlan}
               {...props}
@@ -1330,7 +1340,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
 export default createBuiltin(DataGridComponent, {
   helperText:
-    'The [MUI X Data Grid](https://mui.com/x/react-data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
+    'The [MUI X Data Grid](https://mui.com/toolpad/studio/components/data-grid/) component.\n\nThe datagrid lets users display tabular data in a flexible grid.',
   errorProp: 'error',
   loadingPropSource: ['rows', 'columns'],
   loadingProp: 'loading',

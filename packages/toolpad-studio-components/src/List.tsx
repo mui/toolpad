@@ -37,7 +37,7 @@ function List({ itemCount, renderItem, disablePadding = false, sx, loading }: Li
 export default createBuiltin(List, {
   loadingPropSource: ['itemCount'],
   loadingProp: 'loading',
-  helperText: 'A list component.',
+  helperText: 'A [List](https://mui.com/toolpad/studio/components/list/) component.',
   argTypes: {
     itemCount: {
       helperText: 'Number of items to render.',

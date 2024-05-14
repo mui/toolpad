@@ -12,18 +12,71 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
-      "matchDepTypes": ["peerDependencies"],
-      "rangeStrategy": "widen"
+      "groupName": "Typings",
+      "matchPackagePatterns": ["^@types/"],
+      "description": "At the top so other rules can overwrite it"
     },
     {
-      "groupName": "dependencies",
-      "matchManagers": ["npm"],
-      "matchDepTypes": ["dependencies"]
+      "matchDepTypes": ["peerDependencies"],
+      "rangeStrategy": "widen"
     },
     {
       "groupName": "devDependencies",
       "matchManagers": ["npm"],
       "matchDepTypes": ["devDependencies"]
+    },
+    {
+      "groupName": "Docs",
+      "matchFileNames": ["docs/**"]
+    },
+    {
+      "groupName": "babel",
+      "matchPackagePatterns": ["^@babel/", "^@types/babel"]
+    },
+    {
+      "groupName": "Emotion",
+      "matchPackagePatterns": "@emotion/*"
+    },
+    {
+      "groupName": "core-js",
+      "matchPackageNames": ["core-js"],
+      "allowedVersions": "< 2.0.0"
+    },
+    {
+      "groupName": "eslint",
+      "matchPackageNames": ["eslint"],
+      "matchPackagePatterns": ["^eslint-", "^@eslint/", "^@eslint-", "^@typescript-eslint/"]
+    },
+    {
+      "groupName": "stylis",
+      "matchPackageNames": ["stylis"],
+      "matchPackagePatterns": ["^stylis-"]
+    },
+    {
+      "groupName": "Next.js",
+      "matchPackageNames": ["next"],
+      "matchPackagePatterns": ["^@next/"]
+    },
+    {
+      "groupName": "zod",
+      "matchPackageNames": ["zod"],
+      "matchPackagePatterns": ["^zod-"]
+    },
+    {
+      "groupName": "react-router",
+      "matchPackageNames": ["react-router", "react-router-dom"]
+    },
+    {
+      "groupName": "Tanstack",
+      "matchPackagePatterns": ["^@tanstack/"]
+    },
+    {
+      "groupName": "Google APIs",
+      "matchPackagePatterns": ["^@googleapis/"]
+    },
+    {
+      "groupName": "React",
+      "matchPackageNames": ["react", "react-dom", "react-is", "react-test-renderer"]
     },
     {
       "groupName": "MUI Core",
@@ -68,20 +121,9 @@
       "allowedVersions": "< 2.0.0"
     },
     {
-      "groupName": "Unsupported engines",
-      "matchPackageNames": ["next", "eslint"],
-      "matchPackagePatterns": ["^@next/", "^@typescript-eslint/", "^@argos-ci/"],
-      "description": "Restricted to a Node.js version that's unsupported on codesandboxci"
-    },
-    {
       "groupName": "superjson",
       "matchPackageNames": ["superjson"],
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
-    },
-    {
-      "groupName": "Auth.js",
-      "matchPackageNames": ["@auth/core"],
-      "description": "Breaking change in https://github.com/nextauthjs/next-auth/issues/10289"
     },
     {
       "matchDepTypes": ["action"],
@@ -92,6 +134,10 @@
       "matchManagers": ["github-actions"]
     },
     {
+      "groupName": "Examples",
+      "matchFileNames": ["examples/**"]
+    },
+    {
       "groupName": "Update @toolpad/studio in examples",
       "matchPackageNames": ["@toolpad/studio"],
       "matchFiles": ["examples/*/package.json"],
@@ -100,7 +146,7 @@
     }
   ],
   "postUpdateOptions": ["pnpmDedupe"],
-  "prConcurrentLimit": 30,
+  "prConcurrentLimit": 15,
   "prHourlyLimit": 0,
   "rangeStrategy": "bump",
   "schedule": "on sunday before 6:00am",

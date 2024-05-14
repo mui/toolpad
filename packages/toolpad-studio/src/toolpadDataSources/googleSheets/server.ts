@@ -5,6 +5,7 @@ import { match } from 'path-to-regexp';
 import { asArray } from '@toolpad/utils/collections';
 import * as express from 'express';
 import { Maybe } from '@toolpad/utils/types';
+import invariant from 'invariant';
 import { ServerDataSource, CreateHandlerApi } from '../../types';
 import config from '../../server/config';
 import {
@@ -13,13 +14,14 @@ import {
   GoogleSheetsApiQuery,
   GoogleSheetsResult,
 } from './types';
-import type { IToolpadProject } from '../server';
 
 /**
  * Create an OAuth2 client based on the configuration
  */
 
-function createOAuthClient(externalUrl: string): OAuth2Client {
+function createOAuthClient(): OAuth2Client {
+  const externalUrl = process.env.TOOLPAD_EDITOR_EXTERNAL_URL;
+  invariant(externalUrl, 'Missing TOOLPAD_EDITOR_EXTERNAL_URL');
   if (!config.googleSheetsClientId) {
     throw new Error('Google Sheets: Missing client ID "TOOLPAD_DATASOURCE_GOOGLESHEETS_CLIENT_ID"');
   }
@@ -61,9 +63,11 @@ function createSheetsClient(client: OAuth2Client) {
   });
 }
 
-export default function createDatasource(
-  project: IToolpadProject,
-): ServerDataSource<GoogleSheetsConnectionParams, GoogleSheetsApiQuery, GoogleSheetsPrivateQuery> {
+export default function createDatasource(): ServerDataSource<
+  GoogleSheetsConnectionParams,
+  GoogleSheetsApiQuery,
+  GoogleSheetsPrivateQuery
+> {
   /**
    * Executor function for this connection
    * @param connection  The connection object
@@ -74,8 +78,7 @@ export default function createDatasource(
     connection: Maybe<GoogleSheetsConnectionParams>,
     query: GoogleSheetsApiQuery,
   ): Promise<GoogleSheetsResult> => {
-    const runtimeConfig = await project.getRuntimeConfig();
-    const client = createOAuthClient(runtimeConfig.externalUrl);
+    const client = createOAuthClient();
     if (connection) {
       client.setCredentials(connection);
     }
@@ -125,8 +128,7 @@ export default function createDatasource(
     connection: Maybe<GoogleSheetsConnectionParams>,
     query: GoogleSheetsPrivateQuery,
   ): Promise<any> => {
-    const runtimeConfig = await project.getRuntimeConfig();
-    const client = createOAuthClient(runtimeConfig.externalUrl);
+    const client = createOAuthClient();
     if (connection) {
       client.setCredentials(connection);
     }
@@ -218,8 +220,7 @@ export default function createDatasource(
         req: express.Request,
         res: express.Response,
       ): Promise<express.Response | void> => {
-        const runtimeConfig = await project.getRuntimeConfig();
-        const client = createOAuthClient(runtimeConfig.externalUrl);
+        const client = createOAuthClient();
         try {
           const pathname = `/${asArray(req.query.path)
             .map((segment = '') => encodeURIComponent(String(segment)))

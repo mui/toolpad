@@ -1,5 +1,106 @@
 # Changelog
 
+## v0.1.55
+
+<!-- generated comparing v0.1.54..master -->
+
+_May 8, 2024_
+
+A big thanks to the 7 contributors who made this release possible. Here are some highlights ✨:
+
+Add max width option to page container, auto-scroll to selected elements, support enabling/disabling initial visibility in Data Grid columns, environment variable preview fixes, fix functions on Windows, add deployment guides for some other platforms.
+
+- &#8203;<!-- 52 -->Add max width option to the page (#3484) @Janpot
+- &#8203;<!-- 51 -->Changes required for the React integration (#3493) @Janpot
+- &#8203;<!-- 45 -->feat: add auto-scroll to canvas elements when selected from panel (#3344) @b4s36t4
+- &#8203;<!-- 44 -->Lock file maintenance Examples (#3486) @renovate[bot]
+- &#8203;<!-- 43 -->Lock file maintenance (#3485) @renovate[bot]
+- &#8203;<!-- 42 -->Work on decoupling studio server constituents (#3482) @Janpot
+- &#8203;<!-- 41 -->Update README files (#3463) @prakhargupta1
+- &#8203;<!-- 40 -->Remove dead code (#3460) @Janpot
+- &#8203;<!-- 39 -->Fix custom components for id cells (#3459) @Janpot
+- &#8203;<!-- 38 -->Fix performance regression (#3458) @Janpot
+- &#8203;<!-- 37 -->Link/Update docs in Studio (#3448) @prakhargupta1
+- &#8203;<!-- 36 -->Fix default value not initializing for controlled properties (#3445) @Janpot
+- &#8203;<!-- 35 -->Revert using published @mui/docs (#3440) @Janpot
+- &#8203;<!-- 34 -->Fix issues from trying MUI ESM branch (#3417) @Janpot
+- &#8203;<!-- 31 -->Fix environment binding preview (#3413) @Janpot
+- &#8203;<!-- 30 -->Use url.pathToFileURL to correctly resolve functions paths on windows (#3412) @Janpot
+- &#8203;<!-- 29 -->Remove renovate grouping (#3325) @Janpot
+- &#8203;<!-- 27 -->Remove unsupported engines section from renovate (#3376) @Janpot
+- &#8203;<!-- 26 -->fix: Duplicate entry in `CHANGELOG.md` (#3388) @bharatkashyap
+- &#8203;<!-- 25 -->[code-infra] Closer sync with eslint config of codebase (#3441) @oliviertassinari
+- &#8203;<!-- 24 -->[core] Support toggling initial visibility of columns (#3490) @Janpot
+- &#8203;<!-- 23 -->[core] ESLint unification (#3488) @oliviertassinari
+- &#8203;<!-- 22 -->[core] Remove react pages experiment (#3483) @Janpot
+- &#8203;<!-- 21 -->[core] Update monorepo (#3424) @oliviertassinari
+- &#8203;<!-- 20 -->[core] Match other .eslintrc.js files @oliviertassinari
+- &#8203;<!-- 19 -->[core] Add notes to help future blame (#3426) @oliviertassinari
+- &#8203;<!-- 18 -->[core] Use the root dependency (#3425) @oliviertassinari
+- &#8203;<!-- 17 -->[core] Remove engine please-use-pnpm (#3399) @oliviertassinari
+- &#8203;<!-- 16 -->[docs] Fix pnpm install command (#3525) @konekoya
+- &#8203;<!-- 15 -->[docs] Fix Netlify preview 301 JS assets @oliviertassinari
+- &#8203;<!-- 14 -->[docs] [ui] Make Pro badge style consistent (#3418) @bharatkashyap
+- &#8203;<!-- 13 -->[docs] Fix typos on the roadmap page @oliviertassinari
+- &#8203;<!-- 12 -->[docs] Make sure we install the latest version of Toolpad Studio (#3454) @oliviertassinari
+- &#8203;<!-- 11 -->[docs] Remove MarkdownElement import (#3451) @Janpot
+- &#8203;<!-- 10 -->[docs] Add documentation on how to create controlled properties (#3444) @Janpot
+- &#8203;<!-- 09 -->[docs] Add a guide on how to deploy on railway (#3381) @prakhargupta1
+- &#8203;<!-- 08 -->[docs] Remove double redirections (#3415) @bharatkashyap
+- &#8203;<!-- 07 -->[docs] Fix broken paths, meta for ahrefs (#3409) @bharatkashyap
+- &#8203;<!-- 06 -->[docs] Fix some of the double redirections (#3411) @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Add guide on deployment to Google cloud (#3387) @prakhargupta1
+- &#8203;<!-- 04 -->[docs] Revert monorepo update (#3403) @Janpot
+- &#8203;<!-- 03 -->[docs] Fix trailing slashes on server render (#3402) @Janpot
+- &#8203;<!-- 02 -->[docs] Remove more traces of yarn (#3400) @oliviertassinari
+- &#8203;<!-- 01 -->[ux] Disable Open in editor button if no function is selected (#3492) @bharatkashyap
+
+All contributors of this release in alphabetical order: @b4s36t4, @bharatkashyap, @Janpot, @konekoya, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
+## v0.1.54
+
+<!-- generated comparing v0.1.53..master -->
+
+_Apr 12, 2024_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+Adds groupable and aggregable columns for the Premium data grid, a faster editor for Toolpad Studio, and introduces Toolpad Core under `--core` on the CLI! Plus a new custom components example, multiple documentation updates and bug fixes.
+
+- &#8203;<!-- 31 -->Update renovate.json @Janpot
+- &#8203;<!-- 30 -->Update renovate.json @Janpot
+- &#8203;<!-- 29 -->Add RFC to readme (#3353) @prakhargupta1
+- &#8203;<!-- 28 -->Move TreeView icons into the theme (#3337) @Janpot
+- &#8203;<!-- 27 -->Lock file maintenance (#3351) @renovate[bot]
+- &#8203;<!-- 26 -->Fix screenshot flakeyness (#3341) @Janpot
+- &#8203;<!-- 25 -->Add rename, duplicate and delete for Page Hierarchy (#3336) @asif-choudhari
+- &#8203;<!-- 24 -->Upgrade vite (#3340) @Janpot
+- &#8203;<!-- 23 -->Add custom component example (#3329) @Janpot
+- &#8203;<!-- 22 -->Fix dedupe check (#3330) @Janpot
+- &#8203;<!-- 21 -->Fix crash when components folder contains a tsconfig (#3327) @Janpot
+- &#8203;<!-- 20 -->Allow OPTIONS method in HTTP queries (#3308) @Janpot
+- &#8203;<!-- 19 -->Remove fallback modules (#3326) @Janpot
+- &#8203;<!-- 18 -->Update Node.js in circleci (#3324) @Janpot
+- &#8203;<!-- 17 -->Update renovate.json @Janpot
+- &#8203;<!-- 16 -->Update renovate.json @Janpot
+- &#8203;<!-- 15 -->Fix typo : use npm instead of pnpm in instruction (#3323) @HazzazBinFaiz
+- &#8203;<!-- 14 -->[cli] Introduce `--core` (#3304) @bharatkashyap
+- &#8203;<!-- 13 -->[code-infra] Use @mui/docs from npm (#3301) @michaldudak
+- &#8203;<!-- 12 -->[code-infra] Fix prettier in scripts (#3382) @Janpot
+- &#8203;<!-- 11 -->[core] Move Monaco setup outside of the library (#3206) @Janpot
+- &#8203;<!-- 10 -->[core] Make inline canvas the default (#3370) @Janpot
+- &#8203;<!-- 09 -->[core] Remove deprecated usage of LicenseInfo (#3372) @Janpot
+- &#8203;<!-- 08 -->[core] Continue rename of Toolpad @oliviertassinari
+- &#8203;<!-- 07 -->[DataGrid] Add support for groupable and aggregable columns (#3369) @Janpot
+- &#8203;<!-- 06 -->[docs] Improve the writing on the "why Toolpad" doc (#3377) @Janpot
+- &#8203;<!-- 05 -->[docs] Update delete-grid-row.md (#3354) @prakhargupta1
+- &#8203;<!-- 04 -->[docs] remove redirect to component reference (#3356) @Janpot
+- &#8203;<!-- 03 -->[examples] Premium grid example (#3360) @Janpot
+- &#8203;<!-- 02 -->[queries] Remove locally hosted demo data (#3374) @Janpot
+- &#8203;<!-- 01 -->[ui] Add a chip to indicate pro features (#3358) @bharatkashyap
+
+All contributors of this release in alphabetical order: @asif-choudhari, @bharatkashyap, @HazzazBinFaiz, @Janpot, @michaldudak, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
 ## v0.1.53
 
 <!-- generated comparing v0.1.52..master -->

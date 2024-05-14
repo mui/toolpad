@@ -28,6 +28,9 @@ test('Code component cell', async ({ page }) => {
     ),
   ).toBeVisible();
   await expect(editorModel.pageRoot.getByText('field: "customField"')).toBeVisible();
+
+  // Can use cusom component for id field
+  await expect(editorModel.pageRoot.getByText('[id:0]')).toBeVisible();
 });
 
 test('Code component column selector', async ({ page }) => {

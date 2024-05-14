@@ -98,6 +98,10 @@ export interface ConnectionNode<P = unknown> extends AppDomNodeBase {
 
 export type PageDisplayMode = 'standalone' | 'shell';
 
+export type ContainerWidth = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'none';
+
+export const DEFAULT_CONTAINER_WIDTH = 'lg' satisfies ContainerWidth;
+
 export interface PageNode extends AppDomNodeBase {
   readonly type: 'page';
   readonly attributes: {
@@ -106,8 +110,8 @@ export interface PageNode extends AppDomNodeBase {
     readonly parameters?: [string, string][];
     readonly module?: string;
     readonly display?: PageDisplayMode;
-    readonly codeFile?: boolean;
     readonly displayName?: string;
+    readonly maxWidth?: ContainerWidth;
     readonly authorization?: {
       readonly allowAll?: boolean;
       readonly allowedRoles?: string[];
@@ -1209,10 +1213,6 @@ export function getPageDisplayName(node: PageNode): string {
 
 export function getPageTitle(node: PageNode): string {
   return node.attributes.title || getPageDisplayName(node);
-}
-
-export function isCodePage(node: PageNode): boolean {
-  return !!node.attributes.codeFile;
 }
 
 export function getPlan(dom: AppDom): ToolpadPlan {

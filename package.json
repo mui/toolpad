@@ -14,7 +14,7 @@
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
-    "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs --ignore toolpad-core-nextjs",
+    "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs",
     "docs:dev": "pnpm --filter docs dev",
     "docs:build": "pnpm --filter docs build",
     "docs:build:api": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildApi.ts",

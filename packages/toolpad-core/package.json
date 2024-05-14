@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/core",
-  "version": "0.1.54",
+  "version": "0.1.55",
   "author": "Toolpad Team",
   "description": "Dashboard framework powered by MUI.",
   "main": "./build/index.js",
@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "scripts": {
-    "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
+    "build": "pnpm prebuild && pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
     "build:node": "node ../../scripts/build.mjs node",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
@@ -44,8 +44,8 @@
   "dependencies": {
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.5",
-    "@mui/icons-material": "5.15.16",
-    "@mui/material": "5.15.16",
+    "@mui/icons-material": "5.15.17",
+    "@mui/material": "5.15.17",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
@@ -82,11 +82,6 @@
     "node": ">=18"
   },
   "files": [
-    "AppProvider/",
-    "DashboardLayout/",
-    "themes/",
-    "node/AppProvider/",
-    "node/DashboardLayout/",
-    "node/themes/"
+    "build"
   ]
 }

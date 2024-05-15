@@ -37,7 +37,7 @@
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
-  "homepage": "https://github.com/mui/mui-toolpad#readme",
+  "homepage": "https://mui.com/toolpad/",
   "files": [
     "public",
     "scripts",

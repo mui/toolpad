@@ -89,6 +89,7 @@ const PauseButton = styled(IconButton)(({ theme }) => [
 export default function DemoVideo() {
   /** @type {React.MutableRefObject<HTMLVideoElement>} */
   const videoRef = React.useRef();
+  const [isPlaying, setIsPlaying] = React.useState(false);
 
   React.useEffect(() => {
     const video = videoRef.current;
@@ -97,6 +98,7 @@ export default function DemoVideo() {
     }
 
     const handlePlayEvent = () => {
+      setIsPlaying(true);
       if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('event', 'toolpad_video', {
           event_label: 'Video Start',
@@ -105,30 +107,17 @@ export default function DemoVideo() {
       }
     };
 
+    const handlePauseEvent = () => {
+      setIsPlaying(false);
+    };
+
     video.addEventListener('play', handlePlayEvent);
+    video.addEventListener('pause', handlePauseEvent);
     return () => {
       video.removeEventListener('play', handlePlayEvent);
+      video.removeEventListener('pause', handlePauseEvent);
     };
   }, []);
-
-  const subscribe = React.useCallback((cb) => {
-    const video = videoRef.current;
-    if (!video) {
-      throw new Error('videoRef should be attached to a video');
-    }
-    video.addEventListener('play', cb);
-    video.addEventListener('pause', cb);
-    return () => {
-      video.removeEventListener('play', cb);
-      video.removeEventListener('pause', cb);
-    };
-  }, []);
-
-  const isPlaying = React.useSyncExternalStore(
-    subscribe,
-    () => !videoRef.current.paused,
-    () => false,
-  );
 
   const handlePlay = () => {
     videoRef.current.play();

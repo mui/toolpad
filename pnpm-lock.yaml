@@ -84,6 +84,12 @@ importers:
       '@babel/preset-typescript':
         specifier: 7.24.1
         version: 7.24.1(@babel/core@7.24.4)
+      '@mui/internal-docs-utils':
+        specifier: 1.0.6
+        version: 1.0.6
+      '@mui/internal-scripts':
+        specifier: 1.0.6
+        version: 1.0.6
       '@mui/monorepo':
         specifier: github:mui/material-ui#6477d93ce61ab0e6b500b90e484129217eb6f5ec
         version: github.com/mui/material-ui/6477d93ce61ab0e6b500b90e484129217eb6f5ec(@opentelemetry/api@1.8.0)
@@ -102,6 +108,9 @@ importers:
       '@types/archiver':
         specifier: 6.0.2
         version: 6.0.2
+      '@types/fs-extra':
+        specifier: 11.0.4
+        version: 11.0.4
       '@types/gtag.js':
         specifier: 0.0.19
         version: 0.0.19
@@ -3784,6 +3793,13 @@ packages:
       react: 18.2.0
     dev: false
 
+  /@mui/internal-docs-utils@1.0.6:
+    resolution: {integrity: sha512-/XZsdEPulG2bkTTZAkQ7/jECzwdRLUs3HB9TgFmQixBCMblYpNHMTRVGJe9UrDHEAlJmBXFf0stiqboOJBM8sw==}
+    dependencies:
+      rimraf: 5.0.7
+      typescript: 5.4.5
+    dev: true
+
   /@mui/internal-markdown@1.0.1:
     resolution: {integrity: sha512-goTCzEbx0yxDbCU9ngHo02f5TBHwngF6RDM2ALqtgUsvNp14/lVU3OFytvpxcwjeSrrbVPEw4MSidYO8FnlUKQ==}
     dependencies:
@@ -3801,6 +3817,23 @@ packages:
       marked: 5.1.2
       prismjs: 1.29.0
     dev: false
+
+  /@mui/internal-scripts@1.0.6:
+    resolution: {integrity: sha512-Walp2Uw1Ho/LTX2mFWZjpcXesUAMsDfndCCoDbOfYaUMVlwFw9N8GzgYgdTNfxy0/kMYR5ExkAoW3ON9VPpvsw==}
+    dependencies:
+      '@babel/core': 7.24.5
+      '@babel/plugin-syntax-class-properties': 7.12.13(@babel/core@7.24.5)
+      '@babel/plugin-syntax-jsx': 7.24.1(@babel/core@7.24.5)
+      '@babel/plugin-syntax-typescript': 7.24.1(@babel/core@7.24.5)
+      '@babel/types': 7.24.5
+      '@mui/internal-docs-utils': 1.0.6
+      doctrine: 3.0.0
+      lodash: 4.17.21
+      typescript: 5.4.5
+      uuid: 9.0.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
 
   /@mui/joy@5.0.0-beta.36(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-fFW8jqA/6JcnjjSUgiFJ17bbvMxwFU+daT5Ohpi1qYrDub0XYj1+8UYDUgGCLsv8XNe50AkbnqidtAlMpq7Glg==}
@@ -5946,6 +5979,13 @@ packages:
       '@types/node': 20.12.11
     dev: true
 
+  /@types/fs-extra@11.0.4:
+    resolution: {integrity: sha512-yTbItCNreRooED33qjunPthRcSjERP1r4MqCZc7wv0u2sUkzTFp45tgUfS5+r7FrZPdmCCNflLhVSP/o+SemsQ==}
+    dependencies:
+      '@types/jsonfile': 6.1.4
+      '@types/node': 20.12.11
+    dev: true
+
   /@types/glob@8.1.0:
     resolution: {integrity: sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==}
     dependencies:
@@ -6011,6 +6051,12 @@ packages:
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+
+  /@types/jsonfile@6.1.4:
+    resolution: {integrity: sha512-D5qGUYwjvnNNextdU59/+fI+spnwtTFmyQP0h+PfIOSkNfpU6AOICUOkm4i0OnSk+NyjdPJrxCDro0sJsWlRpQ==}
+    dependencies:
+      '@types/node': 20.12.11
+    dev: true
 
   /@types/jsonwebtoken@8.5.9:
     resolution: {integrity: sha512-272FMnFGzAVMGtu9tkr29hRL6bZj4Zs1KZNeHLnKqAvp06tAIcarTMwOh8/8bz4FmKRcMxZhZNeUAQsNLoiPhg==}

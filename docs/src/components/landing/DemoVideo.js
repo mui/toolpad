@@ -215,11 +215,11 @@ export default function DemoVideo() {
       </MuteButton>
 
       <Video
-        poster="/static/toolpad/marketing/index-hero-video-poster.png"
+        poster="/static/toolpad/marketing/index-hero-video-poster-2.png"
         ref={videoRef}
         onTimeUpdate={handleTimeUpdate}
       >
-        <source src="/static/toolpad/marketing/index-hero-demo-video.mp4" type="video/mp4" />
+        <source src="/static/toolpad/marketing/index-hero-demo-video-2.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </Video>
     </VideoContainer>

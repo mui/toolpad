@@ -18,7 +18,11 @@
   "keywords": [
     "react",
     "mui",
-    "toolpad"
+    "toolpad",
+    "internal tools",
+    "crud",
+    "admin",
+    "dashboard"
   ],
   "repository": {
     "type": "git",

@@ -13,7 +13,9 @@
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": false,
     "allowJs": true,
-    "paths": {}
+    "paths": {
+      "@toolpad/utils/*": ["../toolpad-utils/src/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["build", "node_modules"]

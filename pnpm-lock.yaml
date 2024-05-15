@@ -534,9 +534,27 @@ importers:
       '@mui/icons-material':
         specifier: 5.15.17
         version: 5.15.17(@mui/material@5.15.17)(@types/react@18.3.1)(react@18.2.0)
+      '@mui/lab':
+        specifier: 5.0.0-alpha.170
+        version: 5.0.0-alpha.170(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@mui/material@5.15.17)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
       '@mui/material':
         specifier: 5.15.17
         version: 5.15.17(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/x-data-grid':
+        specifier: 7.4.0
+        version: 7.4.0(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@mui/material@5.15.17)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-query':
+        specifier: 5.36.0
+        version: 5.36.0(react@18.2.0)
+      '@toolpad/utils':
+        specifier: workspace:*
+        version: link:../toolpad-utils
+      client-only:
+        specifier: ^0.0.1
+        version: 0.0.1
+      invariant:
+        specifier: 2.2.4
+        version: 2.2.4
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -544,6 +562,9 @@ importers:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
     devDependencies:
+      '@types/invariant':
+        specifier: 2.2.37
+        version: 2.2.37
       '@types/react':
         specifier: 18.3.1
         version: 18.3.1

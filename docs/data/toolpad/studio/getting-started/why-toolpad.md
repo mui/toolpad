@@ -11,7 +11,7 @@
 - **Single source of truth**. Because Toolpad Studio runs alongside your existing code, it lets you maintain a single source of truth for all business logic.
 - **Integrates well with your development lifecycle**. Your project lives on your file system. You can use your own IDE, version control system, deployment target, CLI tools.
 
-## Trade-offs with pro-code tools
+## Limitations with pro-code tools
 
 The key problems most pro-code tools have relative to Toolpad Studio:
 
@@ -41,7 +41,7 @@ While front-end developers feel comfortable with it, most developers of internal
 
 Wouldn't it be great if you could use a tool that is approachable, not requiring to be a React expert?
 
-## Trade-offs with low-code tools
+## Limitations with low-code tools
 
 The key problems most low-code tools have relative to Toolpad Studio:
 

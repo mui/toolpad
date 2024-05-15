@@ -16,6 +16,25 @@
     "check-types": "tsup && tsc --noEmit",
     "test": "vitest run"
   },
+  "keywords": [
+    "react",
+    "mui",
+    "toolpad",
+    "internal tools",
+    "crud",
+    "low code",
+    "admin",
+    "dashboard"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mui/mui-toolpad.git",
+    "directory": "packages/toolpad-studio"
+  },
+  "bugs": {
+    "url": "https://github.com/mui/mui-toolpad/issues"
+  },
+  "homepage": "https://mui.com/toolpad/",
   "files": [
     "public",
     "scripts",

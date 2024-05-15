@@ -43,10 +43,7 @@ interface AppProviderProps {
 }
 
 function AppProvider(props: AppProviderProps) {
-  const { children,
-    theme = baseTheme,
-    branding = null,
-    navigation = [] } = props;
+  const { children, theme = baseTheme, branding = null, navigation = [] } = props;
 
   return (
     <ThemeProvider theme={theme}>
@@ -105,11 +102,11 @@ AppProvider.propTypes /* remove-proptypes */ = {
         kind: PropTypes.oneOf(['divider']).isRequired,
       }),
     ]).isRequired,
-  ).isRequired,
+  ),
   /**
    * @ignore
    */
-  theme: PropTypes.object.isRequired,
+  theme: PropTypes.object,
 } as any;
 
 export { AppProvider };

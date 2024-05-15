@@ -34,7 +34,7 @@ export async function generateCoreApiPages() {
 import * as React from 'react';
 import MarkdownDocs from 'docs/src/modules/components/MarkdownDocsV2';
 import AppFrame from 'docs/src/modules/components/AppFrame';
-import * as pageProps from '${importStatement}?@mui/markdown';
+import * as pageProps from '${importStatement}?muiMarkdown';
 
 export default function Page(props) {
   const { userLanguage, ...other } = props;
@@ -120,7 +120,7 @@ Page.getLayout = (page) => {
 import * as React from 'react';
 import MarkdownDocs from 'docs/src/modules/components/MarkdownDocsV2';
 import AppFrame from 'docs/src/modules/components/AppFrame';
-import * as pageProps from '${importStatement}?@mui/markdown';
+import * as pageProps from '${importStatement}?muiMarkdown';
 import mapApiPageTranslations from 'docs/src/modules/utils/mapApiPageTranslations';
 ${apiTabImportStatements}
 

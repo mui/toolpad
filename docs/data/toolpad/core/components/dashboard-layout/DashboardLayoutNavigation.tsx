@@ -5,10 +5,11 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FolderIcon from '@mui/icons-material/Folder';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import type { Navigation } from '@toolpad/core';
 
 // @TODO: Have path examples, including nested paths, once navigation adapter is implemented
 
-const NAVIGATION = [
+const NAVIGATION: Navigation = [
   {
     title: 'Item 1',
     icon: <DescriptionIcon />,

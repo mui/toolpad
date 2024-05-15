@@ -1,11 +1,11 @@
 import { createTheme } from '@mui/material/styles';
 
-const baseTheme = createTheme();
+const defaultTheme = createTheme();
 
-const theme = createTheme(baseTheme, {
+export const baseTheme = createTheme(defaultTheme, {
   palette: {
     background: {
-      default: baseTheme.palette.grey['50'],
+      default: defaultTheme.palette.grey['50'],
     },
   },
   typography: {
@@ -20,7 +20,7 @@ const theme = createTheme(baseTheme, {
           borderWidth: 0,
           borderBottomWidth: 1,
           borderStyle: 'solid',
-          borderColor: baseTheme.palette.divider,
+          borderColor: defaultTheme.palette.divider,
           boxShadow: 'none',
         },
       },
@@ -35,7 +35,7 @@ const theme = createTheme(baseTheme, {
     MuiIconButton: {
       styleOverrides: {
         root: {
-          color: baseTheme.palette.primary.dark,
+          color: defaultTheme.palette.primary.dark,
           padding: 8,
         },
       },
@@ -43,7 +43,7 @@ const theme = createTheme(baseTheme, {
     MuiListSubheader: {
       styleOverrides: {
         root: {
-          color: baseTheme.palette.grey['600'],
+          color: defaultTheme.palette.grey['600'],
           fontSize: 12,
           fontWeight: '700',
           height: 40,
@@ -65,20 +65,20 @@ const theme = createTheme(baseTheme, {
           borderRadius: 8,
           '&.Mui-selected': {
             '& .MuiListItemIcon-root': {
-              color: baseTheme.palette.primary.dark,
+              color: defaultTheme.palette.primary.dark,
             },
             '& .MuiTypography-root': {
-              color: baseTheme.palette.primary.dark,
+              color: defaultTheme.palette.primary.dark,
             },
             '& .MuiSvgIcon-root': {
-              color: baseTheme.palette.primary.dark,
+              color: defaultTheme.palette.primary.dark,
             },
             '& .MuiTouchRipple-child': {
-              backgroundColor: baseTheme.palette.primary.dark,
+              backgroundColor: defaultTheme.palette.primary.dark,
             },
           },
           '& .MuiSvgIcon-root': {
-            color: baseTheme.palette.action.active,
+            color: defaultTheme.palette.action.active,
           },
         },
       },
@@ -110,5 +110,3 @@ const theme = createTheme(baseTheme, {
     },
   },
 });
-
-export default theme;

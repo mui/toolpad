@@ -20,9 +20,25 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material';
 import { BrandingContext, Navigation, NavigationContext, NavigationPageItem } from '../AppProvider';
 
-const IS_CLIENT = typeof window !== 'undefined';
+const DRAWER_WIDTH = 320;
 
-const DEFAULT_DRAWER_WIDTH = 320;
+// @TODO: Remove temporary usePathname once navigation adapter is implemented
+
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  return new URL(window.location.href).pathname;
+}
+
+function getServerSnapshot() {
+  return '/';
+}
+
+function usePathname() {
+  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
 
 const TOOLPAD_LOGO = (
   <svg width={40} height={40} fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -79,30 +95,27 @@ const TOOLPAD_LOGO = (
 const LogoContainer = styled('div')({
   position: 'relative',
   height: 40,
-  img: {
+  '& img': {
     maxHeight: 40,
   },
 });
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
+  basePath?: string;
   depth?: number;
 }
 
 function DashboardSidebarSubNavigation({
   subNavigation,
+  basePath = '',
   depth = 0,
 }: DashboardSidebarSubNavigationProps) {
-  // Rerender once to update with client-side navigation
-  const [hasMounted, setHasMounted] = React.useState(false);
+  const pathname = usePathname();
 
-  const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState<string[]>([]);
-
-  React.useEffect(() => {
-    setHasMounted(true);
-
-    if (IS_CLIENT) {
-      const initialExpandedSidebarItemIds = subNavigation
+  const initialExpandedSidebarItemIds = React.useMemo(
+    () =>
+      subNavigation
         .map((navigationItem, navigationItemIndex) => ({
           navigationItem,
           originalIndex: navigationItemIndex,
@@ -111,20 +124,25 @@ function DashboardSidebarSubNavigation({
           ({ navigationItem }) =>
             (!navigationItem.kind || navigationItem.kind === 'page') &&
             navigationItem.children &&
-            navigationItem.children.some(
-              (nestedNavigationItem) =>
+            navigationItem.children.some((nestedNavigationItem) => {
+              const navigationItemFullPath = `${basePath}${(nestedNavigationItem as NavigationPageItem).path ?? ''}`;
+
+              return (
                 (!nestedNavigationItem.kind || nestedNavigationItem.kind === 'page') &&
-                nestedNavigationItem.path === window.location.pathname,
-            ),
+                navigationItemFullPath === pathname
+              );
+            }),
         )
         .map(
           ({ navigationItem, originalIndex }) =>
             `${(navigationItem as NavigationPageItem).title}-${depth}-${originalIndex}`,
-        );
+        ),
+    [basePath, depth, pathname, subNavigation],
+  );
 
-      setExpandedSidebarItemIds(initialExpandedSidebarItemIds);
-    }
-  }, [depth, subNavigation]);
+  const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState(
+    initialExpandedSidebarItemIds,
+  );
 
   const handleSidebarItemClick = React.useCallback(
     (itemId: string) => () => {
@@ -159,6 +177,8 @@ function DashboardSidebarSubNavigation({
           );
         }
 
+        const navigationItemFullPath = `${basePath}${navigationItem.path ?? ''}`;
+
         const navigationItemId = `${navigationItem.title}-${depth}-${navigationItemIndex}`;
 
         const isNestedNavigationExpanded = expandedSidebarItemIds.includes(navigationItemId);
@@ -172,7 +192,7 @@ function DashboardSidebarSubNavigation({
         const listItem = (
           <ListItem>
             <ListItemButton
-              selected={IS_CLIENT && hasMounted && window.location.pathname === navigationItem.path}
+              selected={pathname === navigationItemFullPath}
               onClick={handleSidebarItemClick(navigationItemId)}
             >
               <ListItemIcon>{navigationItem.icon}</ListItemIcon>
@@ -184,18 +204,18 @@ function DashboardSidebarSubNavigation({
 
         return (
           <React.Fragment key={navigationItemId}>
-            {navigationItem.path ? (
-              <a href={navigationItem.path} style={{ color: 'inherit', textDecoration: 'none' }}>
+            {navigationItem.path && !navigationItem.children ? (
+              <a href={navigationItemFullPath} style={{ color: 'inherit', textDecoration: 'none' }}>
                 {listItem}
               </a>
             ) : (
               listItem
             )}
-
-            {IS_CLIENT && hasMounted && navigationItem.children ? (
+            {navigationItem.children ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
                   subNavigation={navigationItem.children}
+                  basePath={navigationItemFullPath}
                   depth={depth + 1}
                 />
               </Collapse>
@@ -252,12 +272,10 @@ DashboardSidebarSubNavigation.propTypes /* remove-proptypes */ = {
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  sidebarWidth?: number;
-  hideTitle?: boolean;
 }
 
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, sidebarWidth = DEFAULT_DRAWER_WIDTH, hideTitle = false } = props;
+  const { children } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
@@ -277,11 +295,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
               <Box sx={{ mr: 1 }}>
                 <LogoContainer>{branding?.logo ?? TOOLPAD_LOGO}</LogoContainer>
               </Box>
-              {!hideTitle ? (
-                <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
-                  {branding?.title ?? 'Toolpad'}
-                </Typography>
-              ) : null}
+              <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
+                {branding?.title ?? 'Toolpad'}
+              </Typography>
             </Stack>
           </a>
           <Box sx={{ flexGrow: 1 }} />
@@ -302,10 +318,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <Drawer
         variant="permanent"
         sx={{
-          width: sidebarWidth,
+          width: DRAWER_WIDTH,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: sidebarWidth,
+            width: DRAWER_WIDTH,
             boxSizing: 'border-box',
           },
         }}

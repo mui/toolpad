@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import type { Theme } from '@emotion/react';
+import { baseTheme } from '../themes';
 
 export interface Branding {
   title?: string;
@@ -36,13 +37,16 @@ export const NavigationContext = React.createContext<Navigation>([]);
 
 interface AppProviderProps {
   children: React.ReactNode;
-  theme: Theme;
+  theme?: Theme;
   branding?: Branding | null;
-  navigation: Navigation;
+  navigation?: Navigation;
 }
 
 function AppProvider(props: AppProviderProps) {
-  const { children, theme, branding = null, navigation } = props;
+  const { children,
+    theme = baseTheme,
+    branding = null,
+    navigation = [] } = props;
 
   return (
     <ThemeProvider theme={theme}>

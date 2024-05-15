@@ -21,13 +21,11 @@
     "mui",
     "toolpad",
     "internal tools",
-    "typescript",
     "crud",
     "self hosted",
-    "admin panel",
     "low code",
-    "open core",
-    "react admin dashboard"
+    "admin",
+    "dashboard"
   ],
   "repository": {
     "type": "git",

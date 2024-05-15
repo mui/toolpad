@@ -21,9 +21,8 @@
     "toolpad",
     "internal tools",
     "crud",
-    "admin panel",
-    "admin framework",
-    "react admin dashboard"
+    "admin",
+    "dashboard"
   ],
   "repository": {
     "type": "git",

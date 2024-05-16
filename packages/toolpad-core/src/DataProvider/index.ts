@@ -1,1 +1,1 @@
-export * from "./DataProvider";
+export * from './DataProvider';

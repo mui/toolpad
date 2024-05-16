@@ -1,5 +1,5 @@
-import * as React from "react";
-import { LinearProgress, Skeleton, styled } from "@mui/material";
+import * as React from 'react';
+import { LinearProgress, Skeleton, styled } from '@mui/material';
 import {
   gridColumnPositionsSelector,
   gridColumnsTotalWidthSelector,
@@ -7,7 +7,7 @@ import {
   useGridApiContext,
   useGridRootProps,
   useGridSelector,
-} from "@mui/x-data-grid";
+} from '@mui/x-data-grid';
 
 // Pseudo random number. See https://stackoverflow.com/a/47593316
 function mulberry32(a: number): () => number {
@@ -26,10 +26,10 @@ function randomBetween(seed: number, min: number, max: number): () => number {
   return () => min + (max - min) * random();
 }
 
-const SkeletonCell = styled("div")(({ theme }) => ({
-  display: "flex",
-  flexDirection: "row",
-  alignItems: "center",
+const SkeletonCell = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
@@ -62,10 +62,7 @@ export default function SkeletonLoadingOverlay() {
       for (const column of columns) {
         const width = Math.round(random());
         array.push(
-          <SkeletonCell
-            key={`col-${column.field}-${i}`}
-            sx={{ justifyContent: column.align }}
-          >
+          <SkeletonCell key={`col-${column.field}-${i}`} sx={{ justifyContent: column.align }}>
             <Skeleton sx={{ mx: 1 }} width={`${width}%`} />
           </SkeletonCell>,
         );
@@ -81,7 +78,7 @@ export default function SkeletonLoadingOverlay() {
 
   React.useEffect(() => {
     // The `subscribeEvent` method will automatically unsubscribe in the cleanup function of the `useEffect`.
-    return apiRef.current.subscribeEvent("scrollPositionChange", (params) => {
+    return apiRef.current.subscribeEvent('scrollPositionChange', (params) => {
       if (scrollRef.current) {
         scrollRef.current.scrollLeft = params.left;
       }
@@ -94,12 +91,12 @@ export default function SkeletonLoadingOverlay() {
     <div
       ref={scrollRef}
       style={{
-        display: "grid",
+        display: 'grid',
         gridTemplateColumns: `${columns
           .map(({ computedWidth }) => `${computedWidth}px`)
-          .join(" ")} 1fr`,
+          .join(' ')} 1fr`,
         gridAutoRows: `${rowHeight}px`,
-        overflowX: "hidden",
+        overflowX: 'hidden',
       }}
     >
       {children}

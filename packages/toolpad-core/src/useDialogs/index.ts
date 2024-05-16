@@ -1,1 +1,1 @@
-export * from "./useDialogs";
+export * from './useDialogs';

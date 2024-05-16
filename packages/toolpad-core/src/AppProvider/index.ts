@@ -1,1 +1,2 @@
-export { default } from './AppProvider';
+'use client';
+export * from './AppProvider';

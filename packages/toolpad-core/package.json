@@ -1,75 +1,75 @@
 {
   "name": "@toolpad/core",
   "version": "0.1.55",
+  "author": "Toolpad Team",
+  "description": "Dashboard framework powered by MUI.",
+  "main": "./build/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./build/index.d.ts",
+      "default": "./build/index.js"
+    },
+    "./*": {
+      "types": "./build/*/index.d.ts",
+      "default": "./build/*/index.js"
+    }
+  },
   "keywords": [
-    "toolpad"
+    "react",
+    "mui",
+    "toolpad",
+    "internal tools",
+    "crud",
+    "admin",
+    "dashboard"
   ],
-  "description": "Build dashboards fast.",
   "repository": {
     "type": "git",
     "url": "https://github.com/mui/mui-toolpad.git",
     "directory": "packages/toolpad-core"
   },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
-  "author": "Toolpad Team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
-  "license": "MIT",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "require": "./dist/*.cjs",
-      "default": "./dist/*.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit",
+    "build": "pnpm prebuild && pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
+    "build:node": "node ../../scripts/build.mjs node",
+    "build:stable": "node ../../scripts/build.mjs stable",
+    "build:copy-files": "node ../../scripts/copyFiles.mjs",
+    "build:types": "tsc -b tsconfig.build.json",
+    "prebuild": "rimraf build tsconfig.build.tsbuildinfo",
+    "dev": "pnpm build:stable --watch & pnpm build:types --watch",
+    "check-types": "tsc --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
-    "@emotion/cache": "11.11.0",
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.5",
     "@mui/icons-material": "5.15.17",
     "@mui/material": "5.15.17",
-    "@mui/material-nextjs": "5.15.11",
-    "next": "14.2.3",
     "react": "18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@types/react": "18.3.1",
     "@types/react-dom": "18.3.0"
   },
   "peerDependencies": {
-    "@emotion/react": "^11",
-    "@emotion/styled": "^11",
     "@mui/icons-material": "^5",
     "@mui/material": "^5",
-    "@types/react": "^18",
-    "next": "^14",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "^18"
   },
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "files": [
+    "build"
+  ]
 }

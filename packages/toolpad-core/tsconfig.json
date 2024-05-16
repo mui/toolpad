@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./build/tsconfig.json.tsbuildinfo",
     "module": "esnext",
     "target": "es5",
     "lib": ["es2022", "dom"],
     "jsx": "preserve",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
@@ -13,10 +15,10 @@
     "allowSyntheticDefaultImports": true,
     "noErrorTruncation": false,
     "allowJs": true,
-    "paths": {
-      "@toolpad/utils/*": ["../toolpad-utils/src/*"]
-    }
+    "outDir": "build",
+    "rootDir": "src"
   },
   "include": ["src/**/*"],
-  "exclude": ["build", "node_modules"]
+  "exclude": ["build", "node_modules"],
+  "references": [{ "path": "../toolpad-utils" }]
 }

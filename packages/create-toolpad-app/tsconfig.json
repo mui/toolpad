@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./dist/tsconfig.json.tsbuildinfo",
     "target": "es2020",
     "module": "esnext",
     "moduleResolution": "bundler",

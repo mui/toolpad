@@ -472,6 +472,7 @@ export interface SerializableGridColumn
   dateTimeFormat?: DateFormat;
   codeComponent?: string;
   visible?: boolean;
+  aggregable?: boolean;
 }
 
 export type SerializableGridColumns = SerializableGridColumn[];

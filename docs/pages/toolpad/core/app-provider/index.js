@@ -1,13 +1,7 @@
 import * as React from 'react';
-import MarkdownDocs from 'docs/src/modules/components/MarkdownDocsV2';
-import AppFrame from 'docs/src/modules/components/AppFrame';
+import MarkdownDocs from 'docs/src/modules/components/MarkdownDocs';
 import * as pageProps from 'docs-toolpad/data/toolpad/core/components/app-provider/app-provider.md?muiMarkdown';
 
-export default function Page(props) {
-  const { userLanguage, ...other } = props;
-  return <MarkdownDocs {...pageProps} {...other} />;
+export default function Page() {
+  return <MarkdownDocs disableAd {...pageProps} />;
 }
-
-Page.getLayout = (page) => {
-  return <AppFrame>{page}</AppFrame>;
-};

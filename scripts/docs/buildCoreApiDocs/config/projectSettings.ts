@@ -5,7 +5,6 @@ import findApiPages from '@mui-internal/api-docs-builder/utils/findApiPages';
 import { getCoreComponentInfo } from './getCoreComponentInfo';
 import { getCoreHookInfo } from './getCoreHookInfo';
 import { generateCoreApiPages } from './generateCoreApiPages';
-import { generateApiLinks } from './generateApiLinks';
 import { getComponentImports } from './getComponentImports';
 
 export const projectSettings: ProjectSettings = {
@@ -28,14 +27,6 @@ export const projectSettings: ProjectSettings = {
   skipComponent: () => false,
   onCompleted: async () => {
     await generateCoreApiPages();
-  },
-  onWritingManifestFile(builds, source) {
-    const apiLinks = generateApiLinks(builds);
-    if (apiLinks.length > 0) {
-      return `module.exports = ${JSON.stringify(apiLinks)}`;
-    }
-
-    return source;
   },
   skipAnnotatingComponentDefinition: true,
   skipSlotsAndClasses: true,

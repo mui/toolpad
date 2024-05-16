@@ -64,6 +64,6 @@ function findCoreHooksDemos(
     .filter((page) => page.hooks && page.hooks.includes(hookName))
     .map((page) => ({
       demoPageTitle: getTitle(page.markdownContent),
-      demoPathname: `${fixPathname(page.pathname)}#hook${page.hooks?.length > 1 ? 's' : ''}`,
+      demoPathname: fixPathname(page.pathname),
     }));
 }

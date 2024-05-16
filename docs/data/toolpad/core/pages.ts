@@ -60,7 +60,7 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/core/components-group',
     title: 'Components',
     children: [
-      { pathname: '/toolpad/core/components', title: 'All components' },
+      { pathname: '/toolpad/core/components/all-components', title: 'All components' },
       {
         pathname: '/toolpad/core/components/layout-group',
         subheader: 'Layout',
@@ -79,19 +79,19 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/core/components/data-grid',
             title: 'Data Grid',
           },
-          {
-            pathname: '/toolpad/core/components/line-chart',
-            title: 'Line Chart',
-          },
         ],
       },
       {
         pathname: '/toolpad/core/components/filter-group',
-        subheader: 'Filters',
+        subheader: 'Utils',
         children: [
           {
-            pathname: '/toolpad/core/components/select-filter',
-            title: 'Select',
+            pathname: '/toolpad/core/components/dialogs',
+            title: 'useDialog',
+          },
+          {
+            pathname: '/toolpad/core/components/notifications',
+            title: 'useNotifications',
           },
         ],
       },

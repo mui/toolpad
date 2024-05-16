@@ -1,0 +1,51 @@
+import * as React from 'react';
+import { DialogProvider, useDialogs } from '@toolpad/core/useDialogs';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
+
+function MyCustomDialog({ payload, open, onClose }) {
+  return (
+    <Dialog fullWidth open={open} onClose={() => onClose()}>
+      <DialogTitle>Dialog with payload</DialogTitle>
+      <DialogContent>The payload is &quot;{payload}&quot;</DialogContent>
+      <DialogActions>
+        <Button onClick={() => onClose()}>Close me</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function DemoContent() {
+  const dialogs = useDialogs();
+  const [payload, setPayload] = React.useState('Some payload');
+  return (
+    // preview
+    <Stack spacing={2}>
+      <TextField
+        label="Payload"
+        value={payload}
+        onChange={(event) => setPayload(event.currentTarget.value)}
+      />
+      <Button
+        onClick={async () => {
+          await dialogs.open(MyCustomDialog, payload);
+        }}
+      >
+        Open
+      </Button>
+    </Stack>
+  );
+}
+
+export default function CustomDialogWithPayload() {
+  return (
+    <DialogProvider>
+      <DemoContent />
+    </DialogProvider>
+  );
+}

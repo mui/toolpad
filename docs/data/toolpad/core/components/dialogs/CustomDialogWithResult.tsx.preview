@@ -1,0 +1,8 @@
+<Button
+  onClick={async () => {
+    const result = await dialogs.open(MyCustomDialog);
+    await dialogs.alert(`Your name is "${result}"`);
+  }}
+>
+  Open
+</Button>

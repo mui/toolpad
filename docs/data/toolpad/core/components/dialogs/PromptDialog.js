@@ -1,0 +1,30 @@
+import * as React from 'react';
+import { DialogProvider, useDialogs } from '@toolpad/core/useDialogs';
+import Button from '@mui/material/Button';
+
+function DemoContent() {
+  const dialogs = useDialogs();
+  return (
+    // preview
+    <div>
+      <Button
+        onClick={async () => {
+          const name = await dialogs.prompt("What's your name?");
+          if (name) {
+            await dialogs.alert(`Hi there, ${name}`);
+          }
+        }}
+      >
+        Prompt
+      </Button>
+    </div>
+  );
+}
+
+export default function PromptDialog() {
+  return (
+    <DialogProvider>
+      <DemoContent />
+    </DialogProvider>
+  );
+}

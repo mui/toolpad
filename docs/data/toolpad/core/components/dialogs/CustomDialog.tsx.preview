@@ -1,0 +1,7 @@
+<Button
+  onClick={async () => {
+    await dialogs.open(MyCustomDialog);
+  }}
+>
+  Open custom
+</Button>

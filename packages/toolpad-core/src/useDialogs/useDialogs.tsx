@@ -34,7 +34,7 @@ export interface PromptOptions extends SystemDialogBase<string | null> {
   cancelText?: React.ReactNode;
 }
 
-export interface DialogProps<P, R> {
+export interface DialogProps<P = undefined, R = void> {
   payload: P;
   open: boolean;
   onClose: (result: R) => Promise<void>;
@@ -54,13 +54,17 @@ export interface OpenPromptDialog {
 
 type DialogComponent<P, R> = React.ComponentType<DialogProps<P, R>>;
 
-export interface OpenDialogOptions<P, R> {
-  payload: P;
+export interface OpenDialogOptions<R> {
   onClose?: (result: R) => Promise<void>;
 }
 
 export interface OpenDialog {
-  <P, R>(Component: DialogComponent<P, R>, options: OpenDialogOptions<P, R>): Promise<R>;
+  <P extends undefined, R>(
+    Component: DialogComponent<P, R>,
+    payload?: P,
+    options?: OpenDialogOptions<R>,
+  ): Promise<R>;
+  <P, R>(Component: DialogComponent<P, R>, payload: P, options?: OpenDialogOptions<R>): Promise<R>;
 }
 
 export interface CloseDialog {
@@ -103,10 +107,12 @@ export function DialogProvider({ children }: DialogProviderprops) {
   const nextId = React.useRef(0);
 
   const requestDialog = React.useCallback<OpenDialog>(
-    <P, R>(
+    function open<P, R>(
       Component: DialogComponent<P, R>,
-      { payload, onClose = async () => {} }: OpenDialogOptions<P, R>,
-    ) => {
+      payload: P,
+      options: OpenDialogOptions<R> = {},
+    ) {
+      const { onClose = async () => {} } = options;
       let resolve: ((result: R) => void) | undefined;
       const promise = new Promise<R>((resolveImpl) => {
         resolve = resolveImpl;
@@ -198,7 +204,7 @@ export interface AlertDialogProps extends DialogProps<AlertDialogPayload, void> 
 export function AlertDialog({ open, payload, onClose }: AlertDialogProps) {
   const okButtonProps = useDialogLoadingButton(() => onClose());
   return (
-    <Dialog maxWidth="xs" open={open} onClose={() => onClose()}>
+    <Dialog maxWidth="xs" fullWidth open={open} onClose={() => onClose()}>
       <DialogTitle>{payload.title ?? 'Alert'}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
@@ -220,7 +226,7 @@ export function ConfirmDialog({ open, payload, onClose }: ConfirmDialogProps) {
   const cancelButtonProps = useDialogLoadingButton(() => onClose(false));
   const okButtonProps = useDialogLoadingButton(() => onClose(true));
   return (
-    <Dialog maxWidth="xs" open={open} onClose={() => onClose(false)}>
+    <Dialog maxWidth="xs" fullWidth open={open} onClose={() => onClose(false)}>
       <DialogTitle>{payload.title ?? 'Confirm'}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
@@ -246,7 +252,7 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
   const cancelButtonProps = useDialogLoadingButton(() => onClose(null));
   const okButtonProps = useDialogLoadingButton(() => onClose(input));
   return (
-    <Dialog maxWidth="xs" open={open} onClose={() => onClose(null)}>
+    <Dialog maxWidth="xs" fullWidth open={open} onClose={() => onClose(null)}>
       <DialogTitle>{payload.title ?? 'Confirm'}</DialogTitle>
       <DialogContent>
         <DialogContentText>{payload.msg} </DialogContentText>
@@ -282,19 +288,19 @@ export function useDialogs(): DialogHook {
 
   const alert = React.useCallback<OpenAlertDialog>(
     async (msg, { onClose, ...options } = {}) =>
-      open(AlertDialog, { onClose, payload: { ...options, msg } }),
+      open(AlertDialog, { ...options, msg }, { onClose }),
     [open],
   );
 
   const confirm = React.useCallback<OpenConfirmDialog>(
     async (msg, { onClose, ...options } = {}) =>
-      open(ConfirmDialog, { onClose, payload: { ...options, msg } }),
+      open(ConfirmDialog, { ...options, msg }, { onClose }),
     [open],
   );
 
   const prompt = React.useCallback<OpenPromptDialog>(
     async (msg, { onClose, ...options } = {}) =>
-      open(PromptDialog, { onClose, payload: { ...options, msg } }),
+      open(PromptDialog, { ...options, msg }, { onClose }),
     [open],
   );
 

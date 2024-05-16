@@ -1,0 +1,12 @@
+<TextField
+  label="Payload"
+  value={payload}
+  onChange={(event) => setPayload(event.currentTarget.value)}
+/>
+<Button
+  onClick={async () => {
+    await dialogs.open(MyCustomDialog, payload);
+  }}
+>
+  Open
+</Button>

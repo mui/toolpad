@@ -103,6 +103,12 @@ const LICENSE_INFO: MuiLicenseInfo = {
 
 const DEFAULT_COLUMN_TYPES = getGridDefaultColumnTypes();
 
+const DataGridRoot = styled('div')({
+  width: '100%',
+  height: '100%',
+  position: 'relative',
+});
+
 const SetActionResultContext = React.createContext<((result: ActionResult) => void) | undefined>(
   undefined,
 );
@@ -296,6 +302,21 @@ function inferColumnType(value: unknown): string {
   }
 }
 
+const ImageCellImg = styled('img')(({ theme }) => ({
+  maxWidth: '100%',
+  maxHeight: '100%',
+  objectFit: 'contain',
+  paddingTop: theme.spacing(1),
+  paddingBottom: theme.spacing(1),
+}));
+
+const ImageCellPopoverImg = styled('img')(({ theme }) => ({
+  maxWidth: '60vw',
+  maxHeight: '60vh',
+  objectFit: 'contain',
+  margin: theme.spacing(1),
+}));
+
 function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any>) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
 
@@ -315,15 +336,13 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
 
   return (
     <React.Fragment>
-      <Box
+      <ImageCellImg
         aria-owns={open ? popoverId : undefined}
         aria-haspopup="true"
         onMouseEnter={handlePopoverOpen}
         onMouseLeave={handlePopoverClose}
-        component="img"
         src={src}
         alt={alt}
-        sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', py: 1 }}
       />
       <Popover
         id={popoverId}
@@ -335,12 +354,7 @@ function ImageCell({ field, id, value: src }: GridRenderCellParams<any, any, any
         onClose={handlePopoverClose}
         disableRestoreFocus
       >
-        <Box
-          component="img"
-          src={src}
-          alt={alt}
-          sx={{ maxWidth: '60vw', maxHeight: '60vh', objectFit: 'contain', m: 1 }}
-        />
+        <ImageCellPopoverImg src={src} alt={alt} />
       </Popover>
     </React.Fragment>
   );
@@ -458,6 +472,7 @@ export interface SerializableGridColumn
   dateTimeFormat?: DateFormat;
   codeComponent?: string;
   visible?: boolean;
+  aggregable?: boolean;
 }
 
 export type SerializableGridColumns = SerializableGridColumn[];
@@ -1288,7 +1303,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
 
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
-      <Box ref={ref} sx={{ ...sx, width: '100%', height: '100%', position: 'relative' }}>
+      <DataGridRoot ref={ref} sx={sx}>
         <ErrorBoundary fallbackRender={dataGridFallbackRender} resetKeys={[rows]}>
           <SetActionResultContext.Provider value={setActionResult}>
             <DataGridPremium
@@ -1333,7 +1348,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
           onClose={() => setActionResult(null)}
           apiRef={apiRef}
         />
-      </Box>
+      </DataGridRoot>
     </LicenseInfoProvider>
   );
 });

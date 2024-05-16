@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./dist/tsconfig.json.tsbuildinfo",
     "module": "esnext",
     "moduleResolution": "bundler",
     "alwaysStrict": true,

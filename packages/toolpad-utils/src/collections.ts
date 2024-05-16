@@ -100,11 +100,8 @@ export function filterKeys<U>(
  * Pass a subset of properties to only compare those.
  */
 export function equalProperties<P extends object>(obj1: P, obj2: P, subset?: (keyof P)[]): boolean {
-  const keysToCheck = new Set<PropertyKey>(subset ?? [...Object.keys(obj1), ...Object.keys(obj2)]);
-  for (const key of keysToCheck) {
-    if (obj1[key as keyof P] !== obj2[key as keyof P]) {
-      return false;
-    }
-  }
-  return true;
+  const keysToCheck = new Set(
+    subset ?? ([...Object.keys(obj1), ...Object.keys(obj2)] as (keyof P)[]),
+  );
+  return Array.from(keysToCheck).every((key) => Object.is(obj1[key], obj2[key]));
 }

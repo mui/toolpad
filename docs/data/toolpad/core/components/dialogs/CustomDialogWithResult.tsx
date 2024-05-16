@@ -10,7 +10,7 @@ import Stack from '@mui/material/Stack';
 import DialogContentText from '@mui/material/DialogContentText';
 
 function MyCustomDialog({ open, onClose }: DialogProps<undefined, string | null>) {
-  const [result, setResult] = React.useState('John Snow');
+  const [result, setResult] = React.useState('Jon Snow');
   return (
     <Dialog fullWidth open={open} onClose={() => onClose(null)}>
       <DialogTitle>Dialog with payload</DialogTitle>

@@ -35,7 +35,7 @@ function getPreviewNodes(path) {
     //   <Stack>
     //     <div />
     // ^^^^ Blank JSXText including newline
-    //   </Stacke>
+    //   </Stack>
     // )
     previewNode = path.node.children.filter((child, index, children) => {
       const isSurroundingBlankJSXText =

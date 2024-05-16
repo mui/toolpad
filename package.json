@@ -41,7 +41,7 @@
   "devDependencies": {
     "@argos-ci/core": "1.5.5",
     "@babel/cli": "7.24.1",
-    "@babel/core": "7.24.4",
+    "@babel/core": "7.24.5",
     "@babel/node": "7.23.9",
     "@babel/plugin-transform-react-constant-elements": "7.24.1",
     "@babel/plugin-transform-runtime": "7.24.3",

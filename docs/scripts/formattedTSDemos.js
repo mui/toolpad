@@ -24,7 +24,7 @@ const {
 } = require('@mui-internal/api-docs-builder/utils/createTypeScriptProject');
 const yargs = require('yargs');
 const { fixBabelGeneratorIssues, fixLineEndings } = require('@mui/internal-docs-utils');
-const { default: CORE_TYPESCRIPT_PROJECTS } = require('../../scripts/coreTypeScriptProjects');
+const { default: CORE_TYPESCRIPT_PROJECTS } = require('../../scripts/coreTypescriptProjects');
 
 const babelConfig = {
   presets: ['@babel/preset-typescript'],

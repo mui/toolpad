@@ -114,7 +114,7 @@ export function createGlobalState<T>(initialState: T) {
     return React.useSyncExternalStore(subscribe, getState);
   };
 
-  const useState = () => {
+  const useState = (): [T, React.Dispatch<React.SetStateAction<T>>] => {
     const value = useValue();
     return [value, setState];
   };

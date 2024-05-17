@@ -11,44 +11,38 @@ import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import Stack from '@mui/material/Stack';
 
-function DemoContent() {
+export default function AlertNotification() {
   const notifications = useNotifications();
   const [severity, setSeverity] = React.useState<
     'info' | 'success' | 'warning' | 'error'
   >('info');
   return (
-    // preview
-    <Stack>
-      <FormControl>
-        <FormLabel id="alert-notification-severity">Severity</FormLabel>
-        <RadioGroup
-          row
-          value={severity}
-          onChange={(event) => setSeverity(event.target.value as any)}
-          aria-labelledby="alert-notification-severity"
-          name="severity"
+    <div>
+      <NotificationsProvider />
+      <Stack>
+        <FormControl>
+          <FormLabel id="alert-notification-severity">Severity</FormLabel>
+          <RadioGroup
+            row
+            value={severity}
+            onChange={(event) => setSeverity(event.target.value as any)}
+            aria-labelledby="alert-notification-severity"
+            name="severity"
+          >
+            <FormControlLabel value="info" control={<Radio />} label="Info" />
+            <FormControlLabel value="success" control={<Radio />} label="Success" />
+            <FormControlLabel value="warning" control={<Radio />} label="Warning" />
+            <FormControlLabel value="error" control={<Radio />} label="Error" />
+          </RadioGroup>
+        </FormControl>
+        <Button
+          onClick={async () => {
+            await notifications.show('Consider yourself notified!', { severity });
+          }}
         >
-          <FormControlLabel value="info" control={<Radio />} label="Info" />
-          <FormControlLabel value="success" control={<Radio />} label="Success" />
-          <FormControlLabel value="warning" control={<Radio />} label="Warning" />
-          <FormControlLabel value="error" control={<Radio />} label="Error" />
-        </RadioGroup>
-      </FormControl>
-      <Button
-        onClick={async () => {
-          await notifications.enqueue('Consider yourself notified!', { severity });
-        }}
-      >
-        Notify me
-      </Button>
-    </Stack>
-  );
-}
-
-export default function AlertNotification() {
-  return (
-    <NotificationsProvider>
-      <DemoContent />
-    </NotificationsProvider>
+          Notify me
+        </Button>
+      </Stack>
+    </div>
   );
 }

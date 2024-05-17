@@ -5,28 +5,21 @@ import {
 } from '@toolpad/core/useNotifications';
 import Button from '@mui/material/Button';
 
-function DemoContent() {
+export default function BasicNotification() {
   const notifications = useNotifications();
   return (
     // preview
     <div>
+      <NotificationsProvider />
       <Button
         onClick={async () => {
-          await notifications.enqueue('Consider yourself notified!', {
-            // autoHideDuration: 3000,
+          await notifications.show('Consider yourself notified!', {
+            autoHideDuration: 5000,
           });
         }}
       >
         Notify me
       </Button>
     </div>
-  );
-}
-
-export default function BasicNotification() {
-  return (
-    <NotificationsProvider>
-      <DemoContent />
-    </NotificationsProvider>
   );
 }

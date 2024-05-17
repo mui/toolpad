@@ -10,10 +10,11 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import * as React from 'react';
+import { createGlobalState, useNonNullableContext } from '@toolpad/utils/react';
 
 const closeText = 'Close';
 
-export interface EnqueueNotificationOptions {
+export interface ShowNotificationOptions {
   key?: string; // To dedupe snackbars
   severity?: 'info' | 'warning' | 'error' | 'success';
   autoHideDuration?: number;
@@ -21,39 +22,91 @@ export interface EnqueueNotificationOptions {
   onAction?: () => void;
 }
 
-export interface EnqueueNotification {
-  (message: React.ReactNode, options?: EnqueueNotificationOptions): string;
+export interface ShowNotification {
+  (message: React.ReactNode, options?: ShowNotificationOptions): string;
 }
 
 export interface CloseNotification {
   (key: string): void;
 }
 
-const EnqueueNotificationContext = React.createContext<EnqueueNotification>(() => {
-  throw new Error('No NotificationsProvider');
-});
-
-const CloseNotificationContext = React.createContext<CloseNotification>(() => {
-  throw new Error('No NotificationsProvider');
-});
-
 interface NotificationQueueEntry {
   notificationKey: string;
-  options: EnqueueNotificationOptions;
+  options: ShowNotificationOptions;
   open: boolean;
   message: React.ReactNode;
 }
+
+interface NotificationsState {
+  queue: NotificationQueueEntry[];
+}
+
+interface NotificationsContextValue {
+  getState: () => NotificationsState;
+  subscribe: (cb: () => void) => () => void;
+  show: ShowNotification;
+  close: CloseNotification;
+}
+
+function createNotificationsContext(): NotificationsContextValue | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  let nextId = 1;
+  let state: NotificationsState = { queue: [] };
+  // Only one subscriber allowed, last one wins
+  const subscribers = new Set<() => void>();
+
+  const setState: React.Dispatch<React.SetStateAction<NotificationsState>> = (newState) => {
+    state = typeof newState === 'function' ? newState(state) : newState;
+    Array.from(subscribers).forEach((cb) => cb());
+  };
+
+  return {
+    getState: () => state,
+    subscribe: (cb) => {
+      subscribers.add(cb);
+      return () => {
+        subscribers.delete(cb);
+      };
+    },
+    show: (message, options = {}) => {
+      const notificationKey = options.key ?? `::toolpad-internal::notification::${nextId}`;
+      nextId += 1;
+      setState((prev) => {
+        if (prev.queue.some((n) => n.notificationKey === notificationKey)) {
+          // deduplicate by key
+          return prev;
+        }
+        return {
+          ...prev,
+          queue: [...prev.queue, { message, options, notificationKey, open: true }],
+        };
+      });
+      return notificationKey;
+    },
+    close: (key) => {
+      setState((prev) => ({
+        ...prev,
+        queue: prev.queue.filter((n) => n.notificationKey !== key),
+      }));
+    },
+  };
+}
+
+const NotificationsContext = React.createContext(createNotificationsContext());
 
 interface NotificationProps {
   notificationKey: string;
   badge: string | null;
   open: boolean;
   message: React.ReactNode;
-  options: EnqueueNotificationOptions;
+  options: ShowNotificationOptions;
 }
 
 function Notification({ notificationKey, open, message, options, badge }: NotificationProps) {
-  const close = React.useContext(CloseNotificationContext);
+  const { close } = useNonNullableContext(NotificationsContext);
 
   const { severity, actionText, onAction, autoHideDuration } = options;
 
@@ -107,68 +160,72 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
   );
 }
 
-interface NotificationsState {
-  queue: NotificationQueueEntry[];
+interface UseNotifications {
+  show: ShowNotification;
+  close: CloseNotification;
 }
 
-export interface NotificationsProviderProps {
-  children?: React.ReactNode;
+const serverNotifications: UseNotifications = {
+  show: () => {
+    throw new Error('Not supported on server side');
+  },
+  close: () => {
+    throw new Error('Not supported on server side');
+  },
+};
+
+export function useNotifications(): UseNotifications {
+  const context = React.useContext(NotificationsContext);
+
+  if (context) {
+    const { show, close } = context;
+    return { show, close };
+  }
+
+  return serverNotifications;
 }
 
-let nextId = 1;
+interface NotificationsUiProps {
+  context: NotificationsContextValue;
+}
 
-export function NotificationsProvider({ children }: NotificationsProviderProps) {
-  const [state, setState] = React.useState<NotificationsState>({ queue: [] });
-
-  const enqueue = React.useCallback<EnqueueNotification>((message, options = {}) => {
-    const notificationKey = options.key ?? `::toolpad-internal::notification::${nextId}`;
-    nextId += 1;
-    setState((prev) => {
-      if (prev.queue.some((n) => n.notificationKey === notificationKey)) {
-        // deduplicate by key
-        return prev;
-      }
-      return {
-        ...prev,
-        queue: [...prev.queue, { message, options, notificationKey, open: true }],
-      };
-    });
-    return notificationKey;
-  }, []);
-
-  const close = React.useCallback<CloseNotification>((key) => {
-    setState((prev) => ({
-      ...prev,
-      queue: prev.queue.filter((n) => n.notificationKey !== key),
-    }));
-  }, []);
+function Notifications({ context }: NotificationsUiProps) {
+  const getServerState = React.useCallback(() => ({ queue: [] }), []);
+  const state: NotificationsState = React.useSyncExternalStore(
+    context.subscribe,
+    context.getState,
+    getServerState,
+  );
 
   const currentNotification = state.queue[0] ?? null;
 
-  return (
-    <EnqueueNotificationContext.Provider value={enqueue}>
-      <CloseNotificationContext.Provider value={close}>
-        {children}
-
-        {currentNotification ? (
-          <Notification
-            {...currentNotification}
-            badge={state.queue.length > 1 ? String(state.queue.length) : null}
-          />
-        ) : null}
-      </CloseNotificationContext.Provider>
-    </EnqueueNotificationContext.Provider>
-  );
+  return currentNotification ? (
+    <Notification
+      {...currentNotification}
+      badge={state.queue.length > 1 ? String(state.queue.length) : null}
+    />
+  ) : null;
 }
 
-export function useNotifications() {
-  const enqueue = React.useContext(EnqueueNotificationContext);
-  const close = React.useContext(CloseNotificationContext);
-  return React.useMemo(
-    () => ({
-      enqueue,
-      close,
-    }),
-    [enqueue, close],
-  );
+const master = createGlobalState<string | null>(null);
+
+export function NotificationsProvider() {
+  const context = React.useContext(NotificationsContext);
+
+  const id = React.useId();
+
+  React.useEffect(() => {
+    master.setState((prev) => (prev === null ? id : prev));
+    return () => {
+      master.setState((prev) => (prev === id ? null : prev));
+    };
+  }, [id]);
+
+  const [masterId] = master.useState();
+
+  if (!context || masterId !== id) {
+    return null;
+  }
+
+  return <Notifications context={context} />;
 }

@@ -3,8 +3,6 @@ const fs = require('fs');
 
 const pluginName = 'babel-plugin-jsx-preview';
 
-const wrapperTypes = ['div', 'Box', 'Stack'];
-
 /**
  * @typedef {import('@babel/core')} babel
  */
@@ -12,8 +10,10 @@ const wrapperTypes = ['div', 'Box', 'Stack'];
 /**
  *
  * @param {babel.NodePath<babel.types.JSXElement>} path
+ * @param {babel.PluginPass} state
  */
-function getPreviewNodes(path) {
+function getPreviewNodes(path, state) {
+  const wrapperTypes = state.opts.wrapperTypes ?? [];
   /**
    * @type {(babel.types.JSXElement['children'])}
    */
@@ -82,7 +82,7 @@ export default function babelPluginJsxPreview() {
   return {
     name: pluginName,
     visitor: {
-      ExportDefaultDeclaration(path) {
+      ExportDefaultDeclaration(path, state) {
         const declarationPath = path.get('declaration');
         if (!declarationPath.isFunctionDeclaration()) {
           return;
@@ -94,7 +94,7 @@ export default function babelPluginJsxPreview() {
         const returnedJSXPath = lastReturnPath.get('argument');
 
         if (returnedJSXPath.isJSXElement()) {
-          previewNodes = getPreviewNodes(returnedJSXPath);
+          previewNodes = getPreviewNodes(returnedJSXPath, state);
         }
       },
     },

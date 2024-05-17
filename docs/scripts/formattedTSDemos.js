@@ -9,7 +9,7 @@
  * List of demos or folders to ignore when transpiling.
  * Only ignore files that aren't used in the UI.
  */
-const ignoreList = [];
+const ignoreList = ['/pages.ts', 'styling.ts', 'styling.tsx'];
 
 const path = require('path');
 const fse = require('fs-extra');
@@ -24,7 +24,7 @@ const {
 } = require('@mui-internal/api-docs-builder/utils/createTypeScriptProject');
 const yargs = require('yargs');
 const { fixBabelGeneratorIssues, fixLineEndings } = require('@mui/internal-docs-utils');
-const { default: CORE_TYPESCRIPT_PROJECTS } = require('../../scripts/coreTypeScriptProjects');
+const { default: CORE_TYPESCRIPT_PROJECTS } = require('../../scripts/coreTypescriptProjects');
 
 const babelConfig = {
   presets: ['@babel/preset-typescript'],

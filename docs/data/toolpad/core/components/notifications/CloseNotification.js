@@ -3,12 +3,19 @@ import {
   NotificationsProvider,
   useNotifications,
 } from '@toolpad/core/useNotifications';
-import { Switch } from '@mui/material';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
 export default function CloseNotification() {
   const notifications = useNotifications();
   const [online, setOnline] = React.useState(true);
+  const prevOnline = React.useRef(online);
   React.useEffect(() => {
+    if (prevOnline.current === online) {
+      return () => {};
+    }
+    prevOnline.current = online;
+
     const key = online
       ? notifications.show('You are now online', {
           severity: 'success',
@@ -22,10 +29,16 @@ export default function CloseNotification() {
       notifications.close(key);
     };
   }, [notifications, online]);
+
   return (
     <div>
       <NotificationsProvider />
-      <Switch value={online} onChange={() => setOnline((prev) => !prev)} />
+      <FormControlLabel
+        control={
+          <Switch checked={online} onChange={() => setOnline((prev) => !prev)} />
+        }
+        label="Online"
+      />
     </div>
   );
 }

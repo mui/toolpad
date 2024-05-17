@@ -17,3 +17,7 @@
 ## Close notifications
 
 {{"demo": "CloseNotification.js"}}
+
+## Dedupe notifications
+
+{{"demo": "DedupeNotification.js"}}

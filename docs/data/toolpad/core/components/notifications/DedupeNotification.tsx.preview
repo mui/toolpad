@@ -1,0 +1,11 @@
+<NotificationsProvider />
+<Button
+  onClick={async () => {
+    await notifications.show('Listen carefully, I will say this only once', {
+      key: 'dedupe-notification',
+      autoHideDuration: 5000,
+    });
+  }}
+>
+  Notify me
+</Button>

@@ -31,6 +31,10 @@ const noRestrictedImports = {
 
 module.exports = {
   ...baseline,
+  plugins: [
+    ...baseline.plugins,
+    // 'eslint-plugin-react-compiler'
+  ],
   settings: {
     'import/resolver': {
       webpack: {
@@ -94,6 +98,7 @@ module.exports = {
       },
     ],
     'material-ui/no-hardcoded-labels': 'off', // We are not really translating the docs/website anymore
+    // 'react-compiler/react-compiler': 'error',
   },
   overrides: [
     ...baseline.overrides,

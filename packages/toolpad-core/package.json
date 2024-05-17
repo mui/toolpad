@@ -41,7 +41,7 @@
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
     "build:types": "tsc -b tsconfig.build.json",
     "prebuild": "rimraf build tsconfig.build.tsbuildinfo",
-    "dev": "pnpm build:stable --watch & pnpm build:types --watch",
+    "dev": "concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch --preserveWatchOutput\"",
     "check-types": "tsc --noEmit",
     "test": "vitest run"
   },
@@ -59,7 +59,8 @@
   "devDependencies": {
     "@types/invariant": "2.2.37",
     "@types/react": "18.3.1",
-    "@types/react-dom": "18.3.0"
+    "@types/react-dom": "18.3.0",
+    "concurrently": "8.2.2"
   },
   "peerDependencies": {
     "@mui/icons-material": "^5",

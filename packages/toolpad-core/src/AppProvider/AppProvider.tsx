@@ -41,7 +41,16 @@ interface AppProviderProps {
   branding?: Branding | null;
   navigation?: Navigation;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [App Provider](https://mui.com/toolpad/core/app-provider/)
+ *
+ * API:
+ *
+ * - [AppProvider API](https://mui.com/toolpad/core/api/app-provider)
+ */
 function AppProvider(props: AppProviderProps) {
   const { children, theme = baseTheme, branding = null, navigation = [] } = props;
 

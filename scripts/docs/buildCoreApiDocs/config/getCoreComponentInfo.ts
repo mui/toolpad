@@ -1,12 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import kebabCase from 'lodash/kebabCase';
 import { getHeaders, getTitle } from '@mui/internal-markdown';
 import {
   ComponentInfo,
   extractPackageFile,
-  getApiPath,
   parseFile,
-  fixPathname,
 } from '@mui-internal/api-docs-builder/buildApiUtils';
 import findPagesMarkdown from '@mui-internal/api-docs-builder/utils/findPagesMarkdown';
 
@@ -32,7 +31,7 @@ export function getCoreDemos(name: string) {
     .filter((page) => page.components.includes(name))
     .map((page) => ({
       demoPageTitle: getTitle(page.markdownContent),
-      demoPathname: fixPathname(page.pathname),
+      demoPathname: `${page.pathname.replace('/components/', '/')}/`,
     }));
 }
 
@@ -44,13 +43,12 @@ export function getCoreComponentInfo(filename: string): ComponentInfo {
   }
 
   const demos = getCoreDemos(name);
-  const apiPath = getApiPath(demos, name) || '';
 
   return {
     filename,
     name,
     muiName: name,
-    apiPathname: apiPath,
+    apiPathname: `/toolpad/core/api/${kebabCase(name)}`,
     apiPagesDirectory: path.join(process.cwd(), `docs/pages/toolpad/core/api`),
     isSystemComponent: false,
     readFile: () => {

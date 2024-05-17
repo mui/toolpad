@@ -274,7 +274,16 @@ DashboardSidebarSubNavigation.propTypes /* remove-proptypes */ = {
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [Dashboard Layout](https://mui.com/toolpad/core/dashboard-layout/)
+ *
+ * API:
+ *
+ * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
+ */
 function DashboardLayout(props: DashboardLayoutProps) {
   const { children } = props;
 
@@ -303,17 +312,17 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </a>
           <Box sx={{ flexGrow: 1 }} />
           {/* <Stack>
-                <IconButton
-                  size="large"
-                  aria-label="Show new notifications"
-                  color="inherit"
-                  sx={{
-                    border: (theme) => `1px solid ${theme.palette.divider}`,
-                  }}
-                >
-                  <NotificationsIcon />
-                </IconButton>
-               </Stack> */}
+                   <IconButton
+                     size="large"
+                     aria-label="Show new notifications"
+                     color="inherit"
+                     sx={{
+                       border: (theme) => `1px solid ${theme.palette.divider}`,
+                     }}
+                   >
+                     <NotificationsIcon />
+                   </IconButton>
+                  </Stack> */}
         </Toolbar>
       </AppBar>
       <Drawer

@@ -1,13 +1,16 @@
 {
   "props": {},
   "name": "DashboardLayout",
-  "imports": ["import { DashboardLayout } from '@toolpad/core/src';"],
+  "imports": [
+    "import DashboardLayout from '/packages/toolpad-core/src/DashboardLayout/DashboardLayout.tsx';",
+    "import { DashboardLayout } from '/packages/toolpad-core/src/DashboardLayout/DashboardLayout.tsx';"
+  ],
   "classes": [],
   "spread": true,
   "themeDefaultProps": null,
   "muiName": "DashboardLayout",
   "filename": "/packages/toolpad-core/src/DashboardLayout/DashboardLayout.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-dashboard-layout/\">Dashboard Layout</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/dashboard-layout/\">Dashboard Layout</a></li></ul>",
   "cssComponent": false
 }

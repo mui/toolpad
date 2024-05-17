@@ -1,13 +1,16 @@
 {
   "props": {},
   "name": "AppProvider",
-  "imports": ["import { AppProvider } from '@toolpad/core/src';"],
+  "imports": [
+    "import AppProvider from '/packages/toolpad-core/src/AppProvider/AppProvider.tsx';",
+    "import { AppProvider } from '/packages/toolpad-core/src/AppProvider/AppProvider.tsx';"
+  ],
   "classes": [],
   "spread": true,
   "themeDefaultProps": null,
   "muiName": "AppProvider",
   "filename": "/packages/toolpad-core/src/AppProvider/AppProvider.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-app-provider/\">App Provider</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/app-provider/\">App Provider</a></li></ul>",
   "cssComponent": false
 }

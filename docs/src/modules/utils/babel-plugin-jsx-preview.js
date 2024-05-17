@@ -124,16 +124,21 @@ export default function babelPluginJsxPreview() {
       } else if (previewNodes.length > 0) {
         const startNode = previewNodes[0];
         const endNode = previewNodes.slice(-1)[0];
-        const startLine = startNode.loc?.start.line;
-        const endLine = endNode.loc?.end.line;
-        if (typeof startLine === 'number' && typeof endLine === 'number') {
-          const previewLines = lines.slice(startLine - 1, endLine);
-
-          if (previewLines.length <= maxLines) {
-            const dedentedPreviewLines = dedentLines(previewLines);
-            fs.writeFileSync(outputFilename, dedentedPreviewLines.join('\n'));
-            hasPreview = true;
+        const preview = state.code.slice(startNode.start, endNode.end);
+        const previewLines = preview.split(/\n/);
+        // The first line is already trimmed either due to trimmed blank JSXText or because it's a single node which babel already trims.
+        // The last line is therefore the meassure for indentation
+        const indentation = previewLines.slice(-1)[0].match(/^\s*/)[0].length;
+        const dedentedPreviewLines = preview.split(/\n/).map((line, index) => {
+          if (index === 0) {
+            return line;
           }
+          return line.slice(indentation);
+        });
+
+        if (previewLines.length <= maxLines) {
+          fs.writeFileSync(outputFilename, dedentedPreviewLines.join('\n'));
+          hasPreview = true;
         }
       }
 

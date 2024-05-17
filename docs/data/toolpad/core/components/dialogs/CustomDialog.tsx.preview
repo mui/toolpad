@@ -1,1 +1,15 @@
+function MyCustomDialog({ open, onClose }: DialogProps) {
+  return (
+    <Dialog fullWidth open={open} onClose={() => onClose()}>
+      <DialogTitle>Custom dialog</DialogTitle>
+      <DialogContent>I am a custom dialog</DialogContent>
+      <DialogActions>
+        <Button onClick={() => onClose()}>Close me</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// ...
+
 await dialogs.open(MyCustomDialog);

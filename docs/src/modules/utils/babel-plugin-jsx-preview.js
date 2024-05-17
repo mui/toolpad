@@ -70,6 +70,45 @@ function dedentLines(lines) {
   return trimmedLines.map((line) => line.slice(indentation));
 }
 
+/** @type {(input: string) => boolean} */
+const isPreviewStart = (line) =>
+  ['// preview-start', '{/* preview-start */}'].includes(line.trim());
+/** @type {(input: string) => boolean} */
+const isPreviewEnd = (line) => ['// preview-end', '{/* preview-end */}'].includes(line.trim());
+
+/**
+ *
+ * @param {string} code
+ * @returns {string | null}
+ */
+function extractExplicitPreview(code) {
+  const lines = code.split(/\n/);
+
+  const ranges = [];
+
+  let start = -1;
+  for (const [index, line] of lines.entries()) {
+    if (isPreviewStart(line) && start < 0) {
+      start = index;
+    } else if (isPreviewEnd(line) && start >= 0) {
+      ranges.push([start, index]);
+      start = -1;
+    }
+  }
+
+  const previewSections = ranges.map(([startLine, endLine]) => {
+    const previewLines = lines.slice(startLine + 1, endLine);
+    const dedentedPreviewLines = dedentLines(previewLines);
+    return dedentedPreviewLines.join('\n');
+  });
+
+  if (previewSections.length > 0) {
+    return previewSections.join('\n\n// ...\n\n');
+  }
+
+  return null;
+}
+
 /**
  * @returns {babel.PluginObj}
  */
@@ -108,18 +147,10 @@ export default function babelPluginJsxPreview() {
 
       let hasPreview = false;
 
-      const lines = state.code.split(/\n/);
-      const previewStart = lines.findIndex((line) =>
-        ['// preview-start', '{/* preview-start */}'].includes(line.trim()),
-      );
-      const previewEnd = lines.findIndex((line) =>
-        ['// preview-end', '{/* preview-end */}'].includes(line.trim()),
-      );
+      const explicitPreview = extractExplicitPreview(state.code);
 
-      if (previewStart >= 0 && previewEnd >= 0 && previewStart < previewEnd) {
-        const previewLines = lines.slice(previewStart + 1, previewEnd);
-        const dedentedPreviewLines = dedentLines(previewLines);
-        fs.writeFileSync(outputFilename, dedentedPreviewLines.join('\n'));
+      if (explicitPreview) {
+        fs.writeFileSync(outputFilename, explicitPreview);
         hasPreview = true;
       } else if (previewNodes.length > 0) {
         const startNode = previewNodes[0];

@@ -87,11 +87,11 @@ const pages: MuiPage[] = [
         children: [
           {
             pathname: '/toolpad/core/components/dialogs',
-            title: 'useDialog',
+            title: 'dialogs',
           },
           {
             pathname: '/toolpad/core/components/notifications',
-            title: 'useNotifications',
+            title: 'notifications',
           },
         ],
       },

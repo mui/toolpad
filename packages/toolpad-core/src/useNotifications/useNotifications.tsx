@@ -1,12 +1,12 @@
 import {
   Alert,
-  AlertProps,
   Badge,
   Button,
   CloseReason,
   IconButton,
   Snackbar,
   SnackbarCloseReason,
+  SnackbarContent,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import * as React from 'react';
@@ -22,7 +22,7 @@ export interface EnqueueNotificationOptions {
 }
 
 export interface EnqueueNotification {
-  (msg: React.ReactNode, options?: EnqueueNotificationOptions): string;
+  (message: React.ReactNode, options?: EnqueueNotificationOptions): string;
 }
 
 export interface CloseNotification {
@@ -41,22 +41,18 @@ interface NotificationQueueEntry {
   notificationKey: string;
   options: EnqueueNotificationOptions;
   open: boolean;
-  msg: React.ReactNode;
+  message: React.ReactNode;
 }
 
 interface NotificationProps {
   notificationKey: string;
   badge: string | null;
   open: boolean;
-  msg: React.ReactNode;
+  message: React.ReactNode;
   options: EnqueueNotificationOptions;
 }
 
-function PassThrough({ children }: AlertProps) {
-  return children;
-}
-
-function Notification({ notificationKey, open, msg, options, badge }: NotificationProps) {
+function Notification({ notificationKey, open, message, options, badge }: NotificationProps) {
   const close = React.useContext(CloseNotificationContext);
 
   const { severity, actionText, onAction, autoHideDuration } = options;
@@ -90,8 +86,6 @@ function Notification({ notificationKey, open, msg, options, badge }: Notificati
     </React.Fragment>
   );
 
-  const AlertComponent: React.ComponentType<AlertProps> = severity ? Alert : PassThrough;
-
   return (
     <Snackbar
       key={notificationKey}
@@ -100,10 +94,14 @@ function Notification({ notificationKey, open, msg, options, badge }: Notificati
       onClose={handleClose}
       action={action}
     >
-      <Badge badgeContent={badge} color="primary">
-        <AlertComponent severity={severity ?? 'info'} sx={{ width: '100%' }} action={action}>
-          {msg}
-        </AlertComponent>
+      <Badge badgeContent={badge} color="primary" sx={{ width: '100%' }}>
+        {severity ? (
+          <Alert severity={severity} sx={{ width: '100%' }} action={action}>
+            {message}
+          </Alert>
+        ) : (
+          <SnackbarContent message={message} action={action} />
+        )}
       </Badge>
     </Snackbar>
   );
@@ -122,7 +120,7 @@ let nextId = 1;
 export function NotificationsProvider({ children }: NotificationsProviderProps) {
   const [state, setState] = React.useState<NotificationsState>({ queue: [] });
 
-  const enqueue = React.useCallback<EnqueueNotification>((msg, options = {}) => {
+  const enqueue = React.useCallback<EnqueueNotification>((message, options = {}) => {
     const notificationKey = options.key ?? `::toolpad-internal::notification::${nextId}`;
     nextId += 1;
     setState((prev) => {
@@ -132,7 +130,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
       }
       return {
         ...prev,
-        queue: [...prev.queue, { msg, options, notificationKey, open: true }],
+        queue: [...prev.queue, { message, options, notificationKey, open: true }],
       };
     });
     return notificationKey;

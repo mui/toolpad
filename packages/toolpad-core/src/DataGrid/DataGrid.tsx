@@ -53,6 +53,7 @@ function useSsr() {
 interface ToolbarCreateButtonContextValue {
   slotsProp?: Partial<GridSlotsComponent>;
   onClick: () => void;
+  visible: boolean;
   disabled: boolean;
 }
 
@@ -341,13 +342,15 @@ function updateColumnsWithDataProviderEditing<R extends Datum>(
 }
 
 function ToolbarGridCreateButton() {
-  const { slotsProp, onClick, disabled } = useNonNullableContext(ToolbarCreateButtonContext);
+  const { visible, slotsProp, onClick, disabled } = useNonNullableContext(
+    ToolbarCreateButtonContext,
+  );
   const ButtonComponent = slotsProp?.baseButton ?? Button;
-  return (
+  return visible ? (
     <ButtonComponent color="primary" startIcon={<AddIcon />} onClick={onClick} disabled={disabled}>
       Add record
     </ButtonComponent>
-  );
+  ) : null;
 }
 
 function ToolbarGridToolbar() {
@@ -556,6 +559,7 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
     }),
     [slotsProp],
   );
+  const hasCreateButton = !!dataProvider?.createOne;
 
   const createButtonContext = React.useMemo(() => {
     return {
@@ -563,9 +567,10 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
       onClick: () => {
         handleCreateRowRequest();
       },
+      visible: hasCreateButton,
       disabled: !!editingState.editedRowId || loading,
     };
-  }, [editingState.editedRowId, handleCreateRowRequest, loading, slotsProp]);
+  }, [editingState.editedRowId, handleCreateRowRequest, hasCreateButton, loading, slotsProp]);
 
   const getRowId = React.useCallback(
     (row: R) => {

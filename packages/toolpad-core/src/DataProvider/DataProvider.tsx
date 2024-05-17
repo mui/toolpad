@@ -1,4 +1,10 @@
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  QueryClient,
+  QueryClientProvider,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query';
 import invariant from 'invariant';
 import * as React from 'react';
 import { getObjectKey } from '@toolpad/utils/objectKey';
@@ -255,4 +261,14 @@ export function useDeleteOne<R extends Datum>(
     }),
     [isPending, error, mutateAsync, reset],
   );
+}
+
+const queryClient = new QueryClient();
+
+export interface CacheProviderProps {
+  children?: React.ReactNode;
+}
+
+export function CacheProvider({ children }: CacheProviderProps) {
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

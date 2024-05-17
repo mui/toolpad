@@ -9,11 +9,14 @@ function DemoContent() {
       <Button
         onClick={async () => {
           // preview-start
-          const confirmed = await dialogs.confirm('Are you sure?');
+          const confirmed = await dialogs.confirm('Are you sure?', {
+            okText: 'Yes',
+            cancelText: 'No',
+          });
           if (confirmed) {
             await dialogs.alert("Then let's do it!");
           } else {
-            await dialogs.alert('Cancelled!');
+            await dialogs.alert('Ok, forget about it!');
           }
           // preview-end
         }}

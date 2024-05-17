@@ -1,7 +1,1 @@
-<Button
-  onClick={async () => {
-    await dialogs.alert('Hello World');
-  }}
->
-  Alert
-</Button>
+await dialogs.alert('Hello World');

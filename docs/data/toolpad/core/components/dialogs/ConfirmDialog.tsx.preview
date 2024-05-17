@@ -1,12 +1,6 @@
-<Button
-  onClick={async () => {
-    const confirmed = await dialogs.confirm('Are you sure?');
-    if (confirmed) {
-      await dialogs.alert("Then let's do it!");
-    } else {
-      await dialogs.alert('Cancelled!');
-    }
-  }}
->
-  Confirm
-</Button>
+const confirmed = await dialogs.confirm('Are you sure?');
+if (confirmed) {
+  await dialogs.alert("Then let's do it!");
+} else {
+  await dialogs.alert('Cancelled!');
+}

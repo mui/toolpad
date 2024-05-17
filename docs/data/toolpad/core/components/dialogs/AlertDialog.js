@@ -5,11 +5,12 @@ import Button from '@mui/material/Button';
 function DemoContent() {
   const dialogs = useDialogs();
   return (
-    // preview
     <div>
       <Button
         onClick={async () => {
+          // preview-start
           await dialogs.alert('Hello World');
+          // preview-end
         }}
       >
         Alert

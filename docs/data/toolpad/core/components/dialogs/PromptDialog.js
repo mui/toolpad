@@ -5,14 +5,15 @@ import Button from '@mui/material/Button';
 function DemoContent() {
   const dialogs = useDialogs();
   return (
-    // preview
     <div>
       <Button
         onClick={async () => {
+          // preview-start
           const name = await dialogs.prompt("What's your name?");
           if (name) {
             await dialogs.alert(`Hi there, ${name}`);
           }
+          // preview-end
         }}
       >
         Prompt

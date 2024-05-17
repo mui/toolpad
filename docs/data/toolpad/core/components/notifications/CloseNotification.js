@@ -16,6 +16,7 @@ export default function CloseNotification() {
     }
     prevOnline.current = online;
 
+    // preview-start
     const key = online
       ? notifications.show('You are now online', {
           severity: 'success',
@@ -28,6 +29,7 @@ export default function CloseNotification() {
     return () => {
       notifications.close(key);
     };
+    // preview-end
   }, [notifications, online]);
 
   return (

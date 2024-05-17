@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { DialogProvider, useDialogs } from '@toolpad/core/useDialogs';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -31,20 +30,16 @@ function MyCustomDialog({ open, onClose }) {
   );
 }
 
-MyCustomDialog.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired,
-};
-
 function DemoContent() {
   const dialogs = useDialogs();
   return (
-    // preview
     <Stack spacing={2}>
       <Button
         onClick={async () => {
+          // preview-start
           const result = await dialogs.open(MyCustomDialog);
           await dialogs.alert(`Your name is "${result}"`);
+          // preview-end
         }}
       >
         Open

@@ -33,12 +33,13 @@ function MyCustomDialog({ open, onClose }: DialogProps<undefined, string | null>
 function DemoContent() {
   const dialogs = useDialogs();
   return (
-    // preview
     <Stack spacing={2}>
       <Button
         onClick={async () => {
+          // preview-start
           const result = await dialogs.open(MyCustomDialog);
           await dialogs.alert(`Your name is "${result}"`);
+          // preview-end
         }}
       >
         Open

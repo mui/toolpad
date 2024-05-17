@@ -24,7 +24,6 @@ function DemoContent() {
   const dialogs = useDialogs();
   const [payload, setPayload] = React.useState('Some payload');
   return (
-    // preview
     <Stack spacing={2}>
       <TextField
         label="Payload"
@@ -33,7 +32,9 @@ function DemoContent() {
       />
       <Button
         onClick={async () => {
+          // preview-start
           await dialogs.open(MyCustomDialog, payload);
+          // preview-end
         }}
       >
         Open

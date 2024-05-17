@@ -17,9 +17,9 @@ function getPreviewNodes(path) {
   /**
    * @type {(babel.types.JSXElement['children'])}
    */
-  let previewNode = [];
+  let previewNodes = [];
 
-  previewNode = [path.node];
+  previewNodes = [path.node];
   const name = path.get('openingElement').get('name');
   if (
     name.isJSXIdentifier() &&
@@ -37,7 +37,7 @@ function getPreviewNodes(path) {
     // ^^^^ Blank JSXText including newline
     //   </Stack>
     // )
-    previewNode = path.node.children.filter((child, index, children) => {
+    previewNodes = path.node.children.filter((child, index, children) => {
       const isSurroundingBlankJSXText =
         (index === 0 || index === children.length - 1) &&
         child.type === 'JSXText' &&
@@ -45,7 +45,29 @@ function getPreviewNodes(path) {
       return !isSurroundingBlankJSXText;
     });
   }
-  return previewNode;
+  return previewNodes;
+}
+
+/**
+ *
+ * @param {string[]} lines
+ * @returns {string[]}
+ */
+function trimEmptyLines(lines) {
+  const start = lines.findIndex((line) => line.trim() !== '');
+  const end = lines.findLastIndex((line) => line.trim() !== '');
+  return lines.slice(start, end + 1);
+}
+
+/**
+ *
+ * @param {string[]} lines
+ * @returns {string[]}
+ */
+function dedentLines(lines) {
+  const trimmedLines = trimEmptyLines(lines);
+  const indentation = trimmedLines[0]?.match(/^\s*/)?.[0].length ?? 0;
+  return trimmedLines.map((line) => line.slice(indentation));
 }
 
 /**
@@ -60,18 +82,7 @@ export default function babelPluginJsxPreview() {
   return {
     name: pluginName,
     visitor: {
-      JSXElement(path) {
-        const comments = path.node.leadingComments || [];
-        const hasComment = comments.some((comment) => comment.value.trim() === 'preview');
-        if (hasComment) {
-          previewNodes = getPreviewNodes(path);
-        }
-      },
       ExportDefaultDeclaration(path) {
-        if (previewNodes) {
-          return;
-        }
-
         const declarationPath = path.get('declaration');
         if (!declarationPath.isFunctionDeclaration()) {
           return;
@@ -88,29 +99,41 @@ export default function babelPluginJsxPreview() {
       },
     },
     post(state) {
-      const { maxLines, outputFilename } = state.opts.plugins.find((plugin) => {
-        return plugin.key === pluginName;
-      }).options;
+      const previewPlugin = state.opts.plugins?.find((plugin) => plugin.key === pluginName);
+      if (!previewPlugin) {
+        throw new Error(`Can't find the ${pluginName} plugin.`);
+      }
+
+      const { maxLines, outputFilename } = previewPlugin.options;
 
       let hasPreview = false;
-      if (previewNodes.length > 0) {
+
+      const lines = state.code.split(/\n/);
+      const previewStart = lines.findIndex((line) =>
+        ['// preview-start', '{/* preview-start */}'].includes(line.trim()),
+      );
+      const previewEnd = lines.findIndex((line) =>
+        ['// preview-end', '{/* preview-end */}'].includes(line.trim()),
+      );
+
+      if (previewStart >= 0 && previewEnd >= 0 && previewStart < previewEnd) {
+        const previewLines = lines.slice(previewStart + 1, previewEnd);
+        const dedentedPreviewLines = dedentLines(previewLines);
+        fs.writeFileSync(outputFilename, dedentedPreviewLines.join('\n'));
+        hasPreview = true;
+      } else if (previewNodes.length > 0) {
         const startNode = previewNodes[0];
         const endNode = previewNodes.slice(-1)[0];
-        const preview = state.code.slice(startNode.start, endNode.end);
-        const previewLines = preview.split(/\n/);
-        // The first line is already trimmed either due to trimmed blank JSXText or because it's a single node which babel already trims.
-        // The last line is therefore the meassure for indentation
-        const indentation = previewLines.slice(-1)[0].match(/^\s*/)[0].length;
-        const deindentedPreviewLines = preview.split(/\n/).map((line, index) => {
-          if (index === 0) {
-            return line;
-          }
-          return line.slice(indentation);
-        });
+        const startLine = startNode.loc?.start.line;
+        const endLine = endNode.loc?.end.line;
+        if (typeof startLine === 'number' && typeof endLine === 'number') {
+          const previewLines = lines.slice(startLine - 1, endLine);
 
-        if (deindentedPreviewLines.length <= maxLines) {
-          fs.writeFileSync(outputFilename, deindentedPreviewLines.join('\n'));
-          hasPreview = true;
+          if (previewLines.length <= maxLines) {
+            const dedentedPreviewLines = dedentLines(previewLines);
+            fs.writeFileSync(outputFilename, dedentedPreviewLines.join('\n'));
+            hasPreview = true;
+          }
         }
       }
 

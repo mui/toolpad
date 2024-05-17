@@ -8,14 +8,15 @@ import Button from '@mui/material/Button';
 export default function BasicNotification() {
   const notifications = useNotifications();
   return (
-    // preview
     <div>
       <NotificationsProvider />
       <Button
         onClick={async () => {
+          // preview-start
           await notifications.show('Consider yourself notified!', {
             autoHideDuration: 3000,
           });
+          // preview-end
         }}
       >
         Notify me

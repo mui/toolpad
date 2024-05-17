@@ -37,10 +37,12 @@ export default function AlertNotification() {
         </FormControl>
         <Button
           onClick={async () => {
+            // preview-start
             await notifications.show('Consider yourself notified!', {
               severity,
               autoHideDuration: 3000,
             });
+            // preview-end
           }}
         >
           Notify me

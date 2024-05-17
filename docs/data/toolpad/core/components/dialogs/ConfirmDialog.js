@@ -5,16 +5,17 @@ import Button from '@mui/material/Button';
 function DemoContent() {
   const dialogs = useDialogs();
   return (
-    // preview
     <div>
       <Button
         onClick={async () => {
+          // preview-start
           const confirmed = await dialogs.confirm('Are you sure?');
           if (confirmed) {
             await dialogs.alert("Then let's do it!");
           } else {
             await dialogs.alert('Cancelled!');
           }
+          // preview-end
         }}
       >
         Confirm

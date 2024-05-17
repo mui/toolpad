@@ -14,7 +14,7 @@ export default function BasicNotification() {
       <Button
         onClick={async () => {
           await notifications.show('Consider yourself notified!', {
-            autoHideDuration: 5000,
+            autoHideDuration: 3000,
           });
         }}
       >

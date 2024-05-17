@@ -9,3 +9,11 @@
 ## Alert notifications
 
 {{"demo": "AlertNotification.js"}}
+
+## Multiple notifications
+
+{{"demo": "MultipleNotifications.js"}}
+
+## Close notifications
+
+{{"demo": "CloseNotification.js"}}

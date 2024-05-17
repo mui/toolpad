@@ -209,10 +209,15 @@ function Notifications({ context }: NotificationsUiProps) {
 
 const master = createGlobalState<string | null>(null);
 
+export interface NotificationsProviderProps {
+  children?: React.ReactNode;
+}
+
 export function NotificationsProvider() {
   const context = React.useContext(NotificationsContext);
 
   const id = React.useId();
+  const [masterId] = master.useState();
 
   React.useEffect(() => {
     master.setState((prev) => (prev === null ? id : prev));
@@ -220,8 +225,6 @@ export function NotificationsProvider() {
       master.setState((prev) => (prev === id ? null : prev));
     };
   }, [id]);
-
-  const [masterId] = master.useState();
 
   if (!context || masterId !== id) {
     return null;

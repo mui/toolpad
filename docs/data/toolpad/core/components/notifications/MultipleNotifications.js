@@ -5,17 +5,15 @@ import {
 } from '@toolpad/core/useNotifications';
 import Button from '@mui/material/Button';
 
-export default function BasicNotification() {
+export default function MultipleNotifications() {
   const notifications = useNotifications();
   return (
-    // preview
     <div>
       <NotificationsProvider />
       <Button
         onClick={async () => {
-          await notifications.show('Consider yourself notified!', {
-            autoHideDuration: 3000,
-          });
+          await notifications.show('Hello', { autoHideDuration: 1000 });
+          await notifications.show('Goodbye', { autoHideDuration: 1000 });
         }}
       >
         Notify me

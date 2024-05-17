@@ -141,12 +141,12 @@ function DeleteAction<R extends Datum>({ id, dataProvider }: DeleteActionProps<R
       setPending(true);
       invariant(dataProvider.deleteOne, 'deleteOne not implemented');
       await dataProvider.deleteOne(id);
-      notifications.enqueue('Row deleted', {
+      notifications.show('Row deleted', {
         severity: 'success',
         autoHideDuration: 5000,
       });
     } catch (error) {
-      notifications.enqueue('Failed to delete row', { severity: 'error' });
+      notifications.show('Failed to delete row', { severity: 'error' });
     } finally {
       setPending(false);
       await refetch();
@@ -482,13 +482,13 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
             if (process.env.NODE_ENV !== 'production') {
               message = `${message}: ${errorFrom(creationError).message}`;
             }
-            notifications.enqueue(message, {
+            notifications.show(message, {
               severity: 'error',
             });
             return { ...originalRow, _action: 'delete' };
           }
 
-          const key = notifications.enqueue('Row created', {
+          const key = notifications.show('Row created', {
             severity: 'success',
             actionText: 'Show',
             autoHideDuration: 5000,
@@ -514,13 +514,13 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
             if (process.env.NODE_ENV !== 'production') {
               message = `${message}: ${errorFrom(updateError).message}`;
             }
-            notifications.enqueue(message, {
+            notifications.show(message, {
               severity: 'error',
             });
             return originalRow;
           }
 
-          const key = notifications.enqueue('Row updated', {
+          const key = notifications.show('Row updated', {
             severity: 'success',
             autoHideDuration: 5000,
             actionText: 'Show',

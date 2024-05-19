@@ -61,8 +61,8 @@ importers:
         specifier: 1.5.5
         version: 1.5.5
       '@babel/cli':
-        specifier: 7.24.1
-        version: 7.24.1(@babel/core@7.24.5)
+        specifier: 7.24.5
+        version: 7.24.5(@babel/core@7.24.5)
       '@babel/core':
         specifier: 7.24.5
         version: 7.24.5
@@ -76,8 +76,8 @@ importers:
         specifier: 7.24.3
         version: 7.24.3(@babel/core@7.24.5)
       '@babel/preset-env':
-        specifier: 7.24.4
-        version: 7.24.4(@babel/core@7.24.5)
+        specifier: 7.24.5
+        version: 7.24.5(@babel/core@7.24.5)
       '@babel/preset-react':
         specifier: 7.24.1
         version: 7.24.1(@babel/core@7.24.5)
@@ -1327,8 +1327,8 @@ packages:
       preact-render-to-string: 5.2.3(preact@10.11.3)
     dev: false
 
-  /@babel/cli@7.24.1(@babel/core@7.24.5):
-    resolution: {integrity: sha512-HbmrtxyFUr34LwAlV9jS+sSIjUp4FpdtIMGwgufY3AsxrIfsh/HxlMTywsONAZsU0RMYbZtbZFpUCrSGs7o0EA==}
+  /@babel/cli@7.24.5(@babel/core@7.24.5):
+    resolution: {integrity: sha512-2qg1mYtJRsOOWF6IUwLP5jI42P8Cc0hQ5TmnjLrik/4DKouO8dFJN80HEz81VmVeUs97yuuf3vQ/9j7Elrcjlg==}
     engines: {node: '>=6.9.0'}
     hasBin: true
     peerDependencies:
@@ -2506,8 +2506,8 @@ packages:
       '@babel/helper-plugin-utils': 7.24.5
     dev: true
 
-  /@babel/preset-env@7.24.4(@babel/core@7.24.5):
-    resolution: {integrity: sha512-7Kl6cSmYkak0FK/FXjSEnLJ1N9T/WA2RkMhu17gZ/dsxKJUuTYNIylahPTzqpLyJN4WhDif8X0XK1R8Wsguo/A==}
+  /@babel/preset-env@7.24.5(@babel/core@7.24.5):
+    resolution: {integrity: sha512-UGK2ifKtcC8i5AI4cH+sbLLuLc2ktYSFJgBAXorKAsHUZmrQ1q6aQ6i3BvU24wWs2AAKqQB6kq3N9V9Gw1HiMQ==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0

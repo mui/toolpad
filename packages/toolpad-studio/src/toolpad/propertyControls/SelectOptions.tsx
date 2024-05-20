@@ -29,6 +29,7 @@ function SelectOptionsPropEditor({
   value = [],
   onChange,
 }: EditorProps<(string | SelectOption)[]>) {
+  const [optionErrorMessage, setOptionErrorMessage] = React.useState('');
   const [editOptionsDialogOpen, setEditOptionsDialogOpen] = React.useState(false);
   const optionInputRef = React.useRef<HTMLInputElement | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
@@ -47,17 +48,31 @@ function SelectOptionsPropEditor({
     return null;
   }, [editingIndex, value]);
 
+  const validateOptionValue = React.useCallback(
+    (inputValue: string) => {
+      const errorState = value.some((item) =>
+        typeof item !== 'string' ? item.value === inputValue : item === inputValue,
+      );
+      setOptionErrorMessage(errorState ? "Must not have duplicate values!" : "")
+    },
+    [value],
+  );
+
   const handleOptionTextInput = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
+      validateOptionValue((event.target as HTMLInputElement).value);
       if (event.key === 'Enter') {
         const inputText = (event.target as HTMLInputElement).value;
+        if (optionErrorMessage || !inputText) {
+          return;
+        }
         onChange([...value, inputText]);
         if (optionInputRef.current) {
           optionInputRef.current.value = '';
         }
       }
     },
-    [onChange, value],
+    [onChange, value, optionErrorMessage, validateOptionValue],
   );
 
   const handleOptionDelete = React.useCallback(
@@ -81,14 +96,19 @@ function SelectOptionsPropEditor({
 
   const handleOptionChange = React.useCallback(
     (newOption: string | SelectOption) => {
+      const newOptionValue = (typeof newOption !== 'string' && newOption.value) ?? newOption;
+
+      validateOptionValue(newOptionValue as string);
+
       if (typeof newOption === 'object') {
         if (!newOption.label) {
           newOption = newOption.value;
         }
       }
+
       onChange(value.map((option, i) => (i === editingIndex ? newOption : option)));
     },
-    [editingIndex, onChange, value],
+    [editingIndex, onChange, value, validateOptionValue],
   );
 
   const handleEditOptionsDialogClose = React.useCallback(() => {
@@ -114,6 +134,7 @@ function SelectOptionsPropEditor({
         fullWidth
         open={editOptionsDialogOpen}
         onClose={() => {
+          setOptionErrorMessage('');
           setEditOptionsDialogOpen(false);
         }}
       >
@@ -129,6 +150,8 @@ function SelectOptionsPropEditor({
               <Stack gap={1} py={1}>
                 <TextField
                   label="Value"
+                  error={!!optionErrorMessage}
+                  helperText={optionErrorMessage ? <span>This option already exists</span> : null}
                   value={editingOption.value}
                   onChange={(event) => {
                     handleOptionChange({ ...editingOption, value: event.target.value });
@@ -202,15 +225,20 @@ function SelectOptionsPropEditor({
               ) : null}
               <TextField
                 fullWidth
+                error={!!optionErrorMessage}
                 sx={{ my: 1 }}
                 variant="outlined"
                 inputRef={optionInputRef}
                 onKeyUp={handleOptionTextInput}
                 label={'Add option'}
                 helperText={
-                  <span>
-                    Press <kbd>Enter</kbd> or <kbd>Return</kbd> to add
-                  </span>
+                  optionErrorMessage ? (
+                    <span>This option already exists</span>
+                  ) : (
+                    <span>
+                      Press <kbd>Enter</kbd> or <kbd>Return</kbd> to add
+                    </span>
+                  )
                 }
               />
             </DialogContent>

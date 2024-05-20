@@ -36,16 +36,32 @@ export const BrandingContext = React.createContext<Branding | null>(null);
 export const NavigationContext = React.createContext<Navigation>([]);
 
 interface AppProviderProps {
+  /**
+   * The content of the app provider.
+   */
   children: React.ReactNode;
+  /**
+   * [Theme](https://mui.com/material-ui/customization/theming/) used by the app.
+   * @default baseTheme
+   */
   theme?: Theme;
+  /**
+   * Branding options for the app.
+   * @default null
+   */
   branding?: Branding | null;
+  /**
+   * Navigation definition for the app.
+   * @default []
+   */
   navigation?: Navigation;
 }
+
 /**
  *
  * Demos:
  *
- * - [App Provider](https://mui.com/toolpad/core/app-provider/)
+ * - [App Provider](https://mui.com/toolpad/core/react-app-provider/)
  *
  * API:
  *
@@ -70,18 +86,20 @@ AppProvider.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * @ignore
+   * Branding options for the app.
+   * @default null
    */
   branding: PropTypes.shape({
     logo: PropTypes.node,
     title: PropTypes.string,
   }),
   /**
-   * @ignore
+   * The content of the app provider.
    */
   children: PropTypes.node,
   /**
-   * @ignore
+   * Navigation definition for the app.
+   * @default []
    */
   navigation: PropTypes.arrayOf(
     PropTypes.oneOfType([
@@ -113,7 +131,8 @@ AppProvider.propTypes /* remove-proptypes */ = {
     ]).isRequired,
   ),
   /**
-   * @ignore
+   * [Theme](https://mui.com/material-ui/customization/theming/) used by the app.
+   * @default baseTheme
    */
   theme: PropTypes.object,
 } as any;

@@ -5,6 +5,7 @@ import { getHeaders, getTitle } from '@mui/internal-markdown';
 import {
   ComponentInfo,
   extractPackageFile,
+  fixPathname,
   parseFile,
 } from '@mui-internal/api-docs-builder/buildApiUtils';
 import findPagesMarkdown from '@mui-internal/api-docs-builder/utils/findPagesMarkdown';
@@ -31,7 +32,7 @@ export function getCoreDemos(name: string) {
     .filter((page) => page.components.includes(name))
     .map((page) => ({
       demoPageTitle: getTitle(page.markdownContent),
-      demoPathname: `${page.pathname.replace('/components/', '/')}/`,
+      demoPathname: fixPathname(page.pathname),
     }));
 }
 

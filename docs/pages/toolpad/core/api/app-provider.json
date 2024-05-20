@@ -1,9 +1,23 @@
 {
-  "props": {},
+  "props": {
+    "children": { "type": { "name": "node" }, "required": true },
+    "branding": {
+      "type": { "name": "shape", "description": "{ logo?: node, title?: string }" },
+      "default": "null"
+    },
+    "navigation": {
+      "type": {
+        "name": "arrayOf",
+        "description": "Array&lt;{ children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', path?: string, title: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
+      },
+      "default": "[]"
+    },
+    "theme": { "type": { "name": "object" }, "default": "baseTheme" }
+  },
   "name": "AppProvider",
   "imports": [
-    "import AppProvider from '/packages/toolpad-core/src/AppProvider/AppProvider.tsx';",
-    "import { AppProvider } from '/packages/toolpad-core/src/AppProvider/AppProvider.tsx';"
+    "import { AppProvider } from '@toolpad-core/AppProvider';",
+    "import { AppProvider } from '@toolpad-core';"
   ],
   "classes": [],
   "spread": true,
@@ -11,6 +25,6 @@
   "muiName": "AppProvider",
   "filename": "/packages/toolpad-core/src/AppProvider/AppProvider.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/app-provider/\">App Provider</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-app-provider/\">App Provider</a></li></ul>",
   "cssComponent": false
 }

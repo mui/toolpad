@@ -272,13 +272,17 @@ DashboardSidebarSubNavigation.propTypes /* remove-proptypes */ = {
 } as any;
 
 interface DashboardLayoutProps {
+  /**
+   * The content of the dashboard.
+   */
   children: React.ReactNode;
 }
+
 /**
  *
  * Demos:
  *
- * - [Dashboard Layout](https://mui.com/toolpad/core/dashboard-layout/)
+ * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
  *
  * API:
  *
@@ -312,17 +316,17 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </a>
           <Box sx={{ flexGrow: 1 }} />
           {/* <Stack>
-                   <IconButton
-                     size="large"
-                     aria-label="Show new notifications"
-                     color="inherit"
-                     sx={{
-                       border: (theme) => `1px solid ${theme.palette.divider}`,
-                     }}
-                   >
-                     <NotificationsIcon />
-                   </IconButton>
-                  </Stack> */}
+                         <IconButton
+                           size="large"
+                           aria-label="Show new notifications"
+                           color="inherit"
+                           sx={{
+                             border: (theme) => `1px solid ${theme.palette.divider}`,
+                           }}
+                         >
+                           <NotificationsIcon />
+                         </IconButton>
+                        </Stack> */}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -358,7 +362,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * @ignore
+   * The content of the dashboard.
    */
   children: PropTypes.node,
 } as any;

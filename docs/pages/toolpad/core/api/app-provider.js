@@ -10,7 +10,7 @@ export default function Page(props) {
 
 Page.getInitialProps = () => {
   const req = require.context(
-    'docs/translations/api-docs/app-provider',
+    'docs-toolpad/translations/api-docs/app-provider',
     false,
     /\.\/app-provider.*.json$/,
   );

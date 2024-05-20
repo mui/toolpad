@@ -66,7 +66,7 @@ const pages: MuiPage[] = [
         subheader: 'Provider',
         children: [
           {
-            pathname: '/toolpad/core/app-provider',
+            pathname: '/toolpad/core/react-app-provider',
             title: 'App Provider',
           },
         ],
@@ -76,7 +76,7 @@ const pages: MuiPage[] = [
         subheader: 'Layout',
         children: [
           {
-            pathname: '/toolpad/core/dashboard-layout',
+            pathname: '/toolpad/core/react-dashboard-layout',
             title: 'Dashboard Layout',
           },
         ],

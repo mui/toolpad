@@ -10,7 +10,7 @@ export default function Page(props) {
 
 Page.getInitialProps = () => {
   const req = require.context(
-    'docs/translations/api-docs/dashboard-layout',
+    'docs-toolpad/translations/api-docs/dashboard-layout',
     false,
     /\.\/dashboard-layout.*.json$/,
   );

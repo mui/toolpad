@@ -1,4 +1,9 @@
-import { ArgTypeDefinition, ComponentConfig, createComponent } from '@toolpad/studio-runtime';
+import {
+  ArgTypeDefinition,
+  ComponentConfig,
+  createComponent,
+  ToolpadComponent,
+} from '@toolpad/studio-runtime';
 
 export type BuiltinArgTypeDefinition<P extends object, K extends keyof P> = ArgTypeDefinition<
   P,
@@ -19,6 +24,6 @@ export type BuiltinComponentConfig<P extends object> = ComponentConfig<P> & {
 export default function createBuiltin<P extends object>(
   Component: React.ComponentType<P>,
   config: BuiltinComponentConfig<P>,
-) {
+): ToolpadComponent<P> {
   return createComponent(Component, config);
 }

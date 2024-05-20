@@ -638,11 +638,11 @@ importers:
         specifier: 7.5.0
         version: 7.5.0(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@mui/material@5.15.18)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
       '@tanstack/react-query':
-        specifier: 5.36.0
-        version: 5.36.0(react@18.2.0)
+        specifier: 5.37.1
+        version: 5.37.1(react@18.2.0)
       '@tanstack/react-query-devtools':
-        specifier: 5.36.0
-        version: 5.36.0(@tanstack/react-query@5.36.0)(react@18.2.0)
+        specifier: 5.37.1
+        version: 5.37.1(@tanstack/react-query@5.37.1)(react@18.2.0)
       '@toolpad/studio-components':
         specifier: workspace:*
         version: link:../toolpad-studio-components
@@ -954,8 +954,8 @@ importers:
         specifier: 7.2.0
         version: 7.2.0(@types/react@18.3.1)(react@18.2.0)
       '@tanstack/react-query':
-        specifier: 5.36.0
-        version: 5.36.0(react@18.2.0)
+        specifier: 5.37.1
+        version: 5.37.1(react@18.2.0)
       '@toolpad/studio-runtime':
         specifier: workspace:*
         version: link:../toolpad-studio-runtime
@@ -997,8 +997,8 @@ importers:
         specifier: 5.15.18
         version: 5.15.18(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
       '@tanstack/react-query':
-        specifier: 5.36.0
-        version: 5.36.0(react@18.2.0)
+        specifier: 5.37.1
+        version: 5.37.1(react@18.2.0)
       '@toolpad/utils':
         specifier: workspace:*
         version: link:../toolpad-utils
@@ -5608,31 +5608,31 @@ packages:
       tslib: 2.6.2
     dev: false
 
-  /@tanstack/query-core@5.36.0:
-    resolution: {integrity: sha512-B5BD3pg/mztDR36i77hGcyySKKeYrbM5mnogOROTBi1SUml5ByRK7PGUUl16vvubvQC+mSnqziFG/VIy/DE3FQ==}
+  /@tanstack/query-core@5.36.1:
+    resolution: {integrity: sha512-BteWYEPUcucEu3NBcDAgKuI4U25R9aPrHSP6YSf2NvaD2pSlIQTdqOfLRsxH9WdRYg7k0Uom35Uacb6nvbIMJg==}
     dev: false
 
-  /@tanstack/query-devtools@5.32.1:
-    resolution: {integrity: sha512-7Xq57Ctopiy/4atpb0uNY5VRuCqRS/1fi/WBCKKX6jHMa6cCgDuV/AQuiwRXcKARbq2OkVAOrW2v4xK9nTbcCA==}
+  /@tanstack/query-devtools@5.37.1:
+    resolution: {integrity: sha512-XcG4IIHIv0YQKrexTqo2zogQWR1Sz672tX2KsfE9kzB+9zhx44vRKH5si4WDILE1PIWQpStFs/NnrDQrBAUQpg==}
     dev: false
 
-  /@tanstack/react-query-devtools@5.36.0(@tanstack/react-query@5.36.0)(react@18.2.0):
-    resolution: {integrity: sha512-AxZSmM7CmjDQrcY9gceFBS+1DqkfTqAMpDCMltzIxMKvKn+ZhgBsV49aewhVXP1DgZzb+Is4f9HH2EMu//njXw==}
+  /@tanstack/react-query-devtools@5.37.1(@tanstack/react-query@5.37.1)(react@18.2.0):
+    resolution: {integrity: sha512-fWL3rV/avL9HsHt3RVYxuLCqSHghBwSGPIUMDZ9hfg9PDjQaeI9d8kJj6yLoCBWUhTue5/rQbISvFtr+yxyYyA==}
     peerDependencies:
-      '@tanstack/react-query': ^5.36.0
+      '@tanstack/react-query': ^5.37.1
       react: ^18.0.0
     dependencies:
-      '@tanstack/query-devtools': 5.32.1
-      '@tanstack/react-query': 5.36.0(react@18.2.0)
+      '@tanstack/query-devtools': 5.37.1
+      '@tanstack/react-query': 5.37.1(react@18.2.0)
       react: 18.2.0
     dev: false
 
-  /@tanstack/react-query@5.36.0(react@18.2.0):
-    resolution: {integrity: sha512-BATvtM0rohwg7pRHUnxgeDiwLWRGZ8OM/4y8LImHVpecQWoH6Uhytu3Z8YV6V7hQ1sMQBFcUrGE1/e4MxR6YiA==}
+  /@tanstack/react-query@5.37.1(react@18.2.0):
+    resolution: {integrity: sha512-EhtBNA8GL3XFeSx6VYUjXQ96n44xe3JGKZCzBINrCYlxbZP6UwBafv7ti4eSRWc2Fy+fybQre0w17gR6lMzULA==}
     peerDependencies:
       react: ^18.0.0
     dependencies:
-      '@tanstack/query-core': 5.36.0
+      '@tanstack/query-core': 5.36.1
       react: 18.2.0
     dev: false
 

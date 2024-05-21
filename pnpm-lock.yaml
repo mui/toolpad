@@ -91,8 +91,8 @@ importers:
         specifier: 1.0.7
         version: 1.0.7
       '@mui/internal-scripts':
-        specifier: 1.0.7
-        version: 1.0.7
+        specifier: 1.0.8
+        version: 1.0.8
       '@mui/monorepo':
         specifier: github:mui/material-ui#2223961179a8812664c589e4ee8042f108bfc021
         version: github.com/mui/material-ui/2223961179a8812664c589e4ee8042f108bfc021(@opentelemetry/api@1.8.0)
@@ -3884,8 +3884,8 @@ packages:
       prismjs: 1.29.0
     dev: false
 
-  /@mui/internal-scripts@1.0.7:
-    resolution: {integrity: sha512-thfua621F0yMFHbjoonaNTSE/IEZOKNX/MR1Pk1F+9AqP9veQqJHbrmb3mgjRzQ/YYHZj0aHKzLYpFMjOmYCGA==}
+  /@mui/internal-scripts@1.0.8:
+    resolution: {integrity: sha512-oWiDtSZyFoqhft6V03/5rcwe0WHOY23A4yZ+CUbTV0anPjSb5/N1aws2Bgkc9m69aqyZqhRYRhLlTweVIxOCPw==}
     dependencies:
       '@babel/core': 7.24.5
       '@babel/plugin-syntax-class-properties': 7.12.13(@babel/core@7.24.5)

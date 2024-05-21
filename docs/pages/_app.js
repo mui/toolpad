@@ -5,6 +5,7 @@ import { loadCSS } from 'fg-loadcss/src/loadCSS';
 import NextHead from 'next/head';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
+import { ponyfillGlobal } from '@mui/utils';
 import { LicenseInfo } from '@mui/x-license';
 import PageContext from 'docs/src/modules/components/PageContext';
 import GoogleAnalytics from 'docs/src/modules/components/GoogleAnalytics';
@@ -21,13 +22,42 @@ import { DocsProvider } from '@mui/docs/DocsProvider';
 import { mapTranslations } from '@mui/docs/i18n';
 import toolpadStudioPages from '../data/toolpad/studio/pages';
 import toolpadCorePages from '../data/toolpad/core/pages';
-
 import config from '../config';
 
 const clientSideEmotionCache = createEmotionCache();
 
 let reloadInterval;
 LicenseInfo.setLicenseKey(process.env.NEXT_PUBLIC_MUI_LICENSE);
+
+function getMuiPackageVersion(packageName, commitRef) {
+  if (commitRef === undefined) {
+    // #default-branch-switch
+    // Use the "latest" npm tag for the master git branch
+    // Use the "next" npm tag for the next git branch
+    return 'latest';
+  }
+  const shortSha = commitRef.slice(0, 8);
+  return `https://pkg.csb.dev/mui/mui-toolpad/commit/${shortSha}/@mui/${packageName}`;
+}
+
+ponyfillGlobal.muiDocConfig = {
+  csbIncludePeerDependencies: (deps, { versions }) => {
+    const newDeps = { ...deps };
+
+    if (newDeps['@toolpad/core']) {
+      newDeps['@mui/material'] = versions['@mui/material'];
+      newDeps['@mui/icons-material'] = versions['@mui/icons-material'];
+    }
+    return newDeps;
+  },
+  csbGetVersions: (versions, { muiCommitRef }) => {
+    const output = {
+      ...versions,
+      '@toolpad/core': getMuiPackageVersion('core', muiCommitRef),
+    };
+    return output;
+  },
+};
 
 // Avoid infinite loop when "Upload on reload" is set in the Chrome sw dev tools.
 function lazyReload() {

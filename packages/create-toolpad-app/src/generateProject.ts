@@ -20,7 +20,7 @@ export default function generateProject(
       title: 'Main items',
     },
     {
-      path: '/page',
+      slug: '/page',
       title: 'Page',
       icon: <DashboardIcon />,
     },

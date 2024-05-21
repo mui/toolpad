@@ -73,7 +73,7 @@ function DashboardSidebarSubNavigation({
             (!navigationItem.kind || navigationItem.kind === 'page') &&
             navigationItem.children &&
             navigationItem.children.some((nestedNavigationItem) => {
-              const navigationItemFullPath = `${basePath}${(nestedNavigationItem as NavigationPageItem).path ?? ''}`;
+              const navigationItemFullPath = `${basePath}${(nestedNavigationItem as NavigationPageItem).slug ?? ''}`;
 
               return (
                 (!nestedNavigationItem.kind || nestedNavigationItem.kind === 'page') &&
@@ -125,7 +125,7 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const navigationItemFullPath = `${basePath}${navigationItem.path ?? ''}`;
+        const navigationItemFullPath = `${basePath}${navigationItem.slug ?? ''}`;
 
         const navigationItemId = `${navigationItem.title}-${depth}-${navigationItemIndex}`;
 
@@ -152,7 +152,7 @@ function DashboardSidebarSubNavigation({
 
         return (
           <React.Fragment key={navigationItemId}>
-            {navigationItem.path && !navigationItem.children ? (
+            {navigationItem.slug && !navigationItem.children ? (
               <a href={navigationItemFullPath} style={{ color: 'inherit', textDecoration: 'none' }}>
                 {listItem}
               </a>

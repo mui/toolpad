@@ -12,7 +12,7 @@ export interface Branding {
 export interface NavigationPageItem {
   kind?: 'page';
   title: string;
-  path?: string;
+  slug?: string;
   icon?: React.ReactNode;
   children?: Navigation;
 }

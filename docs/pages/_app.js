@@ -37,7 +37,7 @@ function getMuiPackageVersion(packageName, commitRef) {
     return 'latest';
   }
   const shortSha = commitRef.slice(0, 8);
-  return `https://pkg.csb.dev/mui/mui-toolpad/commit/${shortSha}/@mui/${packageName}`;
+  return `https://pkg.csb.dev/mui/mui-toolpad/commit/${shortSha}/${packageName}`;
 }
 
 ponyfillGlobal.muiDocConfig = {
@@ -53,7 +53,7 @@ ponyfillGlobal.muiDocConfig = {
   csbGetVersions: (versions, { muiCommitRef }) => {
     const output = {
       ...versions,
-      '@toolpad/core': getMuiPackageVersion('core', muiCommitRef),
+      '@toolpad/core': getMuiPackageVersion('@toolpad/core', muiCommitRef),
     };
     return output;
   },

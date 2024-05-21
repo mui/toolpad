@@ -21,7 +21,7 @@ import {
   GridPaginationModel,
 } from '@mui/x-data-grid';
 import * as React from 'react';
-import { Box, Button, CircularProgress, styled } from '@mui/material';
+import { Button, CircularProgress, styled } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -40,7 +40,19 @@ import {
   useGetMany,
   GetManyParams,
   ValidProp,
+  ResolvedFields,
 } from '../DataProvider';
+import InferencingAlert from './InferrencingAlert';
+
+const RootContainer = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+const GridContainer = styled('div')({
+  flex: 1,
+  position: 'relative',
+});
 
 const subscribe = () => () => {};
 const getSnapshot = () => false;
@@ -163,6 +175,37 @@ function DeleteAction<R extends Datum>({ id, dataProvider }: DeleteActionProps<R
   );
 }
 
+function inferFields(rows: any[]): ResolvedFields<any> {
+  const result: any = {};
+
+  const types = new Map<string, Set<string>>();
+
+  const rowsToConsider = 10;
+  const rowSlice = rows.slice(0, rowsToConsider);
+
+  for (const row of rowSlice) {
+    for (const key of Object.keys(row)) {
+      const value = row[key];
+      const type = typeof value;
+      const existingType = types.get(key);
+      if (existingType) {
+        existingType.add(type);
+      } else {
+        types.set(key, new Set([type]));
+      }
+    }
+  }
+
+  for (const [field, value] of Array.from(types.entries())) {
+    if (value.size === 1) {
+      const type = value.size === 1 ? Array.from(value)[0] : 'string';
+      result[field] = { type };
+    }
+  }
+
+  return result;
+}
+
 interface GridState {
   editedRowId: GridRowId | null;
   isProcessingRowUpdate: boolean;
@@ -217,13 +260,13 @@ function gridEditingReducer(state: GridState, action: GridAction): GridState {
   }
 }
 
-export function updateColumnsWithDataProviderFields<R extends Datum>(
-  dataProvider: ResolvedDataProvider<R>,
-  baseColumns: readonly GridColDef<R>[],
+export function getColumnsFromDataProviderFields<R extends Datum>(
+  fields?: ResolvedFields<R>,
+  baseColumns?: readonly GridColDef<R>[],
 ): readonly GridColDef<R>[] {
-  const fieldMap = new Map<keyof R & string, ResolvedField<R, any>>(
-    Object.entries(dataProvider.fields ?? {}),
-  );
+  const fieldMap = new Map<keyof R & string, ResolvedField<R, any>>(Object.entries(fields ?? {}));
+
+  baseColumns = baseColumns ?? Object.keys(fields ?? {}).map((field) => ({ field }));
 
   const resolvedColumns = baseColumns.map(function mapper<K extends ValidProp<R>>(
     baseColDef: GridColDef<R, R[K], string>,
@@ -594,15 +637,35 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
     }
   }, []);
 
+  // Calculate separately to avoid re-calculating columns on every render
+  const inferredFields = React.useMemo<ResolvedFields<R> | null>(() => {
+    if (process.env.NODE_ENV === 'production') {
+      // We don't infer in production, inference is a dev only feature
+      return null;
+    }
+    if (!dataProvider) {
+      // There are no rows coming from the data provider
+      return null;
+    }
+    if (dataProvider.fields) {
+      // The data provider already provides fields
+      return null;
+    }
+    if (!data?.rows) {
+      return null;
+    }
+    return inferFields(data.rows);
+  }, [dataProvider, data?.rows]);
+
   const columns = React.useMemo(() => {
     if (!dataProvider) {
       return columnsProp ?? [];
     }
 
-    let gridColumns: readonly GridColDef<R>[] =
-      columnsProp ?? Object.keys(dataProvider.fields).map((field) => ({ field }));
-
-    gridColumns = updateColumnsWithDataProviderFields(dataProvider, gridColumns);
+    let gridColumns = getColumnsFromDataProviderFields(
+      inferredFields ?? dataProvider.fields,
+      columnsProp,
+    );
 
     gridColumns = updateColumnsWithDataProviderEditing(
       dataProvider,
@@ -612,55 +675,57 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
     );
 
     return gridColumns;
-  }, [columnsProp, dataProvider, editingState]);
+  }, [columnsProp, dataProvider, editingState, inferredFields]);
 
   const isSsr = useSsr();
 
   return (
     <RefetchContext.Provider value={refetch}>
       <ToolbarCreateButtonContext.Provider value={createButtonContext}>
-        <Box
+        <RootContainer
           sx={{
             height: props.autoHeight ? undefined : '100%',
-            position: 'relative',
           }}
         >
-          <XDataGrid
-            pagination
-            apiRef={apiRef}
-            rows={rows}
-            columns={columns}
-            loading={loading}
-            processRowUpdate={processRowUpdate}
-            slots={slots}
-            rowModesModel={rowModesModelPatched}
-            onRowEditStart={handleRowEditStart}
-            getRowId={getRowId}
-            {...(props.paginationMode === 'server'
-              ? {
-                  gridPaginationModel,
-                  onPaginationModelChange: setGridPaginationModel,
-                  rowCount: data?.totalCount ?? -1,
-                }
-              : {})}
-            {...props}
-            // TODO: How can we make this optional?
-            editMode="row"
-          />
+          {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
+          <GridContainer>
+            <XDataGrid
+              pagination
+              apiRef={apiRef}
+              rows={rows}
+              columns={columns}
+              loading={loading}
+              processRowUpdate={processRowUpdate}
+              slots={slots}
+              rowModesModel={rowModesModelPatched}
+              onRowEditStart={handleRowEditStart}
+              getRowId={getRowId}
+              {...(props.paginationMode === 'server'
+                ? {
+                    gridPaginationModel,
+                    onPaginationModelChange: setGridPaginationModel,
+                    rowCount: data?.totalCount ?? -1,
+                  }
+                : {})}
+              {...props}
+              // TODO: How can we make this optional?
+              editMode="row"
+            />
 
-          {isSsr ? (
-            // At last show something during SSR https://github.com/mui/mui-x/issues/7599
-            <PlaceholderBorder>
-              <LoadingOverlay />
-            </PlaceholderBorder>
-          ) : null}
+            {isSsr ? (
+              // At last show something during SSR https://github.com/mui/mui-x/issues/7599
+              <PlaceholderBorder>
+                <LoadingOverlay />
+              </PlaceholderBorder>
+            ) : null}
 
-          {error ? (
-            <PlaceholderBorder>
-              <ErrorOverlay error={error} />
-            </PlaceholderBorder>
-          ) : null}
-        </Box>
+            {error ? (
+              <PlaceholderBorder>
+                <ErrorOverlay error={error} />
+              </PlaceholderBorder>
+            ) : null}
+          </GridContainer>
+        </RootContainer>
       </ToolbarCreateButtonContext.Provider>
     </RefetchContext.Provider>
   );

@@ -86,7 +86,7 @@ export interface DataProviderDefinition<R extends Datum> {
   createOne?: CreateOneMethod<R>;
   updateOne?: UpdateOneMethod<R>;
   deleteOne?: DeleteOneMethod;
-  fields: FieldDefs<R>;
+  fields?: FieldDefs<R>;
 }
 
 export type ResolvedFields<R extends Datum> = {
@@ -99,19 +99,22 @@ export interface ResolvedDataProvider<R extends Datum> {
   createOne?: CreateOneMethod<R>;
   updateOne?: UpdateOneMethod<R>;
   deleteOne?: DeleteOneMethod;
-  fields: ResolvedFields<R>;
+  fields?: ResolvedFields<R>;
 }
 
 export function createDataProvider<R extends Datum>(
   input: DataProviderDefinition<R>,
 ): ResolvedDataProvider<R> {
-  const fields = {
-    id: { label: 'id', type: 'string' },
-    ...Object.fromEntries(
-      Object.entries(input.fields).map(([k, v]) => [k, { type: 'string', label: k, ...v }]),
-    ),
-  } as ResolvedFields<R>;
-  return { ...input, fields };
+  const result = { ...input } as ResolvedDataProvider<R>;
+  if (input.fields) {
+    result.fields = {
+      id: { label: 'id', type: 'string' },
+      ...Object.fromEntries(
+        Object.entries(input.fields).map(([k, v]) => [k, { type: 'string', label: k, ...v }]),
+      ),
+    } as ResolvedFields<R>;
+  }
+  return result;
 }
 
 export interface Query<R> {

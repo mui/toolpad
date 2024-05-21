@@ -12,7 +12,3 @@ const myData = createDataProvider({
     name: { label: 'Name' },
   },
 });
-
-// ...
-
-<DataGrid dataProvider={myData} />

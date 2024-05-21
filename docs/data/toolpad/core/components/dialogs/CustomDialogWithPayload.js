@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { DialogProvider, useDialogs } from '@toolpad/core/useDialogs';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -19,6 +20,12 @@ function MyCustomDialog({ payload, open, onClose }) {
     </Dialog>
   );
 }
+
+MyCustomDialog.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
+  payload: PropTypes.string.isRequired,
+};
 
 function DemoContent() {
   const dialogs = useDialogs();

@@ -25,11 +25,13 @@ export default function CloseNotification() {
       : notifications.show('You are now offline', {
           severity: 'error',
         });
+    // preview-end
 
     return () => {
+      // preview-start
       notifications.close(key);
+      // preview-end
     };
-    // preview-end
   }, [notifications, online]);
 
   return (

@@ -7,6 +7,6 @@ const key = online
       severity: 'error',
     });
 
-return () => {
-  notifications.close(key);
-};
+// ...
+
+notifications.close(key);

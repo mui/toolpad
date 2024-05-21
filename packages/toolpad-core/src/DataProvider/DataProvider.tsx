@@ -31,6 +31,12 @@ export interface FieldDef<R extends Datum, K extends ValidProp<R> = ValidProp<R>
   valueFormatter?: ValueFormatter<R, K>;
 }
 
+export type FieldDefs<R extends Datum> = {
+  [K in Exclude<keyof R & string, 'id'>]: FieldDef<R, K>;
+} & {
+  id?: FieldDef<R, 'id'>;
+};
+
 export interface IndexPagination {
   start: number;
   pageSize: number;
@@ -80,11 +86,7 @@ export interface DataProviderDefinition<R extends Datum> {
   createOne?: CreateOneMethod<R>;
   updateOne?: UpdateOneMethod<R>;
   deleteOne?: DeleteOneMethod;
-  fields: {
-    [K in Exclude<keyof R & string, 'id'>]: FieldDef<R, K>;
-  } & {
-    id?: FieldDef<R, 'id'>;
-  };
+  fields: FieldDefs<R>;
 }
 
 export type ResolvedFields<R extends Datum> = {

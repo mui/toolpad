@@ -3,7 +3,14 @@ import { Box, BoxProps, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNode } from '@toolpad/studio-runtime';
 import { equalProperties } from '@toolpad/utils/collections';
-import { useForm, FieldValues, ValidationMode, FieldError, Controller } from 'react-hook-form';
+import {
+  useForm,
+  FieldValues,
+  ValidationMode,
+  FieldError,
+  Controller,
+  useController,
+} from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin, { BuiltinArgTypeDefinitions } from './createBuiltin';
 
@@ -68,12 +75,7 @@ function Form({
     form.reset();
   }, [form]);
 
-  const formContextValue = React.useMemo(
-    () => ({ form, fieldValues: value }),
-    // form never changes so also use formState as dependency to update context when form state changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [form, form.formState, value],
-  );
+  const formContextValue = React.useMemo(() => ({ form, fieldValues: value }), [form, value]);
 
   return (
     <FormContext.Provider value={formContextValue}>
@@ -217,9 +219,13 @@ export function useFormInput<V>({
 
   const formInputDisplayName = label || name || 'Field';
 
-  const formInputError = formInputName
-    ? (form?.formState.errors[formInputName] as FieldError)
-    : undefined;
+  const { fieldState } = useController({
+    disabled: !form,
+    name: formInputName,
+    control: form?.control,
+  });
+
+  const formInputError = formInputName ? fieldState.error : undefined;
 
   const previousDefaultValueRef = React.useRef(defaultValue);
   React.useEffect(() => {
@@ -258,12 +264,12 @@ export function useFormInput<V>({
     if (
       form &&
       !equalProperties(validationProps, previousManualValidationPropsRef.current) &&
-      form.formState.dirtyFields[formInputName]
+      fieldState.isDirty
     ) {
       form.trigger(formInputName);
       previousManualValidationPropsRef.current = validationProps;
     }
-  }, [form, formInputName, validationProps]);
+  }, [fieldState.isDirty, form, formInputName, validationProps]);
 
   const handleFormInputChange = React.useCallback(
     (newValue: V) => {

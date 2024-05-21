@@ -13,3 +13,5 @@ build
 
 /test/integration/*/fixture*/
 /test/visual/*/fixture*/
+
+.generated

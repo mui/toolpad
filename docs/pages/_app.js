@@ -48,12 +48,14 @@ ponyfillGlobal.muiDocConfig = {
       newDeps['@mui/material'] = versions['@mui/material'];
       newDeps['@mui/icons-material'] = versions['@mui/icons-material'];
     }
+
     return newDeps;
   },
   csbGetVersions: (versions, { muiCommitRef }) => {
     const output = {
       ...versions,
       '@toolpad/core': getMuiPackageVersion('@toolpad/core', muiCommitRef),
+      '@toolpad/utils': getMuiPackageVersion('@toolpad/utils', muiCommitRef),
     };
     return output;
   },

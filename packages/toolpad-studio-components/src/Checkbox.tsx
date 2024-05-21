@@ -46,13 +46,12 @@ export type Props = Omit<FormControlLabelProps, 'control' | 'onChange'> &
   } & Pick<FormInputComponentProps, 'name' | 'isRequired'> &
   SwitchProps;
 
-function Checkbox({ ...rest }: Props) {
-  rest.checked = rest.checked ?? false;
+function Checkbox(props: Props) {
   const { onFormInputChange, renderFormInput, formInputError } = useFormInput<boolean>({
-    name: rest.name,
-    label: rest.label,
-    onChange: rest.onChange,
-    validationProps: { isRequired: rest.isRequired },
+    name: props.name,
+    label: props.label,
+    onChange: props.onChange,
+    validationProps: { isRequired: props.isRequired },
   });
 
   const handleChange = React.useCallback(
@@ -63,36 +62,33 @@ function Checkbox({ ...rest }: Props) {
     [onFormInputChange],
   );
 
-  const renderedOptions = React.useMemo(() => {
-    const props = {
-      onChange: handleChange,
-      required: rest.isRequired,
-      size: rest.size,
-      defaultChecked: rest.defaultChecked,
-      disabled: rest.disabled,
-      color: rest.color,
-      sx: rest.sx,
-      checked: rest.checked,
-    };
-    return (
-      <FormControl error={Boolean(formInputError)} fullWidth={rest.fullWidth}>
-        <FormGroup>
-          <FormControlLabel
-            label={rest.label}
-            checked={rest.checked}
-            labelPlacement={rest.labelPlacement}
-            componentsProps={rest.componentsProps}
-            control={
-              rest.mode === 'checkBox' ? <MuiCheckbox {...props} /> : <MuiSwitch {...props} />
-            }
-          />
-        </FormGroup>
-        <FormHelperText>{formInputError?.message || ''}</FormHelperText>
-      </FormControl>
-    );
-  }, [rest, formInputError, handleChange]);
+  const CheckboxControl = props.mode === 'switch' ? MuiSwitch : MuiCheckbox;
 
-  return renderFormInput(renderedOptions);
+  return renderFormInput(
+    <FormControl error={Boolean(formInputError)} fullWidth={props.fullWidth}>
+      <FormGroup>
+        <FormControlLabel
+          label={props.label}
+          checked={props.checked ?? false}
+          labelPlacement={props.labelPlacement}
+          componentsProps={props.componentsProps}
+          control={
+            <CheckboxControl
+              onChange={handleChange}
+              required={props.isRequired}
+              size={props.size}
+              defaultChecked={props.defaultChecked}
+              disabled={props.disabled}
+              color={props.color}
+              sx={props.sx}
+              checked={props.checked ?? false}
+            />
+          }
+        />
+      </FormGroup>
+      <FormHelperText>{formInputError?.message || ''}</FormHelperText>
+    </FormControl>,
+  );
 }
 
 function Component(props: Props) {

@@ -23,7 +23,7 @@ const myData = createDataProvider({
 export default function BasicDataProvider() {
   return (
     <CacheProvider>
-      <Box sx={{ height: 275, width: '100%' }}>
+      <Box sx={{ height: 300, width: '100%' }}>
         {/* preview-start */}
         <DataGrid dataProvider={myData} />
         {/* preview-end */}

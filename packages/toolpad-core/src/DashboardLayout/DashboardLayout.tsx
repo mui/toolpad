@@ -230,49 +230,6 @@ function DashboardSidebarSubNavigation({
   );
 }
 
-DashboardSidebarSubNavigation.propTypes /* remove-proptypes */ = {
-  // ┌────────────────────────────── Warning ──────────────────────────────┐
-  // │ These PropTypes are generated from the TypeScript type definitions. │
-  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
-  // └─────────────────────────────────────────────────────────────────────┘
-  /**
-   * @ignore
-   */
-  depth: PropTypes.number,
-  /**
-   * @ignore
-   */
-  subNavigation: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.shape({
-        children: PropTypes.arrayOf(
-          PropTypes.oneOfType([
-            PropTypes.object,
-            PropTypes.shape({
-              kind: PropTypes.oneOf(['header']).isRequired,
-              title: PropTypes.string.isRequired,
-            }),
-            PropTypes.shape({
-              kind: PropTypes.oneOf(['divider']).isRequired,
-            }),
-          ]).isRequired,
-        ),
-        icon: PropTypes.node,
-        kind: PropTypes.oneOf(['page']),
-        path: PropTypes.string,
-        title: PropTypes.string.isRequired,
-      }),
-      PropTypes.shape({
-        kind: PropTypes.oneOf(['header']).isRequired,
-        title: PropTypes.string.isRequired,
-      }),
-      PropTypes.shape({
-        kind: PropTypes.oneOf(['divider']).isRequired,
-      }),
-    ]).isRequired,
-  ).isRequired,
-} as any;
-
 interface DashboardLayoutProps {
   /**
    * The content of the dashboard.
@@ -318,17 +275,17 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </a>
           <Box sx={{ flexGrow: 1 }} />
           {/* <Stack>
-              <IconButton
-                size="large"
-                aria-label="Show new notifications"
-                color="inherit"
-                sx={{
-                  border: (theme) => `1px solid ${theme.palette.divider}`,
-                }}
-              >
-                <NotificationsIcon />
-              </IconButton>
-             </Stack> */}
+               <IconButton
+                 size="large"
+                 aria-label="Show new notifications"
+                 color="inherit"
+                 sx={{
+                   border: (theme) => `1px solid ${theme.palette.divider}`,
+                 }}
+               >
+                 <NotificationsIcon />
+               </IconButton>
+              </Stack> */}
         </Toolbar>
       </AppBar>
       <Drawer

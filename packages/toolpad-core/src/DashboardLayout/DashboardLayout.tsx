@@ -160,6 +160,7 @@ function DashboardSidebarSubNavigation({
             ) : (
               listItem
             )}
+
             {navigationItem.children ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
@@ -264,17 +265,17 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </a>
           <Box sx={{ flexGrow: 1 }} />
           {/* <Stack>
-            <IconButton
-              size="large"
-              aria-label="Show new notifications"
-              color="inherit"
-              sx={{
-                border: (theme) => `1px solid ${theme.palette.divider}`,
-              }}
-            >
-              <NotificationsIcon />
-            </IconButton>
-          </Stack> */}
+             <IconButton
+               size="large"
+               aria-label="Show new notifications"
+               color="inherit"
+               sx={{
+                 border: (theme) => `1px solid ${theme.palette.divider}`,
+               }}
+             >
+               <NotificationsIcon />
+             </IconButton>
+            </Stack> */}
         </Toolbar>
       </AppBar>
       <Drawer

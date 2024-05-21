@@ -62,6 +62,7 @@ interface AppProviderProps {
  * Demos:
  *
  * - [App Provider](https://mui.com/toolpad/core/react-app-provider/)
+ * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
  *
  * API:
  *
@@ -118,7 +119,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
-        path: PropTypes.string,
+        slug: PropTypes.string,
         title: PropTypes.string.isRequired,
       }),
       PropTypes.shape({
@@ -134,7 +135,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
    * [Theme](https://mui.com/material-ui/customization/theming/) used by the app.
    * @default baseTheme
    */
-  theme: PropTypes.object,
+  theme: PropTypes.any,
 } as any;
 
 export { AppProvider };

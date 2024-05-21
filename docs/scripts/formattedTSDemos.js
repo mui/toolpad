@@ -154,8 +154,6 @@ async function main(argv) {
     ...(await getFiles(path.join(workspaceRoot, 'docs/data'))), // new structure
   ].filter((fileName) => filePattern.test(fileName));
 
-  console.log(tsxFiles);
-
   const buildProject = createTypeScriptProjectBuilder(CORE_TYPESCRIPT_PROJECTS);
   const project = buildProject('docs', { files: tsxFiles });
 

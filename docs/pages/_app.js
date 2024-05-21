@@ -44,7 +44,7 @@ ponyfillGlobal.muiDocConfig = {
   csbIncludePeerDependencies: (deps, { versions }) => {
     const newDeps = { ...deps };
 
-    newDeps.invariant = versions.latest;
+    newDeps.invariant = 'latest';
 
     if (newDeps['@toolpad/core']) {
       newDeps['@mui/material'] = versions['@mui/material'];

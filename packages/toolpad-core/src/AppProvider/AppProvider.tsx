@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider, Theme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import type { Theme } from '@emotion/react';
 import { baseTheme } from '../themes';
 
 export interface Branding {

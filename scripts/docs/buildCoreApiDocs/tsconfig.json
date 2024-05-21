@@ -16,16 +16,7 @@
     "strict": true,
     "jsx": "react",
 
-    "types": ["node"],
-    "paths": {
-      "@mui-internal/api-docs-builder": [
-        "../../../node_modules/@mui/monorepo/packages/api-docs-builder"
-      ],
-      "@mui-internal/api-docs-builder/*": [
-        "../../../node_modules/@mui/monorepo/packages/api-docs-builder/*"
-      ],
-      "docs/*": ["../../../node_modules/@mui/monorepo/docs/*"]
-    }
+    "types": ["node"]
   },
   "include": ["./**/*.ts"]
 }

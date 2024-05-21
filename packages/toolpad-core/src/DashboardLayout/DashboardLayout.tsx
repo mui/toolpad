@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { styled } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -16,9 +17,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { styled } from '@mui/material';
-import ToolpadLogo from './ToolpadLogo';
 import { BrandingContext, Navigation, NavigationContext, NavigationPageItem } from '../AppProvider';
+import ToolpadLogo from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320;
 

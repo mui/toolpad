@@ -16,7 +16,6 @@
     "typescript:transpile:dev": "cross-env BABEL_ENV=development babel-node --extensions \".tsx,.ts,.js\" scripts/formattedTSDemos --watch"
   },
   "dependencies": {
-    "@babel/core": "7.24.5",
     "@babel/plugin-transform-object-assign": "7.24.1",
     "@babel/runtime-corejs2": "7.24.5",
     "@date-io/date-fns-jalali": "3.0.0",
@@ -36,6 +35,7 @@
     "@mui/styles": "5.15.18",
     "@mui/utils": "5.15.14",
     "@mui/x-license": "7.2.0",
+    "@toolpad/core": "workspace:*",
     "@toolpad/studio": "workspace:*",
     "@trendmicro/react-interpolate": "0.5.5",
     "@types/lodash": "4.17.1",
@@ -68,7 +68,6 @@
     "postcss": "8.4.38",
     "prismjs": "1.29.0",
     "prop-types": "15.8.1",
-    "raw-loader": "4.0.2",
     "react": "18.2.0",
     "react-docgen": "7.0.3",
     "react-dom": "18.2.0",
@@ -88,6 +87,7 @@
     "webpack-bundle-analyzer": "4.10.2"
   },
   "devDependencies": {
+    "@babel/core": "7.24.5",
     "@babel/plugin-transform-react-constant-elements": "7.24.1",
     "@babel/preset-typescript": "7.24.1",
     "@types/babel__core": "^7.20.5",

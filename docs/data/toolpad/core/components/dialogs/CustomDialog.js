@@ -7,7 +7,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 
-// preview-start
 function MyCustomDialog({ open, onClose }) {
   return (
     <Dialog fullWidth open={open} onClose={() => onClose()}>
@@ -19,7 +18,6 @@ function MyCustomDialog({ open, onClose }) {
     </Dialog>
   );
 }
-// preview-end
 
 MyCustomDialog.propTypes = {
   onClose: PropTypes.func.isRequired,

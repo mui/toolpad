@@ -2,6 +2,9 @@ import * as React from 'react';
 import { ThemeProvider, Theme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { baseTheme } from '../themes';
+import { NotificationsProvider } from '../useNotifications';
+import { DialogProvider } from '../useDialogs';
+import { CacheProvider } from '../DataProvider';
 
 export interface Branding {
   title?: string;
@@ -47,11 +50,16 @@ export function AppProvider({
   navigation = [],
 }: AppProviderProps) {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrandingContext.Provider value={branding}>
-        <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
-      </BrandingContext.Provider>
-    </ThemeProvider>
+    <CacheProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <NotificationsProvider />
+        <DialogProvider>
+          <BrandingContext.Provider value={branding}>
+            <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
+          </BrandingContext.Provider>
+        </DialogProvider>
+      </ThemeProvider>
+    </CacheProvider>
   );
 }

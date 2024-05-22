@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { CacheProvider, createDataProvider } from '@toolpad/core/DataProvider';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { createDataProvider } from '@toolpad/core/DataProvider';
 import { DataGrid } from '@toolpad/core/DataGrid';
 import Box from '@mui/material/Box';
-import { DialogProvider } from '@toolpad/core/useDialogs';
 
 // preview-start
 const myData = createDataProvider({
@@ -23,12 +23,10 @@ const myData = createDataProvider({
 
 export default function BasicDataProvider() {
   return (
-    <DialogProvider>
-      <CacheProvider>
-        <Box sx={{ height: 300, width: '100%' }}>
-          <DataGrid dataProvider={myData} />
-        </Box>
-      </CacheProvider>
-    </DialogProvider>
+    <AppProvider>
+      <Box sx={{ height: 300, width: '100%' }}>
+        <DataGrid dataProvider={myData} />
+      </Box>
+    </AppProvider>
   );
 }

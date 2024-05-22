@@ -69,8 +69,8 @@ function InferencingDialog({ open, onClose, payload }: DialogProps<InferrenceDia
       <DialogContent>
         This data grid gets its data from a Toolpad data provider. As the data provider is missing
         definitions for fields, this grid inferred a default set of fields. These fields are not
-        visible in production. To bake these fields into the data provider, copy the following
-        snippet into the data provider definition:
+        visible in production. To bake them in the data provider, copy the following snippet into
+        the data provider definition:
         <CodeSnippet>{snippet}</CodeSnippet>
         Read more about inferencing in the <a href={INFERENCING_DOCS_URL}>docs</a>.
       </DialogContent>
@@ -102,7 +102,8 @@ export default function InferencingAlert({ fields }: InferencingDialogProps) {
         </IconButton>
       }
     >
-      The fields for this grid were <a href={INFERENCING_DOCS_URL}>inferred</a>.
+      The fields for this grid were <a href={INFERENCING_DOCS_URL}>inferred</a>. Don&quot;t use in
+      production.
     </Alert>
   );
 }

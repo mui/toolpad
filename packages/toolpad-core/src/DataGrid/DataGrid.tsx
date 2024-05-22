@@ -639,10 +639,6 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
 
   // Calculate separately to avoid re-calculating columns on every render
   const inferredFields = React.useMemo<ResolvedFields<R> | null>(() => {
-    if (process.env.NODE_ENV === 'production') {
-      // We don't infer in production, inference is a dev only feature
-      return null;
-    }
     if (!dataProvider) {
       // There are no rows coming from the data provider
       return null;

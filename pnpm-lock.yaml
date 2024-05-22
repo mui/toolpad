@@ -91,8 +91,8 @@ importers:
         specifier: 1.0.7
         version: 1.0.7
       '@mui/internal-scripts':
-        specifier: 1.0.7
-        version: 1.0.7
+        specifier: 1.0.8
+        version: 1.0.8
       '@mui/monorepo':
         specifier: github:mui/material-ui#2223961179a8812664c589e4ee8042f108bfc021
         version: github.com/mui/material-ui/2223961179a8812664c589e4ee8042f108bfc021(@opentelemetry/api@1.8.0)
@@ -288,6 +288,9 @@ importers:
       '@mui/x-license':
         specifier: 7.2.0
         version: 7.2.0(@types/react@18.3.1)(react@18.2.0)
+      '@toolpad/core':
+        specifier: workspace:*
+        version: link:../packages/toolpad-core
       '@toolpad/studio':
         specifier: workspace:*
         version: link:../packages/toolpad-studio
@@ -540,18 +543,12 @@ importers:
 
   packages/toolpad-core:
     dependencies:
-      '@emotion/react':
-        specifier: 11.11.4
-        version: 11.11.4(@types/react@18.3.1)(react@18.2.0)
-      '@emotion/styled':
-        specifier: 11.11.5
-        version: 11.11.5(@emotion/react@11.11.4)(@types/react@18.3.1)(react@18.2.0)
       '@mui/lab':
         specifier: 5.0.0-alpha.170
-        version: 5.0.0-alpha.170(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@mui/material@5.15.18)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
+        version: 5.0.0-alpha.170(@mui/material@5.15.18)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
       '@mui/x-data-grid':
         specifier: 7.4.0
-        version: 7.4.0(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@mui/material@5.15.18)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
+        version: 7.4.0(@mui/material@5.15.18)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
       '@tanstack/react-query':
         specifier: 5.36.0
         version: 5.36.0(react@18.2.0)
@@ -3883,8 +3880,8 @@ packages:
       prismjs: 1.29.0
     dev: false
 
-  /@mui/internal-scripts@1.0.7:
-    resolution: {integrity: sha512-thfua621F0yMFHbjoonaNTSE/IEZOKNX/MR1Pk1F+9AqP9veQqJHbrmb3mgjRzQ/YYHZj0aHKzLYpFMjOmYCGA==}
+  /@mui/internal-scripts@1.0.8:
+    resolution: {integrity: sha512-oWiDtSZyFoqhft6V03/5rcwe0WHOY23A4yZ+CUbTV0anPjSb5/N1aws2Bgkc9m69aqyZqhRYRhLlTweVIxOCPw==}
     dependencies:
       '@babel/core': 7.24.5
       '@babel/plugin-syntax-class-properties': 7.12.13(@babel/core@7.24.5)
@@ -4578,7 +4575,7 @@ packages:
       - '@types/react'
     dev: false
 
-  /@mui/x-data-grid@7.4.0(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@mui/material@5.15.18)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0):
+  /@mui/x-data-grid@7.4.0(@mui/material@5.15.18)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-ILu0AVqqHQf4wN/nblsJ/k7PkvlB115vQ/FEiYk7neZlc/kOJOUyst3MWMVClAecZ8+JEs476q40xd4r1CtMfw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -4587,7 +4584,7 @@ packages:
       react-dom: ^17.0.0 || ^18.0.0
     dependencies:
       '@babel/runtime': 7.24.5
-      '@mui/material': 5.15.18(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/material': 5.15.18(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
       '@mui/system': 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.3.1)(react@18.2.0)
       '@mui/utils': 5.15.14(@types/react@18.3.1)(react@18.2.0)
       clsx: 2.1.1

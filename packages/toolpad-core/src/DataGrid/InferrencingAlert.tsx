@@ -102,7 +102,7 @@ export default function InferencingAlert({ fields }: InferencingDialogProps) {
         </IconButton>
       }
     >
-      The fields for this grid were <a href={INFERENCING_DOCS_URL}>inferenced</a>.
+      The fields for this grid were <a href={INFERENCING_DOCS_URL}>inferred</a>.
     </Alert>
   );
 }

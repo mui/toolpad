@@ -92,7 +92,7 @@ async function transpileFile(tsxPath, project) {
           {
             maxLines: 16,
             outputFilename: `${tsxPath}.preview`,
-            wrapperTypes: ['div', 'Box', 'Stack'],
+            wrapperTypes: ['div', 'Box', 'Stack', 'AppProvider'],
           },
         ],
       ]);

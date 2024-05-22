@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "paths": {
       "@toolpad/studio-components": ["../packages/toolpad-studio-components/src/index.tsx"],
       "@toolpad/studio-runtime": ["../packages/toolpad-studio-runtime/src/index.tsx"],
@@ -16,6 +17,9 @@
       "@mui-internal/api-docs-builder": ["../node_modules/@mui/monorepo/packages/api-docs-builder"],
       "@mui-internal/api-docs-builder/*": [
         "../node_modules/@mui/monorepo/packages/api-docs-builder/*"
+      ],
+      "@mui/internal-scripts/typescript-to-proptypes": [
+        "../node_modules/@mui/monorepo/packages-internal/scripts/typescript-to-proptypes/src"
       ],
       "docs/*": ["../node_modules/@mui/monorepo/docs/*"]
     },

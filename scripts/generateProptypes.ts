@@ -17,14 +17,7 @@ import {
   TypeScriptProject,
 } from '@mui-internal/api-docs-builder/utils/createTypeScriptProject';
 
-import CORE_TYPESCRIPT_PROJECTS from './coreTypeScriptProjects';
-
-function sortBreakpointsLiteralByViewportAscending(a: ts.LiteralType, b: ts.LiteralType) {
-  // default breakpoints ordered by their size ascending
-  const breakpointOrder: readonly unknown[] = ['"xs"', '"sm"', '"md"', '"lg"', '"xl"'];
-
-  return breakpointOrder.indexOf(a.value) - breakpointOrder.indexOf(b.value);
-}
+import CORE_TYPESCRIPT_PROJECTS from './coreTypescriptProjects';
 
 function sortSizeByScaleAscending(a: ts.LiteralType, b: ts.LiteralType) {
   const sizeOrder: readonly unknown[] = ['"small"', '"medium"', '"large"'];
@@ -36,13 +29,6 @@ const getSortLiteralUnions: InjectPropTypesInFileOptions['getSortLiteralUnions']
   component,
   propType,
 ) => {
-  if (
-    component.name === 'Hidden' &&
-    (propType.name === 'initialWidth' || propType.name === 'only')
-  ) {
-    return sortBreakpointsLiteralByViewportAscending;
-  }
-
   if (propType.name === 'size') {
     return sortSizeByScaleAscending;
   }
@@ -50,10 +36,25 @@ const getSortLiteralUnions: InjectPropTypesInFileOptions['getSortLiteralUnions']
   return undefined;
 };
 
-async function generateProptypes(project: TypeScriptProject, sourceFile: string): Promise<void> {
+async function generateProptypes(
+  project: TypeScriptProject,
+  sourceFile: string,
+  tsFile: string,
+): Promise<void> {
   const components = getPropTypesFromFile({
-    filePath: sourceFile,
+    filePath: tsFile,
     project,
+    shouldResolveObject: ({ name }) => {
+      if (
+        name.toLowerCase().endsWith('classes') ||
+        name === 'theme' ||
+        name === 'ownerState' ||
+        (name.endsWith('Props') && name !== 'componentsProps' && name !== 'slotProps')
+      ) {
+        return false;
+      }
+      return undefined;
+    },
     checkDeclarations: true,
   });
 
@@ -61,7 +62,19 @@ async function generateProptypes(project: TypeScriptProject, sourceFile: string)
     return;
   }
 
-  components.forEach((component) => {
+  // exclude internal slot components, for example ButtonRoot
+  const cleanComponents = components.filter((component) => {
+    if (component.propsFilename?.endsWith('.tsx')) {
+      // only check for .tsx
+      const match = component.propsFilename.match(/.*\/([A-Z][a-zA-Z]+)\.tsx/);
+      if (match) {
+        return component.name === match[1];
+      }
+    }
+    return true;
+  });
+
+  cleanComponents.forEach((component) => {
     component.types.forEach((prop) => {
       if (!prop.jsDoc) {
         prop.jsDoc = '@ignore';
@@ -71,13 +84,16 @@ async function generateProptypes(project: TypeScriptProject, sourceFile: string)
 
   const sourceContent = await fse.readFile(sourceFile, 'utf8');
   const isTsFile = /(\.(ts|tsx))/.test(sourceFile);
-  const propsFile = sourceFile.replace(/(\.d\.ts|\.tsx|\.ts)/g, '.types.ts');
 
+  // TODO remove, should only have .types.ts
+  const propsFile = tsFile.replace(/(\.d\.ts|\.tsx|\.ts)/g, 'Props.ts');
+  const propsFileAlternative = tsFile.replace(/(\.d\.ts|\.tsx|\.ts)/g, '.types.ts');
+  const generatedForTypeScriptFile = sourceFile === tsFile;
   const result = injectPropTypesInFile({
-    components,
+    components: cleanComponents,
     target: sourceContent,
     options: {
-      disablePropTypesTypeChecking: true,
+      disablePropTypesTypeChecking: generatedForTypeScriptFile,
       babelOptions: {
         filename: sourceFile,
       },
@@ -123,9 +139,9 @@ async function generateProptypes(project: TypeScriptProject, sourceFile: string)
         let shouldDocument;
 
         prop.filenames.forEach((filename) => {
-          const isExternal = filename !== sourceFile;
-
-          const implementedBySelfPropsFile = filename === propsFile;
+          const isExternal = filename !== tsFile;
+          const implementedBySelfPropsFile =
+            filename === propsFile || filename === propsFileAlternative;
           if (!isExternal || implementedBySelfPropsFile) {
             shouldDocument = true;
           }
@@ -168,7 +184,7 @@ async function run(argv: HandlerArgv) {
   // Example: AppBar/AppBar.d.ts
   const allFiles = await Promise.all(
     [path.resolve(__dirname, '../packages/toolpad-core/src')].map((folderPath) =>
-      glob(['[A-Z]*/[A-Z]*.*@(d.ts|ts|tsx)', '[A-Z]*/[A-Z]*/[A-Z]*.*@(d.ts|ts|tsx)'], {
+      glob('+([A-Z])*/+([A-Z])*.*@(d.ts|ts|tsx)', {
         absolute: true,
         cwd: folderPath,
       }),
@@ -177,21 +193,29 @@ async function run(argv: HandlerArgv) {
 
   const files = _.flatten(allFiles)
     .filter((filePath) => {
-      return !(
-        filePath.includes('.test.') ||
-        filePath.includes('.spec.') ||
-        filePath.includes('.types.')
-      );
+      // Filter out files where the directory name and filename doesn't match
+      // Example: Modal/ModalManager.d.ts
+      let folderName = path.basename(path.dirname(filePath));
+      const fileName = path.basename(filePath).replace(/(\.d\.ts|\.tsx|\.ts)/g, '');
+
+      // An exception is if the folder name starts with Unstable_/unstable_
+      // Example: Unstable_Grid2/Grid2.tsx
+      if (/(u|U)nstable_/g.test(folderName)) {
+        folderName = folderName.slice(9);
+      }
+
+      return fileName === folderName;
     })
     .filter((filePath) => filePattern.test(filePath));
 
-  const promises = files.map<Promise<void>>(async (sourceFile) => {
+  const promises = files.map<Promise<void>>(async (tsFile) => {
+    const sourceFile = tsFile.includes('.d.ts') ? tsFile.replace('.d.ts', '.js') : tsFile;
     try {
-      const projectName = sourceFile.match(/packages\/([a-zA-Z-]+)\/src/)![1];
+      const projectName = tsFile.match(/packages\/([a-zA-Z-]+)\/src/)![1];
       const project = buildProject(projectName);
-      await generateProptypes(project, sourceFile);
+      await generateProptypes(project, sourceFile, tsFile);
     } catch (error: any) {
-      error.message = `${sourceFile}: ${error.message}`;
+      error.message = `${tsFile}: ${error.message}`;
       throw error;
     }
   });

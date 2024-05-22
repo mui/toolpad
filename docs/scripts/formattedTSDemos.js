@@ -89,7 +89,11 @@ async function transpileFile(tsxPath, project) {
       transformOptions.plugins = transformOptions.plugins.concat([
         [
           require.resolve('docs/src/modules/utils/babel-plugin-jsx-preview'),
-          { maxLines: 16, outputFilename: `${tsxPath}.preview` },
+          {
+            maxLines: 16,
+            outputFilename: `${tsxPath}.preview`,
+            wrapperTypes: ['div', 'Box', 'Stack', 'AppProvider'],
+          },
         ],
       ]);
     }

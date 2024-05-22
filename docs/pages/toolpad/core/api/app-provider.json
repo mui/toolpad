@@ -12,7 +12,7 @@
       },
       "default": "[]"
     },
-    "theme": { "type": { "name": "any" }, "default": "baseTheme" }
+    "theme": { "type": { "name": "object" }, "default": "baseTheme" }
   },
   "name": "AppProvider",
   "imports": [

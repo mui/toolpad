@@ -14,6 +14,17 @@ function App({ children }) {
 }
 ```
 
+To get access to the dialogs API you first have to call the `useDialogs` hook.
+
+```js
+import { useDialogs } from '@toolpad/core/useDialogs';
+
+function MyApp() {
+  const dialogs = useDialogs();
+  // ...
+}
+```
+
 :::info
 The Toolpad AppProvider automatically comes with dialogs enabled. You won't need to explicitly add the DialogProvider in Toolpad applications.
 :::
@@ -33,17 +44,6 @@ function MyCustomDialog({ open, onClose }: DialogProps) {
       </DialogActions>
     </Dialog>
   );
-}
-```
-
-To show this dialog you first have to request the dialogs API with the `useDialogs` hook.
-
-```js
-import { useDialogs } from '@toolpad/core/useDialogs';
-
-function MyApp() {
-  const dialogs = useDialogs();
-  // ...
 }
 ```
 

@@ -259,7 +259,16 @@ function gridEditingReducer(state: GridState, action: GridAction): GridState {
       throw new Error(`Unhandled action: ${JSON.stringify(action)}`);
   }
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [Data Grid](https://mui.com/)
+ *
+ * API:
+ *
+ * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
+ */
 export function getColumnsFromDataProviderFields<R extends Datum>(
   fields?: ResolvedFields<R>,
   baseColumns?: readonly GridColDef<R>[],
@@ -446,7 +455,7 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
   return diff;
 }
 
-export/**
+/**
  *
  * Demos:
  *
@@ -455,7 +464,11 @@ export/**
  * API:
  *
  * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
- */ function DataGrid<R extends Datum>(props: DataGridProps<R>) {
+ */
+export const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
+  props: DataGridProps<R>,
+  ref,
+) {
   const {
     dataProvider,
     columns: columnsProp,
@@ -695,6 +708,7 @@ export/**
           {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
           <GridContainer>
             <XDataGrid
+              ref={ref}
               pagination
               apiRef={apiRef}
               rows={rows}
@@ -734,4 +748,4 @@ export/**
       </ToolbarCreateButtonContext.Provider>
     </RefetchContext.Provider>
   );
-}
+});

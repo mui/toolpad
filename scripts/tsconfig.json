@@ -20,8 +20,7 @@
       ],
       "@mui/internal-scripts/typescript-to-proptypes": [
         "../node_modules/@mui/monorepo/packages-internal/scripts/typescript-to-proptypes/src"
-      ],
-      "docs/*": ["../node_modules/@mui/monorepo/docs/*"]
+      ]
     },
     "module": "ESNext",
     "noEmit": true,

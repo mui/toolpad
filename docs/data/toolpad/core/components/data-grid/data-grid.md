@@ -32,20 +32,59 @@ To help you get started quickly, the grid is able to inferrence data provider fi
 
 ## Serverside pagination
 
-By default the grid paginates items client side. If your backend supports serverside pagination, enable it with the `paginationMode` flag in the data provider. Now the `getMany` method will receive a pagination parameter
+By default the grid paginates items client side. If your backend supports serverside pagination, enable it with the `paginationMode` flag in the data provider. Now the `getMany` method will receive a `pagination` parameter. This parameter is an object containing a `start` and `pageSize` propety that denote the start index and offset for the requested page. You can optionally send a `rowCount` along with the `rows`.
 
 {{"demo": "ServerSidePagination.js"}}
 
+You can decide whether your data provider supports pagination exclusively or optionally by throwing an error when `pagination` is `null`.
+
 ## CRUD
+
+The data provider
 
 ### create
 
+{{"demo": "CrudCreate.js"}}
+
 ### update
+
+{{"demo": "CrudUpdate.js"}}
 
 ### delete
 
-## 🚧 Premium/pro grid
+{{"demo": "CrudDelete.js"}}
 
 ## 🚧 Input validation
 
+For create and update logic, the data provider supports validation
+
+### 🚧 Static
+
+In the field definitions, with e.g. a `required` property.
+
+```js
+fields: {
+  name: {
+    required: true,
+    validate: (value) => value.length < 10 ? null : 'Too long'
+  },
+}
+```
+
+### 🚧 Dynamic
+
+In the `updateOne`/`createOne` method, by throwing a specific error.
+
+```js
+throw new ValidationError({
+  name: 'Already exists',
+});
+```
+
+## 🚧 Premium/pro grid
+
+An X premium and pro version of the grid are exported from the `@toolpad/enterprise` package. An X license is required accordingly.
+
 ## 🚧 Access control
+
+The data provider integrates with Toolpad access control to enable/disable CRUD features based on the current user roles.

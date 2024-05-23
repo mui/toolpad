@@ -438,7 +438,7 @@ function usePatchedRowModesModel(rowModesModel: GridRowModesModel): GridRowModes
 function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: R): Partial<R> {
   const keys = new Set([...Object.keys(original), ...Object.keys(changed)]);
   const diff: Partial<R> = {};
-  Array.prototype.forEach.call(keys, (key: keyof R) => {
+  Array.from(keys).forEach((key: keyof R) => {
     const originalValue = original[key];
     const changedValue = changed[key];
     if (Object.is(originalValue, changedValue)) {
@@ -451,7 +451,7 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
     ) {
       return;
     }
-    (diff as any)[key] = changed[key];
+    (diff as any)[key] = changedValue;
   });
   return diff;
 }

@@ -20,6 +20,7 @@ import {
   GridEventListener,
   GridPaginationModel,
 } from '@mui/x-data-grid';
+import PropTypes from 'prop-types';
 import * as React from 'react';
 import { Button, CircularProgress, styled } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -249,7 +250,6 @@ function gridEditingReducer(state: GridState, action: GridAction): GridState {
     case 'START_ROW_UPDATE':
       return {
         ...state,
-
         isProcessingRowUpdate: true,
         rowModesModel: {},
       };
@@ -465,7 +465,7 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
  *
  * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
  */
-export const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
+const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
   const {
     dataProvider,
     columns: columnsProp,
@@ -726,7 +726,6 @@ export const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<
               // TODO: How can we make this optional?
               editMode="row"
             />
-
             {isSsr ? (
               // At last show something during SSR https://github.com/mui/mui-x/issues/7599
               <PlaceholderBorder>
@@ -745,3 +744,323 @@ export const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<
     </RefetchContext.Provider>
   );
 };
+
+DataGrid.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * The ref object that allows Data Grid manipulation. Can be instantiated with `useGridApiRef()`.
+   */
+  apiRef: PropTypes.shape({
+    current: PropTypes.object.isRequired,
+  }),
+  /**
+   * If `true`, the Data Grid height is dynamic and follow the number of rows in the Data Grid.
+   * @default false
+   */
+  autoHeight: PropTypes.bool,
+  /**
+   * The options for autosize when user-initiated.
+   */
+  autosizeOptions: PropTypes.shape({
+    columns: PropTypes.arrayOf(PropTypes.string),
+    expand: PropTypes.bool,
+    includeHeaders: PropTypes.bool,
+    includeOutliers: PropTypes.bool,
+    outliersFactor: PropTypes.number,
+  }),
+  /**
+   * @ignore
+   */
+  columns: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({
+        align: PropTypes.oneOf(['center', 'left', 'right']),
+        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
+        description: PropTypes.string,
+        disableColumnMenu: PropTypes.bool,
+        disableExport: PropTypes.bool,
+        disableReorder: PropTypes.bool,
+        display: PropTypes.oneOf(['flex', 'text']),
+        editable: PropTypes.bool,
+        field: PropTypes.string.isRequired,
+        filterable: PropTypes.bool,
+        filterOperators: PropTypes.arrayOf(
+          PropTypes.shape({
+            getApplyFilterFn: PropTypes.func.isRequired,
+            getValueAsString: PropTypes.func,
+            headerLabel: PropTypes.string,
+            InputComponent: PropTypes.elementType,
+            InputComponentProps: PropTypes.object,
+            label: PropTypes.string,
+            requiresFilterValue: PropTypes.bool,
+            value: PropTypes.string.isRequired,
+          }),
+        ),
+        flex: PropTypes.number,
+        getApplyQuickFilterFn: PropTypes.func,
+        getSortComparator: PropTypes.func,
+        groupable: PropTypes.bool,
+        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
+        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+        headerName: PropTypes.string,
+        hideable: PropTypes.bool,
+        hideSortIcons: PropTypes.bool,
+        maxWidth: PropTypes.number,
+        minWidth: PropTypes.number,
+        pinnable: PropTypes.bool,
+        preProcessEditCellProps: PropTypes.func,
+        renderCell: PropTypes.func,
+        renderEditCell: PropTypes.func,
+        renderHeader: PropTypes.func,
+        resizable: PropTypes.bool,
+        sortable: PropTypes.bool,
+        sortComparator: PropTypes.func,
+        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
+        type: PropTypes.oneOf([
+          'actions',
+          'boolean',
+          'custom',
+          'date',
+          'dateTime',
+          'number',
+          'singleSelect',
+          'string',
+        ]),
+        valueFormatter: PropTypes.func,
+        valueGetter: PropTypes.func,
+        valueParser: PropTypes.func,
+        valueSetter: PropTypes.func,
+        width: PropTypes.number,
+      }),
+      PropTypes.shape({
+        align: PropTypes.oneOf(['center', 'left', 'right']),
+        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
+        description: PropTypes.string,
+        disableColumnMenu: PropTypes.bool,
+        disableExport: PropTypes.bool,
+        disableReorder: PropTypes.bool,
+        display: PropTypes.oneOf(['flex', 'text']),
+        editable: PropTypes.bool,
+        field: PropTypes.string.isRequired,
+        filterable: PropTypes.bool,
+        filterOperators: PropTypes.arrayOf(
+          PropTypes.shape({
+            getApplyFilterFn: PropTypes.func.isRequired,
+            getValueAsString: PropTypes.func,
+            headerLabel: PropTypes.string,
+            InputComponent: PropTypes.elementType,
+            InputComponentProps: PropTypes.object,
+            label: PropTypes.string,
+            requiresFilterValue: PropTypes.bool,
+            value: PropTypes.string.isRequired,
+          }),
+        ),
+        flex: PropTypes.number,
+        getActions: PropTypes.func.isRequired,
+        getApplyQuickFilterFn: PropTypes.func,
+        getSortComparator: PropTypes.func,
+        groupable: PropTypes.bool,
+        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
+        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+        headerName: PropTypes.string,
+        hideable: PropTypes.bool,
+        hideSortIcons: PropTypes.bool,
+        maxWidth: PropTypes.number,
+        minWidth: PropTypes.number,
+        pinnable: PropTypes.bool,
+        preProcessEditCellProps: PropTypes.func,
+        renderCell: PropTypes.func,
+        renderEditCell: PropTypes.func,
+        renderHeader: PropTypes.func,
+        resizable: PropTypes.bool,
+        sortable: PropTypes.bool,
+        sortComparator: PropTypes.func,
+        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
+        type: PropTypes.oneOf([
+          /**
+           * The type of the column.
+           * @default 'actions'
+           */
+          'actions',
+        ]).isRequired,
+        valueFormatter: PropTypes.func,
+        valueGetter: PropTypes.func,
+        valueParser: PropTypes.func,
+        valueSetter: PropTypes.func,
+        width: PropTypes.number,
+      }),
+      PropTypes.shape({
+        align: PropTypes.oneOf(['center', 'left', 'right']),
+        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
+        description: PropTypes.string,
+        disableColumnMenu: PropTypes.bool,
+        disableExport: PropTypes.bool,
+        disableReorder: PropTypes.bool,
+        display: PropTypes.oneOf(['flex', 'text']),
+        editable: PropTypes.bool,
+        field: PropTypes.string.isRequired,
+        filterable: PropTypes.bool,
+        filterOperators: PropTypes.arrayOf(
+          PropTypes.shape({
+            getApplyFilterFn: PropTypes.func.isRequired,
+            getValueAsString: PropTypes.func,
+            headerLabel: PropTypes.string,
+            InputComponent: PropTypes.elementType,
+            InputComponentProps: PropTypes.object,
+            label: PropTypes.string,
+            requiresFilterValue: PropTypes.bool,
+            value: PropTypes.string.isRequired,
+          }),
+        ),
+        flex: PropTypes.number,
+        getApplyQuickFilterFn: PropTypes.func,
+        getOptionLabel: PropTypes.func,
+        getOptionValue: PropTypes.func,
+        getSortComparator: PropTypes.func,
+        groupable: PropTypes.bool,
+        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
+        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+        headerName: PropTypes.string,
+        hideable: PropTypes.bool,
+        hideSortIcons: PropTypes.bool,
+        maxWidth: PropTypes.number,
+        minWidth: PropTypes.number,
+        pinnable: PropTypes.bool,
+        preProcessEditCellProps: PropTypes.func,
+        renderCell: PropTypes.func,
+        renderEditCell: PropTypes.func,
+        renderHeader: PropTypes.func,
+        resizable: PropTypes.bool,
+        sortable: PropTypes.bool,
+        sortComparator: PropTypes.func,
+        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
+        type: PropTypes.oneOf([
+          /**
+           * The type of the column.
+           * @default 'singleSelect'
+           */
+          'singleSelect',
+        ]).isRequired,
+        valueFormatter: PropTypes.func,
+        valueGetter: PropTypes.func,
+        valueOptions: PropTypes.oneOfType([
+          PropTypes.arrayOf(
+            PropTypes.oneOfType([
+              PropTypes.number,
+              PropTypes.object,
+              PropTypes.shape({
+                label: PropTypes.string.isRequired,
+                value: PropTypes.any.isRequired,
+              }),
+              PropTypes.string,
+            ]).isRequired,
+          ),
+          PropTypes.func,
+        ]),
+        valueParser: PropTypes.func,
+        valueSetter: PropTypes.func,
+        width: PropTypes.number,
+      }),
+    ]).isRequired,
+  ),
+  /**
+   * @ignore
+   */
+  dataProvider: PropTypes.shape({
+    createOne: PropTypes.func,
+    deleteOne: PropTypes.func,
+    fields: PropTypes.object,
+    getMany: PropTypes.func.isRequired,
+    getOne: PropTypes.func,
+    updateOne: PropTypes.func,
+  }),
+  /**
+   * Return the id of a given [[GridRowModel]].
+   */
+  getRowId: PropTypes.func,
+  /**
+   * The initial state of the DataGrid.
+   * The data in it will be set in the state on initialization but will not be controlled.
+   * If one of the data in `initialState` is also being controlled, then the control state wins.
+   */
+  initialState: PropTypes.shape({
+    columns: PropTypes.shape({
+      columnVisibilityModel: PropTypes.object,
+      dimensions: PropTypes.object,
+      orderedFields: PropTypes.arrayOf(PropTypes.string),
+    }),
+    density: PropTypes.oneOf(['comfortable', 'compact', 'standard']),
+    filter: PropTypes.shape({
+      filterModel: PropTypes.shape({
+        items: PropTypes.arrayOf(PropTypes.object).isRequired,
+        logicOperator: PropTypes.oneOf(['and', 'or']),
+        quickFilterExcludeHiddenColumns: PropTypes.bool,
+        quickFilterLogicOperator: PropTypes.oneOf(['and', 'or']),
+        quickFilterValues: PropTypes.array,
+      }),
+    }),
+    pagination: PropTypes.shape({
+      meta: PropTypes.shape({
+        hasNextPage: PropTypes.bool,
+      }),
+      paginationModel: PropTypes.shape({
+        page: PropTypes.number,
+        pageSize: PropTypes.number,
+      }),
+      rowCount: PropTypes.number,
+    }),
+    preferencePanel: PropTypes.shape({
+      labelId: PropTypes.string,
+      open: PropTypes.bool.isRequired,
+      openedPanelValue: PropTypes.oneOf(['columns', 'filters']),
+      panelId: PropTypes.string,
+    }),
+    sorting: PropTypes.shape({
+      sortModel: PropTypes.arrayOf(
+        PropTypes.shape({
+          field: PropTypes.string.isRequired,
+          sort: PropTypes.oneOf(['asc', 'desc']),
+        }),
+      ),
+    }),
+  }),
+  /**
+   * Pagination can be processed on the server or client-side.
+   * Set it to 'client' if you would like to handle the pagination on the client-side.
+   * Set it to 'server' if you would like to handle the pagination on the server-side.
+   * @default "client"
+   */
+  paginationMode: PropTypes.oneOf(['client', 'server']),
+  /**
+   * Callback called before updating a row with new values in the row and cell editing.
+   * @template R
+   * @param {R} newRow Row object with the new values.
+   * @param {R} oldRow Row object with the old values.
+   * @returns {Promise<R> | R} The final values to update the row.
+   */
+  processRowUpdate: PropTypes.func,
+  /**
+   * Controls the modes of the rows.
+   */
+  rowModesModel: PropTypes.object,
+  /**
+   * @ignore
+   */
+  rows: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    }),
+  ),
+  /**
+   * Overridable components.
+   */
+  slots: PropTypes.object,
+} as any;
+
+export { DataGrid };

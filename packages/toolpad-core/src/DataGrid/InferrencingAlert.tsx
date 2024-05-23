@@ -10,7 +10,7 @@ import DialogActions from '@mui/material/DialogActions';
 import HelpIcon from '@mui/icons-material/Help';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ResolvedFields } from '../DataProvider';
-import { DialogProps, useDialogs } from '../useDialogs';
+import { DialogProps } from '../useDialogs';
 
 const COPY_BUTTON_CLASS = 'copy-button';
 
@@ -89,24 +89,28 @@ export interface InferencingDialogProps {
  * @ignore - internal component.
  */
 export default function InferencingAlert({ fields }: InferencingDialogProps) {
-  const dialogs = useDialogs();
+  const [open, setOpen] = React.useState(false);
+
   return (
-    <Alert
-      severity="warning"
-      action={
-        <IconButton
-          color="inherit"
-          size="small"
-          onClick={async () => {
-            await dialogs.open(InferencingDialog, { fields });
-          }}
-        >
-          <HelpIcon />
-        </IconButton>
-      }
-    >
-      The fields for this grid were <a href={INFERENCING_DOCS_URL}>inferred</a>. Don&quot;t use in
-      production.
-    </Alert>
+    <React.Fragment>
+      <InferencingDialog open={open} onClose={async () => setOpen(false)} payload={{ fields }} />
+      <Alert
+        severity="warning"
+        action={
+          <IconButton
+            color="inherit"
+            size="small"
+            onClick={() => {
+              setOpen(true);
+            }}
+          >
+            <HelpIcon />
+          </IconButton>
+        }
+      >
+        The fields for this grid were <a href={INFERENCING_DOCS_URL}>inferred</a>. Don&quot;t use in
+        production.
+      </Alert>
+    </React.Fragment>
   );
 }

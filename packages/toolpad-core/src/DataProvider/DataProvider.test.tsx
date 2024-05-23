@@ -24,6 +24,6 @@ describe('DataProvider', () => {
       </CacheProvider>,
     );
 
-    expect(getByText('foo')).toBeTruthy();
+    expect(getByText('Columns')).toBeTruthy();
   });
 });

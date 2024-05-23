@@ -91,8 +91,8 @@ importers:
         specifier: 1.0.7
         version: 1.0.7
       '@mui/internal-markdown':
-        specifier: 1.0.3
-        version: 1.0.3
+        specifier: 1.0.4
+        version: 1.0.4
       '@mui/internal-scripts':
         specifier: 1.0.8
         version: 1.0.8
@@ -284,7 +284,7 @@ importers:
         version: 5.15.18(@mui/material@5.15.18)(@types/react@18.3.1)(react@18.2.0)
       '@mui/internal-markdown':
         specifier: ^1.0.1
-        version: 1.0.3
+        version: 1.0.4
       '@mui/joy':
         specifier: 5.0.0-beta.36
         version: 5.0.0-beta.36(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
@@ -3845,7 +3845,7 @@ packages:
       '@babel/runtime': 7.24.5
       '@mui/base': 5.0.0-beta.40(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
       '@mui/icons-material': 5.15.18(@mui/material@5.15.18)(@types/react@18.3.1)(react@18.2.0)
-      '@mui/internal-markdown': 1.0.3
+      '@mui/internal-markdown': 1.0.4
       '@mui/material': 5.15.18(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
       '@mui/system': 5.15.15(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@types/react@18.3.1)(react@18.2.0)
       '@types/react': 18.3.1
@@ -3880,8 +3880,8 @@ packages:
       typescript: 5.4.5
     dev: true
 
-  /@mui/internal-markdown@1.0.3:
-    resolution: {integrity: sha512-b+8T8S1raSuaOXaNyKiChyw1Lb/nEY1ITGsw6oygVLacsN6mZ7EB5cmvEbHA4EQiNwqCn7BgI9OoBTTr0GdZtg==}
+  /@mui/internal-markdown@1.0.4:
+    resolution: {integrity: sha512-wG9J76LpfknM5g30+xbaRmOYjxIJwt/d5S4qEniohcNp8cQuovPP0c3AhAhPTXsCyIn9xCsrc+qQwDne9kvxFg==}
     dependencies:
       '@babel/runtime': 7.24.5
       lodash: 4.17.21
@@ -10778,6 +10778,7 @@ packages:
 
   /inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
+    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
     dependencies:
       once: 1.4.0
       wrappy: 1.0.2

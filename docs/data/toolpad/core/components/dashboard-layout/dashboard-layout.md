@@ -1,3 +1,9 @@
+---
+productId: toolpad-core
+title: Dashboard Layout
+components: AppProvider, DashboardLayout
+---
+
 # Dashboard Layout
 
 <p class="description">The dashboard layout component provides a customizable out-of-the-box layout for a typical dashboard page.</p>

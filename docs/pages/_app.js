@@ -19,7 +19,6 @@ import findActivePage from 'docs/src/modules/utils/findActivePage';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 import toolpadPkgJson from '@toolpad/studio/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
-import { mapTranslations } from '@mui/docs/i18n';
 import toolpadStudioPages from '../data/toolpad/studio/pages';
 import toolpadCorePages from '../data/toolpad/core/pages';
 import config from '../config';
@@ -260,11 +259,7 @@ function AppWrapper(props) {
         <meta name="mui:productId" content={productId} />
         <meta name="mui:productCategoryId" content={productCategoryId} />
       </NextHead>
-      <DocsProvider
-        config={config}
-        defaultUserLanguage={pageProps.userLanguage}
-        translations={pageProps.translations}
-      >
+      <DocsProvider config={config} defaultUserLanguage={pageProps.userLanguage}>
         <CodeCopyProvider>
           <CodeVariantProvider>
             <PageContext.Provider value={pageContextValue}>
@@ -307,9 +302,6 @@ MyApp.propTypes = {
 MyApp.getInitialProps = async ({ ctx, Component }) => {
   let pageProps = {};
 
-  const req = require.context('../translations', false, /translations.*\.json$/);
-  const translations = mapTranslations(req);
-
   if (Component.getInitialProps) {
     pageProps = await Component.getInitialProps(ctx);
   }
@@ -317,7 +309,6 @@ MyApp.getInitialProps = async ({ ctx, Component }) => {
   return {
     pageProps: {
       userLanguage: ctx.query.userLanguage || 'en',
-      translations,
       ...pageProps,
     },
   };

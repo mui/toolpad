@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { styled } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -18,7 +19,6 @@ import Typography from '@mui/material/Typography';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { BrandingContext, Navigation, NavigationContext, NavigationPageItem } from '../AppProvider';
-import ToolpadLogo from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320;
 
@@ -47,6 +47,60 @@ const LogoContainer = styled('div')({
     maxHeight: 40,
   },
 });
+
+function ToolpadLogo({ size = 40 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g mask="url(#a)">
+        <path d="M22.74 27.73v-7.6l6.64-3.79v7.6l-6.64 3.79Z" fill="#007FFF" />
+        <path d="M16.1 23.93v-7.59l6.64 3.8v7.59l-6.65-3.8Z" fill="#39F" />
+        <path d="m16.1 16.34 6.64-3.8 6.64 3.8-6.64 3.8-6.65-3.8Z" fill="#A5D8FF" />
+      </g>
+      <mask
+        id="b"
+        style={{
+          maskType: 'alpha',
+        }}
+        maskUnits="userSpaceOnUse"
+        x="8"
+        y="17"
+        width="14"
+        height="15"
+      >
+        <path
+          d="M8.5 22.3c0-1.05.56-2 1.46-2.53l3.75-2.14c.89-.5 1.98-.5 2.87 0l3.75 2.14a2.9 2.9 0 0 1 1.46 2.52v4.23c0 1.04-.56 2-1.46 2.52l-3.75 2.14c-.89.5-1.98.5-2.87 0l-3.75-2.14a2.9 2.9 0 0 1-1.46-2.52v-4.23Z"
+          fill="#D7DCE1"
+        />
+      </mask>
+      <g mask="url(#b)">
+        <path d="M15.14 32v-7.6l6.65-3.8v7.6L15.14 32Z" fill="#007FFF" />
+        <path d="M8.5 28.2v-7.6l6.64 3.8V32L8.5 28.2Z" fill="#39F" />
+        <path d="m8.5 20.6 6.64-3.79 6.65 3.8-6.65 3.8-6.64-3.8Z" fill="#A5D8FF" />
+      </g>
+      <mask
+        id="c"
+        style={{
+          maskType: 'alpha',
+        }}
+        maskUnits="userSpaceOnUse"
+        x="8"
+        y="4"
+        width="22"
+        height="20"
+      >
+        <path
+          d="M24.17 4.82a2.9 2.9 0 0 0-2.87 0L9.97 11.22a2.9 2.9 0 0 0-1.47 2.53v4.22c0 1.04.56 2 1.46 2.52l3.75 2.14c.89.5 1.98.5 2.87 0l11.33-6.42a2.9 2.9 0 0 0 1.47-2.52V9.48c0-1.04-.56-2-1.46-2.52l-3.75-2.14Z"
+          fill="#D7DCE1"
+        />
+      </mask>
+      <g mask="url(#c)">
+        <path d="M15.14 23.46v-7.6L29.38 7.8v7.59l-14.24 8.07Z" fill="#007FFF" />
+        <path d="M8.5 19.66v-7.6l6.64 3.8v7.6l-6.64-3.8Z" fill="#39F" />
+        <path d="M8.5 12.07 22.74 4l6.64 3.8-14.24 8.06-6.64-3.8Z" fill="#A5D8FF" />
+      </g>
+    </svg>
+  );
+}
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
@@ -159,6 +213,7 @@ function DashboardSidebarSubNavigation({
             ) : (
               listItem
             )}
+
             {navigationItem.children ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
@@ -176,10 +231,25 @@ function DashboardSidebarSubNavigation({
 }
 
 interface DashboardLayoutProps {
+  /**
+   * The content of the dashboard.
+   */
   children: React.ReactNode;
 }
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+/**
+ *
+ * Demos:
+ *
+ * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
+ *
+ * API:
+ *
+ * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
+ */
+function DashboardLayout(props: DashboardLayoutProps) {
+  const { children } = props;
+
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 
@@ -205,17 +275,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </a>
           <Box sx={{ flexGrow: 1 }} />
           {/* <Stack>
-            <IconButton
-              size="large"
-              aria-label="Show new notifications"
-              color="inherit"
-              sx={{
-                border: (theme) => `1px solid ${theme.palette.divider}`,
-              }}
-            >
-              <NotificationsIcon />
-            </IconButton>
-          </Stack> */}
+                               <IconButton
+                                 size="large"
+                                 aria-label="Show new notifications"
+                                 color="inherit"
+                                 sx={{
+                                   border: (theme) => `1px solid ${theme.palette.divider}`,
+                                 }}
+                               >
+                                 <NotificationsIcon />
+                               </IconButton>
+                              </Stack> */}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -244,3 +314,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     </Box>
   );
 }
+
+DashboardLayout.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * The content of the dashboard.
+   */
+  children: PropTypes.node,
+} as any;
+
+export { DashboardLayout };

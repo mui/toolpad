@@ -48,15 +48,16 @@
   "dependencies": {
     "@toolpad/utils": "workspace:*",
     "client-only": "^0.0.1",
-    "invariant": "2.2.4"
+    "invariant": "2.2.4",
+    "prop-types": "15.8.1"
   },
   "devDependencies": {
     "@mui/icons-material": "5.15.18",
     "@mui/material": "5.15.18",
     "@types/invariant": "2.2.37",
+    "@types/prop-types": "15.7.12",
     "@types/react": "18.3.1",
-    "@types/react-dom": "18.3.0",
-    "concurrently": "8.2.2"
+    "@types/react-dom": "18.3.0"
   },
   "peerDependencies": {
     "@mui/icons-material": "^5",

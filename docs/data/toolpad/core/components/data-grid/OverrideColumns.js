@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import { DialogProvider } from '@toolpad/core/useDialogs';
 
 const myData = createDataProvider({
-  // preview-start
   async getMany() {
     return {
       rows: [
@@ -14,19 +13,30 @@ const myData = createDataProvider({
       ],
     };
   },
-  // preview-end
   fields: {
     id: { label: 'ID' },
     name: { label: 'Name' },
   },
 });
 
-export default function BasicDataProvider() {
+export default function OverrideColumns() {
   return (
     <DialogProvider>
       <CacheProvider>
         <Box sx={{ height: 250, width: '100%' }}>
-          <DataGrid dataProvider={myData} />
+          {/* preview-start */}
+          <DataGrid
+            dataProvider={myData}
+            columns={[
+              // renders header name from data provider
+              { field: 'id' },
+              // overrides header name from data provider
+              { field: 'name', headerName: 'First name' },
+              // adds a new column
+              { field: 'greeting', valueGetter: (_, row) => `Hi, ${row.name}` },
+            ]}
+          />
+          {/* preview-end */}
         </Box>
       </CacheProvider>
     </DialogProvider>

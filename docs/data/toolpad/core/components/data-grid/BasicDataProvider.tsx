@@ -4,8 +4,8 @@ import { DataGrid } from '@toolpad/core/DataGrid';
 import Box from '@mui/material/Box';
 import { DialogProvider } from '@toolpad/core/useDialogs';
 
-// preview-start
 const myData = createDataProvider({
+  // preview-start
   async getMany() {
     return {
       rows: [
@@ -14,18 +14,18 @@ const myData = createDataProvider({
       ],
     };
   },
+  // preview-end
   fields: {
     id: { label: 'ID' },
     name: { label: 'Name' },
   },
 });
-// preview-end
 
 export default function BasicDataProvider() {
   return (
     <DialogProvider>
       <CacheProvider>
-        <Box sx={{ height: 300, width: '100%' }}>
+        <Box sx={{ height: 250, width: '100%' }}>
           <DataGrid dataProvider={myData} />
         </Box>
       </CacheProvider>

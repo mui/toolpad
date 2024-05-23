@@ -1,14 +1,8 @@
-const myData = createDataProvider({
-  async getMany() {
-    return {
-      rows: [
-        { id: '1', name: 'John' },
-        { id: '2', name: 'Jane' },
-      ],
-    };
-  },
-  fields: {
-    id: { label: 'ID' },
-    name: { label: 'Name' },
-  },
-});
+async getMany() {
+  return {
+    rows: [
+      { id: '1', name: 'John' },
+      { id: '2', name: 'Jane' },
+    ],
+  };
+},

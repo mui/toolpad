@@ -273,7 +273,16 @@ const queryClient = new QueryClient();
 export interface CacheProviderProps {
   children?: React.ReactNode;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [Data Grid](https://mui.com/)
+ *
+ * API:
+ *
+ * - [DataProvider API](https://mui.com/toolpad/core/api/data-provider)
+ */
 export function CacheProvider(props: CacheProviderProps) {
   const { children } = props;
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;

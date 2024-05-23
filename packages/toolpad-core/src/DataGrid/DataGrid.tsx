@@ -446,7 +446,16 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
   return diff;
 }
 
-export function DataGrid<R extends Datum>(props: DataGridProps<R>) {
+export/**
+ *
+ * Demos:
+ *
+ * - [Data Grid](https://mui.com/)
+ *
+ * API:
+ *
+ * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
+ */ function DataGrid<R extends Datum>(props: DataGridProps<R>) {
   const {
     dataProvider,
     columns: columnsProp,

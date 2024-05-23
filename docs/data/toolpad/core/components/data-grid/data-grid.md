@@ -40,19 +40,29 @@ You can decide whether your data provider supports pagination exclusively or opt
 
 ## CRUD
 
-The data provider
+The data provider supports all basic CRUD operations
 
-### create
+### Create
+
+When you add a `createOne` method to the data provider, the grid will get a "Add record" button in the Toolbar. When you click this button, a draft row shows wich you can fill with values for the created item. To commit the new row, click the save button. This will call the `createOne` function with the values that were filled. When the operation finishes, a notification will show.
 
 {{"demo": "CrudCreate.js"}}
 
-### update
+### Update
+
+When you add a `updateOne` method to the data provider, the grid will get edit buttons in its action column. When you click this button, the row goes in editing mode. When you click the save button, the `updateOne` method will be called with the row id as first parameter and the changed values as the second parameter. When the operation finishes, a notification will show.
 
 {{"demo": "CrudUpdate.js"}}
 
-### delete
+### Delete
+
+When you add a `deleteOne` method to your data provider, the grid will get delete buttons in its action column. When you click this button, the `deleteOne` method will be called with the id of the relevant row. When the operation finishes, a notification will show.
 
 {{"demo": "CrudDelete.js"}}
+
+### 🚧 Delete multiple
+
+When the data provider contains a `deleteMany` method, the grid will allows for multiple selection and delete.
 
 ## 🚧 Input validation
 

@@ -3,6 +3,7 @@ import { CacheProvider, createDataProvider } from '@toolpad/core/DataProvider';
 import { DataGrid } from '@toolpad/core/DataGrid';
 import Box from '@mui/material/Box';
 import { DialogProvider } from '@toolpad/core/useDialogs';
+import { NotificationsProvider } from '@toolpad/core/useNotifications';
 
 let nextId = 1;
 const getNextId = () => {
@@ -38,6 +39,7 @@ const myData = createDataProvider({
 export default function CrudCreate() {
   return (
     <DialogProvider>
+      <NotificationsProvider />
       <CacheProvider>
         <Box sx={{ height: 250, width: '100%' }}>
           <DataGrid dataProvider={myData} />

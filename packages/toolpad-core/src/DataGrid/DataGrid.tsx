@@ -446,7 +446,7 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
   return diff;
 }
 
-export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
+export function DataGrid<R extends Datum>(props: DataGridProps<R>) {
   const {
     dataProvider,
     columns: columnsProp,
@@ -457,8 +457,8 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
     autosizeOptions: autosizeOptionsProp,
     getRowId: getRowIdProp,
     rowModesModel: rowModesModelProp,
-    ...props
-  } = propsIn;
+    ...restProps
+  } = props;
 
   const gridApiRefOwn = useGridApiRef();
   const apiRef = apiRefProp ?? gridApiRefOwn;
@@ -483,7 +483,7 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
   const useGetManyParams = React.useMemo<GetManyParams<R>>(
     () => ({
       pagination:
-        props.paginationMode === 'server'
+        restProps.paginationMode === 'server'
           ? {
               start: gridPaginationModel.page * gridPaginationModel.pageSize,
               pageSize: gridPaginationModel.pageSize,
@@ -491,7 +491,7 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
           : null,
       filter: {},
     }),
-    [gridPaginationModel.page, gridPaginationModel.pageSize, props.paginationMode],
+    [gridPaginationModel.page, gridPaginationModel.pageSize, restProps.paginationMode],
   );
 
   const { data, loading, error, refetch } = useGetMany(dataProvider ?? null, useGetManyParams);
@@ -680,7 +680,7 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
       <ToolbarCreateButtonContext.Provider value={createButtonContext}>
         <RootContainer
           sx={{
-            height: props.autoHeight ? undefined : '100%',
+            height: restProps.autoHeight ? undefined : '100%',
           }}
         >
           {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
@@ -696,14 +696,14 @@ export function DataGrid<R extends Datum>(propsIn: DataGridProps<R>) {
               rowModesModel={rowModesModelPatched}
               onRowEditStart={handleRowEditStart}
               getRowId={getRowId}
-              {...(props.paginationMode === 'server'
+              {...(restProps.paginationMode === 'server'
                 ? {
                     gridPaginationModel,
                     onPaginationModelChange: setGridPaginationModel,
                     rowCount: data?.totalCount ?? -1,
                   }
                 : {})}
-              {...props}
+              {...restProps}
               // TODO: How can we make this optional?
               editMode="row"
             />

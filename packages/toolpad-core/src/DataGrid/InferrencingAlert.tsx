@@ -85,6 +85,9 @@ export interface InferencingDialogProps {
   fields: ResolvedFields<any>;
 }
 
+/**
+ * @ignore - internal component.
+ */
 export default function InferencingAlert({ fields }: InferencingDialogProps) {
   const dialogs = useDialogs();
   return (

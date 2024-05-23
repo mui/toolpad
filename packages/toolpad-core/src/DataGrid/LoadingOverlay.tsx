@@ -33,6 +33,9 @@ const SkeletonCell = styled('div')(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.divider}`,
 }));
 
+/**
+ * @ignore - internal component.
+ */
 export default function SkeletonLoadingOverlay() {
   const apiRef = useGridApiContext();
   const rootProps = useGridRootProps();

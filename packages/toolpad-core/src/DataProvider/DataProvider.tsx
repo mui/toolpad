@@ -274,6 +274,7 @@ export interface CacheProviderProps {
   children?: React.ReactNode;
 }
 
-export function CacheProvider({ children }: CacheProviderProps) {
+export function CacheProvider(props: CacheProviderProps) {
+  const { children } = props;
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

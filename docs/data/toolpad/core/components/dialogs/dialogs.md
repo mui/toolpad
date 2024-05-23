@@ -65,7 +65,7 @@ A dialog can return a value with the `onClose` handler. The promise returned by 
 
 ## Stacked dialogs
 
-Dialogs can be stacked. A dialog can open other another dialog which will come to the foreground. Closing the latter will reveal the former again.
+Dialogs can be stacked. A dialog can open other another dialog which comes to the foreground upon opening. Closing the latter reveals the former again.
 
 {{"demo": "StackedDialog.js"}}
 

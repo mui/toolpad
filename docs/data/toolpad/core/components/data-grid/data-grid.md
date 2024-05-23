@@ -20,19 +20,19 @@ The simplest data provider exposes a `getMany` function and a `fields` definitio
 
 ## Override columns
 
-The Toolpad core grid adopts the fields that are defined in its data provider. This is handy because it allows for sharing formatting and validation options between data rendering components. But it is still possible to override the defaults at the level of an individual grid. The grid will adopt the columns you've defined in the `columns` property, and set default values for the individual column options for eac of them.
+The Toolpad core grid adopts the fields that are defined in its data provider. This is handy because it allows for sharing formatting and validation options between data rendering components. But it is still possible to override the defaults at the level of an individual grid. The grid adopts the columns you've defined in the `columns` property, and sets default values for the individual column options for each of them.
 
 {{"demo": "OverrideColumns.js"}}
 
 ## Column inferrence
 
-To help you get started quickly, the grid is able to inferrence data provider fields if they are not defined. This allows you to quickly get started with a basic field definition based on the returned data. When a data provider is passed that doesn't have a field definiton, the grid will infer one and show a warning. Click the question mark to show more information on how to solve the warning message. Try copying the snippet from the dialog and paste it in the data provider definition below:
+To help you get started quickly, the grid is able to inferrence data provider fields if they are not defined. This allows you to quickly get started with a basic field definition based on the returned data. When a data provider is passed that doesn't have a field definiton, the grid infers field definitions and shows a warning. Click the question mark to show more information on how to solve the warning message. Try copying the snippet from the dialog and paste it in the data provider definition below:
 
 {{"demo": "FieldInferrence.js"}}
 
 ## Serverside pagination
 
-By default the grid paginates items client side. If your backend supports serverside pagination, enable it with the `paginationMode` flag in the data provider. Now the `getMany` method will receive a `pagination` parameter. This parameter is an object containing a `start` and `pageSize` propety that denote the start index and offset for the requested page. You can optionally send a `rowCount` along with the `rows`.
+By default the grid paginates items client-side. If your backend supports serverside pagination, enable it with the `paginationMode` flag in the data provider. Now the `getMany` method receives a `pagination` parameter. This parameter is an object containing a `start` and `pageSize` property that denote the start index and offset for the requested page. You can optionally send a `rowCount` along with the `rows`.
 
 {{"demo": "ServerSidePagination.js"}}
 
@@ -44,25 +44,25 @@ The data provider supports all basic CRUD operations
 
 ### Create
 
-When you add a `createOne` method to the data provider, the grid will get a "Add record" button in the Toolbar. When you click this button, a draft row shows wich you can fill with values for the created item. To commit the new row, click the save button. This will call the `createOne` function with the values that were filled. When the operation finishes, a notification will show.
+When you add a `createOne` method to the data provider, the grid gets a "Add record" button in the Toolbar. When you click this button, a draft row shows wich you can fill with values for the created item. To commit the new row, click the save button. This calls the `createOne` function with the values that were filled. When the operation finishes, a notification shows.
 
 {{"demo": "CrudCreate.js"}}
 
 ### Update
 
-When you add a `updateOne` method to the data provider, the grid will get edit buttons in its action column. When you click this button, the row goes in editing mode. When you click the save button, the `updateOne` method will be called with the row id as first parameter and the changed values as the second parameter. When the operation finishes, a notification will show.
+When you add a `updateOne` method to the data provider, the grid gets edit buttons in its action column. When you click this button, the row goes in editing mode. When you click the save button, the `updateOne` method is called with the row id as first parameter and the changed values as the second parameter. When the operation finishes, a notification shows.
 
 {{"demo": "CrudUpdate.js"}}
 
 ### Delete
 
-When you add a `deleteOne` method to your data provider, the grid will get delete buttons in its action column. When you click this button, the `deleteOne` method will be called with the id of the relevant row. When the operation finishes, a notification will show.
+When you add a `deleteOne` method to your data provider, the grid gets delete buttons in its action column. When you click this button, the `deleteOne` method is called with the id of the relevant row. When the operation finishes, a notification shows.
 
 {{"demo": "CrudDelete.js"}}
 
 ### 🚧 Delete multiple
 
-When the data provider contains a `deleteMany` method, the grid will allows for multiple selection and delete.
+When the data provider contains a `deleteMany` method, the grid allows for multiple selection and delete.
 
 ## 🚧 Input validation
 
@@ -70,7 +70,7 @@ For create and update logic, the data provider supports validation
 
 ### 🚧 Static
 
-In the field definitions, with e.g. a `required` property.
+In the field definitions, with for example a `required` property.
 
 ```js
 fields: {

@@ -20,6 +20,7 @@
     "paths": {
       "@toolpad/core": ["./packages/toolpad-core/src"],
       "@toolpad/core/*": ["./packages/toolpad-core/src/*"],
+      "docs-toolpad/*": ["./docs/*"],
       "@mui-internal/api-docs-builder": ["./node_modules/@mui/monorepo/packages/api-docs-builder"],
       "@mui-internal/api-docs-builder/*": [
         "./node_modules/@mui/monorepo/packages/api-docs-builder/*"

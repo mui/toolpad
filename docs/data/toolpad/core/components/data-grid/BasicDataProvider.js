@@ -1,6 +1,4 @@
 import * as React from 'react';
-// TODO: replace DialogProvider/CacheProvider with AppProvider
-// import { AppProvider } from '@toolpad/core/AppProvider';
 import { CacheProvider, createDataProvider } from '@toolpad/core/DataProvider';
 import { DataGrid } from '@toolpad/core/DataGrid';
 import Box from '@mui/material/Box';

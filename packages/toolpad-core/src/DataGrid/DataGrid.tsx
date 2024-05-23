@@ -465,10 +465,7 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
  *
  * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
  */
-export const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
-  props: DataGridProps<R>,
-  ref,
-) {
+export const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
   const {
     dataProvider,
     columns: columnsProp,
@@ -708,7 +705,6 @@ export const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
           {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
           <GridContainer>
             <XDataGrid
-              ref={ref}
               pagination
               apiRef={apiRef}
               rows={rows}
@@ -748,4 +744,4 @@ export const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
       </ToolbarCreateButtonContext.Provider>
     </RefetchContext.Provider>
   );
-});
+};

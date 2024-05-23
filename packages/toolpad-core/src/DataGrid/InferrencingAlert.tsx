@@ -48,7 +48,7 @@ function CodeSnippet({ children }: { children: string }) {
   );
 }
 
-const INFERENCING_DOCS_URL = 'https://mui.com/toolpad/core/components/data-grid#inferencing';
+const INFERENCING_DOCS_URL = 'https://mui.com/toolpad/core/components/data-grid/#column-inferrence';
 
 interface InferrenceDialogPayload {
   fields: ResolvedFields<any>;

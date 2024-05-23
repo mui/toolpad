@@ -63,6 +63,12 @@ A dialog can return a value with the `onClose` handler. The promise returned by 
 
 {{"demo": "CustomDialogWithResult.js"}}
 
+## Stacked dialogs
+
+Dialogs can be stacked. A dialog can open other another dialog which will come to the foreground. Closing the latter will reveal the former again.
+
+{{"demo": "StackedDialog.js"}}
+
 ## System dialogs
 
 Toolpad comes with a set of system dialogs that improve on the native `window.alert`, `window.confirm`, and `window.prompt` APIs. These APIs are very similar, but they create dialogs that follow your application theme.

@@ -34,7 +34,7 @@
     "@mui/material-nextjs": "5.15.11",
     "@mui/styles": "5.15.18",
     "@mui/utils": "5.15.14",
-    "@mui/x-license": "7.2.0",
+    "@mui/x-license": "7.2.1",
     "@toolpad/core": "workspace:*",
     "@toolpad/studio": "workspace:*",
     "@trendmicro/react-interpolate": "0.5.5",

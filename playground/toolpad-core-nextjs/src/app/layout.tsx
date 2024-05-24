@@ -10,12 +10,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    path: '/dashboard',
+    slug: '/dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    path: '/dashboard/orders',
+    slug: '/dashboard/orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },

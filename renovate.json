@@ -12,11 +12,6 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
-      "groupName": "Typings",
-      "matchPackagePatterns": ["^@types/"],
-      "description": "At the top so other rules can overwrite it"
-    },
-    {
       "matchDepTypes": ["peerDependencies"],
       "rangeStrategy": "widen"
     },
@@ -24,6 +19,11 @@
       "groupName": "devDependencies",
       "matchManagers": ["npm"],
       "matchDepTypes": ["devDependencies"]
+    },
+    {
+      "groupName": "Typings",
+      "matchPackagePatterns": ["^@types/"],
+      "description": "At the top so other rules can overwrite it"
     },
     {
       "groupName": "Docs",

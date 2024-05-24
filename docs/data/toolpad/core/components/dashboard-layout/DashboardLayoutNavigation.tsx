@@ -7,8 +7,6 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import type { Navigation } from '@toolpad/core';
 
-// @TODO: Have path examples, including nested paths, once navigation adapter is implemented
-
 const NAVIGATION: Navigation = [
   {
     title: 'Item 1',

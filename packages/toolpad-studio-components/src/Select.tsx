@@ -71,8 +71,8 @@ function Select({
       value={value}
       onChange={handleChange}
       select
-      fullWidth
-      sx={{ ...(!fullWidth && !value ? { width: 120 } : {}), ...sx }}
+      fullWidth={fullWidth}
+      sx={{ minWidth: 120, ...sx }}
       {...(formInputError && {
         error: Boolean(formInputError),
         helperText: formInputError.message || '',

@@ -3,7 +3,6 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { Navigation } from '@toolpad/core';
-import theme from './theme';
 
 const NAVIGATION: Navigation = [
   {
@@ -26,9 +25,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <AppProvider theme={theme} navigation={NAVIGATION}>
-          {props.children}
-        </AppProvider>
+        <AppProvider navigation={NAVIGATION}>{props.children}</AppProvider>
       </body>
     </html>
   );

@@ -143,7 +143,7 @@ pnpm install
 
 This uses the local version of Toolpad Core as built in the mono-repository, and allows for quickly testing out changes and their results.
 
-Some application examples for different JavaScript frameworks (such as Next.js, Vite...) are present in the `playground` folder that can be used to quickly develop on Toolpad Core on a live application.
+Some application examples for different JavaScript frameworks (such as Next.js, Vite…) are present in the `playground` folder that can be used to quickly develop on Toolpad Core on a live application.
 
 1. Install dependencies:
 

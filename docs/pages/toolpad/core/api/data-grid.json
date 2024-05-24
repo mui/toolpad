@@ -1,35 +1,5 @@
 {
-  "props": {
-    "apiRef": { "type": { "name": "shape", "description": "{ current: object }" } },
-    "autoHeight": { "type": { "name": "bool" }, "default": "false" },
-    "autosizeOptions": {
-      "type": {
-        "name": "shape",
-        "description": "{ columns?: Array&lt;string&gt;, expand?: bool, includeHeaders?: bool, includeOutliers?: bool, outliersFactor?: number }"
-      }
-    },
-    "getRowId": { "type": { "name": "func" } },
-    "initialState": {
-      "type": {
-        "name": "shape",
-        "description": "{ columns?: { columnVisibilityModel?: object, dimensions?: object, orderedFields?: Array&lt;string&gt; }, density?: 'comfortable'<br>&#124;&nbsp;'compact'<br>&#124;&nbsp;'standard', filter?: { filterModel?: { items: Array&lt;object&gt;, logicOperator?: 'and'<br>&#124;&nbsp;'or', quickFilterExcludeHiddenColumns?: bool, quickFilterLogicOperator?: 'and'<br>&#124;&nbsp;'or', quickFilterValues?: array } }, pagination?: { meta?: { hasNextPage?: bool }, paginationModel?: { page?: number, pageSize?: number }, rowCount?: number }, preferencePanel?: { labelId?: string, open: bool, openedPanelValue?: 'columns'<br>&#124;&nbsp;'filters', panelId?: string }, sorting?: { sortModel?: Array&lt;{ field: string, sort?: 'asc'<br>&#124;&nbsp;'desc' }&gt; } }"
-      }
-    },
-    "paginationMode": {
-      "type": { "name": "enum", "description": "'client'<br>&#124;&nbsp;'server'" },
-      "default": "\"client\""
-    },
-    "processRowUpdate": {
-      "type": { "name": "func" },
-      "signature": {
-        "type": "function(newRow: R, oldRow: R) => Promise<R> | R",
-        "describedArgs": ["newRow", "oldRow"],
-        "returned": "Promise<R> | R"
-      }
-    },
-    "rowModesModel": { "type": { "name": "object" } },
-    "slots": { "type": { "name": "object" }, "additionalInfo": { "slotsApi": true } }
-  },
+  "props": {},
   "name": "DataGrid",
   "imports": [
     "import { DataGrid } from '@toolpad-core/DataGrid';",

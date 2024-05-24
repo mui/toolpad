@@ -468,8 +468,13 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
  * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
  */
 const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
+  const { dataProvider, ...restProps1 } = props;
+
+  // TODO: figure out how to stop generating prop types for X Grid properties
+  // and document with inheritance
+  const restProps2 = restProps1;
+
   const {
-    dataProvider,
     columns: columnsProp,
     processRowUpdate: processRowUpdateProp,
     slots: slotsProp,
@@ -479,7 +484,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
     getRowId: getRowIdProp,
     rowModesModel: rowModesModelProp,
     ...restProps
-  } = props;
+  } = restProps2;
 
   const [notification, setNotification] = React.useState<DataGridNotification | null>(null);
 
@@ -726,27 +731,6 @@ DataGrid.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * The ref object that allows Data Grid manipulation. Can be instantiated with `useGridApiRef()`.
-   */
-  apiRef: PropTypes.shape({
-    current: PropTypes.object.isRequired,
-  }),
-  /**
-   * If `true`, the Data Grid height is dynamic and follow the number of rows in the Data Grid.
-   * @default false
-   */
-  autoHeight: PropTypes.bool,
-  /**
-   * The options for autosize when user-initiated.
-   */
-  autosizeOptions: PropTypes.shape({
-    columns: PropTypes.arrayOf(PropTypes.string),
-    expand: PropTypes.bool,
-    includeHeaders: PropTypes.bool,
-    includeOutliers: PropTypes.bool,
-    outliersFactor: PropTypes.number,
-  }),
-  /**
    * @ignore
    */
   columns: PropTypes.arrayOf(
@@ -956,75 +940,6 @@ DataGrid.propTypes /* remove-proptypes */ = {
     updateOne: PropTypes.func,
   }),
   /**
-   * Return the id of a given [[GridRowModel]].
-   */
-  getRowId: PropTypes.func,
-  /**
-   * The initial state of the DataGrid.
-   * The data in it will be set in the state on initialization but will not be controlled.
-   * If one of the data in `initialState` is also being controlled, then the control state wins.
-   */
-  initialState: PropTypes.shape({
-    columns: PropTypes.shape({
-      columnVisibilityModel: PropTypes.object,
-      dimensions: PropTypes.object,
-      orderedFields: PropTypes.arrayOf(PropTypes.string),
-    }),
-    density: PropTypes.oneOf(['comfortable', 'compact', 'standard']),
-    filter: PropTypes.shape({
-      filterModel: PropTypes.shape({
-        items: PropTypes.arrayOf(PropTypes.object).isRequired,
-        logicOperator: PropTypes.oneOf(['and', 'or']),
-        quickFilterExcludeHiddenColumns: PropTypes.bool,
-        quickFilterLogicOperator: PropTypes.oneOf(['and', 'or']),
-        quickFilterValues: PropTypes.array,
-      }),
-    }),
-    pagination: PropTypes.shape({
-      meta: PropTypes.shape({
-        hasNextPage: PropTypes.bool,
-      }),
-      paginationModel: PropTypes.shape({
-        page: PropTypes.number,
-        pageSize: PropTypes.number,
-      }),
-      rowCount: PropTypes.number,
-    }),
-    preferencePanel: PropTypes.shape({
-      labelId: PropTypes.string,
-      open: PropTypes.bool.isRequired,
-      openedPanelValue: PropTypes.oneOf(['columns', 'filters']),
-      panelId: PropTypes.string,
-    }),
-    sorting: PropTypes.shape({
-      sortModel: PropTypes.arrayOf(
-        PropTypes.shape({
-          field: PropTypes.string.isRequired,
-          sort: PropTypes.oneOf(['asc', 'desc']),
-        }),
-      ),
-    }),
-  }),
-  /**
-   * Pagination can be processed on the server or client-side.
-   * Set it to 'client' if you would like to handle the pagination on the client-side.
-   * Set it to 'server' if you would like to handle the pagination on the server-side.
-   * @default "client"
-   */
-  paginationMode: PropTypes.oneOf(['client', 'server']),
-  /**
-   * Callback called before updating a row with new values in the row and cell editing.
-   * @template R
-   * @param {R} newRow Row object with the new values.
-   * @param {R} oldRow Row object with the old values.
-   * @returns {Promise<R> | R} The final values to update the row.
-   */
-  processRowUpdate: PropTypes.func,
-  /**
-   * Controls the modes of the rows.
-   */
-  rowModesModel: PropTypes.object,
-  /**
    * @ignore
    */
   rows: PropTypes.arrayOf(
@@ -1032,10 +947,6 @@ DataGrid.propTypes /* remove-proptypes */ = {
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     }),
   ),
-  /**
-   * Overridable components.
-   */
-  slots: PropTypes.object,
 } as any;
 
 export { DataGrid };

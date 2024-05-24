@@ -54,9 +54,10 @@ export function getCoreComponentInfo(filename: string): ComponentInfo {
     isSystemComponent: false,
     readFile: () => {
       srcInfo = parseFile(filename);
+      console.log(srcInfo, srcInfo?.inheritedComponent);
       return srcInfo;
     },
-    getInheritance: () => {
+    getInheritance: (inheritedComponent = srcInfo?.inheritedComponent) => {
       return null;
     },
     getDemos: () => demos,

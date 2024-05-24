@@ -1,0 +1,4 @@
+<Box sx={{ height: 300 }}>
+  <DataGrid dataProvider={movieData} />
+</Box>
+<div style={{ height: 300 }}>Barchart</div>

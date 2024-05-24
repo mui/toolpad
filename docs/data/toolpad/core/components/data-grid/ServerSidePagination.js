@@ -2,7 +2,7 @@ import * as React from 'react';
 import { CacheProvider, createDataProvider } from '@toolpad/core/DataProvider';
 import { DataGrid } from '@toolpad/core/DataGrid';
 import Box from '@mui/material/Box';
-import { DialogProvider } from '@toolpad/core/useDialogs';
+
 import invariant from 'invariant';
 
 const myData = createDataProvider({
@@ -28,12 +28,10 @@ const myData = createDataProvider({
 
 export default function ServerSidePagination() {
   return (
-    <DialogProvider>
-      <CacheProvider>
-        <Box sx={{ height: 250, width: '100%' }}>
-          <DataGrid paginationMode="server" dataProvider={myData} />
-        </Box>
-      </CacheProvider>
-    </DialogProvider>
+    <CacheProvider>
+      <Box sx={{ height: 250, width: '100%' }}>
+        <DataGrid paginationMode="server" dataProvider={myData} />
+      </Box>
+    </CacheProvider>
   );
 }

@@ -32,7 +32,6 @@ import invariant from 'invariant';
 import { useNonNullableContext } from '@toolpad/utils/react';
 import { errorFrom } from '@toolpad/utils/errors';
 import RowsLoadingOverlay from './LoadingOverlay';
-import { useNotifications } from '../useNotifications';
 import { ErrorOverlay, LoadingOverlay } from '../shared';
 import {
   ResolvedDataProvider,
@@ -44,6 +43,11 @@ import {
   ResolvedFields,
 } from '../DataProvider';
 import InferencingAlert from './InferrencingAlert';
+import {
+  NotificationSnackbar,
+  DataGridNotification,
+  SetDataGridNotificationContext,
+} from './NotificationSnackbar';
 
 const RootContainer = styled('div')({
   display: 'flex',
@@ -149,24 +153,21 @@ function DeleteAction<R extends Datum>({ id, dataProvider }: DeleteActionProps<R
   const refetch = useNonNullableContext(RefetchContext);
   const [pending, setPending] = React.useState(false);
 
-  const notifications = useNotifications();
+  const setNotification = useNonNullableContext(SetDataGridNotificationContext);
 
   const handleDeleteClick = React.useCallback(async () => {
     try {
       setPending(true);
       invariant(dataProvider.deleteOne, 'deleteOne not implemented');
       await dataProvider.deleteOne(id);
-      notifications.show('Row deleted', {
-        severity: 'success',
-        autoHideDuration: 5000,
-      });
+      setNotification({ message: 'Row deleted', severity: 'success' });
     } catch (error) {
-      notifications.show('Failed to delete row', { severity: 'error' });
+      setNotification({ message: 'Failed to delete row', severity: 'error' });
     } finally {
       setPending(false);
       await refetch();
     }
-  }, [dataProvider, id, notifications, refetch]);
+  }, [dataProvider, id, refetch, setNotification]);
 
   return (
     <GridActionsCellItem
@@ -480,6 +481,8 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
     ...restProps
   } = props;
 
+  const [notification, setNotification] = React.useState<DataGridNotification | null>(null);
+
   const gridApiRefOwn = useGridApiRef();
   const apiRef = apiRefProp ?? gridApiRefOwn;
 
@@ -497,8 +500,6 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
   const handleCreateRowRequest = React.useCallback(() => {
     dispatchEditingAction({ kind: 'START_ROW_EDIT', rowId: DRAFT_ROW_ID });
   }, []);
-
-  const notifications = useNotifications();
 
   const useGetManyParams = React.useMemo<GetManyParams<R>>(
     () => ({
@@ -548,23 +549,11 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
             if (process.env.NODE_ENV !== 'production') {
               message = `${message}: ${errorFrom(creationError).message}`;
             }
-            notifications.show(message, {
-              severity: 'error',
-            });
+            setNotification({ message, severity: 'error' });
             return { ...originalRow, _action: 'delete' };
           }
 
-          const key = notifications.show('Row created', {
-            severity: 'success',
-            actionText: 'Show',
-            autoHideDuration: 5000,
-            onAction: () => {
-              apiRef.current.setFilterModel({
-                items: [{ field: 'id', operator: 'equals', value: String(result.id) }],
-              });
-              notifications.close(key);
-            },
-          });
+          setNotification({ message: 'Row created', severity: 'success', showId: result.id });
         } else {
           invariant(updateOne, 'updateOne not implemented');
 
@@ -580,23 +569,11 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
             if (process.env.NODE_ENV !== 'production') {
               message = `${message}: ${errorFrom(updateError).message}`;
             }
-            notifications.show(message, {
-              severity: 'error',
-            });
+            setNotification({ message, severity: 'error' });
             return originalRow;
           }
 
-          const key = notifications.show('Row updated', {
-            severity: 'success',
-            autoHideDuration: 5000,
-            actionText: 'Show',
-            onAction: () => {
-              apiRef.current.setFilterModel({
-                items: [{ field: 'id', operator: 'equals', value: String(result.id) }],
-              });
-              notifications.close(key);
-            },
-          });
+          setNotification({ message: 'Row updated', severity: 'success', showId: result.id });
         }
 
         return result;
@@ -605,14 +582,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
         refetch();
       }
     };
-  }, [
-    apiRef,
-    dataProvider?.createOne,
-    dataProvider?.updateOne,
-    notifications,
-    processRowUpdateProp,
-    refetch,
-  ]);
+  }, [dataProvider?.createOne, dataProvider?.updateOne, processRowUpdateProp, refetch]);
 
   const slots = React.useMemo<Partial<GridSlotsComponent>>(
     () => ({
@@ -697,51 +667,55 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
 
   return (
     <RefetchContext.Provider value={refetch}>
-      <ToolbarCreateButtonContext.Provider value={createButtonContext}>
-        <RootContainer
-          sx={{
-            height: restProps.autoHeight ? undefined : '100%',
-          }}
-        >
-          {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
-          <GridContainer>
-            <XDataGrid
-              pagination
-              apiRef={apiRef}
-              rows={rows}
-              columns={columns}
-              loading={loading}
-              processRowUpdate={processRowUpdate}
-              slots={slots}
-              rowModesModel={rowModesModelPatched}
-              onRowEditStart={handleRowEditStart}
-              getRowId={getRowId}
-              {...(restProps.paginationMode === 'server'
-                ? {
-                    gridPaginationModel,
-                    onPaginationModelChange: setGridPaginationModel,
-                    rowCount: data?.totalCount ?? -1,
-                  }
-                : {})}
-              {...restProps}
-              // TODO: How can we make this optional?
-              editMode="row"
-            />
-            {isSsr ? (
-              // At last show something during SSR https://github.com/mui/mui-x/issues/7599
-              <PlaceholderBorder>
-                <LoadingOverlay />
-              </PlaceholderBorder>
-            ) : null}
+      <SetDataGridNotificationContext.Provider value={setNotification}>
+        <ToolbarCreateButtonContext.Provider value={createButtonContext}>
+          <RootContainer
+            sx={{
+              height: restProps.autoHeight ? undefined : '100%',
+            }}
+          >
+            {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
+            <GridContainer>
+              <XDataGrid
+                pagination
+                apiRef={apiRef}
+                rows={rows}
+                columns={columns}
+                loading={loading}
+                processRowUpdate={processRowUpdate}
+                slots={slots}
+                rowModesModel={rowModesModelPatched}
+                onRowEditStart={handleRowEditStart}
+                getRowId={getRowId}
+                {...(restProps.paginationMode === 'server'
+                  ? {
+                      gridPaginationModel,
+                      onPaginationModelChange: setGridPaginationModel,
+                      rowCount: data?.totalCount ?? -1,
+                    }
+                  : {})}
+                {...restProps}
+                // TODO: How can we make this optional?
+                editMode="row"
+              />
+              {isSsr ? (
+                // At last show something during SSR https://github.com/mui/mui-x/issues/7599
+                <PlaceholderBorder>
+                  <LoadingOverlay />
+                </PlaceholderBorder>
+              ) : null}
 
-            {error ? (
-              <PlaceholderBorder>
-                <ErrorOverlay error={error} />
-              </PlaceholderBorder>
-            ) : null}
-          </GridContainer>
-        </RootContainer>
-      </ToolbarCreateButtonContext.Provider>
+              {error ? (
+                <PlaceholderBorder>
+                  <ErrorOverlay error={error} />
+                </PlaceholderBorder>
+              ) : null}
+            </GridContainer>
+
+            <NotificationSnackbar apiRef={apiRef} notification={notification} />
+          </RootContainer>
+        </ToolbarCreateButtonContext.Provider>
+      </SetDataGridNotificationContext.Provider>
     </RefetchContext.Provider>
   );
 };

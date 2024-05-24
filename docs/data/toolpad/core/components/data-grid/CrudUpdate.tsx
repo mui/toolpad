@@ -2,7 +2,6 @@ import * as React from 'react';
 import { CacheProvider, createDataProvider } from '@toolpad/core/DataProvider';
 import { DataGrid } from '@toolpad/core/DataGrid';
 import Box from '@mui/material/Box';
-import { NotificationsProvider } from '@toolpad/core/useNotifications';
 
 let nextId = 1;
 const getNextId = () => {
@@ -43,7 +42,6 @@ export default function CrudUpdate() {
   return (
     <CacheProvider>
       <Box sx={{ height: 250, width: '100%' }}>
-        <NotificationsProvider />
         <DataGrid dataProvider={myData} />
       </Box>
     </CacheProvider>

@@ -17,7 +17,7 @@ const myData = createDataProvider({
 });
 // preview-end
 
-export default function FieldInferrence() {
+export default function FieldInference() {
   return (
     <Box sx={{ height: 300, width: '100%' }}>
       <DataGrid dataProvider={myData} />

@@ -10,7 +10,6 @@ import DialogActions from '@mui/material/DialogActions';
 import HelpIcon from '@mui/icons-material/Help';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { ResolvedFields } from '../DataProvider';
-import { DialogProps } from '../useDialogs';
 
 const COPY_BUTTON_CLASS = 'copy-button';
 
@@ -50,18 +49,20 @@ function CodeSnippet({ children }: { children: string }) {
 
 const INFERENCING_DOCS_URL = 'https://mui.com/toolpad/core/components/data-grid/#column-inferrence';
 
-interface InferrenceDialogPayload {
+interface InferencingDialogProps {
+  open: boolean;
+  onClose: () => void;
   fields: ResolvedFields<any>;
 }
 
-function InferencingDialog({ open, onClose, payload }: DialogProps<InferrenceDialogPayload>) {
+function InferencingDialog({ open, onClose, fields }: InferencingDialogProps) {
   const snippet = React.useMemo(() => {
-    const serializedFields = Object.entries(payload.fields).map(([field, def]) => {
+    const serializedFields = Object.entries(fields).map(([field, def]) => {
       return `  ${field}: { type: '${def.type}' },`;
     });
     const text = `fields: {\n${serializedFields.join('\n')}\n}`;
     return text;
-  }, [payload.fields]);
+  }, [fields]);
 
   return (
     <Dialog fullWidth open={open} onClose={() => onClose()}>
@@ -81,19 +82,19 @@ function InferencingDialog({ open, onClose, payload }: DialogProps<InferrenceDia
   );
 }
 
-export interface InferencingDialogProps {
+export interface InferencingAlertProps {
   fields: ResolvedFields<any>;
 }
 
 /**
  * @ignore - internal component.
  */
-export default function InferencingAlert({ fields }: InferencingDialogProps) {
+export default function InferencingAlert({ fields }: InferencingAlertProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
     <React.Fragment>
-      <InferencingDialog open={open} onClose={async () => setOpen(false)} payload={{ fields }} />
+      <InferencingDialog open={open} onClose={async () => setOpen(false)} fields={fields} />
       <Alert
         severity="warning"
         action={

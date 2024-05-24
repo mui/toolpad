@@ -11,6 +11,7 @@ describe('DataGrid', () => {
   afterEach(cleanup);
 
   test('renders content correctly', async () => {
+    // placeholder test
     const { getByText } = render(<DataGrid />);
 
     expect(getByText('Columns')).toBeTruthy();

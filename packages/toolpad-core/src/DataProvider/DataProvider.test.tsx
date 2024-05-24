@@ -12,6 +12,7 @@ describe('DataProvider', () => {
   afterEach(cleanup);
 
   test('renders content correctly', async () => {
+    // placeholder test
     const data = createDataProvider({
       async getMany() {
         return { rows: [{ id: 1, hello: 'foo' }] };

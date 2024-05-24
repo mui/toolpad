@@ -92,20 +92,6 @@ const pages: MuiPage[] = [
           },
         ],
       },
-      {
-        pathname: '/toolpad/core/components/filter-group',
-        subheader: 'Utils',
-        children: [
-          {
-            pathname: '/toolpad/core/components/dialogs',
-            title: 'dialogs',
-          },
-          {
-            pathname: '/toolpad/core/components/notifications',
-            title: 'notifications',
-          },
-        ],
-      },
     ],
   },
   {

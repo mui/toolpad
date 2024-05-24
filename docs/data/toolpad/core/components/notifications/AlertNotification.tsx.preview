@@ -1,4 +1,0 @@
-await notifications.show('Consider yourself notified!', {
-  severity,
-  autoHideDuration: 3000,
-});

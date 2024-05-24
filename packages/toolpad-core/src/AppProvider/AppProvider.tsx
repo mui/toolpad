@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { ThemeProvider, Theme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { baseTheme } from '../themes';
+import { NotificationsProvider } from '../useNotifications';
+import { DialogProvider } from '../useDialogs';
 
 export interface Branding {
   title?: string;
@@ -73,9 +75,12 @@ function AppProvider(props: AppProviderProps) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrandingContext.Provider value={branding}>
-        <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
-      </BrandingContext.Provider>
+      <NotificationsProvider />
+      <DialogProvider>
+        <BrandingContext.Provider value={branding}>
+          <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
+        </BrandingContext.Provider>
+      </DialogProvider>
     </ThemeProvider>
   );
 }

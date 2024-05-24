@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CacheProvider, createDataProvider } from '@toolpad/core/DataProvider';
+import { createDataProvider } from '@toolpad/core/DataProvider';
 import { DataGrid } from '@toolpad/core/DataGrid';
 import Box from '@mui/material/Box';
 
@@ -20,22 +20,20 @@ const myData = createDataProvider({
 
 export default function OverrideColumns() {
   return (
-    <CacheProvider>
-      <Box sx={{ height: 250, width: '100%' }}>
-        {/* preview-start */}
-        <DataGrid
-          dataProvider={myData}
-          columns={[
-            // renders header name from data provider
-            { field: 'id' },
-            // overrides header name from data provider
-            { field: 'name', headerName: 'First name' },
-            // adds a new column
-            { field: 'greeting', valueGetter: (_, row) => `Hi, ${row.name}` },
-          ]}
-        />
-        {/* preview-end */}
-      </Box>
-    </CacheProvider>
+    <Box sx={{ height: 250, width: '100%' }}>
+      {/* preview-start */}
+      <DataGrid
+        dataProvider={myData}
+        columns={[
+          // renders header name from data provider
+          { field: 'id' },
+          // overrides header name from data provider
+          { field: 'name', headerName: 'First name' },
+          // adds a new column
+          { field: 'greeting', valueGetter: (_, row) => `Hi, ${row.name}` },
+        ]}
+      />
+      {/* preview-end */}
+    </Box>
   );
 }

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CacheProvider, createDataProvider } from '@toolpad/core/DataProvider';
+import { createDataProvider } from '@toolpad/core/DataProvider';
 import { DataGrid } from '@toolpad/core/DataGrid';
 import Box from '@mui/material/Box';
 
@@ -22,10 +22,8 @@ const myData = createDataProvider({
 
 export default function BasicDataProvider() {
   return (
-    <CacheProvider>
-      <Box sx={{ height: 250, width: '100%' }}>
-        <DataGrid dataProvider={myData} />
-      </Box>
-    </CacheProvider>
+    <Box sx={{ height: 250, width: '100%' }}>
+      <DataGrid dataProvider={myData} />
+    </Box>
   );
 }

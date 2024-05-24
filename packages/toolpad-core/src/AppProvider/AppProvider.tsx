@@ -5,7 +5,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { baseTheme } from '../themes';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogProvider } from '../useDialogs';
-import { CacheProvider } from '../DataProvider';
 
 export interface Branding {
   title?: string;
@@ -74,17 +73,15 @@ function AppProvider(props: AppProviderProps) {
   const { children, theme = baseTheme, branding = null, navigation = [] } = props;
 
   return (
-    <CacheProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <NotificationsProvider />
-        <DialogProvider>
-          <BrandingContext.Provider value={branding}>
-            <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
-          </BrandingContext.Provider>
-        </DialogProvider>
-      </ThemeProvider>
-    </CacheProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <NotificationsProvider />
+      <DialogProvider>
+        <BrandingContext.Provider value={branding}>
+          <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
+        </BrandingContext.Provider>
+      </DialogProvider>
+    </ThemeProvider>
   );
 }
 

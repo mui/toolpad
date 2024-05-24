@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { describe, test, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
-import { createDataProvider, CacheProvider } from './DataProvider';
+import { createDataProvider } from './DataProvider';
 import { DataGrid } from '../DataGrid';
 
 describe('DataProvider', () => {
@@ -18,11 +18,7 @@ describe('DataProvider', () => {
       },
     });
 
-    const { getByText } = render(
-      <CacheProvider>
-        <DataGrid dataProvider={data} />
-      </CacheProvider>,
-    );
+    const { getByText } = render(<DataGrid dataProvider={data} />);
 
     expect(getByText('Columns')).toBeTruthy();
   });

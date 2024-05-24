@@ -4,6 +4,11 @@ import * as React from 'react';
 import { getObjectKey } from '@toolpad/utils/objectKey';
 import { Filter, getKeyFromFilter, useAppliedFilter } from './filter';
 
+/**
+ * @ignore - do not document.
+ * Not a hook nor a component
+ */
+
 export type ValidId = string | number;
 export type ValidDatum = {
   id: ValidId;

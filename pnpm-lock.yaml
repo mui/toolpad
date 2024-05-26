@@ -54,11 +54,11 @@ importers:
         specifier: 17.7.2
         version: 17.7.2
       zod:
-        specifier: 3.22.4
-        version: 3.22.4
+        specifier: 3.23.8
+        version: 3.23.8
       zod-to-json-schema:
-        specifier: 3.22.5
-        version: 3.22.5(zod@3.22.4)
+        specifier: 3.23.0
+        version: 3.23.0(zod@3.23.8)
     devDependencies:
       '@argos-ci/core':
         specifier: 1.5.5
@@ -866,11 +866,11 @@ importers:
         specifier: 17.7.2
         version: 17.7.2
       zod:
-        specifier: 3.22.4
-        version: 3.22.4
+        specifier: 3.23.8
+        version: 3.23.8
       zod-validation-error:
-        specifier: 3.1.0
-        version: 3.1.0(zod@3.22.4)
+        specifier: 3.3.0
+        version: 3.3.0(zod@3.23.8)
     devDependencies:
       '@types/babel__code-frame':
         specifier: 7.0.6
@@ -9358,8 +9358,8 @@ packages:
       '@babel/plugin-proposal-private-methods': 7.18.6(@babel/core@7.24.5)
       eslint: 8.57.0
       hermes-parser: 0.20.1
-      zod: 3.22.4
-      zod-validation-error: 3.1.0(zod@3.22.4)
+      zod: 3.23.8
+      zod-validation-error: 3.3.0(zod@3.23.8)
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -16917,25 +16917,25 @@ packages:
       readable-stream: 4.5.2
     dev: false
 
-  /zod-to-json-schema@3.22.5(zod@3.22.4):
-    resolution: {integrity: sha512-+akaPo6a0zpVCCseDed504KBJUQpEW5QZw7RMneNmKw+fGaML1Z9tUNLnHHAC8x6dzVRO1eB2oEMyZRnuBZg7Q==}
+  /zod-to-json-schema@3.23.0(zod@3.23.8):
+    resolution: {integrity: sha512-az0uJ243PxsRIa2x1WmNE/pnuA05gUq/JB8Lwe1EDCCL/Fz9MgjYQ0fPlyc2Tcv6aF2ZA7WM5TWaRZVEFaAIag==}
     peerDependencies:
-      zod: ^3.22.4
+      zod: ^3.23.3
     dependencies:
-      zod: 3.22.4
+      zod: 3.23.8
     dev: false
 
-  /zod-validation-error@3.1.0(zod@3.22.4):
-    resolution: {integrity: sha512-zujS6HqJjMZCsvjfbnRs7WI3PXN39ovTcY1n8a+KTm4kOH0ZXYsNiJkH1odZf4xZKMkBDL7M2rmQ913FCS1p9w==}
+  /zod-validation-error@3.3.0(zod@3.23.8):
+    resolution: {integrity: sha512-Syib9oumw1NTqEv4LT0e6U83Td9aVRk9iTXPUQr1otyV1PuXQKOvOwhMNqZIq5hluzHP2pMgnOmHEo7kPdI2mw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       zod: ^3.18.0
     dependencies:
-      zod: 3.22.4
+      zod: 3.23.8
     dev: false
 
-  /zod@3.22.4:
-    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+  /zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
     dev: false
 
   /zwitch@1.0.5:

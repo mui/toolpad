@@ -749,8 +749,8 @@ importers:
         specifier: 2.2.4
         version: 2.2.4
       json-to-ts:
-        specifier: 1.7.0
-        version: 1.7.0
+        specifier: 2.1.0
+        version: 2.1.0
       json5:
         specifier: 2.2.3
         version: 2.2.3
@@ -11392,8 +11392,8 @@ packages:
     resolution: {integrity: sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA==}
     dev: true
 
-  /json-to-ts@1.7.0:
-    resolution: {integrity: sha512-uVhcw4SLnf9ucMwFpom/G1/IT+lnoILOyHbFE6xqxvw67oCvHl6iDZzmjyn2lPCRPsAOMSQgG/ZxvbCPySMi1Q==}
+  /json-to-ts@2.1.0:
+    resolution: {integrity: sha512-JeScjtIGYAxQVxEYgQUKROU0329eS+rsTSviGtuKiwKuXpcIU7DxhDYm2tey0vcBetwc9kD0+YHDI5KvEexMew==}
     dependencies:
       es7-shim: 6.0.0
       hash.js: 1.1.7

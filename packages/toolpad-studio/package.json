@@ -106,7 +106,7 @@
     "google-auth-library": "9.10.0",
     "http-proxy-middleware": "3.0.0",
     "invariant": "2.2.4",
-    "json-to-ts": "1.7.0",
+    "json-to-ts": "2.1.0",
     "json5": "2.2.3",
     "latest-version": "9.0.0",
     "lodash-es": "4.17.21",

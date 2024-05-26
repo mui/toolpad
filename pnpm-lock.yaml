@@ -815,8 +815,8 @@ importers:
         specifier: 4.0.13
         version: 4.0.13(react@18.2.0)
       react-hook-form:
-        specifier: 7.51.4
-        version: 7.51.4(react@18.2.0)
+        specifier: 7.51.5
+        version: 7.51.5(react@18.2.0)
       react-inspector:
         specifier: 6.0.2
         version: 6.0.2(react@18.2.0)
@@ -993,8 +993,8 @@ importers:
         specifier: 4.0.13
         version: 4.0.13(react@18.2.0)
       react-hook-form:
-        specifier: 7.51.4
-        version: 7.51.4(react@18.2.0)
+        specifier: 7.51.5
+        version: 7.51.5(react@18.2.0)
     devDependencies:
       '@types/invariant':
         specifier: 2.2.37
@@ -14144,6 +14144,15 @@ packages:
 
   /react-hook-form@7.51.4(react@18.2.0):
     resolution: {integrity: sha512-V14i8SEkh+V1gs6YtD0hdHYnoL4tp/HX/A45wWQN15CYr9bFRmmRdYStSO5L65lCCZRF+kYiSKhm9alqbcdiVA==}
+    engines: {node: '>=12.22.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18
+    dependencies:
+      react: 18.2.0
+    dev: false
+
+  /react-hook-form@7.51.5(react@18.2.0):
+    resolution: {integrity: sha512-J2ILT5gWx1XUIJRETiA7M19iXHlG74+6O3KApzvqB/w8S5NQR7AbU8HVZrMALdmDgWpRPYiZJl0zx8Z4L2mP6Q==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18

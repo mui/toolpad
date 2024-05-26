@@ -97,8 +97,8 @@ importers:
         specifier: 1.0.8
         version: 1.0.8
       '@mui/monorepo':
-        specifier: github:mui/material-ui#2223961179a8812664c589e4ee8042f108bfc021
-        version: github.com/mui/material-ui/2223961179a8812664c589e4ee8042f108bfc021(@opentelemetry/api@1.8.0)
+        specifier: github:mui/material-ui#a3fdc9f9682b57a6059792634863e39f322cef8d
+        version: github.com/mui/material-ui/a3fdc9f9682b57a6059792634863e39f322cef8d(@opentelemetry/api@1.8.0)
       '@mui/x-charts':
         specifier: 7.5.1
         version: 7.5.1(@mui/material@5.15.18)(react-dom@18.2.0)(react@18.2.0)
@@ -3763,18 +3763,6 @@ packages:
       call-bind: 1.0.7
     dev: false
 
-  /@mswjs/interceptors@0.27.2:
-    resolution: {integrity: sha512-mE6PhwcoW70EX8+h+Y/4dLfHk33GFt/y5PzDJz56ktMyaVGFXMJ5BYLbUjdmGEABfE0x5GgAGyKbrbkYww2s3A==}
-    engines: {node: '>=18'}
-    dependencies:
-      '@open-draft/deferred-promise': 2.2.0
-      '@open-draft/logger': 0.3.0
-      '@open-draft/until': 2.1.0
-      is-node-process: 1.2.0
-      outvariant: 1.4.2
-      strict-event-emitter: 0.5.1
-    dev: true
-
   /@mui/base@5.0.0-beta.40(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-I/lGHztkCzvwlXpjD2+SNmvNQvB4227xBXhISPjEaJUXGImOQ9f3D2Yj/T3KasSI/h0MLWy74X0J6clhPmsRbQ==}
     engines: {node: '>=12.0.0'}
@@ -4830,11 +4818,11 @@ packages:
       - '@types/react'
     dev: false
 
-  /@netlify/functions@2.6.3(@opentelemetry/api@1.8.0):
-    resolution: {integrity: sha512-7Z9gWyAuPI2NnBOvpYPD66KIWOgNznLz9BkyZ0c7qeRE6p23UCMVZ2VsrJpjPDgoJtKplGSBzASl6fQD7iEeWw==}
+  /@netlify/functions@2.7.0(@opentelemetry/api@1.8.0):
+    resolution: {integrity: sha512-4pXC/fuj3eGQ86wbgPiM4zY8+AsNrdz6vcv6FEdUJnZW+LqF8IWjQcY3S0d1hLeLKODYOqq4CkrzGyCpce63Nw==}
     engines: {node: '>=14.0.0'}
     dependencies:
-      '@netlify/serverless-functions-api': 1.18.0(@opentelemetry/api@1.8.0)
+      '@netlify/serverless-functions-api': 1.18.1(@opentelemetry/api@1.8.0)
     transitivePeerDependencies:
       - '@opentelemetry/api'
     dev: true
@@ -4844,11 +4832,10 @@ packages:
     engines: {node: ^14.16.0 || >=16.0.0}
     dev: true
 
-  /@netlify/serverless-functions-api@1.18.0(@opentelemetry/api@1.8.0):
-    resolution: {integrity: sha512-VCU5btoGZ8M6iI7HSwpfZXCpBLKWFmRtq5xYt0K7dY96BZWVBmaZY6Tn+w4L2DrGXwAsIeOFNp8CHjVXfuCAkg==}
+  /@netlify/serverless-functions-api@1.18.1(@opentelemetry/api@1.8.0):
+    resolution: {integrity: sha512-DrSvivchuwsuQW03zbVPT3nxCQa5tn7m4aoPOsQKibuJXIuSbfxzCBxPLz0+LchU5ds7YyOaCc9872Y32ngYzg==}
     engines: {node: '>=18.0.0'}
     dependencies:
-      '@mswjs/interceptors': 0.27.2
       '@netlify/node-cookies': 0.1.0
       '@opentelemetry/core': 1.24.1(@opentelemetry/api@1.8.0)
       '@opentelemetry/otlp-transformer': 0.50.0(@opentelemetry/api@1.8.0)
@@ -5301,21 +5288,6 @@ packages:
     resolution: {integrity: sha512-D4iHGTdAnEEVsB8fl95m1hiz7D5YiRdQ9b/OEb3BYRVwbLsGHcRVPz+u+BgRLNk0Q0/4iZCBqDN96j2XNxfXrA==}
     dependencies:
       '@octokit/openapi-types': 18.1.1
-    dev: true
-
-  /@open-draft/deferred-promise@2.2.0:
-    resolution: {integrity: sha512-CecwLWx3rhxVQF6V4bAgPS5t+So2sTbPgAzafKkVizyi7tlwpcFpdFqq+wqF2OwNBmqFuu6tOyouTuxgpMfzmA==}
-    dev: true
-
-  /@open-draft/logger@0.3.0:
-    resolution: {integrity: sha512-X2g45fzhxH238HKO4xbSr7+wBS8Fvw6ixhTDuvLd5mqh6bJJCFAPwU9mPDxbcrRtfxv4u5IHCEH77BmxvXmmxQ==}
-    dependencies:
-      is-node-process: 1.2.0
-      outvariant: 1.4.2
-    dev: true
-
-  /@open-draft/until@2.1.0:
-    resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
     dev: true
 
   /@opentelemetry/api-logs@0.50.0:
@@ -10272,6 +10244,7 @@ packages:
 
   /glob@7.1.4:
     resolution: {integrity: sha512-hkLPepehmnKk41pUGm3sYxoFs/umurYfYJCerbXEyFIWcAzvpipAgVkBqqT9RBKMGjnq6kMuyYwha6csxbiM1A==}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -10283,6 +10256,7 @@ packages:
 
   /glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -10294,6 +10268,7 @@ packages:
   /glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
+    deprecated: Glob versions prior to v9 are no longer supported
     dependencies:
       fs.realpath: 1.0.0
       inflight: 1.0.6
@@ -11032,10 +11007,6 @@ packages:
   /is-negative-zero@2.0.3:
     resolution: {integrity: sha512-5KoIu2Ngpyek75jXodFvnafB6DJgr3u8uuK0LEZJjrU19DrMD3EVERaR8sjz8CCGgpZvxPl9SuE1GMVPFHx1mw==}
     engines: {node: '>= 0.4'}
-
-  /is-node-process@1.2.0:
-    resolution: {integrity: sha512-Vg4o6/fqPxIjtxgUH5QLJhwZ7gW5diGCVlXpuUfELC62CuxM1iHcRe51f2W1FDy04Ai4KJkagKjx3XaqyfRKXw==}
-    dev: true
 
   /is-number-object@1.0.7:
     resolution: {integrity: sha512-k1U0IRzLMo7ZlYIfzRu23Oh6MiIFasgpb9X76eqfFZAqwH44UI4KTBvBYIZ1dSL9ZzChTB9ShHfLkR4pdW5krQ==}
@@ -13161,10 +13132,6 @@ packages:
     resolution: {integrity: sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==}
     engines: {node: '>=0.10.0'}
 
-  /outvariant@1.4.2:
-    resolution: {integrity: sha512-Ou3dJ6bA/UJ5GVHxah4LnqDwZRwAmWxrG3wtrHrbGnP4RnLCtA64A4F+ae7Y8ww660JaddSoArUR5HjipWSHAQ==}
-    dev: true
-
   /p-event@5.0.1:
     resolution: {integrity: sha512-dd589iCQ7m1L0bmC5NLlVYfy3TbBEsMUfWx9PyAgPeIcFZ/E2yaTZ4Rz4MiBmmJShviiftHVXOqfnfzJ6kyMrQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -14610,6 +14577,7 @@ packages:
 
   /rimraf@2.7.1:
     resolution: {integrity: sha512-uWjbaKIK3T1OSVptzX7Nl6PvQ3qAGtKEtVRjRuazjfL3Bx5eI409VZSqgND+4UNnmzLVdPj9FqFJNPqBZFve4w==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
     dependencies:
       glob: 7.2.3
@@ -14617,6 +14585,7 @@ packages:
 
   /rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
     dependencies:
       glob: 7.2.3
@@ -15151,10 +15120,6 @@ packages:
       queue-tick: 1.0.1
     optionalDependencies:
       bare-events: 2.2.2
-
-  /strict-event-emitter@0.5.1:
-    resolution: {integrity: sha512-vMgjE/GGEPEFnhFub6pa4FmJBRBVOLpIII2hvCZ8Kzb7K0hlHo7mQv6xYrBvCL2LtAIBwFUK8wvuJgTVSQ5MFQ==}
-    dev: true
 
   /string-at@1.1.0:
     resolution: {integrity: sha512-jCpPowWKBn0NFdvtmK2qxK40Ol4jPcgCt8qYnKpPx6B5eDwHMDhRvq9MCsDEgsOTNtbXY6beAMHMRT2qPJXllA==}
@@ -16919,15 +16884,16 @@ packages:
     resolution: {integrity: sha512-V50KMwwzqJV0NpZIZFwfOD5/lyny3WlSzRiXgA0G7VUnRlqttta1L6UQIHzd6EuBY/cHGfwTIck7w1yH6Q5zUw==}
     dev: true
 
-  github.com/mui/material-ui/2223961179a8812664c589e4ee8042f108bfc021(@opentelemetry/api@1.8.0):
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/2223961179a8812664c589e4ee8042f108bfc021}
-    id: github.com/mui/material-ui/2223961179a8812664c589e4ee8042f108bfc021
+  github.com/mui/material-ui/a3fdc9f9682b57a6059792634863e39f322cef8d(@opentelemetry/api@1.8.0):
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/a3fdc9f9682b57a6059792634863e39f322cef8d}
+    id: github.com/mui/material-ui/a3fdc9f9682b57a6059792634863e39f322cef8d
     name: '@mui/monorepo'
-    version: 6.0.0-alpha.7
+    version: 6.0.0-alpha.8
+    engines: {pnpm: 8.15.8}
     requiresBuild: true
     dependencies:
       '@googleapis/sheets': 5.0.5
-      '@netlify/functions': 2.6.3(@opentelemetry/api@1.8.0)
+      '@netlify/functions': 2.7.0(@opentelemetry/api@1.8.0)
       '@slack/bolt': 3.18.0
       execa: 8.0.1
       google-auth-library: 9.9.0

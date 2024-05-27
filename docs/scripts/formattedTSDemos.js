@@ -89,7 +89,11 @@ async function transpileFile(tsxPath, project) {
       transformOptions.plugins = transformOptions.plugins.concat([
         [
           require.resolve('docs/src/modules/utils/babel-plugin-jsx-preview'),
-          { maxLines: 16, outputFilename: `${tsxPath}.preview` },
+          {
+            maxLines: 16,
+            outputFilename: `${tsxPath}.preview`,
+            wrapperTypes: ['div', 'Box', 'Stack', 'AppProvider'],
+          },
         ],
       ]);
     }
@@ -153,8 +157,6 @@ async function main(argv) {
   const tsxFiles = [
     ...(await getFiles(path.join(workspaceRoot, 'docs/data'))), // new structure
   ].filter((fileName) => filePattern.test(fileName));
-
-  console.log(tsxFiles);
 
   const buildProject = createTypeScriptProjectBuilder(CORE_TYPESCRIPT_PROJECTS);
   const project = buildProject('docs', { files: tsxFiles });

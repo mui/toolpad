@@ -120,8 +120,8 @@
     "tsx": "4.11.0",
     "vitest": "1.6.0",
     "yargs": "17.7.2",
-    "zod": "3.22.4",
-    "zod-to-json-schema": "3.22.5"
+    "zod": "3.23.8",
+    "zod-to-json-schema": "3.23.0"
   },
   "engines": {
     "node": ">=18",

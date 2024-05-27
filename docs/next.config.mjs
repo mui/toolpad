@@ -2,6 +2,7 @@
 import * as path from 'path';
 import * as url from 'url';
 import { createRequire } from 'module';
+import { LANGUAGES, LANGUAGES_IGNORE_PAGES, LANGUAGES_IN_PROGRESS } from './config.js';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -57,6 +58,7 @@ export default withDocsInfra({
         alias: {
           ...config.resolve.alias,
           docs: path.resolve(MONOREPO_PATH, './docs'),
+          'docs-toolpad': path.resolve(WORKSPACE_ROOT, './docs'),
           ...MONOREPO_PACKAGES,
           '@toolpad/studio-components': path.resolve(
             currentDirectory,
@@ -85,6 +87,14 @@ export default withDocsInfra({
                     loader: '@mui/internal-markdown/loader',
                     options: {
                       workspaceRoot: WORKSPACE_ROOT,
+                      ignoreLanguagePages: LANGUAGES_IGNORE_PAGES,
+                      languagesInProgress: LANGUAGES_IN_PROGRESS,
+                      packages: [
+                        {
+                          productId: 'toolpad-core',
+                          paths: [path.join(WORKSPACE_ROOT, 'packages/toolpad-core/src')],
+                        },
+                      ],
                       env: {
                         SOURCE_CODE_REPO: options.config.env.SOURCE_CODE_REPO,
                         LIB_VERSION: options.config.env.LIB_VERSION,
@@ -141,6 +151,12 @@ export default withDocsInfra({
         output: 'export',
       }
     : {
+        rewrites: async () => {
+          return [
+            { source: `/:lang(${LANGUAGES.join('|')})?/:rest*`, destination: '/:rest*' },
+            { source: '/api/:rest*', destination: '/api-docs/:rest*' },
+          ];
+        },
         redirects: async () => [
           {
             source: '/',

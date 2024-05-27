@@ -131,6 +131,12 @@
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
     },
     {
+      "groupName": "unist-util-visit",
+      "matchPackageNames": ["unist-util-visit"],
+      "allowedVersions": "< 2.1.0",
+      "description": "Dependency of appi-docs-builder"
+    },
+    {
       "matchDepTypes": ["action"],
       "pinDigests": true
     },

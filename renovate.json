@@ -133,7 +133,13 @@
     {
       "groupName": "unist-util-visit",
       "matchPackageNames": ["unist-util-visit"],
-      "allowedVersions": "< 2.1.0",
+      "allowedVersions": "< 3.0.0",
+      "description": "Dependency of appi-docs-builder"
+    },
+    {
+      "groupName": "react-docgen",
+      "matchPackageNames": ["react-docgen"],
+      "allowedVersions": "< 6.0.0",
       "description": "Dependency of appi-docs-builder"
     },
     {

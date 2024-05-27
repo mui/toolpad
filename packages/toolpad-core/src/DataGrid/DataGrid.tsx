@@ -704,7 +704,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
                   ? {
                       gridPaginationModel,
                       onPaginationModelChange: setGridPaginationModel,
-                      rowCount: data?.totalCount ?? -1,
+                      rowCount: data?.rowCount ?? -1,
                     }
                   : {})}
                 {...restProps}

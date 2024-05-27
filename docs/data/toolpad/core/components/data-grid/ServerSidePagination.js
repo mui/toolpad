@@ -15,7 +15,7 @@ const myData = createDataProvider({
         item: `Item ${pagination.start + i}`,
         page: Math.floor(pagination.start / pagination.pageSize) + 1,
       })),
-      totalCount: 1000000,
+      rowCount: 1000000,
     };
   },
   // preview-end

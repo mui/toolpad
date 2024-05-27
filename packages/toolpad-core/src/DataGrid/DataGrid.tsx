@@ -19,6 +19,7 @@ import {
   GridActionsCellItem,
   GridEventListener,
   GridPaginationModel,
+  gridClasses,
 } from '@mui/x-data-grid';
 import PropTypes from 'prop-types';
 import * as React from 'react';
@@ -677,6 +678,13 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
           <RootContainer
             sx={{
               height: restProps.autoHeight ? undefined : '100%',
+              // Disable vertical scrolling when editing a row
+              [`& .${gridClasses.virtualScroller}`]: {
+                ...(editingState.editedRowId === DRAFT_ROW_ID ? { overflowY: 'hidden' } : {}),
+              },
+              [`& .${gridClasses['scrollbar--vertical']}`]: {
+                ...(editingState.editedRowId === DRAFT_ROW_ID ? { pointerEvents: 'none' } : {}),
+              },
             }}
           >
             {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}

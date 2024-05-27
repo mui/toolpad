@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { LinearProgress, Skeleton, styled } from '@mui/material';
 import {
-  gridColumnPositionsSelector,
-  gridColumnsTotalWidthSelector,
   gridDensityFactorSelector,
+  gridDimensionsSelector,
+  gridRowCountSelector,
+  gridVisibleColumnDefinitionsSelector,
   useGridApiContext,
   useGridRootProps,
   useGridSelector,
@@ -40,7 +41,7 @@ export default function SkeletonLoadingOverlay() {
   const apiRef = useGridApiContext();
   const rootProps = useGridRootProps();
 
-  const dimensions = apiRef.current?.getRootDimensions();
+  const dimensions = useGridSelector(apiRef, gridDimensionsSelector);
   const viewportHeight = dimensions?.viewportInnerSize.height ?? 0;
 
   const factor = useGridSelector(apiRef, gridDensityFactorSelector);
@@ -48,13 +49,7 @@ export default function SkeletonLoadingOverlay() {
 
   const skeletonRowsCount = Math.ceil(viewportHeight / rowHeight);
 
-  const totalWidth = gridColumnsTotalWidthSelector(apiRef);
-  const positions = gridColumnPositionsSelector(apiRef);
-  const inViewportCount = React.useMemo(
-    () => positions.filter((value) => value <= totalWidth).length,
-    [totalWidth, positions],
-  );
-  const columns = apiRef.current.getVisibleColumns().slice(0, inViewportCount);
+  const columns = useGridSelector(apiRef, gridVisibleColumnDefinitionsSelector);
 
   const children = React.useMemo(() => {
     // reseed random number generator to create stable lines betwen renders
@@ -75,7 +70,7 @@ export default function SkeletonLoadingOverlay() {
     return array;
   }, [skeletonRowsCount, columns]);
 
-  const rowsCount = apiRef.current.getRowsCount();
+  const rowsCount = useGridSelector(apiRef, gridRowCountSelector);
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
 

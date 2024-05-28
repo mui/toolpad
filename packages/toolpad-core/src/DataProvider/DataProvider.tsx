@@ -50,7 +50,7 @@ export interface GetManyParams<R extends Datum> {
 
 export interface GetManyResult<R extends Datum> {
   rows: R[];
-  totalCount?: number;
+  rowCount?: number;
 }
 
 export interface GetManyMethod<R extends Datum> {

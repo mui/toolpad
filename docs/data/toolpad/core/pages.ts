@@ -87,7 +87,7 @@ const pages: MuiPage[] = [
         subheader: 'Data',
         children: [
           {
-            pathname: '/toolpad/core/components/data-grid',
+            pathname: '/toolpad/core/react-data-grid',
             title: 'Data Grid',
           },
         ],

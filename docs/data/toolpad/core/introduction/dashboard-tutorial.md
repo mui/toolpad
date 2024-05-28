@@ -12,21 +12,19 @@ Toolpad core comes with the concept of data providers. At its core, a data provi
 ```js
 import { createDataProvider } from '@toolpad/core/DataProvider';
 
-const movieData = createDataProvider({
+const npmData = createDataProvider({
   async getMany() {
     const res = await fetch(
-      'https://raw.githubusercontent.com/mui/mui-toolpad/master/public/movies.json',
+      'https://api.npmjs.org/downloads/range/last-year/react',
     );
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    const { movies } = await res.json();
-    return { rows: movies };
+    const { downloads } = await res.json();
+    return { rows: downloads.map((point: any) => ({ ...point, id: point.day })) };
   },
   fields: {
     id: {},
-    title: {},
-    year: {},
-    director: {},
-    runtime: {},
+    day: { type: 'date' },
+    downloads: { type: 'number' },
   },
 });
 ```
@@ -41,8 +39,8 @@ import { Box } from '@mui/material';
 
 export default function App() {
   return (
-    <Box sx={{ height: 400 }}>
-      <DataGrid dataProvider={movieData} />
+    <Box sx={{ height: 300 }}>
+      <DataGrid dataProvider={npmData} />
     </Box>
   );
 }
@@ -57,21 +55,21 @@ This results in the following output
 The data providers can be shared between different data components. For example, to also visualize this data in a chart you can add the BarChart component and connect the same data:
 
 ```js
-import { DataGrid, BarChart } from '@toolpad/core';
+import { DataGrid, LineChart } from '@toolpad/core';
 
 // ...
 
 export default function App() {
   return (
     <div>
-      <Box sx={{ height: 400 }}>
-        <DataGrid dataProvider={movieData} />
+      <Box sx={{ height: 300 }}>
+        <DataGrid dataProvider={npmData} />
       </Box>
-      <BarChart
-        dataProvider={movieData}
-        height={400}
-        groupBy="year"
-        aggregation="count"
+      <LineChart
+        height={300}
+        dataProvider={npmData}
+        xAxis={[{ dataKey: 'day' }]}
+        series={[{ dataKey: 'downloads' }]}
       />
     </div>
   );
@@ -98,9 +96,7 @@ export default function App() {
           onChange={(event) => setMaxRuntime(event.target.value)}
         />
       </Toolbar>
-      <DataContext filter={[[movieData, { runtime: { lt: maxRuntime } }]]}>
-        {/* ... */}
-      </DataContext>
+      <DataContext filter={{ runtime: { lt: maxRuntime } }}>{/* ... */}</DataContext>
     </div>
   );
 }

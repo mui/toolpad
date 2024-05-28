@@ -1,25 +1,22 @@
 import * as React from 'react';
 import { createDataProvider } from '@toolpad/core/DataProvider';
 import { DataGrid } from '@toolpad/core/DataGrid';
+import { LineChart } from '@toolpad/core/LineChart';
 import Box from '@mui/material/Box';
 
-const movieData = createDataProvider({
+const npmData = createDataProvider({
   async getMany() {
-    const res = await fetch(
-      'https://raw.githubusercontent.com/mui/mui-toolpad/master/public/movies.json',
-    );
+    const res = await fetch('https://api.npmjs.org/downloads/range/last-year/react');
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
-    const { movies } = await res.json();
-    return { rows: movies };
+    const { downloads } = await res.json();
+    return { rows: downloads.map((point: any) => ({ ...point, id: point.day })) };
   },
   fields: {
     id: {},
-    title: {},
-    year: {},
-    runtime: {},
-    director: {},
+    day: { type: 'date' },
+    downloads: { type: 'number' },
   },
 });
 
@@ -27,9 +24,14 @@ export default function Tutorial2() {
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ height: 300 }}>
-        <DataGrid dataProvider={movieData} />
+        <DataGrid dataProvider={npmData} />
       </Box>
-      <div style={{ height: 300 }}>Barchart</div>
+      <LineChart
+        height={300}
+        dataProvider={npmData}
+        xAxis={[{ dataKey: 'day' }]}
+        series={[{ dataKey: 'downloads' }]}
+      />
     </Box>
   );
 }

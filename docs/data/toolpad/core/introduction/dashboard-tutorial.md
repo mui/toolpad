@@ -12,21 +12,19 @@ Toolpad Core comes with the concept of data providers. At its core, a data provi
 ```js
 import { createDataProvider } from '@toolpad/core/DataProvider';
 
-const movieData = createDataProvider({
+const npmData = createDataProvider({
   async getMany() {
-    const res = await fetch(
-      'https://raw.githubusercontent.com/mui/mui-toolpad/master/public/movies.json',
-    );
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    const { movies } = await res.json();
-    return { rows: movies };
+    const res = await fetch('https://api.npmjs.org/downloads/range/last-year/react');
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    }
+    const { downloads } = await res.json();
+    return { rows: downloads.map((point: any) => ({ ...point, id: point.day })) };
   },
   fields: {
     id: {},
-    title: {},
-    year: {},
-    director: {},
-    runtime: {},
+    day: { type: 'date' },
+    downloads: { type: 'number' },
   },
 });
 ```
@@ -41,8 +39,8 @@ import { Box } from '@mui/material';
 
 export default function App() {
   return (
-    <Box sx={{ height: 400 }}>
-      <DataGrid dataProvider={movieData} />
+    <Box sx={{ height: 300, width: '100%' }}>
+      <DataGrid dataProvider={npmData} />
     </Box>
   );
 }

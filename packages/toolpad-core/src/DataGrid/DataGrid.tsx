@@ -693,7 +693,6 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
       inferredFields ?? dataProvider.fields,
       columnsProp,
     );
-    console.log(gridColumns, dataProvider.fields);
 
     gridColumns = updateColumnsWithDataProviderEditing(
       dataProvider,

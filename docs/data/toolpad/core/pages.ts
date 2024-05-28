@@ -1,4 +1,5 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
+import pagesApi from './pagesApi';
 
 const pages: MuiPage[] = [
   {
@@ -81,27 +82,22 @@ const pages: MuiPage[] = [
           },
         ],
       },
+      {
+        pathname: '/toolpad/core/components/data-group',
+        subheader: 'Data',
+        children: [
+          {
+            pathname: '/toolpad/core/react-data-grid',
+            title: 'Data Grid',
+          },
+        ],
+      },
     ],
   },
   {
     pathname: '/toolpad/core/api-group',
     title: 'APIs',
-    children: [
-      {
-        pathname: '/toolpad/core/api/components-group',
-        subheader: 'Components',
-        children: [
-          {
-            pathname: '/toolpad/core/api/app-provider',
-            title: 'AppProvider',
-          },
-          {
-            pathname: '/toolpad/core/api/dashboard-layout',
-            title: 'DashboardLayout',
-          },
-        ],
-      },
-    ],
+    children: pagesApi,
   },
   {
     pathname: '/toolpad/core/customization',

@@ -112,7 +112,7 @@ export function createDataProvider<R extends Datum>(
   const result = { ...input } as ResolvedDataProvider<R>;
   if (input.fields) {
     result.fields = {
-      id: { label: DEFAULT_ID_FIELD, type: 'string' },
+      [input.idField ?? DEFAULT_ID_FIELD]: { type: 'string' },
       ...Object.fromEntries(
         Object.entries(input.fields).map(([k, v]) => [k, { type: 'string', label: k, ...v }]),
       ),

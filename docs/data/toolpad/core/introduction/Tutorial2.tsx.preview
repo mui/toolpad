@@ -1,4 +1,9 @@
 <Box sx={{ height: 300 }}>
-  <DataGrid dataProvider={movieData} />
+  <DataGrid dataProvider={npmData} />
 </Box>
-<div style={{ height: 300 }}>Barchart</div>
+<LineChart
+  height={300}
+  dataProvider={npmData}
+  xAxis={[{ dataKey: 'day' }]}
+  series={[{ dataKey: 'downloads' }]}
+/>

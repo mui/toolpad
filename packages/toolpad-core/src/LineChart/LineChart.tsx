@@ -6,12 +6,15 @@ import {
   LineChartProps as XLineChartProps,
   AxisConfig,
   blueberryTwilightPalette,
+  LineSeriesType,
 } from '@mui/x-charts';
 import { Box, useTheme } from '@mui/material';
 import { Datum, ResolvedDataProvider, useGetMany } from '../DataProvider';
 import { ErrorOverlay, LoadingOverlay } from '../shared';
 
-export interface LineChartProps<R extends Datum> extends XLineChartProps {
+export type LineChartSeries = XLineChartProps['series'];
+
+export interface LineChartProps<R extends Datum> extends Partial<XLineChartProps> {
   dataProvider: ResolvedDataProvider<R>;
 }
 
@@ -20,32 +23,41 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
   const theme = useTheme();
   const { data, loading, error } = useGetMany(dataProvider);
   const resolvedXAxis = React.useMemo(() => {
-    return (
-      xAxis?.map((axis) => {
-        let defaults: Partial<AxisConfig> = {};
-        if (axis.dataKey) {
-          const field = dataProvider.fields?.[axis.dataKey];
-          if (field) {
-            defaults = {
-              label: field.label,
-            };
-            if (field.type === 'date') {
-              defaults.scaleType = 'time';
-            }
+    if (!xAxis || xAxis.length <= 0) {
+      return [{ dataKey: 'id' }];
+    }
+    return xAxis.map((axis) => {
+      let defaults: Partial<AxisConfig> = {};
+      if (axis.dataKey) {
+        const field = dataProvider.fields?.[axis.dataKey];
+        if (field) {
+          defaults = {
+            label: field.label,
+          };
+          if (field.type === 'date') {
+            defaults.scaleType = 'time';
           }
         }
-        return { ...defaults, ...axis };
-      }) ?? []
-    );
+      }
+      return { ...defaults, ...axis };
+    });
   }, [dataProvider.fields, xAxis]);
 
   const resolvedSeries = React.useMemo(() => {
+    const resolvedSeriesProp: LineChartSeries =
+      series ||
+      Object.keys(dataProvider.fields ?? {})
+        .filter((dataKey) => dataKey !== 'id' && dataProvider.fields?.[dataKey]?.type === 'number')
+        .map((dataKey) => ({ dataKey }));
+
     const colorSchemeIndices = new Map(
       Object.keys(dataProvider.fields ?? {}).map((name, i) => [name, i]),
     );
+
     const colors = blueberryTwilightPalette(theme.palette.mode);
-    return series.map((s) => {
-      let defaults: Partial<XLineChartProps['series'][number]> = {};
+
+    return resolvedSeriesProp.map((s) => {
+      let defaults: Partial<LineSeriesType> = {};
       if (s.dataKey) {
         const name = s.dataKey;
         const field = dataProvider.fields?.[name];
@@ -91,3 +103,5 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
     </Box>
   );
 }
+/*
+Since we're sharing books, my wife (who also works in a people department) is reading Erin Meyer's "The Culture Map" and she's been telling me about it. I didn't read it myself but what she told me about high vs. low context cultures was very insightful in understanding 

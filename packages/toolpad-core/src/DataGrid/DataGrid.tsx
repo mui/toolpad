@@ -117,10 +117,7 @@ const PlaceholderBorder = styled('div')(({ theme }) => ({
 
 type ProcessRowUpdate = XDataGridProps['processRowUpdate'];
 
-export interface DataGridProps<R extends Datum>
-  extends Omit<XDataGridProps<R>, 'columns' | 'rows'> {
-  rows?: readonly R[];
-  columns?: readonly GridColDef<R>[];
+export interface DataGridProps<R extends Datum> extends Partial<XDataGridProps<R>> {
   dataProvider?: ResolvedDataProvider<R>;
 }
 

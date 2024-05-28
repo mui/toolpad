@@ -1,1 +1,1 @@
-<DataGrid dataProvider={movieData} />
+<DataGrid dataProvider={npmData} />

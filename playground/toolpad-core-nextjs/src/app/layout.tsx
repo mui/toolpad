@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { AppProvider, Navigation } from '@toolpad/core/AppProvider';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import type { Navigation } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {

@@ -22,6 +22,6 @@ Error and loading states are automatically handled. Errors from the data provide
 
 ## Customization
 
-The chart automatically adopts configuration from the data provider. When you pick a `dataKey` for an axis or a series, the chart will automatically infer default values for series and axis options. The Toolpad Core components accept all properties that the X components offer. SO to customize the chart further, you can override these defaults and add extra options as you need.
+The chart automatically adopts configuration from the data provider. When you pick a `dataKey` for an axis or a series, the chart automatically infers default values for series and axis options. The Toolpad Core components accept all properties that the X components offer. SO to customize the chart further, you can override these defaults and add extra options as you need.
 
 {{"demo": "CustomizedLineChart.js"}}

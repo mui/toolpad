@@ -9,6 +9,7 @@ import { useNonNullableContext } from '@toolpad/utils/react';
 import CloseIcon from '@mui/icons-material/Close';
 
 export interface DataGridNotification {
+  key: string;
   severity: 'error' | 'success';
   message: React.ReactNode;
   showId?: GridRowId;
@@ -21,18 +22,20 @@ export const SetDataGridNotificationContext = React.createContext<React.Dispatch
 export interface NotificationSnackbarProps {
   notification: DataGridNotification | null;
   apiRef: React.MutableRefObject<GridApi>;
+  idField: string;
 }
 
 /**
  * @ignore - internal component.
  */
-export function NotificationSnackbar({ notification, apiRef }: NotificationSnackbarProps) {
+export function NotificationSnackbar({ notification, apiRef, idField }: NotificationSnackbarProps) {
   const latestNotification = useLatest(notification);
   const open = !!notification;
   const setNotification = useNonNullableContext(SetDataGridNotificationContext);
 
   return (
     <Snackbar
+      key={latestNotification?.key}
       sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}
       open={open}
       autoHideDuration={5000}
@@ -52,7 +55,7 @@ export function NotificationSnackbar({ notification, apiRef }: NotificationSnack
                   apiRef.current.setFilterModel({
                     items: [
                       {
-                        field: 'id',
+                        field: idField,
                         operator: 'equals',
                         value: String(latestNotification.showId),
                       },

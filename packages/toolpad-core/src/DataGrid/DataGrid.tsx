@@ -111,7 +111,6 @@ function cleanDraftRow<R>(row: MaybeDraftRow<R>): R {
 const PlaceholderBorder = styled('div')(({ theme }) => ({
   position: 'absolute',
   inset: '0 0 0 0',
-  backgroundColor: theme.palette.background.paper,
   borderColor: theme.palette.divider,
   borderWidth: 1,
   borderStyle: 'solid',
@@ -717,6 +716,9 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
               },
               [`& .${gridClasses['scrollbar--vertical']}`]: {
                 ...(editingState.editedRowId === DRAFT_ROW_ID ? { pointerEvents: 'none' } : {}),
+              },
+              [`& .${gridClasses.root}`]: {
+                visibility: error ? 'hidden' : undefined,
               },
             }}
           >

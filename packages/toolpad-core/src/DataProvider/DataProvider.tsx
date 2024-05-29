@@ -139,7 +139,17 @@ function getKeyForParams(params: GetManyParams<any>): string[] {
   ];
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      networkMode: 'always',
+    },
+    mutations: {
+      networkMode: 'always',
+    },
+  },
+});
 
 export function useGetMany<R extends Datum>(
   dataProvider: ResolvedDataProvider<R> | null,

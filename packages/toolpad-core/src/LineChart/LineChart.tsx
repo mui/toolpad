@@ -8,9 +8,15 @@ import {
   blueberryTwilightPalette,
   LineSeriesType,
 } from '@mui/x-charts';
-import { Box, useTheme } from '@mui/material';
+import { styled, useTheme } from '@mui/material';
 import { Datum, ResolvedDataProvider, useGetMany } from '../DataProvider';
 import { ErrorOverlay, LoadingOverlay } from '../shared';
+
+const LineChartRoot = styled('div')({
+  position: 'relative',
+});
+
+const CHART_CLASS = 'line-chart';
 
 export type LineChartSeries = XLineChartProps['series'];
 
@@ -96,10 +102,24 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
   }, [data?.rows, dataProvider.fields]);
 
   return (
-    <Box sx={{ position: 'relative' }}>
-      <XLineChart dataset={dataSet} xAxis={resolvedXAxis} series={resolvedSeries} {...rest} />
+    <LineChartRoot
+      sx={{
+        [`& .${CHART_CLASS}`]: {
+          visibility: error ? 'hidden' : undefined,
+        },
+      }}
+    >
+      <div className={CHART_CLASS} style={{ display: 'contents' }}>
+        <XLineChart
+          className={CHART_CLASS}
+          dataset={dataSet}
+          xAxis={resolvedXAxis}
+          series={resolvedSeries}
+          {...rest}
+        />
+      </div>
       {loading ? <LoadingOverlay /> : null}
       {error ? <ErrorOverlay error={error} /> : null}
-    </Box>
+    </LineChartRoot>
   );
 }

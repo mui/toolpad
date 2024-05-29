@@ -8,7 +8,8 @@ const npmData = createDataProvider({
   async getMany() {
     const res = await fetch('https://api.npmjs.org/downloads/range/last-year/react');
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      const { error } = await res.json();
+      throw new Error(`HTTP ${res.status}: ${error}`);
     }
     const { downloads } = await res.json();
     return { rows: downloads };

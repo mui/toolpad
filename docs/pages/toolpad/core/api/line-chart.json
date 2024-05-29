@@ -1,5 +1,18 @@
 {
-  "props": {},
+  "props": {
+    "series": {
+      "type": {
+        "name": "arrayOf",
+        "description": "Array&lt;{ area?: bool, color?: string, connectNulls?: bool, curve?: 'catmullRom'<br>&#124;&nbsp;'linear'<br>&#124;&nbsp;'monotoneX'<br>&#124;&nbsp;'monotoneY'<br>&#124;&nbsp;'natural'<br>&#124;&nbsp;'step'<br>&#124;&nbsp;'stepAfter'<br>&#124;&nbsp;'stepBefore', data?: Array&lt;number&gt;, dataKey?: string, disableHighlight?: bool, highlightScope?: { faded?: 'global'<br>&#124;&nbsp;'none'<br>&#124;&nbsp;'series', highlighted?: 'item'<br>&#124;&nbsp;'none'<br>&#124;&nbsp;'series' }, id?: number<br>&#124;&nbsp;string, label?: func<br>&#124;&nbsp;string, showMark?: func<br>&#124;&nbsp;bool, stack?: string, stackOffset?: 'diverging'<br>&#124;&nbsp;'expand'<br>&#124;&nbsp;'none'<br>&#124;&nbsp;'silhouette'<br>&#124;&nbsp;'wiggle', stackOrder?: 'appearance'<br>&#124;&nbsp;'ascending'<br>&#124;&nbsp;'descending'<br>&#124;&nbsp;'insideOut'<br>&#124;&nbsp;'none'<br>&#124;&nbsp;'reverse', type?: 'line', valueFormatter?: func, xAxisKey?: string, yAxisKey?: string }&gt;"
+      }
+    },
+    "xAxis": {
+      "type": {
+        "name": "arrayOf",
+        "description": "Array&lt;{ axisId?: number<br>&#124;&nbsp;string, classes?: object, colorMap?: { color: Array&lt;string&gt;<br>&#124;&nbsp;func, max?: Date<br>&#124;&nbsp;number, min?: Date<br>&#124;&nbsp;number, type: 'continuous' }<br>&#124;&nbsp;{ colors: Array&lt;string&gt;, thresholds: Array&lt;Date<br>&#124;&nbsp;number&gt;, type: 'piecewise' }<br>&#124;&nbsp;{ colors: Array&lt;string&gt;, type: 'ordinal', unknownColor?: string, values?: Array&lt;Date<br>&#124;&nbsp;number<br>&#124;&nbsp;string&gt; }, data?: array, dataKey?: string, disableLine?: bool, disableTicks?: bool, fill?: string, hideTooltip?: bool, id?: number<br>&#124;&nbsp;string, label?: string, labelFontSize?: number, labelStyle?: object, max?: Date<br>&#124;&nbsp;number, min?: Date<br>&#124;&nbsp;number, position?: 'bottom'<br>&#124;&nbsp;'left'<br>&#124;&nbsp;'right'<br>&#124;&nbsp;'top', reverse?: bool, scaleType?: 'band'<br>&#124;&nbsp;'linear'<br>&#124;&nbsp;'log'<br>&#124;&nbsp;'point'<br>&#124;&nbsp;'pow'<br>&#124;&nbsp;'sqrt'<br>&#124;&nbsp;'time'<br>&#124;&nbsp;'utc', slotProps?: { axisLabel?: object, axisLine?: object, axisTick?: object, axisTickLabel?: object }, slots?: { axisLabel?: elementType, axisLine?: elementType, axisTick?: elementType, axisTickLabel?: elementType }, stroke?: string, tickFontSize?: number, tickInterval?: 'auto'<br>&#124;&nbsp;array<br>&#124;&nbsp;func, tickLabelInterval?: 'auto'<br>&#124;&nbsp;func, tickLabelPlacement?: 'middle'<br>&#124;&nbsp;'tick', tickLabelStyle?: object, tickMaxStep?: number, tickMinStep?: number, tickNumber?: number, tickPlacement?: 'end'<br>&#124;&nbsp;'extremities'<br>&#124;&nbsp;'middle'<br>&#124;&nbsp;'start', tickSize?: number, valueFormatter?: func }&gt;"
+      }
+    }
+  },
   "name": "LineChart",
   "imports": [
     "import { LineChart } from '@toolpad-core/LineChart';",

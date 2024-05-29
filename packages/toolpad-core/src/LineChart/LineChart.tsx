@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import {
   LineChart as XLineChart,
   LineChartProps as XLineChartProps,
@@ -122,5 +123,154 @@ function LineChart<R extends Datum>(props: LineChartProps<R>) {
     </LineChartRoot>
   );
 }
+
+LineChart.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * @ignore
+   */
+  children: PropTypes.node,
+  /**
+   * @ignore
+   */
+  dataProvider: PropTypes.shape({
+    createOne: PropTypes.func,
+    deleteOne: PropTypes.func,
+    fields: PropTypes.object,
+    getMany: PropTypes.func.isRequired,
+    getOne: PropTypes.func,
+    idField: PropTypes.object,
+    updateOne: PropTypes.func,
+  }),
+  /**
+   * The series to display in the line chart.
+   * An array of [[LineSeriesType]] objects.
+   */
+  series: PropTypes.arrayOf(
+    PropTypes.shape({
+      area: PropTypes.bool,
+      color: PropTypes.string,
+      connectNulls: PropTypes.bool,
+      curve: PropTypes.oneOf([
+        'catmullRom',
+        'linear',
+        'monotoneX',
+        'monotoneY',
+        'natural',
+        'step',
+        'stepAfter',
+        'stepBefore',
+      ]),
+      data: PropTypes.arrayOf(PropTypes.number),
+      dataKey: PropTypes.string,
+      disableHighlight: PropTypes.bool,
+      highlightScope: PropTypes.shape({
+        faded: PropTypes.oneOf(['global', 'none', 'series']),
+        highlighted: PropTypes.oneOf(['item', 'none', 'series']),
+      }),
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      label: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+      showMark: PropTypes.oneOfType([PropTypes.func, PropTypes.bool]),
+      stack: PropTypes.string,
+      stackOffset: PropTypes.oneOf(['diverging', 'expand', 'none', 'silhouette', 'wiggle']),
+      stackOrder: PropTypes.oneOf([
+        'appearance',
+        'ascending',
+        'descending',
+        'insideOut',
+        'none',
+        'reverse',
+      ]),
+      type: PropTypes.oneOf(['line']),
+      valueFormatter: PropTypes.func,
+      xAxisKey: PropTypes.string,
+      yAxisKey: PropTypes.string,
+    }),
+  ),
+  /**
+   * The configuration of the x-axes.
+   * If not provided, a default axis config is used.
+   * An array of [[AxisConfig]] objects.
+   */
+  xAxis: PropTypes.arrayOf(
+    PropTypes.shape({
+      axisId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      classes: PropTypes.object,
+      colorMap: PropTypes.oneOfType([
+        PropTypes.shape({
+          color: PropTypes.oneOfType([
+            PropTypes.arrayOf(PropTypes.string.isRequired),
+            PropTypes.func,
+          ]).isRequired,
+          max: PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.number]),
+          min: PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.number]),
+          type: PropTypes.oneOf(['continuous']).isRequired,
+        }),
+        PropTypes.shape({
+          colors: PropTypes.arrayOf(PropTypes.string).isRequired,
+          thresholds: PropTypes.arrayOf(
+            PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.number]).isRequired,
+          ).isRequired,
+          type: PropTypes.oneOf(['piecewise']).isRequired,
+        }),
+        PropTypes.shape({
+          colors: PropTypes.arrayOf(PropTypes.string).isRequired,
+          type: PropTypes.oneOf(['ordinal']).isRequired,
+          unknownColor: PropTypes.string,
+          values: PropTypes.arrayOf(
+            PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.number, PropTypes.string])
+              .isRequired,
+          ),
+        }),
+      ]),
+      data: PropTypes.array,
+      dataKey: PropTypes.string,
+      disableLine: PropTypes.bool,
+      disableTicks: PropTypes.bool,
+      fill: PropTypes.string,
+      hideTooltip: PropTypes.bool,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+      label: PropTypes.string,
+      labelFontSize: PropTypes.number,
+      labelStyle: PropTypes.object,
+      max: PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.number]),
+      min: PropTypes.oneOfType([PropTypes.instanceOf(Date), PropTypes.number]),
+      position: PropTypes.oneOf(['bottom', 'left', 'right', 'top']),
+      reverse: PropTypes.bool,
+      scaleType: PropTypes.oneOf(['band', 'linear', 'log', 'point', 'pow', 'sqrt', 'time', 'utc']),
+      slotProps: PropTypes.shape({
+        axisLabel: PropTypes.object,
+        axisLine: PropTypes.object,
+        axisTick: PropTypes.object,
+        axisTickLabel: PropTypes.object,
+      }),
+      slots: PropTypes.shape({
+        axisLabel: PropTypes.elementType,
+        axisLine: PropTypes.elementType,
+        axisTick: PropTypes.elementType,
+        axisTickLabel: PropTypes.elementType,
+      }),
+      stroke: PropTypes.string,
+      tickFontSize: PropTypes.number,
+      tickInterval: PropTypes.oneOfType([
+        PropTypes.oneOf(['auto']),
+        PropTypes.array,
+        PropTypes.func,
+      ]),
+      tickLabelInterval: PropTypes.oneOfType([PropTypes.oneOf(['auto']), PropTypes.func]),
+      tickLabelPlacement: PropTypes.oneOf(['middle', 'tick']),
+      tickLabelStyle: PropTypes.object,
+      tickMaxStep: PropTypes.number,
+      tickMinStep: PropTypes.number,
+      tickNumber: PropTypes.number,
+      tickPlacement: PropTypes.oneOf(['end', 'extremities', 'middle', 'start']),
+      tickSize: PropTypes.number,
+      valueFormatter: PropTypes.func,
+    }),
+  ),
+} as any;
 
 export { LineChart };

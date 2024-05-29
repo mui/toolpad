@@ -22,7 +22,7 @@ export interface LineChartProps<R extends Datum> extends Partial<XLineChartProps
   dataProvider?: ResolvedDataProvider<R>;
 }
 
-export /**
+/**
  *
  * Demos:
  *
@@ -31,7 +31,8 @@ export /**
  * API:
  *
  * - [LineChart API](https://mui.com/toolpad/core/api/line-chart)
- */ function LineChart<R extends Datum>(props: LineChartProps<R>) {
+ */
+function LineChart<R extends Datum>(props: LineChartProps<R>) {
   const { dataProvider, xAxis, series, ...rest } = props;
   const theme = useTheme();
   const { data, loading, error } = useGetMany(dataProvider ?? null);
@@ -121,3 +122,5 @@ export /**
     </LineChartRoot>
   );
 }
+
+export { LineChart };

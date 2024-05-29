@@ -9,6 +9,9 @@ import { Filter, getKeyFromFilter, useAppliedFilter } from './filter';
  * Not a hook nor a component
  */
 
+export const DEFAULT_ID_FIELD = 'id';
+export type DefaultIdField = typeof DEFAULT_ID_FIELD;
+
 export type ValidId = string | number;
 export type ValidDatum = {
   id: ValidId;
@@ -16,24 +19,24 @@ export type ValidDatum = {
 };
 export type Datum<R extends ValidDatum = ValidDatum> = R;
 
-export type ValidProp<R extends Datum> = keyof R & string;
+export type FieldOf<R extends Datum> = keyof R & string;
 
 export type FieldType = 'string' | 'number' | 'boolean' | 'date';
 
-export interface ValueFormatter<R extends Datum, K extends ValidProp<R>> {
+export interface ValueFormatter<R extends Datum, K extends FieldOf<R>> {
   (value: R[K], field: K): string;
 }
 
-export interface FieldDef<R extends Datum, K extends ValidProp<R> = ValidProp<R>> {
+export interface FieldDef<R extends Datum, K extends FieldOf<R> = FieldOf<R>> {
   type?: FieldType;
   label?: string;
   valueFormatter?: ValueFormatter<R, K>;
 }
 
 export type FieldDefs<R extends Datum> = {
-  [K in Exclude<keyof R & string, 'id'>]: FieldDef<R, K>;
+  [K in Exclude<FieldOf<R>, DefaultIdField>]: FieldDef<R, K>;
 } & {
-  id?: FieldDef<R, 'id'>;
+  id?: FieldDef<R, DefaultIdField>;
 };
 
 export interface IndexPagination {
@@ -57,7 +60,7 @@ export interface GetManyMethod<R extends Datum> {
   (params: GetManyParams<R>): Promise<GetManyResult<R>>;
 }
 
-export interface ResolvedField<R extends Datum, K extends ValidProp<R> = ValidProp<R>> {
+export interface ResolvedField<R extends Datum, K extends FieldOf<R> = FieldOf<R>> {
   type: FieldType;
   label: string;
   valueFormatter?: ValueFormatter<R, K>;
@@ -85,11 +88,12 @@ export interface DataProviderDefinition<R extends Datum> {
   createOne?: CreateOneMethod<R>;
   updateOne?: UpdateOneMethod<R>;
   deleteOne?: DeleteOneMethod;
+  idField?: FieldOf<R>;
   fields?: FieldDefs<R>;
 }
 
 export type ResolvedFields<R extends Datum> = {
-  [K in keyof R & string]: ResolvedField<R, K>;
+  [K in FieldOf<R>]: ResolvedField<R, K>;
 };
 
 export interface ResolvedDataProvider<R extends Datum> {
@@ -98,6 +102,7 @@ export interface ResolvedDataProvider<R extends Datum> {
   createOne?: CreateOneMethod<R>;
   updateOne?: UpdateOneMethod<R>;
   deleteOne?: DeleteOneMethod;
+  idField?: FieldOf<R>;
   fields?: ResolvedFields<R>;
 }
 
@@ -107,7 +112,7 @@ export function createDataProvider<R extends Datum>(
   const result = { ...input } as ResolvedDataProvider<R>;
   if (input.fields) {
     result.fields = {
-      id: { label: 'id', type: 'string' },
+      [input.idField ?? DEFAULT_ID_FIELD]: { type: 'string' },
       ...Object.fromEntries(
         Object.entries(input.fields).map(([k, v]) => [k, { type: 'string', label: k, ...v }]),
       ),

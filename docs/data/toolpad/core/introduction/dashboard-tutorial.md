@@ -21,8 +21,8 @@ const npmData = createDataProvider({
     const { downloads } = await res.json();
     return { rows: downloads.map((point: any) => ({ ...point, id: point.day })) };
   },
+  idField: 'day',
   fields: {
-    id: {},
     day: { type: 'date' },
     downloads: { type: 'number' },
   },
@@ -49,57 +49,3 @@ export default function App() {
 This results in the following output
 
 {{"demo": "Tutorial1.js", "hideToolbar": true}}
-
-## Sharing a datasource
-
-The data providers can be shared between different data components. For example, to also visualize this data in a chart you can add the BarChart component and connect the same data:
-
-```js
-import { DataGrid, BarChart } from '@toolpad/core';
-
-// ...
-
-export default function App() {
-  return (
-    <div>
-      <Box sx={{ height: 400 }}>
-        <DataGrid dataProvider={movieData} />
-      </Box>
-      <BarChart
-        dataProvider={movieData}
-        height={400}
-        groupBy="year"
-        aggregation="count"
-      />
-    </div>
-  );
-}
-```
-
-This results in the following Dashboard
-
-{{"demo": "Tutorial2.js", "hideToolbar": true}}
-
-## Filtering
-
-```js
-import { DataContext } from '@toolpad/core';
-
-export default function App() {
-  const [maxRuntime, setMaxRuntime] = React.useState(200);
-  return (
-    <div>
-      <Toolbar>
-        <TextField
-          label="Maximum Runtime"
-          value={maxRuntime}
-          onChange={(event) => setMaxRuntime(event.target.value)}
-        />
-      </Toolbar>
-      <DataContext filter={[[movieData, { runtime: { lt: maxRuntime } }]]}>
-        {/* ... */}
-      </DataContext>
-    </div>
-  );
-}
-```

@@ -20,9 +20,10 @@ const myData = createDataProvider({
 
 export default function OverrideColumns() {
   return (
-    <Box sx={{ height: 250, width: '100%' }}>
+    <Box sx={{ width: '100%' }}>
       {/* preview-start */}
       <DataGrid
+        height={250}
         dataProvider={myData}
         columns={[
           // renders header name from data provider

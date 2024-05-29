@@ -10,10 +10,11 @@ const npmData = createDataProvider({
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
     const { downloads } = await res.json();
-    return { rows: downloads.map((point: any) => ({ ...point, id: point.day })) };
+
+    return { rows: downloads };
   },
+  idField: 'day',
   fields: {
-    id: {},
     day: { type: 'date' },
     downloads: { type: 'number' },
   },

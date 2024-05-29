@@ -3,8 +3,9 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { AppProvider, Navigation } from '@toolpad/core/AppProvider';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import type { Navigation, Branding } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {
@@ -17,7 +18,7 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-const BRANDING = {
+const BRANDING: Branding = {
   logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
   title: 'MUI',
 };

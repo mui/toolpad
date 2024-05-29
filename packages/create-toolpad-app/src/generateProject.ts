@@ -9,8 +9,9 @@ export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
   const rootLayoutContent = `  
-  import { AppProvider, Navigation } from '@toolpad/core/AppProvider';
+  import { AppProvider } from '@toolpad/core/AppProvider';
   import DashboardIcon from "@mui/icons-material/Dashboard";
+  import type { Navigation } from '@toolpad/core';
   import theme from '../theme';
 
   const NAVIGATION: Navigation = [

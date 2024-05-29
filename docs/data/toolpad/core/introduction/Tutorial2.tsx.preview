@@ -1,6 +1,4 @@
-<Box sx={{ height: 300 }}>
-  <DataGrid dataProvider={npmData} />
-</Box>
+<DataGrid height={300} dataProvider={npmData} />
 <LineChart
   height={300}
   dataProvider={npmData}

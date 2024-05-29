@@ -11,10 +11,10 @@ const npmData = createDataProvider({
       throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     }
     const { downloads } = await res.json();
-    return { rows: downloads.map((point: any) => ({ ...point, id: point.day })) };
+    return { rows: downloads };
   },
+  idField: 'day',
   fields: {
-    id: {},
     day: { type: 'date' },
     downloads: { type: 'number' },
   },
@@ -23,9 +23,7 @@ const npmData = createDataProvider({
 export default function Tutorial2() {
   return (
     <Box sx={{ width: '100%' }}>
-      <Box sx={{ height: 300 }}>
-        <DataGrid dataProvider={npmData} />
-      </Box>
+      <DataGrid height={300} dataProvider={npmData} />
       <LineChart
         height={300}
         dataProvider={npmData}

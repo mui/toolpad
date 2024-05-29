@@ -47,7 +47,7 @@ function CodeSnippet({ children }: { children: string }) {
   );
 }
 
-const INFERENCING_DOCS_URL = 'https://mui.com/toolpad/core/components/data-grid/#column-inferrence';
+const INFERENCING_DOCS_URL = 'https://mui.com/toolpad/core/react-data-grid/#column-inference';
 
 interface InferencingDialogProps {
   open: boolean;

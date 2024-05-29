@@ -39,18 +39,8 @@ const pages: MuiPage[] = [
         subheader: 'Features',
         children: [
           {
-            pathname: '/toolpad/core/features/authentication',
-
-            title: 'Authentication',
-          },
-          {
             pathname: '/toolpad/core/features/data-providers',
             title: 'Data Providers',
-          },
-          {
-            pathname: '/toolpad/core/features/audit-logs',
-            title: 'Audit Logs',
-            plan: 'pro',
           },
         ],
       },
@@ -103,11 +93,6 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/core/api/components-group',
         subheader: 'Components',
         children: componentsApi,
-      },
-      {
-        pathname: '/toolpad/core/api/hooks-group',
-        subheader: 'Hooks',
-        children: hooksApi,
       },
     ],
   },

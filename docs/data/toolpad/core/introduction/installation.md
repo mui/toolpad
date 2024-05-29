@@ -47,7 +47,7 @@ yarn dev
 
 3. Visit **http://localhost:3000/** in your browser to open the application.
 
-4. The CLI will boostrap the following directory:
+4. The CLI bootstraps the following directory:
 
    ```bash
     ├── app

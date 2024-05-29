@@ -20,7 +20,7 @@ yarn
 
 ## Build step
 
-This command will create an optimized production build for the Toolpad Studio app and will output the generated files:
+This command creates an optimized production build for the app and outputs the generated files:
 
 <codeblock storageKey="package-manager">
 

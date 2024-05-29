@@ -8,7 +8,7 @@ components: DataGrid, DataProvider
 
 <p class="description">Data Grid component for CRUD ("Create Read Update Delete") applications.</p>
 
-Toolpad Core extends the [MUI X data grid](https://mui.com/x/react-data-grid/) with CRUD functionality. It abstracts the manipulations in a data provider object. The data provider object describes the shape of the data and the available manipulations. When you pass the data provider to a grid it is automatically configured as a CRUD grid. All properties of the X grid are also available and can be used to override the data provider behavior.
+Toolpad Core extends the [X data grid](https://mui.com/x/react-data-grid/) with CRUD functionality. It abstracts the manipulations in a data provider object. The data provider object describes the shape of the data and the available manipulations. When you pass the data provider to a grid it is automatically configured as a CRUD grid. All properties of the X grid are also available and can be used to override the data provider behavior.
 
 Where Core and X components focus on the user interface, Toolpad Core components start from a definition of the data. It centralizes data loading, filtering, pagination, field formatting, mutations, access control and more.
 

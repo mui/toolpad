@@ -5,7 +5,7 @@ title: Examples
 
 # Toolpad Core - Examples
 
-<p class="description">Browse our collection of Toolpad Core examples to help you get started quickly:</p>
+<p class="description">Browse a collection of Toolpad Core examples to help you get started quickly:</p>
 
 <!-- #default-branch-switch -->
 

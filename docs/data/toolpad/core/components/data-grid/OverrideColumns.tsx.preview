@@ -1,4 +1,5 @@
 <DataGrid
+  height={250}
   dataProvider={myData}
   columns={[
     // renders header name from data provider

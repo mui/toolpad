@@ -20,6 +20,7 @@ import {
   GridEventListener,
   GridPaginationModel,
   gridClasses,
+  GridRowIdGetter,
 } from '@mui/x-data-grid';
 import PropTypes from 'prop-types';
 import * as React from 'react';
@@ -40,8 +41,10 @@ import {
   Datum,
   useGetMany,
   GetManyParams,
-  ValidProp,
+  FieldOf,
   ResolvedFields,
+  ValidId,
+  DEFAULT_ID_FIELD,
 } from '../DataProvider';
 import InferencingAlert from './InferencingAlert';
 import {
@@ -121,6 +124,7 @@ export interface DataGridProps<R extends Datum>
   extends Omit<XDataGridProps<R>, 'columns' | 'rows'> {
   rows?: readonly R[];
   columns?: readonly GridColDef<R>[];
+  height?: number;
   dataProvider?: ResolvedDataProvider<R>;
 }
 
@@ -161,9 +165,17 @@ function DeleteAction<R extends Datum>({ id, dataProvider }: DeleteActionProps<R
       setPending(true);
       invariant(dataProvider.deleteOne, 'deleteOne not implemented');
       await dataProvider.deleteOne(id);
-      setNotification({ message: 'Row deleted', severity: 'success' });
+      setNotification({
+        key: `delete-success-${id}`,
+        message: 'Row deleted',
+        severity: 'success',
+      });
     } catch (error) {
-      setNotification({ message: 'Failed to delete row', severity: 'error' });
+      setNotification({
+        key: `delete-failed-${id}`,
+        message: 'Failed to delete row',
+        severity: 'error',
+      });
     } finally {
       setPending(false);
       await refetch();
@@ -280,7 +292,7 @@ export function getColumnsFromDataProviderFields<R extends Datum>(
 
   baseColumns = baseColumns ?? Object.keys(fields ?? {}).map((field) => ({ field }));
 
-  const resolvedColumns = baseColumns.map(function mapper<K extends ValidProp<R>>(
+  const resolvedColumns = baseColumns.map(function mapper<K extends FieldOf<R>>(
     baseColDef: GridColDef<R, R[K], string>,
   ): GridColDef<R, R[K], string> {
     const dataProviderField: ResolvedField<R, K> | undefined = fieldMap.get(baseColDef.field);
@@ -316,18 +328,19 @@ function updateColumnsWithDataProviderEditing<R extends Datum>(
   state: GridState,
   dispatch: React.Dispatch<GridAction>,
 ): readonly GridColDef<R>[] {
+  const idField = dataProvider.idField ?? DEFAULT_ID_FIELD;
   const canEdit = !!dataProvider.updateOne;
   const canDelete = !!dataProvider.deleteOne;
   const canCreate = !!dataProvider.createOne;
   const hasEditableRows = canCreate || canEdit;
   const hasActionsColumn: boolean = canCreate || canEdit || canDelete;
 
-  const resolvedColumns = baseColumns.map(function mapper<K extends ValidProp<R>>(
+  const resolvedColumns = baseColumns.map(function mapper<K extends FieldOf<R>>(
     baseColDef: GridColDef<R, R[K], string>,
   ): GridColDef<R, R[K], string> {
     const colDef = { ...baseColDef };
 
-    if (hasEditableRows && colDef.field !== 'id') {
+    if (hasEditableRows && colDef.field !== idField) {
       colDef.editable = true;
     }
 
@@ -345,9 +358,10 @@ function updateColumnsWithDataProviderEditing<R extends Datum>(
       width: 100,
       getActions: (params) => {
         const actions: React.ReactElement<GridActionsCellItemProps>[] = [];
+        const rowId = params.row[idField] as GridRowId;
 
         const isEditing = state.editedRowId !== null || state.isProcessingRowUpdate;
-        const isEditedRow = params.id === state.editedRowId;
+        const isEditedRow = rowId === state.editedRowId;
 
         if (isEditedRow) {
           actions.push(
@@ -379,13 +393,13 @@ function updateColumnsWithDataProviderEditing<R extends Datum>(
                 label="Edit"
                 disabled={isEditing}
                 onClick={() => {
-                  dispatch({ kind: 'START_ROW_EDIT', rowId: params.id });
+                  dispatch({ kind: 'START_ROW_EDIT', rowId });
                 }}
               />,
             );
           }
           if (canDelete) {
-            actions.push(<DeleteAction key="delete" id={params.id} dataProvider={dataProvider} />);
+            actions.push(<DeleteAction key="delete" id={rowId} dataProvider={dataProvider} />);
           }
         }
         return actions;
@@ -487,6 +501,8 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
     ...restProps
   } = restProps2;
 
+  const idField = dataProvider?.idField ?? DEFAULT_ID_FIELD;
+
   const [notification, setNotification] = React.useState<DataGridNotification | null>(null);
 
   const gridApiRefOwn = useGridApiRef();
@@ -555,11 +571,17 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
             if (process.env.NODE_ENV !== 'production') {
               message = `${message}: ${errorFrom(creationError).message}`;
             }
-            setNotification({ message, severity: 'error' });
+            setNotification({ key: `create-failed`, message, severity: 'error' });
             return { ...originalRow, _action: 'delete' };
           }
 
-          setNotification({ message: 'Row created', severity: 'success', showId: result.id });
+          const createdId = result[idField] as GridRowId;
+          setNotification({
+            key: `create-success-${createdId}`,
+            message: 'Row created',
+            severity: 'success',
+            showId: createdId,
+          });
         } else {
           invariant(updateOne, 'updateOne not implemented');
 
@@ -568,18 +590,28 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
             return originalRow;
           }
 
+          const updatedId = updatedRow[idField] as ValidId;
           try {
-            result = await updateOne(updatedRow.id, changedValues);
+            result = await updateOne(updatedId, changedValues);
           } catch (updateError) {
             let message = 'Failed to update row';
             if (process.env.NODE_ENV !== 'production') {
               message = `${message}: ${errorFrom(updateError).message}`;
             }
-            setNotification({ message, severity: 'error' });
+            setNotification({
+              key: `update-failed-${updatedId}`,
+              message,
+              severity: 'error',
+            });
             return originalRow;
           }
 
-          setNotification({ message: 'Row updated', severity: 'success', showId: result.id });
+          setNotification({
+            key: `update-success-${updatedId}`,
+            message: 'Row updated',
+            severity: 'success',
+            showId: result[idField] as GridRowId,
+          });
         }
 
         return result;
@@ -588,7 +620,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
         refetch();
       }
     };
-  }, [dataProvider?.createOne, dataProvider?.updateOne, processRowUpdateProp, refetch]);
+  }, [dataProvider, idField, processRowUpdateProp, refetch]);
 
   const slots = React.useMemo<Partial<GridSlotsComponent>>(
     () => ({
@@ -611,7 +643,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
     };
   }, [editingState.editedRowId, handleCreateRowRequest, hasCreateButton, loading, slotsProp]);
 
-  const getRowId = React.useCallback(
+  const getRowId = React.useCallback<GridRowIdGetter<R>>(
     (row: R) => {
       if (isDraftRow(row)) {
         return DRAFT_ROW_ID;
@@ -619,19 +651,23 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
       if (getRowIdProp) {
         return getRowIdProp(row);
       }
-      return row.id;
+      return row[idField] as GridRowId;
     },
-    [getRowIdProp],
+    [getRowIdProp, idField],
   );
 
   // Remove when https://github.com/mui/mui-x/issues/11423 is fixed
   const rowModesModelPatched = usePatchedRowModesModel(editingState.rowModesModel ?? {});
 
-  const handleRowEditStart = React.useCallback<GridEventListener<'rowEditStart'>>((params) => {
-    if (params.reason === 'cellDoubleClick') {
-      dispatchEditingAction({ kind: 'START_ROW_EDIT', rowId: params.id });
-    }
-  }, []);
+  const handleRowEditStart = React.useCallback<GridEventListener<'rowEditStart'>>(
+    (params) => {
+      const rowId = params.row[idField] as GridRowId;
+      if (params.reason === 'cellDoubleClick') {
+        dispatchEditingAction({ kind: 'START_ROW_EDIT', rowId });
+      }
+    },
+    [idField],
+  );
 
   // Calculate separately to avoid re-calculating columns on every render
   const inferredFields = React.useMemo<ResolvedFields<R> | null>(() => {
@@ -677,7 +713,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
         <ToolbarCreateButtonContext.Provider value={createButtonContext}>
           <RootContainer
             sx={{
-              height: restProps.autoHeight ? undefined : '100%',
+              height: restProps.autoHeight ? undefined : restProps.height ?? '100%',
               // Disable vertical scrolling when editing a row
               [`& .${gridClasses.virtualScroller}`]: {
                 ...(editingState.editedRowId === DRAFT_ROW_ID ? { overflowY: 'hidden' } : {}),
@@ -725,7 +761,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
               ) : null}
             </GridContainer>
 
-            <NotificationSnackbar apiRef={apiRef} notification={notification} />
+            <NotificationSnackbar apiRef={apiRef} notification={notification} idField={idField} />
           </RootContainer>
         </ToolbarCreateButtonContext.Provider>
       </SetDataGridNotificationContext.Provider>

@@ -1,14 +1,11 @@
-# API reference
+# Toolpad Core - API Reference
 
-<p class="description">This page contains an index to the most important JavaScript APIs of Toolpad.</p>
+<p class="description">This page contains an index to the most important APIs of Toolpad.</p>
 
 ## Components
 
+- [App Provider](/toolpad/core/api/app-provider/)
 - [Dashboard Layout](/toolpad/core/api/dashboard-layout/)
 - [Data Grid](/toolpad/core/api/data-grid/)
-- [Line Chart](/toolpad/core/api/line-chart/)
-- [Select Filter](/toolpad/core/api/select-filter/)
 
 ## Hooks
-
-- [useFilterState](/toolpad/core/api/use-filter-state/)

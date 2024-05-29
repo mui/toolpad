@@ -1,5 +1,5 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import pagesApi from './pagesApi';
+import { components as componentsApi, hooks as hooksApi } from './pagesApi';
 
 const pages: MuiPage[] = [
   {
@@ -97,11 +97,19 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/core/api-group',
     title: 'APIs',
-    children: pagesApi,
-  },
-  {
-    pathname: '/toolpad/core/customization',
-    title: 'Customization',
+    children: [
+      { pathname: '/toolpad/core/api/reference', title: 'Index' },
+      {
+        pathname: '/toolpad/core/api/components-group',
+        subheader: 'Components',
+        children: componentsApi,
+      },
+      {
+        pathname: '/toolpad/core/api/hooks-group',
+        subheader: 'Hooks',
+        children: hooksApi,
+      },
+    ],
   },
 ];
 

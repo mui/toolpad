@@ -11,7 +11,7 @@ export default function generateProject(
   const rootLayoutContent = `  
   import { AppProvider } from '@toolpad/core/AppProvider';
   import DashboardIcon from "@mui/icons-material/Dashboard";
-  import type { Navigation } from '@toolpad/core';
+  import type { Navigation } from "@toolpad/core";
   import theme from '../theme';
 
   const NAVIGATION: Navigation = [

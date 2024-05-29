@@ -7,8 +7,8 @@ import { describe, test, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import sinon from 'sinon';
 import { LineChart as XLineChart } from '@mui/x-charts';
+import describeConformance from '@toolpad/utils/describeConformance';
 import { LineChart } from './LineChart';
-import describeConformance from '../../test/describeConformance';
 
 export const stubMatchMedia = (matches = true) =>
   sinon.stub().returns({

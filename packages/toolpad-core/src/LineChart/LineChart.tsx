@@ -50,10 +50,13 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
   }, [dataProvider.fields, xAxis]);
 
   const resolvedSeries = React.useMemo(() => {
+    const idField = dataProvider.idField ?? 'id';
     const resolvedSeriesProp: LineChartSeries =
       series ||
       Object.keys(dataProvider.fields ?? {})
-        .filter((dataKey) => dataKey !== 'id' && dataProvider.fields?.[dataKey]?.type === 'number')
+        .filter(
+          (dataKey) => dataKey !== idField && dataProvider.fields?.[dataKey]?.type === 'number',
+        )
         .map((dataKey) => ({ dataKey }));
 
     const colorSchemeIndices = new Map(
@@ -81,7 +84,7 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
       }
       return { ...defaults, ...s };
     });
-  }, [dataProvider.fields, theme.palette.mode, series]);
+  }, [dataProvider.idField, dataProvider.fields, series, theme.palette.mode]);
 
   const dataSet = React.useMemo(() => {
     const resolvedRows = data?.rows ?? [];

@@ -6,8 +6,6 @@ title: Toolpad Core - Installation
 
 <p class="description">Learn how to install Toolpad Core in your local environment.</p>
 
-## Install instructions
-
 1. Run the following command to start Toolpad Core:
 
 <codeblock storageKey="package-manager">
@@ -47,10 +45,30 @@ yarn dev
 
 </codeblock>
 
-3. Visit **http://localhost:3000/** in your browser to open the application
+3. Visit **http://localhost:3000/** in your browser to open the application.
 
-4. `create-toolpad-app` will generate starter code for a Next.js app. The features included in the bootstrapped app will depend on the preference provided to the CLI:
+4. The CLI will boostrap the following directory:
 
-- Using the app/pages router
-- Using authentication
-- Using a data provider
+   ```bash
+    ├── app
+    │ ├── auth
+    │ ├──── [...path]
+    │ └────── page.tsx
+    │ ├── api
+    │ ├──── auth
+    │ ├────── [...nextAuth]
+    │ └───────── route.tsx
+    │ ├── (dashboard)
+    | ├──── layout.tsx
+    │ ├──── page
+    │ └────── page.tsx
+    ├──── layout.tsx
+    └──── page.tsx
+
+   ```
+
+   and the following page appears when you run the project locally:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/installation-1.png", "alt": "Toolpad Core entry point", "caption": "Starting with Toolpad Core", "zoom": true, "indent": 1 }}
+
+5. Installation is complete! Begin building your project by making edits to `(dashboard/page/page.tsx`. To understand how to leverage Toolpad Core to build dashboards quickly, [see the detailed tutorial](/toolpad/core/introduction/tutorial/).

@@ -4,140 +4,102 @@ title: Tutorial
 
 # Toolpad Core - Tutorial
 
-<p class="description">Tutorial</p>
+<p class="description">Learn how to use Toolpad Core through an illustrative example dashboard.</p>
 
-## Steps to follow
+## Bootstrapping
 
-1. Run:
+<br/>
 
-   ```bash
-   yarn create toolpad-app --core --example tutorial
-   ```
+1. To choose a project name and create a basic project for this tutorial, run:
 
-   This will prompt for a project name and create a basic project for this tutorial
+<codeblock storageKey="package-manager">
 
-2. Run:
+```bash npm
+npx create-toolpad-app@latest --example core-tutorial
+```
 
-   ```bash
-   cd my-first-project
-   yarn dev
-   ```
+```bash pnpm
+pnpm create toolpad-app --example core-tutorial
+```
 
-   to start the app in dev mode
+```bash yarn
+yarn create toolpad-app --example core-tutorial
+```
 
-3. Create a file `/app/hello-world/page.tsx` and add
+  </codeblock>
 
-   ```tsx
-   import * as React from 'react';
+2. To start the basic project on [http://localhost:3000](http://localhost:3000/), run:
 
-   export default async function HelloWorld() {
-     return <div>Hello world!</div>;
-   }
-   ```
+<codeblock storageKey="package-manager">
 
-4. Open [http://localhost:3000/hello-world](http://localhost:3000/hello-world) in your browser and verify that it shows "Hello World!"
+```bash npm
+cd <project-name>
+npm install && npm run dev
+```
 
-5. Now to add our first data provider. Copy the sample CSV file (insert link) to the project root and add the following
+```bash pnpm
+cd <project-name>
+pnpm install && pnpm dev
+```
 
-   ```tsx
-   import * as React from 'react';
-   import createDataProviderCsv from '@mui/toolpad-data-csv';
-   import DataGrid from '@mui/x-data-grid';
-   import { useDataGrid } from '@mui/toolpad';
+```bash yarn
+cd <project-name>
+yarn && yarn dev
+```
 
-   const myCsvData = createDataProviderCsv('./sample-data.csv');
+</codeblock>
 
-   export default async function HelloWorld() {
-     const dataGridProps = useDataGrid(myCsvData);
+3. The following splash screen appears:
 
-     return (
-       <div>
-         <DataGrid {...dataGridProps} />
-       </div>
-     );
-   }
-   ```
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/installation-1.png", "alt": "Toolpad Core entry point", "caption": "Starting with Toolpad Core", "zoom": true, "indent": 1 }}
 
-   :::warning
-   Add live demo here of the above
-   Break down each line that was added and explain what it does.
-   :::
+4. The app has one page already created, which can be viewed by clicking on the "Go to page" button. The following page should appear:
 
-6. This is great, but we'd also like to visualise this data:
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/tutorial-1.png", "alt": "Toolpad Core default page", "caption": "Default page in dashboard layout", "zoom": true, "indent": 1 }}
 
-   ```tsx
-   import * as React from 'react';
-   import createDataProviderCsv from '@mui/toolpad-data-csv';
-   import DataGrid from '@mui/x-data-grid';
-   import { BarChart } from '@mui/x-charts';
-   import { useDataGrid, useChart } from '@mui/toolpad';
+## Create a new page
 
-   const myCsvData = createDataProviderCsv('./sample-data.csv');
+<br/>
 
-   export default async function HelloWorld() {
-     const dataGridProps = useDataGrid(myCsvData);
-     const chartProps = useChart(myCsvData, {
-       xAxis: 'categories',
-       yAxis: ['values'],
-     });
+1. To add a new page and make it appear in the sidebar navigation, create a new folder within the `(dashboard)` directory titled `page-2` and add the following content to `page.tsx` inside it:
 
-     return (
-       <div>
-         <DataGrid {...dataGridProps} />
-         <BarChart {...chartProps} />
-       </div>
-     );
-   }
-   ```
+```tsx
+import { Typography, Container } from '@mui/material';
+export default function Home() {
+  return (
+    <main>
+      <Container sx={{ mx: 4 }}>
+        <Typography variant="h6" color="grey.800">
+          This is page 2!
+        </Typography>
+      </Container>
+    </main>
+  );
+}
+```
 
-   :::warning
-   ❕ Add live demo here of the above
-   Break down each line that was added and explain what it does.
-   :::
+2. Add the newly created page to the sidebar navigation by adding the following code to the navigation items array in `app/layout.tsx`:
 
-   Now both the data grid and the chart display the CSV data
+```tsx
+const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Main items',
+  },
+  {
+    slug: '/page',
+    title: 'Page',
+    icon: <DashboardIcon />,
+  },
+  // Add the following new item:
+  {
+    slug: '/page-2',
+    title: 'Page 2',
+    icon: <DashboardIcon />,
+  },
+];
+```
 
-7. Wouldn't it be nice if the chart also displayed the data in the grid as it was filtered?
+The newly created page can now be navigated to from the sidebar, like the following:
 
-   ```tsx
-   import * as React from 'react';
-   import createDataProviderCsv from '@mui/toolpad-data-csv';
-   import DataGrid, { GridFilterModel } from '@mui/x-data-grid';
-   import { BarChart } from '@mui/x-charts';
-   import { useDataGrid, useChart, useSharedDataProvider } from '@mui/toolpad';
-
-   const myCsvData = createDataProviderCsv('./sample-data.csv');
-
-   export default async function HelloWorld() {
-     const [filterModel, setFilterModel] = React.useState<GridFilterModel>({});
-
-     const mySharedProvider = useSharedDataProvider(myCsvData, {
-       filterModel,
-       setFilterModel,
-     });
-
-     const dataGridProps = useDataGrid(mySharedProvider);
-     const chartProps = useChart(mySharedProvider, {
-       xAxis: 'categories',
-       yAxis: ['values'],
-     });
-
-     return (
-       <div>
-         <DataGrid
-           {...dataGridProps}
-           filterModel={filterModel}
-           onFilterModelChange={setFilterModel}
-         />
-         <BarChart {...chartProps} />
-       </div>
-     );
-   }
-   ```
-
-   :::warning
-   Add live demo here of the above
-   Break down each line that was added and explain what it does.
-   :::
-
-   This concludes the tutorial.
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/tutorial-2.gif", "alt": "Toolpad Core new page", "caption": "Adding pages to navigation", "zoom": true, "indent": 1 }}

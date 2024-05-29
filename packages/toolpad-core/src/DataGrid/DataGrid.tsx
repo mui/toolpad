@@ -483,8 +483,12 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
  * API:
  *
  * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
+ * - inherits [X DataGrid API](https://mui.com/x/api/data-grid/data-grid/)
  */
-const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
+const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
+  props: DataGridProps<R>,
+  ref: React.Ref<HTMLDivElement>,
+) {
   const { dataProvider, ...restProps1 } = props;
 
   // TODO: figure out how to stop generating prop types for X Grid properties
@@ -731,6 +735,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
             {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
             <GridContainer>
               <XDataGrid
+                ref={ref}
                 pagination
                 apiRef={apiRef}
                 rows={rows}
@@ -772,7 +777,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
       </SetDataGridNotificationContext.Provider>
     </RefetchContext.Provider>
   );
-};
+});
 
 DataGrid.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐

@@ -35,8 +35,12 @@ export interface LineChartProps<R extends Datum> extends Partial<XLineChartProps
  * API:
  *
  * - [LineChart API](https://mui.com/toolpad/core/api/line-chart)
+ * - inherits [X LineChart API](https://mui.com/x/api/charts/line-chart/)
  */
-function LineChart<R extends Datum>(props: LineChartProps<R>) {
+const LineChart = React.forwardRef(function LineChart<R extends Datum>(
+  props: LineChartProps<R>,
+  ref: React.Ref<HTMLDivElement>,
+) {
   const { dataProvider, ...restProps1 } = props;
   // TODO: figure out how to stop generating prop types for X Grid properties
   // and document with inheritance
@@ -123,13 +127,19 @@ function LineChart<R extends Datum>(props: LineChartProps<R>) {
   return (
     <LineChartRoot>
       <div style={{ display: 'contents', visibility: error || loading ? 'hidden' : undefined }}>
-        <XLineChart dataset={dataSet} xAxis={resolvedXAxis} series={resolvedSeries} {...rest} />
+        <XLineChart
+          ref={ref}
+          dataset={dataSet}
+          xAxis={resolvedXAxis}
+          series={resolvedSeries}
+          {...rest}
+        />
       </div>
       {loading ? <LoadingOverlay /> : null}
       {error ? <ErrorOverlay error={error} /> : null}
     </LineChartRoot>
   );
-}
+});
 
 LineChart.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐

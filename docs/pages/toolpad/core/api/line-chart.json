@@ -14,10 +14,14 @@
   ],
   "classes": [],
   "spread": true,
-  "themeDefaultProps": null,
+  "themeDefaultProps": false,
   "muiName": "LineChart",
+  "forwardsRefTo": "HTMLDivElement",
   "filename": "/packages/toolpad-core/src/LineChart/LineChart.tsx",
-  "inheritance": null,
+  "inheritance": {
+    "component": "X LineChart",
+    "pathname": "https://mui.com/x/api/charts/line-chart/"
+  },
   "demos": "<ul><li><a href=\"/toolpad/core/react-line-chart/\">Line Chart</a></li></ul>",
   "cssComponent": false
 }

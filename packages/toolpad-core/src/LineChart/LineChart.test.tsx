@@ -6,7 +6,9 @@ import * as React from 'react';
 import { describe, test, expect, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import sinon from 'sinon';
+import { LineChart as XLineChart } from '@mui/x-charts';
 import { LineChart } from './LineChart';
+import describeConformance from '../../test/describeConformance';
 
 export const stubMatchMedia = (matches = true) =>
   sinon.stub().returns({
@@ -22,6 +24,12 @@ describe('LineChart', () => {
     cleanup();
     window.matchMedia = originalMatchMedia;
   });
+
+  describeConformance(<LineChart />, () => ({
+    inheritComponent: XLineChart,
+    refInstanceof: window.HTMLDivElement,
+    skip: ['themeDefaultProps'],
+  }));
 
   test('renders content correctly', async () => {
     window.matchMedia = stubMatchMedia(false);

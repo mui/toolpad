@@ -15,10 +15,14 @@
   ],
   "classes": [],
   "spread": true,
-  "themeDefaultProps": null,
+  "themeDefaultProps": false,
   "muiName": "DataGrid",
+  "forwardsRefTo": "HTMLDivElement",
   "filename": "/packages/toolpad-core/src/DataGrid/DataGrid.tsx",
-  "inheritance": null,
+  "inheritance": {
+    "component": "X DataGrid",
+    "pathname": "https://mui.com/x/api/data-grid/data-grid/"
+  },
   "demos": "<ul><li><a href=\"/\">Data Grid</a></li></ul>",
   "cssComponent": false
 }

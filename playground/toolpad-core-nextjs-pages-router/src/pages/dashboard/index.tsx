@@ -1,7 +1,7 @@
 import * as React from 'react';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import DashboardLayout from '@/components/DashboardLayout';
 
 export default function DashboardPage() {
   return (

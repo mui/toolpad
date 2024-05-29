@@ -18,7 +18,12 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { BrandingContext, Navigation, NavigationContext, NavigationPageItem } from '../AppProvider';
+import {
+  BrandingContext,
+  Navigation,
+  NavigationContext,
+  NavigationPageItem,
+} from '../AppProvider/AppProvider';
 
 const DRAWER_WIDTH = 320;
 
@@ -273,18 +278,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Stack>
           </a>
           <Box sx={{ flexGrow: 1 }} />
-          {/* <Stack>
-                               <IconButton
-                                 size="large"
-                                 aria-label="Show new notifications"
-                                 color="inherit"
-                                 sx={{
-                                   border: (theme) => `1px solid ${theme.palette.divider}`,
-                                 }}
-                               >
-                                 <NotificationsIcon />
-                               </IconButton>
-                              </Stack> */}
         </Toolbar>
       </AppBar>
       <Drawer

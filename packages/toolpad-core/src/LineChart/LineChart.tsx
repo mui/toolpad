@@ -105,18 +105,12 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
     <LineChartRoot
       sx={{
         [`& .${CHART_CLASS}`]: {
-          visibility: error ? 'hidden' : undefined,
+          visibility: error || loading ? 'hidden' : undefined,
         },
       }}
     >
       <div className={CHART_CLASS} style={{ display: 'contents' }}>
-        <XLineChart
-          className={CHART_CLASS}
-          dataset={dataSet}
-          xAxis={resolvedXAxis}
-          series={resolvedSeries}
-          {...rest}
-        />
+        <XLineChart dataset={dataSet} xAxis={resolvedXAxis} series={resolvedSeries} {...rest} />
       </div>
       {loading ? <LoadingOverlay /> : null}
       {error ? <ErrorOverlay error={error} /> : null}

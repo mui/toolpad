@@ -103,5 +103,3 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
     </Box>
   );
 }
-/*
-Since we're sharing books, my wife (who also works in a people department) is reading Erin Meyer's "The Culture Map" and she's been telling me about it. I didn't read it myself but what she told me about high vs. low context cultures was very insightful in understanding 

@@ -28,6 +28,6 @@ describe('LineChart', () => {
     // placeholder test
     const { getByText } = render(<LineChart />);
 
-    //  expect(getByText('No data to display')).toBeTruthy();
+    expect(getByText('No data to display')).toBeTruthy();
   });
 });

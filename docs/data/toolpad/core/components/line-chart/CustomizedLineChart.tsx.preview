@@ -1,0 +1,13 @@
+<LineChart
+  height={250}
+  dataProvider={myData}
+  series={[
+    {
+      dataKey: 'value',
+      label: 'Custom Label',
+      color: 'red',
+      area: true,
+      showMark: false,
+    },
+  ]}
+/>

@@ -1,1 +1,9 @@
-{ "componentDescription": "", "propDescriptions": {}, "classDescriptions": {} }
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "dataProvider": {
+      "description": "The data provider to resolve the displayed data. This object must be referentially stable."
+    }
+  },
+  "classDescriptions": {}
+}

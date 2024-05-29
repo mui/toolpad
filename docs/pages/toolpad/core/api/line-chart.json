@@ -1,5 +1,12 @@
 {
-  "props": {},
+  "props": {
+    "dataProvider": {
+      "type": {
+        "name": "shape",
+        "description": "{ createOne?: func, deleteOne?: func, fields?: object, getMany: func, getOne?: func, idField?: object, updateOne?: func }"
+      }
+    }
+  },
   "name": "LineChart",
   "imports": [
     "import { LineChart } from '@toolpad-core/LineChart';",

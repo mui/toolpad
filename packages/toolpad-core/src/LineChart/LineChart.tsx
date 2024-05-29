@@ -20,6 +20,9 @@ const LineChartRoot = styled('div')({
 export type LineChartSeries = XLineChartProps['series'];
 
 export interface LineChartProps<R extends Datum> extends Partial<XLineChartProps> {
+  /**
+   * The data provider to resolve the displayed data. This object must be referentially stable.
+   */
   dataProvider?: ResolvedDataProvider<R>;
 }
 
@@ -138,7 +141,7 @@ LineChart.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * @ignore
+   * The data provider to resolve the displayed data. This object must be referentially stable.
    */
   dataProvider: PropTypes.shape({
     createOne: PropTypes.func,

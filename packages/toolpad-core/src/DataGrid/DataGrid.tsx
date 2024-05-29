@@ -120,7 +120,13 @@ const PlaceholderBorder = styled('div')(({ theme }) => ({
 type ProcessRowUpdate = XDataGridProps['processRowUpdate'];
 
 export interface DataGridProps<R extends Datum> extends Partial<XDataGridProps<R>> {
+  /**
+   * The height of the datagrid in pixels. If left `undefined`, it adopts the height of its parent.
+   */
   height?: number;
+  /**
+   * The data provider to resolve the displayed data. This object must be referentially stable.
+   */
   dataProvider?: ResolvedDataProvider<R>;
 }
 
@@ -774,7 +780,7 @@ DataGrid.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * @ignore
+   * The data provider to resolve the displayed data. This object must be referentially stable.
    */
   dataProvider: PropTypes.shape({
     createOne: PropTypes.func,
@@ -786,7 +792,7 @@ DataGrid.propTypes /* remove-proptypes */ = {
     updateOne: PropTypes.func,
   }),
   /**
-   * @ignore
+   * The height of the datagrid in pixels. If left `undefined`, it adopts the height of its parent.
    */
   height: PropTypes.number,
 } as any;

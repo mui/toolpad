@@ -1,5 +1,13 @@
 {
-  "props": {},
+  "props": {
+    "dataProvider": {
+      "type": {
+        "name": "shape",
+        "description": "{ createOne?: func, deleteOne?: func, fields?: object, getMany: func, getOne?: func, idField?: object, updateOne?: func }"
+      }
+    },
+    "height": { "type": { "name": "number" } }
+  },
   "name": "DataGrid",
   "imports": [
     "import { DataGrid } from '@toolpad-core/DataGrid';",

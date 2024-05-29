@@ -16,15 +16,13 @@ const LineChartRoot = styled('div')({
   position: 'relative',
 });
 
-const CHART_CLASS = 'line-chart';
-
 export type LineChartSeries = XLineChartProps['series'];
 
 export interface LineChartProps<R extends Datum> extends Partial<XLineChartProps> {
   dataProvider?: ResolvedDataProvider<R>;
 }
 
-export/**
+export /**
  *
  * Demos:
  *
@@ -114,14 +112,8 @@ export/**
   }, [data?.rows, dataProvider?.fields]);
 
   return (
-    <LineChartRoot
-      sx={{
-        [`& .${CHART_CLASS}`]: {
-          visibility: error || loading ? 'hidden' : undefined,
-        },
-      }}
-    >
-      <div className={CHART_CLASS} style={{ display: 'contents' }}>
+    <LineChartRoot>
+      <div style={{ display: 'contents', visibility: error || loading ? 'hidden' : undefined }}>
         <XLineChart dataset={dataSet} xAxis={resolvedXAxis} series={resolvedSeries} {...rest} />
       </div>
       {loading ? <LoadingOverlay /> : null}

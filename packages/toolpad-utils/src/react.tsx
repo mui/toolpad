@@ -101,20 +101,16 @@ export function createGlobalState<T>(initialState: T) {
     };
   };
 
-  const getState = () => {
-    return state;
-  };
+  const getState = () => state;
 
   const setState = (newState: T | ((oldValue: T) => T)) => {
     state = typeof newState === 'function' ? (newState as Function)(state) : newState;
     listeners.forEach((cb) => cb(state));
   };
 
-  const useValue = () => {
-    return React.useSyncExternalStore(subscribe, getState);
-  };
+  const useValue = () => React.useSyncExternalStore(subscribe, getState, getState);
 
-  const useState = () => {
+  const useState = (): [T, React.Dispatch<React.SetStateAction<T>>] => {
     const value = useValue();
     return [value, setState];
   };

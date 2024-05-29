@@ -1,0 +1,11 @@
+async getMany({ pagination }) {
+  invariant(pagination, 'This data provider requires server-side pagination.');
+  return {
+    rows: Array.from(new Array(pagination.pageSize), (_, i) => ({
+      id: `${pagination.start + i}`,
+      item: `Item ${pagination.start + i}`,
+      page: Math.floor(pagination.start / pagination.pageSize) + 1,
+    })),
+    rowCount: 1000000,
+  };
+},

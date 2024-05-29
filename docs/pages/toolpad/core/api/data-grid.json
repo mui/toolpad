@@ -1,0 +1,16 @@
+{
+  "props": {},
+  "name": "DataGrid",
+  "imports": [
+    "import { DataGrid } from '@toolpad-core/DataGrid';",
+    "import { DataGrid } from '@toolpad-core';"
+  ],
+  "classes": [],
+  "spread": true,
+  "themeDefaultProps": null,
+  "muiName": "DataGrid",
+  "filename": "/packages/toolpad-core/src/DataGrid/DataGrid.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/\">Data Grid</a></li></ul>",
+  "cssComponent": false
+}

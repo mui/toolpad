@@ -1,0 +1,3 @@
+async deleteOne(id) {
+  DATA = DATA.filter((item) => item.id !== id);
+},

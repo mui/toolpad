@@ -21,13 +21,22 @@ const CHART_CLASS = 'line-chart';
 export type LineChartSeries = XLineChartProps['series'];
 
 export interface LineChartProps<R extends Datum> extends Partial<XLineChartProps> {
-  dataProvider: ResolvedDataProvider<R>;
+  dataProvider?: ResolvedDataProvider<R>;
 }
 
-export function LineChart<R extends Datum>(props: LineChartProps<R>) {
+export/**
+ *
+ * Demos:
+ *
+ * - [Line Chart](https://mui.com/toolpad/core/react-line-chart/)
+ *
+ * API:
+ *
+ * - [LineChart API](https://mui.com/toolpad/core/api/line-chart)
+ */ function LineChart<R extends Datum>(props: LineChartProps<R>) {
   const { dataProvider, xAxis, series, ...rest } = props;
   const theme = useTheme();
-  const { data, loading, error } = useGetMany(dataProvider);
+  const { data, loading, error } = useGetMany(dataProvider ?? null);
   const resolvedXAxis = React.useMemo(() => {
     if (!xAxis || xAxis.length <= 0) {
       return [{ dataKey: 'id' }];
@@ -35,7 +44,7 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
     return xAxis.map((axis) => {
       let defaults: Partial<AxisConfig> = {};
       if (axis.dataKey) {
-        const field = dataProvider.fields?.[axis.dataKey];
+        const field = dataProvider?.fields?.[axis.dataKey];
         if (field) {
           defaults = {
             label: field.label,
@@ -47,20 +56,20 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
       }
       return { ...defaults, ...axis };
     });
-  }, [dataProvider.fields, xAxis]);
+  }, [dataProvider?.fields, xAxis]);
 
   const resolvedSeries = React.useMemo(() => {
-    const idField = dataProvider.idField ?? 'id';
+    const idField = dataProvider?.idField ?? 'id';
     const resolvedSeriesProp: LineChartSeries =
       series ||
-      Object.keys(dataProvider.fields ?? {})
+      Object.keys(dataProvider?.fields ?? {})
         .filter(
-          (dataKey) => dataKey !== idField && dataProvider.fields?.[dataKey]?.type === 'number',
+          (dataKey) => dataKey !== idField && dataProvider?.fields?.[dataKey]?.type === 'number',
         )
         .map((dataKey) => ({ dataKey }));
 
     const colorSchemeIndices = new Map(
-      Object.keys(dataProvider.fields ?? {}).map((name, i) => [name, i]),
+      Object.keys(dataProvider?.fields ?? {}).map((name, i) => [name, i]),
     );
 
     const colors = blueberryTwilightPalette(theme.palette.mode);
@@ -69,7 +78,7 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
       let defaults: Partial<LineSeriesType> = {};
       if (s.dataKey) {
         const name = s.dataKey;
-        const field = dataProvider.fields?.[name];
+        const field = dataProvider?.fields?.[name];
         if (field) {
           const colorSchemeIndex = colorSchemeIndices.get(name) ?? 0;
           defaults = {
@@ -84,13 +93,13 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
       }
       return { ...defaults, ...s };
     });
-  }, [dataProvider.idField, dataProvider.fields, series, theme.palette.mode]);
+  }, [dataProvider?.idField, dataProvider?.fields, series, theme.palette.mode]);
 
   const dataSet = React.useMemo(() => {
     const resolvedRows = data?.rows ?? [];
     return resolvedRows.map((row) => {
       const result: NonNullable<XLineChartProps['dataset']>[number] = {};
-      for (const [name, field] of Object.entries(dataProvider.fields ?? {})) {
+      for (const [name, field] of Object.entries(dataProvider?.fields ?? {})) {
         let value = row[name];
         if (field.type === 'date' && (typeof value === 'string' || typeof value === 'number')) {
           value = new Date(value);
@@ -102,7 +111,7 @@ export function LineChart<R extends Datum>(props: LineChartProps<R>) {
       }
       return result;
     });
-  }, [data?.rows, dataProvider.fields]);
+  }, [data?.rows, dataProvider?.fields]);
 
   return (
     <LineChartRoot

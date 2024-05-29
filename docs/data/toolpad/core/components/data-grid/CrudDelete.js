@@ -33,8 +33,8 @@ const myData = createDataProvider({
 
 export default function CrudDelete() {
   return (
-    <Box sx={{ height: 250, width: '100%' }}>
-      <DataGrid dataProvider={myData} />
+    <Box sx={{ width: '100%' }}>
+      <DataGrid height={250} dataProvider={myData} />
     </Box>
   );
 }

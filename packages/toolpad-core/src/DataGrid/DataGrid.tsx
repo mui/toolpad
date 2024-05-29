@@ -124,6 +124,7 @@ export interface DataGridProps<R extends Datum>
   extends Omit<XDataGridProps<R>, 'columns' | 'rows'> {
   rows?: readonly R[];
   columns?: readonly GridColDef<R>[];
+  height?: number;
   dataProvider?: ResolvedDataProvider<R>;
 }
 
@@ -712,7 +713,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
         <ToolbarCreateButtonContext.Provider value={createButtonContext}>
           <RootContainer
             sx={{
-              height: restProps.autoHeight ? undefined : '100%',
+              height: restProps.autoHeight ? undefined : restProps.height ?? '100%',
               // Disable vertical scrolling when editing a row
               [`& .${gridClasses.virtualScroller}`]: {
                 ...(editingState.editedRowId === DRAFT_ROW_ID ? { overflowY: 'hidden' } : {}),

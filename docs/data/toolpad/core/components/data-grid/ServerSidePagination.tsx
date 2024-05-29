@@ -28,8 +28,8 @@ const myData = createDataProvider({
 
 export default function ServerSidePagination() {
   return (
-    <Box sx={{ height: 250, width: '100%' }}>
-      <DataGrid paginationMode="server" dataProvider={myData} />
+    <Box sx={{ width: '100%' }}>
+      <DataGrid height={250} paginationMode="server" dataProvider={myData} />
     </Box>
   );
 }

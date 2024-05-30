@@ -161,8 +161,6 @@ export function useGetMany<R extends Datum>(
   const providerKey = dataProvider ? getObjectKey(dataProvider) : null;
   const environmentFilter = useFilter();
 
-  console.log(environmentFilter);
-
   const resolvedParams: GetManyParams<R> = React.useMemo(() => {
     const filter = deepmerge({} as Filter<R>, environmentFilter, params?.filter ?? {});
     return { paginatuon: null, ...params, filter } as GetManyParams<R>;

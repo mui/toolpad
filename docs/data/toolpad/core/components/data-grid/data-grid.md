@@ -30,13 +30,33 @@ To help you get started quickly, the grid is able to inferrence data provider fi
 
 {{"demo": "FieldInference.js"}}
 
-## Serverside pagination
+## Server-side Pagination
 
-By default the grid paginates items client-side. If your backend supports serverside pagination, enable it with the `paginationMode` flag in the data provider. Now the `getMany` method receives a `pagination` parameter. This parameter is an object containing a `start` and `pageSize` property that denote the start index and offset for the requested page. You can optionally send a `rowCount` along with the `rows`.
+By default the grid paginates items client-side. If your backend supports serverside pagination, enable it with the `paginationMode` flag in the data grid. Now the `getMany` method receives a `pagination` parameter. This parameter is an object containing a `start` and `pageSize` property that denote the start index and offset for the requested page. You can optionally send a `rowCount` along with the `rows`.
 
 {{"demo": "ServerSidePagination.js"}}
 
 You can decide whether your data provider supports pagination exclusively or optionally by throwing an error when `pagination` is `null`.
+
+## Server-side Filtering
+
+By default, the grid filters rows clinet-side. If your backend supports filtering, you can enable it with the `filterMode` property in the data grid. To pass a `filter` to the data provider, set `filterMode` to `'server'`.
+
+```js
+async getMany({ filter }) {
+  const url = new URL('https://api.example.com/data');
+  for (const [field, ops = {}] of Object.entries(filter)) {
+    for (const [operator, value] of Object.entries(ops)) {
+      url.searchParams.append(field, `${operator}:${value}`);
+    }
+  }
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+  }
+  return { rows: await res.json() };
+},
+```
 
 ## CRUD
 

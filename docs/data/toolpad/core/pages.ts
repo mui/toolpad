@@ -1,5 +1,7 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import { components as componentsApi } from './pagesApi';
+import pagesApi from './pagesApi';
+
+// TODO: Split pagesApi into components and hooks
 
 const pages: MuiPage[] = [
   {
@@ -88,11 +90,10 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/core/api-group',
     title: 'APIs',
     children: [
-      { pathname: '/toolpad/core/api/reference', title: 'Index' },
       {
         pathname: '/toolpad/core/api/components-group',
         subheader: 'Components',
-        children: componentsApi,
+        children: pagesApi,
       },
     ],
   },

@@ -81,4 +81,32 @@ The Toolpad Core components automatically adopt default values
 
 ## Global Filtering
 
+Wrap the dashboard with a `DataContext` to apply global filtering:
+
+```js
+const [range, setRange] = React.useState('last-month');
+const filter = React.useMemo(() => ({ range: { equals: range } }), [range]);
+
+// ...
+
+return (
+  <Stack sx={{ width: '100%' }} spacing={2}>
+    <DataContext filter={filter}>
+      <Toolbar disableGutters>
+        <TextField
+          select
+          label="Range"
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
+        >
+          <MenuItem value="last-month">Last Month</MenuItem>
+          <MenuItem value="last-year">Last Year</MenuItem>
+        </TextField>
+      </Toolbar>
+      {/* ... */}
+    </DataContext>
+  </Stack>
+);
+```
+
 {{"demo": "Tutorial3.js", "hideToolbar": true}}

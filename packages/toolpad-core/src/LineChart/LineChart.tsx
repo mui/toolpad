@@ -133,6 +133,8 @@ const LineChart = React.forwardRef(function LineChart<R extends Datum>(
           xAxis={resolvedXAxis}
           series={resolvedSeries}
           {...rest}
+          // Remove once https://github.com/mui/mui-x/issues/12873 is fixed
+          skipAnimation
         />
       </div>
       {loading ? <LoadingOverlay /> : null}

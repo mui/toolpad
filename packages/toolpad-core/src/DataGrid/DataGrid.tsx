@@ -21,10 +21,11 @@ import {
   GridPaginationModel,
   gridClasses,
   GridRowIdGetter,
+  GridFilterModel,
 } from '@mui/x-data-grid';
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { Button, CircularProgress, styled } from '@mui/material';
+import { Button, CircularProgress, styled, useControlled } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -52,6 +53,7 @@ import {
   DataGridNotification,
   SetDataGridNotificationContext,
 } from './NotificationSnackbar';
+import { Filter } from '../DataProvider/filter';
 
 const RootContainer = styled('div')({
   display: 'flex',
@@ -474,6 +476,17 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
   return diff;
 }
 
+function fromGridFilterModel<R extends Datum>(filterModel: GridFilterModel): Filter<R> {
+  const filter: Filter<R> = {};
+  for (const [field, filterItem] of Object.entries(filterModel.items)) {
+    for (const [operator, value] of Object.entries(filterItem)) {
+      filter[field as FieldOf<R>] ??= {};
+      (filter[field as FieldOf<R>] as any)[operator] = value;
+    }
+  }
+  return filter;
+}
+
 /**
  *
  * Demos:
@@ -504,6 +517,12 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
     autosizeOptions: autosizeOptionsProp,
     getRowId: getRowIdProp,
     rowModesModel: rowModesModelProp,
+    filterMode: filterModeProp,
+    filterModel: filterModelProp,
+    onFilterModelChange: onFilterModelChangeProp,
+    paginationMode: paginationModeProp,
+    paginationModel: paginationModelProp,
+    onPaginationModelChange: onPaginationModelChangeProp,
     ...restProps
   } = restProps2;
 
@@ -514,10 +533,39 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
   const gridApiRefOwn = useGridApiRef();
   const apiRef = apiRefProp ?? gridApiRefOwn;
 
-  const [gridPaginationModel, setGridPaginationModel] = React.useState<GridPaginationModel>({
-    pageSize: 10,
-    page: 0,
+  const [gridPaginationModel, setGridPaginationModel] = useControlled<GridPaginationModel>({
+    controlled: paginationModelProp,
+    default: { page: 0, pageSize: 100 },
+    name: 'DataGrid',
+    state: 'paginationModel',
   });
+
+  const onGridPaginationModelChange = React.useCallback<
+    NonNullable<XDataGridProps['onPaginationModelChange']>
+  >(
+    (paginationModel, details) => {
+      setGridPaginationModel(paginationModel);
+      onPaginationModelChangeProp?.(paginationModel, details);
+    },
+    [onPaginationModelChangeProp, setGridPaginationModel],
+  );
+
+  const [gridFilterModel, setGridFilterModel] = useControlled<GridFilterModel>({
+    controlled: filterModelProp,
+    default: { items: [] },
+    name: 'DataGrid',
+    state: 'filterModel',
+  });
+
+  const onGridFilterModelChange = React.useCallback<
+    NonNullable<XDataGridProps['onFilterModelChange']>
+  >(
+    (filterModel, details) => {
+      setGridFilterModel(filterModel);
+      onFilterModelChangeProp?.(filterModel, details);
+    },
+    [onFilterModelChangeProp, setGridFilterModel],
+  );
 
   const [editingState, dispatchEditingAction] = React.useReducer(gridEditingReducer, {
     editedRowId: null,
@@ -532,15 +580,21 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
   const useGetManyParams = React.useMemo<GetManyParams<R>>(
     () => ({
       pagination:
-        restProps.paginationMode === 'server'
+        paginationModeProp === 'server'
           ? {
               start: gridPaginationModel.page * gridPaginationModel.pageSize,
               pageSize: gridPaginationModel.pageSize,
             }
           : null,
-      filter: {},
+      filter: filterModeProp === 'server' ? fromGridFilterModel(gridFilterModel) : {},
     }),
-    [gridPaginationModel.page, gridPaginationModel.pageSize, restProps.paginationMode],
+    [
+      filterModeProp,
+      gridFilterModel,
+      gridPaginationModel.page,
+      gridPaginationModel.pageSize,
+      paginationModeProp,
+    ],
   );
 
   const { data, loading, error, refetch } = useGetMany(dataProvider ?? null, useGetManyParams);
@@ -746,15 +800,19 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
                 rowModesModel={rowModesModelPatched}
                 onRowEditStart={handleRowEditStart}
                 getRowId={getRowId}
-                {...(restProps.paginationMode === 'server'
+                filterMode={filterModeProp ?? 'client'}
+                filterModel={gridFilterModel}
+                onFilterModelChange={onGridFilterModelChange}
+                paginationMode={paginationModeProp ?? 'client'}
+                paginationModel={gridPaginationModel}
+                onPaginationModelChange={onGridPaginationModelChange}
+                {...(paginationModeProp === 'server'
                   ? {
-                      gridPaginationModel,
-                      onPaginationModelChange: setGridPaginationModel,
                       rowCount: data?.rowCount ?? -1,
                     }
                   : {})}
                 {...restProps}
-                // TODO: How can we make this optional?
+                // TODO: How can we make this optional? Can we move to a different UI for row creation?
                 editMode="row"
               />
               {isSsr ? (

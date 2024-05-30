@@ -10,8 +10,10 @@ Toolpad Core comes with the concept of data providers. At its core, a data provi
 import { createDataProvider } from '@toolpad/core/DataProvider';
 
 const npmData = createDataProvider({
-  async getMany() {
-    const res = await fetch('https://api.npmjs.org/downloads/range/last-year/react');
+  async getMany({ filter }) {
+    const res = await fetch(
+      `https://api.npmjs.org/downloads/range/${encodeURIComponent(filter.range?.equals ?? 'last-month')}/react`,
+    );
     if (!res.ok) {
       const { error } = await res.json();
       throw new Error(`HTTP ${res.status}: ${error}`);
@@ -31,15 +33,15 @@ You can then visualize this data by connecting it to a grid:
 
 ```js
 import { DataGrid } from '@toolpad/core';
-import { Box } from '@mui/material';
+import { Stack } from '@mui/material';
 
 // ...
 
 export default function App() {
   return (
-    <Box sx={{ height: 300, width: '100%' }}>
-      <DataGrid dataProvider={npmData} />
-    </Box>
+    <Stack sx={{ width: '100%' }} spacing={2}>
+      <DataGrid height={300} dataProvider={npmData} />
+    </Stack>
   );
 }
 ```
@@ -60,15 +62,15 @@ import { DataGrid, LineChart } from '@toolpad/core';
 
 export default function App() {
   return (
-    <Box sx={{ height: 300, width: '100%' }}>
-      <DataGrid dataProvider={npmData} />
+    <Stack sx={{ width: '100%' }} spacing={2}>
+      <DataGrid height={300} dataProvider={npmData} />
       <LineChart
         height={300}
         dataProvider={npmData}
         xAxis={[{ dataKey: 'day' }]}
         series={[{ dataKey: 'downloads' }]}
       />
-    </Box>
+    </Stack>
   );
 }
 ```
@@ -76,3 +78,7 @@ export default function App() {
 The Toolpad Core components automatically adopt default values
 
 {{"demo": "Tutorial2.js", "hideToolbar": true}}
+
+## Global Filtering
+
+{{"demo": "Tutorial3.js", "hideToolbar": true}}

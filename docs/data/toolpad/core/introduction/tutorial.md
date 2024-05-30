@@ -55,7 +55,7 @@ yarn && yarn dev
 
 4. The app has one page already created, which can be viewed by clicking on the "Go to page" button. The following page should appear:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/tutorial-1.png", "alt": "Toolpad Core default page", "caption": "Default page in dashboard layout", "zoom": true, "indent": 1 }}
+{{"demo": "TutorialDefault.js", "iframe": true, "hideToolbar": true }}
 
 ## Create a new page
 

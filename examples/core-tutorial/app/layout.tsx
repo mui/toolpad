@@ -13,11 +13,6 @@ const NAVIGATION: Navigation = [
     title: 'Page',
     icon: <DashboardIcon />,
   },
-  {
-    slug: '/page-2',
-    title: 'Page 2',
-    icon: <DashboardIcon />,
-  },
 ];
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -29,7 +29,7 @@ function Templates({ examplesFile }: TemplatesProps) {
       setExamples(exampleContent.default);
     };
     importExamples();
-  }, []);
+  }, [examplesFile]);
 
   return (
     <Grid container spacing={2} sx={{ pt: 2, pb: 4 }}>

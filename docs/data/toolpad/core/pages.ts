@@ -1,5 +1,5 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
-import { components as componentsApi, hooks as hooksApi } from './pagesApi';
+import { components as componentsApi } from './pagesApi';
 
 const pages: MuiPage[] = [
   {

@@ -1,17 +1,17 @@
-"use client";
-import { createTheme } from "@mui/material/styles";
+'use client';
+import { createTheme } from '@mui/material/styles';
 
 const defaultTheme = createTheme();
 
 const theme = createTheme(defaultTheme, {
   palette: {
     background: {
-      default: defaultTheme.palette.grey["50"],
+      default: defaultTheme.palette.grey['50'],
     },
   },
   typography: {
     h6: {
-      fontWeight: "700",
+      fontWeight: '700',
     },
   },
   components: {
@@ -20,9 +20,9 @@ const theme = createTheme(defaultTheme, {
         root: {
           borderWidth: 0,
           borderBottomWidth: 1,
-          borderStyle: "solid",
+          borderStyle: 'solid',
           borderColor: defaultTheme.palette.divider,
-          boxShadow: "none",
+          boxShadow: 'none',
         },
       },
     },
@@ -44,9 +44,9 @@ const theme = createTheme(defaultTheme, {
     MuiListSubheader: {
       styleOverrides: {
         root: {
-          color: defaultTheme.palette.grey["600"],
+          color: defaultTheme.palette.grey['600'],
           fontSize: 12,
-          fontWeight: "700",
+          fontWeight: '700',
           height: 40,
           paddingLeft: 32,
         },
@@ -64,21 +64,21 @@ const theme = createTheme(defaultTheme, {
       styleOverrides: {
         root: {
           borderRadius: 8,
-          "&.Mui-selected": {
-            "& .MuiListItemIcon-root": {
+          '&.Mui-selected': {
+            '& .MuiListItemIcon-root': {
               color: defaultTheme.palette.primary.dark,
             },
-            "& .MuiTypography-root": {
+            '& .MuiTypography-root': {
               color: defaultTheme.palette.primary.dark,
             },
-            "& .MuiSvgIcon-root": {
+            '& .MuiSvgIcon-root': {
               color: defaultTheme.palette.primary.dark,
             },
-            "& .MuiTouchRipple-child": {
+            '& .MuiTouchRipple-child': {
               backgroundColor: defaultTheme.palette.primary.dark,
             },
           },
-          "& .MuiSvgIcon-root": {
+          '& .MuiSvgIcon-root': {
             color: defaultTheme.palette.action.active,
           },
         },
@@ -87,8 +87,8 @@ const theme = createTheme(defaultTheme, {
     MuiListItemText: {
       styleOverrides: {
         root: {
-          "& .MuiTypography-root": {
-            fontWeight: "500",
+          '& .MuiTypography-root': {
+            fontWeight: '500',
           },
         },
       },
@@ -104,8 +104,8 @@ const theme = createTheme(defaultTheme, {
       styleOverrides: {
         root: {
           borderBottomWidth: 2,
-          marginLeft: "16px",
-          marginRight: "16px",
+          marginLeft: '16px',
+          marginRight: '16px',
         },
       },
     },

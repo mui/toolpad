@@ -111,7 +111,6 @@ function cleanDraftRow<R>(row: MaybeDraftRow<R>): R {
 const PlaceholderBorder = styled('div')(({ theme }) => ({
   position: 'absolute',
   inset: '0 0 0 0',
-  backgroundColor: theme.palette.background.paper,
   borderColor: theme.palette.divider,
   borderWidth: 1,
   borderStyle: 'solid',
@@ -120,11 +119,14 @@ const PlaceholderBorder = styled('div')(({ theme }) => ({
 
 type ProcessRowUpdate = XDataGridProps['processRowUpdate'];
 
-export interface DataGridProps<R extends Datum>
-  extends Omit<XDataGridProps<R>, 'columns' | 'rows'> {
-  rows?: readonly R[];
-  columns?: readonly GridColDef<R>[];
+export interface DataGridProps<R extends Datum> extends Partial<XDataGridProps<R>> {
+  /**
+   * The height of the datagrid in pixels. If left `undefined`, it adopts the height of its parent.
+   */
   height?: number;
+  /**
+   * The data provider to resolve the displayed data. This object must be referentially stable.
+   */
   dataProvider?: ResolvedDataProvider<R>;
 }
 
@@ -481,8 +483,12 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
  * API:
  *
  * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
+ * - inherits [X DataGrid API](https://mui.com/x/api/data-grid/data-grid/)
  */
-const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
+const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
+  props: DataGridProps<R>,
+  ref: React.Ref<HTMLDivElement>,
+) {
   const { dataProvider, ...restProps1 } = props;
 
   // TODO: figure out how to stop generating prop types for X Grid properties
@@ -721,11 +727,15 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
               [`& .${gridClasses['scrollbar--vertical']}`]: {
                 ...(editingState.editedRowId === DRAFT_ROW_ID ? { pointerEvents: 'none' } : {}),
               },
+              [`& .${gridClasses.root}`]: {
+                visibility: error ? 'hidden' : undefined,
+              },
             }}
           >
             {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
             <GridContainer>
               <XDataGrid
+                ref={ref}
                 pagination
                 apiRef={apiRef}
                 rows={rows}
@@ -767,7 +777,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
       </SetDataGridNotificationContext.Provider>
     </RefetchContext.Provider>
   );
-};
+});
 
 DataGrid.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐
@@ -775,205 +785,7 @@ DataGrid.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * @ignore
-   */
-  columns: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.shape({
-        align: PropTypes.oneOf(['center', 'left', 'right']),
-        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
-        description: PropTypes.string,
-        disableColumnMenu: PropTypes.bool,
-        disableExport: PropTypes.bool,
-        disableReorder: PropTypes.bool,
-        display: PropTypes.oneOf(['flex', 'text']),
-        editable: PropTypes.bool,
-        field: PropTypes.string.isRequired,
-        filterable: PropTypes.bool,
-        filterOperators: PropTypes.arrayOf(
-          PropTypes.shape({
-            getApplyFilterFn: PropTypes.func.isRequired,
-            getValueAsString: PropTypes.func,
-            headerLabel: PropTypes.string,
-            InputComponent: PropTypes.elementType,
-            InputComponentProps: PropTypes.object,
-            label: PropTypes.string,
-            requiresFilterValue: PropTypes.bool,
-            value: PropTypes.string.isRequired,
-          }),
-        ),
-        flex: PropTypes.number,
-        getApplyQuickFilterFn: PropTypes.func,
-        getSortComparator: PropTypes.func,
-        groupable: PropTypes.bool,
-        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
-        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        headerName: PropTypes.string,
-        hideable: PropTypes.bool,
-        hideSortIcons: PropTypes.bool,
-        maxWidth: PropTypes.number,
-        minWidth: PropTypes.number,
-        pinnable: PropTypes.bool,
-        preProcessEditCellProps: PropTypes.func,
-        renderCell: PropTypes.func,
-        renderEditCell: PropTypes.func,
-        renderHeader: PropTypes.func,
-        resizable: PropTypes.bool,
-        sortable: PropTypes.bool,
-        sortComparator: PropTypes.func,
-        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
-        type: PropTypes.oneOf([
-          'actions',
-          'boolean',
-          'custom',
-          'date',
-          'dateTime',
-          'number',
-          'singleSelect',
-          'string',
-        ]),
-        valueFormatter: PropTypes.func,
-        valueGetter: PropTypes.func,
-        valueParser: PropTypes.func,
-        valueSetter: PropTypes.func,
-        width: PropTypes.number,
-      }),
-      PropTypes.shape({
-        align: PropTypes.oneOf(['center', 'left', 'right']),
-        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
-        description: PropTypes.string,
-        disableColumnMenu: PropTypes.bool,
-        disableExport: PropTypes.bool,
-        disableReorder: PropTypes.bool,
-        display: PropTypes.oneOf(['flex', 'text']),
-        editable: PropTypes.bool,
-        field: PropTypes.string.isRequired,
-        filterable: PropTypes.bool,
-        filterOperators: PropTypes.arrayOf(
-          PropTypes.shape({
-            getApplyFilterFn: PropTypes.func.isRequired,
-            getValueAsString: PropTypes.func,
-            headerLabel: PropTypes.string,
-            InputComponent: PropTypes.elementType,
-            InputComponentProps: PropTypes.object,
-            label: PropTypes.string,
-            requiresFilterValue: PropTypes.bool,
-            value: PropTypes.string.isRequired,
-          }),
-        ),
-        flex: PropTypes.number,
-        getActions: PropTypes.func.isRequired,
-        getApplyQuickFilterFn: PropTypes.func,
-        getSortComparator: PropTypes.func,
-        groupable: PropTypes.bool,
-        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
-        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        headerName: PropTypes.string,
-        hideable: PropTypes.bool,
-        hideSortIcons: PropTypes.bool,
-        maxWidth: PropTypes.number,
-        minWidth: PropTypes.number,
-        pinnable: PropTypes.bool,
-        preProcessEditCellProps: PropTypes.func,
-        renderCell: PropTypes.func,
-        renderEditCell: PropTypes.func,
-        renderHeader: PropTypes.func,
-        resizable: PropTypes.bool,
-        sortable: PropTypes.bool,
-        sortComparator: PropTypes.func,
-        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
-        type: PropTypes.oneOf([
-          /**
-           * The type of the column.
-           * @default 'actions'
-           */
-          'actions',
-        ]).isRequired,
-        valueFormatter: PropTypes.func,
-        valueGetter: PropTypes.func,
-        valueParser: PropTypes.func,
-        valueSetter: PropTypes.func,
-        width: PropTypes.number,
-      }),
-      PropTypes.shape({
-        align: PropTypes.oneOf(['center', 'left', 'right']),
-        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
-        description: PropTypes.string,
-        disableColumnMenu: PropTypes.bool,
-        disableExport: PropTypes.bool,
-        disableReorder: PropTypes.bool,
-        display: PropTypes.oneOf(['flex', 'text']),
-        editable: PropTypes.bool,
-        field: PropTypes.string.isRequired,
-        filterable: PropTypes.bool,
-        filterOperators: PropTypes.arrayOf(
-          PropTypes.shape({
-            getApplyFilterFn: PropTypes.func.isRequired,
-            getValueAsString: PropTypes.func,
-            headerLabel: PropTypes.string,
-            InputComponent: PropTypes.elementType,
-            InputComponentProps: PropTypes.object,
-            label: PropTypes.string,
-            requiresFilterValue: PropTypes.bool,
-            value: PropTypes.string.isRequired,
-          }),
-        ),
-        flex: PropTypes.number,
-        getApplyQuickFilterFn: PropTypes.func,
-        getOptionLabel: PropTypes.func,
-        getOptionValue: PropTypes.func,
-        getSortComparator: PropTypes.func,
-        groupable: PropTypes.bool,
-        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
-        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        headerName: PropTypes.string,
-        hideable: PropTypes.bool,
-        hideSortIcons: PropTypes.bool,
-        maxWidth: PropTypes.number,
-        minWidth: PropTypes.number,
-        pinnable: PropTypes.bool,
-        preProcessEditCellProps: PropTypes.func,
-        renderCell: PropTypes.func,
-        renderEditCell: PropTypes.func,
-        renderHeader: PropTypes.func,
-        resizable: PropTypes.bool,
-        sortable: PropTypes.bool,
-        sortComparator: PropTypes.func,
-        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
-        type: PropTypes.oneOf([
-          /**
-           * The type of the column.
-           * @default 'singleSelect'
-           */
-          'singleSelect',
-        ]).isRequired,
-        valueFormatter: PropTypes.func,
-        valueGetter: PropTypes.func,
-        valueOptions: PropTypes.oneOfType([
-          PropTypes.arrayOf(
-            PropTypes.oneOfType([
-              PropTypes.number,
-              PropTypes.object,
-              PropTypes.shape({
-                label: PropTypes.string.isRequired,
-                value: PropTypes.any.isRequired,
-              }),
-              PropTypes.string,
-            ]).isRequired,
-          ),
-          PropTypes.func,
-        ]),
-        valueParser: PropTypes.func,
-        valueSetter: PropTypes.func,
-        width: PropTypes.number,
-      }),
-    ]).isRequired,
-  ),
-  /**
-   * @ignore
+   * The data provider to resolve the displayed data. This object must be referentially stable.
    */
   dataProvider: PropTypes.shape({
     createOne: PropTypes.func,
@@ -981,16 +793,13 @@ DataGrid.propTypes /* remove-proptypes */ = {
     fields: PropTypes.object,
     getMany: PropTypes.func.isRequired,
     getOne: PropTypes.func,
+    idField: PropTypes.object,
     updateOne: PropTypes.func,
   }),
   /**
-   * @ignore
+   * The height of the datagrid in pixels. If left `undefined`, it adopts the height of its parent.
    */
-  rows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-    }),
-  ),
+  height: PropTypes.number,
 } as any;
 
 export { DataGrid };

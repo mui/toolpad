@@ -90,6 +90,10 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/core/react-data-grid',
             title: 'Data Grid',
           },
+          {
+            pathname: '/toolpad/core/react-line-chart',
+            title: 'Line Chart',
+          },
         ],
       },
     ],

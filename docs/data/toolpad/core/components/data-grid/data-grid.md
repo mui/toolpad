@@ -1,6 +1,6 @@
 ---
 productId: toolpad-core
-title: App Provider
+title: DataGrid
 components: DataGrid, DataProvider
 ---
 

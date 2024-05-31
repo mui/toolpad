@@ -213,6 +213,7 @@ function DashboardSidebarSubNavigation({
             ) : (
               listItem
             )}
+
             {navigationItem.children ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation

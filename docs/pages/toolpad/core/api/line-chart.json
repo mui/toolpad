@@ -1,0 +1,27 @@
+{
+  "props": {
+    "dataProvider": {
+      "type": {
+        "name": "shape",
+        "description": "{ createOne?: func, deleteOne?: func, fields?: object, getMany: func, getOne?: func, idField?: object, updateOne?: func }"
+      }
+    }
+  },
+  "name": "LineChart",
+  "imports": [
+    "import { LineChart } from '@toolpad-core/LineChart';",
+    "import { LineChart } from '@toolpad-core';"
+  ],
+  "classes": [],
+  "spread": true,
+  "themeDefaultProps": false,
+  "muiName": "LineChart",
+  "forwardsRefTo": "HTMLDivElement",
+  "filename": "/packages/toolpad-core/src/LineChart/LineChart.tsx",
+  "inheritance": {
+    "component": "X LineChart",
+    "pathname": "https://mui.com/x/api/charts/line-chart/"
+  },
+  "demos": "<ul><li><a href=\"/toolpad/core/react-line-chart/\">Line Chart</a></li></ul>",
+  "cssComponent": false
+}

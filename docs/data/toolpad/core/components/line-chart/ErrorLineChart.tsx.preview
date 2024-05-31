@@ -1,0 +1,1 @@
+<LineChart height={150} dataProvider={myData} />

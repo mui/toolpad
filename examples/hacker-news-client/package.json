@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@toolpad/studio": "^0.1.55",
-    "axios": "^1.6.8"
+    "axios": "^1.7.2"
   }
 }

@@ -45,37 +45,33 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(
 
     const appTheme = React.useMemo(() => createToolpadAppTheme(dom), [dom]);
 
-    React.useImperativeHandle(
-      forwardedRef,
-      () => {
-        const gridElement = gridRef.current;
-        invariant(gridElement, 'Overlay grid ref not bound');
+    React.useImperativeHandle(forwardedRef, () => {
+      const gridElement = gridRef.current;
+      invariant(gridElement, 'Overlay grid ref not bound');
 
-        let columnEdges: number[] = [];
-        const gridColumnContainers = Array.from(gridElement.children);
-        const gridColumnEdges = gridColumnContainers.map((container: Element) => {
-          const containerRect = container.firstElementChild?.getBoundingClientRect();
-          return containerRect
-            ? [Math.round(containerRect.x), Math.round(containerRect.x + containerRect.width)]
-            : [];
-        });
-        columnEdges = gridColumnEdges.flat();
+      let columnEdges: number[] = [];
+      const gridColumnContainers = Array.from(gridElement.children);
+      const gridColumnEdges = gridColumnContainers.map((container: Element) => {
+        const containerRect = container.firstElementChild?.getBoundingClientRect();
+        return containerRect
+          ? [Math.round(containerRect.x), Math.round(containerRect.x + containerRect.width)]
+          : [];
+      });
+      columnEdges = gridColumnEdges.flat();
 
-        return {
-          gridElement: gridRef.current,
-          getMinColumnWidth() {
-            return columnEdges[1] - columnEdges[0];
-          },
-          getLeftColumnEdges() {
-            return columnEdges.filter((column, index) => index % 2 === 0);
-          },
-          getRightColumnEdges() {
-            return columnEdges.filter((column, index) => index % 2 === 1);
-          },
-        };
-      },
-      [],
-    );
+      return {
+        gridElement: gridRef.current,
+        getMinColumnWidth() {
+          return columnEdges[1] - columnEdges[0];
+        },
+        getLeftColumnEdges() {
+          return columnEdges.filter((column, index) => index % 2 === 0);
+        },
+        getRightColumnEdges() {
+          return columnEdges.filter((column, index) => index % 2 === 1);
+        },
+      };
+    }, []);
 
     const pageChildrenSlotRect = pageNode?.slots?.children?.rect;
 

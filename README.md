@@ -12,7 +12,7 @@
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
 [![npm latest package](https://img.shields.io/npm/v/@toolpad/core/latest.svg)](https://www.npmjs.com/package/@toolpad/core)
-[![npm downloads](https://img.shields.io/npm/dm/@toolpad/studio.svg)](https://www.npmjs.com/package/@toolpad/studio)
+[![npm downloads](https://img.shields.io/npm/dm/@toolpad/core.svg)](https://www.npmjs.com/package/@toolpad/core)
 [![GitHub branch status](https://img.shields.io/github/checks-status/mui/mui-toolpad/HEAD)](https://github.com/mui/mui-toolpad/commits/HEAD/)
 [![Follow on X](https://img.shields.io/twitter/follow/Toolpad_.svg?label=follow+Toolpad)](https://x.com/Toolpad_)
 [![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-toolpad/issues/8)

@@ -418,24 +418,20 @@ export default React.forwardRef<MonacoEditorHandle, MonacoEditorProps>(function 
     };
   }, []);
 
-  React.useImperativeHandle(
-    ref,
-    () => {
-      return {
-        get editor() {
-          const editor = instanceRef.current;
-          if (!editor) {
-            throw new Error('Editor not created yet');
-          }
-          return editor;
-        },
-        get monaco() {
-          return monaco;
-        },
-      };
-    },
-    [],
-  );
+  React.useImperativeHandle(ref, () => {
+    return {
+      get editor() {
+        const editor = instanceRef.current;
+        if (!editor) {
+          throw new Error('Editor not created yet');
+        }
+        return editor;
+      },
+      get monaco() {
+        return monaco;
+      },
+    };
+  }, []);
 
   return (
     <EditorRoot className={clsx({ [classes.disabled]: disabled }, className)} sx={sx} {...props}>

@@ -30,8 +30,8 @@ importers:
         specifier: 0.0.0
         version: 0.0.0
       inquirer:
-        specifier: 9.2.22
-        version: 9.2.22
+        specifier: 9.2.23
+        version: 9.2.23
       invariant:
         specifier: 2.2.4
         version: 2.2.4
@@ -512,8 +512,8 @@ importers:
         specifier: 8.0.1
         version: 8.0.1
       inquirer:
-        specifier: 9.2.22
-        version: 9.2.22
+        specifier: 9.2.23
+        version: 9.2.23
       invariant:
         specifier: 2.2.4
         version: 2.2.4
@@ -11014,8 +11014,8 @@ packages:
       wrap-ansi: 6.2.0
     dev: true
 
-  /inquirer@9.2.22:
-    resolution: {integrity: sha512-SqLLa/Oe5rZUagTR9z+Zd6izyatHglbmbvVofo1KzuVB54YHleWzeHNLoR7FOICGOeQSqeLh1cordb3MzhGcEw==}
+  /inquirer@9.2.23:
+    resolution: {integrity: sha512-kod5s+FBPIDM2xiy9fu+6wdU/SkK5le5GS9lh4FEBjBHqiMgD9lLFbCbuqFNAjNL2ZOy9Wd9F694IOzN9pZHBA==}
     engines: {node: '>=18'}
     dependencies:
       '@inquirer/figures': 1.0.3

@@ -104,6 +104,100 @@ The newly created page can now be navigated to from the sidebar, like the follow
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/tutorial-2.gif", "alt": "Toolpad Core new page", "caption": "Adding pages to navigation", "zoom": true, "indent": 1 }}
 
+## Dashboard content
+
+Now that your project is set up, it's time to build your first dashboard. This part of the tutorial takes you through building a small dashboard that allows monitoring npm downloads.
+
+### Connecting to a data source
+
+Toolpad Core comes with the concept of data providers. At its core, you could look at a data provider as an abstracts over a remote collection. At the very least, a data provider implements the `getMany` method and defines the fields it returns. The `getMany` method must return an object with a `rows` property:
+
+```js
+import { createDataProvider } from '@toolpad/core/DataProvider';
+
+const npmData = createDataProvider({
+  async getMany({ filter }) {
+    const res = await fetch(
+      `https://api.npmjs.org/downloads/range/${encodeURIComponent(filter.range?.equals ?? 'last-month')}/react`,
+    );
+    if (!res.ok) {
+      const { error } = await res.json();
+      throw new Error(`HTTP ${res.status}: ${error}`);
+    }
+    const { downloads } = await res.json();
+    return { rows: downloads };
+  },
+  idField: 'day',
+  fields: {
+    day: { type: 'date' },
+    downloads: { type: 'number' },
+  },
+});
+```
+
+This data provider calls the npm API and returns the downloads collection. It defines the two fields available in this collection, `day`, which we mark as the unique id field with the `idField` property and `downloads`. You can then visualize this data by connecting it to a grid:
+
+```js
+import { DataGrid } from '@toolpad/core';
+import { Stack } from '@mui/material';
+
+// ...
+
+export default function App() {
+  return (
+    <Stack sx={{ width: '100%' }} spacing={2}>
+      <DataGrid height={300} dataProvider={npmData} />
+    </Stack>
+  );
+}
+```
+
+This results in the following output
+
+{{"demo": "Tutorial1.js", "hideToolbar": true}}
+
+You don't need to configure any columns, the grid infers them from the data provider. Any default that you define in the fields is adopted by any data rendering component that uses this data provider.
+
+### Sharing data providers
+
+Interesting things happen when you share data providers between different components. For instance, you can add a chart that uses the same data. Similar to the grid, this chart displays the same data as the grid. Under the hood the data fetching happens only once.
+
+```js
+// ...
+import { DataGrid, LineChart } from '@toolpad/core';
+
+// ...
+
+export default function App() {
+  return (
+    <Stack sx={{ width: '100%' }} spacing={2}>
+      <DataGrid height={300} dataProvider={npmData} />
+      <LineChart
+        height={300}
+        dataProvider={npmData}
+        xAxis={[{ dataKey: 'day' }]}
+        series={[{ dataKey: 'downloads' }]}
+      />
+    </Stack>
+  );
+}
+```
+
+The Toolpad Core components automatically adopt default values. For instance, if you add a `label` to the field, both the grid uses it in the column header, and the chart uses it in the legend:
+
+```js
+  // ...
+  fields: {
+    day: { type: 'date' },
+    downloads: { type: 'number', label: 'Npm Downloads' },
+  },
+  // ...
+```
+
+The result is the following:
+
+{{"demo": "Tutorial2.js", "hideToolbar": true}}
+
 ### Global Filtering
 
 Wrap the dashboard with a `DataContext` to apply global filtering:
@@ -133,5 +227,7 @@ return (
   </Stack>
 );
 ```
+
+Any data provider that is used under this context now by default applies this filter.
 
 {{"demo": "Tutorial3.js", "hideToolbar": true}}

@@ -22,6 +22,7 @@ import {
   gridClasses,
   GridRowIdGetter,
   GridFilterModel,
+  GridApi,
 } from '@mui/x-data-grid';
 import PropTypes from 'prop-types';
 import * as React from 'react';
@@ -47,7 +48,7 @@ import {
   ValidId,
   DEFAULT_ID_FIELD,
 } from '../DataProvider';
-import InferencingAlert from './InferrencingAlert';
+import InferencingAlert from './InferencingAlert';
 import {
   NotificationSnackbar,
   DataGridNotification,
@@ -233,7 +234,7 @@ interface GridState {
 }
 
 type GridAction =
-  | { kind: 'START_ROW_EDIT'; rowId: GridRowId }
+  | { kind: 'START_ROW_EDIT'; rowId: GridRowId; fieldToFocus: string | undefined }
   | { kind: 'CANCEL_ROW_EDIT' }
   | { kind: 'START_ROW_UPDATE' }
   | { kind: 'END_ROW_UPDATE' };
@@ -250,6 +251,7 @@ function gridEditingReducer(state: GridState, action: GridAction): GridState {
         rowModesModel: {
           [action.rowId]: {
             mode: GridRowModes.Edit,
+            fieldToFocus: action.fieldToFocus,
           },
         },
       };
@@ -327,6 +329,7 @@ export function getColumnsFromDataProviderFields<R extends Datum>(
 }
 
 function updateColumnsWithDataProviderEditing<R extends Datum>(
+  apiRef: React.MutableRefObject<GridApi>,
   dataProvider: ResolvedDataProvider<R>,
   baseColumns: readonly GridColDef<R>[],
   state: GridState,
@@ -365,7 +368,7 @@ function updateColumnsWithDataProviderEditing<R extends Datum>(
         const rowId = params.row[idField] as GridRowId;
 
         const isEditing = state.editedRowId !== null || state.isProcessingRowUpdate;
-        const isEditedRow = rowId === state.editedRowId;
+        const isEditedRow = isDraftRow(params.row) || rowId === state.editedRowId;
 
         if (isEditedRow) {
           actions.push(
@@ -397,7 +400,11 @@ function updateColumnsWithDataProviderEditing<R extends Datum>(
                 label="Edit"
                 disabled={isEditing}
                 onClick={() => {
-                  dispatch({ kind: 'START_ROW_EDIT', rowId });
+                  dispatch({
+                    kind: 'START_ROW_EDIT',
+                    rowId,
+                    fieldToFocus: getEditedRowFieldToFocus(apiRef, idField),
+                  });
                 }}
               />,
             );
@@ -438,23 +445,6 @@ function ToolbarGridToolbar() {
   );
 }
 
-function usePatchedRowModesModel(rowModesModel: GridRowModesModel): GridRowModesModel {
-  const prevRowModesModel = React.useRef(rowModesModel);
-  React.useEffect(() => {
-    prevRowModesModel.current = rowModesModel;
-  }, [rowModesModel]);
-
-  return React.useMemo(() => {
-    if (rowModesModel === prevRowModesModel.current) {
-      return rowModesModel;
-    }
-    const base = Object.fromEntries(
-      Object.keys(prevRowModesModel.current).map((rowId) => [rowId, { mode: GridRowModes.View }]),
-    );
-    return { ...base, ...rowModesModel };
-  }, [rowModesModel]);
-}
-
 function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: R): Partial<R> {
   const keys = new Set([...Object.keys(original), ...Object.keys(changed)]);
   const diff: Partial<R> = {};
@@ -485,6 +475,14 @@ function fromGridFilterModel<R extends Datum>(filterModel: GridFilterModel): Fil
     }
   }
   return filter;
+}
+
+function getEditedRowFieldToFocus(
+  apiRef: React.MutableRefObject<GridApi>,
+  idField: ValidId,
+): string | undefined {
+  const firstNonIdColumn = apiRef.current.getVisibleColumns().find((col) => col.field !== idField);
+  return firstNonIdColumn?.field;
 }
 
 /**
@@ -574,8 +572,12 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
   });
 
   const handleCreateRowRequest = React.useCallback(() => {
-    dispatchEditingAction({ kind: 'START_ROW_EDIT', rowId: DRAFT_ROW_ID });
-  }, []);
+    dispatchEditingAction({
+      kind: 'START_ROW_EDIT',
+      rowId: DRAFT_ROW_ID,
+      fieldToFocus: getEditedRowFieldToFocus(apiRef, idField),
+    });
+  }, [apiRef, idField]);
 
   const useGetManyParams = React.useMemo<GetManyParams<R>>(
     () => ({
@@ -716,17 +718,19 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
     [getRowIdProp, idField],
   );
 
-  // Remove when https://github.com/mui/mui-x/issues/11423 is fixed
-  const rowModesModelPatched = usePatchedRowModesModel(editingState.rowModesModel ?? {});
-
   const handleRowEditStart = React.useCallback<GridEventListener<'rowEditStart'>>(
     (params) => {
       const rowId = params.row[idField] as GridRowId;
-      if (params.reason === 'cellDoubleClick') {
-        dispatchEditingAction({ kind: 'START_ROW_EDIT', rowId });
+      const canEdit = !!dataProvider?.updateOne;
+      if (params.reason === 'cellDoubleClick' && canEdit) {
+        dispatchEditingAction({
+          kind: 'START_ROW_EDIT',
+          rowId,
+          fieldToFocus: getEditedRowFieldToFocus(apiRef, idField),
+        });
       }
     },
-    [idField],
+    [apiRef, dataProvider?.updateOne, idField],
   );
 
   // Calculate separately to avoid re-calculating columns on every render
@@ -756,6 +760,7 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
     );
 
     gridColumns = updateColumnsWithDataProviderEditing(
+      apiRef,
       dataProvider,
       gridColumns,
       editingState,
@@ -763,7 +768,7 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
     );
 
     return gridColumns;
-  }, [columnsProp, dataProvider, editingState, inferredFields]);
+  }, [apiRef, columnsProp, dataProvider, editingState, inferredFields]);
 
   const isSsr = useSsr();
 
@@ -797,7 +802,7 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
                 loading={loading}
                 processRowUpdate={processRowUpdate}
                 slots={slots}
-                rowModesModel={rowModesModelPatched}
+                rowModesModel={editingState.rowModesModel}
                 onRowEditStart={handleRowEditStart}
                 getRowId={getRowId}
                 filterMode={filterModeProp ?? 'client'}

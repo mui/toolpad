@@ -1,4 +1,4 @@
-# Charts in Toolpad Studio
+# Custom Components in Toolpad Studio
 
 <p class="description">A Toolpad Studio app that shows how to create custom components.</p>
 

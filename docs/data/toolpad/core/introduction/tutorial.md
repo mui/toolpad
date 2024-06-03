@@ -137,15 +137,15 @@ This data provider calls the npm API and returns the downloads collection. It de
 
 ```js
 import { DataGrid } from '@toolpad/core';
-import { Box } from '@mui/material';
+import { Stack } from '@mui/material';
 
 // ...
 
 export default function App() {
   return (
-    <Box sx={{ width: '100%' }}>
+    <Stack sx={{ width: '100%' }} spacing={2}>
       <DataGrid height={300} dataProvider={npmData} />
-    </Box>
+    </Stack>
   );
 }
 ```
@@ -168,7 +168,7 @@ import { DataGrid, LineChart } from '@toolpad/core';
 
 export default function App() {
   return (
-    <Box sx={{ width: '100%' }}>
+    <Stack sx={{ width: '100%' }} spacing={2}>
       <DataGrid height={300} dataProvider={npmData} />
       <LineChart
         height={300}
@@ -176,7 +176,7 @@ export default function App() {
         xAxis={[{ dataKey: 'day' }]}
         series={[{ dataKey: 'downloads' }]}
       />
-    </Box>
+    </Stack>
   );
 }
 ```

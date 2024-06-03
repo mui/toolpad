@@ -1,5 +1,49 @@
 # Changelog
 
+## v0.2.0
+
+<!-- generated comparing v0.1.55..master -->
+
+_Jun 3, 2024_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+First components in @toolpad/core: [DashboardLayout](https://github.com/mui/mui-toolpad/discussions/3309#:~:text=per%20authentication%20page.-,Dashboard%20layout,-provides%20UI%20for), DataGrid and LineChart. Initial [data providers](https://github.com/mui/mui-toolpad/discussions/3311) implementation.
+
+- &#8203;<!-- 31 -->Lock file maintenance (#3622) @renovate[bot]
+- &#8203;<!-- 30 -->Lock file maintenance Examples (#3624) @renovate[bot]
+- &#8203;<!-- 29 -->Add Next.js app router Toolpad Core playground (#3587) @apedroferreira
+- &#8203;<!-- 28 -->Isolate api-docs-builder deps @Janpot
+- &#8203;<!-- 27 -->isolate react-docgen @Janpot
+- &#8203;<!-- 26 -->Update renovate.json @Janpot
+- &#8203;<!-- 25 -->Group vite dependency updates @Janpot
+- &#8203;<!-- 24 -->Generate API docs for Toolpad Core (#3536) @apedroferreira
+- &#8203;<!-- 23 -->Add DashboardLayout component to @toolpad/core (#3554) @apedroferreira
+- &#8203;<!-- 22 -->Some fixes from new react compiler eslint plugin (#3562) @Janpot
+- &#8203;<!-- 21 -->Update renovate.json @Janpot
+- &#8203;<!-- 20 -->Updates to project setup (#3561) @Janpot
+- &#8203;<!-- 19 -->Add keywords and other info in package.json (#3556) @prakhargupta1
+- &#8203;<!-- 18 -->Toolpad Core build process (#3552) @apedroferreira
+- &#8203;<!-- 17 -->Group docs dependencies for renovate bot @Janpot
+- &#8203;<!-- 16 -->Bring back some dependency update grouping (#3551) @Janpot
+- &#8203;<!-- 15 -->[core] Initial DataGrid component (#3558) @Janpot
+- &#8203;<!-- 14 -->[core] Base typescript projects on the file location instead of on cwd (#3580) @Janpot
+- &#8203;<!-- 13 -->[DataGrid] Data provider create and update fixes (#3621) @Janpot
+- &#8203;<!-- 12 -->[DataGrid] Add height property (#3612) @Janpot
+- &#8203;<!-- 11 -->[DataProvider] Support custom Id field (#3613) @Janpot
+- &#8203;<!-- 10 -->[docs] Start Toolpad Core docs (#3383) @bharatkashyap
+- &#8203;<!-- 09 -->[docs] Add Toolpad core tutorial example (#3617) @bharatkashyap
+- &#8203;<!-- 08 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 07 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Update twitter.com to x.com @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Support demo previews with comments (#3577) @Janpot
+- &#8203;<!-- 03 -->[docs] Fix demo codesandbox dependencies (#3578) @Janpot
+- &#8203;<!-- 02 -->[docs] Keep referrer for GA (#3530) @oliviertassinari
+- &#8203;<!-- 01 -->[LineChart] initial LineChart (#3611) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
 ## v0.1.55
 
 <!-- generated comparing v0.1.54..master -->

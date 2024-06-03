@@ -4,7 +4,7 @@
 
 ## Interface
 
-A data provider is a stateless interface representing a collection of remote data. It mainly contains method to fetch and manipulate this data, along with certain additional methods for certain data providers.
+A data provider is a stateless interface representing a collection of remote data. It mainly contains methods to fetch and manipulate this data, along with certain additional methods for certain data providers.
 
 ```tsx
 import { createDataProvider } from '@toolpad/data';
@@ -33,10 +33,6 @@ const sharedDataSource = useSharedDataProvider(dataProvider, {
   // options
 });
 ```
-
-:::info
-Find more details in the [connecting to components](/toolpad/data/connecting-to-components/) page
-:::
 
 ## Server-side data providers
 

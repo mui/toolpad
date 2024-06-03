@@ -13,4 +13,4 @@ This collection includes apps that showcase connecting to APIs, adding custom co
 
 If you're interested in how we, at MUI, use Toolpad Studio to build internal apps, check out the [blog post](https://mui.com/blog/toolpad-use-cases/).
 
-{{"component": "modules/components/ExamplesGrid.js"}}
+{{"component": "modules/components/ExamplesGrid/ExamplesGrid.tsx", "examplesFile": "studio-examples.ts"}}

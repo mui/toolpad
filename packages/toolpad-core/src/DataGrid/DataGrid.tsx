@@ -46,7 +46,7 @@ import {
   ValidId,
   DEFAULT_ID_FIELD,
 } from '../DataProvider';
-import InferencingAlert from './InferrencingAlert';
+import InferencingAlert from './InferencingAlert';
 import {
   NotificationSnackbar,
   DataGridNotification,

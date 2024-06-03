@@ -17,7 +17,7 @@ const npmData = createDataProvider({
   idField: 'day',
   fields: {
     day: { type: 'date' },
-    downloads: { type: 'number' },
+    downloads: { type: 'number', label: 'Npm Downloads' },
   },
 });
 

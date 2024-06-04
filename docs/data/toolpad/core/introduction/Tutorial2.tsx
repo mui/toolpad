@@ -5,8 +5,10 @@ import { LineChart } from '@toolpad/core/LineChart';
 import Stack from '@mui/material/Stack';
 
 const npmData = createDataProvider({
-  async getMany() {
-    const res = await fetch('https://api.npmjs.org/downloads/range/last-year/react');
+  async getMany({ filter }) {
+    const res = await fetch(
+      `https://api.npmjs.org/downloads/range/${encodeURIComponent(filter.range?.equals ?? 'last-month')}/react`,
+    );
     if (!res.ok) {
       const { error } = await res.json();
       throw new Error(`HTTP ${res.status}: ${error}`);

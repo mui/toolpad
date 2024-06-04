@@ -11,7 +11,11 @@ import { Router } from '../AppProvider';
 vi.mock('next/router', () => vi.importActual('next-router-mock'));
 vi.mock('next/compat/router', () => vi.importActual('next-router-mock'));
 
-function RouterTest() {
+interface RouterTestProps {
+  children: React.ReactNode;
+}
+
+function RouterTest({ children }: RouterTestProps) {
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -22,7 +26,7 @@ function RouterTest() {
     };
   }, [pathname]);
 
-  return <AppProvider router={router}>Hello</AppProvider>;
+  return <AppProvider router={router}>{children}</AppProvider>;
 }
 
 describe('AppProvider', () => {

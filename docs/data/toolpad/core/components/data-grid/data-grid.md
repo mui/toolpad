@@ -32,7 +32,7 @@ To help you get started quickly, the grid is able to infer data provider fields 
 
 ## Server-side Pagination
 
-By default the grid paginates items client-side. If your backend supports serverside pagination, enable it with the `paginationMode` flag in the data grid. Now the `getMany` method receives a `pagination` parameter. This parameter is an object containing a `start` and `pageSize` property that denote the start index and offset for the requested page. You can optionally send a `rowCount` along with the `rows`.
+By default the grid paginates items client-side. If your backend supports server-side pagination, enable it with the `paginationMode` flag in the data grid. Now the `getMany` method receives a `pagination` parameter. This parameter is an object containing a `start` and `pageSize` property that denote the start index and offset for the requested page. You can optionally send a `rowCount` along with the `rows`.
 
 {{"demo": "ServerSidePagination.js"}}
 

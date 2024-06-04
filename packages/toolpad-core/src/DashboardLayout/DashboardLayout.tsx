@@ -18,7 +18,13 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { BrandingContext, Navigation, NavigationContext, NavigationPageItem } from '../AppProvider';
+import {
+  BrandingContext,
+  Navigation,
+  NavigationContext,
+  NavigationPageItem,
+  RouterContext,
+} from '../AppProvider';
 
 const DRAWER_WIDTH = 320;
 
@@ -113,7 +119,9 @@ function DashboardSidebarSubNavigation({
   basePath = '',
   depth = 0,
 }: DashboardSidebarSubNavigationProps) {
-  const pathname = usePathname();
+  const routerContext = React.useContext(RouterContext);
+
+  const pathname = routerContext?.pathname ?? '/';
 
   const initialExpandedSidebarItemIds = React.useMemo(
     () =>
@@ -156,6 +164,17 @@ function DashboardSidebarSubNavigation({
     },
     [],
   );
+
+  const handleLinkClick = React.useMemo(() => {
+    if (!routerContext) {
+      return undefined;
+    }
+    return (event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      const url = new URL(event.currentTarget.href);
+      routerContext.navigate(url.pathname, { history: 'push' });
+    };
+  }, [routerContext]);
 
   return (
     <List sx={{ mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
@@ -207,7 +226,11 @@ function DashboardSidebarSubNavigation({
         return (
           <React.Fragment key={navigationItemId}>
             {navigationItem.slug && !navigationItem.children ? (
-              <a href={navigationItemFullPath} style={{ color: 'inherit', textDecoration: 'none' }}>
+              <a
+                href={navigationItemFullPath}
+                onClick={handleLinkClick}
+                style={{ color: 'inherit', textDecoration: 'none' }}
+              >
                 {listItem}
               </a>
             ) : (
@@ -230,7 +253,7 @@ function DashboardSidebarSubNavigation({
   );
 }
 
-interface DashboardLayoutProps {
+export interface DashboardLayoutProps {
   /**
    * The content of the dashboard.
    */

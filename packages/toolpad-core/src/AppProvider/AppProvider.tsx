@@ -1,8 +1,26 @@
+'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, Theme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { baseTheme } from '../themes';
+
+export interface NavigateOptions {
+  history?: 'auto' | 'push' | 'replace';
+}
+
+export interface Navigate {
+  (url: string | URL, options?: NavigateOptions): void;
+}
+
+/**
+ * Abstract router used by Toolpad components.
+ */
+export interface Router {
+  pathname: string;
+  searchParams: URLSearchParams;
+  navigate: Navigate;
+}
 
 export interface Branding {
   title?: string;
@@ -30,11 +48,14 @@ export type NavigationItem = NavigationPageItem | NavigationSubheaderItem | Navi
 
 export type Navigation = NavigationItem[];
 
+// TODO: hide these contexts from public API
 export const BrandingContext = React.createContext<Branding | null>(null);
 
 export const NavigationContext = React.createContext<Navigation>([]);
 
-interface AppProviderProps {
+export const RouterContext = React.createContext<Router | null>(null);
+
+export interface AppProviderProps {
   /**
    * The content of the app provider.
    */
@@ -54,6 +75,11 @@ interface AppProviderProps {
    * @default []
    */
   navigation?: Navigation;
+
+  /**
+   * Router implementation used inside Toolpad components.
+   */
+  router?: Router;
 }
 
 /**
@@ -68,15 +94,17 @@ interface AppProviderProps {
  * - [AppProvider API](https://mui.com/toolpad/core/api/app-provider)
  */
 function AppProvider(props: AppProviderProps) {
-  const { children, theme = baseTheme, branding = null, navigation = [] } = props;
+  const { children, theme = baseTheme, branding = null, navigation = [], router = null } = props;
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <BrandingContext.Provider value={branding}>
-        <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
-      </BrandingContext.Provider>
-    </ThemeProvider>
+    <RouterContext.Provider value={router}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <BrandingContext.Provider value={branding}>
+          <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
+        </BrandingContext.Provider>
+      </ThemeProvider>
+    </RouterContext.Provider>
   );
 }
 

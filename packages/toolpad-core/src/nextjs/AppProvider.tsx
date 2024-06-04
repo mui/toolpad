@@ -5,7 +5,7 @@ import { AppProviderNextApp } from './AppProviderNextApp';
 import { AppProviderNextPages } from './AppProviderNextPages';
 import { AppProviderProps } from '../AppProvider';
 
-export/**
+/**
  *
  * Demos:
  *
@@ -15,8 +15,11 @@ export/**
  * API:
  *
  * - [AppProvider API](https://mui.com/toolpad/core/api/app-provider)
- */ function AppProvider(props: AppProviderProps) {
+ */
+function AppProvider(props: AppProviderProps) {
   const router = useRouter();
   const AppProviderComponent = router ? AppProviderNextPages : AppProviderNextApp;
   return <AppProviderComponent {...props} />;
 }
+
+export { AppProvider };

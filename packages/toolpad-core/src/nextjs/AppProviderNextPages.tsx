@@ -1,14 +1,9 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 import { asArray } from '@toolpad/utils/collections';
-import {
-  AppProvider as BaseAppProvider,
-  AppProviderProps as BaseAppProviderProps,
-  Navigate,
-  Router,
-} from '../AppProvider';
+import { AppProvider, AppProviderProps, Navigate, Router } from '../AppProvider';
 
-export function AppProvider(props: BaseAppProviderProps) {
+export function AppProviderNextPages(props: AppProviderProps) {
   const { push, replace, asPath, query } = useRouter();
 
   const search = React.useMemo(() => {
@@ -46,5 +41,5 @@ export function AppProvider(props: BaseAppProviderProps) {
     [asPath, navigate, searchParams],
   );
 
-  return <BaseAppProvider router={routerImpl} {...props} />;
+  return <AppProvider router={routerImpl} {...props} />;
 }

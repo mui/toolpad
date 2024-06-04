@@ -1,14 +1,9 @@
-'use client';
 import * as React from 'react';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
-import {
-  AppProvider as BaseAppProvider,
-  AppProviderProps as BaseAppProviderProps,
-  Navigate,
-  Router,
-} from '../AppProvider';
+import { AppProvider, AppProviderProps, Navigate, Router } from '../AppProvider';
 
-export function AppProvider(props: BaseAppProviderProps) {
+export function AppProviderNextApp(props: AppProviderProps) {
+  console.log('next app');
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { push, replace } = useRouter();
@@ -35,5 +30,5 @@ export function AppProvider(props: BaseAppProviderProps) {
     [pathname, navigate, searchParams],
   );
 
-  return <BaseAppProvider router={routerImpl} {...props} />;
+  return <AppProvider router={routerImpl} {...props} />;
 }

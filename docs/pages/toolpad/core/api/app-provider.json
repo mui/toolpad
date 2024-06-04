@@ -12,6 +12,13 @@
       },
       "default": "[]"
     },
+    "router": {
+      "type": {
+        "name": "shape",
+        "description": "{ navigate: func, pathname: string, searchParams: { __@iterator@38: func, append: func, delete: func, entries: func, forEach: func, get: func, getAll: func, has: func, keys: func, set: func, size: number, sort: func, toString: func, values: func } }"
+      },
+      "default": "null"
+    },
     "theme": { "type": { "name": "object" }, "default": "baseTheme" }
   },
   "name": "AppProvider",

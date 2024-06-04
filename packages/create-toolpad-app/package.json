@@ -32,7 +32,7 @@
   "dependencies": {
     "@toolpad/utils": "workspace:*",
     "chalk": "5.3.0",
-    "execa": "8.0.1",
+    "execa": "9.1.0",
     "inquirer": "9.2.23",
     "invariant": "2.2.4",
     "semver": "7.6.2",

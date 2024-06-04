@@ -84,7 +84,7 @@ async function isFolderEmpty(pathDir: string): Promise<boolean> {
 const packageManager = getPackageManager();
 
 const validatePath = async (relativePath: string): Promise<boolean | string> => {
-  const absolutePath = path.join(process.cwd(), relativePath);
+  const absolutePath = bashResolvePath(relativePath);
 
   try {
     await fs.access(absolutePath, fsConstants.F_OK);

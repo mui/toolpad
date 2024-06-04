@@ -3,6 +3,9 @@ import { useRouter } from 'next/router';
 import { asArray } from '@toolpad/utils/collections';
 import { AppProvider, AppProviderProps, Navigate, Router } from '../AppProvider';
 
+/**
+ * @ignore - internal component.
+ */
 export function AppProviderNextPages(props: AppProviderProps) {
   const { push, replace, asPath, query } = useRouter();
 

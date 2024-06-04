@@ -28,24 +28,6 @@ import {
 
 const DRAWER_WIDTH = 320;
 
-// @TODO: Remove temporary usePathname once navigation adapter is implemented
-
-function subscribe() {
-  return () => {};
-}
-
-function getSnapshot() {
-  return new URL(window.location.href).pathname;
-}
-
-function getServerSnapshot() {
-  return '/';
-}
-
-function usePathname() {
-  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-}
-
 const LogoContainer = styled('div')({
   position: 'relative',
   height: 40,

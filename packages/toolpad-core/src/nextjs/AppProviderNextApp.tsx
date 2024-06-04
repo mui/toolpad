@@ -2,8 +2,10 @@ import * as React from 'react';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { AppProvider, AppProviderProps, Navigate, Router } from '../AppProvider';
 
+/**
+ * @ignore - internal component.
+ */
 export function AppProviderNextApp(props: AppProviderProps) {
-  console.log('next app');
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { push, replace } = useRouter();

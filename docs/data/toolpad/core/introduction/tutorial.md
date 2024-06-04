@@ -110,7 +110,7 @@ Now that your project is set up, it's time to build your first dashboard. This p
 
 ### Connecting to a data source
 
-Toolpad Core comes with the concept of data providers. At its core, you could look at a data provider as an abstracts over a remote collection. At the very least, a data provider implements the `getMany` method and defines the fields it returns. The `getMany` method must return an object with a `rows` property:
+Toolpad Core comes with the concept of data providers. At its core, you could look at a data provider as an abstraction over a remote collection. At the very least, a data provider implements the `getMany` method and defines the fields it returns. The `getMany` method must return an object with a `rows` property:
 
 ```js
 import { createDataProvider } from '@toolpad/core/DataProvider';

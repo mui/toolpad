@@ -1,7 +1,9 @@
 import { AppProvider } from '@toolpad/core/AppProvider';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { NextPage } from 'next';
+
 import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core';
 
@@ -19,19 +21,23 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/dashboard',
+    slug: '/',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/dashboard/orders',
+    slug: '/orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
 ];
 
+function getDefaultLayout(page: React.ReactElement) {
+  return <DashboardLayout>{page}</DashboardLayout>;
+}
+
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
-  const getLayout = Component.getLayout ?? ((page) => page);
+  const getLayout = Component.getLayout ?? getDefaultLayout;
 
   return (
     <AppProvider navigation={NAVIGATION}>{getLayout(<Component {...pageProps} />)}</AppProvider>

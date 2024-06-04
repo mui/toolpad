@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
@@ -20,7 +19,3 @@ export default function DashboardOrdersPage() {
     </Box>
   );
 }
-
-DashboardOrdersPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <DashboardLayout>{page}</DashboardLayout>;
-};

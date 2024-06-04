@@ -2,7 +2,7 @@ import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
-export default function HomePage() {
+export default function DashboardPage() {
   return (
     <Box
       sx={{
@@ -14,7 +14,7 @@ export default function HomePage() {
       }}
     >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Welcome to Toolpad!
+        Welcome to the Toolpad dashboard!
       </Typography>
     </Box>
   );

@@ -981,8 +981,13 @@ DataGrid.propTypes /* remove-proptypes */ = {
     fields: PropTypes.object,
     getMany: PropTypes.func.isRequired,
     getOne: PropTypes.func,
+    idField: PropTypes.object,
     updateOne: PropTypes.func,
   }),
+  /**
+   * @ignore
+   */
+  height: PropTypes.number,
   /**
    * @ignore
    */

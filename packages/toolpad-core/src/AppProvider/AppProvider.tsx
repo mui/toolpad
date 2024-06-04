@@ -34,7 +34,7 @@ export const BrandingContext = React.createContext<Branding | null>(null);
 
 export const NavigationContext = React.createContext<Navigation>([]);
 
-interface AppProviderProps {
+export interface AppProviderProps {
   /**
    * The content of the app provider.
    */

@@ -40,7 +40,7 @@ You can decide whether your data provider supports pagination exclusively or opt
 
 ## Server-side Filtering
 
-By default, the grid filters rows clinet-side. If your backend supports filtering, you can enable it with the `filterMode` property in the data grid. To pass a `filter` to the data provider, set `filterMode` to `'server'`.
+By default, the grid filters rows client-side. If your backend supports filtering, you can enable it with the `filterMode` property in the data grid. To pass a `filter` to the data provider, set `filterMode` to `'server'`.
 
 ```js
 async getMany({ filter }) {

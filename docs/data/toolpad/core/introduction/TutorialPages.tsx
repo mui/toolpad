@@ -2,6 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider, Navigation, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
@@ -19,7 +20,7 @@ const NAVIGATION: Navigation = [
   {
     slug: '/page-2',
     title: 'Page 2',
-    icon: <DashboardIcon />,
+    icon: <TimelineIcon />,
   },
 ];
 

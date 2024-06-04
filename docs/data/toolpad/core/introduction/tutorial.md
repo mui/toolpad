@@ -95,7 +95,7 @@ const NAVIGATION: Navigation = [
   {
     slug: '/page-2',
     title: 'Page 2',
-    icon: <DashboardIcon />,
+    icon: <TimelineIcon />,
   },
 ];
 ```

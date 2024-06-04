@@ -116,8 +116,10 @@ Toolpad Core comes with the concept of data providers. At its core, you could lo
 import { createDataProvider } from '@toolpad/core/DataProvider';
 
 const npmData = createDataProvider({
-  async getMany() {
-    const res = await fetch('https://api.npmjs.org/downloads/range/last-year/react');
+  async getMany({ filter }) {
+    const res = await fetch(
+      `https://api.npmjs.org/downloads/range/${encodeURIComponent(filter.range?.equals ?? 'last-month')}/react`,
+    );
     if (!res.ok) {
       const { error } = await res.json();
       throw new Error(`HTTP ${res.status}: ${error}`);
@@ -195,3 +197,37 @@ The Toolpad Core components automatically adopt default values. For instance, if
 The result is the following:
 
 {{"demo": "Tutorial2.js", "hideToolbar": true}}
+
+### Global Filtering
+
+Wrap the dashboard with a `DataContext` to apply global filtering:
+
+```js
+const [range, setRange] = React.useState('last-month');
+const filter = React.useMemo(() => ({ range: { equals: range } }), [range]);
+
+// ...
+
+return (
+  <Stack sx={{ width: '100%' }} spacing={2}>
+    <DataContext filter={filter}>
+      <Toolbar disableGutters>
+        <TextField
+          select
+          label="Range"
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
+        >
+          <MenuItem value="last-month">Last Month</MenuItem>
+          <MenuItem value="last-year">Last Year</MenuItem>
+        </TextField>
+      </Toolbar>
+      {/* ... */}
+    </DataContext>
+  </Stack>
+);
+```
+
+Any data provider that is used under this context now by default applies this filter.
+
+{{"demo": "Tutorial3.js", "hideToolbar": true}}

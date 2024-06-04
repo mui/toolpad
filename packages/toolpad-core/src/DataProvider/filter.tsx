@@ -1,6 +1,6 @@
 import 'client-only';
 import * as React from 'react';
-import type { Datum, ResolvedDataProvider, ValidDatum } from './DataProvider';
+import type { Datum } from './DataProvider';
 
 export interface FilterOption<R, K extends keyof R & string = keyof R & string> {
   field: K;
@@ -14,7 +14,7 @@ export function getKeyFromFilter<R extends Datum>(filter: Filter<R>): string {
 
 export type Filter<R extends Datum> = {
   [field in keyof R & string]?: {
-    [operator: string]: string;
+    [operator in string]?: string;
   };
 };
 
@@ -28,86 +28,12 @@ export type CreateUrlParameterOptions<V> = {
   defaultValue?: V;
 } & (V extends string ? {} : { codec: Codec<V> });
 
-export type FilterOperatorBinding<R extends ValidDatum> = {
-  [field in keyof R]: {
-    [operator: string]: R[keyof R];
-  };
-};
+const FilterContext = React.createContext<Filter<any>>({});
 
-export type FilterBinding<R extends ValidDatum> = [
-  ResolvedDataProvider<R>,
-  FilterOperatorBinding<R>,
-];
+export const FilterProvider = FilterContext.Provider;
 
-type FilterBindingContextValue = [ResolvedDataProvider<any>, Filter<any>][];
-
-const FilterBindingContext = React.createContext<FilterBindingContextValue>([]);
-
-export interface FilterBindingProviderProps {
-  children?: React.ReactNode;
-  bindings: FilterBinding<any>[];
-}
-
-export function FilterBindingProvider({ children, bindings }: FilterBindingProviderProps) {
-  const filters: FilterBindingContextValue = React.useMemo(() => {
-    return bindings.map(([dataProvider, dataProviderbindings]) => {
-      const filter: Filter<any> = {};
-
-      for (const [name, operatorParam] of Object.entries(dataProviderbindings)) {
-        for (const [operator, value] of Object.entries(operatorParam)) {
-          if (value !== null) {
-            filter[name] ??= {};
-            filter[name]![operator] = value;
-          }
-        }
-      }
-
-      return [dataProvider, filter];
-    });
-  }, [bindings]);
-
-  const prevFiltersRef = React.useRef(filters);
-
-  // Stabilize the value of filters so that we don't trigger unnecessary re-renders
-  // this allows for taking the bindings as unstable prop
-  const stableFilters = React.useMemo(() => {
-    const prevFilters = prevFiltersRef.current;
-    if (prevFilters === filters) {
-      return filters;
-    }
-    if (prevFilters.length !== filters.length) {
-      return filters;
-    }
-
-    const changes: FilterBindingContextValue = [];
-    let changeDetected = false;
-    for (let i = 0; i < filters.length; i += 1) {
-      const [dp, filter] = filters[i];
-      const [prevDp, prevFilter] = prevFilters[i];
-      if (dp === prevDp && getKeyFromFilter(filter) === getKeyFromFilter(prevFilter)) {
-        changes.push(prevFilters[i]);
-      } else {
-        changes.push(filters[i]);
-        changeDetected = true;
-      }
-    }
-
-    return changeDetected ? changes : prevFilters;
-  }, [filters]);
-
-  return (
-    <FilterBindingContext.Provider value={stableFilters}>{children}</FilterBindingContext.Provider>
-  );
-}
-
-export function useAppliedFilter<R extends Datum>(
-  dataProvider: ResolvedDataProvider<R> | null,
-): Filter<R> {
-  const filters = React.useContext(FilterBindingContext);
-  return React.useMemo(
-    () => filters.find(([dp]) => dp === dataProvider)?.[1] ?? {},
-    [dataProvider, filters],
-  );
+export function useFilter() {
+  return React.useContext(FilterContext);
 }
 
 type UseUrlQueryParameterStateOptions<V> = {

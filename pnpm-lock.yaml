@@ -564,6 +564,9 @@ importers:
       '@mui/lab':
         specifier: 5.0.0-alpha.170
         version: 5.0.0-alpha.170(@mui/material@5.15.19)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
+      '@mui/utils':
+        specifier: 5.15.14
+        version: 5.15.14(@types/react@18.3.1)(react@18.2.0)
       '@mui/x-charts':
         specifier: 7.6.1
         version: 7.6.1(@mui/material@5.15.19)(@types/react@18.3.1)(react-dom@18.2.0)(react@18.2.0)
@@ -6190,10 +6193,6 @@ packages:
     dependencies:
       '@types/lodash': 4.17.4
     dev: true
-
-  /@types/lodash@4.17.1:
-    resolution: {integrity: sha512-X+2qazGS3jxLAIz5JDXDzglAF3KpijdhFxlf/V1+hEsOUc+HnWi81L/uv/EvGuV90WY+7mPGFCUDGfQC3Gj95Q==}
-    dev: false
 
   /@types/lodash@4.17.4:
     resolution: {integrity: sha512-wYCP26ZLxaT3R39kiN2+HcJ4kTd3U1waI/cY7ivWYqFP6pW3ZNpvi6Wd6PHZx7T/t8z0vlkXMg3QYLa7DZ/IJQ==}

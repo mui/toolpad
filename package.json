@@ -53,7 +53,7 @@
     "@babel/preset-typescript": "7.24.6",
     "@mui/internal-docs-utils": "1.0.7",
     "@mui/internal-markdown": "1.0.4",
-    "@mui/internal-scripts": "1.0.8",
+    "@mui/internal-scripts": "1.0.9",
     "@mui/monorepo": "github:mui/material-ui#a3fdc9f9682b57a6059792634863e39f322cef8d",
     "@mui/x-charts": "7.6.1",
     "@next/eslint-plugin-next": "14.2.3",

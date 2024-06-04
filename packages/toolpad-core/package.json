@@ -64,13 +64,14 @@
     "@types/react-dom": "18.3.0",
     "@types/sinon": "^17.0.3",
     "next": "^14.2.3",
+    "next-router-mock": "^0.9.13",
     "sinon": "^18.0.0"
   },
   "peerDependencies": {
     "@mui/icons-material": "^5",
     "@mui/material": "^5",
-    "react": "^18",
-    "next": "^14"
+    "next": "^14",
+    "react": "^18"
   },
   "peerDependenciesMeta": {
     "next": {

@@ -110,6 +110,6 @@ afterEach(async () => {
   }
 
   if (testDir) {
-    await fs.rm(testDir, { recursive: true, force: true, maxRetries: 3 });
+    await fs.rm(testDir, { recursive: true, force: true });
   }
-});
+}, 30000);

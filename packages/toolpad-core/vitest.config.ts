@@ -4,9 +4,10 @@ export default defineConfig({
   test: {
     setupFiles: ['../../test/setupVitest.ts'],
     browser: {
-      enabled: !process.env.CI,
+      enabled: false, // enabled through CLI
       name: 'chromium',
       provider: 'playwright',
+      headless: !!process.env.CI,
     },
   },
 });

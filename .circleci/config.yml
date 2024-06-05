@@ -136,6 +136,11 @@ jobs:
             pnpm prettier:all
             pnpm check-changes
       - run:
+          name: '`pnpm proptypes` changes committed?'
+          command: |
+            pnpm proptypes
+            pnpm check-changes
+      - run:
           name: '`pnpm jsonSchemas` changes committed?'
           command: |
             pnpm jsonSchemas
@@ -165,7 +170,7 @@ jobs:
     resource_class: 'large'
     parallelism: 2
     docker:
-      - image: mcr.microsoft.com/playwright:v1.43.1-focal
+      - image: mcr.microsoft.com/playwright:v1.44.1-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

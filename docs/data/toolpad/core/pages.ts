@@ -1,6 +1,8 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
 import pagesApi from './pagesApi';
 
+// TODO: Split pagesApi into components and hooks
+
 const pages: MuiPage[] = [
   {
     pathname: '/toolpad/core/intro-group',
@@ -39,18 +41,8 @@ const pages: MuiPage[] = [
         subheader: 'Features',
         children: [
           {
-            pathname: '/toolpad/core/features/authentication',
-
-            title: 'Authentication',
-          },
-          {
             pathname: '/toolpad/core/features/data-providers',
             title: 'Data Providers',
-          },
-          {
-            pathname: '/toolpad/core/features/audit-logs',
-            title: 'Audit Logs',
-            plan: 'pro',
           },
         ],
       },
@@ -90,6 +82,10 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/core/react-data-grid',
             title: 'Data Grid',
           },
+          {
+            pathname: '/toolpad/core/react-line-chart',
+            title: 'Line Chart',
+          },
         ],
       },
     ],
@@ -97,11 +93,13 @@ const pages: MuiPage[] = [
   {
     pathname: '/toolpad/core/api-group',
     title: 'APIs',
-    children: pagesApi,
-  },
-  {
-    pathname: '/toolpad/core/customization',
-    title: 'Customization',
+    children: [
+      {
+        pathname: '/toolpad/core/api/components-group',
+        subheader: 'Components',
+        children: pagesApi,
+      },
+    ],
   },
 ];
 

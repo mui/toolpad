@@ -93,6 +93,7 @@ test(
 
 afterEach(async () => {
   if (toolpadProcess && typeof toolpadProcess.exitCode !== 'number') {
+    toolpadProcess.catch(() => null);
     toolpadProcess.kill('SIGKILL');
     await once(toolpadProcess, 'exit');
   }

@@ -2,7 +2,10 @@ import { keepPreviousData, QueryClient, useMutation, useQuery } from '@tanstack/
 import invariant from 'invariant';
 import * as React from 'react';
 import { getObjectKey } from '@toolpad/utils/objectKey';
-import { Filter, getKeyFromFilter, useAppliedFilter } from './filter';
+import { deepmerge } from '@mui/utils';
+import { Filter, FilterProvider, getKeyFromFilter, useFilter } from './filter';
+
+export { Filter, useFilter } from './filter';
 
 /**
  * @ignore - do not document.
@@ -139,17 +142,27 @@ function getKeyForParams(params: GetManyParams<any>): string[] {
   ];
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      networkMode: 'always',
+    },
+    mutations: {
+      networkMode: 'always',
+    },
+  },
+});
 
 export function useGetMany<R extends Datum>(
   dataProvider: ResolvedDataProvider<R> | null,
   params?: GetManyParams<R>,
 ): Query<GetManyResult<R>> {
   const providerKey = dataProvider ? getObjectKey(dataProvider) : null;
-  const environmentFilter = useAppliedFilter(dataProvider);
+  const environmentFilter = useFilter();
 
   const resolvedParams: GetManyParams<R> = React.useMemo(() => {
-    const filter = { ...environmentFilter, ...params?.filter };
+    const filter = deepmerge({} as Filter<R>, environmentFilter, params?.filter ?? {});
     return { paginatuon: null, ...params, filter } as GetManyParams<R>;
   }, [environmentFilter, params]);
 
@@ -287,4 +300,17 @@ export function useDeleteOne<R extends Datum>(
     }),
     [isPending, error, mutateAsync, reset],
   );
+}
+
+export interface DataContextProps {
+  filter?: Filter<any>;
+  children?: React.ReactNode;
+}
+
+const defaultFilter: Filter<any> = {};
+
+export function DataContext(props: DataContextProps) {
+  const { filter = defaultFilter, children } = props;
+
+  return <FilterProvider value={filter}>{children}</FilterProvider>;
 }

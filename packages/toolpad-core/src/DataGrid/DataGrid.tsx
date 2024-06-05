@@ -21,10 +21,12 @@ import {
   GridPaginationModel,
   gridClasses,
   GridRowIdGetter,
+  GridFilterModel,
+  GridApi,
 } from '@mui/x-data-grid';
 import PropTypes from 'prop-types';
 import * as React from 'react';
-import { Button, CircularProgress, styled } from '@mui/material';
+import { Button, CircularProgress, styled, useControlled } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -46,12 +48,13 @@ import {
   ValidId,
   DEFAULT_ID_FIELD,
 } from '../DataProvider';
-import InferencingAlert from './InferrencingAlert';
+import InferencingAlert from './InferencingAlert';
 import {
   NotificationSnackbar,
   DataGridNotification,
   SetDataGridNotificationContext,
 } from './NotificationSnackbar';
+import { Filter } from '../DataProvider/filter';
 
 const RootContainer = styled('div')({
   display: 'flex',
@@ -111,7 +114,6 @@ function cleanDraftRow<R>(row: MaybeDraftRow<R>): R {
 const PlaceholderBorder = styled('div')(({ theme }) => ({
   position: 'absolute',
   inset: '0 0 0 0',
-  backgroundColor: theme.palette.background.paper,
   borderColor: theme.palette.divider,
   borderWidth: 1,
   borderStyle: 'solid',
@@ -120,11 +122,14 @@ const PlaceholderBorder = styled('div')(({ theme }) => ({
 
 type ProcessRowUpdate = XDataGridProps['processRowUpdate'];
 
-export interface DataGridProps<R extends Datum>
-  extends Omit<XDataGridProps<R>, 'columns' | 'rows'> {
-  rows?: readonly R[];
-  columns?: readonly GridColDef<R>[];
+export interface DataGridProps<R extends Datum> extends Partial<XDataGridProps<R>> {
+  /**
+   * The height of the datagrid in pixels. If left `undefined`, it adopts the height of its parent.
+   */
   height?: number;
+  /**
+   * The data provider to resolve the displayed data. This object must be referentially stable.
+   */
   dataProvider?: ResolvedDataProvider<R>;
 }
 
@@ -229,7 +234,7 @@ interface GridState {
 }
 
 type GridAction =
-  | { kind: 'START_ROW_EDIT'; rowId: GridRowId }
+  | { kind: 'START_ROW_EDIT'; rowId: GridRowId; fieldToFocus: string | undefined }
   | { kind: 'CANCEL_ROW_EDIT' }
   | { kind: 'START_ROW_UPDATE' }
   | { kind: 'END_ROW_UPDATE' };
@@ -246,6 +251,7 @@ function gridEditingReducer(state: GridState, action: GridAction): GridState {
         rowModesModel: {
           [action.rowId]: {
             mode: GridRowModes.Edit,
+            fieldToFocus: action.fieldToFocus,
           },
         },
       };
@@ -323,6 +329,7 @@ export function getColumnsFromDataProviderFields<R extends Datum>(
 }
 
 function updateColumnsWithDataProviderEditing<R extends Datum>(
+  apiRef: React.MutableRefObject<GridApi>,
   dataProvider: ResolvedDataProvider<R>,
   baseColumns: readonly GridColDef<R>[],
   state: GridState,
@@ -361,7 +368,7 @@ function updateColumnsWithDataProviderEditing<R extends Datum>(
         const rowId = params.row[idField] as GridRowId;
 
         const isEditing = state.editedRowId !== null || state.isProcessingRowUpdate;
-        const isEditedRow = rowId === state.editedRowId;
+        const isEditedRow = isDraftRow(params.row) || rowId === state.editedRowId;
 
         if (isEditedRow) {
           actions.push(
@@ -393,7 +400,11 @@ function updateColumnsWithDataProviderEditing<R extends Datum>(
                 label="Edit"
                 disabled={isEditing}
                 onClick={() => {
-                  dispatch({ kind: 'START_ROW_EDIT', rowId });
+                  dispatch({
+                    kind: 'START_ROW_EDIT',
+                    rowId,
+                    fieldToFocus: getEditedRowFieldToFocus(apiRef, idField),
+                  });
                 }}
               />,
             );
@@ -434,23 +445,6 @@ function ToolbarGridToolbar() {
   );
 }
 
-function usePatchedRowModesModel(rowModesModel: GridRowModesModel): GridRowModesModel {
-  const prevRowModesModel = React.useRef(rowModesModel);
-  React.useEffect(() => {
-    prevRowModesModel.current = rowModesModel;
-  }, [rowModesModel]);
-
-  return React.useMemo(() => {
-    if (rowModesModel === prevRowModesModel.current) {
-      return rowModesModel;
-    }
-    const base = Object.fromEntries(
-      Object.keys(prevRowModesModel.current).map((rowId) => [rowId, { mode: GridRowModes.View }]),
-    );
-    return { ...base, ...rowModesModel };
-  }, [rowModesModel]);
-}
-
 function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: R): Partial<R> {
   const keys = new Set([...Object.keys(original), ...Object.keys(changed)]);
   const diff: Partial<R> = {};
@@ -472,6 +466,25 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
   return diff;
 }
 
+function fromGridFilterModel<R extends Datum>(filterModel: GridFilterModel): Filter<R> {
+  const filter: Filter<R> = {};
+  for (const [field, filterItem] of Object.entries(filterModel.items)) {
+    for (const [operator, value] of Object.entries(filterItem)) {
+      filter[field as FieldOf<R>] ??= {};
+      (filter[field as FieldOf<R>] as any)[operator] = value;
+    }
+  }
+  return filter;
+}
+
+function getEditedRowFieldToFocus(
+  apiRef: React.MutableRefObject<GridApi>,
+  idField: ValidId,
+): string | undefined {
+  const firstNonIdColumn = apiRef.current.getVisibleColumns().find((col) => col.field !== idField);
+  return firstNonIdColumn?.field;
+}
+
 /**
  *
  * Demos:
@@ -481,8 +494,12 @@ function diffRows<R extends Record<PropertyKey, unknown>>(original: R, changed: 
  * API:
  *
  * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
+ * - inherits [X DataGrid API](https://mui.com/x/api/data-grid/data-grid/)
  */
-const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
+const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
+  props: DataGridProps<R>,
+  ref: React.Ref<HTMLDivElement>,
+) {
   const { dataProvider, ...restProps1 } = props;
 
   // TODO: figure out how to stop generating prop types for X Grid properties
@@ -498,6 +515,12 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
     autosizeOptions: autosizeOptionsProp,
     getRowId: getRowIdProp,
     rowModesModel: rowModesModelProp,
+    filterMode: filterModeProp,
+    filterModel: filterModelProp,
+    onFilterModelChange: onFilterModelChangeProp,
+    paginationMode: paginationModeProp,
+    paginationModel: paginationModelProp,
+    onPaginationModelChange: onPaginationModelChangeProp,
     ...restProps
   } = restProps2;
 
@@ -508,10 +531,39 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
   const gridApiRefOwn = useGridApiRef();
   const apiRef = apiRefProp ?? gridApiRefOwn;
 
-  const [gridPaginationModel, setGridPaginationModel] = React.useState<GridPaginationModel>({
-    pageSize: 10,
-    page: 0,
+  const [gridPaginationModel, setGridPaginationModel] = useControlled<GridPaginationModel>({
+    controlled: paginationModelProp,
+    default: { page: 0, pageSize: 100 },
+    name: 'DataGrid',
+    state: 'paginationModel',
   });
+
+  const onGridPaginationModelChange = React.useCallback<
+    NonNullable<XDataGridProps['onPaginationModelChange']>
+  >(
+    (paginationModel, details) => {
+      setGridPaginationModel(paginationModel);
+      onPaginationModelChangeProp?.(paginationModel, details);
+    },
+    [onPaginationModelChangeProp, setGridPaginationModel],
+  );
+
+  const [gridFilterModel, setGridFilterModel] = useControlled<GridFilterModel>({
+    controlled: filterModelProp,
+    default: { items: [] },
+    name: 'DataGrid',
+    state: 'filterModel',
+  });
+
+  const onGridFilterModelChange = React.useCallback<
+    NonNullable<XDataGridProps['onFilterModelChange']>
+  >(
+    (filterModel, details) => {
+      setGridFilterModel(filterModel);
+      onFilterModelChangeProp?.(filterModel, details);
+    },
+    [onFilterModelChangeProp, setGridFilterModel],
+  );
 
   const [editingState, dispatchEditingAction] = React.useReducer(gridEditingReducer, {
     editedRowId: null,
@@ -520,21 +572,31 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
   });
 
   const handleCreateRowRequest = React.useCallback(() => {
-    dispatchEditingAction({ kind: 'START_ROW_EDIT', rowId: DRAFT_ROW_ID });
-  }, []);
+    dispatchEditingAction({
+      kind: 'START_ROW_EDIT',
+      rowId: DRAFT_ROW_ID,
+      fieldToFocus: getEditedRowFieldToFocus(apiRef, idField),
+    });
+  }, [apiRef, idField]);
 
   const useGetManyParams = React.useMemo<GetManyParams<R>>(
     () => ({
       pagination:
-        restProps.paginationMode === 'server'
+        paginationModeProp === 'server'
           ? {
               start: gridPaginationModel.page * gridPaginationModel.pageSize,
               pageSize: gridPaginationModel.pageSize,
             }
           : null,
-      filter: {},
+      filter: filterModeProp === 'server' ? fromGridFilterModel(gridFilterModel) : {},
     }),
-    [gridPaginationModel.page, gridPaginationModel.pageSize, restProps.paginationMode],
+    [
+      filterModeProp,
+      gridFilterModel,
+      gridPaginationModel.page,
+      gridPaginationModel.pageSize,
+      paginationModeProp,
+    ],
   );
 
   const { data, loading, error, refetch } = useGetMany(dataProvider ?? null, useGetManyParams);
@@ -656,17 +718,19 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
     [getRowIdProp, idField],
   );
 
-  // Remove when https://github.com/mui/mui-x/issues/11423 is fixed
-  const rowModesModelPatched = usePatchedRowModesModel(editingState.rowModesModel ?? {});
-
   const handleRowEditStart = React.useCallback<GridEventListener<'rowEditStart'>>(
     (params) => {
       const rowId = params.row[idField] as GridRowId;
-      if (params.reason === 'cellDoubleClick') {
-        dispatchEditingAction({ kind: 'START_ROW_EDIT', rowId });
+      const canEdit = !!dataProvider?.updateOne;
+      if (params.reason === 'cellDoubleClick' && canEdit) {
+        dispatchEditingAction({
+          kind: 'START_ROW_EDIT',
+          rowId,
+          fieldToFocus: getEditedRowFieldToFocus(apiRef, idField),
+        });
       }
     },
-    [idField],
+    [apiRef, dataProvider?.updateOne, idField],
   );
 
   // Calculate separately to avoid re-calculating columns on every render
@@ -696,6 +760,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
     );
 
     gridColumns = updateColumnsWithDataProviderEditing(
+      apiRef,
       dataProvider,
       gridColumns,
       editingState,
@@ -703,7 +768,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
     );
 
     return gridColumns;
-  }, [columnsProp, dataProvider, editingState, inferredFields]);
+  }, [apiRef, columnsProp, dataProvider, editingState, inferredFields]);
 
   const isSsr = useSsr();
 
@@ -721,11 +786,15 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
               [`& .${gridClasses['scrollbar--vertical']}`]: {
                 ...(editingState.editedRowId === DRAFT_ROW_ID ? { pointerEvents: 'none' } : {}),
               },
+              [`& .${gridClasses.root}`]: {
+                visibility: error ? 'hidden' : undefined,
+              },
             }}
           >
             {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
             <GridContainer>
               <XDataGrid
+                ref={ref}
                 pagination
                 apiRef={apiRef}
                 rows={rows}
@@ -733,18 +802,22 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
                 loading={loading}
                 processRowUpdate={processRowUpdate}
                 slots={slots}
-                rowModesModel={rowModesModelPatched}
+                rowModesModel={editingState.rowModesModel}
                 onRowEditStart={handleRowEditStart}
                 getRowId={getRowId}
-                {...(restProps.paginationMode === 'server'
+                filterMode={filterModeProp ?? 'client'}
+                filterModel={gridFilterModel}
+                onFilterModelChange={onGridFilterModelChange}
+                paginationMode={paginationModeProp ?? 'client'}
+                paginationModel={gridPaginationModel}
+                onPaginationModelChange={onGridPaginationModelChange}
+                {...(paginationModeProp === 'server'
                   ? {
-                      gridPaginationModel,
-                      onPaginationModelChange: setGridPaginationModel,
                       rowCount: data?.rowCount ?? -1,
                     }
                   : {})}
                 {...restProps}
-                // TODO: How can we make this optional?
+                // TODO: How can we make this optional? Can we move to a different UI for row creation?
                 editMode="row"
               />
               {isSsr ? (
@@ -767,7 +840,7 @@ const DataGrid = function DataGrid<R extends Datum>(props: DataGridProps<R>) {
       </SetDataGridNotificationContext.Provider>
     </RefetchContext.Provider>
   );
-};
+});
 
 DataGrid.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐
@@ -775,205 +848,7 @@ DataGrid.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * @ignore
-   */
-  columns: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.shape({
-        align: PropTypes.oneOf(['center', 'left', 'right']),
-        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
-        description: PropTypes.string,
-        disableColumnMenu: PropTypes.bool,
-        disableExport: PropTypes.bool,
-        disableReorder: PropTypes.bool,
-        display: PropTypes.oneOf(['flex', 'text']),
-        editable: PropTypes.bool,
-        field: PropTypes.string.isRequired,
-        filterable: PropTypes.bool,
-        filterOperators: PropTypes.arrayOf(
-          PropTypes.shape({
-            getApplyFilterFn: PropTypes.func.isRequired,
-            getValueAsString: PropTypes.func,
-            headerLabel: PropTypes.string,
-            InputComponent: PropTypes.elementType,
-            InputComponentProps: PropTypes.object,
-            label: PropTypes.string,
-            requiresFilterValue: PropTypes.bool,
-            value: PropTypes.string.isRequired,
-          }),
-        ),
-        flex: PropTypes.number,
-        getApplyQuickFilterFn: PropTypes.func,
-        getSortComparator: PropTypes.func,
-        groupable: PropTypes.bool,
-        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
-        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        headerName: PropTypes.string,
-        hideable: PropTypes.bool,
-        hideSortIcons: PropTypes.bool,
-        maxWidth: PropTypes.number,
-        minWidth: PropTypes.number,
-        pinnable: PropTypes.bool,
-        preProcessEditCellProps: PropTypes.func,
-        renderCell: PropTypes.func,
-        renderEditCell: PropTypes.func,
-        renderHeader: PropTypes.func,
-        resizable: PropTypes.bool,
-        sortable: PropTypes.bool,
-        sortComparator: PropTypes.func,
-        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
-        type: PropTypes.oneOf([
-          'actions',
-          'boolean',
-          'custom',
-          'date',
-          'dateTime',
-          'number',
-          'singleSelect',
-          'string',
-        ]),
-        valueFormatter: PropTypes.func,
-        valueGetter: PropTypes.func,
-        valueParser: PropTypes.func,
-        valueSetter: PropTypes.func,
-        width: PropTypes.number,
-      }),
-      PropTypes.shape({
-        align: PropTypes.oneOf(['center', 'left', 'right']),
-        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
-        description: PropTypes.string,
-        disableColumnMenu: PropTypes.bool,
-        disableExport: PropTypes.bool,
-        disableReorder: PropTypes.bool,
-        display: PropTypes.oneOf(['flex', 'text']),
-        editable: PropTypes.bool,
-        field: PropTypes.string.isRequired,
-        filterable: PropTypes.bool,
-        filterOperators: PropTypes.arrayOf(
-          PropTypes.shape({
-            getApplyFilterFn: PropTypes.func.isRequired,
-            getValueAsString: PropTypes.func,
-            headerLabel: PropTypes.string,
-            InputComponent: PropTypes.elementType,
-            InputComponentProps: PropTypes.object,
-            label: PropTypes.string,
-            requiresFilterValue: PropTypes.bool,
-            value: PropTypes.string.isRequired,
-          }),
-        ),
-        flex: PropTypes.number,
-        getActions: PropTypes.func.isRequired,
-        getApplyQuickFilterFn: PropTypes.func,
-        getSortComparator: PropTypes.func,
-        groupable: PropTypes.bool,
-        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
-        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        headerName: PropTypes.string,
-        hideable: PropTypes.bool,
-        hideSortIcons: PropTypes.bool,
-        maxWidth: PropTypes.number,
-        minWidth: PropTypes.number,
-        pinnable: PropTypes.bool,
-        preProcessEditCellProps: PropTypes.func,
-        renderCell: PropTypes.func,
-        renderEditCell: PropTypes.func,
-        renderHeader: PropTypes.func,
-        resizable: PropTypes.bool,
-        sortable: PropTypes.bool,
-        sortComparator: PropTypes.func,
-        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
-        type: PropTypes.oneOf([
-          /**
-           * The type of the column.
-           * @default 'actions'
-           */
-          'actions',
-        ]).isRequired,
-        valueFormatter: PropTypes.func,
-        valueGetter: PropTypes.func,
-        valueParser: PropTypes.func,
-        valueSetter: PropTypes.func,
-        width: PropTypes.number,
-      }),
-      PropTypes.shape({
-        align: PropTypes.oneOf(['center', 'left', 'right']),
-        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
-        description: PropTypes.string,
-        disableColumnMenu: PropTypes.bool,
-        disableExport: PropTypes.bool,
-        disableReorder: PropTypes.bool,
-        display: PropTypes.oneOf(['flex', 'text']),
-        editable: PropTypes.bool,
-        field: PropTypes.string.isRequired,
-        filterable: PropTypes.bool,
-        filterOperators: PropTypes.arrayOf(
-          PropTypes.shape({
-            getApplyFilterFn: PropTypes.func.isRequired,
-            getValueAsString: PropTypes.func,
-            headerLabel: PropTypes.string,
-            InputComponent: PropTypes.elementType,
-            InputComponentProps: PropTypes.object,
-            label: PropTypes.string,
-            requiresFilterValue: PropTypes.bool,
-            value: PropTypes.string.isRequired,
-          }),
-        ),
-        flex: PropTypes.number,
-        getApplyQuickFilterFn: PropTypes.func,
-        getOptionLabel: PropTypes.func,
-        getOptionValue: PropTypes.func,
-        getSortComparator: PropTypes.func,
-        groupable: PropTypes.bool,
-        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
-        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        headerName: PropTypes.string,
-        hideable: PropTypes.bool,
-        hideSortIcons: PropTypes.bool,
-        maxWidth: PropTypes.number,
-        minWidth: PropTypes.number,
-        pinnable: PropTypes.bool,
-        preProcessEditCellProps: PropTypes.func,
-        renderCell: PropTypes.func,
-        renderEditCell: PropTypes.func,
-        renderHeader: PropTypes.func,
-        resizable: PropTypes.bool,
-        sortable: PropTypes.bool,
-        sortComparator: PropTypes.func,
-        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
-        type: PropTypes.oneOf([
-          /**
-           * The type of the column.
-           * @default 'singleSelect'
-           */
-          'singleSelect',
-        ]).isRequired,
-        valueFormatter: PropTypes.func,
-        valueGetter: PropTypes.func,
-        valueOptions: PropTypes.oneOfType([
-          PropTypes.arrayOf(
-            PropTypes.oneOfType([
-              PropTypes.number,
-              PropTypes.object,
-              PropTypes.shape({
-                label: PropTypes.string.isRequired,
-                value: PropTypes.any.isRequired,
-              }),
-              PropTypes.string,
-            ]).isRequired,
-          ),
-          PropTypes.func,
-        ]),
-        valueParser: PropTypes.func,
-        valueSetter: PropTypes.func,
-        width: PropTypes.number,
-      }),
-    ]).isRequired,
-  ),
-  /**
-   * @ignore
+   * The data provider to resolve the displayed data. This object must be referentially stable.
    */
   dataProvider: PropTypes.shape({
     createOne: PropTypes.func,
@@ -985,17 +860,9 @@ DataGrid.propTypes /* remove-proptypes */ = {
     updateOne: PropTypes.func,
   }),
   /**
-   * @ignore
+   * The height of the datagrid in pixels. If left `undefined`, it adopts the height of its parent.
    */
   height: PropTypes.number,
-  /**
-   * @ignore
-   */
-  rows: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-    }),
-  ),
 } as any;
 
 export { DataGrid };

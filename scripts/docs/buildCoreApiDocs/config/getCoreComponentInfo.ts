@@ -56,8 +56,21 @@ export function getCoreComponentInfo(filename: string): ComponentInfo {
       srcInfo = parseFile(filename);
       return srcInfo;
     },
-    getInheritance: () => {
-      return null;
+    getInheritance: (x) => {
+      switch (x) {
+        case 'XDataGrid':
+          return {
+            name: 'X DataGrid',
+            apiPathname: 'https://mui.com/x/api/data-grid/data-grid/',
+          };
+        case 'XLineChart':
+          return {
+            name: 'X LineChart',
+            apiPathname: 'https://mui.com/x/api/charts/line-chart/',
+          };
+        default:
+          return null;
+      }
     },
     getDemos: () => demos,
   };

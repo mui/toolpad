@@ -6,15 +6,7 @@ import { AppProviderNextPages } from './AppProviderNextPages';
 import { AppProviderProps } from '../AppProvider';
 
 /**
- *
- * Demos:
- *
- * - [App Provider](https://mui.com/toolpad/core/react-app-provider/)
- * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
- *
- * API:
- *
- * - [AppProvider API](https://mui.com/toolpad/core/api/app-provider)
+ * @ignore - internal component.
  */
 function AppProvider(props: AppProviderProps) {
   const router = useRouter();

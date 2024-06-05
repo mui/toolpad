@@ -54,7 +54,7 @@ import {
   DataGridNotification,
   SetDataGridNotificationContext,
 } from './NotificationSnackbar';
-import { Filter } from '../DataProvider/filter';
+import { type Filter } from '../DataProvider/filter';
 
 const RootContainer = styled('div')({
   display: 'flex',

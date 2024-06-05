@@ -1,0 +1,12 @@
+<DashboardLayout>
+  <Box
+    sx={{
+      py: 4,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    }}
+  >
+    <Typography>Dashboard content</Typography>
+  </Box>
+</DashboardLayout>

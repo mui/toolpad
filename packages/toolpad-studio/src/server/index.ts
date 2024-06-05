@@ -72,10 +72,10 @@ async function createDevHandler(project: ToolpadProject) {
     },
   });
 
-  worker.once('exit', (code) => {
+  /*   worker.once('exit', (code) => {
     console.error(`App dev server failed ${code}`);
     process.exit(1);
-  });
+  }); */
 
   let resolveReadyPromise: () => void | undefined;
   const readyPromise = new Promise<void>((resolve) => {

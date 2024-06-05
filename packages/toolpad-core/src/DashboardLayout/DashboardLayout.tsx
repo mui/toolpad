@@ -24,7 +24,7 @@ import {
   NavigationContext,
   NavigationPageItem,
   RouterContext,
-} from '../shared/context';
+} from '../AppProvider/AppProvider';
 
 const DRAWER_WIDTH = 320;
 

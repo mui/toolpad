@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
-import { AppProvider, AppProviderProps } from '../AppProvider';
-import { Navigate, Router } from '../shared/context';
+import { AppProvider, AppProviderProps, Navigate, Router } from '../AppProvider';
 
 /**
  * @ignore - internal component.

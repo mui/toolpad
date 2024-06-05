@@ -3,8 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import { asArray } from '@toolpad/utils/collections';
-import { AppProvider, AppProviderProps } from '../AppProvider';
-import { Navigate, Router } from '../shared/context';
+import { AppProvider, AppProviderProps, Navigate, Router } from '../AppProvider';
 
 /**
  * @ignore - internal component.

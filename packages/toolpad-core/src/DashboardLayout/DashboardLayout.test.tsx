@@ -11,7 +11,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import { DashboardLayout } from './DashboardLayout';
-import { BrandingContext, Navigation, NavigationContext } from '../AppProvider/AppProvider';
+import { BrandingContext, Navigation, NavigationContext } from '../AppProvider';
 
 describe('DashboardLayout', () => {
   afterEach(cleanup);

@@ -17,9 +17,7 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 const cliPath = path.resolve(currentDirectory, '../dist/index.js');
 
 let testDir: string | undefined;
-let cpController: AbortController | undefined;
 let cp: ExecaChildProcess | undefined;
-let toolpadProcessController: AbortController | undefined;
 let toolpadProcess: ExecaChildProcess | undefined;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
@@ -43,10 +41,8 @@ test(
   'create-toolpad-app can bootstrap a Toolpad Studio app',
   async () => {
     testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-'));
-    cpController = new AbortController();
     cp = execa(cliPath, [testDir], {
       cwd: currentDirectory,
-      cancelSignal: cpController.signal,
     });
     cp.stdout?.pipe(process.stdout);
     cp.stderr?.pipe(process.stderr);
@@ -76,14 +72,12 @@ test(
 
     expect(gitignore.length).toBeGreaterThan(0);
 
-    toolpadProcessController = new AbortController();
     toolpadProcess = execa('pnpm', ['dev', '--create'], {
       cwd: testDir,
       env: {
         FORCE_COLOR: '0',
         BROWSER: 'none',
       },
-      cancelSignal: toolpadProcessController.signal,
     });
     toolpadProcess.stdout?.pipe(process.stdout);
     toolpadProcess.stderr?.pipe(process.stderr);
@@ -100,13 +94,13 @@ test(
 );
 
 afterEach(async () => {
-  if (toolpadProcess && toolpadProcessController) {
+  if (toolpadProcess) {
     await terminate(toolpadProcess.pid!);
     await toolpadProcess.catch(() => null);
     console.log('toolpad ended');
   }
 
-  if (cp && cpController) {
+  if (cp) {
     await terminate(cp.pid!);
     await cp.catch(() => null);
     console.log('create-toolpad-app ended');

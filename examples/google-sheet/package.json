@@ -8,7 +8,7 @@
     "start": "toolpad-studio start"
   },
   "dependencies": {
-    "@toolpad/studio": "0.1.55",
-    "googleapis": "134.0.0"
+    "@toolpad/studio": "0.2.0",
+    "googleapis": "137.1.0"
   }
 }

@@ -53,6 +53,11 @@
       "matchPackagePatterns": ["^stylis-"]
     },
     {
+      "groupName": "Vite",
+      "matchPackageNames": ["vite"],
+      "matchPackagePatterns": ["^@vitejs/"]
+    },
+    {
       "groupName": "Next.js",
       "matchPackageNames": ["next"],
       "matchPackagePatterns": ["^@next/"]
@@ -76,7 +81,7 @@
     },
     {
       "groupName": "React",
-      "matchPackageNames": ["react", "react-dom", "react-is", "react-test-renderer"]
+      "matchPackageNames": ["react", "react-dom", "react-is", "react-test-renderer", "@types/react"]
     },
     {
       "groupName": "MUI Core",
@@ -124,6 +129,11 @@
       "groupName": "superjson",
       "matchPackageNames": ["superjson"],
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
+    },
+    {
+      "groupName": "api-docs-builder dependency",
+      "matchPackageNames": ["unist-util-visit", "react-docgen", "remark"],
+      "description": "Dependency of api-docs-builder, sync manually"
     },
     {
       "matchDepTypes": ["action"],

@@ -40,7 +40,7 @@ Stack Overflow contains a wealth of information about MUI products. Toolpad Stu
 
 ### Social media
 
-Toolpad Studio has a growing presence on [Twitter/X](https://twitter.com/Toolpad_).
+Toolpad Studio has a growing presence on [Twitter/X](https://x.com/Toolpad_).
 You can use it to share what you're working on and connect with other developers.
 
 Please keep in mind that we don't actively monitor direct messages on the company's social media accounts, so this is _not_ a good way to get in touch with us directly.

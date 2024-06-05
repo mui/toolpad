@@ -1,0 +1,11 @@
+const myData = createDataProvider({
+  async getMany() {
+    return {
+      rows: [
+        { id: '1', name: 'John' },
+        { id: '2', name: 'Jane' },
+      ],
+    };
+  },
+  // paste fields here:
+});

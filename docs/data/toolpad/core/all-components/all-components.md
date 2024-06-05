@@ -4,3 +4,4 @@
 
 - [App Provider](/toolpad/core/react-app-provider/)
 - [Dashboard Layout](/toolpad/core/react-dashboard-layout/)
+- [Data Grid](/toolpad/core/react-data-grid/)

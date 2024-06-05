@@ -1,0 +1,12 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "dataProvider": {
+      "description": "The data provider to resolve the displayed data. This object must be referentially stable."
+    },
+    "height": {
+      "description": "The height of the datagrid in pixels. If left <code>undefined</code>, it adopts the height of its parent."
+    }
+  },
+  "classDescriptions": {}
+}

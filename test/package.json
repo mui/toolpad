@@ -2,7 +2,7 @@
   "name": "@toolpad/studio-tests",
   "private": true,
   "devDependencies": {
-    "@mui/material": "5.15.17",
+    "@mui/material": "5.15.19",
     "@toolpad/studio": "workspace:*",
     "@toolpad/utils": "workspace:*",
     "@types/invariant": "2.2.37",
@@ -13,5 +13,5 @@
     "react-dom": "18.2.0"
   },
   "type": "module",
-  "version": "0.1.55"
+  "version": "0.2.0"
 }

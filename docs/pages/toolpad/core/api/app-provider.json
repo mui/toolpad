@@ -1,0 +1,13 @@
+{
+  "props": {},
+  "name": "AppProvider",
+  "imports": ["import { AppProvider } from '@toolpad-core/nextjs';"],
+  "classes": [],
+  "spread": true,
+  "themeDefaultProps": null,
+  "muiName": "AppProvider",
+  "filename": "/packages/toolpad-core/src/nextjs/AppProvider.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-app-provider/\">App Provider</a></li>\n<li><a href=\"/toolpad/core/react-dashboard-layout/\">Dashboard Layout</a></li></ul>",
+  "cssComponent": false
+}

@@ -1,4 +1,7 @@
 import type { MuiPage } from '@mui/monorepo/docs/src/MuiPage';
+import pagesApi from './pagesApi';
+
+// TODO: Split pagesApi into components and hooks
 
 const pages: MuiPage[] = [
   {
@@ -38,18 +41,8 @@ const pages: MuiPage[] = [
         subheader: 'Features',
         children: [
           {
-            pathname: '/toolpad/core/features/authentication',
-
-            title: 'Authentication',
-          },
-          {
             pathname: '/toolpad/core/features/data-providers',
             title: 'Data Providers',
-          },
-          {
-            pathname: '/toolpad/core/features/audit-logs',
-            title: 'Audit Logs',
-            plan: 'pro',
           },
         ],
       },
@@ -60,14 +53,24 @@ const pages: MuiPage[] = [
     pathname: '/toolpad/core/components-group',
     title: 'Components',
     children: [
-      { pathname: '/toolpad/core/components', title: 'All components' },
+      { pathname: '/toolpad/core/all-components', title: 'All components' },
       {
-        pathname: '/toolpad/core/components/layout-group',
+        pathname: '/toolpad/core/provider-group',
+        subheader: 'Provider',
+        children: [
+          {
+            pathname: '/toolpad/core/react-app-provider',
+            title: 'App Provider',
+          },
+        ],
+      },
+      {
+        pathname: '/toolpad/core/layout-group',
         subheader: 'Layout',
         children: [
           {
-            pathname: '/toolpad/core/components/dashboard',
-            title: 'Dashboard',
+            pathname: '/toolpad/core/react-dashboard-layout',
+            title: 'Dashboard Layout',
           },
         ],
       },
@@ -76,22 +79,12 @@ const pages: MuiPage[] = [
         subheader: 'Data',
         children: [
           {
-            pathname: '/toolpad/core/components/data-grid',
+            pathname: '/toolpad/core/react-data-grid',
             title: 'Data Grid',
           },
           {
-            pathname: '/toolpad/core/components/line-chart',
+            pathname: '/toolpad/core/react-line-chart',
             title: 'Line Chart',
-          },
-        ],
-      },
-      {
-        pathname: '/toolpad/core/components/filter-group',
-        subheader: 'Filters',
-        children: [
-          {
-            pathname: '/toolpad/core/components/select-filter',
-            title: 'Select',
           },
         ],
       },
@@ -99,55 +92,14 @@ const pages: MuiPage[] = [
   },
   {
     pathname: '/toolpad/core/api-group',
-    title: 'API',
+    title: 'APIs',
     children: [
-      {
-        pathname: '/toolpad/core/api',
-        title: 'Index',
-      },
       {
         pathname: '/toolpad/core/api/components-group',
         subheader: 'Components',
-        children: [
-          {
-            pathname: '/toolpad/core/api/dashboard',
-            title: 'Dashboard',
-          },
-          {
-            pathname: '/toolpad/core/api/data-grid',
-            title: 'Data Grid',
-          },
-          {
-            pathname: '/toolpad/core/api/line-chart',
-            title: 'Line Chart',
-          },
-        ],
-      },
-      {
-        pathname: '/toolpad/core/api/filters-group',
-        subheader: 'Filters',
-        children: [
-          {
-            pathname: '/toolpad/core/api/select-filter',
-            title: 'Select',
-          },
-        ],
-      },
-      {
-        pathname: '/toolpad/core/api/hooks-group',
-        subheader: 'Hooks',
-        children: [
-          {
-            pathname: '/toolpad/core/api/use-filter-state',
-            title: 'useFilterState',
-          },
-        ],
+        children: pagesApi,
       },
     ],
-  },
-  {
-    pathname: '/toolpad/core/customization',
-    title: 'Customization',
   },
 ];
 

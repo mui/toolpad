@@ -22,11 +22,17 @@ async function runCommand(
 ) {
   const projectDir = path.resolve(process.cwd(), dir);
 
-  await runApp({
+  const app = await runApp({
     ...args,
     dir: projectDir,
     dev: cmd !== 'start',
     toolpadDevMode,
+  });
+
+  process.once('SIGINT', () => {
+    app.dispose().finally(() => {
+      process.exit(0);
+    });
   });
 }
 

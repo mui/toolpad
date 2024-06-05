@@ -6,6 +6,7 @@ import { Readable } from 'stream';
 import { execa } from 'execa';
 import { test, expect, afterEach } from 'vitest';
 import * as os from 'os';
+import terminate from 'terminate';
 
 type ExecaChildProcess = ReturnType<typeof execa>;
 
@@ -99,15 +100,14 @@ test(
 );
 
 afterEach(async () => {
-  console.log(toolpadProcess?.exitCode);
   if (toolpadProcess && toolpadProcessController) {
-    toolpadProcess.kill('SIGTERM');
+    await terminate(toolpadProcess.pid!);
     await toolpadProcess.catch(() => null);
     console.log('toolpad ended');
   }
 
   if (cp && cpController) {
-    cp.kill('SIGTERM');
+    await terminate(cp.pid!);
     await cp.catch(() => null);
     console.log('create-toolpad-app ended');
   }

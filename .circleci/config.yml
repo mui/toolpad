@@ -233,6 +233,10 @@ workflows:
           <<: *default-context
           requires:
             - checkout
+      - test_unit_browser:
+          <<: *default-context
+          requires:
+            - checkout
       - test_integration:
           <<: *default-context
           requires:

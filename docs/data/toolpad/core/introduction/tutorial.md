@@ -95,14 +95,14 @@ const NAVIGATION: Navigation = [
   {
     slug: '/page-2',
     title: 'Page 2',
-    icon: <DashboardIcon />,
+    icon: <TimelineIcon />,
   },
 ];
 ```
 
 The newly created page can now be navigated to from the sidebar, like the following:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/tutorial-2.gif", "alt": "Toolpad Core new page", "caption": "Adding pages to navigation", "zoom": true, "indent": 1 }}
+{{"demo": "TutorialPages.js", "iframe": true, "hideToolbar": true }}
 
 ## Dashboard content
 

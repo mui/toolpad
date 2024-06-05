@@ -43,7 +43,7 @@
     "prebuild": "rimraf build tsconfig.build.tsbuildinfo",
     "dev": "concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch --preserveWatchOutput\"",
     "check-types": "tsc --noEmit",
-    "test": "vitest",
+    "test": "vitest run",
     "test:browser": "vitest run --browser.enabled"
   },
   "dependencies": {

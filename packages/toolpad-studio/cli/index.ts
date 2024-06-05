@@ -29,11 +29,11 @@ async function runCommand(
     toolpadDevMode,
   });
 
-  process.once('SIGINT', () => {
-    app.dispose().finally(() => {
-      process.exit(0);
-    });
-  });
+  // process.once('SIGINT', () => {
+  //   app.dispose().finally(() => {
+  //     process.exit(0);
+  //   });
+  // });
 }
 
 async function devCommand(args: RunOptions) {

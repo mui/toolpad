@@ -165,6 +165,7 @@ export async function runCustomServer(
     stdout: process.stdout,
     [asyncDisposeSymbol]: async () => {
       process.env = origEnv;
+      child.catch(() => null);
       await child.kill();
     },
   };

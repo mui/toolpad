@@ -1134,7 +1134,7 @@ importers:
         specifier: 3.4.3
         version: 3.4.3
 
-  playground/toolpad-core-nextjs:
+  playground/nextjs:
     devDependencies:
       '@emotion/react':
         specifier: 11.11.4
@@ -1173,7 +1173,7 @@ importers:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
 
-  playground/toolpad-core-nextjs-pages-router:
+  playground/nextjs-pages-router:
     devDependencies:
       '@emotion/react':
         specifier: 11.11.4

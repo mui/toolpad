@@ -3,10 +3,11 @@ import * as path from 'path';
 import * as url from 'url';
 import readline from 'readline';
 import { Readable } from 'stream';
-import { execa, ExecaChildProcess } from 'execa';
+import { execa } from 'execa';
 import { test, expect, afterEach } from 'vitest';
-import { once } from 'events';
 import * as os from 'os';
+
+type ExecaChildProcess = ReturnType<typeof execa>;
 
 const TEST_TIMEOUT = process.env.CI ? 60000 : 600000;
 
@@ -15,8 +16,10 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 const cliPath = path.resolve(currentDirectory, '../dist/index.js');
 
 let testDir: string | undefined;
-let cp: ExecaChildProcess<string> | undefined;
-let toolpadProcess: ExecaChildProcess<string> | undefined;
+let cpController: AbortController | undefined;
+let cp: ExecaChildProcess | undefined;
+let toolpadProcessController: AbortController | undefined;
+let toolpadProcess: ExecaChildProcess | undefined;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
   return new Promise((resolve, reject) => {
@@ -39,8 +42,10 @@ test(
   'create-toolpad-app can bootstrap a Toolpad Studio app',
   async () => {
     testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-'));
+    cpController = new AbortController();
     cp = execa(cliPath, [testDir], {
       cwd: currentDirectory,
+      cancelSignal: cpController.signal,
     });
     cp.stdout?.pipe(process.stdout);
     cp.stderr?.pipe(process.stderr);
@@ -70,12 +75,14 @@ test(
 
     expect(gitignore.length).toBeGreaterThan(0);
 
+    toolpadProcessController = new AbortController();
     toolpadProcess = execa('pnpm', ['dev', '--create'], {
       cwd: testDir,
       env: {
         FORCE_COLOR: '0',
         BROWSER: 'none',
       },
+      cancelSignal: toolpadProcessController.signal,
     });
     toolpadProcess.stdout?.pipe(process.stdout);
     toolpadProcess.stderr?.pipe(process.stderr);
@@ -92,22 +99,17 @@ test(
 );
 
 afterEach(async () => {
-  if (toolpadProcess && typeof toolpadProcess.exitCode !== 'number') {
-    toolpadProcess.catch(() => null);
-    toolpadProcess.kill('SIGKILL');
-    await once(toolpadProcess, 'exit');
+  if (toolpadProcess && toolpadProcessController) {
+    toolpadProcessController.abort();
+    await toolpadProcess.catch(() => null);
   }
-});
 
-afterEach(async () => {
+  if (cp && cpController) {
+    cpController.abort();
+    await cp.catch(() => null);
+  }
+
   if (testDir) {
     await fs.rm(testDir, { recursive: true, force: true, maxRetries: 3 });
-  }
-});
-
-afterEach(async () => {
-  if (cp && typeof cp.exitCode !== 'number') {
-    cp.kill('SIGKILL');
-    await once(cp, 'exit');
   }
 });

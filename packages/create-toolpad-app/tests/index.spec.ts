@@ -99,16 +99,19 @@ test(
 );
 
 afterEach(async () => {
+  console.log('killing toolpad');
   if (toolpadProcess && toolpadProcessController) {
     toolpadProcessController.abort();
     await toolpadProcess.catch(() => null);
   }
 
+  console.log('killing create-toolpad-app');
   if (cp && cpController) {
     cpController.abort();
     await cp.catch(() => null);
   }
 
+  console.log('cleaning up test directory');
   if (testDir) {
     await fs.rm(testDir, { recursive: true, force: true });
   }

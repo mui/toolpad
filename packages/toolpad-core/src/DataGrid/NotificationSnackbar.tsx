@@ -41,8 +41,7 @@ export function NotificationSnackbar({ notification, apiRef, idField }: Notifica
   const filterableColumns = useGridSelector(apiRef, gridFilterableColumnDefinitionsSelector);
   const operator = React.useMemo(() => {
     const operators = filterableColumns.find((column) => column.field === idField)?.filterOperators;
-    return operators?.find((operator) => operator.value === '=' || operator.value === 'equals')
-      ?.value;
+    return operators?.find(({ value }) => value === '=' || value === 'equals')?.value;
   }, [filterableColumns]);
 
   return (

@@ -828,9 +828,9 @@ function DataGrid<R extends Datum>(props: DataGridProps<R>) {
                   <ErrorOverlay error={error} />
                 </PlaceholderBorder>
               ) : null}
-            </GridContainer>
 
-            <NotificationSnackbar apiRef={apiRef} notification={notification} idField={idField} />
+              <NotificationSnackbar apiRef={apiRef} notification={notification} idField={idField} />
+            </GridContainer>
           </RootContainer>
         </ToolbarCreateButtonContext.Provider>
       </SetDataGridNotificationContext.Provider>

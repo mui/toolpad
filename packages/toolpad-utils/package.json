@@ -1,7 +1,7 @@
 {
   "name": "@toolpad/utils",
   "version": "0.2.0",
-  "description": "Build MUI apps quickly",
+  "description": "Shared utilities used by Toolpad packages.",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
   "license": "MIT",

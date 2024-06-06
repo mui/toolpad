@@ -142,7 +142,7 @@ module.exports = {
         '*.spec.tsx',
         '*.test.ts',
         '*.test.tsx',
-        'vitest.config.ts',
+        'vitest.config.mts',
       ],
       rules: {
         'import/no-extraneous-dependencies': ['error'],

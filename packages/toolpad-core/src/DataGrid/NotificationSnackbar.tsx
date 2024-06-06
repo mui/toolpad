@@ -42,7 +42,7 @@ export function NotificationSnackbar({ notification, apiRef, idField }: Notifica
   const operator = React.useMemo(() => {
     const operators = filterableColumns.find((column) => column.field === idField)?.filterOperators;
     return operators?.find(({ value }) => value === '=' || value === 'equals')?.value;
-  }, [filterableColumns]);
+  }, [filterableColumns, idField]);
 
   return (
     <Snackbar

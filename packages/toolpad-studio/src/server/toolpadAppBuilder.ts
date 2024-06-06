@@ -278,11 +278,6 @@ if (import.meta.hot) {
             : []),
         ],
       },
-      server: {
-        warmup: {
-          clientFiles: ['virtual:toolpad-files:editor.tsx'],
-        },
-      },
       optimizeDeps: {
         include: [
           ...(dev
@@ -293,7 +288,7 @@ if (import.meta.hot) {
                 'monaco-editor/esm/vs/basic-languages/typescript/typescript',
                 'monaco-editor/esm/vs/basic-languages/markdown/markdown',
               ]
-            : []),
+            : ['@toolpad/studio/entrypoint', '@toolpad/studio/editor']),
         ],
       },
       appType: 'custom',

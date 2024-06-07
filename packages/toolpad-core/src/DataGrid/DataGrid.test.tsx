@@ -123,10 +123,10 @@ describe('DataGrid', () => {
       const snackbar = await screen.findByRole('alert');
       expect(snackbar.textContent).toMatch('Row created');
 
-      within(snackbar).getByRole('button', { name: 'Show' }).click();
-      await waitFor(() =>
-        expect(within(screen.getByRole('rowgroup')).queryAllByRole('row')).toHaveLength(1),
-      );
+      const showButton = within(snackbar).getByRole('button', { name: 'Show' });
+      fireEvent.click(showButton);
+
+      expect(within(screen.getByRole('rowgroup')).queryAllByRole('row')).toHaveLength(1);
       expect(screen.getByText('Charlie')).toBeTruthy();
 
       expect(dataProvider.createOne).toHaveBeenCalledOnce();
@@ -206,10 +206,10 @@ describe('DataGrid', () => {
     const snackbar = await screen.findByRole('alert');
     expect(snackbar.textContent).toMatch('Row updated');
 
-    within(snackbar).getByRole('button', { name: 'Show' }).click();
-    await waitFor(() =>
-      expect(within(screen.getByRole('rowgroup')).queryAllByRole('row')).toHaveLength(1),
-    );
+    const showButton = within(snackbar).getByRole('button', { name: 'Show' });
+    fireEvent.click(showButton);
+
+    expect(within(screen.getByRole('rowgroup')).queryAllByRole('row')).toHaveLength(1);
     expect(screen.getByText('Charlie')).toBeTruthy();
   });
 

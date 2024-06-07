@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { describe, test, expect, afterEach, vi } from 'vitest';
-import { render, cleanup, waitFor, fireEvent, within } from '@testing-library/react';
+import { render, cleanup, waitFor, fireEvent, within, screen } from '@testing-library/react';
 import { DataGrid as XDataGrid } from '@mui/x-data-grid';
 import describeConformance from '@toolpad/utils/describeConformance';
 import invariant from 'invariant';
@@ -61,9 +61,9 @@ describe('DataGrid', () => {
       },
     });
 
-    const screen = render(<DataGrid height={300} dataProvider={dataProvider} />);
+    render(<DataGrid height={300} dataProvider={dataProvider} />);
 
-    await waitFor(() => expect(screen.getByText('Alice')).toBeTruthy());
+    await screen.findByText('Alice');
 
     expect(screen.queryByRole('button', { name: 'Add record' })).toBeFalsy();
   });
@@ -89,13 +89,13 @@ describe('DataGrid', () => {
         },
       });
 
-      const screen = render(
+      const view = render(
         <Box sx={{ width: 700 }}>
           <DataGrid height={300} dataProvider={dataProvider} />
         </Box>,
       );
 
-      await waitFor(() => expect(screen.getByText('Alice')).toBeTruthy());
+      await screen.findByText('Alice');
 
       expect(screen.queryAllByRole('menuitem', { name: 'Edit' })).toHaveLength(0);
       expect(screen.queryAllByRole('menuitem', { name: 'Delete' })).toHaveLength(0);
@@ -104,7 +104,7 @@ describe('DataGrid', () => {
 
       fireEvent.click(addRecordButton);
 
-      const nameInput = getCell(screen.baseElement, 0, 1).querySelector('input');
+      const nameInput = getCell(view.baseElement, 0, 1).querySelector('input');
       expect(nameInput).toBeTruthy();
 
       const saveButton = screen.getByRole('menuitem', { name: 'Save' });
@@ -113,7 +113,7 @@ describe('DataGrid', () => {
 
       fireEvent.click(saveButton);
 
-      await waitFor(() => expect(getCell(screen.baseElement, 2, 1).textContent).toBe('Charlie'));
+      await waitFor(() => expect(getCell(view.baseElement, 2, 1).textContent).toBe('Charlie'));
       const snackbar = await screen.findByRole('alert');
       expect(snackbar.textContent).toMatch('Row created');
 
@@ -152,9 +152,9 @@ describe('DataGrid', () => {
       },
     });
 
-    const screen = render(<DataGrid height={300} dataProvider={dataProvider} />);
+    const view = render(<DataGrid height={300} dataProvider={dataProvider} />);
 
-    await waitFor(() => expect(screen.getByText('Alice')).toBeTruthy());
+    await screen.findByText('Alice');
 
     expect(
       screen
@@ -163,7 +163,7 @@ describe('DataGrid', () => {
     ).toHaveLength(2);
     expect(screen.queryByRole('button', { name: 'Add record' })).toBeFalsy();
 
-    const editRecordButton = within(getRow(screen.baseElement, 1)).getByRole('menuitem', {
+    const editRecordButton = within(getRow(view.baseElement, 1)).getByRole('menuitem', {
       name: 'Edit',
     });
 
@@ -177,14 +177,14 @@ describe('DataGrid', () => {
         .filter((el) => !(el as HTMLButtonElement).disabled),
     ).toHaveLength(0);
 
-    const nameInput = getCell(screen.baseElement, 1, 1).querySelector('input');
+    const nameInput = getCell(view.baseElement, 1, 1).querySelector('input');
     expect(nameInput).toBeTruthy();
     expect(nameInput!.value).toBe('Bob');
     fireEvent.change(nameInput!, { target: { value: 'Charlie' } });
 
     fireEvent.click(saveButton);
 
-    await waitFor(() => expect(getCell(screen.baseElement, 1, 1).textContent).toBe('Charlie'));
+    await waitFor(() => expect(getCell(view.baseElement, 1, 1).textContent).toBe('Charlie'));
 
     await waitFor(() => {
       expect(
@@ -223,18 +223,18 @@ describe('DataGrid', () => {
       },
     });
 
-    const screen = render(<DataGrid height={300} dataProvider={dataProvider} />);
+    const view = render(<DataGrid height={300} dataProvider={dataProvider} />);
 
-    await waitFor(() => expect(screen.getByText('Alice')).toBeTruthy());
+    await screen.findByText('Alice');
 
     expect(screen.queryAllByRole('menuitem', { name: 'Edit' })).toHaveLength(0);
     expect(screen.queryByRole('button', { name: 'Add record' })).toBeFalsy();
 
-    const deleteRecordButton = within(getRow(screen.baseElement, 1)).getByRole('menuitem', {
+    const deleteRecordButton = within(getRow(view.baseElement, 1)).getByRole('menuitem', {
       name: 'Delete "2"',
     });
 
-    await waitFor(() => expect(screen.queryByText('Bob')).toBeTruthy());
+    await screen.findByText('Bob');
 
     fireEvent.click(deleteRecordButton);
 

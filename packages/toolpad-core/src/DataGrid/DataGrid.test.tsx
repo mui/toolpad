@@ -22,18 +22,24 @@ function createSequence() {
 }
 
 function getRow(root: HTMLElement, rowIndex: number): HTMLElement {
-  const row = root.querySelector<HTMLElement>(`[role="row"][data-rowindex="${rowIndex}"]`);
-  if (row == null) {
+  const row = within(root)
+    .queryAllByRole('row')
+    ?.find((theRow) => Number(theRow.dataset.rowindex) === rowIndex);
+  if (!row) {
     throw new Error(`Row ${rowIndex} not found`);
   }
   return row;
 }
 
 function getCell(root: HTMLElement, rowIndex: number, colIndex: number): HTMLElement {
-  const cell = root.querySelector<HTMLElement>(
-    `[role="row"][data-rowindex="${rowIndex}"] [role="gridcell"][data-colindex="${colIndex}"]`,
-  );
-  if (cell == null) {
+  const row = getRow(root, rowIndex);
+  if (!row) {
+    throw new Error(`Cell ${rowIndex} ${colIndex} not found`);
+  }
+  const cell = within(row)
+    .queryAllByRole('gridcell')
+    ?.find((theCell) => Number(theCell.dataset.colindex) === colIndex);
+  if (!cell) {
     throw new Error(`Cell ${rowIndex} ${colIndex} not found`);
   }
   return cell;
@@ -104,7 +110,7 @@ describe('DataGrid', () => {
 
       fireEvent.click(addRecordButton);
 
-      const nameInput = getCell(view.baseElement, 0, 1).querySelector('input');
+      const nameInput = within(getCell(view.baseElement, 0, 1)).getByRole('textbox');
       expect(nameInput).toBeTruthy();
 
       const saveButton = screen.getByRole('menuitem', { name: 'Save' });
@@ -177,9 +183,10 @@ describe('DataGrid', () => {
         .filter((el) => !(el as HTMLButtonElement).disabled),
     ).toHaveLength(0);
 
-    const nameInput = getCell(view.baseElement, 1, 1).querySelector('input');
-    expect(nameInput).toBeTruthy();
-    expect(nameInput!.value).toBe('Bob');
+    const nameInput = within(getCell(view.baseElement, 1, 1)).getByRole<HTMLInputElement>(
+      'textbox',
+    );
+    expect(nameInput.value).toBe('Bob');
     fireEvent.change(nameInput!, { target: { value: 'Charlie' } });
 
     fireEvent.click(saveButton);

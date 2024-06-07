@@ -18,7 +18,7 @@ Wrap the whole application with the `AppProvider` component to enable many of To
 
 The `AppProvider` for Next.js applications includes routing out-of-the-box.
 
-```
+```tsx
 import { AppProvider } from '@toolpad/core/nextjs/AppProvider';
 // or
 import { AppProvider } from '@toolpad/core/nextjs';

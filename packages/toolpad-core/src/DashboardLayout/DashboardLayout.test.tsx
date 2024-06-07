@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { describe, test, expect, afterEach } from 'vitest';
-import { render, cleanup, within, waitFor, fireEvent } from '@testing-library/react';
+import { render, cleanup, within, fireEvent } from '@testing-library/react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';

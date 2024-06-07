@@ -71,14 +71,10 @@
   "peerDependencies": {
     "@mui/icons-material": "^5",
     "@mui/material": "^5",
-    "@mui/material-nextjs": "^5",
     "next": "^14",
     "react": "^18"
   },
   "peerDependenciesMeta": {
-    "@mui/material-nextjs": {
-      "optional": true
-    },
     "next": {
       "optional": true
     }

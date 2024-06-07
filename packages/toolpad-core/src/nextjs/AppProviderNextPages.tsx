@@ -1,7 +1,5 @@
 import * as React from 'react';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import { asArray } from '@toolpad/utils/collections';
 import { AppProvider, AppProviderProps, Navigate, Router } from '../AppProvider';
 
@@ -46,12 +44,5 @@ export function AppProviderNextPages(props: AppProviderProps) {
     [asPath, navigate, searchParams],
   );
 
-  return (
-    <AppCacheProvider>
-      <Head>
-        <meta name="viewport" content="initial-scale=1, width=device-width" />
-      </Head>
-      <AppProvider router={routerImpl} {...props} />
-    </AppCacheProvider>
-  );
+  return <AppProvider router={routerImpl} {...props} />;
 }

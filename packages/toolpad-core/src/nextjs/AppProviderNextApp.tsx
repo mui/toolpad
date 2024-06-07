@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import { AppProvider, AppProviderProps, Navigate, Router } from '../AppProvider';
 
 /**
@@ -33,9 +32,5 @@ export function AppProviderNextApp(props: AppProviderProps) {
     [pathname, navigate, searchParams],
   );
 
-  return (
-    <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-      <AppProvider router={routerImpl} {...props} />
-    </AppRouterCacheProvider>
-  );
+  return <AppProvider router={routerImpl} {...props} />;
 }

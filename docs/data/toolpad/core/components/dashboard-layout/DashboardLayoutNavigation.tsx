@@ -19,6 +19,7 @@ const NAVIGATION: Navigation = [
     icon: <DescriptionIcon />,
   },
   {
+    slug: '/movies',
     title: 'Movies',
     icon: <FolderIcon />,
     children: [
@@ -57,6 +58,7 @@ const NAVIGATION: Navigation = [
         ],
       },
       {
+        slug: '/fantasy',
         title: 'Fantasy',
         icon: <DescriptionIcon />,
         children: [

@@ -36,6 +36,7 @@ export default function AppProviderBasic() {
   }, [pathname]);
 
   return (
+    // preview-start
     <AppProvider navigation={NAVIGATION} router={router}>
       <DashboardLayout>
         <Box
@@ -50,5 +51,6 @@ export default function AppProviderBasic() {
         </Box>
       </DashboardLayout>
     </AppProvider>
+    // preview-end
   );
 }

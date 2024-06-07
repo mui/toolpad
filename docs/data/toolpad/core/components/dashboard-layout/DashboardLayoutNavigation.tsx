@@ -24,6 +24,37 @@ const NAVIGATION: Navigation = [
     icon: <FolderIcon />,
     children: [
       {
+        slug: '/fantasy',
+        title: 'Fantasy',
+        icon: <DescriptionIcon />,
+        children: [
+          {
+            kind: 'header',
+            title: 'Epic Fantasy',
+          },
+          {
+            slug: '/lord-of-the-rings',
+            title: 'Lord of the Rings',
+            icon: <DescriptionIcon />,
+          },
+          {
+            slug: '/harry-potter',
+            title: 'Harry Potter',
+            icon: <DescriptionIcon />,
+          },
+          { kind: 'divider' },
+          {
+            kind: 'header',
+            title: 'Modern Fantasy',
+          },
+          {
+            slug: '/chronicles-of-narnia',
+            title: 'Chronicles of Narnia',
+            icon: <DescriptionIcon />,
+          },
+        ],
+      },
+      {
         slug: '/action',
         title: 'Action',
         icon: <DescriptionIcon />,
@@ -53,37 +84,6 @@ const NAVIGATION: Navigation = [
           {
             slug: '/matrix',
             title: 'The Matrix',
-            icon: <DescriptionIcon />,
-          },
-        ],
-      },
-      {
-        slug: '/fantasy',
-        title: 'Fantasy',
-        icon: <DescriptionIcon />,
-        children: [
-          {
-            kind: 'header',
-            title: 'Epic Fantasy',
-          },
-          {
-            slug: '/lord-of-the-rings',
-            title: 'Lord of the Rings',
-            icon: <DescriptionIcon />,
-          },
-          {
-            slug: '/harry-potter',
-            title: 'Harry Potter',
-            icon: <DescriptionIcon />,
-          },
-          { kind: 'divider' },
-          {
-            kind: 'header',
-            title: 'Modern Fantasy',
-          },
-          {
-            slug: '/chronicles-of-narnia',
-            title: 'Chronicles of Narnia',
             icon: <DescriptionIcon />,
           },
         ],

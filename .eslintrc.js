@@ -108,10 +108,6 @@ module.exports = {
     {
       files: ['**/*.test.js', '**/*.test.ts', '**/*.test.tsx'],
       extends: ['plugin:testing-library/react'],
-      rules: {
-        // Let's turn off these rules for now. It's a bit debatable whether they are useful.
-        'testing-library/no-node-access': 'off',
-      },
     },
     {
       files: ['docs/src/modules/components/**/*.js'],

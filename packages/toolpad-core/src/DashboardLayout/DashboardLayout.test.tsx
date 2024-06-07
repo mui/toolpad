@@ -96,16 +96,11 @@ describe('DashboardLayout', () => {
 
     // Check list items and their links
 
-    const dashboardItem = within(navigation).getByText('Dashboard');
-    const ordersItem = within(navigation).getByText('Orders');
+    const dashboardItem = within(navigation).getByRole('link', { name: 'Dashboard' });
+    const ordersItem = within(navigation).getByRole('link', { name: 'Orders' });
 
-    expect(dashboardItem).toBeTruthy();
-    expect(ordersItem).toBeTruthy();
-
-    const dashboardItemLink = dashboardItem.closest('a') as HTMLElement;
-    expect(dashboardItemLink.getAttribute('href')).toBe('/dashboard');
-    const ordersItemLink = ordersItem.closest('a') as HTMLElement;
-    expect(ordersItemLink.getAttribute('href')).toBe('/orders');
+    expect(dashboardItem.getAttribute('href')).toBe('/dashboard');
+    expect(ordersItem.getAttribute('href')).toBe('/orders');
 
     const reportsItem = within(navigation).getByText('Reports');
 

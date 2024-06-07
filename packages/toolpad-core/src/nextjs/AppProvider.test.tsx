@@ -8,8 +8,21 @@ import { render, cleanup } from '@testing-library/react';
 import { AppProvider } from './AppProvider';
 import { Router } from '../AppProvider';
 
-vi.mock('next/router', () => vi.importActual('next-router-mock'));
-vi.mock('next/compat/router', () => vi.importActual('next-router-mock'));
+vi.mock('./nextNavigation', () => {
+  const searchParams = new URLSearchParams();
+  const push = () => {};
+  const replace = () => {};
+  const router = { push, replace };
+  return {
+    usePathname: () => '/',
+    useSearchParams: () => searchParams,
+    useRouter: () => router,
+  };
+});
+
+vi.mock('./nextRouter', () => ({ useRouter: () => null }));
+
+vi.mock('./nextCompatRouter', () => ({ useRouter: () => null }));
 
 interface RouterTestProps {
   children: React.ReactNode;
@@ -29,7 +42,7 @@ function RouterTest({ children }: RouterTestProps) {
   return <AppProvider router={router}>{children}</AppProvider>;
 }
 
-describe('AppProvider', () => {
+describe('Nextjs AppProvider', () => {
   afterEach(cleanup);
 
   test('renders content correctly', async () => {

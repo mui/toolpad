@@ -4,9 +4,9 @@ import invariant from 'invariant';
 import * as React from 'react';
 import { getObjectKey } from '@toolpad/utils/objectKey';
 import { deepmerge } from '@mui/utils';
-import { Filter, FilterProvider, getKeyFromFilter, useFilter } from './filter';
+import { type Filter, FilterProvider, getKeyFromFilter, useFilter } from './filter';
 
-export { Filter, useFilter } from './filter';
+export { type Filter, useFilter } from './filter';
 
 /**
  * @ignore - do not document.

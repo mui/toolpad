@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { describe, test, expect, afterEach } from 'vitest';
-import { render, cleanup, within, waitFor } from '@testing-library/react';
+import { render, cleanup, within, waitFor, fireEvent } from '@testing-library/react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -119,11 +119,9 @@ describe('DashboardLayout', () => {
 
     // Check nested list items
 
-    reportsItem.click();
+    fireEvent.click(reportsItem);
 
-    await waitFor(async () => {
-      expect(within(navigation).getByText('Sales')).toBeTruthy();
-      expect(within(navigation).getByText('Traffic')).toBeTruthy();
-    });
+    expect(within(navigation).getByText('Sales')).toBeTruthy();
+    expect(within(navigation).getByText('Traffic')).toBeTruthy();
   });
 });

@@ -110,8 +110,6 @@ module.exports = {
       extends: ['plugin:testing-library/react'],
       rules: {
         // Let's turn off these rules for now. It's a bit debatable whether they are useful.
-        'testing-library/no-manual-cleanup': 'off',
-        'testing-library/prefer-screen-queries': 'off',
         'testing-library/no-node-access': 'off',
       },
     },

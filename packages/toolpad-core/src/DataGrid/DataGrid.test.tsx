@@ -3,15 +3,13 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect, afterEach } from 'vitest';
-import { render, cleanup, screen } from '@testing-library/react';
+import { describe, test, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { DataGrid as XDataGrid } from '@mui/x-data-grid';
 import describeConformance from '@toolpad/utils/describeConformance';
 import { DataGrid } from './DataGrid';
 
 describe('DataGrid', () => {
-  afterEach(cleanup);
-
   describeConformance(<DataGrid />, () => ({
     inheritComponent: XDataGrid,
     refInstanceof: window.HTMLDivElement,

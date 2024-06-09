@@ -893,8 +893,8 @@ importers:
         specifier: 8.17.0
         version: 8.17.0
       yaml:
-        specifier: 2.4.2
-        version: 2.4.2
+        specifier: 2.4.5
+        version: 2.4.5
       yaml-diff-patch:
         specifier: 2.0.0
         version: 2.0.0
@@ -1124,8 +1124,8 @@ importers:
         specifier: 3.5.3
         version: 3.5.3
       yaml:
-        specifier: 2.4.2
-        version: 2.4.2
+        specifier: 2.4.5
+        version: 2.4.5
       yaml-diff-patch:
         specifier: 2.0.0
         version: 2.0.0
@@ -9899,8 +9899,8 @@ packages:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
 
-  yaml@2.4.2:
-    resolution: {integrity: sha512-B3VqDZ+JAg1nZpaEmWtTXUlBneoGx6CPM9b0TENK6aoSu5t73dItudwdgmi6tHlIZZId4dZ9skcAQ2UbcyAeVA==}
+  yaml@2.4.5:
+    resolution: {integrity: sha512-aBx2bnqDzVOyNKfsysjA2ms5ZlnjSAW2eG3/L5G/CSujfjLJTJsEw1bGw8kCf04KodQWk1pxlGnZ56CRxiawmg==}
     engines: {node: '>= 14'}
     hasBin: true
 
@@ -18070,7 +18070,7 @@ snapshots:
   postcss-load-config@4.0.2(postcss@8.4.38):
     dependencies:
       lilconfig: 3.1.1
-      yaml: 2.4.2
+      yaml: 2.4.5
     optionalDependencies:
       postcss: 8.4.38
 
@@ -20046,11 +20046,11 @@ snapshots:
     dependencies:
       fast-json-patch: 3.1.1
       oppa: 0.4.0
-      yaml: 2.4.2
+      yaml: 2.4.5
 
   yaml@1.10.2: {}
 
-  yaml@2.4.2: {}
+  yaml@2.4.5: {}
 
   yargs-parser@20.2.9: {}
 

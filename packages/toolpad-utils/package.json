@@ -61,7 +61,7 @@
     "prettier": "3.2.5",
     "react-is": "18.3.1",
     "title": "3.5.3",
-    "yaml": "2.4.2",
+    "yaml": "2.4.5",
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {

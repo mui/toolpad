@@ -62,7 +62,7 @@
     "@emotion/server": "11.11.0",
     "@emotion/styled": "11.11.5",
     "@googleapis/drive": "8.10.0",
-    "@googleapis/sheets": "7.0.1",
+    "@googleapis/sheets": "8.0.0",
     "@mui/icons-material": "5.15.19",
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.15.19",

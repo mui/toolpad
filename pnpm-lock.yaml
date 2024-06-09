@@ -809,8 +809,8 @@ importers:
         specifier: 0.49.0
         version: 0.49.0
       mysql2:
-        specifier: 3.9.8
-        version: 3.9.8
+        specifier: 3.10.0
+        version: 3.10.0
       nanoid:
         specifier: 5.0.7
         version: 5.0.7
@@ -7506,8 +7506,8 @@ packages:
     resolution: {integrity: sha512-avsJQhyd+680gKXyG/sQc0nXaC6rBkPOfyHYcFb9+hdkqQkR9bdnkJ0AMZhke0oesPqIO+mFFJ+IdBc7mst4IA==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
-  mysql2@3.9.8:
-    resolution: {integrity: sha512-+5JKNjPuks1FNMoy9TYpl77f+5frbTklz7eb3XDwbpsERRLEeXiW2PDEkakYF50UuKU2qwfGnyXpKYvukv8mGA==}
+  mysql2@3.10.0:
+    resolution: {integrity: sha512-qx0mfWYt1DpTPkw8mAcHW/OwqqyNqBLBHvY5IjN8+icIYTjt6znrgYJ+gxqNNRpVknb5Wc/gcCM4XjbCR0j5tw==}
     engines: {node: '>= 8.0'}
 
   mz@2.7.0:
@@ -17323,7 +17323,7 @@ snapshots:
 
   mute-stream@1.0.0: {}
 
-  mysql2@3.9.8:
+  mysql2@3.10.0:
     dependencies:
       denque: 2.1.0
       generate-function: 2.3.1

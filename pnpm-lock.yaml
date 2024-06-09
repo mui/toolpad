@@ -509,8 +509,8 @@ importers:
         specifier: 5.3.0
         version: 5.3.0
       execa:
-        specifier: 9.1.0
-        version: 9.1.0
+        specifier: 9.2.0
+        version: 9.2.0
       inquirer:
         specifier: 9.2.23
         version: 9.2.23
@@ -761,8 +761,8 @@ importers:
         specifier: 0.21.4
         version: 0.21.4
       execa:
-        specifier: 9.1.0
-        version: 9.1.0
+        specifier: 9.2.0
+        version: 9.2.0
       express:
         specifier: 4.19.2
         version: 4.19.2

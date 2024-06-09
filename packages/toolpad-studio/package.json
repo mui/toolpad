@@ -137,7 +137,7 @@
     "serialize-javascript": "6.0.2",
     "superjson": "2.0.0",
     "typescript": "5.4.5",
-    "vite": "5.2.12",
+    "vite": "5.2.13",
     "vm-browserify": "1.1.2",
     "whatwg-url": "14.0.0",
     "ws": "8.17.0",

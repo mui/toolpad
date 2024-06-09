@@ -245,7 +245,7 @@ importers:
         version: 0.1.1(vitest@2.0.0-beta.9(@types/node@20.14.2)(@vitest/browser@2.0.0-beta.9)(jsdom@24.1.0)(terser@5.31.0))
       vitest-fail-on-console:
         specifier: 0.7.0
-        version: 0.7.0(vite@5.2.12(@types/node@20.14.2)(terser@5.31.0))(vitest@2.0.0-beta.9(@types/node@20.14.2)(@vitest/browser@2.0.0-beta.9)(jsdom@24.1.0)(terser@5.31.0))
+        version: 0.7.0(vite@5.2.13(@types/node@20.14.2)(terser@5.31.0))(vitest@2.0.0-beta.9(@types/node@20.14.2)(@vitest/browser@2.0.0-beta.9)(jsdom@24.1.0)(terser@5.31.0))
 
   docs:
     dependencies:
@@ -723,7 +723,7 @@ importers:
         version: 9.0.15
       '@vitejs/plugin-react':
         specifier: 4.3.0
-        version: 4.3.0(vite@5.2.12(@types/node@20.14.2)(terser@5.31.0))
+        version: 4.3.0(vite@5.2.13(@types/node@20.14.2)(terser@5.31.0))
       '@webcontainer/env':
         specifier: 1.1.1
         version: 1.1.1
@@ -881,8 +881,8 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
       vite:
-        specifier: 5.2.12
-        version: 5.2.12(@types/node@20.14.2)(terser@5.31.0)
+        specifier: 5.2.13
+        version: 5.2.13(@types/node@20.14.2)(terser@5.31.0)
       vm-browserify:
         specifier: 1.1.2
         version: 1.1.2
@@ -9643,8 +9643,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite@5.2.12:
-    resolution: {integrity: sha512-/gC8GxzxMK5ntBwb48pR32GGhENnjtY30G4A0jemunsBkiEZFw60s8InGpN8gkhHEkjnRK1aSAxeQgwvFhUHAA==}
+  vite@5.2.13:
+    resolution: {integrity: sha512-SSq1noJfY9pR3I1TUENL3rQYDQCFqgD+lM6fTRAM8Nv6Lsg5hDLaXkjETVeBt+7vZBCMoibD+6IWnT2mJ+Zb/A==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -13340,14 +13340,14 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react@4.3.0(vite@5.2.12(@types/node@20.14.2)(terser@5.31.0))':
+  '@vitejs/plugin-react@4.3.0(vite@5.2.13(@types/node@20.14.2)(terser@5.31.0))':
     dependencies:
       '@babel/core': 7.24.7
       '@babel/plugin-transform-react-jsx-self': 7.24.6(@babel/core@7.24.7)
       '@babel/plugin-transform-react-jsx-source': 7.24.6(@babel/core@7.24.7)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.2.12(@types/node@20.14.2)(terser@5.31.0)
+      vite: 5.2.13(@types/node@20.14.2)(terser@5.31.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -19736,7 +19736,7 @@ snapshots:
       debug: 4.3.5
       pathe: 1.1.2
       picocolors: 1.0.1
-      vite: 5.2.12(@types/node@20.14.2)(terser@5.31.0)
+      vite: 5.2.13(@types/node@20.14.2)(terser@5.31.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -19747,7 +19747,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.2.12(@types/node@20.14.2)(terser@5.31.0):
+  vite@5.2.13(@types/node@20.14.2)(terser@5.31.0):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
@@ -19767,10 +19767,10 @@ snapshots:
       redent: 4.0.0
       vitest: 2.0.0-beta.9(@types/node@20.14.2)(@vitest/browser@2.0.0-beta.9)(jsdom@24.1.0)(terser@5.31.0)
 
-  vitest-fail-on-console@0.7.0(vite@5.2.12(@types/node@20.14.2)(terser@5.31.0))(vitest@2.0.0-beta.9(@types/node@20.14.2)(@vitest/browser@2.0.0-beta.9)(jsdom@24.1.0)(terser@5.31.0)):
+  vitest-fail-on-console@0.7.0(vite@5.2.13(@types/node@20.14.2)(terser@5.31.0))(vitest@2.0.0-beta.9(@types/node@20.14.2)(@vitest/browser@2.0.0-beta.9)(jsdom@24.1.0)(terser@5.31.0)):
     dependencies:
       chalk: 5.3.0
-      vite: 5.2.12(@types/node@20.14.2)(terser@5.31.0)
+      vite: 5.2.13(@types/node@20.14.2)(terser@5.31.0)
       vitest: 2.0.0-beta.9(@types/node@20.14.2)(@vitest/browser@2.0.0-beta.9)(jsdom@24.1.0)(terser@5.31.0)
 
   vitest@2.0.0-beta.9(@types/node@20.14.2)(@vitest/browser@2.0.0-beta.9)(jsdom@24.1.0)(terser@5.31.0):
@@ -19789,7 +19789,7 @@ snapshots:
       std-env: 3.7.0
       tinybench: 2.8.0
       tinypool: 1.0.0
-      vite: 5.2.12(@types/node@20.14.2)(terser@5.31.0)
+      vite: 5.2.13(@types/node@20.14.2)(terser@5.31.0)
       vite-node: 2.0.0-beta.9(@types/node@20.14.2)(terser@5.31.0)
       why-is-node-running: 2.2.2
     optionalDependencies:

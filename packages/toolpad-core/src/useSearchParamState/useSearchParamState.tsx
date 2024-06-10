@@ -87,7 +87,7 @@ export function useSearchParamState<V = string>(
   const { codec } = options ?? {};
 
   const subscribe = React.useCallback((cb: () => void) => {
-    const handler = (event: NavigationEvent) => {
+    const handler = () => {
       cb();
     };
     addNavigateEventListener(handler);
@@ -122,8 +122,9 @@ export function useSearchParamState<V = string>(
     [name, codec, initialValue],
   );
   const value = React.useMemo(
-    () => (codec && typeof rawValue === 'string' ? codec.parse(rawValue) : (rawValue as V)),
+    () => (codec && typeof rawValue === 'string' ? decode(codec, rawValue) : (rawValue as V)),
     [codec, rawValue],
   );
+
   return [value ?? initialValue, setValue];
 }

@@ -3,6 +3,7 @@ import { ProjectSettings } from '@mui-internal/api-docs-builder';
 import findApiPages from '@mui-internal/api-docs-builder/utils/findApiPages';
 import { LANGUAGES } from '../../../../docs/config';
 import { getCoreComponentInfo } from './getCoreComponentInfo';
+import { getCoreHookInfo } from './getCoreHookInfo';
 import { getComponentImports } from './getComponentImports';
 
 export const projectSettings: ProjectSettings = {
@@ -18,6 +19,7 @@ export const projectSettings: ProjectSettings = {
   ],
   getApiPages: () => findApiPages('docs/pages/toolpad/core/api'),
   getComponentInfo: getCoreComponentInfo,
+  getHookInfo: getCoreHookInfo,
   getComponentImports,
   translationLanguages: LANGUAGES,
   skipComponent: () => false,

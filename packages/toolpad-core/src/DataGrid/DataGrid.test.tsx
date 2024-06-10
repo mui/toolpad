@@ -79,8 +79,6 @@ describe('DataGrid', () => {
       },
     });
 
-    screen.query;
-
     render(<DataGrid height={300} dataProvider={dataProvider} />);
 
     await screen.findByText('Alice');

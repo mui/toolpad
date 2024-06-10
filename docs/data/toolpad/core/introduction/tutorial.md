@@ -200,10 +200,10 @@ The result is the following:
 
 ### Global Filtering
 
-Wrap the dashboard with a `DataContext` to apply global filtering:
+Wrap the dashboard with a `DataContext` to apply global filtering. To enable deep-linking of the dashboard, you can use the `useSearchParamState` hook. Which sync local React state with a search parameter.
 
 ```js
-const [range, setRange] = React.useState('last-month');
+const [range, setRange] = useSearchParamState('range', 'last-month');
 const filter = React.useMemo(() => ({ range: { equals: range } }), [range]);
 
 // ...

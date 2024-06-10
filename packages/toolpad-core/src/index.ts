@@ -7,3 +7,5 @@ export * from './DataProvider';
 export * from './DataGrid';
 
 export * from './LineChart';
+
+export * from './useSearchParamState';

@@ -186,6 +186,9 @@ importers:
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
+      eslint-plugin-testing-library:
+        specifier: ^6.2.2
+        version: 6.2.2(eslint@8.57.0)(typescript@5.4.5)
       eslint-plugin-typescript-enum:
         specifier: 2.1.0
         version: 2.1.0(eslint@8.57.0)(typescript@5.4.5)
@@ -577,8 +580,8 @@ importers:
         specifier: 7.6.2
         version: 7.6.2(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@5.15.19(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query':
-        specifier: 5.40.0
-        version: 5.40.0(react@18.3.1)
+        specifier: 5.40.1
+        version: 5.40.1(react@18.3.1)
       '@toolpad/utils':
         specifier: workspace:*
         version: link:../toolpad-utils
@@ -695,11 +698,11 @@ importers:
         specifier: 7.6.2
         version: 7.6.2(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@5.15.19(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query':
-        specifier: 5.40.0
-        version: 5.40.0(react@18.3.1)
+        specifier: 5.40.1
+        version: 5.40.1(react@18.3.1)
       '@tanstack/react-query-devtools':
-        specifier: 5.40.0
-        version: 5.40.0(@tanstack/react-query@5.40.0(react@18.3.1))(react@18.3.1)
+        specifier: 5.40.1
+        version: 5.40.1(@tanstack/react-query@5.40.1(react@18.3.1))(react@18.3.1)
       '@toolpad/studio-components':
         specifier: workspace:*
         version: link:../toolpad-studio-components
@@ -1008,8 +1011,8 @@ importers:
         specifier: 7.6.1
         version: 7.6.1(@types/react@18.3.3)(react@18.3.1)
       '@tanstack/react-query':
-        specifier: 5.40.0
-        version: 5.40.0(react@18.3.1)
+        specifier: 5.40.1
+        version: 5.40.1(react@18.3.1)
       '@toolpad/studio-runtime':
         specifier: workspace:*
         version: link:../toolpad-studio-runtime
@@ -1051,8 +1054,8 @@ importers:
         specifier: 5.15.19
         version: 5.15.19(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query':
-        specifier: 5.40.0
-        version: 5.40.0(react@18.3.1)
+        specifier: 5.40.1
+        version: 5.40.1(react@18.3.1)
       '@toolpad/utils':
         specifier: workspace:*
         version: link:../toolpad-utils
@@ -3627,14 +3630,14 @@ packages:
   '@tanstack/query-devtools@5.37.1':
     resolution: {integrity: sha512-XcG4IIHIv0YQKrexTqo2zogQWR1Sz672tX2KsfE9kzB+9zhx44vRKH5si4WDILE1PIWQpStFs/NnrDQrBAUQpg==}
 
-  '@tanstack/react-query-devtools@5.40.0':
-    resolution: {integrity: sha512-JoQOQj/LKaHoHVMAh73R0pc4lIAHiZMV8L4DGHsTSvHcKi22LZmSC9aYBY9oMkqGpFtKmbspwrUIn55+czNSbA==}
+  '@tanstack/react-query-devtools@5.40.1':
+    resolution: {integrity: sha512-/AN2UsbuL+28/KSlBkVHq/4chHTEp4l2UWTKWixXbn4pprLQrZGmQTAKN4tYxZDuNwNZY5+Zp67pDfXj+F/UBA==}
     peerDependencies:
-      '@tanstack/react-query': ^5.40.0
+      '@tanstack/react-query': ^5.40.1
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.40.0':
-    resolution: {integrity: sha512-iv/W0Axc4aXhFzkrByToE1JQqayxTPNotCoSCnarR/A1vDIHaoKpg7FTIfP3Ev2mbKn1yrxq0ZKYUdLEJxs6Tg==}
+  '@tanstack/react-query@5.40.1':
+    resolution: {integrity: sha512-gOcmu+gpFd2taHrrgMM9RemLYYEDYfsCqszxCC0xtx+csDa4R8t7Hr7SfWXQP13S2sF+mOxySo/+FNXJFYBqcA==}
     peerDependencies:
       react: ^18.0.0
 
@@ -5599,6 +5602,12 @@ packages:
     engines: {node: '>=4'}
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
+
+  eslint-plugin-testing-library@6.2.2:
+    resolution: {integrity: sha512-1E94YOTUDnOjSLyvOwmbVDzQi/WkKm3WVrMXu6SmBr6DN95xTGZmI6HJ/eOkSXh/DlheRsxaPsJvZByDBhWLVQ==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0, npm: '>=6'}
+    peerDependencies:
+      eslint: ^7.5.0 || ^8.0.0
 
   eslint-plugin-typescript-enum@2.1.0:
     resolution: {integrity: sha512-n6RO89KJ2V2nHVAdIq1q3IBeYZSNZjBreqXOzpjmsBtw+NNhSTTSQXqwO00VYOce9Gy8cr2cDEYpj0Km+Ij90Q==}
@@ -12569,13 +12578,13 @@ snapshots:
 
   '@tanstack/query-devtools@5.37.1': {}
 
-  '@tanstack/react-query-devtools@5.40.0(@tanstack/react-query@5.40.0(react@18.3.1))(react@18.3.1)':
+  '@tanstack/react-query-devtools@5.40.1(@tanstack/react-query@5.40.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@tanstack/query-devtools': 5.37.1
-      '@tanstack/react-query': 5.40.0(react@18.3.1)
+      '@tanstack/react-query': 5.40.1(react@18.3.1)
       react: 18.3.1
 
-  '@tanstack/react-query@5.40.0(react@18.3.1)':
+  '@tanstack/react-query@5.40.1(react@18.3.1)':
     dependencies:
       '@tanstack/query-core': 5.40.0
       react: 18.3.1
@@ -15019,6 +15028,14 @@ snapshots:
       resolve: 2.0.0-next.5
       semver: 6.3.1
       string.prototype.matchall: 4.0.11
+
+  eslint-plugin-testing-library@6.2.2(eslint@8.57.0)(typescript@5.4.5):
+    dependencies:
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.4.5)
+      eslint: 8.57.0
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
 
   eslint-plugin-typescript-enum@2.1.0(eslint@8.57.0)(typescript@5.4.5):
     dependencies:

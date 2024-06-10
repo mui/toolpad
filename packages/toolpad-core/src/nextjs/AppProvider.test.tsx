@@ -3,8 +3,8 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect, afterEach, vi } from 'vitest';
-import { render, cleanup } from '@testing-library/react';
+import { describe, test, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { AppProvider } from './AppProvider';
 import { Router } from '../AppProvider';
 
@@ -43,12 +43,10 @@ function RouterTest({ children }: RouterTestProps) {
 }
 
 describe('Nextjs AppProvider', () => {
-  afterEach(cleanup);
-
   test('renders content correctly', async () => {
     // placeholder test
-    const { getByText } = render(<RouterTest>Hello</RouterTest>);
+    render(<RouterTest>Hello</RouterTest>);
 
-    expect(getByText('Hello')).toBeTruthy();
+    expect(screen.getByText('Hello')).toBeTruthy();
   });
 });

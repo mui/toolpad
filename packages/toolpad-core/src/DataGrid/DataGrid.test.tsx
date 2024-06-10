@@ -3,8 +3,8 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect, afterEach, vi } from 'vitest';
-import { render, cleanup, waitFor, fireEvent, within, screen } from '@testing-library/react';
+import { describe, test, expect, vi } from 'vitest';
+import { render, waitFor, fireEvent, within, screen } from '@testing-library/react';
 import { DataGrid as XDataGrid } from '@mui/x-data-grid';
 import describeConformance from '@toolpad/utils/describeConformance';
 import invariant from 'invariant';
@@ -58,8 +58,6 @@ function getCell(root: HTMLElement, rowIndex: number, colIndex: number): HTMLEle
 }
 
 describe('DataGrid', () => {
-  afterEach(cleanup);
-
   describeConformance(<DataGrid />, () => ({
     inheritComponent: XDataGrid,
     skip: ['themeDefaultProps'],

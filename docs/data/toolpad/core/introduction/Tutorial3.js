@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createDataProvider, DataContext } from '@toolpad/core/DataProvider';
 import { DataGrid } from '@toolpad/core/DataGrid';
+import { useSearchParamState } from '@toolpad/core/useSearchParamState';
 import { LineChart } from '@toolpad/core/LineChart';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -27,7 +28,7 @@ const npmData = createDataProvider({
 });
 
 export default function Tutorial3() {
-  const [range, setRange] = React.useState('last-month');
+  const [range, setRange] = useSearchParamState('range', 'last-month');
   const filter = React.useMemo(() => ({ range: { equals: range } }), [range]);
 
   return (

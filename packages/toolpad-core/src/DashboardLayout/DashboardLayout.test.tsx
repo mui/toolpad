@@ -3,8 +3,8 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect, afterEach } from 'vitest';
-import { render, cleanup, within, waitFor } from '@testing-library/react';
+import { describe, test, expect } from 'vitest';
+import { render, within, fireEvent, screen } from '@testing-library/react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -14,12 +14,10 @@ import { DashboardLayout } from './DashboardLayout';
 import { BrandingContext, Navigation, NavigationContext } from '../AppProvider';
 
 describe('DashboardLayout', () => {
-  afterEach(cleanup);
-
   test('renders content correctly', async () => {
-    const { getByText } = render(<DashboardLayout>Hello world</DashboardLayout>);
+    render(<DashboardLayout>Hello world</DashboardLayout>);
 
-    expect(getByText('Hello world')).toBeTruthy();
+    expect(screen.getByText('Hello world')).toBeTruthy();
   });
 
   test('renders branding correctly in header', async () => {
@@ -28,13 +26,13 @@ describe('DashboardLayout', () => {
       logo: <img src="https://placehold.co/600x400" alt="Placeholder Logo" />,
     };
 
-    const { getByRole } = render(
+    render(
       <BrandingContext.Provider value={BRANDING}>
         <DashboardLayout>Hello world</DashboardLayout>
       </BrandingContext.Provider>,
     );
 
-    const header = getByRole('banner');
+    const header = screen.getByRole('banner');
 
     expect(within(header).getByText('My Company')).toBeTruthy();
     expect(within(header).getByAltText('Placeholder Logo')).toBeTruthy();
@@ -83,13 +81,13 @@ describe('DashboardLayout', () => {
       },
     ];
 
-    const { getByRole } = render(
+    render(
       <NavigationContext.Provider value={NAVIGATION}>
         <DashboardLayout>Hello world</DashboardLayout>
       </NavigationContext.Provider>,
     );
 
-    const navigation = getByRole('navigation');
+    const navigation = screen.getByRole('navigation');
 
     // Check list subheaders
 
@@ -98,16 +96,11 @@ describe('DashboardLayout', () => {
 
     // Check list items and their links
 
-    const dashboardItem = within(navigation).getByText('Dashboard');
-    const ordersItem = within(navigation).getByText('Orders');
+    const dashboardItem = within(navigation).getByRole('link', { name: 'Dashboard' });
+    const ordersItem = within(navigation).getByRole('link', { name: 'Orders' });
 
-    expect(dashboardItem).toBeTruthy();
-    expect(ordersItem).toBeTruthy();
-
-    const dashboardItemLink = dashboardItem.closest('a') as HTMLElement;
-    expect(dashboardItemLink.getAttribute('href')).toBe('/dashboard');
-    const ordersItemLink = ordersItem.closest('a') as HTMLElement;
-    expect(ordersItemLink.getAttribute('href')).toBe('/orders');
+    expect(dashboardItem.getAttribute('href')).toBe('/dashboard');
+    expect(ordersItem.getAttribute('href')).toBe('/orders');
 
     const reportsItem = within(navigation).getByText('Reports');
 
@@ -119,11 +112,9 @@ describe('DashboardLayout', () => {
 
     // Check nested list items
 
-    reportsItem.click();
+    fireEvent.click(reportsItem);
 
-    await waitFor(async () => {
-      expect(within(navigation).getByText('Sales')).toBeTruthy();
-      expect(within(navigation).getByText('Traffic')).toBeTruthy();
-    });
+    expect(within(navigation).getByText('Sales')).toBeTruthy();
+    expect(within(navigation).getByText('Traffic')).toBeTruthy();
   });
 });

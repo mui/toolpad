@@ -33,9 +33,6 @@ function getRow(root: HTMLElement, rowIndex: number): HTMLElement {
 
 function getCell(root: HTMLElement, rowIndex: number, colIndex: number): HTMLElement {
   const row = getRow(root, rowIndex);
-  if (!row) {
-    throw new Error(`Cell ${rowIndex} ${colIndex} not found`);
-  }
   const cell = within(row)
     .queryAllByRole('gridcell')
     ?.find((theCell) => Number(theCell.dataset.colindex) === colIndex);

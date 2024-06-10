@@ -21,23 +21,38 @@ function createSequence() {
   };
 }
 
-function getRow(root: HTMLElement, rowIndex: number): HTMLElement {
+function queryRow(root: HTMLElement, rowIndex: number): HTMLElement | null {
   const row = within(root)
     .queryAllByRole('row')
     ?.find((theRow) => Number(theRow.dataset.rowindex) === rowIndex);
+  return row || null;
+}
+
+function getRow(root: HTMLElement, rowIndex: number): HTMLElement {
+  const row = queryRow(root, rowIndex);
   if (!row) {
     throw new Error(`Row ${rowIndex} not found`);
   }
   return row;
 }
 
-function getCell(root: HTMLElement, rowIndex: number, colIndex: number): HTMLElement {
-  const row = getRow(root, rowIndex);
+function queryCell(root: HTMLElement, rowIndex: number, colIndex: number): HTMLElement | null {
+  const row = queryRow(root, rowIndex);
+  if (!row) {
+    return null;
+  }
+
   const cell = within(row)
     .queryAllByRole('gridcell')
     ?.find((theCell) => Number(theCell.dataset.colindex) === colIndex);
+
+  return cell || null;
+}
+
+function getCell(root: HTMLElement, rowIndex: number, colIndex: number): HTMLElement {
+  const cell = queryCell(root, rowIndex, colIndex);
   if (!cell) {
-    throw new Error(`Cell ${rowIndex} ${colIndex} not found`);
+    throw new Error(`Cell [${rowIndex}, ${colIndex}] not found`);
   }
   return cell;
 }
@@ -63,6 +78,8 @@ describe('DataGrid', () => {
         name: { type: 'string' },
       },
     });
+
+    screen.query;
 
     render(<DataGrid height={300} dataProvider={dataProvider} />);
 

@@ -75,8 +75,10 @@ function decode<V>(codec: Codec<V>, value: string | null): V | null {
 
 /**
  * Works like the React.useState hook, but synchronises the state with a URL query parameter named "name".
- * @param name
- * @param options
+ *
+ * API:
+ *
+ * - [useSearchParamState API](https://mui.com/toolpad/core/api/use-search-param-state/)
  */
 export function useSearchParamState<V = string>(
   name: string,

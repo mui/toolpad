@@ -55,7 +55,7 @@
     "@mui/internal-docs-utils": "1.0.7",
     "@mui/internal-markdown": "1.0.4",
     "@mui/internal-scripts": "1.0.9",
-    "@mui/monorepo": "github:mui/material-ui#1ee901b29abe22e3c369d793c24fd1bdcff35ab7",
+    "@mui/monorepo": "github:Janpot/material-ui#remove-base-guard",
     "@mui/x-charts": "7.6.2",
     "@next/eslint-plugin-next": "14.2.3",
     "@playwright/test": "1.44.1",

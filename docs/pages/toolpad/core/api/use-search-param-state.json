@@ -1,0 +1,11 @@
+{
+  "parameters": {},
+  "returnValue": {},
+  "name": "useSearchParamState",
+  "filename": "/packages/toolpad-core/src/useSearchParamState/useSearchParamState.tsx",
+  "imports": [
+    "import useSearchParamState from '/packages/toolpad-core/src/useSearchParamState/useSearchParamState.tsx';",
+    "import { useSearchParamState } from '/packages/toolpad-core/src/useSearchParamState/useSearchParamState.tsx';"
+  ],
+  "demos": "<ul></ul>"
+}

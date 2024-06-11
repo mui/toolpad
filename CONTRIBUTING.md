@@ -157,10 +157,10 @@ Some application examples for different JavaScript frameworks (such as Next.js, 
    pnpm dev
    ```
 
-3. Run any application in the `playground` folder in development mode, such as `toolpad-core-nextjs`
+3. Run any application in the `playground` folder in development mode, such as `playground-nextjs`
 
    ```bash
-   cd playground/toolpad-core-nextjs
+   cd playground/playground-nextjs
    ```
 
    ```bash

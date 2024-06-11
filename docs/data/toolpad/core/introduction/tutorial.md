@@ -200,34 +200,57 @@ The result is the following:
 
 ### Global Filtering
 
-Wrap the dashboard with a `DataContext` to apply global filtering:
+Many dashboards require interactivity. Global filtering that applies to the whole page. Toolpad Core allows creating a data context that centralizes this filtering. Every data provider used under this context has the default filter applied. There is also a `useSearchParamState` hook available that enable you to persist filter values to the url. Just like the `React.useState` hook, it returns a state variable and an set function.
 
 ```js
-const [range, setRange] = React.useState('last-month');
+// The range is persisted to the ?range=... url search parameter
+const [range, setRange] = useSearchParamState('range', 'last-month');
 const filter = React.useMemo(() => ({ range: { equals: range } }), [range]);
-
-// ...
-
-return (
-  <Stack sx={{ width: '100%' }} spacing={2}>
-    <DataContext filter={filter}>
-      <Toolbar disableGutters>
-        <TextField
-          select
-          label="Range"
-          value={range}
-          onChange={(e) => setRange(e.target.value)}
-        >
-          <MenuItem value="last-month">Last Month</MenuItem>
-          <MenuItem value="last-year">Last Year</MenuItem>
-        </TextField>
-      </Toolbar>
-      {/* ... */}
-    </DataContext>
-  </Stack>
-);
 ```
 
-Any data provider that is used under this context now by default applies this filter.
+Wrap the dashboard with a `DataContext` to apply global filtering. The filter you pass to this context is applied to any data provider used underneath.
+
+```js
+export default function App() {
+  const [range, setRange] = useSearchParamState('range', 'last-month');
+  const filter = React.useMemo(() => ({ range: { equals: range } }), [range]);
+  return (
+    <DataContext filter={filter}>
+      <Stack sx={{ width: '100%' }} spacing={2}>
+        <DataGrid height={300} dataProvider={npmData} />
+        <LineChart
+          height={300}
+          dataProvider={npmData}
+          xAxis={[{ dataKey: 'day' }]}
+          series={[{ dataKey: 'downloads' }]}
+        />
+      </Stack>
+    </DataContext>
+  );
+}
+```
+
+The result looks as follows. Try to change the range to see it persisted to the url.
 
 {{"demo": "Tutorial3.js", "hideToolbar": true}}
+
+## Conclusion
+
+This concludes the mini tutorial that brings you from zero to a working dashboard. You can check out the final code of this tutorial with the `create-toolpad-app` CLI:
+
+<!-- TODO: fix the following command -->
+
+<codeblock storageKey="package-manager">
+```bash npm
+npx create-toolpad-app@latest --core --example core-tutorial
+```
+
+```bash pnpm
+pnpm create toolpad-app@latest --core --example core-tutorial
+```
+
+```bash yarn
+yarn create toolpad-app@latest --core --example core-tutorial
+```
+
+</codeblock>

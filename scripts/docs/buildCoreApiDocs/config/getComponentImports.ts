@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 
 const repositoryRoot = path.resolve(__dirname, '../../../..');
 
@@ -19,9 +20,18 @@ export function getComponentImports(name: string, filename: string) {
 
   const componentDirectory = directories[3];
   if (componentDirectory === name) {
+    const nextjsRelativePath = path.resolve(relativePath, '../../nextjs');
+    const hasNextJsVersion = fs.existsSync(`${nextjsRelativePath}/${name}.tsx`);
+
     return [
-      `import { ${name} } from '@toolpad-core/${name}';`,
-      `import { ${name} } from '@toolpad-core';`,
+      `import { ${name} } from '@toolpad-core/${name}';${
+        hasNextJsVersion
+          ? `\nimport { ${name} } from '@toolpad-core/nextjs/${name}'; // Next.js`
+          : ''
+      }`,
+      `import { ${name} } from '@toolpad-core';${
+        hasNextJsVersion ? `\nimport { ${name} } from '@toolpad-core/nextjs'; // Next.js` : ''
+      }`,
     ];
   }
 

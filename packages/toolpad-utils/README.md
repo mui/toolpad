@@ -1,15 +1,3 @@
-# @toolpad/studio-runtime
+# @toolpad/utils
 
-Low-code tool, powered by MUI
-
-## Installation
-
-Install the package in your project directory with:
-
-```bash
-npm install @toolpad/studio-runtime
-```
-
-## Documentation
-
-[The documentation](./docs)
+Shared utilities used by Toolpad packages.

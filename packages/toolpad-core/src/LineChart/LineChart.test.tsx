@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { describe, test, expect, afterEach } from 'vitest';
-import { render, cleanup, waitFor } from '@testing-library/react';
+import { render, waitFor, screen } from '@testing-library/react';
 import sinon from 'sinon';
 import { LineChart as XLineChart } from '@mui/x-charts';
 import describeConformance from '@toolpad/utils/describeConformance';
@@ -21,7 +21,6 @@ describe('LineChart', () => {
   const originalMatchMedia = window.matchMedia;
 
   afterEach(() => {
-    cleanup();
     window.matchMedia = originalMatchMedia;
   });
 
@@ -34,11 +33,11 @@ describe('LineChart', () => {
   test('renders content correctly', async () => {
     window.matchMedia = stubMatchMedia(false);
     // placeholder test
-    const { getByText } = render(<LineChart height={300} />);
+    render(<LineChart height={300} />);
 
     await waitFor(
       () => {
-        expect(getByText('No data to display')).toBeTruthy();
+        expect(screen.getByText('No data to display')).toBeTruthy();
       },
       { timeout: 1000 },
     );

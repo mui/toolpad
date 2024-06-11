@@ -3,7 +3,12 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import { GridApi, GridRowId } from '@mui/x-data-grid';
+import {
+  GridApi,
+  GridRowId,
+  gridFilterableColumnDefinitionsSelector,
+  useGridSelector,
+} from '@mui/x-data-grid';
 import useLatest from '@toolpad/utils/hooks/useLatest';
 import { useNonNullableContext } from '@toolpad/utils/react';
 import CloseIcon from '@mui/icons-material/Close';
@@ -33,10 +38,16 @@ export function NotificationSnackbar({ notification, apiRef, idField }: Notifica
   const open = !!notification;
   const setNotification = useNonNullableContext(SetDataGridNotificationContext);
 
+  const filterableColumns = useGridSelector(apiRef, gridFilterableColumnDefinitionsSelector);
+  const operator = React.useMemo(() => {
+    const operators = filterableColumns.find((column) => column.field === idField)?.filterOperators;
+    return operators?.find(({ value }) => value === '=' || value === 'equals')?.value;
+  }, [filterableColumns, idField]);
+
   return (
     <Snackbar
       key={latestNotification?.key}
-      sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, m: 2 }}
+      sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, m: 1 }}
       open={open}
       autoHideDuration={5000}
       onClose={() => setNotification(null)}
@@ -47,7 +58,7 @@ export function NotificationSnackbar({ notification, apiRef, idField }: Notifica
         sx={{ width: '100%' }}
         action={
           <React.Fragment>
-            {typeof latestNotification?.showId === 'undefined' ? null : (
+            {latestNotification?.showId === undefined || !operator ? null : (
               <Button
                 color="inherit"
                 size="small"
@@ -56,8 +67,8 @@ export function NotificationSnackbar({ notification, apiRef, idField }: Notifica
                     items: [
                       {
                         field: idField,
-                        operator: 'equals',
-                        value: String(latestNotification.showId),
+                        operator,
+                        value: latestNotification.showId,
                       },
                     ],
                   });

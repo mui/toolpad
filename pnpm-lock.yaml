@@ -100,8 +100,8 @@ importers:
         specifier: 1.0.9
         version: 1.0.9
       '@mui/monorepo':
-        specifier: github:Janpot/material-ui#remove-base-guard
-        version: https://codeload.github.com/Janpot/material-ui/tar.gz/1ba47b9431860b8ddafad05169ac5f54b7e4f87c(@opentelemetry/api@1.8.0)(encoding@0.1.13)
+        specifier: github:mui/material-ui#1ee901b29abe22e3c369d793c24fd1bdcff35ab7
+        version: https://codeload.github.com/mui/material-ui/tar.gz/1ee901b29abe22e3c369d793c24fd1bdcff35ab7(@opentelemetry/api@1.8.0)(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.6.2
         version: 7.6.2(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-alpha.10(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2801,8 +2801,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/Janpot/material-ui/tar.gz/1ba47b9431860b8ddafad05169ac5f54b7e4f87c':
-    resolution: {tarball: https://codeload.github.com/Janpot/material-ui/tar.gz/1ba47b9431860b8ddafad05169ac5f54b7e4f87c}
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/1ee901b29abe22e3c369d793c24fd1bdcff35ab7':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/1ee901b29abe22e3c369d793c24fd1bdcff35ab7}
     version: 6.0.0-alpha.10
     engines: {pnpm: 9.2.0}
 
@@ -11663,7 +11663,7 @@ snapshots:
       '@emotion/styled': 11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@types/react': 18.3.3
 
-  '@mui/monorepo@https://codeload.github.com/Janpot/material-ui/tar.gz/1ba47b9431860b8ddafad05169ac5f54b7e4f87c(@opentelemetry/api@1.8.0)(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/1ee901b29abe22e3c369d793c24fd1bdcff35ab7(@opentelemetry/api@1.8.0)(encoding@0.1.13)':
     dependencies:
       '@googleapis/sheets': 7.0.1(encoding@0.1.13)
       '@netlify/functions': 2.7.0(@opentelemetry/api@1.8.0)

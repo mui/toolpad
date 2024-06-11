@@ -4,12 +4,13 @@
 
 import * as React from 'react';
 import { describe, test, expect } from 'vitest';
-import { render, within, fireEvent, screen } from '@testing-library/react';
+import { render, within, screen } from '@testing-library/react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
+import userEvent from '@testing-library/user-event';
 import { DashboardLayout } from './DashboardLayout';
 import { BrandingContext, Navigation, NavigationContext } from '../AppProvider';
 
@@ -81,6 +82,7 @@ describe('DashboardLayout', () => {
       },
     ];
 
+    const user = userEvent.setup();
     render(
       <NavigationContext.Provider value={NAVIGATION}>
         <DashboardLayout>Hello world</DashboardLayout>
@@ -111,8 +113,7 @@ describe('DashboardLayout', () => {
     expect(within(navigation).queryByText('Traffic')).toBeNull();
 
     // Check nested list items
-
-    fireEvent.click(reportsItem);
+    await user.click(reportsItem);
 
     expect(within(navigation).getByText('Sales')).toBeTruthy();
     expect(within(navigation).getByText('Traffic')).toBeTruthy();

@@ -92,12 +92,12 @@ const pages: MuiPage[] = [
         subheader: 'Utils',
         children: [
           {
-            pathname: '/toolpad/core/react-dialogs',
-            title: 'dialogs',
+            pathname: '/toolpad/core/react-use-dialogs',
+            title: 'useDialogs',
           },
           {
-            pathname: '/toolpad/core/react-notifications',
-            title: 'notifications',
+            pathname: '/toolpad/core/react-use-notifications',
+            title: 'useNotifications',
           },
         ],
       },

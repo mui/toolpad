@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNotifications } from '@toolpad/core/notifications';
+import { useNotifications } from '@toolpad/core/useNotifications';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 

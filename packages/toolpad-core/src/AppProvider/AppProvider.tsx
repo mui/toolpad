@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { ThemeProvider, Theme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { baseTheme } from '../themes';
-import { NotificationsProvider } from '../notifications';
+import { NotificationsProvider } from '../useNotifications';
 import { DialogProvider } from '../useDialogs';
 
 export interface NavigateOptions {

@@ -7,7 +7,7 @@ Toolpad core offers a set of abstractions that make it easier to interact with n
 First thing you need to do to get access to the notifications APIs is install the NotificationsProvider.
 
 ```js
-import { NotificationsProvider } from '@toolpad/core/notifications';
+import { NotificationsProvider } from '@toolpad/core/useNotifications';
 
 function App({ children }) {
   return <NotificationsProvider>{children}</NotificationsProvider>;
@@ -17,7 +17,7 @@ function App({ children }) {
 Now you can get acess to the notifications APIs through the `useNotifications` hook.
 
 ```js
-import { useNotifications } from '@toolpad/core/notifications';
+import { useNotifications } from '@toolpad/core/useNotifications';
 
 function MyApp() {
   const notifications = useNotifications();

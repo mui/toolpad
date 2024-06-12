@@ -140,15 +140,18 @@ export function DialogProvider(props: DialogProviderprops) {
     [keyPrefix],
   );
 
-  const closeDialogUi = React.useCallback(function closeDialogUi<R>(dialog: Promise<R>) {
-    setStack((prevStack) =>
-      prevStack.map((entry) => (entry.promise === dialog ? { ...entry, open: false } : entry)),
-    );
-    setTimeout(() => {
-      // wait for closing animation
-      setStack((prevStack) => prevStack.filter((entry) => entry.promise !== dialog));
-    }, unmountAfter);
-  }, []);
+  const closeDialogUi = React.useCallback(
+    function closeDialogUi<R>(dialog: Promise<R>) {
+      setStack((prevStack) =>
+        prevStack.map((entry) => (entry.promise === dialog ? { ...entry, open: false } : entry)),
+      );
+      setTimeout(() => {
+        // wait for closing animation
+        setStack((prevStack) => prevStack.filter((entry) => entry.promise !== dialog));
+      }, unmountAfter);
+    },
+    [unmountAfter],
+  );
 
   const closeDialog = React.useCallback(
     async function closeDialog<R>(dialog: Promise<R>, result: R) {

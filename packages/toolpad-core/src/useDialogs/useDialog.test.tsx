@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { describe, test, expect } from 'vitest';
-import { renderHook, within, screen, act } from '@testing-library/react';
+import { renderHook, within, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { DialogProvider, useDialogs } from './useDialogs';
 

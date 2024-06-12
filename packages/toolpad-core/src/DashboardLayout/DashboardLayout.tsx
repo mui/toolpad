@@ -7,6 +7,7 @@ import Collapse from '@mui/material/Collapse';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -15,7 +16,10 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
@@ -25,6 +29,7 @@ import {
   NavigationPageItem,
   RouterContext,
 } from '../AppProvider/AppProvider';
+import { ColorModeContext } from '../AppProvider/AppThemeProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320;
@@ -122,7 +127,7 @@ function DashboardSidebarSubNavigation({
           return (
             <Divider
               key={`divider-${depth}-${navigationItemIndex}`}
-              sx={{ mt: 1, mb: nextItem.kind === 'header' ? 0 : 1 }}
+              sx={{ mt: 1, mb: nextItem?.kind === 'header' ? 0 : 1 }}
             />
           );
         }
@@ -204,6 +209,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
+  const colorMode = React.useContext(ColorModeContext);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -226,6 +232,14 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Stack>
           </a>
           <Box sx={{ flexGrow: 1 }} />
+          <Tooltip title={`${colorMode?.mode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
+            <IconButton
+              aria-label={`Switch to ${colorMode?.mode === 'dark' ? 'light' : 'dark'} mode`}
+              onClick={colorMode?.toggleMode}
+            >
+              {colorMode?.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+            </IconButton>
+          </Tooltip>
         </Toolbar>
       </AppBar>
       <Drawer

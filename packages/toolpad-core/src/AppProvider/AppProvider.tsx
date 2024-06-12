@@ -1,9 +1,10 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { ThemeProvider, Theme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { baseTheme } from '../themes';
+import { Theme } from '@mui/material/styles';
+import type { AtLeastOne } from '@toolpad/utils/types';
+import { baseThemeLight, baseThemeDark } from '../themes';
+import { AppThemeProvider } from './AppThemeProvider';
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -49,6 +50,7 @@ export type NavigationItem = NavigationPageItem | NavigationSubheaderItem | Navi
 export type Navigation = NavigationItem[];
 
 // TODO: hide these contexts from public API
+
 export const BrandingContext = React.createContext<Branding | null>(null);
 
 export const NavigationContext = React.createContext<Navigation>([]);
@@ -61,10 +63,13 @@ export interface AppProviderProps {
    */
   children: React.ReactNode;
   /**
-   * [Theme](https://mui.com/material-ui/customization/theming/) used by the app.
-   * @default baseTheme
+   * [Themes](https://mui.com/material-ui/customization/theming/) to be used by the app in light/dark mode.
+   * @default { light: baseThemeLight, dark: baseThemeDark }
    */
-  theme?: Theme;
+  themes?: AtLeastOne<{
+    light: Theme;
+    dark: Theme;
+  }>;
   /**
    * Branding options for the app.
    * @default null
@@ -95,16 +100,21 @@ export interface AppProviderProps {
  * - [AppProvider API](https://mui.com/toolpad/core/api/app-provider)
  */
 function AppProvider(props: AppProviderProps) {
-  const { children, theme = baseTheme, branding = null, navigation = [], router = null } = props;
+  const {
+    children,
+    themes = { light: baseThemeLight, dark: baseThemeDark },
+    branding = null,
+    navigation = [],
+    router = null,
+  } = props;
 
   return (
     <RouterContext.Provider value={router}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+      <AppThemeProvider themes={themes}>
         <BrandingContext.Provider value={branding}>
           <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
         </BrandingContext.Provider>
-      </ThemeProvider>
+      </AppThemeProvider>
     </RouterContext.Provider>
   );
 }

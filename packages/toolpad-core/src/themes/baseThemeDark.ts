@@ -1,11 +1,18 @@
 import { createTheme } from '@mui/material/styles';
 
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
 
-export const baseTheme = createTheme(defaultTheme, {
+export const baseThemeDark = createTheme(defaultTheme, {
   palette: {
     background: {
-      default: defaultTheme.palette.grey['50'],
+      default: defaultTheme.palette.grey['900'],
+    },
+    text: {
+      primary: defaultTheme.palette.grey['100'],
     },
   },
   typography: {
@@ -17,11 +24,19 @@ export const baseTheme = createTheme(defaultTheme, {
     MuiAppBar: {
       styleOverrides: {
         root: {
+          backgroundColor: defaultTheme.palette.background.default,
           borderWidth: 0,
           borderBottomWidth: 1,
           borderStyle: 'solid',
           borderColor: defaultTheme.palette.divider,
           boxShadow: 'none',
+        },
+      },
+    },
+    MuiToolbar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'inherit',
         },
       },
     },
@@ -43,7 +58,7 @@ export const baseTheme = createTheme(defaultTheme, {
     MuiListSubheader: {
       styleOverrides: {
         root: {
-          color: defaultTheme.palette.grey['600'],
+          color: defaultTheme.palette.grey['500'],
           fontSize: 12,
           fontWeight: '700',
           height: 40,
@@ -78,7 +93,7 @@ export const baseTheme = createTheme(defaultTheme, {
             },
           },
           '& .MuiSvgIcon-root': {
-            color: defaultTheme.palette.action.active,
+            color: defaultTheme.palette.grey['100'],
           },
         },
       },

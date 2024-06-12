@@ -17,7 +17,6 @@
   "spread": true,
   "themeDefaultProps": false,
   "muiName": "DataGrid",
-  "forwardsRefTo": "HTMLDivElement",
   "filename": "/packages/toolpad-core/src/DataGrid/DataGrid.tsx",
   "inheritance": {
     "component": "X DataGrid",

@@ -9,8 +9,9 @@ export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
   const rootLayoutContent = `  
-  import { AppProvider } from '@toolpad/core/AppProvider';
+  import { AppProvider } from "@toolpad/core/nextjs";
   import DashboardIcon from "@mui/icons-material/Dashboard";
+  import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
   import type { Navigation } from "@toolpad/core";
   import theme from '../theme';
 
@@ -30,9 +31,11 @@ export default function generateProject(
     return (
       <html lang="en">
         <body>
-        <AppProvider theme={theme} navigation={NAVIGATION}>
-          {children}
-        </AppProvider>
+          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+            <AppProvider theme={theme} navigation={NAVIGATION}>
+              {children}
+            </AppProvider>
+          </AppRouterCacheProvider>
         </body>
       </html>
     );
@@ -277,6 +280,7 @@ export default function generateProject(
       next: '^14',
       '@toolpad/core': 'latest',
       '@mui/material': '^5',
+      '@mui/material-nextjs': '^5',
       '@mui/icons-material': '^5',
       '@emotion/react': '^11',
       '@emotion/styled': '^11',

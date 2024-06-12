@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import {
   LineChart as XLineChart,
   LineChartProps as XLineChartProps,
-  AxisConfig,
   blueberryTwilightPalette,
   LineSeriesType,
 } from '@mui/x-charts';
@@ -25,6 +24,8 @@ export interface LineChartProps<R extends Datum> extends Partial<XLineChartProps
    */
   dataProvider?: ResolvedDataProvider<R>;
 }
+
+type ChartsXAxis = NonNullable<XLineChartProps['xAxis']>[number];
 
 /**
  *
@@ -53,7 +54,7 @@ const LineChart = React.forwardRef(function LineChart<R extends Datum>(
       return [{ dataKey: 'id' }];
     }
     return xAxis.map((axis) => {
-      let defaults: Partial<AxisConfig> = {};
+      let defaults: Partial<ChartsXAxis> = {};
       if (axis.dataKey) {
         const field = dataProvider?.fields?.[axis.dataKey];
         if (field) {

@@ -112,8 +112,7 @@ export async function createViteConfig({
   const initialDom = await loadDom();
   const plan = appDom.getPlan(initialDom);
 
-  const getEntryPoint = (target: 'prod' | 'dev' | 'editor') => {
-    const isCanvas = target === 'dev';
+  const getEntryPoint = (target: 'prod' | 'editor') => {
     const isEditor = target === 'editor';
 
     const componentsId = 'virtual:toolpad-files:components.tsx';
@@ -121,7 +120,6 @@ export async function createViteConfig({
     return `
 import { init, setComponents } from '@toolpad/studio/entrypoint';
 import components from ${JSON.stringify(componentsId)};
-${isCanvas ? `import AppCanvas from '@toolpad/studio/canvas'` : ''}
 ${isEditor ? `import ToolpadEditor from '@toolpad/studio/editor'` : ''}
 
 // importing monaco to get around module ordering issues in esbuild
@@ -160,7 +158,6 @@ const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 setComponents(components);
 
 init({
-  ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
   ${isEditor ? `ToolpadApp: ToolpadEditor,` : ''}
   base: ${JSON.stringify(base)},
   initialState,
@@ -281,12 +278,6 @@ if (import.meta.hot) {
             : []),
         ],
       },
-      server: {
-        fs: {
-          allow: [root, path.resolve(currentDirectory, '../../../../')],
-          cachedChecks: false,
-        },
-      },
       optimizeDeps: {
         include: [
           ...(dev
@@ -297,7 +288,7 @@ if (import.meta.hot) {
                 'monaco-editor/esm/vs/basic-languages/typescript/typescript',
                 'monaco-editor/esm/vs/basic-languages/markdown/markdown',
               ]
-            : []),
+            : ['@toolpad/studio/entrypoint', '@toolpad/studio/editor']),
         ],
       },
       appType: 'custom',

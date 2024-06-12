@@ -15,10 +15,12 @@ const NAVIGATION = [
     title: 'Main items',
   },
   {
+    slug: '/dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
+    slug: '/orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -30,28 +32,42 @@ const NAVIGATION = [
     title: 'Analytics',
   },
   {
+    slug: '/reports',
     title: 'Reports',
     icon: <BarChartIcon />,
     children: [
       {
+        slug: '/sales',
         title: 'Sales',
         icon: <DescriptionIcon />,
       },
       {
+        slug: '/traffic',
         title: 'Traffic',
         icon: <DescriptionIcon />,
       },
     ],
   },
   {
+    slug: '/integrations',
     title: 'Integrations',
     icon: <LayersIcon />,
   },
 ];
 
 export default function DashboardLayoutBasic() {
+  const [pathname, setPathname] = React.useState('/page');
+
+  const router = React.useMemo(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
+
   return (
-    <AppProvider navigation={NAVIGATION}>
+    <AppProvider navigation={NAVIGATION} router={router}>
       <DashboardLayout>
         <Box
           sx={{
@@ -61,7 +77,7 @@ export default function DashboardLayoutBasic() {
             alignItems: 'center',
           }}
         >
-          <Typography>Dashboard content goes here.</Typography>
+          <Typography>Dashboard content for {pathname}</Typography>
         </Box>
       </DashboardLayout>
     </AppProvider>

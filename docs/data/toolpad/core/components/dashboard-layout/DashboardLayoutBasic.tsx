@@ -6,7 +6,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import type { Navigation } from '@toolpad/core';
 
@@ -16,10 +16,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
+    slug: '/dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
+    slug: '/orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -31,28 +33,42 @@ const NAVIGATION: Navigation = [
     title: 'Analytics',
   },
   {
+    slug: '/reports',
     title: 'Reports',
     icon: <BarChartIcon />,
     children: [
       {
+        slug: '/sales',
         title: 'Sales',
         icon: <DescriptionIcon />,
       },
       {
+        slug: '/traffic',
         title: 'Traffic',
         icon: <DescriptionIcon />,
       },
     ],
   },
   {
+    slug: '/integrations',
     title: 'Integrations',
     icon: <LayersIcon />,
   },
 ];
 
 export default function DashboardLayoutBasic() {
+  const [pathname, setPathname] = React.useState('/page');
+
+  const router = React.useMemo<Router>(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
+
   return (
-    <AppProvider navigation={NAVIGATION}>
+    <AppProvider navigation={NAVIGATION} router={router}>
       <DashboardLayout>
         <Box
           sx={{
@@ -62,7 +78,7 @@ export default function DashboardLayoutBasic() {
             alignItems: 'center',
           }}
         >
-          <Typography>Dashboard content goes here.</Typography>
+          <Typography>Dashboard content for {pathname}</Typography>
         </Box>
       </DashboardLayout>
     </AppProvider>

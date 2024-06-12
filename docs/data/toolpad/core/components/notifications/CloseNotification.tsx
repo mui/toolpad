@@ -1,8 +1,5 @@
 import * as React from 'react';
-import {
-  NotificationsProvider,
-  useNotifications,
-} from '@toolpad/core/useNotifications';
+import { useNotifications } from '@toolpad/core/notifications';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 
@@ -34,7 +31,6 @@ export default function CloseNotification() {
 
   return (
     <div>
-      <NotificationsProvider />
       <FormControlLabel
         control={
           <Switch checked={online} onChange={() => setOnline((prev) => !prev)} />

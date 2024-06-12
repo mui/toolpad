@@ -1,15 +1,11 @@
 import * as React from 'react';
-import {
-  NotificationsProvider,
-  useNotifications,
-} from '@toolpad/core/useNotifications';
+import { useNotifications } from '@toolpad/core/notifications';
 import Button from '@mui/material/Button';
 
 export default function BasicNotification() {
   const notifications = useNotifications();
   return (
     <div>
-      <NotificationsProvider />
       <Button
         onClick={async () => {
           // preview-start

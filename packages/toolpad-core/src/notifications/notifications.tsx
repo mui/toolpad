@@ -7,10 +7,11 @@ import {
   Snackbar,
   SnackbarCloseReason,
   SnackbarContent,
+  SnackbarProps,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import * as React from 'react';
-import { createGlobalState, useNonNullableContext } from '@toolpad/utils/react';
+import { useNonNullableContext } from '@toolpad/utils/react';
 
 const closeText = 'Close';
 
@@ -42,60 +43,19 @@ interface NotificationsState {
 }
 
 interface NotificationsContextValue {
-  getState: () => NotificationsState;
-  subscribe: (cb: () => void) => () => void;
   show: ShowNotification;
   close: CloseNotification;
 }
 
-function createNotificationsContext(): NotificationsContextValue | null {
-  if (typeof window === 'undefined') {
-    return null;
-  }
+const NotificationsContext = React.createContext<NotificationsContextValue | null>(null);
 
-  let nextId = 1;
-  let state: NotificationsState = { queue: [] };
-  // Only one subscriber allowed, last one wins
-  const subscribers = new Set<() => void>();
+const SlotsContext = React.createContext<NotificationsProviderSlots>({
+  snackbar: Snackbar,
+});
 
-  const setState: React.Dispatch<React.SetStateAction<NotificationsState>> = (newState) => {
-    state = typeof newState === 'function' ? newState(state) : newState;
-    Array.from(subscribers).forEach((cb) => cb());
-  };
-
-  return {
-    getState: () => state,
-    subscribe: (cb) => {
-      subscribers.add(cb);
-      return () => {
-        subscribers.delete(cb);
-      };
-    },
-    show: (message, options = {}) => {
-      const notificationKey = options.key ?? `::toolpad-internal::notification::${nextId}`;
-      nextId += 1;
-      setState((prev) => {
-        if (prev.queue.some((n) => n.notificationKey === notificationKey)) {
-          // deduplicate by key
-          return prev;
-        }
-        return {
-          ...prev,
-          queue: [...prev.queue, { message, options, notificationKey, open: true }],
-        };
-      });
-      return notificationKey;
-    },
-    close: (key) => {
-      setState((prev) => ({
-        ...prev,
-        queue: prev.queue.filter((n) => n.notificationKey !== key),
-      }));
-    },
-  };
+export interface NotificationsProviderSlots {
+  snackbar: React.ComponentType<SnackbarProps>;
 }
-
-const NotificationsContext = React.createContext(createNotificationsContext());
 
 interface NotificationProps {
   notificationKey: string;
@@ -139,8 +99,10 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
     </React.Fragment>
   );
 
+  const { snackbar: SnackbarComponent } = React.useContext(SlotsContext);
+
   return (
-    <Snackbar
+    <SnackbarComponent
       key={notificationKey}
       open={open}
       autoHideDuration={autoHideDuration}
@@ -156,7 +118,7 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
           <SnackbarContent message={message} action={action} />
         )}
       </Badge>
-    </Snackbar>
+    </SnackbarComponent>
   );
 }
 
@@ -186,17 +148,10 @@ export function useNotifications(): UseNotifications {
 }
 
 interface NotificationsUiProps {
-  context: NotificationsContextValue;
+  state: NotificationsState;
 }
 
-function Notifications({ context }: NotificationsUiProps) {
-  const getServerState = React.useCallback(() => ({ queue: [] }), []);
-  const state: NotificationsState = React.useSyncExternalStore(
-    context.subscribe,
-    context.getState,
-    getServerState,
-  );
-
+function Notifications({ state }: NotificationsUiProps) {
   const currentNotification = state.queue[0] ?? null;
 
   return currentNotification ? (
@@ -206,29 +161,53 @@ function Notifications({ context }: NotificationsUiProps) {
     />
   ) : null;
 }
-
-const master = createGlobalState<string | null>(null);
-
 export interface NotificationsProviderProps {
   children?: React.ReactNode;
+  slots?: Partial<NotificationsProviderSlots>;
 }
 
-export function NotificationsProvider() {
-  const context = React.useContext(NotificationsContext);
+let nextId = 1;
 
-  const id = React.useId();
-  const [masterId] = master.useState();
+export function NotificationsProvider({ children, slots }: NotificationsProviderProps) {
+  const [state, setState] = React.useState<NotificationsState>({ queue: [] });
 
-  React.useEffect(() => {
-    master.setState((prev) => (prev === null ? id : prev));
-    return () => {
-      master.setState((prev) => (prev === id ? null : prev));
-    };
-  }, [id]);
+  const show = React.useCallback<ShowNotification>((message, options = {}) => {
+    const notificationKey = options.key ?? `::toolpad-internal::notification::${nextId}`;
+    nextId += 1;
+    setState((prev) => {
+      if (prev.queue.some((n) => n.notificationKey === notificationKey)) {
+        // deduplicate by key
+        return prev;
+      }
+      return {
+        ...prev,
+        queue: [...prev.queue, { message, options, notificationKey, open: true }],
+      };
+    });
+    return notificationKey;
+  }, []);
 
-  if (!context || masterId !== id) {
-    return null;
-  }
+  const close = React.useCallback<CloseNotification>((key) => {
+    setState((prev) => ({
+      ...prev,
+      queue: prev.queue.filter((n) => n.notificationKey !== key),
+    }));
+  }, []);
 
-  return <Notifications context={context} />;
+  const contextValue = React.useMemo(() => ({ show, close }), [show, close]);
+
+  const outerSlots = React.useContext(SlotsContext);
+  const slotsContextValue = React.useMemo(
+    () => (slots ? { ...outerSlots, ...slots } : outerSlots),
+    [outerSlots, slots],
+  );
+
+  return (
+    <SlotsContext.Provider value={slotsContextValue}>
+      <NotificationsContext.Provider value={contextValue}>
+        {children}
+        <Notifications state={state} />
+      </NotificationsContext.Provider>
+    </SlotsContext.Provider>
+  );
 }

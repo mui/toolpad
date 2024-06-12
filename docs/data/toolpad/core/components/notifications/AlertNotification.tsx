@@ -1,8 +1,5 @@
 import * as React from 'react';
-import {
-  NotificationsProvider,
-  useNotifications,
-} from '@toolpad/core/useNotifications';
+import { useNotifications } from '@toolpad/core/notifications';
 import Button from '@mui/material/Button';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
@@ -18,7 +15,6 @@ export default function AlertNotification() {
   >('info');
   return (
     <div>
-      <NotificationsProvider />
       <Stack>
         <FormControl>
           <FormLabel id="alert-notification-severity">Severity</FormLabel>

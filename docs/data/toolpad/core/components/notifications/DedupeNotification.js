@@ -1,8 +1,5 @@
 import * as React from 'react';
-import {
-  NotificationsProvider,
-  useNotifications,
-} from '@toolpad/core/useNotifications';
+import { useNotifications } from '@toolpad/core/notifications';
 import Button from '@mui/material/Button';
 
 export default function DedupeNotification() {
@@ -10,7 +7,6 @@ export default function DedupeNotification() {
   return (
     // preview
     <div>
-      <NotificationsProvider />
       <Button
         onClick={async () => {
           // preview-start

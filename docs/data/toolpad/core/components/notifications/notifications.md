@@ -7,22 +7,17 @@ Toolpad core offers a set of abstractions that make it easier to interact with n
 First thing you need to do to get access to the notifications APIs is install the NotificationsProvider.
 
 ```js
-import { NotificationsProvider } from '@toolpad/core/useNotifications';
+import { NotificationsProvider } from '@toolpad/core/notifications';
 
 function App({ children }) {
-  return (
-    <React.Fragment>
-      {children}
-      <NotificationsProvider />
-    </React.Fragment>
-  );
+  return <NotificationsProvider>{children}</NotificationsProvider>;
 }
 ```
 
-To then get acess to the notifications APIs you need to call the `useNotifications` hook.
+Now you can get acess to the notifications APIs through the `useNotifications` hook.
 
 ```js
-import { useNotifications } from '@toolpad/core/useNotifications';
+import { useNotifications } from '@toolpad/core/notifications';
 
 function MyApp() {
   const notifications = useNotifications();
@@ -63,6 +58,12 @@ You can programmatically close existing notifications. Each notification has an 
 You can supply your own value for a key to shown notifications to associate them with this key. Notifications with the same key are deduplicated as long as one is already open. If you try to show a notification with the same key, the call is simply ignored.
 
 {{"demo": "DedupeNotification.js"}}
+
+## Scoped notifications
+
+Notifcation providers can be nested. That way you can scope the notifications to a subset of the page. Use the slots to position the snackbar relative to a specific element on the page.
+
+{{"demo": "ScopedNotification.js"}}
 
 ## 🚧 Notification center
 

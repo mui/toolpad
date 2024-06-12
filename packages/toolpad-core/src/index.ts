@@ -10,4 +10,4 @@ export * from './LineChart';
 
 export * from './useDialogs';
 
-export * from './useNotifications';
+export * from './notifications';

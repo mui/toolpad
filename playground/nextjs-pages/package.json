@@ -9,8 +9,8 @@
   "devDependencies": {
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.5",
-    "@mui/icons-material": "5.15.19",
-    "@mui/material": "5.15.19",
+    "@mui/icons-material": "5.15.20",
+    "@mui/material": "5.15.20",
     "@mui/material-nextjs": "5.15.11",
     "@toolpad/core": "workspace:*",
     "@types/react": "18.3.3",

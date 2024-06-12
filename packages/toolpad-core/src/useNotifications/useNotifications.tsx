@@ -12,6 +12,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import * as React from 'react';
 import { useNonNullableContext } from '@toolpad/utils/react';
+import { useSlotProps } from '@mui/base/utils';
 
 const closeText = 'Close';
 
@@ -49,13 +50,15 @@ interface NotificationsContextValue {
 
 const NotificationsContext = React.createContext<NotificationsContextValue | null>(null);
 
-const SlotsContext = React.createContext<NotificationsProviderSlots>({
-  snackbar: Snackbar,
-});
-
-export interface NotificationsProviderSlots {
-  snackbar: React.ComponentType<SnackbarProps>;
+export interface NotificationsProviderSlotProps {
+  snackbar: SnackbarProps;
 }
+
+type Slots<T> = { [K in keyof T]: React.ComponentType<T[K]> };
+
+export type NotificationsProviderSlots = Slots<NotificationsProviderSlotProps>;
+
+const RootPropsContext = React.createContext<NotificationsProviderProps | null>(null);
 
 interface NotificationProps {
   notificationKey: string;
@@ -99,16 +102,22 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
     </React.Fragment>
   );
 
-  const { snackbar: SnackbarComponent } = React.useContext(SlotsContext);
+  const props = React.useContext(RootPropsContext);
+  const SnackbarComponent = props?.slots?.snackbar ?? Snackbar;
+  const snackbarSlotProps = useSlotProps({
+    elementType: SnackbarComponent,
+    ownerState: props,
+    externalSlotProps: props?.slotProps?.snackbar,
+    additionalProps: {
+      open,
+      autoHideDuration,
+      onClose: handleClose,
+      action,
+    },
+  });
 
   return (
-    <SnackbarComponent
-      key={notificationKey}
-      open={open}
-      autoHideDuration={autoHideDuration}
-      onClose={handleClose}
-      action={action}
-    >
+    <SnackbarComponent key={notificationKey} {...snackbarSlotProps}>
       <Badge badgeContent={badge} color="primary" sx={{ width: '100%' }}>
         {severity ? (
           <Alert severity={severity} sx={{ width: '100%' }} action={action}>
@@ -161,14 +170,19 @@ function Notifications({ state }: NotificationsUiProps) {
     />
   ) : null;
 }
+
 export interface NotificationsProviderProps {
   children?: React.ReactNode;
+  // eslint-disable-next-line react/no-unused-prop-types
   slots?: Partial<NotificationsProviderSlots>;
+  // eslint-disable-next-line react/no-unused-prop-types
+  slotProps?: Partial<NotificationsProviderSlotProps>;
 }
 
 let nextId = 1;
 
-export function NotificationsProvider({ children, slots }: NotificationsProviderProps) {
+export function NotificationsProvider(props: NotificationsProviderProps) {
+  const { children } = props;
   const [state, setState] = React.useState<NotificationsState>({ queue: [] });
 
   const show = React.useCallback<ShowNotification>((message, options = {}) => {
@@ -196,18 +210,12 @@ export function NotificationsProvider({ children, slots }: NotificationsProvider
 
   const contextValue = React.useMemo(() => ({ show, close }), [show, close]);
 
-  const outerSlots = React.useContext(SlotsContext);
-  const slotsContextValue = React.useMemo(
-    () => (slots ? { ...outerSlots, ...slots } : outerSlots),
-    [outerSlots, slots],
-  );
-
   return (
-    <SlotsContext.Provider value={slotsContextValue}>
+    <RootPropsContext.Provider value={props}>
       <NotificationsContext.Provider value={contextValue}>
         {children}
         <Notifications state={state} />
       </NotificationsContext.Provider>
-    </SlotsContext.Provider>
+    </RootPropsContext.Provider>
   );
 }

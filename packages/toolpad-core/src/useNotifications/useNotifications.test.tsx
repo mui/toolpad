@@ -3,13 +3,37 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect, vi } from 'vitest';
-import { render, waitFor, within, screen } from '@testing-library/react';
+import { describe, test, expect } from 'vitest';
+import { renderHook, within, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { useNotifications } from './useNotifications';
+import { NotificationsProvider, useNotifications } from './useNotifications';
+
+interface TestWrapperProps {
+  children: React.ReactNode;
+}
+
+function TestWrapper({ children }: TestWrapperProps) {
+  return <NotificationsProvider>{children}</NotificationsProvider>;
+}
 
 describe('useNotifications', () => {
-  test('notifies', async () => {
-    console.log('stub');
+  test('can do basic notifications', async () => {
+    const { result, rerender } = renderHook(() => useNotifications(), { wrapper: TestWrapper });
+
+    expect(screen.queryByRole('alert')).toBeNull();
+
+    const key = result.current.show('Hello');
+    expect(key).toBeTypeOf('string');
+
+    rerender();
+
+    const snackbar = screen.getByRole('alert');
+    expect(snackbar.textContent).toBe('Hello');
+
+    await userEvent.click(within(snackbar).getByRole('button', { name: 'Close' }));
+
+    rerender();
+
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 });

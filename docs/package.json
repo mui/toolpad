@@ -34,6 +34,7 @@
     "@mui/material-nextjs": "^5.15.11",
     "@mui/styles": "^5.15.19",
     "@mui/system": "^5.15.15",
+    "@mui/utils": "5.15.14",
     "@mui/x-license": "7.6.1",
     "@toolpad/core": "workspace:*",
     "@toolpad/studio": "workspace:*",

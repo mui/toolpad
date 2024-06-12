@@ -309,6 +309,9 @@ importers:
       '@mui/system':
         specifier: ^5.15.15
         version: 5.15.15(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
+      '@mui/utils':
+        specifier: 5.15.14
+        version: 5.15.14(@types/react@18.3.3)(react@18.3.1)
       '@mui/x-license':
         specifier: 7.6.1
         version: 7.6.1(@types/react@18.3.3)(react@18.3.1)

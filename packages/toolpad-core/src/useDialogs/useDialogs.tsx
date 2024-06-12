@@ -255,9 +255,32 @@ export interface PromptDialogProps extends DialogProps<PromptDialogPayload, stri
 export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
   const [input, setInput] = React.useState('');
   const cancelButtonProps = useDialogLoadingButton(() => onClose(null));
-  const okButtonProps = useDialogLoadingButton(() => onClose(input));
+
+  const [loading, setLoading] = React.useState(false);
+
+  const name = 'input';
   return (
-    <Dialog maxWidth="xs" fullWidth open={open} onClose={() => onClose(null)}>
+    <Dialog
+      maxWidth="xs"
+      fullWidth
+      open={open}
+      onClose={() => onClose(null)}
+      PaperProps={{
+        component: 'form',
+        onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
+          event.preventDefault();
+          try {
+            setLoading(true);
+            const formData = new FormData(event.currentTarget);
+            const value = formData.get(name) ?? '';
+            invariant(typeof value === 'string', 'Value must come from a text input');
+            await onClose(value);
+          } finally {
+            setLoading(false);
+          }
+        },
+      }}
+    >
       <DialogTitle>{payload.title ?? 'Confirm'}</DialogTitle>
       <DialogContent>
         <DialogContentText>{payload.msg} </DialogContentText>
@@ -266,7 +289,7 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
           required
           margin="dense"
           id="name"
-          name="input"
+          name={name}
           type="text"
           fullWidth
           variant="standard"
@@ -278,7 +301,7 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
         <LoadingButton disabled={!open} {...cancelButtonProps}>
           {payload.cancelText ?? 'Cancel'}
         </LoadingButton>
-        <LoadingButton disabled={!open} {...okButtonProps}>
+        <LoadingButton disabled={!open} loading={loading} type="submit">
           {payload.okText ?? 'Ok'}
         </LoadingButton>
       </DialogActions>

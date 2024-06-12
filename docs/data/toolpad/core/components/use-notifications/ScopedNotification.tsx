@@ -2,12 +2,11 @@ import * as React from 'react';
 import {
   NotificationsProvider,
   useNotifications,
-  NotificationsProviderSlots,
 } from '@toolpad/core/useNotifications';
 import Button from '@mui/material/Button';
 import { Box, Snackbar, styled } from '@mui/material';
 
-const notificationsProviderSlots: NotificationsProviderSlots = {
+const notificationsProviderSlots = {
   snackbar: styled(Snackbar)({ position: 'absolute' }),
 };
 

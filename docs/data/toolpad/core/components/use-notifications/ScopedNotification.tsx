@@ -2,14 +2,13 @@ import * as React from 'react';
 import {
   NotificationsProvider,
   useNotifications,
+  NotificationsProviderSlots,
 } from '@toolpad/core/useNotifications';
 import Button from '@mui/material/Button';
 import { Box, Snackbar, styled } from '@mui/material';
 
-const ScopedSnackbar = styled(Snackbar)({ position: 'absolute' });
-
-const notificationsProviderSlots = {
-  snackbar: ScopedSnackbar,
+const notificationsProviderSlots: NotificationsProviderSlots = {
+  snackbar: styled(Snackbar)({ position: 'absolute' }),
 };
 
 function ScopedContent() {

@@ -6,10 +6,8 @@ import {
 import Button from '@mui/material/Button';
 import { Box, Snackbar, styled } from '@mui/material';
 
-const ScopedSnackbar = styled(Snackbar)({ position: 'absolute' });
-
 const notificationsProviderSlots = {
-  snackbar: ScopedSnackbar,
+  snackbar: styled(Snackbar)({ position: 'absolute' }),
 };
 
 function ScopedContent() {

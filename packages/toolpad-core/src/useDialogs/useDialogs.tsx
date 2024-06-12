@@ -99,9 +99,11 @@ const CloseDialogContext = React.createContext<CloseDialog>(async () => {
 
 export interface DialogProviderprops {
   children?: React.ReactNode;
+  unmountAfter?: number;
 }
 
-export function DialogProvider({ children }: DialogProviderprops) {
+export function DialogProvider(props: DialogProviderprops) {
+  const { children, unmountAfter = 1000 } = props;
   const [stack, setStack] = React.useState<DialogStackEntry<any, any>[]>([]);
   const keyPrefix = React.useId();
   const nextId = React.useRef(0);
@@ -145,7 +147,7 @@ export function DialogProvider({ children }: DialogProviderprops) {
     setTimeout(() => {
       // wait for closing animation
       setStack((prevStack) => prevStack.filter((entry) => entry.promise !== dialog));
-    }, 1000);
+    }, unmountAfter);
   }, []);
 
   const closeDialog = React.useCallback(

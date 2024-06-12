@@ -152,47 +152,47 @@ describe('useDialogs', () => {
 
       expect(screen.queryByRole('dialog')).toBeFalsy();
     });
-  });
 
-  test('can pass a payload', async () => {
-    function CustomDialog({ open, onClose, payload }: DialogProps<string>) {
-      return open ? (
-        <div role="dialog">
-          {payload} <button onClick={() => onClose()}>Close me</button>
-        </div>
-      ) : null;
-    }
-    const { result, rerender } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+    test('can pass a payload', async () => {
+      function CustomDialog({ open, onClose, payload }: DialogProps<string>) {
+        return open ? (
+          <div role="dialog">
+            {payload} <button onClick={() => onClose()}>Close me</button>
+          </div>
+        ) : null;
+      }
+      const { result, rerender } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
 
-    result.current.open(CustomDialog, 'I am content');
+      result.current.open(CustomDialog, 'I am content');
 
-    const dialog = await screen.findByRole('dialog');
+      const dialog = await screen.findByRole('dialog');
 
-    rerender();
+      rerender();
 
-    expect(within(dialog).getByText('I am content')).toBeTruthy();
-  });
+      expect(within(dialog).getByText('I am content')).toBeTruthy();
+    });
 
-  test('can receive result', async () => {
-    function CustomDialog({ open, onClose }: DialogProps<void, string>) {
-      return open ? (
-        <div role="dialog">
-          Hello <button onClick={() => onClose('I am result')}>Close me</button>
-        </div>
-      ) : null;
-    }
-    const { result, rerender } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+    test('can receive result', async () => {
+      function CustomDialog({ open, onClose }: DialogProps<void, string>) {
+        return open ? (
+          <div role="dialog">
+            Hello <button onClick={() => onClose('I am result')}>Close me</button>
+          </div>
+        ) : null;
+      }
+      const { result, rerender } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
 
-    const dialogResult = result.current.open(CustomDialog);
+      const dialogResult = result.current.open(CustomDialog);
 
-    const dialog = await screen.findByRole('dialog');
+      const dialog = await screen.findByRole('dialog');
 
-    rerender();
+      rerender();
 
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Close me' }));
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Close me' }));
 
-    rerender();
+      rerender();
 
-    expect(await dialogResult).toBe('I am result');
+      expect(await dialogResult).toBe('I am result');
+    });
   });
 });

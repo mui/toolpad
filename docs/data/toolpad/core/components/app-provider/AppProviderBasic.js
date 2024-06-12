@@ -2,10 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import DescriptionIcon from '@mui/icons-material/Description';
-import LayersIcon from '@mui/icons-material/Layers';
+import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
@@ -15,47 +12,19 @@ const NAVIGATION = [
     title: 'Main items',
   },
   {
-    slug: '/dashboard',
-    title: 'Dashboard',
+    slug: '/page',
+    title: 'Page',
     icon: <DashboardIcon />,
   },
+  // Add the following new item:
   {
-    slug: '/orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-  {
-    kind: 'divider',
-  },
-  {
-    kind: 'header',
-    title: 'Analytics',
-  },
-  {
-    slug: '/reports',
-    title: 'Reports',
-    icon: <BarChartIcon />,
-    children: [
-      {
-        slug: '/sales',
-        title: 'Sales',
-        icon: <DescriptionIcon />,
-      },
-      {
-        slug: '/traffic',
-        title: 'Traffic',
-        icon: <DescriptionIcon />,
-      },
-    ],
-  },
-  {
-    slug: '/integrations',
-    title: 'Integrations',
-    icon: <LayersIcon />,
+    slug: '/page-2',
+    title: 'Page 2',
+    icon: <TimelineIcon />,
   },
 ];
 
-export default function DashboardLayoutBasic() {
+export default function AppProviderBasic() {
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
@@ -67,6 +36,7 @@ export default function DashboardLayoutBasic() {
   }, [pathname]);
 
   return (
+    // preview-start
     <AppProvider navigation={NAVIGATION} router={router}>
       <DashboardLayout>
         <Box
@@ -81,5 +51,6 @@ export default function DashboardLayoutBasic() {
         </Box>
       </DashboardLayout>
     </AppProvider>
+    // preview-end
   );
 }

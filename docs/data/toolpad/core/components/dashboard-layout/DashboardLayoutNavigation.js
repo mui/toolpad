@@ -8,35 +8,81 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
 const NAVIGATION = [
   {
-    title: 'Item 1',
+    slug: '/home',
+    title: 'Home',
     icon: <DescriptionIcon />,
   },
   {
-    title: 'Item 2',
+    slug: '/about',
+    title: 'About Us',
     icon: <DescriptionIcon />,
   },
   {
-    title: 'Folder 1',
+    slug: '/movies',
+    title: 'Movies',
     icon: <FolderIcon />,
     children: [
       {
-        title: 'Item A1',
+        slug: '/fantasy',
+        title: 'Fantasy',
         icon: <DescriptionIcon />,
-      },
-      {
-        title: 'Item A2',
-        icon: <DescriptionIcon />,
-      },
-      {
-        title: 'Folder A1',
-        icon: <FolderIcon />,
         children: [
           {
-            title: 'Item B1',
+            kind: 'header',
+            title: 'Epic Fantasy',
+          },
+          {
+            slug: '/lord-of-the-rings',
+            title: 'Lord of the Rings',
             icon: <DescriptionIcon />,
           },
           {
-            title: 'Item B2',
+            slug: '/harry-potter',
+            title: 'Harry Potter',
+            icon: <DescriptionIcon />,
+          },
+          { kind: 'divider' },
+          {
+            kind: 'header',
+            title: 'Modern Fantasy',
+          },
+          {
+            slug: '/chronicles-of-narnia',
+            title: 'Chronicles of Narnia',
+            icon: <DescriptionIcon />,
+          },
+        ],
+      },
+      {
+        slug: '/action',
+        title: 'Action',
+        icon: <DescriptionIcon />,
+        children: [
+          {
+            slug: '/mad-max',
+            title: 'Mad Max',
+            icon: <DescriptionIcon />,
+          },
+          {
+            slug: '/die-hard',
+            title: 'Die Hard',
+            icon: <DescriptionIcon />,
+          },
+        ],
+      },
+      {
+        slug: '/sci-fi',
+        title: 'Sci-Fi',
+        icon: <DescriptionIcon />,
+        children: [
+          {
+            slug: '/star-wars',
+            title: 'Star Wars',
+            icon: <DescriptionIcon />,
+          },
+          {
+            slug: '/matrix',
+            title: 'The Matrix',
             icon: <DescriptionIcon />,
           },
         ],
@@ -46,43 +92,55 @@ const NAVIGATION = [
   { kind: 'divider' },
   {
     kind: 'header',
-    title: 'Header 1',
+    title: 'Animals',
   },
   {
-    title: 'Item A',
+    slug: '/mammals',
+    title: 'Mammals',
     icon: <DescriptionIcon />,
-  },
-  {
-    kind: 'header',
-    title: 'Header 2',
-  },
-  {
-    title: 'Item B',
-    icon: <DescriptionIcon />,
-  },
-  {
-    title: 'Folder 2',
-    icon: <FolderIcon />,
     children: [
       {
-        kind: 'header',
-        title: 'Header A1',
-      },
-      {
-        title: 'Item C1',
+        slug: '/lion',
+        title: 'Lion',
         icon: <DescriptionIcon />,
       },
       {
-        title: 'Item C2',
+        slug: '/elephant',
+        title: 'Elephant',
         icon: <DescriptionIcon />,
       },
-      { kind: 'divider' },
+    ],
+  },
+  {
+    slug: '/birds',
+    title: 'Birds',
+    icon: <DescriptionIcon />,
+    children: [
       {
-        kind: 'header',
-        title: 'Header A2',
+        slug: '/eagle',
+        title: 'Eagle',
+        icon: <DescriptionIcon />,
       },
       {
-        title: 'Item C3',
+        slug: '/parrot',
+        title: 'Parrot',
+        icon: <DescriptionIcon />,
+      },
+    ],
+  },
+  {
+    slug: '/reptiles',
+    title: 'Reptiles',
+    icon: <DescriptionIcon />,
+    children: [
+      {
+        slug: '/crocodile',
+        title: 'Crocodile',
+        icon: <DescriptionIcon />,
+      },
+      {
+        slug: '/snake',
+        title: 'Snake',
         icon: <DescriptionIcon />,
       },
     ],
@@ -90,8 +148,18 @@ const NAVIGATION = [
 ];
 
 export default function DashboardLayoutNavigation() {
+  const [pathname, setPathname] = React.useState('/page');
+
+  const router = React.useMemo(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
+
   return (
-    <AppProvider navigation={NAVIGATION}>
+    <AppProvider navigation={NAVIGATION} router={router}>
       <DashboardLayout>
         <Box
           sx={{
@@ -101,7 +169,7 @@ export default function DashboardLayoutNavigation() {
             alignItems: 'center',
           }}
         >
-          <Typography>Dashboard content goes here.</Typography>
+          <Typography>Dashboard content for {pathname}</Typography>
         </Box>
       </DashboardLayout>
     </AppProvider>

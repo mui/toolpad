@@ -90,7 +90,7 @@ async function generateProptypes(
   const propsFileAlternative = tsFile.replace(/(\.d\.ts|\.tsx|\.ts)/g, '.types.ts');
   const generatedForTypeScriptFile = sourceFile === tsFile;
   const result = injectPropTypesInFile({
-    components: cleanComponents,
+    components,
     target: sourceContent,
     options: {
       disablePropTypesTypeChecking: generatedForTypeScriptFile,

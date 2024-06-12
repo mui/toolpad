@@ -131,9 +131,19 @@
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
     },
     {
-      "groupName": "api-docs-builder dependency",
-      "matchPackageNames": ["unist-util-visit", "react-docgen", "remark"],
-      "description": "Dependency of api-docs-builder, sync manually"
+      "groupName": "unist-util-visit - incompatible versions",
+      "matchPackageNames": ["unist-util-visit"],
+      "allowedVersions": "< 3.0.0"
+    },
+    {
+      "groupName": "remark - incompatible versions",
+      "matchPackageNames": ["remark"],
+      "allowedVersions": "< 14.0.0"
+    },
+    {
+      "groupName": "react-docgen - incompatible versions",
+      "matchPackageNames": ["react-docgen"],
+      "allowedVersions": "< 6.0.0"
     },
     {
       "matchDepTypes": ["action"],

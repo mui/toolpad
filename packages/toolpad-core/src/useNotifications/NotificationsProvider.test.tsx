@@ -3,7 +3,7 @@
  */
 
 import * as React from 'react';
-import { describe } from 'vitest';
+import { describe, test } from 'vitest';
 import describeConformance from '@toolpad/utils/describeConformance';
 import { NotificationsProvider } from './NotificationsProvider';
 
@@ -14,4 +14,6 @@ describe('NotificationsProvider', () => {
       snackbar: {},
     },
   }));
+
+  test('dummy test', () => {});
 });

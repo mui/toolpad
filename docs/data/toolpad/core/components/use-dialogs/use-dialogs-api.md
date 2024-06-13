@@ -2,6 +2,13 @@
 
 <p class="description">API reference for the useDialogs hook.</p>
 
+:::success
+For examples and details on the usage of this React hook, visit the demo pages:
+
+- [useDialogs](/toolpad/core/react-use-dialogs/)
+
+:::
+
 ## Import
 
 ```js

@@ -1,3 +1,9 @@
+---
+productId: toolpad-core
+title: useDialogs
+components: DialogsProvider
+---
+
 # Dialogs
 
 <p class="description">Imperative APIs to open and interact with dialogs.</p>
@@ -93,7 +99,6 @@ Analog to [`window.prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Win
 
 {{"demo": "PromptDialog.js"}}
 
-## API
+## Hook API
 
-- [`useDialogs`](/toolpad/core/react-use-dialogs/api/)
-- `DialogsProvider`
+- [`useDialogs()`](/toolpad/core/react-use-dialogs/api/)

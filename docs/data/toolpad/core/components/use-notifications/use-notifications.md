@@ -1,3 +1,9 @@
+---
+productId: toolpad-core
+title: useNotifications
+components: NotificationsProvider
+---
+
 # Notifications
 
 <p class="description">Imperative APIs to show and interact with application notifications</p>
@@ -69,7 +75,6 @@ Notifcation providers can be nested. That way you can scope the notifications to
 
 When multiple notifications are available, click the badge to open the notification center to show a scrollable list of all available notifications. This feature is not available yet.
 
-## API
+## Hook API
 
-- [`useNotifications`](/toolpad/core/react-use-notifications/api/)
-- `NotificationsProvider`
+- [`useNotifications()`](/toolpad/core/react-use-notifications/api/)

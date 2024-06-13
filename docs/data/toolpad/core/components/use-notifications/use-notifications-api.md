@@ -2,6 +2,13 @@
 
 <p class="description">API reference for the useNotifications hook.</p>
 
+:::success
+For examples and details on the usage of this React hook, visit the demo pages:
+
+- [useNotifications](/toolpad/core/react-use-notifications/)
+
+:::
+
 ## Import
 
 ```js

@@ -8,7 +8,6 @@ import Button from '@mui/material/Button';
 import { Box, Snackbar, styled } from '@mui/material';
 
 const notificationsProviderSlots: NotificationsProviderSlots = {
-  // @ts-expect-error
   snackbar: styled(Snackbar)({ position: 'absolute' }),
 };
 

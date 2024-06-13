@@ -18,7 +18,17 @@ export interface DialogProviderprops {
   unmountAfter?: number;
 }
 
-export function DialogsProvider(props: DialogProviderprops) {
+/**
+ *
+ * Demos:
+ *
+ * - [Dialogs](https://mui.com/toolpad/core/react-use-dialogs/)
+ *
+ * API:
+ *
+ * - [DialogsProvider API](https://mui.com/toolpad/core/api/dialogs-provider)
+ */
+function DialogsProvider(props: DialogProviderprops) {
   const { children, unmountAfter = 1000 } = props;
   const [stack, setStack] = React.useState<DialogStackEntry<any, any>[]>([]);
   const keyPrefix = React.useId();
@@ -102,3 +112,5 @@ export function DialogsProvider(props: DialogProviderprops) {
     </DialogsContext.Provider>
   );
 }
+
+export { DialogsProvider };

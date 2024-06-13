@@ -83,9 +83,9 @@ export interface NotificationsProviderSlotProps {
   snackbar: SnackbarProps;
 }
 
-type Slots<T> = { [K in keyof T]: React.ComponentType<T[K]> };
-
-export type NotificationsProviderSlots = Slots<NotificationsProviderSlotProps>;
+export interface NotificationsProviderSlots {
+  snackbar: React.ElementType;
+}
 
 const RootPropsContext = React.createContext<NotificationsProviderProps | null>(null);
 
@@ -201,6 +201,7 @@ function Notifications({ state }: NotificationsUiProps) {
 
 export interface NotificationsProviderProps {
   children?: React.ReactNode;
+
   // eslint-disable-next-line react/no-unused-prop-types
   slots?: Partial<NotificationsProviderSlots>;
   // eslint-disable-next-line react/no-unused-prop-types

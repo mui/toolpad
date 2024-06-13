@@ -1,32 +1,24 @@
 import * as React from 'react';
 import { redirect } from 'next/navigation';
-import {
-  Avatar,
-  Box,
-  Button,
-  Container,
-  Divider,
-  Grid,
-  Link,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Avatar, Box, Container, Typography } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import { AuthError } from 'next-auth';
+import Image from 'next/image';
 import { signIn, providerMap } from '../../../auth';
 // import { AuthContext } from '../../AuthContext';
 
 const IconProviderMap = new Map<string, React.ReactNode>([
-  ['github', <GitHubIcon />],
-  ['credentials', <PasswordIcon />],
+  ['github', <GitHubIcon key="github" />],
+  ['credentials', <PasswordIcon key="credentials" />],
   [
     'google',
-    <img
+    <Image
       alt="Google logo"
       loading="lazy"
+      key="google"
       height="18"
       width="18"
       src="https://authjs.dev/img/providers/google.svg"
@@ -72,7 +64,7 @@ export default function SignInPage() {
                   // Signin can fail for a number of reasons, such as the user
                   // not existing, or the user not having the correct role.
                   if (error instanceof AuthError) {
-                    return redirect(`/auth-error?error=${error.type}`);
+                    redirect(`/auth-error?error=${error.type}`);
                   }
                   // Otherwise if a redirects happens NextJS can handle it
                   // so you can just re-throw the error and let NextJS handle it.

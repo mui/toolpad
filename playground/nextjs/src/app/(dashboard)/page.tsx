@@ -1,10 +1,9 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { LoadingButton } from '@mui/lab';
 import UserAvatar from '../../components/UserAvatar';
 import SignOut from '../../components/SignOut';
-import { auth, signOut } from '../../auth';
+import { auth } from '../../auth';
 
 export default async function HomePage() {
   const session = await auth();

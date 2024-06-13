@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { signOut } from '../auth';
 import LoadingButton from '@mui/lab/LoadingButton';
+import { signOut } from '../auth';
 
 export default async function SignOut() {
   return (

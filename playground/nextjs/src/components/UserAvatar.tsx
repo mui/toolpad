@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { auth } from '../auth';
 import Avatar from '@mui/material/Avatar';
+import { auth } from '../auth';
 
 export default async function UserAvatar() {
   const session = await auth();
 
-  if (!session || !session.user) return null;
+  if (!session || !session.user) {
+    return null;
+  }
 
   return (
     <div>

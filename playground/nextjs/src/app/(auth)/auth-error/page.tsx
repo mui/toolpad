@@ -4,9 +4,9 @@ import * as React from 'react';
 import { Container, Box, Typography, Button } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
 
-enum Error {
-  Configuration = 'Configuration',
-}
+const Error = {
+  Configuration: 'Configuration',
+};
 
 const errorMap = {
   [Error.Configuration]: (
@@ -20,7 +20,7 @@ const errorMap = {
 export default function AuthErrorPage() {
   const search = useSearchParams();
 
-  const error = search.get('error') as Error;
+  const error = search.get('error') || Error.Configuration;
   return (
     <Container component="main" maxWidth="xs">
       <Box

@@ -5,7 +5,7 @@ import { ThemeProvider, Theme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { baseTheme } from '../themes';
 import { NotificationsProvider } from '../useNotifications';
-import { DialogProvider } from '../useDialogs';
+import { DialogsProvider } from '../useDialogs';
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -104,11 +104,11 @@ function AppProvider(props: AppProviderProps) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <NotificationsProvider>
-          <DialogProvider>
+          <DialogsProvider>
             <BrandingContext.Provider value={branding}>
               <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
             </BrandingContext.Provider>
-          </DialogProvider>
+          </DialogsProvider>
         </NotificationsProvider>
       </ThemeProvider>
     </RouterContext.Provider>

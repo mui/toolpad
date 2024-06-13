@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { DialogProvider, useDialogs } from '@toolpad/core/useDialogs';
+import { DialogsProvider, useDialogs } from '@toolpad/core/useDialogs';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -66,8 +66,8 @@ function DemoContent() {
 
 export default function CustomDialogWithPayload() {
   return (
-    <DialogProvider>
+    <DialogsProvider>
       <DemoContent />
-    </DialogProvider>
+    </DialogsProvider>
   );
 }

@@ -23,6 +23,7 @@ export const projectSettings: ProjectSettings = {
   getComponentImports,
   translationLanguages: LANGUAGES,
   skipComponent: (filename: string) => {
+    console.log(filename);
     const relativePath = path.relative(repositoryRoot, filename);
     const directories = path.dirname(relativePath).split(path.sep);
 

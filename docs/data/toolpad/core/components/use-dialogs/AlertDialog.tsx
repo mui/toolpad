@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { DialogProvider, useDialogs } from '@toolpad/core/useDialogs';
+import { DialogsProvider, useDialogs } from '@toolpad/core/useDialogs';
 import Button from '@mui/material/Button';
 
 function DemoContent() {
@@ -21,8 +21,8 @@ function DemoContent() {
 
 export default function AlertDialog() {
   return (
-    <DialogProvider>
+    <DialogsProvider>
       <DemoContent />
-    </DialogProvider>
+    </DialogsProvider>
   );
 }

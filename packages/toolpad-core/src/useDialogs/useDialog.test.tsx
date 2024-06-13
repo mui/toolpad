@@ -6,14 +6,14 @@ import * as React from 'react';
 import { describe, test, expect } from 'vitest';
 import { renderHook, within, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { DialogProps, DialogProvider, useDialogs } from './useDialogs';
+import { DialogProps, DialogsProvider, useDialogs } from './useDialogs';
 
 interface TestWrapperProps {
   children: React.ReactNode;
 }
 
 function TestWrapper({ children }: TestWrapperProps) {
-  return <DialogProvider unmountAfter={0}>{children}</DialogProvider>;
+  return <DialogsProvider unmountAfter={0}>{children}</DialogsProvider>;
 }
 
 describe('useDialogs', () => {

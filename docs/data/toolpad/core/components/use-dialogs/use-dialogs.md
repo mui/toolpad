@@ -4,13 +4,13 @@
 
 Toolpad core offers a set of abstractions that makes interacting with dialogs simpler. It has an imperative API to open and close dialogs, and allows dialogs to be stacked on top of each other.
 
-First thing you need to do is install the DialogProvider at the root of your application.
+First thing you need to do is install the DialogsProvider at the root of your application.
 
 ```tsx
-import { DialogProvider } from '@toolpad/core/useDialogs';
+import { DialogsProvider } from '@toolpad/core/useDialogs';
 
 function App({ children }) {
-  return <DialogProvider>{children}</DialogProvider>;
+  return <DialogsProvider>{children}</DialogsProvider>;
 }
 ```
 
@@ -26,7 +26,7 @@ function MyApp() {
 ```
 
 :::info
-The Toolpad AppProvider automatically comes with dialogs enabled. You won't need to explicitly add the DialogProvider in Toolpad applications.
+The Toolpad AppProvider automatically comes with dialogs enabled. You won't need to explicitly add the DialogsProvider in Toolpad applications.
 :::
 
 ## Basic dialog

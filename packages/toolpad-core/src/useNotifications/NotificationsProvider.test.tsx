@@ -5,10 +5,13 @@
 import * as React from 'react';
 import { describe } from 'vitest';
 import describeConformance from '@toolpad/utils/describeConformance';
-import { DialogsProvider } from './DialogsProvider';
+import { NotificationsProvider } from './NotificationsProvider';
 
-describe('DialogsProvider', () => {
-  describeConformance(<DialogsProvider />, () => ({
+describe('NotificationsProvider', () => {
+  describeConformance(<NotificationsProvider />, () => ({
     skip: ['themeDefaultProps'],
+    slots: {
+      snackbar: {},
+    },
   }));
 });

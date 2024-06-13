@@ -1,0 +1,13 @@
+{
+  "props": {},
+  "name": "NotificationsProvider",
+  "imports": ["import { NotificationsProvider } from '@toolpad-core/useNotifications';"],
+  "classes": [],
+  "spread": true,
+  "themeDefaultProps": false,
+  "muiName": "NotificationsProvider",
+  "filename": "/packages/toolpad-core/src/useNotifications/NotificationsProvider.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-use-notifications/\">Notifications</a></li></ul>",
+  "cssComponent": false
+}

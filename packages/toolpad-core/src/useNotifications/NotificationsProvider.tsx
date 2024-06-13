@@ -139,6 +139,16 @@ export interface NotificationsProviderProps {
 
 let nextId = 1;
 
+/**
+ *
+ * Demos:
+ *
+ * - [Notifications](https://mui.com/toolpad/core/react-use-notifications/)
+ *
+ * API:
+ *
+ * - [NotificationsProvider API](https://mui.com/toolpad/core/api/notifications-provider)
+ */
 function NotificationsProvider(props: NotificationsProviderProps) {
   const { children } = props;
   const [state, setState] = React.useState<NotificationsState>({ queue: [] });

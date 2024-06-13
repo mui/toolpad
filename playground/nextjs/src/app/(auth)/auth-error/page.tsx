@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Container, Box, Typography, Button } from '@mui/material';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 enum Error {
   Configuration = 'Configuration',
@@ -19,7 +19,7 @@ const errorMap = {
 
 export default function AuthErrorPage() {
   const search = useSearchParams();
-  const params = useParams();
+
   const error = search.get('error') as Error;
   return (
     <Container component="main" maxWidth="xs">
@@ -31,7 +31,6 @@ export default function AuthErrorPage() {
           alignItems: 'center',
         }}
       >
-        <p>{JSON.stringify(params)}</p>
         <Typography variant="h5" gutterBottom>
           Something went wrong
         </Typography>

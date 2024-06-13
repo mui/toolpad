@@ -4,8 +4,8 @@ import type { Provider } from 'next-auth/providers';
 
 const providers: Provider[] = [
   GitHub({
-    clientId: process.env.TOOLPAD_GITHUB_CLIENT_ID,
-    clientSecret: process.env.TOOLPAD_GITHUB_CLIENT_SECRET,
+    clientId: process.env.TOOLPAD_AUTH_GITHUB_CLIENT_ID,
+    clientSecret: process.env.TOOLPAD_AUTH_GITHUB_CLIENT_SECRET,
   }),
 ];
 

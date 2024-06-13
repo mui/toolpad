@@ -16,7 +16,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import { AuthError } from 'next-auth';
-import { signIn, providerMap } from '../../auth';
+import { signIn, providerMap } from '../../../auth';
 // import { AuthContext } from '../../AuthContext';
 
 const IconProviderMap = new Map<string, React.ReactNode>([
@@ -67,7 +67,7 @@ export default function SignInPage() {
               action={async () => {
                 'use server';
                 try {
-                  await signIn(provider.id, { redirectTo: '/dashboard' });
+                  await signIn(provider.id, { redirectTo: '/' });
                 } catch (error) {
                   // Signin can fail for a number of reasons, such as the user
                   // not existing, or the user not having the correct role.

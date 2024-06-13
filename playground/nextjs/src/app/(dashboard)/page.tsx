@@ -1,8 +1,14 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { LoadingButton } from '@mui/lab';
+import UserAvatar from '../../components/UserAvatar';
+import SignOut from '../../components/SignOut';
+import { auth, signOut } from '../../auth';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+
   return (
     <Box
       sx={{
@@ -13,9 +19,11 @@ export default function HomePage() {
         alignItems: 'center',
       }}
     >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Welcome to Toolpad!
+      <UserAvatar />
+      <Typography variant="h4" component="h1" sx={{ my: 2 }}>
+        Welcome to Toolpad, {session?.user?.name || 'User'}!
       </Typography>
+      <SignOut />
     </Box>
   );
 }

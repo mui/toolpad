@@ -7,10 +7,10 @@ export default function MultipleNotifications() {
   return (
     <div>
       <Button
-        onClick={async () => {
+        onClick={() => {
           // preview-start
-          await notifications.show('Hello', { autoHideDuration: 1000 });
-          await notifications.show('Goodbye', { autoHideDuration: 1000 });
+          notifications.show('Hello', { autoHideDuration: 1000 });
+          notifications.show('Goodbye', { autoHideDuration: 1000 });
           // preview-end
         }}
       >

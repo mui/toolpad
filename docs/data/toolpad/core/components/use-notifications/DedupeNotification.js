@@ -8,9 +8,9 @@ export default function DedupeNotification() {
     // preview
     <div>
       <Button
-        onClick={async () => {
+        onClick={() => {
           // preview-start
-          await notifications.show('Listen carefully, I will say this only once', {
+          notifications.show('Listen carefully, I will say this only once', {
             key: 'dedupe-notification',
             autoHideDuration: 5000,
           });

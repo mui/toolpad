@@ -15,8 +15,8 @@ function ScopedContent() {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
       <Button
-        onClick={async () => {
-          await notifications.show('Consider yourself notified!', {
+        onClick={() => {
+          notifications.show('Consider yourself notified!', {
             autoHideDuration: 3000,
           });
         }}

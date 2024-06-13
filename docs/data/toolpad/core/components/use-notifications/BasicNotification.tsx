@@ -7,9 +7,9 @@ export default function BasicNotification() {
   return (
     <div>
       <Button
-        onClick={async () => {
+        onClick={() => {
           // preview-start
-          await notifications.show('Consider yourself notified!', {
+          notifications.show('Consider yourself notified!', {
             autoHideDuration: 3000,
           });
           // preview-end

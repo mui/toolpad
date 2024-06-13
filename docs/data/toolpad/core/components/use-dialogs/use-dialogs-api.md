@@ -12,7 +12,7 @@ import { useDialogs } from '@toolpad/core';
 
 Learn about the difference by reading this [guide](https://mui.com/material-ui/guides/minimizing-bundle-size/) on minimizing bundle size.
 
-## usage
+## Usage
 
 Get access to the dialogs API by invoking the hook.
 

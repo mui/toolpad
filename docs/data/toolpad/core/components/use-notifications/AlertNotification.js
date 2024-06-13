@@ -30,9 +30,9 @@ export default function AlertNotification() {
           </RadioGroup>
         </FormControl>
         <Button
-          onClick={async () => {
+          onClick={() => {
             // preview-start
-            await notifications.show('Consider yourself notified!', {
+            notifications.show('Consider yourself notified!', {
               severity,
               autoHideDuration: 3000,
             });

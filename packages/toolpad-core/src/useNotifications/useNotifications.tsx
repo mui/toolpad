@@ -25,6 +25,13 @@ export interface ShowNotificationOptions {
 }
 
 export interface ShowNotification {
+  /**
+   * Show a snackbar in the application.
+   * @param message The message to display in the snackbar.
+   * @param options Options for the snackbar.
+   * @returns The key that represents the notification. Useful for programmatically
+   * closing it.
+   */
   (message: React.ReactNode, options?: ShowNotificationOptions): string;
 }
 

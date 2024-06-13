@@ -6,7 +6,8 @@ import * as React from 'react';
 import { describe, test, expect } from 'vitest';
 import { renderHook, within, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { NotificationsProvider, useNotifications } from './useNotifications';
+import { useNotifications } from './useNotifications';
+import { NotificationsProvider } from './NotificationsProvider';
 
 interface TestWrapperProps {
   children: React.ReactNode;

@@ -6,7 +6,8 @@ import * as React from 'react';
 import { describe, test, expect } from 'vitest';
 import { renderHook, within, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { DialogProps, DialogsProvider, useDialogs } from './useDialogs';
+import { DialogProps, useDialogs } from './useDialogs';
+import { DialogsProvider } from './DialogsProvider';
 
 interface TestWrapperProps {
   children: React.ReactNode;

@@ -22,7 +22,7 @@ const dialogs = useDialogs();
 
 ## Reference
 
-### `dialogs.alert(message, options?)`
+### `dialogs.alert`
 
 Open an alert dialog, returns a promise that resolves when the user closes the dialog.
 
@@ -30,6 +30,12 @@ Open an alert dialog, returns a promise that resolves when the user closes the d
 await dialogs.alert('Something went wrong', {
   title: 'Attention!',
 });
+```
+
+**Signature:**
+
+```js
+function alert(message, options?)
 ```
 
 **Parameters:**
@@ -44,7 +50,7 @@ await dialogs.alert('Something went wrong', {
 
 `Promise<void>` A promise that resolves once the user has dismissed the dialog.
 
-### `dialogs.confirm(message, options?)`
+### `dialogs.confirm`
 
 Open a confirmation dialog. Returns a promise that resolves to true if the user confirms, false if the user cancels.
 
@@ -53,6 +59,12 @@ const confirmed = await dialogs.confirm('Are you sure?', {
   okText: 'Yes',
   cancelText: 'No',
 });
+```
+
+**Signature:**
+
+```js
+function confirm(message, options?)
 ```
 
 **Parameters:**
@@ -69,7 +81,7 @@ const confirmed = await dialogs.confirm('Are you sure?', {
 
 `Promise<boolean>` A promise that resolves to true if the user confirms, false if the user cancels.
 
-### `dialogs.prompt(message, options?)`
+### `dialogs.prompt`
 
 Open a prompt dialog to request user input. Returns a promise that resolves to the input if the user confirms, null if the user cancels.
 
@@ -77,6 +89,12 @@ Open a prompt dialog to request user input. Returns a promise that resolves to t
 const input = await dialogs.prompt('What is your name?', {
   canceltext: 'Leave me alone',
 });
+```
+
+**Signature:**
+
+```js
+function prompt(message, options?)
 ```
 
 **Parameters:**
@@ -92,7 +110,7 @@ const input = await dialogs.prompt('What is your name?', {
 
 `Promise<string>` A promise that resolves to the user input if the user confirms, null if the user cancels.
 
-### `dialogs.open(component, payload, options?)`
+### `dialogs.open`
 
 Open a custom dialog. The dialog is a React component that optionally takes a payload and optionally returns a result in its `onClose` property.
 
@@ -106,6 +124,12 @@ const result = await dialogs.open(MyDialog, 123, {
 });
 ```
 
+**Signature:**
+
+```js
+function open(component, payload, options?)
+```
+
 **Parameters:**
 
 - `component`: `React.ComponentType<{ open: boolean, onClose: (result: R) => Promise<void>, payload: P }>` The dialog component to display.
@@ -117,7 +141,7 @@ const result = await dialogs.open(MyDialog, 123, {
 
 `Promise<R>` A promise that resolves to the user input if the user confirms, null if the user cancels.
 
-### `dialogs.close(dialog, result)`
+### `dialogs.close`
 
 Programmatically close a dialog that was previously opened with `dialogs.open`. If the dialog returns a result, `close` must also be called with a result. The original dialog promise will be resolved with this result. This promise is also returned from the `close` function.
 
@@ -129,10 +153,17 @@ const myDialog = dialogs.open(/* ... */);
 const result = await dialogs.close(myDialog, 123);
 ```
 
+**Signature:**
+
+```js
+function close(dialog, result)
+```
+
 **Parameters:**
 
 - `dialog`: `Promise<R>` The dialog to close. This should be a promise that was previously returned by `dialogs.open`.
 - `result?`: `R` The result to return from the dialog.
-  **Returns:**
+
+**Returns:**
 
 `Promise<R>` A promise that resolves with the dialog result when the dialog is fully closed.

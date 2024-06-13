@@ -32,6 +32,12 @@ const notification = notifications.show('Something great just happened!', {
 });
 ```
 
+**Signature:**
+
+```js
+function show(message, options?)
+```
+
 **Parameters:**
 
 - `message`: `React.ReactNode` The message to show in the snackbar.
@@ -55,6 +61,12 @@ const notification = notifications.show(/* ... */);
 // ...
 
 notifications.close(notification);
+```
+
+**Signature:**
+
+```js
+function close(notification)
 ```
 
 **Parameters**

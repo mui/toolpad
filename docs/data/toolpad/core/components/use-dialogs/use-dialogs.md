@@ -95,5 +95,5 @@ Analog to [`window.prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Win
 
 ## API
 
-- [`useDialog`](/toolpad/core/react-use-dialogs/api/)
+- [`useDialogs`](/toolpad/core/react-use-dialogs/api/)
 - `DialogsProvider`

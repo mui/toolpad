@@ -23,13 +23,12 @@ export const projectSettings: ProjectSettings = {
   getComponentImports,
   translationLanguages: LANGUAGES,
   skipComponent: (filename: string) => {
-    console.log(filename);
     const relativePath = path.relative(repositoryRoot, filename);
     const directories = path.dirname(relativePath).split(path.sep);
 
     return directories[3] === 'nextjs';
   },
-  skipSlotsAndClasses: true,
+  skipSlotsAndClasses: false,
   translationPagesDirectory: 'docs/translations/api-docs',
   importTranslationPagesDirectory: 'docs-toolpad/translations/api-docs',
   generateClassName: () => '',

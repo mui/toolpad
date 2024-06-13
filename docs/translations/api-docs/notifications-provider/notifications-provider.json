@@ -1,1 +1,6 @@
-{ "componentDescription": "", "propDescriptions": {}, "classDescriptions": {} }
+{
+  "componentDescription": "",
+  "propDescriptions": {},
+  "classDescriptions": {},
+  "slotDescriptions": { "snackbar": "The component that renders the snackbar." }
+}

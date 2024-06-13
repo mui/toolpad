@@ -27,6 +27,10 @@ export interface NotificationsProviderSlotProps {
 }
 
 export interface NotificationsProviderSlots {
+  /**
+   * The component that renders the snackbar.
+   * @default Snackbar
+   */
   snackbar: React.ElementType;
 }
 

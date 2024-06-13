@@ -2,6 +2,14 @@
   "props": {},
   "name": "NotificationsProvider",
   "imports": ["import { NotificationsProvider } from '@toolpad-core/useNotifications';"],
+  "slots": [
+    {
+      "name": "snackbar",
+      "description": "The component that renders the snackbar.",
+      "default": "Snackbar",
+      "class": null
+    }
+  ],
   "classes": [],
   "spread": true,
   "themeDefaultProps": false,

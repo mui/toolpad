@@ -149,8 +149,7 @@ export function useNotifications(): UseNotifications {
   const context = React.useContext(NotificationsContext);
 
   if (context) {
-    const { show, close } = context;
-    return { show, close };
+    return context;
   }
 
   return serverNotifications;

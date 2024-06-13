@@ -92,3 +92,8 @@ The dialog title and button texts are customizable with the `title`, `okText`, a
 Analog to [`window.prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) it opens a dialog inquiring the user for some input text. The user can fill the input box and upon confirmation the promise returned from the `prompt` call is resolved with its value. The dialog title and button texts are customizable with the `title`, `okText`, and `cancelText` properties.
 
 {{"demo": "PromptDialog.js"}}
+
+## API
+
+- [`useDialog`](/toolpad/core/react-use-dialogs/api/)
+- `DialogsProvider`

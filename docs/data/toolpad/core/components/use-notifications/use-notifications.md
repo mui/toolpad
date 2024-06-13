@@ -68,3 +68,8 @@ Notifcation providers can be nested. That way you can scope the notifications to
 ## 🚧 Notification center
 
 When multiple notifications are available, click the badge to open the notification center to show a scrollable list of all available notifications. This feature is not available yet.
+
+## API
+
+- [`useNotifications`](/toolpad/core/react-use-notifications/api/)
+- `NotificationsProvider`

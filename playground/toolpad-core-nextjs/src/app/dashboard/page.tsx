@@ -1,8 +1,14 @@
 import * as React from 'react';
+
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import UserAvatar from '../../components/UserAvatar';
+import { auth } from '../../auth';
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  const session = await auth();
+
   return (
     <Box
       sx={{
@@ -13,9 +19,25 @@ export default function Dashboard() {
         alignItems: 'center',
       }}
     >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Welcome to the Toolpad dashboard!
+      <UserAvatar />
+      <Typography variant="h4" component="h1" sx={{ my: 3 }}>
+        Welcome to the Toolpad dashboard, {session?.user?.name || 'user'}
       </Typography>
+      <Button
+        component="a"
+        href="/signout"
+        variant="contained"
+        disableElevation
+        sx={{
+          textTransform: 'capitalize',
+          backgroundColor: '#29242e',
+          filter: 'opacity(0.9)',
+          transition: 'filter 0.2s ease-in',
+          '&:hover': { backgroundColor: '#29242e', filter: 'opacity(1)' },
+        }}
+      >
+        Sign out
+      </Button>
     </Box>
   );
 }

@@ -1,6 +1,8 @@
+'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material';
+import { useColorScheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -29,7 +31,6 @@ import {
   NavigationPageItem,
   RouterContext,
 } from '../AppProvider/AppProvider';
-import { ColorModeContext } from '../AppProvider/AppThemeProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320;
@@ -209,7 +210,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
-  const colorMode = React.useContext(ColorModeContext);
+
+  const { mode, setMode } = useColorScheme();
+
+  // @TODO: Show theme switcher only in client I think, follow docs example
+  const toggleMode = React.useCallback(() => {
+    setMode(mode === 'dark' ? 'light' : 'dark');
+  }, [mode, setMode]);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -232,12 +239,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Stack>
           </a>
           <Box sx={{ flexGrow: 1 }} />
-          <Tooltip title={`${colorMode?.mode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
+          <Tooltip title={`${mode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
             <IconButton
-              aria-label={`Switch to ${colorMode?.mode === 'dark' ? 'light' : 'dark'} mode`}
-              onClick={colorMode?.toggleMode}
+              aria-label={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}
+              onClick={toggleMode}
             >
-              {colorMode?.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+              {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
           </Tooltip>
         </Toolbar>

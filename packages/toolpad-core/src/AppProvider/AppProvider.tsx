@@ -1,9 +1,8 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Theme } from '@mui/material/styles';
-import type { AtLeastOne } from '@toolpad/utils/types';
-import { baseThemeLight, baseThemeDark } from '../themes';
+import { CssVarsTheme } from '@mui/material/styles';
+import { baseTheme } from '../themes';
 import { AppThemeProvider } from './AppThemeProvider';
 
 export interface NavigateOptions {
@@ -63,13 +62,10 @@ export interface AppProviderProps {
    */
   children: React.ReactNode;
   /**
-   * [Themes](https://mui.com/material-ui/customization/theming/) to be used by the app in light/dark mode.
-   * @default { light: baseThemeLight, dark: baseThemeDark }
+   * [Theme](https://mui.com/material-ui/customization/theming/) to be used by the app in light/dark mode.
+   * @default baseTheme
    */
-  themes?: AtLeastOne<{
-    light: Theme;
-    dark: Theme;
-  }>;
+  theme?: CssVarsTheme;
   /**
    * Branding options for the app.
    * @default null
@@ -100,17 +96,11 @@ export interface AppProviderProps {
  * - [AppProvider API](https://mui.com/toolpad/core/api/app-provider)
  */
 function AppProvider(props: AppProviderProps) {
-  const {
-    children,
-    themes = { light: baseThemeLight, dark: baseThemeDark },
-    branding = null,
-    navigation = [],
-    router = null,
-  } = props;
+  const { children, theme = baseTheme, branding = null, navigation = [], router = null } = props;
 
   return (
     <RouterContext.Provider value={router}>
-      <AppThemeProvider themes={themes}>
+      <AppThemeProvider theme={theme}>
         <BrandingContext.Provider value={branding}>
           <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
         </BrandingContext.Provider>

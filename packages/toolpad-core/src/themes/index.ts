@@ -1,3 +1,2 @@
 'use client';
-export * from './baseThemeLight';
-export * from './baseThemeDark';
+export * from './baseTheme';

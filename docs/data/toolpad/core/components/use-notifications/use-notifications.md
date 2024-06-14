@@ -67,7 +67,7 @@ You can supply your own value for a key to shown notifications to associate them
 
 ## Scoped notifications
 
-Notifcation providers can be nested. That way you can scope the notifications to a subset of the page. Use the slots to position the snackbar relative to a specific element on the page.
+Notification providers can be nested. That way you can scope the notifications to a subset of the page. Use the slots to position the snackbar relative to a specific element on the page.
 
 {{"demo": "ScopedNotification.js"}}
 

@@ -13,7 +13,7 @@ interface DialogStackEntry<P, R> {
   resolve: (result: R) => void;
 }
 
-export interface DialogProviderprops {
+export interface DialogProviderProps {
   children?: React.ReactNode;
   unmountAfter?: number;
 }
@@ -28,7 +28,7 @@ export interface DialogProviderprops {
  *
  * - [DialogsProvider API](https://mui.com/toolpad/core/api/dialogs-provider)
  */
-function DialogsProvider(props: DialogProviderprops) {
+function DialogsProvider(props: DialogProviderProps) {
   const { children, unmountAfter = 1000 } = props;
   const [stack, setStack] = React.useState<DialogStackEntry<any, any>[]>([]);
   const keyPrefix = React.useId();

@@ -94,7 +94,7 @@ Open a prompt dialog to request user input. Returns a promise that resolves to t
 
 ```js
 const input = await dialogs.prompt('What is your name?', {
-  canceltext: 'Leave me alone',
+  cancelText: 'Leave me alone',
 });
 ```
 

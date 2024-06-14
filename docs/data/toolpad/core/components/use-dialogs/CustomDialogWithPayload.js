@@ -24,7 +24,7 @@ function MyCustomDialog({ payload, open, onClose }) {
 MyCustomDialog.propTypes = {
   /**
    * A function to call when the dialog should be closed. If the dialog has a return
-   * value, it should be apssed as an argument to this function. You should use the promise
+   * value, it should be passed as an argument to this function. You should use the promise
    * that is returned to show a loading state while the dialog is performing async actions
    * on close.
    * @param result The result to return from the dialog.

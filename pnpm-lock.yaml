@@ -842,8 +842,8 @@ importers:
         specifier: 4.5.1
         version: 4.5.1
       prettier:
-        specifier: 3.3.1
-        version: 3.3.1
+        specifier: 3.3.2
+        version: 3.3.2
       pretty-bytes:
         specifier: 6.1.1
         version: 6.1.1
@@ -1118,8 +1118,8 @@ importers:
         specifier: 2.2.4
         version: 2.2.4
       prettier:
-        specifier: 3.3.1
-        version: 3.3.1
+        specifier: 3.3.2
+        version: 3.3.2
       react:
         specifier: ^18.0.0
         version: 18.3.1

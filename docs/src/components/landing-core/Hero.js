@@ -15,7 +15,8 @@ export default function Hero() {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'center',
-        py: 20,
+        mt: 10,
+        mb: 10,
         // maxWidth: { md: 500, lg: 600, xl: 'unset' },
       }}
     >

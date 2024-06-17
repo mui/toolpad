@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
-import InvertColorsRoundedIcon from '@mui/icons-material/InvertColorsRounded';
 import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import AccessibilityNewRounded from '@mui/icons-material/AccessibilityNewRounded';
@@ -12,28 +11,32 @@ import InfoCard from 'docs/src/components/action/InfoCard';
 
 const content = [
   {
-    icon: <InvertColorsRoundedIcon fontSize="small" color="primary" />,
-    title: 'Timeless aesthetics',
+    icon: <img src="/static/toolpad/marketing/react-svgrepo-com.svg" width={24} alt="React" />,
+    title: 'React',
     description:
-      "Build beautiful UIs with ease. Start with Google's Material Design, or create your own sophisticated theme.",
+      'Toolpad is a code-centric approach to admin apps. Entire app is accessible and customizable through React code.',
   },
   {
-    icon: <HandymanRoundedIcon fontSize="small" color="primary" />,
-    title: 'Intuitive customization',
+    icon: (
+      <img src="/static/toolpad/marketing/typescript-svgrepo-com.svg" width={24} alt="Typesript" />
+    ),
+    title: 'Typesript',
     description:
-      'Our components are as flexible as they are powerful. You always have full control over how they look and behave.',
+      'Typescript enhances code maintainability and developer productivity, making it a preferred choice for Toolpad apps.',
   },
   {
-    icon: <ArticleRoundedIcon fontSize="small" color="primary" />,
-    title: 'Unrivaled documentation',
+    icon: (
+      <img src="/static/toolpad/marketing/nextjs-icon-svgrepo-com.svg" width={24} alt="Next.js" />
+    ),
+    title: 'Next.js',
     description:
-      'The answer to your problem can be found in our documentation. How can we be so sure? Because our docs boast over 2,000 contributors.',
+      'Next.js sets the industry standard for modern React applications. Building over ﻿it, is a leverage that makes Toolpad efficient.',
   },
   {
-    icon: <AccessibilityNewRounded fontSize="small" color="primary" />,
-    title: 'Dedicated to accessibility',
+    icon: <img src="/static/logo.svg" alt="MUI" />,
+    title: 'MUI',
     description:
-      "We believe in building for everyone. That's why accessibility is one of our highest priorities with every new feature we ship.",
+      'The tight integration with MUI ensures you get all the latest features from our list of MaterialUI components.',
   },
 ];
 
@@ -41,11 +44,11 @@ export default function BuiltWith() {
   return (
     <Section>
       <SectionHeadline
-        overline="Why build with MUI?"
+        overline="Why build with Toolpad?"
         title={
           <Typography variant="h2" sx={{ mt: 1, mb: { xs: 2, sm: 4 } }}>
-            A <GradientText>delightful experience</GradientText> <br />
-            for you and your users
+            Built using <GradientText>the best</GradientText> <br />
+            in the ecosystem...
           </Typography>
         }
       />

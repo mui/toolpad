@@ -89,7 +89,7 @@ export default function Hero() {
           <GetStartedButtons
             primaryLabel={'Get started'}
             primaryUrl="www.google.com"
-            installation={'npx create-toolpad-app@latest'}
+            installation={'npx create-toolpad-app@latest --core'}
             sx={{ width: '100%' }}
           />
         </Box>

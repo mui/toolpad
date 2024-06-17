@@ -24,15 +24,14 @@ export default function Features() {
   }
   return (
     <Section>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} alignItems="center">
         <Grid item md={6} sx={{ minWidth: 0 }}>
           <SectionHeadline
-            overline="Framework"
+            overline="Features"
             title={
               <Typography variant="h2">
                 {' '}
-                Fullstack <GradientText> Higher UI primitives </GradientText> and a data first
-                design
+                <GradientText> Higher UI primitives </GradientText> and a data first design
               </Typography>
             }
             description="Quickly build admin interfaces, CRUD apps, and more with a set of higher-level components. Toolpad is designed to be a data-first framework, with a focus on making it easy to interact with your APIs."
@@ -82,7 +81,7 @@ export default function Features() {
             sx={[
               (theme) => ({
                 p: 2,
-                minHeight: 800,
+                minHeight: 800, // To be removed, once we add the demo
                 display: 'flex',
                 flexWrap: 'wrap',
                 zIndex: 1,

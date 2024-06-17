@@ -53,14 +53,16 @@ export default function StudioIntro() {
             altInstallation="npx create-toolpad-app@latest"
           />
         </Grid>
-        <Grid xs={7}>
+        <Grid item xs={7}>
+          {' '}
+          {/* Added 'item' prop */}
           <Card
             sx={(theme) => ({
-              height: '100%',
+              width: '100%',
               display: 'flex',
               flexDirection: 'column',
-              px: 2,
-              pt: 2,
+              px: 1,
+              pt: 1,
               pb: 1,
               gap: 1.5,
               borderRadius: 1,

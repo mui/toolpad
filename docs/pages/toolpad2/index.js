@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import AppHeader from 'docs/src/layouts/AppHeader';
 import AppFooter from 'docs/src/layouts/AppFooter';
 import AppHeaderBanner from 'docs/src/components/banner/AppHeaderBanner';
+import Examples from '../../src/components/landing2/Examples';
 import Hero from '../../src/components/landing2/Hero';
 import Features from '../../src/components/landing2/Features';
 import BuiltWith from '../../src/components/landing2/BuiltWith';
@@ -23,7 +24,7 @@ export default function Home() {
         <Divider />
         <BuiltWith />
         <Divider />
-        {/* <Examples /> */}
+        <Examples />
         <StudioIntro />
       </main>
       <AppFooter />

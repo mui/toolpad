@@ -2,9 +2,9 @@ import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import IconImage from 'docs/src/components/icon/IconImage';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import { alpha } from '@mui/material/styles';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+// import Chip from '@mui/material/Chip';
+// import { alpha } from '@mui/material/styles';
+// import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import GetStartedButtons from './GetStartedButtons';
 // import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 
@@ -44,7 +44,7 @@ export default function Hero() {
         >
           <IconImage width={28} height={28} loading="eager" name="product-toolpad" />
           Toolpad
-          <Chip
+          {/* <Chip
             label="Read the announcement"
             component="a"
             // href={ROUTES.toolpadBetaBlog}
@@ -68,6 +68,7 @@ export default function Hero() {
               }),
             ]}
           />
+        */}
         </Typography>
         <Typography variant="h1" sx={{ my: 2, minWidth: { xs: 'auto', sm: 600 } }}>
           Open-source dashboard
@@ -88,7 +89,7 @@ export default function Hero() {
         >
           <GetStartedButtons
             primaryLabel={'Get started'}
-            primaryUrl="www.google.com"
+            primaryUrl="https://mui.com/toolpad/core/introduction/"
             installation={'npx create-toolpad-app@latest --core'}
             sx={{ width: '100%' }}
           />

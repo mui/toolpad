@@ -47,7 +47,7 @@ export default function BuiltWith() {
         overline="Why build with Toolpad?"
         title={
           <Typography variant="h2" sx={{ mt: 1, mb: { xs: 2, sm: 4 } }}>
-            Built using <GradientText>the best</GradientText> <br />
+            Leverage the <GradientText>the best</GradientText> <br />
             in the ecosystem...
           </Typography>
         }

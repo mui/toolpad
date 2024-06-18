@@ -144,6 +144,8 @@ export interface NotificationsProviderProps {
 let nextId = 1;
 
 /**
+ * Provider for Notifications. The subtree of this component can use the `useNotifications` hook to
+ * access the notifications API. The notifications are shown in the same order they are requested.
  *
  * Demos:
  *

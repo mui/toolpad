@@ -30,7 +30,7 @@ const content = [
       'Next.js sets the industry standard for modern React applications. Building over ﻿it, is a leverage that makes Toolpad efficient.',
   },
   {
-    icon: <img src="/static/logo.svg" alt="MUI" />,
+    icon: <img src="https://mui.com/static/logo.png" width={30} alt="MUI" />,
     title: 'MUI',
     description:
       'The tight integration with MUI ensures you get all the latest features from our list of MaterialUI components.',
@@ -44,14 +44,14 @@ export default function BuiltWith() {
         overline="Why build with Toolpad?"
         title={
           <Typography variant="h2" sx={{ mt: 1, mb: { xs: 2, sm: 4 } }}>
-            Leverage the <GradientText>the best</GradientText> <br />
+            Leverage <GradientText>the best</GradientText> <br />
             in the ecosystem...
           </Typography>
         }
       />
-      <Grid container spacing={3}>
+      <Grid container>
         {content.map(({ icon, title, description }) => (
-          <Grid key={title} item xs={12} sm={6} lg={3}>
+          <Grid item key={title} xs={12} sm={6} lg={3} sx={{ padding: 1 }}>
             <InfoCard title={title} icon={icon} description={description} />
           </Grid>
         ))}

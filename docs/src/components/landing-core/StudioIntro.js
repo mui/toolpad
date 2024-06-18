@@ -24,7 +24,7 @@ export default function StudioIntro() {
       }}
     >
       <Grid container spacing={4} justifyContent="flex-start">
-        <Grid item xs={5}>
+        <Grid item md={5}>
           <SectionHeadline
             overline="Toolpad Studio"
             title={
@@ -39,13 +39,14 @@ export default function StudioIntro() {
               </React.Fragment>
             }
           />
+
           <GetStartedButtons
             primaryUrl="https://mui.com/toolpad-studio"
             primaryLabel="Explore Studio"
             altInstallation="npx create-toolpad-app@latest"
           />
         </Grid>
-        <Grid item xs={7}>
+        <Grid item xs={12} md={7}>
           {' '}
           {/* Added 'item' prop */}
           <Card

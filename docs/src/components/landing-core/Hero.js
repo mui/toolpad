@@ -2,30 +2,28 @@ import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import IconImage from 'docs/src/components/icon/IconImage';
 import Box from '@mui/material/Box';
+import GradientText from 'docs/src/components/typography/GradientText';
 // import Chip from '@mui/material/Chip';
 // import { alpha } from '@mui/material/styles';
 // import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Container } from '@mui/material';
 import GetStartedButtons from './GetStartedButtons';
 // import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 
 export default function Hero() {
   return (
-    <Box
+    <Container
       sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'center',
-        mt: 10,
-        mb: 10,
-        // maxWidth: { md: 500, lg: 600, xl: 'unset' },
+        py: { xs: 4, sm: 8 },
       }}
     >
       <Box
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
-          // maxWidth: { md: 500, lg: 600, xl: 'unset' },
+          justifyContent: 'flex-start',
+          alignItems: 'center',
+          padding: 4,
         }}
       >
         <Typography
@@ -71,16 +69,28 @@ export default function Hero() {
           />
         */}
         </Typography>
-        <Typography variant="h1" sx={{ my: 2, minWidth: { xs: 'auto', sm: 600 } }}>
-          Open-source dashboard
-          <br />
-          framework for React
-        </Typography>
-        <Typography color="text.secondary" sx={{ maxWidth: 620, mb: 3, textWrap: 'balance' }}>
-          From the creators of MUI, Toolpad comes batteries included for your next admin panel and
-          internal tools project. Bootstrap from scratch in our CLI with well chosen defaults, or
-          drop Toolpad into your existing Next.js or Vite* project.
-        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            textAlign: 'center', // Add this line
+          }}
+        >
+          <Typography variant="h1" sx={{ my: 2 }}>
+            Open-source dashboard
+            <br />
+            <GradientText> framework </GradientText> for React
+          </Typography>
+          <Typography
+            color="text.secondary"
+            sx={{ maxWidth: 620, mb: 3, textWrap: 'balance', textAlign: 'center' }}
+          >
+            From the creators of MUI, Toolpad comes batteries included for your next admin panel and
+            internal tools project. Bootstrap from scratch in our CLI with well chosen defaults, or
+            drop Toolpad into your existing Next.js or Vite* project.
+          </Typography>
+        </Box>
         <Box
           sx={{
             display: 'flex',
@@ -96,6 +106,6 @@ export default function Hero() {
           />
         </Box>
       </Box>
-    </Box>
+    </Container>
   );
 }

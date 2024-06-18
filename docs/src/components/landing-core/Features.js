@@ -24,17 +24,17 @@ export default function Features() {
   }
   return (
     <Section>
-      <Grid container spacing={2} alignItems="center">
-        <Grid item md={6} sx={{ minWidth: 0 }}>
+      <Grid container alignItems="center">
+        <Grid item md={6} sx={{ padding: 2 }}>
           <SectionHeadline
             overline="Features"
             title={
               <Typography variant="h2">
                 {' '}
-                <GradientText> Higher UI primitives </GradientText> and a data first design
+                Fullstack <GradientText> higher UI primitives </GradientText> and components
               </Typography>
             }
-            description="Quickly build admin interfaces, CRUD apps, and more with a set of higher-level components. Toolpad is designed to be a data-first framework, with a focus on making it easy to interact with your APIs."
+            description="Quickly build admin interfaces, CRUD apps with a set of higher-level components. Toolpad is designed to be a data-first framework that simplifies data loading and management."
           />
           <Group sx={{ m: -2, p: 2 }}>
             <Highlighter disableBorder {...getSelectedProps(0)} onClick={() => setIndex(0)}>
@@ -74,7 +74,7 @@ export default function Features() {
             </Highlighter>
           </Group>
         </Grid>
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6} sx={{ padding: 2 }}>
           <Card
             variant="outlined"
             // {...props}

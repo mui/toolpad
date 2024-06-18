@@ -22,12 +22,18 @@ const NAVIGATION: Navigation = [
   },
 ];
 
+const BRANDING = {
+  title: 'My Toolpad Core App',
+};
+
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <AppProvider navigation={NAVIGATION}>{props.children}</AppProvider>
+          <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+            {props.children}
+          </AppProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

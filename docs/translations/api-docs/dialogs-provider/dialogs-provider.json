@@ -1,0 +1,5 @@
+{
+  "componentDescription": "Provider for Dialog stacks. The subtree of this component can use the `useDialogs` hook to\naccess the dialogs API. The dialogs are rendered in the order they are requested.",
+  "propDescriptions": {},
+  "classDescriptions": {}
+}

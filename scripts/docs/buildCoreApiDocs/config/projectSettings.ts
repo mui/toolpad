@@ -28,7 +28,7 @@ export const projectSettings: ProjectSettings = {
 
     return directories[3] === 'nextjs';
   },
-  skipSlotsAndClasses: true,
+  skipSlotsAndClasses: false,
   translationPagesDirectory: 'docs/translations/api-docs',
   importTranslationPagesDirectory: 'docs-toolpad/translations/api-docs',
   generateClassName: () => '',

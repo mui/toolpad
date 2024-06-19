@@ -81,7 +81,7 @@ When you use the [Toolpad pro plan](/toolpad/studio/getting-started/roadmap/#pai
 
 ### Column pinning (PRO)
 
-When you use the [Toolpad pro plan](/toolpad/studio/getting-started/roadmap/#paid-plan), the grid columns can be individually pinned. Each column menu gets a pin option. You can also pre-initialize the grid with pinned columns by using the "Pinned" option in the column editor:
+When you use the [Toolpad pro plan](/toolpad/studio/getting-started/roadmap/#paid-plan), the grid columns can be individually pinned. You can also pre-initialize the grid with pinned columns by using the **Pinned** option in the column editor:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/components/datagrid/pinning.png", "alt": "Column pinning option", "caption": "Column pinning option", "zoom": false, "width": 284 }}
 

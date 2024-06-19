@@ -38,6 +38,7 @@ import PropertyControl from '../../components/PropertyControl';
 // TODO: this import suggests leaky abstraction
 import { usePageEditorState } from '../AppEditor/PageEditor/PageEditorProvider';
 import { UpgradeChip } from '../AppEditor/UpgradeNotification';
+import ToggleButtonSelect from '../../components/ToggleButtonSelect';
 
 type GridAlignment = SerializableGridColumn['align'];
 
@@ -359,10 +360,20 @@ function GridColumnEditor({
             }
             label="Aggregable"
           />
+
+          <ToggleButtonSelect
+            options={['left', 'center', 'right']}
+            fullWidth
+            label="Pinned"
+            value={editedColumn.pin ?? 'center'}
+            onChange={(pin) =>
+              handleColumnChange({ ...editedColumn, pin: pin === 'center' ? undefined : pin })
+            }
+          />
         </React.Fragment>
       ) : (
         <Typography variant="body2">
-          Grouping/aggregation
+          Grouping/aggregation/pinning
           <UpgradeChip
             sx={{ ml: 1 }}
             url="https://mui.com/toolpad/studio/components/data-grid/#grouping"

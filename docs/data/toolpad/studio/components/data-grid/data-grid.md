@@ -85,7 +85,7 @@ When you use the [Toolpad pro plan](/toolpad/studio/getting-started/roadmap/#pai
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/components/datagrid/pinning.png", "alt": "Column pinning option", "caption": "Column pinning option", "zoom": false, "width": 284 }}
 
-For example, a table where the **name** column is pinned to the left, and the **Location** column to the right looks as follows:
+For example, a table where the **Name** column is pinned to the left, and the **Location** column to the right looks as follows:
 
 {{"demo": "DataGridPinning.js", "hideToolbar": true, "bg": "inline"}}
 

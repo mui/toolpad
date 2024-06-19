@@ -116,7 +116,7 @@ export function SignInPage({ providers, signIn }: SignInPageProps) {
 
           {credentialsProvider ? (
             <React.Fragment>
-              <Divider sx={{ mt: 2, mx: 0 }}>or</Divider>
+              <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>
               <Box
                 component="form"
                 action={(formData) => {
@@ -125,8 +125,14 @@ export function SignInPage({ providers, signIn }: SignInPageProps) {
                 noValidate
               >
                 <TextField
-                  margin="normal"
+                  margin="dense"
                   required
+                  inputProps={{
+                    sx: { paddingTop: '12px', paddingBottom: '12px' },
+                  }}
+                  InputLabelProps={{
+                    sx: { lineHeight: '1rem' },
+                  }}
                   fullWidth
                   id="email"
                   label="Email Address"
@@ -135,9 +141,15 @@ export function SignInPage({ providers, signIn }: SignInPageProps) {
                   autoFocus
                 />
                 <TextField
-                  margin="normal"
+                  margin="dense"
                   required
                   fullWidth
+                  inputProps={{
+                    sx: { paddingTop: '12px', paddingBottom: '12px' },
+                  }}
+                  InputLabelProps={{
+                    sx: { lineHeight: '1rem' },
+                  }}
                   name="password"
                   label="Password"
                   type="password"
@@ -147,18 +159,35 @@ export function SignInPage({ providers, signIn }: SignInPageProps) {
                 <FormControlLabel
                   control={<Checkbox value="remember" color="primary" />}
                   label="Remember me"
+                  slotProps={{ typography: { color: 'textSecondary' } }}
                 />
-                <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                <Button
+                  type="submit"
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  disableElevation
+                  sx={{
+                    mt: 3,
+                    mb: 2,
+                    textTransform: 'capitalize',
+                    filter: 'opacity(0.9)',
+                    transition: 'filter 0.2s ease-in',
+                    '&:hover': {
+                      filter: 'opacity(1)',
+                    },
+                  }}
+                >
                   Sign In
                 </Button>
                 <Grid container>
                   <Grid item xs>
-                    <Link href="#" variant="body2">
+                    <Link href="/" variant="body2">
                       Forgot password?
                     </Link>
                   </Grid>
                   <Grid item>
-                    <Link href="#" variant="body2">
+                    <Link href="/" variant="body2">
                       {"Don't have an account? Sign Up"}
                     </Link>
                   </Grid>

@@ -79,7 +79,7 @@ When you use the [Toolpad pro plan](/toolpad/studio/getting-started/roadmap/#pai
 
 {{"demo": "DataGridPro.js", "hideToolbar": true, "bg": "inline"}}
 
-### Column pinning
+### Column pinning (PRO)
 
 When you use the [Toolpad pro plan](/toolpad/studio/getting-started/roadmap/#paid-plan), the grid columns can be individually pinned. Each column menu gets a pin option. You can also pre-initialize the grid with pinned columns by using the "Pinned" option in the column editor:
 

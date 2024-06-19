@@ -820,7 +820,9 @@ async function writeThemeFile(root: string, theme: Theme | null) {
 async function writeApplicationFile(root: string, application: Application | null) {
   const applicationFilePath = getApplicationFile(root);
   if (application) {
-    await updateYamlFile(applicationFilePath, application);
+    await updateYamlFile(applicationFilePath, application, {
+      schemaUrl: getSchemaUrl('Application'),
+    });
   } else {
     await fs.rm(applicationFilePath, { recursive: true, force: true });
   }

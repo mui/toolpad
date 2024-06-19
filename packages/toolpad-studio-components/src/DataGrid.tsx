@@ -38,6 +38,7 @@ import {
   GridValueGetter,
   GridToolbarProps,
   GridColType,
+  GridPinnedColumnFields,
 } from '@mui/x-data-grid-premium';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -472,7 +473,7 @@ export interface SerializableGridColumn
   dateTimeFormat?: DateFormat;
   codeComponent?: string;
   visible?: boolean;
-  aggregable?: boolean;
+  pin?: 'left' | 'right';
 }
 
 export type SerializableGridColumns = SerializableGridColumn[];
@@ -1301,6 +1302,19 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
     (columnsProp ?? []).map((column) => [column.field, column.visible ?? true]),
   );
 
+  const pinnedColumns: GridPinnedColumnFields = React.useMemo(() => {
+    const result = (columnsProp ?? []).reduce<GridPinnedColumnFields>((acc, column) => {
+      if (column.pin) {
+        acc[column.pin] ??= [];
+        acc[column.pin]?.push(column.field);
+      }
+      return acc;
+    }, {});
+    result.right ??= [];
+    result.right.push(ACTIONS_COLUMN_FIELD);
+    return result;
+  }, [columnsProp]);
+
   return (
     <LicenseInfoProvider info={LICENSE_INFO}>
       <DataGridRoot ref={ref} sx={sx}>
@@ -1330,10 +1344,11 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               rowSelectionModel={selectionModel}
               initialState={{
                 columns: { columnVisibilityModel },
-                pinnedColumns: { right: [ACTIONS_COLUMN_FIELD] },
+                pinnedColumns,
               }}
               disableAggregation={!isProPlan}
               disableRowGrouping={!isProPlan}
+              disableColumnPinning={!isProPlan}
               {...props}
               {...dataProviderProps}
               sx={{

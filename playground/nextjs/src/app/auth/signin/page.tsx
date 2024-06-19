@@ -16,7 +16,7 @@ export default async function SignIn() {
           // Signin can fail for a number of reasons, such as the user
           // not existing, or the user not having the correct role.
           if (error instanceof AuthError) {
-            redirect(`/auth-error?error=${error.type}`);
+            redirect(`/auth/error?error=${error.type}`);
           }
           // Otherwise if a redirects happens NextJS can handle it
           // so you can just re-throw the error and let NextJS handle it.

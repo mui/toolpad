@@ -1,0 +1,13 @@
+{
+  "props": {},
+  "name": "DialogsProvider",
+  "imports": ["import { DialogsProvider } from '@toolpad-core/useDialogs';"],
+  "classes": [],
+  "spread": true,
+  "themeDefaultProps": false,
+  "muiName": "DialogsProvider",
+  "filename": "/packages/toolpad-core/src/useDialogs/DialogsProvider.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-use-dialogs/\">Dialogs</a></li></ul>",
+  "cssComponent": false
+}

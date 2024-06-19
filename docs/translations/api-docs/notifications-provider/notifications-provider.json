@@ -1,0 +1,6 @@
+{
+  "componentDescription": "Provider for Notifications. The subtree of this component can use the `useNotifications` hook to\naccess the notifications API. The notifications are shown in the same order they are requested.",
+  "propDescriptions": {},
+  "classDescriptions": {},
+  "slotDescriptions": { "snackbar": "The component that renders the snackbar." }
+}

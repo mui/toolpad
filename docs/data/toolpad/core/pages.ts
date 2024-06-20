@@ -99,6 +99,10 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/core/react-use-notifications',
             title: 'useNotifications',
           },
+          {
+            pathname: '/toolpad/core/react-persistent-state',
+            title: 'Peristent State',
+          },
         ],
       },
     ],

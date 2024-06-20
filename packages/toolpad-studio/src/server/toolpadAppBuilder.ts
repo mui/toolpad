@@ -241,7 +241,7 @@ if (import.meta.hot) {
       },
       envFile: false,
       resolve: {
-        dedupe: ['@mui/material'],
+        dedupe: ['@mui/material', '@emotion/react', '@emotion/styled'],
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)

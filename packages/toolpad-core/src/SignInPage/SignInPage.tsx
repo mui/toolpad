@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -51,7 +52,7 @@ export interface SignInPageProps {
   signIn: (provider: AuthProvider, formData?: FormData) => void;
 }
 
-export function SignInPage({ providers, signIn }: SignInPageProps) {
+function SignInPage({ providers, signIn }: SignInPageProps) {
   const branding = React.useContext(BrandingContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   return (
@@ -200,3 +201,25 @@ export function SignInPage({ providers, signIn }: SignInPageProps) {
     </Container>
   );
 }
+
+SignInPage.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * @ignore
+   */
+  providers: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }),
+  ),
+  /**
+   * @ignore
+   */
+  signIn: PropTypes.func.isRequired,
+} as any;
+
+export { SignInPage };

@@ -6,6 +6,7 @@ export default defineConfig({
     coverage: {
       exclude: ['./dist/**'],
       reportsDirectory: './.coverage',
+      reporter: ['text', 'lcov'],
     },
   },
 });

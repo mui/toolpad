@@ -106,8 +106,10 @@ export function useStorageStateServer<T = string>(): UseStorageStateHookResult<T
   return serverValue;
 }
 
-export interface DefaultStorageStateoptions {}
-export interface StorageStateOptions<T> extends DefaultStorageStateoptions {
+export interface DefaultStorageStateoptions<T = string> {
+  codec?: Codec<T>;
+}
+export interface StorageStateOptions<T> extends DefaultStorageStateoptions<T> {
   codec: Codec<T>;
 }
 
@@ -133,8 +135,8 @@ const getKeyServerSnapshot = () => null;
 export function useStorageState(
   area: Storage,
   key: string | null,
-  initializer: string | null | StorageStateInitializer<string>,
-  options: StorageStateOptions<string>,
+  initializer?: string | null | StorageStateInitializer<string>,
+  options?: DefaultStorageStateoptions,
 ): UseStorageStateHookResult<string>;
 export function useStorageState<T>(
   area: Storage,
@@ -145,10 +147,10 @@ export function useStorageState<T>(
 export function useStorageState<T = string>(
   area: Storage,
   key: string | null,
-  initializer: T | null | StorageStateInitializer<T>,
-  options?: StorageStateOptions<T>,
+  initializer: T | null | StorageStateInitializer<T> = null,
+  options?: DefaultStorageStateoptions | StorageStateOptions<T>,
 ): UseStorageStateHookResult<T> {
-  const { codec = CODEC_STRING as unknown as Codec<T> } = options ?? {};
+  const codec = (options?.codec ?? CODEC_STRING) as Codec<T>;
 
   const [initialValue] = React.useState(initializer);
   const encodedInitialValue = React.useMemo(

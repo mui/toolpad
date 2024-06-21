@@ -18,6 +18,7 @@
 [![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-toolpad/issues/8)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/mui-toolpad.svg)](https://isitmaintained.com/project/mui/mui-toolpad 'Average time to resolve an issue')
 [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui-org)](https://opencollective.com/mui-org)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/6294/badge)](https://www.bestpractices.dev/projects/6294)
 
 </div>
 
@@ -85,7 +86,11 @@ GitHub allows us to host the Git repository and coordinate contributions.
 
 Netlify allows us to distribute the documentation.
 
-[<img loading="lazy" alt="BrowserStack" src="https://www.browserstack.com/images/mail/browserstack-logo-footer.png" height="30">](https://www.browserstack.com/)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://mui.com/static/readme/browserstack-darkmode.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://mui.com/static/readme/browserstack-lightmode.svg">
+  <img alt="BrowserStack logo" src="https://mui.com/static/readme/browserstack-lightmode.svg" width="140" height="25">
+</picture>
 
 BrowserStack allows us to test in real browsers.
 

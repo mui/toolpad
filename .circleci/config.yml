@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  codecov: codecov/codecov@4.0.1
 
 default-job: &default-job
   working_directory: /tmp/mui-toolpad
@@ -164,6 +166,7 @@ jobs:
       - run:
           name: Tests fake browser
           command: pnpm test
+      - codecov/upload
 
   test_unit_browser:
     <<: *default-job

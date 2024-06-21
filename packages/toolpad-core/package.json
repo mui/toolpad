@@ -45,7 +45,7 @@
     "check-types": "tsc --noEmit",
     "test": "vitest run --coverage",
     "test:dev": "vitest",
-    "test:browser": "vitest run --coverage --browser.enabled",
+    "test:browser": "vitest run --browser.enabled",
     "test:browser:dev": "vitest --browser.enabled"
   },
   "dependencies": {

@@ -16,4 +16,4 @@ export * from './useLocalStorageState';
 
 export * from './useSessionStorageState';
 
-export * from './persistence/Codec';
+export * from './persistence/codec';

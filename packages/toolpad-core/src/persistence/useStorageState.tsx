@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { CODEC_STRING, Codec } from './Codec';
+import { CODEC_STRING, Codec } from './codec';
 
 // storage events only work across tabs, we'll use an event emitter to announce within the current tab
 const currentTabChangeListeners = new Map<string, Set<() => void>>();

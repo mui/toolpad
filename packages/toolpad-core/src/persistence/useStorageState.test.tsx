@@ -2,10 +2,8 @@
  * @vitest-environment jsdom
  */
 
-import * as React from 'react';
 import { describe, test, expect, beforeEach } from 'vitest';
-import { renderHook, within, screen } from '@testing-library/react';
-import { userEvent } from '@testing-library/user-event';
+import { renderHook } from '@testing-library/react';
 import { useStorageState } from './useStorageState';
 
 describe('useStorageState', () => {

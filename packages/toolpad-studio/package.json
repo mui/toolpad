@@ -14,7 +14,7 @@
     "build:cli": "tsup",
     "dev:cli": "tsup --watch",
     "check-types": "tsup && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --coverage"
   },
   "keywords": [
     "react",

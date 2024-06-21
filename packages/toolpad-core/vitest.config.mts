@@ -9,5 +9,9 @@ export default defineConfig({
       provider: 'playwright',
       headless: !!process.env.CI,
     },
+    coverage: {
+      exclude: ['./build/**'],
+      reportsDirectory: './.coverage',
+    },
   },
 });

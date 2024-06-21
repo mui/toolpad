@@ -114,7 +114,25 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/core/api/components-group',
         subheader: 'Components',
-        children: pagesApi,
+        children: [
+          ...pagesApi,
+          {
+            pathname: '/toolpad/core/react-use-notifications/api/',
+            title: 'useNotifications',
+          },
+          {
+            pathname: '/toolpad/core/react-use-dialogs/api/',
+            title: 'useDialogs',
+          },
+          {
+            pathname: '/toolpad/core/react-persistent-state/use-local-storage-state-api/',
+            title: 'useLocalStorageState',
+          },
+          {
+            pathname: '/toolpad/core/react-persistent-state/use-session-storage-state-api/',
+            title: 'useSessionStorageState',
+          },
+        ],
       },
     ],
   },

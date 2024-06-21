@@ -106,9 +106,10 @@ export function useStorageStateServer<T = string>(): UseStorageStateHookResult<T
   return serverValue;
 }
 
-export type StorageStateOptions<T> = {
-  codec?: Codec<T>;
-} & (T extends string ? {} : { codec: Codec<T> });
+export interface DefaultStorageStateoptions {}
+export interface StorageStateOptions<T> extends DefaultStorageStateoptions {
+  codec: Codec<T>;
+}
 
 function encode<V>(codec: Codec<V>, value: V | null): string | null {
   return value === null ? null : codec.stringify(value);
@@ -129,13 +130,24 @@ const getKeyServerSnapshot = () => null;
  * Since the storage API isn't available in server-rendering environments, we
  * return null during SSR and hydration.
  */
+export function useStorageState(
+  area: Storage,
+  key: string | null,
+  initializer: string | null | StorageStateInitializer<string>,
+  options: StorageStateOptions<string>,
+): UseStorageStateHookResult<string>;
+export function useStorageState<T>(
+  area: Storage,
+  key: string | null,
+  initializer: T | null | StorageStateInitializer<T>,
+  options: StorageStateOptions<T>,
+): UseStorageStateHookResult<T>;
 export function useStorageState<T = string>(
   area: Storage,
   key: string | null,
-  initializer: T | null | StorageStateInitializer<T> = null,
-  ...args: T extends string ? [StorageStateOptions<T>?] : [StorageStateOptions<T>]
+  initializer: T | null | StorageStateInitializer<T>,
+  options?: StorageStateOptions<T>,
 ): UseStorageStateHookResult<T> {
-  const [options] = args;
   const { codec = CODEC_STRING as unknown as Codec<T> } = options ?? {};
 
   const [initialValue] = React.useState(initializer);
@@ -183,8 +195,41 @@ export function useStorageState<T = string>(
   return [storedValue, setStoredValue];
 }
 
-export type UseStorageState = <T = string>(
-  key: string | null,
-  initializer?: T | null | StorageStateInitializer<T>,
-  ...args: T extends string ? [StorageStateOptions<T>?] : [StorageStateOptions<T>]
-) => UseStorageStateHookResult<T>;
+export interface UseStorageState {
+  /**
+   * Sync state to local or session storage so that it persists through a page refresh. Usage is
+   * similar to useState except we pass in a storage key that uniquely identifies the value.
+   * @param key The key to use for storing the value in local or session storage.
+   * @param initializer The initial value to use if the key is not present in storage.
+   * @param options Additional options for the storage state.
+   */
+  (
+    key: string | null,
+    initializer?: string | null | StorageStateInitializer<string>,
+    options?: DefaultStorageStateoptions,
+  ): UseStorageStateHookResult<string>;
+  /**
+   * Sync state to local or session storage so that it persists through a page refresh. Usage is
+   * similar to useState except we pass in a storage key that uniquely identifies the value.
+   * @param key The key to use for storing the value in local or session storage.
+   * @param initializer The initial value to use if the key is not present in storage.
+   * @param options Additional options for the storage state.
+   */
+  <T>(
+    key: string | null,
+    initializer: T | null | StorageStateInitializer<T>,
+    options: StorageStateOptions<T>,
+  ): UseStorageStateHookResult<T>;
+  /**
+   * Sync state to local or session storage so that it persists through a page refresh. Usage is
+   * similar to useState except we pass in a storage key that uniquely identifies the value.
+   * @param key The key to use for storing the value in local or session storage.
+   * @param initializer The initial value to use if the key is not present in storage.
+   * @param options Additional options for the storage state.
+   */
+  <T>(
+    key: string | null,
+    initializer?: T | null | StorageStateInitializer<T>,
+    options?: StorageStateOptions<T>,
+  ): UseStorageStateHookResult<T>;
+}

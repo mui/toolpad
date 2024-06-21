@@ -9,8 +9,8 @@ import { UseStorageState, useStorageState, useStorageStateServer } from '../pers
  * Since the storage API isn't available in server-rendering environments, we
  * return null during SSR and hydration.
  */
-const useLocalStorageStateBrowser = ((...args) =>
-  useStorageState(window.localStorage, ...args)) as UseStorageState;
+const useLocalStorageStateBrowser: UseStorageState = (...args: [any, any, any]) =>
+  useStorageState(window.localStorage, ...args);
 
 export const useLocalStorageState: UseStorageState =
   typeof window === 'undefined' ? useStorageStateServer : useLocalStorageStateBrowser;

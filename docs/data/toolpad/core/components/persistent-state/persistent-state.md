@@ -21,6 +21,8 @@ The default behavior of the hook is to read and write string values. All you hav
 
 Open this <a target="_blank" href="#string-values">page</a> in another tab to see the hook in action.
 
+**important** Passing `null` to `setState` results in removing the value from storage.
+
 ### Rich data types
 
 If you need to store values other than srings, you can use the `codec` parameter in the hook options to declare the methods used for serialization and deserialization. A codec contains a `parse` method and `stringify` method.
@@ -37,11 +39,17 @@ The `useLocalStorageState` hook returns `null` when local storage is not availab
 
 ### Custom validation
 
-For complex data types we recommend using these hooks with a typed validation library such as [`zod`](https://www.npmjs.com/package/zod).
+For complex data types you can pair these hooks with a typed validation library such as [`zod`](https://www.npmjs.com/package/zod).
+
+{{"demo": "LocalStorageStateZod.js"}}
 
 ## Session Storage
 
+The `useSessionStorageState` hook works identical to the [`useLocalStorageState`](#local-storage) hook, except that it reads and writes from `window.sessionStorage` instead of `window.localStorage`.
+
 ## Search Parameters
+
+🚧 Coming soon
 
 ## Hook API
 

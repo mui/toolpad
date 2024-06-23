@@ -521,8 +521,8 @@ importers:
         specifier: 5.3.0
         version: 5.3.0
       execa:
-        specifier: 9.2.0
-        version: 9.2.0
+        specifier: 9.3.0
+        version: 9.3.0
       inquirer:
         specifier: 9.2.23
         version: 9.2.23
@@ -776,8 +776,8 @@ importers:
         specifier: 0.21.5
         version: 0.21.5
       execa:
-        specifier: 9.2.0
-        version: 9.2.0
+        specifier: 9.3.0
+        version: 9.3.0
       express:
         specifier: 4.19.2
         version: 4.19.2
@@ -5693,6 +5693,10 @@ packages:
 
   execa@9.2.0:
     resolution: {integrity: sha512-vpOyYg7UAVKLAWWtRS2gAdgkT7oJbCn0me3gmUmxZih4kd3MF/oo8kNTBTIbkO3yuuF5uB4ZCZfn8BOolITYhg==}
+    engines: {node: ^18.19.0 || >=20.5.0}
+
+  execa@9.3.0:
+    resolution: {integrity: sha512-l6JFbqnHEadBoVAVpN5dl2yCyfX28WoBAGaoQcNmLLSedOxTxcn2Qa83s8I/PA5i56vWru2OHOtrwF7Om2vqlg==}
     engines: {node: ^18.19.0 || >=20.5.0}
 
   exponential-backoff@3.1.1:
@@ -11647,7 +11651,7 @@ snapshots:
       '@googleapis/sheets': 7.0.1(encoding@0.1.13)
       '@netlify/functions': 2.7.0(@opentelemetry/api@1.8.0)
       '@slack/bolt': 3.18.0
-      execa: 9.2.0
+      execa: 9.3.0
       google-auth-library: 9.9.0(encoding@0.1.13)
     transitivePeerDependencies:
       - '@opentelemetry/api'
@@ -15213,6 +15217,21 @@ snapshots:
       strip-final-newline: 3.0.0
 
   execa@9.2.0:
+    dependencies:
+      '@sindresorhus/merge-streams': 4.0.0
+      cross-spawn: 7.0.3
+      figures: 6.1.0
+      get-stream: 9.0.1
+      human-signals: 7.0.0
+      is-plain-obj: 4.1.0
+      is-stream: 4.0.1
+      npm-run-path: 5.3.0
+      pretty-ms: 9.0.0
+      signal-exit: 4.1.0
+      strip-final-newline: 4.0.0
+      yoctocolors: 2.0.2
+
+  execa@9.3.0:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
       cross-spawn: 7.0.3

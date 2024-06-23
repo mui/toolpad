@@ -43,7 +43,7 @@
     "test:rest:start": "tsx ./scripts/restTestServer.ts"
   },
   "devDependencies": {
-    "@argos-ci/core": "2.2.0",
+    "@argos-ci/core": "2.3.0",
     "@babel/cli": "7.24.7",
     "@babel/core": "7.24.7",
     "@babel/node": "7.24.7",
@@ -89,7 +89,7 @@
     "eslint-plugin-react-hooks": "4.6.2",
     "eslint-plugin-testing-library": "^6.2.2",
     "eslint-plugin-typescript-enum": "2.1.0",
-    "execa": "9.2.0",
+    "execa": "9.3.0",
     "fast-glob": "^3.3.2",
     "format-util": "1.0.5",
     "fs-extra": "11.2.0",
@@ -104,7 +104,7 @@
     "regenerator-runtime": "0.14.1",
     "remark": "13.0.0",
     "rimraf": "5.0.7",
-    "typescript": "5.4.5",
+    "typescript": "5.5.2",
     "unist-util-visit": "2.0.3",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.7.0"

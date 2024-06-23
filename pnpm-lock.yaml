@@ -791,8 +791,8 @@ importers:
         specifier: 7.1.0
         version: 7.1.0
       glob:
-        specifier: 10.4.1
-        version: 10.4.1
+        specifier: 10.4.2
+        version: 10.4.2
       google-auth-library:
         specifier: '*'
         version: 9.9.0(encoding@0.1.13)
@@ -6050,8 +6050,8 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
 
-  glob@10.4.1:
-    resolution: {integrity: sha512-2jelhlq3E4ho74ZyVLN03oKdAZVUa6UDZzFLVH1H7dnoax+y9qyaq8zBkfDIggjniU19z0wU18y16jMB2eyVIw==}
+  glob@10.4.2:
+    resolution: {integrity: sha512-GwMlUF6PkPo3Gk21UxkCohOv0PLcIXVtKyLlpEI28R/cO/4eNOdmLk3CMW1wROV/WR/EsZOWAfBbBOqYvs88/w==}
     engines: {node: '>=16 || 14 >=14.18'}
     hasBin: true
 
@@ -7832,6 +7832,9 @@ packages:
   p-waterfall@2.1.1:
     resolution: {integrity: sha512-RRTnDb2TBG/epPRI2yYXsimO0v3BXC8Yd3ogr1545IaqKK17VGhbWVeGGN+XfCm/08OK8635nH31c8bATkHuSw==}
     engines: {node: '>=8'}
+
+  package-json-from-dist@1.0.0:
+    resolution: {integrity: sha512-dATvCeZN/8wQsGywez1mzHtTlP22H8OEfPrVMLNr4/eGa+ijtLn/6M5f0dY8UKNrC2O9UCU6SSoG3qRKnt7STw==}
 
   package-json@10.0.0:
     resolution: {integrity: sha512-w34pqp733w35nElGG6eH1OnDnHEWud4uxruQ2nKzY/Uy0uOJmWFdjDcAC+xAD4goVuBZStwaAEBS21BANv83HQ==}
@@ -13497,7 +13500,7 @@ snapshots:
 
   archiver-utils@5.0.2:
     dependencies:
-      glob: 10.4.1
+      glob: 10.4.2
       graceful-fs: 4.2.11
       is-stream: 2.0.1
       lazystream: 1.0.1
@@ -13902,7 +13905,7 @@ snapshots:
     dependencies:
       '@npmcli/fs': 3.1.0
       fs-minipass: 3.0.3
-      glob: 10.4.1
+      glob: 10.4.2
       lru-cache: 7.18.3
       minipass: 7.1.2
       minipass-collect: 1.0.2
@@ -13917,7 +13920,7 @@ snapshots:
     dependencies:
       '@npmcli/fs': 3.1.0
       fs-minipass: 3.0.3
-      glob: 10.4.1
+      glob: 10.4.2
       lru-cache: 10.2.2
       minipass: 7.1.2
       minipass-collect: 2.0.1
@@ -15647,12 +15650,13 @@ snapshots:
       minipass: 7.1.2
       path-scurry: 1.11.1
 
-  glob@10.4.1:
+  glob@10.4.2:
     dependencies:
       foreground-child: 3.1.1
       jackspeak: 3.4.0
       minimatch: 9.0.4
       minipass: 7.1.2
+      package-json-from-dist: 1.0.0
       path-scurry: 1.11.1
 
   glob@7.2.3:
@@ -17286,7 +17290,7 @@ snapshots:
     dependencies:
       env-paths: 2.2.1
       exponential-backoff: 3.1.1
-      glob: 10.4.1
+      glob: 10.4.2
       graceful-fs: 4.2.11
       make-fetch-happen: 13.0.1
       nopt: 7.2.1
@@ -17711,6 +17715,8 @@ snapshots:
   p-waterfall@2.1.1:
     dependencies:
       p-reduce: 2.1.0
+
+  package-json-from-dist@1.0.0: {}
 
   package-json@10.0.0:
     dependencies:
@@ -18266,14 +18272,14 @@ snapshots:
 
   read-package-json@6.0.4:
     dependencies:
-      glob: 10.4.1
+      glob: 10.4.2
       json-parse-even-better-errors: 3.0.1
       normalize-package-data: 5.0.0
       npm-normalize-package-bin: 3.0.1
 
   read-package-json@7.0.1:
     dependencies:
-      glob: 10.4.1
+      glob: 10.4.2
       json-parse-even-better-errors: 3.0.1
       normalize-package-data: 6.0.1
       npm-normalize-package-bin: 3.0.1
@@ -18515,7 +18521,7 @@ snapshots:
 
   rimraf@5.0.7:
     dependencies:
-      glob: 10.4.1
+      glob: 10.4.2
 
   robust-predicates@3.0.2: {}
 
@@ -19056,7 +19062,7 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       commander: 4.1.1
-      glob: 10.4.1
+      glob: 10.4.2
       lines-and-columns: 1.2.4
       mz: 2.7.0
       pirates: 4.0.6
@@ -19157,7 +19163,7 @@ snapshots:
   test-exclude@7.0.1:
     dependencies:
       '@istanbuljs/schema': 0.1.3
-      glob: 10.4.1
+      glob: 10.4.2
       minimatch: 9.0.4
 
   text-extensions@1.9.0: {}

@@ -1,6 +1,6 @@
 version: 2.1
 orbs:
-  codecov: codecov/codecov@4.0.1
+  codecov: codecov/codecov@4.1.0
 
 default-job: &default-job
   working_directory: /tmp/mui-toolpad

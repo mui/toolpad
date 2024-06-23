@@ -65,7 +65,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/gtag.js": "0.0.20",
     "@types/invariant": "2.2.37",
-    "@types/node": "20.14.2",
+    "@types/node": "20.14.8",
     "@types/yargs": "17.0.32",
     "@typescript-eslint/eslint-plugin": "7.12.0",
     "@typescript-eslint/parser": "7.12.0",

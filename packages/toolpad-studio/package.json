@@ -172,7 +172,7 @@
     "eslint-plugin-import": "2.29.1",
     "formidable": "3.5.1",
     "react-transition-group": "4.4.5",
-    "webpack": "5.92.0"
+    "webpack": "5.92.1"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

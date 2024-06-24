@@ -45,7 +45,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "check-types": "tsup && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run --coverage"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"

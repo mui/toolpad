@@ -18,7 +18,7 @@
 [![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-toolpad/issues/8)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/mui-toolpad.svg)](https://isitmaintained.com/project/mui/mui-toolpad 'Average time to resolve an issue')
 [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui-org)](https://opencollective.com/mui-org)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/6294/badge)](https://www.bestpractices.dev/projects/6294)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/6294/badge?v2)](https://www.bestpractices.dev/projects/6294)
 
 </div>
 
@@ -97,5 +97,3 @@ BrowserStack allows us to test in real browsers.
 [<img loading="lazy" alt="CodeCov" src="https://github.com/codecov.png?size=70" width="35" height="35">](https://codecov.io/)
 
 CodeCov allows us to monitor the test coverage.
-
-<!-- invalidate cache -->

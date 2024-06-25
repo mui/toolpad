@@ -213,7 +213,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const { mode, setMode } = useColorScheme();
 
-  // @TODO: Show theme switcher only in client I think, follow docs example
+  const [hasMounted, setHasMounted] = React.useState(false);
+  React.useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const toggleMode = React.useCallback(() => {
     setMode(mode === 'dark' ? 'light' : 'dark');
   }, [mode, setMode]);
@@ -239,14 +243,16 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Stack>
           </a>
           <Box sx={{ flexGrow: 1 }} />
-          <Tooltip title={`${mode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
-            <IconButton
-              aria-label={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}
-              onClick={toggleMode}
-            >
-              {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-            </IconButton>
-          </Tooltip>
+          {hasMounted ? (
+            <Tooltip title={`${mode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
+              <IconButton
+                aria-label={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}
+                onClick={toggleMode}
+              >
+                {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+              </IconButton>
+            </Tooltip>
+          ) : null}
         </Toolbar>
       </AppBar>
       <Drawer

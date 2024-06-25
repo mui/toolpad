@@ -6,6 +6,7 @@ export const baseTheme = extendTheme({
       palette: {
         background: {
           default: 'var(--mui-palette-grey-50)',
+          defaultChannel: 'var(--mui-palette-grey-50)',
         },
       },
     },
@@ -13,15 +14,15 @@ export const baseTheme = extendTheme({
       palette: {
         background: {
           default: 'var(--mui-palette-grey-900)',
+          defaultChannel: 'var(--mui-palette-grey-900)',
         },
         text: {
-          primary: 'var(--mui-palette-grey-100)',
+          primary: 'var(--mui-palette-grey-200)',
+          primaryChannel: 'var(--mui-palette-grey-200)',
         },
       },
     },
   },
-
-  // @TODO: This isn't doing anything, find alternative
   typography: {
     h6: {
       fontWeight: '700',
@@ -106,9 +107,6 @@ export const baseTheme = extendTheme({
           },
           '& .MuiSvgIcon-root': {
             color: theme.vars.palette.action.active,
-            [theme.getColorSchemeSelector('dark')]: {
-              color: theme.vars.palette.grey['100'],
-            },
           },
         }),
       },

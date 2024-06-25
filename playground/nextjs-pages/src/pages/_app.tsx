@@ -9,6 +9,7 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core';
 import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
+import LinearProgress from '@mui/material/LinearProgress';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
@@ -53,7 +54,7 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   const { status } = useSession({ required: true });
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return <LinearProgress />;
   }
 
   return children;
@@ -87,10 +88,11 @@ export default function App(props: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? getDefaultLayout;
   const requireAuth = Component.requireAuth ?? true;
 
-  let pageContent = <AppLayout>{getLayout(<Component {...pageProps} />)}</AppLayout>;
+  let pageContent = getLayout(<Component {...pageProps} />);
   if (requireAuth) {
     pageContent = <RequireAuth>{pageContent}</RequireAuth>;
   }
+  pageContent = <AppLayout>{pageContent}</AppLayout>;
 
   return (
     <AppCacheProvider {...props}>

@@ -79,7 +79,7 @@ export function User() {
               variant="outlined"
               size="small"
               color="inherit"
-              endIcon={<LogoutIcon />}
+              startIcon={<LogoutIcon />}
               onClick={authentication?.signOut}
             >
               Sign out

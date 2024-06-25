@@ -55,6 +55,7 @@ export interface SignInPageProps {
 function SignInPage({ providers, signIn }: SignInPageProps) {
   const branding = React.useContext(BrandingContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
+
   return (
     <Container component="main" maxWidth="xs">
       <Box
@@ -83,7 +84,7 @@ function SignInPage({ providers, signIn }: SignInPageProps) {
               return (
                 <form
                   key={provider.id}
-                  action={() => {
+                  onSubmit={() => {
                     signIn(provider);
                   }}
                 >

@@ -34,21 +34,32 @@ const NAVIGATION: Navigation = [
   },
 ];
 
+const BRANDING = {
+  title: 'My Toolpad Core App',
+};
+
 function getDefaultLayout(page: React.ReactElement) {
   return <DashboardLayout>{page}</DashboardLayout>;
 }
 
 export default function App(props: AppPropsWithLayout) {
-  const { Component, pageProps } = props;
+  const {
+    Component,
+    pageProps: { session, ...pageProps },
+  } = props;
 
   const getLayout = Component.getLayout ?? getDefaultLayout;
+
+  console.log('session', session);
 
   return (
     <AppCacheProvider {...props}>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AppProvider navigation={NAVIGATION}>{getLayout(<Component {...pageProps} />)}</AppProvider>
+      <AppProvider navigation={NAVIGATION} branding={BRANDING} session={session}>
+        {getLayout(<Component {...pageProps} />)}
+      </AppProvider>
     </AppCacheProvider>
   );
 }

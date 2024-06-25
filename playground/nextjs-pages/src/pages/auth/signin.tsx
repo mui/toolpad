@@ -10,6 +10,10 @@ export default function SignIn({
   return <SignInPage providers={providers} signIn={(provider) => signIn(provider.id)} />;
 }
 
+SignIn.getLayout = function getLayout(page: React.ReactNode) {
+  return page;
+};
+
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await auth(context);
 

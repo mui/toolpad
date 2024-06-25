@@ -50,6 +50,12 @@ export type NavigationItem = NavigationPageItem | NavigationSubheaderItem | Navi
 
 export type Navigation = NavigationItem[];
 
+export interface Session {
+  user?: {
+    name?: string | null;
+  };
+}
+
 // TODO: hide these contexts from public API
 export const BrandingContext = React.createContext<Branding | null>(null);
 
@@ -73,7 +79,7 @@ export interface AppProviderProps {
    */
   branding?: Branding | null;
   /**
-   * Navigation definition for the app.
+   * Navigation definition        for the app.
    * @default []
    */
   navigation?: Navigation;
@@ -83,6 +89,10 @@ export interface AppProviderProps {
    * @default null
    */
   router?: Router;
+  /**
+   * Session info about the current user.
+   */
+  session?: Session | null;
 }
 
 /**

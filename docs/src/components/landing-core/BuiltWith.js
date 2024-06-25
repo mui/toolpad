@@ -17,9 +17,9 @@ const content = [
     icon: (
       <img src="/static/toolpad/marketing/typescript-svgrepo-com.svg" width={24} alt="Typesript" />
     ),
-    title: 'Typesript',
+    title: 'TypeScript',
     description:
-      'Typescript enhances code maintainability and developer productivity, making it a preferred choice for Toolpad apps.',
+      'TypeScript enhances code maintainability and developer productivity, making it a preferred choice for Toolpad apps.',
   },
   {
     icon: (

@@ -48,7 +48,6 @@ const pages: MuiPage[] = [
       },
     ],
   },
-
   {
     pathname: '/toolpad/core/components-group',
     title: 'Components',
@@ -85,6 +84,20 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-line-chart',
             title: 'Line Chart',
+          },
+        ],
+      },
+      {
+        pathname: '/toolpad/core/components/filter-group',
+        subheader: 'Utils',
+        children: [
+          {
+            pathname: '/toolpad/core/react-use-dialogs',
+            title: 'useDialogs',
+          },
+          {
+            pathname: '/toolpad/core/react-use-notifications',
+            title: 'useNotifications',
           },
         ],
       },

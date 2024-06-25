@@ -10,15 +10,6 @@ interface DelayedInvocation<P extends unknown[]> {
   params: P;
 }
 
-function clear<P extends unknown[]>(
-  delayedInvocation: React.MutableRefObject<DelayedInvocation<P> | null>,
-) {
-  if (delayedInvocation.current) {
-    clearTimeout(delayedInvocation.current.timeout);
-    delayedInvocation.current = null;
-  }
-}
-
 function defer<P extends unknown[]>(
   fn: React.MutableRefObject<Handler<P>>,
   params: P,
@@ -49,6 +40,13 @@ export default function useDebouncedHandler<P extends unknown[]>(
 
   const delayedInvocation = React.useRef<DelayedInvocation<P> | null>(null);
 
+  const clearCurrent = React.useCallback(() => {
+    if (delayedInvocation.current) {
+      clearTimeout(delayedInvocation.current.timeout);
+      delayedInvocation.current = null;
+    }
+  }, []);
+
   React.useEffect(() => {
     if (!delayedInvocation.current) {
       return;
@@ -59,15 +57,15 @@ export default function useDebouncedHandler<P extends unknown[]>(
     const elapsed = Date.now() - startTime;
     const newDelay = Math.max(delay - elapsed, 0);
 
-    clear(delayedInvocation);
+    clearCurrent();
     delayedInvocation.current = defer(fnRef, params, newDelay);
-  }, [delay]);
+  }, [delay, clearCurrent]);
 
   return React.useCallback(
     (...params: P) => {
-      clear(delayedInvocation);
+      clearCurrent();
       delayedInvocation.current = defer(fnRef, params, delay);
     },
-    [delay],
+    [delay, clearCurrent],
   );
 }

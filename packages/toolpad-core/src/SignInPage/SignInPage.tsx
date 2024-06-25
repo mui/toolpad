@@ -84,7 +84,8 @@ function SignInPage({ providers, signIn }: SignInPageProps) {
               return (
                 <form
                   key={provider.id}
-                  onSubmit={() => {
+                  onSubmit={(event) => {
+                    event.preventDefault();
                     signIn(provider);
                   }}
                 >
@@ -121,7 +122,9 @@ function SignInPage({ providers, signIn }: SignInPageProps) {
               <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>
               <Box
                 component="form"
-                action={(formData) => {
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  const formData = new FormData(event.currentTarget);
                   signIn(credentialsProvider, formData);
                 }}
                 noValidate

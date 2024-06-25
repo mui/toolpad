@@ -1,0 +1,2 @@
+notifications.show('Hello', { autoHideDuration: 1000 });
+notifications.show('Goodbye', { autoHideDuration: 1000 });

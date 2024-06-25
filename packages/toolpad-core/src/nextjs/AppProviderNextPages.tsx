@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useRouter } from 'next/router';
 import { asArray } from '@toolpad/utils/collections';
+import { useRouter } from './nextRouter';
 import { AppProvider, AppProviderProps, Navigate, Router } from '../AppProvider';
 
 /**

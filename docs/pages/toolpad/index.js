@@ -12,6 +12,7 @@ import Features from '../../src/components/landing-core/Features';
 import BuiltWith from '../../src/components/landing-core/BuiltWith';
 import StudioIntro from '../../src/components/landing-core/StudioIntro';
 
+
 export default function Home() {
   return (
     <BrandingCssVarsProvider>

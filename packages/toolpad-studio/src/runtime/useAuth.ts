@@ -55,6 +55,10 @@ interface UseAuthInput {
   signInPagePath: string;
 }
 
+function navigateNative(url: string) {
+  window.location.href = url;
+}
+
 export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPayload {
   const location = useLocation();
   const navigate = useNavigate();
@@ -169,7 +173,7 @@ export function useAuth({ dom, basename, signInPagePath }: UseAuthInput): AuthPa
 
         const { url: signInUrl } = await signInResponse.json();
 
-        window.location.href = signInUrl;
+        navigateNative(signInUrl);
       } catch (error) {
         console.error((error as Error).message);
         signOut();

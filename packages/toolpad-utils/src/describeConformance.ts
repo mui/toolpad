@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 export interface ConformanceOptions {
-  refInstanceof: unknown;
+  refInstanceof?: unknown;
   inheritComponent?: React.ElementType;
   skip?: Array<'themeDefaultProps'>;
 }

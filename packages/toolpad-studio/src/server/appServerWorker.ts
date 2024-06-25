@@ -90,6 +90,7 @@ export async function main({ port, ...config }: AppViteServerConfig) {
       }
       case 'exit': {
         await devServer.close();
+        process.exit();
         break;
       }
       default:

@@ -52,8 +52,16 @@ export type Navigation = NavigationItem[];
 
 export interface Session {
   user?: {
+    id?: string | null;
     name?: string | null;
+    image?: string | null;
+    email?: string | null;
   };
+}
+
+export interface Authentication {
+  signIn: () => void;
+  signOut: () => void;
 }
 
 // TODO: hide these contexts from public API
@@ -62,6 +70,10 @@ export const BrandingContext = React.createContext<Branding | null>(null);
 export const NavigationContext = React.createContext<Navigation>([]);
 
 export const RouterContext = React.createContext<Router | null>(null);
+
+export const SessionContext = React.createContext<Session | null>(null);
+
+export const AutheticationContext = React.createContext<Authentication | null>(null);
 
 export interface AppProviderProps {
   /**
@@ -93,6 +105,10 @@ export interface AppProviderProps {
    * Session info about the current user.
    */
   session?: Session | null;
+  /**
+   * Authentication methods.
+   */
+  authentication?: Authentication | null;
 }
 
 /**
@@ -107,21 +123,35 @@ export interface AppProviderProps {
  * - [AppProvider API](https://mui.com/toolpad/core/api/app-provider)
  */
 function AppProvider(props: AppProviderProps) {
-  const { children, theme = baseTheme, branding = null, navigation = [], router = null } = props;
+  const {
+    children,
+    theme = baseTheme,
+    branding = null,
+    navigation = [],
+    router = null,
+    session = null,
+    authentication = null,
+  } = props;
 
   return (
-    <RouterContext.Provider value={router}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <NotificationsProvider>
-          <DialogsProvider>
-            <BrandingContext.Provider value={branding}>
-              <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
-            </BrandingContext.Provider>
-          </DialogsProvider>
-        </NotificationsProvider>
-      </ThemeProvider>
-    </RouterContext.Provider>
+    <AutheticationContext.Provider value={authentication}>
+      <SessionContext.Provider value={session}>
+        <RouterContext.Provider value={router}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <NotificationsProvider>
+              <DialogsProvider>
+                <BrandingContext.Provider value={branding}>
+                  <NavigationContext.Provider value={navigation}>
+                    {children}
+                  </NavigationContext.Provider>
+                </BrandingContext.Provider>
+              </DialogsProvider>
+            </NotificationsProvider>
+          </ThemeProvider>
+        </RouterContext.Provider>
+      </SessionContext.Provider>
+    </AutheticationContext.Provider>
   );
 }
 

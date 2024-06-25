@@ -8,7 +8,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core';
-import { SessionProvider, useSession } from 'next-auth/react';
+import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
@@ -40,6 +40,11 @@ const BRANDING = {
   title: 'My Toolpad Core App',
 };
 
+const AUTHENTICATION = {
+  signIn,
+  signOut,
+};
+
 function getDefaultLayout(page: React.ReactElement) {
   return <DashboardLayout>{page}</DashboardLayout>;
 }
@@ -61,7 +66,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AppProvider navigation={NAVIGATION} branding={BRANDING} session={session}>
+      <AppProvider
+        navigation={NAVIGATION}
+        branding={BRANDING}
+        session={session}
+        authentication={AUTHENTICATION}
+      >
         {children}
       </AppProvider>
     </React.Fragment>

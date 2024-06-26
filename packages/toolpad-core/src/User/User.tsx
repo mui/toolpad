@@ -5,12 +5,12 @@ import Popover from '@mui/material/Popover';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { SessionContext, AutheticationContext } from '../AppProvider/AppProvider';
+import { SessionContext, AuthenticationContext } from '../AppProvider/AppProvider';
 import { SessionAvatar } from './SessionAvatar';
 
 export interface UserProps {}
 
-export/**
+export /**
  *
  * Demos:
  *
@@ -36,7 +36,7 @@ export/**
   const popoverId = React.useId();
   const id = open ? popoverId : undefined;
 
-  const authentication = React.useContext(AutheticationContext);
+  const authentication = React.useContext(AuthenticationContext);
 
   if (!authentication) {
     return null;

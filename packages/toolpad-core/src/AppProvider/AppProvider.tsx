@@ -73,7 +73,7 @@ export const RouterContext = React.createContext<Router | null>(null);
 
 export const SessionContext = React.createContext<Session | null>(null);
 
-export const AutheticationContext = React.createContext<Authentication | null>(null);
+export const AuthenticationContext = React.createContext<Authentication | null>(null);
 
 export interface AppProviderProps {
   /**
@@ -136,7 +136,7 @@ function AppProvider(props: AppProviderProps) {
   } = props;
 
   return (
-    <AutheticationContext.Provider value={authentication}>
+    <AuthenticationContext.Provider value={authentication}>
       <SessionContext.Provider value={session}>
         <RouterContext.Provider value={router}>
           <ThemeProvider theme={theme}>
@@ -153,7 +153,7 @@ function AppProvider(props: AppProviderProps) {
           </ThemeProvider>
         </RouterContext.Provider>
       </SessionContext.Provider>
-    </AutheticationContext.Provider>
+    </AuthenticationContext.Provider>
   );
 }
 

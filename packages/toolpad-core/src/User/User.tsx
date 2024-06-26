@@ -10,7 +10,7 @@ import { SessionAvatar } from './SessionAvatar';
 
 export interface UserProps {}
 
-export /**
+/**
  *
  * Demos:
  *
@@ -19,7 +19,7 @@ export /**
  * API:
  *
  * - [User API](https://mui.com/toolpad/core/api/user)
- */ function User(props: UserProps) {
+ */ function User() {
   const session = React.useContext(SessionContext);
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -95,3 +95,5 @@ export /**
     </React.Fragment>
   );
 }
+
+export { User };

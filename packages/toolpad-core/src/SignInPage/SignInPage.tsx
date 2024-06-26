@@ -51,6 +51,7 @@ export interface SignInPageProps {
   providers?: AuthProvider[];
   signIn: (provider: AuthProvider, formData?: FormData) => void;
 }
+
 /**
  *
  * Demos:

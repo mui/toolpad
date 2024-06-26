@@ -1,28 +1,25 @@
 import * as React from 'react';
 import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
-import Avatar, { AvatarProps } from '@mui/material/Avatar';
 import Popover from '@mui/material/Popover';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { Session, SessionContext, AutheticationContext } from '../AppProvider/AppProvider';
+import { SessionContext, AutheticationContext } from '../AppProvider/AppProvider';
+import { SessionAvatar } from './SessionAvatar';
 
-interface SessionAvatarProps extends AvatarProps {
-  session: Session;
-}
+export interface UserProps {}
 
-function SessionAvatar({ session, ...props }: SessionAvatarProps) {
-  return (
-    <Avatar
-      src={session.user?.image || ''}
-      alt={session.user?.name || session.user?.email || ''}
-      {...props}
-    />
-  );
-}
-
-export function User() {
+export/**
+ *
+ * Demos:
+ *
+ * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
+ *
+ * API:
+ *
+ * - [User API](https://mui.com/toolpad/core/api/user)
+ */ function User(props: UserProps) {
   const session = React.useContext(SessionContext);
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);

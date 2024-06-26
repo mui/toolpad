@@ -103,10 +103,12 @@ export interface AppProviderProps {
   router?: Router;
   /**
    * Session info about the current user.
+   * @default null
    */
   session?: Session | null;
   /**
    * Authentication methods.
+   * @default null
    */
   authentication?: Authentication | null;
 }
@@ -161,6 +163,14 @@ AppProvider.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
+   * Authentication methods.
+   * @default null
+   */
+  authentication: PropTypes.shape({
+    signIn: PropTypes.func.isRequired,
+    signOut: PropTypes.func.isRequired,
+  }),
+  /**
    * Branding options for the app.
    * @default null
    */
@@ -173,7 +183,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * Navigation definition for the app.
+   * Navigation definition        for the app.
    * @default []
    */
   navigation: PropTypes.arrayOf(
@@ -213,6 +223,18 @@ AppProvider.propTypes /* remove-proptypes */ = {
     navigate: PropTypes.func.isRequired,
     pathname: PropTypes.string.isRequired,
     searchParams: PropTypes.instanceOf(URLSearchParams),
+  }),
+  /**
+   * Session info about the current user.
+   * @default null
+   */
+  session: PropTypes.shape({
+    user: PropTypes.shape({
+      email: PropTypes.string,
+      id: PropTypes.string,
+      image: PropTypes.string,
+      name: PropTypes.string,
+    }),
   }),
   /**
    * [Theme](https://mui.com/material-ui/customization/theming/) used by the app.

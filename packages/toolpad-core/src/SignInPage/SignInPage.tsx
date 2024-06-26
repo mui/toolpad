@@ -51,7 +51,16 @@ export interface SignInPageProps {
   providers?: AuthProvider[];
   signIn: (provider: AuthProvider, formData?: FormData) => void;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [Sign In Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ *
+ * API:
+ *
+ * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
+ */
 function SignInPage({ providers, signIn }: SignInPageProps) {
   const branding = React.useContext(BrandingContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');

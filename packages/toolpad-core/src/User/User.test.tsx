@@ -8,10 +8,15 @@ import * as React from 'react';
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import describeConformance from '@toolpad/utils/describeConformance';
 import { User } from './User';
 import { AppProvider } from '../AppProvider';
 
 describe('AppProvider', () => {
+  describeConformance(<User />, () => ({
+    skip: ['themeDefaultProps'],
+  }));
+
   test('renders nothing in button when no authentication', async () => {
     render(<User />);
 

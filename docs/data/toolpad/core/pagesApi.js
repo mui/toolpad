@@ -5,4 +5,6 @@ module.exports = [
   { pathname: '/toolpad/core/api/dialogs-provider' },
   { pathname: '/toolpad/core/api/line-chart' },
   { pathname: '/toolpad/core/api/notifications-provider' },
+  { pathname: '/toolpad/core/api/sign-in-page' },
+  { pathname: '/toolpad/core/api/user' },
 ];

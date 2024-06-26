@@ -1,0 +1,16 @@
+{
+  "props": {},
+  "name": "User",
+  "imports": [
+    "import { User } from '@toolpad-core/User';",
+    "import { User } from '@toolpad-core';"
+  ],
+  "classes": [],
+  "spread": true,
+  "themeDefaultProps": false,
+  "muiName": "User",
+  "filename": "/packages/toolpad-core/src/User/User.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-dashboard-layout/\">Dashboard Layout</a></li></ul>",
+  "cssComponent": false
+}

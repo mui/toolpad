@@ -1,6 +1,10 @@
 {
   "props": {
     "children": { "type": { "name": "node" }, "required": true },
+    "authentication": {
+      "type": { "name": "shape", "description": "{ signIn: func, signOut: func }" },
+      "default": "null"
+    },
     "branding": {
       "type": { "name": "shape", "description": "{ logo?: node, title?: string }" },
       "default": "null"
@@ -16,6 +20,13 @@
       "type": {
         "name": "shape",
         "description": "{ navigate: func, pathname: string, searchParams?: URLSearchParams }"
+      },
+      "default": "null"
+    },
+    "session": {
+      "type": {
+        "name": "shape",
+        "description": "{ user?: { email?: string, id?: string, image?: string, name?: string } }"
       },
       "default": "null"
     },

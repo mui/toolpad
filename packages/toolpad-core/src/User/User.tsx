@@ -41,13 +41,21 @@ export function User() {
 
   const authentication = React.useContext(AutheticationContext);
 
-  if (!session?.user) {
+  if (!authentication) {
     return null;
+  }
+
+  if (!session?.user) {
+    return (
+      <Button variant="text" color="inherit" size="small" onClick={authentication.signIn}>
+        Sign In
+      </Button>
+    );
   }
 
   return (
     <React.Fragment>
-      <IconButton aria-describedby={id} onClick={handleClick}>
+      <IconButton aria-describedby={id} onClick={handleClick} aria-label="Current User">
         <SessionAvatar session={session} sx={{ width: 32, height: 32 }} />
       </IconButton>
       <Popover
@@ -82,7 +90,7 @@ export function User() {
               startIcon={<LogoutIcon />}
               onClick={authentication?.signOut}
             >
-              Sign out
+              Sign Out
             </Button>
           </Stack>
         </Stack>

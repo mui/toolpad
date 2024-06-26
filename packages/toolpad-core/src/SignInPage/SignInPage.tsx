@@ -228,7 +228,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
   /**
    * @ignore
    */
-  signIn: PropTypes.func.isRequired,
+  signIn: PropTypes.func,
 } as any;
 
 export { SignInPage };

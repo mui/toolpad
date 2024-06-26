@@ -6,6 +6,8 @@
     "import { SignInPage } from '@toolpad-core';"
   ],
   "classes": [],
+  "spread": true,
+  "themeDefaultProps": false,
   "muiName": "SignInPage",
   "filename": "/packages/toolpad-core/src/SignInPage/SignInPage.tsx",
   "inheritance": null,

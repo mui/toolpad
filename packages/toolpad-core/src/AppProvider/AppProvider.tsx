@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { CssVarsTheme } from '@mui/material/styles';
+import { CssVarsTheme, Theme } from '@mui/material/styles';
 import { baseTheme } from '../themes';
 import { AppThemeProvider } from './AppThemeProvider';
 import { NotificationsProvider } from '../useNotifications';
@@ -67,7 +67,7 @@ export interface AppProviderProps {
    * [Theme](https://mui.com/material-ui/customization/theming/) to be used by the app in light/dark mode.
    * @default baseTheme
    */
-  theme?: CssVarsTheme;
+  theme?: Theme | { light: Theme; dark: Theme } | CssVarsTheme;
   /**
    * Branding options for the app.
    * @default null

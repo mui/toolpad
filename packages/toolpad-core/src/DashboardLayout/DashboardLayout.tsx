@@ -2,7 +2,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material';
-import { useColorScheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -31,6 +30,7 @@ import {
   NavigationPageItem,
   RouterContext,
 } from '../AppProvider/AppProvider';
+import { PaletteModeContext } from '../AppProvider/AppThemeProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320;
@@ -210,8 +210,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
-
-  const { mode, setMode } = useColorScheme();
+  const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
 
   const [hasMounted, setHasMounted] = React.useState(false);
   React.useEffect(() => {
@@ -219,8 +218,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   }, []);
 
   const toggleMode = React.useCallback(() => {
-    setMode(mode === 'dark' ? 'light' : 'dark');
-  }, [mode, setMode]);
+    setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
+  }, [paletteMode, setPaletteMode]);
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -243,13 +242,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Stack>
           </a>
           <Box sx={{ flexGrow: 1 }} />
-          {hasMounted ? (
-            <Tooltip title={`${mode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
+          {hasMounted && isDualTheme ? (
+            <Tooltip title={`${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
               <IconButton
-                aria-label={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}
+                aria-label={`Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`}
                 onClick={toggleMode}
               >
-                {mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+                {paletteMode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
               </IconButton>
             </Tooltip>
           ) : null}

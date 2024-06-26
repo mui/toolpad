@@ -37,11 +37,6 @@ const IconProviderMap = new Map<string, React.ReactNode>([
   ],
 ]);
 
-const IconBackgroundMap = new Map<string, string>([
-  ['github', '#24292e'],
-  ['credentials', 'default'],
-]);
-
 export interface AuthProvider {
   id: string;
   name: string;
@@ -109,13 +104,12 @@ function SignInPage({ providers, signIn }: SignInPageProps) {
                     name={'provider'}
                     value={provider.id}
                     startIcon={IconProviderMap.get(provider.id)}
+                    color="inherit"
                     sx={{
                       textTransform: 'capitalize',
-                      backgroundColor: IconBackgroundMap.get(provider.id) || '#333',
                       filter: 'opacity(0.9)',
                       transition: 'filter 0.2s ease-in',
                       '&:hover': {
-                        backgroundColor: IconBackgroundMap.get(provider.id) || '#333',
                         filter: 'opacity(1)',
                       },
                     }}
@@ -182,6 +176,7 @@ function SignInPage({ providers, signIn }: SignInPageProps) {
                   size="large"
                   variant="contained"
                   disableElevation
+                  color="inherit"
                   sx={{
                     mt: 3,
                     mb: 2,

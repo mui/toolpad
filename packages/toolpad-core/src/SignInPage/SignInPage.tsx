@@ -44,7 +44,7 @@ export interface AuthProvider {
 
 export interface SignInPageProps {
   providers?: AuthProvider[];
-  signIn: (provider: AuthProvider, formData?: FormData) => void;
+  signIn?: (provider: AuthProvider, formData?: FormData) => void;
 }
 
 /**
@@ -91,7 +91,7 @@ function SignInPage({ providers, signIn }: SignInPageProps) {
                   key={provider.id}
                   onSubmit={(event) => {
                     event.preventDefault();
-                    signIn(provider);
+                    signIn?.(provider);
                   }}
                 >
                   <LoadingButton
@@ -129,7 +129,7 @@ function SignInPage({ providers, signIn }: SignInPageProps) {
                 onSubmit={(event) => {
                   event.preventDefault();
                   const formData = new FormData(event.currentTarget);
-                  signIn(credentialsProvider, formData);
+                  signIn?.(credentialsProvider, formData);
                 }}
                 noValidate
               >
@@ -188,7 +188,7 @@ function SignInPage({ providers, signIn }: SignInPageProps) {
                     },
                   }}
                 >
-                  Sign In
+                  Sign in with username and password
                 </Button>
                 <Grid container>
                   <Grid item xs>

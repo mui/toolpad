@@ -118,12 +118,9 @@ function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
   const isDualTheme = 'light' in theme.colorSchemes && 'dark' in theme.colorSchemes;
 
   return (
-    <React.Fragment>
-      {getInitColorSchemeScript()}
-      <CssVarsProvider theme={theme} defaultMode="system">
-        <CSSVarsThemeConsumer isDualTheme={isDualTheme}>{children}</CSSVarsThemeConsumer>
-      </CssVarsProvider>
-    </React.Fragment>
+    <CssVarsProvider theme={theme} defaultMode="system">
+      <CSSVarsThemeConsumer isDualTheme={isDualTheme}>{children}</CSSVarsThemeConsumer>
+    </CssVarsProvider>
   );
 }
 
@@ -148,7 +145,10 @@ function AppThemeProvider(props: AppThemeProviderProps) {
   );
 
   return isCSSVarsTheme ? (
-    <CSSVarsThemeProvider theme={theme}>{themeChildren}</CSSVarsThemeProvider>
+    <React.Fragment>
+      {getInitColorSchemeScript()}
+      <CSSVarsThemeProvider theme={theme}>{themeChildren}</CSSVarsThemeProvider>
+    </React.Fragment>
   ) : (
     <StandardThemeProvider theme={theme}>{themeChildren}</StandardThemeProvider>
   );

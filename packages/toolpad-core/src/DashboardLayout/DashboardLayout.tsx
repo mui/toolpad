@@ -235,7 +235,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
               <Box sx={{ mr: 1 }}>
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
               </Box>
-              <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
+              <Typography
+                variant="h6"
+                sx={{ color: (theme) => (theme.vars ?? theme).palette.primary.main }}
+              >
                 {branding?.title ?? 'Toolpad'}
               </Typography>
             </Stack>

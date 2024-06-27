@@ -1,6 +1,7 @@
 import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
+import type {} from '@mui/material/themeCssVarsAugmentation';
 
-export const baseTheme = extendTheme({
+const baseTheme = extendTheme({
   colorSchemes: {
     light: {
       palette: {
@@ -138,3 +139,5 @@ export const baseTheme = extendTheme({
     },
   },
 });
+
+export { baseTheme };

@@ -9,17 +9,8 @@ import {
 } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import useLocalStorageState from '@toolpad/utils/hooks/useLocalStorageState';
+import { PaletteModeContext } from '../shared/context';
 import type { AppProviderProps } from './AppProvider';
-
-export const PaletteModeContext = React.createContext<{
-  paletteMode: PaletteMode;
-  setPaletteMode: (mode: PaletteMode) => void;
-  isDualTheme: boolean;
-}>({
-  paletteMode: 'light',
-  setPaletteMode: () => {},
-  isDualTheme: false,
-});
 
 function usePreferredMode() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -129,7 +120,7 @@ function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
   return (
     <React.Fragment>
       {getInitColorSchemeScript()}
-      <CssVarsProvider theme={theme}>
+      <CssVarsProvider theme={theme} defaultMode="system">
         <CSSVarsThemeConsumer isDualTheme={isDualTheme}>{children}</CSSVarsThemeConsumer>
       </CssVarsProvider>
     </React.Fragment>

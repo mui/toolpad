@@ -25,12 +25,11 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   BrandingContext,
-  Navigation,
   NavigationContext,
-  NavigationPageItem,
+  PaletteModeContext,
   RouterContext,
-} from '../AppProvider/AppProvider';
-import { PaletteModeContext } from '../AppProvider/AppThemeProvider';
+} from '../shared/context';
+import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320;

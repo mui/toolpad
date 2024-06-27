@@ -95,6 +95,4 @@ export type Branded<A, B> = A & Brand<B>;
 export type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 export type ExpandNested<T> = T extends infer O ? { [K in keyof O]: Expand<O[K]> } : never;
 
-export type AtLeastOne<T> = { [K in keyof T]: Pick<T, K> }[keyof T];
-
 export {};

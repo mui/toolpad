@@ -2,7 +2,7 @@ import * as React from 'react';
 import { PageContent } from '@toolpad/core/PageContent';
 import { AppProvider } from '@toolpad/core/AppProvider';
 
-const Navigation = [
+const NAVIGATION = [
   {
     kind: 'header',
     title: 'Main items',
@@ -21,7 +21,7 @@ const Navigation = [
 
 export default function BasicPageContent() {
   return (
-    <AppProvider>
+    <AppProvider navigation={NAVIGATION}>
       <PageContent>The content</PageContent>
     </AppProvider>
   );

@@ -6,6 +6,9 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { baseTheme } from '../themes';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
+import { Navigation, NavigationContext } from '../contexts/NavigationContext';
+
+export { Navigation };
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -29,31 +32,8 @@ export interface Branding {
   logo?: React.ReactNode;
 }
 
-export interface NavigationPageItem {
-  kind?: 'page';
-  title?: string;
-  slug: string;
-  icon?: React.ReactNode;
-  children?: NavigationItem[];
-}
-
-export interface NavigationSubheaderItem {
-  kind: 'header';
-  title: string;
-}
-
-export interface NavigationDividerItem {
-  kind: 'divider';
-}
-
-export type NavigationItem = NavigationPageItem | NavigationSubheaderItem | NavigationDividerItem;
-
-export type Navigation = NavigationItem[];
-
 // TODO: hide these contexts from public API
 export const BrandingContext = React.createContext<Branding | null>(null);
-
-export const NavigationContext = React.createContext<Navigation>([]);
 
 export const RouterContext = React.createContext<Router | null>(null);
 
@@ -152,8 +132,8 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
-        slug: PropTypes.string.isRequired,
-        title: PropTypes.string,
+        slug: PropTypes.string,
+        title: PropTypes.string.isRequired,
       }),
       PropTypes.shape({
         kind: PropTypes.oneOf(['header']).isRequired,

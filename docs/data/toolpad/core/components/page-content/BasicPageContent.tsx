@@ -4,7 +4,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 
 const NAVIGATION = [
   {
-    kind: 'header',
+    kind: 'header' as const,
     title: 'Main items',
   },
   {

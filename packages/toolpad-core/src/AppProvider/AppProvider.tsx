@@ -31,10 +31,10 @@ export interface Branding {
 
 export interface NavigationPageItem {
   kind?: 'page';
-  title: string;
-  slug?: string;
+  title?: string;
+  slug: string;
   icon?: React.ReactNode;
-  children?: Navigation;
+  children?: NavigationItem[];
 }
 
 export interface NavigationSubheaderItem {
@@ -77,7 +77,6 @@ export interface AppProviderProps {
    * @default []
    */
   navigation?: Navigation;
-
   /**
    * Router implementation used inside Toolpad components.
    * @default null
@@ -153,8 +152,8 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
-        slug: PropTypes.string,
-        title: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
+        title: PropTypes.string,
       }),
       PropTypes.shape({
         kind: PropTypes.oneOf(['header']).isRequired,

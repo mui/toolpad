@@ -33,14 +33,12 @@ const baseTheme = extendTheme({
     MuiAppBar: {
       styleOverrides: {
         root: ({ theme }) => ({
+          backgroundColor: theme.vars.palette.background.paper,
           borderWidth: 0,
           borderBottomWidth: 1,
           borderStyle: 'solid',
           borderColor: theme.vars.palette.divider,
           boxShadow: 'none',
-          [theme.getColorSchemeSelector('dark')]: {
-            backgroundColor: theme.vars.palette.background.paper,
-          },
         }),
       },
     },

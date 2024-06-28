@@ -25,7 +25,7 @@ Open this <a target="_blank" href="#string-values">page</a> in another tab to se
 
 ### Rich data types
 
-If you need to store values other than srings, you can use the `codec` parameter in the hook options to declare the methods used for serialization and deserialization. A codec contains a `parse` method and `stringify` method.
+If you need to store values other than strings, you can use the `codec` parameter in the hook options to declare the methods used for serialization and deserialization. A codec contains a `parse` method and `stringify` method.
 
 {{"demo": "LocalStorageStateCustom.js"}}
 

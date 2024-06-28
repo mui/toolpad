@@ -8,18 +8,21 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { SessionContext, AuthenticationContext } from '../AppProvider/AppProvider';
 import { SessionAvatar } from './SessionAvatar';
 
-export interface UserProps {}
+export interface AccountProps {}
 
 /**
  *
  * Demos:
  *
+ * - [Account](https://mui.com/toolpad/core/react-account/)
  * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
+ * - [Sign In Page](https://mui.com/toolpad/core/react-sign-in-page/)
  *
  * API:
  *
- * - [User API](https://mui.com/toolpad/core/api/user)
- */ function User() {
+ * - [Account API](https://mui.com/toolpad/core/api/account)
+ */
+function Account() {
   const session = React.useContext(SessionContext);
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -96,4 +99,4 @@ export interface UserProps {}
   );
 }
 
-export { User };
+export { Account };

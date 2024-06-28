@@ -4,7 +4,6 @@ import { SignInPage } from '@toolpad/core';
 const providers = [
   { id: 'github', name: 'GitHub' },
   { id: 'google', name: 'Google' },
-  { id: 'facebook', name: 'Facebook' },
 ];
 
 export default function BasicSignInPage() {

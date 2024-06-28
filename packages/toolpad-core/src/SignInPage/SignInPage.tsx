@@ -43,7 +43,17 @@ export interface AuthProvider {
 }
 
 export interface SignInPageProps {
+  /**
+   * The list of authentication providers to display.
+   * @default []
+   */
   providers?: AuthProvider[];
+  /**
+   * Callback fired when a user signs in.
+   * @param provider The authentication provider.
+   * @param formData The form data if the provider is 'credentials'.
+   * @default undefined
+   */
   signIn?: (provider: AuthProvider, formData?: FormData) => void;
 }
 
@@ -57,7 +67,8 @@ export interface SignInPageProps {
  *
  * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
  */
-function SignInPage({ providers, signIn }: SignInPageProps) {
+function SignInPage(props: SignInPageProps) {
+  const { providers, signIn } = props;
   const branding = React.useContext(BrandingContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
 

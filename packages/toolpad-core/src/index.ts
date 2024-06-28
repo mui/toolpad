@@ -10,7 +10,7 @@ export * from './LineChart';
 
 export * from './SignInPage';
 
-export * from './User';
+export * from './Account';
 
 export * from './useDialogs';
 

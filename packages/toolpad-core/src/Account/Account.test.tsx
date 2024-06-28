@@ -9,16 +9,16 @@ import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import describeConformance from '@toolpad/utils/describeConformance';
-import { User } from './User';
+import { Account } from './Account';
 import { AppProvider } from '../AppProvider';
 
 describe('AppProvider', () => {
-  describeConformance(<User />, () => ({
+  describeConformance(<Account />, () => ({
     skip: ['themeDefaultProps'],
   }));
 
   test('renders nothing in button when no authentication', async () => {
-    render(<User />);
+    render(<Account />);
 
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
@@ -27,7 +27,7 @@ describe('AppProvider', () => {
     const auth = { signIn: vi.fn(), signOut: vi.fn() };
     render(
       <AppProvider authentication={auth}>
-        <User />
+        <Account />
       </AppProvider>,
     );
 
@@ -43,7 +43,7 @@ describe('AppProvider', () => {
     const session = { user: { name: 'John Doe', email: 'john@example.com' } };
     render(
       <AppProvider authentication={auth} session={session}>
-        <User />
+        <Account />
       </AppProvider>,
     );
 

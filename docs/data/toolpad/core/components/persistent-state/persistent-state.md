@@ -7,7 +7,7 @@ title: Persistent storage state
 
 <p class="description">Hooks for synchronizing React state with browser storage.</p>
 
-Toolpad provides a set of primitives that harmonize how you deal with persisting global state in the browser. Through our hooks you can synchronise React state with local storage or session storage, or in the url as a query parameter. These hooks all follow a similar philosophy, they identify their data with unique key and support rich data types through the use of codecs.
+Toolpad provides a set of primitives that harmonize how you deal with persisting global state in the browser. Through our hooks you can synchronise React state with local storage or session storage, or in the url as a query parameter. These hooks all follow a similar philosophy: they identify their data with a unique key and support rich data types through the use of codecs.
 
 The hook's signature intentionally resembles the `React.useState` hook. Where the first parameter represents the key under which to store the state in the browser, and the second parameter corresponds to the initial value. An optional third parameter can be used to configure the hook.
 

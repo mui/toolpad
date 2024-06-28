@@ -168,7 +168,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
     searchParams: PropTypes.instanceOf(URLSearchParams),
   }),
   /**
-   * [Theme](https://mui.com/material-ui/customization/theming/) used by the app.
+   * [Theme](https://mui.com/material-ui/customization/theming/) to be used by the app in light/dark mode.
    * @default baseTheme
    */
   theme: PropTypes.object,

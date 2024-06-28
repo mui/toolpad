@@ -132,8 +132,8 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
-        slug: PropTypes.string,
-        title: PropTypes.string.isRequired,
+        slug: PropTypes.string.isRequired,
+        title: PropTypes.string,
       }),
       PropTypes.shape({
         kind: PropTypes.oneOf(['header']).isRequired,

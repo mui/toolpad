@@ -47,12 +47,12 @@ describe('DashboardLayout', () => {
       },
       {
         title: 'Dashboard',
-        slug: '/dashboard',
+        slug: 'dashboard',
         icon: <DashboardIcon />,
       },
       {
         title: 'Orders',
-        slug: '/orders',
+        slug: 'orders',
         icon: <ShoppingCartIcon />,
       },
       {

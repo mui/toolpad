@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/studio",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "bin": {
     "toolpad-studio": "./cli.mjs"

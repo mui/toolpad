@@ -6,7 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { baseTheme } from '../themes';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
-import { Navigation, NavigationContext } from '../contexts/NavigationContext';
+import { type Navigation, NavigationContext } from '../contexts/NavigationContext';
 
 export { Navigation };
 

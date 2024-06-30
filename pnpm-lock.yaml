@@ -668,8 +668,8 @@ importers:
         specifier: 8.11.0
         version: 8.11.0(encoding@0.1.13)
       '@googleapis/sheets':
-        specifier: 8.0.0
-        version: 8.0.0(encoding@0.1.13)
+        specifier: 9.0.0
+        version: 9.0.0(encoding@0.1.13)
       '@mui/icons-material':
         specifier: 5.15.21
         version: 5.15.21(@mui/material@5.15.21(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
@@ -2342,6 +2342,10 @@ packages:
 
   '@googleapis/sheets@8.0.0':
     resolution: {integrity: sha512-EwLC+bMLTz3n2EDJMhMdrNR+aTxDBPpcq3k6Ibc4eKrp8UbytNAEB0VgfQFOGJN7+BTCcjiojt08O/cwn+YnHg==}
+    engines: {node: '>=12.0.0'}
+
+  '@googleapis/sheets@9.0.0':
+    resolution: {integrity: sha512-CKoczlGSjWlPyous7nX626b/Bj9BK9DiVxaMwzWK8bkm1qk7VrSg/074y+XFQ+QPyyNyOIWB9tOFm99/PbEhXw==}
     engines: {node: '>=12.0.0'}
 
   '@grpc/grpc-js@1.10.9':
@@ -11211,6 +11215,13 @@ snapshots:
       - supports-color
 
   '@googleapis/sheets@8.0.0(encoding@0.1.13)':
+    dependencies:
+      googleapis-common: 7.2.0(encoding@0.1.13)
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@googleapis/sheets@9.0.0(encoding@0.1.13)':
     dependencies:
       googleapis-common: 7.2.0(encoding@0.1.13)
     transitivePeerDependencies:

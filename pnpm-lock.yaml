@@ -665,8 +665,8 @@ importers:
         specifier: 11.11.5
         version: 11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@googleapis/drive':
-        specifier: 8.10.0
-        version: 8.10.0(encoding@0.1.13)
+        specifier: 8.11.0
+        version: 8.11.0(encoding@0.1.13)
       '@googleapis/sheets':
         specifier: 8.0.0
         version: 8.0.0(encoding@0.1.13)
@@ -2336,8 +2336,8 @@ packages:
   '@floating-ui/utils@0.2.2':
     resolution: {integrity: sha512-J4yDIIthosAsRZ5CPYP/jQvUAQtlZTTD/4suA08/FEnlxqW3sKS9iAhgsa9VYLZ6vDHn/ixJgIqRQPotoBjxIw==}
 
-  '@googleapis/drive@8.10.0':
-    resolution: {integrity: sha512-loumtaDmAn2JvU4KuFMhhtaYG1Hxw0RVS4vl+rOWMU7NAU151XYfIWFDJfFFZjvYZxH4tbsmHEnF+DKH1hQ75Q==}
+  '@googleapis/drive@8.11.0':
+    resolution: {integrity: sha512-HW6/2oThc4X086mGkZxpdP4P+aHpYbjHa6wr9l1F/R+snpk6G8/EuRXEcTkgQUl2t/NdNz3lj8re0AQBG5faSA==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sheets@8.0.0':
@@ -11284,7 +11284,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.2': {}
 
-  '@googleapis/drive@8.10.0(encoding@0.1.13)':
+  '@googleapis/drive@8.11.0(encoding@0.1.13)':
     dependencies:
       googleapis-common: 7.2.0(encoding@0.1.13)
     transitivePeerDependencies:

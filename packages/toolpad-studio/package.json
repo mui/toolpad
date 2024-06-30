@@ -121,7 +121,7 @@
     "path-to-regexp": "6.2.2",
     "perf-cascade": "3.0.3",
     "pg": "8.12.0",
-    "piscina": "4.5.1",
+    "piscina": "4.6.1",
     "prettier": "3.3.2",
     "pretty-bytes": "6.1.1",
     "react": "18.3.1",

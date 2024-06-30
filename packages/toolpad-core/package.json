@@ -56,7 +56,7 @@
     "@mui/utils": "5.15.20",
     "@mui/x-charts": "7.8.0",
     "@mui/x-data-grid": "7.8.0",
-    "@tanstack/react-query": "5.45.1",
+    "@tanstack/react-query": "5.49.0",
     "@toolpad/utils": "workspace:*",
     "client-only": "^0.0.1",
     "invariant": "2.2.4",

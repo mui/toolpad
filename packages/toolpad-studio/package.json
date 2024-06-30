@@ -136,7 +136,7 @@
     "semver": "7.6.2",
     "serialize-javascript": "6.0.2",
     "superjson": "2.0.0",
-    "typescript": "5.4.5",
+    "typescript": "5.5.2",
     "vite": "5.3.2",
     "vm-browserify": "1.1.2",
     "whatwg-url": "14.0.0",

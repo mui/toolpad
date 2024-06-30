@@ -58,7 +58,7 @@
     "@mui/monorepo": "github:mui/material-ui#c47e4d83785b3f4eda5c738442c18ad7befcacb9",
     "@mui/x-charts": "7.8.0",
     "@next/eslint-plugin-next": "14.2.4",
-    "@playwright/test": "1.44.1",
+    "@playwright/test": "1.45.0",
     "@testing-library/react": "16.0.0",
     "@testing-library/user-event": "14.5.2",
     "@types/archiver": "6.0.2",

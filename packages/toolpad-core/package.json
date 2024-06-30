@@ -73,7 +73,7 @@
     "@vitest/browser": "beta",
     "next": "^14.2.4",
     "next-router-mock": "^0.9.13",
-    "playwright": "^1.44.1",
+    "playwright": "^1.45.0",
     "sinon": "^18.0.0",
     "vitest": "beta"
   },

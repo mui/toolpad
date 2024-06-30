@@ -818,8 +818,8 @@ importers:
         specifier: 4.0.3
         version: 4.0.3
       monaco-editor:
-        specifier: 0.49.0
-        version: 0.49.0
+        specifier: 0.50.0
+        version: 0.50.0
       mysql2:
         specifier: 3.10.1
         version: 3.10.1
@@ -7397,8 +7397,8 @@ packages:
   module-details-from-path@1.0.3:
     resolution: {integrity: sha512-ySViT69/76t8VhE1xXHK6Ch4NcDd26gx0MzKXLO+F7NOtnqH68d9zF94nT8ZWSxXh8ELOERsnJO/sWt1xZYw5A==}
 
-  monaco-editor@0.49.0:
-    resolution: {integrity: sha512-2I8/T3X/hLxB2oPHgqcNYUVdA/ZEFShT7IAujifIPMfKkNbLOqY8XCoyHCXrsdjb36dW9MwoTwBCFpXKMwNwaQ==}
+  monaco-editor@0.50.0:
+    resolution: {integrity: sha512-8CclLCmrRRh+sul7C08BmPBP3P8wVWfBHomsTcndxg5NRCEPfu/mc2AGU8k37ajjDVXcXFc12ORAMUkmk+lkFA==}
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -17253,7 +17253,7 @@ snapshots:
 
   module-details-from-path@1.0.3: {}
 
-  monaco-editor@0.49.0: {}
+  monaco-editor@0.50.0: {}
 
   mri@1.2.0: {}
 

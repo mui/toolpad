@@ -80,8 +80,8 @@ export default function App(props) {
 
 An `AppProvider` can set a visual theme for all elements inside it to adopt via the `theme` prop. This prop can be set in a few distinct ways with different advantages and disadvantages:
 
-1. [CSS Variables Theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/): the default and recommended theming option for Toolpad applications, as despite being an experimental feature it is the only option that prevents issues such as [dark-mode SSR flickering](https://github.com/mui/material-ui/issues/27651), and it supports both light and dark mode with a single theme definition. The provided default theme in Toolpad, as well as any theme that can be imported from `@toolpad-core/themes` are already in this format.
-2. [Standard Material UI Theme](https://mui.com/material-ui/customization/theming/): a single standard Material UI theme can be provided as the only theme to be used.
+1. [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/): the default and recommended theming option for Toolpad applications, as despite being an experimental feature it is the only option that prevents issues such as [dark-mode SSR flickering](https://github.com/mui/material-ui/issues/27651), and it supports both light and dark mode with a single theme definition. The provided default theme in Toolpad, as well as any theme that can be imported from `@toolpad-core/themes` are already in this format.
+2. [Standard Material UI theme](https://mui.com/material-ui/customization/theming/): a single standard Material UI theme can be provided as the only theme to be used.
 3. **Light and dark themes**: two separate Material UI themes can be provided for light and dark mode in an object with the format `{ light: Theme, dark: Theme }`
 
 {{"demo": "AppProviderTheme.js", "height": 500, "iframe": true}}

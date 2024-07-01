@@ -16,7 +16,7 @@ Many features of this component are configurable through the [AppProvider](https
 
 A `DashboardLayout` brings in a header and sidebar with navigation, as well as a scrollable area for page content.
 
-If application [themes](https://mui.com/toolpad/core/react-app-provider/#theming) are defined for both light and dark mode, a theme switcher in the header allows for easily switching between the two modes.
+If application [themes](https://mui.com/toolpad/core/react-app-provider/#theming) are defined for both light and dark mode, a theme switcher in the header allows for easy switching between the two modes.
 
 {{"demo": "DashboardLayoutBasic.js", "height": 500, "iframe": true}}
 

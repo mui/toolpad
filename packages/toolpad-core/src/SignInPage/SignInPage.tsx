@@ -228,6 +228,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
+   * @ignore
    * The list of authentication providers to display.
    * @default []
    */
@@ -238,6 +239,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
     }),
   ),
   /**
+   * @ignore
    * Callback fired when a user signs in.
    * @param provider The authentication provider.
    * @param formData The form data if the provider is 'credentials'.

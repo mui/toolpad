@@ -11,6 +11,6 @@
     "@toolpad/studio": "0.3.0"
   },
   "devDependencies": {
-    "assemblyscript": "0.27.27"
+    "assemblyscript": "0.27.28"
   }
 }

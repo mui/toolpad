@@ -67,6 +67,7 @@ export default function DashboardLayoutBasic() {
   }, [pathname]);
 
   return (
+    // preview-start
     <AppProvider navigation={NAVIGATION} router={router}>
       <DashboardLayout>
         <Box
@@ -81,5 +82,6 @@ export default function DashboardLayoutBasic() {
         </Box>
       </DashboardLayout>
     </AppProvider>
+    // preview-end
   );
 }

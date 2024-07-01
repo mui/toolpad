@@ -19,11 +19,6 @@ const NAVIGATION = [
   },
 ];
 
-const BRANDING = {
-  logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
-  title: 'MUI',
-};
-
 export default function DashboardLayoutBranding() {
   const [pathname, setPathname] = React.useState('/page');
 
@@ -36,7 +31,15 @@ export default function DashboardLayoutBranding() {
   }, [pathname]);
 
   return (
-    <AppProvider navigation={NAVIGATION} branding={BRANDING} router={router}>
+    // preview-start
+    <AppProvider
+      navigation={NAVIGATION}
+      branding={{
+        logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+        title: 'MUI',
+      }}
+      router={router}
+    >
       <DashboardLayout>
         <Box
           sx={{
@@ -50,5 +53,6 @@ export default function DashboardLayoutBranding() {
         </Box>
       </DashboardLayout>
     </AppProvider>
+    // preview-end
   );
 }

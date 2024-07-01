@@ -5,7 +5,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation, Branding } from '@toolpad/core';
+import type { Navigation } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {
@@ -20,11 +20,6 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-const BRANDING: Branding = {
-  logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
-  title: 'MUI',
-};
-
 export default function DashboardLayoutBranding() {
   const [pathname, setPathname] = React.useState('/page');
 
@@ -37,7 +32,15 @@ export default function DashboardLayoutBranding() {
   }, [pathname]);
 
   return (
-    <AppProvider navigation={NAVIGATION} branding={BRANDING} router={router}>
+    // preview-start
+    <AppProvider
+      navigation={NAVIGATION}
+      branding={{
+        logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+        title: 'MUI',
+      }}
+      router={router}
+    >
       <DashboardLayout>
         <Box
           sx={{
@@ -51,5 +54,6 @@ export default function DashboardLayoutBranding() {
         </Box>
       </DashboardLayout>
     </AppProvider>
+    // preview-end
   );
 }

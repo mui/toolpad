@@ -1,4 +1,4 @@
-<AppProvider navigation={NAVIGATION} router={router}>
+<AppProvider navigation={NAVIGATION} router={router} theme={{ light: baseLightTheme, dark: baseDarkTheme }}>
   <DashboardLayout>
     <Box
       sx={{

@@ -140,6 +140,7 @@
     },
   ]}
   router={router}
+  theme={{ light: baseLightTheme, dark: baseDarkTheme }}
 >
   <DashboardLayout>
     <Box

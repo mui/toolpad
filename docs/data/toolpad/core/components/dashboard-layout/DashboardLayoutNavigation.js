@@ -5,6 +5,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FolderIcon from '@mui/icons-material/Folder';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 
 export default function DashboardLayoutNavigation() {
   const [pathname, setPathname] = React.useState('/page');
@@ -161,6 +162,7 @@ export default function DashboardLayoutNavigation() {
         },
       ]}
       router={router}
+      theme={{ light: baseLightTheme, dark: baseDarkTheme }}
     >
       <DashboardLayout>
         <Box

@@ -5,6 +5,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 
 const NAVIGATION = [
   {
@@ -39,6 +40,7 @@ export default function DashboardLayoutBranding() {
         title: 'MUI',
       }}
       router={router}
+      theme={{ light: baseLightTheme, dark: baseDarkTheme }}
     >
       <DashboardLayout>
         <Box

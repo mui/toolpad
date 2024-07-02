@@ -19,7 +19,7 @@
       },
       "default": "null"
     },
-    "theme": { "type": { "name": "object" }, "default": "baseTheme" }
+    "theme": { "type": { "name": "object" }, "default": "baseCSSVarsTheme" }
   },
   "name": "AppProvider",
   "imports": [

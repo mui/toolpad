@@ -1,12 +1,4 @@
-<AppProvider
-  navigation={NAVIGATION}
-  branding={{
-    logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
-    title: 'MUI',
-  }}
-  router={router}
-  theme={{ light: baseLightTheme, dark: baseDarkTheme }}
->
+<AppProvider navigation={NAVIGATION} router={router} theme={customTheme}>
   <DashboardLayout>
     <Box
       sx={{

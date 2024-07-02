@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -9,6 +8,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 
 const NAVIGATION = [
   {
@@ -72,14 +72,7 @@ export default function DashboardLayoutBasic() {
     <AppProvider
       navigation={NAVIGATION}
       router={router}
-      theme={{
-        light: createTheme(),
-        dark: createTheme({
-          palette: {
-            mode: 'dark',
-          },
-        }),
-      }}
+      theme={{ light: baseLightTheme, dark: baseDarkTheme }}
     >
       <DashboardLayout>
         <Box

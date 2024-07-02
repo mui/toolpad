@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { CssVarsTheme, Theme } from '@mui/material/styles';
-import { baseTheme } from '../themes';
+import { baseCSSVarsTheme } from '../themes';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
 import { BrandingContext, NavigationContext, RouterContext } from '../shared/context';
@@ -58,7 +58,7 @@ export interface AppProviderProps {
   children: React.ReactNode;
   /**
    * [Theme](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
-   * @default baseTheme
+   * @default baseCSSVarsTheme
    */
   theme?: Theme | { light: Theme; dark: Theme } | CssVarsTheme;
   /**
@@ -91,7 +91,13 @@ export interface AppProviderProps {
  * - [AppProvider API](https://mui.com/toolpad/core/api/app-provider)
  */
 function AppProvider(props: AppProviderProps) {
-  const { children, theme = baseTheme, branding = null, navigation = [], router = null } = props;
+  const {
+    children,
+    theme = baseCSSVarsTheme,
+    branding = null,
+    navigation = [],
+    router = null,
+  } = props;
 
   return (
     <RouterContext.Provider value={router}>
@@ -169,7 +175,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
   }),
   /**
    * [Theme](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
-   * @default baseTheme
+   * @default baseCSSVarsTheme
    */
   theme: PropTypes.object,
 } as any;

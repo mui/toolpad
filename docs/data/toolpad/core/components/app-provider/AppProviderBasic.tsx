@@ -5,6 +5,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 import type { Navigation, Router } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
@@ -38,7 +39,11 @@ export default function AppProviderBasic() {
 
   return (
     // preview-start
-    <AppProvider navigation={NAVIGATION} router={router}>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={{ light: baseLightTheme, dark: baseDarkTheme }}
+    >
       <DashboardLayout>
         <Box
           sx={{

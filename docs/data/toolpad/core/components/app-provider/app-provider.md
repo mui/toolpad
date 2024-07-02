@@ -18,7 +18,7 @@ Wrap an application page with the `AppProvider` component.
 
 Ideally, the `AppProvider` should wrap every page in the application, therefore in most projects it should be imported and placed in the file that defines a **shared layout** for all pages.
 
-In the following example, an `AppProvider` component wrapping the page provides it with a default theme, and a `DashboardLayout` placed inside it gets its navigation and routing features automatically set based on the props passed to the `AppProvider`.
+In the following (purely demonstrative) example, an `AppProvider` component wrapping the page provides it with a default theme, and a `DashboardLayout` placed inside it gets its navigation and routing features automatically set based on the props passed to the `AppProvider`.
 
 {{"demo": "AppProviderBasic.js", "height": 500, "iframe": true}}
 
@@ -80,7 +80,7 @@ export default function App(props) {
 
 An `AppProvider` can set a visual theme for all elements inside it to adopt via the `theme` prop. This prop can be set in a few distinct ways with different advantages and disadvantages:
 
-1. [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/): the default and recommended theming option for Toolpad applications, as despite being an experimental feature it is the only option that prevents issues such as [dark-mode SSR flickering](https://github.com/mui/material-ui/issues/27651), and it supports both light and dark mode with a single theme definition. The provided default theme in Toolpad, as well as any theme that can be imported from `@toolpad-core/themes` are already in this format.
+1. [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/): the default and recommended theming option for Toolpad applications, as it is the only option that prevents issues such as [dark-mode SSR flickering](https://github.com/mui/material-ui/issues/27651) and supports both light and dark mode with a single theme definition. The provided default theme in Toolpad is already in this format.
 2. [Standard Material UI theme](https://mui.com/material-ui/customization/theming/): a single standard Material UI theme can be provided as the only theme to be used.
 3. **Light and dark themes**: two separate Material UI themes can be provided for light and dark mode in an object with the format `{ light: Theme, dark: Theme }`
 
@@ -88,8 +88,8 @@ An `AppProvider` can set a visual theme for all elements inside it to adopt via 
 
 ### Predefined themes
 
-A set of predefined themes that work well with Toolpad applications can be imported from `@toolpad-core/themes`.
+A set of predefined themes that work well with Toolpad applications can be imported from `@toolpad/core/themes`.
 
 ```tsx
-import { baseTheme } from '@toolpad-core/themes';
+import { baseCSSVarsTheme } from '@toolpad/core/themes';
 ```

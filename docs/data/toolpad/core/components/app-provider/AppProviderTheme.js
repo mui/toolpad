@@ -24,7 +24,7 @@ const NAVIGATION = [
   },
 ];
 
-const theme = extendTheme({
+const customTheme = extendTheme({
   colorSchemes: {
     light: {
       palette: {
@@ -174,7 +174,7 @@ export default function AppProviderTheme() {
 
   return (
     // preview-start
-    <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
+    <AppProvider navigation={NAVIGATION} router={router} theme={customTheme}>
       <DashboardLayout>
         <Box
           sx={{

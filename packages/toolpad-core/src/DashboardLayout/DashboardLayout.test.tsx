@@ -11,8 +11,11 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
 import { BrandingContext, NavigationContext } from '../shared/context';
 import type { Navigation } from '../AppProvider';
+import { AppThemeProvider } from '../AppProvider/AppThemeProvider';
+import { baseDarkTheme, baseLightTheme } from '../themes';
 import { DashboardLayout } from './DashboardLayout';
 
 describe('DashboardLayout', () => {
@@ -38,6 +41,29 @@ describe('DashboardLayout', () => {
 
     expect(within(header).getByText('My Company')).toBeTruthy();
     expect(within(header).getByAltText('Placeholder Logo')).toBeTruthy();
+  });
+
+  test('can switch theme', async () => {
+    const user = userEvent.setup();
+    render(
+      <AppThemeProvider theme={{ light: baseLightTheme, dark: baseDarkTheme }}>
+        <DashboardLayout>Hello world</DashboardLayout>
+      </AppThemeProvider>,
+    );
+
+    const header = screen.getByRole('banner');
+
+    const themeSwitcherButton = within(header).getByLabelText('Switch to dark mode');
+
+    expect(document.body).toHaveStyle(`background-color: rgb(250, 250, 250)`);
+
+    await user.click(themeSwitcherButton);
+
+    expect(document.body).toHaveStyle(`background-color: rgb(33, 33, 33)`);
+
+    await user.click(themeSwitcherButton);
+
+    expect(document.body).toHaveStyle(`background-color: rgb(250, 250, 250)`);
   });
 
   test('navigation works correctly', async () => {

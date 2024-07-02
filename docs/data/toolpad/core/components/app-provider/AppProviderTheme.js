@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -24,27 +24,12 @@ const NAVIGATION = [
   },
 ];
 
-const customTheme = extendTheme({
-  colorSchemes: {
-    light: {
-      palette: {
-        background: {
-          default: 'var(--mui-palette-grey-50)',
-          defaultChannel: 'var(--mui-palette-grey-50)',
-        },
-      },
-    },
-    dark: {
-      palette: {
-        background: {
-          default: 'var(--mui-palette-grey-900)',
-          defaultChannel: 'var(--mui-palette-grey-900)',
-        },
-        text: {
-          primary: 'var(--mui-palette-grey-200)',
-          primaryChannel: 'var(--mui-palette-grey-200)',
-        },
-      },
+const defaultDarkTheme = createTheme({ palette: { mode: 'dark' } });
+
+const customTheme = createTheme(defaultDarkTheme, {
+  palette: {
+    background: {
+      default: '#2A4364',
     },
   },
   typography: {
@@ -55,20 +40,21 @@ const customTheme = extendTheme({
   components: {
     MuiAppBar: {
       styleOverrides: {
-        root: ({ theme }) => ({
-          backgroundColor: theme.vars.palette.background.paper,
+        root: {
+          backgroundColor: '#112E4D',
+          backgroundImage: 'none',
           borderWidth: 0,
           borderBottomWidth: 1,
           borderStyle: 'solid',
-          borderColor: theme.vars.palette.divider,
+          borderColor: defaultDarkTheme.palette.divider,
           boxShadow: 'none',
-        }),
+        },
       },
     },
-    MuiToolbar: {
+    MuiDrawer: {
       styleOverrides: {
-        root: {
-          backgroundColor: 'inherit',
+        paper: {
+          backgroundColor: '#112E4D',
         },
       },
     },
@@ -81,24 +67,21 @@ const customTheme = extendTheme({
     },
     MuiIconButton: {
       styleOverrides: {
-        root: ({ theme }) => ({
-          color: theme.vars.palette.primary.dark,
+        root: {
+          color: defaultDarkTheme.palette.primary.dark,
           padding: 8,
-        }),
+        },
       },
     },
     MuiListSubheader: {
       styleOverrides: {
-        root: ({ theme }) => ({
-          color: theme.vars.palette.grey['600'],
+        root: {
+          backgroundColor: '#112E4D',
           fontSize: 12,
           fontWeight: '700',
           height: 40,
           paddingLeft: 32,
-          [theme.getColorSchemeSelector('dark')]: {
-            color: theme.vars.palette.grey['500'],
-          },
-        }),
+        },
       },
     },
     MuiListItem: {
@@ -111,26 +94,26 @@ const customTheme = extendTheme({
     },
     MuiListItemButton: {
       styleOverrides: {
-        root: ({ theme }) => ({
+        root: {
           borderRadius: 8,
           '&.Mui-selected': {
             '& .MuiListItemIcon-root': {
-              color: theme.vars.palette.primary.dark,
+              color: defaultDarkTheme.palette.primary.dark,
             },
             '& .MuiTypography-root': {
-              color: theme.vars.palette.primary.dark,
+              color: defaultDarkTheme.palette.primary.dark,
             },
             '& .MuiSvgIcon-root': {
-              color: theme.vars.palette.primary.dark,
+              color: defaultDarkTheme.palette.primary.dark,
             },
             '& .MuiTouchRipple-child': {
-              backgroundColor: theme.vars.palette.primary.dark,
+              backgroundColor: defaultDarkTheme.palette.primary.dark,
             },
           },
           '& .MuiSvgIcon-root': {
-            color: theme.vars.palette.action.active,
+            color: defaultDarkTheme.palette.action.active,
           },
-        }),
+        },
       },
     },
     MuiListItemText: {

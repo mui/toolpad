@@ -88,7 +88,7 @@ An `AppProvider` can set a visual theme for all elements inside it to adopt via 
 
 ### Predefined themes
 
-A set of predefined themes that work well with Toolpad applications can be imported:
+A set of predefined themes that work well with Toolpad applications can be imported from `@toolpad-core/themes`.
 
 ```tsx
 import { baseTheme } from '@toolpad-core/themes';

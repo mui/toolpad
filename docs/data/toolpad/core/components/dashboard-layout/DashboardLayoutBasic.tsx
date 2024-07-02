@@ -2,6 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import { createTheme } from '@mui/material/styles';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -69,7 +70,18 @@ export default function DashboardLayoutBasic() {
 
   return (
     // preview-start
-    <AppProvider navigation={NAVIGATION} router={router}>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={{
+        light: createTheme(),
+        dark: createTheme({
+          palette: {
+            mode: 'dark',
+          },
+        }),
+      }}
+    >
       <DashboardLayout>
         <Box
           sx={{

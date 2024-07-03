@@ -249,12 +249,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           >
             <MenuIcon />
           </IconButton>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="center"
-            sx={{ flex: { xs: 1, md: 0 } }}
-          >
+          <Stack direction="row" justifyContent="center" sx={{ flex: { xs: 1, md: 0 } }}>
             <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
               <Stack direction="row" alignItems="center">
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>

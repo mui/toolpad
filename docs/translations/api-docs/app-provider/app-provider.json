@@ -6,7 +6,7 @@
     "navigation": { "description": "Navigation definition for the app." },
     "router": { "description": "Router implementation used inside Toolpad components." },
     "theme": {
-      "description": "<a href=\"https://mui.com/toolpad/core/react-app-provider/#theming\">Theme</a> to be used by the app in light/dark mode. A <a href=\"https://mui.com/material-ui/experimental-api/css-theme-variables/overview/\">CSS variables theme</a> is recommended."
+      "description": "<a href=\"https://mui.com/toolpad/core/react-app-provider/#theming\">Theme or themes</a> to be used by the app in light/dark mode. A <a href=\"https://mui.com/material-ui/experimental-api/css-theme-variables/overview/\">CSS variables theme</a> is recommended."
     }
   },
   "classDescriptions": {}

@@ -57,7 +57,7 @@ export interface AppProviderProps {
    */
   children: React.ReactNode;
   /**
-   * [Theme](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
+   * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
    * @default baseCSSVarsTheme
    */
   theme?: Theme | { light: Theme; dark: Theme } | CssVarsTheme;
@@ -174,7 +174,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
     searchParams: PropTypes.instanceOf(URLSearchParams),
   }),
   /**
-   * [Theme](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
+   * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
    * @default baseCSSVarsTheme
    */
   theme: PropTypes.object,

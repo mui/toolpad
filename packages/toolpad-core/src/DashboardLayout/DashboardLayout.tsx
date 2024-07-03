@@ -16,8 +16,10 @@ import ListSubheader from '@mui/material/ListSubheader';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   BrandingContext,
   Navigation,
@@ -205,6 +207,30 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 
+  const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
+
+  const handleNavigationToggle = React.useCallback(() => {
+    setIsMobileNavigationOpen((previousIsOpen) => !previousIsOpen);
+  }, []);
+
+  const drawerContent = (
+    <React.Fragment>
+      <Toolbar />
+      <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}>
+        <DashboardSidebarSubNavigation subNavigation={navigation} />
+      </Box>
+    </React.Fragment>
+  );
+
+  const drawerSx = {
+    width: DRAWER_WIDTH,
+    flexShrink: 0,
+    [`& .MuiDrawer-paper`]: {
+      width: DRAWER_WIDTH,
+      boxSizing: 'border-box',
+    },
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar
@@ -215,37 +241,53 @@ function DashboardLayout(props: DashboardLayoutProps) {
         }}
       >
         <Toolbar>
-          <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-            <Stack direction="row" alignItems="center">
-              <Box sx={{ mr: 1 }}>
+          <IconButton
+            aria-label="Open navigation menu"
+            onClick={handleNavigationToggle}
+            edge="start"
+            sx={{ display: { xs: 'block', md: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            sx={{ flex: { xs: 1, md: 0 } }}
+          >
+            <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Stack direction="row" alignItems="center">
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
-              </Box>
-              <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
-                {branding?.title ?? 'Toolpad'}
-              </Typography>
-            </Stack>
-          </a>
-          <Box sx={{ flexGrow: 1 }} />
+                <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
+                  {branding?.title ?? 'Toolpad'}
+                </Typography>
+              </Stack>
+            </a>
+          </Stack>
+          <Box sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }} />
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="permanent"
+        variant="temporary"
+        open={isMobileNavigationOpen}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
         sx={{
-          width: DRAWER_WIDTH,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: DRAWER_WIDTH,
-            boxSizing: 'border-box',
-          },
+          display: { xs: 'block', md: 'none' },
+          ...drawerSx,
         }}
       >
-        <Toolbar />
-        <Box
-          component="nav"
-          sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}
-        >
-          <DashboardSidebarSubNavigation subNavigation={navigation} />
-        </Box>
+        {drawerContent}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          ...drawerSx,
+        }}
+      >
+        {drawerContent}
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />

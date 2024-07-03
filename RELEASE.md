@@ -11,7 +11,7 @@
 1. Generate the changelog using:
 
    ```bash
-   pnpm release:changelog
+   pnpm release:changelog --release master
    ```
 
    Running this command requires a [GitHub personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with the `public_repo` scope.

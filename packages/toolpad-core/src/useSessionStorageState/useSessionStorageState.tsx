@@ -10,7 +10,7 @@ import { UseStorageState, useStorageState, useStorageStateServer } from '../pers
  * return null during SSR and hydration.
  */
 const useSessionStorageStateBrowser: UseStorageState = (...args: [any, any, any]) =>
-  useStorageState(window.localStorage, ...args);
+  useStorageState(window.sessionStorage, ...args);
 
 export const useSessionStorageState: UseStorageState =
   typeof window === 'undefined' ? useStorageStateServer : useSessionStorageStateBrowser;

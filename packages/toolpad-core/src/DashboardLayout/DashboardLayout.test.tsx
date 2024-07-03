@@ -15,9 +15,6 @@ import { DashboardLayout } from './DashboardLayout';
 import { BrandingContext, Navigation, NavigationContext } from '../AppProvider';
 
 describe('DashboardLayout', () => {
-  // Test in desktop screen width
-  window.innerWidth = 1024;
-
   test('renders content correctly', async () => {
     render(<DashboardLayout>Hello world</DashboardLayout>);
 

@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { z } from 'zod';
 
+// preview-start
 const schema = z.enum(['foo', 'bar', 'baz']).default('foo');
 
 const CODEC = {
@@ -17,6 +18,7 @@ const CODEC = {
   },
   stringify: (value) => JSON.stringify(value),
 };
+// preview-end
 
 export default function LocalStorageStateZod() {
   const [value, setValue] = useLocalStorageState('zod-value', null, {

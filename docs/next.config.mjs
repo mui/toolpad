@@ -15,9 +15,6 @@ const { findPages } = require('./src/modules/utils/find');
 
 const WORKSPACE_ROOT = path.resolve(currentDirectory, '../');
 const MONOREPO_PATH = path.resolve(currentDirectory, '../node_modules/@mui/monorepo');
-const MONOREPO_PACKAGES = {
-  '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
-};
 
 export default withDocsInfra({
   transpilePackages: [
@@ -59,7 +56,6 @@ export default withDocsInfra({
           ...config.resolve.alias,
           docs: path.resolve(MONOREPO_PATH, './docs'),
           'docs-toolpad': path.resolve(WORKSPACE_ROOT, './docs'),
-          ...MONOREPO_PACKAGES,
           '@toolpad/studio-components': path.resolve(
             currentDirectory,
             '../packages/toolpad-studio-components/src',

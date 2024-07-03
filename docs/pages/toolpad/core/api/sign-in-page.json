@@ -1,5 +1,18 @@
 {
-  "props": {},
+  "props": {
+    "providers": {
+      "type": { "name": "arrayOf", "description": "Array&lt;{ id: string, name: string }&gt;" },
+      "default": "[]"
+    },
+    "signIn": {
+      "type": { "name": "func" },
+      "default": "undefined",
+      "signature": {
+        "type": "function(provider: AuthProvider, formData: FormData) => void",
+        "describedArgs": ["provider", "formData"]
+      }
+    }
+  },
   "name": "SignInPage",
   "imports": [
     "import { SignInPage } from '@toolpad/core/SignInPage';",

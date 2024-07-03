@@ -38,7 +38,19 @@ const IconProviderMap = new Map<string, React.ReactNode>([
 ]);
 
 export interface AuthProvider {
+  /**
+   * The unique identifier of the authentication provider.
+   * @default ''
+   * @example 'google'
+   * @example 'github'
+   */
   id: string;
+  /**
+   * The name of the authentication provider.
+   * @default ''
+   * @example 'Google'
+   * @example 'GitHub'
+   */
   name: string;
 }
 
@@ -50,11 +62,12 @@ export interface SignInPageProps {
   providers?: AuthProvider[];
   /**
    * Callback fired when a user signs in.
-   * @param provider The authentication provider.
-   * @param formData The form data if the provider is 'credentials'.
+   * @param {AuthProvider} provider The authentication provider.
+   * @param {FormData} formData The form data if the provider id is 'credentials'.
+   * @returns {void}
    * @default undefined
    */
-  signIn?: (provider: AuthProvider, formData?: FormData) => void;
+  signIn?: (provider: AuthProvider, formData?: any) => void;
 }
 
 /**
@@ -239,8 +252,9 @@ SignInPage.propTypes /* remove-proptypes */ = {
   ),
   /**
    * Callback fired when a user signs in.
-   * @param provider The authentication provider.
-   * @param formData The form data if the provider is 'credentials'.
+   * @param {AuthProvider} provider The authentication provider.
+   * @param {FormData} formData The form data if the provider id is 'credentials'.
+   * @returns {void}
    * @default undefined
    */
   signIn: PropTypes.func,

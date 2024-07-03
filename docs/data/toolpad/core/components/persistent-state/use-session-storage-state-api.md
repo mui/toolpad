@@ -38,4 +38,4 @@ const [state, setState] = useSessionStorageState('my-key', 'initial value');
 
 **Returns**
 
-`[T | null, React.Dispatch<React.SetStateAction<T | null>>]` Similar to `React.setState` result, it returns an tupple where the first item represents the state, and the second item a setter for the state.
+`[T | null, React.Dispatch<React.SetStateAction<T | null>>]` Similar to `React.setState` result, it returns a tuple where the first item represents the state, and the second item a setter for the state.

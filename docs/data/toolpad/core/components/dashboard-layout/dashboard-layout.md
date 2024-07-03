@@ -30,7 +30,7 @@ This can be done via the `branding` prop in the [AppProvider](https://mui.com/to
 
 ## Navigation
 
-The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) allows for setting any type of navigation structure in the `DashboardLayout` sidebar by adding different navigation elements as building blocks in any order, such as:
+The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) allows for setting any type of navigation structure in the `DashboardLayout` sidebar by including different navigation elements as building blocks in any order, such as:
 
 - links `{ slug: '/home', title: 'Home', icon: <DescriptionIcon /> }`;
 - headings `{ kind: 'header', title: 'Epic Fantasy' }`;

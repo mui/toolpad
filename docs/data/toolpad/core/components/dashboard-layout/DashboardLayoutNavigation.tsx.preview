@@ -90,7 +90,7 @@
     {
       slug: '/mammals',
       title: 'Mammals',
-      icon: <DescriptionIcon />,
+      icon: <FolderIcon />,
       children: [
         {
           slug: '/lion',
@@ -107,7 +107,7 @@
     {
       slug: '/birds',
       title: 'Birds',
-      icon: <DescriptionIcon />,
+      icon: <FolderIcon />,
       children: [
         {
           slug: '/eagle',
@@ -124,7 +124,7 @@
     {
       slug: '/reptiles',
       title: 'Reptiles',
-      icon: <DescriptionIcon />,
+      icon: <FolderIcon />,
       children: [
         {
           slug: '/crocodile',

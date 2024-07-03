@@ -36,7 +36,7 @@ import { AppProvider } from '@toolpad/core/nextjs';
 
 ### Next.js App Router
 
-When using the **Next.js App Router**, the most typical file where to import and use `AppProvider` will be at the top level `app/layout.tsx` file that defines the layout for all the application pages.
+When using the **Next.js App Router**, the most typical file where to import and use `AppProvider` will be at the top level `layout.tsx` file that defines the layout for all the application pages.
 
 ```tsx
 // app/layout.tsx

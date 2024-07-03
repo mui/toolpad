@@ -112,7 +112,7 @@ export default function DashboardLayoutNavigation() {
         {
           slug: '/mammals',
           title: 'Mammals',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               slug: '/lion',
@@ -129,7 +129,7 @@ export default function DashboardLayoutNavigation() {
         {
           slug: '/birds',
           title: 'Birds',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               slug: '/eagle',
@@ -146,7 +146,7 @@ export default function DashboardLayoutNavigation() {
         {
           slug: '/reptiles',
           title: 'Reptiles',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               slug: '/crocodile',

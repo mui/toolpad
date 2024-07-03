@@ -8,22 +8,22 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
-    "next": "^14",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "next": "^14.2.4",
     "@toolpad/core": "latest",
-    "@mui/material": "^5",
-    "@mui/icons-material": "^5",
-    "@emotion/react": "^11",
-    "@emotion/styled": "^11",
-    "@emotion/cache": "^11"
+    "@mui/material": "^5.15.21",
+    "@mui/icons-material": "^5.15.21",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@emotion/cache": "^11.11.0"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^9.4.0",
-    "eslint-config-next": "^14"
+    "typescript": "^5.5.2",
+    "@types/node": "^20.14.9",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^9.6.0",
+    "eslint-config-next": "^14.2.4"
   }
 }

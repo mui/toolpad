@@ -1,9 +1,17 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Breadcrumbs, Container, Link, Stack, Toolbar, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Container, { ContainerProps } from '@mui/material/Container';
+import Link from '@mui/material/Link';
+import Stack from '@mui/material/Stack';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import { useSlotProps } from '@mui/base/utils';
 import { RouterContext } from '../AppProvider';
 import { Link as ToolpadLink } from '../shared/Link';
+import { PageContentToolbar, PageContentToolbarProps } from './PageContentToolbar';
 import {
   isPageItem,
   Navigation,
@@ -69,10 +77,23 @@ function matchPath(navigation: Navigation, path: string): BreadCrumbItem[] | nul
   return lookup.get(path) ?? null;
 }
 
-export interface PageContentProps {
+export interface PageContentSlotProps {
+  toolbar: PageContentToolbarProps;
+}
+
+export interface PageContentSlots {
+  /**
+   * The component that renders the actions toolbar.
+   * @default Snackbar
+   */
+  toolbar: React.ElementType;
+}
+
+export interface PageContentProps extends ContainerProps {
   children?: React.ReactNode;
-  actions?: React.ReactNode[];
   title?: string;
+  slots?: PageContentSlots;
+  slotProps?: PageContentSlotProps;
 }
 /**
  *
@@ -85,7 +106,7 @@ export interface PageContentProps {
  * - [PageContent API](https://mui.com/toolpad/core/api/page-content)
  */
 function PageContent(props: PageContentProps) {
-  const { children, actions } = props;
+  const { children, slots, slotProps, ...rest } = props;
   const routerContext = React.useContext(RouterContext);
   const navigationContext = React.useContext(NavigationContext);
   const pathname = routerContext?.pathname ?? '/';
@@ -96,9 +117,17 @@ function PageContent(props: PageContentProps) {
 
   const title = (breadCrumbs ? breadCrumbs[breadCrumbs.length - 1].title : '') ?? props.title;
 
+  const ToolbarComponent = props?.slots?.toolbar ?? PageContentToolbar;
+  const toolbarSlotProps = useSlotProps({
+    elementType: ToolbarComponent,
+    ownerState: props,
+    externalSlotProps: props?.slotProps?.toolbar,
+    additionalProps: {},
+  });
+
   return (
-    <Container sx={{ my: 2 }}>
-      <Stack>
+    <Container {...rest}>
+      <Stack sx={{ my: 2 }} spacing={2}>
         <Stack>
           <Breadcrumbs aria-label="breadcrumb">
             {breadCrumbs
@@ -114,7 +143,9 @@ function PageContent(props: PageContentProps) {
                       {item.title}
                     </Link>
                   ) : (
-                    <Typography color="text.primary"> {item.title}</Typography>
+                    <Typography key={item.path} color="text.primary">
+                      {item.title}
+                    </Typography>
                   );
                 })
               : null}
@@ -123,9 +154,7 @@ function PageContent(props: PageContentProps) {
           <Toolbar disableGutters>
             {title ? <Typography variant="h4">{title}</Typography> : null}
             <Box sx={{ flex: 1 }} />
-            <Stack direction="row" spacing={1}>
-              {actions}
-            </Stack>
+            <ToolbarComponent {...toolbarSlotProps} />
           </Toolbar>
         </Stack>
         <div>{children}</div>
@@ -142,11 +171,21 @@ PageContent.propTypes /* remove-proptypes */ = {
   /**
    * @ignore
    */
-  actions: PropTypes.arrayOf(PropTypes.node),
+  children: PropTypes.node,
   /**
    * @ignore
    */
-  children: PropTypes.node,
+  slotProps: PropTypes.shape({
+    toolbar: PropTypes.shape({
+      children: PropTypes.node,
+    }).isRequired,
+  }),
+  /**
+   * @ignore
+   */
+  slots: PropTypes.shape({
+    toolbar: PropTypes.elementType,
+  }),
   /**
    * @ignore
    */

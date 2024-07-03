@@ -5,7 +5,66 @@
     "import { PageContent } from '@toolpad-core/PageContent';",
     "import { PageContent } from '@toolpad-core';"
   ],
-  "classes": [],
+  "slots": [
+    {
+      "name": "toolbar",
+      "description": "The component that renders the actions toolbar.",
+      "default": "Snackbar",
+      "class": null
+    }
+  ],
+  "classes": [
+    {
+      "key": "disableGutters",
+      "className": "",
+      "description": "Styles applied to the root element if `disableGutters={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "fixed",
+      "className": "",
+      "description": "Styles applied to the root element if `fixed={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "maxWidthLg",
+      "className": "",
+      "description": "Styles applied to the root element if `maxWidth=\"lg\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "maxWidthMd",
+      "className": "",
+      "description": "Styles applied to the root element if `maxWidth=\"md\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "maxWidthSm",
+      "className": "",
+      "description": "Styles applied to the root element if `maxWidth=\"sm\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "maxWidthXl",
+      "className": "",
+      "description": "Styles applied to the root element if `maxWidth=\"xl\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "maxWidthXs",
+      "className": "",
+      "description": "Styles applied to the root element if `maxWidth=\"xs\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "root",
+      "className": "",
+      "description": "Styles applied to the root element.",
+      "isGlobal": false
+    }
+  ],
+  "spread": true,
+  "themeDefaultProps": false,
   "muiName": "PageContent",
   "filename": "/packages/toolpad-core/src/PageContent/PageContent.tsx",
   "inheritance": null,

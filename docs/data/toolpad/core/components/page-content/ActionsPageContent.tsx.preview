@@ -1,0 +1,16 @@
+function PageToolbar() {
+  return (
+    <PageContentToolbar>
+      <Button startIcon={<FileDownloadIcon />} color="inherit">
+        Export
+      </Button>
+      <DateRangePicker
+        sx={{ width: 220 }}
+        defaultValue={[dayjs(), dayjs().add(14, 'day')]}
+        slots={{ field: SingleInputDateRangeField }}
+        slotProps={{ field: { size: 'small' } as any }}
+        label="Period"
+      />
+    </PageContentToolbar>
+  );
+}

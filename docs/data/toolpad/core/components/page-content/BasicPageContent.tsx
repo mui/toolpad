@@ -1,28 +1,53 @@
 import * as React from 'react';
 import { PageContent } from '@toolpad/core/PageContent';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import { AppProvider, Router } from '@toolpad/core/AppProvider';
+import { useDemoRouter } from '@toolpad/core/internals/demo';
+import { Link } from '@mui/material';
 
 const NAVIGATION = [
-  {
-    kind: 'header' as const,
-    title: 'Main items',
-  },
-  {
-    slug: '',
-    title: 'Dashboard',
-    icon: 'DashboardIcon',
-  },
-  {
-    slug: 'orders',
-    title: 'Orders',
-    icon: 'ShoppingCartIcon',
-  },
+  { slug: '', title: 'Home' },
+  { slug: 'orders', title: 'Orders' },
 ];
 
+interface ContentProps {
+  router: Router;
+}
+
+function Content({ router }: ContentProps) {
+  switch (router.pathname) {
+    case '/':
+      return (
+        <React.Fragment>
+          The home page.{' '}
+          {router.pathname === '/' ? (
+            <Link
+              href="/orders"
+              onClick={(event) => {
+                event.preventDefault();
+                router.navigate('/orders');
+              }}
+            >
+              Go to orders
+            </Link>
+          ) : null}
+          .
+        </React.Fragment>
+      );
+    case '/orders':
+      return 'The orders page';
+    default:
+      return 'Not found';
+  }
+}
+
 export default function BasicPageContent() {
+  const router = useDemoRouter('/orders');
+
   return (
-    <AppProvider navigation={NAVIGATION}>
-      <PageContent>The content</PageContent>
+    <AppProvider navigation={NAVIGATION} router={router}>
+      <PageContent>
+        <Content router={router} />
+      </PageContent>
     </AppProvider>
   );
 }

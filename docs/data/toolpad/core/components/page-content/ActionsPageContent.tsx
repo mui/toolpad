@@ -1,0 +1,84 @@
+import * as React from 'react';
+import { useDemoRouter } from '@toolpad/core/internals/demo';
+import { PageContent, PageContentToolbar } from '@toolpad/core/PageContent';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
+import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Unstable_Grid2';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import dayjs from 'dayjs';
+
+const NAVIGATION = [
+  { slug: '', title: 'Weather' },
+  { slug: 'orders', title: 'Orders' },
+];
+
+function Content() {
+  return (
+    <Grid container spacing={3}>
+      <Grid xs={4}>
+        <Card>
+          <CardContent>
+            <Typography variant="caption">Temperature</Typography>
+            <Typography variant="h4">24°C</Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid xs={4}>
+        <Card>
+          <CardContent>
+            <Typography variant="caption">Precipitation</Typography>
+            <Typography variant="h4">5%</Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+      <Grid xs={4}>
+        <Card>
+          <CardContent>
+            <Typography variant="caption">Wind</Typography>
+            <Typography variant="h4">18km/h</Typography>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  );
+}
+
+// preview-start
+function PageToolbar() {
+  return (
+    <PageContentToolbar>
+      <Button startIcon={<FileDownloadIcon />} color="inherit">
+        Export
+      </Button>
+      <DateRangePicker
+        sx={{ width: 220 }}
+        defaultValue={[dayjs(), dayjs().add(14, 'day')]}
+        slots={{ field: SingleInputDateRangeField }}
+        slotProps={{ field: { size: 'small' } as any }}
+        label="Period"
+      />
+    </PageContentToolbar>
+  );
+}
+// preview-end
+
+export default function ActionsPageContent() {
+  const router = useDemoRouter();
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <AppProvider navigation={NAVIGATION} router={router}>
+        <PageContent slots={{ toolbar: PageToolbar }}>
+          <Content />
+        </PageContent>
+      </AppProvider>
+    </LocalizationProvider>
+  );
+}

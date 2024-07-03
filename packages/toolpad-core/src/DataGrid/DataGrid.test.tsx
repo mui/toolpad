@@ -85,69 +85,63 @@ describe('DataGrid', () => {
     expect(screen.queryByRole('button', { name: 'Add record' })).toBeFalsy();
   });
 
-  test(
-    'Supports create flow',
-    async () => {
-      const getNextId = createSequence();
-      let rows = [
-        { id: getNextId(), name: 'Alice' },
-        { id: getNextId(), name: 'Bob' },
-      ];
-      const dataProvider = createDataProvider({
-        getMany: async () => ({ rows }),
-        createOne: vi.fn(async (data) => {
-          const newRow = { ...data, id: getNextId() };
-          rows = [...rows, newRow];
-          return newRow;
-        }),
-        fields: {
-          id: { type: 'number' },
-          name: { type: 'string' },
-        },
-      });
+  test('Supports create flow', async () => {
+    const getNextId = createSequence();
+    let rows = [
+      { id: getNextId(), name: 'Alice' },
+      { id: getNextId(), name: 'Bob' },
+    ];
+    const dataProvider = createDataProvider({
+      getMany: async () => ({ rows }),
+      createOne: vi.fn(async (data) => {
+        const newRow = { ...data, id: getNextId() };
+        rows = [...rows, newRow];
+        return newRow;
+      }),
+      fields: {
+        id: { type: 'number' },
+        name: { type: 'string' },
+      },
+    });
 
-      const user = userEvent.setup();
-      const view = render(
-        <Box sx={{ width: 700 }}>
-          <DataGrid height={300} dataProvider={dataProvider} />
-        </Box>,
-      );
+    const user = userEvent.setup();
+    const view = render(
+      <Box sx={{ width: 700 }}>
+        <DataGrid height={300} dataProvider={dataProvider} />
+      </Box>,
+    );
 
-      await screen.findByText('Alice');
+    await screen.findByText('Alice');
 
-      expect(screen.queryAllByRole('menuitem', { name: 'Edit' })).toHaveLength(0);
-      expect(screen.queryAllByRole('menuitem', { name: 'Delete' })).toHaveLength(0);
+    expect(screen.queryAllByRole('menuitem', { name: 'Edit' })).toHaveLength(0);
+    expect(screen.queryAllByRole('menuitem', { name: 'Delete' })).toHaveLength(0);
 
-      const addRecordButton = screen.getByRole('button', { name: 'Add record' });
+    const addRecordButton = screen.getByRole('button', { name: 'Add record' });
 
-      await user.click(addRecordButton);
+    await user.click(addRecordButton);
 
-      const nameInput = within(getCell(view.baseElement, 0, 1)).getByRole('textbox');
-      expect(nameInput).toBeTruthy();
+    const nameInput = within(getCell(view.baseElement, 0, 1)).getByRole('textbox');
+    expect(nameInput).toBeTruthy();
 
-      const saveButton = screen.getByRole('menuitem', { name: 'Save' });
+    const saveButton = screen.getByRole('menuitem', { name: 'Save' });
 
-      await user.keyboard('Charlie');
+    await user.keyboard('Charlie');
 
-      await user.click(saveButton);
+    await user.click(saveButton);
 
-      await waitFor(() => expect(getCell(view.baseElement, 2, 1).textContent).toBe('Charlie'));
-      const snackbar = await screen.findByRole('alert');
-      expect(snackbar.textContent).toMatch('Row created');
+    await waitFor(() => expect(getCell(view.baseElement, 2, 1).textContent).toBe('Charlie'));
+    const snackbar = await screen.findByRole('alert');
+    expect(snackbar.textContent).toMatch('Row created');
 
-      const showButton = within(snackbar).getByRole('button', { name: 'Show' });
-      await user.click(showButton);
+    const showButton = within(snackbar).getByRole('button', { name: 'Show' });
+    await user.click(showButton);
 
-      expect(within(screen.getByRole('rowgroup')).queryAllByRole('row')).toHaveLength(1);
-      expect(screen.getByText('Charlie')).toBeTruthy();
+    expect(within(screen.getByRole('rowgroup')).queryAllByRole('row')).toHaveLength(1);
+    expect(screen.getByText('Charlie')).toBeTruthy();
 
-      expect(dataProvider.createOne).toHaveBeenCalledOnce();
-      expect(dataProvider.createOne).toHaveBeenCalledWith({ name: 'Charlie' });
-    },
-    {
-      timeout: 10000000,
-    },
-  );
+    expect(dataProvider.createOne).toHaveBeenCalledOnce();
+    expect(dataProvider.createOne).toHaveBeenCalledWith({ name: 'Charlie' });
+  });
 
   test('Supports update flow', async () => {
     const getNextId = createSequence();

@@ -1,1 +1,3 @@
-<PageContent>The content</PageContent>
+<PageContent>
+  <Content router={router} />
+</PageContent>

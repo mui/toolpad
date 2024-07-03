@@ -3,7 +3,7 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect, beforeAll } from 'vitest';
+import { describe, test, expect } from 'vitest';
 import { render, within, screen } from '@testing-library/react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -15,10 +15,8 @@ import { DashboardLayout } from './DashboardLayout';
 import { BrandingContext, Navigation, NavigationContext } from '../AppProvider';
 
 describe('DashboardLayout', () => {
-  beforeAll(() => {
-    // Test in desktop screen size
-    window.innerWidth = 1024;
-  });
+  // Test in desktop screen size
+  window.innerWidth = 1024;
 
   test('renders content correctly', async () => {
     render(<DashboardLayout>Hello world</DashboardLayout>);

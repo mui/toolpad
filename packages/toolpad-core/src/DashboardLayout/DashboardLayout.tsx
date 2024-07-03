@@ -209,7 +209,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
 
-  const handleNavigationToggle = React.useCallback(() => {
+  const toggleMobileNavigation = React.useCallback(() => {
     setIsMobileNavigationOpen((previousIsOpen) => !previousIsOpen);
   }, []);
 
@@ -243,7 +243,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar>
           <IconButton
             aria-label="Open navigation menu"
-            onClick={handleNavigationToggle}
+            onClick={toggleMobileNavigation}
             edge="start"
             sx={{ display: { xs: 'block', md: 'none' } }}
           >

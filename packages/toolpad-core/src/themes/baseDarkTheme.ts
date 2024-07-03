@@ -93,7 +93,7 @@ const baseDarkTheme = createTheme(defaultDarkTheme, {
             },
           },
           '& .MuiSvgIcon-root': {
-            color: defaultDarkTheme.palette.grey['100'],
+            color: defaultDarkTheme.palette.action.active,
           },
         },
       },

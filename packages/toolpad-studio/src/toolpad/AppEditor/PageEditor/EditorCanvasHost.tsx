@@ -19,7 +19,6 @@ import { update } from '@toolpad/utils/immutability';
 import { throttle } from 'lodash-es';
 import invariant from 'invariant';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import { createCommands, type ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import { useProject } from '../../../project';
 import { RuntimeState } from '../../../runtime';
 import { RenderedPage, ToolpadAppProvider } from '../../../runtime/ToolpadApp';
@@ -31,6 +30,53 @@ import {
 } from '../../../utils/geometry';
 import { PageViewState, NodeInfo, SlotsState } from '../../../types';
 import { useAppStateApi } from '../../AppState';
+
+const COMMAND_HANDLERS = Symbol('hidden property to hold the command handlers');
+
+type Commands<T extends Record<string, Function>> = T & {
+  [COMMAND_HANDLERS]: Partial<T>;
+};
+
+function createCommands<T extends Record<string, Function>>(initial: Partial<T> = {}): Commands<T> {
+  return new Proxy(
+    {
+      [COMMAND_HANDLERS]: initial,
+    },
+    {
+      get(target, prop, receiver) {
+        if (typeof prop !== 'string') {
+          return Reflect.get(target, prop, receiver);
+        }
+
+        return (...args: any[]): any => {
+          const handler = target[COMMAND_HANDLERS][prop];
+          if (typeof handler !== 'function') {
+            throw new Error(`Command "${prop}" not recognized.`);
+          }
+          return handler(...args);
+        };
+      },
+    },
+  ) as Commands<T>;
+}
+
+// Interface to communicate between editor and canvas
+export interface ToolpadBridge {
+  // Events fired in the editor, listened in the canvas
+  editorEvents: Emitter<{}>;
+  // Commands executed from the canvas, ran in the editor
+  editorCommands: Commands<{}>;
+  // Events fired in the canvas, listened in the editor
+  canvasEvents: Emitter<RuntimeEvents>;
+  // Commands executed from the editor, ran in the canvas
+  canvasCommands: Commands<{
+    getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
+    getPageViewState(): PageViewState;
+    scrollComponent(nodeId: string): void;
+    isReady(): boolean;
+    invalidateQueries(): void;
+  }>;
+}
 
 export function updateNodeInfo(nodeInfo: NodeInfo, rootElm: Element): NodeInfo {
   const nodeElm = rootElm.querySelector(`[data-toolpad-node-id="${nodeInfo.nodeId}"]`);

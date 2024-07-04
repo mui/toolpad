@@ -5,7 +5,6 @@ import type { InlineConfig, Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { indent } from '@toolpad/utils/strings';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import inspect from 'vite-plugin-inspect';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';

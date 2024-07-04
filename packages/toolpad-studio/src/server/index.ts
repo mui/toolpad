@@ -13,6 +13,7 @@ import chalk from 'chalk';
 import { serveRpc } from '@toolpad/utils/workerRpc';
 import * as url from 'node:url';
 import cors from 'cors';
+import compression from 'compression';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
 import { initProject, resolveProjectDir, type ToolpadProject } from './localMode';
@@ -279,6 +280,8 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
 
   const app = express();
   const httpServer = createServer(app);
+
+  app.use(compression());
 
   app.get('/health-check', (req, res) => {
     const memoryUsage = process.memoryUsage();

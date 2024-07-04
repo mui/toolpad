@@ -15,4 +15,13 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
     },
   },
+  resolve: {
+    alias: [
+      {
+        // FIXME(https://github.com/mui/material-ui/issues/35233)
+        find: /^@mui\/icons-material\/(?!esm\/)([^/]*)/,
+        replacement: '@mui/icons-material/esm/$1',
+      },
+    ],
+  },
 });

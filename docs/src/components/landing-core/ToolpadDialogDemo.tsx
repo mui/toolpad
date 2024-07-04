@@ -2,7 +2,6 @@ import * as React from 'react';
 import {
   DialogsProvider,
   useDialogs,
-  DialogProps,
 } from '@toolpad/core/useDialogs';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -31,19 +30,17 @@ function DemoContent() {
     <div>
       <Button
         onClick={async () => {
-          // preview-start
           await dialogs.open(MyCustomDialog);
-          // preview-end
         }}
       >
-        Open custom
+        Open dialog
       </Button>
     </div>
   );
 }
 
 
-export default function CustomDialog() {
+export default function ToolpadDialogDemo() {
   return (
     <Frame sx={{ height: '100%' }}>
       <Frame.Demo sx={{ p: 2 }}>

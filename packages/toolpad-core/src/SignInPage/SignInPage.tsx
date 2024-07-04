@@ -4,7 +4,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
@@ -19,6 +18,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import Stack from '@mui/material/Stack';
 import { BrandingContext } from '../AppProvider';
+import { useNotifications } from '../useNotifications';
 
 const IconProviderMap = new Map<string, React.ReactNode>([
   ['github', <GitHubIcon key="github" />],
@@ -63,11 +63,12 @@ export interface SignInPageProps {
   /**
    * Callback fired when a user signs in.
    * @param {AuthProvider} provider The authentication provider.
-   * @param {FormData} formData The form data if the provider id is 'credentials'.
-   * @returns {void}
+   * @param {FormData} formData The form data if the provider id is 'credentials'.\
+   * @param {string} callbackUrl The URL to redirect to after signing in.
+   * @returns {void} | {string}
    * @default undefined
    */
-  signIn?: (provider: AuthProvider, formData?: any) => void;
+  signIn?: (provider: AuthProvider, formData?: any, callbackUrl?: string) => void | Promise<string>;
 }
 
 /**
@@ -84,6 +85,20 @@ function SignInPage(props: SignInPageProps) {
   const { providers, signIn } = props;
   const branding = React.useContext(BrandingContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
+  const [{ loading, providerId }, setFormStatus] = React.useState<{
+    loading: boolean;
+    providerId: string;
+  }>({
+    providerId: '',
+    loading: false,
+  });
+
+  const callbackUrl =
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('callbackUrl') ?? '/'
+      : '/';
+
+  const notifications = useNotifications();
 
   return (
     <Container component="main" maxWidth="xs">
@@ -115,6 +130,9 @@ function SignInPage(props: SignInPageProps) {
                   key={provider.id}
                   onSubmit={(event) => {
                     event.preventDefault();
+                    setFormStatus((prev) => ({ ...prev, providerId: provider.id, loading: true }));
+                    // OAuth providers will redirect to their own page
+                    // so we don't need to set loading to false, or wait for a response
                     signIn?.(provider);
                   }}
                 >
@@ -126,6 +144,7 @@ function SignInPage(props: SignInPageProps) {
                     size="large"
                     disableElevation
                     name={'provider'}
+                    loading={loading && providerId === provider.id}
                     value={provider.id}
                     startIcon={IconProviderMap.get(provider.id)}
                     color="inherit"
@@ -150,10 +169,28 @@ function SignInPage(props: SignInPageProps) {
               <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>
               <Box
                 component="form"
-                onSubmit={(event) => {
+                onSubmit={async (event) => {
+                  setFormStatus({
+                    providerId: credentialsProvider.id,
+                    loading: true,
+                  });
                   event.preventDefault();
                   const formData = new FormData(event.currentTarget);
-                  signIn?.(credentialsProvider, formData);
+                  const credentialsResponse = await signIn?.(
+                    credentialsProvider,
+                    formData,
+                    callbackUrl,
+                  );
+                  setFormStatus((prev) => ({
+                    ...prev,
+                    loading: false,
+                  }));
+                  if (credentialsResponse) {
+                    notifications.show(credentialsResponse, {
+                      severity: 'error',
+                      autoHideDuration: 3000,
+                    });
+                  }
                 }}
                 noValidate
               >
@@ -195,13 +232,14 @@ function SignInPage(props: SignInPageProps) {
                   label="Remember me"
                   slotProps={{ typography: { color: 'textSecondary' } }}
                 />
-                <Button
+                <LoadingButton
                   type="submit"
                   fullWidth
                   size="large"
                   variant="contained"
                   disableElevation
                   color="inherit"
+                  loading={loading && providerId === credentialsProvider.id}
                   sx={{
                     mt: 3,
                     mb: 2,
@@ -213,8 +251,8 @@ function SignInPage(props: SignInPageProps) {
                     },
                   }}
                 >
-                  Sign in with username and password
-                </Button>
+                  Sign in
+                </LoadingButton>
                 <Grid container>
                   <Grid item xs>
                     <Link href="/" variant="body2">

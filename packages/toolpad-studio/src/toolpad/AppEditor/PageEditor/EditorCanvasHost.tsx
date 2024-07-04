@@ -8,6 +8,8 @@ import {
   useAppHost,
   queryClient,
   NodeId,
+  FlowDirection,
+  SlotType,
 } from '@toolpad/studio-runtime';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
@@ -17,15 +19,81 @@ import { update } from '@toolpad/utils/immutability';
 import { throttle } from 'lodash-es';
 import invariant from 'invariant';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import { createCommands, type ToolpadBridge } from '../../../canvas/ToolpadBridge';
 import { useProject } from '../../../project';
 import { RuntimeState } from '../../../runtime';
 import { RenderedPage, ToolpadAppProvider } from '../../../runtime/ToolpadApp';
 import { CanvasHooks, CanvasHooksContext } from '../../../runtime/CanvasHooksContext';
-import { rectContainsPoint } from '../../../utils/geometry';
-import { PageViewState } from '../../../types';
-import { updateNodeInfo } from '../../../canvas';
+import {
+  rectContainsPoint,
+  getRelativeBoundingRect,
+  getRelativeOuterRect,
+} from '../../../utils/geometry';
+import { PageViewState, NodeInfo, SlotsState } from '../../../types';
 import { useAppStateApi } from '../../AppState';
+
+// Interface to communicate between editor and canvas
+export interface ToolpadBridge {
+  // Events fired in the canvas, listened in the editor
+  canvasEvents: Emitter<RuntimeEvents>;
+  // Commands executed from the editor, ran in the canvas
+  canvasCommands: {
+    getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
+    getPageViewState(): PageViewState;
+    scrollComponent(nodeId: string): void;
+    isReady(): boolean;
+    invalidateQueries(): void;
+  };
+}
+
+export function updateNodeInfo(nodeInfo: NodeInfo, rootElm: Element): NodeInfo {
+  const nodeElm = rootElm.querySelector(`[data-toolpad-node-id="${nodeInfo.nodeId}"]`);
+
+  if (!nodeElm) {
+    return nodeInfo;
+  }
+
+  const rect = getRelativeOuterRect(rootElm, nodeElm);
+
+  const slotElms = rootElm.querySelectorAll(`[data-toolpad-slot-parent="${nodeInfo.nodeId}"]`);
+
+  const slots: SlotsState = {};
+
+  for (const slotElm of slotElms) {
+    const slotName = slotElm.getAttribute('data-toolpad-slot-name');
+    const slotType = slotElm.getAttribute('data-toolpad-slot-type');
+
+    invariant(slotName, 'Slot name not found');
+    invariant(slotType, 'Slot type not found');
+
+    if (slots[slotName]) {
+      continue;
+    }
+
+    const slotRect =
+      slotType === 'single'
+        ? getRelativeBoundingRect(rootElm, slotElm)
+        : getRelativeBoundingRect(rootElm, slotElm);
+
+    const display = window.getComputedStyle(slotElm).display;
+    let flowDirection: FlowDirection = 'row';
+    if (slotType === 'layout') {
+      flowDirection = 'column';
+    } else if (display === 'grid') {
+      const gridAutoFlow = window.getComputedStyle(slotElm).gridAutoFlow;
+      flowDirection = gridAutoFlow === 'row' ? 'column' : 'row';
+    } else if (display === 'flex') {
+      flowDirection = window.getComputedStyle(slotElm).flexDirection as FlowDirection;
+    }
+
+    slots[slotName] = {
+      type: slotType as SlotType,
+      rect: slotRect,
+      flowDirection,
+    };
+  }
+
+  return { ...nodeInfo, rect, slots };
+}
 
 interface OverlayProps {
   children?: React.ReactNode;
@@ -156,10 +224,8 @@ export default function EditorCanvasHost({
       }
 
       const bridge: ToolpadBridge = {
-        editorEvents: new Emitter(),
-        editorCommands: createCommands(),
         canvasEvents: new Emitter(),
-        canvasCommands: createCommands({
+        canvasCommands: {
           isReady: () => true,
           getPageViewState: () => {
             let nodes = viewState.current.nodes;
@@ -182,7 +248,6 @@ export default function EditorCanvasHost({
           invalidateQueries: () => {
             queryClient.invalidateQueries();
           },
-          update: () => {},
           scrollComponent: (nodeId: NodeId) => {
             if (!appRoot) {
               return;
@@ -190,8 +255,8 @@ export default function EditorCanvasHost({
             const node = appRoot.querySelector(`[data-node-id='${nodeId}']`);
             node?.scrollIntoView({ behavior: 'instant', block: 'end', inline: 'end' });
           },
-        }),
-      } satisfies ToolpadBridge;
+        },
+      };
 
       const handleScreenUpdate = throttle(
         () => {

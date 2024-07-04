@@ -8,8 +8,9 @@
       "type": { "name": "func" },
       "default": "undefined",
       "signature": {
-        "type": "function(provider: AuthProvider, formData: FormData) => void",
-        "describedArgs": ["provider", "formData"]
+        "type": "function(provider: AuthProvider, formData: FormData, callbackUrl: string) => void",
+        "describedArgs": ["provider", "formData", "callbackUrl"],
+        "returned": "void"
       }
     }
   },

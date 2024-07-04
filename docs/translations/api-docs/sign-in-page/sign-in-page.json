@@ -6,7 +6,9 @@
       "description": "Callback fired when a user signs in.",
       "typeDescriptions": {
         "provider": "The authentication provider.",
-        "formData": "The form data if the provider id is &#39;credentials&#39;."
+        "formData": "The form data if the provider id is &#39;credentials&#39;.\\",
+        "callbackUrl": "The URL to redirect to after signing in.",
+        "void": "| {string}"
       }
     }
   },

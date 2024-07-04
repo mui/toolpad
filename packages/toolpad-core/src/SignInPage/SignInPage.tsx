@@ -292,8 +292,9 @@ SignInPage.propTypes /* remove-proptypes */ = {
   /**
    * Callback fired when a user signs in.
    * @param {AuthProvider} provider The authentication provider.
-   * @param {FormData} formData The form data if the provider id is 'credentials'.
-   * @returns {void}
+   * @param {FormData} formData The form data if the provider id is 'credentials'.\
+   * @param {string} callbackUrl The URL to redirect to after signing in.
+   * @returns {void} | {string}
    * @default undefined
    */
   signIn: PropTypes.func,

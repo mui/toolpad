@@ -9,9 +9,9 @@ import Examples from '../../src/components/landing-core/Examples';
 import Hero from '../../src/components/landing-core/Hero';
 import HeroVideo from '../../src/components/landing/HeroVideo';
 import Features from '../../src/components/landing-core/Features';
+import Features2 from '../../src/components/landing-core/Features';
 import BuiltWith from '../../src/components/landing-core/BuiltWith';
 import StudioIntro from '../../src/components/landing-core/StudioIntro';
-
 
 export default function Home() {
   return (
@@ -21,7 +21,6 @@ export default function Home() {
       <AppHeader gitHubRepository="https://github.com/mui/mui-toolpad" />
       <main id="main-content">
         <Hero />
-        <HeroVideo />
         {/* <HeroVideo /> */}
         <Features />
         <Divider />

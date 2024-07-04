@@ -31,51 +31,18 @@ import {
 import { PageViewState, NodeInfo, SlotsState } from '../../../types';
 import { useAppStateApi } from '../../AppState';
 
-const COMMAND_HANDLERS = Symbol('hidden property to hold the command handlers');
-
-type Commands<T extends Record<string, Function>> = T & {
-  [COMMAND_HANDLERS]: Partial<T>;
-};
-
-function createCommands<T extends Record<string, Function>>(initial: Partial<T> = {}): Commands<T> {
-  return new Proxy(
-    {
-      [COMMAND_HANDLERS]: initial,
-    },
-    {
-      get(target, prop, receiver) {
-        if (typeof prop !== 'string') {
-          return Reflect.get(target, prop, receiver);
-        }
-
-        return (...args: any[]): any => {
-          const handler = target[COMMAND_HANDLERS][prop];
-          if (typeof handler !== 'function') {
-            throw new Error(`Command "${prop}" not recognized.`);
-          }
-          return handler(...args);
-        };
-      },
-    },
-  ) as Commands<T>;
-}
-
 // Interface to communicate between editor and canvas
 export interface ToolpadBridge {
-  // Events fired in the editor, listened in the canvas
-  editorEvents: Emitter<{}>;
-  // Commands executed from the canvas, ran in the editor
-  editorCommands: Commands<{}>;
   // Events fired in the canvas, listened in the editor
   canvasEvents: Emitter<RuntimeEvents>;
   // Commands executed from the editor, ran in the canvas
-  canvasCommands: Commands<{
+  canvasCommands: {
     getViewCoordinates(clientX: number, clientY: number): { x: number; y: number } | null;
     getPageViewState(): PageViewState;
     scrollComponent(nodeId: string): void;
     isReady(): boolean;
     invalidateQueries(): void;
-  }>;
+  };
 }
 
 export function updateNodeInfo(nodeInfo: NodeInfo, rootElm: Element): NodeInfo {
@@ -257,10 +224,8 @@ export default function EditorCanvasHost({
       }
 
       const bridge: ToolpadBridge = {
-        editorEvents: new Emitter(),
-        editorCommands: createCommands(),
         canvasEvents: new Emitter(),
-        canvasCommands: createCommands({
+        canvasCommands: {
           isReady: () => true,
           getPageViewState: () => {
             let nodes = viewState.current.nodes;
@@ -283,7 +248,6 @@ export default function EditorCanvasHost({
           invalidateQueries: () => {
             queryClient.invalidateQueries();
           },
-          update: () => {},
           scrollComponent: (nodeId: NodeId) => {
             if (!appRoot) {
               return;
@@ -291,8 +255,8 @@ export default function EditorCanvasHost({
             const node = appRoot.querySelector(`[data-node-id='${nodeId}']`);
             node?.scrollIntoView({ behavior: 'instant', block: 'end', inline: 'end' });
           },
-        }),
-      } satisfies ToolpadBridge;
+        },
+      };
 
       const handleScreenUpdate = throttle(
         () => {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import MarkdownElement from '@mui/monorepo/docs/src/modules/components/MarkdownElement';
+import { MarkdownElement } from '@mui/docs/MarkdownElement';
 import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDocs';
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
 import type { JSONSchema7, JSONSchema7Definition } from 'json-schema';

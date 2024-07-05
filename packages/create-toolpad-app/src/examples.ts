@@ -26,7 +26,9 @@ async function downloadTar(url: string) {
   // https://github.com/microsoft/TypeScript/issues/29867
   const readable = Readable.fromWeb(response.body);
   readable.on('data', (chunk) => {
-    process.stdout.write(`Downloading… ${(current / 1000000).toFixed(2)} MBs\r`);
+    process.stdout.write(
+      `Downloading… ${new Intl.NumberFormat('en-US', { style: 'unit', unit: 'megabyte' }).format(current / 1000000)}\r`,
+    );
     current += chunk.length;
   });
   await pipeline(readable, createWriteStream(tempFile));

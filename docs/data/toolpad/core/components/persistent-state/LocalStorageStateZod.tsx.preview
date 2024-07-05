@@ -1,0 +1,14 @@
+const schema = z.enum(['foo', 'bar', 'baz']).default('foo');
+
+type SchemaType = z.infer<typeof schema>;
+
+const CODEC: Codec<SchemaType> = {
+  parse: (value) => {
+    try {
+      return schema.parse(JSON.parse(value));
+    } catch {
+      return 'foo';
+    }
+  },
+  stringify: (value) => JSON.stringify(value),
+};

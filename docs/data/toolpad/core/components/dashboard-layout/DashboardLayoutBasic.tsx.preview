@@ -7,6 +7,6 @@
       alignItems: 'center',
     }}
   >
-    <Typography>Dashboard content goes here.</Typography>
+    <Typography>Dashboard content for {pathname}</Typography>
   </Box>
 </DashboardLayout>

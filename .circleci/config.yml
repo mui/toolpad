@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  codecov: codecov/codecov@4.1.0
 
 default-job: &default-job
   working_directory: /tmp/mui-toolpad
@@ -164,17 +166,35 @@ jobs:
       - run:
           name: Tests fake browser
           command: pnpm test
+      - codecov/upload
+
+  test_unit_browser:
+    <<: *default-job
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.45.0-focal
+        environment:
+          NODE_ENV: test
+
+    steps:
+      - checkout
+      - install_js:
+          browsers: true
+      - run:
+          name: 'Build packages'
+          command: pnpm release:build
+      - run:
+          name: Tests real browser
+          command: pnpm test:browser
 
   test_integration:
     <<: *default-job
     resource_class: 'large'
     parallelism: 2
     docker:
-      - image: mcr.microsoft.com/playwright:v1.44.1-focal
+      - image: mcr.microsoft.com/playwright:v1.45.0-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
-          EXPERIMENTAL_INLINE_CANVAS: 1
 
     steps:
       - checkout
@@ -213,6 +233,10 @@ workflows:
           requires:
             - checkout
       - test_unit:
+          <<: *default-context
+          requires:
+            - checkout
+      - test_unit_browser:
           <<: *default-context
           requires:
             - checkout

@@ -54,7 +54,7 @@ import {
   DataGridNotification,
   SetDataGridNotificationContext,
 } from './NotificationSnackbar';
-import { Filter } from '../DataProvider/filter';
+import { type Filter } from '../DataProvider/filter';
 
 const RootContainer = styled('div')({
   display: 'flex',
@@ -496,10 +496,7 @@ function getEditedRowFieldToFocus(
  * - [DataGrid API](https://mui.com/toolpad/core/api/data-grid)
  * - inherits [X DataGrid API](https://mui.com/x/api/data-grid/data-grid/)
  */
-const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
-  props: DataGridProps<R>,
-  ref: React.Ref<HTMLDivElement>,
-) {
+function DataGrid<R extends Datum>(props: DataGridProps<R>) {
   const { dataProvider, ...restProps1 } = props;
 
   // TODO: figure out how to stop generating prop types for X Grid properties
@@ -794,7 +791,6 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
             {inferredFields ? <InferencingAlert fields={inferredFields} /> : null}
             <GridContainer>
               <XDataGrid
-                ref={ref}
                 pagination
                 apiRef={apiRef}
                 rows={rows}
@@ -832,15 +828,15 @@ const DataGrid = React.forwardRef(function DataGrid<R extends Datum>(
                   <ErrorOverlay error={error} />
                 </PlaceholderBorder>
               ) : null}
-            </GridContainer>
 
-            <NotificationSnackbar apiRef={apiRef} notification={notification} idField={idField} />
+              <NotificationSnackbar apiRef={apiRef} notification={notification} idField={idField} />
+            </GridContainer>
           </RootContainer>
         </ToolbarCreateButtonContext.Provider>
       </SetDataGridNotificationContext.Provider>
     </RefetchContext.Provider>
   );
-});
+}
 
 DataGrid.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐

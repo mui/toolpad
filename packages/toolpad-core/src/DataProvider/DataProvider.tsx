@@ -1,11 +1,12 @@
 import { keepPreviousData, QueryClient, useMutation, useQuery } from '@tanstack/react-query';
+import PropTypes from 'prop-types';
 import invariant from 'invariant';
 import * as React from 'react';
 import { getObjectKey } from '@toolpad/utils/objectKey';
 import { deepmerge } from '@mui/utils';
-import { Filter, FilterProvider, getKeyFromFilter, useFilter } from './filter';
+import { type Filter, FilterProvider, getKeyFromFilter, useFilter } from './filter';
 
-export { Filter, useFilter } from './filter';
+export { type Filter, useFilter } from './filter';
 
 /**
  * @ignore - do not document.
@@ -95,9 +96,7 @@ export interface DataProviderDefinition<R extends Datum> {
   fields?: FieldDefs<R>;
 }
 
-export type ResolvedFields<R extends Datum> = {
-  [K in FieldOf<R>]: ResolvedField<R, K>;
-};
+export type ResolvedFields<R extends Datum> = { [K in FieldOf<R>]: ResolvedField<R, K> };
 
 export interface ResolvedDataProvider<R extends Datum> {
   getMany: GetManyMethod<R>;
@@ -309,8 +308,19 @@ export interface DataContextProps {
 
 const defaultFilter: Filter<any> = {};
 
-export function DataContext(props: DataContextProps) {
+function DataContext(props: DataContextProps) {
   const { filter = defaultFilter, children } = props;
 
   return <FilterProvider value={filter}>{children}</FilterProvider>;
 }
+
+DataContext.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  children: PropTypes.node,
+  filter: PropTypes.object,
+} as any;
+
+export { DataContext };

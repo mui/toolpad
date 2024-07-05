@@ -1,0 +1,9 @@
+const confirmed = await dialogs.confirm('Are you sure?', {
+  okText: 'Yes',
+  cancelText: 'No',
+});
+if (confirmed) {
+  await dialogs.alert("Then let's do it!");
+} else {
+  await dialogs.alert('Ok, forget about it!');
+}

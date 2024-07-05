@@ -36,6 +36,7 @@ module.exports = {
   plugins: [
     ...baseline.plugins,
     ...(ENABLE_REACT_COMPILER_PLUGIN ? ['eslint-plugin-react-compiler'] : []),
+    'testing-library',
   ],
   settings: {
     'import/resolver': {
@@ -105,6 +106,10 @@ module.exports = {
   overrides: [
     ...baseline.overrides,
     {
+      files: ['**/*.test.js', '**/*.test.ts', '**/*.test.tsx'],
+      extends: ['plugin:testing-library/react'],
+    },
+    {
       files: ['docs/src/modules/components/**/*.js'],
       rules: {
         'material-ui/no-hardcoded-labels': 'off',
@@ -142,7 +147,7 @@ module.exports = {
         '*.spec.tsx',
         '*.test.ts',
         '*.test.tsx',
-        'vitest.config.ts',
+        'vitest.config.mts',
       ],
       rules: {
         'import/no-extraneous-dependencies': ['error'],

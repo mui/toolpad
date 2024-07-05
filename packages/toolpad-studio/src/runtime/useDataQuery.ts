@@ -66,7 +66,7 @@ export function useDataQuery(
 
   const result: UseFetch = React.useMemo(
     () => ({
-      isLoading: isLoading && enabled,
+      isLoading: isLoading && !!enabled,
       isFetching,
       error,
       data,

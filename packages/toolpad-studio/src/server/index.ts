@@ -248,7 +248,7 @@ async function createToolpadHandler({
         `frame-src * data: blob: ;`,
         `style-src * data: blob: 'unsafe-inline';`,
         `font-src * data: blob: 'unsafe-inline';`,
-        `frame-ancestors * data: blob: 'unsafe-inline';`,
+        `frame-ancestors * data: blob:;`,
       ].join(' '),
     );
     expressNext();

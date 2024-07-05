@@ -161,7 +161,7 @@ export default function DashboardLayoutNavigation() {
 
   return (
     <AppProvider navigation={NAVIGATION} router={router}>
-      <DashboardLayout>
+      <DashboardLayout initialNavigationOpen>
         <Box
           sx={{
             py: 4,

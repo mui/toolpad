@@ -1,4 +1,4 @@
-<DashboardLayout>
+<DashboardLayout initialNavigationOpen>
   <Box
     sx={{
       py: 4,

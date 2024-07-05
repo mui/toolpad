@@ -1,5 +1,10 @@
 {
   "componentDescription": "",
-  "propDescriptions": { "children": { "description": "The content of the dashboard." } },
+  "propDescriptions": {
+    "children": { "description": "The content of the dashboard." },
+    "initialNavigationOpen": {
+      "description": "Whether the mobile navigation drawer should start open."
+    }
+  },
   "classDescriptions": {}
 }

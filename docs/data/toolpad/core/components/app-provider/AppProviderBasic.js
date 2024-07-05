@@ -38,7 +38,7 @@ export default function AppProviderBasic() {
   return (
     // preview-start
     <AppProvider navigation={NAVIGATION} router={router}>
-      <DashboardLayout>
+      <DashboardLayout initialNavigationOpen>
         <Box
           sx={{
             py: 4,

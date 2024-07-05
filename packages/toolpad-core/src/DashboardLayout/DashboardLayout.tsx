@@ -39,6 +39,27 @@ const LogoContainer = styled('div')({
   },
 });
 
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'isMobileNavigationOpen' })<{
+  isMobileNavigationOpen: boolean;
+}>(({ theme, isMobileNavigationOpen }) => ({
+  flexGrow: 1,
+  [theme.breakpoints.down('md')]: {
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${DRAWER_WIDTH}px`,
+    ...(isMobileNavigationOpen && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+  },
+}));
+
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
@@ -147,7 +168,7 @@ function DashboardSidebarSubNavigation({
               selected={pathname === navigationItemFullPath}
               onClick={handleSidebarItemClick(navigationItemId)}
             >
-              <ListItemIcon>{navigationItem.icon}</ListItemIcon>
+              {navigationItem.icon ? <ListItemIcon>{navigationItem.icon}</ListItemIcon> : null}
               <ListItemText primary={navigationItem.title} />
               {navigationItem.children ? nestedNavigationCollapseIcon : null}
             </ListItemButton>
@@ -189,6 +210,11 @@ export interface DashboardLayoutProps {
    * The content of the dashboard.
    */
   children: React.ReactNode;
+  /**
+   * Whether the mobile navigation drawer should start open.
+   * @default false
+   */
+  initialNavigationOpen?: boolean;
 }
 
 /**
@@ -202,12 +228,12 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children } = props;
+  const { children, initialNavigationOpen = false } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 
-  const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
+  const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(initialNavigationOpen);
 
   const toggleMobileNavigation = React.useCallback(() => {
     setIsMobileNavigationOpen((previousIsOpen) => !previousIsOpen);
@@ -249,7 +275,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
           >
             <MenuIcon />
           </IconButton>
-          <Stack direction="row" justifyContent="center" sx={{ flex: { xs: 1, md: 0 } }}>
+          <Box
+            sx={{
+              position: { xs: 'absolute', md: 'static' },
+              left: { xs: '50%', md: 'auto' },
+              transform: { xs: 'translateX(-50%)', md: 'none' },
+            }}
+          >
             <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
               <Stack direction="row" alignItems="center">
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
@@ -258,12 +290,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 </Typography>
               </Stack>
             </a>
-          </Stack>
+          </Box>
           <Box sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }} />
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="temporary"
+        variant="persistent"
         open={isMobileNavigationOpen}
         ModalProps={{
           keepMounted: true, // Better open performance on mobile.
@@ -284,10 +316,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
       >
         {drawerContent}
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Main isMobileNavigationOpen={isMobileNavigationOpen}>
         <Toolbar />
         <Container maxWidth="lg">{children}</Container>
-      </Box>
+      </Main>
     </Box>
   );
 }
@@ -301,6 +333,11 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * Whether the mobile navigation drawer should start open.
+   * @default false
+   */
+  initialNavigationOpen: PropTypes.bool,
 } as any;
 
 export { DashboardLayout };

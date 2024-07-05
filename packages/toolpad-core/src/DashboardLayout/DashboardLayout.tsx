@@ -29,7 +29,8 @@ import {
 } from '../AppProvider/AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 
-const DRAWER_WIDTH = 320;
+const DRAWER_WIDTH = 320; // px
+const MIN_CONTENT_WIDTH = 320; // px
 
 const LogoContainer = styled('div')({
   position: 'relative',
@@ -43,8 +44,8 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'isMobileNav
   isMobileNavigationOpen: boolean;
 }>(({ theme, isMobileNavigationOpen }) => ({
   flexGrow: 1,
+  minWidth: MIN_CONTENT_WIDTH,
   [theme.breakpoints.down('md')]: {
-    padding: theme.spacing(3),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,

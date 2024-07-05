@@ -13,21 +13,6 @@ import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import type { Navigation } from '@toolpad/core';
 
-
-const code = `
-<BarChart
-  series={[
-    { data: [35, 44, 24, 34] },
-    { data: [51, 6, 49, 30] },
-    { data: [15, 25, 30, 50] },
-    { data: [60, 50, 15, 25] },
-  ]}
-  height={290}
-  xAxis={[{ data: ['Q1', 'Q2', 'Q3', 'Q4'], scaleType: 'band' }]}
-  margin={{ top: 10, bottom: 30, left: 40, right: 10 }}
-  colors={blueberryTwilightPaletteLight}
-/>`;        
-
 const NAVIGATION: Navigation = [
   {
     kind: 'header',
@@ -74,7 +59,7 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-export default function DashboardLayoutBasic() {
+function DashboardLayoutBasic() {
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -85,6 +70,24 @@ export default function DashboardLayoutBasic() {
     };
   }, [pathname]);
 
+  return (
+      <AppProvider navigation={NAVIGATION} router={router}>
+      <DashboardLayout>
+        <Box
+          sx={{
+            py: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Typography>Dashboard content for {pathname}</Typography>
+        </Box>
+      </DashboardLayout>
+    </AppProvider>
+  );
+}
+export default function ToolpadDashboardLayout() {
   return (
     <Frame sx={{ height: '100%' }}>
       <Frame.Demo sx={{ p: 2 }}>
@@ -103,7 +106,76 @@ export default function DashboardLayoutBasic() {
             }),
           })}
         >
-    <AppProvider navigation={NAVIGATION} router={router}>
+          <DashboardLayoutBasic/>
+        </Paper>
+      </Frame.Demo>
+      <Frame.Info data-mui-color-scheme="dark" sx={{ maxHeight: 600, overflow: 'auto' }}>
+        <HighlightedCode copyButtonHidden plainStyle code={code} language="jsx" />
+      </Frame.Info>
+    </Frame>
+  );
+}
+
+const code = `
+const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Main items',
+  },
+  {
+    slug: '/dashboard',
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    slug: '/orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
+  {
+    kind: 'divider',
+  },
+  {
+    kind: 'header',
+    title: 'Analytics',
+  },
+  {
+    slug: '/reports',
+    title: 'Reports',
+    icon: <BarChartIcon />,
+    children: [
+      {
+        slug: '/sales',
+        title: 'Sales',
+        icon: <DescriptionIcon />,
+      },
+      {
+        slug: '/traffic',
+        title: 'Traffic',
+        icon: <DescriptionIcon />,
+      },
+    ],
+  },
+  {
+    slug: '/integrations',
+    title: 'Integrations',
+    icon: <LayersIcon />,
+  },
+];
+
+function DashboardLayoutBasic() {
+  const [pathname, setPathname] = React.useState('/page');
+
+  const router = React.useMemo<Router>(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
+
+  return (
+      <AppProvider navigation={NAVIGATION} router={router}>
       <DashboardLayout>
         <Box
           sx={{
@@ -117,12 +189,5 @@ export default function DashboardLayoutBasic() {
         </Box>
       </DashboardLayout>
     </AppProvider>
-        </Paper>
-        
-      </Frame.Demo>
-      <Frame.Info data-mui-color-scheme="dark" sx={{ maxHeight: 300, overflow: 'auto' }}>
-        <HighlightedCode copyButtonHidden plainStyle code={code} language="jsx" />
-      </Frame.Info>
-    </Frame>
   );
-}
+}`;        

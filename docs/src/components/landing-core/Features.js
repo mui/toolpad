@@ -6,7 +6,7 @@ import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import XComponentsSwitcher from './XComponentsSwitcher';
 import ToolpadDialogDemo from './ToolpadDialogDemo';
-import DashboardLayoutBasic from './DashboardLayoutBasic';
+import ToolpadDashboardLayout from './ToolpadDashboardLayout';
 import XChartsDemo from './XChartDemo';
 import ToolpadNotificationDemo from './ToolpadNotificationDemo';
 
@@ -37,9 +37,9 @@ export default function ToolpadComponents() {
         >
           <React.Fragment>
             {componentIndex === 0 && <XChartsDemo />}
-            {componentIndex === 1 && <ToolpadNotificationDemo />}
+            {componentIndex === 1 && <ToolpadDashboardLayout />}
             {componentIndex === 2 && <ToolpadDialogDemo />}
-            {componentIndex === 3 && <DashboardLayoutBasic />}
+            {componentIndex === 3 && <ToolpadNotificationDemo />}
           </React.Fragment>
         </Grid>
       </Grid>

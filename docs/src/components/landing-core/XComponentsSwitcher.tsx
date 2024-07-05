@@ -72,20 +72,26 @@ export default function XComponentsSwitcher(props: {
   const { componentIndex, setComponentIndex } = props;
   const componentElement = [
     <ComponentItem
-      name="Navigation and layout"
-      // label="Fast, feature-rich data table."
-      description="The Layout component provides a standard structure for functional apps, including customizable nav bar, header bar and more."
-      icon={<AutoAwesomeMosaic />}
-    />,
-    <ComponentItem
       name="Authentication"
       description="Toolpad simplifies setting authentication through authProvider object, hooks and the Login pages. Check out the supported Identity providers."
       // label="A suite of components for selecting dates, times, and ranges."
       icon={<LockOpenIcon />}
     />,
     <ComponentItem
-      name="Dialogs and snackbars"
-      description="Native dialogs and snackbar components offer an easy way to setup interactivity in the dashbaord application."
+      name="Navigation and layout"
+      // label="Fast, feature-rich data table."
+      description="The Layout component provides a standard structure for functional apps, including customizable nav bar, header bar and more."
+      icon={<AutoAwesomeMosaic />}
+    />,
+    <ComponentItem
+      name="Imperative dialogs"
+      description="Native dialogs offer an easy way to setup interactivity in the dashboard application."
+      // label="Data visualization graphs, including bar, line, pie, scatter, and more."
+      icon={<NotificationsIcon />}
+    />,
+    <ComponentItem
+      name="Notification snackbars"
+      description="Snackbars notify users about an action that a system has performed or will perform."
       // label="Data visualization graphs, including bar, line, pie, scatter, and more."
       icon={<NotificationsIcon />}
     />,

@@ -8,6 +8,7 @@ import * as appDom from '@toolpad/studio-runtime/appDom';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
+import { FONTS_URL } from '../runtime/constants';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -26,11 +27,10 @@ function getHtmlContent(entry: string) {
     <html lang="en">
       <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Toolpad</title>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        />
+        <link rel="preload" href="${FONTS_URL}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="${FONTS_URL}"></noscript>
       </head>
       <body>
         <div id="root"></div>

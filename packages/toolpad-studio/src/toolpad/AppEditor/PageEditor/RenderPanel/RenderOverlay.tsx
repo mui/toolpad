@@ -43,13 +43,13 @@ import NodeHud from './NodeHud';
 import { OverlayGrid, OverlayGridHandle } from './OverlayGrid';
 import { NodeInfo } from '../../../../types';
 import NodeDropArea from './NodeDropArea';
-import type { ToolpadBridge } from '../../../../canvas/ToolpadBridge';
 import { PinholeOverlay } from '../../../../PinholeOverlay';
 import {
   deleteOrphanedLayoutNodes,
   normalizePageRowColumnSizes,
   removePageLayoutNode,
 } from '../../pageLayout';
+import { ToolpadBridge } from '../EditorCanvasHost';
 
 const VERTICAL_RESIZE_SNAP_UNITS = 4; // px
 

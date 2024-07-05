@@ -166,7 +166,9 @@ function SignInPage(props: SignInPageProps) {
 
           {credentialsProvider ? (
             <React.Fragment>
-              <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>
+              {(providers ?? []).length === 1 ? null : (
+                <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>
+              )}
               <Box
                 component="form"
                 onSubmit={async (event) => {

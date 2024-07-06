@@ -35,6 +35,18 @@ const IconProviderMap = new Map<string, React.ReactNode>([
       style={{ marginLeft: '2px', marginRight: '2px' }}
     />,
   ],
+  [
+    'facebook',
+    <img
+      alt="Facebook logo"
+      loading="lazy"
+      key="facebook"
+      height="18"
+      width="18"
+      src="https://authjs.dev/img/providers/facebook.svg"
+      style={{ marginLeft: '2px', marginRight: '2px' }}
+    />,
+  ],
 ]);
 
 export interface AuthProvider {
@@ -84,6 +96,7 @@ export interface SignInPageProps {
 function SignInPage(props: SignInPageProps) {
   const { providers, signIn } = props;
   const branding = React.useContext(BrandingContext);
+
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const [{ loading, providerId }, setFormStatus] = React.useState<{
     loading: boolean;
@@ -110,10 +123,12 @@ function SignInPage(props: SignInPageProps) {
           alignItems: 'center',
         }}
       >
-        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
-          {branding?.logo ?? <LockOutlinedIcon />}
-        </Avatar>
-        <Typography variant="h5" gutterBottom>
+        {branding?.logo ?? (
+          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+        )}
+        <Typography variant="h5" color="textPrimary" gutterBottom>
           Sign in {branding?.title ? `to ${branding.title}` : null}
         </Typography>
         <Typography variant="body2" color="textSecondary" gutterBottom>

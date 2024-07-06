@@ -2,7 +2,7 @@
   "name": "@toolpad/studio-tests",
   "private": true,
   "devDependencies": {
-    "@mui/material": "5.15.21",
+    "@mui/material": "5.16.0",
     "@toolpad/studio": "workspace:*",
     "@toolpad/utils": "workspace:*",
     "@types/invariant": "2.2.37",

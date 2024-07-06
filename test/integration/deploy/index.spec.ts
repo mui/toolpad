@@ -16,6 +16,10 @@ test.use({
   },
   localAppConfig: {
     cmd: 'start',
+    env: {
+      // For an obscure reason, and only with Playwright Chromium, frame-ancestors *; fails.
+      disableCSP: 'true',
+    },
   },
 });
 

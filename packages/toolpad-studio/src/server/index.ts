@@ -237,23 +237,22 @@ async function createToolpadHandler({
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-    if (process.env.disableCSP !== 'true') {
-      res.setHeader(
-        'Content-Security-Policy',
-        [
-          `default-src * data: mediastream: blob: filesystem: about: ws: wss: 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-inline';`,
-          `script-src * data: blob: 'unsafe-inline' 'unsafe-eval';`,
-          `script-src-elem * data: blob: 'unsafe-inline';`,
-          `connect-src * data: blob: 'unsafe-inline';`,
-          `img-src * data: blob: 'unsafe-inline';`,
-          `media-src * data: blob: 'unsafe-inline';`,
-          `frame-src * data: blob: ;`,
-          `style-src * data: blob: 'unsafe-inline';`,
-          `font-src * data: blob: 'unsafe-inline';`,
-          `frame-ancestors *;`,
-        ].join(' '),
-      );
-    }
+    res.setHeader(
+      'Content-Security-Policy',
+      [
+        `default-src * data: mediastream: blob: filesystem: about: ws: wss: 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-inline';`,
+        `script-src * data: blob: 'unsafe-inline' 'unsafe-eval';`,
+        `script-src-elem * data: blob: 'unsafe-inline';`,
+        `connect-src * data: blob: 'unsafe-inline';`,
+        `img-src * data: blob: 'unsafe-inline';`,
+        `media-src * data: blob: 'unsafe-inline';`,
+        `frame-src * data: blob: ;`,
+        `style-src * data: blob: 'unsafe-inline';`,
+        `font-src * data: blob: 'unsafe-inline';`,
+        `frame-ancestors *;`,
+      ].join(' '),
+    );
+
     expressNext();
   });
 

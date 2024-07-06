@@ -16,20 +16,17 @@ test.use({
   },
   localAppConfig: {
     cmd: 'start',
-    env: {
-      // For an obscure reason, and only with Playwright Chromium, frame-ancestors *; fails.
-      disableCSP: 'true',
-    },
   },
 });
 
 test('can render in an iframe', async ({ page, baseURL }) => {
+  await page.goto('https://example.com');
   await page.evaluate(
     ([src]) => {
       const iframe = document.createElement('iframe');
       iframe.src = src;
       iframe.id = 'my-frame';
-      document.body.append(iframe);
+      document.body.replaceChildren(iframe);
     },
     [`${baseURL}/prod/pages/o57cdlq`],
   );

@@ -133,7 +133,7 @@
     "react-inspector": "6.0.2",
     "react-is": "18.3.1",
     "react-resizable-panels": "2.0.20",
-    "react-router-dom": "6.24.0",
+    "react-router-dom": "6.24.1",
     "semver": "7.6.2",
     "serialize-javascript": "6.0.2",
     "superjson": "2.0.0",

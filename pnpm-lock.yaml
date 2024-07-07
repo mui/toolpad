@@ -800,8 +800,8 @@ importers:
         specifier: 7.1.0
         version: 7.1.0
       glob:
-        specifier: 10.4.2
-        version: 10.4.2
+        specifier: 10.4.3
+        version: 10.4.3
       google-auth-library:
         specifier: '*'
         version: 9.11.0(encoding@0.1.13)
@@ -6215,9 +6215,9 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
 
-  glob@10.4.2:
-    resolution: {integrity: sha512-GwMlUF6PkPo3Gk21UxkCohOv0PLcIXVtKyLlpEI28R/cO/4eNOdmLk3CMW1wROV/WR/EsZOWAfBbBOqYvs88/w==}
-    engines: {node: '>=16 || 14 >=14.18'}
+  glob@10.4.3:
+    resolution: {integrity: sha512-Q38SGlYRpVtDBPSWEylRyctn7uDeTp4NQERTLiCT1FqA9JXPYWqAVmQU6qh4r/zMM5ehxTcbaO8EjhWnvEhmyg==}
+    engines: {node: '>=18'}
     hasBin: true
 
   glob@7.2.3:
@@ -12346,7 +12346,7 @@ snapshots:
   '@npmcli/map-workspaces@3.0.6':
     dependencies:
       '@npmcli/name-from-folder': 2.0.0
-      glob: 10.4.2
+      glob: 10.4.3
       minimatch: 9.0.5
       read-package-json-fast: 3.0.2
 
@@ -12368,7 +12368,7 @@ snapshots:
   '@npmcli/package-json@5.2.0':
     dependencies:
       '@npmcli/git': 5.0.7
-      glob: 10.4.2
+      glob: 10.4.3
       hosted-git-info: 7.0.2
       json-parse-even-better-errors: 3.0.2
       normalize-package-data: 6.0.2
@@ -13934,7 +13934,7 @@ snapshots:
 
   archiver-utils@5.0.2:
     dependencies:
-      glob: 10.4.2
+      glob: 10.4.3
       graceful-fs: 4.2.11
       is-stream: 2.0.1
       lazystream: 1.0.1
@@ -14341,7 +14341,7 @@ snapshots:
     dependencies:
       '@npmcli/fs': 3.1.1
       fs-minipass: 3.0.3
-      glob: 10.4.2
+      glob: 10.4.3
       lru-cache: 10.3.0
       minipass: 7.1.2
       minipass-collect: 2.0.1
@@ -16107,7 +16107,7 @@ snapshots:
       minipass: 7.1.2
       path-scurry: 1.11.1
 
-  glob@10.4.2:
+  glob@10.4.3:
     dependencies:
       foreground-child: 3.2.1
       jackspeak: 3.4.0
@@ -17724,7 +17724,7 @@ snapshots:
     dependencies:
       env-paths: 2.2.1
       exponential-backoff: 3.1.1
-      glob: 10.4.2
+      glob: 10.4.3
       graceful-fs: 4.2.11
       make-fetch-happen: 13.0.1
       nopt: 7.2.1
@@ -18934,7 +18934,7 @@ snapshots:
 
   rimraf@5.0.7:
     dependencies:
-      glob: 10.4.2
+      glob: 10.4.3
 
   robust-predicates@3.0.2: {}
 
@@ -19462,7 +19462,7 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.5
       commander: 4.1.1
-      glob: 10.4.2
+      glob: 10.4.3
       lines-and-columns: 1.2.4
       mz: 2.7.0
       pirates: 4.0.6
@@ -19563,7 +19563,7 @@ snapshots:
   test-exclude@7.0.1:
     dependencies:
       '@istanbuljs/schema': 0.1.3
-      glob: 10.4.2
+      glob: 10.4.3
       minimatch: 9.0.5
 
   text-decoder@1.1.0:

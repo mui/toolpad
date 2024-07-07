@@ -46,6 +46,6 @@
     "@types/semver": "7.5.8",
     "@types/tar": "6.1.13",
     "@types/yargs": "17.0.32",
-    "terminate": "^2.6.1"
+    "terminate": "^2.8.0"
   }
 }

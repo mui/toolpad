@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -70,6 +71,10 @@ function DemoPageContent({ pathname }) {
     </Box>
   );
 }
+
+DemoPageContent.propTypes = {
+  pathname: PropTypes.string.isRequired,
+};
 
 export default function DashboardLayoutBasic() {
   const [pathname, setPathname] = React.useState('/page');

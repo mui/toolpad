@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
@@ -23,21 +24,6 @@ const NAVIGATION = [
     icon: <TimelineIcon />,
   },
 ];
-
-function DemoPageContent({ pathname }) {
-  return (
-    <Box
-      sx={{
-        py: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <Typography>Dashboard content for {pathname}</Typography>
-    </Box>
-  );
-}
 
 const defaultDarkTheme = createTheme({ palette: { mode: 'dark' } });
 
@@ -76,6 +62,25 @@ const customTheme = createTheme(defaultDarkTheme, {
     },
   },
 });
+
+function DemoPageContent({ pathname }) {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
+}
+
+DemoPageContent.propTypes = {
+  pathname: PropTypes.string.isRequired,
+};
 
 export default function AppProviderTheme() {
   const [pathname, setPathname] = React.useState('/page');

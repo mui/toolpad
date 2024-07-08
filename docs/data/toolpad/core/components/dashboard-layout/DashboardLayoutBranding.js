@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -20,7 +21,7 @@ const NAVIGATION = [
   },
 ];
 
-function DemoPageContent({ pathname }: { pathname: string }) {
+function DemoPageContent({ pathname }) {
   return (
     <Box
       sx={{
@@ -34,6 +35,10 @@ function DemoPageContent({ pathname }: { pathname: string }) {
     </Box>
   );
 }
+
+DemoPageContent.propTypes = {
+  pathname: PropTypes.string.isRequired,
+};
 
 export default function DashboardLayoutBranding() {
   const [pathname, setPathname] = React.useState('/page');
@@ -58,7 +63,7 @@ export default function DashboardLayoutBranding() {
       theme={{ light: baseLightTheme, dark: baseDarkTheme }}
     >
       <DashboardLayout>
-      <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end

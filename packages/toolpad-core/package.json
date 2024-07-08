@@ -52,10 +52,10 @@
   },
   "dependencies": {
     "@mui/base": "5.0.0-beta.40",
-    "@mui/lab": "5.0.0-alpha.170",
-    "@mui/utils": "5.15.20",
-    "@mui/x-charts": "7.8.0",
-    "@mui/x-data-grid": "7.8.0",
+    "@mui/lab": "5.0.0-alpha.171",
+    "@mui/utils": "5.16.0",
+    "@mui/x-charts": "7.9.0",
+    "@mui/x-data-grid": "7.9.0",
     "@tanstack/react-query": "5.49.0",
     "@toolpad/utils": "workspace:*",
     "client-only": "^0.0.1",
@@ -63,8 +63,8 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "5.15.21",
-    "@mui/material": "5.15.21",
+    "@mui/icons-material": "5.16.0",
+    "@mui/material": "5.16.0",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.12",
     "@types/react": "18.3.3",
@@ -73,7 +73,7 @@
     "@vitest/browser": "beta",
     "next": "^14.2.4",
     "next-router-mock": "^0.9.13",
-    "playwright": "^1.45.0",
+    "playwright": "^1.45.1",
     "sinon": "^18.0.0",
     "vitest": "beta"
   },

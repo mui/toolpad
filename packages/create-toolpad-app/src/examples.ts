@@ -4,6 +4,7 @@
  */
 import * as path from 'path';
 import * as os from 'os';
+import chalk from 'chalk';
 import * as fs from 'fs/promises';
 import { createWriteStream } from 'fs';
 import * as tar from 'tar';
@@ -14,17 +15,34 @@ import invariant from 'invariant';
 async function downloadTar(url: string) {
   const tempFile = path.join(os.tmpdir(), `toolpad-cta-example.temp-${Date.now()}`);
   const response = await fetch(url);
+
   if (!response.ok) {
     throw new Error(`HTTP ${response.status} - ${response.statusText}`);
   }
   invariant(response.body, 'Missing response body');
+
+  let current = 0;
   // @ts-expect-error - @types/node ReadableStream clashing with lib.dom ReadableStream
   // https://github.com/microsoft/TypeScript/issues/29867
-  await pipeline(Readable.fromWeb(response.body), createWriteStream(tempFile));
+  const readable = Readable.fromWeb(response.body);
+  readable.on('data', (chunk) => {
+    process.stdout.write(
+      `Downloading… ${new Intl.NumberFormat('en-US', { style: 'unit', unit: 'megabyte' }).format(current / 1000000)}\r`,
+    );
+    current += chunk.length;
+  });
+  await pipeline(readable, createWriteStream(tempFile));
+
   return tempFile;
 }
 
 export async function downloadAndExtractExample(root: string, name: string) {
+  // eslint-disable-next-line no-console
+  console.log();
+  // eslint-disable-next-line no-console
+  console.log(`${chalk.cyan('info')} - Downloading example "${name}" to ${chalk.cyan(root)}`);
+  // eslint-disable-next-line no-console
+  console.log();
   const tempFile = await downloadTar('https://codeload.github.com/mui/mui-toolpad/tar.gz/master');
 
   await tar.x({
@@ -33,6 +51,15 @@ export async function downloadAndExtractExample(root: string, name: string) {
     strip: 2 + name.split('/').length,
     filter: (p) => p.includes(`mui-toolpad-master/examples/${name}/`),
   });
+
+  // eslint-disable-next-line no-console
+  console.log();
+  // eslint-disable-next-line no-console
+  console.log(
+    `${chalk.green('success')} - Downloaded and extracted "${name}" to ${chalk.cyan(root)}`,
+  );
+  // eslint-disable-next-line no-console
+  console.log();
 
   await fs.unlink(tempFile);
 }

@@ -57,6 +57,21 @@ const NAVIGATION: Navigation = [
   },
 ];
 
+function DemoPageContent({ pathname }: { pathname: string }) {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
+}
+
 export default function DashboardLayoutBasic() {
   const [pathname, setPathname] = React.useState('/page');
 
@@ -76,16 +91,7 @@ export default function DashboardLayoutBasic() {
       theme={{ light: baseLightTheme, dark: baseDarkTheme }}
     >
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content for {pathname}</Typography>
-        </Box>
+        <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end

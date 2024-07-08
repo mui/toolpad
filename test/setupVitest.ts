@@ -16,7 +16,7 @@ afterEach(cleanup);
 
 // Mocks
 
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && !window.matchMedia) {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: vi.fn().mockImplementation((query) => ({

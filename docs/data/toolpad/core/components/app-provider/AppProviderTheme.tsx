@@ -43,12 +43,6 @@ const customTheme: Theme = createTheme(defaultDarkTheme, {
       styleOverrides: {
         root: {
           backgroundColor: '#112E4D',
-          backgroundImage: 'none',
-          borderWidth: 0,
-          borderBottomWidth: 1,
-          borderStyle: 'solid',
-          borderColor: defaultDarkTheme.palette.divider,
-          boxShadow: 'none',
         },
       },
     },
@@ -59,91 +53,30 @@ const customTheme: Theme = createTheme(defaultDarkTheme, {
         },
       },
     },
-    MuiList: {
-      styleOverrides: {
-        root: {
-          padding: 0,
-        },
-      },
-    },
-    MuiIconButton: {
-      styleOverrides: {
-        root: {
-          color: defaultDarkTheme.palette.primary.dark,
-          padding: 8,
-        },
-      },
-    },
     MuiListSubheader: {
       styleOverrides: {
         root: {
           backgroundColor: '#112E4D',
-          fontSize: 12,
-          fontWeight: '700',
-          height: 40,
-          paddingLeft: 32,
-        },
-      },
-    },
-    MuiListItem: {
-      styleOverrides: {
-        root: {
-          paddingTop: 0,
-          paddingBottom: 0,
-        },
-      },
-    },
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          '&.Mui-selected': {
-            '& .MuiListItemIcon-root': {
-              color: defaultDarkTheme.palette.primary.dark,
-            },
-            '& .MuiTypography-root': {
-              color: defaultDarkTheme.palette.primary.dark,
-            },
-            '& .MuiSvgIcon-root': {
-              color: defaultDarkTheme.palette.primary.dark,
-            },
-            '& .MuiTouchRipple-child': {
-              backgroundColor: defaultDarkTheme.palette.primary.dark,
-            },
-          },
-          '& .MuiSvgIcon-root': {
-            color: defaultDarkTheme.palette.action.active,
-          },
-        },
-      },
-    },
-    MuiListItemText: {
-      styleOverrides: {
-        root: {
-          '& .MuiTypography-root': {
-            fontWeight: '500',
-          },
-        },
-      },
-    },
-    MuiListItemIcon: {
-      styleOverrides: {
-        root: {
-          minWidth: 34,
-        },
-      },
-    },
-    MuiDivider: {
-      styleOverrides: {
-        root: {
-          borderBottomWidth: 2,
-          marginLeft: '16px',
-          marginRight: '16px',
         },
       },
     },
   },
 });
+
+function DemoPageContent({ pathname }: { pathname: string }) {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
+}
 
 export default function AppProviderTheme() {
   const [pathname, setPathname] = React.useState('/page');
@@ -157,21 +90,10 @@ export default function AppProviderTheme() {
   }, [pathname]);
 
   return (
-    // preview-start
     <AppProvider navigation={NAVIGATION} router={router} theme={customTheme}>
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content for {pathname}</Typography>
-        </Box>
+        <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
-    // preview-end
   );
 }

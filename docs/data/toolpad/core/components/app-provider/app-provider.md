@@ -18,7 +18,7 @@ Wrap an application page with the `AppProvider` component.
 
 Ideally, the `AppProvider` should wrap every page in the application, therefore in most projects it should be imported and placed in the file that defines a **shared layout** for all pages.
 
-In the following (purely demonstrative) example, an `AppProvider` component wrapping the page provides it with a default theme, and a `DashboardLayout` placed inside it gets its navigation and routing features automatically set based on the props passed to the `AppProvider`.
+In the following example, an `AppProvider` component wrapping the page provides it with a default theme, and a `DashboardLayout` placed inside it gets its navigation and routing features automatically set based on the props passed to the `AppProvider`.
 
 {{"demo": "AppProviderBasic.js", "height": 500, "iframe": true}}
 

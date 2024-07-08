@@ -24,6 +24,21 @@ const NAVIGATION = [
   },
 ];
 
+function DemoPageContent({ pathname }) {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
+}
+
 export default function TutorialPages() {
   const [pathname, setPathname] = React.useState('/page');
 
@@ -38,16 +53,7 @@ export default function TutorialPages() {
   return (
     <AppProvider router={router} navigation={NAVIGATION}>
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content for {pathname}</Typography>
-        </Box>
+        <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
   );

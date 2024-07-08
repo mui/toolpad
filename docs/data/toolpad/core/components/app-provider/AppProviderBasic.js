@@ -17,13 +17,27 @@ const NAVIGATION = [
     title: 'Page',
     icon: <DashboardIcon />,
   },
-  // Add the following new item:
   {
     slug: '/page-2',
     title: 'Page 2',
     icon: <TimelineIcon />,
   },
 ];
+
+function DemoPageContent({ pathname }) {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
+}
 
 export default function AppProviderBasic() {
   const [pathname, setPathname] = React.useState('/page');
@@ -37,25 +51,14 @@ export default function AppProviderBasic() {
   }, [pathname]);
 
   return (
-    // preview-start
     <AppProvider
       navigation={NAVIGATION}
       router={router}
       theme={{ light: baseLightTheme, dark: baseDarkTheme }}
     >
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content for {pathname}</Typography>
-        </Box>
+        <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
-    // preview-end
   );
 }

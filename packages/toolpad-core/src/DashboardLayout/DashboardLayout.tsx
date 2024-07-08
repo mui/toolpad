@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material';
-import AppBar from '@mui/material/AppBar';
+import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Container from '@mui/material/Container';
@@ -23,6 +23,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import useSsr from '@toolpad/utils/hooks/useSsr';
 import {
   BrandingContext,
   NavigationContext,
@@ -34,6 +35,16 @@ import { ToolpadLogo } from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320;
 
+const AppBar = styled(MuiAppBar)(({ theme }) => ({
+  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+  borderWidth: 0,
+  borderBottomWidth: 1,
+  borderStyle: 'solid',
+  borderColor: (theme.vars ?? theme).palette.divider,
+  boxShadow: 'none',
+  zIndex: theme.zIndex.drawer + 1,
+}));
+
 const LogoContainer = styled('div')({
   position: 'relative',
   height: 40,
@@ -41,6 +52,72 @@ const LogoContainer = styled('div')({
     maxHeight: 40,
   },
 });
+
+const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
+  borderRadius: 8,
+  '&.Mui-selected': {
+    '& .MuiListItemIcon-root': {
+      color: (theme.vars ?? theme).palette.primary.dark,
+    },
+    '& .MuiTypography-root': {
+      color: (theme.vars ?? theme).palette.primary.dark,
+    },
+    '& .MuiSvgIcon-root': {
+      color: (theme.vars ?? theme).palette.primary.dark,
+    },
+    '& .MuiTouchRipple-child': {
+      backgroundColor: (theme.vars ?? theme).palette.primary.dark,
+    },
+  },
+  '& .MuiSvgIcon-root': {
+    color: (theme.vars ?? theme).palette.action.active,
+  },
+}));
+
+function ThemeSwitcher() {
+  const isSsr = useSsr();
+
+  const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
+
+  const toggleMode = React.useCallback(() => {
+    setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
+  }, [paletteMode, setPaletteMode]);
+
+  return isDualTheme ? (
+    <Tooltip title={`${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
+      <IconButton
+        aria-label={
+          isSsr
+            ? 'Switch theme mode'
+            : `Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`
+        }
+        onClick={toggleMode}
+        sx={(theme) => ({
+          color: (theme.vars ?? theme).palette.primary.dark,
+          padding: 1,
+        })}
+      >
+        <React.Fragment>
+          <DarkModeIcon
+            sx={(theme) => ({
+              [theme.getColorSchemeSelector('dark')]: {
+                display: 'none',
+              },
+            })}
+          />
+          <LightModeIcon
+            sx={(theme) => ({
+              display: 'none',
+              [theme.getColorSchemeSelector('dark')]: {
+                display: 'inline',
+              },
+            })}
+          />
+        </React.Fragment>
+      </IconButton>
+    </Tooltip>
+  ) : null;
+}
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
@@ -111,11 +188,24 @@ function DashboardSidebarSubNavigation({
   }, [routerContext]);
 
   return (
-    <List sx={{ mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
+    <List sx={{ padding: 0, mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
       {subNavigation.map((navigationItem, navigationItemIndex) => {
         if (navigationItem.kind === 'header') {
           return (
-            <ListSubheader key={`subheader-${depth}-${navigationItemIndex}`} component="div">
+            <ListSubheader
+              key={`subheader-${depth}-${navigationItemIndex}`}
+              component="div"
+              sx={(theme) => ({
+                color: (theme.vars ?? theme).palette.grey['600'],
+                fontSize: 12,
+                fontWeight: '700',
+                height: 40,
+                pl: 4,
+                [theme.getColorSchemeSelector('dark')]: {
+                  color: (theme.vars ?? theme).palette.grey['500'],
+                },
+              })}
+            >
               {navigationItem.title}
             </ListSubheader>
           );
@@ -127,7 +217,13 @@ function DashboardSidebarSubNavigation({
           return (
             <Divider
               key={`divider-${depth}-${navigationItemIndex}`}
-              sx={{ mt: 1, mb: nextItem?.kind === 'header' ? 0 : 1 }}
+              sx={{
+                borderBottomWidth: 2,
+                ml: 2,
+                mr: 2,
+                mt: 1,
+                mb: nextItem?.kind === 'header' ? 0 : 1,
+              }}
             />
           );
         }
@@ -145,15 +241,28 @@ function DashboardSidebarSubNavigation({
         );
 
         const listItem = (
-          <ListItem>
-            <ListItemButton
+          <ListItem sx={{ pt: 0, pb: 0 }}>
+            <NavigationListItemButton
               selected={pathname === navigationItemFullPath}
               onClick={handleSidebarItemClick(navigationItemId)}
             >
-              <ListItemIcon>{navigationItem.icon}</ListItemIcon>
-              <ListItemText primary={navigationItem.title} />
+              <ListItemIcon
+                sx={{
+                  minWidth: 34,
+                }}
+              >
+                {navigationItem.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={navigationItem.title}
+                sx={{
+                  '& .MuiTypography-root': {
+                    fontWeight: '500',
+                  },
+                }}
+              />
               {navigationItem.children ? nestedNavigationCollapseIcon : null}
-            </ListItemButton>
+            </NavigationListItemButton>
           </ListItem>
         );
 
@@ -209,27 +318,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
-  const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
-
-  const [hasMounted, setHasMounted] = React.useState(false);
-  React.useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  const toggleMode = React.useCallback(() => {
-    setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
-  }, [paletteMode, setPaletteMode]);
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar
-        color="inherit"
-        position="fixed"
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-      >
-        <Toolbar>
+      <AppBar color="inherit" position="fixed">
+        <Toolbar sx={{ backgroundColor: 'inherit' }}>
           <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
             <Stack direction="row" alignItems="center">
               <Box sx={{ mr: 1 }}>
@@ -244,16 +337,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Stack>
           </a>
           <Box sx={{ flexGrow: 1 }} />
-          {hasMounted && isDualTheme ? (
-            <Tooltip title={`${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
-              <IconButton
-                aria-label={`Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`}
-                onClick={toggleMode}
-              >
-                {paletteMode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-              </IconButton>
-            </Tooltip>
-          ) : null}
+          <ThemeSwitcher />
         </Toolbar>
       </AppBar>
       <Drawer

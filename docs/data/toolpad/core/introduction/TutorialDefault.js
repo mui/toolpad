@@ -12,20 +12,26 @@ const NAVIGATION = [
   },
 ];
 
+function DemoPageContent() {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Typography>Dashboard content</Typography>
+    </Box>
+  );
+}
+
 export default function TutorialDefault() {
   return (
     <AppProvider navigation={NAVIGATION}>
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content</Typography>
-        </Box>
+        <DemoPageContent />
       </DashboardLayout>
     </AppProvider>
   );

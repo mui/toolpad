@@ -7,6 +7,21 @@ import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 
+function DemoPageContent({ pathname }: { pathname: string }) {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
+}
+
 export default function DashboardLayoutNavigation() {
   const [pathname, setPathname] = React.useState('/page');
 
@@ -165,16 +180,7 @@ export default function DashboardLayoutNavigation() {
       theme={{ light: baseLightTheme, dark: baseDarkTheme }}
     >
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content for {pathname}</Typography>
-        </Box>
+        <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end

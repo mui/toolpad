@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material';
+import { Breakpoint, styled } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -40,12 +40,15 @@ const LogoContainer = styled('div')({
   },
 });
 
-const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'isMobileNavigationOpen' })<{
+const Main = styled('main', {
+  shouldForwardProp: (prop) => prop !== 'isMobileNavigationOpen' && prop !== 'mobileBreakpoint',
+})<{
   isMobileNavigationOpen: boolean;
-}>(({ theme, isMobileNavigationOpen }) => ({
+  mobileBreakpoint: Breakpoint;
+}>(({ theme, isMobileNavigationOpen, mobileBreakpoint }) => ({
   flexGrow: 1,
   minWidth: MIN_CONTENT_WIDTH,
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down(mobileBreakpoint)]: {
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -211,11 +214,13 @@ export interface DashboardLayoutProps {
    * The content of the dashboard.
    */
   children: React.ReactNode;
+
   /**
-   * Whether the mobile navigation drawer should start open.
+   * @internal
+   * Whether the component is being used an as example in documentation.
    * @default false
    */
-  initialNavigationOpen?: boolean;
+  isDemoMode?: boolean;
 }
 
 /**
@@ -229,12 +234,14 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, initialNavigationOpen = false } = props;
+  const { children, isDemoMode = false } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
 
-  const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(initialNavigationOpen);
+  const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(isDemoMode);
+
+  const mobileBreakpoint = isDemoMode ? 'sm' : 'md';
 
   const toggleMobileNavigation = React.useCallback(() => {
     setIsMobileNavigationOpen((previousIsOpen) => !previousIsOpen);
@@ -272,15 +279,15 @@ function DashboardLayout(props: DashboardLayoutProps) {
             aria-label="Open navigation menu"
             onClick={toggleMobileNavigation}
             edge="start"
-            sx={{ display: { xs: 'block', md: 'none' } }}
+            sx={{ display: { xs: 'block', [mobileBreakpoint]: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
           <Box
             sx={{
-              position: { xs: 'absolute', md: 'static' },
-              left: { xs: '50%', md: 'auto' },
-              transform: { xs: 'translateX(-50%)', md: 'none' },
+              position: { xs: 'absolute', [mobileBreakpoint]: 'static' },
+              left: { xs: '50%', [mobileBreakpoint]: 'auto' },
+              transform: { xs: 'translateX(-50%)', [mobileBreakpoint]: 'none' },
             }}
           >
             <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
@@ -292,7 +299,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               </Stack>
             </a>
           </Box>
-          <Box sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }} />
+          <Box sx={{ display: { xs: 'none', [mobileBreakpoint]: 'block' }, flexGrow: 1 }} />
         </Toolbar>
       </AppBar>
       <Drawer
@@ -302,7 +309,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           keepMounted: true, // Better open performance on mobile.
         }}
         sx={{
-          display: { xs: 'block', md: 'none' },
+          display: { xs: 'block', [mobileBreakpoint]: 'none' },
           ...drawerSx,
         }}
       >
@@ -311,13 +318,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <Drawer
         variant="permanent"
         sx={{
-          display: { xs: 'none', md: 'block' },
+          display: { xs: 'none', [mobileBreakpoint]: 'block' },
           ...drawerSx,
         }}
       >
         {drawerContent}
       </Drawer>
-      <Main isMobileNavigationOpen={isMobileNavigationOpen}>
+      <Main isMobileNavigationOpen={isMobileNavigationOpen} mobileBreakpoint={mobileBreakpoint}>
         <Toolbar />
         <Container maxWidth="lg">{children}</Container>
       </Main>
@@ -335,10 +342,11 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * Whether the mobile navigation drawer should start open.
+   * @internal
+   * Whether the component is being used an as example in documentation.
    * @default false
    */
-  initialNavigationOpen: PropTypes.bool,
+  isDemoMode: PropTypes.bool,
 } as any;
 
 export { DashboardLayout };

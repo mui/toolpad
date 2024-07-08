@@ -1,8 +1,5 @@
 {
-  "props": {
-    "children": { "type": { "name": "node" }, "required": true },
-    "initialNavigationOpen": { "type": { "name": "bool" }, "default": "false" }
-  },
+  "props": { "children": { "type": { "name": "node" }, "required": true } },
   "name": "DashboardLayout",
   "imports": [
     "import { DashboardLayout } from '@toolpad-core/DashboardLayout';",

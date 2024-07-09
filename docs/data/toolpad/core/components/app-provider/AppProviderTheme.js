@@ -25,40 +25,12 @@ const NAVIGATION = [
   },
 ];
 
-const defaultDarkTheme = createTheme({ palette: { mode: 'dark' } });
-
-const customTheme = createTheme(defaultDarkTheme, {
+const customTheme = createTheme({
   palette: {
+    mode: 'dark',
     background: {
       default: '#2A4364',
-    },
-  },
-  typography: {
-    h6: {
-      fontWeight: '700',
-    },
-  },
-  components: {
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#112E4D',
-        },
-      },
-    },
-    MuiDrawer: {
-      styleOverrides: {
-        paper: {
-          backgroundColor: '#112E4D',
-        },
-      },
-    },
-    MuiListSubheader: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#112E4D',
-        },
-      },
+      paper: '#112E4D',
     },
   },
 });
@@ -71,6 +43,7 @@ function DemoPageContent({ pathname }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       <Typography>Dashboard content for {pathname}</Typography>
@@ -94,10 +67,12 @@ export default function AppProviderTheme() {
   }, [pathname]);
 
   return (
+    // preview-start
     <AppProvider navigation={NAVIGATION} router={router} theme={customTheme}>
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
+    // preview-end
   );
 }

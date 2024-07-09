@@ -20,6 +20,7 @@ function DemoPageContent() {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       <Typography>Dashboard content</Typography>

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { createTheme, Theme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -25,40 +25,12 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-const defaultDarkTheme = createTheme({ palette: { mode: 'dark' } });
-
-const customTheme: Theme = createTheme(defaultDarkTheme, {
+const customTheme = createTheme({
   palette: {
+    mode: 'dark',
     background: {
       default: '#2A4364',
-    },
-  },
-  typography: {
-    h6: {
-      fontWeight: '700',
-    },
-  },
-  components: {
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#112E4D',
-        },
-      },
-    },
-    MuiDrawer: {
-      styleOverrides: {
-        paper: {
-          backgroundColor: '#112E4D',
-        },
-      },
-    },
-    MuiListSubheader: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#112E4D',
-        },
-      },
+      paper: '#112E4D',
     },
   },
 });
@@ -71,6 +43,7 @@ function DemoPageContent({ pathname }: { pathname: string }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       <Typography>Dashboard content for {pathname}</Typography>
@@ -90,10 +63,12 @@ export default function AppProviderTheme() {
   }, [pathname]);
 
   return (
+    // preview-start
     <AppProvider navigation={NAVIGATION} router={router} theme={customTheme}>
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
+    // preview-end
   );
 }

@@ -8,11 +8,6 @@ const baseLightTheme = createTheme(defaultLightTheme, {
       default: defaultLightTheme.palette.grey['50'],
     },
   },
-  typography: {
-    h6: {
-      fontWeight: '700',
-    },
-  },
 });
 
 export { baseLightTheme };

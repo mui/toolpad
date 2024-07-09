@@ -15,11 +15,6 @@ const baseDarkTheme = createTheme(defaultDarkTheme, {
       primary: defaultDarkTheme.palette.grey['100'],
     },
   },
-  typography: {
-    h6: {
-      fontWeight: '700',
-    },
-  },
 });
 
 export { baseDarkTheme };

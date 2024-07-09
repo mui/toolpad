@@ -24,11 +24,6 @@ const baseCSSVarsTheme = extendTheme({
       },
     },
   },
-  typography: {
-    h6: {
-      fontWeight: '700',
-    },
-  },
 });
 
 export { baseCSSVarsTheme };

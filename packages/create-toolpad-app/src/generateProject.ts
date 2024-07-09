@@ -113,11 +113,6 @@ export default function generateProject(
         default: defaultTheme.palette.grey['50'],
       },
     },
-    typography: {
-      h6: {
-        fontWeight: '700',
-      },
-    },
   });
 
   export default theme;

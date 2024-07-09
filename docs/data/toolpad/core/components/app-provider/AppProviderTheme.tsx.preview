@@ -1,3 +1,5 @@
-<DashboardLayout>
-  <DemoPageContent pathname={pathname} />
-</DashboardLayout>
+<AppProvider navigation={NAVIGATION} router={router} theme={customTheme}>
+  <DashboardLayout>
+    <DemoPageContent pathname={pathname} />
+  </DashboardLayout>
+</AppProvider>

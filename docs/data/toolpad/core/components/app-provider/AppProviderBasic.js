@@ -33,6 +33,7 @@ function DemoPageContent({ pathname }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       <Typography>Dashboard content for {pathname}</Typography>
@@ -56,6 +57,7 @@ export default function AppProviderBasic() {
   }, [pathname]);
 
   return (
+    // preview-start
     <AppProvider
       navigation={NAVIGATION}
       router={router}
@@ -65,5 +67,6 @@ export default function AppProviderBasic() {
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
+    // preview-end
   );
 }

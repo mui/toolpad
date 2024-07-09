@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material';
+import { styled, useTheme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -76,6 +76,7 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
 
 function ThemeSwitcher() {
   const isSsr = useSsr();
+  const theme = useTheme();
 
   const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
 
@@ -92,28 +93,36 @@ function ThemeSwitcher() {
             : `Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`
         }
         onClick={toggleMode}
-        sx={(theme) => ({
+        sx={{
           color: (theme.vars ?? theme).palette.primary.dark,
           padding: 1,
-        })}
+        }}
       >
-        <React.Fragment>
-          <DarkModeIcon
-            sx={(theme) => ({
-              [theme.getColorSchemeSelector('dark')]: {
+        {theme.getColorSchemeSelector ? (
+          <React.Fragment>
+            <DarkModeIcon
+              sx={{
+                [theme.getColorSchemeSelector('dark')]: {
+                  display: 'none',
+                },
+              }}
+            />
+            <LightModeIcon
+              sx={{
                 display: 'none',
-              },
-            })}
-          />
-          <LightModeIcon
-            sx={(theme) => ({
-              display: 'none',
-              [theme.getColorSchemeSelector('dark')]: {
-                display: 'inline',
-              },
-            })}
-          />
-        </React.Fragment>
+                [theme.getColorSchemeSelector('dark')]: {
+                  display: 'inline',
+                },
+              }}
+            />
+          </React.Fragment>
+        ) : null}
+        {!theme.getColorSchemeSelector ? (
+          <React.Fragment>
+            {isSsr ? <LightModeIcon sx={{ visibility: 'hidden' }} /> : null}
+            {!isSsr && paletteMode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+          </React.Fragment>
+        ) : null}
       </IconButton>
     </Tooltip>
   ) : null;
@@ -195,16 +204,12 @@ function DashboardSidebarSubNavigation({
             <ListSubheader
               key={`subheader-${depth}-${navigationItemIndex}`}
               component="div"
-              sx={(theme) => ({
-                color: (theme.vars ?? theme).palette.grey['600'],
+              sx={{
                 fontSize: 12,
                 fontWeight: '700',
                 height: 40,
                 pl: 4,
-                [theme.getColorSchemeSelector('dark')]: {
-                  color: (theme.vars ?? theme).palette.grey['500'],
-                },
-              })}
+              }}
             >
               {navigationItem.title}
             </ListSubheader>
@@ -330,7 +335,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
               </Box>
               <Typography
                 variant="h6"
-                sx={{ color: (theme) => (theme.vars ?? theme).palette.primary.main }}
+                sx={{
+                  color: (theme) => (theme.vars ?? theme).palette.primary.main,
+                  fontWeight: '700',
+                }}
               >
                 {branding?.title ?? 'Toolpad'}
               </Typography>

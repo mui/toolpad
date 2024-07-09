@@ -3,12 +3,13 @@ import Button from '@mui/material/Button';
 import Frame from 'docs/src/components/action/Frame';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
-import { useNotifications } from '@toolpad/core/useNotifications';
+import { useNotifications, NotificationsProvider} from '@toolpad/core/useNotifications';
 
 
 function BasicNotification() {
   const notifications = useNotifications();
   return (
+    
     <div>
       <Button
         onClick={() => {
@@ -43,7 +44,9 @@ export default function ToolpadNotificationDemo() {
             }),
           })}
         >
+      <NotificationsProvider>
       <BasicNotification />
+      </NotificationsProvider>
      </Paper>
     </Frame.Demo>
       <Frame.Info data-mui-color-scheme="dark" sx={{ maxHeight: 600, overflow: 'auto' }}>

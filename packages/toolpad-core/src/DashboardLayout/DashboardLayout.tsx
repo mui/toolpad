@@ -45,12 +45,14 @@ interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
+  onSidebarItemClick?: (itemId: string) => void;
 }
 
 function DashboardSidebarSubNavigation({
   subNavigation,
   basePath = '',
   depth = 0,
+  onSidebarItemClick,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
 
@@ -94,8 +96,12 @@ function DashboardSidebarSubNavigation({
           ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
           : [...previousValue, itemId],
       );
+
+      if (onSidebarItemClick) {
+        onSidebarItemClick(itemId);
+      }
     },
-    [],
+    [onSidebarItemClick],
   );
 
   const handleLinkClick = React.useMemo(() => {
@@ -211,15 +217,25 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
 
+  const handleSetMobileNavigationOpen = React.useCallback(
+    (newOpen: boolean) => () => {
+      setIsMobileNavigationOpen(newOpen);
+    },
+    [],
+  );
+
   const toggleMobileNavigation = React.useCallback(() => {
-    setIsMobileNavigationOpen((previousIsOpen) => !previousIsOpen);
+    setIsMobileNavigationOpen((previousOpen) => !previousOpen);
   }, []);
 
   const drawerContent = (
     <React.Fragment>
       <Toolbar />
       <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}>
-        <DashboardSidebarSubNavigation subNavigation={navigation} />
+        <DashboardSidebarSubNavigation
+          subNavigation={navigation}
+          onSidebarItemClick={handleSetMobileNavigationOpen(false)}
+        />
       </Box>
     </React.Fragment>
   );
@@ -281,7 +297,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <Drawer
         variant="temporary"
         open={isMobileNavigationOpen}
-        onClose={toggleMobileNavigation}
+        onClose={handleSetMobileNavigationOpen(false)}
         ModalProps={{
           keepMounted: true, // Better open performance on mobile.
         }}

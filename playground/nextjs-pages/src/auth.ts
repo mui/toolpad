@@ -14,9 +14,8 @@ const providers: Provider[] = [
       password: { label: 'Password', type: 'password' },
     },
     authorize(c) {
-      console.log('credentials', c);
       if (c.password !== 'password') {
-        return null;
+        throw new Error('Invalid password');
       }
       return {
         id: 'test',
@@ -41,5 +40,17 @@ export const { handlers, auth } = NextAuth({
   pages: {
     signIn: '/auth/signin',
     signOut: '/auth/signout',
+  },
+  callbacks: {
+    authorized({ auth: session, request: { nextUrl } }) {
+      const isLoggedIn = !!session?.user;
+      const isPublicPage = nextUrl.pathname.startsWith('/public');
+
+      if (isPublicPage || isLoggedIn) {
+        return true;
+      }
+
+      return false; // Redirect unauthenticated users to login page
+    },
   },
 });

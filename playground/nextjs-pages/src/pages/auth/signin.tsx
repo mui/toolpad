@@ -12,27 +12,43 @@ export default function SignIn({
     <SignInPage
       providers={providers}
       signIn={async (provider, formData, callbackUrl) => {
-        // Strip the `error` query parameter from the URL
-        // This is useful when the user is redirected back to the page
-        // after a failed login attempt.
-        callbackUrl = callbackUrl?.replace(/\?error=.+$/, '');
-
-        try {
+        if (provider.id === 'credentials') {
           const signInResponse = await signIn(provider.id, {
-            ...(formData && Object.fromEntries(formData)),
-            redirectTo: callbackUrl ?? '/',
+            ...Object.fromEntries(formData),
+            redirect: false,
           });
-          return signInResponse?.ok ? '' : 'Something went wrong.';
-        } catch (error) {
-          if (error instanceof AuthError) {
-            switch (error.type) {
-              case 'CredentialsSignin':
-                return 'Invalid credentials.';
-              default:
-                return 'Something went wrong.';
+          if (signInResponse && signInResponse.error) {
+            // Return the error message if the sign-in failed
+            if (
+              signInResponse.error === 'CredentialsSignin' ||
+              signInResponse.error === 'Configuration'
+            ) {
+              return 'Invalid credentials.';
             }
+            return 'Something went wrong.';
+          } else {
+            // Redirect to the callback URL if the sign-in was successful
+            window.location.href = callbackUrl ?? '/';
+            return '';
           }
-          throw error;
+        } else {
+          try {
+            const signInResponse = await signIn(provider.id, {
+              ...(formData && Object.fromEntries(formData)),
+              redirectTo: callbackUrl ?? '/',
+            });
+            return signInResponse?.ok ? '' : 'Something went wrong.';
+          } catch (error) {
+            if (error instanceof AuthError) {
+              switch (error.type) {
+                case 'CredentialsSignin':
+                  return 'Invalid credentials.';
+                default:
+                  return 'Something went wrong.';
+              }
+            }
+            throw error;
+          }
         }
       }}
     />

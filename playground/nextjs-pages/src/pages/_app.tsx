@@ -51,7 +51,7 @@ function getDefaultLayout(page: React.ReactElement) {
 }
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { status } = useSession({ required: true });
+  const { status } = useSession();
 
   if (status === 'loading') {
     return <LinearProgress />;

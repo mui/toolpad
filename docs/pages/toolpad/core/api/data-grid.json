@@ -737,6 +737,12 @@
       "isGlobal": false
     },
     {
+      "key": "rowSkeleton",
+      "className": "",
+      "description": "Styles applied to the skeleton row element.",
+      "isGlobal": false
+    },
+    {
       "key": "scrollArea",
       "className": "",
       "description": "Styles applied to both scroll area elements.",

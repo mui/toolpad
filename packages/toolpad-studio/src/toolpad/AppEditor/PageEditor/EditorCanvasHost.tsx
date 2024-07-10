@@ -30,6 +30,7 @@ import {
 } from '../../../utils/geometry';
 import { PageViewState, NodeInfo, SlotsState } from '../../../types';
 import { useAppStateApi } from '../../AppState';
+import { FONTS_URL } from '../../../runtime/constants';
 
 // Interface to communicate between editor and canvas
 export interface ToolpadBridge {
@@ -319,9 +320,12 @@ export default function EditorCanvasHost({
           <html lang="en">
             <head>
               <meta charset="UTF-8" />
+              <title>Toolpad</title>
+              <link rel="preload" href="${FONTS_URL}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+              <noscript><link rel="stylesheet" href="${FONTS_URL}"></noscript>
               <link
                 rel="stylesheet"
-                href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+                href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
               />
             </head>
             <body className="notranslate">

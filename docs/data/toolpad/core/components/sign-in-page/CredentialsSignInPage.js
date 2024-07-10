@@ -1,13 +1,9 @@
 import * as React from 'react';
 import { SignInPage } from '@toolpad/core';
 
-const providers = [
-  { id: 'github', name: 'GitHub' },
-  { id: 'google', name: 'Google' },
-  { id: 'credentials', name: 'Email and Password' },
-];
+const providers = [{ id: 'credentials', name: 'Email and Password' }];
 
-export default function BasicSignInPage() {
+export default function CredentialsSignInPage() {
   return (
     <SignInPage
       signIn={(provider) => alert(`Signing in with "${provider.name}"`)}

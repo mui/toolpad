@@ -11,23 +11,25 @@ export default function SignIn({
   return (
     <SignInPage
       providers={providers}
-      signIn={(provider, formData, callbackUrl) => {
+      signIn={async (provider, formData, callbackUrl) => {
         // Strip the `error` query parameter from the URL
         // This is useful when the user is redirected back to the page
         // after a failed login attempt.
         callbackUrl = callbackUrl?.replace(/\?error=.+$/, '');
+
         try {
-          return signIn(provider.id, {
+          const signInResponse = await signIn(provider.id, {
             ...(formData && Object.fromEntries(formData)),
             redirectTo: callbackUrl ?? '/',
           });
+          return signInResponse?.ok ? 'Authentication successful.' : 'Something went wrong.';
         } catch (error) {
           if (error instanceof AuthError) {
             switch (error.type) {
               case 'CredentialsSignin':
                 return 'Invalid credentials.';
               default:
-                return 'Something went wrong';
+                return 'Something went wrong.';
             }
           }
           throw error;

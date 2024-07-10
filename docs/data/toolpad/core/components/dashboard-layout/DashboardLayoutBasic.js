@@ -191,11 +191,12 @@ export default function DashboardLayoutBasic(props) {
   }, [pathname]);
 
   // Remove this const when copying and pasting into your project.
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const mobileNavigationContainer =
+    window !== undefined ? () => window().document.body : undefined;
 
   return (
     <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
-      <DashboardLayout container={container}>
+      <DashboardLayout mobileNavigationContainer={mobileNavigationContainer}>
         <Box
           sx={{
             py: 4,

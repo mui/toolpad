@@ -201,7 +201,7 @@ export interface DashboardLayoutProps {
    * @internal
    * Container element for the navigation drawer.
    */
-  container?: DrawerProps['container'];
+  mobileNavigationContainer?: DrawerProps['container'];
 }
 
 /**
@@ -215,7 +215,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, container } = props;
+  const { children, mobileNavigationContainer } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
@@ -299,7 +299,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         </Toolbar>
       </AppBar>
       <Drawer
-        container={container}
+        container={mobileNavigationContainer}
         variant="temporary"
         open={isMobileNavigationOpen}
         onClose={handleSetMobileNavigationOpen(false)}

@@ -204,7 +204,7 @@ function SignInPage(props: SignInPageProps) {
                   if (credentialsResponse) {
                     notifications.show(credentialsResponse, {
                       severity: 'error',
-                      autoHideDuration: 3000,
+                      autoHideDuration: 30000,
                     });
                   }
                 }}

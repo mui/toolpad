@@ -13,7 +13,9 @@
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.16.0",
     "@mui/material-nextjs": "5.15.11",
+    "@playwright/test": "1.45.1",
     "@toolpad/core": "workspace:*",
+    "@types/node": "20.14.10",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "eslint-config-next": "14.2.4",
@@ -21,5 +23,8 @@
     "next-auth": "5.0.0-beta.18",
     "react": "18.3.1",
     "react-dom": "18.3.1"
+  },
+  "dependencies": {
+    "playwright": "^1.45.1"
   }
 }

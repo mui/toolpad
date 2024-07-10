@@ -24,7 +24,17 @@ const NAVIGATION = [
   },
 ];
 
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
 
 const theme = createTheme(defaultTheme, {
   palette: {
@@ -36,13 +46,6 @@ const theme = createTheme(defaultTheme, {
     h6: {
       fontWeight: '700',
     },
-  },
-  breakpoints: {
-    xs: 300,
-    sm: 300,
-    md: 300,
-    lg: 300,
-    xl: 300,
   },
   components: {
     MuiAppBar: {

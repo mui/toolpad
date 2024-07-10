@@ -15,11 +15,13 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import {
   BrandingContext,
   Navigation,
@@ -265,14 +267,20 @@ function DashboardLayout(props: DashboardLayoutProps) {
         }}
       >
         <Toolbar>
-          <IconButton
-            aria-label="Open navigation menu"
-            onClick={toggleMobileNavigation}
-            edge="start"
+          <Tooltip
+            title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
+            placement="right"
+            enterDelay={1000}
             sx={{ display: { xs: 'block', md: 'none' } }}
           >
-            <MenuIcon />
-          </IconButton>
+            <IconButton
+              aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
+              onClick={toggleMobileNavigation}
+              edge="start"
+            >
+              {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
+            </IconButton>
+          </Tooltip>
           <Box
             sx={{
               position: { xs: 'absolute', md: 'static' },

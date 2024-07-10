@@ -34,7 +34,7 @@ describe('SignInPage', () => {
 
     const emailField = screen.getByRole('textbox', { name: 'Email Address' });
     const passwordField = screen.getByLabelText(/Password/);
-    const signInButton = screen.getByRole('button', { name: 'Sign in with username and password' });
+    const signInButton = screen.getByRole('button', { name: 'Sign in' });
 
     await userEvent.type(emailField, 'john@example.com');
     await userEvent.type(passwordField, 'thepassword');

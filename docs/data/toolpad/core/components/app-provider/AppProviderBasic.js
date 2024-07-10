@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -16,13 +17,130 @@ const NAVIGATION = [
     title: 'Page',
     icon: <DashboardIcon />,
   },
-  // Add the following new item:
   {
     slug: '/page-2',
     title: 'Page 2',
     icon: <TimelineIcon />,
   },
 ];
+
+const defaultTheme = createTheme();
+
+const theme = createTheme(defaultTheme, {
+  palette: {
+    background: {
+      default: defaultTheme.palette.grey['50'],
+    },
+  },
+  typography: {
+    h6: {
+      fontWeight: '700',
+    },
+  },
+  breakpoints: {
+    xs: 300,
+    sm: 300,
+    md: 300,
+    lg: 300,
+    xl: 300,
+  },
+  components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          borderWidth: 0,
+          borderBottomWidth: 1,
+          borderStyle: 'solid',
+          borderColor: defaultTheme.palette.divider,
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiList: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+        },
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          color: defaultTheme.palette.primary.dark,
+          padding: 8,
+        },
+      },
+    },
+    MuiListSubheader: {
+      styleOverrides: {
+        root: {
+          color: defaultTheme.palette.grey['600'],
+          fontSize: 12,
+          fontWeight: '700',
+          height: 40,
+          paddingLeft: 32,
+        },
+      },
+    },
+    MuiListItem: {
+      styleOverrides: {
+        root: {
+          paddingTop: 0,
+          paddingBottom: 0,
+        },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          '&.Mui-selected': {
+            '& .MuiListItemIcon-root': {
+              color: defaultTheme.palette.primary.dark,
+            },
+            '& .MuiTypography-root': {
+              color: defaultTheme.palette.primary.dark,
+            },
+            '& .MuiSvgIcon-root': {
+              color: defaultTheme.palette.primary.dark,
+            },
+            '& .MuiTouchRipple-child': {
+              backgroundColor: defaultTheme.palette.primary.dark,
+            },
+          },
+          '& .MuiSvgIcon-root': {
+            color: defaultTheme.palette.action.active,
+          },
+        },
+      },
+    },
+    MuiListItemText: {
+      styleOverrides: {
+        root: {
+          '& .MuiTypography-root': {
+            fontWeight: '500',
+          },
+        },
+      },
+    },
+    MuiListItemIcon: {
+      styleOverrides: {
+        root: {
+          minWidth: 34,
+        },
+      },
+    },
+    MuiDivider: {
+      styleOverrides: {
+        root: {
+          borderBottomWidth: 2,
+          marginLeft: '16px',
+          marginRight: '16px',
+        },
+      },
+    },
+  },
+});
 
 export default function AppProviderBasic() {
   const [pathname, setPathname] = React.useState('/page');
@@ -37,8 +155,8 @@ export default function AppProviderBasic() {
 
   return (
     // preview-start
-    <AppProvider navigation={NAVIGATION} router={router}>
-      <DashboardLayout isDemoMode>
+    <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
+      <DashboardLayout>
         <Box
           sx={{
             py: 4,

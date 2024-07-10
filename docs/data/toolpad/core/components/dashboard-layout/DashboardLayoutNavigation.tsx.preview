@@ -1,4 +1,4 @@
-<DashboardLayout isDemoMode>
+<DashboardLayout>
   <Box
     sx={{
       py: 4,

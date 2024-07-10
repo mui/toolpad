@@ -38,7 +38,7 @@ export default function DashboardLayoutBranding() {
 
   return (
     <AppProvider navigation={NAVIGATION} branding={BRANDING} router={router}>
-      <DashboardLayout isDemoMode>
+      <DashboardLayout>
         <Box
           sx={{
             py: 4,

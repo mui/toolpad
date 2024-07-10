@@ -22,7 +22,7 @@ export default function SignIn({
             ...(formData && Object.fromEntries(formData)),
             redirectTo: callbackUrl ?? '/',
           });
-          return signInResponse?.ok ? 'Authentication successful.' : 'Something went wrong.';
+          return signInResponse?.ok ? '' : 'Something went wrong.';
         } catch (error) {
           if (error instanceof AuthError) {
             switch (error.type) {

@@ -32,7 +32,6 @@ import {
 import { ToolpadLogo } from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320; // px
-const MIN_CONTENT_WIDTH = 320; // px
 
 const LogoContainer = styled('div')({
   position: 'relative',
@@ -41,29 +40,6 @@ const LogoContainer = styled('div')({
     maxHeight: 40,
   },
 });
-
-const Main = styled('main', {
-  shouldForwardProp: (prop) => prop !== 'isMobileNavigationOpen',
-})<{
-  isMobileNavigationOpen: boolean;
-}>(({ theme, isMobileNavigationOpen }) => ({
-  flexGrow: 1,
-  minWidth: MIN_CONTENT_WIDTH,
-  [theme.breakpoints.down('md')]: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: `-${DRAWER_WIDTH}px`,
-    ...(isMobileNavigationOpen && {
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: 0,
-    }),
-  },
-}));
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
@@ -273,13 +249,15 @@ function DashboardLayout(props: DashboardLayoutProps) {
             enterDelay={1000}
             sx={{ display: { xs: 'block', md: 'none' } }}
           >
-            <IconButton
-              aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
-              onClick={toggleMobileNavigation}
-              edge="start"
-            >
-              {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
-            </IconButton>
+            <div>
+              <IconButton
+                aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
+                onClick={toggleMobileNavigation}
+                edge="start"
+              >
+                {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
+              </IconButton>
+            </div>
           </Tooltip>
           <Box
             sx={{
@@ -301,8 +279,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="persistent"
+        variant="temporary"
         open={isMobileNavigationOpen}
+        onClose={toggleMobileNavigation}
         ModalProps={{
           keepMounted: true, // Better open performance on mobile.
         }}
@@ -322,10 +301,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
       >
         {drawerContent}
       </Drawer>
-      <Main isMobileNavigationOpen={isMobileNavigationOpen}>
+      <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />
         <Container maxWidth="lg">{children}</Container>
-      </Main>
+      </Box>
     </Box>
   );
 }

@@ -178,7 +178,17 @@ const theme = createTheme(defaultTheme, {
   },
 });
 
-export default function DashboardLayoutBasic() {
+interface Props {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function DashboardLayoutBasic(props: Props) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -189,9 +199,12 @@ export default function DashboardLayoutBasic() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const container = window !== undefined ? () => window().document.body : undefined;
+
   return (
     <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
-      <DashboardLayout>
+      <DashboardLayout container={container}>
         <Box
           sx={{
             py: 4,

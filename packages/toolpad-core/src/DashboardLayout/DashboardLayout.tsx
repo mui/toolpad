@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import Drawer from '@mui/material/Drawer';
+import Drawer, { DrawerProps } from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -197,6 +197,11 @@ export interface DashboardLayoutProps {
    * The content of the dashboard.
    */
   children: React.ReactNode;
+  /**
+   * @internal
+   * Container element for the navigation drawer.
+   */
+  container?: DrawerProps['container'];
 }
 
 /**
@@ -210,7 +215,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children } = props;
+  const { children, container } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
@@ -263,9 +268,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
             title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
             placement="right"
             enterDelay={1000}
-            sx={{ display: { xs: 'block', md: 'none' } }}
           >
-            <div>
+            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
               <IconButton
                 aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
                 onClick={toggleMobileNavigation}
@@ -273,7 +277,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               >
                 {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
               </IconButton>
-            </div>
+            </Box>
           </Tooltip>
           <Box
             sx={{
@@ -295,6 +299,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         </Toolbar>
       </AppBar>
       <Drawer
+        container={container}
         variant="temporary"
         open={isMobileNavigationOpen}
         onClose={handleSetMobileNavigationOpen(false)}

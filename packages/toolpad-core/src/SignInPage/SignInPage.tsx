@@ -96,7 +96,6 @@ export interface SignInPageProps {
 function SignInPage(props: SignInPageProps) {
   const { providers, signIn } = props;
   const branding = React.useContext(BrandingContext);
-
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const [{ loading, providerId }, setFormStatus] = React.useState<{
     loading: boolean;

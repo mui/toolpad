@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
-import Frame from '../../modules/components/Frame';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -13,6 +12,7 @@ import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import type { Navigation } from '@toolpad/core';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
+import Frame from '../../modules/components/Frame';
 
 const NAVIGATION: Navigation = [
   {
@@ -72,7 +72,7 @@ function DashboardLayoutBasic() {
   }, [pathname]);
 
   return (
-      <AppProvider navigation={NAVIGATION} router={router}>
+    <AppProvider navigation={NAVIGATION} router={router}>
       <DashboardLayout>
         <Box
           sx={{
@@ -90,9 +90,8 @@ function DashboardLayoutBasic() {
 }
 export default function ToolpadDashboardLayout() {
   return (
-   
     <Frame sx={{ height: '100%' }}>
-      <Frame.Demo sx={{ p: 2}}>
+      <Frame.Demo sx={{ p: 2 }}>
         <Paper
           variant="outlined"
           sx={(theme) => ({
@@ -108,13 +107,13 @@ export default function ToolpadDashboardLayout() {
             }),
           })}
         >
-          <DemoSandbox>
-          <DashboardLayoutBasic/>
+          <DemoSandbox iframe>
+            <DashboardLayoutBasic />
           </DemoSandbox>
         </Paper>
       </Frame.Demo>
       <Frame.Info data-mui-color-scheme="dark" sx={{ maxHeight: 600, overflow: 'auto' }}>
-      <HighlightedCode copyButtonHidden plainStyle code={code} language="jsx" />
+        <HighlightedCode copyButtonHidden plainStyle code={code} language="jsx" />
       </Frame.Info>
     </Frame>
   );
@@ -194,4 +193,4 @@ function DashboardLayoutBasic() {
       </DashboardLayout>
     </AppProvider>
   );
-}`;        
+}`;

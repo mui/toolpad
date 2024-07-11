@@ -8,6 +8,9 @@ export default function CredentialsSignInPage() {
     <SignInPage
       signIn={(provider) => alert(`Signing in with "${provider.name}"`)}
       providers={providers}
+      componentProps={{
+        email: { autoFocus: false },
+      }}
     />
   );
 }

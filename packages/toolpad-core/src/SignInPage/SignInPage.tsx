@@ -16,6 +16,8 @@ import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
+import GoogleIcon from '@mui/icons-material/Google';
+import FacebookIcon from '@mui/icons-material/Facebook';
 import Stack from '@mui/material/Stack';
 import { BrandingContext } from '../AppProvider';
 import { useNotifications } from '../useNotifications';
@@ -23,30 +25,8 @@ import { useNotifications } from '../useNotifications';
 const IconProviderMap = new Map<string, React.ReactNode>([
   ['github', <GitHubIcon key="github" />],
   ['credentials', <PasswordIcon key="credentials" />],
-  [
-    'google',
-    <img
-      alt="Google logo"
-      loading="lazy"
-      key="google"
-      height="18"
-      width="18"
-      src="https://authjs.dev/img/providers/google.svg"
-      style={{ marginLeft: '2px', marginRight: '2px' }}
-    />,
-  ],
-  [
-    'facebook',
-    <img
-      alt="Facebook logo"
-      loading="lazy"
-      key="facebook"
-      height="18"
-      width="18"
-      src="https://authjs.dev/img/providers/facebook.svg"
-      style={{ marginLeft: '2px', marginRight: '2px' }}
-    />,
-  ],
+  ['google', <GoogleIcon key="google" />],
+  ['facebook', <FacebookIcon key="facebook" />],
 ]);
 
 export interface AuthProvider {

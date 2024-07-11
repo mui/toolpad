@@ -145,6 +145,7 @@ export const getDesignTokens = (mode: 'light' | 'dark') =>
       },
       action: {
         hoverOpacity: 0.08,
+        active: grey[700],
         disabled: alpha(grey[700], 0.26),
       },
     },

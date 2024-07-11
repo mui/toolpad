@@ -32,7 +32,7 @@ The component is composable with any authentication library you might want to us
 
 {{"demo": "AuthJsSignInApp.js"}}
 
-Use our detailed examples with both the [Next.js app directory](https://github.com/mui/mui-toolpad/tree/master/playground/nextjs) and [pages directory](https://github.com/mui/mui-toolpad/tree/master/playground/nextjs-pages) to get started using Auth.js with Toolpad Core.
+Use our detailed examples with both the [Next.js app directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/) and [pages directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-pages/) to get started using Auth.js with Toolpad Core.
 
 ## Customization
 

@@ -127,6 +127,7 @@ function SignInPage(props: SignInPageProps) {
             <LockOutlinedIcon />
           </Avatar>
         )}
+
         <Typography variant="h5" color="textPrimary" gutterBottom>
           Sign in {branding?.title ? `to ${branding.title}` : null}
         </Typography>
@@ -183,6 +184,7 @@ function SignInPage(props: SignInPageProps) {
               {(providers ?? []).length === 1 ? null : (
                 <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>
               )}
+
               <Box
                 component="form"
                 onSubmit={async (event) => {

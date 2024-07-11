@@ -149,7 +149,7 @@ export const getDesignTokens = (mode) => ({
         disabled: grey[200],
       }),
       ...(mode === 'light' && {
-        hoverOpacity: 0.9,
+        hoverOpacity: 0.04,
         active: grey[700],
         disabled: alpha(grey[700], 0.3),
       }),

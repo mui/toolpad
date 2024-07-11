@@ -24,7 +24,7 @@ const BRANDING = {
 
 export default function BrandingSignInPage() {
   const { mode, systemMode } = useColorSchemeShim();
-  const calculatedMode = mode === 'system' ? systemMode : mode;
+  const calculatedMode = (mode === 'system' ? systemMode : mode) ?? 'light';
   const brandingDesignTokens = getDesignTokens(calculatedMode);
   const THEME = createTheme({
     ...brandingDesignTokens,

@@ -85,45 +85,51 @@ function ThemeSwitcher() {
   }, [paletteMode, setPaletteMode]);
 
   return isDualTheme ? (
-    <Tooltip title={`${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={500}>
-      <IconButton
-        aria-label={
-          isSsr
-            ? 'Switch theme mode'
-            : `Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`
-        }
-        onClick={toggleMode}
-        sx={{
-          color: (theme.vars ?? theme).palette.primary.dark,
-          padding: 1,
-        }}
-      >
-        {theme.getColorSchemeSelector ? (
-          <React.Fragment>
-            <DarkModeIcon
-              sx={{
-                [theme.getColorSchemeSelector('dark')]: {
+    <Tooltip title={`${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={1000}>
+      <div>
+        <IconButton
+          aria-label={
+            isSsr
+              ? 'Switch theme mode'
+              : `Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`
+          }
+          onClick={toggleMode}
+          sx={{
+            color: (theme.vars ?? theme).palette.primary.dark,
+            padding: 1,
+          }}
+        >
+          {theme.getColorSchemeSelector ? (
+            <React.Fragment>
+              <DarkModeIcon
+                sx={{
+                  [theme.getColorSchemeSelector('dark')]: {
+                    display: 'none',
+                  },
+                }}
+              />
+              <LightModeIcon
+                sx={{
                   display: 'none',
-                },
-              }}
-            />
-            <LightModeIcon
-              sx={{
-                display: 'none',
-                [theme.getColorSchemeSelector('dark')]: {
-                  display: 'inline',
-                },
-              }}
-            />
-          </React.Fragment>
-        ) : null}
-        {!theme.getColorSchemeSelector ? (
-          <React.Fragment>
-            {isSsr ? <LightModeIcon sx={{ visibility: 'hidden' }} /> : null}
-            {!isSsr && paletteMode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-          </React.Fragment>
-        ) : null}
-      </IconButton>
+                  [theme.getColorSchemeSelector('dark')]: {
+                    display: 'inline',
+                  },
+                }}
+              />
+            </React.Fragment>
+          ) : null}
+          {!theme.getColorSchemeSelector ? (
+            <React.Fragment>
+              {isSsr ? <DarkModeIcon /> : null}
+              {!isSsr ? (
+                <React.Fragment>
+                  {paletteMode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+                </React.Fragment>
+              ) : null}
+            </React.Fragment>
+          ) : null}
+        </IconButton>
+      </div>
     </Tooltip>
   ) : null;
 }

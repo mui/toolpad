@@ -26,29 +26,27 @@ export default function SignIn({
               return 'Invalid credentials.';
             }
             return 'Something went wrong.';
-          } else {
-            // Redirect to the callback URL if the sign-in was successful
-            window.location.href = callbackUrl ?? '/';
-            return '';
           }
-        } else {
-          try {
-            const signInResponse = await signIn(provider.id, {
-              ...(formData && Object.fromEntries(formData)),
-              redirectTo: callbackUrl ?? '/',
-            });
-            return signInResponse?.ok ? '' : 'Something went wrong.';
-          } catch (error) {
-            if (error instanceof AuthError) {
-              switch (error.type) {
-                case 'CredentialsSignin':
-                  return 'Invalid credentials.';
-                default:
-                  return 'Something went wrong.';
-              }
+          // Redirect to the callback URL if the sign-in was successful
+          window.location.href = callbackUrl ?? '/';
+          return '';
+        }
+        try {
+          const signInResponse = await signIn(provider.id, {
+            ...(formData && Object.fromEntries(formData)),
+            redirectTo: callbackUrl ?? '/',
+          });
+          return signInResponse?.ok ? '' : 'Something went wrong.';
+        } catch (error) {
+          if (error instanceof AuthError) {
+            switch (error.type) {
+              case 'CredentialsSignin':
+                return 'Invalid credentials.';
+              default:
+                return 'Something went wrong.';
             }
-            throw error;
           }
+          throw error;
         }
       }}
     />

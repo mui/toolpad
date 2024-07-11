@@ -32,7 +32,6 @@
     "test:integration": "rimraf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
     "test:browser": "FORCE_COLOR=1 pnpm run -r test:browser",
     "test:argos": "node ./scripts/pushArgos.mjs",
-    "test:playground:nextjs": "pmpm exec playwright install && pnpm --filter playground-nextjs test",
     "test": "lerna run test --stream",
     "check-types": "lerna run check-types",
     "toolpad-studio": "node --enable-source-maps packages/toolpad-studio/cli.mjs",

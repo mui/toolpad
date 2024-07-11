@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import Drawer, { DrawerProps } from '@mui/material/Drawer';
+import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -18,6 +18,8 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import type { PortalProps } from '@mui/material/Portal';
+import { HTMLElementType } from '@mui/utils';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -198,10 +200,16 @@ export interface DashboardLayoutProps {
    */
   children: React.ReactNode;
   /**
-   * @internal
-   * Container element for the navigation drawer.
+   * An HTML element or function that returns one.
+   * The `container` will have the portal children appended to it.
+   *
+   * You can also provide a callback, which is called in a React layout effect.
+   * This lets you set the container from a ref, and also makes server-side rendering possible.
+   *
+   * By default, it uses the body of the top-level document object,
+   * so it's simply `document.body` most of the time.
    */
-  mobileNavigationContainer?: DrawerProps['container'];
+  container?: PortalProps['container'];
 }
 
 /**
@@ -215,7 +223,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, mobileNavigationContainer } = props;
+  const { children, container } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
@@ -301,7 +309,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         </Toolbar>
       </AppBar>
       <Drawer
-        container={mobileNavigationContainer}
+        container={container}
         variant="temporary"
         open={isMobileNavigationOpen}
         onClose={handleSetMobileNavigationOpen(false)}
@@ -342,17 +350,17 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * @internal
-   * Container element for the navigation drawer.
+   * An HTML element or function that returns one.
+   * The `container` will have the portal children appended to it.
+   *
+   * You can also provide a callback, which is called in a React layout effect.
+   * This lets you set the container from a ref, and also makes server-side rendering possible.
+   *
+   * By default, it uses the body of the top-level document object,
+   * so it's simply `document.body` most of the time.
    */
-  mobileNavigationContainer: PropTypes.oneOfType([
-    function (props, propName) {
-      if (props[propName] == null) {
-        return new Error("Prop '" + propName + "' is required but wasn't specified");
-      } else if (typeof props[propName] !== 'object' || props[propName].nodeType !== 1) {
-        return new Error("Expected prop '" + propName + "' to be of type Element");
-      }
-    },
+  container: PropTypes /* @typescript-to-proptypes-ignore */.oneOfType([
+    HTMLElementType,
     PropTypes.func,
   ]),
 } as any;

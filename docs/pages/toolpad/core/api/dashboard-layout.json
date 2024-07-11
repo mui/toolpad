@@ -1,5 +1,8 @@
 {
-  "props": { "children": { "type": { "name": "node" }, "required": true } },
+  "props": {
+    "children": { "type": { "name": "node" }, "required": true },
+    "container": { "type": { "name": "union", "description": "HTML element<br>&#124;&nbsp;func" } }
+  },
   "name": "DashboardLayout",
   "imports": [
     "import { DashboardLayout } from '@toolpad-core/DashboardLayout';",

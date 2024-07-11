@@ -161,8 +161,7 @@ function DashboardLayoutBranding(props) {
   }, [pathname]);
 
   // Remove this const when copying and pasting into your project.
-  const mobileNavigationContainer =
-    window !== undefined ? () => window().document.body : undefined;
+  const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
     <AppProvider
@@ -171,7 +170,7 @@ function DashboardLayoutBranding(props) {
       router={router}
       theme={theme}
     >
-      <DashboardLayout mobileNavigationContainer={mobileNavigationContainer}>
+      <DashboardLayout container={container}>
         <Box
           sx={{
             py: 4,

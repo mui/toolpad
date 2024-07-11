@@ -1,4 +1,4 @@
-<DashboardLayout>
+<DashboardLayout mobileNavigationContainer={mobileNavigationContainer}>
   <Box
     sx={{
       py: 4,

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -146,7 +147,9 @@ const BRANDING = {
   title: 'MUI',
 };
 
-export default function DashboardLayoutBranding() {
+function DashboardLayoutBranding(props) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
@@ -157,6 +160,10 @@ export default function DashboardLayoutBranding() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const mobileNavigationContainer =
+    window !== undefined ? () => window().document.body : undefined;
+
   return (
     <AppProvider
       navigation={NAVIGATION}
@@ -164,7 +171,7 @@ export default function DashboardLayoutBranding() {
       router={router}
       theme={theme}
     >
-      <DashboardLayout>
+      <DashboardLayout mobileNavigationContainer={mobileNavigationContainer}>
         <Box
           sx={{
             py: 4,
@@ -179,3 +186,13 @@ export default function DashboardLayoutBranding() {
     </AppProvider>
   );
 }
+
+DashboardLayoutBranding.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window: PropTypes.func,
+};
+
+export default DashboardLayoutBranding;

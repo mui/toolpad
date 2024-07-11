@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -134,10 +135,16 @@ const theme = createTheme(defaultTheme, {
   },
 });
 
-export default function TutorialDefault() {
+function TutorialDefault(props) {
+  const { window } = props;
+
+  // Remove this const when copying and pasting into your project.
+  const mobileNavigationContainer =
+    window !== undefined ? () => window().document.body : undefined;
+
   return (
     <AppProvider navigation={NAVIGATION} theme={theme}>
-      <DashboardLayout>
+      <DashboardLayout mobileNavigationContainer={mobileNavigationContainer}>
         <Box
           sx={{
             py: 4,
@@ -152,3 +159,13 @@ export default function TutorialDefault() {
     </AppProvider>
   );
 }
+
+TutorialDefault.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window: PropTypes.func,
+};
+
+export default TutorialDefault;

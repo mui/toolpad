@@ -270,7 +270,17 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-export default function DashboardLayoutNavigation() {
+interface Props {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function DashboardLayoutNavigation(props: Props) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -281,9 +291,13 @@ export default function DashboardLayoutNavigation() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const mobileNavigationContainer =
+    window !== undefined ? () => window().document.body : undefined;
+
   return (
     <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
-      <DashboardLayout>
+      <DashboardLayout mobileNavigationContainer={mobileNavigationContainer}>
         <Box
           sx={{
             py: 4,

@@ -134,10 +134,24 @@ const theme = createTheme(defaultTheme, {
   },
 });
 
-export default function TutorialDefault() {
+interface Props {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function TutorialDefault(props: Props) {
+  const { window } = props;
+
+  // Remove this const when copying and pasting into your project.
+  const mobileNavigationContainer =
+    window !== undefined ? () => window().document.body : undefined;
+
   return (
     <AppProvider navigation={NAVIGATION} theme={theme}>
-      <DashboardLayout>
+      <DashboardLayout mobileNavigationContainer={mobileNavigationContainer}>
         <Box
           sx={{
             py: 4,

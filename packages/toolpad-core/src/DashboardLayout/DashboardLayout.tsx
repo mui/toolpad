@@ -264,21 +264,23 @@ function DashboardLayout(props: DashboardLayoutProps) {
         }}
       >
         <Toolbar>
-          <Tooltip
-            title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
-            placement="right"
-            enterDelay={1000}
-          >
-            <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-              <IconButton
-                aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
-                onClick={toggleMobileNavigation}
-                edge="start"
-              >
-                {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
-              </IconButton>
-            </Box>
-          </Tooltip>
+          <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+            <Tooltip
+              title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
+              placement="right"
+              enterDelay={1000}
+            >
+              <div>
+                <IconButton
+                  aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
+                  onClick={toggleMobileNavigation}
+                  edge="start"
+                >
+                  {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
+                </IconButton>
+              </div>
+            </Tooltip>
+          </Box>
           <Box
             sx={{
               position: { xs: 'absolute', md: 'static' },
@@ -339,6 +341,20 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * @internal
+   * Container element for the navigation drawer.
+   */
+  mobileNavigationContainer: PropTypes.oneOfType([
+    function (props, propName) {
+      if (props[propName] == null) {
+        return new Error("Prop '" + propName + "' is required but wasn't specified");
+      } else if (typeof props[propName] !== 'object' || props[propName].nodeType !== 1) {
+        return new Error("Expected prop '" + propName + "' to be of type Element");
+      }
+    },
+    PropTypes.func,
+  ]),
 } as any;
 
 export { DashboardLayout };

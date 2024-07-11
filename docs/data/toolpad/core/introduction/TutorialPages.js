@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -146,7 +147,9 @@ const theme = createTheme(defaultTheme, {
   },
 });
 
-export default function TutorialPages() {
+function TutorialPages(props) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
@@ -157,9 +160,13 @@ export default function TutorialPages() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const mobileNavigationContainer =
+    window !== undefined ? () => window().document.body : undefined;
+
   return (
     <AppProvider router={router} navigation={NAVIGATION} theme={theme}>
-      <DashboardLayout>
+      <DashboardLayout mobileNavigationContainer={mobileNavigationContainer}>
         <Box
           sx={{
             py: 4,
@@ -174,3 +181,13 @@ export default function TutorialPages() {
     </AppProvider>
   );
 }
+
+TutorialPages.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window: PropTypes.func,
+};
+
+export default TutorialPages;

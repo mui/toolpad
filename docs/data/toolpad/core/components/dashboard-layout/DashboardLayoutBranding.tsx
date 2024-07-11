@@ -147,7 +147,17 @@ const BRANDING: Branding = {
   title: 'MUI',
 };
 
-export default function DashboardLayoutBranding() {
+interface Props {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function DashboardLayoutBranding(props: Props) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -158,6 +168,10 @@ export default function DashboardLayoutBranding() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const mobileNavigationContainer =
+    window !== undefined ? () => window().document.body : undefined;
+
   return (
     <AppProvider
       navigation={NAVIGATION}
@@ -165,7 +179,7 @@ export default function DashboardLayoutBranding() {
       router={router}
       theme={theme}
     >
-      <DashboardLayout>
+      <DashboardLayout mobileNavigationContainer={mobileNavigationContainer}>
         <Box
           sx={{
             py: 4,

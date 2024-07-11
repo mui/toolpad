@@ -1,5 +1,5 @@
+/* eslint-disable import/no-unresolved */
 'use server';
-
 import { AuthError } from 'next-auth';
 
 import { signIn } from './auth';

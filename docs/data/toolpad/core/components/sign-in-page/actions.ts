@@ -1,5 +1,5 @@
+/* eslint-disable import/no-unresolved */
 'use server';
-
 import { AuthError } from 'next-auth';
 import type { AuthProvider } from '@toolpad/core';
 import { signIn } from './auth';

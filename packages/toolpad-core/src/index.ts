@@ -1,3 +1,9 @@
+import * as packageJson from '../package.json';
+
+const version = packageJson.version;
+
+export { version };
+
 export * from './AppProvider';
 
 export * from './DashboardLayout';

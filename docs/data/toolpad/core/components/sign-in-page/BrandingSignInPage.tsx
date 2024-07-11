@@ -39,6 +39,9 @@ export default function BrandingSignInPage() {
       <SignInPage
         signIn={(provider) => alert(`Signing in with "${provider.name}"`)}
         providers={providers}
+        componentProps={{
+          email: { autoFocus: false },
+        }}
       />
     </AppProvider>
     // preview-end

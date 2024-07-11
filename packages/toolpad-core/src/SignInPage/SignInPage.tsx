@@ -10,9 +10,9 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import LoadingButton from '@mui/lab/LoadingButton';
+import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
@@ -81,6 +81,18 @@ export interface SignInPageProps {
    * @default undefined
    */
   signIn?: (provider: AuthProvider, formData?: any, callbackUrl?: string) => void | Promise<string>;
+  /**
+   * Props to pass to the constituent components in the credentials form
+   * @default {}
+   * @example { email: { autoFocus: false } }
+   * @example { password: { variant: 'outlined' } }
+   * @example { email: { autoFocus: false }, password: { variant: 'outlined' } }
+   */
+  componentProps?: {
+    email?: TextFieldProps;
+    password?: TextFieldProps;
+    button?: LoadingButtonProps;
+  };
 }
 
 /**
@@ -94,7 +106,7 @@ export interface SignInPageProps {
  * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
  */
 function SignInPage(props: SignInPageProps) {
-  const { providers, signIn } = props;
+  const { providers, signIn, componentProps } = props;
   const branding = React.useContext(BrandingContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const [{ loading, providerId }, setFormStatus] = React.useState<{
@@ -228,6 +240,7 @@ function SignInPage(props: SignInPageProps) {
                   type="email"
                   autoComplete="email"
                   autoFocus
+                  {...componentProps?.email}
                 />
                 <TextField
                   margin="dense"
@@ -244,6 +257,7 @@ function SignInPage(props: SignInPageProps) {
                   type="password"
                   id="password"
                   autoComplete="current-password"
+                  {...componentProps?.password}
                 />
                 <FormControlLabel
                   control={<Checkbox value="remember" color="primary" />}
@@ -268,6 +282,7 @@ function SignInPage(props: SignInPageProps) {
                       filter: 'opacity(1)',
                     },
                   }}
+                  {...componentProps?.button}
                 >
                   Sign in
                 </LoadingButton>
@@ -297,6 +312,14 @@ SignInPage.propTypes /* remove-proptypes */ = {
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * Props to pass to the constituent components in the credentials form
+   * @default {}
+   * @example { email: { autoFocus: false } }
+   * @example { password: { variant: 'outlined' } }
+   * @example { email: { autoFocus: false }, password: { variant: 'outlined' } }
+   */
+  componentProps: PropTypes.object,
   /**
    * The list of authentication providers to display.
    * @default []

@@ -64,6 +64,10 @@ export const getDesignTokens = (mode) => ({
     },
     divider: mode === 'dark' ? alpha(blue[100], 0.08) : grey[100],
     primaryDark: blueDark,
+    background: {
+      default: mode === 'light' ? grey[50] : blueDark[800],
+      paper: mode === 'light' ? '#fff' : blueDark[900],
+    },
     mode,
     ...(mode === 'dark' && {
       background: {
@@ -137,6 +141,10 @@ export const getDesignTokens = (mode) => ({
       700: '#AB6800', // vs white bg: WCAG 4.4 AA large, APCA 71 Ok for text
       800: '#8C5800', // vs white bg: WCAG 5.9 AAA large, APCA 80 Best for text
       900: '#5A3600', // vs white bg: WCAG 10.7 AAA, APCA 95 Best for text
+    },
+    action: {
+      hoverOpacity: 0.08,
+      disabled: alpha(grey[700], 0.26),
     },
   },
   shape: {

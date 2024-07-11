@@ -36,15 +36,21 @@ Use our detailed examples with both the [Next.js app directory](https://github.c
 
 ## Customization
 
+### Component Props
+
+`SignInPage` can be customized by passing in `componentProps` to the underlying components of the credentials form.
+
+{{"demo": "ComponentsPropsSignIn.js"}}
+
 ### Theme and Branding
 
-Through the `branding` and `theme` props in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be customized to match your own branding.
+Through the `branding` and `theme` props in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be customized to match your own styles.
 
 {{"demo": "BrandingSignInPage.js", "iframe": true }}
 
 ### 🚧 Slots
 
-The `SignInPage` component will allow passing in custom forms when using the `credentials` provider. This is in progress.
+To enable deep customization beyond what is possible with custom props, the `SignInPage` component will allow passing in your own forms when using the `credentials` provider. This is in progress.
 
 ### 🚧 Layouts
 

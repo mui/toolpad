@@ -120,12 +120,7 @@ function ThemeSwitcher() {
           ) : null}
           {!theme.getColorSchemeSelector ? (
             <React.Fragment>
-              {isSsr ? <DarkModeIcon /> : null}
-              {!isSsr ? (
-                <React.Fragment>
-                  {paletteMode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
-                </React.Fragment>
-              ) : null}
+              {isSsr || paletteMode !== 'dark' ? <DarkModeIcon /> : <LightModeIcon />}
             </React.Fragment>
           ) : null}
         </IconButton>

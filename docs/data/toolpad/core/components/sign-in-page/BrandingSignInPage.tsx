@@ -30,7 +30,7 @@ export default function BrandingSignInPage() {
     ...brandingDesignTokens,
     palette: {
       ...brandingDesignTokens.palette,
-      mode,
+      mode: calculatedMode,
     },
   });
 

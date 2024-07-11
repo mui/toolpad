@@ -4,5 +4,15 @@ import { providerMap } from './auth';
 import { authenticate } from './actions';
 
 export default function AuthJsSignInApp() {
-  return <SignInPage signIn={authenticate} providers={providerMap} />;
+  return (
+    <SignInPage
+      signIn={authenticate}
+      providers={providerMap}
+      componentProps={{
+        email: {
+          autoFocus: false,
+        },
+      }}
+    />
+  );
 }

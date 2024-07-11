@@ -46,7 +46,7 @@ Use our detailed examples with both the [Next.js app directory](https://github.c
 
 Through the `branding` and `theme` props in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be customized to match your own styles.
 
-{{"demo": "BrandingSignInPage.js", "iframe": true }}
+{{"demo": "BrandingSignInPage.js"}}
 
 ### 🚧 Slots
 

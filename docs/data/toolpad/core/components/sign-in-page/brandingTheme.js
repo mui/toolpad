@@ -143,9 +143,16 @@ export const getDesignTokens = (mode) => ({
       900: '#5A3600', // vs white bg: WCAG 10.7 AAA, APCA 95 Best for text
     },
     action: {
-      hoverOpacity: 0.08,
-      active: grey[700],
-      disabled: alpha(grey[700], 0.26),
+      ...(mode === 'dark' && {
+        hoverOpacity: 0.08,
+        active: grey[700],
+        disabled: grey[200],
+      }),
+      ...(mode === 'light' && {
+        hoverOpacity: 0.9,
+        active: grey[700],
+        disabled: alpha(grey[700], 0.3),
+      }),
     },
   },
   shape: {

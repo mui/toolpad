@@ -1,5 +1,6 @@
 {
   "props": {
+    "componentProps": { "type": { "name": "object" }, "default": "{}" },
     "providers": {
       "type": { "name": "arrayOf", "description": "Array&lt;{ id: string, name: string }&gt;" },
       "default": "[]"

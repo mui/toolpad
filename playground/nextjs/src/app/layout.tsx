@@ -4,7 +4,6 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { Navigation } from '@toolpad/core';
-import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 
 const NAVIGATION: Navigation = [
   {
@@ -28,12 +27,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     <html lang="en" data-mui-color-scheme="light">
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          <AppProvider
-            navigation={NAVIGATION}
-            theme={{ light: baseLightTheme, dark: baseDarkTheme }}
-          >
-            {props.children}
-          </AppProvider>
+          <AppProvider navigation={NAVIGATION}>{props.children}</AppProvider>
         </AppRouterCacheProvider>
       </body>
     </html>

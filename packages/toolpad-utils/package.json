@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/utils",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Shared utilities used by Toolpad packages.",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",

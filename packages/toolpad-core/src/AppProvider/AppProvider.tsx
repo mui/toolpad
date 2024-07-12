@@ -3,6 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { ThemeProvider, Theme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { BadgeProps } from '@mui/material';
 import { baseTheme } from '../themes';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
@@ -34,6 +35,10 @@ export interface NavigationPageItem {
   title: string;
   slug?: string;
   icon?: React.ReactNode;
+  badge?: {
+    content: BadgeProps['badgeContent'];
+    color?: BadgeProps['color'];
+  };
   children?: Navigation;
 }
 

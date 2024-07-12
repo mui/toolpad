@@ -14,6 +14,9 @@ const NAVIGATION: Navigation = [
     slug: '/',
     title: 'Dashboard',
     icon: <DashboardIcon />,
+    badge: {
+      content: 20,
+    },
   },
   {
     slug: '/orders',

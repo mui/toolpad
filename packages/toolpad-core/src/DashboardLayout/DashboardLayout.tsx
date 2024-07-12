@@ -148,16 +148,20 @@ function DashboardSidebarSubNavigation({
             >
               <ListItemIcon>{navigationItem.icon}</ListItemIcon>
               <ListItemText primary={navigationItem.title} />
-              {navigationItem.children ? nestedNavigationCollapseIcon : null}
               {navigationItem.badge ? (
                 <Badge
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
                   badgeContent={navigationItem.badge.content}
                   color={navigationItem.badge.color ?? 'primary'}
                   sx={{
-                    mr: 1,
+                    mr: navigationItem.children ? 3 : 1.5,
                   }}
                 />
               ) : null}
+              {navigationItem.children ? nestedNavigationCollapseIcon : null}
             </ListItemButton>
           </ListItem>
         );

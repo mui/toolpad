@@ -1,7 +1,6 @@
 {
-  "name": "playground-nextjs",
+  "name": "core-auth-nextjs",
   "version": "0.3.0",
-  "private": true,
   "scripts": {
     "dev": "next dev",
     "lint": "next lint"
@@ -13,7 +12,7 @@
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.16.0",
     "@mui/material-nextjs": "5.15.11",
-    "@toolpad/core": "0.3.0",
+    "@toolpad/core": "latest",
     "@types/node": "20.14.10",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",

@@ -25,16 +25,6 @@ const NAVIGATION = [
   },
 ];
 
-const customTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    background: {
-      default: '#2A4364',
-      paper: '#112E4D',
-    },
-  },
-});
-
 function DemoPageContent({ pathname }) {
   return (
     <Box
@@ -54,6 +44,16 @@ function DemoPageContent({ pathname }) {
 DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
+
+const customTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: '#2A4364',
+      paper: '#112E4D',
+    },
+  },
+});
 
 export default function AppProviderTheme() {
   const [pathname, setPathname] = React.useState('/page');

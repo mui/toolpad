@@ -1,6 +1,32 @@
 # Changelog
 
-## 0.3.0
+## v0.3.1
+
+<!-- generated comparing v0.3.0..master -->
+
+_Jul 12, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Improve Toolpad home page, add persistent state hooks to Toolpad Core and fix some performance issues in Toolpad Studio production apps.
+
+- &#8203;<!-- 13 -->Remove dead code (#3754) @Janpot
+- &#8203;<!-- 12 -->Lock file maintenance (#3740) @renovate[bot]
+- &#8203;<!-- 11 -->Lock file maintenance Docs (#3743) @renovate[bot]
+- &#8203;<!-- 10 -->Lock file maintenance Examples (#3742) @renovate[bot]
+- &#8203;<!-- 09 -->Lock file maintenance Docs (#3741) @renovate[bot]
+- &#8203;<!-- 08 -->[cli] Add information when `--example` is present (#3749) @bharatkashyap
+- &#8203;<!-- 07 -->[code-infra] Use `@mui/docs` where possible (#3751) @LukasTy
+- &#8203;<!-- 06 -->[core] Fix a few performance issues in Toolpad production apps (#3756) @Janpot
+- &#8203;<!-- 05 -->[core] Optimize studio production build (#3755) @Janpot
+- &#8203;<!-- 04 -->[core] Implement persistent state hooks (#3696) @Janpot
+- &#8203;<!-- 03 -->[docs] Update to match monorepo script (#3753) @bharatkashyap
+- &#8203;<!-- 02 -->[docs] Use product demo video of the onboarding on the landing page (#3555) @Janpot
+- &#8203;<!-- 01 -->[security] Slightly improve CSP header (#3757) @oliviertassinari
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @LukasTy, @oliviertassinari, @renovate[bot]
+
+## v0.3.0
 
 <!-- generated comparing v0.2.0..master -->
 

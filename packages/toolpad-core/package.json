@@ -52,8 +52,8 @@
   },
   "dependencies": {
     "@mui/base": "5.0.0-beta.40",
-    "@mui/lab": "5.0.0-alpha.171",
-    "@mui/utils": "5.16.0",
+    "@mui/lab": "5.0.0-alpha.172",
+    "@mui/utils": "5.16.1",
     "@mui/x-charts": "7.9.0",
     "@mui/x-data-grid": "7.9.0",
     "@tanstack/react-query": "5.49.0",
@@ -63,8 +63,8 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "5.16.0",
-    "@mui/material": "5.16.0",
+    "@mui/icons-material": "5.16.1",
+    "@mui/material": "5.16.1",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.12",
     "@types/react": "18.3.3",

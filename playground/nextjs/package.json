@@ -9,10 +9,10 @@
   "devDependencies": {
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.5",
-    "@mui/icons-material": "5.16.0",
+    "@mui/icons-material": "5.16.1",
     "@mui/lab": "5.0.0-alpha.170",
-    "@mui/material": "5.16.0",
-    "@mui/material-nextjs": "5.15.11",
+    "@mui/material": "5.16.1",
+    "@mui/material-nextjs": "5.16.1",
     "@playwright/test": "1.45.1",
     "@toolpad/core": "workspace:*",
     "@types/node": "20.14.10",

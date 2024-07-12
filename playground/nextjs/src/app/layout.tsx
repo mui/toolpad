@@ -14,11 +14,29 @@ const NAVIGATION: Navigation = [
     slug: '/',
     title: 'Dashboard',
     icon: <DashboardIcon />,
+    badge: {
+      content: 2,
+    },
   },
   {
     slug: '/orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
+    badge: {
+      content: 'longlongligbg',
+      color: 'error',
+    },
+    children: [
+      {
+        slug: '/nested',
+        title: 'Nested orders',
+        icon: <ShoppingCartIcon />,
+        badge: {
+          content: '12',
+          color: 'success',
+        },
+      },
+    ],
   },
 ];
 

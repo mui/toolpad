@@ -150,14 +150,13 @@ function DashboardSidebarSubNavigation({
               <ListItemText primary={navigationItem.title} />
               {navigationItem.badge ? (
                 <Badge
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
                   badgeContent={navigationItem.badge.content}
                   color={navigationItem.badge.color ?? 'primary'}
                   sx={{
-                    mr: navigationItem.children ? 3 : 1.5,
+                    '& .MuiBadge-badge': {
+                      position: 'static',
+                      transform: 'none',
+                    },
                   }}
                 />
               ) : null}

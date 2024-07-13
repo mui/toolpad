@@ -1,9 +1,13 @@
 <SignInPage
-  signIn={(provider) => alert(`Signing in with "${provider.name}"`)}
+  signIn={(provider, formData) =>
+    alert(
+      `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
+    )
+  }
   componentProps={{
-    email: { autoFocus: false, variant: 'standard' },
-    password: { variant: 'standard' },
-    button: { variant: 'outlined' },
+    emailField: { autoFocus: false, variant: 'standard' },
+    passwordField: { variant: 'standard' },
+    submitButton: { variant: 'outlined' },
   }}
   providers={providers}
 />

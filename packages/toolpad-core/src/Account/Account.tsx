@@ -47,7 +47,21 @@ function Account() {
 
   if (!session?.user) {
     return (
-      <Button variant="text" color="inherit" size="small" onClick={authentication.signIn}>
+      <Button
+        sx={{
+          textTransform: 'capitalize',
+          filter: 'opacity(0.9)',
+          transition: 'filter 0.2s ease-in',
+          '&:hover': {
+            filter: 'opacity(1)',
+          },
+        }}
+        disableElevation
+        variant="contained"
+        color="inherit"
+        size="small"
+        onClick={authentication.signIn}
+      >
         Sign In
       </Button>
     );
@@ -84,8 +98,17 @@ function Account() {
           <Stack direction="row" sx={{ p: 1, justifyContent: 'right' }}>
             <Button
               disabled={!authentication}
-              variant="outlined"
+              variant="contained"
               size="small"
+              sx={{
+                textTransform: 'capitalize',
+                filter: 'opacity(0.9)',
+                transition: 'filter 0.2s ease-in',
+                '&:hover': {
+                  filter: 'opacity(1)',
+                },
+              }}
+              disableElevation
               color="inherit"
               startIcon={<LogoutIcon />}
               onClick={authentication?.signOut}

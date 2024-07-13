@@ -1,18 +1,24 @@
 import * as React from 'react';
-import { SignInPage } from '@toolpad/core';
+import { AppProvider, SignInPage } from '@toolpad/core';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
 
 export default function ComponentsPropsSignIn() {
   return (
-    <SignInPage
-      signIn={(provider) => alert(`Signing in with "${provider.name}"`)}
-      componentProps={{
-        email: { autoFocus: false, variant: 'standard' },
-        password: { variant: 'standard' },
-        button: { variant: 'outlined' },
-      }}
-      providers={providers}
-    />
+    <AppProvider>
+      <SignInPage
+        signIn={(provider, formData) =>
+          alert(
+            `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
+          )
+        }
+        componentProps={{
+          emailField: { autoFocus: false, variant: 'standard' },
+          passwordField: { variant: 'standard' },
+          submitButton: { variant: 'outlined' },
+        }}
+        providers={providers}
+      />
+    </AppProvider>
   );
 }

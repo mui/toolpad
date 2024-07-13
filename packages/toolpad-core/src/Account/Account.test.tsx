@@ -38,7 +38,7 @@ describe('AppProvider', () => {
     expect(auth.signIn).toHaveBeenCalled();
   });
 
-  test('renders content correctly when tehre is a session', async () => {
+  test('renders content correctly when there is a session', async () => {
     const auth = { signIn: vi.fn(), signOut: vi.fn() };
     const session = { user: { name: 'John Doe', email: 'john@example.com' } };
     render(

@@ -69,9 +69,9 @@ export interface SignInPageProps {
    * @example { email: { autoFocus: false }, password: { variant: 'outlined' } }
    */
   componentProps?: {
-    email?: TextFieldProps;
-    password?: TextFieldProps;
-    button?: LoadingButtonProps;
+    emailField?: TextFieldProps;
+    passwordField?: TextFieldProps;
+    submitButton?: LoadingButtonProps;
   };
 }
 
@@ -115,7 +115,7 @@ function SignInPage(props: SignInPageProps) {
         }}
       >
         {branding?.logo ?? (
-          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+          <Avatar sx={{ my: 1, mb: 2, bgcolor: 'primary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
         )}
@@ -154,7 +154,6 @@ function SignInPage(props: SignInPageProps) {
                     loading={loading && providerId === provider.id}
                     value={provider.id}
                     startIcon={IconProviderMap.get(provider.id)}
-                    color="inherit"
                     sx={{
                       textTransform: 'capitalize',
                       filter: 'opacity(0.9)',
@@ -220,7 +219,7 @@ function SignInPage(props: SignInPageProps) {
                   type="email"
                   autoComplete="email"
                   autoFocus
-                  {...componentProps?.email}
+                  {...componentProps?.emailField}
                 />
                 <TextField
                   margin="dense"
@@ -237,7 +236,7 @@ function SignInPage(props: SignInPageProps) {
                   type="password"
                   id="password"
                   autoComplete="current-password"
-                  {...componentProps?.password}
+                  {...componentProps?.passwordField}
                 />
                 <FormControlLabel
                   control={<Checkbox value="remember" color="primary" />}
@@ -250,7 +249,7 @@ function SignInPage(props: SignInPageProps) {
                   size="large"
                   variant="contained"
                   disableElevation
-                  color="inherit"
+                  color="primary"
                   loading={loading && providerId === credentialsProvider.id}
                   sx={{
                     mt: 3,
@@ -262,7 +261,7 @@ function SignInPage(props: SignInPageProps) {
                       filter: 'opacity(1)',
                     },
                   }}
-                  {...componentProps?.button}
+                  {...componentProps?.submitButton}
                 >
                   Sign in
                 </LoadingButton>

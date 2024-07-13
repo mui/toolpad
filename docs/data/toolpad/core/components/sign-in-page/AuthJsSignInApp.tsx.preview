@@ -2,7 +2,7 @@
   signIn={authenticate}
   providers={providerMap}
   componentProps={{
-    email: {
+    emailField: {
       autoFocus: false,
     },
   }}

@@ -11,7 +11,7 @@ const providers: Provider[] = [
   }),
   Credentials({
     credentials: {
-      email: { label: 'Email Address', type: 'email' },
+      email: { label: 'Email', type: 'email' },
       password: { label: 'Password', type: 'password' },
     },
     authorize(c) {

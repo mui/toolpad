@@ -55,7 +55,7 @@
     "@mui/internal-docs-utils": "1.0.8",
     "@mui/internal-markdown": "1.0.8",
     "@mui/internal-scripts": "1.0.13",
-    "@mui/monorepo": "github:mui/material-ui#987bb036905fdd4474ae5aaee7b2b5a3dc6b9315",
+    "@mui/monorepo": "github:mui/material-ui#a070a894fbe21c52df446438ca1bb5a891d5e1b5",
     "@mui/x-charts": "7.9.0",
     "@next/eslint-plugin-next": "14.2.4",
     "@playwright/test": "1.45.1",

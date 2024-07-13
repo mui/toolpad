@@ -19,6 +19,7 @@ import Typography from '@mui/material/Typography';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Account } from '../Account';
+
 import {
   BrandingContext,
   Navigation,

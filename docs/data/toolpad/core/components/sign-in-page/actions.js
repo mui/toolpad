@@ -19,6 +19,5 @@ export async function authenticate(provider, formData, callbackUrl) {
           return 'Something went wrong';
       }
     }
-    throw error;
   }
 }

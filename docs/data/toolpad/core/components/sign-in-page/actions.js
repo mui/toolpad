@@ -19,5 +19,7 @@ export async function authenticate(provider, formData, callbackUrl) {
           return 'Something went wrong';
       }
     }
+    console.error(error);
+    return 'Something went wrong';
   }
 }

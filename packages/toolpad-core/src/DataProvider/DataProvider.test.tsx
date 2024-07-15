@@ -17,7 +17,7 @@ describe('DataProvider', () => {
       },
     });
 
-    render(<DataGrid dataProvider={data} />);
+    render(<DataGrid height={300} dataProvider={data} />);
 
     expect(screen.getByText('Columns')).toBeTruthy();
   });

@@ -29,35 +29,35 @@
    - Focus on new user facing features or changes
    - Be concise, link to relevant documentation for extra clarity
 
-Use the following template to format the list of changes:
+   Use the following template to format the list of changes:
 
-```md
-<!-- HEADER + HIGHLIGHTS -->
+   ```md
+   <!-- HEADER + HIGHLIGHTS -->
 
-### `@toolpad/core`
+   ### `@toolpad/core`
 
-- Commit message (#pr-number) @author
-- ...
+   - Commit message (#pr-number) @author
+   - ...
 
-### `@toolpad/studio`
+   ### `@toolpad/studio`
 
-- Commit message (#pr-number) @author
-- ...
+   - Commit message (#pr-number) @author
+   - ...
 
-### Docs
+   ### Docs
 
-- Commit message (#pr-number) @author
-- ...
+   - Commit message (#pr-number) @author
+   - ...
 
-### Core
+   ### Core
 
-- Commit message (#pr-number) @author
-- ...
+   - Commit message (#pr-number) @author
+   - ...
 
-<!-- CONTRIBUTORS -->
-```
+   <!-- CONTRIBUTORS -->
+   ```
 
-Strip the `[tag]` from the commit lines and order them in each section. Sections that don't have changes can be removed altogether. If necessary, improve, redact or correct commit messages.
+   Strip the `[tag]` from the commit lines and order them in each section. Sections that don't have changes can be removed altogether. If necessary, improve, redact or correct commit messages.
 
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 

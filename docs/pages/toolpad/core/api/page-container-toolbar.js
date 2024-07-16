@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ApiPage from 'docs/src/modules/components/ApiPage';
 import mapApiPageTranslations from 'docs/src/modules/utils/mapApiPageTranslations';
-import jsonPageContent from './page-content-toolbar.json';
+import jsonPageContent from './page-container-toolbar.json';
 
 export default function Page(props) {
   const { descriptions, pageContent } = props;
@@ -10,9 +10,9 @@ export default function Page(props) {
 
 Page.getInitialProps = () => {
   const req = require.context(
-    'docs-toolpad/translations/api-docs/page-content-toolbar',
+    'docs-toolpad/translations/api-docs/page-container-toolbar',
     false,
-    /\.\/page-content-toolbar.*.json$/,
+    /\.\/page-container-toolbar.*.json$/,
   );
   const descriptions = mapApiPageTranslations(req);
 

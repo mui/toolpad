@@ -1,3 +1,0 @@
-<PageContent>
-  <Content router={router} />
-</PageContent>

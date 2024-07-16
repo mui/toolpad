@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { PageContent } from '@toolpad/core/PageContent';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { useDemoRouter } from '@toolpad/core/internals/demo';
 import { Link } from '@mui/material';
 
@@ -9,7 +9,11 @@ const NAVIGATION = [
   { slug: 'orders', title: 'Orders' },
 ];
 
-function Content({ router }) {
+interface ContentProps {
+  router: Router;
+}
+
+function Content({ router }: ContentProps) {
   switch (router.pathname) {
     case '/':
       return (
@@ -29,7 +33,6 @@ function Content({ router }) {
           .
         </React.Fragment>
       );
-
     case '/orders':
       return 'The orders page';
     default:
@@ -37,14 +40,14 @@ function Content({ router }) {
   }
 }
 
-export default function BasicPageContent() {
+export default function BasicPageContainer() {
   const router = useDemoRouter('/orders');
 
   return (
     <AppProvider navigation={NAVIGATION} router={router}>
-      <PageContent>
+      <PageContainer>
         <Content router={router} />
-      </PageContent>
+      </PageContainer>
     </AppProvider>
   );
 }

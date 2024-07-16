@@ -7,18 +7,18 @@ import { expect, describe, test, vi } from 'vitest';
 import describeConformance from '@toolpad/utils/describeConformance';
 import { render, within, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { PageContent } from './PageContent';
+import { PageContainer } from './PageContainer';
 import { AppProvider } from '../AppProvider';
 
-describe('PageContent', () => {
-  describeConformance(<PageContent />, () => ({
+describe('PageContainer', () => {
+  describeConformance(<PageContainer />, () => ({
     skip: ['themeDefaultProps'],
     slots: {
       toolbar: {},
     },
   }));
 
-  test('renders page content correctly', async () => {
+  test('renders page container correctly', async () => {
     const user = await userEvent.setup();
     const router = { pathname: '/orders', searchParams: new URLSearchParams(), navigate: vi.fn() };
     render(
@@ -29,7 +29,7 @@ describe('PageContent', () => {
         ]}
         router={router}
       >
-        <PageContent />
+        <PageContainer />
       </AppProvider>,
     );
 

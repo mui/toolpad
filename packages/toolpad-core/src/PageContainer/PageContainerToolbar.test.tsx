@@ -5,10 +5,10 @@
 import * as React from 'react';
 import { describe, test } from 'vitest';
 import describeConformance from '@toolpad/utils/describeConformance';
-import { PageContentToolbar } from './PageContentToolbar';
+import { PageContainerToolbar } from './PageContainerToolbar';
 
-describe('PageContentToolbar', () => {
-  describeConformance(<PageContentToolbar />, () => ({
+describe('PageContainerToolbar', () => {
+  describeConformance(<PageContainerToolbar />, () => ({
     skip: ['themeDefaultProps'],
   }));
 

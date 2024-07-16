@@ -54,7 +54,7 @@ export default function generateProject(
   }
   `;
 
-  const rootPageContent = `
+  const rootPageContainer = `
   import Link from "next/link";
   import { Button, Container, Typography, Box } from "@mui/material";
 
@@ -86,7 +86,7 @@ export default function generateProject(
   }
   `;
 
-  const dashboardPageContent = `
+  const dashboardPageContainer = `
   import { Typography, Container } from "@mui/material";
   export default function Home() {
     return (
@@ -432,10 +432,10 @@ export default function generateProject(
   return new Map([
     ['app/api/auth/[...nextAuth]/route.ts', { content: '' }],
     ['app/auth/[...path]/page.tsx', { content: '' }],
-    ['app/(dashboard)/page/page.tsx', { content: dashboardPageContent }],
+    ['app/(dashboard)/page/page.tsx', { content: dashboardPageContainer }],
     ['app/(dashboard)/layout.tsx', { content: dashboardLayoutContent }],
     ['app/layout.tsx', { content: rootLayoutContent }],
-    ['app/page.tsx', { content: rootPageContent }],
+    ['app/page.tsx', { content: rootPageContainer }],
     ['theme.ts', { content: themeContent }],
     ['next-env.d.ts', { content: nextTypesContent }],
     ['next.config.mjs', { content: nextConfigContent }],

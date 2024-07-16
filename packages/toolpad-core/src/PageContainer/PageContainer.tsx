@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography';
 import { useSlotProps } from '@mui/base/utils';
 import { RouterContext } from '../AppProvider';
 import { Link as ToolpadLink } from '../shared/Link';
-import { PageContentToolbar, PageContentToolbarProps } from './PageContentToolbar';
+import { PageContainerToolbar, PageContainerToolbarProps } from './PageContainerToolbar';
 import {
   isPageItem,
   Navigation,
@@ -77,11 +77,11 @@ function matchPath(navigation: Navigation, path: string): BreadCrumbItem[] | nul
   return lookup.get(path) ?? null;
 }
 
-export interface PageContentSlotProps {
-  toolbar: PageContentToolbarProps;
+export interface PageContainerSlotProps {
+  toolbar: PageContainerToolbarProps;
 }
 
-export interface PageContentSlots {
+export interface PageContainerSlots {
   /**
    * The component that renders the actions toolbar.
    * @default Snackbar
@@ -89,23 +89,23 @@ export interface PageContentSlots {
   toolbar: React.ElementType;
 }
 
-export interface PageContentProps extends ContainerProps {
+export interface PageContainerProps extends ContainerProps {
   children?: React.ReactNode;
   title?: string;
-  slots?: PageContentSlots;
-  slotProps?: PageContentSlotProps;
+  slots?: PageContainerSlots;
+  slotProps?: PageContainerSlotProps;
 }
 /**
  *
  * Demos:
  *
- * - [Page Content](https://mui.com/toolpad/core/react-page-content/)
+ * - [Page Container](https://mui.com/toolpad/core/react-page-content/)
  *
  * API:
  *
- * - [PageContent API](https://mui.com/toolpad/core/api/page-content)
+ * - [PageContainer API](https://mui.com/toolpad/core/api/page-container)
  */
-function PageContent(props: PageContentProps) {
+function PageContainer(props: PageContainerProps) {
   const { children, slots, slotProps, ...rest } = props;
   const routerContext = React.useContext(RouterContext);
   const navigationContext = React.useContext(NavigationContext);
@@ -117,7 +117,7 @@ function PageContent(props: PageContentProps) {
 
   const title = (breadCrumbs ? breadCrumbs[breadCrumbs.length - 1].title : '') ?? props.title;
 
-  const ToolbarComponent = props?.slots?.toolbar ?? PageContentToolbar;
+  const ToolbarComponent = props?.slots?.toolbar ?? PageContainerToolbar;
   const toolbarSlotProps = useSlotProps({
     elementType: ToolbarComponent,
     ownerState: props,
@@ -163,7 +163,7 @@ function PageContent(props: PageContentProps) {
   );
 }
 
-PageContent.propTypes /* remove-proptypes */ = {
+PageContainer.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
@@ -192,4 +192,4 @@ PageContent.propTypes /* remove-proptypes */ = {
   title: PropTypes.string,
 } as any;
 
-export { PageContent };
+export { PageContainer };

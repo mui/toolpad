@@ -8,7 +8,7 @@ export * from './DataGrid';
 
 export * from './LineChart';
 
-export * from './PageContent';
+export * from './PageContainer';
 
 export * from './useDialogs';
 

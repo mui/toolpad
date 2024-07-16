@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useDemoRouter } from '@toolpad/core/internals/demo';
-import { PageContent, PageContentToolbar } from '@toolpad/core/PageContent';
+import { PageContainer, PageContainerToolbar } from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -53,7 +53,7 @@ function Content() {
 // preview-start
 function PageToolbar() {
   return (
-    <PageContentToolbar>
+    <PageContainerToolbar>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
         Export
       </Button>
@@ -61,23 +61,23 @@ function PageToolbar() {
         sx={{ width: 220 }}
         defaultValue={[dayjs(), dayjs().add(14, 'day')]}
         slots={{ field: SingleInputDateRangeField }}
-        slotProps={{ field: { size: 'small' } }}
+        slotProps={{ field: { size: 'small' } as any }}
         label="Period"
       />
-    </PageContentToolbar>
+    </PageContainerToolbar>
   );
 }
 // preview-end
 
-export default function ActionsPageContent() {
+export default function ActionsPageContainer() {
   const router = useDemoRouter();
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AppProvider navigation={NAVIGATION} router={router}>
-        <PageContent slots={{ toolbar: PageToolbar }}>
+        <PageContainer slots={{ toolbar: PageToolbar }}>
           <Content />
-        </PageContent>
+        </PageContainer>
       </AppProvider>
     </LocalizationProvider>
   );

@@ -8,12 +8,12 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
 const NAVIGATION = [
   {
-    slug: '/dashboard',
+    segment: '/dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    segment: '/orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },

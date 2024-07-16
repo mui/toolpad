@@ -21,7 +21,7 @@ export default function generateProject(
       title: 'Main items',
     },
     {
-      slug: '/page',
+      segment: '/page',
       title: 'Page',
       icon: <DashboardIcon />,
     },

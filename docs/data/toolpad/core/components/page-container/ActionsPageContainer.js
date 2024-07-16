@@ -15,8 +15,8 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import dayjs from 'dayjs';
 
 const NAVIGATION = [
-  { slug: '', title: 'Weather' },
-  { slug: 'orders', title: 'Orders' },
+  { segment: '', title: 'Weather' },
+  { segment: 'orders', title: 'Orders' },
 ];
 
 function Content() {

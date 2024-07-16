@@ -24,8 +24,8 @@ describe('PageContainer', () => {
     render(
       <AppProvider
         navigation={[
-          { slug: '', title: 'Home' },
-          { slug: 'orders', title: 'Orders' },
+          { segment: '', title: 'Home' },
+          { segment: 'orders', title: 'Orders' },
         ]}
         router={router}
       >

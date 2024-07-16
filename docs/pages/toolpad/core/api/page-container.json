@@ -68,6 +68,6 @@
   "muiName": "PageContainer",
   "filename": "/packages/toolpad-core/src/PageContainer/PageContainer.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-page-content/\">Page Container</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-page-container/\">Page Container</a></li></ul>",
   "cssComponent": false
 }

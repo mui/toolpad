@@ -67,7 +67,7 @@ function DashboardSidebarSubNavigation({
               if (!isPageItem(nestedNavigationItem)) {
                 return false;
               }
-              const navigationItemFullPath = `${basePath}/${nestedNavigationItem.slug ?? ''}`;
+              const navigationItemFullPath = `${basePath}/${nestedNavigationItem.segment ?? ''}`;
 
               return navigationItemFullPath === pathname;
             }),
@@ -116,7 +116,7 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const navigationItemFullPath = `${basePath}/${navigationItem.slug ?? ''}`;
+        const navigationItemFullPath = `${basePath}/${navigationItem.segment ?? ''}`;
 
         const navigationItemId = `${navigationItem.title}-${depth}-${navigationItemIndex}`;
 
@@ -131,7 +131,7 @@ function DashboardSidebarSubNavigation({
         const listItem = (
           <ListItem>
             <ListItemButton
-              {...(typeof navigationItem.slug === 'string' && !navigationItem.children
+              {...(typeof navigationItem.segment === 'string' && !navigationItem.children
                 ? {
                     component: Link,
                     href: navigationItemFullPath,

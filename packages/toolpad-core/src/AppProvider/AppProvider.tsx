@@ -132,7 +132,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
-        slug: PropTypes.string.isRequired,
+        segment: PropTypes.string.isRequired,
         title: PropTypes.string,
       }),
       PropTypes.shape({

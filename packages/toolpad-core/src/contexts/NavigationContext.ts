@@ -7,7 +7,7 @@ import * as React from 'react';
 export interface NavigationPageItem {
   kind?: 'page';
   title?: string;
-  slug: string;
+  segment: string;
   icon?: React.ReactNode;
   children?: NavigationItem[];
 }

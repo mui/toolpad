@@ -10,7 +10,7 @@ export /**
  *
  * Demos:
  *
- * - [Page Container](https://mui.com/toolpad/core/react-page-content/)
+ * - [Page Container](https://mui.com/toolpad/core/react-page-container/)
  *
  * API:
  *

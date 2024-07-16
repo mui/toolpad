@@ -5,8 +5,8 @@ import { useDemoRouter } from '@toolpad/core/internals/demo';
 import { Link } from '@mui/material';
 
 const NAVIGATION = [
-  { slug: '', title: 'Home' },
-  { slug: 'orders', title: 'Orders' },
+  { segment: '', title: 'Home' },
+  { segment: 'orders', title: 'Orders' },
 ];
 
 interface ContentProps {

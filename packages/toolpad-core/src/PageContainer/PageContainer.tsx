@@ -20,7 +20,7 @@ import {
   NavigationPageItem,
 } from '../contexts/NavigationContext';
 
-const isRootPage = (item: NavigationItem) => isPageItem(item) && !item.slug;
+const isRootPage = (item: NavigationItem) => isPageItem(item) && !item.segment;
 
 interface BreadCrumbItem extends NavigationPageItem {
   path: string;
@@ -33,7 +33,7 @@ function createPageLookup(
 ): Map<string, BreadCrumbItem[]> {
   const result = new Map<string, BreadCrumbItem[]>();
 
-  const resolveSlug = (slug: string) => `${base}${slug ? `/${slug}` : ''}` || '/';
+  const resolveSlug = (segment: string) => `${base}${segment ? `/${segment}` : ''}` || '/';
 
   const root = navigation.find((item) => isRootPage(item)) as NavigationPageItem | undefined;
   const rootCrumb = root ? { path: resolveSlug(''), ...root } : undefined;
@@ -43,7 +43,7 @@ function createPageLookup(
       continue;
     }
 
-    const path = resolveSlug(item.slug);
+    const path = resolveSlug(item.segment);
     if (result.has(path)) {
       throw new Error(`Duplicate path in navigation: ${path}`);
     }
@@ -99,7 +99,7 @@ export interface PageContainerProps extends ContainerProps {
  *
  * Demos:
  *
- * - [Page Container](https://mui.com/toolpad/core/react-page-content/)
+ * - [Page Container](https://mui.com/toolpad/core/react-page-container/)
  *
  * API:
  *

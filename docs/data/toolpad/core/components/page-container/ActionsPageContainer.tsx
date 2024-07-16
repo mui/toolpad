@@ -22,7 +22,7 @@ const NAVIGATION = [
 function Content() {
   return (
     <Grid container spacing={3}>
-      <Grid xs={4}>
+      <Grid size={{ xs: 4 }}>
         <Card>
           <CardContent>
             <Typography variant="caption">Temperature</Typography>
@@ -30,7 +30,7 @@ function Content() {
           </CardContent>
         </Card>
       </Grid>
-      <Grid xs={4}>
+      <Grid size={{ xs: 4 }}>
         <Card>
           <CardContent>
             <Typography variant="caption">Precipitation</Typography>
@@ -38,7 +38,7 @@ function Content() {
           </CardContent>
         </Card>
       </Grid>
-      <Grid xs={4}>
+      <Grid size={{ xs: 4 }}>
         <Card>
           <CardContent>
             <Typography variant="caption">Wind</Typography>

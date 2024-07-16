@@ -1,4 +1,5 @@
 'use server';
+// eslint-disable-next-line import/no-unresolved
 import { AuthError } from 'next-auth';
 import type { AuthProvider } from '@toolpad/core';
 import { signIn } from './auth';

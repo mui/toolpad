@@ -1,6 +1,5 @@
 {
   "props": {
-    "componentProps": { "type": { "name": "object" }, "default": "{}" },
     "providers": {
       "type": { "name": "arrayOf", "description": "Array&lt;{ id: string, name: string }&gt;" },
       "default": "[]"
@@ -13,6 +12,13 @@
         "describedArgs": ["provider", "formData", "callbackUrl"],
         "returned": "void"
       }
+    },
+    "slotProps": {
+      "type": {
+        "name": "shape",
+        "description": "{ emailField?: object, passwordField?: object, submitButton?: object }"
+      },
+      "default": "{}"
     }
   },
   "name": "SignInPage",

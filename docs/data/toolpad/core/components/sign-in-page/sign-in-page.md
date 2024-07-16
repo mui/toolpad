@@ -24,7 +24,7 @@ To render a username password form, pass in a provider with `credentials` as the
 
 ## Notifications
 
-The `signIn` prop takes a `Promise` which can either resolve with a success message, or reject with an `Error`. `SignInPage` integrates with [`useNotifications`](/toolpad/core/react-use-notifications/) by default to display notifications in either case.
+The `signIn` prop takes a `Promise` which can either resolve with a success message, or reject with an `Error`. `SignInPage` integrates with the [`NotificationsProvider`](/toolpad/core/react-use-notifications/) by default to display notifications in either case.
 
 ### Success
 

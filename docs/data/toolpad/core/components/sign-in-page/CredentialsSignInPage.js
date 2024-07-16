@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { AppProvider, SignInPage } from '@toolpad/core';
 
+// preview-start
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
+// preview-end
 
 const signIn = async (provider, formData) => {
   const promise = new Promise((resolve) => {
@@ -17,6 +19,7 @@ const signIn = async (provider, formData) => {
 
 export default function CredentialsSignInPage() {
   return (
+    // preview-start
     <AppProvider>
       <SignInPage
         signIn={signIn}
@@ -26,5 +29,6 @@ export default function CredentialsSignInPage() {
         }}
       />
     </AppProvider>
+    // preview-end
   );
 }

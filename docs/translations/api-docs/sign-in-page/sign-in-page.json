@@ -1,9 +1,6 @@
 {
   "componentDescription": "",
   "propDescriptions": {
-    "componentProps": {
-      "description": "Props to pass to the constituent components in the credentials form"
-    },
     "providers": { "description": "The list of authentication providers to display." },
     "signIn": {
       "description": "Callback fired when a user signs in.",
@@ -13,6 +10,9 @@
         "callbackUrl": "The URL to redirect to after signing in.",
         "void": "| {string}"
       }
+    },
+    "slotProps": {
+      "description": "Props to pass to the constituent components in the credentials form"
     }
   },
   "classDescriptions": {}

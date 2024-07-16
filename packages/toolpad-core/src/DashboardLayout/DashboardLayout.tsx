@@ -47,7 +47,7 @@ interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
-  onSidebarItemClick?: (itemId: string) => void;
+  onSidebarItemClick?: (item: NavigationPageItem) => void;
 }
 
 function DashboardSidebarSubNavigation({
@@ -92,7 +92,7 @@ function DashboardSidebarSubNavigation({
   );
 
   const handleSidebarItemClick = React.useCallback(
-    (itemId: string) => () => {
+    (itemId: string, item: NavigationPageItem) => () => {
       setExpandedSidebarItemIds((previousValue) =>
         previousValue.includes(itemId)
           ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
@@ -100,7 +100,7 @@ function DashboardSidebarSubNavigation({
       );
 
       if (onSidebarItemClick) {
-        onSidebarItemClick(itemId);
+        onSidebarItemClick(item);
       }
     },
     [onSidebarItemClick],
@@ -155,7 +155,7 @@ function DashboardSidebarSubNavigation({
           <ListItem>
             <ListItemButton
               selected={pathname === navigationItemFullPath}
-              onClick={handleSidebarItemClick(navigationItemId)}
+              onClick={handleSidebarItemClick(navigationItemId, navigationItem)}
             >
               {navigationItem.icon ? <ListItemIcon>{navigationItem.icon}</ListItemIcon> : null}
               <ListItemText primary={navigationItem.title} />
@@ -184,6 +184,7 @@ function DashboardSidebarSubNavigation({
                   subNavigation={navigationItem.children}
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
+                  onSidebarItemClick={onSidebarItemClick}
                 />
               </Collapse>
             ) : null}
@@ -232,7 +233,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const handleSetMobileNavigationOpen = React.useCallback(
     (newOpen: boolean) => () => {
-      setIsMobileNavigationOpen(newOpen);
+        setIsMobileNavigationOpen(newOpen);
     },
     [],
   );
@@ -241,13 +242,19 @@ function DashboardLayout(props: DashboardLayoutProps) {
     setIsMobileNavigationOpen((previousOpen) => !previousOpen);
   }, []);
 
+  const handleNavigationItemClick = React.useCallback((item: NavigationPageItem) => {
+    if (!item.children) {
+      setIsMobileNavigationOpen(false);
+    }
+  }, [])
+
   const drawerContent = (
     <React.Fragment>
       <Toolbar />
       <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}>
         <DashboardSidebarSubNavigation
           subNavigation={navigation}
-          onSidebarItemClick={handleSetMobileNavigationOpen(false)}
+          onSidebarItemClick={handleNavigationItemClick}
         />
       </Box>
     </React.Fragment>

@@ -3,7 +3,7 @@ import { AppProvider, SignInPage } from '@toolpad/core';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
 
-export default function ComponentsPropsSignIn() {
+export default function SlotPropsSignIn() {
   return (
     <AppProvider>
       <SignInPage
@@ -12,7 +12,7 @@ export default function ComponentsPropsSignIn() {
             `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
           )
         }
-        componentProps={{
+        slotProps={{
           emailField: { autoFocus: false, variant: 'standard' },
           passwordField: { variant: 'standard' },
           submitButton: { variant: 'outlined' },

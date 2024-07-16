@@ -15,7 +15,7 @@ const providers: Provider[] = [
     },
     authorize(c) {
       if (c.password !== 'password') {
-        throw new Error('Invalid password');
+        throw new Error('Invalid credentials.');
       }
       return {
         id: 'test',

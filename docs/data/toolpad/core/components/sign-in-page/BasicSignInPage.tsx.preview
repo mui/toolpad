@@ -1,1 +1,0 @@
-<SignInPage signIn={authenticate} providers={providerMap} />

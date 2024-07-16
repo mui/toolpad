@@ -1,0 +1,11 @@
+<AppProvider>
+  <SignInPage
+    signIn={signIn}
+    providers={providers}
+    slotProps={{
+      emailField: {
+        autoFocus: false,
+      },
+    }}
+  />
+</AppProvider>

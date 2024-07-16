@@ -3,17 +3,25 @@ import { AppProvider, SignInPage } from '@toolpad/core';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
 
+const signIn = async (provider, formData) => {
+  const promise = new Promise((resolve) => {
+    setTimeout(() => {
+      alert(
+        `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
+      );
+      resolve('');
+    }, 300);
+  });
+  return promise;
+};
+
 export default function CredentialsSignInPage() {
   return (
     <AppProvider>
       <SignInPage
-        signIn={(provider, formData) =>
-          alert(
-            `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
-          )
-        }
+        signIn={signIn}
         providers={providers}
-        componentProps={{
+        slotProps={{
           emailField: { autoFocus: false },
         }}
       />

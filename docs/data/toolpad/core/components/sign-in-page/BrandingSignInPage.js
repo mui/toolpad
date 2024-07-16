@@ -22,6 +22,16 @@ const BRANDING = {
   title: 'MUI',
 };
 
+const signIn = async (provider) => {
+  const promise = new Promise((resolve) => {
+    setTimeout(() => {
+      alert(`Signing in with "${provider.name}"`);
+      resolve('Signed in!');
+    }, 300);
+  });
+  return promise;
+};
+
 export default function BrandingSignInPage() {
   const { mode, systemMode } = useColorSchemeShim();
   const calculatedMode = (mode === 'system' ? systemMode : mode) ?? 'light';
@@ -37,13 +47,7 @@ export default function BrandingSignInPage() {
   return (
     // preview-start
     <AppProvider branding={BRANDING} theme={THEME}>
-      <SignInPage
-        signIn={(provider) => alert(`Signing in with "${provider.name}"`)}
-        providers={providers}
-        componentProps={{
-          emailField: { autoFocus: false },
-        }}
-      />
+      <SignInPage signIn={signIn} providers={providers} />
     </AppProvider>
     // preview-end
   );

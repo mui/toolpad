@@ -4,7 +4,7 @@
       `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
     )
   }
-  componentProps={{
+  slotProps={{
     emailField: { autoFocus: false, variant: 'standard' },
     passwordField: { variant: 'standard' },
     submitButton: { variant: 'outlined' },

@@ -6,15 +6,7 @@ import { authenticate } from './actions';
 export default function AuthJsSignInApp() {
   return (
     <AppProvider>
-      <SignInPage
-        signIn={authenticate}
-        providers={providerMap}
-        componentProps={{
-          emailField: {
-            autoFocus: false,
-          },
-        }}
-      />
+      <SignInPage signIn={authenticate} providers={providerMap} />
     </AppProvider>
   );
 }

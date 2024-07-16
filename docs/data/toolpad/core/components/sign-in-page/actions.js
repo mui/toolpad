@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 'use server';
 import { AuthError } from 'next-auth';
 
@@ -14,12 +13,11 @@ export async function authenticate(provider, formData, callbackUrl) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case 'CredentialsSignin':
-          return 'Invalid credentials.';
+          throw new Error('Invalid credentials.');
         default:
-          return 'Something went wrong';
+          throw new Error('Something went wrong.');
       }
     }
-    console.error(error);
-    return 'Something went wrong';
+    throw error;
   }
 }

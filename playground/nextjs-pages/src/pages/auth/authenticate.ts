@@ -16,10 +16,9 @@ export const credentialsSignIn = async (
     switch (signInResponse.error) {
       case 'CredentialsSignin':
       case 'Configuration':
-        return 'Invalid credentials.';
-
+        throw new Error('Invalid credentials.');
       default:
-        return 'Something went wrong.';
+        throw new Error('Something went wrong.');
     }
   }
   // Redirect to the callback URL if the sign in was successful
@@ -37,14 +36,17 @@ export const providerSignIn = async (
       ...(formData && Object.fromEntries(formData)),
       redirectTo: callbackUrl ?? '/',
     });
-    return signInResponse?.ok ? '' : 'Something went wrong.';
+    if (signInResponse && !signInResponse?.ok) {
+      throw new Error('Something went wrong.');
+    }
+    return '';
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case 'CredentialsSignin':
-          return 'Invalid credentials.';
+          throw new Error('Invalid credentials.');
         default:
-          return 'Something went wrong.';
+          throw new Error('Something went wrong.');
       }
     }
     throw error;

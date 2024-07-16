@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Sign In Page
-components: SignInPage, Account
+components: SignInPage, Account, NotificationsProvider
 ---
 
 # Sign In Page
@@ -22,17 +22,53 @@ To render a username password form, pass in a provider with `credentials` as the
 
 {{"demo": "CredentialsSignInPage.js", "iframe": true, "height": 500}}
 
+## Notifications
+
+The `signIn` prop takes a `Promise` which can either resolve with a success message, or reject with an `Error`. `SignInPage` integrates with [`useNotifications`](/toolpad/core/react-use-notifications/) by default to display notifications in either case.
+
+### Success
+
+The success notification contains the string returned by the `signIn` function. An empty string disables the notification.
+
+:::info
+Try signing in with different providers to see this behaviour in action.
+:::
+
+{{"demo": "NotificationsSignInPageSuccess.js", "iframe": true, "height": 400}}
+
+### Error
+
+Error notifications are displayed when the `signIn` function throws an error. Throwing an error of the form of:
+
+```tsx
+throw new Error('Invalid credentials.');
+```
+
+will result in "Invalid credentials." being shown in the error notification.
+
+Throwing an empty error – such as `throw new Error('')` – results in a default message in the notification.
+
+:::info
+Try signing in with a random string, `password`, and `default` as the passwords to see this behaviour in action.
+:::
+
+{{"demo": "NotificationsSignInPageError.js", "iframe": true, "height": 500}}
+
 ## Usage with authentication libraries
 
 ### Auth.js
 
 #### Next.js App Directory and GitHub
 
-The component is composable with any authentication library you might want to use. The following is a functional `SignInPage` with [auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions:
+The component is composable with any authentication library you might want to use. The following is a functional `SignInPage` with [auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
-{{"demo": "AuthJsSignInApp.js", "iframe": true, "height": 600 }}
+:::warning
+The following demo will not initiate an actual GitHub authentication flow, since doing that from within an `iframe` is not permitted.
+:::
 
-##### Setting up
+{{"demo": "AuthJsSignInApp.js", "iframe": true, "height": 300 }}
+
+#### Setting up
 
 The project contains an `.env.local` with the following variables:
 
@@ -65,21 +101,21 @@ Use our detailed examples with both the [Next.js app directory](https://github.c
 
 ## Customization
 
-### Component Props
-
-`SignInPage` can be customized by passing in `componentProps` to the underlying components of the credentials form.
-
-{{"demo": "ComponentsPropsSignIn.js", "iframe": true, "height": 540 }}
-
 ### Theme and Branding
 
 Through the `branding` and `theme` props in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be customized to match your own styles.
 
-{{"demo": "BrandingSignInPage.js"}}
+{{"demo": "BrandingSignInPage.js", "iframe": true, "height": 700 }}
 
-### 🚧 Slots
+### Components
 
-To enable deep customization beyond what is possible with custom props, the `SignInPage` component will allow passing in your own forms when using the `credentials` provider. This is in progress.
+`SignInPage` can be customized by passing in `slotProps` to the underlying components of the credentials form.
+
+{{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 540 }}
+
+#### 🚧 Composition
+
+To enable deep customization beyond what is possible with custom props, the `SignInPage` component will allow bringing your own custom granular components, such as inputs and buttons. This is in progress.
 
 ### 🚧 Layouts
 

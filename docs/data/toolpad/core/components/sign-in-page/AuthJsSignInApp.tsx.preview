@@ -1,9 +1,1 @@
-<SignInPage
-  signIn={authenticate}
-  providers={providerMap}
-  componentProps={{
-    emailField: {
-      autoFocus: false,
-    },
-  }}
-/>
+<SignInPage signIn={authenticate} providers={providerMap} />

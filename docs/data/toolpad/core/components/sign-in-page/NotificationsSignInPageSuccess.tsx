@@ -1,25 +1,29 @@
 import * as React from 'react';
 import { AuthProvider, AppProvider, SignInPage } from '@toolpad/core';
 
-// preview-start
 const providers = [
   { id: 'github', name: 'GitHub' },
   { id: 'google', name: 'Google' },
   { id: 'facebook', name: 'Facebook' },
 ];
-// preview-end
 
 const signIn: (provider: AuthProvider) => Promise<string> = async (provider) => {
   const promise = new Promise<string>((resolve) => {
     setTimeout(() => {
       alert(`Signing in with "${provider.name}"`);
-      resolve('');
+      if (provider.id === 'github') {
+        resolve('');
+      } else if (provider.id === 'google') {
+        resolve('Custom message for Google.');
+      } else {
+        resolve('Signed in!');
+      }
     }, 300);
   });
   return promise;
 };
 
-export default function OAuthSignInPage() {
+export default function NotificationsSignInPageSuccess() {
   return (
     // preview-start
     <AppProvider>

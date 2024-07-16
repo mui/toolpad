@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { AppProvider, SignInPage } from '@toolpad/core';
+import { AuthProvider, AppProvider, SignInPage } from '@toolpad/core';
 import { createTheme } from '@mui/material/styles';
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
 import { getDesignTokens } from './brandingTheme';
@@ -22,6 +22,16 @@ const BRANDING = {
   title: 'MUI',
 };
 
+const signIn: (provider: AuthProvider) => Promise<string> = async (provider) => {
+  const promise = new Promise<string>((resolve) => {
+    setTimeout(() => {
+      alert(`Signing in with "${provider.name}"`);
+      resolve('Signed in!');
+    }, 300);
+  });
+  return promise;
+};
+
 export default function BrandingSignInPage() {
   const { mode, systemMode } = useColorSchemeShim();
   const calculatedMode = (mode === 'system' ? systemMode : mode) ?? 'light';
@@ -37,13 +47,7 @@ export default function BrandingSignInPage() {
   return (
     // preview-start
     <AppProvider branding={BRANDING} theme={THEME}>
-      <SignInPage
-        signIn={(provider) => alert(`Signing in with "${provider.name}"`)}
-        providers={providers}
-        componentProps={{
-          emailField: { autoFocus: false },
-        }}
-      />
+      <SignInPage signIn={signIn} providers={providers} />
     </AppProvider>
     // preview-end
   );

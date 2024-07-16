@@ -29,6 +29,36 @@
    - Focus on new user facing features or changes
    - Be concise, link to relevant documentation for extra clarity
 
+   Use the following template to format the list of changes:
+
+   ```md
+   <!-- HEADER + HIGHLIGHTS -->
+
+   ### `@toolpad/core`
+
+   - Commit message (#pr-number) @author
+   - ...
+
+   ### `@toolpad/studio`
+
+   - Commit message (#pr-number) @author
+   - ...
+
+   ### Docs
+
+   - Commit message (#pr-number) @author
+   - ...
+
+   ### Core
+
+   - Commit message (#pr-number) @author
+   - ...
+
+   <!-- CONTRIBUTORS -->
+   ```
+
+   Strip the `[tag]` from the commit lines and order them in each section. Sections that don't have changes can be removed altogether. If necessary, improve, redact or correct commit messages.
+
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 
 1. Open a PR to the `master` branch with the proposed changes. Add the "release" label.

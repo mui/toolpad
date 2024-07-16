@@ -31,7 +31,7 @@ The `signIn` prop takes a `Promise` which can either resolve with a success mess
 The success notification contains the string returned by the `signIn` function. An empty string disables the notification.
 
 :::info
-Try signing in with different providers to see this behaviour in action.
+Try signing in with different providers to see this behavior in action.
 :::
 
 {{"demo": "NotificationsSignInPageSuccess.js", "iframe": true, "height": 400}}
@@ -49,7 +49,7 @@ will result in "Invalid credentials." being shown in the error notification.
 Throwing an empty error – such as `throw new Error('')` – results in a default message in the notification.
 
 :::info
-Try signing in with a random string, `password`, and `default` as the passwords to see this behaviour in action.
+Try signing in with a random string, `password`, and `default` as the passwords to see this behavior in action.
 :::
 
 {{"demo": "NotificationsSignInPageError.js", "iframe": true, "height": 500}}

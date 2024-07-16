@@ -37,18 +37,22 @@ Use the following template to format the list of changes:
 ### `@toolpad/core`
 
 - Commit message (#pr-number) @author
+- ...
 
 ### `@toolpad/studio`
 
 - Commit message (#pr-number) @author
+- ...
 
 ### Docs
 
 - Commit message (#pr-number) @author
+- ...
 
 ### Core
 
 - Commit message (#pr-number) @author
+- ...
 
 <!-- CONTRIBUTORS -->
 ```

@@ -233,7 +233,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const handleSetMobileNavigationOpen = React.useCallback(
     (newOpen: boolean) => () => {
-        setIsMobileNavigationOpen(newOpen);
+      setIsMobileNavigationOpen(newOpen);
     },
     [],
   );
@@ -246,7 +246,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     if (!item.children) {
       setIsMobileNavigationOpen(false);
     }
-  }, [])
+  }, []);
 
   const drawerContent = (
     <React.Fragment>

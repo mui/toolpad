@@ -1,4 +1,4 @@
-import { PlaywrightTestConfig, devices } from '@playwright/test';
+import { devices, defineConfig } from '@playwright/test';
 
 process.env.BROWSER = 'none';
 
@@ -11,7 +11,7 @@ function getShard() {
   return undefined;
 }
 
-const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
+export default defineConfig({
   shard: getShard(),
   forbidOnly: !!process.env.CI,
   retries: process.env.TOOLPAD_TEST_RETRIES ? Number(process.env.TOOLPAD_TEST_RETRIES) : 0,
@@ -45,6 +45,4 @@ const config: PlaywrightTestConfig<{ toolpadDev: boolean }> = {
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-};
-
-export default config;
+});

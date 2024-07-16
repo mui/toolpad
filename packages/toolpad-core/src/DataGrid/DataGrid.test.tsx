@@ -59,7 +59,7 @@ function getCell(root: HTMLElement, rowIndex: number, colIndex: number): HTMLEle
 }
 
 describe('DataGrid', () => {
-  describeConformance(<DataGrid />, () => ({
+  describeConformance(<DataGrid height={300} />, () => ({
     inheritComponent: XDataGrid,
     skip: ['themeDefaultProps'],
   }));

@@ -35,10 +35,7 @@ export interface NavigationPageItem {
   title: string;
   slug?: string;
   icon?: React.ReactNode;
-  badge?: {
-    content: BadgeProps['badgeContent'];
-    color?: BadgeProps['color'];
-  };
+  action?: React.ReactNode;
   children?: Navigation;
 }
 

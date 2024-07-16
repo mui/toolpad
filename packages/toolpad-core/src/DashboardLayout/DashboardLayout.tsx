@@ -2,7 +2,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
-import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Container from '@mui/material/Container';
@@ -148,18 +147,7 @@ function DashboardSidebarSubNavigation({
             >
               <ListItemIcon>{navigationItem.icon}</ListItemIcon>
               <ListItemText primary={navigationItem.title} />
-              {navigationItem.badge ? (
-                <Badge
-                  badgeContent={navigationItem.badge.content}
-                  color={navigationItem.badge.color ?? 'primary'}
-                  sx={{
-                    '& .MuiBadge-badge': {
-                      position: 'static',
-                      transform: 'none',
-                    },
-                  }}
-                />
-              ) : null}
+              {navigationItem.action ?? null}
               {navigationItem.children ? nestedNavigationCollapseIcon : null}
             </ListItemButton>
           </ListItem>

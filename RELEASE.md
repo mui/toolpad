@@ -57,7 +57,7 @@ Use the following template to format the list of changes:
 <!-- CONTRIBUTORS -->
 ```
 
-Strip the `[tag]` from the commit lines and order them in each section. Sections that don't have change can be removed altogether. If necessary, improve, redact or correct commit messages.
+Strip the `[tag]` from the commit lines and order them in each section. Sections that don't have changes can be removed altogether. If necessary, improve, redact or correct commit messages.
 
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 

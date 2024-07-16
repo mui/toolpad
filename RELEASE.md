@@ -29,10 +29,10 @@
    - Focus on new user facing features or changes
    - Be concise, link to relevant documentation for extra clarity
 
-Use the following template to format the changes:
+Use the following template to format the list of changes:
 
 ```md
-HEADER + HIGHLIGHTS
+<!-- HEADER + HIGHLIGHTS -->
 
 ### `@toolpad/core`
 
@@ -49,6 +49,8 @@ HEADER + HIGHLIGHTS
 ### Core
 
 - Commit message (#pr-number) @author
+
+<!-- CONTRIBUTORS -->
 ```
 
 Strip the `[tag]` from the issue line and order them in each section. Sections that don't have change can be removed altogether. If necessary, improve, redact or correct commit messages.

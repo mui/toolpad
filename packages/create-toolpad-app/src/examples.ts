@@ -22,8 +22,6 @@ async function downloadTar(url: string) {
   invariant(response.body, 'Missing response body');
 
   let current = 0;
-  // @ts-expect-error - @types/node ReadableStream clashing with lib.dom ReadableStream
-  // https://github.com/microsoft/TypeScript/issues/29867
   const readable = Readable.fromWeb(response.body);
   readable.on('data', (chunk) => {
     process.stdout.write(

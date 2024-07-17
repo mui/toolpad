@@ -12,7 +12,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import userEvent from '@testing-library/user-event';
 import { DashboardLayout } from './DashboardLayout';
-import { BrandingContext, Navigation, NavigationContext } from '../AppProvider';
+import { AppProvider, BrandingContext, Navigation } from '../AppProvider';
 
 describe('DashboardLayout', () => {
   test('renders content correctly', async () => {
@@ -47,12 +47,12 @@ describe('DashboardLayout', () => {
       },
       {
         title: 'Dashboard',
-        slug: '/dashboard',
+        segment: 'dashboard',
         icon: <DashboardIcon />,
       },
       {
         title: 'Orders',
-        slug: '/orders',
+        segment: 'orders',
         icon: <ShoppingCartIcon />,
       },
       {
@@ -63,20 +63,24 @@ describe('DashboardLayout', () => {
         title: 'Analytics',
       },
       {
+        segment: 'reports',
         title: 'Reports',
         icon: <BarChartIcon />,
         children: [
           {
+            segment: 'sales',
             title: 'Sales',
             icon: <DescriptionIcon />,
           },
           {
+            segment: 'traffic',
             title: 'Traffic',
             icon: <DescriptionIcon />,
           },
         ],
       },
       {
+        segment: 'integrations',
         title: 'Integrations',
         icon: <LayersIcon />,
       },
@@ -84,9 +88,9 @@ describe('DashboardLayout', () => {
 
     const user = userEvent.setup();
     render(
-      <NavigationContext.Provider value={NAVIGATION}>
+      <AppProvider navigation={NAVIGATION}>
         <DashboardLayout>Hello world</DashboardLayout>
-      </NavigationContext.Provider>,
+      </AppProvider>,
     );
 
     const navigation = screen.getByRole('navigation');

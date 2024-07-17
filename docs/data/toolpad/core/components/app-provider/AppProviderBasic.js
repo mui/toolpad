@@ -12,13 +12,13 @@ const NAVIGATION = [
     title: 'Main items',
   },
   {
-    slug: '/page',
+    segment: 'page',
     title: 'Page',
     icon: <DashboardIcon />,
   },
   // Add the following new item:
   {
-    slug: '/page-2',
+    segment: 'page-2',
     title: 'Page 2',
     icon: <TimelineIcon />,
   },

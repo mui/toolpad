@@ -6,14 +6,14 @@ import { RouterContext } from '../AppProvider';
  */
 
 export interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
-  history: 'push' | 'replace';
+  history?: 'auto' | 'push' | 'replace';
 }
 
 export const Link = React.forwardRef(function Link(
   props: LinkProps,
   ref: React.ForwardedRef<HTMLAnchorElement>,
 ) {
-  const { children, href, onClick, history = 'push', ...rest } = props;
+  const { children, href, onClick, history, ...rest } = props;
   const routerContext = React.useContext(RouterContext);
 
   const handleLinkClick = React.useMemo(() => {

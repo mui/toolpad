@@ -48,19 +48,24 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
+    const getBackgroundColorCSSVariable = () =>
+      getComputedStyle(document.documentElement).getPropertyValue(
+        '--mui-palette-common-background',
+      );
+
     const header = screen.getByRole('banner');
 
     const themeSwitcherButton = within(header).getByLabelText('Switch to dark mode');
 
-    expect(document.body).toHaveStyle(`background-color: rgb(255, 255, 255)`);
+    expect(getBackgroundColorCSSVariable()).toBe('#fff');
 
     await user.click(themeSwitcherButton);
 
-    expect(document.body).toHaveStyle(`background-color: rgb(18, 18, 18)`);
+    expect(getBackgroundColorCSSVariable()).toBe('#000');
 
     await user.click(themeSwitcherButton);
 
-    expect(document.body).toHaveStyle(`background-color: rgb(255, 255, 255)`);
+    expect(getBackgroundColorCSSVariable()).toBe('#fff');
   });
 
   test('navigation works correctly', async () => {

@@ -1,8 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { CssVarsTheme, Theme } from '@mui/material/styles';
-import { baseCSSVarsTheme } from '../themes';
+import { experimental_extendTheme as extendTheme, CssVarsTheme, Theme } from '@mui/material/styles';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
 import { BrandingContext, NavigationContext, RouterContext } from '../shared/context';
@@ -32,7 +31,7 @@ export interface Branding {
 
 export interface NavigationPageItem {
   kind?: 'page';
-  title: string;
+  title?: string;
   slug?: string;
   icon?: React.ReactNode;
   children?: Navigation;
@@ -58,7 +57,7 @@ export interface AppProviderProps {
   children: React.ReactNode;
   /**
    * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
-   * @default baseCSSVarsTheme
+   * @default extendTheme()
    */
   theme?: Theme | { light: Theme; dark: Theme } | CssVarsTheme;
   /**
@@ -71,12 +70,17 @@ export interface AppProviderProps {
    * @default []
    */
   navigation?: Navigation;
-
   /**
    * Router implementation used inside Toolpad components.
    * @default null
    */
   router?: Router;
+  /**
+   * The window where the application is rendered.
+   * This is needed when rendering the app inside an iframe, for example.
+   * @default window
+   */
+  window?: Window;
 }
 
 /**
@@ -93,15 +97,16 @@ export interface AppProviderProps {
 function AppProvider(props: AppProviderProps) {
   const {
     children,
-    theme = baseCSSVarsTheme,
+    theme = extendTheme(),
     branding = null,
     navigation = [],
     router = null,
+    window,
   } = props;
 
   return (
     <RouterContext.Provider value={router}>
-      <AppThemeProvider theme={theme}>
+      <AppThemeProvider theme={theme} window={window}>
         <NotificationsProvider>
           <DialogsProvider>
             <BrandingContext.Provider value={branding}>
@@ -153,7 +158,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
         slug: PropTypes.string,
-        title: PropTypes.string.isRequired,
+        title: PropTypes.string,
       }),
       PropTypes.shape({
         kind: PropTypes.oneOf(['header']).isRequired,
@@ -175,9 +180,15 @@ AppProvider.propTypes /* remove-proptypes */ = {
   }),
   /**
    * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
-   * @default baseCSSVarsTheme
+   * @default extendTheme()
    */
   theme: PropTypes.object,
+  /**
+   * The window where the application is rendered.
+   * This is needed when rendering the app inside an iframe, for example.
+   * @default window
+   */
+  window: PropTypes.object,
 } as any;
 
 export { AppProvider };

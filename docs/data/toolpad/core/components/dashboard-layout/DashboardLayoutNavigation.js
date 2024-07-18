@@ -6,7 +6,6 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FolderIcon from '@mui/icons-material/Folder';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 
 function DemoPageContent({ pathname }) {
   return (
@@ -28,7 +27,9 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-export default function DashboardLayoutNavigation() {
+function DashboardLayoutNavigation(props) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
@@ -38,6 +39,9 @@ export default function DashboardLayoutNavigation() {
       navigate: (path) => setPathname(String(path)),
     };
   }, [pathname]);
+
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
 
   return (
     // preview-start
@@ -183,7 +187,7 @@ export default function DashboardLayoutNavigation() {
         },
       ]}
       router={router}
-      theme={{ light: baseLightTheme, dark: baseDarkTheme }}
+      window={demoWindow}
     >
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
@@ -192,3 +196,13 @@ export default function DashboardLayoutNavigation() {
     // preview-end
   );
 }
+
+DashboardLayoutNavigation.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window: PropTypes.func,
+};
+
+export default DashboardLayoutNavigation;

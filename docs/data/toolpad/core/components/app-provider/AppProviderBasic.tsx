@@ -5,7 +5,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 import type { Navigation, Router } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
@@ -41,7 +40,17 @@ function DemoPageContent({ pathname }: { pathname: string }) {
   );
 }
 
-export default function AppProviderBasic() {
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function AppProviderBasic(props: DemoProps) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -52,13 +61,12 @@ export default function AppProviderBasic() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
     // preview-start
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={{ light: baseLightTheme, dark: baseDarkTheme }}
-    >
+    <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>

@@ -9,7 +9,6 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 
 const NAVIGATION = [
   {
@@ -77,7 +76,9 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-export default function DashboardLayoutBasic() {
+function DashboardLayoutBasic(props) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
@@ -88,13 +89,12 @@ export default function DashboardLayoutBasic() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
     // preview-start
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={{ light: baseLightTheme, dark: baseDarkTheme }}
-    >
+    <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
@@ -102,3 +102,13 @@ export default function DashboardLayoutBasic() {
     // preview-end
   );
 }
+
+DashboardLayoutBasic.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window: PropTypes.func,
+};
+
+export default DashboardLayoutBasic;

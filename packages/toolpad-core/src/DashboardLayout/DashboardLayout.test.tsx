@@ -15,7 +15,6 @@ import '@testing-library/jest-dom/vitest';
 import { BrandingContext, NavigationContext } from '../shared/context';
 import type { Navigation } from '../AppProvider';
 import { AppThemeProvider } from '../AppProvider/AppThemeProvider';
-import { baseDarkTheme, baseLightTheme } from '../themes';
 import { DashboardLayout } from './DashboardLayout';
 
 describe('DashboardLayout', () => {
@@ -46,7 +45,7 @@ describe('DashboardLayout', () => {
   test('can switch theme', async () => {
     const user = userEvent.setup();
     render(
-      <AppThemeProvider theme={{ light: baseLightTheme, dark: baseDarkTheme }}>
+      <AppThemeProvider>
         <DashboardLayout>Hello world</DashboardLayout>
       </AppThemeProvider>,
     );

@@ -41,6 +41,8 @@ function DemoPageContent({ pathname }) {
   );
 }
 
+// @TODO: Use CSS vars theme once Toolpad Core uses Material UI v6
+
 DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
@@ -55,7 +57,9 @@ const customTheme = createTheme({
   },
 });
 
-export default function AppProviderTheme() {
+function AppProviderTheme(props) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
@@ -66,9 +70,17 @@ export default function AppProviderTheme() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
     // preview-start
-    <AppProvider navigation={NAVIGATION} router={router} theme={customTheme}>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={customTheme}
+      window={demoWindow}
+    >
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
@@ -76,3 +88,13 @@ export default function AppProviderTheme() {
     // preview-end
   );
 }
+
+AppProviderTheme.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window: PropTypes.func,
+};
+
+export default AppProviderTheme;

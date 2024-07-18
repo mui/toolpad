@@ -5,7 +5,7 @@
     title: 'MUI',
   }}
   router={router}
-  theme={{ light: baseLightTheme, dark: baseDarkTheme }}
+  window={demoWindow}
 >
   <DashboardLayout>
     <DemoPageContent pathname={pathname} />

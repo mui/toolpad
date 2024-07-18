@@ -5,7 +5,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { baseDarkTheme, baseLightTheme } from '@toolpad/core/themes';
 import type { Navigation } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
@@ -37,7 +36,17 @@ function DemoPageContent({ pathname }: { pathname: string }) {
   );
 }
 
-export default function DashboardLayoutBranding() {
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function DashboardLayoutBranding(props: DemoProps) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -48,6 +57,9 @@ export default function DashboardLayoutBranding() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
     // preview-start
     <AppProvider
@@ -57,7 +69,7 @@ export default function DashboardLayoutBranding() {
         title: 'MUI',
       }}
       router={router}
-      theme={{ light: baseLightTheme, dark: baseDarkTheme }}
+      window={demoWindow}
     >
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />

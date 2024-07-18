@@ -164,10 +164,7 @@ function DashboardSidebarSubNavigation({
               );
             }),
         )
-        .map(
-          ({ navigationItem, originalIndex }) =>
-            `${(navigationItem as NavigationPageItem).title}-${depth}-${originalIndex}`,
-        ),
+        .map(({ originalIndex }) => `${depth}-${originalIndex}`),
     [basePath, depth, pathname, subNavigation],
   );
 
@@ -236,7 +233,7 @@ function DashboardSidebarSubNavigation({
 
         const navigationItemFullPath = `${basePath}${navigationItem.slug ?? ''}`;
 
-        const navigationItemId = `${navigationItem.title}-${depth}-${navigationItemIndex}`;
+        const navigationItemId = `${depth}-${navigationItemIndex}`;
 
         const isNestedNavigationExpanded = expandedSidebarItemIds.includes(navigationItemId);
 
@@ -260,7 +257,7 @@ function DashboardSidebarSubNavigation({
                 {navigationItem.icon}
               </ListItemIcon>
               <ListItemText
-                primary={navigationItem.title}
+                primary={navigationItem.title ?? navigationItem.slug}
                 sx={{
                   '& .MuiTypography-root': {
                     fontWeight: '500',

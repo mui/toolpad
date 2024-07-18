@@ -41,6 +41,7 @@ function DemoPageContent({ pathname }: { pathname: string }) {
   );
 }
 
+// @TODO: Use CSS vars theme once Toolpad Core uses Material UI v6
 const customTheme = createTheme({
   palette: {
     mode: 'dark',
@@ -51,7 +52,17 @@ const customTheme = createTheme({
   },
 });
 
-export default function AppProviderTheme() {
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function AppProviderTheme(props: DemoProps) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -62,9 +73,17 @@ export default function AppProviderTheme() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
     // preview-start
-    <AppProvider navigation={NAVIGATION} router={router} theme={customTheme}>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={customTheme}
+      window={demoWindow}
+    >
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>

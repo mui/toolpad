@@ -85,11 +85,3 @@ An `AppProvider` can set a visual theme for all elements inside it to adopt via 
 3. **Light and dark themes**: two separate Material UI themes can be provided for light and dark mode in an object with the format `{ light: Theme, dark: Theme }`
 
 {{"demo": "AppProviderTheme.js", "height": 500, "iframe": true}}
-
-### Predefined themes
-
-A set of predefined themes that work well with Toolpad applications can be imported from `@toolpad/core/themes`.
-
-```tsx
-import { baseCSSVarsTheme } from '@toolpad/core/themes';
-```

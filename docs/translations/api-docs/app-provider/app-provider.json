@@ -1,0 +1,13 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "branding": { "description": "Branding options for the app." },
+    "children": { "description": "The content of the app provider." },
+    "navigation": { "description": "Navigation definition for the app." },
+    "router": { "description": "Router implementation used inside Toolpad components." },
+    "theme": {
+      "description": "<a href=\"https://mui.com/material-ui/customization/theming/\">Theme</a> used by the app."
+    }
+  },
+  "classDescriptions": {}
+}

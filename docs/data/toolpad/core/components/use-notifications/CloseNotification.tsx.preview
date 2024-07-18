@@ -1,0 +1,12 @@
+const key = online
+  ? notifications.show('You are now online', {
+      severity: 'success',
+      autoHideDuration: 3000,
+    })
+  : notifications.show('You are now offline', {
+      severity: 'error',
+    });
+
+return () => {
+  notifications.close(key);
+};

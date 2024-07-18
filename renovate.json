@@ -12,13 +12,22 @@
   "stopUpdatingLabel": "on hold",
   "packageRules": [
     {
+      "matchDepTypes": ["peerDependencies"],
+      "rangeStrategy": "widen"
+    },
+    {
+      "groupName": "devDependencies",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"]
+    },
+    {
       "groupName": "Typings",
       "matchPackagePatterns": ["^@types/"],
       "description": "At the top so other rules can overwrite it"
     },
     {
-      "matchDepTypes": ["peerDependencies"],
-      "rangeStrategy": "widen"
+      "groupName": "Docs",
+      "matchFileNames": ["docs/**"]
     },
     {
       "groupName": "babel",
@@ -44,6 +53,11 @@
       "matchPackagePatterns": ["^stylis-"]
     },
     {
+      "groupName": "Vite",
+      "matchPackageNames": ["vite"],
+      "matchPackagePatterns": ["^@vitejs/"]
+    },
+    {
       "groupName": "Next.js",
       "matchPackageNames": ["next"],
       "matchPackagePatterns": ["^@next/"]
@@ -55,7 +69,7 @@
     },
     {
       "groupName": "react-router",
-      "matchPackageNames": ["react-router", "react-router-dom"],
+      "matchPackageNames": ["react-router", "react-router-dom"]
     },
     {
       "groupName": "Tanstack",
@@ -67,7 +81,7 @@
     },
     {
       "groupName": "React",
-      "matchPackageNames": ["react", "react-dom", "react-is", "react-test-renderer"]
+      "matchPackageNames": ["react", "react-dom", "react-is", "react-test-renderer", "@types/react"]
     },
     {
       "groupName": "MUI Core",
@@ -115,6 +129,21 @@
       "groupName": "superjson",
       "matchPackageNames": ["superjson"],
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
+    },
+    {
+      "groupName": "unist-util-visit - incompatible versions",
+      "matchPackageNames": ["unist-util-visit"],
+      "allowedVersions": "< 3.0.0"
+    },
+    {
+      "groupName": "remark - incompatible versions",
+      "matchPackageNames": ["remark"],
+      "allowedVersions": "< 14.0.0"
+    },
+    {
+      "groupName": "react-docgen - incompatible versions",
+      "matchPackageNames": ["react-docgen"],
+      "allowedVersions": "< 6.0.0"
     },
     {
       "matchDepTypes": ["action"],

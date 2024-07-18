@@ -3,10 +3,12 @@ import * as path from 'path';
 import * as url from 'url';
 import readline from 'readline';
 import { Readable } from 'stream';
-import { execa, ExecaChildProcess } from 'execa';
+import { execa } from 'execa';
 import { test, expect, afterEach } from 'vitest';
-import { once } from 'events';
 import * as os from 'os';
+import terminate from 'terminate';
+
+type ExecaChildProcess = ReturnType<typeof execa>;
 
 const TEST_TIMEOUT = process.env.CI ? 60000 : 600000;
 
@@ -15,8 +17,8 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 const cliPath = path.resolve(currentDirectory, '../dist/index.js');
 
 let testDir: string | undefined;
-let cp: ExecaChildProcess<string> | undefined;
-let toolpadProcess: ExecaChildProcess<string> | undefined;
+let cp: ExecaChildProcess | undefined;
+let toolpadProcess: ExecaChildProcess | undefined;
 
 async function waitForMatch(input: Readable, regex: RegExp): Promise<RegExpExecArray | null> {
   return new Promise((resolve, reject) => {
@@ -92,21 +94,20 @@ test(
 );
 
 afterEach(async () => {
-  if (toolpadProcess && typeof toolpadProcess.exitCode !== 'number') {
-    toolpadProcess.kill('SIGKILL');
-    await once(toolpadProcess, 'exit');
+  if (toolpadProcess) {
+    await terminate(toolpadProcess.pid!);
+    await toolpadProcess.catch(() => null);
+    console.log('toolpad ended');
   }
-});
 
-afterEach(async () => {
+  if (cp) {
+    await terminate(cp.pid!);
+    await cp.catch(() => null);
+    console.log('create-toolpad-app ended');
+  }
+
   if (testDir) {
-    await fs.rm(testDir, { recursive: true, force: true, maxRetries: 3 });
+    await fs.rm(testDir, { recursive: true, force: true });
+    console.log('test directory cleaned up');
   }
-});
-
-afterEach(async () => {
-  if (cp && typeof cp.exitCode !== 'number') {
-    cp.kill('SIGKILL');
-    await once(cp, 'exit');
-  }
-});
+}, 30000);

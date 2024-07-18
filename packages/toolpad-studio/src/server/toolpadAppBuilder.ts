@@ -8,6 +8,7 @@ import * as appDom from '@toolpad/studio-runtime/appDom';
 import type { ComponentEntry, PagesManifest } from './localMode';
 import { INITIAL_STATE_WINDOW_PROPERTY } from '../constants';
 import viteVirtualPlugin, { VirtualFileContent, replaceFiles } from './viteVirtualPlugin';
+import { FONTS_URL } from '../runtime/constants';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -26,11 +27,10 @@ function getHtmlContent(entry: string) {
     <html lang="en">
       <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Toolpad</title>
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
-        />
+        <link rel="preload" href="${FONTS_URL}" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="${FONTS_URL}"></noscript>
       </head>
       <body>
         <div id="root"></div>
@@ -112,8 +112,7 @@ export async function createViteConfig({
   const initialDom = await loadDom();
   const plan = appDom.getPlan(initialDom);
 
-  const getEntryPoint = (target: 'prod' | 'dev' | 'editor') => {
-    const isCanvas = target === 'dev';
+  const getEntryPoint = (target: 'prod' | 'editor') => {
     const isEditor = target === 'editor';
 
     const componentsId = 'virtual:toolpad-files:components.tsx';
@@ -121,46 +120,50 @@ export async function createViteConfig({
     return `
 import { init, setComponents } from '@toolpad/studio/entrypoint';
 import components from ${JSON.stringify(componentsId)};
-${isCanvas ? `import AppCanvas from '@toolpad/studio/canvas'` : ''}
 ${isEditor ? `import ToolpadEditor from '@toolpad/studio/editor'` : ''}
 
-// importing monaco to get around module ordering issues in esbuild
-import 'monaco-editor';
+${
+  isEditor
+    ? `
+      // importing monaco to get around module ordering issues in esbuild
+      import 'monaco-editor';
 
-window.MonacoEnvironment = {
-  getWorker: async (_, label) => {
-    // { type: 'module' } is supported in firefox but behind feature flag:
-    // you have to enable it manually via about:config and set dom.workers.modules.enabled to true.
-    if (label === 'typescript') {
-      const { default: TsWorker } = await import('monaco-editor/esm/vs/language/typescript/ts.worker?worker');
-      return new TsWorker();
-    }
-    if (label === 'json') {
-      const { default: JsonWorker } = await import('monaco-editor/esm/vs/language/json/json.worker?worker');
-      return new JsonWorker();
-    }
-    if (label === 'html') {
-      const { default: HtmlWorker } = await import('monaco-editor/esm/vs/language/html/html.worker?worker');
-      return new HtmlWorker();
-    }
-    if (label === 'css') {
-      const { default: CssWorker } = await import('monaco-editor/esm/vs/language/css/css.worker?worker');
-      return new CssWorker();
-    }
-    if (label === 'editorWorkerService') {
-      const { default: EditorWorker } = await import('monaco-editor/esm/vs/editor/editor.worker?worker');
-      return new EditorWorker();
-    }
-    throw new Error(\`Failed to resolve worker with label "\${label}"\`);
-  },
-} as monaco.Environment;
+      window.MonacoEnvironment = {
+        getWorker: async (_, label) => {
+          // { type: 'module' } is supported in firefox but behind feature flag:
+          // you have to enable it manually via about:config and set dom.workers.modules.enabled to true.
+          if (label === 'typescript') {
+            const { default: TsWorker } = await import('monaco-editor/esm/vs/language/typescript/ts.worker?worker');
+            return new TsWorker();
+          }
+          if (label === 'json') {
+            const { default: JsonWorker } = await import('monaco-editor/esm/vs/language/json/json.worker?worker');
+            return new JsonWorker();
+          }
+          if (label === 'html') {
+            const { default: HtmlWorker } = await import('monaco-editor/esm/vs/language/html/html.worker?worker');
+            return new HtmlWorker();
+          }
+          if (label === 'css') {
+            const { default: CssWorker } = await import('monaco-editor/esm/vs/language/css/css.worker?worker');
+            return new CssWorker();
+          }
+          if (label === 'editorWorkerService') {
+            const { default: EditorWorker } = await import('monaco-editor/esm/vs/editor/editor.worker?worker');
+            return new EditorWorker();
+          }
+          throw new Error(\`Failed to resolve worker with label "\${label}"\`);
+        },
+      } as monaco.Environment;
+      `
+    : ''
+}
 
 const initialState = window[${JSON.stringify(INITIAL_STATE_WINDOW_PROPERTY)}];
 
 setComponents(components);
 
 init({
-  ${isCanvas ? `ToolpadApp: AppCanvas,` : ''}
   ${isEditor ? `ToolpadApp: ToolpadEditor,` : ''}
   base: ${JSON.stringify(base)},
   initialState,
@@ -244,7 +247,7 @@ if (import.meta.hot) {
       },
       envFile: false,
       resolve: {
-        dedupe: ['@mui/material'],
+        dedupe: ['@mui/material', '@emotion/react', '@emotion/styled', '@tanstack/react-query'],
         alias: [
           {
             // FIXME(https://github.com/mui/material-ui/issues/35233)
@@ -281,12 +284,6 @@ if (import.meta.hot) {
             : []),
         ],
       },
-      server: {
-        fs: {
-          allow: [root, path.resolve(currentDirectory, '../../../../')],
-          cachedChecks: false,
-        },
-      },
       optimizeDeps: {
         include: [
           ...(dev
@@ -297,7 +294,7 @@ if (import.meta.hot) {
                 'monaco-editor/esm/vs/basic-languages/typescript/typescript',
                 'monaco-editor/esm/vs/basic-languages/markdown/markdown',
               ]
-            : []),
+            : ['@toolpad/studio/entrypoint', '@toolpad/studio/editor']),
         ],
       },
       appType: 'custom',

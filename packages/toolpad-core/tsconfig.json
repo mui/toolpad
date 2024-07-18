@@ -1,19 +1,24 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "allowJs": true,
-    "isolatedModules": true,
+    "composite": true,
+    "tsBuildInfoFile": "./build/tsconfig.json.tsbuildinfo",
     "module": "esnext",
+    "target": "es5",
+    "lib": ["es2022", "dom"],
+    "jsx": "preserve",
     "moduleResolution": "bundler",
-    "noEmit": false,
-    "outDir": "./dist",
-    "pretty": true,
-    "preserveWatchOutput": true,
-    "rootDir": "src",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "skipLibCheck": true,
-    "target": "es2020",
-    "types": ["react", "node"]
+    "noEmit": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "noErrorTruncation": false,
+    "allowJs": true,
+    "outDir": "build",
+    "rootDir": "src"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/index.ts"],
-  "exclude": ["dist", "src/**/*.spec.*"]
+  "include": ["src/**/*"],
+  "exclude": ["build", "node_modules"],
+  "references": [{ "path": "../toolpad-utils" }]
 }

@@ -1,5 +1,167 @@
 # Changelog
 
+## v0.3.1
+
+<!-- generated comparing v0.3.0..master -->
+
+_Jul 12, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Improve Toolpad home page, add persistent state hooks to Toolpad Core and fix some performance issues in Toolpad Studio production apps.
+
+- &#8203;<!-- 13 -->Remove dead code (#3754) @Janpot
+- &#8203;<!-- 12 -->Lock file maintenance (#3740) @renovate[bot]
+- &#8203;<!-- 11 -->Lock file maintenance Docs (#3743) @renovate[bot]
+- &#8203;<!-- 10 -->Lock file maintenance Examples (#3742) @renovate[bot]
+- &#8203;<!-- 09 -->Lock file maintenance Docs (#3741) @renovate[bot]
+- &#8203;<!-- 08 -->[cli] Add information when `--example` is present (#3749) @bharatkashyap
+- &#8203;<!-- 07 -->[code-infra] Use `@mui/docs` where possible (#3751) @LukasTy
+- &#8203;<!-- 06 -->[core] Fix a few performance issues in Toolpad production apps (#3756) @Janpot
+- &#8203;<!-- 05 -->[core] Optimize studio production build (#3755) @Janpot
+- &#8203;<!-- 04 -->[core] Implement persistent state hooks (#3696) @Janpot
+- &#8203;<!-- 03 -->[docs] Update to match monorepo script (#3753) @bharatkashyap
+- &#8203;<!-- 02 -->[docs] Use product demo video of the onboarding on the landing page (#3555) @Janpot
+- &#8203;<!-- 01 -->[security] Slightly improve CSP header (#3757) @oliviertassinari
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @LukasTy, @oliviertassinari, @renovate[bot]
+
+## v0.3.0
+
+<!-- generated comparing v0.2.0..master -->
+
+_Jun 28, 2024_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+This release adds Dialogs and Notifications hooks to Toolpad Core! Supporting the Next.js Pages router in the Core playground app. Small feature addition to Studio as well: Column Pinning. More tests and documentation fixes.
+
+- &#8203;<!-- 24 -->Update README.md @Janpot
+- &#8203;<!-- 23 -->Update README.md @Janpot
+- &#8203;<!-- 22 -->[Update readme] Add openssf badge and fix browerstack logo (#3694) @prakhargupta1
+- &#8203;<!-- 21 -->Implement notifications/dialogs RFCs (#3584) @Janpot
+- &#8203;<!-- 20 -->Add Next.js pages router app to Toolpad Core playground (#3588) @apedroferreira
+- &#8203;<!-- 19 -->Run toolpad/core tests in the browser (#3640) @Janpot
+- &#8203;<!-- 18 -->Add dashboard tutorial to introduction (#3637) @Janpot
+- &#8203;<!-- 17 -->Lock file maintenance Docs (#3623) @renovate[bot]
+- &#8203;<!-- 16 -->[AppProvider] Create basic router adapters (#3638) @Janpot
+- &#8203;<!-- 15 -->[code-infra] Add eslint plugin for testing-library (#3648) @Janpot
+- &#8203;<!-- 14 -->[core] Remove update-monorepo.yml (#3712) @oliviertassinari
+- &#8203;<!-- 13 -->[core] Add browserslistrc (#3711) @Janpot
+- &#8203;<!-- 12 -->[core] dedupe emotion and react-query (#3695) @Janpot
+- &#8203;<!-- 11 -->[core] Fix a few more React compiler warnings (#3644) @Janpot
+- &#8203;<!-- 10 -->[core] Remove quickjs-emscripten dependency (#3689) @Janpot
+- &#8203;<!-- 09 -->[DataContext] Support global filtering (#3618) @Janpot
+- &#8203;<!-- 08 -->[docs] Fix link icons for file reference section titles (#3709) @Janpot
+- &#8203;<!-- 07 -->[docs] Fix incorrect heading (#3636) @bharatkashyap
+- &#8203;<!-- 06 -->[docs-infra] Sync \_app file with monorepo (#3698) @Janpot
+- &#8203;<!-- 05 -->[studio] Add column pinning (#3693) @Janpot
+- &#8203;<!-- 04 -->[Studio] Remove old canvas entrypoint (#3642) @Janpot
+- &#8203;<!-- 03 -->[test] Enable test coverage for @toolpad/core (#3697) @Janpot
+- &#8203;<!-- 02 -->[test] Test from the user's perspective with user-event (#3670) @Janpot
+- &#8203;<!-- 01 -->[test] Data grid CRUD tests (#3646) @Janpot
+
+## v0.2.0
+
+<!-- generated comparing v0.1.55..master -->
+
+_Jun 3, 2024_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+First components in @toolpad/core: [DashboardLayout](https://github.com/mui/mui-toolpad/discussions/3309#:~:text=per%20authentication%20page.-,Dashboard%20layout,-provides%20UI%20for), DataGrid and LineChart. Initial [data providers](https://github.com/mui/mui-toolpad/discussions/3311) implementation.
+
+- &#8203;<!-- 31 -->Lock file maintenance (#3622) @renovate[bot]
+- &#8203;<!-- 30 -->Lock file maintenance Examples (#3624) @renovate[bot]
+- &#8203;<!-- 29 -->Add Next.js app router Toolpad Core playground (#3587) @apedroferreira
+- &#8203;<!-- 28 -->Isolate api-docs-builder deps @Janpot
+- &#8203;<!-- 27 -->isolate react-docgen @Janpot
+- &#8203;<!-- 26 -->Update renovate.json @Janpot
+- &#8203;<!-- 25 -->Group vite dependency updates @Janpot
+- &#8203;<!-- 24 -->Generate API docs for Toolpad Core (#3536) @apedroferreira
+- &#8203;<!-- 23 -->Add DashboardLayout component to @toolpad/core (#3554) @apedroferreira
+- &#8203;<!-- 22 -->Some fixes from new react compiler eslint plugin (#3562) @Janpot
+- &#8203;<!-- 21 -->Update renovate.json @Janpot
+- &#8203;<!-- 20 -->Updates to project setup (#3561) @Janpot
+- &#8203;<!-- 19 -->Add keywords and other info in package.json (#3556) @prakhargupta1
+- &#8203;<!-- 18 -->Toolpad Core build process (#3552) @apedroferreira
+- &#8203;<!-- 17 -->Group docs dependencies for renovate bot @Janpot
+- &#8203;<!-- 16 -->Bring back some dependency update grouping (#3551) @Janpot
+- &#8203;<!-- 15 -->[core] Initial DataGrid component (#3558) @Janpot
+- &#8203;<!-- 14 -->[core] Base typescript projects on the file location instead of on cwd (#3580) @Janpot
+- &#8203;<!-- 13 -->[DataGrid] Data provider create and update fixes (#3621) @Janpot
+- &#8203;<!-- 12 -->[DataGrid] Add height property (#3612) @Janpot
+- &#8203;<!-- 11 -->[DataProvider] Support custom Id field (#3613) @Janpot
+- &#8203;<!-- 10 -->[docs] Start Toolpad Core docs (#3383) @bharatkashyap
+- &#8203;<!-- 09 -->[docs] Add Toolpad core tutorial example (#3617) @bharatkashyap
+- &#8203;<!-- 08 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 07 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Update twitter.com to x.com @oliviertassinari
+- &#8203;<!-- 04 -->[docs] Support demo previews with comments (#3577) @Janpot
+- &#8203;<!-- 03 -->[docs] Fix demo codesandbox dependencies (#3578) @Janpot
+- &#8203;<!-- 02 -->[docs] Keep referrer for GA (#3530) @oliviertassinari
+- &#8203;<!-- 01 -->[LineChart] initial LineChart (#3611) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
+## v0.1.55
+
+<!-- generated comparing v0.1.54..master -->
+
+_May 8, 2024_
+
+A big thanks to the 7 contributors who made this release possible. Here are some highlights ✨:
+
+Add max width option to page container, auto-scroll to selected elements, support enabling/disabling initial visibility in Data Grid columns, environment variable preview fixes, fix functions on Windows, add deployment guides for some other platforms.
+
+- &#8203;<!-- 52 -->Add max width option to the page (#3484) @Janpot
+- &#8203;<!-- 51 -->Changes required for the React integration (#3493) @Janpot
+- &#8203;<!-- 45 -->feat: add auto-scroll to canvas elements when selected from panel (#3344) @b4s36t4
+- &#8203;<!-- 44 -->Lock file maintenance Examples (#3486) @renovate[bot]
+- &#8203;<!-- 43 -->Lock file maintenance (#3485) @renovate[bot]
+- &#8203;<!-- 42 -->Work on decoupling studio server constituents (#3482) @Janpot
+- &#8203;<!-- 41 -->Update README files (#3463) @prakhargupta1
+- &#8203;<!-- 40 -->Remove dead code (#3460) @Janpot
+- &#8203;<!-- 39 -->Fix custom components for id cells (#3459) @Janpot
+- &#8203;<!-- 38 -->Fix performance regression (#3458) @Janpot
+- &#8203;<!-- 37 -->Link/Update docs in Studio (#3448) @prakhargupta1
+- &#8203;<!-- 36 -->Fix default value not initializing for controlled properties (#3445) @Janpot
+- &#8203;<!-- 35 -->Revert using published @mui/docs (#3440) @Janpot
+- &#8203;<!-- 34 -->Fix issues from trying MUI ESM branch (#3417) @Janpot
+- &#8203;<!-- 31 -->Fix environment binding preview (#3413) @Janpot
+- &#8203;<!-- 30 -->Use url.pathToFileURL to correctly resolve functions paths on windows (#3412) @Janpot
+- &#8203;<!-- 29 -->Remove renovate grouping (#3325) @Janpot
+- &#8203;<!-- 27 -->Remove unsupported engines section from renovate (#3376) @Janpot
+- &#8203;<!-- 26 -->fix: Duplicate entry in `CHANGELOG.md` (#3388) @bharatkashyap
+- &#8203;<!-- 25 -->[code-infra] Closer sync with eslint config of codebase (#3441) @oliviertassinari
+- &#8203;<!-- 24 -->[core] Support toggling initial visibility of columns (#3490) @Janpot
+- &#8203;<!-- 23 -->[core] ESLint unification (#3488) @oliviertassinari
+- &#8203;<!-- 22 -->[core] Remove react pages experiment (#3483) @Janpot
+- &#8203;<!-- 21 -->[core] Update monorepo (#3424) @oliviertassinari
+- &#8203;<!-- 20 -->[core] Match other .eslintrc.js files @oliviertassinari
+- &#8203;<!-- 19 -->[core] Add notes to help future blame (#3426) @oliviertassinari
+- &#8203;<!-- 18 -->[core] Use the root dependency (#3425) @oliviertassinari
+- &#8203;<!-- 17 -->[core] Remove engine please-use-pnpm (#3399) @oliviertassinari
+- &#8203;<!-- 16 -->[docs] Fix pnpm install command (#3525) @konekoya
+- &#8203;<!-- 15 -->[docs] Fix Netlify preview 301 JS assets @oliviertassinari
+- &#8203;<!-- 14 -->[docs] [ui] Make Pro badge style consistent (#3418) @bharatkashyap
+- &#8203;<!-- 13 -->[docs] Fix typos on the roadmap page @oliviertassinari
+- &#8203;<!-- 12 -->[docs] Make sure we install the latest version of Toolpad Studio (#3454) @oliviertassinari
+- &#8203;<!-- 11 -->[docs] Remove MarkdownElement import (#3451) @Janpot
+- &#8203;<!-- 10 -->[docs] Add documentation on how to create controlled properties (#3444) @Janpot
+- &#8203;<!-- 09 -->[docs] Add a guide on how to deploy on railway (#3381) @prakhargupta1
+- &#8203;<!-- 08 -->[docs] Remove double redirections (#3415) @bharatkashyap
+- &#8203;<!-- 07 -->[docs] Fix broken paths, meta for ahrefs (#3409) @bharatkashyap
+- &#8203;<!-- 06 -->[docs] Fix some of the double redirections (#3411) @oliviertassinari
+- &#8203;<!-- 05 -->[docs] Add guide on deployment to Google cloud (#3387) @prakhargupta1
+- &#8203;<!-- 04 -->[docs] Revert monorepo update (#3403) @Janpot
+- &#8203;<!-- 03 -->[docs] Fix trailing slashes on server render (#3402) @Janpot
+- &#8203;<!-- 02 -->[docs] Remove more traces of yarn (#3400) @oliviertassinari
+- &#8203;<!-- 01 -->[ux] Disable Open in editor button if no function is selected (#3492) @bharatkashyap
+
+All contributors of this release in alphabetical order: @b4s36t4, @bharatkashyap, @Janpot, @konekoya, @oliviertassinari, @prakhargupta1, @renovate[bot]
+
 ## v0.1.54
 
 <!-- generated comparing v0.1.53..master -->

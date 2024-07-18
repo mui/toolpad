@@ -5,29 +5,66 @@ import { loadCSS } from 'fg-loadcss/src/loadCSS';
 import NextHead from 'next/head';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
+import { ponyfillGlobal } from '@mui/utils';
 import { LicenseInfo } from '@mui/x-license';
 import PageContext from 'docs/src/modules/components/PageContext';
 import GoogleAnalytics from 'docs/src/modules/components/GoogleAnalytics';
+import { CodeCopyProvider } from '@mui/docs/CodeCopy';
 import { ThemeProvider } from 'docs/src/modules/components/ThemeContext';
 import { CodeVariantProvider } from 'docs/src/modules/utils/codeVariant';
-import { CodeCopyProvider } from 'docs/src/modules/utils/CodeCopy';
+import { CodeStylingProvider } from 'docs/src/modules/utils/codeStylingSolution';
 import DocsStyledEngineProvider from 'docs/src/modules/utils/StyledEngineProvider';
-import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
+import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 import toolpadPkgJson from '@toolpad/studio/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
-import { mapTranslations } from '@mui/docs/i18n';
 import toolpadStudioPages from '../data/toolpad/studio/pages';
 import toolpadCorePages from '../data/toolpad/core/pages';
-
 import config from '../config';
 
+// Remove the license warning from demonstration purposes
+LicenseInfo.setLicenseKey(process.env.NEXT_PUBLIC_MUI_LICENSE);
+
+// Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
 let reloadInterval;
-LicenseInfo.setLicenseKey(process.env.NEXT_PUBLIC_MUI_LICENSE);
+
+function getMuiPackageVersion(packageName, commitRef) {
+  if (commitRef === undefined) {
+    // #default-branch-switch
+    // Use the "latest" npm tag for the master git branch
+    // Use the "next" npm tag for the next git branch
+    return 'latest';
+  }
+  const shortSha = commitRef.slice(0, 8);
+  return `https://pkg.csb.dev/mui/mui-toolpad/commit/${shortSha}/${packageName}`;
+}
+
+ponyfillGlobal.muiDocConfig = {
+  csbIncludePeerDependencies: (deps, { versions }) => {
+    const newDeps = { ...deps };
+
+    newDeps.invariant = 'latest';
+
+    if (newDeps['@toolpad/core']) {
+      newDeps['@mui/material'] = versions['@mui/material'];
+      newDeps['@mui/icons-material'] = versions['@mui/icons-material'];
+    }
+
+    return newDeps;
+  },
+  csbGetVersions: (versions, { muiCommitRef }) => {
+    const output = {
+      ...versions,
+      '@toolpad/core': getMuiPackageVersion('@toolpad/core', muiCommitRef),
+      '@toolpad/utils': getMuiPackageVersion('@toolpad/utils', muiCommitRef),
+    };
+    return output;
+  },
+};
 
 // Avoid infinite loop when "Upload on reload" is set in the Chrome sw dev tools.
 function lazyReload() {
@@ -121,15 +158,18 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
 ██║ ╚═╝ ██║ ╚██████╔╝ ██████╗
 ╚═╝     ╚═╝  ╚═════╝  ╚═════╝
 
+Tip: you can access the documentation \`theme\` object directly in the console.
 `,
     'font-family:monospace;color:#1976d2;font-size:12px;',
   );
 }
-
 function AppWrapper(props) {
   const { children, emotionCache, pageProps } = props;
 
   const router = useRouter();
+  // TODO move productId & productCategoryId resolution to page layout.
+  // We should use the productId field from the markdown and fallback to getProductInfoFromUrl()
+  // if not present
   const { productId, productCategoryId } = getProductInfoFromUrl(router.asPath);
 
   React.useEffect(() => {
@@ -142,13 +182,6 @@ function AppWrapper(props) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
   }, []);
-
-  let fonts = [];
-  if (pathnameToLanguage(router.asPath).canonicalAs.match(/onepirate/)) {
-    fonts = [
-      'https://fonts.googleapis.com/css?family=Roboto+Condensed:700|Work+Sans:300,400&display=swap',
-    ];
-  }
 
   const pageContextValue = React.useMemo(() => {
     let productIdentifier;
@@ -217,6 +250,13 @@ function AppWrapper(props) {
     };
   }, [router.asPath, router.pathname, productId, productCategoryId]);
 
+  let fonts = [];
+  if (pathnameToLanguage(router.asPath).canonicalAs.match(/onepirate/)) {
+    fonts = [
+      'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Work+Sans:wght@300;400&display=swap',
+    ];
+  }
+
   return (
     <React.Fragment>
       <NextHead>
@@ -226,22 +266,20 @@ function AppWrapper(props) {
         <meta name="mui:productId" content={productId} />
         <meta name="mui:productCategoryId" content={productCategoryId} />
       </NextHead>
-      <DocsProvider
-        config={config}
-        defaultUserLanguage={pageProps.userLanguage}
-        translations={pageProps.translations}
-      >
+      <DocsProvider config={config} defaultUserLanguage={pageProps.userLanguage}>
         <CodeCopyProvider>
-          <CodeVariantProvider>
-            <PageContext.Provider value={pageContextValue}>
-              <ThemeProvider>
-                <DocsStyledEngineProvider cacheLtr={emotionCache}>
-                  {children}
-                  <GoogleAnalytics />
-                </DocsStyledEngineProvider>
-              </ThemeProvider>
-            </PageContext.Provider>
-          </CodeVariantProvider>
+          <CodeStylingProvider>
+            <CodeVariantProvider>
+              <PageContext.Provider value={pageContextValue}>
+                <ThemeProvider>
+                  <DocsStyledEngineProvider cacheLtr={emotionCache}>
+                    {children}
+                    <GoogleAnalytics />
+                  </DocsStyledEngineProvider>
+                </ThemeProvider>
+              </PageContext.Provider>
+            </CodeVariantProvider>
+          </CodeStylingProvider>
         </CodeCopyProvider>
       </DocsProvider>
     </React.Fragment>
@@ -256,14 +294,14 @@ AppWrapper.propTypes = {
 
 export default function MyApp(props) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
+  const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
     <AppWrapper emotionCache={emotionCache} pageProps={pageProps}>
-      <Component {...pageProps} />
+      {getLayout(<Component {...pageProps} />)}
     </AppWrapper>
   );
 }
-
 MyApp.propTypes = {
   Component: PropTypes.elementType.isRequired,
   emotionCache: PropTypes.object,
@@ -273,9 +311,6 @@ MyApp.propTypes = {
 MyApp.getInitialProps = async ({ ctx, Component }) => {
   let pageProps = {};
 
-  const req = require.context('../translations', false, /translations.*\.json$/);
-  const translations = mapTranslations(req);
-
   if (Component.getInitialProps) {
     pageProps = await Component.getInitialProps(ctx);
   }
@@ -283,7 +318,6 @@ MyApp.getInitialProps = async ({ ctx, Component }) => {
   return {
     pageProps: {
       userLanguage: ctx.query.userLanguage || 'en',
-      translations,
       ...pageProps,
     },
   };
@@ -291,6 +325,7 @@ MyApp.getInitialProps = async ({ ctx, Component }) => {
 
 // Track fraction of actual events to prevent exceeding event quota.
 // Filter sessions instead of individual events so that we can track multiple metrics per device.
+// See https://github.com/GoogleChromeLabs/web-vitals-report to use this data
 const disableWebVitalsReporting = Math.random() > 0.0001;
 export function reportWebVitals({ id, name, label, delta, value }) {
   if (disableWebVitalsReporting) {

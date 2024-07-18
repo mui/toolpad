@@ -1,75 +1,98 @@
 {
   "name": "@toolpad/core",
-  "version": "0.1.54",
+  "version": "0.3.1",
+  "author": "Toolpad Team",
+  "description": "Dashboard framework powered by MUI.",
+  "main": "./build/index.js",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./build/index.d.ts",
+      "default": "./build/index.js"
+    },
+    "./*": {
+      "types": "./build/*/index.d.ts",
+      "default": "./build/*/index.js"
+    }
+  },
   "keywords": [
-    "toolpad"
+    "react",
+    "mui",
+    "toolpad",
+    "internal tools",
+    "crud",
+    "admin",
+    "dashboard"
   ],
-  "description": "Build dashboards fast.",
   "repository": {
     "type": "git",
     "url": "https://github.com/mui/mui-toolpad.git",
     "directory": "packages/toolpad-core"
   },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
-  "author": "Toolpad Team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
-  "license": "MIT",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "require": "./dist/*.cjs",
-      "default": "./dist/*.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit",
-    "test": "vitest run"
+    "clean": "rimraf build",
+    "prebuild": "pnpm clean",
+    "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
+    "build:node": "node ../../scripts/build.mjs node",
+    "build:stable": "node ../../scripts/build.mjs stable",
+    "build:copy-files": "node ../../scripts/copyFiles.mjs",
+    "build:types": "tsc -b tsconfig.build.json",
+    "predev": "pnpm clean",
+    "dev": "concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch --preserveWatchOutput\"",
+    "check-types": "tsc --noEmit",
+    "test": "vitest run --coverage",
+    "test:dev": "vitest",
+    "test:browser": "vitest run --browser.enabled",
+    "test:browser:dev": "vitest --browser.enabled"
   },
   "dependencies": {
-    "@emotion/cache": "11.11.0",
-    "@emotion/react": "11.11.4",
-    "@emotion/styled": "11.11.5",
-    "@mui/icons-material": "5.15.16",
-    "@mui/material": "5.15.16",
-    "@mui/material-nextjs": "5.15.11",
-    "next": "14.2.3",
-    "react": "18.2.0",
-    "react-dom": "^18.2.0"
+    "@mui/base": "5.0.0-beta.40",
+    "@mui/lab": "5.0.0-alpha.172",
+    "@mui/utils": "5.16.4",
+    "@toolpad/utils": "workspace:*",
+    "client-only": "^0.0.1",
+    "invariant": "2.2.4",
+    "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@types/react": "18.3.1",
-    "@types/react-dom": "18.3.0"
+    "@mui/icons-material": "5.16.4",
+    "@mui/material": "5.16.4",
+    "@types/invariant": "2.2.37",
+    "@types/prop-types": "15.7.12",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "@types/sinon": "^17.0.3",
+    "@vitest/browser": "beta",
+    "next": "^14.2.5",
+    "next-router-mock": "^0.9.13",
+    "playwright": "^1.45.1",
+    "sinon": "^18.0.0",
+    "vitest": "beta"
   },
   "peerDependencies": {
-    "@emotion/react": "^11",
-    "@emotion/styled": "^11",
     "@mui/icons-material": "^5",
     "@mui/material": "^5",
-    "@types/react": "^18",
     "next": "^14",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "^18"
   },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "sideEffects": false,
   "publishConfig": {
     "access": "public"
   },
   "engines": {
     "node": ">=18"
-  }
+  },
+  "files": [
+    "build"
+  ]
 }

@@ -1,6 +1,8 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "moduleResolution": "bundler",
+    "allowJs": true,
     "isolatedModules": true,
     /* files are emitted by babel */
     "noEmit": true,

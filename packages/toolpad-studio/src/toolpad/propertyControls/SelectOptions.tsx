@@ -30,8 +30,8 @@ function SelectOptionsPropEditor({
   onChange,
 }: EditorProps<(string | SelectOption)[]>) {
   const [editOptionsDialogOpen, setEditOptionsDialogOpen] = React.useState(false);
-  const optionInputRef = React.useRef<HTMLInputElement | null>(null);
   const [editingIndex, setEditingIndex] = React.useState<number | null>(null);
+  const [input, setInput] = React.useState<string>('');
 
   const editingOption: SelectOption | null = React.useMemo(() => {
     if (typeof editingIndex === 'number') {
@@ -50,14 +50,11 @@ function SelectOptionsPropEditor({
   const handleOptionTextInput = React.useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'Enter') {
-        const inputText = (event.target as HTMLInputElement).value;
-        onChange([...value, inputText]);
-        if (optionInputRef.current) {
-          optionInputRef.current.value = '';
-        }
+        onChange([...value, input]);
+        setInput('');
       }
     },
-    [onChange, value],
+    [input, onChange, value],
   );
 
   const handleOptionDelete = React.useCallback(
@@ -204,7 +201,8 @@ function SelectOptionsPropEditor({
                 fullWidth
                 sx={{ my: 1 }}
                 variant="outlined"
-                inputRef={optionInputRef}
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
                 onKeyUp={handleOptionTextInput}
                 label={'Add option'}
                 helperText={

@@ -48,6 +48,7 @@ lerna-debug.log
 .env
 
 dist/
+build/
 
 packages/toolpad-studio/public/web_modules
 packages/toolpad-studio/public/runtime
@@ -65,3 +66,5 @@ test-results
 .github/styles/Google
 .github/styles/MUI
 .github/styles/.vale-config
+
+.coverage

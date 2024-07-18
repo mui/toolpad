@@ -1,0 +1,3 @@
+<NotificationsProvider slots={notificationsProviderSlots}>
+  <ScopedContent />
+</NotificationsProvider>

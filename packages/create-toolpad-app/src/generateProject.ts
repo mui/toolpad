@@ -9,14 +9,33 @@ export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
   const rootLayoutContent = `  
-  import { AppProvider } from '@toolpad/core';
+  import { AppProvider } from "@toolpad/core/nextjs";
+  import DashboardIcon from "@mui/icons-material/Dashboard";
+  import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
+  import type { Navigation } from "@toolpad/core";
   import theme from '../theme';
+
+  const NAVIGATION: Navigation = [
+    {
+      kind: 'header',
+      title: 'Main items',
+    },
+    {
+      slug: '/page',
+      title: 'Page',
+      icon: <DashboardIcon />,
+    },
+  ];
   
   export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {      
     return (
       <html lang="en">
         <body>
-          <AppProvider theme={theme}>{children}</AppProvider>
+          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+            <AppProvider theme={theme} navigation={NAVIGATION}>
+              {children}
+            </AppProvider>
+          </AppRouterCacheProvider>
         </body>
       </html>
     );
@@ -24,69 +43,13 @@ export default function generateProject(
     `;
 
   const dashboardLayoutContent = `
-    import {
-    AppBar,
-    Badge,
-    Box,
-    Container,
-    Divider,
-    Drawer,
-    IconButton,
-    List,
-    ListItemButton,
-    ListItemIcon,
-    Toolbar,
-  } from "@mui/material";
-
-  import HomeIcon from "@mui/icons-material/Home";
-  import SettingsIcon from "@mui/icons-material/Settings";
-  import NotificationsIcon from "@mui/icons-material/Notifications";
+  import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
   export default function Layout({
     children,
   }: Readonly<{ children: React.ReactNode }>) {
     return (
-      <Box sx={{ display: "flex" }}>
-        <AppBar position="absolute">
-          <Toolbar sx={{ justifyContent: "flex-end" }}>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-          </Toolbar>
-        </AppBar>
-        <Drawer variant="permanent" anchor="left">
-          <Toolbar
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              px: [1],
-            }}
-          ></Toolbar>
-          <Divider />
-          <List component="nav">
-            <ListItemButton LinkComponent={"a"} href="/">
-              <ListItemIcon>
-                <HomeIcon />
-              </ListItemIcon>
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemIcon>
-                <SettingsIcon />
-              </ListItemIcon>
-            </ListItemButton>
-          </List>
-        </Drawer>
-        <Box
-          component={"main"}
-          sx={{ flexGrow: 1, height: "100vh", overflow: "auto" }}
-        >
-          <Toolbar />
-          <Container maxWidth="lg">{children}</Container>
-        </Box>
-      </Box>
+      <DashboardLayout>{children}</DashboardLayout>
     );
   }
   `;
@@ -139,25 +102,31 @@ export default function generateProject(
   `;
 
   const themeContent = `
-  "use client"
-  import { Roboto } from "next/font/google";
+  "use client";
   import { createTheme } from "@mui/material/styles";
-  
-  const roboto = Roboto({
-    weight: ["300", "400", "500", "700"],
-    subsets: ["latin"],
-    display: "swap",
-  });
-  
-  const theme = createTheme({
+
+  const defaultTheme = createTheme();
+
+  const theme = createTheme(defaultTheme, {
+    palette: {
+      background: {
+        default: defaultTheme.palette.grey['50'],
+      },
+    },
     typography: {
-      fontFamily: roboto.style.fontFamily,
+      h6: {
+        fontWeight: '700',
+      },
     },
     components: {
       MuiAppBar: {
         styleOverrides: {
           root: {
-            boxShadow: "none",
+            borderWidth: 0,
+            borderBottomWidth: 1,
+            borderStyle: 'solid',
+            borderColor: defaultTheme.palette.divider,
+            boxShadow: 'none',
           },
         },
       },
@@ -168,16 +137,85 @@ export default function generateProject(
           },
         },
       },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            color: defaultTheme.palette.primary.dark,
+            padding: 8,
+          },
+        },
+      },
+      MuiListSubheader: {
+        styleOverrides: {
+          root: {
+            color: defaultTheme.palette.grey['600'],
+            fontSize: 12,
+            fontWeight: '700',
+            height: 40,
+            paddingLeft: 32,
+          },
+        },
+      },
+      MuiListItem: {
+        styleOverrides: {
+          root: {
+            paddingTop: 0,
+            paddingBottom: 0,
+          },
+        },
+      },
+      MuiListItemButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            '&.Mui-selected': {
+              '& .MuiListItemIcon-root': {
+                color: defaultTheme.palette.primary.dark,
+              },
+              '& .MuiTypography-root': {
+                color: defaultTheme.palette.primary.dark,
+              },
+              '& .MuiSvgIcon-root': {
+                color: defaultTheme.palette.primary.dark,
+              },
+              '& .MuiTouchRipple-child': {
+                backgroundColor: defaultTheme.palette.primary.dark,
+              },
+            },
+            '& .MuiSvgIcon-root': {
+              color: defaultTheme.palette.action.active,
+            },
+          },
+        },
+      },
+      MuiListItemText: {
+        styleOverrides: {
+          root: {
+            '& .MuiTypography-root': {
+              fontWeight: '500',
+            },
+          },
+        },
+      },
       MuiListItemIcon: {
         styleOverrides: {
           root: {
-            minWidth: "28px",
+            minWidth: 34,
+          },
+        },
+      },
+      MuiDivider: {
+        styleOverrides: {
+          root: {
+            borderBottomWidth: 2,
+            marginLeft: '16px',
+            marginRight: '16px',
           },
         },
       },
     },
   });
-  
+
   export default theme;
   `;
 
@@ -242,6 +280,7 @@ export default function generateProject(
       next: '^14',
       '@toolpad/core': 'latest',
       '@mui/material': '^5',
+      '@mui/material-nextjs': '^5',
       '@mui/icons-material': '^5',
       '@emotion/react': '^11',
       '@emotion/styled': '^11',

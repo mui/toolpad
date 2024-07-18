@@ -2,6 +2,8 @@ const baseline = require('@mui/monorepo/.eslintrc');
 const path = require('path');
 const lodash = require('lodash');
 
+const ENABLE_REACT_COMPILER_PLUGIN = false;
+
 const ALLOWED_LODASH_METHODS = new Set(['throttle', 'debounce', 'set']);
 
 const noRestrictedImports = {
@@ -31,6 +33,11 @@ const noRestrictedImports = {
 
 module.exports = {
   ...baseline,
+  plugins: [
+    ...baseline.plugins,
+    ...(ENABLE_REACT_COMPILER_PLUGIN ? ['eslint-plugin-react-compiler'] : []),
+    'testing-library',
+  ],
   settings: {
     'import/resolver': {
       webpack: {
@@ -50,7 +57,7 @@ module.exports = {
    */
   rules: {
     ...baseline.rules,
-    // TODO move to @mui/monorepo, codebase is moving away from default exports
+    // TODO move to @mui/monorepo, codebase is moving away from default exports https://github.com/mui/material-ui/issues/21862
     'import/prefer-default-export': 'off',
     // TODO move rule into the main repo once it has upgraded
     '@typescript-eslint/return-await': 'off',
@@ -94,9 +101,14 @@ module.exports = {
       },
     ],
     'material-ui/no-hardcoded-labels': 'off', // We are not really translating the docs/website anymore
+    ...(ENABLE_REACT_COMPILER_PLUGIN ? { 'react-compiler/react-compiler': 'error' } : {}),
   },
   overrides: [
     ...baseline.overrides,
+    {
+      files: ['**/*.test.js', '**/*.test.ts', '**/*.test.tsx'],
+      extends: ['plugin:testing-library/react'],
+    },
     {
       files: ['docs/src/modules/components/**/*.js'],
       rules: {
@@ -129,7 +141,14 @@ module.exports = {
         'packages/toolpad-studio-runtime/**/*',
         'packages/toolpad-utils/**/*',
       ],
-      excludedFiles: ['tsup.config.ts', '*.spec.ts', '*.spec.tsx', 'vitest.config.ts'],
+      excludedFiles: [
+        'tsup.config.ts',
+        '*.spec.ts',
+        '*.spec.tsx',
+        '*.test.ts',
+        '*.test.tsx',
+        'vitest.config.mts',
+      ],
       rules: {
         'import/no-extraneous-dependencies': ['error'],
       },

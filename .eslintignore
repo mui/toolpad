@@ -7,7 +7,12 @@ pnpm-lock.yaml
 /packages/toolpad-studio/.next
 /packages/toolpad-studio/public
 
+build
+
 /examples/*/toolpad.yml
 
 /test/integration/*/fixture*/
 /test/visual/*/fixture*/
+
+.generated
+.github

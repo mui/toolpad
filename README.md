@@ -1,27 +1,24 @@
 <!-- markdownlint-disable-next-line -->
 <p align="center">
-  <a href="https://mui.com/toolpad/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/branding/product-toolpad-light.svg" alt="Toolpad Studio logo"></a>
+  <a href="https://mui.com/toolpad/" rel="noopener" target="_blank"><img width="150" src="https://mui.com/static/branding/product-toolpad-light.svg" alt="Toolpad logo"></a>
 </p>
 
-<h1 align="center">Toolpad Studio</h1>
+<h1 align="center">Toolpad</h1>
+
+- [Toolpad Core](https://mui.com/toolpad/core/introduction/) is a framework approach to internal tools. Through high-level components and data management interfaces, It's tightly integrated with [MUI X](http://github.com/mui/mui-x) and MUI's core libraries like [Material UI](http://github.com/mui/material-ui). You can use it as a framework for admin dashboards and CRUD apps!
+- [Toolpad Studio](https://mui.com/toolpad/studio/getting-started/) is a self-hosted low-code admin builder designed to extend the Toolpad Core React components. It's for developers of all trades who want to save time building internal applications. Drag and drop from a catalog of pre-built components, connect to any data source and build apps quickly.
 
 <div align="center">
 
-Toolpad Studio is a self-hosted low-code admin builder designed to extend the [MUI](https://mui.com/) React components. It's for developers of all trades who want to save time building internal applications. Drag-and-drop from a catalogue of pre-built components, connect to any data source and build apps quickly.
-
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
-
-<!--
-[![npm latest package](https://img.shields.io/npm/v/@toolpad/studio/latest.svg)](https://www.npmjs.com/package/@toolpad/studio)
-[![npm next package](https://img.shields.io/npm/v/@toolpad/studio/next.svg)](https://www.npmjs.com/package/@toolpad/studio@beta)
-[![npm downloads](https://img.shields.io/npm/dm/@toolpad/studio.svg)](https://www.npmjs.com/package/@toolpad/studio)
--->
-
-[![CircleCI](https://circleci.com/gh/mui/mui-toolpad/tree/master.svg?style=shield)](https://app.circleci.com/pipelines/github/mui/mui-toolpad?branch=master)
-[![Follow on Twitter](https://img.shields.io/twitter/follow/Toolpad_.svg?label=follow+Toolpad)](https://twitter.com/Toolpad_)
+[![npm latest package](https://img.shields.io/npm/v/@toolpad/core/latest.svg)](https://www.npmjs.com/package/@toolpad/core)
+[![npm downloads](https://img.shields.io/npm/dm/@toolpad/core.svg)](https://www.npmjs.com/package/@toolpad/core)
+[![GitHub branch status](https://img.shields.io/github/checks-status/mui/mui-toolpad/HEAD)](https://github.com/mui/mui-toolpad/commits/HEAD/)
+[![Follow on X](https://img.shields.io/twitter/follow/Toolpad_.svg?label=follow+Toolpad)](https://x.com/Toolpad_)
 [![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-toolpad/issues/8)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/mui-toolpad.svg)](https://isitmaintained.com/project/mui/mui-toolpad 'Average time to resolve an issue')
 [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui-org)](https://opencollective.com/mui-org)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/6294/badge?v2)](https://www.bestpractices.dev/projects/6294)
 
 </div>
 
@@ -89,7 +86,11 @@ GitHub allows us to host the Git repository and coordinate contributions.
 
 Netlify allows us to distribute the documentation.
 
-[<img loading="lazy" alt="BrowserStack" src="https://www.browserstack.com/images/mail/browserstack-logo-footer.png" height="30">](https://www.browserstack.com/)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://mui.com/static/readme/browserstack-darkmode.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://mui.com/static/readme/browserstack-lightmode.svg">
+  <img alt="BrowserStack logo" src="https://mui.com/static/readme/browserstack-lightmode.svg" width="140" height="25">
+</picture>
 
 BrowserStack allows us to test in real browsers.
 

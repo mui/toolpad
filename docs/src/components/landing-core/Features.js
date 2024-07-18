@@ -4,14 +4,13 @@ import Typography from '@mui/material/Typography';
 import Section from 'docs/src/layouts/Section';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
-import XComponentsSwitcher from './XComponentsSwitcher';
+import ToolpadFeaturesSwitcher from './ToolpadFeaturesSwitcher';
 import ToolpadDialogDemo from './ToolpadDialogDemo';
 import ToolpadDashboardLayout from './ToolpadDashboardLayout';
-import XChartsDemo from './XChartDemo';
 import ToolpadNotificationDemo from './ToolpadNotificationDemo';
 
 export default function ToolpadComponents() {
-  const [componentIndex, setComponentIndex] = React.useState(0);
+  const [tab, setTab] = React.useState('navigation');
   return (
     <Section bg="gradient">
       <Grid container spacing={2}>
@@ -25,21 +24,19 @@ export default function ToolpadComponents() {
             }
             description="Quickly build admin dashboard interfaces with a set of components that are designed to work together."
           />
-          <XComponentsSwitcher
-            componentIndex={componentIndex}
-            setComponentIndex={setComponentIndex}
-          />
+          <ToolpadFeaturesSwitcher tab={tab} setTab={setTab} />
         </Grid>
         <Grid
           xs={12}
           md={6}
-          sx={componentIndex === 0 ? { minHeight: { xs: 'auto', sm: 757, md: 'unset' } } : {}}
+          sx={tab === 'navigation' ? { minHeight: { xs: 'auto', sm: 757, md: 'unset' } } : {}}
         >
           <React.Fragment>
-            {componentIndex === 0 && <XChartsDemo />}
-            {componentIndex === 1 && <ToolpadDashboardLayout />}
-            {componentIndex === 2 && <ToolpadDialogDemo />}
-            {componentIndex === 3 && <ToolpadNotificationDemo />}
+            {tab === 'navigation' && <ToolpadDashboardLayout />}
+            {tab === 'auth' && <div>To Do</div>}
+            {tab === 'dialogs' && <ToolpadDialogDemo />}
+            {tab === 'notifications' && <ToolpadNotificationDemo />}
+            {tab === 'page' && <div>To Do</div>}
           </React.Fragment>
         </Grid>
       </Grid>

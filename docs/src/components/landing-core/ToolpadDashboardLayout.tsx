@@ -14,6 +14,82 @@ import type { Navigation } from '@toolpad/core';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
 import Frame from '../../modules/components/Frame';
 
+const code = `
+const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Main items',
+  },
+  {
+    slug: '/dashboard',
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    slug: '/orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
+  {
+    kind: 'divider',
+  },
+  {
+    kind: 'header',
+    title: 'Analytics',
+  },
+  {
+    slug: '/reports',
+    title: 'Reports',
+    icon: <BarChartIcon />,
+    children: [
+      {
+        slug: '/sales',
+        title: 'Sales',
+        icon: <DescriptionIcon />,
+      },
+      {
+        slug: '/traffic',
+        title: 'Traffic',
+        icon: <DescriptionIcon />,
+      },
+    ],
+  },
+  {
+    slug: '/integrations',
+    title: 'Integrations',
+    icon: <LayersIcon />,
+  },
+];
+
+function DashboardLayoutBasic() {
+  const [pathname, setPathname] = React.useState('/page');
+
+  const router = React.useMemo<Router>(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
+
+  return (
+      <AppProvider navigation={NAVIGATION} router={router}>
+      <DashboardLayout>
+        <Box
+          sx={{
+            py: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Typography>Dashboard content for {pathname}</Typography>
+        </Box>
+      </DashboardLayout>
+    </AppProvider>
+  );
+}`;
+
 const NAVIGATION: Navigation = [
   {
     kind: 'header',
@@ -118,79 +194,3 @@ export default function ToolpadDashboardLayout() {
     </Frame>
   );
 }
-
-const code = `
-const NAVIGATION: Navigation = [
-  {
-    kind: 'header',
-    title: 'Main items',
-  },
-  {
-    slug: '/dashboard',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
-  {
-    slug: '/orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-  {
-    kind: 'divider',
-  },
-  {
-    kind: 'header',
-    title: 'Analytics',
-  },
-  {
-    slug: '/reports',
-    title: 'Reports',
-    icon: <BarChartIcon />,
-    children: [
-      {
-        slug: '/sales',
-        title: 'Sales',
-        icon: <DescriptionIcon />,
-      },
-      {
-        slug: '/traffic',
-        title: 'Traffic',
-        icon: <DescriptionIcon />,
-      },
-    ],
-  },
-  {
-    slug: '/integrations',
-    title: 'Integrations',
-    icon: <LayersIcon />,
-  },
-];
-
-function DashboardLayoutBasic() {
-  const [pathname, setPathname] = React.useState('/page');
-
-  const router = React.useMemo<Router>(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
-
-  return (
-      <AppProvider navigation={NAVIGATION} router={router}>
-      <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content for {pathname}</Typography>
-        </Box>
-      </DashboardLayout>
-    </AppProvider>
-  );
-}`;

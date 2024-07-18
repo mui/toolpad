@@ -3,13 +3,29 @@ import Button from '@mui/material/Button';
 import Frame from 'docs/src/components/action/Frame';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
-import { useNotifications, NotificationsProvider} from '@toolpad/core/useNotifications';
+import { useNotifications, NotificationsProvider } from '@toolpad/core/useNotifications';
 
+const code = `
+export default function BasicNotification() {
+  const notifications = useNotifications();
+  return (
+    <div>
+      <Button
+        onClick={() => {
+          notifications.show('Consider yourself notified!', {
+            autoHideDuration: 3000,
+          });
+        }}
+      >
+        Notify me
+      </Button>
+    </div>
+  );
+}`;
 
 function BasicNotification() {
   const notifications = useNotifications();
   return (
-    
     <div>
       <Button
         onClick={() => {
@@ -23,7 +39,6 @@ function BasicNotification() {
     </div>
   );
 }
-
 
 export default function ToolpadNotificationDemo() {
   return (
@@ -44,32 +59,14 @@ export default function ToolpadNotificationDemo() {
             }),
           })}
         >
-      <NotificationsProvider>
-      <BasicNotification />
-      </NotificationsProvider>
-     </Paper>
-    </Frame.Demo>
+          <NotificationsProvider>
+            <BasicNotification />
+          </NotificationsProvider>
+        </Paper>
+      </Frame.Demo>
       <Frame.Info data-mui-color-scheme="dark" sx={{ maxHeight: 600, overflow: 'auto' }}>
         <HighlightedCode copyButtonHidden plainStyle code={code} language="jsx" />
       </Frame.Info>
     </Frame>
   );
 }
-
-const code = `
-export default function BasicNotification() {
-  const notifications = useNotifications();
-  return (
-    <div>
-      <Button
-        onClick={() => {
-          notifications.show('Consider yourself notified!', {
-            autoHideDuration: 3000,
-          });
-        }}
-      >
-        Notify me
-      </Button>
-    </div>
-  );
-}`;

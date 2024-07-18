@@ -45,7 +45,12 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-export default function TutorialPages() {
+function TutorialPages(props) {
+  const { window } = props;
+
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
@@ -57,10 +62,20 @@ export default function TutorialPages() {
   }, [pathname]);
 
   return (
-    <AppProvider router={router} navigation={NAVIGATION}>
+    <AppProvider router={router} navigation={NAVIGATION} window={demoWindow}>
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
   );
 }
+
+TutorialPages.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window: PropTypes.func,
+};
+
+export default TutorialPages;

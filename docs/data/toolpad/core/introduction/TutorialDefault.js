@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -28,12 +29,27 @@ function DemoPageContent() {
   );
 }
 
-export default function TutorialDefault() {
+function TutorialDefault(props) {
+  const { window } = props;
+
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
-    <AppProvider navigation={NAVIGATION}>
+    <AppProvider navigation={NAVIGATION} window={demoWindow}>
       <DashboardLayout>
         <DemoPageContent />
       </DashboardLayout>
     </AppProvider>
   );
 }
+
+TutorialDefault.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window: PropTypes.func,
+};
+
+export default TutorialDefault;

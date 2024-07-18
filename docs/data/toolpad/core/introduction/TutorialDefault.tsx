@@ -28,9 +28,22 @@ function DemoPageContent() {
   );
 }
 
-export default function TutorialDefault() {
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function TutorialDefault(props: DemoProps) {
+  const { window } = props;
+
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
-    <AppProvider navigation={NAVIGATION}>
+    <AppProvider navigation={NAVIGATION} window={demoWindow}>
       <DashboardLayout>
         <DemoPageContent />
       </DashboardLayout>

@@ -25,6 +25,17 @@ const NAVIGATION = [
   },
 ];
 
+// TODO: Use CSS vars theme once Toolpad Core uses Material UI v6
+const customTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: '#2A4364',
+      paper: '#112E4D',
+    },
+  },
+});
+
 function DemoPageContent({ pathname }) {
   return (
     <Box
@@ -41,21 +52,9 @@ function DemoPageContent({ pathname }) {
   );
 }
 
-// @TODO: Use CSS vars theme once Toolpad Core uses Material UI v6
-
 DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
-
-const customTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    background: {
-      default: '#2A4364',
-      paper: '#112E4D',
-    },
-  },
-});
 
 function AppProviderTheme(props) {
   const { window } = props;

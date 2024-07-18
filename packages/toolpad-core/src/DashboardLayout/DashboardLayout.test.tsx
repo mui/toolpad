@@ -12,9 +12,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
-import { BrandingContext, NavigationContext } from '../shared/context';
-import type { Navigation } from '../AppProvider';
-import { AppThemeProvider } from '../AppProvider/AppThemeProvider';
+import { AppProvider, Navigation } from '../AppProvider';
 import { DashboardLayout } from './DashboardLayout';
 
 describe('DashboardLayout', () => {
@@ -31,9 +29,9 @@ describe('DashboardLayout', () => {
     };
 
     render(
-      <BrandingContext.Provider value={BRANDING}>
+      <AppProvider branding={BRANDING}>
         <DashboardLayout>Hello world</DashboardLayout>
-      </BrandingContext.Provider>,
+      </AppProvider>,
     );
 
     const header = screen.getByRole('banner');
@@ -45,24 +43,24 @@ describe('DashboardLayout', () => {
   test('can switch theme', async () => {
     const user = userEvent.setup();
     render(
-      <AppThemeProvider>
+      <AppProvider>
         <DashboardLayout>Hello world</DashboardLayout>
-      </AppThemeProvider>,
+      </AppProvider>,
     );
 
     const header = screen.getByRole('banner');
 
     const themeSwitcherButton = within(header).getByLabelText('Switch to dark mode');
 
-    expect(document.body).toHaveStyle(`background-color: rgb(250, 250, 250)`);
+    expect(document.body).toHaveStyle(`background-color: rgb(255, 255, 255)`);
 
     await user.click(themeSwitcherButton);
 
-    expect(document.body).toHaveStyle(`background-color: rgb(33, 33, 33)`);
+    expect(document.body).toHaveStyle(`background-color: rgb(18, 18, 18)`);
 
     await user.click(themeSwitcherButton);
 
-    expect(document.body).toHaveStyle(`background-color: rgb(250, 250, 250)`);
+    expect(document.body).toHaveStyle(`background-color: rgb(255, 255, 255)`);
   });
 
   test('navigation works correctly', async () => {
@@ -110,9 +108,9 @@ describe('DashboardLayout', () => {
 
     const user = userEvent.setup();
     render(
-      <NavigationContext.Provider value={NAVIGATION}>
+      <AppProvider navigation={NAVIGATION}>
         <DashboardLayout>Hello world</DashboardLayout>
-      </NavigationContext.Provider>,
+      </AppProvider>,
     );
 
     const navigation = screen.getByRole('navigation');

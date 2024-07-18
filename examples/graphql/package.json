@@ -8,9 +8,9 @@
     "start": "toolpad-studio start"
   },
   "dependencies": {
-    "@toolpad/studio": "0.2.0",
-    "graphql": "16.8.1",
-    "graphql-request": "7.0.1",
+    "@toolpad/studio": "0.3.1",
+    "graphql": "16.9.0",
+    "graphql-request": "7.1.0",
     "graphql-tag": "2.12.6"
   }
 }

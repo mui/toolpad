@@ -13,6 +13,7 @@ import chalk from 'chalk';
 import { serveRpc } from '@toolpad/utils/workerRpc';
 import * as url from 'node:url';
 import cors from 'cors';
+import compression from 'compression';
 import { asyncHandler } from '../utils/express';
 import { createProdHandler } from './toolpadAppServer';
 import { initProject, resolveProjectDir, type ToolpadProject } from './localMode';
@@ -235,6 +236,23 @@ async function createToolpadHandler({
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+    res.setHeader(
+      'Content-Security-Policy',
+      [
+        `default-src * data: mediastream: blob: filesystem: about: ws: wss: 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-inline';`,
+        `script-src * data: blob: 'unsafe-inline' 'unsafe-eval';`,
+        `script-src-elem * data: blob: 'unsafe-inline';`,
+        `connect-src * data: blob: 'unsafe-inline';`,
+        `img-src * data: blob: 'unsafe-inline';`,
+        `media-src * data: blob: 'unsafe-inline';`,
+        `frame-src * data: blob: ;`,
+        `style-src * data: blob: 'unsafe-inline';`,
+        `font-src * data: blob: 'unsafe-inline';`,
+        `frame-ancestors *;`,
+      ].join(' '),
+    );
+
     expressNext();
   });
 
@@ -278,7 +296,11 @@ async function startToolpadServer({ port, ...config }: ToolpadServerConfig) {
   const circleBuildNum = process.env.CIRCLE_BUILD_NUM || null;
 
   const app = express();
+  app.disable('x-powered-by');
+
   const httpServer = createServer(app);
+
+  app.use(compression());
 
   app.get('/health-check', (req, res) => {
     const memoryUsage = process.memoryUsage();

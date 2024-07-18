@@ -1,5 +1,66 @@
 # Changelog
 
+## v0.3.1
+
+<!-- generated comparing v0.3.0..master -->
+
+_Jul 12, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+Improve Toolpad home page, add persistent state hooks to Toolpad Core and fix some performance issues in Toolpad Studio production apps.
+
+- &#8203;<!-- 13 -->Remove dead code (#3754) @Janpot
+- &#8203;<!-- 12 -->Lock file maintenance (#3740) @renovate[bot]
+- &#8203;<!-- 11 -->Lock file maintenance Docs (#3743) @renovate[bot]
+- &#8203;<!-- 10 -->Lock file maintenance Examples (#3742) @renovate[bot]
+- &#8203;<!-- 09 -->Lock file maintenance Docs (#3741) @renovate[bot]
+- &#8203;<!-- 08 -->[cli] Add information when `--example` is present (#3749) @bharatkashyap
+- &#8203;<!-- 07 -->[code-infra] Use `@mui/docs` where possible (#3751) @LukasTy
+- &#8203;<!-- 06 -->[core] Fix a few performance issues in Toolpad production apps (#3756) @Janpot
+- &#8203;<!-- 05 -->[core] Optimize studio production build (#3755) @Janpot
+- &#8203;<!-- 04 -->[core] Implement persistent state hooks (#3696) @Janpot
+- &#8203;<!-- 03 -->[docs] Update to match monorepo script (#3753) @bharatkashyap
+- &#8203;<!-- 02 -->[docs] Use product demo video of the onboarding on the landing page (#3555) @Janpot
+- &#8203;<!-- 01 -->[security] Slightly improve CSP header (#3757) @oliviertassinari
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @LukasTy, @oliviertassinari, @renovate[bot]
+
+## v0.3.0
+
+<!-- generated comparing v0.2.0..master -->
+
+_Jun 28, 2024_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+This release adds Dialogs and Notifications hooks to Toolpad Core! Supporting the Next.js Pages router in the Core playground app. Small feature addition to Studio as well: Column Pinning. More tests and documentation fixes.
+
+- &#8203;<!-- 24 -->Update README.md @Janpot
+- &#8203;<!-- 23 -->Update README.md @Janpot
+- &#8203;<!-- 22 -->[Update readme] Add openssf badge and fix browerstack logo (#3694) @prakhargupta1
+- &#8203;<!-- 21 -->Implement notifications/dialogs RFCs (#3584) @Janpot
+- &#8203;<!-- 20 -->Add Next.js pages router app to Toolpad Core playground (#3588) @apedroferreira
+- &#8203;<!-- 19 -->Run toolpad/core tests in the browser (#3640) @Janpot
+- &#8203;<!-- 18 -->Add dashboard tutorial to introduction (#3637) @Janpot
+- &#8203;<!-- 17 -->Lock file maintenance Docs (#3623) @renovate[bot]
+- &#8203;<!-- 16 -->[AppProvider] Create basic router adapters (#3638) @Janpot
+- &#8203;<!-- 15 -->[code-infra] Add eslint plugin for testing-library (#3648) @Janpot
+- &#8203;<!-- 14 -->[core] Remove update-monorepo.yml (#3712) @oliviertassinari
+- &#8203;<!-- 13 -->[core] Add browserslistrc (#3711) @Janpot
+- &#8203;<!-- 12 -->[core] dedupe emotion and react-query (#3695) @Janpot
+- &#8203;<!-- 11 -->[core] Fix a few more React compiler warnings (#3644) @Janpot
+- &#8203;<!-- 10 -->[core] Remove quickjs-emscripten dependency (#3689) @Janpot
+- &#8203;<!-- 09 -->[DataContext] Support global filtering (#3618) @Janpot
+- &#8203;<!-- 08 -->[docs] Fix link icons for file reference section titles (#3709) @Janpot
+- &#8203;<!-- 07 -->[docs] Fix incorrect heading (#3636) @bharatkashyap
+- &#8203;<!-- 06 -->[docs-infra] Sync \_app file with monorepo (#3698) @Janpot
+- &#8203;<!-- 05 -->[studio] Add column pinning (#3693) @Janpot
+- &#8203;<!-- 04 -->[Studio] Remove old canvas entrypoint (#3642) @Janpot
+- &#8203;<!-- 03 -->[test] Enable test coverage for @toolpad/core (#3697) @Janpot
+- &#8203;<!-- 02 -->[test] Test from the user's perspective with user-event (#3670) @Janpot
+- &#8203;<!-- 01 -->[test] Data grid CRUD tests (#3646) @Janpot
+
 ## v0.2.0
 
 <!-- generated comparing v0.1.55..master -->

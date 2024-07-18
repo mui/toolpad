@@ -9,13 +9,14 @@ import { ponyfillGlobal } from '@mui/utils';
 import { LicenseInfo } from '@mui/x-license';
 import PageContext from 'docs/src/modules/components/PageContext';
 import GoogleAnalytics from 'docs/src/modules/components/GoogleAnalytics';
+import { CodeCopyProvider } from '@mui/docs/CodeCopy';
 import { ThemeProvider } from 'docs/src/modules/components/ThemeContext';
 import { CodeVariantProvider } from 'docs/src/modules/utils/codeVariant';
-import { CodeCopyProvider } from 'docs/src/modules/utils/CodeCopy';
+import { CodeStylingProvider } from 'docs/src/modules/utils/codeStylingSolution';
 import DocsStyledEngineProvider from 'docs/src/modules/utils/StyledEngineProvider';
-import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
+import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 import toolpadPkgJson from '@toolpad/studio/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
@@ -23,10 +24,13 @@ import toolpadStudioPages from '../data/toolpad/studio/pages';
 import toolpadCorePages from '../data/toolpad/core/pages';
 import config from '../config';
 
+// Remove the license warning from demonstration purposes
+LicenseInfo.setLicenseKey(process.env.NEXT_PUBLIC_MUI_LICENSE);
+
+// Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
 let reloadInterval;
-LicenseInfo.setLicenseKey(process.env.NEXT_PUBLIC_MUI_LICENSE);
 
 function getMuiPackageVersion(packageName, commitRef) {
   if (commitRef === undefined) {
@@ -154,15 +158,18 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
 ██║ ╚═╝ ██║ ╚██████╔╝ ██████╗
 ╚═╝     ╚═╝  ╚═════╝  ╚═════╝
 
+Tip: you can access the documentation \`theme\` object directly in the console.
 `,
     'font-family:monospace;color:#1976d2;font-size:12px;',
   );
 }
-
 function AppWrapper(props) {
   const { children, emotionCache, pageProps } = props;
 
   const router = useRouter();
+  // TODO move productId & productCategoryId resolution to page layout.
+  // We should use the productId field from the markdown and fallback to getProductInfoFromUrl()
+  // if not present
   const { productId, productCategoryId } = getProductInfoFromUrl(router.asPath);
 
   React.useEffect(() => {
@@ -175,13 +182,6 @@ function AppWrapper(props) {
       jssStyles.parentElement.removeChild(jssStyles);
     }
   }, []);
-
-  let fonts = [];
-  if (pathnameToLanguage(router.asPath).canonicalAs.match(/onepirate/)) {
-    fonts = [
-      'https://fonts.googleapis.com/css?family=Roboto+Condensed:700|Work+Sans:300,400&display=swap',
-    ];
-  }
 
   const pageContextValue = React.useMemo(() => {
     let productIdentifier;
@@ -250,6 +250,13 @@ function AppWrapper(props) {
     };
   }, [router.asPath, router.pathname, productId, productCategoryId]);
 
+  let fonts = [];
+  if (pathnameToLanguage(router.asPath).canonicalAs.match(/onepirate/)) {
+    fonts = [
+      'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Work+Sans:wght@300;400&display=swap',
+    ];
+  }
+
   return (
     <React.Fragment>
       <NextHead>
@@ -261,16 +268,18 @@ function AppWrapper(props) {
       </NextHead>
       <DocsProvider config={config} defaultUserLanguage={pageProps.userLanguage}>
         <CodeCopyProvider>
-          <CodeVariantProvider>
-            <PageContext.Provider value={pageContextValue}>
-              <ThemeProvider>
-                <DocsStyledEngineProvider cacheLtr={emotionCache}>
-                  {children}
-                  <GoogleAnalytics />
-                </DocsStyledEngineProvider>
-              </ThemeProvider>
-            </PageContext.Provider>
-          </CodeVariantProvider>
+          <CodeStylingProvider>
+            <CodeVariantProvider>
+              <PageContext.Provider value={pageContextValue}>
+                <ThemeProvider>
+                  <DocsStyledEngineProvider cacheLtr={emotionCache}>
+                    {children}
+                    <GoogleAnalytics />
+                  </DocsStyledEngineProvider>
+                </ThemeProvider>
+              </PageContext.Provider>
+            </CodeVariantProvider>
+          </CodeStylingProvider>
         </CodeCopyProvider>
       </DocsProvider>
     </React.Fragment>
@@ -285,14 +294,14 @@ AppWrapper.propTypes = {
 
 export default function MyApp(props) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
+  const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
     <AppWrapper emotionCache={emotionCache} pageProps={pageProps}>
-      <Component {...pageProps} />
+      {getLayout(<Component {...pageProps} />)}
     </AppWrapper>
   );
 }
-
 MyApp.propTypes = {
   Component: PropTypes.elementType.isRequired,
   emotionCache: PropTypes.object,
@@ -316,6 +325,7 @@ MyApp.getInitialProps = async ({ ctx, Component }) => {
 
 // Track fraction of actual events to prevent exceeding event quota.
 // Filter sessions instead of individual events so that we can track multiple metrics per device.
+// See https://github.com/GoogleChromeLabs/web-vitals-report to use this data
 const disableWebVitalsReporting = Math.random() > 0.0001;
 export function reportWebVitals({ id, name, label, delta, value }) {
   if (disableWebVitalsReporting) {

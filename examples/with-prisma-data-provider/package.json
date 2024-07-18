@@ -9,15 +9,15 @@
     "prisma": "prisma"
   },
   "dependencies": {
-    "@toolpad/studio": "0.2.0",
-    "@prisma/client": "5.14.0",
+    "@toolpad/studio": "0.3.1",
+    "@prisma/client": "5.16.1",
     "qrcode": "^1.5.3"
   },
   "devDependencies": {
-    "@types/node": "^20.13.0",
+    "@types/node": "^20.14.9",
     "@types/qrcode": "^1.5.5",
-    "prisma": "^5.14.0",
+    "prisma": "^5.16.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.2"
   }
 }

@@ -36,16 +36,6 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/core/introduction/support',
         title: 'Support',
       },
-      {
-        pathname: '/toolpad/core/features-group',
-        subheader: 'Features',
-        children: [
-          {
-            pathname: '/toolpad/core/features/data-providers',
-            title: 'Data Providers',
-          },
-        ],
-      },
     ],
   },
   {
@@ -74,20 +64,6 @@ const pages: MuiPage[] = [
         ],
       },
       {
-        pathname: '/toolpad/core/components/data-group',
-        subheader: 'Data',
-        children: [
-          {
-            pathname: '/toolpad/core/react-data-grid',
-            title: 'Data Grid',
-          },
-          {
-            pathname: '/toolpad/core/react-line-chart',
-            title: 'Line Chart',
-          },
-        ],
-      },
-      {
         pathname: '/toolpad/core/components/filter-group',
         subheader: 'Utils',
         children: [
@@ -98,6 +74,10 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-use-notifications',
             title: 'useNotifications',
+          },
+          {
+            pathname: '/toolpad/core/react-persistent-state',
+            title: 'Peristent State',
           },
         ],
       },
@@ -110,7 +90,25 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/core/api/components-group',
         subheader: 'Components',
-        children: pagesApi,
+        children: [
+          ...pagesApi,
+          {
+            pathname: '/toolpad/core/react-use-notifications/api/',
+            title: 'useNotifications',
+          },
+          {
+            pathname: '/toolpad/core/react-use-dialogs/api/',
+            title: 'useDialogs',
+          },
+          {
+            pathname: '/toolpad/core/react-persistent-state/use-local-storage-state-api/',
+            title: 'useLocalStorageState',
+          },
+          {
+            pathname: '/toolpad/core/react-persistent-state/use-session-storage-state-api/',
+            title: 'useSessionStorageState',
+          },
+        ],
       },
     ],
   },

@@ -6,7 +6,7 @@ import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import { alpha } from '@mui/material/styles';
-import HighlightedCode from 'docs/src/modules/components/HighlightedCode';
+import { HighlightedCode } from '@mui/docs/HighlightedCode';
 
 const code = [
   `

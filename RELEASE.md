@@ -11,7 +11,7 @@
 1. Generate the changelog using:
 
    ```bash
-   pnpm release:changelog
+   pnpm release:changelog --release master
    ```
 
    Running this command requires a [GitHub personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with the `public_repo` scope.
@@ -28,6 +28,36 @@
 
    - Focus on new user facing features or changes
    - Be concise, link to relevant documentation for extra clarity
+
+   Use the following template to format the list of changes:
+
+   ```md
+   <!-- HEADER + HIGHLIGHTS -->
+
+   ### `@toolpad/core`
+
+   - Commit message (#pr-number) @author
+   - ...
+
+   ### `@toolpad/studio`
+
+   - Commit message (#pr-number) @author
+   - ...
+
+   ### Docs
+
+   - Commit message (#pr-number) @author
+   - ...
+
+   ### Core
+
+   - Commit message (#pr-number) @author
+   - ...
+
+   <!-- CONTRIBUTORS -->
+   ```
+
+   Strip the `[tag]` from the commit lines and order them in each section. Sections that don't have changes can be removed altogether. If necessary, improve, redact or correct commit messages.
 
 1. Prepend the changelog to [`CHANGELOG.md`](./CHANGELOG.md).
 

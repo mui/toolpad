@@ -27,7 +27,7 @@ or:
 This app demonstrates the following capabilities of Toolpad:
 
 1. How to use the Tabs component
-2. How to use the COntainer component
+2. How to use the Container component
 
 ## The source
 

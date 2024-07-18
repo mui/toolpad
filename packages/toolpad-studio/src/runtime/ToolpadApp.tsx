@@ -1208,6 +1208,9 @@ function RenderedNodeContent({
             justifyContent: boundLayoutProps.horizontalAlign,
             height: node.layout?.height ?? componentConfig.defaultLayoutHeight,
             minHeight: '100%',
+            '&:empty': {
+              display: 'none',
+            },
           }}
           ref={nodeRef}
           data-toolpad-node-id={nodeId}
@@ -1229,7 +1232,7 @@ const PageRoot = React.forwardRef<HTMLDivElement, PageRootProps>(function PageRo
   ref,
 ) {
   const containerMaxWidth =
-    maxWidth === 'none' ? false : maxWidth ?? appDom.DEFAULT_CONTAINER_WIDTH;
+    maxWidth === 'none' ? false : (maxWidth ?? appDom.DEFAULT_CONTAINER_WIDTH);
   return (
     <Container ref={ref} maxWidth={containerMaxWidth}>
       <Stack data-testid="page-root" direction="column" sx={{ my: 2, gap: 1 }} {...props}>

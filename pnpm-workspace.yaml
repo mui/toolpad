@@ -3,3 +3,4 @@ packages:
   - 'playground/*'
   - 'docs'
   - 'test'
+  - 'examples/custom-server-nextjs'

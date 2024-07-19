@@ -17,6 +17,12 @@
   "bin": {
     "create-toolpad-app": "./dist/index.js"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/api.mjs",
+      "require": "./dist/api.js"
+    }
+  },
   "files": [
     "dist"
   ],

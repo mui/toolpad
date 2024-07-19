@@ -430,8 +430,8 @@ export default function generateProject(
 
   // Define all files to be created up front
   return new Map([
-    ['app/api/auth/[...nextAuth]/route.ts', { content: '' }],
-    ['app/auth/[...path]/page.tsx', { content: '' }],
+    ['app/api/auth/[...nextAuth]/route.ts', { content: 'export {}' }],
+    ['app/auth/[...path]/page.tsx', { content: 'export {}' }],
     ['app/(dashboard)/page/page.tsx', { content: dashboardPageContent }],
     ['app/(dashboard)/layout.tsx', { content: dashboardLayoutContent }],
     ['app/layout.tsx', { content: rootLayoutContent }],

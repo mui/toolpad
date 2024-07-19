@@ -2,6 +2,7 @@
 import * as path from 'path';
 import * as url from 'url';
 import { createRequire } from 'module';
+import { headers } from 'next/headers.js';
 import { LANGUAGES, LANGUAGES_IGNORE_PAGES, LANGUAGES_IN_PROGRESS } from './config.js';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
@@ -162,6 +163,21 @@ export default withDocsInfra({
             source: '/',
             destination: '/toolpad/',
             permanent: false,
+          },
+        ],
+        headers: async () => [
+          {
+            source: '/toolpad/builder',
+            headers: [
+              {
+                key: 'Cross-Origin-Embedder-Policy',
+                value: 'require-corp',
+              },
+              {
+                key: 'Cross-Origin-Opener-Policy',
+                value: 'same-origin',
+              },
+            ],
           },
         ],
       }),

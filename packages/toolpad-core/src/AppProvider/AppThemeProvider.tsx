@@ -119,6 +119,7 @@ function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
       defaultMode="system"
       documentNode={appWindow?.document}
       colorSchemeNode={appWindow?.document?.body}
+      modeStorageKey="mui-toolpad-mode"
     >
       <CSSVarsThemeConsumer isDualTheme={isDualTheme}>{children}</CSSVarsThemeConsumer>
     </CssVarsProvider>
@@ -148,7 +149,7 @@ function AppThemeProvider(props: AppThemeProviderProps) {
 
   return isCSSVarsTheme ? (
     <React.Fragment>
-      <InitColorSchemeScript />
+      <InitColorSchemeScript modeStorageKey="mui-toolpad-mode" />
       <CSSVarsThemeProvider theme={theme} window={appWindow}>
         {themeChildren}
       </CSSVarsThemeProvider>

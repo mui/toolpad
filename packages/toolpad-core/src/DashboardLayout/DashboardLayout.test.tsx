@@ -11,8 +11,9 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom/vitest';
+import { AppProvider, Navigation } from '../AppProvider';
 import { DashboardLayout } from './DashboardLayout';
-import { BrandingContext, Navigation, NavigationContext } from '../AppProvider';
 
 describe('DashboardLayout', () => {
   test('renders content correctly', async () => {
@@ -28,15 +29,43 @@ describe('DashboardLayout', () => {
     };
 
     render(
-      <BrandingContext.Provider value={BRANDING}>
+      <AppProvider branding={BRANDING}>
         <DashboardLayout>Hello world</DashboardLayout>
-      </BrandingContext.Provider>,
+      </AppProvider>,
     );
 
     const header = screen.getByRole('banner');
 
     expect(within(header).getByText('My Company')).toBeTruthy();
     expect(within(header).getByAltText('Placeholder Logo')).toBeTruthy();
+  });
+
+  test('can switch theme', async () => {
+    const user = userEvent.setup();
+    render(
+      <AppProvider>
+        <DashboardLayout>Hello world</DashboardLayout>
+      </AppProvider>,
+    );
+
+    const getBackgroundColorCSSVariable = () =>
+      getComputedStyle(document.documentElement).getPropertyValue(
+        '--mui-palette-common-background',
+      );
+
+    const header = screen.getByRole('banner');
+
+    const themeSwitcherButton = within(header).getByLabelText('Switch to dark mode');
+
+    expect(getBackgroundColorCSSVariable()).toBe('#fff');
+
+    await user.click(themeSwitcherButton);
+
+    expect(getBackgroundColorCSSVariable()).toBe('#000');
+
+    await user.click(themeSwitcherButton);
+
+    expect(getBackgroundColorCSSVariable()).toBe('#fff');
   });
 
   test('navigation works correctly', async () => {
@@ -84,9 +113,9 @@ describe('DashboardLayout', () => {
 
     const user = userEvent.setup();
     render(
-      <NavigationContext.Provider value={NAVIGATION}>
+      <AppProvider navigation={NAVIGATION}>
         <DashboardLayout>Hello world</DashboardLayout>
-      </NavigationContext.Provider>,
+      </AppProvider>,
     );
 
     const navigation = screen.getByRole('navigation');

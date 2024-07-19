@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -23,6 +24,27 @@ const NAVIGATION: Navigation = [
     icon: <TimelineIcon />,
   },
 ];
+
+const customTheme = extendTheme({
+  colorSchemes: {
+    light: {
+      palette: {
+        background: {
+          default: '#E2FAFF',
+          paper: '#D9FAFF',
+        },
+      },
+    },
+    dark: {
+      palette: {
+        background: {
+          default: '#2A4364',
+          paper: '#112E4D',
+        },
+      },
+    },
+  },
+});
 
 function DemoPageContent({ pathname }: { pathname: string }) {
   return (
@@ -48,7 +70,7 @@ interface DemoProps {
   window?: () => Window;
 }
 
-export default function AppProviderBasic(props: DemoProps) {
+export default function AppProviderTheme(props: DemoProps) {
   const { window } = props;
 
   const [pathname, setPathname] = React.useState('/page');
@@ -66,7 +88,12 @@ export default function AppProviderBasic(props: DemoProps) {
 
   return (
     // preview-start
-    <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={customTheme}
+      window={demoWindow}
+    >
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>

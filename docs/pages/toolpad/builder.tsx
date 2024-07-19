@@ -50,13 +50,17 @@ export default function Builder() {
       throw new Error('Frame not found');
     }
 
-    if (webcontainerPromiseRef.current) {
-      return;
-    }
-
     const frame = frameRef.current;
 
-    const webcontainerPromise = webcontainerPromiseRef.current ?? WebContainer.boot();
+    const webcontainerPromise = Promise.resolve(webcontainerPromiseRef.current).then(
+      async (maybeInstance) => {
+        if (maybeInstance) {
+          await maybeInstance.teardown();
+        }
+        return WebContainer.boot();
+      },
+    );
+
     webcontainerPromiseRef.current = webcontainerPromise;
 
     webcontainerPromise.then(async (instance) => {
@@ -87,11 +91,6 @@ export default function Builder() {
         frame.src = `${url}/page`;
       });
     });
-
-    // eslint-disable-next-line consistent-return
-    return () => {
-      // webcontainerPromise.then((instance) => instance.teardown());
-    };
   }, []);
 
   const [loading, setLoading] = React.useState(true);

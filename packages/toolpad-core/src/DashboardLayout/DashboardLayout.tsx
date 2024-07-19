@@ -32,6 +32,7 @@ import {
   NavigationContext,
   PaletteModeContext,
   RouterContext,
+  WindowContext,
 } from '../shared/context';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
@@ -336,6 +337,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
+  const appWindow = React.useContext(WindowContext);
 
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
 
@@ -408,18 +410,21 @@ function DashboardLayout(props: DashboardLayoutProps) {
             <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
               <Stack direction="row" alignItems="center">
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
-                <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
+                <Typography
+                  variant="h6"
+                  sx={{ color: (theme) => theme.palette.primary.main, fontWeight: '700' }}
+                >
                   {branding?.title ?? 'Toolpad'}
                 </Typography>
               </Stack>
             </a>
           </Box>
-          <Box sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1 }} />
           <ThemeSwitcher />
         </Toolbar>
       </AppBar>
       <Drawer
-        container={() => window.document.body}
+        container={appWindow?.document.body}
         variant="temporary"
         open={isMobileNavigationOpen}
         onClose={handleSetMobileNavigationOpen(false)}

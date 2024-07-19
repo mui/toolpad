@@ -1,8 +1,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { extendTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -25,7 +25,7 @@ const NAVIGATION = [
   },
 ];
 
-const theme = extendTheme({
+const demoTheme = extendTheme({
   breakpoints: {
     values: {
       xs: 0,
@@ -78,7 +78,7 @@ function AppProviderBasic(props) {
     <AppProvider
       navigation={NAVIGATION}
       router={router}
-      theme={theme}
+      theme={demoTheme}
       window={demoWindow}
     >
       <DashboardLayout>

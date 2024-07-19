@@ -75,8 +75,8 @@
     "vitest": "beta"
   },
   "peerDependencies": {
-    "@mui/icons-material": "^6",
-    "@mui/material": "^6",
+    "@mui/icons-material": "v6.0.0-beta.2",
+    "@mui/material": "v6.0.0-beta.2",
     "next": "^14",
     "react": "^18"
   },

@@ -27,7 +27,7 @@ function useStandardPaletteMode() {
   const { themeMode, setThemeMode } = useThemeMode();
 
   return {
-    paletteMode: themeMode === 'system' ? preferredMode : themeMode,
+    paletteMode: !themeMode || themeMode === 'system' ? preferredMode : themeMode,
     setPaletteMode: setThemeMode,
   };
 }

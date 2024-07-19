@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme } from '@mui/material';
+import { styled, SxProps, Theme, useTheme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -370,12 +370,14 @@ function DashboardLayout(props: DashboardLayoutProps) {
     </React.Fragment>
   );
 
-  const drawerSx = {
+  const drawerSx: SxProps<Theme> = {
     width: DRAWER_WIDTH,
     flexShrink: 0,
     [`& .MuiDrawer-paper`]: {
       width: DRAWER_WIDTH,
       boxSizing: 'border-box',
+      backgroundImage: 'none',
+      borderRight: (theme) => `1px solid ${theme.palette.divider}`,
     },
   };
 

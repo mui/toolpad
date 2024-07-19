@@ -106,13 +106,13 @@ function AppProvider(props: AppProviderProps) {
     branding = null,
     navigation = [],
     router = null,
-    window,
+    window: appWindow,
   } = props;
 
   return (
-    <WindowContext.Provider value={window}>
+    <WindowContext.Provider value={appWindow}>
       <RouterContext.Provider value={router}>
-        <AppThemeProvider theme={theme} window={window}>
+        <AppThemeProvider theme={theme} window={appWindow}>
           <NotificationsProvider>
             <DialogsProvider>
               <BrandingContext.Provider value={branding}>

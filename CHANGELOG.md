@@ -12,20 +12,20 @@ This release adds a theme switcher and a responsive drawer to the App Layout com
 
 ### `@toolpad/core`
 
-- &#8203;<!-- 8 -->[core] Make DashboardLayout navigation responsive (#3750) @apedroferreira
-- &#8203;<!-- 7 -->[core] Add theme switcher to dashboard layout (#3674) @apedroferreira
-- &#8203;<!-- 5 -->[core] Remove data providers (#3797) @Janpot
+- &#8203;<!-- 8 --> Make DashboardLayout navigation responsive (#3750) @apedroferreira
+- &#8203;<!-- 7 --> Add theme switcher to dashboard layout (#3674) @apedroferreira
+- &#8203;<!-- 5 --> Remove data providers (#3797) @Janpot
 
 ### Docs
 
-- &#8203;<!-- 3 -->[docs] Add tabs example (#3803) @Janpot
-- &#8203;<!-- 1 -->[docs] Migrate Grid2 in the docs to fix landing page layout (#3790) @Janpot
+- &#8203;<!-- 3 --> Add tabs example (#3803) @Janpot
+- &#8203;<!-- 1 --> Migrate Grid2 in the docs to fix landing page layout (#3790) @Janpot
 
 ### Core
 
-- &#8203;<!-- 6 -->[core] Remove lib dom from create-toolpad-app (#3796) @Janpot
-- &#8203;<!-- 4 -->[core] Link GH issue for import/prefer-default-export @oliviertassinari
-- &#8203;<!-- 2 -->[docs] Improve changelog format (#3789) @Janpot
+- &#8203;<!-- 6 --> Remove lib dom from create-toolpad-app (#3796) @Janpot
+- &#8203;<!-- 4 --> Link GH issue for import/prefer-default-export @oliviertassinari
+- &#8203;<!-- 2 --> Improve changelog format (#3789) @Janpot
 
 All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @oliviertassinari
 

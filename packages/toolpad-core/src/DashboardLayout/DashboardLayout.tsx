@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, SxProps, Theme, useTheme } from '@mui/material';
+import { styled, useTheme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -183,11 +183,13 @@ function DashboardSidebarSubNavigation({
 
   const handleSidebarItemClick = React.useCallback(
     (itemId: string, item: NavigationPageItem) => () => {
-      setExpandedSidebarItemIds((previousValue) =>
-        previousValue.includes(itemId)
-          ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
-          : [...previousValue, itemId],
-      );
+      if (item.children) {
+        setExpandedSidebarItemIds((previousValue) =>
+          previousValue.includes(itemId)
+            ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
+            : [...previousValue, itemId],
+        );
+      }
 
       if (onSidebarItemClick) {
         onSidebarItemClick(item);
@@ -370,17 +372,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
     </React.Fragment>
   );
 
-  const drawerSx: SxProps<Theme> = {
-    width: DRAWER_WIDTH,
-    flexShrink: 0,
-    [`& .MuiDrawer-paper`]: {
-      width: DRAWER_WIDTH,
-      boxSizing: 'border-box',
-      backgroundImage: 'none',
-      borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-    },
-  };
-
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
@@ -396,6 +387,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
                   onClick={toggleMobileNavigation}
                   edge="start"
+                  sx={{ ml: 0 }}
                 >
                   {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
                 </IconButton>
@@ -435,7 +427,14 @@ function DashboardLayout(props: DashboardLayoutProps) {
         }}
         sx={{
           display: { xs: 'block', md: 'none' },
-          ...drawerSx,
+          width: DRAWER_WIDTH,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            backgroundImage: 'none',
+            borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+          },
         }}
       >
         {drawerContent}
@@ -444,7 +443,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
         variant="permanent"
         sx={{
           display: { xs: 'none', md: 'block' },
-          ...drawerSx,
+          width: DRAWER_WIDTH,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            backgroundImage: 'none',
+          },
         }}
       >
         {drawerContent}

@@ -203,9 +203,15 @@ export default function Builder() {
           </Button>
           <Button
             // eslint-disable-next-line no-alert
-            onClick={() => window.alert('// TODO: package files and download')}
+            onClick={() => window.alert('// TODO: package files into zip and download')}
           >
             Download project
+          </Button>
+          <Button
+            // eslint-disable-next-line no-alert
+            onClick={() => window.alert('// TODO: Show code files in code editor (read only)')}
+          >
+            Code view
           </Button>
         </Stack>
         <Box sx={{ position: 'relative', flex: 1 }}>

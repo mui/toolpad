@@ -406,7 +406,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
                 <Typography
                   variant="h6"
-                  sx={{ color: (theme) => theme.palette.primary.main, fontWeight: '700' }}
+                  sx={{
+                    color: (theme) => (theme.vars ?? theme).palette.primary.main,
+                    fontWeight: '700',
+                  }}
                 >
                   {branding?.title ?? 'Toolpad'}
                 </Typography>
@@ -433,7 +436,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
             backgroundImage: 'none',
-            borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+            borderRight: (theme) => `1px solid ${(theme.vars ?? theme).palette.divider}`,
           },
         }}
       >

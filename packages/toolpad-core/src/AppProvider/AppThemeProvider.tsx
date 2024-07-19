@@ -3,7 +3,7 @@ import { PaletteMode, Theme, useMediaQuery } from '@mui/material';
 import { CssVarsProvider, ThemeProvider, useColorScheme, CssVarsTheme } from '@mui/material/styles';
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import CssBaseline from '@mui/material/CssBaseline';
-import useLocalStorageState from '@toolpad/utils/hooks/useLocalStorageState';
+import { useLocalStorageState } from '../useLocalStorageState';
 import { PaletteModeContext } from '../shared/context';
 import type { AppProviderProps } from './AppProvider';
 

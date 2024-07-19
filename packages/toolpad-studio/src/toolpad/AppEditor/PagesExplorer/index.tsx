@@ -8,7 +8,7 @@ import invariant from 'invariant';
 import { alphabeticComparator, createPropComparator } from '@toolpad/utils/comparators';
 import useBoolean from '@toolpad/utils/hooks/useBoolean';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import useLocalStorageState from '@toolpad/utils/hooks/useLocalStorageState';
+import useLocalStorageState from '../../../utils/useLocalStorageState';
 import { useAppStateApi, useAppState } from '../../AppState';
 import NodeMenu from '../NodeMenu';
 import { DomView } from '../../../utils/domView';

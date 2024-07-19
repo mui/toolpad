@@ -86,7 +86,10 @@ function ThemeSwitcher() {
   }, [paletteMode, setPaletteMode]);
 
   return isDualTheme ? (
-    <Tooltip title={`${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`} enterDelay={1000}>
+    <Tooltip
+      title={isSsr ? 'Switch mode' : `${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`}
+      enterDelay={1000}
+    >
       <div>
         <IconButton
           aria-label={

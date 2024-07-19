@@ -1,12 +1,7 @@
 import * as React from 'react';
 import { PaletteMode, Theme, useMediaQuery } from '@mui/material';
-import {
-  Experimental_CssVarsProvider as CssVarsProvider,
-  getInitColorSchemeScript,
-  ThemeProvider,
-  useColorScheme,
-  CssVarsTheme,
-} from '@mui/material/styles';
+import { CssVarsProvider, ThemeProvider, useColorScheme, CssVarsTheme } from '@mui/material/styles';
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import CssBaseline from '@mui/material/CssBaseline';
 import useLocalStorageState from '@toolpad/utils/hooks/useLocalStorageState';
 import { PaletteModeContext } from '../shared/context';
@@ -153,7 +148,7 @@ function AppThemeProvider(props: AppThemeProviderProps) {
 
   return isCSSVarsTheme ? (
     <React.Fragment>
-      {getInitColorSchemeScript()}
+      <InitColorSchemeScript />
       <CSSVarsThemeProvider theme={theme} window={window}>
         {themeChildren}
       </CSSVarsThemeProvider>

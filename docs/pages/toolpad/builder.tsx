@@ -71,6 +71,10 @@ export default function Builder() {
   const webcontainerPromiseRef = React.useRef<Promise<WebContainer> | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [rebuilding, setRebuilding] = React.useState(false);
+  const isRebuildingRef = React.useRef(rebuilding);
+  React.useEffect(() => {
+    isRebuildingRef.current = rebuilding;
+  }, [rebuilding]);
 
   const [optionsInput, setOptionsInput] = React.useState({
     name: 'demo',
@@ -139,7 +143,7 @@ export default function Builder() {
             if (data.includes('Compiled /page')) {
               setLoading(false);
             }
-            if (rebuilding && data.includes('Compiled in')) {
+            if (isRebuildingRef.current && data.includes('Compiled in')) {
               setRebuilding(false);
             }
           },

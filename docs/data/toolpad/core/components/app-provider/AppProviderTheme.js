@@ -27,6 +27,14 @@ const NAVIGATION = [
 
 const customTheme = extendTheme({
   colorSchemes: {
+    light: {
+      palette: {
+        background: {
+          default: '#E2FAFF',
+          paper: '#D9FAFF',
+        },
+      },
+    },
     dark: {
       palette: {
         background: {

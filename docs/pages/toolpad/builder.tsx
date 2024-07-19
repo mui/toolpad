@@ -8,6 +8,7 @@ import {
   CssBaseline,
   GlobalStyles,
   TextField,
+  Typography,
   styled,
 } from '@mui/material';
 
@@ -32,9 +33,14 @@ function ensureFolder(folders: string[], containingFolder: Record<string, any>) 
   return ensureFolder(rest, folder.directory);
 }
 
+type Folder = Record<
+  string,
+  { directory: Folder; file?: undefined } | { directory?: undefined; file: { contents: string } }
+>;
+
 // TODO: generate types for create-toolpad-app API
-function createFiles(options: any) {
-  const files = {};
+function createFiles(options: any): Folder {
+  const files: Folder = {};
   for (const [name, { content }] of generateProject(options)) {
     const segments = name.split('/');
     const folders = segments.slice(0, segments.length - 1);
@@ -47,7 +53,7 @@ function createFiles(options: any) {
 
 async function installDependencies(instance: WebContainer) {
   // Install dependencies
-  const installProcess = await instance.spawn('npm', ['install']);
+  const installProcess = await instance.spawn('npm', ['install', '--force']);
   installProcess.output.pipeTo(
     new WritableStream({
       write(data) {
@@ -63,6 +69,8 @@ async function installDependencies(instance: WebContainer) {
 export default function Builder() {
   const frameRef = React.useRef<HTMLIFrameElement>(null);
   const webcontainerPromiseRef = React.useRef<Promise<WebContainer> | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [rebuilding, setRebuilding] = React.useState(false);
 
   const [optionsInput, setOptionsInput] = React.useState({
     name: 'demo',
@@ -76,16 +84,23 @@ export default function Builder() {
 
     Promise.resolve(webcontainerPromiseRef.current).then(async (instance) => {
       if (instance) {
-        instance.mount(createFiles(newoptions));
+        const newFiles = createFiles(newoptions);
+        const newLayoutContent = newFiles.app.directory?.['layout.tsx'].file?.contents;
+        if (!newLayoutContent) {
+          throw new Error('Layout file not found');
+        }
+        instance.fs.writeFile('/app/layout.tsx', newLayoutContent);
+        setRebuilding(true);
       }
     });
   };
 
   const files = React.useMemo(() => createFiles(optionsValue), [optionsValue]);
 
-  // Stable vale for initial files, do not modify unless you want to reboot the web container
-  // e.g. to load a different runtime
-  const [bootFiles] = React.useState(files);
+  const bootFilesref = React.useRef(files);
+  React.useEffect(() => {
+    bootFilesref.current = files;
+  }, [files]);
 
   React.useEffect(() => {
     if (!frameRef.current) {
@@ -94,14 +109,10 @@ export default function Builder() {
 
     const frame = frameRef.current;
 
-    const webcontainerPromise = Promise.resolve(webcontainerPromiseRef.current).then(
-      async (maybeInstance) => {
-        if (maybeInstance) {
-          await maybeInstance.teardown();
-        }
-        return WebContainer.boot();
-      },
+    const webcontainerPromise = Promise.resolve(webcontainerPromiseRef.current).then(async () =>
+      WebContainer.boot(),
     );
+    setLoading(true);
 
     webcontainerPromiseRef.current = webcontainerPromise;
 
@@ -110,7 +121,7 @@ export default function Builder() {
         return;
       }
 
-      await instance.mount(bootFiles);
+      await instance.mount(bootFilesref.current);
 
       const exitCode = await installDependencies(instance);
       if (exitCode !== 0) {
@@ -119,11 +130,18 @@ export default function Builder() {
 
       // Run `npm run dev` to start the next.js dev server
       const devProcess = await instance.spawn('npm', ['run', 'dev']);
+
       devProcess.output.pipeTo(
         new WritableStream({
           write(data) {
             // eslint-disable-next-line no-console
             console.log(data);
+            if (data.includes('Compiled /page')) {
+              setLoading(false);
+            }
+            if (rebuilding && data.includes('Compiled in')) {
+              setRebuilding(false);
+            }
           },
         }),
       );
@@ -133,9 +151,16 @@ export default function Builder() {
         frame.src = `${url}/page`;
       });
     });
-  }, [bootFiles]);
 
-  const [loading, setLoading] = React.useState(true);
+    return () => {
+      if (!webcontainerPromiseRef.current) {
+        return;
+      }
+      webcontainerPromiseRef.current.then((instance) => {
+        instance.teardown();
+      });
+    };
+  }, []);
 
   return (
     <React.Fragment>
@@ -149,10 +174,13 @@ export default function Builder() {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'stretch',
+          gap: 2,
         }}
       >
         <Box sx={{ width: 250 }}>
           <TextField
+            size="small"
+            fullWidth
             label="Project title"
             value={optionsInput.title}
             onChange={(event) =>
@@ -167,17 +195,20 @@ export default function Builder() {
           </Button>
         </Box>
         <Box sx={{ position: 'relative', flex: 1 }}>
-          {loading ? (
+          {loading || rebuilding ? (
             <Box
               sx={{
                 position: 'absolute',
                 inset: '0 0 0 0',
                 display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
               <CircularProgress />
+              <Typography>TODO: show progress. (check the console)</Typography>
             </Box>
           ) : null}
 
@@ -185,9 +216,6 @@ export default function Builder() {
             ref={frameRef}
             title="Application"
             style={{ display: 'block', width: '100%', height: '100%' }}
-            onLoad={() => {
-              setLoading(false);
-            }}
           />
         </Box>
       </Box>

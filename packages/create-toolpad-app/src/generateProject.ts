@@ -3,6 +3,7 @@ import { PackageJson } from './packageType';
 
 interface GenerateProjectOptions {
   name: string;
+  title?: string;
 }
 
 export default function generateProject(
@@ -12,8 +13,12 @@ export default function generateProject(
   import { AppProvider } from "@toolpad/core/nextjs";
   import DashboardIcon from "@mui/icons-material/Dashboard";
   import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
-  import type { Navigation } from "@toolpad/core";
+  import type { Navigation, Branding } from "@toolpad/core";
   import theme from '../theme';
+
+  const BRANDING: Branding = {
+    title: ${JSON.stringify(options.title ?? 'My Project')},
+  };
 
   const NAVIGATION: Navigation = [
     {
@@ -32,7 +37,7 @@ export default function generateProject(
       <html lang="en" data-mui-color-scheme="light">
         <body>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <AppProvider theme={theme} navigation={NAVIGATION}>
+            <AppProvider theme={theme} branding={BRANDING} navigation={NAVIGATION}>
               {children}
             </AppProvider>
           </AppRouterCacheProvider>

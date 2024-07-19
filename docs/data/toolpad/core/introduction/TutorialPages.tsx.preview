@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <DashboardLayout container={container}>
   <Box
     sx={{
@@ -9,4 +10,8 @@
   >
     <Typography>Dashboard content for {pathname}</Typography>
   </Box>
+=======
+<DashboardLayout>
+  <DemoPageContent pathname={pathname} />
+>>>>>>> upstream/master
 </DashboardLayout>

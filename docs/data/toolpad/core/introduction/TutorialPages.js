@@ -1,6 +1,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
+<<<<<<< HEAD
 import { createTheme } from '@mui/material/styles';
+=======
+>>>>>>> upstream/master
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -26,6 +29,7 @@ const NAVIGATION = [
   },
 ];
 
+<<<<<<< HEAD
 const defaultTheme = createTheme({
   breakpoints: {
     values: {
@@ -146,10 +150,37 @@ const theme = createTheme(defaultTheme, {
     },
   },
 });
+=======
+function DemoPageContent({ pathname }) {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
+}
+
+DemoPageContent.propTypes = {
+  pathname: PropTypes.string.isRequired,
+};
+>>>>>>> upstream/master
 
 function TutorialPages(props) {
   const { window } = props;
 
+<<<<<<< HEAD
+=======
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
+>>>>>>> upstream/master
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
@@ -164,6 +195,7 @@ function TutorialPages(props) {
   const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
+<<<<<<< HEAD
     <AppProvider router={router} navigation={NAVIGATION} theme={theme}>
       <DashboardLayout container={container}>
         <Box
@@ -176,6 +208,11 @@ function TutorialPages(props) {
         >
           <Typography>Dashboard content for {pathname}</Typography>
         </Box>
+=======
+    <AppProvider router={router} navigation={NAVIGATION} window={demoWindow}>
+      <DashboardLayout>
+        <DemoPageContent pathname={pathname} />
+>>>>>>> upstream/master
       </DashboardLayout>
     </AppProvider>
   );

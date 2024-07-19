@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
   <DashboardLayout container={container}>
     <Box
@@ -10,5 +11,10 @@
     >
       <Typography>Dashboard content for {pathname}</Typography>
     </Box>
+=======
+<AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
+  <DashboardLayout>
+    <DemoPageContent pathname={pathname} />
+>>>>>>> upstream/master
   </DashboardLayout>
 </AppProvider>

@@ -3,13 +3,10 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import DescriptionIcon from '@mui/icons-material/Description';
-import LayersIcon from '@mui/icons-material/Layers';
-import { AppProvider, Router } from '@toolpad/core/AppProvider';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation } from '@toolpad/core';
+import type { Navigation, Router } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {
@@ -17,47 +14,36 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/dashboard',
-    title: 'Dashboard',
+    slug: '/page',
+    title: 'Page',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-  {
-    kind: 'divider',
-  },
-  {
-    kind: 'header',
-    title: 'Analytics',
-  },
-  {
-    slug: '/reports',
-    title: 'Reports',
-    icon: <BarChartIcon />,
-    children: [
-      {
-        slug: '/sales',
-        title: 'Sales',
-        icon: <DescriptionIcon />,
-      },
-      {
-        slug: '/traffic',
-        title: 'Traffic',
-        icon: <DescriptionIcon />,
-      },
-    ],
-  },
-  {
-    slug: '/integrations',
-    title: 'Integrations',
-    icon: <LayersIcon />,
+    slug: '/page-2',
+    title: 'Page 2',
+    icon: <TimelineIcon />,
   },
 ];
 
-const demoTheme = extendTheme({
+const customTheme = extendTheme({
+  colorSchemes: {
+    light: {
+      palette: {
+        background: {
+          default: '#E2FAFF',
+          paper: '#D9FAFF',
+        },
+      },
+    },
+    dark: {
+      palette: {
+        background: {
+          default: '#2A4364',
+          paper: '#112E4D',
+        },
+      },
+    },
+  },
   breakpoints: {
     values: {
       xs: 0,
@@ -93,7 +79,7 @@ interface DemoProps {
   window?: () => Window;
 }
 
-export default function DashboardLayoutBasic(props: DemoProps) {
+export default function AppProviderTheme(props: DemoProps) {
   const { window } = props;
 
   const [pathname, setPathname] = React.useState('/page');
@@ -114,7 +100,7 @@ export default function DashboardLayoutBasic(props: DemoProps) {
     <AppProvider
       navigation={NAVIGATION}
       router={router}
-      theme={demoTheme}
+      theme={customTheme}
       window={demoWindow}
     >
       <DashboardLayout>

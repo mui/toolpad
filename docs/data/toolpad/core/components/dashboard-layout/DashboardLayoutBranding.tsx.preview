@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <DashboardLayout container={container}>
   <Box
     sx={{
@@ -10,3 +11,18 @@
     <Typography>Dashboard content for {pathname}</Typography>
   </Box>
 </DashboardLayout>
+=======
+<AppProvider
+  navigation={NAVIGATION}
+  branding={{
+    logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+    title: 'MUI',
+  }}
+  router={router}
+  window={demoWindow}
+>
+  <DashboardLayout>
+    <DemoPageContent pathname={pathname} />
+  </DashboardLayout>
+</AppProvider>
+>>>>>>> upstream/master

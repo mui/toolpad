@@ -25,8 +25,6 @@ The framework follows the open-core model, with some features being available un
 - Built with and exclusively for React ⚛️
 - High performance 🚀
 - [Layout and Navigation](/toolpad/core/react-dashboard-layout/)
-- [Data Providers](/toolpad/core/features/data-providers/)
-- [Data Grid](/toolpad/core/react-data-grid/)
 
 ## Upcoming Features 🚧
 
@@ -38,3 +36,5 @@ Visit the [roadmap](/toolpad/core/introduction/roadmap/) to see more details aro
 - [Dialogs and Notifications](/)
 - [Role-based Access Control](/)
 - [Audit Logs](/)
+- [Data Providers](/)
+- [Data Grid](/)

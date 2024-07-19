@@ -36,16 +36,6 @@ const pages: MuiPage[] = [
         pathname: '/toolpad/core/introduction/support',
         title: 'Support',
       },
-      {
-        pathname: '/toolpad/core/features-group',
-        subheader: 'Features',
-        children: [
-          {
-            pathname: '/toolpad/core/features/data-providers',
-            title: 'Data Providers',
-          },
-        ],
-      },
     ],
   },
   {
@@ -70,20 +60,6 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-dashboard-layout',
             title: 'Dashboard Layout',
-          },
-        ],
-      },
-      {
-        pathname: '/toolpad/core/components/data-group',
-        subheader: 'Data',
-        children: [
-          {
-            pathname: '/toolpad/core/react-data-grid',
-            title: 'Data Grid',
-          },
-          {
-            pathname: '/toolpad/core/react-line-chart',
-            title: 'Line Chart',
           },
         ],
       },

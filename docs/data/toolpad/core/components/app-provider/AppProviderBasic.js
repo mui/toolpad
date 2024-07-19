@@ -1,6 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { createTheme } from '@mui/material/styles';
+import { extendTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -25,7 +25,7 @@ const NAVIGATION = [
   },
 ];
 
-const defaultTheme = createTheme({
+const theme = extendTheme({
   breakpoints: {
     values: {
       xs: 0,
@@ -37,114 +37,25 @@ const defaultTheme = createTheme({
   },
 });
 
-const theme = createTheme(defaultTheme, {
-  palette: {
-    background: {
-      default: defaultTheme.palette.grey['50'],
-    },
-  },
-  typography: {
-    h6: {
-      fontWeight: '700',
-    },
-  },
-  components: {
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          borderWidth: 0,
-          borderBottomWidth: 1,
-          borderStyle: 'solid',
-          borderColor: defaultTheme.palette.divider,
-          boxShadow: 'none',
-        },
-      },
-    },
-    MuiList: {
-      styleOverrides: {
-        root: {
-          padding: 0,
-        },
-      },
-    },
-    MuiIconButton: {
-      styleOverrides: {
-        root: {
-          color: defaultTheme.palette.primary.dark,
-          padding: 8,
-        },
-      },
-    },
-    MuiListSubheader: {
-      styleOverrides: {
-        root: {
-          color: defaultTheme.palette.grey['600'],
-          fontSize: 12,
-          fontWeight: '700',
-          height: 40,
-          paddingLeft: 32,
-        },
-      },
-    },
-    MuiListItem: {
-      styleOverrides: {
-        root: {
-          paddingTop: 0,
-          paddingBottom: 0,
-        },
-      },
-    },
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          '&.Mui-selected': {
-            '& .MuiListItemIcon-root': {
-              color: defaultTheme.palette.primary.dark,
-            },
-            '& .MuiTypography-root': {
-              color: defaultTheme.palette.primary.dark,
-            },
-            '& .MuiSvgIcon-root': {
-              color: defaultTheme.palette.primary.dark,
-            },
-            '& .MuiTouchRipple-child': {
-              backgroundColor: defaultTheme.palette.primary.dark,
-            },
-          },
-          '& .MuiSvgIcon-root': {
-            color: defaultTheme.palette.action.active,
-          },
-        },
-      },
-    },
-    MuiListItemText: {
-      styleOverrides: {
-        root: {
-          '& .MuiTypography-root': {
-            fontWeight: '500',
-          },
-        },
-      },
-    },
-    MuiListItemIcon: {
-      styleOverrides: {
-        root: {
-          minWidth: 34,
-        },
-      },
-    },
-    MuiDivider: {
-      styleOverrides: {
-        root: {
-          borderBottomWidth: 2,
-          marginLeft: '16px',
-          marginRight: '16px',
-        },
-      },
-    },
-  },
-});
+function DemoPageContent({ pathname }) {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
+}
+
+DemoPageContent.propTypes = {
+  pathname: PropTypes.string.isRequired,
+};
 
 function AppProviderBasic(props) {
   const { window } = props;
@@ -160,22 +71,18 @@ function AppProviderBasic(props) {
   }, [pathname]);
 
   // Remove this const when copying and pasting into your project.
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const demoWindow = window !== undefined ? window() : undefined;
 
   return (
     // preview-start
-    <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
-      <DashboardLayout container={container}>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content for {pathname}</Typography>
-        </Box>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={theme}
+      window={demoWindow}
+    >
+      <DashboardLayout>
+        <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end

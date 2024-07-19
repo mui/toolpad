@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.3.1/docs/schemas/v1/definitions.json#properties/Page
+
+apiVersion: v1
+kind: page
+spec:
+  title: Tabs demo
+  content:
+    - component: Tabs
+      name: tabs
+      props:
+        tabs:
+          - title: Products
+            name: products
+          - title: Orders
+            name: orders
+          - title: Invoices
+            name: invoices
+        defaultValue: products
+
+    - component: Container
+      name: container2
+      children:
+        - component: Text
+          name: text
+          props:
+            variant: h2
+            value: Products page
+      props:
+        visible:
+          $$jsExpression: tabs.value === 'products'
+    - component: Container
+      name: container1
+      children:
+        - component: Text
+          name: text1
+          props:
+            value: Orders page
+            variant: h2
+      props:
+        visible:
+          $$jsExpression: tabs.value === 'orders'
+    - component: Container
+      name: container
+      children:
+        - component: Text
+          name: text2
+          props:
+            value: Invoices page
+            variant: h2
+      props:
+        visible:
+          $$jsExpression: tabs.value === 'invoices'

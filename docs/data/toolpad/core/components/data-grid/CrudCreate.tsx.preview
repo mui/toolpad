@@ -1,6 +1,0 @@
-async createOne(values) {
-  const id = getNextId();
-  const newItem = { ...values, id };
-  DATA = [...DATA, newItem];
-  return newItem;
-},

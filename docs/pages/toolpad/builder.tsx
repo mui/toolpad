@@ -7,6 +7,7 @@ import {
   CircularProgress,
   CssBaseline,
   GlobalStyles,
+  Stack,
   TextField,
   Typography,
   styled,
@@ -181,7 +182,7 @@ export default function Builder() {
           gap: 2,
         }}
       >
-        <Box sx={{ width: 250 }}>
+        <Stack sx={{ width: 250, gap: 1 }}>
           <TextField
             size="small"
             fullWidth
@@ -191,13 +192,22 @@ export default function Builder() {
               setOptionsInput((prev) => ({ ...prev, title: event.target.value }))
             }
           />
+          <Typography> {'// TODO: branding icon...'}</Typography>
+          <Typography> {'// TODO: theme colors...'}</Typography>
+          <Typography> {'// TODO: pages...'}</Typography>
           <Button
             onClick={() => handleNewOptions(optionsInput)}
             disabled={optionsInput === optionsValue}
           >
             Apply Changes
           </Button>
-        </Box>
+          <Button
+            // eslint-disable-next-line no-alert
+            onClick={() => window.alert('// TODO: package files and download')}
+          >
+            Download project
+          </Button>
+        </Stack>
         <Box sx={{ position: 'relative', flex: 1 }}>
           {loading || rebuilding ? (
             <Box
@@ -212,7 +222,7 @@ export default function Builder() {
               }}
             >
               <CircularProgress />
-              <Typography>TODO: show progress. (check the console)</Typography>
+              <Typography>{'// TODO: show progress. (check the console for now)'}</Typography>
             </Box>
           ) : null}
 

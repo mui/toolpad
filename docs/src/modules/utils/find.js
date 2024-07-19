@@ -87,7 +87,7 @@ function findPages(
     const pathname = itemPath
       .replace(new RegExp(`\\${path.sep}`, 'g'), '/')
       .replace(/^.*\/pages/, '')
-      .replace('.js', '')
+      .replace(/\.(j|t)sx?$/, '')
       .replace(/^\/index$/, '/') // Replace `index` by `/`.
       .replace(/\/index$/, '');
 

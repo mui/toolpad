@@ -103,8 +103,7 @@ export default function generateProject(
 
   const themeContent = `
   "use client";
-  import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
-  import type {} from '@mui/material/themeCssVarsAugmentation';
+  import { extendTheme } from '@mui/material/styles';
 
   const theme = extendTheme({
     colorSchemes: {
@@ -194,9 +193,9 @@ export default function generateProject(
       'react-dom': '^18',
       next: '^14',
       '@toolpad/core': 'latest',
-      '@mui/material': '^5',
+      '@mui/material': '^6',
       '@mui/material-nextjs': '^5',
-      '@mui/icons-material': '^5',
+      '@mui/icons-material': '^6',
       '@emotion/react': '^11',
       '@emotion/styled': '^11',
       '@emotion/cache': '^11',

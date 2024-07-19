@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { experimental_extendTheme as extendTheme, CssVarsTheme, Theme } from '@mui/material/styles';
+import { extendTheme, CssVarsTheme, Theme } from '@mui/material/styles';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
 import { BrandingContext, NavigationContext, RouterContext } from '../shared/context';

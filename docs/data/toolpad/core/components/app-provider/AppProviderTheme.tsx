@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { createTheme } from '@mui/material/styles';
+import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -25,13 +25,15 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-// TODO: Use CSS vars theme once Toolpad Core uses Material UI v6
-const customTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    background: {
-      default: '#2A4364',
-      paper: '#112E4D',
+const customTheme = extendTheme({
+  colorSchemes: {
+    dark: {
+      palette: {
+        background: {
+          default: '#2A4364',
+          paper: '#112E4D',
+        },
+      },
     },
   },
 });

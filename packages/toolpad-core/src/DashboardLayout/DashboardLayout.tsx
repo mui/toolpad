@@ -24,17 +24,20 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MenuIcon from '@mui/icons-material/Menu';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import useSsr from '@toolpad/utils/hooks/useSsr';
 import {
   BrandingContext,
   NavigationContext,
   PaletteModeContext,
   RouterContext,
+  WindowContext,
 } from '../shared/context';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 
-const DRAWER_WIDTH = 320;
+const DRAWER_WIDTH = 320; // px
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   backgroundColor: (theme.vars ?? theme).palette.background.paper,
@@ -137,12 +140,14 @@ interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
+  onSidebarItemClick?: (item: NavigationPageItem) => void;
 }
 
 function DashboardSidebarSubNavigation({
   subNavigation,
   basePath = '',
   depth = 0,
+  onSidebarItemClick,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
 
@@ -177,14 +182,20 @@ function DashboardSidebarSubNavigation({
   );
 
   const handleSidebarItemClick = React.useCallback(
-    (itemId: string) => () => {
-      setExpandedSidebarItemIds((previousValue) =>
-        previousValue.includes(itemId)
-          ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
-          : [...previousValue, itemId],
-      );
+    (itemId: string, item: NavigationPageItem) => () => {
+      if (item.children) {
+        setExpandedSidebarItemIds((previousValue) =>
+          previousValue.includes(itemId)
+            ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
+            : [...previousValue, itemId],
+        );
+      }
+
+      if (onSidebarItemClick) {
+        onSidebarItemClick(item);
+      }
     },
-    [],
+    [onSidebarItemClick],
   );
 
   const handleLinkClick = React.useMemo(() => {
@@ -251,15 +262,17 @@ function DashboardSidebarSubNavigation({
           <ListItem sx={{ pt: 0, pb: 0 }}>
             <NavigationListItemButton
               selected={pathname === navigationItemFullPath}
-              onClick={handleSidebarItemClick(navigationItemId)}
+              onClick={handleSidebarItemClick(navigationItemId, navigationItem)}
             >
-              <ListItemIcon
-                sx={{
-                  minWidth: 34,
-                }}
-              >
-                {navigationItem.icon}
-              </ListItemIcon>
+              {navigationItem.icon ? (
+                <ListItemIcon
+                  sx={{
+                    minWidth: 34,
+                  }}
+                >
+                  {navigationItem.icon}
+                </ListItemIcon>
+              ) : null}
               <ListItemText
                 primary={navigationItem.title ?? navigationItem.slug}
                 sx={{
@@ -293,6 +306,7 @@ function DashboardSidebarSubNavigation({
                   subNavigation={navigationItem.children}
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
+                  onSidebarItemClick={onSidebarItemClick}
                 />
               </Collapse>
             ) : null}
@@ -325,49 +339,123 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
+  const appWindow = React.useContext(WindowContext);
+
+  const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
+
+  const handleSetMobileNavigationOpen = React.useCallback(
+    (newOpen: boolean) => () => {
+      setIsMobileNavigationOpen(newOpen);
+    },
+    [],
+  );
+
+  const toggleMobileNavigation = React.useCallback(() => {
+    setIsMobileNavigationOpen((previousOpen) => !previousOpen);
+  }, []);
+
+  const handleNavigationItemClick = React.useCallback((item: NavigationPageItem) => {
+    if (!item.children) {
+      setIsMobileNavigationOpen(false);
+    }
+  }, []);
+
+  const drawerContent = (
+    <React.Fragment>
+      <Toolbar />
+      <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}>
+        <DashboardSidebarSubNavigation
+          subNavigation={navigation}
+          onSidebarItemClick={handleNavigationItemClick}
+        />
+      </Box>
+    </React.Fragment>
+  );
 
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
         <Toolbar sx={{ backgroundColor: 'inherit' }}>
-          <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-            <Stack direction="row" alignItems="center">
-              <Box sx={{ mr: 1 }}>
+          <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+            <Tooltip
+              title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
+              placement="right"
+              enterDelay={1000}
+            >
+              <div>
+                <IconButton
+                  aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
+                  onClick={toggleMobileNavigation}
+                  edge="start"
+                  sx={{ ml: 0 }}
+                >
+                  {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
+                </IconButton>
+              </div>
+            </Tooltip>
+          </Box>
+          <Box
+            sx={{
+              position: { xs: 'absolute', md: 'static' },
+              left: { xs: '50%', md: 'auto' },
+              transform: { xs: 'translateX(-50%)', md: 'none' },
+            }}
+          >
+            <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Stack direction="row" alignItems="center">
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
-              </Box>
-              <Typography
-                variant="h6"
-                sx={{
-                  color: (theme) => (theme.vars ?? theme).palette.primary.main,
-                  fontWeight: '700',
-                }}
-              >
-                {branding?.title ?? 'Toolpad'}
-              </Typography>
-            </Stack>
-          </a>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: (theme) => (theme.vars ?? theme).palette.primary.main,
+                    fontWeight: '700',
+                  }}
+                >
+                  {branding?.title ?? 'Toolpad'}
+                </Typography>
+              </Stack>
+            </a>
+          </Box>
           <Box sx={{ flexGrow: 1 }} />
           <ThemeSwitcher />
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="permanent"
+        container={appWindow?.document.body}
+        variant="temporary"
+        open={isMobileNavigationOpen}
+        onClose={handleSetMobileNavigationOpen(false)}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
         sx={{
+          display: { xs: 'block', md: 'none' },
           width: DRAWER_WIDTH,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
+            backgroundImage: 'none',
+            borderRight: (theme) => `1px solid ${(theme.vars ?? theme).palette.divider}`,
           },
         }}
       >
-        <Toolbar />
-        <Box
-          component="nav"
-          sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}
-        >
-          <DashboardSidebarSubNavigation subNavigation={navigation} />
-        </Box>
+        {drawerContent}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          width: DRAWER_WIDTH,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            backgroundImage: 'none',
+          },
+        }}
+      >
+        {drawerContent}
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />

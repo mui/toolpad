@@ -5,6 +5,7 @@
     title: 'MUI',
   }}
   router={router}
+  theme={demoTheme}
   window={demoWindow}
 >
   <DashboardLayout>

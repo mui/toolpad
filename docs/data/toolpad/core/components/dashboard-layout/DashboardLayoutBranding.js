@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -19,6 +20,18 @@ const NAVIGATION = [
     icon: <ShoppingCartIcon />,
   },
 ];
+
+const demoTheme = extendTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
 
 function DemoPageContent({ pathname }) {
   return (
@@ -65,6 +78,7 @@ function DashboardLayoutBranding(props) {
         title: 'MUI',
       }}
       router={router}
+      theme={demoTheme}
       window={demoWindow}
     >
       <DashboardLayout>

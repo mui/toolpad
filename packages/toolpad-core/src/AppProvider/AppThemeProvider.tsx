@@ -109,7 +109,7 @@ interface CSSVarsThemeProviderProps {
  * @ignore - internal component.
  */
 function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
-  const { children, theme, window } = props;
+  const { children, theme, window: appWindow } = props;
 
   const isDualTheme = 'light' in theme.colorSchemes && 'dark' in theme.colorSchemes;
 
@@ -117,8 +117,8 @@ function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
     <CssVarsProvider
       theme={theme}
       defaultMode="system"
-      documentNode={window?.document}
-      colorSchemeNode={window?.document?.body}
+      documentNode={appWindow?.document}
+      colorSchemeNode={appWindow?.document?.body}
     >
       <CSSVarsThemeConsumer isDualTheme={isDualTheme}>{children}</CSSVarsThemeConsumer>
     </CssVarsProvider>
@@ -135,7 +135,7 @@ interface AppThemeProviderProps {
  * @ignore - internal component.
  */
 function AppThemeProvider(props: AppThemeProviderProps) {
-  const { children, theme, window } = props;
+  const { children, theme, window: appWindow } = props;
 
   const isCSSVarsTheme = 'colorSchemes' in theme;
 
@@ -149,7 +149,7 @@ function AppThemeProvider(props: AppThemeProviderProps) {
   return isCSSVarsTheme ? (
     <React.Fragment>
       <InitColorSchemeScript />
-      <CSSVarsThemeProvider theme={theme} window={window}>
+      <CSSVarsThemeProvider theme={theme} window={appWindow}>
         {themeChildren}
       </CSSVarsThemeProvider>
     </React.Fragment>

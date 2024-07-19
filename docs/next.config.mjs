@@ -171,7 +171,7 @@ export default withDocsInfra({
         ],
         headers: async () => [
           {
-            source: '/toolpad/builder',
+            source: '/toolpad/core/builder',
             headers: [
               {
                 key: 'Cross-Origin-Embedder-Policy',

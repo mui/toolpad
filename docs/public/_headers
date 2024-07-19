@@ -7,7 +7,7 @@
 /favicon.ico
   Content-Type: image/x-icon
 
-/toolpad/builder
+/toolpad/core/builder
   # https://webcontainers.io/guides/configuring-headers
   Cross-Origin-Embedder-Policy: require-corp
   Cross-Origin-Opener-Policy: same-origin

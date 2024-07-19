@@ -104,6 +104,7 @@ export default function generateProject(
   const themeContent = `
   "use client";
   import { extendTheme } from '@mui/material/styles';
+  import type {} from '@mui/material/themeCssVarsAugmentation';
 
   const theme = extendTheme({
     colorSchemes: {

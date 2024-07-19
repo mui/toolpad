@@ -84,10 +84,11 @@ export default function Builder() {
 
       // Wait for `server-ready` event
       instance.on('server-ready', (port, url) => {
-        frame.src = url;
+        frame.src = `${url}/page`;
       });
     });
 
+    // eslint-disable-next-line consistent-return
     return () => {
       // webcontainerPromise.then((instance) => instance.teardown());
     };

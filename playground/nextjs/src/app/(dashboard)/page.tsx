@@ -11,6 +11,7 @@ export default function HomePage() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       <Typography variant="h4" component="h1" sx={{ mb: 2 }}>

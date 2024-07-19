@@ -1,14 +1,5 @@
-<AppProvider navigation={NAVIGATION} router={router}>
+<AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
   <DashboardLayout>
-    <Box
-      sx={{
-        py: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <Typography>Dashboard content for {pathname}</Typography>
-    </Box>
+    <DemoPageContent pathname={pathname} />
   </DashboardLayout>
 </AppProvider>

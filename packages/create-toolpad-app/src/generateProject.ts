@@ -195,7 +195,7 @@ export default function generateProject(
       next: '^14',
       '@toolpad/core': 'latest',
       '@mui/material': 'next',
-      '@mui/material-nextjs': '^5',
+      '@mui/material-nextjs': 'next',
       '@mui/icons-material': 'next',
       '@emotion/react': '^11',
       '@emotion/styled': '^11',

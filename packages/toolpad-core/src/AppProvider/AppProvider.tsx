@@ -4,7 +4,12 @@ import PropTypes from 'prop-types';
 import { extendTheme, CssVarsTheme, Theme } from '@mui/material/styles';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
-import { BrandingContext, NavigationContext, RouterContext } from '../shared/context';
+import {
+  BrandingContext,
+  NavigationContext,
+  RouterContext,
+  WindowContext,
+} from '../shared/context';
 import { AppThemeProvider } from './AppThemeProvider';
 
 export interface NavigateOptions {
@@ -101,21 +106,25 @@ function AppProvider(props: AppProviderProps) {
     branding = null,
     navigation = [],
     router = null,
-    window,
+    window: appWindow,
   } = props;
 
   return (
-    <RouterContext.Provider value={router}>
-      <AppThemeProvider theme={theme} window={window}>
-        <NotificationsProvider>
-          <DialogsProvider>
-            <BrandingContext.Provider value={branding}>
-              <NavigationContext.Provider value={navigation}>{children}</NavigationContext.Provider>
-            </BrandingContext.Provider>
-          </DialogsProvider>
-        </NotificationsProvider>
-      </AppThemeProvider>
-    </RouterContext.Provider>
+    <WindowContext.Provider value={appWindow}>
+      <RouterContext.Provider value={router}>
+        <AppThemeProvider theme={theme} window={appWindow}>
+          <NotificationsProvider>
+            <DialogsProvider>
+              <BrandingContext.Provider value={branding}>
+                <NavigationContext.Provider value={navigation}>
+                  {children}
+                </NavigationContext.Provider>
+              </BrandingContext.Provider>
+            </DialogsProvider>
+          </NotificationsProvider>
+        </AppThemeProvider>
+      </RouterContext.Provider>
+    </WindowContext.Provider>
   );
 }
 

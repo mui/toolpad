@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -56,6 +57,18 @@ const NAVIGATION = [
   },
 ];
 
+const demoTheme = extendTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
+
 function DemoPageContent({ pathname }) {
   return (
     <Box
@@ -94,7 +107,12 @@ function DashboardLayoutBasic(props) {
 
   return (
     // preview-start
-    <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={demoTheme}
+      window={demoWindow}
+    >
       <DashboardLayout>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>

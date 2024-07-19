@@ -90,6 +90,8 @@ export default function Builder() {
     Promise.resolve(webcontainerPromiseRef.current).then(async (instance) => {
       if (instance) {
         const newFiles = createFiles(newoptions);
+
+        // TODO: generalize this for all files
         const newLayoutContent = newFiles.app.directory?.['layout.tsx'].file?.contents;
         if (!newLayoutContent) {
           throw new Error('Layout file not found');

@@ -5,6 +5,7 @@ export interface GenerateProjectOptions {
   name: string;
   title?: string;
   prefix?: string;
+  toolpadCoreVersion?: string;
 }
 
 export type Files = Map<string, { content: string }>;
@@ -199,7 +200,7 @@ export default function generateProject(options: GenerateProjectOptions): Files 
       react: '^18',
       'react-dom': '^18',
       next: '^14',
-      '@toolpad/core': 'latest',
+      '@toolpad/core': options.toolpadCoreVersion ?? 'latest',
       '@mui/material': 'next',
       '@mui/material-nextjs': 'next',
       '@mui/icons-material': 'next',

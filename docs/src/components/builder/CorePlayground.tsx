@@ -4,10 +4,24 @@ import { Box, Button, CssBaseline, Stack, TextField, Typography } from '@mui/mat
 import AppViewer from './AppViewer';
 import CodeViewer from './CodeViewer';
 
+function getPackageVersion(packageName: string) {
+  const commitRef = process.env.PULL_REQUEST_ID ? process.env.COMMIT_REF : undefined;
+
+  if (commitRef === undefined) {
+    // #default-branch-switch
+    // Use the "latest" npm tag for the master git branch
+    // Use the "next" npm tag for the next git branch
+    return 'latest';
+  }
+  const shortSha = commitRef.slice(0, 8);
+  return `https://pkg.csb.dev/mui/mui-toolpad/commit/${shortSha}/${packageName}`;
+}
+
 export default function CorePlayground() {
   const [optionsInput, setOptionsInput] = React.useState({
     name: 'demo',
     title: 'Toolpad',
+    toolpadCoreVersion: getPackageVersion('@toolpad/core'),
   });
 
   const [optionsValue, setOptionsValue] = React.useState(optionsInput);

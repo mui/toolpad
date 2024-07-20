@@ -4,6 +4,9 @@ import Box from '@mui/material/Box';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
 import { Files } from 'create-toolpad-app';
 import { styled, SxProps } from '@mui/material';
+import FolderIcon from '@mui/icons-material/Folder';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import CodeIcon from '@mui/icons-material/Code';
 
 const Root = styled('div')(({ theme }) => ({
   width: '100%',
@@ -12,6 +15,7 @@ const Root = styled('div')(({ theme }) => ({
   flexDirection: 'row',
   alignItems: 'stretch',
   background: theme.vars.palette.background.default,
+  border: `1px solid ${theme.vars.palette.divider}`,
   borderRadius: theme.vars.shape.borderRadius,
   overflow: 'hidden',
   gap: theme.spacing(1),
@@ -66,7 +70,12 @@ export default function CodeViewer({ sx, files = new Map() }: CodeViewerProps) {
   return (
     <Root sx={sx}>
       <RichTreeView
-        sx={{ width: 200, overflow: 'auto' }}
+        sx={{ width: 200, overflow: 'auto', m: 1 }}
+        slots={{
+          expandIcon: FolderIcon,
+          collapseIcon: FolderOpenIcon,
+          endIcon: CodeIcon,
+        }}
         items={fileTree}
         getItemId={getItemId}
         selectedItems={selectedPath}

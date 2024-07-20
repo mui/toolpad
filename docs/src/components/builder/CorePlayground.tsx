@@ -2,6 +2,7 @@ import * as React from 'react';
 import { generateProject } from 'create-toolpad-app';
 import { Box, Button, CssBaseline, Stack, TextField, Typography } from '@mui/material';
 import AppViewer from './AppViewer';
+import CodeViewer from './CodeViewer';
 
 export default function CorePlayground() {
   const [optionsInput, setOptionsInput] = React.useState({
@@ -16,6 +17,8 @@ export default function CorePlayground() {
   };
 
   const projectFiles = React.useMemo(() => generateProject(optionsValue), [optionsValue]);
+
+  const [showCode, setShowCode] = React.useState(false);
 
   return (
     <React.Fragment>
@@ -56,14 +59,14 @@ export default function CorePlayground() {
           >
             Download project
           </Button>
-          <Button
-            // eslint-disable-next-line no-alert
-            onClick={() => window.alert('// TODO: Show code files in code editor (read only)')}
-          >
-            Code view
-          </Button>
+          <Button onClick={() => setShowCode((prev) => !prev)}>Code view</Button>
         </Stack>
-        <AppViewer sx={{ position: 'relative', flex: 1 }} files={projectFiles} />
+        <Box sx={{ position: 'relative', flex: 1 }}>
+          <AppViewer files={projectFiles} />
+          {showCode ? (
+            <CodeViewer sx={{ position: 'absolute', inset: '0 0 0 0' }} files={projectFiles} />
+          ) : null}
+        </Box>
       </Box>
     </React.Fragment>
   );

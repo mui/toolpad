@@ -4,6 +4,7 @@ import { PackageJson } from './packageType';
 export interface GenerateProjectOptions {
   name: string;
   title?: string;
+  prefix?: string;
 }
 
 export type Files = Map<string, { content: string }>;

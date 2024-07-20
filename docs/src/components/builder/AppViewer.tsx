@@ -1,7 +1,13 @@
 import * as React from 'react';
 import { WebContainer } from '@webcontainer/api';
-import { Box, CircularProgress, Typography, styled } from '@mui/material';
+import { Box, CircularProgress, SxProps, Typography, styled } from '@mui/material';
 import { Files } from 'create-toolpad-app';
+
+const Root = styled('div')({
+  width: '100%',
+  height: '100%',
+  position: 'relative',
+});
 
 const AppFrame = styled('iframe')(({ theme }) => ({
   border: `1px solid ${theme.vars.palette.divider}`,
@@ -59,7 +65,7 @@ async function installDependencies(instance: WebContainer) {
 }
 
 export interface AppViewerProps {
-  sx?: React.CSSProperties;
+  sx?: SxProps;
   files?: Files;
 }
 
@@ -170,7 +176,7 @@ export default function AppViewer({ sx, files = new Map() }: AppViewerProps) {
   }, [files]);
 
   return (
-    <Box sx={sx}>
+    <Root sx={sx}>
       {loading || rebuilding ? (
         <Box
           sx={{
@@ -193,6 +199,6 @@ export default function AppViewer({ sx, files = new Map() }: AppViewerProps) {
         title="Application"
         style={{ display: 'block', width: '100%', height: '100%' }}
       />
-    </Box>
+    </Root>
   );
 }

@@ -103,8 +103,8 @@ importers:
         specifier: 1.0.13
         version: 1.0.13
       '@mui/monorepo':
-        specifier: github:mui/material-ui#3aec5b59c66a8c4c1d1d36d30c1cec6e21ba00a4
-        version: https://codeload.github.com/mui/material-ui/tar.gz/3aec5b59c66a8c4c1d1d36d30c1cec6e21ba00a4(encoding@0.1.13)
+        specifier: github:mui/material-ui#5fa1deb1eabf08b1821667665bf1a0be136c1c10
+        version: https://codeload.github.com/mui/material-ui/tar.gz/5fa1deb1eabf08b1821667665bf1a0be136c1c10(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.11.0
         version: 7.11.0(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-beta.2(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -330,6 +330,9 @@ importers:
       '@mui/x-license':
         specifier: 7.11.0
         version: 7.11.0(@types/react@18.3.3)(react@18.3.1)
+      '@mui/x-tree-view':
+        specifier: 7.11.0
+        version: 7.11.0(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-beta.2(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../packages/toolpad-core
@@ -2373,8 +2376,8 @@ packages:
     resolution: {integrity: sha512-HW6/2oThc4X086mGkZxpdP4P+aHpYbjHa6wr9l1F/R+snpk6G8/EuRXEcTkgQUl2t/NdNz3lj8re0AQBG5faSA==}
     engines: {node: '>=12.0.0'}
 
-  '@googleapis/sheets@5.0.5':
-    resolution: {integrity: sha512-XMoONmgAJm2jYeTYHX4054VcEkElxlgqmnHvt0wAurzEHoGJLdUHhTAJXGPLgSs4WVMPtgU8HLrmk7/U+Qlw7A==}
+  '@googleapis/sheets@8.0.0':
+    resolution: {integrity: sha512-EwLC+bMLTz3n2EDJMhMdrNR+aTxDBPpcq3k6Ibc4eKrp8UbytNAEB0VgfQFOGJN7+BTCcjiojt08O/cwn+YnHg==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sheets@9.0.0':
@@ -2806,9 +2809,9 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/3aec5b59c66a8c4c1d1d36d30c1cec6e21ba00a4':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/3aec5b59c66a8c4c1d1d36d30c1cec6e21ba00a4}
-    version: 5.16.4
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/5fa1deb1eabf08b1821667665bf1a0be136c1c10':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/5fa1deb1eabf08b1821667665bf1a0be136c1c10}
+    version: 6.0.0-beta.0
     engines: {pnpm: 9.4.0}
 
   '@mui/private-theming@5.16.4':
@@ -11348,7 +11351,7 @@ snapshots:
       - encoding
       - supports-color
 
-  '@googleapis/sheets@5.0.5(encoding@0.1.13)':
+  '@googleapis/sheets@8.0.0(encoding@0.1.13)':
     dependencies:
       googleapis-common: 7.2.0(encoding@0.1.13)
     transitivePeerDependencies:
@@ -11887,12 +11890,12 @@ snapshots:
       '@emotion/styled': 11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@types/react': 18.3.3
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/3aec5b59c66a8c4c1d1d36d30c1cec6e21ba00a4(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/5fa1deb1eabf08b1821667665bf1a0be136c1c10(encoding@0.1.13)':
     dependencies:
-      '@googleapis/sheets': 5.0.5(encoding@0.1.13)
+      '@googleapis/sheets': 8.0.0(encoding@0.1.13)
       '@netlify/functions': 2.8.1
       '@slack/bolt': 3.19.0
-      execa: 8.0.1
+      execa: 9.3.0
       google-auth-library: 9.11.0(encoding@0.1.13)
     transitivePeerDependencies:
       - bufferutil
@@ -12263,6 +12266,25 @@ snapshots:
       '@emotion/styled': 11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@mui/base': 5.0.0-beta.40(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mui/material': 5.16.4(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@mui/system': 5.16.4(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
+      '@mui/utils': 5.16.4(@types/react@18.3.3)(react@18.3.1)
+      '@mui/x-internals': 7.11.0(@types/react@18.3.3)(react@18.3.1)
+      '@types/react-transition-group': 4.4.10
+      clsx: 2.1.1
+      prop-types: 15.8.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-transition-group: 4.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+
+  '@mui/x-tree-view@7.11.0(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-beta.2(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@babel/runtime': 7.24.8
+      '@emotion/react': 11.11.4(@types/react@18.3.3)(react@18.3.1)
+      '@emotion/styled': 11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
+      '@mui/base': 5.0.0-beta.40(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@mui/material': 6.0.0-beta.2(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mui/system': 5.16.4(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@mui/utils': 5.16.4(@types/react@18.3.3)(react@18.3.1)
       '@mui/x-internals': 7.11.0(@types/react@18.3.3)(react@18.3.1)

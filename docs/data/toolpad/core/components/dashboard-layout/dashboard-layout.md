@@ -43,6 +43,10 @@ The flexibility in composing and ordering these different elements allows for a 
 
 ## Account
 
-The `DashboardLayout` comes integrated with the [`<Account />`](/toolpad/core/react-account/) component. It renders as an account management menu when a user is signed in, and a text button when not.
+The `DashboardLayout` comes integrated with the [`<Account />`](/toolpad/core/react-account/) component. It renders as an account management menu when a user is signed in, i.e. a `session` object is present, and a button when not.
 
-{{"demo": "../account/AccountSignedIn.js", "height": 320, "iframe": true}}
+:::warning
+The use of an `iframe` may cause some spacing issues in the following demo.
+:::
+
+{{"demo": "../account/AccountWithDashboard.js", "iframe": true, "height": 320 }}

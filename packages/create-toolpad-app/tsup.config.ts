@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['./src/index.ts', './src/api.ts'],
+  entry: ['./src/api.ts', './src/index.ts'],
   silent: true,
   noExternal: ['chalk', 'execa', 'inquirer'],
   clean: true,

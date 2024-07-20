@@ -37,6 +37,7 @@
     "@mui/utils": "next",
     "@mui/x-date-pickers": "7.11.0",
     "@mui/x-license": "7.11.0",
+    "@mui/x-tree-view": "7.11.0",
     "@toolpad/core": "workspace:*",
     "@toolpad/studio": "workspace:*",
     "@trendmicro/react-interpolate": "0.5.5",

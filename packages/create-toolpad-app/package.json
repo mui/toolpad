@@ -19,6 +19,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/api.d.ts",
       "import": "./dist/api.mjs",
       "require": "./dist/api.js"
     }

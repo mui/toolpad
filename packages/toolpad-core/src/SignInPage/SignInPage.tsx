@@ -19,8 +19,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import Stack from '@mui/material/Stack';
-import { BrandingContext } from '../AppProvider';
-import { DocsContext } from '../internal';
+import { BrandingContext, DocsContext } from '../shared/context';
 
 const IconProviderMap = new Map<string, React.ReactNode>([
   ['github', <GitHubIcon key="github" />],
@@ -350,7 +349,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
    * @param {AuthProvider} provider The authentication provider.
    * @param {FormData} formData The form data if the provider id is 'credentials'.\
    * @param {string} callbackUrl The URL to redirect to after signing in.
-   * @returns {Promise<AuthResponse> | void}
+   * @returns {void|Promise<AuthResponse>}
    * @default undefined
    */
   signIn: PropTypes.func,

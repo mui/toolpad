@@ -39,9 +39,9 @@ type Folder = Record<
 >;
 
 // TODO: generate types for create-toolpad-app API
-function createFiles(options: any): Folder {
+function createWebcontainerFiles(flatFiles: Map<string, { content: string }>): Folder {
   const files: Folder = {};
-  for (const [name, { content }] of generateProject(options)) {
+  for (const [name, { content }] of flatFiles) {
     const segments = name.split('/');
     const folders = segments.slice(0, segments.length - 1);
     const folder = ensureFolder(folders, files);
@@ -88,10 +88,10 @@ export default function CorePlayground() {
 
     Promise.resolve(webcontainerPromiseRef.current).then(async (instance) => {
       if (instance) {
-        const newFiles = createFiles(newoptions);
+        const newFiles = generateProject(newoptions);
 
         // TODO: generalize this for all files
-        const newLayoutContent = newFiles.app.directory?.['layout.tsx'].file?.contents;
+        const newLayoutContent = newFiles.get('app/layout.tsx')?.content;
         if (!newLayoutContent) {
           throw new Error('Layout file not found');
         }
@@ -101,12 +101,17 @@ export default function CorePlayground() {
     });
   };
 
-  const files = React.useMemo(() => createFiles(optionsValue), [optionsValue]);
+  const projectFiles = React.useMemo(() => generateProject(optionsValue), [optionsValue]);
 
-  const bootFilesref = React.useRef(files);
+  const webcontainerFiles = React.useMemo(
+    () => createWebcontainerFiles(projectFiles),
+    [projectFiles],
+  );
+
+  const bootFilesref = React.useRef(webcontainerFiles);
   React.useEffect(() => {
-    bootFilesref.current = files;
-  }, [files]);
+    bootFilesref.current = webcontainerFiles;
+  }, [webcontainerFiles]);
 
   React.useEffect(() => {
     if (!frameRef.current) {

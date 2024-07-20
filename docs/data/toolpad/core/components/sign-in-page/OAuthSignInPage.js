@@ -14,7 +14,7 @@ const signIn = async (provider) => {
   const promise = new Promise((resolve) => {
     setTimeout(() => {
       alert(`Signing in with "${provider.name}"`);
-      resolve('');
+      resolve();
     }, 300);
   });
   return promise;

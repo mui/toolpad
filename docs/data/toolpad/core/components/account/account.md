@@ -12,16 +12,16 @@ The `Account` component is a quick and easy way to display an account management
 
 ## Unauthenticated
 
-When signed out, the component renders as an inline sign in button within the dashboard layout
+When signed out, the component renders as an inline sign in button within the dashboard layout.
 
-{{"demo": "AccountSignedOut.js", "iframe": "true", "height": 500}}
+{{"demo": "AccountSignedOut.js", "bg": "outlined"}}
 
 ## Authenticated
 
 Once signed in, the component is rendered as a dropdown containing the user's account details as well as an option to sign out.
 
-{{"demo": "AccountSignedIn.js", "iframe": "true", "height": 500}}
+{{"demo": "AccountSignedIn.js", "bg": "gradient"}}
 
 ## 🚧 Customization
 
-The `Account` component will allow adding your own menu options, including deeply nested options, through `slots`. This is in progress.
+The `Account` component will allow adding your own menu options, including deeply nested options. This is in progress.

@@ -18,41 +18,28 @@ The `SignInPage` component can be set up with an OAuth provider by passing in a 
 
 ## Credentials
 
+:::warning
+It is recommended to use the OAuth provider for more robust maintenance, support and security.
+:::
+
 To render a username password form, pass in a provider with `credentials` as the `id` property. The `signIn` function will accept a `formData` parameter in this case.
 
 {{"demo": "CredentialsSignInPage.js", "iframe": true, "height": 500}}
 
-## Notifications
+### Alerts
 
-The `signIn` prop takes a `Promise` which can either resolve with a success message, or reject with an `Error`. `SignInPage` integrates with the [`NotificationsProvider`](/toolpad/core/react-use-notifications/) by default to display notifications in either case.
+The `signIn` prop takes a function which can either return `void` or a `Promise` which resolves with an `AuthResponse` object of the form:
 
-### Success
-
-The success notification contains the string returned by the `signIn` function. An empty string disables the notification.
-
-:::info
-Try signing in with different providers to see this behavior in action.
-:::
-
-{{"demo": "NotificationsSignInPageSuccess.js", "iframe": true, "height": 400}}
-
-### Error
-
-Error notifications are displayed when the `signIn` function throws an error. Throwing an error of the form of:
-
-```tsx
-throw new Error('Invalid credentials.');
+```ts
+interface AuthResponse {
+  error?: string;
+  type?: string;
+}
 ```
 
-will result in "Invalid credentials." being shown in the error notification.
+This will render an alert with the `error` string as the message.
 
-Throwing an empty error – such as `throw new Error('')` – results in a default message in the notification.
-
-:::info
-Try signing in with a random string, `password`, and `default` as the passwords to see this behavior in action.
-:::
-
-{{"demo": "NotificationsSignInPageError.js", "iframe": true, "height": 500}}
+{{"demo": "NotificationsSignInPageError.js", "iframe": true, "height": 600}}
 
 ## Usage with authentication libraries
 
@@ -63,7 +50,7 @@ Try signing in with a random string, `password`, and `default` as the passwords 
 The component is composable with any authentication library you might want to use. The following is a functional `SignInPage` with [auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
 :::warning
-The following demo will not initiate an actual GitHub authentication flow, since doing that from within an `iframe` is not permitted.
+The following demo will not initiate an actual GitHub authentication flow, since doing that from within an `iframe` is not permitted. Run the [Next.js app directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/) example to test this functionality.
 :::
 
 {{"demo": "AuthJsSignInApp.js", "iframe": true, "height": 300 }}

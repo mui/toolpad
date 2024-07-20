@@ -1,11 +1,10 @@
+resolve({
+  type: 'CredentialsSignin',
+  error: 'Invalid credentials.',
+});
+
+// ...
+
 <AppProvider>
-  <SignInPage
-    signIn={signIn}
-    providers={providers}
-    slotProps={{
-      emailField: {
-        autoFocus: false,
-      },
-    }}
-  />
+  <SignInPage signIn={signIn} providers={providers} />
 </AppProvider>

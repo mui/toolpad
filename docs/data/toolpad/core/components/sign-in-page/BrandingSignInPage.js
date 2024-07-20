@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import { AppProvider, SignInPage } from '@toolpad/core';
 import { createTheme } from '@mui/material/styles';
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
@@ -26,7 +25,7 @@ const signIn = async (provider) => {
   const promise = new Promise((resolve) => {
     setTimeout(() => {
       alert(`Signing in with "${provider.name}"`);
-      resolve('Signed in!');
+      resolve();
     }, 300);
   });
   return promise;

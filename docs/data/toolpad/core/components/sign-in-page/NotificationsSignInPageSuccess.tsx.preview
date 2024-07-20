@@ -1,3 +1,0 @@
-<AppProvider>
-  <SignInPage signIn={signIn} providers={providers} />
-</AppProvider>

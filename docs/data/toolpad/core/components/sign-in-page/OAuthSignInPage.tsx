@@ -9,11 +9,11 @@ const providers = [
 ];
 // preview-end
 
-const signIn: (provider: AuthProvider) => Promise<string> = async (provider) => {
-  const promise = new Promise<string>((resolve) => {
+const signIn: (provider: AuthProvider) => void = async (provider) => {
+  const promise = new Promise<void>((resolve) => {
     setTimeout(() => {
       alert(`Signing in with "${provider.name}"`);
-      resolve('');
+      resolve();
     }, 300);
   });
   return promise;

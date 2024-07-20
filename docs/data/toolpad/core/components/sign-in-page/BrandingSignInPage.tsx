@@ -1,5 +1,4 @@
 import * as React from 'react';
-
 import { AuthProvider, AppProvider, SignInPage } from '@toolpad/core';
 import { createTheme } from '@mui/material/styles';
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
@@ -22,11 +21,11 @@ const BRANDING = {
   title: 'MUI',
 };
 
-const signIn: (provider: AuthProvider) => Promise<string> = async (provider) => {
-  const promise = new Promise<string>((resolve) => {
+const signIn: (provider: AuthProvider) => void = async (provider) => {
+  const promise = new Promise<void>((resolve) => {
     setTimeout(() => {
       alert(`Signing in with "${provider.name}"`);
-      resolve('Signed in!');
+      resolve();
     }, 300);
   });
   return promise;

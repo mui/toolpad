@@ -3,6 +3,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Avatar from '@mui/material/Avatar';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
@@ -19,7 +20,7 @@ import PasswordIcon from '@mui/icons-material/Password';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import Stack from '@mui/material/Stack';
 import { BrandingContext } from '../AppProvider';
-import { useNotifications } from '../useNotifications';
+import { DocsContext } from '../internal';
 
 const IconProviderMap = new Map<string, React.ReactNode>([
   ['github', <GitHubIcon key="github" />],
@@ -67,6 +68,19 @@ export interface AuthProvider {
   name: string;
 }
 
+export interface AuthResponse {
+  /**
+   * The error message if the sign-in failed.
+   * @default ''
+   */
+  error?: string;
+  /**
+   * The type of error that occurred.
+   * @default ''
+   */
+  type?: string;
+}
+
 export interface SignInPageProps {
   /**
    * The list of authentication providers to display.
@@ -78,10 +92,14 @@ export interface SignInPageProps {
    * @param {AuthProvider} provider The authentication provider.
    * @param {FormData} formData The form data if the provider id is 'credentials'.\
    * @param {string} callbackUrl The URL to redirect to after signing in.
-   * @returns {void} | {string}
+   * @returns {void|Promise<AuthResponse>}
    * @default undefined
    */
-  signIn?: (provider: AuthProvider, formData?: any, callbackUrl?: string) => void | Promise<string>;
+  signIn?: (
+    provider: AuthProvider,
+    formData?: any,
+    callbackUrl?: string,
+  ) => void | Promise<AuthResponse>;
   /**
    * Props to pass to the constituent components in the credentials form
    * @default {}
@@ -109,13 +127,16 @@ export interface SignInPageProps {
 function SignInPage(props: SignInPageProps) {
   const { providers, signIn, slotProps } = props;
   const branding = React.useContext(BrandingContext);
+  const docs = React.useContext(DocsContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
-  const [{ loading, providerId }, setFormStatus] = React.useState<{
+  const [{ loading, providerId, error }, setFormStatus] = React.useState<{
     loading: boolean;
     providerId: string;
+    error?: string;
   }>({
     providerId: '',
     loading: false,
+    error: '',
   });
 
   const callbackUrl =
@@ -124,8 +145,6 @@ function SignInPage(props: SignInPageProps) {
       : '/';
 
   const singleProvider = React.useMemo(() => providers?.length === 1, [providers]);
-
-  const notifications = useNotifications();
 
   return (
     <Container component="main" maxWidth="xs">
@@ -151,6 +170,7 @@ function SignInPage(props: SignInPageProps) {
         </Typography>
         <Box sx={{ mt: 2 }}>
           <Stack spacing={1}>
+            {error && providerId !== 'credentials' ? <Alert severity="error">{error}</Alert> : null}
             {Object.values(providers ?? {}).map((provider) => {
               if (provider.id === 'credentials') {
                 return null;
@@ -160,23 +180,13 @@ function SignInPage(props: SignInPageProps) {
                   key={provider.id}
                   onSubmit={async (event) => {
                     event.preventDefault();
-                    setFormStatus((prev) => ({ ...prev, providerId: provider.id, loading: true }));
-                    try {
-                      const oAuthResponse = await signIn?.(provider);
-                      if (oAuthResponse) {
-                        notifications.show(oAuthResponse, {
-                          severity: 'success',
-                          autoHideDuration: 30000,
-                        });
-                      }
-                    } catch (error) {
-                      notifications.show((error as Error)?.message || 'Something went wrong', {
-                        severity: 'error',
-                        autoHideDuration: 30000,
-                      });
-                    } finally {
-                      setFormStatus((prev) => ({ ...prev, loading: false }));
-                    }
+                    setFormStatus({ error: '', providerId: provider.id, loading: true });
+                    const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
+                    setFormStatus((prev) => ({
+                      ...prev,
+                      loading: false,
+                      error: oauthResponse?.error,
+                    }));
                   }}
                 >
                   <LoadingButton
@@ -210,40 +220,32 @@ function SignInPage(props: SignInPageProps) {
           {credentialsProvider ? (
             <React.Fragment>
               {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+              {error && providerId === 'credentials' ? (
+                <Alert sx={{ my: 2 }} severity="error">
+                  {error}
+                </Alert>
+              ) : null}
               <Box
                 component="form"
                 onSubmit={async (event) => {
                   setFormStatus({
+                    error: '',
                     providerId: credentialsProvider.id,
                     loading: true,
                   });
                   event.preventDefault();
-                  try {
-                    const formData = new FormData(event.currentTarget);
-                    const credentialsResponse = await signIn?.(
-                      credentialsProvider,
-                      formData,
-                      callbackUrl,
-                    );
-                    if (credentialsResponse) {
-                      notifications.show(credentialsResponse, {
-                        severity: 'success',
-                        autoHideDuration: 30000,
-                      });
-                    }
-                  } catch (error) {
-                    notifications.show((error as Error)?.message || 'Something went wrong.', {
-                      severity: 'error',
-                      autoHideDuration: 30000,
-                    });
-                  } finally {
-                    setFormStatus((prev) => ({
-                      ...prev,
-                      loading: false,
-                    }));
-                  }
+                  const formData = new FormData(event.currentTarget);
+                  const credentialsResponse = await signIn?.(
+                    credentialsProvider,
+                    formData,
+                    callbackUrl,
+                  );
+                  setFormStatus((prev) => ({
+                    ...prev,
+                    loading: false,
+                    error: credentialsResponse?.error,
+                  }));
                 }}
-                noValidate
               >
                 <TextField
                   margin="dense"
@@ -260,7 +262,7 @@ function SignInPage(props: SignInPageProps) {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  autoFocus={singleProvider}
+                  autoFocus={docs ? false : singleProvider}
                   {...slotProps?.emailField}
                 />
                 <TextField
@@ -348,7 +350,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
    * @param {AuthProvider} provider The authentication provider.
    * @param {FormData} formData The form data if the provider id is 'credentials'.\
    * @param {string} callbackUrl The URL to redirect to after signing in.
-   * @returns {void} | {string}
+   * @returns {Promise<AuthResponse> | void}
    * @default undefined
    */
   signIn: PropTypes.func,

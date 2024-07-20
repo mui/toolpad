@@ -8,9 +8,8 @@
       "type": { "name": "func" },
       "default": "undefined",
       "signature": {
-        "type": "function(provider: AuthProvider, formData: FormData, callbackUrl: string) => void",
-        "describedArgs": ["provider", "formData", "callbackUrl"],
-        "returned": "void"
+        "type": "function(provider: AuthProvider, formData: FormData, callbackUrl: string) => Promise<AuthResponse> | void",
+        "describedArgs": ["provider", "formData", "callbackUrl"]
       }
     },
     "slotProps": {

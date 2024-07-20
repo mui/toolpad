@@ -14,9 +14,8 @@ import {
 
 const AppFrame = styled('iframe')(({ theme }) => ({
   border: `1px solid ${theme.vars.palette.divider}`,
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: theme.vars.shape.borderRadius,
   overflow: 'hidden',
-
   width: '100%',
   height: '100%',
 }));

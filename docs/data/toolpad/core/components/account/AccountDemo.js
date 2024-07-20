@@ -24,13 +24,7 @@ export default function AccountDemo() {
   return (
     <AuthenticationContext.Provider value={authentication}>
       <SessionContext.Provider value={session}>
-        <Account
-          slotProps={{
-            iconButton: { color: 'primary' },
-            signOutButton: { color: 'secondary' },
-          }}
-          signOutLabel="Logout"
-        />
+        <Account />
       </SessionContext.Provider>
     </AuthenticationContext.Provider>
   );

@@ -5,7 +5,7 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ iconButton?: object, signInButton?: object, signOutButton?: object }"
+        "description": "{ avatar?: object, iconButton?: object, signInButton?: object, signOutButton?: object }"
       },
       "default": "{}"
     }

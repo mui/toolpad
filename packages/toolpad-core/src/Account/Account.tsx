@@ -176,6 +176,7 @@ Account.propTypes /* remove-proptypes */ = {
    * @example { signInButton: { color: 'primary' }, signOutButton: { color: 'secondary' } }
    */
   slotProps: PropTypes.shape({
+    avatar: PropTypes.object,
     iconButton: PropTypes.object,
     signInButton: PropTypes.object,
     signOutButton: PropTypes.object,

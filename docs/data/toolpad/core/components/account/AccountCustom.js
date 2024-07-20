@@ -6,7 +6,6 @@ export default function AccountCustom() {
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        alert('Signing in!');
         setSession({
           user: {
             name: 'Bharat Kashyap',
@@ -27,9 +26,18 @@ export default function AccountCustom() {
       <SessionContext.Provider value={session}>
         <Account
           slotProps={{
-            iconButton: { color: 'primary' },
-            signOutButton: { color: 'secondary' },
+            signInButton: {
+              color: 'info',
+              variant: 'outlined',
+              sx: {
+                color: 'primaryDark',
+                fontFamily: 'Inter',
+                fontSize: '1em',
+              },
+            },
+            signOutButton: { color: 'primary', variant: 'outlined' },
           }}
+          signInLabel="Login"
           signOutLabel="Logout"
         />
       </SessionContext.Provider>

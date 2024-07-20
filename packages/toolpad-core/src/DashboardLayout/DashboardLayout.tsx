@@ -105,6 +105,7 @@ function ThemeSwitcher() {
           sx={{
             color: (theme.vars ?? theme).palette.primary.dark,
             padding: 1,
+            marginRight: 1,
           }}
         >
           {theme.getColorSchemeSelector ? (
@@ -418,8 +419,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </a>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <Account />
           <ThemeSwitcher />
+          <Account />
         </Toolbar>
       </AppBar>
       <Drawer

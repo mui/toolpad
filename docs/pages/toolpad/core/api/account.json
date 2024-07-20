@@ -1,5 +1,15 @@
 {
-  "props": {},
+  "props": {
+    "signInLabel": { "type": { "name": "string" }, "default": "'Sign In'" },
+    "signOutLabel": { "type": { "name": "string" }, "default": "'Sign Out'" },
+    "slotProps": {
+      "type": {
+        "name": "shape",
+        "description": "{ iconButton?: object, signInButton?: object, signOutButton?: object }"
+      },
+      "default": "{}"
+    }
+  },
   "name": "Account",
   "imports": [
     "import { Account } from '@toolpad/core/Account';",

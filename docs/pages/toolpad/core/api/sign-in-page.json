@@ -8,7 +8,7 @@
       "type": { "name": "func" },
       "default": "undefined",
       "signature": {
-        "type": "function(provider: AuthProvider, formData: FormData, callbackUrl: string) => Promise<AuthResponse> | void",
+        "type": "function(provider: AuthProvider, formData: FormData, callbackUrl: string) => void | Promise<AuthResponse>",
         "describedArgs": ["provider", "formData", "callbackUrl"]
       }
     },

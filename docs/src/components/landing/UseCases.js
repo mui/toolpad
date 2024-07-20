@@ -107,7 +107,7 @@ export default function CardGrid() {
           }
         />
         <Grid container spacing={5} sx={{ mt: { xs: 1, sm: 4 } }}>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <ImageContainer noLinkStyle href="/toolpad/studio/examples/npm-stats/">
               <Img
                 src="/static/toolpad/docs/studio/examples/npm-stats.png"
@@ -123,7 +123,7 @@ export default function CardGrid() {
               href="/toolpad/studio/examples/npm-stats/"
             />
           </Grid>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <ImageContainer noLinkStyle href="/toolpad/studio/examples/basic-crud-app/">
               <Img
                 src="/static/toolpad/docs/studio/examples/basic-crud-app.png"
@@ -138,7 +138,7 @@ export default function CardGrid() {
               href="/toolpad/studio/examples/basic-crud-app/"
             />
           </Grid>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <ImageContainer noLinkStyle href="/toolpad/studio/examples/qr-generator/">
               <Img
                 src="/static/toolpad/docs/studio/examples/qr-generator.png"
@@ -155,7 +155,7 @@ export default function CardGrid() {
               href="/toolpad/studio/examples/qr-generator/"
             />
           </Grid>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box
               sx={[
                 (theme) => ({

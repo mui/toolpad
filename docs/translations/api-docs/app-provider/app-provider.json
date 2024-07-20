@@ -8,7 +8,10 @@
     "router": { "description": "Router implementation used inside Toolpad components." },
     "session": { "description": "Session info about the current user." },
     "theme": {
-      "description": "<a href=\"https://mui.com/material-ui/customization/theming/\">Theme</a> used by the app."
+      "description": "<a href=\"https://mui.com/toolpad/core/react-app-provider/#theming\">Theme or themes</a> to be used by the app in light/dark mode. A <a href=\"https://mui.com/material-ui/experimental-api/css-theme-variables/overview/\">CSS variables theme</a> is recommended."
+    },
+    "window": {
+      "description": "The window where the application is rendered. This is needed when rendering the app inside an iframe, for example."
     }
   },
   "classDescriptions": {}

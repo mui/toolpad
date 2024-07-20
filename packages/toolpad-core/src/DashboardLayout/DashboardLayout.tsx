@@ -1,12 +1,14 @@
+'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material';
-import AppBar from '@mui/material/AppBar';
+import { styled, useTheme } from '@mui/material';
+import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -15,21 +17,38 @@ import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type {} from '@mui/material/themeCssVarsAugmentation';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MenuIcon from '@mui/icons-material/Menu';
+import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import useSsr from '@toolpad/utils/hooks/useSsr';
 import { Account } from '../Account';
-
 import {
   BrandingContext,
-  Navigation,
   NavigationContext,
-  NavigationPageItem,
+  PaletteModeContext,
   RouterContext,
-} from '../AppProvider/AppProvider';
+  WindowContext,
+} from '../shared/context';
+import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 
-const DRAWER_WIDTH = 320;
+const DRAWER_WIDTH = 320; // px
+
+const AppBar = styled(MuiAppBar)(({ theme }) => ({
+  backgroundColor: (theme.vars ?? theme).palette.background.paper,
+  borderWidth: 0,
+  borderBottomWidth: 1,
+  borderStyle: 'solid',
+  borderColor: (theme.vars ?? theme).palette.divider,
+  boxShadow: 'none',
+  zIndex: theme.zIndex.drawer + 1,
+}));
 
 const LogoContainer = styled('div')({
   position: 'relative',
@@ -39,16 +58,97 @@ const LogoContainer = styled('div')({
   },
 });
 
+const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
+  borderRadius: 8,
+  '&.Mui-selected': {
+    '& .MuiListItemIcon-root': {
+      color: (theme.vars ?? theme).palette.primary.dark,
+    },
+    '& .MuiTypography-root': {
+      color: (theme.vars ?? theme).palette.primary.dark,
+    },
+    '& .MuiSvgIcon-root': {
+      color: (theme.vars ?? theme).palette.primary.dark,
+    },
+    '& .MuiTouchRipple-child': {
+      backgroundColor: (theme.vars ?? theme).palette.primary.dark,
+    },
+  },
+  '& .MuiSvgIcon-root': {
+    color: (theme.vars ?? theme).palette.action.active,
+  },
+}));
+
+function ThemeSwitcher() {
+  const isSsr = useSsr();
+  const theme = useTheme();
+
+  const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
+
+  const toggleMode = React.useCallback(() => {
+    setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
+  }, [paletteMode, setPaletteMode]);
+
+  return isDualTheme ? (
+    <Tooltip
+      title={isSsr ? 'Switch mode' : `${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`}
+      enterDelay={1000}
+    >
+      <div>
+        <IconButton
+          aria-label={
+            isSsr
+              ? 'Switch theme mode'
+              : `Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`
+          }
+          onClick={toggleMode}
+          sx={{
+            color: (theme.vars ?? theme).palette.primary.dark,
+            padding: 1,
+          }}
+        >
+          {theme.getColorSchemeSelector ? (
+            <React.Fragment>
+              <DarkModeIcon
+                sx={{
+                  [theme.getColorSchemeSelector('dark')]: {
+                    display: 'none',
+                  },
+                }}
+              />
+              <LightModeIcon
+                sx={{
+                  display: 'none',
+                  [theme.getColorSchemeSelector('dark')]: {
+                    display: 'inline',
+                  },
+                }}
+              />
+            </React.Fragment>
+          ) : null}
+          {!theme.getColorSchemeSelector ? (
+            <React.Fragment>
+              {isSsr || paletteMode !== 'dark' ? <DarkModeIcon /> : <LightModeIcon />}
+            </React.Fragment>
+          ) : null}
+        </IconButton>
+      </div>
+    </Tooltip>
+  ) : null;
+}
+
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
+  onSidebarItemClick?: (item: NavigationPageItem) => void;
 }
 
 function DashboardSidebarSubNavigation({
   subNavigation,
   basePath = '',
   depth = 0,
+  onSidebarItemClick,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
 
@@ -74,10 +174,7 @@ function DashboardSidebarSubNavigation({
               );
             }),
         )
-        .map(
-          ({ navigationItem, originalIndex }) =>
-            `${(navigationItem as NavigationPageItem).title}-${depth}-${originalIndex}`,
-        ),
+        .map(({ originalIndex }) => `${depth}-${originalIndex}`),
     [basePath, depth, pathname, subNavigation],
   );
 
@@ -86,14 +183,20 @@ function DashboardSidebarSubNavigation({
   );
 
   const handleSidebarItemClick = React.useCallback(
-    (itemId: string) => () => {
-      setExpandedSidebarItemIds((previousValue) =>
-        previousValue.includes(itemId)
-          ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
-          : [...previousValue, itemId],
-      );
+    (itemId: string, item: NavigationPageItem) => () => {
+      if (item.children) {
+        setExpandedSidebarItemIds((previousValue) =>
+          previousValue.includes(itemId)
+            ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
+            : [...previousValue, itemId],
+        );
+      }
+
+      if (onSidebarItemClick) {
+        onSidebarItemClick(item);
+      }
     },
-    [],
+    [onSidebarItemClick],
   );
 
   const handleLinkClick = React.useMemo(() => {
@@ -108,11 +211,20 @@ function DashboardSidebarSubNavigation({
   }, [routerContext]);
 
   return (
-    <List sx={{ mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
+    <List sx={{ padding: 0, mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
       {subNavigation.map((navigationItem, navigationItemIndex) => {
         if (navigationItem.kind === 'header') {
           return (
-            <ListSubheader key={`subheader-${depth}-${navigationItemIndex}`} component="div">
+            <ListSubheader
+              key={`subheader-${depth}-${navigationItemIndex}`}
+              component="div"
+              sx={{
+                fontSize: 12,
+                fontWeight: '700',
+                height: 40,
+                pl: 4,
+              }}
+            >
               {navigationItem.title}
             </ListSubheader>
           );
@@ -124,14 +236,20 @@ function DashboardSidebarSubNavigation({
           return (
             <Divider
               key={`divider-${depth}-${navigationItemIndex}`}
-              sx={{ mt: 1, mb: nextItem.kind === 'header' ? 0 : 1 }}
+              sx={{
+                borderBottomWidth: 2,
+                ml: 2,
+                mr: 2,
+                mt: 1,
+                mb: nextItem?.kind === 'header' ? 0 : 1,
+              }}
             />
           );
         }
 
         const navigationItemFullPath = `${basePath}${navigationItem.slug ?? ''}`;
 
-        const navigationItemId = `${navigationItem.title}-${depth}-${navigationItemIndex}`;
+        const navigationItemId = `${depth}-${navigationItemIndex}`;
 
         const isNestedNavigationExpanded = expandedSidebarItemIds.includes(navigationItemId);
 
@@ -142,15 +260,30 @@ function DashboardSidebarSubNavigation({
         );
 
         const listItem = (
-          <ListItem>
-            <ListItemButton
+          <ListItem sx={{ pt: 0, pb: 0 }}>
+            <NavigationListItemButton
               selected={pathname === navigationItemFullPath}
-              onClick={handleSidebarItemClick(navigationItemId)}
+              onClick={handleSidebarItemClick(navigationItemId, navigationItem)}
             >
-              <ListItemIcon>{navigationItem.icon}</ListItemIcon>
-              <ListItemText primary={navigationItem.title} />
+              {navigationItem.icon ? (
+                <ListItemIcon
+                  sx={{
+                    minWidth: 34,
+                  }}
+                >
+                  {navigationItem.icon}
+                </ListItemIcon>
+              ) : null}
+              <ListItemText
+                primary={navigationItem.title ?? navigationItem.slug}
+                sx={{
+                  '& .MuiTypography-root': {
+                    fontWeight: '500',
+                  },
+                }}
+              />
               {navigationItem.children ? nestedNavigationCollapseIcon : null}
-            </ListItemButton>
+            </NavigationListItemButton>
           </ListItem>
         );
 
@@ -174,6 +307,7 @@ function DashboardSidebarSubNavigation({
                   subNavigation={navigationItem.children}
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
+                  onSidebarItemClick={onSidebarItemClick}
                 />
               </Collapse>
             ) : null}
@@ -206,49 +340,124 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
+  const appWindow = React.useContext(WindowContext);
+
+  const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
+
+  const handleSetMobileNavigationOpen = React.useCallback(
+    (newOpen: boolean) => () => {
+      setIsMobileNavigationOpen(newOpen);
+    },
+    [],
+  );
+
+  const toggleMobileNavigation = React.useCallback(() => {
+    setIsMobileNavigationOpen((previousOpen) => !previousOpen);
+  }, []);
+
+  const handleNavigationItemClick = React.useCallback((item: NavigationPageItem) => {
+    if (!item.children) {
+      setIsMobileNavigationOpen(false);
+    }
+  }, []);
+
+  const drawerContent = (
+    <React.Fragment>
+      <Toolbar />
+      <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}>
+        <DashboardSidebarSubNavigation
+          subNavigation={navigation}
+          onSidebarItemClick={handleNavigationItemClick}
+        />
+      </Box>
+    </React.Fragment>
+  );
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <AppBar
-        color="inherit"
-        position="fixed"
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-      >
-        <Toolbar>
-          <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-            <Stack direction="row" alignItems="center">
-              <Box sx={{ mr: 1 }}>
+      <AppBar color="inherit" position="fixed">
+        <Toolbar sx={{ backgroundColor: 'inherit' }}>
+          <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+            <Tooltip
+              title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
+              placement="right"
+              enterDelay={1000}
+            >
+              <div>
+                <IconButton
+                  aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
+                  onClick={toggleMobileNavigation}
+                  edge="start"
+                  sx={{ ml: 0 }}
+                >
+                  {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
+                </IconButton>
+              </div>
+            </Tooltip>
+          </Box>
+          <Box
+            sx={{
+              position: { xs: 'absolute', md: 'static' },
+              left: { xs: '50%', md: 'auto' },
+              transform: { xs: 'translateX(-50%)', md: 'none' },
+            }}
+          >
+            <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+              <Stack direction="row" alignItems="center">
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
-              </Box>
-              <Typography variant="h6" sx={{ color: (theme) => theme.palette.primary.main }}>
-                {branding?.title ?? 'Toolpad'}
-              </Typography>
-            </Stack>
-          </a>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: (theme) => (theme.vars ?? theme).palette.primary.main,
+                    fontWeight: '700',
+                  }}
+                >
+                  {branding?.title ?? 'Toolpad'}
+                </Typography>
+              </Stack>
+            </a>
+          </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Account />
+          <ThemeSwitcher />
         </Toolbar>
       </AppBar>
       <Drawer
-        variant="permanent"
+        container={appWindow?.document.body}
+        variant="temporary"
+        open={isMobileNavigationOpen}
+        onClose={handleSetMobileNavigationOpen(false)}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
         sx={{
+          display: { xs: 'block', md: 'none' },
           width: DRAWER_WIDTH,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
+            backgroundImage: 'none',
+            borderRight: (theme) => `1px solid ${(theme.vars ?? theme).palette.divider}`,
           },
         }}
       >
-        <Toolbar />
-        <Box
-          component="nav"
-          sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}
-        >
-          <DashboardSidebarSubNavigation subNavigation={navigation} />
-        </Box>
+        {drawerContent}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          width: DRAWER_WIDTH,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            backgroundImage: 'none',
+          },
+        }}
+      >
+        {drawerContent}
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />

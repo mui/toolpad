@@ -1150,6 +1150,9 @@ importers:
       title:
         specifier: 3.5.3
         version: 3.5.3
+      vitest:
+        specifier: 2.0.0-beta.13
+        version: 2.0.0-beta.13(@types/node@20.14.11)(@vitest/browser@2.0.0-beta.13)(jsdom@24.1.0)(terser@5.31.1)
       yaml:
         specifier: 2.4.5
         version: 2.4.5

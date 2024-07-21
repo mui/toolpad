@@ -121,7 +121,7 @@
     "invariant": "2.2.4",
     "lodash": "4.17.21",
     "react-swipeable-views": "^0.14.0",
-    "semver": "7.6.2",
+    "semver": "7.6.3",
     "tsup": "8.1.0",
     "tsx": "4.16.2",
     "vitest": "beta",

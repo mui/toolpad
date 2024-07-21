@@ -117,7 +117,7 @@
     "cross-env": "7.0.3",
     "dotenv-cli": "7.4.2",
     "eslint-import-resolver-exports": "1.0.0-beta.5",
-    "inquirer": "9.3.5",
+    "inquirer": "9.3.6",
     "invariant": "2.2.4",
     "lodash": "4.17.21",
     "react-swipeable-views": "^0.14.0",

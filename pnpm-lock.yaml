@@ -836,8 +836,8 @@ importers:
         specifier: 0.50.0
         version: 0.50.0
       mysql2:
-        specifier: 3.10.2
-        version: 3.10.2
+        specifier: 3.10.3
+        version: 3.10.3
       nanoid:
         specifier: 5.0.7
         version: 5.0.7
@@ -4499,6 +4499,10 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
+  aws-ssl-profiles@1.1.1:
+    resolution: {integrity: sha512-+H+kuK34PfMaI9PNU/NSjBKL5hh/KDM9J72kwYeYEm0A8B1AC4fuCy3qsjnA7lxklgyXsB68yn8Z2xoZEjgwCQ==}
+    engines: {node: '>= 6.0.0'}
+
   axe-core@4.9.1:
     resolution: {integrity: sha512-QbUdXJVTpvUTHU7871ppZkdOLBeGUKBQWHkHrvN2V9IQWGMt61zf3B45BtzjxEJzYuj0JBjBZP/hmYS/R9pmAw==}
     engines: {node: '>=4'}
@@ -7428,8 +7432,8 @@ packages:
     resolution: {integrity: sha512-avsJQhyd+680gKXyG/sQc0nXaC6rBkPOfyHYcFb9+hdkqQkR9bdnkJ0AMZhke0oesPqIO+mFFJ+IdBc7mst4IA==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
-  mysql2@3.10.2:
-    resolution: {integrity: sha512-KCXPEvAkO0RcHPr362O5N8tFY2fXvbjfkPvRY/wGumh4EOemo9Hm5FjQZqv/pCmrnuxGu5OxnSENG0gTXqKMgQ==}
+  mysql2@3.10.3:
+    resolution: {integrity: sha512-k43gmH9i79rZD4hGPdj7pDuT0UBiFjs4UzXEy1cJrV0QqcSABomoLwvejqdbcXN+Vd7gi999CVM6o9vCPKq29g==}
     engines: {node: '>= 8.0'}
 
   mz@2.7.0:
@@ -13860,6 +13864,8 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.0.0
 
+  aws-ssl-profiles@1.1.1: {}
+
   axe-core@4.9.1: {}
 
   axios@1.7.2(debug@4.3.5):
@@ -17322,8 +17328,9 @@ snapshots:
 
   mute-stream@1.0.0: {}
 
-  mysql2@3.10.2:
+  mysql2@3.10.3:
     dependencies:
+      aws-ssl-profiles: 1.1.1
       denque: 2.1.0
       generate-function: 2.3.1
       iconv-lite: 0.6.3

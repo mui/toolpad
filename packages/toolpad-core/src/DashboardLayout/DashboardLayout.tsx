@@ -239,29 +239,6 @@ function DashboardSidebarSubNavigation({
           <ExpandMoreIcon />
         );
 
-        const listItemContent = (
-          <React.Fragment>
-            {navigationItem.icon ? (
-              <ListItemIcon
-                sx={{
-                  minWidth: 34,
-                }}
-              >
-                {navigationItem.icon}
-              </ListItemIcon>
-            ) : null}
-            <ListItemText
-              primary={navigationItem.title ?? navigationItem.segment}
-              sx={{
-                '& .MuiTypography-root': {
-                  fontWeight: '500',
-                },
-              }}
-            />
-            {navigationItem.children ? nestedNavigationCollapseIcon : null}
-          </React.Fragment>
-        );
-
         const listItem = (
           <ListItem sx={{ pt: 0, pb: 0 }}>
             <NavigationListItemButton
@@ -275,7 +252,24 @@ function DashboardSidebarSubNavigation({
                     href: navigationItemFullPath,
                   })}
             >
-              {listItemContent}
+              {navigationItem.icon ? (
+                <ListItemIcon
+                  sx={{
+                    minWidth: 34,
+                  }}
+                >
+                  {navigationItem.icon}
+                </ListItemIcon>
+              ) : null}
+              <ListItemText
+                primary={navigationItem.title ?? navigationItem.segment}
+                sx={{
+                  '& .MuiTypography-root': {
+                    fontWeight: '500',
+                  },
+                }}
+              />
+              {navigationItem.children ? nestedNavigationCollapseIcon : null}
             </NavigationListItemButton>
           </ListItem>
         );

@@ -7,12 +7,33 @@ import {
   styled,
   TextareaAutosize,
   SxProps,
+  Typography,
 } from '@mui/material';
 import { useNode } from '@toolpad/studio-runtime';
 import ErrorIcon from '@mui/icons-material/Error';
 import { errorFrom } from '@toolpad/utils/errors';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
+
+const StaticTextRoot = styled(Typography)({
+  // This will give it height, even when empty.
+  // REMARK: Does it make sense to put it in MUI core?
+  [`&:empty::before`]: { content: '""', display: 'inline-block' },
+  outline: 'none',
+  whiteSpace: 'pre-wrap',
+  overflowWrap: 'anywhere',
+});
+
+const ToolpadLink = styled(MuiLink, {
+  shouldForwardProp: (prop) => prop !== 'hasMinWidth',
+})<{
+  hasMinWidth?: boolean;
+}>(({ hasMinWidth }) => ({
+  minWidth: hasMinWidth ? 150 : undefined,
+  // Same as Typography
+  [`&:empty::before`]: { content: '""', display: 'inline-block' },
+  overflowWrap: 'anywhere',
+}));
 
 const Markdown = React.lazy(async () => import('markdown-to-jsx'));
 
@@ -135,21 +156,18 @@ function LinkContent({ value, href, loading, sx, openInNewTab }: LinkContentProp
     return value;
   }, [value, loading]);
 
+  const hasMinWidth = loading || !value;
+
   return (
-    <MuiLink
+    <ToolpadLink
       href={href}
       target={openInNewTab ? '_blank' : undefined}
       rel="noopener"
-      sx={{
-        minWidth: loading || !value ? 150 : undefined,
-        // Same as Typography
-        [`&:empty::before`]: { content: '""', display: 'inline-block' },
-        overflowWrap: 'anywhere',
-        ...sx,
-      }}
+      hasMinWidth={hasMinWidth}
+      sx={sx}
     >
       {content}
-    </MuiLink>
+    </ToolpadLink>
   );
 }
 
@@ -240,16 +258,8 @@ function TextContent({ value, loading, sx, variant }: TextContentProps) {
       className={`variant-${variant}`}
     />
   ) : (
-    <MuiTypography
-      sx={{
-        ...sx,
-        // This will give it height, even when empty.
-        // REMARK: Does it make sense to put it in MUI core?
-        [`&:empty::before`]: { content: '""', display: 'inline-block' },
-        outline: 'none',
-        whiteSpace: 'pre-wrap',
-        overflowWrap: 'anywhere',
-      }}
+    <StaticTextRoot
+      sx={sx}
       variant={variant}
       onDoubleClick={() => {
         if (nodeRuntime) {
@@ -262,7 +272,7 @@ function TextContent({ value, loading, sx, variant }: TextContentProps) {
       }}
     >
       {loading ? <Skeleton variant="text" /> : input}
-    </MuiTypography>
+    </StaticTextRoot>
   );
 }
 

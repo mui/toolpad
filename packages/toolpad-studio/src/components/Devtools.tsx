@@ -7,6 +7,10 @@ import Console, { LogEntry } from './Console';
 import lazyComponent from '../utils/lazyComponent';
 import CenteredSpinner from './CenteredSpinner';
 
+const DevtoolsRoot = styled('div')({
+  flexDirection: 'column',
+});
+
 const HarViewer = lazyComponent(() => import('./HarViewer'), {
   fallback: <CenteredSpinner />,
 });
@@ -62,12 +66,7 @@ export default function Devtools({ sx, log, onLogClear, har, onHarClear }: Devto
   }, [activeTab, onHarClear, onLogClear]);
 
   return (
-    <Box
-      sx={{
-        ...sx,
-        flexDirection: 'column',
-      }}
-    >
+    <DevtoolsRoot sx={sx}>
       <TabContext value={activeTab}>
         <Box
           sx={{
@@ -120,6 +119,6 @@ export default function Devtools({ sx, log, onLogClear, har, onHarClear }: Devto
           </DebuggerTabPanel>
         ) : null}
       </TabContext>
-    </Box>
+    </DevtoolsRoot>
   );
 }

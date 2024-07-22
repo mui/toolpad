@@ -1,0 +1,12 @@
+<DataGrid
+  height={250}
+  dataProvider={myData}
+  columns={[
+    // renders header name from data provider
+    { field: 'id' },
+    // overrides header name from data provider
+    { field: 'name', headerName: 'First name' },
+    // adds a new column
+    { field: 'greeting', valueGetter: (_, row) => `Hi, ${row.name}` },
+  ]}
+/>

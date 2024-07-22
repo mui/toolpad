@@ -1,0 +1,1 @@
+<DataGrid height={300} dataProvider={npmData} />

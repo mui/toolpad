@@ -1,0 +1,864 @@
+{
+  "props": {
+    "dataProvider": {
+      "type": {
+        "name": "shape",
+        "description": "{ createOne?: func, deleteOne?: func, fields?: object, getMany: func, getOne?: func, idField?: object, updateOne?: func }"
+      }
+    },
+    "height": { "type": { "name": "number" } }
+  },
+  "name": "DataGrid",
+  "imports": [
+    "import { DataGrid } from '@toolpad-core/DataGrid';",
+    "import { DataGrid } from '@toolpad-core';"
+  ],
+  "classes": [
+    {
+      "key": "actionsCell",
+      "className": "",
+      "description": "Styles applied to the root element of the cell with type=\"actions\".",
+      "isGlobal": false
+    },
+    {
+      "key": "aggregationColumnHeader",
+      "className": "",
+      "description": "Styles applied to the root element of the column header when aggregated.",
+      "isGlobal": false
+    },
+    {
+      "key": "aggregationColumnHeader--alignCenter",
+      "className": "",
+      "description": "Styles applied to the root element of the header when aggregation if `headerAlign=\"center\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "aggregationColumnHeader--alignLeft",
+      "className": "",
+      "description": "Styles applied to the root element of the header when aggregation if `headerAlign=\"left\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "aggregationColumnHeader--alignRight",
+      "className": "",
+      "description": "Styles applied to the root element of the header when aggregation if `headerAlign=\"right\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "aggregationColumnHeaderLabel",
+      "className": "",
+      "description": "Styles applied to the aggregation label in the column header when aggregated.",
+      "isGlobal": false
+    },
+    {
+      "key": "autoHeight",
+      "className": "",
+      "description": "Styles applied to the root element if `autoHeight={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "autosizing",
+      "className": "",
+      "description": "Styles applied to the root element while it is being autosized.",
+      "isGlobal": false
+    },
+    {
+      "key": "booleanCell",
+      "className": "",
+      "description": "Styles applied to the icon of the boolean cell.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell",
+      "className": "",
+      "description": "Styles applied to the cell element.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--editable",
+      "className": "",
+      "description": "Styles applied to the cell element if the cell is editable.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--editing",
+      "className": "",
+      "description": "Styles applied to the cell element if the cell is in edit mode.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--flex",
+      "className": "",
+      "description": "Styles applied to the cell element in flex display mode.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--pinnedLeft",
+      "className": "",
+      "description": "Styles applied to the cell element if it is pinned to the left.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--pinnedRight",
+      "className": "",
+      "description": "Styles applied to the cell element if it is pinned to the right.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--rangeBottom",
+      "className": "",
+      "description": "Styles applied to the cell element if it is at the bottom edge of a cell selection range.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--rangeLeft",
+      "className": "",
+      "description": "Styles applied to the cell element if it is at the left edge of a cell selection range.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--rangeRight",
+      "className": "",
+      "description": "Styles applied to the cell element if it is at the right edge of a cell selection range.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--rangeTop",
+      "className": "",
+      "description": "Styles applied to the cell element if it is at the top edge of a cell selection range.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--selectionMode",
+      "className": "",
+      "description": "Styles applied to the cell element if it is in a cell selection range.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--textCenter",
+      "className": "",
+      "description": "Styles applied to the cell element if `align=\"center\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--textLeft",
+      "className": "",
+      "description": "Styles applied to the cell element if `align=\"left\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--textRight",
+      "className": "",
+      "description": "Styles applied to the cell element if `align=\"right\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--withLeftBorder",
+      "className": "",
+      "description": "Styles applied the cell if `showColumnVerticalBorder={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "cell--withRightBorder",
+      "className": "",
+      "description": "Styles applied the cell if `showColumnVerticalBorder={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "cellCheckbox",
+      "className": "",
+      "description": "Styles applied to the cell checkbox element.",
+      "isGlobal": false
+    },
+    {
+      "key": "cellEmpty",
+      "className": "",
+      "description": "Styles applied to the empty cell element.",
+      "isGlobal": false
+    },
+    {
+      "key": "cellSkeleton",
+      "className": "",
+      "description": "Styles applied to the skeleton cell element.",
+      "isGlobal": false
+    },
+    {
+      "key": "checkboxInput",
+      "className": "",
+      "description": "Styles applied to the selection checkbox element.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader",
+      "className": "",
+      "description": "Styles applied to the column header element.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--alignCenter",
+      "className": "",
+      "description": "Styles applied to the column header if `headerAlign=\"center\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--alignLeft",
+      "className": "",
+      "description": "Styles applied to the column header if `headerAlign=\"left\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--alignRight",
+      "className": "",
+      "description": "Styles applied to the column header if `headerAlign=\"right\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--dragging",
+      "className": "",
+      "description": "Styles applied to the floating column header element when it is dragged.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--emptyGroup",
+      "className": "",
+      "description": "Styles applied to the empty column group header cell.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--filledGroup",
+      "className": "",
+      "description": "Styles applied to the column group header cell if not empty.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--filtered",
+      "className": "",
+      "description": "Styles applied to the column header if the column has a filter applied to it.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--last",
+      "className": "",
+      "description": "Styles applied to the last column header element.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--moving",
+      "className": "",
+      "description": "Styles applied to the column header if it is being dragged.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--numeric",
+      "className": "",
+      "description": "Styles applied to the column header if the type of the column is `number`.",
+      "isGlobal": false
+    },
+    { "key": "columnHeader--pinnedLeft", "className": "", "description": "", "isGlobal": false },
+    { "key": "columnHeader--pinnedRight", "className": "", "description": "", "isGlobal": false },
+    {
+      "key": "columnHeader--sortable",
+      "className": "",
+      "description": "Styles applied to the column header if the column is sortable.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--sorted",
+      "className": "",
+      "description": "Styles applied to the column header if the column is sorted.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--withLeftBorder",
+      "className": "",
+      "description": "",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeader--withRightBorder",
+      "className": "",
+      "description": "Styles applied the column header if `showColumnVerticalBorder={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeaderCheckbox",
+      "className": "",
+      "description": "Styles applied to the header checkbox cell element.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeaderDraggableContainer",
+      "className": "",
+      "description": "Styles applied to the column header's draggable container element.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeaders",
+      "className": "",
+      "description": "Styles applied to the column headers.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeaderTitle",
+      "className": "",
+      "description": "Styles applied to the column header's title element;",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeaderTitleContainer",
+      "className": "",
+      "description": "Styles applied to the column header's title container element.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnHeaderTitleContainerContent",
+      "className": "",
+      "description": "Styles applied to the column header's title excepted buttons.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnSeparator",
+      "className": "",
+      "description": "Styles applied to the column header separator element.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnSeparator--resizable",
+      "className": "",
+      "description": "Styles applied to the column header separator if the column is resizable.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnSeparator--resizing",
+      "className": "",
+      "description": "Styles applied to the column header separator if the column is being resized.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnSeparator--sideLeft",
+      "className": "",
+      "description": "Styles applied to the column header separator if the side is \"left\".",
+      "isGlobal": false
+    },
+    {
+      "key": "columnSeparator--sideRight",
+      "className": "",
+      "description": "Styles applied to the column header separator if the side is \"right\".",
+      "isGlobal": false
+    },
+    {
+      "key": "columnsManagement",
+      "className": "",
+      "description": "Styles applied to the columns management body.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnsManagementFooter",
+      "className": "",
+      "description": "Styles applied to the columns management footer element.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnsManagementHeader",
+      "className": "",
+      "description": "Styles applied to the columns management header element.",
+      "isGlobal": false
+    },
+    {
+      "key": "columnsManagementRow",
+      "className": "",
+      "description": "Styles applied to the columns management row element.",
+      "isGlobal": false
+    },
+    {
+      "key": "container--bottom",
+      "className": "",
+      "description": "Styles applied to the bottom container.",
+      "isGlobal": false
+    },
+    {
+      "key": "container--top",
+      "className": "",
+      "description": "Styles applied to the top container.",
+      "isGlobal": false
+    },
+    {
+      "key": "detailPanel",
+      "className": "",
+      "description": "Styles applied to the detail panel element.",
+      "isGlobal": false
+    },
+    {
+      "key": "detailPanels",
+      "className": "",
+      "description": "Styles applied to the detail panels wrapper element.",
+      "isGlobal": false
+    },
+    {
+      "key": "detailPanelToggleCell",
+      "className": "",
+      "description": "Styles applied to the detail panel toggle cell element.",
+      "isGlobal": false
+    },
+    {
+      "key": "detailPanelToggleCell--expanded",
+      "className": "",
+      "description": "Styles applied to the detail panel toggle cell element if expanded.",
+      "isGlobal": false
+    },
+    {
+      "key": "editBooleanCell",
+      "className": "",
+      "description": "Styles applied to root of the boolean edit component.",
+      "isGlobal": false
+    },
+    {
+      "key": "editInputCell",
+      "className": "",
+      "description": "Styles applied to the root of the input component.",
+      "isGlobal": false
+    },
+    {
+      "key": "filterForm",
+      "className": "",
+      "description": "Styles applied to the root of the filter form component.",
+      "isGlobal": false
+    },
+    {
+      "key": "filterFormColumnInput",
+      "className": "",
+      "description": "Styles applied to the column input of the filter form component.",
+      "isGlobal": false
+    },
+    {
+      "key": "filterFormDeleteIcon",
+      "className": "",
+      "description": "Styles applied to the delete icon of the filter form component.",
+      "isGlobal": false
+    },
+    {
+      "key": "filterFormLogicOperatorInput",
+      "className": "",
+      "description": "Styles applied to the link operator input of the filter form component.",
+      "isGlobal": false
+    },
+    {
+      "key": "filterFormOperatorInput",
+      "className": "",
+      "description": "Styles applied to the operator input of the filter form component.",
+      "isGlobal": false
+    },
+    {
+      "key": "filterFormValueInput",
+      "className": "",
+      "description": "Styles applied to the value input of the filter form component.",
+      "isGlobal": false
+    },
+    {
+      "key": "filterIcon",
+      "className": "",
+      "description": "Styles applied to the filter icon element.",
+      "isGlobal": false
+    },
+    {
+      "key": "footerCell",
+      "className": "",
+      "description": "Styles applied to the root element of the cell inside a footer row.",
+      "isGlobal": false
+    },
+    {
+      "key": "footerContainer",
+      "className": "",
+      "description": "Styles applied to the footer container element.",
+      "isGlobal": false
+    },
+    {
+      "key": "groupingCriteriaCell",
+      "className": "",
+      "description": "Styles applied to the root element of the grouping criteria cell",
+      "isGlobal": false
+    },
+    {
+      "key": "groupingCriteriaCellToggle",
+      "className": "",
+      "description": "Styles applied to the toggle of the grouping criteria cell",
+      "isGlobal": false
+    },
+    {
+      "key": "headerFilterRow",
+      "className": "",
+      "description": "Styles applied to the column header filter row.",
+      "isGlobal": false
+    },
+    {
+      "key": "iconButtonContainer",
+      "className": "",
+      "description": "Styles applied to the column header icon's container.",
+      "isGlobal": false
+    },
+    {
+      "key": "iconSeparator",
+      "className": "",
+      "description": "Styles applied to the column header separator icon element.",
+      "isGlobal": false
+    },
+    {
+      "key": "main",
+      "className": "",
+      "description": "Styles applied to the main container element.",
+      "isGlobal": false
+    },
+    {
+      "key": "main--hasPinnedRight",
+      "className": "",
+      "description": "Styles applied to the main container element when it has right pinned columns.",
+      "isGlobal": false
+    },
+    {
+      "key": "menu",
+      "className": "",
+      "description": "Styles applied to the menu element.",
+      "isGlobal": false
+    },
+    {
+      "key": "menuIcon",
+      "className": "",
+      "description": "Styles applied to the menu icon element.",
+      "isGlobal": false
+    },
+    {
+      "key": "menuIconButton",
+      "className": "",
+      "description": "Styles applied to the menu icon button element.",
+      "isGlobal": false
+    },
+    {
+      "key": "menuList",
+      "className": "",
+      "description": "Styles applied to the menu list element.",
+      "isGlobal": false
+    },
+    {
+      "key": "menuOpen",
+      "className": "",
+      "description": "Styles applied to the menu icon element if the menu is open.",
+      "isGlobal": false
+    },
+    {
+      "key": "overlay",
+      "className": "",
+      "description": "Styles applied to the overlay element.",
+      "isGlobal": false
+    },
+    {
+      "key": "overlayWrapper",
+      "className": "",
+      "description": "Styles applied to the overlay wrapper element.",
+      "isGlobal": false
+    },
+    {
+      "key": "overlayWrapperInner",
+      "className": "",
+      "description": "Styles applied to the overlay wrapper inner element.",
+      "isGlobal": false
+    },
+    {
+      "key": "panel",
+      "className": "",
+      "description": "Styles applied to the panel element.",
+      "isGlobal": false
+    },
+    {
+      "key": "panelContent",
+      "className": "",
+      "description": "Styles applied to the panel content element.",
+      "isGlobal": false
+    },
+    {
+      "key": "panelFooter",
+      "className": "",
+      "description": "Styles applied to the panel footer element.",
+      "isGlobal": false
+    },
+    {
+      "key": "panelHeader",
+      "className": "",
+      "description": "Styles applied to the panel header element.",
+      "isGlobal": false
+    },
+    {
+      "key": "panelWrapper",
+      "className": "",
+      "description": "Styles applied to the panel wrapper element.",
+      "isGlobal": false
+    },
+    {
+      "key": "paper",
+      "className": "",
+      "description": "Styles applied to the paper element.",
+      "isGlobal": false
+    },
+    {
+      "key": "pinnedColumns",
+      "className": "",
+      "description": "Styles applied to the pinned columns.",
+      "isGlobal": false
+    },
+    {
+      "key": "pinnedRows",
+      "className": "",
+      "description": "Styles applied to the pinned rows container.",
+      "isGlobal": false
+    },
+    {
+      "key": "pinnedRows--bottom",
+      "className": "",
+      "description": "Styles applied to the bottom pinned rows container.",
+      "isGlobal": false
+    },
+    {
+      "key": "pinnedRows--top",
+      "className": "",
+      "description": "Styles applied to the top pinned rows container.",
+      "isGlobal": false
+    },
+    {
+      "key": "pinnedRowsRenderZone",
+      "className": "",
+      "description": "Styles applied to pinned rows render zones.",
+      "isGlobal": false
+    },
+    {
+      "key": "root",
+      "className": "",
+      "description": "Styles applied to the root element.",
+      "isGlobal": false
+    },
+    {
+      "key": "root--densityComfortable",
+      "className": "",
+      "description": "Styles applied to the root element if density is \"comfortable\".",
+      "isGlobal": false
+    },
+    {
+      "key": "root--densityCompact",
+      "className": "",
+      "description": "Styles applied to the root element if density is \"compact\".",
+      "isGlobal": false
+    },
+    {
+      "key": "root--densityStandard",
+      "className": "",
+      "description": "Styles applied to the root element if density is \"standard\" (default).",
+      "isGlobal": false
+    },
+    {
+      "key": "root--disableUserSelection",
+      "className": "",
+      "description": "Styles applied to the root element when user selection is disabled.",
+      "isGlobal": false
+    },
+    {
+      "key": "row",
+      "className": "",
+      "description": "Styles applied to the row element.",
+      "isGlobal": false
+    },
+    {
+      "key": "row--detailPanelExpanded",
+      "className": "",
+      "description": "Styles applied to the row if its detail panel is open.",
+      "isGlobal": false
+    },
+    {
+      "key": "row--dragging",
+      "className": "",
+      "description": "Styles applied to the floating special row reorder cell element when it is dragged.",
+      "isGlobal": false
+    },
+    {
+      "key": "row--dynamicHeight",
+      "className": "",
+      "description": "Styles applied to the row if it has dynamic row height.",
+      "isGlobal": false
+    },
+    {
+      "key": "row--editable",
+      "className": "",
+      "description": "Styles applied to the row element if the row is editable.",
+      "isGlobal": false
+    },
+    {
+      "key": "row--editing",
+      "className": "",
+      "description": "Styles applied to the row element if the row is in edit mode.",
+      "isGlobal": false
+    },
+    {
+      "key": "row--firstVisible",
+      "className": "",
+      "description": "Styles applied to the first visible row element on every page of the grid.",
+      "isGlobal": false
+    },
+    {
+      "key": "row--lastVisible",
+      "className": "",
+      "description": "Styles applied to the last visible row element on every page of the grid.",
+      "isGlobal": false
+    },
+    {
+      "key": "rowCount",
+      "className": "",
+      "description": "Styles applied to the footer row count element to show the total number of rows.\nOnly works when pagination is disabled.",
+      "isGlobal": false
+    },
+    {
+      "key": "rowReorderCell",
+      "className": "",
+      "description": "Styles applied to the root element of the row reorder cell",
+      "isGlobal": false
+    },
+    {
+      "key": "rowReorderCell--draggable",
+      "className": "",
+      "description": "Styles applied to the root element of the row reorder cell when dragging is allowed",
+      "isGlobal": false
+    },
+    {
+      "key": "rowReorderCellContainer",
+      "className": "",
+      "description": "Styles applied to the row reorder cell container element.",
+      "isGlobal": false
+    },
+    {
+      "key": "rowReorderCellPlaceholder",
+      "className": "",
+      "description": "Styles applied to the row's draggable placeholder element inside the special row reorder cell.",
+      "isGlobal": false
+    },
+    {
+      "key": "rowSkeleton",
+      "className": "",
+      "description": "Styles applied to the skeleton row element.",
+      "isGlobal": false
+    },
+    {
+      "key": "scrollArea",
+      "className": "",
+      "description": "Styles applied to both scroll area elements.",
+      "isGlobal": false
+    },
+    {
+      "key": "scrollArea--left",
+      "className": "",
+      "description": "Styles applied to the left scroll area element.",
+      "isGlobal": false
+    },
+    {
+      "key": "scrollArea--right",
+      "className": "",
+      "description": "Styles applied to the right scroll area element.",
+      "isGlobal": false
+    },
+    {
+      "key": "scrollbar",
+      "className": "",
+      "description": "Styles applied to the scrollbars.",
+      "isGlobal": false
+    },
+    {
+      "key": "scrollbar--horizontal",
+      "className": "",
+      "description": "Styles applied to the horizontal scrollbar.",
+      "isGlobal": false
+    },
+    {
+      "key": "scrollbar--vertical",
+      "className": "",
+      "description": "Styles applied to the horizontal scrollbar.",
+      "isGlobal": false
+    },
+    {
+      "key": "selectedRowCount",
+      "className": "",
+      "description": "Styles applied to the footer selected row count element.",
+      "isGlobal": false
+    },
+    {
+      "key": "sortIcon",
+      "className": "",
+      "description": "Styles applied to the sort icon element.",
+      "isGlobal": false
+    },
+    {
+      "key": "toolbarContainer",
+      "className": "",
+      "description": "Styles applied to the toolbar container element.",
+      "isGlobal": false
+    },
+    {
+      "key": "toolbarFilterList",
+      "className": "",
+      "description": "Styles applied to the toolbar filter list element.",
+      "isGlobal": false
+    },
+    {
+      "key": "treeDataGroupingCell",
+      "className": "",
+      "description": "Styles applied to the root of the grouping column of the tree data.",
+      "isGlobal": false
+    },
+    {
+      "key": "treeDataGroupingCellToggle",
+      "className": "",
+      "description": "Styles applied to the toggle of the grouping cell of the tree data.",
+      "isGlobal": false
+    },
+    {
+      "key": "virtualScroller",
+      "className": "",
+      "description": "Styles applied to the virtualization container.",
+      "isGlobal": false
+    },
+    {
+      "key": "virtualScrollerContent",
+      "className": "",
+      "description": "Styles applied to the virtualization content.",
+      "isGlobal": false
+    },
+    {
+      "key": "virtualScrollerContent--overflowed",
+      "className": "",
+      "description": "Styles applied to the virtualization content when its height is bigger than the virtualization container.",
+      "isGlobal": false
+    },
+    {
+      "key": "virtualScrollerRenderZone",
+      "className": "",
+      "description": "Styles applied to the virtualization render zone.",
+      "isGlobal": false
+    },
+    {
+      "key": "withBorderColor",
+      "className": "",
+      "description": "Styles applied to cells, column header and other elements that have border.\nSets border color only.",
+      "isGlobal": false
+    },
+    {
+      "key": "withVerticalBorder",
+      "className": "",
+      "description": "Styles applied the grid if `showColumnVerticalBorder={true}`.",
+      "isGlobal": false
+    }
+  ],
+  "spread": true,
+  "themeDefaultProps": false,
+  "muiName": "DataGrid",
+  "filename": "/packages/toolpad-core/src/DataGrid/DataGrid.tsx",
+  "inheritance": {
+    "component": "X DataGrid",
+    "pathname": "https://mui.com/x/api/data-grid/data-grid/"
+  },
+  "demos": "<ul><li><a href=\"/\">Data Grid</a></li></ul>",
+  "cssComponent": false
+}

@@ -1,0 +1,10 @@
+async updateOne(id, values) {
+  console.log(id, values);
+  const existing = DATA.find((item) => item.id === id);
+  if (!existing) {
+    throw new Error(`Item with id ${id} not found`);
+  }
+  const updated = { ...existing, ...values };
+  DATA = DATA.map((item) => (item.id === updated.id ? updated : item));
+  return updated;
+},

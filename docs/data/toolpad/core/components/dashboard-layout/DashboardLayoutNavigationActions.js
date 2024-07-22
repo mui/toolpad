@@ -12,7 +12,6 @@ import CallIcon from '@mui/icons-material/Call';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
-
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 

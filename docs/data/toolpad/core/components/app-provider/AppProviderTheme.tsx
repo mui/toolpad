@@ -30,8 +30,8 @@ const customTheme = extendTheme({
     light: {
       palette: {
         background: {
-          default: '#E2FAFF',
-          paper: '#D9FAFF',
+          default: '#F9F9FE',
+          paper: '#EEEEF9',
         },
       },
     },

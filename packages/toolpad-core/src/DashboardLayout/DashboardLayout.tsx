@@ -26,16 +26,17 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import useSsr from '@toolpad/utils/hooks/useSsr';
-import { ToolpadLogo } from './ToolpadLogo';
 import { Link } from '../shared/Link';
-import { NavigationContext, isPageItem } from '../contexts/NavigationContext';
 import {
   BrandingContext,
+  NavigationContext,
   PaletteModeContext,
   RouterContext,
   WindowContext,
 } from '../shared/context';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
+import { ToolpadLogo } from './ToolpadLogo';
+import { getItemTitle, isPageItem } from '../shared/navigation';
 
 const DRAWER_WIDTH = 320; // px
 
@@ -206,7 +207,7 @@ function DashboardSidebarSubNavigation({
                 pl: 4,
               }}
             >
-              {navigationItem.title}
+              {getItemTitle(navigationItem)}
             </ListSubheader>
           );
         }
@@ -262,7 +263,7 @@ function DashboardSidebarSubNavigation({
                 </ListItemIcon>
               ) : null}
               <ListItemText
-                primary={navigationItem.title ?? navigationItem.segment}
+                primary={getItemTitle(navigationItem)}
                 sx={{
                   '& .MuiTypography-root': {
                     fontWeight: '500',

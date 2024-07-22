@@ -78,7 +78,7 @@ function DashboardLayoutNavigation(props) {
             {
               segment: 'fantasy',
               title: 'Fantasy',
-              icon: <DescriptionIcon />,
+              icon: <FolderIcon />,
               children: [
                 {
                   kind: 'header',
@@ -109,7 +109,7 @@ function DashboardLayoutNavigation(props) {
             {
               segment: 'action',
               title: 'Action',
-              icon: <DescriptionIcon />,
+              icon: <FolderIcon />,
               children: [
                 {
                   segment: 'mad-max',
@@ -126,7 +126,7 @@ function DashboardLayoutNavigation(props) {
             {
               segment: 'sci-fi',
               title: 'Sci-Fi',
-              icon: <DescriptionIcon />,
+              icon: <FolderIcon />,
               children: [
                 {
                   segment: 'star-wars',
@@ -150,7 +150,7 @@ function DashboardLayoutNavigation(props) {
         {
           segment: 'mammals',
           title: 'Mammals',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               segment: 'lion',
@@ -167,7 +167,7 @@ function DashboardLayoutNavigation(props) {
         {
           segment: 'birds',
           title: 'Birds',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               segment: 'eagle',
@@ -184,7 +184,7 @@ function DashboardLayoutNavigation(props) {
         {
           segment: 'reptiles',
           title: 'Reptiles',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               segment: 'crocodile',

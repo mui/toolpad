@@ -18,7 +18,7 @@
         {
           segment: 'fantasy',
           title: 'Fantasy',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               kind: 'header',
@@ -49,7 +49,7 @@
         {
           segment: 'action',
           title: 'Action',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               segment: 'mad-max',
@@ -66,7 +66,7 @@
         {
           segment: 'sci-fi',
           title: 'Sci-Fi',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               segment: 'star-wars',
@@ -90,7 +90,7 @@
     {
       segment: 'mammals',
       title: 'Mammals',
-      icon: <DescriptionIcon />,
+      icon: <FolderIcon />,
       children: [
         {
           segment: 'lion',
@@ -107,7 +107,7 @@
     {
       segment: 'birds',
       title: 'Birds',
-      icon: <DescriptionIcon />,
+      icon: <FolderIcon />,
       children: [
         {
           segment: 'eagle',
@@ -124,7 +124,7 @@
     {
       segment: 'reptiles',
       title: 'Reptiles',
-      icon: <DescriptionIcon />,
+      icon: <FolderIcon />,
       children: [
         {
           segment: 'crocodile',

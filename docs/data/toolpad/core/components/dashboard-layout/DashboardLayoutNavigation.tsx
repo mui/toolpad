@@ -81,7 +81,7 @@ export default function DashboardLayoutNavigation(props: DemoProps) {
             {
               segment: 'fantasy',
               title: 'Fantasy',
-              icon: <DescriptionIcon />,
+              icon: <FolderIcon />,
               children: [
                 {
                   kind: 'header',
@@ -112,7 +112,7 @@ export default function DashboardLayoutNavigation(props: DemoProps) {
             {
               segment: 'action',
               title: 'Action',
-              icon: <DescriptionIcon />,
+              icon: <FolderIcon />,
               children: [
                 {
                   segment: 'mad-max',
@@ -129,7 +129,7 @@ export default function DashboardLayoutNavigation(props: DemoProps) {
             {
               segment: 'sci-fi',
               title: 'Sci-Fi',
-              icon: <DescriptionIcon />,
+              icon: <FolderIcon />,
               children: [
                 {
                   segment: 'star-wars',
@@ -153,7 +153,7 @@ export default function DashboardLayoutNavigation(props: DemoProps) {
         {
           segment: 'mammals',
           title: 'Mammals',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               segment: 'lion',
@@ -170,7 +170,7 @@ export default function DashboardLayoutNavigation(props: DemoProps) {
         {
           segment: 'birds',
           title: 'Birds',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               segment: 'eagle',
@@ -187,7 +187,7 @@ export default function DashboardLayoutNavigation(props: DemoProps) {
         {
           segment: 'reptiles',
           title: 'Reptiles',
-          icon: <DescriptionIcon />,
+          icon: <FolderIcon />,
           children: [
             {
               segment: 'crocodile',

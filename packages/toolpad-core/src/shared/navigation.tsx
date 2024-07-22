@@ -1,8 +1,4 @@
-import type {
-  NavigationItem,
-  NavigationPageItem,
-  NavigationSubheaderItem,
-} from '../../build/AppProvider';
+import type { NavigationItem, NavigationPageItem, NavigationSubheaderItem } from '../AppProvider';
 
 export const getItemKind = (item: NavigationItem) => item.kind ?? 'page';
 

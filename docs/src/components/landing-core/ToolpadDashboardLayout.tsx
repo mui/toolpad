@@ -137,10 +137,6 @@ const NAVIGATION: Navigation = [
 ];
 
 interface DemoProps {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
   window?: () => Window;
 }
 
@@ -157,7 +153,6 @@ function DashboardLayoutBasic(props: DemoProps) {
     };
   }, [pathname]);
 
-  // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (

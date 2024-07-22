@@ -8,8 +8,8 @@ export interface HelpTooltipIconProps extends SvgIconProps {
 
 export default function HelpTooltipIcon({ helpText, ...props }: HelpTooltipIconProps) {
   return (
-    <Tooltip title={helpText}>
-      <HelpOutlineIcon {...props} color="secondary" />
+    <Tooltip title={helpText} sx={{ color: 'text.secondary' }}>
+      <HelpOutlineIcon {...props} color="inherit" />
     </Tooltip>
   );
 }

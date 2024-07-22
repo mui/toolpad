@@ -9,11 +9,11 @@
   "devDependencies": {
     "@emotion/react": "11.11.4",
     "@emotion/styled": "11.11.5",
-    "@playwright/test": "1.45.1",
     "@mui/icons-material": "5.16.4",
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "5.16.4",
     "@mui/material-nextjs": "5.16.4",
+    "@playwright/test": "1.45.1",
     "@toolpad/core": "workspace:*",
     "@types/node": "20.14.10",
     "@types/react": "18.3.3",
@@ -23,8 +23,5 @@
     "next-auth": "5.0.0-beta.18",
     "react": "18.3.1",
     "react-dom": "18.3.1"
-  },
-  "dependencies": {
-    "playwright": "^1.45.1"
   }
 }

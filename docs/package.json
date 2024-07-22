@@ -94,7 +94,7 @@
     "zod": "3.23.8"
   },
   "devDependencies": {
-    "@babel/core": "7.24.8",
+    "@babel/core": "7.24.9",
     "@babel/plugin-transform-react-constant-elements": "7.24.7",
     "@babel/preset-typescript": "7.24.7",
     "@types/babel__core": "^7.20.5",

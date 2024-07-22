@@ -124,8 +124,8 @@ function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
       documentNode={appWindow?.document}
       colorSchemeNode={appWindow?.document?.body}
       attribute={COLOR_SCHEME_ATTRIBUTE}
-      modeStorageKey={COLOR_SCHEME_STORAGE_KEY}
-      colorSchemeStorageKey={MODE_STORAGE_KEY}
+        colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
+        modeStorageKey={MODE_STORAGE_KEY}
     >
       <CSSVarsThemeConsumer isDualTheme={isDualTheme}>{children}</CSSVarsThemeConsumer>
     </CssVarsProvider>
@@ -157,8 +157,8 @@ function AppThemeProvider(props: AppThemeProviderProps) {
     <React.Fragment>
       <InitColorSchemeScript
         attribute={COLOR_SCHEME_ATTRIBUTE}
-        modeStorageKey={COLOR_SCHEME_STORAGE_KEY}
-        colorSchemeStorageKey={MODE_STORAGE_KEY}
+        colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
+        modeStorageKey={MODE_STORAGE_KEY}
       />
       <CSSVarsThemeProvider theme={theme} window={appWindow}>
         {themeChildren}

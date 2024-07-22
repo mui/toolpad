@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { RouterContext } from '../AppProvider';
+import { RouterContext } from './context';
 
 /**
  * @ignore - internal component.

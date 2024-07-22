@@ -6,10 +6,10 @@ export interface HelpTooltipIconProps extends SvgIconProps {
   helpText: React.ReactNode;
 }
 
-export default function HelpTooltipIcon({ helpText, sx, ...props }: HelpTooltipIconProps) {
+export default function HelpTooltipIcon({ helpText, ...props }: HelpTooltipIconProps) {
   return (
     <Tooltip title={helpText}>
-      <HelpOutlineIcon {...props} sx={{ color: 'text.secondary', ...sx }} />
+      <HelpOutlineIcon {...props} color="secondary" />
     </Tooltip>
   );
 }

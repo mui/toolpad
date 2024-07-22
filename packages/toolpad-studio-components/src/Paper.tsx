@@ -1,13 +1,18 @@
 import * as React from 'react';
-import { Paper as MuiPaper, PaperProps as MuiPaperProps } from '@mui/material';
+import { Paper as MuiPaper, PaperProps as MuiPaperProps, styled } from '@mui/material';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 
+const PaperRoot = styled(MuiPaper)(({ theme }) => ({
+  padding: theme.spacing(1),
+  width: '100%',
+}));
+
 function Paper({ children, sx, ...rest }: MuiPaperProps) {
   return (
-    <MuiPaper sx={{ padding: 1, width: '100%', ...sx }} {...rest}>
+    <PaperRoot sx={sx} {...rest}>
       {children}
-    </MuiPaper>
+    </PaperRoot>
   );
 }
 

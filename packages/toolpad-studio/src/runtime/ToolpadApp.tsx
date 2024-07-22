@@ -1208,6 +1208,9 @@ function RenderedNodeContent({
             justifyContent: boundLayoutProps.horizontalAlign,
             height: node.layout?.height ?? componentConfig.defaultLayoutHeight,
             minHeight: '100%',
+            '&:empty': {
+              display: 'none',
+            },
           }}
           ref={nodeRef}
           data-toolpad-node-id={nodeId}

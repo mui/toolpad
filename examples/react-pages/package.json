@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@mui/material": "5.15.21",
-    "@toolpad/studio": "0.3.0",
+    "@toolpad/studio": "0.3.2",
     "@mui/x-data-grid": "7.8.0",
     "@tanstack/react-query": "5.49.2"
   },

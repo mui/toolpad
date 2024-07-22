@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/studio-components",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -33,23 +33,24 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit"
+    "check-types": "tsup && tsc --noEmit",
+    "build:types": "tsc --declaration --emitDeclarationOnly"
   },
   "bugs": {
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/icons-material": "5.16.1",
+    "@mui/icons-material": "5.16.4",
     "@mui/lab": "5.0.0-alpha.172",
-    "@mui/material": "5.16.1",
-    "@mui/x-charts": "7.9.0",
-    "@mui/x-data-grid-premium": "7.9.0",
-    "@mui/x-date-pickers": "7.9.0",
-    "@mui/x-license": "7.9.0",
+    "@mui/material": "5.16.4",
+    "@mui/x-charts": "7.11.0",
+    "@mui/x-data-grid-premium": "7.11.0",
+    "@mui/x-date-pickers": "7.11.0",
+    "@mui/x-license": "7.11.0",
     "@tanstack/react-query": "5.49.0",
     "@toolpad/studio-runtime": "workspace:*",
     "@toolpad/utils": "workspace:*",
-    "dayjs": "1.11.11",
+    "dayjs": "1.11.12",
     "invariant": "2.2.4",
     "markdown-to-jsx": "7.4.7",
     "react-error-boundary": "4.0.13",

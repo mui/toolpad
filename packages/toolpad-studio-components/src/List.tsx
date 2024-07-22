@@ -1,8 +1,12 @@
 import * as React from 'react';
 import { TemplateRenderer } from '@toolpad/studio-runtime';
-import { Box, List as MuiList, ListItem, SxProps, Skeleton, Stack } from '@mui/material';
+import { Box, List as MuiList, ListItem, SxProps, Skeleton, Stack, styled } from '@mui/material';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin from './createBuiltin';
+
+const ToolpadList = styled(MuiList)({
+  width: '100%',
+});
 
 export type ListProps = {
   itemCount: number;
@@ -14,7 +18,7 @@ export type ListProps = {
 
 function List({ itemCount, renderItem, disablePadding = false, sx, loading }: ListProps) {
   return (
-    <MuiList disablePadding={disablePadding} sx={{ width: '100%', ...sx }}>
+    <ToolpadList disablePadding={disablePadding} sx={sx}>
       {loading ? (
         <Stack spacing={2}>
           <Skeleton variant="rounded" />
@@ -30,7 +34,7 @@ function List({ itemCount, renderItem, disablePadding = false, sx, loading }: Li
           </ListItem>
         ))
       )}
-    </MuiList>
+    </ToolpadList>
   );
 }
 

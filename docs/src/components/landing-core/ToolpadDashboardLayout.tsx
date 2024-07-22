@@ -136,7 +136,17 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-function DashboardLayoutBasic() {
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+function DashboardLayoutBasic(props: DemoProps) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -147,8 +157,11 @@ function DashboardLayoutBasic() {
     };
   }, [pathname]);
 
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
-    <AppProvider navigation={NAVIGATION} router={router}>
+    <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
       <DashboardLayout>
         <Box
           sx={{

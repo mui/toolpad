@@ -99,6 +99,10 @@ function CSSVarsThemeConsumer(props: CSSVarsThemeConsumerProps) {
   );
 }
 
+const COLOR_SCHEME_ATTRIBUTE = 'data-mui-color-scheme';
+const COLOR_SCHEME_STORAGE_KEY = 'mui-toolpad-color-scheme';
+const MODE_STORAGE_KEY = 'mui-toolpad-mode';
+
 interface CSSVarsThemeProviderProps {
   children: React.ReactNode;
   theme: NonNullable<CssVarsTheme>;
@@ -119,7 +123,9 @@ function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
       defaultMode="system"
       documentNode={appWindow?.document}
       colorSchemeNode={appWindow?.document?.body}
-      modeStorageKey="mui-toolpad-mode"
+      attribute={COLOR_SCHEME_ATTRIBUTE}
+      modeStorageKey={COLOR_SCHEME_STORAGE_KEY}
+      colorSchemeStorageKey={MODE_STORAGE_KEY}
     >
       <CSSVarsThemeConsumer isDualTheme={isDualTheme}>{children}</CSSVarsThemeConsumer>
     </CssVarsProvider>
@@ -149,7 +155,11 @@ function AppThemeProvider(props: AppThemeProviderProps) {
 
   return isCSSVarsTheme ? (
     <React.Fragment>
-      <InitColorSchemeScript modeStorageKey="mui-toolpad-mode" />
+      <InitColorSchemeScript
+        attribute={COLOR_SCHEME_ATTRIBUTE}
+        modeStorageKey={COLOR_SCHEME_STORAGE_KEY}
+        colorSchemeStorageKey={MODE_STORAGE_KEY}
+      />
       <CSSVarsThemeProvider theme={theme} window={appWindow}>
         {themeChildren}
       </CSSVarsThemeProvider>

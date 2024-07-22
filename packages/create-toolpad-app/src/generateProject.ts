@@ -91,7 +91,7 @@ export default function generateProject(
   export default function Home() {
     return (
       <main>
-        <Container sx={{ mx: 4 }}>
+        <Container sx={{ my: 4 }}>
           <Typography variant="h6" color="grey.800">
             Dashboard content!
           </Typography>

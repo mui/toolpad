@@ -24,6 +24,17 @@ const StaticTextRoot = styled(Typography)({
   overflowWrap: 'anywhere',
 });
 
+const ToolpadLink = styled(MuiLink, {
+  shouldForwardProp: (prop) => prop !== 'hasMinWidth',
+})<{
+  hasMinWidth?: boolean;
+}>(({ hasMinWidth }) => ({
+  minWidth: hasMinWidth ? 150 : undefined,
+  // Same as Typography
+  [`&:empty::before`]: { content: '""', display: 'inline-block' },
+  overflowWrap: 'anywhere',
+}));
+
 const Markdown = React.lazy(async () => import('markdown-to-jsx'));
 
 const StyledTextareaAutosize = styled(TextareaAutosize)(({ theme }) => ({
@@ -145,21 +156,18 @@ function LinkContent({ value, href, loading, sx, openInNewTab }: LinkContentProp
     return value;
   }, [value, loading]);
 
+  const hasMinWidth = loading || !value;
+
   return (
-    <MuiLink
+    <ToolpadLink
       href={href}
       target={openInNewTab ? '_blank' : undefined}
       rel="noopener"
-      sx={{
-        minWidth: loading || !value ? 150 : undefined,
-        // Same as Typography
-        [`&:empty::before`]: { content: '""', display: 'inline-block' },
-        overflowWrap: 'anywhere',
-        ...sx,
-      }}
+      hasMinWidth={hasMinWidth}
+      sx={sx}
     >
       {content}
-    </MuiLink>
+    </ToolpadLink>
   );
 }
 

@@ -6,8 +6,36 @@ import {
   SxProps,
   inputBaseClasses,
   inputClasses,
+  styled,
 } from '@mui/material';
 import invariant from 'invariant';
+
+const EditableTextRoot = styled(TextField, {
+  shouldForwardProp: (prop) => prop !== 'editable' && prop !== 'readOnly',
+})<{
+  readOnly: boolean;
+  editable: boolean;
+}>(({ theme, editable, readOnly }) => ({
+  transition: theme.transitions.create(['border-bottom'], {
+    duration: theme.transitions.duration.short,
+  }),
+  [`.${inputClasses.root}.${inputBaseClasses.root}:before, .${inputClasses.root}.${inputBaseClasses.root}:not(${inputBaseClasses.disabled}):hover:before`]:
+    {
+      borderBottom: editable ? `initial` : 'none',
+    },
+  [`& .${inputClasses.root}.${inputBaseClasses.root}::after`]: readOnly
+    ? {
+        transform: 'scaleX(0)',
+        borderBottom: 'none',
+        transition: theme.transitions.create(['transform'], {
+          duration: theme.transitions.duration.short,
+        }),
+      }
+    : {
+        transform: 'scaleX(1)',
+        borderBottom: '2px solid primary',
+      },
+}));
 
 interface EditableTextProps {
   defaultValue?: string;
@@ -114,7 +142,7 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
     );
 
     return (
-      <TextField
+      <EditableTextRoot
         error={error}
         helperText={helperText}
         ref={ref}
@@ -137,32 +165,11 @@ const EditableText = React.forwardRef<HTMLInputElement, EditableTextProps>(
         onBlur={handleBlur}
         onChange={handleChange}
         size={size ?? 'small'}
-        sx={{
-          ...sx,
-          transition: (theme: Theme) =>
-            theme.transitions.create(['border-bottom'], {
-              duration: theme.transitions.duration.short,
-            }),
-          [`.${inputClasses.root}.${inputBaseClasses.root}:before, .${inputClasses.root}.${inputBaseClasses.root}:not(${inputBaseClasses.disabled}):hover:before`]:
-            {
-              borderBottom: editable ? `initial` : 'none',
-            },
-          [`& .${inputClasses.root}.${inputBaseClasses.root}::after`]: readOnly
-            ? {
-                transform: 'scaleX(0)',
-                borderBottom: 'none',
-                transition: (theme: Theme) =>
-                  theme.transitions.create(['transform'], {
-                    duration: theme.transitions.duration.short,
-                  }),
-              }
-            : {
-                transform: 'scaleX(1)',
-                borderBottom: '2px solid primary',
-              },
-        }}
+        readOnly={readOnly}
+        editable={!!editable}
+        sx={sx}
         value={value}
-        variant={'standard'}
+        variant="standard"
       />
     );
   },

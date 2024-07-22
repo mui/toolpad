@@ -1,5 +1,4 @@
-import { LinearProgress } from '@mui/material';
-import { Box } from '@mui/system';
+import { LinearProgress, Box } from '@mui/material';
 import * as React from 'react';
 import ErrorAlert from '../toolpad/AppEditor/PageEditor/ErrorAlert';
 

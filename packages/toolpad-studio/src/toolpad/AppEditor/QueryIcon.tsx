@@ -4,7 +4,7 @@ import JavascriptIcon from '@mui/icons-material/Javascript';
 import AdsClickIcon from '@mui/icons-material/AdsClick';
 import AutoModeIcon from '@mui/icons-material/AutoMode';
 import { SvgIconProps } from '@mui/material/SvgIcon';
-import { SxProps } from '@mui/system';
+import { SxProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 const dataSourceIconMap = new Map<string, React.FC<SvgIconProps>>([

@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/core",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "Toolpad Team",
   "description": "Dashboard framework powered by MUI.",
   "main": "./build/index.js",
@@ -53,18 +53,15 @@
   "dependencies": {
     "@mui/base": "5.0.0-beta.40",
     "@mui/lab": "5.0.0-alpha.172",
-    "@mui/utils": "5.16.4",
-    "@mui/x-charts": "7.10.0",
-    "@mui/x-data-grid": "7.10.0",
-    "@tanstack/react-query": "5.49.0",
+    "@mui/utils": "6.0.0-beta.1",
     "@toolpad/utils": "workspace:*",
     "client-only": "^0.0.1",
     "invariant": "2.2.4",
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "5.16.4",
-    "@mui/material": "5.16.4",
+    "@mui/icons-material": "6.0.0-beta.2",
+    "@mui/material": "6.0.0-beta.2",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.12",
     "@types/react": "18.3.3",
@@ -73,13 +70,13 @@
     "@vitest/browser": "beta",
     "next": "^14.2.5",
     "next-router-mock": "^0.9.13",
-    "playwright": "^1.45.1",
+    "playwright": "^1.45.2",
     "sinon": "^18.0.0",
     "vitest": "beta"
   },
   "peerDependencies": {
-    "@mui/icons-material": "^5",
-    "@mui/material": "^5",
+    "@mui/icons-material": "v6.0.0-beta.2",
+    "@mui/material": "v6.0.0-beta.2",
     "next": "^14",
     "react": "^18"
   },

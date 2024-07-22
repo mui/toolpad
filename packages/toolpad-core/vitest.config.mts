@@ -8,6 +8,10 @@ export default defineConfig({
       name: 'chromium',
       provider: 'playwright',
       headless: !!process.env.CI,
+      viewport: {
+        width: 1024,
+        height: 896,
+      },
     },
     coverage: {
       exclude: ['./build/**'],

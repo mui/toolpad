@@ -1,12 +1,10 @@
-<DashboardLayout>
-  <Box
-    sx={{
-      py: 4,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    }}
-  >
-    <Typography>Dashboard content for {pathname}</Typography>
-  </Box>
-</DashboardLayout>
+<AppProvider
+  navigation={NAVIGATION}
+  router={router}
+  theme={demoTheme}
+  window={demoWindow}
+>
+  <DashboardLayout>
+    <DemoPageContent pathname={pathname} />
+  </DashboardLayout>
+</AppProvider>

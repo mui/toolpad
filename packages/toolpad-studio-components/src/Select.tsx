@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { TextFieldProps, MenuItem, TextField } from '@mui/material';
+import { TextFieldProps, MenuItem, TextField, styled } from '@mui/material';
 import createBuiltin from './createBuiltin';
 import {
   FORM_INPUT_ARG_TYPES,
@@ -8,6 +8,10 @@ import {
   withComponentForm,
 } from './Form';
 import { SX_PROP_HELPER_TEXT } from './constants';
+
+const ToolpadTextField = styled(TextField)({
+  minWidth: 120,
+});
 
 export interface SelectOption {
   value: string;
@@ -66,20 +70,20 @@ function Select({
   );
 
   return renderFormInput(
-    <TextField
+    <ToolpadTextField
       {...rest}
       value={value}
       onChange={handleChange}
       select
       fullWidth={fullWidth}
-      sx={{ minWidth: 120, ...sx }}
+      sx={sx}
       {...(formInputError && {
         error: Boolean(formInputError),
         helperText: formInputError.message || '',
       })}
     >
       {renderedOptions}
-    </TextField>,
+    </ToolpadTextField>,
   );
 }
 

@@ -15,7 +15,7 @@ import CardGrid from '../../src/components/landing/CardGrid';
 import Pricing from '../../src/components/landing/PricingTable';
 import Marquee from '../../src/components/landing/Marquee';
 import features from '../../data/toolpad/studio/landing/features';
-import studioUseCases from '../../data/toolpad/studio/landing/useCases';
+import useCases from '../../data/toolpad/studio/landing/useCases';
 import marquee from '../../data/toolpad/studio/landing/marquee';
 import {
   Headline,
@@ -44,7 +44,7 @@ export default function Home() {
         <Hero />
         <HeroVideo />
         <Divider />
-        <UseCases content={studioUseCases} />
+        <UseCases content={useCases} />
         <Divider />
         <CardGrid content={features} />
         <Divider />

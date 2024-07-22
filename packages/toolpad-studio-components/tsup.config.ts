@@ -34,7 +34,9 @@ export default defineConfig((options) => ({
   esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
   async onSuccess() {
     // eslint-disable-next-line no-console
-    console.log('build successful');
+    console.log('build successful, generate typings...');
     spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true, stdio: 'inherit' });
+    // eslint-disable-next-line no-console
+    console.log('typings generated');
   },
 }));

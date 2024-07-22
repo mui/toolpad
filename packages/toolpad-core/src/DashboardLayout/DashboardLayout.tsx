@@ -41,7 +41,6 @@ import { ToolpadLogo } from './ToolpadLogo';
 const DRAWER_WIDTH = 320; // px
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
-  backgroundColor: (theme.vars ?? theme).palette.background.paper,
   borderWidth: 0,
   borderBottomWidth: 1,
   borderStyle: 'solid',
@@ -239,8 +238,7 @@ function DashboardSidebarSubNavigation({
               key={`divider-${depth}-${navigationItemIndex}`}
               sx={{
                 borderBottomWidth: 2,
-                ml: 2,
-                mr: 2,
+                mx: 2,
                 mt: 1,
                 mb: nextItem?.kind === 'header' ? 0 : 1,
               }}

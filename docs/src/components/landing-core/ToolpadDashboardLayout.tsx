@@ -136,7 +136,13 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-function DashboardLayoutBasic() {
+interface DemoProps {
+  window?: () => Window;
+}
+
+function DashboardLayoutBasic(props: DemoProps) {
+  const { window } = props;
+
   const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
@@ -147,8 +153,10 @@ function DashboardLayoutBasic() {
     };
   }, [pathname]);
 
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
-    <AppProvider navigation={NAVIGATION} router={router}>
+    <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
       <DashboardLayout>
         <Box
           sx={{

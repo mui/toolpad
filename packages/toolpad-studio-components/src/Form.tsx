@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Box, BoxProps, Stack } from '@mui/material';
+import { Box, BoxProps, Stack, styled } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useNode } from '@toolpad/studio-runtime';
 import { equalProperties } from '@toolpad/utils/collections';
@@ -13,6 +13,10 @@ import {
 } from 'react-hook-form';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import createBuiltin, { BuiltinArgTypeDefinitions } from './createBuiltin';
+
+const FormRoot = styled('div')({
+  width: '100%',
+});
 
 export const FormContext = React.createContext<{
   form: ReturnType<typeof useForm> | null;
@@ -80,7 +84,7 @@ function Form({
   return (
     <FormContext.Provider value={formContextValue}>
       {hasChrome ? (
-        <Box sx={{ ...sx, width: '100%' }}>
+        <FormRoot sx={sx}>
           <form onSubmit={form.handleSubmit(handleSubmit)} onReset={handleReset}>
             {children}
 
@@ -119,7 +123,7 @@ function Form({
               </Stack>
             </Box>
           </form>
-        </Box>
+        </FormRoot>
       ) : (
         children
       )}

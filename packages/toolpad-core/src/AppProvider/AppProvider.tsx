@@ -153,6 +153,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
   navigation: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.shape({
+        action: PropTypes.node,
         children: PropTypes.arrayOf(
           PropTypes.oneOfType([
             PropTypes.object,

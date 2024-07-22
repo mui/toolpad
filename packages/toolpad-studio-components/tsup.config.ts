@@ -1,5 +1,5 @@
-import { spawnSync } from 'child_process';
 import * as fs from 'fs/promises';
+import { $ } from 'execa';
 import path from 'path';
 import { defineConfig, Options } from 'tsup';
 
@@ -35,7 +35,7 @@ export default defineConfig((options) => ({
   async onSuccess() {
     // eslint-disable-next-line no-console
     console.log('build successful, generate typings...');
-    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true, stdio: 'inherit' });
+    await $`tsc --emitDeclarationOnly --declaration`;
     // eslint-disable-next-line no-console
     console.log('typings generated');
   },

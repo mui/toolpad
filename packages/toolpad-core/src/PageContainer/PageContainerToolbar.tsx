@@ -1,12 +1,20 @@
 'use client';
 import * as React from 'react';
-import Stack from '@mui/material/Stack';
+import { styled } from '@mui/material';
+
+const PageContainerToolbarRoot = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  gap: theme.spacing(1),
+  // Ensure the toolbar is always on the right side, even after wrapping
+  marginLeft: 'auto',
+}));
 
 export interface PageContainerToolbarProps {
   children?: React.ReactNode;
 }
 
-export /**
+/**
  *
  * Demos:
  *
@@ -15,10 +23,9 @@ export /**
  * API:
  *
  * - [PageContainerToolbar API](https://mui.com/toolpad/core/api/page-container-toolbar)
- */ function PageContainerToolbar({ children }: PageContainerToolbarProps) {
-  return (
-    <Stack direction="row" spacing={1}>
-      {children}
-    </Stack>
-  );
+ */
+function PageContainerToolbar(props: PageContainerToolbarProps) {
+  return <PageContainerToolbarRoot {...props} />;
 }
+
+export { PageContainerToolbar };

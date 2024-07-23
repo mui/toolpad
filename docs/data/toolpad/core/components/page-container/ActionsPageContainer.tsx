@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import dayjs from 'dayjs';
+import { Paper } from '@mui/material';
 
 const NAVIGATION = [
   { segment: '', title: 'Weather' },
@@ -22,24 +23,24 @@ const NAVIGATION = [
 function Content() {
   return (
     <Grid container spacing={3}>
-      <Grid size={{ xs: 4 }}>
-        <Card>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Card variant="outlined">
           <CardContent>
             <Typography variant="caption">Temperature</Typography>
             <Typography variant="h4">24°C</Typography>
           </CardContent>
         </Card>
       </Grid>
-      <Grid size={{ xs: 4 }}>
-        <Card>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Card variant="outlined">
           <CardContent>
             <Typography variant="caption">Precipitation</Typography>
             <Typography variant="h4">5%</Typography>
           </CardContent>
         </Card>
       </Grid>
-      <Grid size={{ xs: 4 }}>
-        <Card>
+      <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+        <Card variant="outlined">
           <CardContent>
             <Typography variant="caption">Wind</Typography>
             <Typography variant="h4">18km/h</Typography>
@@ -75,9 +76,11 @@ export default function ActionsPageContainer() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AppProvider navigation={NAVIGATION} router={router}>
-        <PageContainer slots={{ toolbar: PageToolbar }}>
-          <Content />
-        </PageContainer>
+        <Paper sx={{ width: '100%' }}>
+          <PageContainer slots={{ toolbar: PageToolbar }}>
+            <Content />
+          </PageContainer>
+        </Paper>
       </AppProvider>
     </LocalizationProvider>
   );

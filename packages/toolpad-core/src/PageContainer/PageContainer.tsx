@@ -1,7 +1,6 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Container, { ContainerProps } from '@mui/material/Container';
 import Link from '@mui/material/Link';
@@ -11,15 +10,9 @@ import Typography from '@mui/material/Typography';
 import { useSlotProps } from '@mui/base/utils';
 import { Link as ToolpadLink } from '../shared/Link';
 import { PageContainerToolbar, PageContainerToolbarProps } from './PageContainerToolbar';
-import {
-  isPageItem,
-  Navigation,
-  NavigationContext,
-  NavigationItem,
-  NavigationPageItem,
-} from '../contexts/NavigationContext';
-import { RouterContext } from '../shared/context';
-import { getItemTitle } from '../shared/navigation';
+import { NavigationContext, RouterContext } from '../shared/context';
+import { getItemTitle, isPageItem } from '../shared/navigation';
+import { NavigationItem, NavigationPageItem, Navigation } from '../AppProvider';
 
 const isRootPage = (item: NavigationItem) => isPageItem(item) && !item.segment;
 
@@ -116,8 +109,6 @@ function PageContainer(props: PageContainerProps) {
     [navigationContext, pathname],
   );
 
-  console.log('breadCrumbs', navigationContext, pathname);
-
   const title =
     (breadCrumbs ? getItemTitle(breadCrumbs[breadCrumbs.length - 1]) : '') ?? props.title;
 
@@ -155,9 +146,11 @@ function PageContainer(props: PageContainerProps) {
               : null}
           </Breadcrumbs>
 
-          <Toolbar disableGutters>
+          <Toolbar
+            disableGutters
+            sx={{ flexWrap: 'wrap', gap: 2, justifyContent: 'space-between' }}
+          >
             {title ? <Typography variant="h4">{title}</Typography> : null}
-            <Box sx={{ flex: 1 }} />
             <ToolbarComponent {...toolbarSlotProps} />
           </Toolbar>
         </Stack>

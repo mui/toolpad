@@ -26,4 +26,4 @@ When signed out, the component renders as an inline sign in button within the da
 
 ### 🚧 Composition
 
-The `Account` component will allow adding your own menu options, including deeply nested options. This is in progress.
+The `Account` component allows adding your own menu options, including deeply nested options. This is in progress.

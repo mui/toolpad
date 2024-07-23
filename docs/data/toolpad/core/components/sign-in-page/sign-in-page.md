@@ -19,10 +19,10 @@ The `SignInPage` component can be set up with an OAuth provider by passing in a 
 ## Credentials
 
 :::warning
-It is recommended to use the OAuth provider for more robust maintenance, support and security.
+It is recommended to use the OAuth provider for more robust maintenance, support, and security.
 :::
 
-To render a username password form, pass in a provider with `credentials` as the `id` property. The `signIn` function will accept a `formData` parameter in this case.
+To render a username password form, pass in a provider with `credentials` as the `id` property. The `signIn` function accepts a `formData` parameter in this case.
 
 {{"demo": "CredentialsSignInPage.js", "iframe": true, "height": 500}}
 
@@ -37,7 +37,7 @@ interface AuthResponse {
 }
 ```
 
-This will render an alert with the `error` string as the message.
+This renders an alert with the `error` string as the message.
 
 {{"demo": "NotificationsSignInPageError.js", "iframe": true, "height": 600}}
 
@@ -50,7 +50,7 @@ This will render an alert with the `error` string as the message.
 The component is composable with any authentication library you might want to use. The following is a functional `SignInPage` with [auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
 :::warning
-The following demo will not initiate an actual GitHub authentication flow, since doing that from within an `iframe` is not permitted. Run the [Next.js app directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/) example to test this functionality.
+The following demo does not initiate an actual GitHub authentication flow, since doing that from within an `iframe` is not permitted. Run the [Next.js app directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/) example to test this functionality.
 :::
 
 {{"demo": "AuthJsSignInApp.js", "iframe": true, "height": 300 }}
@@ -82,7 +82,7 @@ npx auth secret
 | `AUTH_GITHUB_ID`                                                                                                                                         | GitHub OAuth app client ID.     |
 | `AUTH_GITHUB_SECRET`                                                                                                                                     | GitHub OAuth app client secret. |
 
-To get the required credentials from GitHub, we need to create an application in their developer settings. Read this [guide on Auth.js](https://authjs.dev/guides/configuring-github) on how to obtain those.
+To get the required credentials from GitHub, create an application in their developer settings. Read this [guide on Auth.js](https://authjs.dev/guides/configuring-github) on how to obtain those.
 
 Use our detailed examples with both the [Next.js app directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/) and [pages directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-pages/) to get started using Auth.js with Toolpad Core.
 
@@ -102,8 +102,8 @@ Through the `branding` and `theme` props in the [AppProvider](https://mui.com/to
 
 #### 🚧 Composition
 
-To enable deep customization beyond what is possible with custom props, the `SignInPage` component will allow bringing your own custom granular components, such as inputs and buttons. This is in progress.
+To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs and buttons. This is in progress.
 
 ### 🚧 Layouts
 
-The `SignInPage` component will have versions with different layouts for authentication - one column, two column and others such. The APIs of these components will be identical. This is in progress.
+The `SignInPage` component has versions with different layouts for authentication - one column, two column and others such. The APIs of these components is identical. This is in progress.

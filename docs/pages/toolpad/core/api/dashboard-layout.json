@@ -1,6 +1,10 @@
 {
   "props": {
     "children": { "type": { "name": "node" }, "required": true },
+    "branding": {
+      "type": { "name": "shape", "description": "{ logo?: node, title?: string }" },
+      "default": "null"
+    },
     "navigation": {
       "type": {
         "name": "arrayOf",
@@ -10,7 +14,7 @@
     },
     "paletteMode": { "type": { "name": "enum", "description": "'dark'<br>&#124;&nbsp;'light'" } },
     "setPaletteMode": { "type": { "name": "func" } },
-    "window": { "type": { "name": "object" }, "default": "null" }
+    "window": { "type": { "name": "object" }, "default": "window" }
   },
   "name": "DashboardLayout",
   "imports": [

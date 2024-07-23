@@ -1,11 +1,14 @@
 {
   "componentDescription": "",
   "propDescriptions": {
+    "branding": { "description": "Branding options for the layout." },
     "children": { "description": "The content of the dashboard." },
     "navigation": { "description": "Navigation definition for the layout." },
     "paletteMode": { "description": "Active palette mode in theme." },
     "setPaletteMode": { "description": "Function to run when the theme switcher is toggled." },
-    "window": { "description": "Branding options for the layout." }
+    "window": {
+      "description": "The window where the layout is rendered. This is needed when rendering the layout inside an iframe, for example."
+    }
   },
   "classDescriptions": {}
 }

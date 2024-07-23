@@ -310,17 +310,16 @@ export interface DashboardLayoutProps {
    * The content of the dashboard.
    */
   children: React.ReactNode;
+  /**
+   * Branding options for the layout.
+   * @default null
+   */
   branding?: AppProviderProps['branding'];
   /**
    * Navigation definition for the layout.
    * @default []
    */
   navigation?: AppProviderProps['navigation'];
-  /**
-   * The window where the layout is rendered.
-   * This is needed when rendering the layout inside an iframe, for example.
-   * @default window
-   */
   /**
    * Active palette mode in theme.
    */
@@ -330,8 +329,9 @@ export interface DashboardLayoutProps {
    */
   setPaletteMode?: (theme: PaletteMode) => void;
   /**
-   * Branding options for the layout.
-   * @default null
+   * The window where the layout is rendered.
+   * This is needed when rendering the layout inside an iframe, for example.
+   * @default window
    */
   window?: AppProviderProps['window'];
 }
@@ -494,7 +494,8 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * @ignore
+   * Branding options for the layout.
+   * @default null
    */
   branding: PropTypes.shape({
     logo: PropTypes.node,
@@ -546,8 +547,9 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   setPaletteMode: PropTypes.func,
   /**
-   * Branding options for the layout.
-   * @default null
+   * The window where the layout is rendered.
+   * This is needed when rendering the layout inside an iframe, for example.
+   * @default window
    */
   window: PropTypes.object,
 } as any;

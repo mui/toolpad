@@ -83,13 +83,13 @@ function DashboardLayoutNavigationActions(props) {
     <AppProvider
       navigation={[
         {
-          slug: '/contacts',
+          segment: '/contacts',
           title: 'Contacts',
           icon: <PersonIcon />,
           action: <Chip label={7} color="primary" size="small" />,
         },
         {
-          slug: '/calls',
+          segment: '/calls',
           title: 'Calls',
           icon: <CallIcon />,
           action: (
@@ -120,13 +120,13 @@ function DashboardLayoutNavigationActions(props) {
           ),
           children: [
             {
-              slug: '/made',
+              segment: '/made',
               title: 'Made',
               icon: <CallMadeIcon />,
               action: <Chip label={12} color="success" size="small" />,
             },
             {
-              slug: '/received',
+              segment: '/received',
               title: 'Received',
               icon: <CallReceivedIcon />,
               action: <Chip label={4} color="error" size="small" />,

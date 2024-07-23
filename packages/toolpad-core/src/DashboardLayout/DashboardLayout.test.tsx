@@ -77,12 +77,12 @@ describe('DashboardLayout', () => {
       },
       {
         title: 'Dashboard',
-        slug: '/dashboard',
+        segment: 'dashboard',
         icon: <DashboardIcon />,
       },
       {
         title: 'Orders',
-        slug: '/orders',
+        segment: 'orders',
         icon: <ShoppingCartIcon />,
       },
       {
@@ -93,20 +93,24 @@ describe('DashboardLayout', () => {
         title: 'Analytics',
       },
       {
+        segment: 'reports',
         title: 'Reports',
         icon: <BarChartIcon />,
         children: [
           {
+            segment: 'sales',
             title: 'Sales',
             icon: <DescriptionIcon />,
           },
           {
+            segment: 'traffic',
             title: 'Traffic',
             icon: <DescriptionIcon />,
           },
         ],
       },
       {
+        segment: 'integrations',
         title: 'Integrations',
         icon: <LayersIcon />,
       },

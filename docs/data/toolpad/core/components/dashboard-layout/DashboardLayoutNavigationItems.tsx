@@ -64,22 +64,22 @@ export default function DashboardLayoutNavigationItems(props: DemoProps) {
     <AppProvider
       navigation={[
         {
-          slug: '/home',
+          segment: 'home',
           title: 'Home',
           icon: <DescriptionIcon />,
         },
         {
-          slug: '/about',
+          segment: 'about',
           title: 'About Us',
           icon: <DescriptionIcon />,
         },
         {
-          slug: '/movies',
+          segment: 'movies',
           title: 'Movies',
           icon: <FolderIcon />,
           children: [
             {
-              slug: '/fantasy',
+              segment: 'fantasy',
               title: 'Fantasy',
               icon: <FolderIcon />,
               children: [
@@ -88,12 +88,12 @@ export default function DashboardLayoutNavigationItems(props: DemoProps) {
                   title: 'Epic Fantasy',
                 },
                 {
-                  slug: '/lord-of-the-rings',
+                  segment: 'lord-of-the-rings',
                   title: 'Lord of the Rings',
                   icon: <DescriptionIcon />,
                 },
                 {
-                  slug: '/harry-potter',
+                  segment: 'harry-potter',
                   title: 'Harry Potter',
                   icon: <DescriptionIcon />,
                 },
@@ -103,41 +103,41 @@ export default function DashboardLayoutNavigationItems(props: DemoProps) {
                   title: 'Modern Fantasy',
                 },
                 {
-                  slug: '/chronicles-of-narnia',
+                  segment: 'chronicles-of-narnia',
                   title: 'Chronicles of Narnia',
                   icon: <DescriptionIcon />,
                 },
               ],
             },
             {
-              slug: '/action',
+              segment: 'action',
               title: 'Action',
               icon: <FolderIcon />,
               children: [
                 {
-                  slug: '/mad-max',
+                  segment: 'mad-max',
                   title: 'Mad Max',
                   icon: <DescriptionIcon />,
                 },
                 {
-                  slug: '/die-hard',
+                  segment: 'die-hard',
                   title: 'Die Hard',
                   icon: <DescriptionIcon />,
                 },
               ],
             },
             {
-              slug: '/sci-fi',
+              segment: 'sci-fi',
               title: 'Sci-Fi',
               icon: <FolderIcon />,
               children: [
                 {
-                  slug: '/star-wars',
+                  segment: 'star-wars',
                   title: 'Star Wars',
                   icon: <DescriptionIcon />,
                 },
                 {
-                  slug: '/matrix',
+                  segment: 'matrix',
                   title: 'The Matrix',
                   icon: <DescriptionIcon />,
                 },
@@ -151,51 +151,51 @@ export default function DashboardLayoutNavigationItems(props: DemoProps) {
           title: 'Animals',
         },
         {
-          slug: '/mammals',
+          segment: 'mammals',
           title: 'Mammals',
           icon: <FolderIcon />,
           children: [
             {
-              slug: '/lion',
+              segment: 'lion',
               title: 'Lion',
               icon: <DescriptionIcon />,
             },
             {
-              slug: '/elephant',
+              segment: 'elephant',
               title: 'Elephant',
               icon: <DescriptionIcon />,
             },
           ],
         },
         {
-          slug: '/birds',
+          segment: 'birds',
           title: 'Birds',
           icon: <FolderIcon />,
           children: [
             {
-              slug: '/eagle',
+              segment: 'eagle',
               title: 'Eagle',
               icon: <DescriptionIcon />,
             },
             {
-              slug: '/parrot',
+              segment: 'parrot',
               title: 'Parrot',
               icon: <DescriptionIcon />,
             },
           ],
         },
         {
-          slug: '/reptiles',
+          segment: 'reptiles',
           title: 'Reptiles',
           icon: <FolderIcon />,
           children: [
             {
-              slug: '/crocodile',
+              segment: 'crocodile',
               title: 'Crocodile',
               icon: <DescriptionIcon />,
             },
             {
-              slug: '/snake',
+              segment: 'snake',
               title: 'Snake',
               icon: <DescriptionIcon />,
             },

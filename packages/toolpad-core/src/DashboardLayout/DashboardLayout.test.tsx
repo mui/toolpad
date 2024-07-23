@@ -158,13 +158,13 @@ describe('DashboardLayout', () => {
     const NAVIGATION: Navigation = [
       {
         title: 'Item 1',
-        slug: '/item1',
+        segment: '/item1',
         icon: <DescriptionIcon />,
         action: <div>Action 1</div>,
       },
       {
         title: 'Item',
-        slug: '/item 2',
+        segment: '/item 2',
         icon: <DescriptionIcon />,
         action: <div>Action 2</div>,
       },

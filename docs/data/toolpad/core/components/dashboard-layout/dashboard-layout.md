@@ -38,7 +38,7 @@ The flexibility in composing and ordering these different elements allows for a 
 
 The main navigation items that can be used are:
 
-- **Links:** `{ slug: '/home', title: 'Home', icon: <DescriptionIcon /> }`;
+- **Links:** `{ segment: '/home', title: 'Home', icon: <DescriptionIcon /> }`;
 - **Headings:** `{ kind: 'header', title: 'Epic Fantasy' }`;
 - **Dividers:** `{ kind: 'divider' }`;
 - **Collapsible nested navigation:** `{ title: 'Fantasy', icon: <FolderIcon />, children: [ ... ] }`.

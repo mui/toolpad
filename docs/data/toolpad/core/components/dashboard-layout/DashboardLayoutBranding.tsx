@@ -10,12 +10,12 @@ import type { Navigation } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {
-    slug: '/dashboard',
+    segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },

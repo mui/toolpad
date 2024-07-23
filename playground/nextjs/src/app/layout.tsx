@@ -13,12 +13,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/',
+    slug: '',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    slug: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },

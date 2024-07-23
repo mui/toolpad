@@ -36,8 +36,8 @@ export interface Branding {
 
 export interface NavigationPageItem {
   kind?: 'page';
+  segment: string;
   title?: string;
-  slug?: string;
   icon?: React.ReactNode;
   children?: Navigation;
 }
@@ -208,7 +208,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
-        slug: PropTypes.string,
+        segment: PropTypes.string.isRequired,
         title: PropTypes.string,
       }),
       PropTypes.shape({

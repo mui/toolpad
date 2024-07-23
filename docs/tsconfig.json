@@ -14,13 +14,6 @@
     "noImplicitAny": true,
     "jsx": "preserve"
   },
-  "include": [
-    "docs-env.d.ts",
-    "pages/**/*",
-    "src/**/*",
-    "data/**/*",
-    "next.config.mjs",
-    "../packages/toolpad-core/src/internals"
-  ],
+  "include": ["docs-env.d.ts", "pages/**/*", "src/**/*", "data/**/*", "next.config.mjs"],
   "exclude": ["docs/.next", "docs/export"]
 }

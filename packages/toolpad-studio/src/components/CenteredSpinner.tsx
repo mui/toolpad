@@ -1,5 +1,13 @@
-import { CircularProgress, Box, SxProps } from '@mui/material';
+import { CircularProgress, SxProps, styled } from '@mui/material';
 import * as React from 'react';
+
+const Root = styled('div')({
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
 
 export interface CenteredSpinnerProps {
   sx?: SxProps;
@@ -7,17 +15,8 @@ export interface CenteredSpinnerProps {
 
 export default function CenteredSpinner({ sx }: CenteredSpinnerProps) {
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        ...sx,
-      }}
-    >
+    <Root sx={sx}>
       <CircularProgress />
-    </Box>
+    </Root>
   );
 }

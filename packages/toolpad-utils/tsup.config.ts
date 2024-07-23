@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
-import path from 'path';
-import { spawnSync } from 'child_process';
+import { $ } from 'execa';
+import * as path from 'path';
 import { defineConfig, Options } from 'tsup';
 
 type EsbuildPlugin = NonNullable<Options['esbuildPlugins']>[number];
@@ -32,7 +32,9 @@ export default defineConfig((options) => ({
   esbuildPlugins: [cleanFolderOnFailure(path.resolve(__dirname, 'dist'))],
   async onSuccess() {
     // eslint-disable-next-line no-console
-    console.log('build successful');
-    spawnSync('tsc', ['--emitDeclarationOnly', '--declaration'], { shell: true });
+    console.log('build successful, generate typings...');
+    await $`tsc --emitDeclarationOnly --declaration`;
+    // eslint-disable-next-line no-console
+    console.log('typings generated');
   },
 }));

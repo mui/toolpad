@@ -1,8 +1,16 @@
-import { Box, Skeleton, SxProps, styled } from '@mui/material';
+import { Skeleton, SxProps, styled } from '@mui/material';
 import * as React from 'react';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 import ErrorOverlay from './components/ErrorOverlay';
+
+const ImageRoot = styled('div')({
+  maxWidth: '100%',
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
 
 export interface ImageProps {
   src: string;
@@ -31,18 +39,7 @@ function Image({
   error: errorProp,
   fit,
 }: ImageProps) {
-  const sx: SxProps = React.useMemo(
-    () => ({
-      ...sxProp,
-      width,
-      height,
-      position: 'relative',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }),
-    [sxProp, width, height],
-  );
+  const sx: SxProps = React.useMemo(() => ({ ...sxProp, width, height }), [sxProp, width, height]);
 
   const [imgError, setImgError] = React.useState<Error | null>(null);
   const [imgLoading, setImgLoading] = React.useState(false);
@@ -64,7 +61,7 @@ function Image({
   const loading = loadingProp || imgLoading;
   const error = errorProp || imgError;
   return (
-    <Box sx={{ maxWidth: '100%', position: 'relative', ...sx }}>
+    <ImageRoot sx={sx}>
       {error ? <ErrorOverlay error={error} /> : null}
       {loading && !error ? <Skeleton variant="rectangular" width={width} height={height} /> : null}
       <Img
@@ -77,7 +74,7 @@ function Image({
         onLoad={handleLoad}
         onError={handleError}
       />
-    </Box>
+    </ImageRoot>
   );
 }
 

@@ -18,6 +18,7 @@ import {
   FormControlLabel,
   Radio,
   FormHelperText,
+  Stack,
 } from '@mui/material';
 import { errorFrom } from '@toolpad/utils/errors';
 import AddIcon from '@mui/icons-material/Add';
@@ -25,7 +26,6 @@ import { useMutation } from '@tanstack/react-query';
 import { LoadingButton } from '@mui/lab';
 import { generateUniqueString } from '@toolpad/utils/strings';
 import { PaginationMode } from '@toolpad/studio-runtime';
-import { Stack } from '@mui/system';
 import { EditorProps } from '../../types';
 import { useProjectApi } from '../../projectApi';
 import type {

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { CircularProgress, Box, BoxProps } from '@mui/material';
+import { CircularProgress, BoxProps, styled } from '@mui/material';
 
 import {
   BarPlot,
@@ -23,6 +23,12 @@ import { errorFrom } from '@toolpad/utils/errors';
 import createBuiltin from './createBuiltin';
 import ErrorOverlay from './components/ErrorOverlay';
 import { SX_PROP_HELPER_TEXT } from './constants';
+
+const ChartRoot = styled('div')({
+  position: 'relative',
+  height: '100%',
+  width: '100%',
+});
 
 type ChartDataSeriesKind = 'line' | 'bar' | 'area' | 'scatter';
 
@@ -170,7 +176,7 @@ function Chart({ data = [], loading, error, sx }: ChartProps) {
   const firstDataSeries = chartSeries[0];
 
   return (
-    <Box sx={{ ...sx, position: 'relative', height: '100%', width: '100%' }} aria-busy={loading}>
+    <ChartRoot sx={sx} aria-busy={loading}>
       {displayError ? <ErrorOverlay error={displayError} /> : null}
       {loading && !error ? (
         <div
@@ -241,7 +247,7 @@ function Chart({ data = [], loading, error, sx }: ChartProps) {
           ) : null}
         </ResponsiveChartContainer>
       ) : null}
-    </Box>
+    </ChartRoot>
   );
 }
 

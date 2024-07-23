@@ -80,7 +80,7 @@ function ContentCard({ icon, title, description, href }) {
   );
 }
 
-export default function CardGrid() {
+export default function UseCases() {
   return (
     <Box
       sx={[
@@ -217,7 +217,7 @@ ContentCard.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
-CardGrid.propTypes = {
+UseCases.propTypes = {
   content: PropTypes.shape({
     cards: PropTypes.arrayOf(
       PropTypes.shape({

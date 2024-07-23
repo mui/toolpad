@@ -191,7 +191,7 @@ export default function ToolpadDashboardLayout() {
             }),
           })}
         >
-          <DemoSandbox iframe>
+          <DemoSandbox iframe name="DashboardLayout">
             <DashboardLayoutBasic />
           </DemoSandbox>
         </Paper>

@@ -11,6 +11,7 @@ export default function OrdersPage() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       <Typography sx={{ mb: 2 }}>Welcome to the Toolpad orders!</Typography>

@@ -19,7 +19,8 @@
       },
       "default": "null"
     },
-    "theme": { "type": { "name": "object" }, "default": "baseTheme" }
+    "theme": { "type": { "name": "object" }, "default": "extendTheme()" },
+    "window": { "type": { "name": "object" }, "default": "window" }
   },
   "name": "AppProvider",
   "imports": [

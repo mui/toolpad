@@ -11,6 +11,7 @@ export default function HomePage() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        textAlign: 'center',
       }}
     >
       <Typography sx={{ mb: 2 }}>Welcome to Toolpad!</Typography>

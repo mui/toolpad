@@ -8,7 +8,7 @@ import {
 
 export default function Document(props: DocumentProps & DocumentHeadTagsProps) {
   return (
-    <Html lang="en">
+    <Html lang="en" data-mui-color-scheme="light">
       <Head>
         <meta name="emotion-insertion-point" content="" />
         <DocumentHeadTags {...props} />

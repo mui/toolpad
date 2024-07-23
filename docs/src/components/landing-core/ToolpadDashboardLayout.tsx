@@ -12,7 +12,6 @@ import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import type { Navigation } from '@toolpad/core';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
-import { styled } from '@mui/material';
 import Frame from '../../modules/components/Frame';
 
 const code = `
@@ -175,14 +174,6 @@ function DashboardLayoutBasic(props: DemoProps) {
     </AppProvider>
   );
 }
-
-const X = styled('div')(({ theme }) => ({
-  backgroundColor: (theme.vars || theme).palette.background.default,
-  flexGrow: 1,
-  height: 400,
-  border: 0,
-  boxShadow: (theme.vars || theme)?.shadows?.[1],
-}));
 
 export default function ToolpadDashboardLayout() {
   return (

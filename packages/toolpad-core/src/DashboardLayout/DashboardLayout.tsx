@@ -5,7 +5,6 @@ import { styled, useTheme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
-import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -27,6 +26,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import useSsr from '@toolpad/utils/hooks/useSsr';
+import { Link } from '../shared/Link';
 import {
   BrandingContext,
   NavigationContext,
@@ -36,6 +36,7 @@ import {
 } from '../shared/context';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
+import { getItemTitle, isPageItem } from '../shared/navigation';
 
 const DRAWER_WIDTH = 320; // px
 
@@ -161,15 +162,15 @@ function DashboardSidebarSubNavigation({
         }))
         .filter(
           ({ navigationItem }) =>
-            (!navigationItem.kind || navigationItem.kind === 'page') &&
+            isPageItem(navigationItem) &&
             navigationItem.children &&
             navigationItem.children.some((nestedNavigationItem) => {
-              const navigationItemFullPath = `${basePath}${(nestedNavigationItem as NavigationPageItem).slug ?? ''}`;
+              if (!isPageItem(nestedNavigationItem)) {
+                return false;
+              }
+              const navigationItemFullPath = `${basePath}/${nestedNavigationItem.segment ?? ''}`;
 
-              return (
-                (!nestedNavigationItem.kind || nestedNavigationItem.kind === 'page') &&
-                navigationItemFullPath === pathname
-              );
+              return navigationItemFullPath === pathname;
             }),
         )
         .map(({ originalIndex }) => `${depth}-${originalIndex}`),
@@ -180,33 +181,16 @@ function DashboardSidebarSubNavigation({
     initialExpandedSidebarItemIds,
   );
 
-  const handleSidebarItemClick = React.useCallback(
-    (itemId: string, item: NavigationPageItem) => () => {
-      if (item.children) {
-        setExpandedSidebarItemIds((previousValue) =>
-          previousValue.includes(itemId)
-            ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
-            : [...previousValue, itemId],
-        );
-      }
-
-      if (onSidebarItemClick) {
-        onSidebarItemClick(item);
-      }
+  const handleOpenFolderClick = React.useCallback(
+    (itemId: string) => () => {
+      setExpandedSidebarItemIds((previousValue) =>
+        previousValue.includes(itemId)
+          ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
+          : [...previousValue, itemId],
+      );
     },
-    [onSidebarItemClick],
+    [],
   );
-
-  const handleLinkClick = React.useMemo(() => {
-    if (!routerContext) {
-      return undefined;
-    }
-    return (event: React.MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
-      const url = new URL(event.currentTarget.href);
-      routerContext.navigate(url.pathname, { history: 'push' });
-    };
-  }, [routerContext]);
 
   return (
     <List sx={{ padding: 0, mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
@@ -223,7 +207,7 @@ function DashboardSidebarSubNavigation({
                 pl: 4,
               }}
             >
-              {navigationItem.title}
+              {getItemTitle(navigationItem)}
             </ListSubheader>
           );
         }
@@ -244,7 +228,7 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const navigationItemFullPath = `${basePath}${navigationItem.slug ?? ''}`;
+        const navigationItemFullPath = `${basePath}/${navigationItem.segment ?? ''}`;
 
         const navigationItemId = `${depth}-${navigationItemIndex}`;
 
@@ -260,7 +244,14 @@ function DashboardSidebarSubNavigation({
           <ListItem sx={{ pt: 0, pb: 0 }}>
             <NavigationListItemButton
               selected={pathname === navigationItemFullPath}
-              onClick={handleSidebarItemClick(navigationItemId, navigationItem)}
+              {...(navigationItem.children
+                ? {
+                    onClick: handleOpenFolderClick(navigationItemId),
+                  }
+                : {
+                    LinkComponent: Link,
+                    href: navigationItemFullPath,
+                  })}
             >
               {navigationItem.icon ? (
                 <ListItemIcon
@@ -272,7 +263,7 @@ function DashboardSidebarSubNavigation({
                 </ListItemIcon>
               ) : null}
               <ListItemText
-                primary={navigationItem.title ?? navigationItem.slug}
+                primary={getItemTitle(navigationItem)}
                 sx={{
                   '& .MuiTypography-root': {
                     fontWeight: '500',
@@ -286,17 +277,7 @@ function DashboardSidebarSubNavigation({
 
         return (
           <React.Fragment key={navigationItemId}>
-            {navigationItem.slug && !navigationItem.children ? (
-              <a
-                href={navigationItemFullPath}
-                onClick={handleLinkClick}
-                style={{ color: 'inherit', textDecoration: 'none' }}
-              >
-                {listItem}
-              </a>
-            ) : (
-              listItem
-            )}
+            {listItem}
 
             {navigationItem.children ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
@@ -457,7 +438,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Toolbar />
-        <Container maxWidth="lg">{children}</Container>
+        <div>{children}</div>
       </Box>
     </Box>
   );

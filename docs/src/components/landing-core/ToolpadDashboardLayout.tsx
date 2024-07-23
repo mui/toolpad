@@ -62,7 +62,7 @@ const NAVIGATION: Navigation = [
 ];
 
 function DashboardLayoutBasic() {
-  const [pathname, setPathname] = React.useState('page');
+  const [pathname, setPathname] = React.useState('dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {

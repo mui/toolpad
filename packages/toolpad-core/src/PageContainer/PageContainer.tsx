@@ -5,14 +5,21 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Container, { ContainerProps } from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useSlotProps } from '@mui/base/utils';
+import { styled } from '@mui/material';
 import { Link as ToolpadLink } from '../shared/Link';
 import { PageContainerToolbar, PageContainerToolbarProps } from './PageContainerToolbar';
 import { NavigationContext, RouterContext } from '../shared/context';
 import { getItemTitle, isPageItem } from '../shared/navigation';
 import { NavigationItem, NavigationPageItem, Navigation } from '../AppProvider';
+
+const PageContentHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  jusifyCOntent: 'space-between',
+  gap: theme.spacing(2),
+}));
 
 const isRootPage = (item: NavigationItem) => isPageItem(item) && !item.segment;
 
@@ -146,13 +153,10 @@ function PageContainer(props: PageContainerProps) {
               : null}
           </Breadcrumbs>
 
-          <Toolbar
-            disableGutters
-            sx={{ flexWrap: 'wrap', gap: 2, justifyContent: 'space-between' }}
-          >
+          <PageContentHeader>
             {title ? <Typography variant="h4">{title}</Typography> : null}
             <ToolbarComponent {...toolbarSlotProps} />
-          </Toolbar>
+          </PageContentHeader>
         </Stack>
         <div>{children}</div>
       </Stack>

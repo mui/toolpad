@@ -43,7 +43,7 @@ DemoPageContent.propTypes = {
 function DashboardLayoutNavigationItems(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/home');
+  const [pathname, setPathname] = React.useState('home');
 
   const router = React.useMemo(() => {
     return {

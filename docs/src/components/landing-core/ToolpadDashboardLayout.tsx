@@ -62,7 +62,7 @@ const NAVIGATION: Navigation = [
 ];
 
 function DashboardLayoutBasic() {
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('page');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -143,7 +143,7 @@ interface DemoProps {
 function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('page');
 
   const router = React.useMemo<Router>(() => {
     return {

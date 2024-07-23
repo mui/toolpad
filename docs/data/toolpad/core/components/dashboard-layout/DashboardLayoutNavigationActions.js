@@ -50,7 +50,7 @@ DemoPageContent.propTypes = {
 function DashboardLayoutNavigationActions(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/contacts');
+  const [pathname, setPathname] = React.useState('contacts');
 
   const router = React.useMemo(() => {
     return {

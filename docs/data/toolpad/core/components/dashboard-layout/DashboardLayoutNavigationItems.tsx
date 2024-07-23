@@ -46,7 +46,7 @@ interface DemoProps {
 export default function DashboardLayoutNavigationItems(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/home');
+  const [pathname, setPathname] = React.useState('home');
 
   const router = React.useMemo<Router>(() => {
     return {

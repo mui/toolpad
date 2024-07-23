@@ -53,7 +53,7 @@ interface DemoProps {
 export default function DashboardLayoutNavigationActions(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/contacts');
+  const [pathname, setPathname] = React.useState('contacts');
 
   const router = React.useMemo<Router>(() => {
     return {

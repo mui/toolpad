@@ -19,6 +19,7 @@ import {
   NavigationPageItem,
 } from '../contexts/NavigationContext';
 import { RouterContext } from '../shared/context';
+import { getItemTitle } from '../shared/navigation';
 
 const isRootPage = (item: NavigationItem) => isPageItem(item) && !item.segment;
 
@@ -33,17 +34,17 @@ function createPageLookup(
 ): Map<string, BreadCrumbItem[]> {
   const result = new Map<string, BreadCrumbItem[]>();
 
-  const resolveSlug = (segment: string) => `${base}${segment ? `/${segment}` : ''}` || '/';
+  const resolveSegment = (segment: string) => `${base}${segment ? `/${segment}` : ''}` || '/';
 
   const root = navigation.find((item) => isRootPage(item)) as NavigationPageItem | undefined;
-  const rootCrumb = root ? { path: resolveSlug(''), ...root } : undefined;
+  const rootCrumb = root ? { path: resolveSegment(''), ...root } : undefined;
 
   for (const item of navigation) {
     if (!isPageItem(item)) {
       continue;
     }
 
-    const path = resolveSlug(item.segment);
+    const path = resolveSegment(item.segment);
     if (result.has(path)) {
       throw new Error(`Duplicate path in navigation: ${path}`);
     }
@@ -115,7 +116,10 @@ function PageContainer(props: PageContainerProps) {
     [navigationContext, pathname],
   );
 
-  const title = (breadCrumbs ? breadCrumbs[breadCrumbs.length - 1].title : '') ?? props.title;
+  console.log('breadCrumbs', navigationContext, pathname);
+
+  const title =
+    (breadCrumbs ? getItemTitle(breadCrumbs[breadCrumbs.length - 1]) : '') ?? props.title;
 
   const ToolbarComponent = props?.slots?.toolbar ?? PageContainerToolbar;
   const toolbarSlotProps = useSlotProps({
@@ -140,11 +144,11 @@ function PageContainer(props: PageContainerProps) {
                       color="inherit"
                       href={item.path}
                     >
-                      {item.title}
+                      {getItemTitle(item)}
                     </Link>
                   ) : (
                     <Typography key={item.path} color="text.primary">
-                      {item.title}
+                      {getItemTitle(item)}
                     </Typography>
                   );
                 })

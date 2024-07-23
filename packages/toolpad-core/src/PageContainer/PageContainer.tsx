@@ -9,7 +9,6 @@ import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { useSlotProps } from '@mui/base/utils';
-import { RouterContext } from '../AppProvider';
 import { Link as ToolpadLink } from '../shared/Link';
 import { PageContainerToolbar, PageContainerToolbarProps } from './PageContainerToolbar';
 import {
@@ -19,6 +18,7 @@ import {
   NavigationItem,
   NavigationPageItem,
 } from '../contexts/NavigationContext';
+import { RouterContext } from '../shared/context';
 
 const isRootPage = (item: NavigationItem) => isPageItem(item) && !item.segment;
 

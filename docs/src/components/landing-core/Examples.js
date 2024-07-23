@@ -79,7 +79,7 @@ function ContentCard({ icon, title, description, href }) {
   );
 }
 
-export default function CardGrid() {
+export default function Examples() {
   return (
     <Box
       sx={[
@@ -183,16 +183,4 @@ ContentCard.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
-CardGrid.propTypes = {
-  content: PropTypes.shape({
-    cards: PropTypes.arrayOf(
-      PropTypes.shape({
-        description: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-        imageUrl: PropTypes.string,
-        title: PropTypes.string.isRequired,
-      }),
-    ),
-    Headline: PropTypes.node.isRequired,
-    overline: PropTypes.string.isRequired,
-  }).isRequired,
-};
+Examples.propTypes = {};

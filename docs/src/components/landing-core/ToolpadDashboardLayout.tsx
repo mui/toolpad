@@ -21,12 +21,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/dashboard',
+    segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -38,31 +38,31 @@ const NAVIGATION: Navigation = [
     title: 'Analytics',
   },
   {
-    slug: '/reports',
+    segment: 'reports',
     title: 'Reports',
     icon: <BarChartIcon />,
     children: [
       {
-        slug: '/sales',
+        segment: 'sales',
         title: 'Sales',
         icon: <DescriptionIcon />,
       },
       {
-        slug: '/traffic',
+        segment: 'traffic',
         title: 'Traffic',
         icon: <DescriptionIcon />,
       },
     ],
   },
   {
-    slug: '/integrations',
+    segment: 'integrations',
     title: 'Integrations',
     icon: <LayersIcon />,
   },
 ];
 
 function DashboardLayoutBasic() {
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -96,12 +96,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/dashboard',
+    segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -113,24 +113,24 @@ const NAVIGATION: Navigation = [
     title: 'Analytics',
   },
   {
-    slug: '/reports',
+    segment: 'reports',
     title: 'Reports',
     icon: <BarChartIcon />,
     children: [
       {
-        slug: '/sales',
+        segment: 'sales',
         title: 'Sales',
         icon: <DescriptionIcon />,
       },
       {
-        slug: '/traffic',
+        segment: 'traffic',
         title: 'Traffic',
         icon: <DescriptionIcon />,
       },
     ],
   },
   {
-    slug: '/integrations',
+    segment: 'integrations',
     title: 'Integrations',
     icon: <LayersIcon />,
   },
@@ -140,10 +140,12 @@ interface DemoProps {
   window?: () => Window;
 }
 
+const NOOP = () => {};
+
 function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('page');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -172,6 +174,7 @@ function DashboardLayoutBasic(props: DemoProps) {
     </AppProvider>
   );
 }
+
 export default function ToolpadDashboardLayout() {
   return (
     <Frame sx={{ height: '100%' }}>
@@ -191,7 +194,13 @@ export default function ToolpadDashboardLayout() {
             }),
           })}
         >
-          <DemoSandbox iframe>
+          <DemoSandbox
+            iframe
+            name="DashboardLayout"
+            onResetDemoClick={NOOP}
+            productId="joy-ui"
+            usesCssVarsTheme
+          >
             <DashboardLayoutBasic />
           </DemoSandbox>
         </Paper>

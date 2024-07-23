@@ -24,7 +24,7 @@ export default function StudioIntro() {
       }}
     >
       <Grid container spacing={4} justifyContent="flex-start">
-        <Grid item md={5}>
+        <Grid size={{ md: 5 }}>
           <SectionHeadline
             overline="Toolpad Studio"
             title={
@@ -46,9 +46,7 @@ export default function StudioIntro() {
             altInstallation="npx create-toolpad-app@latest"
           />
         </Grid>
-        <Grid item xs={12} md={7}>
-          {' '}
-          {/* Added 'item' prop */}
+        <Grid size={{ xs: 12, md: 7 }}>
           <Card
             sx={(theme) => ({
               width: '100%',

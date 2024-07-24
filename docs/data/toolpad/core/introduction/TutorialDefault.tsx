@@ -26,8 +26,13 @@ const demoTheme = extendTheme({
   },
 });
 
-function DemoPageContent() {
-  return <PageContainer />;
+function DemoPageContent({ pathname }: { pathname: string }) {
+  switch (pathname) {
+    case '/page':
+      return <PageContainer>Hello world!</PageContainer>;
+    default:
+      return null;
+  }
 }
 
 interface DemoProps {
@@ -54,7 +59,7 @@ export default function TutorialDefault(props: DemoProps) {
       window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent />
+        <DemoPageContent pathname={demoRouter.pathname} />
       </DashboardLayout>
     </AppProvider>
   );

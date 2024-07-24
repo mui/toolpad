@@ -105,7 +105,7 @@ export default function generateProject(
     return (
       <main>
         <Typography variant="h6" color="grey.800">
-          Dashboard content!
+          Hello world!
         </Typography>
       </main>
     );

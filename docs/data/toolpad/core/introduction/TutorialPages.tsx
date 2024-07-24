@@ -38,17 +38,19 @@ const demoTheme = extendTheme({
   },
 });
 
-function contentForPathname(pathname: string) {
+function DemoPageContent({ pathname }: { pathname: string }) {
   switch (pathname) {
+    case '/page':
+      return <PageContainer>Hello world!</PageContainer>;
     case '/page-2':
-      return <Typography variant="h6">This is Page 2</Typography>;
+      return (
+        <PageContainer>
+          <Typography variant="h6">This is Page 2</Typography>
+        </PageContainer>
+      );
     default:
       return null;
   }
-}
-
-function DemoPageContent({ pathname }: { pathname: string }) {
-  return <PageContainer>{contentForPathname(pathname)}</PageContainer>;
 }
 
 interface DemoProps {

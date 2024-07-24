@@ -67,7 +67,7 @@ export default function TutorialPages(props: DemoProps) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const demoRouter = useDemoRouter('/page');
+  const demoRouter = useDemoRouter('/page-2');
 
   return (
     <AppProvider

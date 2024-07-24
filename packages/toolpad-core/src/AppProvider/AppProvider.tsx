@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { extendTheme, CssVarsTheme, Theme } from '@mui/material/styles';
+import { CssVarsTheme, Theme, useTheme } from '@mui/material/styles';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
 import {
@@ -100,9 +100,10 @@ export interface AppProviderProps {
  * - [AppProvider API](https://mui.com/toolpad/core/api/app-provider)
  */
 function AppProvider(props: AppProviderProps) {
+  const outerTheme = useTheme();
   const {
     children,
-    theme = extendTheme(),
+    theme = outerTheme,
     branding = null,
     navigation = [],
     router = null,
@@ -189,7 +190,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
   }),
   /**
    * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
-   * @default extendTheme()
+   * @default createTheme()
    */
   theme: PropTypes.object,
   /**

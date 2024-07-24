@@ -70,11 +70,9 @@ import { PageContainer } from '@toolpad/core/';
 export default function Home() {
   return (
     <PageContainer>
-      <main>
-        <Typography variant="h6" color="grey.800">
-          This is page 2!
-        </Typography>
-      </main>
+      <Typography variant="h6" color="grey.800">
+        This is page 2!
+      </Typography>
     </PageContainer>
   );
 }

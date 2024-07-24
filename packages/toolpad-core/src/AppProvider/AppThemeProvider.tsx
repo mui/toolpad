@@ -7,6 +7,10 @@ import { useLocalStorageState } from '../useLocalStorageState';
 import { PaletteModeContext } from '../shared/context';
 import type { AppProviderProps } from './AppProvider';
 
+const COLOR_SCHEME_ATTRIBUTE = 'data-toolpad-color-scheme';
+const COLOR_SCHEME_STORAGE_KEY = 'mui-toolpad-color-scheme';
+const MODE_STORAGE_KEY = 'mui-toolpad-mode';
+
 function usePreferredMode() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   return prefersDarkMode ? 'dark' : 'light';
@@ -14,21 +18,13 @@ function usePreferredMode() {
 
 type ThemeMode = PaletteMode | 'system';
 
-function useThemeMode() {
-  const [themeMode, setThemeMode] = useLocalStorageState<ThemeMode>(
-    'toolpad-palette-mode',
-    'system',
-  );
-  return { themeMode, setThemeMode };
-}
-
 function useStandardPaletteMode() {
   const preferredMode = usePreferredMode();
-  const { themeMode, setThemeMode } = useThemeMode();
+  const [mode, setMode] = useLocalStorageState<ThemeMode>(MODE_STORAGE_KEY, 'system');
 
   return {
-    paletteMode: !themeMode || themeMode === 'system' ? preferredMode : themeMode,
-    setPaletteMode: setThemeMode,
+    paletteMode: !mode || mode === 'system' ? preferredMode : mode,
+    setPaletteMode: setMode,
   };
 }
 
@@ -99,10 +95,6 @@ function CSSVarsThemeConsumer(props: CSSVarsThemeConsumerProps) {
   );
 }
 
-const COLOR_SCHEME_ATTRIBUTE = 'data-mui-color-scheme';
-const COLOR_SCHEME_STORAGE_KEY = 'mui-toolpad-color-scheme';
-const MODE_STORAGE_KEY = 'mui-toolpad-mode';
-
 interface CSSVarsThemeProviderProps {
   children: React.ReactNode;
   theme: NonNullable<CssVarsTheme>;
@@ -123,6 +115,7 @@ function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
       defaultMode="system"
       documentNode={appWindow?.document}
       colorSchemeNode={appWindow?.document?.body}
+      disableNestedContext
       attribute={COLOR_SCHEME_ATTRIBUTE}
       colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
       modeStorageKey={MODE_STORAGE_KEY}

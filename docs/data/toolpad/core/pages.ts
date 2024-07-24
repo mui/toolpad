@@ -61,6 +61,10 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/core/react-dashboard-layout',
             title: 'Dashboard Layout',
           },
+          {
+            pathname: '/toolpad/core/react-page-container',
+            title: 'Page Container',
+          },
         ],
       },
       {

@@ -2,6 +2,8 @@ export * from './AppProvider';
 
 export * from './DashboardLayout';
 
+export * from './PageContainer';
+
 export * from './useDialogs';
 
 export * from './useNotifications';

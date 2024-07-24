@@ -11,7 +11,6 @@ import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import Grid from '@mui/material/Unstable_Grid2';
-// import examples from '../../modules/components/ExamplesGrid/core-examples';
 
 const ImageContainer = styled(Link)(({ theme }) => [
   {

@@ -8,7 +8,7 @@ title: Toolpad Overview
 
 This framework leverages the existing suite of components offered by MUI, and ties them together with the most commonly-used backend integrations to help you create dashboards fast. Imagine a React dashboard template but with backend features like authentication, role-based access control and data fetching already included. It comes with the guarantee of MUI's enterprise-tested components, and the Toolpad team's focus on using the latest stable libraries, and prioritising razor-sharp performance.
 
-{{"demo": "../components/dashboard-layout/DashboardLayoutNavigation.js", "height": 640, "iframe": true}}
+{{"demo": "../components/dashboard-layout/DashboardLayoutNavigationItems.js", "height": 640, "iframe": true}}
 
 ## Overview
 

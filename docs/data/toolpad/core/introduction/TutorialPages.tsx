@@ -6,7 +6,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider, Navigation, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
 
 const NAVIGATION: Navigation = [
   {
@@ -40,9 +39,17 @@ const demoTheme = extendTheme({
 
 function DemoPageContent({ pathname }: { pathname: string }) {
   return (
-    <PageContainer>
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+      }}
+    >
       <Typography>Dashboard content for {pathname}</Typography>
-    </PageContainer>
+    </Box>
   );
 }
 

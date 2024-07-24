@@ -100,7 +100,7 @@ export default function generateProject(
 
   const dashboardPage = `
   import { Typography } from "@mui/material";
-  
+
   export default function Home() {
     return (
       <main>

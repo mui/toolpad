@@ -380,7 +380,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               transform: { xs: 'translateX(-50%)', md: 'none' },
             }}
           >
-            <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
               <Stack direction="row" alignItems="center">
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
                 <Typography
@@ -393,7 +393,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   {branding?.title ?? 'Toolpad'}
                 </Typography>
               </Stack>
-            </a>
+            </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <ThemeSwitcher />

@@ -6,6 +6,7 @@ import { AppProvider, Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internals/demo';
 import { PageContainer } from '@toolpad/core/PageContainer';
+import { Typography } from '@mui/material';
 
 const NAVIGATION: Navigation = [
   {
@@ -37,8 +38,17 @@ const demoTheme = extendTheme({
   },
 });
 
-function DemoPageContent() {
-  return <PageContainer />;
+function contentForPathname(pathname: string) {
+  switch (pathname) {
+    case '/page-2':
+      return <Typography variant="h6">This is Page 2</Typography>;
+    default:
+      return null;
+  }
+}
+
+function DemoPageContent({ pathname }: { pathname: string }) {
+  return <PageContainer>{contentForPathname(pathname)}</PageContainer>;
 }
 
 interface DemoProps {

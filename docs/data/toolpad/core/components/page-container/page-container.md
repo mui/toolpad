@@ -6,7 +6,7 @@ components: PageContainer, PageContainerToolbar
 
 # Page Container
 
-<p class="description">A component that wraps page container and provides title, breadcrumbs, page actions.</p>
+<p class="description">A component that wraps page content and provides a title, breadcrumbs, and page actions.</p>
 
 The page container component is the ideal wrapper for your actual dashboard content. It shows the title of the current page and provides breadcrumbs to navigate back into the current hierarchy. It also provides a responsive [container](https://mui.com/material-ui/react-container/) for your page container.
 

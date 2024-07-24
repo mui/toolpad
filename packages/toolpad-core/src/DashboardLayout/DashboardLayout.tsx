@@ -37,6 +37,7 @@ import {
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 import { getItemTitle, isPageItem } from '../shared/navigation';
+import { useApplicationTitle } from '../shared/branding';
 
 const DRAWER_WIDTH = 320; // px
 
@@ -319,6 +320,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
   const appWindow = React.useContext(WindowContext);
+  const applicationTitle = useApplicationTitle();
 
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
 
@@ -390,7 +392,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                     fontWeight: '700',
                   }}
                 >
-                  {branding?.title ?? 'Toolpad'}
+                  {applicationTitle}
                 </Typography>
               </Stack>
             </Link>

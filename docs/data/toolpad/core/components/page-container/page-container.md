@@ -40,7 +40,9 @@ For example, under the following navigation structure:
 </AppProvider>
 ```
 
-The breadcrumbs will contain **ACME / Home / Orders** when you visit the path **/home/orders**, and the title of the page will in that case be **Orders**.
+The breadcrumbs contains **ACME / Home / Orders** when you visit the path **/home/orders**, and the page will get a title of **Orders**.
+
+{{"demo": "TitleBreadcrumbsPageContainer.js", "height": 300, "hideToolbar": true}}
 
 ## Actions
 
@@ -50,4 +52,4 @@ You can configure additional actions in the area that is reserved on the right. 
 
 ## Responsiveness
 
-The Page Container component inherits the properties of the Material UI [Container](https://mui.com/material-ui/react-container/) component. You can use its `maxWidth` and `fixed` properties to control the bounds of the page.
+The Page Container component inherits the properties of the Material&nbsp;UI [Container](https://mui.com/material-ui/react-container/) component. You can use its `maxWidth` and `fixed` properties to control the bounds of the page.

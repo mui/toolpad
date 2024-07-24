@@ -14,12 +14,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/page',
+    segment: '/page',
     title: 'Page',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/page-2',
+    segment: '/page-2',
     title: 'Page 2',
     icon: <TimelineIcon />,
   },
@@ -30,8 +30,8 @@ const customTheme = extendTheme({
     light: {
       palette: {
         background: {
-          default: '#E2FAFF',
-          paper: '#D9FAFF',
+          default: '#F9F9FE',
+          paper: '#EEEEF9',
         },
       },
     },
@@ -82,7 +82,7 @@ interface DemoProps {
 export default function AppProviderTheme(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('page');
 
   const router = React.useMemo<Router>(() => {
     return {

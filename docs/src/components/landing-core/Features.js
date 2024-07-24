@@ -14,7 +14,7 @@ export default function ToolpadComponents() {
   return (
     <Section bg="gradient">
       <Grid container spacing={2}>
-        <Grid md={6}>
+        <Grid size={{ md: 6 }}>
           <SectionHeadline
             overline="Features"
             title={
@@ -27,8 +27,7 @@ export default function ToolpadComponents() {
           <ToolpadFeaturesSwitcher tab={tab} setTab={setTab} />
         </Grid>
         <Grid
-          xs={12}
-          md={6}
+          size={{ xs: 12, md: 6 }}
           sx={tab === 'navigation' ? { minHeight: { xs: 'auto', sm: 757, md: 'unset' } } : {}}
         >
           <React.Fragment>

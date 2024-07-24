@@ -21,12 +21,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    segment: '/dashboard',
+    segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    segment: '/orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -38,31 +38,31 @@ const NAVIGATION: Navigation = [
     title: 'Analytics',
   },
   {
-    segment: '/reports',
+    segment: 'reports',
     title: 'Reports',
     icon: <BarChartIcon />,
     children: [
       {
-        segment: '/sales',
+        segment: 'sales',
         title: 'Sales',
         icon: <DescriptionIcon />,
       },
       {
-        segment: '/traffic',
+        segment: 'traffic',
         title: 'Traffic',
         icon: <DescriptionIcon />,
       },
     ],
   },
   {
-    segment: '/integrations',
+    segment: 'integrations',
     title: 'Integrations',
     icon: <LayersIcon />,
   },
 ];
 
 function DashboardLayoutBasic() {
-  const [pathname, setPathname] = React.useState('page');
+  const [pathname, setPathname] = React.useState('dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -96,12 +96,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    segment: '/dashboard',
+    segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    segment: '/orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -113,24 +113,24 @@ const NAVIGATION: Navigation = [
     title: 'Analytics',
   },
   {
-    segment: '/reports',
+    segment: 'reports',
     title: 'Reports',
     icon: <BarChartIcon />,
     children: [
       {
-        segment: '/sales',
+        segment: 'sales',
         title: 'Sales',
         icon: <DescriptionIcon />,
       },
       {
-        segment: '/traffic',
+        segment: 'traffic',
         title: 'Traffic',
         icon: <DescriptionIcon />,
       },
     ],
   },
   {
-    segment: '/integrations',
+    segment: 'integrations',
     title: 'Integrations',
     icon: <LayersIcon />,
   },
@@ -139,6 +139,8 @@ const NAVIGATION: Navigation = [
 interface DemoProps {
   window?: () => Window;
 }
+
+const NOOP = () => {};
 
 function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
@@ -172,6 +174,7 @@ function DashboardLayoutBasic(props: DemoProps) {
     </AppProvider>
   );
 }
+
 export default function ToolpadDashboardLayout() {
   return (
     <Frame sx={{ height: '100%' }}>
@@ -191,7 +194,13 @@ export default function ToolpadDashboardLayout() {
             }),
           })}
         >
-          <DemoSandbox iframe>
+          <DemoSandbox
+            iframe
+            name="DashboardLayout"
+            onResetDemoClick={NOOP}
+            productId="joy-ui"
+            usesCssVarsTheme
+          >
             <DashboardLayoutBasic />
           </DemoSandbox>
         </Paper>

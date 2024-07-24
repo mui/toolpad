@@ -26,4 +26,4 @@ You can configure additional actions in the area that is reserved on the right. 
 
 ## Responsiveness
 
-The Page Container component inherits the properties of the MUI [Container](https://mui.com/material-ui/react-container/) component. You can use its `maxWidth` and `fixed` properties to control the bounds of the page.
+The Page Container component inherits the properties of the Material UI [Container](https://mui.com/material-ui/react-container/) component. You can use its `maxWidth` and `fixed` properties to control the bounds of the page.

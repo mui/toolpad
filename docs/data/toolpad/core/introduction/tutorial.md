@@ -65,15 +65,17 @@ yarn && yarn dev
 
 ```tsx
 import { Typography, Container } from '@mui/material';
+import { PageContainer } from '@toolpad/core/';
+
 export default function Home() {
   return (
-    <main>
-      <Container sx={{ mx: 4 }}>
+    <PageContainer>
+      <main>
         <Typography variant="h6" color="grey.800">
           This is page 2!
         </Typography>
-      </Container>
-    </main>
+      </main>
+    </PageContainer>
   );
 }
 ```

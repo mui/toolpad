@@ -14,9 +14,7 @@ export default function HomePage() {
         textAlign: 'center',
       }}
     >
-      <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-        Welcome to Toolpad!
-      </Typography>
+      <Typography sx={{ mb: 2 }}>Welcome to Toolpad!</Typography>
     </Box>
   );
 }

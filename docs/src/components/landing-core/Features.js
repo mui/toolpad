@@ -8,6 +8,7 @@ import ToolpadFeaturesSwitcher from './ToolpadFeaturesSwitcher';
 import ToolpadDialogDemo from './ToolpadDialogDemo';
 import ToolpadDashboardLayout from './ToolpadDashboardLayout';
 import ToolpadNotificationDemo from './ToolpadNotificationDemo';
+import ToolpadPageContainerDemo from './ToolpadPageContainerDemo';
 
 export default function ToolpadComponents() {
   const [tab, setTab] = React.useState('navigation');
@@ -35,7 +36,7 @@ export default function ToolpadComponents() {
             {tab === 'auth' && <div>To Do</div>}
             {tab === 'dialogs' && <ToolpadDialogDemo />}
             {tab === 'notifications' && <ToolpadNotificationDemo />}
-            {tab === 'page' && <div>To Do</div>}
+            {tab === 'page' && <ToolpadPageContainerDemo />}
           </React.Fragment>
         </Grid>
       </Grid>

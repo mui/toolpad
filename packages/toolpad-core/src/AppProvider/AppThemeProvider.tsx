@@ -18,18 +18,13 @@ function usePreferredMode() {
 
 type ThemeMode = PaletteMode | 'system';
 
-function useThemeMode() {
-  const [themeMode, setThemeMode] = useLocalStorageState<ThemeMode>(MODE_STORAGE_KEY, 'system');
-  return { themeMode, setThemeMode };
-}
-
 function useStandardPaletteMode() {
   const preferredMode = usePreferredMode();
-  const { themeMode, setThemeMode } = useThemeMode();
+  const [mode, setMode] = useLocalStorageState<ThemeMode>(MODE_STORAGE_KEY, 'system');
 
   return {
-    paletteMode: !themeMode || themeMode === 'system' ? preferredMode : themeMode,
-    setPaletteMode: setThemeMode,
+    paletteMode: !mode || mode === 'system' ? preferredMode : mode,
+    setPaletteMode: setMode,
   };
 }
 

@@ -20,7 +20,7 @@ The breacrumbs are formed by matching the current pathname with the navigation s
 
 ## Actions
 
-You can configure additional actions in the area that is reserved on the right. To do so provide the `toolbar` slot to the `PageContainer` component. You can wrap the `PageContainerToolbar` component.
+You can configure additional actions in the area that is reserved on the right. To do so provide the `toolbar` slot to the `PageContainer` component. You can wrap the `PageContainerToolbar` component to create a custom toolbar component, as shown here:
 
 {{"demo": "ActionsPageContainer.js", "height": 300}}
 

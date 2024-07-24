@@ -168,7 +168,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
-        segment: PropTypes.string.isRequired,
+        segment: PropTypes.string,
         title: PropTypes.string,
       }),
       PropTypes.shape({

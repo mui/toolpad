@@ -8,7 +8,7 @@
     "navigation": {
       "type": {
         "name": "arrayOf",
-        "description": "Array&lt;{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', segment: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
+        "description": "Array&lt;{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', segment?: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
       },
       "default": "[]"
     },

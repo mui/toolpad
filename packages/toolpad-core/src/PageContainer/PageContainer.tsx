@@ -66,7 +66,7 @@ function createPageLookup(
         if (result.has(childPath)) {
           throw new Error(`Duplicate path in navigation: ${childPath}`);
         }
-        result.set(childPath, [itemCrumb, ...childItems]);
+        result.set(childPath, childItems);
       }
     }
   }

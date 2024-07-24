@@ -3,7 +3,7 @@ import Alert, { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
-import { SxProps } from '@mui/system';
+import { SxProps } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { UPGRADE_URL } from '../../constants';
 

@@ -14,12 +14,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/page',
+    segment: 'page',
     title: 'Page',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/page-2',
+    segment: 'page-2',
     title: 'Page 2',
     icon: <TimelineIcon />,
   },
@@ -64,7 +64,7 @@ interface DemoProps {
 export default function AppProviderBasic(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('page');
 
   const router = React.useMemo<Router>(() => {
     return {

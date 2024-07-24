@@ -70,6 +70,10 @@ export default withDocsInfra({
             '../packages/toolpad-studio-runtime/src',
           ),
           '@toolpad/utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
+          '@toolpad/core/package.json': path.resolve(
+            currentDirectory,
+            '../packages/toolpad-core/package.json',
+          ),
           '@toolpad/core': path.resolve(currentDirectory, '../packages/toolpad-core/src'),
           'create-toolpad-app': path.resolve(
             currentDirectory,

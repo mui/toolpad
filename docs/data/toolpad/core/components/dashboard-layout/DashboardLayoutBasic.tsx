@@ -17,12 +17,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/dashboard',
+    segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -34,24 +34,24 @@ const NAVIGATION: Navigation = [
     title: 'Analytics',
   },
   {
-    slug: '/reports',
+    segment: 'reports',
     title: 'Reports',
     icon: <BarChartIcon />,
     children: [
       {
-        slug: '/sales',
+        segment: 'sales',
         title: 'Sales',
         icon: <DescriptionIcon />,
       },
       {
-        slug: '/traffic',
+        segment: 'traffic',
         title: 'Traffic',
         icon: <DescriptionIcon />,
       },
     ],
   },
   {
-    slug: '/integrations',
+    segment: 'integrations',
     title: 'Integrations',
     icon: <LayersIcon />,
   },
@@ -96,7 +96,7 @@ interface DemoProps {
 export default function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {

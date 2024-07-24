@@ -10,12 +10,12 @@ import type { Navigation } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {
-    slug: '/dashboard',
+    segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -60,7 +60,7 @@ interface DemoProps {
 export default function DashboardLayoutBranding(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {

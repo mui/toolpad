@@ -28,7 +28,7 @@ export default function generateProject(options: GenerateProjectOptions): Files 
       title: 'Main items',
     },
     {
-      slug: '/page',
+      segment: 'page',
       title: 'Page',
       icon: <DashboardIcon />,
     },

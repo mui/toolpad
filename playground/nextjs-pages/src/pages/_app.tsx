@@ -23,12 +23,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/',
+    segment: '/',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    segment: '/orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },

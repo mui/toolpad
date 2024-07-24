@@ -25,7 +25,8 @@
       "@mui-internal/api-docs-builder/*": [
         "./node_modules/@mui/monorepo/packages/api-docs-builder/*"
       ],
-      "@mui/docs/*": ["./node_modules/@mui/monorepo/packages/docs/*"]
+      "docs/*": ["./node_modules/@mui/monorepo/docs/*"],
+      "@mui/docs/*": ["./node_modules/@mui/monorepo/packages/mui-docs/src/*"]
     }
   },
   "include": ["./test", "packages/toolpad-utils/src/http.ts"]

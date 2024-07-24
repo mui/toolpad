@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
   Autocomplete as MuiAutocomplete,
   AutocompleteProps as MuiAutocompleteProps,
+  styled,
   TextField,
 } from '@mui/material';
 import createBuiltin from './createBuiltin';
@@ -12,6 +13,14 @@ import {
   useFormInput,
   withComponentForm,
 } from './Form';
+
+const ToolpadMuiAutocomplete = styled(MuiAutocomplete<AutocompleteOption, false>, {
+  shouldForwardProp: (prop) => prop !== 'hasWidth',
+})<{
+  hasWidth?: boolean;
+}>(({ hasWidth }) => ({
+  width: hasWidth ? 120 : '100%',
+}));
 
 type AutocompleteOption = string | { label?: string; value?: string };
 type AutocompleteValue = string | null;
@@ -85,8 +94,10 @@ function Autocomplete({
     [getValue, onFormInputChange],
   );
 
+  const hasWidth = !rest.fullWidth && !value;
+
   return renderFormInput(
-    <MuiAutocomplete
+    <ToolpadMuiAutocomplete
       onChange={handleChange}
       options={options ?? []}
       isOptionEqualToValue={(option, selectedValue) => getValue(option) === getValue(selectedValue)}
@@ -103,7 +114,8 @@ function Autocomplete({
           })}
         />
       )}
-      sx={{ ...(!rest.fullWidth && !value ? { width: 120 } : {}), ...sx }}
+      hasWidth={hasWidth}
+      sx={sx}
       {...rest}
     />,
   );

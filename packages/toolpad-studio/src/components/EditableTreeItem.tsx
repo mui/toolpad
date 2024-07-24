@@ -8,8 +8,21 @@ import {
   Popover,
   Typography,
   alpha,
-  useTheme,
+  styled,
 } from '@mui/material';
+
+const EditableTreeItemRoot = styled(TreeItem, {
+  shouldForwardProp: (prop) => prop !== 'isEditing',
+})<{
+  isEditing: boolean;
+}>(({ theme, isEditing }) => ({
+  paddingLeft: theme.spacing(0.5),
+  '> .MuiTreeItem-content': {
+    padding: theme.spacing(0, 0.5),
+    gap: theme.spacing(0.5),
+    backgroundColor: isEditing ? alpha(theme.palette.primary.main, 0.2) : undefined,
+  },
+}));
 
 export interface EditableTreeItemProps extends Omit<TreeItemProps, 'label'> {
   labelText?: string;
@@ -41,8 +54,6 @@ export default function EditableTreeItem({
   sx,
   ...rest
 }: EditableTreeItemProps) {
-  const theme = useTheme();
-
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const [itemNameInput, setItemNameInput] = React.useState(suggestedNewItemName);
@@ -125,7 +136,7 @@ export default function EditableTreeItem({
   };
 
   return (
-    <TreeItem
+    <EditableTreeItemRoot
       {...rest}
       onClick={handleClick}
       label={renderLabel(
@@ -183,15 +194,8 @@ export default function EditableTreeItem({
           </Typography>
         ),
       )}
-      sx={{
-        ...sx,
-        paddingLeft: theme.spacing(0.5),
-        '> .MuiTreeItem-content': {
-          padding: theme.spacing(0, 0.5),
-          gap: theme.spacing(0.5),
-          backgroundColor: isEditing ? alpha(theme.palette.primary.main, 0.2) : undefined,
-        },
-      }}
+      isEditing={isEditing}
+      sx={sx}
     />
   );
 }

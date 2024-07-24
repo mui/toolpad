@@ -40,7 +40,8 @@
     "monorepo:update": "tsx ./scripts/updateMonorepo.ts",
     "monorepo:canary": "tsx ./scripts/canaryMonorepo.ts",
     "check-changes": "git add -A && git diff --exit-code --staged",
-    "test:rest:start": "tsx ./scripts/restTestServer.ts"
+    "test:rest:start": "tsx ./scripts/restTestServer.ts",
+    "clean": "pnpm -r exec rm -rf build dist"
   },
   "devDependencies": {
     "@argos-ci/core": "2.3.0",

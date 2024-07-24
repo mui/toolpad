@@ -10,13 +10,37 @@ components: PageContainer, PageContainerToolbar
 
 `PageContent` is the ideal wrapper for the content of your dashboard. It shows the current page title, and provides breadcrumbs to navigate back into the current hierarchy. It makes your page responsive through the use of the Material UI Container component under the hood.
 
-Just like [`DashboardLayout`](/toolpad/core/react-dashboard-layout/), `PageContainer` uses the navigation structure that is defined in the `AppProvider` to build up its breadcrumbs and title.
+Just like [`DashboardLayout`](/toolpad/core/react-dashboard-layout/), `PageContainer` uses the navigation structure that is defined in the [`AppProvider`](/toolpad/core/react-app-provider/) to build up its breadcrumbs and title.
 
 {{"demo": "BasicPageContainer.js", "height": 300}}
 
 ## Title and Breadcrumbs
 
-The breacrumbs are formed by matching the current pathname with the navigation structure defined in the `AppProvider`. The title of the matched segment is used as the page title. You can override the page title with the `title` property.
+The breacrumbs are formed by matching the current pathname with the navigation structure defined in the [`AppProvider`](/toolpad/core/react-app-provider/). The title of the matched segment is used as the page title. You can override the page title with the `title` property.
+
+For example, under the following navigation structure:
+
+```tsx
+<AppProvider
+  branding={{ title: 'ACME' }}
+  navigation={[
+    {
+      segment: 'home',
+      title: 'Home',
+      children: [
+        {
+          segment: 'orders',
+          title: 'Orders',
+        },
+      ],
+    },
+  ]}
+>
+  ...
+</AppProvider>
+```
+
+The breadcrumbs will contain **ACME / Home / Orders** when you visit the path **/home/orders**, and the title of the page will in that case be **Orders**.
 
 ## Actions
 

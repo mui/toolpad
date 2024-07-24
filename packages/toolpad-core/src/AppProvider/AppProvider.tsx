@@ -36,7 +36,7 @@ export interface Branding {
 
 export interface NavigationPageItem {
   kind?: 'page';
-  segment: string;
+  segment?: string;
   title?: string;
   icon?: React.ReactNode;
   action?: React.ReactNode;

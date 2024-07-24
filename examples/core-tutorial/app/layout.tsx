@@ -9,7 +9,7 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    segment: '/page',
+    segment: 'page',
     title: 'Page',
     icon: <DashboardIcon />,
   },

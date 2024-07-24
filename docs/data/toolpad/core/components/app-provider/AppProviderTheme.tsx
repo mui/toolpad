@@ -14,12 +14,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    segment: '/page',
+    segment: 'page',
     title: 'Page',
     icon: <DashboardIcon />,
   },
   {
-    segment: '/page-2',
+    segment: 'page-2',
     title: 'Page 2',
     icon: <TimelineIcon />,
   },

@@ -13,7 +13,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Unstable_Grid2';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import dayjs from 'dayjs';
-import { Paper } from '@mui/material';
+import { Paper, useTheme } from '@mui/material';
 
 const NAVIGATION = [
   { segment: '', title: 'Weather' },
@@ -73,9 +73,11 @@ function PageToolbar() {
 export default function ActionsPageContainer() {
   const router = useDemoRouter();
 
+  const theme = useTheme();
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <AppProvider navigation={NAVIGATION} router={router}>
+      <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
         <Paper sx={{ width: '100%' }}>
           <PageContainer slots={{ toolbar: PageToolbar }}>
             <Content />

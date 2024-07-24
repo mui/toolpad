@@ -13,6 +13,7 @@ import { PageContainerToolbar, PageContainerToolbarProps } from './PageContainer
 import { NavigationContext, RouterContext } from '../shared/context';
 import { getItemTitle, isPageItem } from '../shared/navigation';
 import { NavigationItem, NavigationPageItem, Navigation } from '../AppProvider';
+import { useApplicationTitle } from '../shared/branding';
 
 const PageContentHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -111,10 +112,22 @@ function PageContainer(props: PageContainerProps) {
   const routerContext = React.useContext(RouterContext);
   const navigationContext = React.useContext(NavigationContext);
   const pathname = routerContext?.pathname ?? '/';
-  const breadCrumbs = React.useMemo(
-    () => matchPath(navigationContext, pathname),
-    [navigationContext, pathname],
-  );
+  const applicationTitle = useApplicationTitle();
+  const breadCrumbs = React.useMemo(() => {
+    let crumbs = matchPath(navigationContext, pathname) ?? [];
+
+    if (crumbs.length <= 0 || crumbs[0].path !== '/') {
+      crumbs = [
+        {
+          segment: '',
+          path: '/',
+          title: applicationTitle,
+        },
+        ...crumbs,
+      ];
+    }
+    return crumbs;
+  }, [navigationContext, pathname, applicationTitle]);
 
   const title =
     (breadCrumbs ? getItemTitle(breadCrumbs[breadCrumbs.length - 1]) : '') ?? props.title;

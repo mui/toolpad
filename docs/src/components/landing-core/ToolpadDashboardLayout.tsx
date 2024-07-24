@@ -2,7 +2,7 @@ import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -10,8 +10,10 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation } from '@toolpad/core';
+import { PageContainer, type Navigation } from '@toolpad/core';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
+import Grid from '@mui/material/Unstable_Grid2';
+import { styled } from '@mui/material';
 import Frame from '../../modules/components/Frame';
 
 const code = `
@@ -142,6 +144,12 @@ interface DemoProps {
 
 const NOOP = () => {};
 
+const PlaceHolder = styled('div')<{ height: number }>(({ theme, height }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  height,
+  borderRadius: theme.shape.borderRadius,
+}));
+
 function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
 
@@ -168,7 +176,19 @@ function DashboardLayoutBasic(props: DemoProps) {
             alignItems: 'center',
           }}
         >
-          <Typography>Dashboard content for {pathname}</Typography>
+          <PageContainer>
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <PlaceHolder height={100} />
+              </Grid>
+              <Grid size={6}>
+                <PlaceHolder height={100} />
+              </Grid>
+              <Grid size={12}>
+                <PlaceHolder height={200} />
+              </Grid>
+            </Grid>
+          </PageContainer>
         </Box>
       </DashboardLayout>
     </AppProvider>

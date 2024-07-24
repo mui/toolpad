@@ -7,7 +7,9 @@ import { PageContainer } from '@toolpad/core/PageContainer';
 import { useDemoRouter } from '@toolpad/core/internals/demo';
 
 const code = `
-<PageContainer>Page content</PageContainer> fkwjhfoefgkjrjhhr ierhgoiehroigheoir gieriogeoirjgoierjgoeirjgoeirjij
+<PageContainer>
+  Page content
+</PageContainer>
 `;
 
 const NAVIGATION = [

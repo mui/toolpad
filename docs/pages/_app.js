@@ -216,7 +216,7 @@ function AppWrapper(props) {
         productIdentifier = {
           metadata: '',
           name: 'Toolpad Core',
-          versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
+          versions: [{ text: `v0.0.1`, current: true }],
         };
         pages = toolpadCorePages;
       }
@@ -225,7 +225,7 @@ function AppWrapper(props) {
         productIdentifier = {
           metadata: '',
           name: 'Toolpad Core',
-          versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
+          versions: [{ text: `v0.0.1`, current: true }],
         };
         pages = toolpadCorePages;
       } else if (productId === 'toolpad-studio') {

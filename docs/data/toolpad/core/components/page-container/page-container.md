@@ -16,7 +16,7 @@ Just like the Dashboard Layout component, the page container component uses the 
 
 ## Title and Breadcrumbs
 
-The breacrumbs are formed by matching the current pathname with the navigation structure in the App Layout. The title of the matched segment is used as the page title. You can override the page title with the `title` property.
+The breacrumbs are formed by matching the current pathname with the navigation structure defined in the `AppProvider`. The title of the matched segment is used as the page title. You can override the page title with the `title` property.
 
 ## Actions
 

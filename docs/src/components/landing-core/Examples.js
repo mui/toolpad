@@ -11,7 +11,6 @@ import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import Grid from '@mui/material/Unstable_Grid2';
-// import examples from '../../modules/components/ExamplesGrid/core-examples';
 
 const ImageContainer = styled(Link)(({ theme }) => [
   {
@@ -79,7 +78,7 @@ function ContentCard({ icon, title, description, href }) {
   );
 }
 
-export default function CardGrid() {
+export default function Examples() {
   return (
     <Box
       sx={[
@@ -183,16 +182,4 @@ ContentCard.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
-CardGrid.propTypes = {
-  content: PropTypes.shape({
-    cards: PropTypes.arrayOf(
-      PropTypes.shape({
-        description: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-        imageUrl: PropTypes.string,
-        title: PropTypes.string.isRequired,
-      }),
-    ),
-    Headline: PropTypes.node.isRequired,
-    overline: PropTypes.string.isRequired,
-  }).isRequired,
-};
+Examples.propTypes = {};

@@ -2,7 +2,7 @@ import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -10,8 +10,10 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation } from '@toolpad/core';
+import { PageContainer, type Navigation } from '@toolpad/core';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
+import Grid from '@mui/material/Unstable_Grid2';
+import { styled } from '@mui/material';
 import Frame from '../../modules/components/Frame';
 
 const code = `
@@ -21,12 +23,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/dashboard',
+    segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -38,31 +40,31 @@ const NAVIGATION: Navigation = [
     title: 'Analytics',
   },
   {
-    slug: '/reports',
+    segment: 'reports',
     title: 'Reports',
     icon: <BarChartIcon />,
     children: [
       {
-        slug: '/sales',
+        segment: 'sales',
         title: 'Sales',
         icon: <DescriptionIcon />,
       },
       {
-        slug: '/traffic',
+        segment: 'traffic',
         title: 'Traffic',
         icon: <DescriptionIcon />,
       },
     ],
   },
   {
-    slug: '/integrations',
+    segment: 'integrations',
     title: 'Integrations',
     icon: <LayersIcon />,
   },
 ];
 
 function DashboardLayoutBasic() {
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -96,12 +98,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/dashboard',
+    segment: 'dashboard',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: '/orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -113,24 +115,24 @@ const NAVIGATION: Navigation = [
     title: 'Analytics',
   },
   {
-    slug: '/reports',
+    segment: 'reports',
     title: 'Reports',
     icon: <BarChartIcon />,
     children: [
       {
-        slug: '/sales',
+        segment: 'sales',
         title: 'Sales',
         icon: <DescriptionIcon />,
       },
       {
-        slug: '/traffic',
+        segment: 'traffic',
         title: 'Traffic',
         icon: <DescriptionIcon />,
       },
     ],
   },
   {
-    slug: '/integrations',
+    segment: 'integrations',
     title: 'Integrations',
     icon: <LayersIcon />,
   },
@@ -140,10 +142,18 @@ interface DemoProps {
   window?: () => Window;
 }
 
+const NOOP = () => {};
+
+const PlaceHolder = styled('div')<{ height: number }>(({ theme, height }) => ({
+  border: `1px solid ${theme.palette.divider}`,
+  height,
+  borderRadius: theme.shape.borderRadius,
+}));
+
 function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('page');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -166,12 +176,25 @@ function DashboardLayoutBasic(props: DemoProps) {
             alignItems: 'center',
           }}
         >
-          <Typography>Dashboard content for {pathname}</Typography>
+          <PageContainer>
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <PlaceHolder height={100} />
+              </Grid>
+              <Grid size={6}>
+                <PlaceHolder height={100} />
+              </Grid>
+              <Grid size={12}>
+                <PlaceHolder height={200} />
+              </Grid>
+            </Grid>
+          </PageContainer>
         </Box>
       </DashboardLayout>
     </AppProvider>
   );
 }
+
 export default function ToolpadDashboardLayout() {
   return (
     <Frame sx={{ height: '100%' }}>
@@ -191,7 +214,13 @@ export default function ToolpadDashboardLayout() {
             }),
           })}
         >
-          <DemoSandbox iframe>
+          <DemoSandbox
+            iframe
+            name="DashboardLayout"
+            onResetDemoClick={NOOP}
+            productId="joy-ui"
+            usesCssVarsTheme
+          >
             <DashboardLayoutBasic />
           </DemoSandbox>
         </Paper>

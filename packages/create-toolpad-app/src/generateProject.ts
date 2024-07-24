@@ -29,7 +29,7 @@ export default function generateProject(
   
   export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {      
     return (
-      <html lang="en" data-mui-color-scheme="light">
+      <html lang="en" data-toolpad-color-scheme="light">
         <body>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
             <AppProvider theme={theme} navigation={NAVIGATION}>
@@ -54,7 +54,19 @@ export default function generateProject(
   }
   `;
 
-  const rootPageContent = `
+  const dashboardPageLayout = `
+  import { PageContainer } from '@toolpad/core/PageContainer';
+
+  export default function Layout({
+    children,
+  }: Readonly<{ children: React.ReactNode }>) {
+    return (
+      <PageContainer>{children}</PageContainer>
+    );
+  }
+  `;
+
+  const rootPageContainer = `
   import Link from "next/link";
   import { Button, Container, Typography, Box } from "@mui/material";
 
@@ -86,16 +98,15 @@ export default function generateProject(
   }
   `;
 
-  const dashboardPageContent = `
-  import { Typography, Container } from "@mui/material";
+  const dashboardPage = `
+  import { Typography } from "@mui/material";
+
   export default function Home() {
     return (
       <main>
-        <Container sx={{ my: 4 }}>
-          <Typography variant="h6" color="grey.800">
-            Dashboard content!
-          </Typography>
-        </Container>
+        <Typography variant="h6" color="grey.800">
+          Hello world!
+        </Typography>
       </main>
     );
   }
@@ -347,10 +358,11 @@ export default function generateProject(
   return new Map([
     ['app/api/auth/[...nextAuth]/route.ts', { content: '' }],
     ['app/auth/[...path]/page.tsx', { content: '' }],
-    ['app/(dashboard)/page/page.tsx', { content: dashboardPageContent }],
+    ['app/(dashboard)/page/page.tsx', { content: dashboardPage }],
+    ['app/(dashboard)/page/layout.tsx', { content: dashboardPageLayout }],
     ['app/(dashboard)/layout.tsx', { content: dashboardLayoutContent }],
     ['app/layout.tsx', { content: rootLayoutContent }],
-    ['app/page.tsx', { content: rootPageContent }],
+    ['app/page.tsx', { content: rootPageContainer }],
     ['theme.ts', { content: themeContent }],
     ['next-env.d.ts', { content: nextTypesContent }],
     ['next.config.mjs', { content: nextConfigContent }],

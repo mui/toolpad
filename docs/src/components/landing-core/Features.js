@@ -8,13 +8,14 @@ import ToolpadFeaturesSwitcher from './ToolpadFeaturesSwitcher';
 import ToolpadDialogDemo from './ToolpadDialogDemo';
 import ToolpadDashboardLayout from './ToolpadDashboardLayout';
 import ToolpadNotificationDemo from './ToolpadNotificationDemo';
+import ToolpadPageContainerDemo from './ToolpadPageContainerDemo';
 
 export default function ToolpadComponents() {
   const [tab, setTab] = React.useState('navigation');
   return (
     <Section bg="gradient">
       <Grid container spacing={2}>
-        <Grid md={6}>
+        <Grid size={{ md: 6 }}>
           <SectionHeadline
             overline="Features"
             title={
@@ -27,8 +28,7 @@ export default function ToolpadComponents() {
           <ToolpadFeaturesSwitcher tab={tab} setTab={setTab} />
         </Grid>
         <Grid
-          xs={12}
-          md={6}
+          size={{ xs: 12, md: 6 }}
           sx={tab === 'navigation' ? { minHeight: { xs: 'auto', sm: 757, md: 'unset' } } : {}}
         >
           <React.Fragment>
@@ -36,7 +36,7 @@ export default function ToolpadComponents() {
             {tab === 'auth' && <div>To Do</div>}
             {tab === 'dialogs' && <ToolpadDialogDemo />}
             {tab === 'notifications' && <ToolpadNotificationDemo />}
-            {tab === 'page' && <div>To Do</div>}
+            {tab === 'page' && <ToolpadPageContainerDemo />}
           </React.Fragment>
         </Grid>
       </Grid>

@@ -37,6 +37,7 @@ import {
 import type { AppProviderProps, Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 import { getItemTitle, isPageItem } from '../shared/navigation';
+import { useApplicationTitle } from '../shared/branding';
 
 const DRAWER_WIDTH = 320; // px
 
@@ -279,6 +280,7 @@ function DashboardSidebarSubNavigation({
                   },
                 }}
               />
+              {navigationItem.action ?? null}
               {navigationItem.children ? nestedNavigationCollapseIcon : null}
             </NavigationListItemButton>
           </ListItem>
@@ -360,6 +362,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const navigationContext = React.useContext(NavigationContext);
   const windowContext = React.useContext(WindowContext);
 
+  const applicationTitle = useApplicationTitle();
+
   const branding = brandingProp ?? brandingContext;
   const navigation = navigationProp ?? navigationContext;
   const appWindow = windowProp ?? windowContext;
@@ -424,7 +428,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               transform: { xs: 'translateX(-50%)', md: 'none' },
             }}
           >
-            <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
               <Stack direction="row" alignItems="center">
                 <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
                 <Typography
@@ -434,10 +438,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
                     fontWeight: '700',
                   }}
                 >
-                  {branding?.title ?? 'Toolpad'}
+                  {applicationTitle}
                 </Typography>
               </Stack>
-            </a>
+            </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <ThemeSwitcher value={paletteMode} onChange={setPaletteMode} />

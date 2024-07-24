@@ -64,7 +64,7 @@ function TutorialPages(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('page');
 
   const router = React.useMemo(() => {
     return {

@@ -270,6 +270,7 @@ function DashboardSidebarSubNavigation({
                   },
                 }}
               />
+              {navigationItem.action ?? null}
               {navigationItem.children ? nestedNavigationCollapseIcon : null}
             </NavigationListItemButton>
           </ListItem>

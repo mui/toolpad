@@ -7,6 +7,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { useDemoRouter } from '@toolpad/core/internals/demo';
 
 const NAVIGATION = [
   {
@@ -64,25 +65,17 @@ function TutorialPages(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const [pathname, setPathname] = React.useState('/page');
-
-  const router = React.useMemo(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const demoRouter = useDemoRouter();
 
   return (
     <AppProvider
-      router={router}
       navigation={NAVIGATION}
+      router={demoRouter}
       theme={demoTheme}
       window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={demoRouter.pathname} />
       </DashboardLayout>
     </AppProvider>
   );

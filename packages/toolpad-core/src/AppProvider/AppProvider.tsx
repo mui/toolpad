@@ -89,7 +89,7 @@ export interface AppProviderProps {
    */
   branding?: Branding | null;
   /**
-   * Navigation definition        for the app.
+   * Navigation definition for the app.
    * @default []
    */
   navigation?: Navigation;
@@ -188,7 +188,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * Navigation definition        for the app.
+   * Navigation definition for the app.
    * @default []
    */
   navigation: PropTypes.arrayOf(

@@ -35,7 +35,7 @@ function createPageLookup(
 ): Map<string, BreadCrumbItem[]> {
   const result = new Map<string, BreadCrumbItem[]>();
 
-  const resolveSegment = (segment: string) => `${base}${segment ? `/${segment}` : ''}` || '/';
+  const resolveSegment = (segment?: string) => `${base}${segment ? `/${segment}` : ''}` || '/';
 
   const root = navigation.find((item) => isRootPage(item)) as NavigationPageItem | undefined;
   const rootCrumb = root ? { path: resolveSegment(''), ...root } : undefined;

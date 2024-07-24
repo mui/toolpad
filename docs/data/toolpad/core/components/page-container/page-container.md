@@ -8,7 +8,7 @@ components: PageContainer, PageContainerToolbar
 
 <p class="description">A component that wraps page content and provides a title, breadcrumbs, and page actions.</p>
 
-`PageContent` is the ideal wrapper for the content of your dashboard. It shows the current page title, and provides breadcrumbs to navigate back into the current hierarchy. It makes your page responsive through the use of the Material UI Container component under the hood.
+`PageContent` is the ideal wrapper for the content of your dashboard. It shows the current page title, and provides breadcrumbs to navigate back into the current hierarchy. It makes your page responsive through the use of the Material&nbsp;UI Container component under the hood.
 
 Just like [`DashboardLayout`](/toolpad/core/react-dashboard-layout/), `PageContainer` uses the navigation structure that is defined in the [`AppProvider`](/toolpad/core/react-app-provider/) to build up its breadcrumbs and title.
 
@@ -40,7 +40,7 @@ For example, under the following navigation structure:
 </AppProvider>
 ```
 
-The breadcrumbs contains **ACME / Home / Orders** when you visit the path **/home/orders**, and the page will get a title of **Orders**.
+The breadcrumbs contains **ACME / Home / Orders** when you visit the path **/home/orders**, and the page has a title of **Orders**.
 
 {{"demo": "TitleBreadcrumbsPageContainer.js", "height": 300, "hideToolbar": true}}
 

@@ -24,7 +24,7 @@ const NAVIGATION: Navigation = [
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-mui-color-scheme="light">
+    <html lang="en" data-toolpad-color-scheme="light">
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <AppProvider navigation={NAVIGATION}>{props.children}</AppProvider>

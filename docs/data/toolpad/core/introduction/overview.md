@@ -8,7 +8,7 @@ title: Toolpad Overview
 
 This framework leverages the existing suite of components offered by MUI, and ties them together with the most commonly-used backend integrations to help you create dashboards fast. Imagine a React dashboard template but with backend features like authentication, role-based access control and data fetching already included. It comes with the guarantee of MUI's enterprise-tested components, and the Toolpad team's focus on using the latest stable libraries, and prioritising razor-sharp performance.
 
-{{"demo": "../components/dashboard-layout/DashboardLayoutNavigationItems.js", "height": 640, "iframe": true}}
+{{"demo": "../components/dashboard-layout/DashboardLayoutNavigationItems.js", "height": 640, "iframe": true, "hideToolbar": true}}
 
 ## Overview
 
@@ -25,6 +25,11 @@ The framework follows the open-core model, with some features being available un
 - Built with and exclusively for React ⚛️
 - High performance 🚀
 - [Layout and Navigation](/toolpad/core/react-dashboard-layout/)
+- [Page Container](/toolpad/core/react-page-container/)
+- [Authentication](/)
+- [Dialogs](/toolpad/core/react-use-dialogs/)
+- [Notifications](/toolpad/core/react-use-notifications/)
+- [Persistent State](/toolpad/core/react-persistent-state/)
 
 ## Upcoming Features 🚧
 
@@ -32,8 +37,6 @@ The framework follows the open-core model, with some features being available un
 Visit the [roadmap](/toolpad/core/introduction/roadmap/) to see more details around upcoming features.
 :::
 
-- [Authentication](/)
-- [Dialogs and Notifications](/)
 - [Role-based Access Control](/)
 - [Audit Logs](/)
 - [Data Providers](/)

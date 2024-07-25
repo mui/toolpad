@@ -25,10 +25,6 @@ const pages: MuiPage[] = [
         title: 'Examples',
       },
       {
-        pathname: '/toolpad/core/introduction/build-deploy',
-        title: 'Build and Deploy',
-      },
-      {
         pathname: '/toolpad/core/introduction/roadmap',
         title: 'Roadmap',
       },

@@ -42,6 +42,7 @@ describe('DashboardLayout', () => {
 
   test('can switch theme', async () => {
     const user = userEvent.setup();
+
     render(
       <AppProvider>
         <DashboardLayout>Hello world</DashboardLayout>
@@ -116,6 +117,7 @@ describe('DashboardLayout', () => {
     ];
 
     const user = userEvent.setup();
+
     render(
       <AppProvider navigation={NAVIGATION}>
         <DashboardLayout>Hello world</DashboardLayout>
@@ -150,5 +152,33 @@ describe('DashboardLayout', () => {
 
     expect(within(navigation).getByText('Sales')).toBeTruthy();
     expect(within(navigation).getByText('Traffic')).toBeTruthy();
+  });
+
+  test('renders navigation actions', async () => {
+    const NAVIGATION: Navigation = [
+      {
+        title: 'Item 1',
+        segment: '/item1',
+        icon: <DescriptionIcon />,
+        action: <div>Action 1</div>,
+      },
+      {
+        title: 'Item',
+        segment: '/item 2',
+        icon: <DescriptionIcon />,
+        action: <div>Action 2</div>,
+      },
+    ];
+
+    render(
+      <AppProvider navigation={NAVIGATION}>
+        <DashboardLayout>Hello world</DashboardLayout>
+      </AppProvider>,
+    );
+
+    const navigation = screen.getByRole('navigation');
+
+    expect(within(navigation).getByText('Action 1')).toBeTruthy();
+    expect(within(navigation).getByText('Action 2')).toBeTruthy();
   });
 });

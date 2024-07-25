@@ -1,14 +1,15 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import { useDemoRouter } from '@toolpad/core/internals/demo';
 
 const NAVIGATION = [
   {
+    segment: 'page',
     title: 'Page',
     icon: <DashboardIcon />,
   },
@@ -26,21 +27,18 @@ const demoTheme = extendTheme({
   },
 });
 
-function DemoPageContent() {
-  return (
-    <Box
-      sx={{
-        py: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-      }}
-    >
-      <Typography>Dashboard content</Typography>
-    </Box>
-  );
+function DemoPageContent({ pathname }) {
+  switch (pathname) {
+    case '/page':
+      return <PageContainer>Hello world!</PageContainer>;
+    default:
+      return null;
+  }
 }
+
+DemoPageContent.propTypes = {
+  pathname: PropTypes.string.isRequired,
+};
 
 function TutorialDefault(props) {
   const { window } = props;
@@ -48,10 +46,17 @@ function TutorialDefault(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
+  const demoRouter = useDemoRouter('/page');
+
   return (
-    <AppProvider navigation={NAVIGATION} theme={demoTheme} window={demoWindow}>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={demoRouter}
+      theme={demoTheme}
+      window={demoWindow}
+    >
       <DashboardLayout>
-        <DemoPageContent />
+        <DemoPageContent pathname={demoRouter.pathname} />
       </DashboardLayout>
     </AppProvider>
   );

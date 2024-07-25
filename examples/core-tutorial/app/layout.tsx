@@ -9,7 +9,7 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/page',
+    segment: '/page',
     title: 'Page',
     icon: <DashboardIcon />,
   },

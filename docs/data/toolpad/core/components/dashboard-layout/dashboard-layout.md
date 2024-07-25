@@ -30,16 +30,26 @@ This can be done via the `branding` prop in the [AppProvider](https://mui.com/to
 
 ## Navigation
 
-The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) allows for setting any type of navigation structure in the `DashboardLayout` sidebar by including different navigation elements as building blocks in any order, such as:
-
-- links `{ slug: '/home', title: 'Home', icon: <DescriptionIcon /> }`;
-- headings `{ kind: 'header', title: 'Epic Fantasy' }`;
-- dividers `{ kind: 'divider' }`;
-- collapsible nested navigation `{ title: 'Fantasy', icon: <FolderIcon />, children: [ ... ] }`.
+The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) allows for setting any type of navigation structure in the `DashboardLayout` sidebar by including different navigation elements as building blocks in any order.
 
 The flexibility in composing and ordering these different elements allows for a great variety of navigation structures to fit your use case.
 
-{{"demo": "DashboardLayoutNavigation.js", "height": 640, "iframe": true}}
+### Navigation Items
+
+The main navigation items that can be used are:
+
+- **Links:** `{ segment: '/home', title: 'Home', icon: <DescriptionIcon /> }`;
+- **Headings:** `{ kind: 'header', title: 'Epic Fantasy' }`;
+- **Dividers:** `{ kind: 'divider' }`;
+- **Collapsible nested navigation:** `{ title: 'Fantasy', icon: <FolderIcon />, children: [ ... ] }`.
+
+{{"demo": "DashboardLayoutNavigationItems.js", "height": 640, "iframe": true}}
+
+### Navigation Actions
+
+Navigation links have an optional `action` prop that can be used to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
+
+{{"demo": "DashboardLayoutNavigationActions.js", "height": 500, "iframe": true}}
 
 ## Account
 

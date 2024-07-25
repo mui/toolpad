@@ -1,12 +1,13 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { useDemoRouter } from '@toolpad/core/internals/demo';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import { Typography } from '@mui/material';
 
 const NAVIGATION = [
   {
@@ -39,19 +40,19 @@ const demoTheme = extendTheme({
 });
 
 function DemoPageContent({ pathname }) {
-  return (
-    <Box
-      sx={{
-        py: 4,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        textAlign: 'center',
-      }}
-    >
-      <Typography>Dashboard content for {pathname}</Typography>
-    </Box>
-  );
+  switch (pathname) {
+    case '/page':
+      return <PageContainer>Hello world!</PageContainer>;
+    case '/page-2':
+      return (
+        <PageContainer>
+          <Typography variant="h6">This is Page 2</Typography>
+        </PageContainer>
+      );
+
+    default:
+      return null;
+  }
 }
 
 DemoPageContent.propTypes = {
@@ -64,25 +65,17 @@ function TutorialPages(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const [pathname, setPathname] = React.useState('/page');
-
-  const router = React.useMemo(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const demoRouter = useDemoRouter('/page-2');
 
   return (
     <AppProvider
-      router={router}
       navigation={NAVIGATION}
+      router={demoRouter}
       theme={demoTheme}
       window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={demoRouter.pathname} />
       </DashboardLayout>
     </AppProvider>
   );

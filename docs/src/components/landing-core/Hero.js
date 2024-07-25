@@ -3,12 +3,8 @@ import Typography from '@mui/material/Typography';
 import IconImage from 'docs/src/components/icon/IconImage';
 import Box from '@mui/material/Box';
 import GradientText from 'docs/src/components/typography/GradientText';
-// import Chip from '@mui/material/Chip';
-// import { alpha } from '@mui/material/styles';
-// import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Container } from '@mui/material';
 import GetStartedButtons from './GetStartedButtons';
-// import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 
 export default function Hero() {
   return (
@@ -43,31 +39,6 @@ export default function Hero() {
         >
           <IconImage width={28} height={28} loading="eager" name="product-toolpad" />
           Toolpad
-          {/* <Chip
-            label="Read the announcement"
-            component="a"
-            // href={ROUTES.toolpadBetaBlog}
-            color="primary"
-            size="small"
-            variant="outlined"
-            clickable
-            onDelete={() => {}}
-            deleteIcon={<ChevronRightIcon />}
-            sx={[
-              (theme) => ({
-                pb: 0.15,
-                ml: 0.8,
-                background: alpha(theme.palette.primary[50], 0.5),
-                borderColor: (theme.vars || theme).palette.primary[100],
-                ...theme.applyDarkStyles({
-                  color: (theme.vars || theme).palette.primary[200],
-                  borderColor: (theme.vars || theme).palette.primary[700],
-                  background: alpha(theme.palette.primary[800], 0.3),
-                }),
-              }),
-            ]}
-          />
-        */}
         </Typography>
         <Box
           sx={{
@@ -100,7 +71,7 @@ export default function Hero() {
         >
           <GetStartedButtons
             primaryLabel={'Get started'}
-            primaryUrl="https://mui.com/toolpad/core/introduction/"
+            primaryUrl="/toolpad/core/introduction/"
             installation={'npx create-toolpad-app@latest --core'}
             sx={{ width: '100%' }}
           />

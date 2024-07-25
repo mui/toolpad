@@ -13,12 +13,12 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '',
+    segment: '',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
   {
-    slug: 'orders',
+    segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
@@ -37,7 +37,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const session = await auth();
 
   return (
-    <html lang="en" data-mui-color-scheme="light">
+    <html lang="en" data-toolpad-color-scheme="light">
       <body>
         <SessionProvider session={session}>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>

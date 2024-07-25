@@ -17,9 +17,7 @@ export default async function HomePage() {
         textAlign: 'center',
       }}
     >
-      <Typography variant="h4" component="h1" sx={{ my: 2 }}>
-        Welcome to Toolpad, {session?.user?.name || 'User'}!
-      </Typography>
+      <Typography sx={{ mb: 2 }}>Welcome to Toolpad, {session?.user?.name || 'User'}!</Typography>
     </Box>
   );
 }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Box from '@mui/material/Box';
 import { Session, AppProvider, DashboardLayout } from '@toolpad/core';
 
 export default function AccountWithDashboard() {
@@ -30,7 +31,7 @@ export default function AccountWithDashboard() {
   return (
     <AppProvider session={session} authentication={authentication}>
       <DashboardLayout>
-        <p>Content</p>
+        <Box sx={{ px: 6, py: 2 }}>Dashboard content</Box>
       </DashboardLayout>
     </AppProvider>
   );

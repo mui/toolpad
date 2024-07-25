@@ -7,6 +7,11 @@
 /favicon.ico
   Content-Type: image/x-icon
 
+/toolpad/core/builder
+  # https://webcontainers.io/guides/configuring-headers
+  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Opener-Policy: same-origin
+
 /*
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   # Block usage in iframes.

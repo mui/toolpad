@@ -12,9 +12,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": false,
-    "outDir": "./dist",
     "pretty": true,
-    "rootDir": "src",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "preserveWatchOutput": true,
     "types": ["node"]
   },

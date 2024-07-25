@@ -112,6 +112,7 @@
     "vitest-fail-on-console": "0.7.0"
   },
   "dependencies": {
+    "@microsoft/api-extractor": "^7.47.2",
     "@types/lodash": "4.17.7",
     "@vitest/browser": "beta",
     "archiver": "7.0.1",

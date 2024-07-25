@@ -4,7 +4,7 @@ import * as fs from 'fs/promises';
 import { constants as fsConstants } from 'fs';
 import path from 'path';
 import yargs from 'yargs';
-import { input } from '@inquirer/prompts';
+import { input, confirm, select, checkbox } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { errorFrom } from '@toolpad/utils/errors';
 import { execa } from 'execa';
@@ -13,7 +13,8 @@ import { readJsonFile } from '@toolpad/utils/fs';
 import invariant from 'invariant';
 import { bashResolvePath } from '@toolpad/utils/cli';
 import { PackageJson } from './packageType';
-import generateProject from './generateProject';
+import generateProject, { GenerateProjectOptions } from './generateProject';
+import type { SupportedRouter, SupportedAuthProvider } from './generateProject';
 import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
 
@@ -161,30 +162,30 @@ const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean)
   }
 };
 
-const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
+const scaffoldCoreProject = async (options: GenerateProjectOptions): Promise<void> => {
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
   console.log(
-    `${chalk.cyan('info')} - Creating Toolpad Core project in ${chalk.cyan(absolutePath)}`,
+    `${chalk.cyan('info')} - Creating Toolpad Core project in ${chalk.cyan(options.absolutePath)}`,
   );
   // eslint-disable-next-line no-console
   console.log();
-  const files = generateProject({ name: path.basename(absolutePath) });
-  await writeFiles(absolutePath, files);
+  const files = generateProject(options);
+  await writeFiles(options.absolutePath, files);
 
   // eslint-disable-next-line no-console
   console.log(`${chalk.cyan('info')} - Installing dependencies`);
   // eslint-disable-next-line no-console
   console.log();
 
-  await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
+  await execa(packageManager, ['install'], { stdio: 'inherit', cwd: options.absolutePath });
 
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
   console.log(
-    `${chalk.green('success')} - Created Toolpad Core project at ${chalk.cyan(absolutePath)}`,
+    `${chalk.green('success')} - Created Toolpad Core project at ${chalk.cyan(options.absolutePath)}`,
   );
   // eslint-disable-next-line no-console
   console.log();
@@ -267,7 +268,38 @@ const run = async () => {
   }
   // If the core flag is set, create a new project with Toolpad Core
   else if (coreFlag) {
-    await scaffoldCoreProject(absolutePath);
+    const routerOption: SupportedRouter = await select({
+      message: 'Which router would you like to use?',
+      default: 'nextjs',
+      choices: [
+        { name: 'Next.js App Router', value: 'nextjs-app' },
+        { name: 'Next.js Pages Router', value: 'nextjs-pages' },
+      ],
+    });
+    const authFlag = await confirm({
+      message: 'Would you like to enable authentication?',
+      default: true,
+    });
+    let authProviderOptions: SupportedAuthProvider[] = [];
+    if (authFlag) {
+      authProviderOptions = await checkbox({
+        message: 'Select an authentication provider',
+        choices: [
+          { name: 'Credentials', value: 'credentials' },
+          { name: 'Google', value: 'google' },
+          { name: 'GitHub', value: 'github' },
+          { name: 'Facebook', value: 'facebook' },
+        ],
+      });
+    }
+    const options = {
+      name: path.basename(absolutePath),
+      absolutePath,
+      router: routerOption,
+      auth: authFlag,
+      authProviders: authProviderOptions,
+    };
+    await scaffoldCoreProject(options);
   } else {
     // Otherwise, create a new project with Toolpad Studio
     await scaffoldStudioProject(absolutePath, installFlag);

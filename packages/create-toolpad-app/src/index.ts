@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 
 import * as fs from 'fs/promises';
 import { constants as fsConstants } from 'fs';
@@ -110,13 +111,10 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
 
 // Create a new `package.json` file and install dependencies
 const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean): Promise<void> => {
-  // eslint-disable-next-line no-console
   console.log();
-  // eslint-disable-next-line no-console
   console.log(
     `${chalk.cyan('info')} - Creating Toolpad Studio project in ${chalk.cyan(absolutePath)}`,
   );
-  // eslint-disable-next-line no-console
   console.log();
 
   const packageJson: PackageJson = {
@@ -133,11 +131,10 @@ const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean)
   };
 
   const DEFAULT_GENERATED_GITIGNORE_FILE = '.gitignore';
-  // eslint-disable-next-line no-console
+
   console.log(`${chalk.cyan('info')} - Initializing package.json file`);
   await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
 
-  // eslint-disable-next-line no-console
   console.log(`${chalk.cyan('info')} - Initializing .gitignore file`);
   await fs.copyFile(
     path.resolve(__dirname, `./gitignoreTemplate`),
@@ -145,48 +142,43 @@ const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean)
   );
 
   if (installFlag) {
-    // eslint-disable-next-line no-console
     console.log(`${chalk.cyan('info')} - Installing dependencies`);
-    // eslint-disable-next-line no-console
+
     console.log();
 
     await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
 
-    // eslint-disable-next-line no-console
     console.log();
-    // eslint-disable-next-line no-console
+
     console.log(`${chalk.green('success')} - Dependencies installed successfully!`);
-    // eslint-disable-next-line no-console
+
     console.log();
   }
 };
 
 const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
-  // eslint-disable-next-line no-console
   console.log();
-  // eslint-disable-next-line no-console
+
   console.log(
     `${chalk.cyan('info')} - Creating Toolpad Core project in ${chalk.cyan(absolutePath)}`,
   );
-  // eslint-disable-next-line no-console
+
   console.log();
   const files = generateProject({ name: path.basename(absolutePath) });
   await writeFiles(absolutePath, files);
 
-  // eslint-disable-next-line no-console
   console.log(`${chalk.cyan('info')} - Installing dependencies`);
-  // eslint-disable-next-line no-console
+
   console.log();
 
   await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
 
-  // eslint-disable-next-line no-console
   console.log();
-  // eslint-disable-next-line no-console
+
   console.log(
     `${chalk.green('success')} - Created Toolpad Core project at ${chalk.cyan(absolutePath)}`,
   );
-  // eslint-disable-next-line no-console
+
   console.log();
 };
 
@@ -200,7 +192,6 @@ const run = async () => {
 
   // check the node version before create
   if (!satisfies(process.version, pkgJson.engines.node)) {
-    // eslint-disable-next-line no-console
     console.log(
       `${chalk.red('error')} - Your node version ${
         process.version
@@ -240,11 +231,10 @@ const run = async () => {
   if (pathArg) {
     const pathValidOrError = await validatePath(pathArg);
     if (typeof pathValidOrError === 'string') {
-      // eslint-disable-next-line no-console
       console.log();
-      // eslint-disable-next-line no-console
+
       console.log(pathValidOrError);
-      // eslint-disable-next-line no-console
+
       console.log();
       process.exit(1);
     }
@@ -264,19 +254,21 @@ const run = async () => {
   // If the user has provided an example, download and extract it
   if (args.example) {
     await downloadAndExtractExample(absolutePath, args.example);
-    // eslint-disable-next-line no-console
-    console.log(`${chalk.cyan('info')} - Installing dependencies`);
-    // eslint-disable-next-line no-console
-    console.log();
-    await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
-    // eslint-disable-next-line no-console
-    console.log();
-    // eslint-disable-next-line no-console
-    console.log(
-      `${chalk.green('success')} - Installed "${args.example}" at ${chalk.cyan(absolutePath)}`,
-    );
-    // eslint-disable-next-line no-console
-    console.log();
+
+    if (installFlag) {
+      console.log(`${chalk.cyan('info')} - Installing dependencies`);
+
+      console.log();
+      await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
+
+      console.log();
+
+      console.log(
+        `${chalk.green('success')} - Installed "${args.example}" at ${chalk.cyan(absolutePath)}`,
+      );
+
+      console.log();
+    }
   }
   // If the core flag is set, create a new project with Toolpad Core
   else if (coreFlag) {
@@ -302,9 +294,8 @@ const run = async () => {
       packageManager === 'yarn' ? '' : ' run'
     } dev`,
   )}`;
-  // eslint-disable-next-line no-console
+
   console.log(message);
-  // eslint-disable-next-line no-console
   console.log();
 };
 

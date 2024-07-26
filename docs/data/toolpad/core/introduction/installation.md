@@ -75,7 +75,6 @@ yarn dev
 
 5. Installation is complete! Begin building your project by making edits to `(dashboard/page/page.tsx`. To understand how to leverage Toolpad Core to build dashboards quickly, [see the detailed tutorial](/toolpad/core/introduction/tutorial/).
 
-
 ## Manual Installation
 
 Start by installing the required dependencies:
@@ -128,4 +127,3 @@ pnpm toolpad-core:dev
 </codeblock>
 
 When you run this command, Toolpad Core will initialize the application in the **./my-toolpad-core-app** folder.
-

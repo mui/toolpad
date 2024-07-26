@@ -46,7 +46,7 @@ export const dashboardLayoutContent = `
   }
   `;
 
-export const dashboardPageLayout = `
+export const dashboardPageContent = `
   import { PageContainer } from '@toolpad/core/PageContainer';
 
   export default function Layout({

@@ -51,12 +51,17 @@ export default function generateProject(
       // ...
     ]);
     if (options.auth) {
+      // Add additional files for authentication
       const authFiles = new Map([
         ['auth.ts', { content: authContent }],
         ['middleware.ts', { content: middlewareContent }],
         ['app/api/auth/[...nextAuth]/route.ts', { content: authRouterHandlerContent }],
         ['app/auth/signin.tsx', { content: signInPageContent }],
       ]);
+      // Replace some existing file content with auth-specific content
+      nextJsAppRouterStarter.set('app/(dashboard)/page.tsx', {
+        content: dashboardPageAuthContent,
+      });
       return new Map([...nextJsAppRouterStarter, ...authFiles]);
     }
   }

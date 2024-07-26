@@ -13,6 +13,10 @@ import {
   gitignoreTemplate,
   eslintConfigContent,
   tsConfigContent,
+  authContent,
+  middlewareContent,
+  authRouterHandlerContent,
+  signInPageContent,
 } from './templates';
 
 export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';
@@ -31,9 +35,7 @@ export default function generateProject(
   packageJson.name = path.basename(options.name);
 
   if (options.router === 'nextjs-app') {
-    return new Map([
-      ['app/api/auth/[...nextAuth]/route.ts', { content: '' }],
-      ['app/auth/[...path]/page.tsx', { content: '' }],
+    const nextJsAppRouterStarter = new Map([
       ['app/(dashboard)/page/page.tsx', { content: dashboardPage }],
       ['app/(dashboard)/page/layout.tsx', { content: dashboardPageLayout }],
       ['app/(dashboard)/layout.tsx', { content: dashboardLayoutContent }],
@@ -48,6 +50,15 @@ export default function generateProject(
       ['.gitignore', { content: gitignoreTemplate }],
       // ...
     ]);
+    if (options.auth) {
+      const authFiles = new Map([
+        ['auth.ts', { content: authContent }],
+        ['middleware.ts', { content: middlewareContent }],
+        ['app/api/auth/[...nextAuth]/route.ts', { content: authRouterHandlerContent }],
+        ['app/auth/signin.tsx', { content: signInPageContent }],
+      ]);
+      return new Map([...nextJsAppRouterStarter, ...authFiles]);
+    }
   }
 
   return new Map([

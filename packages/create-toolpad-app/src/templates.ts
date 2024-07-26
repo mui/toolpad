@@ -315,6 +315,12 @@ export const gitignoreTemplate = `
   .yarn/install-state.gz
   `;
 
+export const authRouterHandlerContent = `
+import { handlers } from '../../../../auth';
+
+export const { GET, POST } = handlers;
+`;
+
 export const packageJson: PackageJson = {
   version: '0.1.0',
   scripts: {
@@ -344,3 +350,119 @@ export const packageJson: PackageJson = {
     'eslint-config-next': '^14',
   },
 };
+
+export const authContent = `import NextAuth from 'next-auth';
+import GitHub from 'next-auth/providers/github';
+import Credentials from 'next-auth/providers/credentials';
+import type { Provider } from 'next-auth/providers';
+
+const providers: Provider[] = [
+  GitHub({
+    clientId: process.env.AUTH_GITHUB_ID,
+    clientSecret: process.env.AUTH_GITHUB_SECRET,
+  }),
+  Credentials({
+    credentials: {
+      email: { label: 'Email Address', type: 'email' },
+      password: { label: 'Password', type: 'password' },
+    },
+    authorize(c) {
+      if (c.password !== 'password') {
+        // TODO: Set next-auth version to latest when
+        // https://github.com/nextauthjs/next-auth/issues/11074 is resolved
+        return null;
+      }
+      return {
+        id: 'test',
+        name: 'Test User',
+        email: 'test@example.com',
+      };
+    },
+  }),
+];
+
+export const providerMap = providers.map((provider) => {
+  if (typeof provider === 'function') {
+    const providerData = provider();
+    return { id: providerData.id, name: providerData.name };
+  }
+  return { id: provider.id, name: provider.name };
+});
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  providers,
+  secret: process.env.AUTH_SECRET,
+  pages: {
+    signIn: '/auth/signin',
+  },
+  callbacks: {
+    authorized({ auth: session, request: { nextUrl } }) {
+      const isLoggedIn = !!session?.user;
+      const isPublicPage = nextUrl.pathname.startsWith('/public');
+
+      if (isPublicPage || isLoggedIn) {
+        return true;
+      }
+
+      return false; // Redirect unauthenticated users to login page
+    },
+  },
+});
+`;
+
+export const middlewareContent = `export { auth as middleware } from './auth';
+
+export const config = {
+  // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
+  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+};
+`;
+
+export const signInPageContent = `
+import * as React from 'react';
+import type { AuthProvider } from '@toolpad/core';
+import { SignInPage } from '@toolpad/core/SignInPage';
+import { AuthError } from 'next-auth';
+import { providerMap, signIn } from '../../../auth';
+
+export default function SignIn() {
+  return (
+    <SignInPage
+      providers={providerMap}
+      signIn={async (provider: AuthProvider, formData: FormData, callbackUrl?: string) => {
+        'use server';
+        try {
+          return await signIn(provider.id, {
+            ...(formData && { email: formData.get('email'), password: formData.get('password') }),
+            redirectTo: callbackUrl ?? '/',
+          });
+        } catch (error) {
+          // The desired flow for successful sign in in all cases
+          // and unsuccessful sign in for OAuth providers will cause a \`redirect\`,
+          // and \`redirect\` is a throwing function, so we need to re-throw
+          // to allow the redirect to happen
+          // Source: https://github.com/vercel/next.js/issues/49298#issuecomment-1542055642
+          // Detect a \`NEXT_REDIRECT\` error and re-throw it
+          if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+            throw error;
+          }
+          // Handle Auth.js errors
+          if (error instanceof AuthError) {
+            return {
+              error:
+                error.type === 'CredentialsSignin'
+                  ? 'Invalid credentials.'
+                  : 'An error with Auth.js occurred.',
+              type: error.type,
+            };
+          }
+          // An error boundary must exist to handle unknown errors
+          return {
+            error: 'Something went wrong.',
+            type: 'UnknownError',
+          };
+        }
+      }}
+    />
+  );
+}`;

@@ -5,15 +5,15 @@
       "type": { "name": "shape", "description": "{ logo?: node, title?: string }" },
       "default": "null"
     },
+    "colorScheme": { "type": { "name": "enum", "description": "'dark'<br>&#124;&nbsp;'light'" } },
     "navigation": {
       "type": {
         "name": "arrayOf",
-        "description": "Array&lt;{ children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', segment: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
+        "description": "Array&lt;{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', segment: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
       },
       "default": "[]"
     },
-    "paletteMode": { "type": { "name": "enum", "description": "'dark'<br>&#124;&nbsp;'light'" } },
-    "setPaletteMode": { "type": { "name": "func" } },
+    "onColorSchemeChange": { "type": { "name": "func" } },
     "window": { "type": { "name": "object" }, "default": "window" }
   },
   "name": "DashboardLayout",

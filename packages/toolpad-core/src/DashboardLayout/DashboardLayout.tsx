@@ -510,12 +510,17 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
+   * Active color scheme in theme.
+   */
+  colorScheme: PropTypes.oneOf(['dark', 'light']),
+  /**
    * Navigation definition for the layout.
    * @default []
    */
   navigation: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.shape({
+        action: PropTypes.node,
         children: PropTypes.arrayOf(
           PropTypes.oneOfType([
             PropTypes.object,
@@ -543,13 +548,9 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
     ]).isRequired,
   ),
   /**
-   * Active palette mode in theme.
+   * Callback to run when the theme color scheme is changed.
    */
-  paletteMode: PropTypes.oneOf(['dark', 'light']),
-  /**
-   * Function to run when the theme switcher is toggled.
-   */
-  setPaletteMode: PropTypes.func,
+  onColorSchemeChange: PropTypes.func,
   /**
    * The window where the layout is rendered.
    * This is needed when rendering the layout inside an iframe, for example.

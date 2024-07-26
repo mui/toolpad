@@ -2,10 +2,11 @@ import * as React from 'react';
 import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
-import { AppProvider, Navigation } from '@toolpad/core/AppProvider';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internals/demo';
 import { PageContainer } from '@toolpad/core/PageContainer';
+import type { Navigation } from '@toolpad/core';
 import { Typography } from '@mui/material';
 
 const NAVIGATION: Navigation = [

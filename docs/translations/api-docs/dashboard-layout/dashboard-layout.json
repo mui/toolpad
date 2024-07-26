@@ -3,9 +3,11 @@
   "propDescriptions": {
     "branding": { "description": "Branding options for the layout." },
     "children": { "description": "The content of the dashboard." },
+    "colorScheme": { "description": "Active color scheme in theme." },
     "navigation": { "description": "Navigation definition for the layout." },
-    "paletteMode": { "description": "Active palette mode in theme." },
-    "setPaletteMode": { "description": "Function to run when the theme switcher is toggled." },
+    "onColorSchemeChange": {
+      "description": "Callback to run when the theme color scheme is changed."
+    },
     "window": {
       "description": "The window where the layout is rendered. This is needed when rendering the layout inside an iframe, for example."
     }

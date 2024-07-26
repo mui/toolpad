@@ -1,10 +1,9 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { extendTheme } from '@mui/material/styles';
+import { CssVarsProvider, extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import type { Navigation, Router } from '@toolpad/core';
 
@@ -57,7 +56,7 @@ interface DemoProps {
   window?: () => Window;
 }
 
-export default function DashboardLayoutBranding(props: DemoProps) {
+export default function DashboardLayoutStandalone(props: DemoProps) {
   const { window } = props;
 
   const [pathname, setPathname] = React.useState('dashboard');
@@ -74,21 +73,26 @@ export default function DashboardLayoutBranding(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    // preview-start
-    <AppProvider
-      navigation={NAVIGATION}
-      branding={{
-        logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
-        title: 'MUI',
-      }}
-      router={router}
+    <CssVarsProvider
       theme={demoTheme}
-      window={demoWindow}
+      documentNode={demoWindow?.document}
+      colorSchemeNode={demoWindow?.document?.body}
+      colorSchemeStorageKey="mui-toolpad-color-scheme"
+      modeStorageKey="mui-toolpad-mode"
     >
-      <DashboardLayout>
+      <DashboardLayout
+        navigation={NAVIGATION}
+        branding={{
+          logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
+          title: 'MUI',
+        }}
+        colorScheme={}
+        onColorSchemeChange={}
+        router={router}
+        window={demoWindow}
+      >
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
-    </AppProvider>
-    // preview-end
+    </CssVarsProvider>
   );
 }

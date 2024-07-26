@@ -105,7 +105,7 @@ export default function Examples() {
           }
         />
         <Grid container spacing={5} sx={{ mt: { xs: 1, sm: 4 } }}>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <ImageContainer noLinkStyle href="https://mui.com/toolpad/core/introduction/tutorial/">
               <Img
                 src="/static/toolpad/docs/studio/examples/qr-generator.png"
@@ -120,7 +120,7 @@ export default function Examples() {
               href="https://mui.com/toolpad/core/introduction/tutorial/"
             />
           </Grid>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box
               sx={[
                 (theme) => ({

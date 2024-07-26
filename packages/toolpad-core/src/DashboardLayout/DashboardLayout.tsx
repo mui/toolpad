@@ -79,12 +79,7 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   },
 }));
 
-interface ThemeSwitcherProps {
-  value?: PaletteMode;
-  onChange?: (mode: PaletteMode) => void;
-}
-
-function ThemeSwitcher({ value, onChange }: ThemeSwitcherProps) {
+function ThemeSwitcher() {
   const isSsr = useSsr();
   const theme = useTheme();
 
@@ -323,14 +318,6 @@ export interface DashboardLayoutProps {
    */
   navigation?: AppProviderProps['navigation'];
   /**
-   * Active palette mode in theme.
-   */
-  paletteMode?: PaletteMode;
-  /**
-   * Function to run when the theme switcher is toggled.
-   */
-  setPaletteMode?: (theme: PaletteMode) => void;
-  /**
    * The window where the layout is rendered.
    * This is needed when rendering the layout inside an iframe, for example.
    * @default window
@@ -351,8 +338,6 @@ export interface DashboardLayoutProps {
 function DashboardLayout(props: DashboardLayoutProps) {
   const {
     children,
-    paletteMode,
-    setPaletteMode,
     branding: brandingProp,
     navigation: navigationProp,
     window: windowProp,
@@ -444,7 +429,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <ThemeSwitcher value={paletteMode} onChange={setPaletteMode} />
+          <ThemeSwitcher />
         </Toolbar>
       </AppBar>
       <Drawer

@@ -79,15 +79,20 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   },
 }));
 
-function ThemeSwitcher() {
+interface ThemeSwitcherProps {
+  colorScheme?: PaletteMode;
+  onColorSchemeChange?: (mode: PaletteMode) => void;
+}
+
+function ThemeSwitcher({ colorScheme, onColorSchemeChange }: ThemeSwitcherProps) {
   const isSsr = useSsr();
   const theme = useTheme();
 
   const paletteModeContext = React.useContext(PaletteModeContext);
 
-  const paletteMode = value ?? paletteModeContext.paletteMode;
-  const setPaletteMode = onChange ?? paletteModeContext.setPaletteMode;
-  const isDualTheme = !!onChange ?? paletteModeContext.isDualTheme;
+  const paletteMode = colorScheme ?? paletteModeContext.paletteMode;
+  const setPaletteMode = onColorSchemeChange ?? paletteModeContext.setPaletteMode;
+  const isDualTheme = !!onColorSchemeChange || paletteModeContext.isDualTheme;
 
   const toggleMode = React.useCallback(() => {
     setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
@@ -318,6 +323,14 @@ export interface DashboardLayoutProps {
    */
   navigation?: AppProviderProps['navigation'];
   /**
+   * Active color scheme in theme.
+   */
+  colorScheme?: PaletteMode;
+  /**
+   * Callback to run when the theme color scheme is changed.
+   */
+  onColorSchemeChange?: (theme: PaletteMode) => void;
+  /**
    * The window where the layout is rendered.
    * This is needed when rendering the layout inside an iframe, for example.
    * @default window
@@ -338,6 +351,8 @@ export interface DashboardLayoutProps {
 function DashboardLayout(props: DashboardLayoutProps) {
   const {
     children,
+    colorScheme,
+    onColorSchemeChange,
     branding: brandingProp,
     navigation: navigationProp,
     window: windowProp,
@@ -429,7 +444,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <ThemeSwitcher />
+          <ThemeSwitcher colorScheme={colorScheme} onColorSchemeChange={onColorSchemeChange} />
         </Toolbar>
       </AppBar>
       <Drawer

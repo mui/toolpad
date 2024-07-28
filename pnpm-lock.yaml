@@ -97,8 +97,8 @@ importers:
         specifier: 1.0.13
         version: 1.0.13
       '@mui/monorepo':
-        specifier: github:mui/material-ui#2fe1e9c0ecd0cfa928ed632083c0dfe05ba4351c
-        version: https://codeload.github.com/mui/material-ui/tar.gz/2fe1e9c0ecd0cfa928ed632083c0dfe05ba4351c(encoding@0.1.13)
+        specifier: github:mui/material-ui#d69604d3feb1dd1dd9b9bf3398c08237e77dafa6
+        version: https://codeload.github.com/mui/material-ui/tar.gz/d69604d3feb1dd1dd9b9bf3398c08237e77dafa6(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.11.1
         version: 7.11.1(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-beta.3(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -191,7 +191,7 @@ importers:
         version: 7.34.3(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-47e15aa-20240725(eslint@8.57.0)
+        version: 0.0.0-experimental-9ed098e-20240725(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -2868,9 +2868,9 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/2fe1e9c0ecd0cfa928ed632083c0dfe05ba4351c':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/2fe1e9c0ecd0cfa928ed632083c0dfe05ba4351c}
-    version: 6.0.0-beta.2
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/d69604d3feb1dd1dd9b9bf3398c08237e77dafa6':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/d69604d3feb1dd1dd9b9bf3398c08237e77dafa6}
+    version: 6.0.0-beta.3
     engines: {pnpm: 9.5.0}
 
   '@mui/private-theming@5.16.5':
@@ -5781,8 +5781,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-47e15aa-20240725:
-    resolution: {integrity: sha512-kc++BYUMmCvEM54mrdEZtc5nWskmUVDNza6/Jezee02CBLh+ftPHl4hDtophy4puUAMhZ+p2loJi1gM36hhDbQ==}
+  eslint-plugin-react-compiler@0.0.0-experimental-9ed098e-20240725:
+    resolution: {integrity: sha512-Xv2iD8kU6R4Wdjdh1WhdP8UnSqSV+/XcadxwBCmMr836fQUoXGuw/uVGc01v9opZs9SwKzo+8My6ayVCgAinPA==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -12021,7 +12021,7 @@ snapshots:
       '@emotion/styled': 11.11.5(@emotion/react@11.11.4(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@types/react': 18.3.3
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/2fe1e9c0ecd0cfa928ed632083c0dfe05ba4351c(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/d69604d3feb1dd1dd9b9bf3398c08237e77dafa6(encoding@0.1.13)':
     dependencies:
       '@googleapis/sheets': 8.0.0(encoding@0.1.13)
       '@netlify/functions': 2.8.1
@@ -15557,7 +15557,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-47e15aa-20240725(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-9ed098e-20240725(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.24.9
       '@babel/parser': 7.24.8

@@ -191,7 +191,7 @@ importers:
         version: 7.34.3(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-47e15aa-20240725(eslint@8.57.0)
+        version: 0.0.0-experimental-9ed098e-20240725(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -890,8 +890,8 @@ importers:
         specifier: 18.3.1
         version: 18.3.1
       react-resizable-panels:
-        specifier: 2.0.21
-        version: 2.0.21(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 2.0.22
+        version: 2.0.22(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-router-dom:
         specifier: 6.24.1
         version: 6.24.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -5781,8 +5781,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-47e15aa-20240725:
-    resolution: {integrity: sha512-kc++BYUMmCvEM54mrdEZtc5nWskmUVDNza6/Jezee02CBLh+ftPHl4hDtophy4puUAMhZ+p2loJi1gM36hhDbQ==}
+  eslint-plugin-react-compiler@0.0.0-experimental-9ed098e-20240725:
+    resolution: {integrity: sha512-Xv2iD8kU6R4Wdjdh1WhdP8UnSqSV+/XcadxwBCmMr836fQUoXGuw/uVGc01v9opZs9SwKzo+8My6ayVCgAinPA==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -8538,8 +8538,8 @@ packages:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
     engines: {node: '>=0.10.0'}
 
-  react-resizable-panels@2.0.21:
-    resolution: {integrity: sha512-rFRjZ2sJ+iut0hY+5NtIxoIRlQqTWqZ6rMNahaZeZDpRPQyg8xiKjrlvXMq52WswFwpg47GFJcxn7f9uAFnZsQ==}
+  react-resizable-panels@2.0.22:
+    resolution: {integrity: sha512-G8x8o7wjQxCG+iF4x4ngKVBpe0CY+DAZ/SaiDoqBEt0yuKJe9OE/VVYMBMMugQ3GyQ65NnSJt23tujlaZZe75A==}
     peerDependencies:
       react: ^16.14.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
@@ -15557,7 +15557,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-47e15aa-20240725(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-9ed098e-20240725(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.24.9
       '@babel/parser': 7.24.8
@@ -18706,7 +18706,7 @@ snapshots:
 
   react-refresh@0.14.2: {}
 
-  react-resizable-panels@2.0.21(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-resizable-panels@2.0.22(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)

@@ -284,10 +284,11 @@ const run = async () => {
     if (authFlag) {
       authProviderOptions = await checkbox({
         message: 'Select authentication providers to enable:',
+        required: true,
         choices: [
-          { name: 'Username/Password', value: 'credentials' },
-          { name: 'Google', value: 'google' },
-          { name: 'GitHub', value: 'github' },
+          { name: 'Username/Password', value: 'Credentials' },
+          { name: 'Google', value: 'Google' },
+          { name: 'GitHub', value: 'GitHub' },
         ],
       });
     }

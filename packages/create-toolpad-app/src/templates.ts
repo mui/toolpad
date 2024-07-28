@@ -39,7 +39,6 @@ import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { Navigation } from '@toolpad/core';
 import { SessionProvider, signIn, signOut } from 'next-auth/react';
 import { auth } from '../auth';
@@ -50,14 +49,9 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    slug: '/',
+    segment: '',
     title: 'Dashboard',
     icon: <DashboardIcon />,
-  },
-  {
-    slug: '/orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
   },
 ];
 
@@ -105,6 +99,19 @@ export const dashboardLayoutContent = `
     );
   }
   `;
+
+export const dashboardLayoutAuthAppContent = `import * as React from 'react';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
+
+export default function DashboardPagesLayout(props: { children: React.ReactNode }) {
+  return (
+    <DashboardLayout>
+      <PageContainer>{props.children}</PageContainer>
+    </DashboardLayout>
+  );
+}
+`;
 
 export const dashboardPageLayoutContent = `
   import { PageContainer } from '@toolpad/core/PageContainer';
@@ -437,62 +444,94 @@ export const packageJson: PackageJson = {
     'eslint-config-next': '^14',
   },
 };
-
 export const packageJsonAuthApp: PackageJson = {
-  version: '0.1.0',
-  scripts: {
-    dev: 'next dev',
-    lint: 'next lint',
-  },
+  ...packageJson,
   dependencies: {
-    '@emotion/react': '^11.11.4',
-    '@emotion/styled': '^11.11.5',
-    '@mui/icons-material': '^5.16.0',
-    '@mui/lab': '^5.0.0-alpha.170',
-    '@mui/material': '^5.16.0',
-    '@mui/material-nextjs': '^5.15.11',
-    '@toolpad/core': 'latest',
-    next: '14.2.4',
+    ...packageJson.dependencies,
     'next-auth': '5.0.0-beta.18',
-    react: '18.3.1',
-    'react-dom': '18.3.1',
-  },
-  devDependencies: {
-    '@types/node': '^20.14.10',
-    '@types/react': '^18.3.3',
-    '@types/react-dom': '^18.3.0',
-    'eslint-config-next': '14.2.4',
   },
 };
 
-export const authContent = `import NextAuth from 'next-auth';
-import GitHub from 'next-auth/providers/github';
-import Credentials from 'next-auth/providers/credentials';
+// export const packageJsonAuthApp: PackageJson = {
+//   version: '0.1.0',
+//   scripts: {
+//     dev: 'next dev',
+//     lint: 'next lint',
+//   },
+//   dependencies: {
+//     react: '^18',
+//     'react-dom': '^18',
+//     next: '^14',
+//     'next-auth': '5.0.0-beta.18',
+//     '@toolpad/core': 'latest',
+//     '@mui/material': 'next',
+//     '@mui/material-nextjs': 'next',
+//     '@mui/icons-material': 'next',
+//     '@emotion/react': '^11',
+//     '@emotion/styled': '^11',
+//     '@emotion/cache': '^11',
+//     '@mui/lab': 'next',
+//   },
+//   devDependencies: {
+//     typescript: '^5',
+//     '@types/node': '^20',
+//     '@types/react': '^18',
+//     '@types/react-dom': '^18',
+//     eslint: '^8',
+//     'eslint-config-next': '^14',
+//   },
+// };
+
+export const credentialsProviderContent = `Credentials({
+  credentials: {
+    email: { label: 'Email Address', type: 'email' },
+    password: { label: 'Password', type: 'password' },
+  },
+  authorize(c) {
+    if (c.password !== 'password') {      
+      return null;
+    }
+    return {
+      id: 'test',
+      name: 'Test User',
+      email: 'test@example.com',
+    };
+  },
+}),
+`;
+
+export const oAuthProviderContent = (provider: string) => `
+${provider}({
+  clientId: process.env.${provider.toUpperCase()}_CLIENT_ID,
+  clientSecret: process.env.${provider.toUpperCase()}_CLIENT_SECRET,
+}),`;
+
+export const providerImport = (provider: string) => `
+import ${provider} from 'next-auth/providers/${provider?.toLowerCase()}';
+`;
+
+export const callbacksContent = `
+callbacks: {
+  authorized({ auth: session, request: { nextUrl } }) {
+    const isLoggedIn = !!session?.user;
+    const isPublicPage = nextUrl.pathname.startsWith('/public');
+
+    if (isPublicPage || isLoggedIn) {
+      return true;
+    }
+
+    return false; // Redirect unauthenticated users to login page
+  },
+},
+`;
+
+export const authContent = `
+import NextAuth from 'next-auth';
+  // PROVIDER_IMPORTS
 import type { Provider } from 'next-auth/providers';
 
 const providers: Provider[] = [
-  GitHub({
-    clientId: process.env.AUTH_GITHUB_ID,
-    clientSecret: process.env.AUTH_GITHUB_SECRET,
-  }),
-  Credentials({
-    credentials: {
-      email: { label: 'Email Address', type: 'email' },
-      password: { label: 'Password', type: 'password' },
-    },
-    authorize(c) {
-      if (c.password !== 'password') {
-        // TODO: Set next-auth version to latest when
-        // https://github.com/nextauthjs/next-auth/issues/11074 is resolved
-        return null;
-      }
-      return {
-        id: 'test',
-        name: 'Test User',
-        email: 'test@example.com',
-      };
-    },
-  }),
+// PROVIDER_CONTENT
 ];
 
 export const providerMap = providers.map((provider) => {
@@ -509,22 +548,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: '/auth/signin',
   },
-  callbacks: {
-    authorized({ auth: session, request: { nextUrl } }) {
-      const isLoggedIn = !!session?.user;
-      const isPublicPage = nextUrl.pathname.startsWith('/public');
-
-      if (isPublicPage || isLoggedIn) {
-        return true;
-      }
-
-      return false; // Redirect unauthenticated users to login page
-    },
-  },
+  // CALLBACKS_CONTENT
 });
 `;
 
-export const middlewareContent = `export { auth as middleware } from './auth';
+export const middlewareContent = `
+export { auth as middleware } from './auth';
 
 export const config = {
   // https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher

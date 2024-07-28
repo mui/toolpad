@@ -36,7 +36,7 @@
     "execa": "9.3.0",
     "invariant": "2.2.4",
     "semver": "7.6.3",
-    "tar": "7.4.0",
+    "tar": "7.4.3",
     "yargs": "17.7.2"
   },
   "devDependencies": {

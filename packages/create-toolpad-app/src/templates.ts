@@ -34,6 +34,66 @@ export const rootLayoutContent = `
   }
     `;
 
+export const rootLayoutAuthAppContent = `
+import * as React from 'react';
+import { AppProvider } from '@toolpad/core/nextjs';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import type { Navigation } from '@toolpad/core';
+import { SessionProvider, signIn, signOut } from 'next-auth/react';
+import { auth } from '../auth';
+
+const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Main items',
+  },
+  {
+    slug: '/',
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    slug: '/orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
+];
+
+const BRANDING = {
+  title: 'My Toolpad Core App',
+};
+
+const AUTHENTICATION = {
+  signIn,
+  signOut,
+};
+
+export default async function RootLayout(props: { children: React.ReactNode }) {
+  const session = await auth();
+
+  return (
+    <html lang="en">
+      <body>
+        <SessionProvider session={session}>
+          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+            <AppProvider
+              navigation={NAVIGATION}
+              branding={BRANDING}
+              session={session}
+              authentication={AUTHENTICATION}
+            >
+              {props.children}
+            </AppProvider>
+          </AppRouterCacheProvider>
+        </SessionProvider>
+      </body>
+    </html>
+  );
+}
+`;
+
 export const dashboardLayoutContent = `
   import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
@@ -46,7 +106,7 @@ export const dashboardLayoutContent = `
   }
   `;
 
-export const dashboardPageContent = `
+export const dashboardPageLayoutContent = `
   import { PageContainer } from '@toolpad/core/PageContainer';
 
   export default function Layout({
@@ -90,7 +150,7 @@ export const rootPageContainer = `
   }
   `;
 
-export const dashboardPage = `
+export const dashboardPageContent = `
   import { Typography } from "@mui/material";
 
   export default function Home() {
@@ -103,6 +163,33 @@ export const dashboardPage = `
     );
   }
   `;
+
+export const dashboardPageAuthAppContent = `
+import * as React from 'react';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import { auth } from '../../auth';
+
+export default async function HomePage() {
+  const session = await auth();
+
+  return (
+    <Box
+      sx={{
+        my: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Typography variant="h4" component="h1" sx={{ my: 2 }}>
+        Welcome to Toolpad, {session?.user?.name || 'User'}!
+      </Typography>
+    </Box>
+  );
+}
+`;
 
 export const themeContent = `
   "use client";
@@ -351,6 +438,33 @@ export const packageJson: PackageJson = {
   },
 };
 
+export const packageJsonAuthApp: PackageJson = {
+  version: '0.1.0',
+  scripts: {
+    dev: 'next dev',
+    lint: 'next lint',
+  },
+  dependencies: {
+    '@emotion/react': '^11.11.4',
+    '@emotion/styled': '^11.11.5',
+    '@mui/icons-material': '^5.16.0',
+    '@mui/lab': '^5.0.0-alpha.170',
+    '@mui/material': '^5.16.0',
+    '@mui/material-nextjs': '^5.15.11',
+    '@toolpad/core': 'latest',
+    next: '14.2.4',
+    'next-auth': '5.0.0-beta.18',
+    react: '18.3.1',
+    'react-dom': '18.3.1',
+  },
+  devDependencies: {
+    '@types/node': '^20.14.10',
+    '@types/react': '^18.3.3',
+    '@types/react-dom': '^18.3.0',
+    'eslint-config-next': '14.2.4',
+  },
+};
+
 export const authContent = `import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
 import Credentials from 'next-auth/providers/credentials';
@@ -466,3 +580,22 @@ export default function SignIn() {
     />
   );
 }`;
+
+export const readmeContent = `
+# Create Toolpad App
+
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [\`create-toolpad-app\`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+## Getting Started
+
+First, run the development server: \`npm run dev\`
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+`;

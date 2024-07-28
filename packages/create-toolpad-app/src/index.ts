@@ -270,7 +270,7 @@ const run = async () => {
   else if (coreFlag) {
     const routerOption: SupportedRouter = await select({
       message: 'Which router would you like to use?',
-      default: 'nextjs',
+      default: 'nextjs-app',
       choices: [
         { name: 'Next.js App Router', value: 'nextjs-app' },
         { name: 'Next.js Pages Router', value: 'nextjs-pages' },
@@ -283,12 +283,11 @@ const run = async () => {
     let authProviderOptions: SupportedAuthProvider[] = [];
     if (authFlag) {
       authProviderOptions = await checkbox({
-        message: 'Select an authentication provider',
+        message: 'Select authentication providers to enable:',
         choices: [
-          { name: 'Credentials', value: 'credentials' },
+          { name: 'Username/Password', value: 'credentials' },
           { name: 'Google', value: 'google' },
           { name: 'GitHub', value: 'github' },
-          { name: 'Facebook', value: 'facebook' },
         ],
       });
     }

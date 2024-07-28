@@ -191,7 +191,7 @@ importers:
         version: 7.34.3(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-47e15aa-20240725(eslint@8.57.0)
+        version: 0.0.0-experimental-9ed098e-20240725(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -551,8 +551,8 @@ importers:
         specifier: 7.6.3
         version: 7.6.3
       tar:
-        specifier: 7.4.0
-        version: 7.4.0
+        specifier: 7.4.3
+        version: 7.4.3
       yargs:
         specifier: 17.7.2
         version: 17.7.2
@@ -5781,8 +5781,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-47e15aa-20240725:
-    resolution: {integrity: sha512-kc++BYUMmCvEM54mrdEZtc5nWskmUVDNza6/Jezee02CBLh+ftPHl4hDtophy4puUAMhZ+p2loJi1gM36hhDbQ==}
+  eslint-plugin-react-compiler@0.0.0-experimental-9ed098e-20240725:
+    resolution: {integrity: sha512-Xv2iD8kU6R4Wdjdh1WhdP8UnSqSV+/XcadxwBCmMr836fQUoXGuw/uVGc01v9opZs9SwKzo+8My6ayVCgAinPA==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -9311,8 +9311,8 @@ packages:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
 
-  tar@7.4.0:
-    resolution: {integrity: sha512-XQs0S8fuAkQWuqhDeCdMlJXDX80D7EOVLDPVFkna9yQfzS+PHKgfxcei0jf6/+QAWcjqrnC8uM3fSAnrQl+XYg==}
+  tar@7.4.3:
+    resolution: {integrity: sha512-5S7Va8hKfV7W5U6g3aYxXmlPoZVAwUMy9AOKyF2fVuZa2UD3qZjg578OrLRt8PcNN1PleVaL/5/yYATNL0ICUw==}
     engines: {node: '>=18'}
 
   temp-dir@1.0.0:
@@ -15557,7 +15557,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-47e15aa-20240725(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-9ed098e-20240725(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.24.9
       '@babel/parser': 7.24.8
@@ -19611,7 +19611,7 @@ snapshots:
       mkdirp: 1.0.4
       yallist: 4.0.0
 
-  tar@7.4.0:
+  tar@7.4.3:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0

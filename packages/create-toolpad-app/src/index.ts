@@ -264,6 +264,22 @@ const run = async () => {
   // If the user has provided an example, download and extract it
   if (args.example) {
     await downloadAndExtractExample(absolutePath, args.example);
+
+    if (installFlag) {
+      // eslint-disable-next-line no-console
+      console.log(`${chalk.cyan('info')} - Installing dependencies`);
+      // eslint-disable-next-line no-console
+      console.log();
+      await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
+      // eslint-disable-next-line no-console
+      console.log();
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.green('success')} - Installed "${args.example}" at ${chalk.cyan(absolutePath)}`,
+      );
+      // eslint-disable-next-line no-console
+      console.log();
+    }
   }
   // If the core flag is set, create a new project with Toolpad Core
   else if (coreFlag) {

@@ -112,7 +112,6 @@ function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
   return (
     <CssVarsProvider
       theme={theme}
-      defaultMode="system"
       documentNode={appWindow?.document}
       colorSchemeNode={appWindow?.document?.body}
       disableNestedContext

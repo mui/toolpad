@@ -1,25 +1,11 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { extendTheme } from '@mui/material/styles';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { AppProvider, Router } from '@toolpad/core/AppProvider';
+import DescriptionIcon from '@mui/icons-material/Description';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation } from '@toolpad/core';
-
-const NAVIGATION: Navigation = [
-  {
-    segment: 'dashboard',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-];
 
 const demoTheme = extendTheme({
   breakpoints: {
@@ -33,7 +19,7 @@ const demoTheme = extendTheme({
   },
 });
 
-function DemoPageContent({ pathname }: { pathname: string }) {
+function DemoPageContent({ pathname }) {
   return (
     <Box
       sx={{
@@ -49,20 +35,16 @@ function DemoPageContent({ pathname }: { pathname: string }) {
   );
 }
 
-interface DemoProps {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
-  window?: () => Window;
-}
+DemoPageContent.propTypes = {
+  pathname: PropTypes.string.isRequired,
+};
 
-export default function DashboardLayoutBranding(props: DemoProps) {
+function DashboardLayoutNavigationHeadings(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
+  const [pathname, setPathname] = React.useState('/lion');
 
-  const router = React.useMemo<Router>(() => {
+  const router = React.useMemo(() => {
     return {
       pathname,
       searchParams: new URLSearchParams(),
@@ -76,11 +58,26 @@ export default function DashboardLayoutBranding(props: DemoProps) {
   return (
     // preview-start
     <AppProvider
-      navigation={NAVIGATION}
-      branding={{
-        logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
-        title: 'MUI',
-      }}
+      navigation={[
+        {
+          kind: 'header',
+          title: 'Animals',
+        },
+        {
+          segment: 'lion',
+          title: 'Lion',
+          icon: <DescriptionIcon />,
+        },
+        {
+          kind: 'header',
+          title: 'Movies',
+        },
+        {
+          segment: 'lord-of-the-rings',
+          title: 'Lord of the Rings',
+          icon: <DescriptionIcon />,
+        },
+      ]}
       router={router}
       theme={demoTheme}
       window={demoWindow}
@@ -92,3 +89,13 @@ export default function DashboardLayoutBranding(props: DemoProps) {
     // preview-end
   );
 }
+
+DashboardLayoutNavigationHeadings.propTypes = {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window: PropTypes.func,
+};
+
+export default DashboardLayoutNavigationHeadings;

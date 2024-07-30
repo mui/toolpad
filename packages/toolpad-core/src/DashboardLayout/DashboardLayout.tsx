@@ -229,7 +229,7 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const navigationItemFullPath = `${basePath}/${navigationItem.segment ?? ''}`;
+        const navigationItemFullPath = `${basePath}${basePath && !navigationItem.segment ? '' : '/'}${navigationItem.segment ?? ''}`;
 
         const navigationItemId = `${depth}-${navigationItemIndex}`;
 

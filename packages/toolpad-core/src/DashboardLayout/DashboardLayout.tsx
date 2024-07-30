@@ -169,7 +169,7 @@ function DashboardSidebarSubNavigation({
               if (!isPageItem(nestedNavigationItem)) {
                 return false;
               }
-              const navigationItemFullPath = `${basePath}/${nestedNavigationItem.segment ?? ''}`;
+              const navigationItemFullPath = `${basePath}${basePath && !navigationItem.segment ? '' : '/'}${navigationItem.segment ?? ''}`;
 
               return navigationItemFullPath === pathname;
             }),

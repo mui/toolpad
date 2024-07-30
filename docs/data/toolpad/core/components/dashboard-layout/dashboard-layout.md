@@ -49,7 +49,7 @@ Navigation links can be placed in the sidebar as items with the format:
 Navigation headings can be placed in the sidebar as items with the format:
 
 ```tsx
-{ kind: 'header', title: 'Epic Fantasy' }
+{ kind: 'header', title: 'Animals' }
 ```
 
 {{"demo": "DashboardLayoutNavigationHeadings.js", "height": 400, "iframe": true}}
@@ -71,7 +71,7 @@ Dividers can can be placed between items in the sidebar as items with the format
 Nested navigation structures can be placed in the sidebar as items with the format:
 
 ```tsx
-{ title: 'Fantasy', icon: <FolderIcon />, children: [ ... ] }
+{ title: 'Movies', icon: <FolderIcon />, children: [ ... ] }
 ```
 
 {{"demo": "DashboardLayoutNavigationNested.js", "height": 400, "iframe": true}}

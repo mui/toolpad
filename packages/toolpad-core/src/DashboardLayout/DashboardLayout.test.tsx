@@ -164,7 +164,7 @@ describe('DashboardLayout', () => {
       },
       {
         title: 'Item',
-        segment: 'item 2',
+        segment: 'item2',
         icon: <DescriptionIcon />,
         action: <div>Action 2</div>,
       },

@@ -18,7 +18,10 @@ import {
   gitignoreTemplate,
   eslintConfigContent,
   tsConfigContent,
-  authContent,
+  authImports,
+  providerSetupContent,
+  providerMapContent,
+  authContentEnd,
   middlewareContent,
   authRouterHandlerContent,
   signInPageContent,
@@ -41,8 +44,10 @@ export interface GenerateProjectOptions {
 export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
+  // Add app name to package.json
   packageJson.name = path.basename(options.name);
 
+  // Default files, common to all apps
   const files = new Map<string, { content: string }>([
     ['theme.ts', { content: themeContent }],
     ['next-env.d.ts', { content: nextTypesContent }],
@@ -62,57 +67,45 @@ export default function generateProject(
     default: {
       const nextJsAppRouterStarter = new Map([
         ['app/(dashboard)/layout.tsx', { content: dashboardLayoutContent }],
-        ['app/(dashboard)/page/page.tsx', { content: dashboardPageContent }],
-        ['app/(dashboard)/page/layout.tsx', { content: dashboardPageLayoutContent }],
         ['app/layout.tsx', { content: rootLayoutContent }],
-        ['app/page.tsx', { content: rootPageContainer }],
-        // ...
       ]);
       if (options.auth) {
-        // Add additional files for authentication
-        let replacedAuthContent = authContent;
-        if (options.authProviders.length) {
-          const authImports = options.authProviders
-            .map((provider) => providerImport(provider))
-            .join('');
-          const providerContent = options.authProviders
-            .map((provider) => {
-              return provider === 'Credentials'
-                ? credentialsProviderContent
-                : oAuthProviderContent(provider);
-            })
-            .join('\n');
-          replacedAuthContent = authContent.replace('// PROVIDER_IMPORTS', authImports);
-          replacedAuthContent = replacedAuthContent.replace('// PROVIDER_CONTENT', providerContent);
-          if (options.authProviders.includes('Credentials')) {
-            replacedAuthContent = replacedAuthContent.replace(
-              '// CALLBACKS_CONTENT',
-              callbacksContent,
-            );
-          } else {
-            replacedAuthContent = replacedAuthContent.replace('// CALLBACKS_CONTENT', '');
-          }
-        } else {
-          replacedAuthContent = authContent.replace('// PROVIDER_IMPORTS', '');
-          replacedAuthContent = replacedAuthContent.replace('// PROVIDER_CONTENT', '');
-          replacedAuthContent = replacedAuthContent.replace('// CALLBACKS_CONTENT', '');
-        }
+        // Add additional specific to authentication
+        let providerImports = '';
+        let providerContent = '';
+
+        options.authProviders.forEach((provider) => {
+          providerImports += providerImport(provider);
+          providerContent +=
+            provider === 'Credentials'
+              ? credentialsProviderContent
+              : oAuthProviderContent(provider);
+        });
+
+        const authCallbacksContent = options.authProviders.includes('Credentials')
+          ? callbacksContent
+          : '';
+
+        const authContent = `${authImports}${providerImports}${providerSetupContent}${providerContent}${providerMapContent}${authCallbacksContent}${authContentEnd}`;
+
         const authFiles = new Map([
-          ['auth.ts', { content: replacedAuthContent }],
+          ['auth.ts', { content: authContent }],
           ['middleware.ts', { content: middlewareContent }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: authRouterHandlerContent }],
           ['app/auth/signin/page.tsx', { content: signInPageContent }],
         ]);
-        // Replace existing file content with auth-specific content
+        // Add app name to package.json
         packageJsonAuthApp.name = path.basename(options.name);
+
+        // Replace default files with auth-specific content
         files.set('package.json', {
           content: JSON.stringify(packageJsonAuthApp, null, 2),
         });
-        nextJsAppRouterStarter.delete('app/(dashboard)/page/page.tsx');
+
+        // Replace default next-js-app starter files with auth-specific content
         nextJsAppRouterStarter.set('app/(dashboard)/page.tsx', {
           content: dashboardPageAuthAppContent,
         });
-        nextJsAppRouterStarter.delete('app/(dashboard)/page/layout.tsx');
         nextJsAppRouterStarter.set('app/(dashboard)/layout.tsx', {
           content: dashboardLayoutAuthAppContent,
         });
@@ -123,6 +116,13 @@ export default function generateProject(
 
         return new Map([...files, ...nextJsAppRouterStarter, ...authFiles]);
       }
+      nextJsAppRouterStarter.set('app/(dashboard)/page/page.tsx', {
+        content: dashboardPageContent,
+      });
+      nextJsAppRouterStarter.set('app/(dashboard)/page/layout.tsx', {
+        content: dashboardPageLayoutContent,
+      });
+      nextJsAppRouterStarter.set('app/page.tsx', { content: rootPageContainer });
       return new Map([...files, ...nextJsAppRouterStarter]);
     }
   }

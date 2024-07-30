@@ -142,7 +142,7 @@ const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean)
   console.log(`${chalk.cyan('info')} - Initializing .gitignore file`);
   await fs.copyFile(
     path.resolve(__dirname, `./gitignoreTemplate`),
-    path.join(absolutePath, DEFAULT_GENERATED_GITIGNORE_FILE),
+    path.join(absolutePath, 'templates', DEFAULT_GENERATED_GITIGNORE_FILE),
   );
 
   if (installFlag) {

@@ -523,7 +523,8 @@ export const oAuthProviderContent = (provider: string) => `
 ${provider}({
   clientId: process.env.${provider.toUpperCase()}_CLIENT_ID,
   clientSecret: process.env.${provider.toUpperCase()}_CLIENT_SECRET,
-}),`;
+}),
+`;
 
 export const providerImport = (provider: string) => `
 import ${provider} from 'next-auth/providers/${provider?.toLowerCase()}';
@@ -544,13 +545,16 @@ callbacks: {
 },
 `;
 
-export const authContent = `
-import NextAuth from 'next-auth';
-  // PROVIDER_IMPORTS
+export const authImports = `
+import NextAuth from 'next-auth';  
+`;
+
+export const providerSetupContent = `
 import type { Provider } from 'next-auth/providers';
 
 const providers: Provider[] = [
-// PROVIDER_CONTENT
+`;
+export const providerMapContent = `
 ];
 
 export const providerMap = providers.map((provider) => {
@@ -567,7 +571,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: '/auth/signin',
   },
-  // CALLBACKS_CONTENT
+`;
+
+export const authContentEnd = `
 });
 `;
 

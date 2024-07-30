@@ -44,6 +44,7 @@ const customTheme = extendTheme({
       },
     },
   },
+  colorSchemeSelector: 'class',
   breakpoints: {
     values: {
       xs: 0,

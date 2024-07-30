@@ -103,7 +103,10 @@ export interface AppProviderProps {
 function AppProvider(props: AppProviderProps) {
   const {
     children,
-    theme = extendTheme({ colorSchemes: { light: {}, dark: {} } }),
+    theme = extendTheme({
+      colorSchemes: { light: true, dark: true },
+      colorSchemeSelector: 'class',
+    }),
     branding = null,
     navigation = [],
     router = null,

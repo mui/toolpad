@@ -25,6 +25,7 @@ const theme = extendTheme({
       },
     },
   },
+  colorSchemeSelector: 'class',
 });
 
 export default theme;

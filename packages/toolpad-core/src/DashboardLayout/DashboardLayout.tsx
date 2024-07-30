@@ -36,7 +36,7 @@ import {
 } from '../shared/context';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
-import { getItemTitle, isPageItem } from '../shared/navigation';
+import { getItemTitle, getPageItemFullPath, isPageItem } from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
 
 const DRAWER_WIDTH = 320; // px
@@ -169,9 +169,12 @@ function DashboardSidebarSubNavigation({
               if (!isPageItem(nestedNavigationItem)) {
                 return false;
               }
-              const navigationItemFullPath = `${basePath}/${nestedNavigationItem.segment ?? ''}`;
+              const nestedNavigationItemFullPath = getPageItemFullPath(
+                basePath,
+                nestedNavigationItem,
+              );
 
-              return navigationItemFullPath === pathname;
+              return nestedNavigationItemFullPath === pathname;
             }),
         )
         .map(({ originalIndex }) => `${depth}-${originalIndex}`),
@@ -191,6 +194,15 @@ function DashboardSidebarSubNavigation({
       );
     },
     [],
+  );
+
+  const activeNavigationItemIndex = React.useMemo(
+    () =>
+      subNavigation.findIndex(
+        (navigationItem) =>
+          isPageItem(navigationItem) && pathname === getPageItemFullPath(basePath, navigationItem),
+      ),
+    [basePath, pathname, subNavigation],
   );
 
   return (
@@ -229,7 +241,7 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const navigationItemFullPath = `${basePath}/${navigationItem.segment ?? ''}`;
+        const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
 
         const navigationItemId = `${depth}-${navigationItemIndex}`;
 
@@ -241,10 +253,12 @@ function DashboardSidebarSubNavigation({
           <ExpandMoreIcon />
         );
 
+        const isSelected = navigationItemIndex === activeNavigationItemIndex;
+
         const listItem = (
           <ListItem sx={{ pt: 0, pb: 0 }}>
             <NavigationListItemButton
-              selected={pathname === navigationItemFullPath}
+              selected={isSelected}
               {...(navigationItem.children
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),

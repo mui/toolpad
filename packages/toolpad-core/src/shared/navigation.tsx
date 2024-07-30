@@ -8,3 +8,7 @@ export const isPageItem = (item: NavigationItem): item is NavigationPageItem =>
 export const getItemTitle = (item: NavigationPageItem | NavigationSubheaderItem) => {
   return isPageItem(item) ? item.title ?? item.segment ?? '' : item.title;
 };
+
+export function getPageItemFullPath(basePath: string, navigationItem: NavigationPageItem) {
+  return `${basePath}${basePath && !navigationItem.segment ? '' : '/'}${navigationItem.segment ?? ''}`;
+}

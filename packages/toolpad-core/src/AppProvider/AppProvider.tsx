@@ -11,6 +11,7 @@ import {
   WindowContext,
 } from '../shared/context';
 import { AppThemeProvider } from './AppThemeProvider';
+import { getPageItemFullPath, isPageItem } from '../shared/navigation';
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -55,6 +56,16 @@ export interface NavigationDividerItem {
 export type NavigationItem = NavigationPageItem | NavigationSubheaderItem | NavigationDividerItem;
 
 export type Navigation = NavigationItem[];
+
+function getSubNavigationFullPaths(subNavigation: Navigation, basePath = ''): string[] {
+  return subNavigation.filter(isPageItem).flatMap((navigationItem) => {
+    const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
+
+    return navigationItem.children
+      ? getSubNavigationFullPaths(navigationItem.children, navigationItemFullPath)
+      : navigationItemFullPath;
+  });
+}
 
 export interface AppProviderProps {
   /**
@@ -109,6 +120,18 @@ function AppProvider(props: AppProviderProps) {
     router = null,
     window: appWindow,
   } = props;
+
+  React.useEffect(() => {
+    const navigationFullPaths = getSubNavigationFullPaths(navigation);
+
+    for (let i = 0; i < navigationFullPaths.length; i += 1) {
+      const checkedPath = navigationFullPaths[i];
+
+      if (i !== navigationFullPaths.findIndex((path) => path === checkedPath)) {
+        console.warn(`Duplicate path in navigation: ${checkedPath}`);
+      }
+    }
+  }, [navigation]);
 
   return (
     <WindowContext.Provider value={appWindow}>

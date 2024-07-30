@@ -10,7 +10,8 @@ components: AppProvider, DashboardLayout
 
 The `DashboardLayout` component is a quick, easy way to provide a standard full-screen layout with a header and sidebar to any dashboard page, as well as ready-to-use and easy to customize navigation and branding.
 
-Many features of this component are configurable through the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) component that should wrap it.
+Many features of this component are configurable through the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) component that should wrap it, which is the recommended approach for a Toolpad app.
+However, it is also possible to use the `DashboardLayout` as a standalone component by setting those configurations with the component props themselves.
 
 ## Demo
 
@@ -50,3 +51,9 @@ The main navigation items that can be used are:
 Navigation links have an optional `action` prop that can be used to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
 
 {{"demo": "DashboardLayoutNavigationActions.js", "height": 500, "iframe": true}}
+
+## Standalone Usage
+
+The component branding, navigation, theme switching and routing can also be set via component props themselves instead of indirectly through an `AppProvider`.
+
+{{"demo": "DashboardLayoutStandalone.js", "height": 500, "iframe": true}}

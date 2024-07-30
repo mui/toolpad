@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme } from '@mui/material';
+import { PaletteMode, styled, useTheme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -34,7 +34,7 @@ import {
   RouterContext,
   WindowContext,
 } from '../shared/context';
-import type { Navigation, NavigationPageItem } from '../AppProvider';
+import type { AppProviderProps, Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 import { getItemTitle, isPageItem } from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
@@ -79,11 +79,20 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   },
 }));
 
-function ThemeSwitcher() {
+interface ThemeSwitcherProps {
+  colorScheme?: PaletteMode;
+  onColorSchemeChange?: (mode: PaletteMode) => void;
+}
+
+function ThemeSwitcher({ colorScheme, onColorSchemeChange }: ThemeSwitcherProps) {
   const isSsr = useSsr();
   const theme = useTheme();
 
-  const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
+  const paletteModeContext = React.useContext(PaletteModeContext);
+
+  const paletteMode = colorScheme ?? paletteModeContext.paletteMode;
+  const setPaletteMode = onColorSchemeChange ?? paletteModeContext.setPaletteMode;
+  const isDualTheme = !!onColorSchemeChange || paletteModeContext.isDualTheme;
 
   const toggleMode = React.useCallback(() => {
     setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
@@ -303,6 +312,30 @@ export interface DashboardLayoutProps {
    * The content of the dashboard.
    */
   children: React.ReactNode;
+  /**
+   * Branding options for the layout.
+   * @default null
+   */
+  branding?: AppProviderProps['branding'];
+  /**
+   * Navigation definition for the layout.
+   * @default []
+   */
+  navigation?: AppProviderProps['navigation'];
+  /**
+   * Active color scheme in theme.
+   */
+  colorScheme?: PaletteMode;
+  /**
+   * Callback to run when the theme color scheme is changed.
+   */
+  onColorSchemeChange?: (theme: PaletteMode) => void;
+  /**
+   * The window where the layout is rendered.
+   * This is needed when rendering the layout inside an iframe, for example.
+   * @default window
+   */
+  window?: AppProviderProps['window'];
 }
 
 /**
@@ -316,12 +349,24 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children } = props;
+  const {
+    children,
+    colorScheme,
+    onColorSchemeChange,
+    branding: brandingProp,
+    navigation: navigationProp,
+    window: windowProp,
+  } = props;
 
-  const branding = React.useContext(BrandingContext);
-  const navigation = React.useContext(NavigationContext);
-  const appWindow = React.useContext(WindowContext);
+  const brandingContext = React.useContext(BrandingContext);
+  const navigationContext = React.useContext(NavigationContext);
+  const windowContext = React.useContext(WindowContext);
+
   const applicationTitle = useApplicationTitle();
+
+  const branding = brandingProp ?? brandingContext;
+  const navigation = navigationProp ?? navigationContext;
+  const appWindow = windowProp ?? windowContext;
 
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
 
@@ -399,7 +444,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <ThemeSwitcher />
+          <ThemeSwitcher colorScheme={colorScheme} onColorSchemeChange={onColorSchemeChange} />
         </Toolbar>
       </AppBar>
       <Drawer
@@ -453,9 +498,65 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
+   * Branding options for the layout.
+   * @default null
+   */
+  branding: PropTypes.shape({
+    logo: PropTypes.node,
+    title: PropTypes.string,
+  }),
+  /**
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * Active color scheme in theme.
+   */
+  colorScheme: PropTypes.oneOf(['dark', 'light']),
+  /**
+   * Navigation definition for the layout.
+   * @default []
+   */
+  navigation: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({
+        action: PropTypes.node,
+        children: PropTypes.arrayOf(
+          PropTypes.oneOfType([
+            PropTypes.object,
+            PropTypes.shape({
+              kind: PropTypes.oneOf(['header']).isRequired,
+              title: PropTypes.string.isRequired,
+            }),
+            PropTypes.shape({
+              kind: PropTypes.oneOf(['divider']).isRequired,
+            }),
+          ]).isRequired,
+        ),
+        icon: PropTypes.node,
+        kind: PropTypes.oneOf(['page']),
+        segment: PropTypes.string.isRequired,
+        title: PropTypes.string,
+      }),
+      PropTypes.shape({
+        kind: PropTypes.oneOf(['header']).isRequired,
+        title: PropTypes.string.isRequired,
+      }),
+      PropTypes.shape({
+        kind: PropTypes.oneOf(['divider']).isRequired,
+      }),
+    ]).isRequired,
+  ),
+  /**
+   * Callback to run when the theme color scheme is changed.
+   */
+  onColorSchemeChange: PropTypes.func,
+  /**
+   * The window where the layout is rendered.
+   * This is needed when rendering the layout inside an iframe, for example.
+   * @default window
+   */
+  window: PropTypes.object,
 } as any;
 
 export { DashboardLayout };

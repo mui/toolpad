@@ -472,34 +472,6 @@ export const packageJsonAuthApp: PackageJson = {
     'eslint-config-next': '14.2.4',
   },
 };
-//   version: '0.1.0',
-//   scripts: {
-//     dev: 'next dev',
-//     lint: 'next lint',
-//   },
-//   dependencies: {
-//     react: '^18',
-//     'react-dom': '^18',
-//     next: '^14',
-//     'next-auth': '5.0.0-beta.18',
-//     '@toolpad/core': 'latest',
-//     '@mui/material': 'next',
-//     '@mui/material-nextjs': 'next',
-//     '@mui/icons-material': 'next',
-//     '@emotion/react': '^11',
-//     '@emotion/styled': '^11',
-//     '@emotion/cache': '^11',
-//     '@mui/lab': 'next',
-//   },
-//   devDependencies: {
-//     typescript: '^5',
-//     '@types/node': '^20',
-//     '@types/react': '^18',
-//     '@types/react-dom': '^18',
-//     eslint: '^8',
-//     'eslint-config-next': '^14',
-//   },
-// };
 
 export const credentialsProviderContent = `Credentials({
   credentials: {

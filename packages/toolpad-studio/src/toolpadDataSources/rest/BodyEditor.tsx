@@ -28,6 +28,10 @@ import TabPanel from '../../components/TabPanel';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { HTTP_NO_BODY } from './shared';
 
+const BodyEditorRoot = styled('div')({
+  position: 'relative',
+});
+
 interface ContentTypeSpec {
   alias: string;
   language: string;
@@ -271,7 +275,7 @@ export default function BodyEditor({
   );
 
   return (
-    <Box sx={{ ...sx, position: 'relative' }}>
+    <BodyEditorRoot sx={sx}>
       <TabContext value={activeTab}>
         <TabPanel disableGutters value="raw">
           <RawBodyEditor
@@ -309,6 +313,6 @@ export default function BodyEditor({
           </Typography>
         </Box>
       ) : null}
-    </Box>
+    </BodyEditorRoot>
   );
 }

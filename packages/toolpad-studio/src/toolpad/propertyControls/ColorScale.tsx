@@ -11,6 +11,7 @@ import {
   Input,
   ListItemProps,
   Typography,
+  styled,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -18,6 +19,10 @@ import { EditorProps } from '../../types';
 import PropertyControl from '../../components/PropertyControl';
 import { ColorPickerIconButton } from '../../components/ColorPicker';
 import FlexFill from '../../components/FlexFill';
+
+const ListItemRoot = styled(ListItem)({
+  gap: 1,
+});
 
 const EMPTY_STOPS: ColorScaleStop[] = [];
 
@@ -32,12 +37,11 @@ function ColorScaleListItem({
   valueLabel,
   value,
   onChange,
-  sx,
   onDelete,
   ...props
 }: ColorScaleListItemProps) {
   return (
-    <ListItem {...props} sx={{ ...sx, gap: 1 }}>
+    <ListItemRoot {...props}>
       {valueLabel ? (
         <Typography>{valueLabel}</Typography>
       ) : (
@@ -66,7 +70,7 @@ function ColorScaleListItem({
       >
         <DeleteIcon fontSize="inherit" />
       </IconButton>
-    </ListItem>
+    </ListItemRoot>
   );
 }
 

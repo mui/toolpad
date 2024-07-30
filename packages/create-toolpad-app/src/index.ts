@@ -300,6 +300,22 @@ const run = async () => {
       authProviders: authProviderOptions,
     };
     await scaffoldCoreProject(options);
+
+    if (installFlag) {
+      // eslint-disable-next-line no-console
+      console.log(`${chalk.cyan('info')} - Installing dependencies`);
+      // eslint-disable-next-line no-console
+      console.log();
+      await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
+      // eslint-disable-next-line no-console
+      console.log();
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.green('success')} - Installed "${args.example}" at ${chalk.cyan(absolutePath)}`,
+      );
+      // eslint-disable-next-line no-console
+      console.log();
+    }
   } else {
     // Otherwise, create a new project with Toolpad Studio
     await scaffoldStudioProject(absolutePath, installFlag);

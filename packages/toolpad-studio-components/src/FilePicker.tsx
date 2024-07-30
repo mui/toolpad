@@ -78,8 +78,9 @@ function FilePicker({ multiple, value, onChange, isRequired, ...rest }: FilePick
       })}
       slotProps={{
         htmlInput: { multiple },
-        inputLabel: { shrink: true }
-      }} />,
+        inputLabel: { shrink: true },
+      }}
+    />,
   );
 }
 

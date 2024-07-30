@@ -4,7 +4,7 @@ import * as fs from 'fs/promises';
 import { constants as fsConstants } from 'fs';
 import path from 'path';
 import yargs from 'yargs';
-import inquirer from 'inquirer';
+import { input } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { errorFrom } from '@toolpad/utils/errors';
 import { execa } from 'execa';
@@ -109,7 +109,7 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
 };
 
 // Create a new `package.json` file and install dependencies
-const scaffoldProject = async (absolutePath: string, installFlag: boolean): Promise<void> => {
+const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean): Promise<void> => {
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
@@ -249,28 +249,44 @@ const run = async () => {
       process.exit(1);
     }
   }
+  let projectPath = pathArg;
 
-  const questions = [
-    {
-      type: 'input',
-      name: 'path',
+  if (!pathArg) {
+    projectPath = await input({
       message: 'Enter path for new project directory:',
-      validate: (input: string) => validatePath(input),
-      when: !pathArg,
+      validate: validatePath,
       default: '.',
-    },
-  ];
+    });
+  }
 
-  const answers = await inquirer.prompt(questions);
+  const absolutePath = bashResolvePath(projectPath);
 
-  const absolutePath = bashResolvePath(answers.path || pathArg);
-
+  // If the user has provided an example, download and extract it
   if (args.example) {
     await downloadAndExtractExample(absolutePath, args.example);
-  } else if (coreFlag) {
+
+    if (installFlag) {
+      // eslint-disable-next-line no-console
+      console.log(`${chalk.cyan('info')} - Installing dependencies`);
+      // eslint-disable-next-line no-console
+      console.log();
+      await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
+      // eslint-disable-next-line no-console
+      console.log();
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.green('success')} - Installed "${args.example}" at ${chalk.cyan(absolutePath)}`,
+      );
+      // eslint-disable-next-line no-console
+      console.log();
+    }
+  }
+  // If the core flag is set, create a new project with Toolpad Core
+  else if (coreFlag) {
     await scaffoldCoreProject(absolutePath);
   } else {
-    await scaffoldProject(absolutePath, installFlag);
+    // Otherwise, create a new project with Toolpad Studio
+    await scaffoldStudioProject(absolutePath, installFlag);
   }
 
   const changeDirectoryInstruction =

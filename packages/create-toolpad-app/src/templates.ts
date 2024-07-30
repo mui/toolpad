@@ -455,10 +455,10 @@ export const packageJsonAuthApp: PackageJson = {
   dependencies: {
     '@emotion/react': '^11.11.4',
     '@emotion/styled': '^11.11.5',
-    '@mui/icons-material': '^5.16.0',
-    '@mui/lab': '^5.0.0-alpha.170',
-    '@mui/material': '^5.16.0',
-    '@mui/material-nextjs': '^5.15.11',
+    '@mui/icons-material': '6.0.0-beta.2',
+    '@mui/lab': '6.0.0-beta.2',
+    '@mui/material': '6.0.0-beta.2',
+    '@mui/material-nextjs': 'next',
     '@toolpad/core': 'latest',
     next: '14.2.4',
     'next-auth': '5.0.0-beta.18',
@@ -473,59 +473,40 @@ export const packageJsonAuthApp: PackageJson = {
   },
 };
 
-export const credentialsProviderContent = `Credentials({
-  credentials: {
-    email: { label: 'Email Address', type: 'email' },
-    password: { label: 'Password', type: 'password' },
-  },
-  authorize(c) {
-    if (c.password !== 'password') {      
-      return null;
-    }
-    return {
-      id: 'test',
-      name: 'Test User',
-      email: 'test@example.com',
-    };
-  },
-}),
-`;
+export const credentialsProviderContent = `
+  Credentials({
+    credentials: {
+      email: { label: 'Email Address', type: 'email' },
+      password: { label: 'Password', type: 'password' },
+    },
+    authorize(c) {
+      if (c.password !== 'password') {      
+        return null;
+      }
+      return {
+        id: 'test',
+        name: 'Test User',
+        email: 'test@example.com',
+      };
+    },
+  }),`;
 
 export const oAuthProviderContent = (provider: string) => `
-${provider}({
-  clientId: process.env.${provider.toUpperCase()}_CLIENT_ID,
-  clientSecret: process.env.${provider.toUpperCase()}_CLIENT_SECRET,
-}),
-`;
+  ${provider}({
+    clientId: process.env.${provider.toUpperCase()}_CLIENT_ID,
+    clientSecret: process.env.${provider.toUpperCase()}_CLIENT_SECRET,
+  }),`;
 
 export const providerImport = (provider: string) => `
-import ${provider} from 'next-auth/providers/${provider?.toLowerCase()}';
-`;
+import ${provider} from 'next-auth/providers/${provider?.toLowerCase()}';`;
 
-export const callbacksContent = `
-callbacks: {
-  authorized({ auth: session, request: { nextUrl } }) {
-    const isLoggedIn = !!session?.user;
-    const isPublicPage = nextUrl.pathname.startsWith('/public');
-
-    if (isPublicPage || isLoggedIn) {
-      return true;
-    }
-
-    return false; // Redirect unauthenticated users to login page
-  },
-},
-`;
-
-export const authImports = `
-import NextAuth from 'next-auth';  
-`;
+export const authImports = `import NextAuth from 'next-auth';`;
 
 export const providerSetupContent = `
 import type { Provider } from 'next-auth/providers';
 
-const providers: Provider[] = [
-`;
+const providers: Provider[] = [`;
+
 export const providerMapContent = `
 ];
 
@@ -542,11 +523,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET,
   pages: {
     signIn: '/auth/signin',
+  },`;
+
+export const callbacksContent = `
+  callbacks: {
+    authorized({ auth: session, request: { nextUrl } }) {
+      const isLoggedIn = !!session?.user;
+      const isPublicPage = nextUrl.pathname.startsWith('/public');
+
+      if (isPublicPage || isLoggedIn) {
+        return true;
+      }
+
+      return false; // Redirect unauthenticated users to login page
+    },
   },
 `;
 
 export const authContentEnd = `
 });
+`;
+
+export const authEnvContent = `
+# Generate a secret with \`npx auth secret\`
+# and replace the value below with it
+AUTH_SECRET=secret
+`;
+
+export const providerEnvContent = (provider: string) => `
+${provider.toUpperCase()}_CLIENT_ID=
+${provider.toUpperCase()}_CLIENT_SECRET=
 `;
 
 export const middlewareContent = `

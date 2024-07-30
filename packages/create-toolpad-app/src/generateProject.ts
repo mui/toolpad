@@ -29,6 +29,8 @@ import {
   oAuthProviderContent,
   credentialsProviderContent,
   callbacksContent,
+  providerEnvContent,
+  authEnvContent,
 } from './templates';
 
 export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';
@@ -73,6 +75,7 @@ export default function generateProject(
         // Add additional specific to authentication
         let providerImports = '';
         let providerContent = '';
+        let envProviderContent = '';
 
         options.authProviders.forEach((provider) => {
           providerImports += providerImport(provider);
@@ -80,6 +83,7 @@ export default function generateProject(
             provider === 'Credentials'
               ? credentialsProviderContent
               : oAuthProviderContent(provider);
+          envProviderContent += provider === 'Credentials' ? '' : providerEnvContent(provider);
         });
 
         const authCallbacksContent = options.authProviders.includes('Credentials')
@@ -87,9 +91,11 @@ export default function generateProject(
           : '';
 
         const authContent = `${authImports}${providerImports}${providerSetupContent}${providerContent}${providerMapContent}${authCallbacksContent}${authContentEnd}`;
+        const envContent = `${authEnvContent}${envProviderContent}`;
 
         const authFiles = new Map([
           ['auth.ts', { content: authContent }],
+          ['.env.local', { content: envContent }],
           ['middleware.ts', { content: middlewareContent }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: authRouterHandlerContent }],
           ['app/auth/signin/page.tsx', { content: signInPageContent }],

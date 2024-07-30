@@ -540,8 +540,7 @@ export const callbacksContent = `
   },
 `;
 
-export const authContentEnd = `
-});
+export const authContentEnd = `});
 `;
 
 export const authEnvContent = `

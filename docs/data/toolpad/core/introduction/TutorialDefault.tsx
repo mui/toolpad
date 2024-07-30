@@ -15,6 +15,7 @@ const NAVIGATION: Navigation = [
 ];
 
 const demoTheme = extendTheme({
+  colorSchemes: { light: {}, dark: {} },
   breakpoints: {
     values: {
       xs: 0,

@@ -15,14 +15,12 @@ const providers: Provider[] = [
     },
     authorize(c) {
       if (c.password !== 'password') {
-        // TODO: Set next-auth version to latest when
-        // https://github.com/nextauthjs/next-auth/issues/11074 is resolved
         return null;
       }
       return {
         id: 'test',
         name: 'Test User',
-        email: 'test@example.com',
+        email: c.email,
       };
     },
   }),

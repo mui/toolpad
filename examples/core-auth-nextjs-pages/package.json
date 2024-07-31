@@ -14,7 +14,7 @@
     "@mui/material-nextjs": "next",
     "@toolpad/core": "latest",
     "next": "14.2.4",
-    "next-auth": "5.0.0-beta.18",
+    "next-auth": "beta",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },

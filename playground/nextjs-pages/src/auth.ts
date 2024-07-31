@@ -20,7 +20,7 @@ const providers: Provider[] = [
       return {
         id: 'test',
         name: 'Test User',
-        email: 'test@example.com',
+        email: c.email,
       };
     },
   }),

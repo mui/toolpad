@@ -51,8 +51,6 @@ export async function downloadAndExtractExample(root: string, name: string) {
   });
 
   // eslint-disable-next-line no-console
-  console.log();
-  // eslint-disable-next-line no-console
   console.log(
     `${chalk.green('success')} - Downloaded and extracted "${name}" to ${chalk.cyan(root)}`,
   );

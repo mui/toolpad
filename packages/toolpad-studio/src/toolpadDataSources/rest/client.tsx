@@ -101,13 +101,13 @@ function UrlControl({ label, disabled, baseUrl, value, onChange }: UrlControlPro
       disabled={disabled}
       onChange={handleChange}
       label={label}
-      slotProps={{
-        input: baseUrl
+      InputProps={
+        baseUrl
           ? {
               startAdornment: <InputAdornment position="start">{baseUrl}</InputAdornment>,
             }
-          : undefined,
-      }}
+          : undefined
+      }
     />
   );
 }
@@ -539,6 +539,7 @@ function QueryEditor({
                 >
                   <TextField
                     select
+                    inputProps={{ sx: { fontSize: 12 } }}
                     value={input.attributes.query.method || 'GET'}
                     size="small"
                     sx={{
@@ -547,9 +548,6 @@ function QueryEditor({
                       },
                     }}
                     onChange={handleMethodChange}
-                    slotProps={{
-                      htmlInput: { sx: { fontSize: 12 } },
-                    }}
                   >
                     {HTTP_METHODS.map((method) => (
                       <MenuItem key={method} value={method}>

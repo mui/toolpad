@@ -59,19 +59,17 @@ export default function PageDisplayNameEditor({ node }: PageDisplayNameEditorPro
       onKeyDown={handleKeyPress}
       error={!pageDisplayNameInput}
       helperText={validateInput(pageDisplayNameInput)}
-      slotProps={{
-        input: {
-          endAdornment:
-            pageDisplayNameInput === node.attributes.displayName ? (
-              <InputAdornment position="end">
-                <Tooltip title="Reset to default value">
-                  <IconButton onClick={handleReset} edge="end">
-                    <ResetIcon />
-                  </IconButton>
-                </Tooltip>
-              </InputAdornment>
-            ) : null,
-        },
+      InputProps={{
+        endAdornment:
+          pageDisplayNameInput === node.attributes.displayName ? (
+            <InputAdornment position="end">
+              <Tooltip title="Reset to default value">
+                <IconButton onClick={handleReset} edge="end">
+                  <ResetIcon />
+                </IconButton>
+              </Tooltip>
+            </InputAdornment>
+          ) : null,
       }}
     />
   );

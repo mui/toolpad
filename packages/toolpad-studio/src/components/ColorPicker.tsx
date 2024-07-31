@@ -64,14 +64,12 @@ export default function ColorPicker({ label, value, onChange }: ColorPickerProps
       label={label}
       value={value}
       onChange={(event) => onChange?.(event.target.value)}
-      slotProps={{
-        input: {
-          endAdornment: (
-            <InputAdornment position="end">
-              <ColorPickerIconButton value={value} onChange={onChange} label={label} />
-            </InputAdornment>
-          ),
-        },
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <ColorPickerIconButton value={value} onChange={onChange} label={label} />
+          </InputAdornment>
+        ),
       }}
     />
   );

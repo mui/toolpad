@@ -1,9 +1,13 @@
 import * as React from 'react';
-import { Alert, AlertTitle, IconButton, Collapse, Box, SxProps } from '@mui/material';
+import { Alert, AlertTitle, IconButton, Collapse, Box, SxProps, styled } from '@mui/material';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { indent } from '@toolpad/utils/strings';
 import Pre from '../../../components/Pre';
+
+const AlertRoot = styled(Alert)({
+  position: 'relative',
+});
 
 export interface ErrorAlertProps {
   error: unknown;
@@ -37,7 +41,7 @@ export default function ErrorAlert({ error, sx }: ErrorAlertProps) {
   const toggleExpanded = React.useCallback(() => setExpanded((actual) => !actual), []);
 
   return (
-    <Alert severity="error" sx={{ ...sx, position: 'relative' }}>
+    <AlertRoot severity="error" sx={sx}>
       {stack ? (
         <IconButton
           color="inherit"
@@ -61,6 +65,6 @@ export default function ErrorAlert({ error, sx }: ErrorAlertProps) {
           </Box>
         </Collapse>
       ) : null}
-    </Alert>
+    </AlertRoot>
   );
 }

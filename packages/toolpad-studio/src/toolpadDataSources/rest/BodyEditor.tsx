@@ -28,6 +28,10 @@ import TabPanel from '../../components/TabPanel';
 import ParametersEditor from '../../toolpad/AppEditor/PageEditor/ParametersEditor';
 import { HTTP_NO_BODY } from './shared';
 
+const BodyEditorRoot = styled('div')({
+  position: 'relative',
+});
+
 interface ContentTypeSpec {
   alias: string;
   language: string;
@@ -257,7 +261,9 @@ export default function BodyEditor({
             [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
             width: 200,
           }}
-          inputProps={{ sx: { fontSize: 12 } }}
+          slotProps={{
+            htmlInput: { sx: { fontSize: 12 } },
+          }}
         >
           <MenuItem value="raw">raw</MenuItem>
           <MenuItem value="urlEncoded">x-www-form-urlencoded</MenuItem>
@@ -269,7 +275,7 @@ export default function BodyEditor({
   );
 
   return (
-    <Box sx={{ ...sx, position: 'relative' }}>
+    <BodyEditorRoot sx={sx}>
       <TabContext value={activeTab}>
         <TabPanel disableGutters value="raw">
           <RawBodyEditor
@@ -307,6 +313,6 @@ export default function BodyEditor({
           </Typography>
         </Box>
       ) : null}
-    </Box>
+    </BodyEditorRoot>
   );
 }

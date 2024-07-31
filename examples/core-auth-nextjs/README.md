@@ -20,15 +20,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Setting up
 
-The project contains an `.env.local` with the following variables:
+The project requires an `.env.local` with the following variables:
 
 ```bash
 AUTH_SECRET=
 AUTH_GITHUB_ID=
 AUTH_GITHUB_SECRET=
 ```
-
-You must pass values to them before running this project.
 
 ### AUTH_SECRET
 

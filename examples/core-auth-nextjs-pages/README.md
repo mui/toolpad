@@ -4,15 +4,13 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Setting up
 
-The project contains an `.env.local` with the following variables:
+The project requires an `.env.local` with the following variables:
 
 ```bash
 AUTH_SECRET=
 AUTH_GITHUB_ID=
 AUTH_GITHUB_SECRET=
 ```
-
-You must pass values to them before running this project.
 
 ### AUTH_SECRET
 

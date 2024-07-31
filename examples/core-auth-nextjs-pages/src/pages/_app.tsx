@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
 import Head from 'next/head';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -47,7 +48,11 @@ const AUTHENTICATION = {
 };
 
 function getDefaultLayout(page: React.ReactElement) {
-  return <DashboardLayout>{page}</DashboardLayout>;
+  return (
+    <DashboardLayout>
+      <PageContainer>{page}</PageContainer>
+    </DashboardLayout>
+  );
 }
 
 function RequireAuth({ children }: { children: React.ReactNode }) {

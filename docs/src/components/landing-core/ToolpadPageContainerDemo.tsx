@@ -21,7 +21,7 @@ function PageContainerDemp() {
   const router = useDemoRouter('/orders');
   return (
     <AppProvider navigation={NAVIGATION} router={router}>
-      <Paper sx={{ width: '100%' }}>
+      <Paper sx={{ width: '100%', height: { sm: 200, md: 400 } }}>
         <PageContainer>Page content</PageContainer>
       </Paper>
     </AppProvider>

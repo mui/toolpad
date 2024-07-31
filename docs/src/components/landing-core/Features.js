@@ -6,6 +6,7 @@ import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import ToolpadFeaturesSwitcher from './ToolpadFeaturesSwitcher';
 import ToolpadDialogDemo from './ToolpadDialogDemo';
+import ToolpadAuthDemo from './ToolpadAuthDemo';
 import ToolpadDashboardLayout from './ToolpadDashboardLayout';
 import ToolpadNotificationDemo from './ToolpadNotificationDemo';
 import ToolpadPageContainerDemo from './ToolpadPageContainerDemo';
@@ -33,10 +34,10 @@ export default function ToolpadComponents() {
         >
           <React.Fragment>
             {tab === 'navigation' && <ToolpadDashboardLayout />}
-            {tab === 'auth' && <div>To Do</div>}
+            {tab === 'auth' && <ToolpadAuthDemo />}
+            {tab === 'page' && <ToolpadPageContainerDemo />}
             {tab === 'dialogs' && <ToolpadDialogDemo />}
             {tab === 'notifications' && <ToolpadNotificationDemo />}
-            {tab === 'page' && <ToolpadPageContainerDemo />}
           </React.Fragment>
         </Grid>
       </Grid>

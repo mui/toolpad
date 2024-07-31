@@ -185,7 +185,7 @@ export default function Hero() {
             secondaryLabel={'Book a demo'}
             secondaryUrl={ROUTES.toolpadDemoBooking}
             secondaryUrlTarget="_blank"
-            altInstallation={'npx create-toolpad-app@latest'}
+            altInstallation={'npx create-toolpad-app@latest --studio'}
             sx={{ width: '100%' }}
           />
         </Box>

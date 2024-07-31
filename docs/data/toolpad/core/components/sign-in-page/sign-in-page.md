@@ -6,7 +6,7 @@ components: SignInPage, Account, NotificationsProvider
 
 # Sign In Page
 
-<p class="description">A component that renders a functional authentication page for your application.</p>
+<p class="description">A customizable sign in UI component that abstracts away the pain needed to wire together a secure authentication page for your application.</p>
 
 The `SignInPage` component is a quick way to generate a ready-to-use authentication page with multiple OAuth providers, or a credentials form.
 
@@ -47,44 +47,88 @@ This renders an alert with the `error` string as the message.
 
 #### Next.js App Directory and GitHub
 
-The component is composable with any authentication library you might want to use. The following is a functional `SignInPage` with [auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
+The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
-:::warning
-The following demo does not initiate an actual GitHub authentication flow, since doing that from within an `iframe` is not permitted. Run the [Next.js app directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/) example to test this functionality.
-:::
-
-{{"demo": "AuthJsSignInApp.js", "iframe": true, "height": 300 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "alt": "Auth.js & Next.js with Toolpad Core sign in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign In page", "zoom": true, "indent": 1 }}
 
 #### Setting up
 
-The project contains an `.env.local` with the following variables:
-
-```bash
-AUTH_SECRET=
-AUTH_GITHUB_ID=
-AUTH_GITHUB_SECRET=
-```
-
-You must pass values to them before running this project.
-
-##### AUTH_SECRET
-
-`AUTH_SECRET` is a random value used by the Auth.js to encrypt tokens and email verification hashes. (See [Auth.js Deployment documentation](https://authjs.dev/getting-started/deployment) to learn more). You can generate one via running:
-
-```bash
-npx auth secret
-```
+If you're using the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), Auth.js is already installed. Otherwise, follow the [installation instructions](https://authjs.dev/getting-started/installation).
 
 ##### GitHub configuration
 
-| environment variable name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | description                     |
-| :------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------ |
-| `AUTH_GITHUB_ID`                                                                                                                                         | GitHub OAuth app client ID.     |
-| `AUTH_GITHUB_SECRET`                                                                                                                                     | GitHub OAuth app client secret. |
+To get the required credentials, create an application in the GitHub developer settings. Read this [guide on Auth.js](https://authjs.dev/guides/configuring-github#adding-environment-variables) on how to obtain those.
 
-To get the required credentials from GitHub, create an application in their developer settings. Read this [guide on Auth.js](https://authjs.dev/guides/configuring-github) on how to obtain those.
+##### Server Configuration
 
-Use our detailed examples with both the [Next.js app directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/) and [pages directory](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-pages/) to get started using Auth.js with Toolpad Core.
+The `SignInPage` component can slot in as a custom sign in page inside Auth.js:
+
+```ts title="./auth.ts"
+// ...
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  providers,
+  secret: process.env.AUTH_SECRET,
+  pages: {
+    signIn: '/auth/signin', // you can customize this based on your requirement
+  },
+// ...
+```
+
+You can then have a fully built GitHub sign in page appear at `/auth/signin` by adding `SignInPage` to `page.tsx`:
+
+```tsx title="./app/auth/signin/page.tsx"
+// ...
+import * as React from 'react';
+import type { AuthProvider } from '@toolpad/core';
+import { SignInPage } from '@toolpad/core/SignInPage';
+import { AuthError } from 'next-auth';
+import { providerMap, signIn } from '../../../auth';
+
+export default function SignIn() {
+  return (
+    <SignInPage
+      providers={providerMap}
+      signIn={async (
+        provider: AuthProvider,
+        formData: FormData,
+        callbackUrl?: string,
+      ) => {
+        'use server';
+        try {
+          return await signIn(provider.id, {
+            ...(formData && {
+              email: formData.get('email'),
+              password: formData.get('password'),
+            }),
+            redirectTo: callbackUrl ?? '/',
+          });
+        } catch (error) {
+          if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+            throw error;
+          }
+          if (error instanceof AuthError) {
+            return {
+              error:
+                error.type === 'CredentialsSignin'
+                  ? 'Invalid credentials.'
+                  : 'An error with Auth.js occurred.',
+              type: error.type,
+            };
+          }
+          return {
+            error: 'Something went wrong.',
+            type: 'UnknownError',
+          };
+        }
+      }}
+    />
+  );
+}
+```
+
+:::info
+If you're using the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), all of this is already configured for you. Otherwise, follow the [custom sign in page instructions](https://authjs.dev/guides/pages/signin).
+:::
 
 ## Customization
 
@@ -106,4 +150,8 @@ To enable deep customization beyond what is possible with custom props, the `Sig
 
 ### 🚧 Layouts
 
-The `SignInPage` component has versions with different layouts for authentication - one column, two column and others such. The APIs of these components is identical. This is in progress.
+The `SignInPage` component has versions with different layouts for authentication - one column, two column and others such. The APIs of these components are identical. This is in progress.
+
+## 🚧 Other authentication Flows
+
+The `SignInPage` will be accompanied by other components to allow users to sign up, verify emails and reset passwords. This is in progress.

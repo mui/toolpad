@@ -9,7 +9,7 @@ const providers = [
   { id: 'google', name: 'Google' },
   { id: 'credentials', name: 'Email and Password' },
 ];
-
+// preview-start
 const BRANDING = {
   logo: (
     <img
@@ -20,13 +20,14 @@ const BRANDING = {
   ),
   title: 'MUI',
 };
+// preview-end
 
 const signIn: (provider: AuthProvider) => void = async (provider) => {
   const promise = new Promise<void>((resolve) => {
     setTimeout(() => {
-      alert(`Signing in with "${provider.name}"`);
+      console.log(`Sign in with ${provider.id}`);
       resolve();
-    }, 300);
+    }, 500);
   });
   return promise;
 };

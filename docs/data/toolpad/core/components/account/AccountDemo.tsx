@@ -11,7 +11,6 @@ export default function AccountDemo() {
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        alert('Signing in!');
         setSession({
           user: {
             name: 'Bharat Kashyap',

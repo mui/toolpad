@@ -107,7 +107,7 @@ export default function Examples() {
         <Grid container spacing={5} sx={{ mt: { xs: 1, sm: 4 } }}>
           <Grid size={{ xs: 12, md: 6 }}>
             <ImageContainer noLinkStyle href="https://mui.com/toolpad/core/introduction/tutorial/">
-              <Img src="/static/toolpad/docs/core/auth-next.png" width="2880" height="1592" />
+              <Img src="/static/toolpad/marketing/admin-app.png" width="2880" height="1592" />
             </ImageContainer>
             <ContentCard
               icon={<DashboardRoundedIcon fontSize="small" color="primary" />}

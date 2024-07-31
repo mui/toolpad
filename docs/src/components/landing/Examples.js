@@ -6,13 +6,11 @@ import Box from '@mui/material/Box';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import HandymanRoundedIcon from '@mui/icons-material/HandymanRounded';
-import AdminPanelSettingsRoundedIcon from '@mui/icons-material/AdminPanelSettingsRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 
 const ImageContainer = styled(Link)(({ theme }) => [
   {
@@ -80,7 +78,7 @@ function ContentCard({ icon, title, description, href }) {
   );
 }
 
-export default function UseCases() {
+export default function Examples() {
   return (
     <Box
       sx={[
@@ -99,47 +97,16 @@ export default function UseCases() {
         }}
       >
         <SectionHeadline
-          overline="Use cases"
+          overline="Examples"
           title={
             <Typography variant="h2">
-              Toolpad Studio is <GradientText>ideal for building</GradientText>
+              Toolpad Core is <GradientText>ideal for building</GradientText>
             </Typography>
           }
         />
         <Grid container spacing={5} sx={{ mt: { xs: 1, sm: 4 } }}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <ImageContainer noLinkStyle href="/toolpad/studio/examples/npm-stats/">
-              <Img
-                src="/static/toolpad/docs/studio/examples/npm-stats.png"
-                width="2880"
-                height="1592"
-              />
-            </ImageContainer>
-            <ContentCard
-              icon={<DashboardRoundedIcon fontSize="small" color="primary" />}
-              title="Analytics dashboard"
-              description="Build Analytics dashboards to slice and dice any metric across various dimensions. Further, use them to monitor KPIs, track business goals, and identify trends and opportunities. Toolpad Studio allows you to combine data from multiple sources and bind
-                it by writing JavaScript anywhere."
-              href="/toolpad/studio/examples/npm-stats/"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <ImageContainer noLinkStyle href="/toolpad/studio/examples/basic-crud-app/">
-              <Img
-                src="/static/toolpad/docs/studio/examples/basic-crud-app.png"
-                width="2880"
-                height="1592"
-              />
-            </ImageContainer>
-            <ContentCard
-              icon={<AdminPanelSettingsRoundedIcon fontSize="small" color="primary" />}
-              title="Admin panel"
-              description="Enable your teams to quickly view and manage customer orders, queries, and refunds by creating admin apps that gather data from third-party APIs providers like Stripe, Twilio, Zendesk, etc. Toolpad Studio allows end users to create, read, update, or delete records."
-              href="/toolpad/studio/examples/basic-crud-app/"
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <ImageContainer noLinkStyle href="/toolpad/studio/examples/qr-generator/">
+          <Grid xs={12} md={6}>
+            <ImageContainer noLinkStyle href="https://mui.com/toolpad/core/introduction/tutorial/">
               <Img
                 src="/static/toolpad/docs/studio/examples/qr-generator.png"
                 width="2880"
@@ -147,15 +114,13 @@ export default function UseCases() {
               />
             </ImageContainer>
             <ContentCard
-              icon={<HandymanRoundedIcon fontSize="small" color="primary" />}
-              title="Utility apps"
-              description="Provide the stakeholders with simple apps to manage their daily operations. You can quickly build an app on Toolpad Studio by calling APIs or writing custom functions.
-                Your app remains secure as the code never leaves your network, and you can
-                securely deploy it to any service you choose."
-              href="/toolpad/studio/examples/qr-generator/"
+              icon={<DashboardRoundedIcon fontSize="small" color="primary" />}
+              title="Admin app"
+              description="This app shows you to get started with Toolpad Core and use basic layout and navigation features."
+              href="https://mui.com/toolpad/core/introduction/tutorial/"
             />
           </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid xs={12} md={6}>
             <Box
               sx={[
                 (theme) => ({
@@ -196,10 +161,10 @@ export default function UseCases() {
                 Build much more!
               </Typography>
               <Typography variant="body" color="text.secondary" textAlign="center">
-                Learn how to build these and many other apps using Toolpad Studio!
+                Learn how to build these and many other apps using Toolpad Core!
               </Typography>
               <Link href="/toolpad/studio/examples/" variant="body" sx={{ mt: 1 }}>
-                View more examples
+                Check out docs
                 <KeyboardArrowRightRounded fontSize="small" />
               </Link>
             </Box>
@@ -217,16 +182,4 @@ ContentCard.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
-UseCases.propTypes = {
-  content: PropTypes.shape({
-    cards: PropTypes.arrayOf(
-      PropTypes.shape({
-        description: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
-        imageUrl: PropTypes.string,
-        title: PropTypes.string.isRequired,
-      }),
-    ),
-    Headline: PropTypes.node.isRequired,
-    overline: PropTypes.string.isRequired,
-  }).isRequired,
-};
+Examples.propTypes = {};

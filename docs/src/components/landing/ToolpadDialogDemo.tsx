@@ -27,10 +27,8 @@ function DemoContent() {
   return (
     <div>
       <Button
-        onClick={async () => {
-          // preview-start
-          await dialogs.open(MyCustomDialog);
-          // preview-end
+        onClick={async () => {          
+          await dialogs.open(MyCustomDialog);          
         }}
       >
         Open custom

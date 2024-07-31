@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
@@ -41,9 +41,9 @@ export default function StudioIntro() {
           />
 
           <GetStartedButtons
-            primaryUrl="https://mui.com/toolpad-studio"
+            primaryUrl="/toolpad/studio/"
             primaryLabel="Explore Studio"
-            altInstallation="npx create-toolpad-app@latest"
+            altInstallation="npx create-toolpad-app@latest --studio"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 7 }}>

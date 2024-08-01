@@ -1,5 +1,7 @@
+import * as React from 'react';
 import Link from 'next/link';
-import { Button, Container, Typography, Box } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
+import NavigateButton from './NavigateButton';
 
 export default function Home() {
   return (
@@ -12,14 +14,7 @@ export default function Home() {
         <Typography variant="body1">
           Get started by editing <code>(dashboard)/page/page.tsx</code>
         </Typography>
-
-        <Box sx={{ mt: 2 }}>
-          <Link href="/page">
-            <Button variant="contained" color="primary">
-              Go to Page
-            </Button>
-          </Link>
-        </Box>
+        <NavigateButton />
       </Box>
     </Container>
   );

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Link from 'next/link';
 import { Container, Typography, Box } from '@mui/material';
 import NavigateButton from './NavigateButton';

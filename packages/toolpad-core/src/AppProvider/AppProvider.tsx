@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { extendTheme, CssVarsTheme, Theme } from '@mui/material/styles';
+import { createTheme, Theme } from '@mui/material/styles';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
 import {
@@ -63,9 +63,9 @@ export interface AppProviderProps {
   children: React.ReactNode;
   /**
    * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
-   * @default extendTheme()
+   * @default createTheme({ cssVariables: true, colorSchemes: { dark: true } })
    */
-  theme?: Theme | { light: Theme; dark: Theme } | CssVarsTheme;
+  theme?: Theme | { light: Theme; dark: Theme };
   /**
    * Branding options for the app.
    * @default null
@@ -103,7 +103,12 @@ export interface AppProviderProps {
 function AppProvider(props: AppProviderProps) {
   const {
     children,
-    theme = extendTheme(),
+    theme = createTheme({
+      cssVariables: {
+        colorSchemeSelector: 'data-toolpad-color-scheme',
+      },
+      colorSchemes: { dark: true },
+    }),
     branding = null,
     navigation = [],
     router = null,
@@ -191,7 +196,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
   }),
   /**
    * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
-   * @default extendTheme()
+   * @default createTheme()
    */
   theme: PropTypes.object,
   /**

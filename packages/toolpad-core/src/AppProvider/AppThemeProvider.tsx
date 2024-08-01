@@ -41,9 +41,7 @@ function PaletteModeProvider({ children }: { children: React.ReactNode }) {
   }, [allColorSchemes, mode, preferredMode, setMode]);
 
   return (
-    <PaletteModeContext.Provider
-      value={paletteModeContextValue}
-    >
+    <PaletteModeContext.Provider value={paletteModeContextValue}>
       {children}
     </PaletteModeContext.Provider>
   );
@@ -90,7 +88,7 @@ function AppThemeProvider(props: AppThemeProviderProps) {
         />
       )}
       <PaletteModeProvider>
-      <CssBaseline enableColorScheme />
+        <CssBaseline enableColorScheme />
         {children}
       </PaletteModeProvider>
     </ThemeProvider>

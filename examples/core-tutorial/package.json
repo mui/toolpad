@@ -12,7 +12,7 @@
     "react-dom": "^18.3.1",
     "next": "^14.2.4",
     "@toolpad/core": "latest",
-    "@mui/material": "^6.0.0-beta.2",
+    "@mui/material": "https://pkg.csb.dev/mui/material-ui/commit/00058883/@mui/material",
     "@mui/icons-material": "^6.0.0-beta.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",

@@ -12,13 +12,13 @@ import { satisfies } from 'semver';
 import { readJsonFile } from '@toolpad/utils/fs';
 import invariant from 'invariant';
 import { bashResolvePath } from '@toolpad/utils/cli';
-import { PackageJson } from './packageType';
+import type { PackageJson } from './templates/packageType';
 import generateProject, { GenerateProjectOptions } from './generateProject';
 import type { SupportedRouter, SupportedAuthProvider } from './generateProject';
 import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
+import generateStudioProject, { PackageManager } from './generateStudioProject';
 
-type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
   interface Error {
     code?: unknown;
@@ -120,30 +120,8 @@ const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean)
   // eslint-disable-next-line no-console
   console.log();
 
-  const packageJson: PackageJson = {
-    name: path.basename(absolutePath),
-    version: '0.1.0',
-    scripts: {
-      dev: 'toolpad-studio dev',
-      build: 'toolpad-studio build',
-      start: 'toolpad-studio start',
-    },
-    dependencies: {
-      '@toolpad/studio': 'latest',
-    },
-  };
-
-  const DEFAULT_GENERATED_GITIGNORE_FILE = '.gitignore';
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.cyan('info')} - Initializing package.json file`);
-  await fs.writeFile(path.join(absolutePath, 'package.json'), JSON.stringify(packageJson, null, 2));
-
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.cyan('info')} - Initializing .gitignore file`);
-  await fs.copyFile(
-    path.resolve(__dirname, `./gitignoreTemplate`),
-    path.join(absolutePath, 'templates', DEFAULT_GENERATED_GITIGNORE_FILE),
-  );
+  const files = generateStudioProject(packageManager, path.basename(absolutePath));
+  await writeFiles(absolutePath, files);
 
   if (installFlag) {
     // eslint-disable-next-line no-console

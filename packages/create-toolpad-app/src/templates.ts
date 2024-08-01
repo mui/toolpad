@@ -88,17 +88,18 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
 }
 `;
 
-export const dashboardLayoutContent = `
-  import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+export const dashboardLayoutContent = `import * as React from 'react';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
 
-  export default function Layout({
-    children,
-  }: Readonly<{ children: React.ReactNode }>) {
-    return (
-      <DashboardLayout>{children}</DashboardLayout>
-    );
-  }
-  `;
+export default function Layout(props: { children: React.ReactNode }) {
+  return (
+    <DashboardLayout>
+      <PageContainer>{props.children}</PageContainer>
+    </DashboardLayout>
+  );
+}  
+`;
 
 export const dashboardLayoutAuthAppContent = `import * as React from 'react';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
@@ -113,63 +114,66 @@ export default function DashboardPagesLayout(props: { children: React.ReactNode 
 }
 `;
 
-export const dashboardPageLayoutContent = `
-  import { PageContainer } from '@toolpad/core/PageContainer';
-
-  export default function Layout({
-    children,
-  }: Readonly<{ children: React.ReactNode }>) {
-    return (
-      <PageContainer>{children}</PageContainer>
-    );
-  }
-  `;
-
-export const rootPageContainer = `
-  import Link from "next/link";
-  import { Button, Container, Typography, Box } from "@mui/material";
-
+export const rootPageContent = `import Link from 'next/link';
+  import { Container, Typography, Box } from '@mui/material';
+  import NavigateButton from './NavigateButton';
+  
   export default function Home() {
     return (
       <Container>
         <Box sx={{ my: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
-            Welcome to{" "}
-            <Link href="https://mui.com/toolpad/core/introduction">
-              Toolpad Core!
-            </Link>
+            Welcome to <Link href="https://mui.com/toolpad/core/introduction">Toolpad Core!</Link>
           </Typography>
-
+  
           <Typography variant="body1">
             Get started by editing <code>(dashboard)/page/page.tsx</code>
           </Typography>
-
-          <Box sx={{ mt: 2 }}>
-            <Link href="/page">
-              <Button variant="contained" color="primary">
-                Go to Page
-              </Button>
-            </Link>
-          </Box>
+          <NavigateButton />
         </Box>
       </Container>
     );
-  }
+  }  
   `;
+
+export const navigateButtonContent = `'use client';
+import * as React from 'react';
+import Link from 'next/link';
+import { LoadingButton } from '@mui/lab';
+import { Box } from '@mui/material';
+
+export default function NavigateButton() {
+  const [loading, setLoading] = React.useState(false);
+  return (
+    <Box sx={{ mt: 2 }}>
+      <Link href="/page">
+        <LoadingButton
+          variant="contained"
+          color="primary"
+          loading={loading}
+          onClick={() => setLoading(true)}
+        >
+          Go to Page
+        </LoadingButton>
+      </Link>
+    </Box>
+  );
+}
+`;
 
 export const dashboardPageContent = `
-  import { Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 
-  export default function Home() {
-    return (
-      <main>
-        <Typography variant="h6" color="grey.800">
-          Hello world!
-        </Typography>
-      </main>
-    );
-  }
-  `;
+export default function Home() {
+  return (
+    <main>
+      <Typography variant="h6" color="grey.800">
+        Hello world!
+      </Typography>
+    </main>
+  );
+}
+`;
 
 export const dashboardPageAuthAppContent = `
 import * as React from 'react';

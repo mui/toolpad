@@ -7,10 +7,9 @@ import {
   dashboardLayoutAuthAppContent,
   dashboardPageContent,
   dashboardPageAuthAppContent,
-  dashboardPageLayoutContent,
   rootLayoutContent,
   rootLayoutAuthAppContent,
-  rootPageContainer,
+  rootPageContent,
   themeContent,
   readmeContent,
   nextTypesContent,
@@ -70,6 +69,7 @@ export default function generateProject(
       const nextJsAppRouterStarter = new Map([
         ['app/(dashboard)/layout.tsx', { content: dashboardLayoutContent }],
         ['app/layout.tsx', { content: rootLayoutContent }],
+        ['app/page.tsx', { content: rootPageContent }],
       ]);
       if (options.auth) {
         // Add additional specific to authentication
@@ -125,10 +125,6 @@ export default function generateProject(
       nextJsAppRouterStarter.set('app/(dashboard)/page/page.tsx', {
         content: dashboardPageContent,
       });
-      nextJsAppRouterStarter.set('app/(dashboard)/page/layout.tsx', {
-        content: dashboardPageLayoutContent,
-      });
-      nextJsAppRouterStarter.set('app/page.tsx', { content: rootPageContainer });
       return new Map([...files, ...nextJsAppRouterStarter]);
     }
   }

@@ -102,7 +102,7 @@ export default function NavigateButton() {
 }
 `;
 
-  const dashboardPage = `
+  const dashboardPageContent = `
   import { Typography } from "@mui/material";
 
   export default function Home() {
@@ -362,7 +362,7 @@ export default function NavigateButton() {
   return new Map([
     ['app/api/auth/[...nextAuth]/route.ts', { content: '' }],
     ['app/auth/[...path]/page.tsx', { content: '' }],
-    ['app/(dashboard)/page/page.tsx', { content: dashboardPage }],
+    ['app/(dashboard)/page/page.tsx', { content: dashboardPageContent }],
     ['app/(dashboard)/layout.tsx', { content: dashboardLayoutContent }],
     ['app/layout.tsx', { content: rootLayoutContent }],
     ['app/NavigateButton.tsx', { content: navigateButtonContent }],

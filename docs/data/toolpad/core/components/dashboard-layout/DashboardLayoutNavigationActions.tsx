@@ -15,21 +15,6 @@ import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import type { Navigation } from '@toolpad/core';
 
-const CALLS_NAVIGATION: Navigation = [
-  {
-    segment: '/made',
-    title: 'Made',
-    icon: <CallMadeIcon />,
-    action: <Chip label={12} color="success" size="small" />,
-  },
-  {
-    segment: '/received',
-    title: 'Received',
-    icon: <CallReceivedIcon />,
-    action: <Chip label={4} color="error" size="small" />,
-  },
-];
-
 const demoTheme = extendTheme({
   breakpoints: {
     values: {
@@ -57,6 +42,21 @@ function DemoPageContent({ pathname }: { pathname: string }) {
     </Box>
   );
 }
+
+const CALLS_NAVIGATION: Navigation = [
+  {
+    segment: '/made',
+    title: 'Made',
+    icon: <CallMadeIcon />,
+    action: <Chip label={12} color="success" size="small" />,
+  },
+  {
+    segment: '/received',
+    title: 'Received',
+    icon: <CallReceivedIcon />,
+    action: <Chip label={4} color="error" size="small" />,
+  },
+];
 
 interface DemoProps {
   /**

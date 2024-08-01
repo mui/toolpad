@@ -15,21 +15,6 @@ import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
-const CALLS_NAVIGATION = [
-  {
-    segment: '/made',
-    title: 'Made',
-    icon: <CallMadeIcon />,
-    action: <Chip label={12} color="success" size="small" />,
-  },
-  {
-    segment: '/received',
-    title: 'Received',
-    icon: <CallReceivedIcon />,
-    action: <Chip label={4} color="error" size="small" />,
-  },
-];
-
 const demoTheme = extendTheme({
   breakpoints: {
     values: {
@@ -61,6 +46,21 @@ function DemoPageContent({ pathname }) {
 DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
+
+const CALLS_NAVIGATION = [
+  {
+    segment: '/made',
+    title: 'Made',
+    icon: <CallMadeIcon />,
+    action: <Chip label={12} color="success" size="small" />,
+  },
+  {
+    segment: '/received',
+    title: 'Received',
+    icon: <CallReceivedIcon />,
+    action: <Chip label={4} color="error" size="small" />,
+  },
+];
 
 function DashboardLayoutNavigationActions(props) {
   const { window } = props;

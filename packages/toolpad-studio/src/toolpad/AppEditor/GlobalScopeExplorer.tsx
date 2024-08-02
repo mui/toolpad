@@ -1,7 +1,12 @@
-import { Typography, Divider, Box, SxProps } from '@mui/material';
+import { Typography, Divider, Box, SxProps, styled } from '@mui/material';
 import { ScopeMeta, ScopeMetaField } from '@toolpad/studio-runtime';
 import * as React from 'react';
 import ObjectInspector from '../../components/ObjectInspector';
+
+const ExplorerRoot = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+});
 
 export interface GlobalScopeExplorerProps {
   value: Record<string, unknown>;
@@ -68,7 +73,7 @@ export default function GlobalScopeExplorer({ meta, value, sx }: GlobalScopeExpl
   const structure = React.useMemo(() => groupScopeMeta(value, meta), [meta, value]);
 
   return (
-    <Box sx={{ ...sx, display: 'flex', flexDirection: 'column' }}>
+    <ExplorerRoot sx={sx}>
       <Typography sx={{ ml: 1, mb: 1 }} variant="subtitle2">
         Scope
       </Typography>
@@ -97,6 +102,6 @@ export default function GlobalScopeExplorer({ meta, value, sx }: GlobalScopeExpl
           })}
         </Box>
       </Box>
-    </Box>
+    </ExplorerRoot>
   );
 }

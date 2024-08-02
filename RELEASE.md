@@ -76,7 +76,7 @@
 
    And verify the app runs
 
-   b. Toolpad Studio: Run
+   b. Run Toolpad Studio
 
    ```bash
    npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app --studio smoke --use-pnpm

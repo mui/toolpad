@@ -1,4 +1,5 @@
-export default `'use client';
+const navigateButton: TemplateFile = {
+  content: `'use client';
 import * as React from 'react';
 import Link from 'next/link';
 import { LoadingButton } from '@mui/lab';
@@ -21,4 +22,7 @@ export default function NavigateButton() {
     </Box>
   );
 }
-`;
+`,
+};
+
+export default navigateButton;

@@ -1,6 +1,6 @@
-import { PackageJson } from './packageType';
+import { PackageJsonTemplate } from '../types';
 
-export default (appName: string): PackageJson => ({
+const packageJson: PackageJsonTemplate = (appName) => ({
   name: appName,
   version: '0.1.0',
   scripts: {
@@ -30,3 +30,5 @@ export default (appName: string): PackageJson => ({
     'eslint-config-next': '^14',
   },
 });
+
+export default packageJson;

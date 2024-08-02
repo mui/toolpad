@@ -1,4 +1,5 @@
-export default `  
+const rootLayout: TemplateFile = {
+  content: `  
   import { AppProvider } from "@toolpad/core/nextjs";
   import DashboardIcon from "@mui/icons-material/Dashboard";
   import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
@@ -30,4 +31,7 @@ export default `
       </html>
     );
   }
-    `;
+  `,
+};
+
+export default rootLayout;

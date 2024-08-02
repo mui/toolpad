@@ -1,4 +1,5 @@
-export default `import * as React from 'react';
+const signIn: TemplateFile = {
+  content: `import * as React from 'react';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { signIn } from 'next-auth/react';
@@ -79,4 +80,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   };
 }
-`;
+`,
+};
+
+export default signIn;

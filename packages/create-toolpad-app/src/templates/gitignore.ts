@@ -1,4 +1,5 @@
-export default `
+const gitignore: TemplateFile = {
+  content: `
   # Logs
   logs
   *.log
@@ -128,4 +129,7 @@ export default `
   .yarn/unplugged
   .yarn/build-state.yml
   .yarn/install-state.gz
-  `;
+  `,
+};
+
+export default gitignore;

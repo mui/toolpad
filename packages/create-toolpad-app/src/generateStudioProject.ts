@@ -1,7 +1,6 @@
 import studioPackageJson from './templates/studio/packageJson';
 import gitignore from './templates/gitignore';
-
-export type PackageManager = 'npm' | 'pnpm' | 'yarn';
+import type { PackageManager } from './types';
 
 export default function generateStudioProject(
   packageManager: PackageManager,
@@ -11,7 +10,7 @@ export default function generateStudioProject(
 
   const files = new Map<string, { content: string }>([
     ['package.json', { content: JSON.stringify(packageJson, null, 2) }],
-    ['.gitignore', { content: gitignore }],
+    ['.gitignore', { content: gitignore.content }],
   ]);
 
   return files;

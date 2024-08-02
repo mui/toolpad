@@ -1,4 +1,5 @@
-export default `{
+export const tsconfig: TemplateFile = {
+  content: `{
     "compilerOptions": {
       "lib": ["dom", "dom.iterable", "esnext"],
       "allowJs": true,
@@ -24,4 +25,7 @@ export default `{
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
     "exclude": ["node_modules"]
   }
-  `;
+  `,
+};
+
+export default tsconfig;

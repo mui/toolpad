@@ -1,4 +1,5 @@
-export default `import Link from 'next/link';
+const indexPage: TemplateFile = {
+  content: `import Link from 'next/link';
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -20,4 +21,7 @@ export default function HomePage() {
     </Box>
   );
 }
-`;
+`,
+};
+
+export default indexPage;

@@ -1,4 +1,7 @@
-export default `import Link from 'next/link';
+const rootPage: TemplateFile = {
+  content: `
+  "use client";
+  import Link from 'next/link';
   import { Container, Typography, Box } from '@mui/material';
   import NavigateButton from './NavigateButton';
   
@@ -18,4 +21,7 @@ export default `import Link from 'next/link';
       </Container>
     );
   }  
-  `;
+  `,
+};
+
+export default rootPage;

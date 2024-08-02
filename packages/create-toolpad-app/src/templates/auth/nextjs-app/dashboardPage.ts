@@ -1,5 +1,5 @@
-export default `
-import * as React from 'react';
+const dashboardPage: TemplateFile = {
+  content: `import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { auth } from '../../auth';
@@ -23,4 +23,7 @@ export default async function HomePage() {
     </Box>
   );
 }
-`;
+`,
+};
+
+export default dashboardPage;

@@ -12,12 +12,12 @@ import { satisfies } from 'semver';
 import { readJsonFile } from '@toolpad/utils/fs';
 import invariant from 'invariant';
 import { bashResolvePath } from '@toolpad/utils/cli';
-import type { PackageJson } from './templates/packageType';
 import generateProject, { GenerateProjectOptions } from './generateProject';
-import type { SupportedRouter, SupportedAuthProvider } from './generateProject';
+import generateStudioProject from './generateStudioProject';
 import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
-import generateStudioProject, { PackageManager } from './generateStudioProject';
+import type { PackageJson } from './templates/packageType';
+import type { SupportedRouter, SupportedAuthProvider, PackageManager } from './types';
 
 declare global {
   interface Error {
@@ -278,22 +278,6 @@ const run = async () => {
       authProviders: authProviderOptions,
     };
     await scaffoldCoreProject(options);
-
-    if (installFlag) {
-      // eslint-disable-next-line no-console
-      console.log(`${chalk.cyan('info')} - Installing dependencies`);
-      // eslint-disable-next-line no-console
-      console.log();
-      await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
-      // eslint-disable-next-line no-console
-      console.log();
-      // eslint-disable-next-line no-console
-      console.log(
-        `${chalk.green('success')} - Installed "${args.example}" at ${chalk.cyan(absolutePath)}`,
-      );
-      // eslint-disable-next-line no-console
-      console.log();
-    }
   } else {
     // Otherwise, create a new project with Toolpad Studio
     await scaffoldStudioProject(absolutePath, installFlag);

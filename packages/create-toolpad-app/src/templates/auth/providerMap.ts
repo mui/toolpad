@@ -1,4 +1,5 @@
-export default `
+const providerMap: TemplateFile = {
+  content: `
 ];
 
 export const providerMap = providers.map((provider) => {
@@ -14,4 +15,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET,
   pages: {
     signIn: '/auth/signin',
-  },`;
+  },`,
+};
+
+export default providerMap;

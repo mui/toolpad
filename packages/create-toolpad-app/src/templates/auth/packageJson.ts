@@ -1,6 +1,6 @@
-import { PackageJson } from '../packageType';
+import { PackageJsonTemplate } from '../../types';
 
-export default (appName: string): PackageJson => ({
+const packageJson: PackageJsonTemplate = (appName) => ({
   name: appName,
   version: '0.1.0',
   scripts: {
@@ -12,13 +12,13 @@ export default (appName: string): PackageJson => ({
   dependencies: {
     '@emotion/react': '^11.11.4',
     '@emotion/styled': '^11.11.5',
-    '@mui/icons-material': '6.0.0-beta.2',
-    '@mui/lab': '6.0.0-beta.2',
-    '@mui/material': '6.0.0-beta.2',
+    '@mui/icons-material': 'next',
+    '@mui/lab': 'next',
+    '@mui/material': 'next',
     '@mui/material-nextjs': 'next',
     '@toolpad/core': 'latest',
     next: '14.2.4',
-    'next-auth': '5.0.0-beta.18',
+    'next-auth': 'beta',
     react: '18.3.1',
     'react-dom': '18.3.1',
   },
@@ -29,3 +29,5 @@ export default (appName: string): PackageJson => ({
     'eslint-config-next': '14.2.4',
   },
 });
+
+export default packageJson;

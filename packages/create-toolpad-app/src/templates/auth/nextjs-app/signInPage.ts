@@ -1,5 +1,5 @@
-export default `
-import * as React from 'react';
+const signInPage: TemplateFile = {
+  content: `import * as React from 'react';
 import type { AuthProvider } from '@toolpad/core';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { AuthError } from 'next-auth';
@@ -45,4 +45,7 @@ export default function SignIn() {
       }}
     />
   );
-}`;
+}`,
+};
+
+export default signInPage;

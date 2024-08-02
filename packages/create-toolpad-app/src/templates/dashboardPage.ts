@@ -1,4 +1,5 @@
-export default `import { Typography } from "@mui/material";
+const dashboardPage: TemplateFile = {
+  content: `import { Typography } from "@mui/material";
 
 export default function Home() {
   return (
@@ -9,4 +10,7 @@ export default function Home() {
     </main>
   );
 }
-`;
+`,
+};
+
+export default dashboardPage;

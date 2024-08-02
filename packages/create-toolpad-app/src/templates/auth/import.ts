@@ -1,1 +1,5 @@
-export default `import NextAuth from 'next-auth';`;
+const importAuth: TemplateFile = {
+  content: `import NextAuth from 'next-auth';`,
+};
+
+export default importAuth;

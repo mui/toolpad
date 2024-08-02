@@ -1,7 +1,7 @@
-import { PackageJson } from '../packageType';
+import { PackageJsonTemplate } from '../../types';
 
-export default (name: string): PackageJson => ({
-  name,
+const packageJson: PackageJsonTemplate = (appName) => ({
+  name: appName,
   version: '0.1.0',
   scripts: {
     dev: 'toolpad-studio dev',
@@ -12,3 +12,5 @@ export default (name: string): PackageJson => ({
     '@toolpad/studio': 'latest',
   },
 });
+
+export default packageJson;

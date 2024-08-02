@@ -1,4 +1,5 @@
-export default `
+const credentialsProvider: TemplateFile = {
+  content: `
   Credentials({
     credentials: {
       email: { label: 'Email Address', type: 'email' },
@@ -14,4 +15,7 @@ export default `
         email: 'test@example.com',
       };
     },
-  }),`;
+  }),`,
+};
+
+export default credentialsProvider;

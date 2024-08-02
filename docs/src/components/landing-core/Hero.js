@@ -57,9 +57,9 @@ export default function Hero() {
             color="text.secondary"
             sx={{ maxWidth: 620, mb: 3, textWrap: 'balance', textAlign: 'center' }}
           >
-            From the creators of MUI, Toolpad offers the components needed for your next admin panel
-            and internal tools project. Bootstrap from scratch in our CLI with well chosen defaults,
-            or drop Toolpad into your existing Next.js or Vite* project.
+            Toolpad offers the components needed for your next admin portal or internal tool.
+            Bootstrap from scratch in our CLI with well chosen defaults, or drop Toolpad into your
+            existing Next.js or Vite* project.
           </Typography>
         </Box>
         <Box

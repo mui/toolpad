@@ -1,0 +1,11 @@
+const providers = [
+  { id: 'github', name: 'GitHub' },
+  { id: 'google', name: 'Google' },
+  { id: 'facebook', name: 'Facebook' },
+];
+
+// ...
+
+<AppProvider>
+  <SignInPage signIn={signIn} providers={providers} />
+</AppProvider>

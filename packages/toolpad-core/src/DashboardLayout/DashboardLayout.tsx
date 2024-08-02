@@ -241,7 +241,7 @@ function DashboardSidebarSubNavigation({
         const listItem = (
           <ListItem sx={{ pt: 0, pb: 0 }}>
             <NavigationListItemButton
-              selected={pathname === navigationItemFullPath}
+              selected={pathname === navigationItemFullPath && !navigationItem.children}
               {...(navigationItem.children
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),

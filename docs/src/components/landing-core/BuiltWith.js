@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import GradientText from 'docs/src/components/typography/GradientText';
 import Section from 'docs/src/layouts/Section';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
@@ -11,7 +11,7 @@ const content = [
     icon: <img src="/static/toolpad/marketing/react-svgrepo-com.svg" width={24} alt="React" />,
     title: 'React',
     description:
-      'Toolpad is a code-centric approach to admin apps. Entire app is accessible and customizable through React code.',
+      'Toolpad is a code-centric approach to admin apps. The entire app is accessible and customizable through React code.',
   },
   {
     icon: (
@@ -27,13 +27,13 @@ const content = [
     ),
     title: 'Next.js',
     description:
-      'Next.js sets the industry standard for modern React applications. Building over ﻿it, is a leverage that makes Toolpad efficient.',
+      'Next.js sets the industry standard for modern React applications. Building over it is a leverage that makes Toolpad efficient.',
   },
   {
     icon: <img src="https://mui.com/static/logo.png" width={30} alt="MUI" />,
     title: 'MUI',
     description:
-      'The tight integration with MUI ensures you get all the latest features from our list of MaterialUI components.',
+      'A tight integration with MUI ensures you get all the latest features from our list of Material UI components.',
   },
 ];
 
@@ -51,7 +51,7 @@ export default function BuiltWith() {
       />
       <Grid container>
         {content.map(({ icon, title, description }) => (
-          <Grid item key={title} xs={12} sm={6} lg={3} sx={{ padding: 1 }}>
+          <Grid key={title} size={{ xs: 12, sm: 6, lg: 3 }} sx={{ padding: 1 }}>
             <InfoCard title={title} icon={icon} description={description} />
           </Grid>
         ))}

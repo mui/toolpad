@@ -26,6 +26,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import useSsr from '@toolpad/utils/hooks/useSsr';
+import { Account } from '../Account';
 import { Link } from '../shared/Link';
 import {
   BrandingContext,
@@ -105,6 +106,7 @@ function ThemeSwitcher() {
           sx={{
             color: (theme.vars ?? theme).palette.primary.dark,
             padding: 1,
+            marginRight: 1,
           }}
         >
           {theme.getColorSchemeSelector ? (
@@ -400,6 +402,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <ThemeSwitcher />
+          <Account />
         </Toolbar>
       </AppBar>
       <Drawer

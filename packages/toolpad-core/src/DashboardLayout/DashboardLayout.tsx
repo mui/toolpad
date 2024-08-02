@@ -36,7 +36,11 @@ import {
 } from '../shared/context';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
-import { getItemTitle, getPageItemFullPath, isPageItem } from '../shared/navigation';
+import {
+  getItemTitle,
+  getPageItemFullPath,
+  hasSelectedNavigationChildren,
+} from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
 
 const DRAWER_WIDTH = 320; // px
@@ -137,6 +141,9 @@ function ThemeSwitcher() {
   ) : null;
 }
 
+let validatedItemIds = new Set<string>();
+let uniqueItemPaths = new Set<string>();
+
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
@@ -161,21 +168,8 @@ function DashboardSidebarSubNavigation({
           navigationItem,
           originalIndex: navigationItemIndex,
         }))
-        .filter(
-          ({ navigationItem }) =>
-            isPageItem(navigationItem) &&
-            navigationItem.children &&
-            navigationItem.children.some((nestedNavigationItem) => {
-              if (!isPageItem(nestedNavigationItem)) {
-                return false;
-              }
-              const nestedNavigationItemFullPath = getPageItemFullPath(
-                basePath,
-                nestedNavigationItem,
-              );
-
-              return nestedNavigationItemFullPath === pathname;
-            }),
+        .filter(({ navigationItem }) =>
+          hasSelectedNavigationChildren(navigationItem, basePath, pathname),
         )
         .map(({ originalIndex }) => `${depth}-${originalIndex}`),
     [basePath, depth, pathname, subNavigation],
@@ -194,15 +188,6 @@ function DashboardSidebarSubNavigation({
       );
     },
     [],
-  );
-
-  const activeNavigationItemIndex = React.useMemo(
-    () =>
-      subNavigation.findIndex(
-        (navigationItem) =>
-          isPageItem(navigationItem) && pathname === getPageItemFullPath(basePath, navigationItem),
-      ),
-    [basePath, pathname, subNavigation],
   );
 
   return (
@@ -253,12 +238,10 @@ function DashboardSidebarSubNavigation({
           <ExpandMoreIcon />
         );
 
-        const isSelected = navigationItemIndex === activeNavigationItemIndex;
-
         const listItem = (
           <ListItem sx={{ pt: 0, pb: 0 }}>
             <NavigationListItemButton
-              selected={isSelected}
+              selected={pathname === navigationItemFullPath}
               {...(navigationItem.children
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),
@@ -290,6 +273,16 @@ function DashboardSidebarSubNavigation({
             </NavigationListItemButton>
           </ListItem>
         );
+
+        if (!validatedItemIds.has(navigationItemId)) {
+          validatedItemIds.add(navigationItemId);
+
+          if (!uniqueItemPaths.has(navigationItemFullPath)) {
+            uniqueItemPaths.add(navigationItemFullPath);
+          } else {
+            console.warn(`Duplicate path in navigation: ${navigationItemFullPath}`);
+          }
+        }
 
         return (
           <React.Fragment key={navigationItemId}>
@@ -356,6 +349,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
     }
   }, []);
 
+  // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
+  React.useMemo(() => {
+    uniqueItemPaths = new Set();
+    validatedItemIds = new Set();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigation]);
+
   const drawerContent = (
     <React.Fragment>
       <Toolbar />
@@ -405,6 +405,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   sx={{
                     color: (theme) => (theme.vars ?? theme).palette.primary.main,
                     fontWeight: '700',
+                    ml: 0.5,
                   }}
                 >
                   {applicationTitle}

@@ -46,6 +46,9 @@ function createPageLookup(
     }
 
     const path = resolveSegment(item.segment);
+    if (result.has(path)) {
+      console.warn(`Duplicate path in navigation: ${path}`);
+    }
 
     const itemCrumb: BreadCrumbItem = { path, ...item };
 
@@ -60,6 +63,10 @@ function createPageLookup(
     if (item.children) {
       const childrenLookup = createPageLookup(item.children, navigationSegments, path);
       for (const [childPath, childItems] of childrenLookup) {
+        if (result.has(childPath)) {
+          console.warn(`Duplicate path in navigation: ${childPath}`);
+        }
+
         result.set(childPath, childItems);
       }
     }

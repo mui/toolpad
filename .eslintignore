@@ -16,4 +16,6 @@ build
 
 .generated
 .github
+
 .coverage
+.tsup

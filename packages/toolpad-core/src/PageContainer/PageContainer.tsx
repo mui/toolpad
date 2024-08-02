@@ -66,7 +66,6 @@ function createPageLookup(
         if (result.has(childPath)) {
           console.warn(`Duplicate path in navigation: ${childPath}`);
         }
-
         result.set(childPath, childItems);
       }
     }

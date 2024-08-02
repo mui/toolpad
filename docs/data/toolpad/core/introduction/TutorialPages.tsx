@@ -4,7 +4,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider, Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internals/demo';
+import { useDemoRouter } from '@toolpad/core/internals';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { Typography } from '@mui/material';
 

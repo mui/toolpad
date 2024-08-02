@@ -275,13 +275,13 @@ function DashboardSidebarSubNavigation({
         );
 
         if (!validatedItemIds.has(navigationItemId)) {
-          validatedItemIds.add(navigationItemId);
-
           if (!uniqueItemPaths.has(navigationItemFullPath)) {
             uniqueItemPaths.add(navigationItemFullPath);
           } else {
             console.warn(`Duplicate path in navigation: ${navigationItemFullPath}`);
           }
+
+          validatedItemIds.add(navigationItemId);
         }
 
         return (

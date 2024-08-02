@@ -26,7 +26,7 @@ export default function BasicNotification() {
 function BasicNotification() {
   const notifications = useNotifications();
   return (
-    <div>
+    <div style={{ margin: 'auto' }}>
       <Button
         onClick={() => {
           notifications.show('Consider yourself notified!', {

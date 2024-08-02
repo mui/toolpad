@@ -2,8 +2,8 @@
   "props": {},
   "name": "PageContainer",
   "imports": [
-    "import { PageContainer } from '@toolpad-core/PageContainer';",
-    "import { PageContainer } from '@toolpad-core';"
+    "import { PageContainer } from '@toolpad/core/PageContainer';",
+    "import { PageContainer } from '@toolpad/core';"
   ],
   "slots": [
     {

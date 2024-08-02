@@ -24,7 +24,7 @@
     "docs:typescript:formatted": "tsx ./docs/scripts/formattedTSDemos",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "jsonlint": "node ./scripts/jsonlint.mjs",
-    "release:build": "lerna run --ignore docs --stream build",
+    "release:build": "lerna run --ignore docs --stream build --concurrency 1",
     "release:version": "lerna version --exact --no-changelog --no-push --no-git-tag-version",
     "release:publish": "pnpm dedupe && pnpm release:build && pnpm publish --recursive --tag latest",
     "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",

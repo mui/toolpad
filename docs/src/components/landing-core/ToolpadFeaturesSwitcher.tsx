@@ -82,6 +82,14 @@ const componentElement = new Map([
     },
   ],
   [
+    'page',
+    {
+      name: 'Page container',
+      description: 'Sets up breadcrumbs, title, toolbar and a responsive container for your pages.',
+      icon: <AutoAwesomeMotion />,
+    },
+  ],
+  [
     'dialogs',
     {
       name: 'Dialogs',
@@ -97,14 +105,6 @@ const componentElement = new Map([
       description:
         'We offer imperative APIs to deal with snackbars an notifications around your application.',
       icon: <NotificationsIcon />,
-    },
-  ],
-  [
-    'page',
-    {
-      name: 'Page container',
-      description: 'Sets up breadcrumbs, title, toolbar and a responsive container for your pages.',
-      icon: <AutoAwesomeMotion />,
     },
   ],
 ]);

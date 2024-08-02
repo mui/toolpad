@@ -1,8 +1,11 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import { auth } from '../../auth';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+
   return (
     <Box
       sx={{
@@ -14,7 +17,7 @@ export default function HomePage() {
         textAlign: 'center',
       }}
     >
-      <Typography sx={{ mb: 2 }}>Welcome to Toolpad!</Typography>
+      <Typography sx={{ mb: 2 }}>Welcome to Toolpad, {session?.user?.name || 'User'}!</Typography>
     </Box>
   );
 }

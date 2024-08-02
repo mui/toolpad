@@ -65,7 +65,7 @@
 
 1. Smoke test the release with the [CodeSandbox CI](https://ci.codesandbox.io/status/mui/mui-toolpad) package of the PR branch:
 
-   a. Toolpad Core: Run
+   a. Run Toolpad Core
 
    ```bash
    npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke --use-pnpm

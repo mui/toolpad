@@ -44,7 +44,7 @@ const customTheme = extendTheme({
       },
     },
   },
-  colorSchemeSelector: 'class',
+  colorSchemeSelector: 'data-toolpad-color-scheme',
   breakpoints: {
     values: {
       xs: 0,

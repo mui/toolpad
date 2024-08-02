@@ -25,7 +25,7 @@ const theme = extendTheme({
       },
     },
   },
-  colorSchemeSelector: 'class',
+  colorSchemeSelector: 'data-toolpad-color-scheme',
 });
 
 export default theme;

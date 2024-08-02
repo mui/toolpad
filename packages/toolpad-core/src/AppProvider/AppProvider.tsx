@@ -120,7 +120,7 @@ export interface AppProviderProps {
 function defaultTheme(): CssVarsTheme {
   return extendTheme({
     colorSchemes: { light: true, dark: true },
-    colorSchemeSelector: 'class',
+    colorSchemeSelector: 'data-toolpad-color-scheme',
   });
 }
 

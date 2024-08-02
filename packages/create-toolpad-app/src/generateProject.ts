@@ -119,7 +119,7 @@ export default function generateProject(
 
   const theme = extendTheme({
     colorSchemes: { light: true, dark: true },
-    colorSchemeSelector: 'class',
+    colorSchemeSelector: 'data-toolpad-color-scheme',
   });
 
   export default theme;

@@ -59,7 +59,7 @@ const NAVIGATION = [
 
 const demoTheme = extendTheme({
   colorSchemes: { light: true, dark: true },
-  colorSchemeSelector: 'class',
+  colorSchemeSelector: 'data-toolpad-color-scheme',
   breakpoints: {
     values: {
       xs: 0,

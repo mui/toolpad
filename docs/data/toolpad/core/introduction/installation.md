@@ -77,53 +77,38 @@ yarn dev
 
 ## Manual Installation
 
-Start by installing the required dependencies:
+Use your preferred package manager to install `@toolpad/core` in your project:
 
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npm install -S @toolpad/core next@latest react@latest react-dom@latest
+npm install -S @toolpad/core
 ```
 
 ```bash yarn
-yarn add @toolpad/core next@latest react@latest react-dom@latest
+yarn add @toolpad/core
 ```
 
 ```bash pnpm
-pnpm add @toolpad/core next@latest react@latest react-dom@latest
+pnpm add @toolpad/core
 ```
 
 </codeblock>
 
-Then you'll have to add the Toolpad Core scripts to your `package.json`:
-
-```json
-// ./package.json
-...
-  "scripts": {
-    "toolpad-studio:dev": "next dev ./my-toolpad-core-app",
-    "toolpad-studio:build": "next build ./my-toolpad-core-app",
-    "toolpad-studio:start": "next start ./my-toolpad-core-app"
-  }
-...
-```
-
-Now you can start your Toolpad Core application using one of the commands:
+The Toolpad Core package has a peer dependency on `@mui/material` and `@mui/icons-material`. If you aren't using these already in your project, you can install them with:
 
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npm run toolpad-core:dev
+npm install -S @mui/material @mui/icons-material @emotion/react @emotion/styled
 ```
 
 ```bash yarn
-yarn toolpad-core:dev
+yarn add @mui/material @mui/icons-material @emotion/react @emotion/styled
 ```
 
 ```bash pnpm
-pnpm toolpad-core:dev
+pnpm add @mui/material @mui/icons-material @emotion/react @emotion/styled
 ```
 
 </codeblock>
-
-When you run this command, Toolpad Core will initialize the application in the **./my-toolpad-core-app** folder.

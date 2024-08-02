@@ -4,7 +4,7 @@ import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { useDemoRouter } from '@toolpad/core/internals/demo';
+import { useDemoRouter } from '@toolpad/core/internals';
 
 const code = `
 <PageContainer>

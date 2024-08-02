@@ -218,7 +218,7 @@ export default function ToolpadDashboardLayout() {
             iframe
             name="DashboardLayout"
             onResetDemoClick={NOOP}
-            productId="joy-ui"
+            productId="toolpad-core"
             usesCssVarsTheme
           >
             <DashboardLayoutBasic />

@@ -52,7 +52,7 @@ function MyCustomDialog({ open, onClose }: DialogProps) {
 function DemoContent() {
   const dialogs = useDialogs();
   return (
-    <div>
+    <div style={{ margin: 'auto' }}>
       <Button
         onClick={async () => {
           await dialogs.open(MyCustomDialog);

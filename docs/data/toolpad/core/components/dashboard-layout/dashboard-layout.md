@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Dashboard Layout
-components: AppProvider, DashboardLayout
+components: AppProvider, DashboardLayout, Account
 ---
 
 # Dashboard Layout
@@ -50,3 +50,13 @@ The main navigation items that can be used are:
 Navigation links have an optional `action` prop that can be used to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
 
 {{"demo": "DashboardLayoutNavigationActions.js", "height": 500, "iframe": true}}
+
+## Account
+
+The `DashboardLayout` comes integrated with the [`<Account />`](/toolpad/core/react-account/) component. It renders as an account management menu when a user is signed in – a `session` object is present – and a button when not.
+
+:::warning
+The use of an `iframe` may cause some spacing issues in the following demo.
+:::
+
+{{"demo": "../account/AccountWithDashboard.js", "iframe": true, "height": 320 }}

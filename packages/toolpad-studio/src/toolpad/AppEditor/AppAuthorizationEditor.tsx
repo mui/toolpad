@@ -562,9 +562,9 @@ export function AppRoleMappingsEditor({
 
     const authentication = appNode.attributes.authentication;
     const roleMappings = activeAuthProvider
-      ? authentication?.providers?.find(
+      ? (authentication?.providers?.find(
           (providerConfig) => providerConfig.provider === activeAuthProvider,
-        )?.roles ?? []
+        )?.roles ?? [])
       : [];
 
     const existingRows =

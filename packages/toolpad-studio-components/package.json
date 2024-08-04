@@ -54,7 +54,7 @@
     "invariant": "2.2.4",
     "markdown-to-jsx": "7.4.7",
     "react-error-boundary": "4.0.13",
-    "react-hook-form": "7.52.1"
+    "react-hook-form": "7.52.2"
   },
   "devDependencies": {
     "@types/invariant": "2.2.37",

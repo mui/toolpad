@@ -168,13 +168,13 @@
     "@types/whatwg-url": "11.0.5",
     "@types/ws": "8.5.12",
     "@types/yargs": "17.0.32",
-    "ajv": "8.16.0",
+    "ajv": "8.17.1",
     "eslint": "8.57.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-import": "2.29.1",
     "formidable": "3.5.1",
     "react-transition-group": "4.4.5",
-    "webpack": "5.92.1"
+    "webpack": "5.93.0"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

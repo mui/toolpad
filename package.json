@@ -113,7 +113,7 @@
   },
   "dependencies": {
     "@types/lodash": "4.17.7",
-    "@vitest/browser": "2.0.4",
+    "@vitest/browser": "2.0.5",
     "archiver": "7.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.4.2",

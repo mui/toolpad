@@ -17,7 +17,7 @@
     "@types/node": "20.14.14",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
-    "eslint-config-next": "14.2.4",
+    "eslint-config-next": "14.2.5",
     "next": "14.2.5",
     "next-auth": "beta",
     "react": "18.3.1",

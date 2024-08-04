@@ -146,7 +146,7 @@
     "yaml-diff-patch": "2.0.0",
     "yargs": "17.7.2",
     "zod": "3.23.8",
-    "zod-validation-error": "3.3.0"
+    "zod-validation-error": "3.3.1"
   },
   "devDependencies": {
     "@types/babel__code-frame": "7.0.6",

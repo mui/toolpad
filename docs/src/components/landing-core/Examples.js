@@ -10,7 +10,7 @@ import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 
 const ImageContainer = styled(Link)(({ theme }) => [
   {
@@ -107,11 +107,7 @@ export default function Examples() {
         <Grid container spacing={5} sx={{ mt: { xs: 1, sm: 4 } }}>
           <Grid size={{ xs: 12, md: 6 }}>
             <ImageContainer noLinkStyle href="https://mui.com/toolpad/core/introduction/tutorial/">
-              <Img
-                src="/static/toolpad/docs/studio/examples/qr-generator.png"
-                width="2880"
-                height="1592"
-              />
+              <Img src="/static/toolpad/marketing/admin-app.png" width="2880" height="1592" />
             </ImageContainer>
             <ContentCard
               icon={<DashboardRoundedIcon fontSize="small" color="primary" />}

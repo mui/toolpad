@@ -53,9 +53,9 @@
       "matchPackagePatterns": ["^stylis-"]
     },
     {
-      "groupName": "Vite",
-      "matchPackageNames": ["vite"],
-      "matchPackagePatterns": ["^@vitejs/"]
+      "groupName": "Vitest",
+      "matchPackageNames": ["vitest"],
+      "matchPackagePatterns": ["^@vitest/"]
     },
     {
       "groupName": "Next.js",

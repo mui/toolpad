@@ -33,7 +33,7 @@ const Img = styled('img')<DocsImageProps>(({ theme, zoom, indent, width, aspectR
   width: width ?? '-webkit-fill-available',
   display: 'block',
   position: 'relative',
-  aspectRatio: aspectRatio ?? zoom === false ? 'unset' : '1.80904522613', // 1440 / 796
+  aspectRatio: (aspectRatio ?? zoom === false) ? 'unset' : '1.80904522613', // 1440 / 796
   marginTop: theme.spacing(3),
   marginLeft: indent ? theme.spacing(5 * indent) : undefined,
   marginBottom: 0,

@@ -6,8 +6,12 @@ export const isPageItem = (item: NavigationItem): item is NavigationPageItem =>
   getItemKind(item) === 'page';
 
 export const getItemTitle = (item: NavigationPageItem | NavigationSubheaderItem) => {
-  return isPageItem(item) ? (item.title ?? item.segment) : item.title;
+  return isPageItem(item) ? (item.title ?? item.segment ?? '') : item.title;
 };
+
+export function getPageItemFullPath(basePath: string, navigationItem: NavigationPageItem) {
+  return `${basePath}${basePath && !navigationItem.segment ? '' : '/'}${navigationItem.segment ?? ''}`;
+}
 
 export function hasSelectedNavigationChildren(
   navigationItem: NavigationItem,
@@ -15,7 +19,7 @@ export function hasSelectedNavigationChildren(
   pathname: string,
 ): boolean {
   if (isPageItem(navigationItem) && navigationItem.children) {
-    const navigationItemFullPath = `${basePath}${basePath && !navigationItem.segment ? '' : '/'}${navigationItem.segment ?? ''}`;
+    const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
 
     return navigationItem.children.some((nestedNavigationItem) => {
       if (!isPageItem(nestedNavigationItem)) {
@@ -30,7 +34,10 @@ export function hasSelectedNavigationChildren(
         );
       }
 
-      const nestedNavigationItemFullPath = `${navigationItemFullPath}${navigationItemFullPath && !nestedNavigationItem.segment ? '' : '/'}${nestedNavigationItem.segment ?? ''}`;
+      const nestedNavigationItemFullPath = getPageItemFullPath(
+        navigationItemFullPath,
+        nestedNavigationItem,
+      );
 
       return nestedNavigationItemFullPath === pathname;
     });

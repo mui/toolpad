@@ -116,7 +116,7 @@ export default function Examples() {
               href="https://mui.com/toolpad/core/introduction/tutorial/"
             />
           </Grid>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box
               sx={[
                 (theme) => ({

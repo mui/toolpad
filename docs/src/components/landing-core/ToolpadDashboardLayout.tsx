@@ -11,6 +11,7 @@ import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer, type Navigation } from '@toolpad/core';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid2';
 import { styled } from '@mui/material';
 import Frame from '../../modules/components/Frame';
@@ -199,13 +200,13 @@ export default function ToolpadDashboardLayout() {
         <Paper
           variant="outlined"
           sx={(theme) => ({
-            p: 2,
             display: 'flex',
             alignItems: 'center',
             maxWidth: '100%',
             mx: 'auto',
             bgcolor: '#FFF',
             borderRadius: '8px',
+            overflow: 'hidden',
             ...theme.applyDarkStyles({
               bgcolor: 'primaryDark.900',
             }),

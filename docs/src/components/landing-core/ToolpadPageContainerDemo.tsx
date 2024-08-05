@@ -35,13 +35,13 @@ export default function ToolpadPageContainerDemo() {
         <Paper
           variant="outlined"
           sx={(theme) => ({
-            p: 2,
             display: 'flex',
             alignItems: 'center',
             maxWidth: '100%',
             mx: 'auto',
             bgcolor: '#FFF',
             borderRadius: '8px',
+            overflow: 'hidden',
             ...theme.applyDarkStyles({
               bgcolor: 'primaryDark.900',
             }),

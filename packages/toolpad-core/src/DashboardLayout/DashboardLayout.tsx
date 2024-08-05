@@ -52,6 +52,7 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderStyle: 'solid',
   borderColor: (theme.vars ?? theme).palette.divider,
   boxShadow: 'none',
+  left: 0,
   zIndex: theme.zIndex.drawer + 1,
 }));
 
@@ -381,7 +382,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
-        <Toolbar sx={{ backgroundColor: 'inherit' }}>
+        <Toolbar sx={{ backgroundColor: 'inherit', width: '100vw' }}>
           <Box sx={{ display: { xs: 'block', md: 'none' } }}>
             <Tooltip
               title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}

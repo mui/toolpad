@@ -26,7 +26,7 @@ The framework follows the open-core model, with some features being available un
 - High performance 🚀
 - [Layout and Navigation](/toolpad/core/react-dashboard-layout/)
 - [Page Container](/toolpad/core/react-page-container/)
-- [Authentication](/)
+- [Authentication](/toolpad/core/react-sign-in-page/)
 - [Dialogs](/toolpad/core/react-use-dialogs/)
 - [Notifications](/toolpad/core/react-use-notifications/)
 - [Persistent State](/toolpad/core/react-persistent-state/)

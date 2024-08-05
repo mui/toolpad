@@ -37,7 +37,7 @@ import {
 } from '../shared/context';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
-import { getItemTitle, isPageItem } from '../shared/navigation';
+import { getItemTitle, hasSelectedNavigationChildren } from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
 
 const DRAWER_WIDTH = 320; // px
@@ -163,18 +163,8 @@ function DashboardSidebarSubNavigation({
           navigationItem,
           originalIndex: navigationItemIndex,
         }))
-        .filter(
-          ({ navigationItem }) =>
-            isPageItem(navigationItem) &&
-            navigationItem.children &&
-            navigationItem.children.some((nestedNavigationItem) => {
-              if (!isPageItem(nestedNavigationItem)) {
-                return false;
-              }
-              const navigationItemFullPath = `${basePath}/${nestedNavigationItem.segment ?? ''}`;
-
-              return navigationItemFullPath === pathname;
-            }),
+        .filter(({ navigationItem }) =>
+          hasSelectedNavigationChildren(navigationItem, basePath, pathname),
         )
         .map(({ originalIndex }) => `${depth}-${originalIndex}`),
     [basePath, depth, pathname, subNavigation],
@@ -231,7 +221,7 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const navigationItemFullPath = `${basePath}/${navigationItem.segment ?? ''}`;
+        const navigationItemFullPath = `${basePath}${basePath && !navigationItem.segment ? '' : '/'}${navigationItem.segment ?? ''}`;
 
         const navigationItemId = `${depth}-${navigationItemIndex}`;
 

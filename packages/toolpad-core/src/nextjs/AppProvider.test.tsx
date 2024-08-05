@@ -29,7 +29,7 @@ interface RouterTestProps {
 }
 
 function RouterTest({ children }: RouterTestProps) {
-  const [pathname, setPathname] = React.useState('page');
+  const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
     return {

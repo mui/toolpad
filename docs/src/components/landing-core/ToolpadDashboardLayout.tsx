@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
-import Box from '@mui/material/Box';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';

@@ -37,7 +37,11 @@ import {
 } from '../shared/context';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
-import { getItemTitle, isPageItem } from '../shared/navigation';
+import {
+  getItemTitle,
+  getPageItemFullPath,
+  hasSelectedNavigationChildren,
+} from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
 
 const DRAWER_WIDTH = 320; // px
@@ -48,6 +52,7 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderStyle: 'solid',
   borderColor: (theme.vars ?? theme).palette.divider,
   boxShadow: 'none',
+  left: 0,
   zIndex: theme.zIndex.drawer + 1,
 }));
 
@@ -144,6 +149,8 @@ interface DashboardSidebarSubNavigationProps {
   basePath?: string;
   depth?: number;
   onSidebarItemClick?: (item: NavigationPageItem) => void;
+  validatedItemIds: Set<string>;
+  uniqueItemPaths: Set<string>;
 }
 
 function DashboardSidebarSubNavigation({
@@ -151,6 +158,8 @@ function DashboardSidebarSubNavigation({
   basePath = '',
   depth = 0,
   onSidebarItemClick,
+  validatedItemIds,
+  uniqueItemPaths,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
 
@@ -163,18 +172,8 @@ function DashboardSidebarSubNavigation({
           navigationItem,
           originalIndex: navigationItemIndex,
         }))
-        .filter(
-          ({ navigationItem }) =>
-            isPageItem(navigationItem) &&
-            navigationItem.children &&
-            navigationItem.children.some((nestedNavigationItem) => {
-              if (!isPageItem(nestedNavigationItem)) {
-                return false;
-              }
-              const navigationItemFullPath = `${basePath}/${nestedNavigationItem.segment ?? ''}`;
-
-              return navigationItemFullPath === pathname;
-            }),
+        .filter(({ navigationItem }) =>
+          hasSelectedNavigationChildren(navigationItem, basePath, pathname),
         )
         .map(({ originalIndex }) => `${depth}-${originalIndex}`),
     [basePath, depth, pathname, subNavigation],
@@ -231,7 +230,7 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const navigationItemFullPath = `${basePath}/${navigationItem.segment ?? ''}`;
+        const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
 
         const navigationItemId = `${depth}-${navigationItemIndex}`;
 
@@ -246,7 +245,7 @@ function DashboardSidebarSubNavigation({
         const listItem = (
           <ListItem sx={{ pt: 0, pb: 0 }}>
             <NavigationListItemButton
-              selected={pathname === navigationItemFullPath}
+              selected={pathname === navigationItemFullPath && !navigationItem.children}
               {...(navigationItem.children
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),
@@ -279,6 +278,16 @@ function DashboardSidebarSubNavigation({
           </ListItem>
         );
 
+        if (process.env.NODE_ENV !== 'production' && !validatedItemIds.has(navigationItemId)) {
+          if (!uniqueItemPaths.has(navigationItemFullPath)) {
+            uniqueItemPaths.add(navigationItemFullPath);
+          } else {
+            console.warn(`Duplicate path in navigation: ${navigationItemFullPath}`);
+          }
+
+          validatedItemIds.add(navigationItemId);
+        }
+
         return (
           <React.Fragment key={navigationItemId}>
             {listItem}
@@ -290,6 +299,8 @@ function DashboardSidebarSubNavigation({
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
                   onSidebarItemClick={onSidebarItemClick}
+                  validatedItemIds={validatedItemIds}
+                  uniqueItemPaths={uniqueItemPaths}
                 />
               </Collapse>
             ) : null}
@@ -327,6 +338,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
 
+  const validatedItemIdsRef = React.useRef(new Set<string>());
+  const uniqueItemPathsRef = React.useRef(new Set<string>());
+
   const handleSetMobileNavigationOpen = React.useCallback(
     (newOpen: boolean) => () => {
       setIsMobileNavigationOpen(newOpen);
@@ -344,6 +358,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
     }
   }, []);
 
+  // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
+  React.useMemo(() => {
+    validatedItemIdsRef.current = new Set();
+    uniqueItemPathsRef.current = new Set();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigation]);
+
   const drawerContent = (
     <React.Fragment>
       <Toolbar />
@@ -351,6 +372,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <DashboardSidebarSubNavigation
           subNavigation={navigation}
           onSidebarItemClick={handleNavigationItemClick}
+          validatedItemIds={validatedItemIdsRef.current}
+          uniqueItemPaths={uniqueItemPathsRef.current}
         />
       </Box>
     </React.Fragment>
@@ -359,7 +382,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
-        <Toolbar sx={{ backgroundColor: 'inherit' }}>
+        <Toolbar sx={{ backgroundColor: 'inherit', width: '100vw' }}>
           <Box sx={{ display: { xs: 'block', md: 'none' } }}>
             <Tooltip
               title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
@@ -393,6 +416,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   sx={{
                     color: (theme) => (theme.vars ?? theme).palette.primary.main,
                     fontWeight: '700',
+                    ml: 0.5,
                   }}
                 >
                   {applicationTitle}

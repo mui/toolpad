@@ -14,12 +14,12 @@ const NAVIGATION = [
     title: 'Main items',
   },
   {
-    segment: '/page',
+    segment: 'page',
     title: 'Page',
     icon: <DashboardIcon />,
   },
   {
-    segment: '/page-2',
+    segment: 'page-2',
     title: 'Page 2',
     icon: <TimelineIcon />,
   },
@@ -79,7 +79,7 @@ DemoPageContent.propTypes = {
 function AppProviderTheme(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('page');
+  const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
     return {

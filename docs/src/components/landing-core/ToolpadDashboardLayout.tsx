@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
-import Box from '@mui/material/Box';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -63,8 +62,10 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-function DashboardLayoutBasic() {
-  const [pathname, setPathname] = React.useState('dashboard');
+function DashboardLayoutBasic(props: DemoProps) {
+  const { window } = props;
+
+  const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -74,19 +75,24 @@ function DashboardLayoutBasic() {
     };
   }, [pathname]);
 
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
-      <AppProvider navigation={NAVIGATION} router={router}>
+    <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content for {pathname}</Typography>
-        </Box>
+        <PageContainer>
+          <Grid container spacing={2}>
+            <Grid size={6}>
+              <PlaceHolder height={100} />
+            </Grid>
+            <Grid size={6}>
+              <PlaceHolder height={100} />
+            </Grid>
+            <Grid size={12}>
+              <PlaceHolder height={200} />
+            </Grid>
+          </Grid>
+        </PageContainer>
       </DashboardLayout>
     </AppProvider>
   );
@@ -153,7 +159,7 @@ const PlaceHolder = styled('div')<{ height: number }>(({ theme, height }) => ({
 function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('page');
+  const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -168,28 +174,19 @@ function DashboardLayoutBasic(props: DemoProps) {
   return (
     <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <PageContainer>
-            <Grid container spacing={2}>
-              <Grid size={6}>
-                <PlaceHolder height={100} />
-              </Grid>
-              <Grid size={6}>
-                <PlaceHolder height={100} />
-              </Grid>
-              <Grid size={12}>
-                <PlaceHolder height={200} />
-              </Grid>
+        <PageContainer>
+          <Grid container spacing={2}>
+            <Grid size={6}>
+              <PlaceHolder height={100} />
             </Grid>
-          </PageContainer>
-        </Box>
+            <Grid size={6}>
+              <PlaceHolder height={100} />
+            </Grid>
+            <Grid size={12}>
+              <PlaceHolder height={200} />
+            </Grid>
+          </Grid>
+        </PageContainer>
       </DashboardLayout>
     </AppProvider>
   );
@@ -202,13 +199,13 @@ export default function ToolpadDashboardLayout() {
         <Paper
           variant="outlined"
           sx={(theme) => ({
-            p: 2,
             display: 'flex',
             alignItems: 'center',
             maxWidth: '100%',
             mx: 'auto',
             bgcolor: '#FFF',
             borderRadius: '8px',
+            overflow: 'hidden',
             ...theme.applyDarkStyles({
               bgcolor: 'primaryDark.900',
             }),

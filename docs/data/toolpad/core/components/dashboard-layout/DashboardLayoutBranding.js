@@ -58,7 +58,7 @@ DemoPageContent.propTypes = {
 function DashboardLayoutBranding(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('dashboard');
+  const [pathname, setPathname] = React.useState('/dashboard');
 
   const router = React.useMemo(() => {
     return {

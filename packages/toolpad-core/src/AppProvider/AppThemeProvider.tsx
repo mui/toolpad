@@ -46,8 +46,8 @@ function StandardThemeProvider(props: StandardThemeProviderProps) {
   const dualAwareTheme = React.useMemo(
     () =>
       isDualTheme
-        ? theme[paletteMode === 'dark' ? 'dark' : 'light'] ??
-          theme[paletteMode === 'dark' ? 'light' : 'dark']
+        ? (theme[paletteMode === 'dark' ? 'dark' : 'light'] ??
+          theme[paletteMode === 'dark' ? 'light' : 'dark'])
         : theme,
     [isDualTheme, paletteMode, theme],
   );

@@ -286,7 +286,7 @@ function QueryEditor({
   const isBrowserSide = input.attributes.query.browser;
 
   const connectionParams = isBrowserSide ? null : rawConnectionParams;
-  const baseUrl = isBrowserSide ? null : connectionParams?.baseUrl ?? null;
+  const baseUrl = isBrowserSide ? null : (connectionParams?.baseUrl ?? null);
 
   const urlValue: BindableAttrValue<string> = input.attributes.query.url ?? '';
 

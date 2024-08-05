@@ -63,8 +63,10 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-function DashboardLayoutBasic() {
-  const [pathname, setPathname] = React.useState('/dashboard');
+function DashboardLayoutBasic(props: DemoProps) {
+  const { window } = props;
+
+  const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -74,19 +76,24 @@ function DashboardLayoutBasic() {
     };
   }, [pathname]);
 
+  const demoWindow = window !== undefined ? window() : undefined;
+
   return (
-      <AppProvider navigation={NAVIGATION} router={router}>
+    <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>Dashboard content for {pathname}</Typography>
-        </Box>
+        <PageContainer>
+          <Grid container spacing={2}>
+            <Grid size={6}>
+              <PlaceHolder height={100} />
+            </Grid>
+            <Grid size={6}>
+              <PlaceHolder height={100} />
+            </Grid>
+            <Grid size={12}>
+              <PlaceHolder height={200} />
+            </Grid>
+          </Grid>
+        </PageContainer>
       </DashboardLayout>
     </AppProvider>
   );
@@ -168,28 +175,19 @@ function DashboardLayoutBasic(props: DemoProps) {
   return (
     <AppProvider navigation={NAVIGATION} router={router} window={demoWindow}>
       <DashboardLayout>
-        <Box
-          sx={{
-            py: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <PageContainer>
-            <Grid container spacing={2}>
-              <Grid size={6}>
-                <PlaceHolder height={100} />
-              </Grid>
-              <Grid size={6}>
-                <PlaceHolder height={100} />
-              </Grid>
-              <Grid size={12}>
-                <PlaceHolder height={200} />
-              </Grid>
+        <PageContainer>
+          <Grid container spacing={2}>
+            <Grid size={6}>
+              <PlaceHolder height={100} />
             </Grid>
-          </PageContainer>
-        </Box>
+            <Grid size={6}>
+              <PlaceHolder height={100} />
+            </Grid>
+            <Grid size={12}>
+              <PlaceHolder height={200} />
+            </Grid>
+          </Grid>
+        </PageContainer>
       </DashboardLayout>
     </AppProvider>
   );

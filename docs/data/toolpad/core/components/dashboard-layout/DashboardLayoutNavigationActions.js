@@ -47,10 +47,25 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
+const CALLS_NAVIGATION = [
+  {
+    segment: '/made',
+    title: 'Made',
+    icon: <CallMadeIcon />,
+    action: <Chip label={12} color="success" size="small" />,
+  },
+  {
+    segment: '/received',
+    title: 'Received',
+    icon: <CallReceivedIcon />,
+    action: <Chip label={4} color="error" size="small" />,
+  },
+];
+
 function DashboardLayoutNavigationActions(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('contacts');
+  const [pathname, setPathname] = React.useState('/contacts');
 
   const router = React.useMemo(() => {
     return {
@@ -78,6 +93,29 @@ function DashboardLayoutNavigationActions(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
+  const popoverMenuAction = (
+    <React.Fragment>
+      <IconButton aria-describedby={popoverId} onClick={handlePopoverButtonClick}>
+        <MoreHorizIcon />
+      </IconButton>
+      <Menu
+        id={popoverId}
+        open={isPopoverOpen}
+        anchorEl={popoverAnchorEl}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        disableAutoFocus
+        disableAutoFocusItem
+      >
+        <MenuItem onClick={handlePopoverClose}>New call</MenuItem>
+        <MenuItem onClick={handlePopoverClose}>Mark all as read</MenuItem>
+      </Menu>
+    </React.Fragment>
+  );
+
   return (
     // preview-start
     <AppProvider
@@ -92,46 +130,8 @@ function DashboardLayoutNavigationActions(props) {
           segment: 'calls',
           title: 'Calls',
           icon: <CallIcon />,
-          action: (
-            <React.Fragment>
-              <IconButton
-                aria-describedby={popoverId}
-                onClick={handlePopoverButtonClick}
-                sx={{ ml: 1 }}
-              >
-                <MoreHorizIcon />
-              </IconButton>
-              <Menu
-                id={popoverId}
-                open={isPopoverOpen}
-                anchorEl={popoverAnchorEl}
-                onClose={handlePopoverClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                disableAutoFocus
-                disableAutoFocusItem
-              >
-                <MenuItem onClick={handlePopoverClose}>New call</MenuItem>
-                <MenuItem onClick={handlePopoverClose}>Mark all as read</MenuItem>
-              </Menu>
-            </React.Fragment>
-          ),
-          children: [
-            {
-              segment: 'made',
-              title: 'Made',
-              icon: <CallMadeIcon />,
-              action: <Chip label={12} color="success" size="small" />,
-            },
-            {
-              segment: 'received',
-              title: 'Received',
-              icon: <CallReceivedIcon />,
-              action: <Chip label={4} color="error" size="small" />,
-            },
-          ],
+          action: popoverMenuAction,
+          children: CALLS_NAVIGATION,
         },
       ]}
       router={router}

@@ -2,24 +2,9 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { extendTheme } from '@mui/material/styles';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import DescriptionIcon from '@mui/icons-material/Description';
 import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation } from '@toolpad/core';
-
-const NAVIGATION: Navigation = [
-  {
-    segment: 'dashboard',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-];
 
 const demoTheme = extendTheme({
   breakpoints: {
@@ -57,10 +42,10 @@ interface DemoProps {
   window?: () => Window;
 }
 
-export default function DashboardLayoutBranding(props: DemoProps) {
+export default function DashboardLayoutNavigationDividers(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
+  const [pathname, setPathname] = React.useState('/star-wars');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -76,11 +61,19 @@ export default function DashboardLayoutBranding(props: DemoProps) {
   return (
     // preview-start
     <AppProvider
-      navigation={NAVIGATION}
-      branding={{
-        logo: <img src="https://mui.com/static/logo.png" alt="MUI logo" />,
-        title: 'MUI',
-      }}
+      navigation={[
+        {
+          segment: 'star-wars',
+          title: 'Star Wars',
+          icon: <DescriptionIcon />,
+        },
+        { kind: 'divider' },
+        {
+          segment: 'eagle',
+          title: 'Eagle',
+          icon: <DescriptionIcon />,
+        },
+      ]}
       router={router}
       theme={demoTheme}
       window={demoWindow}

@@ -78,7 +78,7 @@ DemoPageContent.propTypes = {
 function AppProviderTheme(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('page');
+  const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo(() => {
     return {

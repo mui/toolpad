@@ -82,7 +82,7 @@ interface DemoProps {
 export default function AppProviderTheme(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('page');
+  const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
     return {

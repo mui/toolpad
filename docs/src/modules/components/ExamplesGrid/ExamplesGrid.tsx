@@ -58,7 +58,7 @@ function Templates({ examplesFile }: TemplatesProps) {
               component="a"
               image={example.src}
               title={example.description}
-              href={example.href}
+              href={example.href || example.source}
               rel="nofollow"
               sx={(theme) => ({
                 height: 0,

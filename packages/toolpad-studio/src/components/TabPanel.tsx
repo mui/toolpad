@@ -1,15 +1,14 @@
-import * as React from 'react';
-import { TabPanel as MuiTabPanel, TabPanelProps as MuiTabPanelProps } from '@mui/lab';
+import { TabPanel as MuiTabPanel } from '@mui/lab';
+import { styled } from '@mui/material';
 
-export interface TabPanelProps extends MuiTabPanelProps {
-  // TODO: Propose feature request in core: disableGutters for TabPanel
+const TabPanel = styled(MuiTabPanel, {
+  shouldForwardProp: (prop) => prop !== 'disableGutters',
+})<{
   disableGutters?: boolean;
-}
-
-const TabPanel = React.forwardRef<typeof MuiTabPanel, TabPanelProps>(
-  ({ disableGutters, sx, ...props }, ref) => (
-    <MuiTabPanel ref={ref} sx={disableGutters ? { padding: 0, ...sx } : sx} {...props} />
-  ),
-);
+}>(({ disableGutters }) => ({
+  ...(disableGutters && {
+    padding: 0,
+  }),
+}));
 
 export default TabPanel;

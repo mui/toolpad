@@ -1,0 +1,13 @@
+<SignInPage
+  signIn={(provider, formData) =>
+    alert(
+      `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
+    )
+  }
+  slotProps={{
+    emailField: { variant: 'standard' },
+    passwordField: { variant: 'standard' },
+    submitButton: { variant: 'outlined' },
+  }}
+  providers={providers}
+/>

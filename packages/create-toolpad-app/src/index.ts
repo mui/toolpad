@@ -17,6 +17,16 @@ import generateProject from './generateProject';
 import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
 
+/**
+ * Find package.json of the create-toolpad-app package
+ */
+async function findCtaPackageJson() {
+  const ctaPackageJsonPath = path.resolve(__dirname, '../package.json');
+  const content = await fs.readFile(ctaPackageJsonPath, 'utf8');
+  const packageJson = JSON.parse(content);
+  return packageJson;
+}
+
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
   interface Error {
@@ -170,7 +180,8 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   );
   // eslint-disable-next-line no-console
   console.log();
-  const files = generateProject({ name: path.basename(absolutePath) });
+  const pkg = await findCtaPackageJson();
+  const files = generateProject({ name: path.basename(absolutePath), version: pkg.version });
   await writeFiles(absolutePath, files);
 
   // eslint-disable-next-line no-console

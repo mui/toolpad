@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { useDemoRouter } from '@toolpad/core/internals/demo';
+import { useDemoRouter } from '@toolpad/core/internals';
 import { Paper, useTheme } from '@mui/material';
 
 const NAVIGATION = [

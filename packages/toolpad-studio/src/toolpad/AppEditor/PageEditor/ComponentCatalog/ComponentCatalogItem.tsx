@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ButtonBase, SxProps, Box } from '@mui/material';
+import { ButtonBase, Box, styled } from '@mui/material';
 import SmartButtonIcon from '@mui/icons-material/SmartButton';
 import ImageIcon from '@mui/icons-material/Image';
 import GridOnIcon from '@mui/icons-material/GridOn';
@@ -36,55 +36,68 @@ import TextFormatIcon from '@mui/icons-material/TextFormat';
 import SpaceBarIcon from '@mui/icons-material/SpaceBar';
 import PieChartIcon from '@mui/icons-material/PieChart';
 
-const iconMap = new Map<string, React.ComponentType<SvgIconProps>>([
-  ['Password', PasswordIcon],
-  ['Autocomplete', ManageSearchIcon],
-  ['Text', NotesIcon],
-  ['Link', LinkIcon],
-  ['Markdown', TextFormatIcon],
-  ['Button', SmartButtonIcon],
-  ['Image', ImageIcon],
-  ['DataGrid', GridOnIcon],
-  ['TextField', Crop75Icon],
-  ['Select', ArrowDropDownCircleIcon],
-  ['List', ListIcon],
-  ['Paper', LayersIcon],
-  ['Form', DnsIcon],
-  ['Card', ContactPageIcon],
-  ['Tabs', TabIcon],
-  ['Slider', TuneIcon],
-  ['Switch', ToggleOnIcon],
-  ['Radio', RadioButtonCheckedIcon],
-  ['DatePicker', DateRangeIcon],
-  ['FilePicker', UploadFileIcon],
-  ['Checkbox', CheckBoxIcon],
-  ['CodeComponent', DashboardCustomizeSharpIcon],
-  ['CreateNew', AddIcon],
-  ['Tabs', TabIcon],
-  ['Container', AutoAwesomeMosaicIcon],
-  ['Chart', InsightsIcon],
-  ['Map', PlaceIcon],
-  ['Drawer', ViewSidebarIcon],
-  ['Pie Chart', PieChartIcon],
-  ['Icon', MoodIcon],
-  ['Html', HtmlIcon],
-  ['PageRow', TableRowsIcon],
-  ['PageColumn', ViewColumnIcon],
-  ['Metric', TagIcon],
-  ['Spacer', SpaceBarIcon],
-]);
+const iconMap = new Map(
+  (
+    [
+      ['Password', PasswordIcon],
+      ['Autocomplete', ManageSearchIcon],
+      ['Text', NotesIcon],
+      ['Link', LinkIcon],
+      ['Markdown', TextFormatIcon],
+      ['Button', SmartButtonIcon],
+      ['Image', ImageIcon],
+      ['DataGrid', GridOnIcon],
+      ['TextField', Crop75Icon],
+      ['Select', ArrowDropDownCircleIcon],
+      ['List', ListIcon],
+      ['Paper', LayersIcon],
+      ['Form', DnsIcon],
+      ['Card', ContactPageIcon],
+      ['Tabs', TabIcon],
+      ['Slider', TuneIcon],
+      ['Switch', ToggleOnIcon],
+      ['Radio', RadioButtonCheckedIcon],
+      ['DatePicker', DateRangeIcon],
+      ['FilePicker', UploadFileIcon],
+      ['Checkbox', CheckBoxIcon],
+      ['CodeComponent', DashboardCustomizeSharpIcon],
+      ['CreateNew', AddIcon],
+      ['Tabs', TabIcon],
+      ['Container', AutoAwesomeMosaicIcon],
+      ['Chart', InsightsIcon],
+      ['Map', PlaceIcon],
+      ['Drawer', ViewSidebarIcon],
+      ['Pie Chart', PieChartIcon],
+      ['Icon', MoodIcon],
+      ['Html', HtmlIcon],
+      ['PageRow', TableRowsIcon],
+      ['PageColumn', ViewColumnIcon],
+      ['Metric', TagIcon],
+      ['Spacer', SpaceBarIcon],
+    ] satisfies [string, React.ComponentType<SvgIconProps>][]
+  ).map(([id, Icon]) => {
+    const StyledIcon: React.ComponentType<SvgIconProps> = styled(Icon, {
+      shouldForwardProp: (prop) => prop !== 'kind',
+    })<{
+      kind?: ComponentItemKind;
+    }>(({ kind }) => ({
+      fontSize: 24,
+      opacity: kind === 'future' ? 0.75 : 1,
+    }));
+    return [id, StyledIcon];
+  }),
+);
 
 type ComponentItemKind = 'future' | 'builtIn' | 'create' | 'custom';
 
-interface ComponentIconProps {
+interface ComponentIconProps extends SvgIconProps {
   id: string;
   kind?: ComponentItemKind;
-  sx?: SxProps;
 }
 
-export function ComponentIcon({ id: componentId, kind, sx }: ComponentIconProps) {
+export function ComponentIcon({ id: componentId, kind, ...props }: ComponentIconProps) {
   const Icon = iconMap.get(kind === 'custom' ? 'CodeComponent' : componentId);
-  return Icon ? <Icon sx={{ fontSize: 24, opacity: kind === 'future' ? 0.75 : 1, ...sx }} /> : null;
+  return Icon ? <Icon {...props} /> : null;
 }
 
 interface ComponentCatalogItemProps {

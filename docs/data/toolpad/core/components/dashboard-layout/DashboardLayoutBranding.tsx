@@ -60,7 +60,7 @@ interface DemoProps {
 export default function DashboardLayoutBranding(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('dashboard');
+  const [pathname, setPathname] = React.useState('/dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {

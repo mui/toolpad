@@ -12,7 +12,7 @@ import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer, type Navigation } from '@toolpad/core';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 import { styled } from '@mui/material';
 import Frame from '../../modules/components/Frame';
 
@@ -64,7 +64,7 @@ const NAVIGATION: Navigation = [
 ];
 
 function DashboardLayoutBasic() {
-  const [pathname, setPathname] = React.useState('dashboard');
+  const [pathname, setPathname] = React.useState('/dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -153,7 +153,7 @@ const PlaceHolder = styled('div')<{ height: number }>(({ theme, height }) => ({
 function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('page');
+  const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -218,7 +218,7 @@ export default function ToolpadDashboardLayout() {
             iframe
             name="DashboardLayout"
             onResetDemoClick={NOOP}
-            productId="joy-ui"
+            productId="toolpad-core"
             usesCssVarsTheme
           >
             <DashboardLayoutBasic />

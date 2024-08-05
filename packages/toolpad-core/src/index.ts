@@ -2,6 +2,10 @@ export * from './AppProvider';
 
 export * from './DashboardLayout';
 
+export * from './SignInPage';
+
+export * from './Account';
+
 export * from './PageContainer';
 
 export * from './useDialogs';

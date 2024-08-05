@@ -63,24 +63,26 @@ yarn && yarn dev
 
 1. To add a new page and make it appear in the sidebar navigation, create a new folder within the `(dashboard)` directory titled `page-2` and add the following content to `page.tsx` inside it:
 
-```tsx
-import { Typography, Container } from '@mui/material';
-import { PageContainer } from '@toolpad/core/';
+```tsx title="./(dashboard)/page-2/page.tsx"
+import { Typography } from '@mui/material';
 
 export default function Home() {
   return (
-    <PageContainer>
-      <Typography variant="h6" color="grey.800">
-        This is page 2!
-      </Typography>
-    </PageContainer>
+    <Typography variant="h6" color="grey.800">
+      This is page 2!
+    </Typography>
   );
 }
 ```
 
 2. Add the newly created page to the sidebar navigation by adding the following code to the navigation items array in `app/layout.tsx`:
 
-```tsx
+```tsx title="app/layout.tsx"
+// Add the following import:
+import TimelineIcon from '@mui/icons-material/TimelineIcon';
+
+// ...
+
 const NAVIGATION: Navigation = [
   {
     kind: 'header',

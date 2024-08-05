@@ -1,5 +1,6 @@
-import { AppProvider } from '@toolpad/core/AppProvider';
+import { AppProvider } from '@toolpad/core/nextjs';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import type { Navigation } from '@toolpad/core';
 import theme from '../theme';
 
@@ -17,11 +18,13 @@ const NAVIGATION: Navigation = [
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-toolpad-color-scheme="light">
       <body>
-        <AppProvider theme={theme} navigation={NAVIGATION}>
-          {children}
-        </AppProvider>
+        <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+          <AppProvider theme={theme} navigation={NAVIGATION}>
+            {children}
+          </AppProvider>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

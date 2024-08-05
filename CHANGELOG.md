@@ -16,7 +16,8 @@ First production-ready release of Toolpad Core! This version includes:
 
 ### Breaking Changes
 
-The `create-toolpad-app` CLI now defaults to creating a Toolpad Core project. 
+The `create-toolpad-app` CLI now defaults to creating a Toolpad Core project.
+
 Please add the `--studio` flag for the previous behavior of generating a Toolpad Studio project.
 
 ### `@toolpad/core`

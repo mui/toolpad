@@ -141,14 +141,13 @@ function ThemeSwitcher() {
   ) : null;
 }
 
-let validatedItemIds = new Set<string>();
-let uniqueItemPaths = new Set<string>();
-
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
   onSidebarItemClick?: (item: NavigationPageItem) => void;
+  validatedItemIds: Set<string>;
+  uniqueItemPaths: Set<string>;
 }
 
 function DashboardSidebarSubNavigation({
@@ -156,6 +155,8 @@ function DashboardSidebarSubNavigation({
   basePath = '',
   depth = 0,
   onSidebarItemClick,
+  validatedItemIds,
+  uniqueItemPaths,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
 
@@ -274,7 +275,7 @@ function DashboardSidebarSubNavigation({
           </ListItem>
         );
 
-        if (!validatedItemIds.has(navigationItemId)) {
+        if (process.env.NODE_ENV !== 'production' && !validatedItemIds.has(navigationItemId)) {
           if (!uniqueItemPaths.has(navigationItemFullPath)) {
             uniqueItemPaths.add(navigationItemFullPath);
           } else {
@@ -295,6 +296,8 @@ function DashboardSidebarSubNavigation({
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
                   onSidebarItemClick={onSidebarItemClick}
+                  validatedItemIds={validatedItemIds}
+                  uniqueItemPaths={uniqueItemPaths}
                 />
               </Collapse>
             ) : null}
@@ -332,6 +335,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
 
+  const validatedItemIdsRef = React.useRef(new Set<string>());
+  const uniqueItemPathsRef = React.useRef(new Set<string>());
+
   const handleSetMobileNavigationOpen = React.useCallback(
     (newOpen: boolean) => () => {
       setIsMobileNavigationOpen(newOpen);
@@ -351,8 +357,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
   React.useMemo(() => {
-    uniqueItemPaths = new Set();
-    validatedItemIds = new Set();
+    validatedItemIdsRef.current = new Set();
+    uniqueItemPathsRef.current = new Set();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
@@ -363,6 +369,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <DashboardSidebarSubNavigation
           subNavigation={navigation}
           onSidebarItemClick={handleNavigationItemClick}
+          validatedItemIds={validatedItemIdsRef.current}
+          uniqueItemPaths={uniqueItemPathsRef.current}
         />
       </Box>
     </React.Fragment>

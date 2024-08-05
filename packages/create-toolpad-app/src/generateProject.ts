@@ -1,7 +1,8 @@
 import path from 'path';
 import { PackageJson } from './packageType';
 
-interface GenerateProjectOptions {
+export interface GenerateProjectOptions {
+  version?: string;
   name: string;
 }
 
@@ -118,33 +119,16 @@ export default function NavigateButton() {
 
   const themeContent = `
   "use client";
-  import { extendTheme } from '@mui/material/styles';
-  import type {} from '@mui/material/themeCssVarsAugmentation';
+  import { createTheme } from '@mui/material/styles';
 
-  const theme = extendTheme({
-    colorSchemes: {
-      light: {
-        palette: {
-          background: {
-            default: 'var(--mui-palette-grey-50)',
-            defaultChannel: 'var(--mui-palette-grey-50)',
-          },
-        },
-      },
-      dark: {
-        palette: {
-          background: {
-            default: 'var(--mui-palette-grey-900)',
-            defaultChannel: 'var(--mui-palette-grey-900)',
-          },
-          text: {
-            primary: 'var(--mui-palette-grey-200)',
-            primaryChannel: 'var(--mui-palette-grey-200)',
-          },
-        },
-      },
-    },
-  });
+  const lightTheme = createTheme();
+  
+  const darkTheme = createTheme({ palette: { mode: 'dark' } });
+
+  const theme = {
+    light: lightTheme,
+    dark: darkTheme
+  };
 
   export default theme;
   `;
@@ -208,10 +192,10 @@ export default function NavigateButton() {
       react: '^18',
       'react-dom': '^18',
       next: '^14',
-      '@toolpad/core': 'latest',
-      '@mui/material': 'next',
-      '@mui/material-nextjs': 'next',
-      '@mui/icons-material': 'next',
+      '@toolpad/core': options.version ?? 'latest',
+      '@mui/material': '^5',
+      '@mui/material-nextjs': '^5',
+      '@mui/icons-material': '^5',
       '@emotion/react': '^11',
       '@emotion/styled': '^11',
       '@emotion/cache': '^11',

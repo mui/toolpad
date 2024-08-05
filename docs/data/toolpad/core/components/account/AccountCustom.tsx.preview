@@ -1,0 +1,20 @@
+<AuthenticationContext.Provider value={authentication}>
+  <SessionContext.Provider value={session}>
+    <Account
+      slotProps={{
+        signInButton: {
+          color: 'info',
+          variant: 'outlined',
+          sx: {
+            color: 'primaryDark',
+            fontFamily: 'Inter',
+            fontSize: '1em',
+          },
+        },
+        signOutButton: { color: 'primary', variant: 'outlined' },
+      }}
+      signInLabel="Login"
+      signOutLabel="Logout"
+    />
+  </SessionContext.Provider>
+</AuthenticationContext.Provider>

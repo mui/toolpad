@@ -13,15 +13,15 @@ title: Toolpad Core - Installation
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npx create-toolpad-app@latest --core
+npx create-toolpad-app@latest
 ```
 
 ```bash pnpm
-pnpm create toolpad-app --core
+pnpm create toolpad-app
 ```
 
 ```bash yarn
-yarn create toolpad-app --core
+yarn create toolpad-app
 ```
 
 </codeblock>

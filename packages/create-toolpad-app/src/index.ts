@@ -225,11 +225,11 @@ const run = async () => {
     .usage('$0 [path] [options]')
     .positional('path', {
       type: 'string',
-      describe: 'The path where the Toolpad Studio project directory will be created',
+      describe: 'The path where the Toolpad project directory will be created',
     })
-    .option('core', {
+    .option('studio', {
       type: 'boolean',
-      describe: 'Create a new project with Toolpad Core',
+      describe: 'Create a new project with Toolpad Studio',
       default: false,
     })
     .option('install', {
@@ -246,7 +246,7 @@ const run = async () => {
 
   const pathArg = args._?.[0] as string;
   const installFlag = args.install as boolean;
-  const coreFlag = args.core as boolean;
+  const studioFlag = args.studio as boolean;
 
   if (pathArg) {
     const pathValidOrError = await validatePath(pathArg);
@@ -292,12 +292,12 @@ const run = async () => {
       console.log();
     }
   }
-  // If the core flag is set, create a new project with Toolpad Core
-  else if (coreFlag) {
-    await scaffoldCoreProject(absolutePath);
-  } else {
-    // Otherwise, create a new project with Toolpad Studio
+  // If the studio flag is set, create a new project with Toolpad Studio
+  else if (studioFlag) {
     await scaffoldStudioProject(absolutePath, installFlag);
+  } else {
+    // Otherwise, create a new project with Toolpad Core
+    await scaffoldCoreProject(absolutePath);
   }
 
   const changeDirectoryInstruction =

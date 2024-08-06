@@ -1,0 +1,11 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "signInLabel": { "description": "The label for the sign in button." },
+    "signOutLabel": { "description": "The label for the sign out button." },
+    "slotProps": {
+      "description": "Props to pass to the constituent components in the Account component."
+    }
+  },
+  "classDescriptions": {}
+}

@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/utils",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Shared utilities used by Toolpad packages.",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -61,7 +61,7 @@
     "prettier": "3.3.3",
     "react-is": "18.3.1",
     "title": "3.5.3",
-    "vitest": "2.0.4",
+    "vitest": "2.0.5",
     "yaml": "2.4.5",
     "yaml-diff-patch": "2.0.0"
   },

@@ -3,9 +3,15 @@ import Alert, { AlertColor } from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
-import { SxProps } from '@mui/material';
+import { styled, SxProps } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { UPGRADE_URL } from '../../constants';
+
+const AlertRoot = styled(Alert)({
+  '.MuiAlert-action': {
+    paddingTop: 0,
+  },
+});
 
 export interface UpgradeAlertProps {
   sx?: SxProps;
@@ -16,9 +22,9 @@ export interface UpgradeAlertProps {
 
 export function UpgradeAlert({ sx, type, action, message }: UpgradeAlertProps) {
   return (
-    <Alert
+    <AlertRoot
       severity={type ?? 'info'}
-      sx={{ '.MuiAlert-action': { pt: 0 }, ...sx }}
+      sx={sx}
       action={
         action ? (
           <Button
@@ -35,7 +41,7 @@ export function UpgradeAlert({ sx, type, action, message }: UpgradeAlertProps) {
       }
     >
       {message}
-    </Alert>
+    </AlertRoot>
   );
 }
 

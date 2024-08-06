@@ -1,5 +1,5 @@
 {
-  "name": "core-test",
+  "name": "core-tutorial",
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
@@ -13,7 +13,8 @@
     "next": "^14.2.4",
     "@toolpad/core": "latest",
     "@mui/material": "https://pkg.csb.dev/mui/material-ui/commit/00058883/@mui/material",
-    "@mui/icons-material": "^6.0.0-beta.2",
+    "@mui/material-nextjs": "next",
+    "@mui/icons-material": "next",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@emotion/cache": "^11.11.0"

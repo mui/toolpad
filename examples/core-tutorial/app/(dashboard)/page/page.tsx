@@ -1,13 +1,11 @@
-import { Typography, Container } from '@mui/material';
+import { Typography } from '@mui/material';
 
 export default function Home() {
   return (
     <main>
-      <Container sx={{ mx: 4 }}>
-        <Typography variant="h6" color="grey.800">
-          Dashboard content!
-        </Typography>
-      </Container>
+      <Typography variant="h6" color="grey.800">
+        Hello world!
+      </Typography>
     </main>
   );
 }

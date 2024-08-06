@@ -7,7 +7,7 @@ import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
 import { errorFrom } from '@toolpad/utils/errors';
 import { useQuery } from '@tanstack/react-query';
-import Grid2 from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Unstable_Grid2';
 import TabPanel from '../../components/TabPanel';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
@@ -340,7 +340,7 @@ function QueryEditor({
 
                 <Divider sx={{ mb: 1.5 }} />
                 <TabPanel value="parameters" disableGutters sx={{ ml: 1 }}>
-                  <Grid2 display="grid" gridTemplateColumns={'1fr 1fr 1fr'} gap={2}>
+                  <Grid display="grid" gridTemplateColumns={'1fr 1fr 1fr'} gap={2}>
                     {Object.entries(parameterDefs).map(([name, definiton]) => {
                       const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
                       return Control ? (
@@ -370,7 +370,7 @@ function QueryEditor({
                         />
                       ) : null;
                     })}
-                  </Grid2>
+                  </Grid>
                 </TabPanel>
               </TabContext>
             </Box>

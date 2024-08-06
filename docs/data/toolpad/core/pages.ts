@@ -25,10 +25,6 @@ const pages: MuiPage[] = [
         title: 'Examples',
       },
       {
-        pathname: '/toolpad/core/introduction/build-deploy',
-        title: 'Build and Deploy',
-      },
-      {
         pathname: '/toolpad/core/introduction/roadmap',
         title: 'Roadmap',
       },
@@ -64,6 +60,14 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-page-container',
             title: 'Page Container',
+          },
+          {
+            pathname: '/toolpad/core/react-sign-in-page',
+            title: 'Sign In Page',
+          },
+          {
+            pathname: '/toolpad/core/react-account',
+            title: 'Account',
           },
         ],
       },

@@ -35,7 +35,7 @@ function createPageLookup(
 ): Map<string, BreadCrumbItem[]> {
   const result = new Map<string, BreadCrumbItem[]>();
 
-  const resolveSegment = (segment: string) => `${base}${segment ? `/${segment}` : ''}` || '/';
+  const resolveSegment = (segment?: string) => `${base}${segment ? `/${segment}` : ''}` || '/';
 
   const root = navigation.find((item) => isRootPage(item)) as NavigationPageItem | undefined;
   const rootCrumb = root ? { path: resolveSegment(''), ...root } : undefined;
@@ -45,9 +45,11 @@ function createPageLookup(
       continue;
     }
 
+    const isNonProdEnv = process.env.NODE_ENV !== 'production';
+
     const path = resolveSegment(item.segment);
-    if (result.has(path)) {
-      throw new Error(`Duplicate path in navigation: ${path}`);
+    if (isNonProdEnv && result.has(path)) {
+      console.warn(`Duplicate path in navigation: ${path}`);
     }
 
     const itemCrumb: BreadCrumbItem = { path, ...item };
@@ -63,8 +65,8 @@ function createPageLookup(
     if (item.children) {
       const childrenLookup = createPageLookup(item.children, navigationSegments, path);
       for (const [childPath, childItems] of childrenLookup) {
-        if (result.has(childPath)) {
-          throw new Error(`Duplicate path in navigation: ${childPath}`);
+        if (isNonProdEnv && result.has(childPath)) {
+          console.warn(`Duplicate path in navigation: ${childPath}`);
         }
         result.set(childPath, childItems);
       }

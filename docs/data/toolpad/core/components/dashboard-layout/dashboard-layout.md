@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Dashboard Layout
-components: AppProvider, DashboardLayout
+components: AppProvider, DashboardLayout, Account
 ---
 
 # Dashboard Layout
@@ -26,7 +26,7 @@ Some elements of the `DashboardLayout` can be configured to match your personali
 
 This can be done via the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), which allows for setting a custom `logo` image or `title` text in the page header.
 
-{{"demo": "DashboardLayoutBranding.js", "height": 500, "iframe": true}}
+{{"demo": "DashboardLayoutBranding.js", "height": 400, "iframe": true}}
 
 ## Navigation
 
@@ -34,19 +34,60 @@ The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-ap
 
 The flexibility in composing and ordering these different elements allows for a great variety of navigation structures to fit your use case.
 
-### Navigation Items
+### Navigation Links
 
-The main navigation items that can be used are:
+Navigation links can be placed in the sidebar as items with the format:
 
-- **Links:** `{ segment: '/home', title: 'Home', icon: <DescriptionIcon /> }`;
-- **Headings:** `{ kind: 'header', title: 'Epic Fantasy' }`;
-- **Dividers:** `{ kind: 'divider' }`;
-- **Collapsible nested navigation:** `{ title: 'Fantasy', icon: <FolderIcon />, children: [ ... ] }`.
+```tsx
+{ segment: 'home', title: 'Home', icon: <DescriptionIcon /> }
+```
 
-{{"demo": "DashboardLayoutNavigationItems.js", "height": 640, "iframe": true}}
+{{"demo": "DashboardLayoutNavigationLinks.js", "height": 400, "iframe": true}}
+
+### Navigation Headings
+
+Navigation headings can be placed in the sidebar as items with the format:
+
+```tsx
+{ kind: 'header', title: 'Animals' }
+```
+
+{{"demo": "DashboardLayoutNavigationHeadings.js", "height": 400, "iframe": true}}
+
+### Navigation Dividers
+
+Dividers can can be placed between items in the sidebar as items with the format:
+
+```tsx
+{
+  kind: 'divider';
+}
+```
+
+{{"demo": "DashboardLayoutNavigationDividers.js", "height": 400, "iframe": true}}
+
+### Nested Navigation
+
+Nested navigation structures can be placed in the sidebar as items with the format:
+
+```tsx
+{ title: 'Movies', icon: <FolderIcon />, children: [ ... ] }
+```
+
+{{"demo": "DashboardLayoutNavigationNested.js", "height": 400, "iframe": true}}
 
 ### Navigation Actions
 
 Navigation links have an optional `action` prop that can be used to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
 
-{{"demo": "DashboardLayoutNavigationActions.js", "height": 500, "iframe": true}}
+{{"demo": "DashboardLayoutNavigationActions.js", "height": 400, "iframe": true}}
+
+## Account
+
+The `DashboardLayout` comes integrated with the [`<Account />`](/toolpad/core/react-account/) component. It renders as an account management menu when a user is signed in – a `session` object is present – and a button when not.
+
+:::warning
+The use of an `iframe` may cause some spacing issues in the following demo.
+:::
+
+{{"demo": "../account/AccountWithDashboard.js", "iframe": true, "height": 320 }}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useDemoRouter } from '@toolpad/core/internals/demo';
+import { useDemoRouter } from '@toolpad/core/internals';
 import { PageContainer, PageContainerToolbar } from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';

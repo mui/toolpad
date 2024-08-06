@@ -4,6 +4,7 @@ import {
   inputBaseClasses,
   formLabelClasses,
   typographyClasses,
+  styled,
 } from '@mui/material';
 import * as React from 'react';
 import {
@@ -17,9 +18,19 @@ import {
 import { WithControlledProp } from '@toolpad/utils/types';
 import { getBindingType } from '../../../runtime/bindings';
 import { getDefaultControl, usePropControlsContext } from '../../propertyControls';
-
 // eslint-disable-next-line import/no-cycle
 import { BindingEditor } from '../BindingEditor';
+
+const EditorRoot = styled(Stack)({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+
+  [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
+  [`& .${formLabelClasses.root}`]: { fontSize: 12 },
+  [`& .${typographyClasses.root}`]: { fontSize: 12 },
+});
 
 export interface RenderControlParams<V> extends WithControlledProp<V> {
   label: string;
@@ -91,17 +102,7 @@ export default function BindableEditor<V>({
   const hasBinding = value && valueBindingType !== 'const';
 
   return (
-    <Stack
-      direction="row"
-      alignItems="center"
-      justifyContent="space-between"
-      sx={{
-        [`& .${inputBaseClasses.root}`]: { fontSize: 12 },
-        [`& .${formLabelClasses.root}`]: { fontSize: 12 },
-        [`& .${typographyClasses.root}`]: { fontSize: 12 },
-        ...sx,
-      }}
-    >
+    <EditorRoot sx={sx}>
       <React.Fragment>
         {renderControl({
           label,
@@ -125,6 +126,6 @@ export default function BindableEditor<V>({
           declaredEnvKeys={declaredEnvKeys}
         />
       </React.Fragment>
-    </Stack>
+    </EditorRoot>
   );
 }

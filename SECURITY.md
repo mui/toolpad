@@ -4,7 +4,7 @@
 
 The versions of the project that are currently supported with security updates.
 
-| Toolpad Version | Release    | Supported          |
+| Toolpad version | Release    | Supported          |
 | --------------: | :--------- | :----------------- |
 |         <=1.0.0 | 2022-06-15 | :white_check_mark: |
 

@@ -11,4 +11,4 @@ declare global {
 }
 
 export type Template = (provider: SupportedAuthProvider) => TemplateFile;
-export type PackageJsonTemplate = (appName: string) => PackageJson;
+export type PackageJsonTemplate = (appName: string, coreVersion?: string) => PackageJson;

@@ -1,6 +1,6 @@
 import { PackageJsonTemplate } from '../../types';
 
-const packageJson: PackageJsonTemplate = (appName) => ({
+const packageJson: PackageJsonTemplate = (appName, coreVersion) => ({
   name: appName,
   version: '0.1.0',
   scripts: {
@@ -12,21 +12,21 @@ const packageJson: PackageJsonTemplate = (appName) => ({
   dependencies: {
     '@emotion/react': '^11.11.4',
     '@emotion/styled': '^11.11.5',
-    '@mui/icons-material': 'next',
-    '@mui/lab': 'next',
-    '@mui/material': 'next',
-    '@mui/material-nextjs': 'next',
-    '@toolpad/core': 'latest',
-    next: '14.2.4',
+    '@mui/icons-material': '^5',
+    '@mui/lab': '^5',
+    '@mui/material': '^5',
+    '@mui/material-nextjs': '^5',
+    '@toolpad/core': coreVersion ?? 'latest',
+    next: '^14',
     'next-auth': 'beta',
-    react: '18.3.1',
-    'react-dom': '18.3.1',
+    react: '^18',
+    'react-dom': '^18',
   },
   devDependencies: {
-    '@types/node': '^20.14.10',
-    '@types/react': '^18.3.3',
-    '@types/react-dom': '^18.3.0',
-    'eslint-config-next': '14.2.4',
+    '@types/node': '^20',
+    '@types/react': '^18',
+    '@types/react-dom': '^18',
+    'eslint-config-next': '^14',
   },
 });
 

@@ -1,6 +1,6 @@
 import { PackageJsonTemplate } from '../types';
 
-const packageJson: PackageJsonTemplate = (appName) => ({
+const packageJson: PackageJsonTemplate = (appName, coreVersion) => ({
   name: appName,
   version: '0.1.0',
   scripts: {
@@ -13,10 +13,10 @@ const packageJson: PackageJsonTemplate = (appName) => ({
     react: '^18',
     'react-dom': '^18',
     next: '^14',
-    '@toolpad/core': 'latest',
-    '@mui/material': 'next',
-    '@mui/material-nextjs': 'next',
-    '@mui/icons-material': 'next',
+    '@toolpad/core': coreVersion ?? 'latest',
+    '@mui/material': '^5',
+    '@mui/material-nextjs': '^5',
+    '@mui/icons-material': '^5',
     '@emotion/react': '^11',
     '@emotion/styled': '^11',
     '@emotion/cache': '^11',

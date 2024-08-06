@@ -247,7 +247,7 @@ const run = async () => {
       describe: 'Install dependencies',
       default: true,
     })
-    .option('--core-version', {
+    .option('core-version', {
       type: 'string',
       describe: 'Use a specific version of Toolpad Core',
     })
@@ -312,7 +312,6 @@ const run = async () => {
   } else {
     // Otherwise, create a new project with Toolpad Core
     await scaffoldCoreProject(absolutePath, {
-      // @ts-expect-error There is something off with the `args` typing
       coreVersion: args.coreVersion,
     });
   }

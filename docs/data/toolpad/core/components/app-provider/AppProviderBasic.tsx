@@ -26,6 +26,8 @@ const NAVIGATION: Navigation = [
 ];
 
 const demoTheme = extendTheme({
+  colorSchemeSelector: 'data-toolpad-color-scheme',
+  colorSchemes: { light: true, dark: true },
   breakpoints: {
     values: {
       xs: 0,

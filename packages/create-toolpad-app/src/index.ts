@@ -171,7 +171,14 @@ const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean)
   }
 };
 
-const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
+interface ScaffoldProjectOptions {
+  coreVersion?: string;
+}
+
+const scaffoldCoreProject = async (
+  absolutePath: string,
+  { coreVersion }: ScaffoldProjectOptions = {},
+): Promise<void> => {
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
@@ -181,7 +188,10 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   // eslint-disable-next-line no-console
   console.log();
   const pkg = await findCtaPackageJson();
-  const files = generateProject({ name: path.basename(absolutePath), version: pkg.version });
+  const files = generateProject({
+    name: path.basename(absolutePath),
+    version: coreVersion || pkg.version,
+  });
   await writeFiles(absolutePath, files);
 
   // eslint-disable-next-line no-console
@@ -236,6 +246,10 @@ const run = async () => {
       type: 'boolean',
       describe: 'Install dependencies',
       default: true,
+    })
+    .option('--core-version', {
+      type: 'string',
+      describe: 'Use a specific version of Toolpad Core',
     })
     .option('example', {
       type: 'string',
@@ -297,7 +311,10 @@ const run = async () => {
     await scaffoldStudioProject(absolutePath, installFlag);
   } else {
     // Otherwise, create a new project with Toolpad Core
-    await scaffoldCoreProject(absolutePath);
+    await scaffoldCoreProject(absolutePath, {
+      // @ts-expect-error There is something off with the `args` typing
+      coreVersion: args.coreVersion,
+    });
   }
 
   const changeDirectoryInstruction =

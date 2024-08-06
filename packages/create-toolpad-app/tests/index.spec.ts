@@ -97,7 +97,7 @@ test(
   'create-toolpad-app can bootstrap a Toolpad Core app',
   async () => {
     testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-'));
-    cp = execa(cliPath, [testDir], {
+    cp = execa(cliPath, [testDir, '--coreVersion', 'latest'], {
       cwd: currentDirectory,
     });
     cp.stdout?.pipe(process.stdout);

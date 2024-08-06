@@ -12,11 +12,11 @@ Toolpad Studio is a self-hosted low-code admin builder designed to extend the [M
 Install the package in your project directory with:
 
 ```bash
-npx create-toolpad-app@latest my-toolpad-studio-app
+npx create-toolpad-app@latest --studio my-toolpad-studio-app
 # or
-yarn create toolpad-app my-toolpad-studio-app
+yarn create toolpad-app --studio my-toolpad-studio-app
 # or
-pnpm create toolpad-app my-toolpad-studio-app
+pnpm create toolpad-app --studio my-toolpad-studio-app
 ```
 
 ## Documentation

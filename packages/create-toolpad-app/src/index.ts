@@ -19,6 +19,16 @@ import { downloadAndExtractExample } from './examples';
 import type { PackageJson } from './templates/packageType';
 import type { SupportedRouter, SupportedAuthProvider, PackageManager } from './types';
 
+/**
+ * Find package.json of the create-toolpad-app package
+ */
+async function findCtaPackageJson() {
+  const ctaPackageJsonPath = path.resolve(__dirname, '../package.json');
+  const content = await fs.readFile(ctaPackageJsonPath, 'utf8');
+  const packageJson = JSON.parse(content);
+  return packageJson;
+}
+
 declare global {
   interface Error {
     code?: unknown;
@@ -149,6 +159,10 @@ const scaffoldCoreProject = async (options: GenerateProjectOptions): Promise<voi
   );
   // eslint-disable-next-line no-console
   console.log();
+  const pkg = await findCtaPackageJson();
+  if (!options.coreVersion) {
+    options.coreVersion = pkg.version;
+  }
   const files = generateProject(options);
   await writeFiles(options.absolutePath, files);
 
@@ -193,17 +207,21 @@ const run = async () => {
     .usage('$0 [path] [options]')
     .positional('path', {
       type: 'string',
-      describe: 'The path where the Toolpad Studio project directory will be created',
+      describe: 'The path where the Toolpad project directory will be created',
     })
-    .option('core', {
+    .option('studio', {
       type: 'boolean',
-      describe: 'Create a new project with Toolpad Core',
+      describe: 'Create a new project with Toolpad Studio',
       default: false,
     })
     .option('install', {
       type: 'boolean',
       describe: 'Install dependencies',
       default: true,
+    })
+    .option('core-version', {
+      type: 'string',
+      describe: 'Use a specific version of Toolpad Core',
     })
     .option('example', {
       type: 'string',
@@ -214,7 +232,7 @@ const run = async () => {
 
   const pathArg = args._?.[0] as string;
   const installFlag = args.install as boolean;
-  const coreFlag = args.core as boolean;
+  const studioFlag = args.studio as boolean;
 
   if (pathArg) {
     const pathValidOrError = await validatePath(pathArg);
@@ -244,8 +262,12 @@ const run = async () => {
   if (args.example) {
     await downloadAndExtractExample(absolutePath, args.example);
   }
-  // If the core flag is set, create a new project with Toolpad Core
-  else if (coreFlag) {
+
+  // If the studio flag is set, create a new project with Toolpad Studio
+  else if (studioFlag) {
+    await scaffoldStudioProject(absolutePath, installFlag);
+  } else {
+    // Otherwise, create a new project with Toolpad Core
     const routerOption: SupportedRouter = await select({
       message: 'Which router would you like to use?',
       default: 'nextjs-app',
@@ -273,14 +295,12 @@ const run = async () => {
     const options = {
       name: path.basename(absolutePath),
       absolutePath,
+      coreVersion: args.coreVersion,
       router: routerOption,
       auth: authFlag,
       authProviders: authProviderOptions,
     };
     await scaffoldCoreProject(options);
-  } else {
-    // Otherwise, create a new project with Toolpad Studio
-    await scaffoldStudioProject(absolutePath, installFlag);
   }
 
   const changeDirectoryInstruction =

@@ -100,7 +100,7 @@ export default function Examples() {
           overline="Examples"
           title={
             <Typography variant="h2">
-              Toolpad is <GradientText>ideal for building</GradientText>
+              Toolpad Core is <GradientText>ideal for building</GradientText>
             </Typography>
           }
         />
@@ -116,7 +116,7 @@ export default function Examples() {
               href="https://mui.com/toolpad/core/introduction/tutorial/"
             />
           </Grid>
-          <Grid xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box
               sx={[
                 (theme) => ({
@@ -157,7 +157,7 @@ export default function Examples() {
                 Build much more!
               </Typography>
               <Typography variant="body" color="text.secondary" textAlign="center">
-                Learn how to build these and many other apps using Toolpad!
+                Learn how to build these and many other apps using Toolpad Core!
               </Typography>
               <Link href="/toolpad/studio/examples/" variant="body" sx={{ mt: 1 }}>
                 Check out docs

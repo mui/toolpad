@@ -43,9 +43,10 @@ import { SupportedAuthProvider, SupportedRouter } from './types';
 export interface GenerateProjectOptions {
   name: string;
   absolutePath: string;
-  router: SupportedRouter;
   auth: boolean;
   authProviders: SupportedAuthProvider[];
+  coreVersion?: string;
+  router: SupportedRouter;
 }
 
 function generateAuthContent(authProviders: SupportedAuthProvider[]) {
@@ -82,7 +83,7 @@ export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
   // Add app name to package.json
-  const packageJsonContent = packageJson(options.name);
+  const packageJsonContent = packageJson(options.name, options.coreVersion);
 
   // Default files, common to all apps
   const files = new Map<string, { content: string }>([
@@ -106,7 +107,7 @@ export default function generateProject(
       ]);
       if (options.auth) {
         const { authContent, envContent } = generateAuthContent(options.authProviders);
-        const packageJsonAuthContent = packageJsonAuth(options.name);
+        const packageJsonAuthContent = packageJsonAuth(options.name, options.coreVersion);
         const authFiles = new Map([
           ['auth.ts', { content: authContent }],
           ['.env.local', { content: envContent }],
@@ -131,7 +132,7 @@ export default function generateProject(
       ]);
       if (options.auth) {
         const { authContent, envContent } = generateAuthContent(options.authProviders);
-        const packageJsonAuthContent = packageJsonAuth(options.name);
+        const packageJsonAuthContent = packageJsonAuth(options.name, options.coreVersion);
 
         const authFiles = new Map([
           ['auth.ts', { content: authContent }],

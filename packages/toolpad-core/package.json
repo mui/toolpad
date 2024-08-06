@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/core",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "Toolpad Team",
   "description": "Dashboard framework powered by MUI.",
   "main": "./build/index.js",
@@ -75,8 +75,8 @@
     "vitest": "2.0.5"
   },
   "peerDependencies": {
-    "@mui/icons-material": "*",
-    "@mui/material": "*",
+    "@mui/icons-material": "5 - 6",
+    "@mui/material": "5 - 6",
     "next": "^14",
     "react": "^18"
   },

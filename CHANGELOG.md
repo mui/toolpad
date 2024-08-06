@@ -8,17 +8,17 @@ _Aug 5, 2024_
 
 A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
 
-First production-ready release of Toolpad Core! This version includes:
+This is the first production-ready release of Toolpad Core! This version includes:
 
-- Authentication support
-- CLI integration to create Toolpad Core projects with `create-toolpad-app`
+- A new SignInPage component
+- Updates to the `create-toolpad-app` CLI to bootstrap Toolpad Core projects
 - Many documentation updates and improvements
 
 ### Breaking Changes
 
-The `create-toolpad-app` CLI now defaults to creating a Toolpad Core project.
+The `create-toolpad-app` CLI now by default bootstraps a Toolpad Core project.
 
-Please add the `--studio` flag for the previous behavior of generating a Toolpad Studio project.
+Please use the `--studio` flag to generate a Toolpad Studio project.
 
 ### `@toolpad/core`
 

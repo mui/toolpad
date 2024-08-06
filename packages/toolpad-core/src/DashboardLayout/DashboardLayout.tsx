@@ -91,6 +91,8 @@ function ThemeSwitcher() {
 
   const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
 
+  console.log(theme, isDualTheme);
+
   const toggleMode = React.useCallback(() => {
     setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
   }, [paletteMode, setPaletteMode]);

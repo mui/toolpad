@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@mui/icons-material": "6.0.0-beta.2",
-    "@mui/material": "https://pkg.csb.dev/mui/material-ui/commit/00058883/@mui/material",
+    "@mui/material": "https://pkg.csb.dev/mui/material-ui/commit/9c35d237/@mui/material",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.12",
     "@types/react": "18.3.3",
@@ -76,7 +76,7 @@
   },
   "peerDependencies": {
     "@mui/icons-material": "5 - 6",
-    "@mui/material": "https://pkg.csb.dev/mui/material-ui/commit/00058883/@mui/material",
+    "@mui/material": "5 - 6",
     "next": "^14",
     "react": "^18"
   },

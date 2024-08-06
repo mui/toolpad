@@ -68,7 +68,7 @@
    a. Run Toolpad Core
 
    ```bash
-   npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke --use-pnpm
+   pnpm dlx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke --core-version https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@toolpad/core
    cd smoke
    pnpm add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@toolpad/core -S
    pnpm dedupe && pnpm dev
@@ -79,7 +79,7 @@
    b. Run Toolpad Studio
 
    ```bash
-   npx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app --studio smoke --use-pnpm
+   pnpm dlx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app --studio smoke
    cd smoke
    pnpm add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@toolpad/studio -S
    pnpm dedupe && pnpm dev

@@ -81,7 +81,7 @@ export interface AppProviderProps {
   children: React.ReactNode;
   /**
    * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
-   * @default createTheme({ cssVariables: true, colorSchemes: { dark: true } })
+   * @default createDefaultTheme()
    */
   theme?: Theme | { light: Theme; dark: Theme };
   /**
@@ -117,6 +117,15 @@ export interface AppProviderProps {
   window?: Window;
 }
 
+function createDefaultTheme() {
+  return createTheme({
+    cssVariables: {
+      colorSchemeSelector: 'data-toolpad-color-scheme',
+    },
+    colorSchemes: { dark: true },
+  });
+}
+
 /**
  *
  * Demos:
@@ -131,12 +140,7 @@ export interface AppProviderProps {
 function AppProvider(props: AppProviderProps) {
   const {
     children,
-    theme = createTheme({
-      cssVariables: {
-        colorSchemeSelector: 'data-toolpad-color-scheme',
-      },
-      colorSchemes: { dark: true },
-    }),
+    theme = createDefaultTheme(),
     branding = null,
     navigation = [],
     router = null,
@@ -250,7 +254,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
   }),
   /**
    * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/experimental-api/css-theme-variables/overview/) is recommended.
-   * @default createTheme({ cssVariables: true, colorSchemes: { dark: true } })
+   * @default createDefaultTheme()
    */
   theme: PropTypes.object,
   /**

@@ -54,7 +54,7 @@ export function createRpcHandler(definition: MethodResolvers): express.RequestHa
   const router = express.Router();
   router.post(
     '/',
-    express.json(),
+    express.json({ limit: '50mb' }),
     asyncHandler(async (req, res) => {
       const parseResult = rpcRequestSchema.safeParse(req.body);
       if (!parseResult.success) {

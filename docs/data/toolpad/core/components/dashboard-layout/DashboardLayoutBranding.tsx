@@ -4,9 +4,9 @@ import Typography from '@mui/material/Typography';
 import { extendTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { AppProvider, Router } from '@toolpad/core/AppProvider';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation } from '@toolpad/core';
+import type { Navigation, Router } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {

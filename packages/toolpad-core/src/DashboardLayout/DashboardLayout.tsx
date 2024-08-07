@@ -466,9 +466,15 @@ function DashboardLayout(props: DashboardLayoutProps) {
       >
         {drawerContent}
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          minWidth: { xs: isMobileNavigationOpen ? '100vw' : 'auto', md: 'auto' },
+        }}
+      >
         <Toolbar />
-        <div>{children}</div>
+        {children}
       </Box>
     </Box>
   );

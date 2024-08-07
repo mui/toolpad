@@ -114,7 +114,7 @@ function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
       theme={theme}
       defaultMode="system"
       documentNode={appWindow?.document}
-      colorSchemeNode={appWindow?.document?.body}
+      colorSchemeNode={appWindow?.document.documentElement}
       disableNestedContext
       attribute={COLOR_SCHEME_ATTRIBUTE}
       colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}

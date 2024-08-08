@@ -30,7 +30,7 @@
     "@mui/internal-markdown": "^1.0.1",
     "@mui/joy": "next",
     "@mui/lab": "next",
-    "@mui/material": "https://pkg.csb.dev/mui/material-ui/commit/9c35d237/@mui/material",
+    "@mui/material": "next",
     "@mui/material-nextjs": "next",
     "@mui/styles": "next",
     "@mui/system": "next",

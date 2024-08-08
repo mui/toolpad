@@ -5,10 +5,9 @@ import Button from '@mui/material/Button';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import { Link } from '@mui/docs/Link';
 import NpmCopyButton from 'docs/src/components/action/NpmCopyButton';
-import GithubStars from '../landing/GithubStars';
 
 export default function GetStartedButtons(props) {
-  const { installation, primaryLabel, primaryUrl, ...other } = props;
+  const { installation, primaryLabel, primaryUrl, secondaryLabel, secondaryUrl, ...other } = props;
   return (
     <React.Fragment>
       <Box
@@ -26,6 +25,7 @@ export default function GetStartedButtons(props) {
           href={primaryUrl}
           component={Link}
           noLinkStyle
+          size="large"
           variant="contained"
           endIcon={<KeyboardArrowRightRounded />}
           sx={{
@@ -36,7 +36,20 @@ export default function GetStartedButtons(props) {
         >
           {primaryLabel}
         </Button>
-        <GithubStars />
+        {secondaryUrl ? (
+          <Button
+            href={secondaryUrl}
+            component={Link}
+            noLinkStyle
+            target={'_blank'}
+            variant="outlined"
+            size="large"
+            color="secondary"
+            endIcon={<KeyboardArrowRightRounded />}
+          >
+            {secondaryLabel}
+          </Button>
+        ) : null}
       </Box>
       <NpmCopyButton installation={installation} sx={{ mt: 2 }} />
     </React.Fragment>

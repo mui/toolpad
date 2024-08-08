@@ -41,7 +41,7 @@ test(
   'create-toolpad-app can bootstrap a Toolpad Studio app',
   async () => {
     testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-'));
-    cp = execa(cliPath, [testDir], {
+    cp = execa(cliPath, [testDir, '--studio'], {
       cwd: currentDirectory,
     });
     cp.stdout?.pipe(process.stdout);
@@ -89,6 +89,59 @@ test(
     const appUrl = match![0];
     const res = await fetch(`${appUrl}/health-check`);
     expect(res).toHaveProperty('status', 200);
+  },
+  TEST_TIMEOUT,
+);
+
+test(
+  'create-toolpad-app can bootstrap a Toolpad Core app',
+  async () => {
+    testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-'));
+    cp = execa(cliPath, [testDir, '--coreVersion', 'latest'], {
+      cwd: currentDirectory,
+    });
+    cp.stdout?.pipe(process.stdout);
+    cp.stderr?.pipe(process.stderr);
+    const result = await cp;
+    expect(result.stdout).toMatch('Run the following to get started');
+    const packageJsonContent = await fs.readFile(path.resolve(testDir, './package.json'), {
+      encoding: 'utf-8',
+    });
+    const packageJson = JSON.parse(packageJsonContent);
+    expect(packageJson).toEqual(
+      expect.objectContaining({
+        dependencies: expect.objectContaining({
+          '@toolpad/core': expect.any(String),
+        }),
+        scripts: expect.objectContaining({
+          dev: 'next dev',
+          build: 'next build',
+          start: 'next start',
+          lint: 'next lint',
+        }),
+      }),
+    );
+
+    // check that file exists or not in the directory
+    const gitignore = await fs.readFile(path.resolve(testDir, './.gitignore'), {
+      encoding: 'utf-8',
+    });
+
+    expect(gitignore.length).toBeGreaterThan(0);
+
+    toolpadProcess = execa('pnpm', ['dev'], {
+      cwd: testDir,
+      env: {
+        FORCE_COLOR: '0',
+        BROWSER: 'none',
+      },
+    });
+    toolpadProcess.stdout?.pipe(process.stdout);
+    toolpadProcess.stderr?.pipe(process.stderr);
+
+    const match = await waitForMatch(toolpadProcess.stdout!, /http:\/\/localhost:(\d+)/);
+
+    expect(match).toBeTruthy();
   },
   TEST_TIMEOUT,
 );

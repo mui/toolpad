@@ -41,9 +41,9 @@ export default function StudioIntro() {
           />
 
           <GetStartedButtons
-            primaryUrl="https://mui.com/toolpad-studio"
+            primaryUrl="/toolpad/studio/"
             primaryLabel="Explore Studio"
-            altInstallation="npx create-toolpad-app@latest"
+            altInstallation="npx create-toolpad-app@latest --studio"
           />
         </Grid>
         <Grid size={{ xs: 12, md: 7 }}>

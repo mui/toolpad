@@ -10,15 +10,15 @@ Then run the command:
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npx create-toolpad-app@latest my-toolpad-app
+npx create-toolpad-app@latest --studio my-toolpad-app
 ```
 
 ```bash yarn
-yarn create toolpad-app my-toolpad-app
+yarn create toolpad-app --studio my-toolpad-app
 ```
 
 ```bash pnpm
-pnpm create toolpad-app my-toolpad-app
+pnpm create toolpad-app --studio my-toolpad-app
 ```
 
 </codeblock>

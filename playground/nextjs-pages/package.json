@@ -1,6 +1,6 @@
 {
   "name": "playground-nextjs-pages",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,7 +10,6 @@
     "@emotion/react": "11.13.0",
     "@emotion/styled": "11.13.0",
     "@mui/icons-material": "next",
-    "@mui/lab": "next",
     "@mui/material": "next",
     "@mui/material-nextjs": "next",
     "@toolpad/core": "workspace:*",
@@ -18,7 +17,7 @@
     "@types/react-dom": "18.3.0",
     "eslint-config-next": "14.2.5",
     "next": "14.2.5",
-    "next-auth": "5.0.0-beta.20",
+    "next-auth": "beta",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   }

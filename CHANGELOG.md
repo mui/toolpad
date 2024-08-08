@@ -1,6 +1,52 @@
 # Changelog
 
-## 0.4.0
+## v0.5.0
+
+<!-- generated comparing v0.4.0..master -->
+
+_Aug 5, 2024_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+This is the first production-ready release of Toolpad Core! This version includes:
+
+- A new SignInPage component
+- Updates to the `create-toolpad-app` CLI to bootstrap Toolpad Core projects
+- Many documentation updates and improvements
+
+### Breaking Changes
+
+The `create-toolpad-app` CLI now by default bootstraps a Toolpad Core project.
+
+Please use the `--studio` flag to generate a Toolpad Studio project.
+
+### `@toolpad/core`
+
+- &#8203;<!-- 09 --> Add authentication to Toolpad Core (#3609) @bharatkashyap
+- &#8203;<!-- 01 --> Make Core the default project (#3868) @bharatkashyap
+- &#8203;<!-- 11 --> Make navigation item segments optional (#3838) @apedroferreira
+- &#8203;<!-- 17 --> Ensure Material UI v5 compatibility (#3894) @Janpot
+- &#8203;<!-- 10 --> Bring in some fixes from the next update branch (#3866) @Janpot
+
+### Docs
+
+- &#8203;<!-- 16 --> Improve DashboardLayout navigation docs (#3864) @apedroferreira
+- &#8203;<!-- 13 --> Fix Core example (#3847) @bharatkashyap
+- &#8203;<!-- 07 --> Fix issues with DashboardLayout in Toolpad Core homepage (#3893) @apedroferreira
+- &#8203;<!-- 06 --> Fix grid layout in examples (#3848) @Janpot
+- &#8203;<!-- 05 --> Fix missing Studio examples grid (#3897) @bharatkashyap
+- &#8203;<!-- 04 --> Add PageContainer content and make the theme follow the docs theme (#3895) @Janpot
+- &#8203;<!-- 03 --> Improve Core tutorial (#3874) @bharatkashyap
+- &#8203;<!-- 02 --> Core docs edits (#3844) @prakhargupta1
+
+### Core
+
+- &#8203;<!-- 12 --> Upgrade `inquirer` to `@inquirer/prompts` (#3843) @bharatkashyap
+- &#8203;<!-- 08 --> Export `@mui/toolpad/internals` (#3873) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @prakhargupta1
+
+## v0.4.0
 
 <!-- generated comparing v0.3.2..master -->
 

@@ -77,7 +77,7 @@ const componentElement = new Map([
     {
       name: 'Authentication',
       description:
-        'Our authentication components help you set up an authentication flow that feels native to your application.',
+        'Our authentication components help you set up complex authentication flows quickly, without subscription costs.',
       icon: <LockOpenIcon />,
     },
   ],
@@ -94,7 +94,7 @@ const componentElement = new Map([
     {
       name: 'Dialogs',
       description:
-        'Toolpad exports an imperative API to manage dialogs in your application. System dialogs that adapt to your application theme are also included.',
+        'Toolpad Core exports an imperative API to manage dialogs in your application. System dialogs that adapt to your application theme are also included.',
       icon: <NotificationsIcon />,
     },
   ],

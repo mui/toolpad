@@ -171,7 +171,14 @@ const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean)
   }
 };
 
-const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
+interface ScaffoldProjectOptions {
+  coreVersion?: string;
+}
+
+const scaffoldCoreProject = async (
+  absolutePath: string,
+  { coreVersion }: ScaffoldProjectOptions = {},
+): Promise<void> => {
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
@@ -181,7 +188,10 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   // eslint-disable-next-line no-console
   console.log();
   const pkg = await findCtaPackageJson();
-  const files = generateProject({ name: path.basename(absolutePath), version: pkg.version });
+  const files = generateProject({
+    name: path.basename(absolutePath),
+    version: coreVersion || pkg.version,
+  });
   await writeFiles(absolutePath, files);
 
   // eslint-disable-next-line no-console
@@ -225,17 +235,21 @@ const run = async () => {
     .usage('$0 [path] [options]')
     .positional('path', {
       type: 'string',
-      describe: 'The path where the Toolpad Studio project directory will be created',
+      describe: 'The path where the Toolpad project directory will be created',
     })
-    .option('core', {
+    .option('studio', {
       type: 'boolean',
-      describe: 'Create a new project with Toolpad Core',
+      describe: 'Create a new project with Toolpad Studio',
       default: false,
     })
     .option('install', {
       type: 'boolean',
       describe: 'Install dependencies',
       default: true,
+    })
+    .option('core-version', {
+      type: 'string',
+      describe: 'Use a specific version of Toolpad Core',
     })
     .option('example', {
       type: 'string',
@@ -246,7 +260,7 @@ const run = async () => {
 
   const pathArg = args._?.[0] as string;
   const installFlag = args.install as boolean;
-  const coreFlag = args.core as boolean;
+  const studioFlag = args.studio as boolean;
 
   if (pathArg) {
     const pathValidOrError = await validatePath(pathArg);
@@ -292,12 +306,14 @@ const run = async () => {
       console.log();
     }
   }
-  // If the core flag is set, create a new project with Toolpad Core
-  else if (coreFlag) {
-    await scaffoldCoreProject(absolutePath);
-  } else {
-    // Otherwise, create a new project with Toolpad Studio
+  // If the studio flag is set, create a new project with Toolpad Studio
+  else if (studioFlag) {
     await scaffoldStudioProject(absolutePath, installFlag);
+  } else {
+    // Otherwise, create a new project with Toolpad Core
+    await scaffoldCoreProject(absolutePath, {
+      coreVersion: args.coreVersion,
+    });
   }
 
   const changeDirectoryInstruction =

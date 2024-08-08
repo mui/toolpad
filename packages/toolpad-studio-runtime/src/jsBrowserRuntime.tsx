@@ -32,7 +32,7 @@ function createBrowserRuntime(): JsRuntime {
       (() => {
         // See https://tc39.es/ecma262/multipage/global-object.html#sec-global-object
         const ecmaGlobals = new Set([ 'globalThis', 'Infinity', 'NaN', 'undefined', 'eval', 'isFinite', 'isNaN', 'parseFloat', 'parseInt', 'decodeURI', 'decodeURIComponent', 'encodeURI', 'encodeURIComponent', 'AggregateError', 'Array', 'ArrayBuffer', 'BigInt', 'BigInt64Array', 'BigUint64Array', 'Boolean', 'DataView', 'Date', 'Error', 'EvalError', 'FinalizationRegistry', 'Float32Array', 'Float64Array', 'Function', 'Int8Array', 'Int16Array', 'Int32Array', 'Map', 'Number', 'Object', 'Promise', 'Proxy', 'RangeError', 'ReferenceError', 'RegExp', 'Set', 'SharedArrayBuffer', 'String', 'Symbol', 'SyntaxError', 'TypeError', 'Uint8Array', 'Uint8ClampedArray', 'Uint16Array', 'Uint32Array', 'URIError', 'WeakMap', 'WeakRef', 'WeakSet', 'Atomics', 'JSON', 'Math', 'Reflect' ]);
-        const allowedDomGlobals = new Set([ 'setTimeout', 'console', 'URL', 'URLSearchParams', 'Intl' ])
+        const allowedDomGlobals = new Set([ 'setTimeout', 'console', 'URL', 'URLSearchParams', 'Intl', 'Blob' ])
 
         // NOTE: This is by no means intended to be a secure way to hide DOM globals 
         const globalThis = new Proxy(window.__SCOPE, {

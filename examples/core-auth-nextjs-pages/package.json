@@ -9,7 +9,6 @@
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@mui/icons-material": "^5",
-    "@mui/lab": "^5",
     "@mui/material": "^5",
     "@mui/material-nextjs": "^5",
     "@toolpad/core": "latest",

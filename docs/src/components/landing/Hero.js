@@ -1,9 +1,9 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import SvgToolpadLogo from 'docs/src/icons/SvgToolpadLogo';
+import SvgToolpadLogo from 'docs/src/icons/SvgToolpadStudioLogo';
 import Box from '@mui/material/Box';
 import GradientText from 'docs/src/components/typography/GradientText';
-import { Container } from '@mui/material';
+import Container from '@mui/material/Container';
 import GetStartedButtons from './GetStartedButtons';
 
 export default function Hero() {

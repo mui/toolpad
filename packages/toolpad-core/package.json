@@ -60,7 +60,7 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "6.0.0-beta.2",
+    "@mui/icons-material": "next",
     "@mui/material": "next",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.12",

@@ -31,6 +31,11 @@ interface LegacyThemeProviderProps {
   window?: Window;
 }
 
+/**
+ * Compatibility layer for classic v5 themes. It will handle state management for the theme switcher.
+ * In the v6 theme, this state management is handled by `useColorScheme`. But this hook will crash if
+ * not run under context with a css vars theme.
+ */
 function LegacyThemeProvider(props: LegacyThemeProviderProps) {
   const { children, theme, window: appWindow } = props;
   invariant(!isCssVarsTheme(theme), 'This provider only accepts legacy themes.');
@@ -50,6 +55,7 @@ function LegacyThemeProvider(props: LegacyThemeProviderProps) {
     [isDualTheme, paletteMode, theme],
   );
 
+  // The v5 shim, based on local state
   const paletteModeContextValue = React.useMemo(
     () => ({
       paletteMode,
@@ -80,6 +86,7 @@ function CssVarsPaletteModeProvider(props: { children: React.ReactNode }) {
   const preferredMode = usePreferredMode();
   const { mode, setMode, allColorSchemes } = useColorScheme();
 
+  // The v6 API, based on `useColorScheme`
   const paletteModeContextValue = React.useMemo(() => {
     return {
       paletteMode: !mode || mode === 'system' ? preferredMode : mode,

@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { extendTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -21,9 +21,11 @@ const NAVIGATION = [
   },
 ];
 
-const demoTheme = extendTheme({
+const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
   colorSchemes: { light: true, dark: true },
-  colorSchemeSelector: 'data-toolpad-color-scheme',
   breakpoints: {
     values: {
       xs: 0,

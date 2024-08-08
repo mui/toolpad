@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { extendTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider, Navigation } from '@toolpad/core/AppProvider';
@@ -26,9 +26,11 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-const demoTheme = extendTheme({
+const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
   colorSchemes: { light: true, dark: true },
-  colorSchemeSelector: 'data-toolpad-color-scheme',
   breakpoints: {
     values: {
       xs: 0,

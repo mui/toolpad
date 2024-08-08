@@ -6,21 +6,24 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@mui/icons-material": "6.0.0-beta.2",
-    "@mui/lab": "6.0.0-beta.2",
-    "@mui/material": "6.0.0-beta.2",
-    "@mui/material-nextjs": "next",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
+    "@mui/icons-material": "^5",
+    "@mui/lab": "^5",
+    "@mui/material": "^5",
+    "@mui/material-nextjs": "^5",
     "@toolpad/core": "latest",
-    "next": "14.2.4",
+    "next": "^14",
     "next-auth": "beta",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "eslint-config-next": "^14.2.4"
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "^14"
   }
 }

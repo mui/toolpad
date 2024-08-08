@@ -1,30 +1,13 @@
 'use client';
-import { extendTheme } from '@mui/material/styles';
-import type {} from '@mui/material/themeCssVarsAugmentation';
+import { createTheme } from '@mui/material/styles';
 
-const theme = extendTheme({
-  colorSchemes: {
-    light: {
-      palette: {
-        background: {
-          default: 'var(--mui-palette-grey-50)',
-          defaultChannel: 'var(--mui-palette-grey-50)',
-        },
-      },
-    },
-    dark: {
-      palette: {
-        background: {
-          default: 'var(--mui-palette-grey-900)',
-          defaultChannel: 'var(--mui-palette-grey-900)',
-        },
-        text: {
-          primary: 'var(--mui-palette-grey-200)',
-          primaryChannel: 'var(--mui-palette-grey-200)',
-        },
-      },
-    },
-  },
-});
+const lightTheme = createTheme();
+
+const darkTheme = createTheme({ palette: { mode: 'dark' } });
+
+const theme = {
+  light: lightTheme,
+  dark: darkTheme,
+};
 
 export default theme;

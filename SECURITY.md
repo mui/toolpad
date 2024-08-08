@@ -4,9 +4,9 @@
 
 The versions of the project that are currently supported with security updates.
 
-| Version | Supported          |
-| :------ | :----------------- |
-| <=1.0   | :white_check_mark: |
+| Toolpad version | Release    | Supported          |
+| --------------: | :--------- | :----------------- |
+|         <=1.0.0 | 2022-06-15 | :white_check_mark: |
 
 ## Reporting a vulnerability
 

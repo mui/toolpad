@@ -1,6 +1,6 @@
 {
   "name": "core-auth-nextjs-pages",
-  "version": "0.3.0",
+  "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
     "lint": "next lint"
@@ -8,6 +8,8 @@
   "dependencies": {
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@emotion/cache": "^11",
+    "@emotion/server": "^11",
     "@mui/icons-material": "^5",
     "@mui/material": "^5",
     "@mui/material-nextjs": "^5",

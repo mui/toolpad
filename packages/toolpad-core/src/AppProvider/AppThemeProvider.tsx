@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { PaletteMode, Theme, useMediaQuery } from '@mui/material';
-import { CssVarsProvider, ThemeProvider, useColorScheme, CssVarsTheme } from '@mui/material/styles';
+import { ThemeProvider, useColorScheme } from '@mui/material/styles';
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import CssBaseline from '@mui/material/CssBaseline';
+import invariant from 'invariant';
 import { useLocalStorageState } from '../useLocalStorageState';
 import { PaletteModeContext } from '../shared/context';
-import type { AppProviderProps } from './AppProvider';
+import type { AppTheme } from './AppProvider';
 
 const COLOR_SCHEME_ATTRIBUTE = 'data-toolpad-color-scheme';
 const COLOR_SCHEME_STORAGE_KEY = 'mui-toolpad-color-scheme';
@@ -18,31 +19,33 @@ function usePreferredMode() {
 
 type ThemeMode = PaletteMode | 'system';
 
-function useStandardPaletteMode() {
-  const preferredMode = usePreferredMode();
-  const [mode, setMode] = useLocalStorageState<ThemeMode>(MODE_STORAGE_KEY, 'system');
+type CssVarsTheme = Theme & { vars: Record<string, string> };
 
-  return {
-    paletteMode: !mode || mode === 'system' ? preferredMode : mode,
-    setPaletteMode: setMode,
-  };
+function isCssVarsTheme(theme: AppTheme): theme is CssVarsTheme {
+  return 'vars' in theme;
 }
 
-interface StandardThemeProviderProps {
+interface LegacyThemeProviderProps {
   children: React.ReactNode;
-  theme: NonNullable<Theme | { light: Theme; dark: Theme }>;
+  theme: AppTheme;
+  window?: Window;
 }
 
 /**
- * @ignore - internal component.
+ * Compatibility layer for classic v5 themes. It will handle state management for the theme switcher.
+ * In the v6 theme, this state management is handled by `useColorScheme`. But this hook will crash if
+ * not run under context with a css vars theme.
  */
-function StandardThemeProvider(props: StandardThemeProviderProps) {
-  const { children, theme } = props;
-
-  const { paletteMode, setPaletteMode } = useStandardPaletteMode();
+function LegacyThemeProvider(props: LegacyThemeProviderProps) {
+  const { children, theme, window: appWindow } = props;
+  invariant(!isCssVarsTheme(theme), 'This provider only accepts legacy themes.');
 
   const isDualTheme = 'light' in theme || 'dark' in theme;
 
+  const preferredMode = usePreferredMode();
+  const [userMode, setUserMode] = useLocalStorageState<ThemeMode>(MODE_STORAGE_KEY, 'system');
+
+  const paletteMode = !userMode || userMode === 'system' ? preferredMode : userMode;
   const dualAwareTheme = React.useMemo(
     () =>
       isDualTheme
@@ -52,113 +55,103 @@ function StandardThemeProvider(props: StandardThemeProviderProps) {
     [isDualTheme, paletteMode, theme],
   );
 
+  // The v5 shim, based on local state
   const paletteModeContextValue = React.useMemo(
-    () => ({ paletteMode, setPaletteMode, isDualTheme }),
-    [isDualTheme, paletteMode, setPaletteMode],
+    () => ({
+      paletteMode,
+      setPaletteMode: setUserMode,
+      isDualTheme,
+    }),
+    [isDualTheme, paletteMode, setUserMode],
   );
 
   return (
-    <ThemeProvider theme={dualAwareTheme}>
+    <ThemeProvider
+      theme={dualAwareTheme}
+      documentNode={appWindow?.document}
+      colorSchemeNode={appWindow?.document?.body}
+      disableNestedContext
+      colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
+      modeStorageKey={MODE_STORAGE_KEY}
+    >
       <PaletteModeContext.Provider value={paletteModeContextValue}>
+        <CssBaseline enableColorScheme />
         {children}
       </PaletteModeContext.Provider>
     </ThemeProvider>
   );
 }
 
-interface CSSVarsThemeConsumerProps {
-  children: React.ReactNode;
-  isDualTheme: boolean;
-}
-
-/**
- * @ignore - internal component.
- */
-function CSSVarsThemeConsumer(props: CSSVarsThemeConsumerProps) {
-  const { children, isDualTheme } = props;
-
+function CssVarsPaletteModeProvider(props: { children: React.ReactNode }) {
   const preferredMode = usePreferredMode();
-  const { mode, setMode } = useColorScheme();
+  const { mode, setMode, allColorSchemes } = useColorScheme();
 
+  // The v6 API, based on `useColorScheme`
   const paletteModeContextValue = React.useMemo(() => {
     return {
       paletteMode: !mode || mode === 'system' ? preferredMode : mode,
       setPaletteMode: setMode,
-      isDualTheme,
+      isDualTheme: allColorSchemes.length > 1,
     };
-  }, [isDualTheme, mode, preferredMode, setMode]);
+  }, [allColorSchemes, mode, preferredMode, setMode]);
 
-  return (
-    <PaletteModeContext.Provider value={paletteModeContextValue}>
-      {children}
-    </PaletteModeContext.Provider>
-  );
+  return <PaletteModeContext.Provider value={paletteModeContextValue} {...props} />;
 }
 
-interface CSSVarsThemeProviderProps {
+interface CssVarsThemeProviderProps {
   children: React.ReactNode;
-  theme: NonNullable<CssVarsTheme>;
-  window?: AppProviderProps['window'];
+  theme: Theme;
+  window?: Window;
 }
 
-/**
- * @ignore - internal component.
- */
-function CSSVarsThemeProvider(props: CSSVarsThemeProviderProps) {
+function CssVarsThemeProvider(props: CssVarsThemeProviderProps) {
   const { children, theme, window: appWindow } = props;
-
-  const isDualTheme = 'light' in theme.colorSchemes && 'dark' in theme.colorSchemes;
+  invariant(isCssVarsTheme(theme), 'This provider only accepts CSS vars themes.');
 
   return (
-    <CssVarsProvider
+    <ThemeProvider
       theme={theme}
-      defaultMode="system"
       documentNode={appWindow?.document}
       colorSchemeNode={appWindow?.document?.body}
       disableNestedContext
-      attribute={COLOR_SCHEME_ATTRIBUTE}
       colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
       modeStorageKey={MODE_STORAGE_KEY}
     >
-      <CSSVarsThemeConsumer isDualTheme={isDualTheme}>{children}</CSSVarsThemeConsumer>
-    </CssVarsProvider>
+      <InitColorSchemeScript
+        attribute={COLOR_SCHEME_ATTRIBUTE}
+        colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
+        modeStorageKey={MODE_STORAGE_KEY}
+      />
+      <CssVarsPaletteModeProvider>
+        <CssBaseline enableColorScheme />
+        {children}
+      </CssVarsPaletteModeProvider>
+    </ThemeProvider>
   );
 }
 
 interface AppThemeProviderProps {
   children: React.ReactNode;
-  theme: NonNullable<AppProviderProps['theme']>;
-  window?: AppProviderProps['window'];
+  theme: AppTheme;
+  window?: Window;
 }
 
 /**
  * @ignore - internal component.
  */
 function AppThemeProvider(props: AppThemeProviderProps) {
-  const { children, theme, window: appWindow } = props;
+  const { children, theme, ...rest } = props;
 
-  const isCSSVarsTheme = 'colorSchemes' in theme;
+  const useCssVarsProvider = isCssVarsTheme(theme);
 
-  const themeChildren = (
-    <React.Fragment>
-      <CssBaseline enableColorScheme />
+  return useCssVarsProvider ? (
+    <CssVarsThemeProvider theme={theme} {...rest}>
       {children}
-    </React.Fragment>
-  );
-
-  return isCSSVarsTheme ? (
-    <React.Fragment>
-      <InitColorSchemeScript
-        attribute={COLOR_SCHEME_ATTRIBUTE}
-        colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
-        modeStorageKey={MODE_STORAGE_KEY}
-      />
-      <CSSVarsThemeProvider theme={theme} window={appWindow}>
-        {themeChildren}
-      </CSSVarsThemeProvider>
-    </React.Fragment>
+    </CssVarsThemeProvider>
   ) : (
-    <StandardThemeProvider theme={theme}>{themeChildren}</StandardThemeProvider>
+    <LegacyThemeProvider theme={theme} {...rest}>
+      {children}
+    </LegacyThemeProvider>
   );
 }
 

@@ -2,6 +2,9 @@
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
   colorSchemes: {
     light: {
       palette: {
@@ -24,7 +27,6 @@ const theme = createTheme({
       },
     },
   },
-  colorSchemeSelector: 'data-toolpad-color-scheme',
 });
 
 export default theme;

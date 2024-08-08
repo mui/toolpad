@@ -30,7 +30,7 @@
       },
       "default": "null"
     },
-    "theme": { "type": { "name": "object" }, "default": "extendTheme()" },
+    "theme": { "type": { "name": "object" }, "default": "createTheme()" },
     "window": { "type": { "name": "object" }, "default": "window" }
   },
   "name": "AppProvider",

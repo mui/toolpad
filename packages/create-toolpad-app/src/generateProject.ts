@@ -119,9 +119,9 @@ export default function NavigateButton() {
 
   const themeContent = `
   "use client";
-  import { extendTheme } from '@mui/material/styles';
+  import { createTheme } from '@mui/material/styles';
 
-  const theme = extendTheme({
+  const theme = createTheme({
     colorSchemes: { light: true, dark: true },
     colorSchemeSelector: 'data-toolpad-color-scheme',
   });

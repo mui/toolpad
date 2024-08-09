@@ -8,7 +8,7 @@ _Aug 9, 2024_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-- Support MUI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
+- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
 - Fix theme switcher in documentation examples
 - Fix DashboardLayout bugs with theming and mobile navigation
 - Fix some file handling restrictions in `@toolpad/studio`

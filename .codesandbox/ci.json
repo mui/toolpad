@@ -10,8 +10,6 @@
     "packages/toolpad-studio-runtime",
     "packages/toolpad-utils"
   ],
-  "publishDirectory": {
-    "@toolpad/core": "packages/toolpad-core/build"
-  },
+  "publishDirectory": {},
   "silent": true
 }

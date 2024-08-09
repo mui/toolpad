@@ -5,7 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { extendTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import PersonIcon from '@mui/icons-material/Person';
 import CallIcon from '@mui/icons-material/Call';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -13,8 +13,13 @@ import CallMadeIcon from '@mui/icons-material/CallMade';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import { AppProvider, Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import type { Navigation } from '@toolpad/core';
 
-const demoTheme = extendTheme({
+const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  colorSchemes: { light: true, dark: true },
   breakpoints: {
     values: {
       xs: 0,
@@ -42,6 +47,21 @@ function DemoPageContent({ pathname }: { pathname: string }) {
   );
 }
 
+const CALLS_NAVIGATION: Navigation = [
+  {
+    segment: '/made',
+    title: 'Made',
+    icon: <CallMadeIcon />,
+    action: <Chip label={12} color="success" size="small" />,
+  },
+  {
+    segment: '/received',
+    title: 'Received',
+    icon: <CallReceivedIcon />,
+    action: <Chip label={4} color="error" size="small" />,
+  },
+];
+
 interface DemoProps {
   /**
    * Injected by the documentation to work in an iframe.
@@ -53,7 +73,7 @@ interface DemoProps {
 export default function DashboardLayoutNavigationActions(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('contacts');
+  const [pathname, setPathname] = React.useState('/contacts');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -82,60 +102,45 @@ export default function DashboardLayoutNavigationActions(props: DemoProps) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
+  const popoverMenuAction = (
+    <React.Fragment>
+      <IconButton aria-describedby={popoverId} onClick={handlePopoverButtonClick}>
+        <MoreHorizIcon />
+      </IconButton>
+      <Menu
+        id={popoverId}
+        open={isPopoverOpen}
+        anchorEl={popoverAnchorEl}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        disableAutoFocus
+        disableAutoFocusItem
+      >
+        <MenuItem onClick={handlePopoverClose}>New call</MenuItem>
+        <MenuItem onClick={handlePopoverClose}>Mark all as read</MenuItem>
+      </Menu>
+    </React.Fragment>
+  );
+
   return (
     // preview-start
     <AppProvider
       navigation={[
         {
-          segment: '/contacts',
+          segment: 'contacts',
           title: 'Contacts',
           icon: <PersonIcon />,
           action: <Chip label={7} color="primary" size="small" />,
         },
         {
-          segment: '/calls',
+          segment: 'calls',
           title: 'Calls',
           icon: <CallIcon />,
-          action: (
-            <React.Fragment>
-              <IconButton
-                aria-describedby={popoverId}
-                onClick={handlePopoverButtonClick}
-                sx={{ ml: 1 }}
-              >
-                <MoreHorizIcon />
-              </IconButton>
-              <Menu
-                id={popoverId}
-                open={isPopoverOpen}
-                anchorEl={popoverAnchorEl}
-                onClose={handlePopoverClose}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'right',
-                }}
-                disableAutoFocus
-                disableAutoFocusItem
-              >
-                <MenuItem onClick={handlePopoverClose}>New call</MenuItem>
-                <MenuItem onClick={handlePopoverClose}>Mark all as read</MenuItem>
-              </Menu>
-            </React.Fragment>
-          ),
-          children: [
-            {
-              segment: '/made',
-              title: 'Made',
-              icon: <CallMadeIcon />,
-              action: <Chip label={12} color="success" size="small" />,
-            },
-            {
-              segment: '/received',
-              title: 'Received',
-              icon: <CallReceivedIcon />,
-              action: <Chip label={4} color="error" size="small" />,
-            },
-          ],
+          action: popoverMenuAction,
+          children: CALLS_NAVIGATION,
         },
       ]}
       router={router}

@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { extendTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -21,7 +21,11 @@ const NAVIGATION = [
   },
 ];
 
-const demoTheme = extendTheme({
+const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  colorSchemes: { light: true, dark: true },
   breakpoints: {
     values: {
       xs: 0,
@@ -56,7 +60,7 @@ DemoPageContent.propTypes = {
 function DashboardLayoutBranding(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('dashboard');
+  const [pathname, setPathname] = React.useState('/dashboard');
 
   const router = React.useMemo(() => {
     return {

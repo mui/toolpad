@@ -2,7 +2,9 @@
 title: Toolpad Core - Installation
 ---
 
-# Toolpad Core - Installation
+# Installation
+
+## Automatic Installation
 
 <p class="description">Learn how to install Toolpad Core in your local environment.</p>
 
@@ -11,15 +13,15 @@ title: Toolpad Core - Installation
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npx create-toolpad-app@latest --core
+npx create-toolpad-app@latest
 ```
 
 ```bash pnpm
-pnpm create toolpad-app --core
+pnpm create toolpad-app
 ```
 
 ```bash yarn
-yarn create toolpad-app --core
+yarn create toolpad-app
 ```
 
 </codeblock>
@@ -72,3 +74,41 @@ yarn dev
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/installation-1.png", "alt": "Toolpad Core entry point", "caption": "Starting with Toolpad Core", "zoom": true, "indent": 1 }}
 
 5. Installation is complete! Begin building your project by making edits to `(dashboard/page/page.tsx`. To understand how to leverage Toolpad Core to build dashboards quickly, [see the detailed tutorial](/toolpad/core/introduction/tutorial/).
+
+## Manual Installation
+
+Use your preferred package manager to install `@toolpad/core` in your project:
+
+<codeblock storageKey="package-manager">
+
+```bash npm
+npm install -S @toolpad/core
+```
+
+```bash yarn
+yarn add @toolpad/core
+```
+
+```bash pnpm
+pnpm add @toolpad/core
+```
+
+</codeblock>
+
+The Toolpad Core package has a peer dependency on `@mui/material` and `@mui/icons-material`. If you aren't using these already in your project, you can install them with:
+
+<codeblock storageKey="package-manager">
+
+```bash npm
+npm install -S @mui/material @mui/icons-material @emotion/react @emotion/styled
+```
+
+```bash yarn
+yarn add @mui/material @mui/icons-material @emotion/react @emotion/styled
+```
+
+```bash pnpm
+pnpm add @mui/material @mui/icons-material @emotion/react @emotion/styled
+```
+
+</codeblock>

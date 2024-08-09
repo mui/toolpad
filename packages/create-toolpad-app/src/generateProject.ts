@@ -1,7 +1,8 @@
 import path from 'path';
 import { PackageJson } from './packageType';
 
-interface GenerateProjectOptions {
+export interface GenerateProjectOptions {
+  version?: string;
   name: string;
 }
 
@@ -42,63 +43,67 @@ export default function generateProject(
   }
     `;
 
-  const dashboardLayoutContent = `
+  const dashboardLayoutContent = `import * as React from 'react';
   import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-
-  export default function Layout({
-    children,
-  }: Readonly<{ children: React.ReactNode }>) {
-    return (
-      <DashboardLayout>{children}</DashboardLayout>
-    );
-  }
-  `;
-
-  const dashboardPageLayout = `
   import { PageContainer } from '@toolpad/core/PageContainer';
-
-  export default function Layout({
-    children,
-  }: Readonly<{ children: React.ReactNode }>) {
+  
+  export default function Layout(props: { children: React.ReactNode }) {
     return (
-      <PageContainer>{children}</PageContainer>
+      <DashboardLayout>
+        <PageContainer>{props.children}</PageContainer>
+      </DashboardLayout>
     );
-  }
+  }  
   `;
 
-  const rootPageContainer = `
-  import Link from "next/link";
-  import { Button, Container, Typography, Box } from "@mui/material";
-
+  const rootPageContent = `import Link from 'next/link';
+  import { Container, Typography, Box } from '@mui/material';
+  import NavigateButton from './NavigateButton';
+  
   export default function Home() {
     return (
       <Container>
         <Box sx={{ my: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
-            Welcome to{" "}
-            <Link href="https://mui.com/toolpad/core/introduction">
-              Toolpad Core!
-            </Link>
+            Welcome to <Link href="https://mui.com/toolpad/core/introduction">Toolpad Core!</Link>
           </Typography>
-
+  
           <Typography variant="body1">
             Get started by editing <code>(dashboard)/page/page.tsx</code>
           </Typography>
-
-          <Box sx={{ mt: 2 }}>
-            <Link href="/page">
-              <Button variant="contained" color="primary">
-                Go to Page
-              </Button>
-            </Link>
-          </Box>
+          <NavigateButton />
         </Box>
       </Container>
     );
-  }
+  }  
   `;
 
-  const dashboardPage = `
+  const navigateButtonContent = `'use client';
+import * as React from 'react';
+import Link from 'next/link';
+import { LoadingButton } from '@mui/lab';
+import { Box } from '@mui/material';
+
+export default function NavigateButton() {
+  const [loading, setLoading] = React.useState(false);
+  return (
+    <Box sx={{ mt: 2 }}>
+      <Link href="/page">
+        <LoadingButton
+          variant="contained"
+          color="primary"
+          loading={loading}
+          onClick={() => setLoading(true)}
+        >
+          Go to Page
+        </LoadingButton>
+      </Link>
+    </Box>
+  );
+}
+`;
+
+  const dashboardPageContent = `
   import { Typography } from "@mui/material";
 
   export default function Home() {
@@ -114,33 +119,16 @@ export default function generateProject(
 
   const themeContent = `
   "use client";
-  import { extendTheme } from '@mui/material/styles';
-  import type {} from '@mui/material/themeCssVarsAugmentation';
+  import { createTheme } from '@mui/material/styles';
 
-  const theme = extendTheme({
-    colorSchemes: {
-      light: {
-        palette: {
-          background: {
-            default: 'var(--mui-palette-grey-50)',
-            defaultChannel: 'var(--mui-palette-grey-50)',
-          },
-        },
-      },
-      dark: {
-        palette: {
-          background: {
-            default: 'var(--mui-palette-grey-900)',
-            defaultChannel: 'var(--mui-palette-grey-900)',
-          },
-          text: {
-            primary: 'var(--mui-palette-grey-200)',
-            primaryChannel: 'var(--mui-palette-grey-200)',
-          },
-        },
-      },
-    },
-  });
+  const lightTheme = createTheme();
+  
+  const darkTheme = createTheme({ palette: { mode: 'dark' } });
+
+  const theme = {
+    light: lightTheme,
+    dark: darkTheme
+  };
 
   export default theme;
   `;
@@ -204,10 +192,10 @@ export default function generateProject(
       react: '^18',
       'react-dom': '^18',
       next: '^14',
-      '@toolpad/core': 'latest',
-      '@mui/material': 'next',
-      '@mui/material-nextjs': 'next',
-      '@mui/icons-material': 'next',
+      '@toolpad/core': options.version ?? 'latest',
+      '@mui/material': '^5',
+      '@mui/material-nextjs': '^5',
+      '@mui/icons-material': '^5',
       '@emotion/react': '^11',
       '@emotion/styled': '^11',
       '@emotion/cache': '^11',
@@ -358,11 +346,11 @@ export default function generateProject(
   return new Map([
     ['app/api/auth/[...nextAuth]/route.ts', { content: '' }],
     ['app/auth/[...path]/page.tsx', { content: '' }],
-    ['app/(dashboard)/page/page.tsx', { content: dashboardPage }],
-    ['app/(dashboard)/page/layout.tsx', { content: dashboardPageLayout }],
+    ['app/(dashboard)/page/page.tsx', { content: dashboardPageContent }],
     ['app/(dashboard)/layout.tsx', { content: dashboardLayoutContent }],
     ['app/layout.tsx', { content: rootLayoutContent }],
-    ['app/page.tsx', { content: rootPageContainer }],
+    ['app/NavigateButton.tsx', { content: navigateButtonContent }],
+    ['app/page.tsx', { content: rootPageContent }],
     ['theme.ts', { content: themeContent }],
     ['next-env.d.ts', { content: nextTypesContent }],
     ['next.config.mjs', { content: nextConfigContent }],

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { extendTheme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -14,18 +14,21 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    segment: '/page',
+    segment: 'page',
     title: 'Page',
     icon: <DashboardIcon />,
   },
   {
-    segment: '/page-2',
+    segment: 'page-2',
     title: 'Page 2',
     icon: <TimelineIcon />,
   },
 ];
 
-const customTheme = extendTheme({
+const customTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
   colorSchemes: {
     light: {
       palette: {
@@ -82,7 +85,7 @@ interface DemoProps {
 export default function AppProviderTheme(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('page');
+  const [pathname, setPathname] = React.useState('/page');
 
   const router = React.useMemo<Router>(() => {
     return {

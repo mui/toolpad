@@ -18,7 +18,7 @@ const PropControlToggleButtonGroup = styled(ToggleButtonGroup)({
 });
 
 function SelectPropEditor({ label, propType, value, onChange, disabled }: EditorProps<string>) {
-  const items = propType.type === 'string' ? propType.enum ?? [] : [];
+  const items = propType.type === 'string' ? (propType.enum ?? []) : [];
   const handleChange = React.useCallback(
     (event: React.MouseEvent, newValue: string) => {
       onChange(newValue || undefined);
@@ -27,7 +27,7 @@ function SelectPropEditor({ label, propType, value, onChange, disabled }: Editor
   );
 
   const enumLabels: Record<string, string> =
-    propType.type === 'string' ? propType.enumLabels ?? {} : {};
+    propType.type === 'string' ? (propType.enumLabels ?? {}) : {};
 
   return (
     <PropertyControl propType={propType}>

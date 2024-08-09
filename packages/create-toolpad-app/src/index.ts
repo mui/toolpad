@@ -4,7 +4,7 @@ import * as fs from 'fs/promises';
 import { constants as fsConstants } from 'fs';
 import path from 'path';
 import yargs from 'yargs';
-import inquirer from 'inquirer';
+import { input } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { errorFrom } from '@toolpad/utils/errors';
 import { execa } from 'execa';
@@ -16,6 +16,16 @@ import { PackageJson } from './packageType';
 import generateProject from './generateProject';
 import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
+
+/**
+ * Find package.json of the create-toolpad-app package
+ */
+async function findCtaPackageJson() {
+  const ctaPackageJsonPath = path.resolve(__dirname, '../package.json');
+  const content = await fs.readFile(ctaPackageJsonPath, 'utf8');
+  const packageJson = JSON.parse(content);
+  return packageJson;
+}
 
 type PackageManager = 'npm' | 'pnpm' | 'yarn';
 declare global {
@@ -109,7 +119,7 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
 };
 
 // Create a new `package.json` file and install dependencies
-const scaffoldProject = async (absolutePath: string, installFlag: boolean): Promise<void> => {
+const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean): Promise<void> => {
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
@@ -161,7 +171,14 @@ const scaffoldProject = async (absolutePath: string, installFlag: boolean): Prom
   }
 };
 
-const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
+interface ScaffoldProjectOptions {
+  coreVersion?: string;
+}
+
+const scaffoldCoreProject = async (
+  absolutePath: string,
+  { coreVersion }: ScaffoldProjectOptions = {},
+): Promise<void> => {
   // eslint-disable-next-line no-console
   console.log();
   // eslint-disable-next-line no-console
@@ -170,7 +187,11 @@ const scaffoldCoreProject = async (absolutePath: string): Promise<void> => {
   );
   // eslint-disable-next-line no-console
   console.log();
-  const files = generateProject({ name: path.basename(absolutePath) });
+  const pkg = await findCtaPackageJson();
+  const files = generateProject({
+    name: path.basename(absolutePath),
+    version: coreVersion || pkg.version,
+  });
   await writeFiles(absolutePath, files);
 
   // eslint-disable-next-line no-console
@@ -214,17 +235,21 @@ const run = async () => {
     .usage('$0 [path] [options]')
     .positional('path', {
       type: 'string',
-      describe: 'The path where the Toolpad Studio project directory will be created',
+      describe: 'The path where the Toolpad project directory will be created',
     })
-    .option('core', {
+    .option('studio', {
       type: 'boolean',
-      describe: 'Create a new project with Toolpad Core',
+      describe: 'Create a new project with Toolpad Studio',
       default: false,
     })
     .option('install', {
       type: 'boolean',
       describe: 'Install dependencies',
       default: true,
+    })
+    .option('core-version', {
+      type: 'string',
+      describe: 'Use a specific version of Toolpad Core',
     })
     .option('example', {
       type: 'string',
@@ -235,7 +260,7 @@ const run = async () => {
 
   const pathArg = args._?.[0] as string;
   const installFlag = args.install as boolean;
-  const coreFlag = args.core as boolean;
+  const studioFlag = args.studio as boolean;
 
   if (pathArg) {
     const pathValidOrError = await validatePath(pathArg);
@@ -249,28 +274,46 @@ const run = async () => {
       process.exit(1);
     }
   }
+  let projectPath = pathArg;
 
-  const questions = [
-    {
-      type: 'input',
-      name: 'path',
+  if (!pathArg) {
+    projectPath = await input({
       message: 'Enter path for new project directory:',
-      validate: (input: string) => validatePath(input),
-      when: !pathArg,
+      validate: validatePath,
       default: '.',
-    },
-  ];
+    });
+  }
 
-  const answers = await inquirer.prompt(questions);
+  const absolutePath = bashResolvePath(projectPath);
 
-  const absolutePath = bashResolvePath(answers.path || pathArg);
-
+  // If the user has provided an example, download and extract it
   if (args.example) {
     await downloadAndExtractExample(absolutePath, args.example);
-  } else if (coreFlag) {
-    await scaffoldCoreProject(absolutePath);
+
+    if (installFlag) {
+      // eslint-disable-next-line no-console
+      console.log(`${chalk.cyan('info')} - Installing dependencies`);
+      // eslint-disable-next-line no-console
+      console.log();
+      await execa(packageManager, ['install'], { stdio: 'inherit', cwd: absolutePath });
+      // eslint-disable-next-line no-console
+      console.log();
+      // eslint-disable-next-line no-console
+      console.log(
+        `${chalk.green('success')} - Installed "${args.example}" at ${chalk.cyan(absolutePath)}`,
+      );
+      // eslint-disable-next-line no-console
+      console.log();
+    }
+  }
+  // If the studio flag is set, create a new project with Toolpad Studio
+  else if (studioFlag) {
+    await scaffoldStudioProject(absolutePath, installFlag);
   } else {
-    await scaffoldProject(absolutePath, installFlag);
+    // Otherwise, create a new project with Toolpad Core
+    await scaffoldCoreProject(absolutePath, {
+      coreVersion: args.coreVersion,
+    });
   }
 
   const changeDirectoryInstruction =

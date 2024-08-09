@@ -19,3 +19,5 @@ export const PaletteModeContext = React.createContext<{
 export const RouterContext = React.createContext<Router | null>(null);
 
 export const WindowContext = React.createContext<Window | undefined>(undefined);
+
+export const DocsContext = React.createContext<boolean>(false);

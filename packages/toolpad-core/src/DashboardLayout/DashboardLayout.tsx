@@ -35,7 +35,7 @@ import {
   RouterContext,
   WindowContext,
 } from '../shared/context';
-import type { Navigation, NavigationPageItem } from '../AppProvider';
+import type { Navigation } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 import {
   getItemTitle,
@@ -149,7 +149,7 @@ interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
-  onSidebarLinkClick?: (item: NavigationPageItem) => void;
+  onSidebarLinkClick: () => void;
   validatedItemIds: Set<string>;
   uniqueItemPaths: Set<string>;
 }
@@ -182,15 +182,6 @@ function DashboardSidebarSubNavigation({
 
   const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState(
     initialExpandedSidebarItemIds,
-  );
-
-  const handleLinkClick = React.useCallback(
-    (item: NavigationPageItem) => () => {
-      if (onSidebarLinkClick) {
-        onSidebarLinkClick(item);
-      }
-    },
-    [onSidebarLinkClick],
   );
 
   const handleOpenFolderClick = React.useCallback(
@@ -263,7 +254,7 @@ function DashboardSidebarSubNavigation({
                 : {
                     LinkComponent: Link,
                     href: navigationItemFullPath,
-                    onClick: handleLinkClick(navigationItem),
+                    onClick: onSidebarLinkClick,
                   })}
             >
               {navigationItem.icon ? (
@@ -363,7 +354,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     setIsMobileNavigationOpen((previousOpen) => !previousOpen);
   }, []);
 
-  const handleNavigationItemClick = React.useCallback(() => {
+  const handleNavigationLinkClick = React.useCallback(() => {
     setIsMobileNavigationOpen(false);
   }, []);
 
@@ -380,7 +371,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}>
         <DashboardSidebarSubNavigation
           subNavigation={navigation}
-          onSidebarLinkClick={handleNavigationItemClick}
+          onSidebarLinkClick={handleNavigationLinkClick}
           validatedItemIds={validatedItemIdsRef.current}
           uniqueItemPaths={uniqueItemPathsRef.current}
         />

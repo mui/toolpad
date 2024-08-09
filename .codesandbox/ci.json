@@ -11,7 +11,12 @@
     "packages/toolpad-utils"
   ],
   "publishDirectory": {
-    "@toolpad/core": "packages/toolpad-core/build"
+    "create-toolpad-app": "packages/create-toolpad-app",
+    "@toolpad/core": "packages/toolpad-core/build",
+    "@toolpad/studio": "packages/toolpad-studio",
+    "@toolpad/studio-components": "packages/toolpad-studio-components",
+    "@toolpad/studio-runtime": "packages/toolpad-studio-runtime",
+    "@toolpad/utils": "packages/toolpad-utils"
   },
   "silent": true
 }

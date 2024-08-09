@@ -125,6 +125,7 @@ function SignInPage(props: SignInPageProps) {
   const { providers, signIn, slotProps } = props;
   const branding = React.useContext(BrandingContext);
   const docs = React.useContext(DocsContext);
+  const router = React.useContext(RouterContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const [{ loading, providerId, error }, setFormStatus] = React.useState<{
     loading: boolean;
@@ -135,8 +136,6 @@ function SignInPage(props: SignInPageProps) {
     loading: false,
     error: '',
   });
-
-  const router = React.useContext(RouterContext);
 
   const callbackUrl = router?.searchParams.get('callbackUrl') ?? '/';
 

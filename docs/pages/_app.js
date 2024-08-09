@@ -18,10 +18,6 @@ import createEmotionCache from 'docs/src/createEmotionCache';
 import findActivePage from 'docs/src/modules/utils/findActivePage';
 import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
-import toolpadPkgJson from '@toolpad/studio/package.json';
-// TODO: figure out eslint resolution errors for this file
-// eslint-disable-next-line import/no-unresolved
-import toolpadCorePkgJson from '@toolpad/core/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
 import toolpadStudioPages from '../data/toolpad/studio/pages';
 import toolpadCorePages from '../data/toolpad/core/pages';
@@ -212,14 +208,14 @@ function AppWrapper(props) {
         productIdentifier = {
           metadata: '',
           name: 'Toolpad Studio',
-          versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
+          versions: [{ text: `v${process.env.TOOLPAD_STUDIO_VERSION}`, current: true }],
         };
         pages = toolpadStudioPages;
       } else {
         productIdentifier = {
           metadata: '',
           name: 'Toolpad Core',
-          versions: [{ text: `v${toolpadCorePkgJson.version}`, current: true }],
+          versions: [{ text: `v${process.env.TOOLPAD_CORE_VERSION}`, current: true }],
         };
         pages = toolpadCorePages;
       }
@@ -228,14 +224,14 @@ function AppWrapper(props) {
         productIdentifier = {
           metadata: '',
           name: 'Toolpad Core',
-          versions: [{ text: `v${toolpadCorePkgJson.version}`, current: true }],
+          versions: [{ text: `v${process.env.TOOLPAD_CORE_VERSION}`, current: true }],
         };
         pages = toolpadCorePages;
       } else if (productId === 'toolpad-studio') {
         productIdentifier = {
           metadata: '',
           name: 'Toolpad Studio',
-          versions: [{ text: `v${toolpadPkgJson.version}`, current: true }],
+          versions: [{ text: `v${process.env.TOOLPAD_STUDIO_VERSION}`, current: true }],
         };
         pages = toolpadStudioPages;
       }

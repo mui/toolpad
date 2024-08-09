@@ -3,7 +3,8 @@
   "version": "0.5.0",
   "author": "Toolpad Team",
   "description": "Dashboard framework powered by MUI.",
-  "main": "./build/index.js",
+  "main": "./build/node/index.js",
+  "module": "./build/index.js",
   "exports": {
     "./package.json": "./package.json",
     ".": {

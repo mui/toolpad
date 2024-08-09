@@ -138,7 +138,7 @@ function SignInPage(props: SignInPageProps) {
 
   const callbackUrl =
     typeof window !== 'undefined'
-      ? new URLSearchParams(window.location.search).get('callbackUrl') ?? '/'
+      ? (new URLSearchParams(window.location.search).get('callbackUrl') ?? '/')
       : '/';
 
   const [isClient, setIsClient] = React.useState(false);

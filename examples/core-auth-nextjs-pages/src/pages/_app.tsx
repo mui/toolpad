@@ -41,6 +41,7 @@ const NAVIGATION: Navigation = [
 
 const BRANDING = {
   title: 'My Toolpad Core App',
+  logo: <DashboardIcon />,
 };
 
 const AUTHENTICATION = {

@@ -118,6 +118,7 @@ function ThemeSwitcher() {
             <React.Fragment>
               <DarkModeIcon
                 sx={{
+                  display: 'inline',
                   [theme.getColorSchemeSelector('dark')]: {
                     display: 'none',
                   },
@@ -132,12 +133,11 @@ function ThemeSwitcher() {
                 }}
               />
             </React.Fragment>
-          ) : null}
-          {!theme.getColorSchemeSelector ? (
+          ) : (
             <React.Fragment>
               {isSsr || paletteMode !== 'dark' ? <DarkModeIcon /> : <LightModeIcon />}
             </React.Fragment>
-          ) : null}
+          )}
         </IconButton>
       </div>
     </Tooltip>

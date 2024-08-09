@@ -4,7 +4,9 @@ import {
   useNotifications,
 } from '@toolpad/core/useNotifications';
 import Button from '@mui/material/Button';
-import { Box, Snackbar, styled } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Snackbar from '@mui/material/Snackbar';
 
 const notificationsProviderSlots = {
   snackbar: styled(Snackbar)({ position: 'absolute' }),

@@ -329,7 +329,7 @@ importers:
         version: 7.12.0(@types/react@18.3.3)(react@18.3.1)
       '@toolpad/core':
         specifier: workspace:*
-        version: link:../packages/toolpad-core
+        version: link:../packages/toolpad-core/build
       '@toolpad/studio':
         specifier: workspace:*
         version: link:../packages/toolpad-studio
@@ -594,6 +594,9 @@ importers:
 
   packages/toolpad-core:
     dependencies:
+      '@babel/runtime':
+        specifier: ^7.25.0
+        version: 7.25.0
       '@mui/lab':
         specifier: 5.0.0-alpha.173
         version: 5.0.0-alpha.173(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-beta.5(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -655,6 +658,7 @@ importers:
       vitest:
         specifier: 2.0.5
         version: 2.0.5(@types/node@22.1.0)(@vitest/browser@2.0.5)(jsdom@24.1.1)(terser@5.31.1)
+    publishDirectory: build
 
   packages/toolpad-studio:
     dependencies:
@@ -1195,7 +1199,7 @@ importers:
         version: 5.16.6(@emotion/cache@11.13.1)(@emotion/server@11.11.0)(@mui/material@5.16.6(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(next@14.2.5(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@toolpad/core':
         specifier: workspace:*
-        version: link:../../packages/toolpad-core
+        version: link:../../packages/toolpad-core/build
       '@types/node':
         specifier: 20.14.14
         version: 20.14.14
@@ -1240,7 +1244,7 @@ importers:
         version: 5.16.6(@emotion/cache@11.13.1)(@emotion/server@11.11.0)(@mui/material@5.16.6(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(next@14.2.5(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@toolpad/core':
         specifier: workspace:*
-        version: link:../../packages/toolpad-core
+        version: link:../../packages/toolpad-core/build
       '@types/react':
         specifier: 18.3.3
         version: 18.3.3

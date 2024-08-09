@@ -11,7 +11,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "proptypes": "tsx ./scripts/generateProptypes.ts",
-    "install:codesandbox": "corepack enable && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install --no-frozen-lockfile",
+    "install:codesandbox": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install",
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",

@@ -153,18 +153,15 @@ function SignInPage(props: SignInPageProps) {
           alignItems: 'center',
         }}
       >
-        {branding?.logo ? (
-          branding.logo
-        ) : (
+        {branding?.logo ?? (
           <Avatar sx={{ my: 1, mb: 2, bgcolor: 'primary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
         )}
 
         <Typography variant="h5" color="textPrimary" gutterBottom>
-          Sign in {branding?.title ? `to ${branding.title}` : ''}
+          Sign in {branding?.title ? `to ${branding.title}` : null}
         </Typography>
-
         <Typography variant="body2" color="textSecondary" gutterBottom>
           Welcome user, please sign in to continue
         </Typography>

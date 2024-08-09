@@ -329,7 +329,7 @@ importers:
         version: 7.12.0(@types/react@18.3.3)(react@18.3.1)
       '@toolpad/core':
         specifier: workspace:*
-        version: link:../packages/toolpad-core/build
+        version: link:../packages/toolpad-core
       '@toolpad/studio':
         specifier: workspace:*
         version: link:../packages/toolpad-studio
@@ -658,7 +658,6 @@ importers:
       vitest:
         specifier: 2.0.5
         version: 2.0.5(@types/node@22.1.0)(@vitest/browser@2.0.5)(jsdom@24.1.1)(terser@5.31.1)
-    publishDirectory: build
 
   packages/toolpad-studio:
     dependencies:
@@ -1199,7 +1198,7 @@ importers:
         version: 5.16.6(@emotion/cache@11.13.1)(@emotion/server@11.11.0)(@mui/material@5.16.6(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(next@14.2.5(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@toolpad/core':
         specifier: workspace:*
-        version: link:../../packages/toolpad-core/build
+        version: link:../../packages/toolpad-core
       '@types/node':
         specifier: 20.14.14
         version: 20.14.14
@@ -1244,7 +1243,7 @@ importers:
         version: 5.16.6(@emotion/cache@11.13.1)(@emotion/server@11.11.0)(@mui/material@5.16.6(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(next@14.2.5(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@toolpad/core':
         specifier: workspace:*
-        version: link:../../packages/toolpad-core/build
+        version: link:../../packages/toolpad-core
       '@types/react':
         specifier: 18.3.3
         version: 18.3.3
@@ -2058,7 +2057,7 @@ packages:
     resolution: {integrity: sha512-AAH4lEkpmzFWrGVlHaxJB7RLH21uPQ9+He+eFLWHmF9IuFQVugz8eAsamaW0DXRrTfco5zj1wWtpdcXJUOfsag==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
-      '@babel/core': ^7.24.8
+      '@babel/core': ^7.0.0-0
 
   '@babel/preset-typescript@7.24.7':
     resolution: {integrity: sha512-SyXRe3OdWwIwalxDg5UtJnJQO+YPcTfwiIY2B0Xlddh9o7jpWLvv8X1RthIeDOxQ+O1ML5BLPCONToObyVQVuQ==}
@@ -2131,7 +2130,7 @@ packages:
   '@docsearch/react@3.6.0':
     resolution: {integrity: sha512-HUFut4ztcVNmqy9gp/wxNbC7pTOHhgVVkHVGCACTuLhUKUhKAF9KYHJtMiLUJxEqiFLQiuri1fWF8zqwM/cu1w==}
     peerDependencies:
-      '@types/react': 18.3.3
+      '@types/react': '>= 16.8.0 < 19.0.0'
       react: '>= 16.8.0 < 19.0.0'
       react-dom: '>= 16.8.0 < 19.0.0'
       search-insights: '>= 1 < 3'

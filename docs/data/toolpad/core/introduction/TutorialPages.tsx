@@ -6,7 +6,7 @@ import { AppProvider, Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internals';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 const NAVIGATION: Navigation = [
   {

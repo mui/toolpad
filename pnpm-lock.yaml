@@ -97,8 +97,8 @@ importers:
         specifier: 1.0.15
         version: 1.0.15
       '@mui/monorepo':
-        specifier: github:mui/material-ui#85a3b55d22570881db6ac1b99181ef79c18fc58d
-        version: https://codeload.github.com/mui/material-ui/tar.gz/85a3b55d22570881db6ac1b99181ef79c18fc58d(encoding@0.1.13)
+        specifier: github:mui/material-ui#b9a041d089cb50067b853b18fe2b140b2e2f0810
+        version: https://codeload.github.com/mui/material-ui/tar.gz/b9a041d089cb50067b853b18fe2b140b2e2f0810(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.12.0
         version: 7.12.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-beta.5(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -594,15 +594,12 @@ importers:
 
   packages/toolpad-core:
     dependencies:
-      '@mui/base':
-        specifier: 5.0.0-beta.40
-        version: 5.0.0-beta.40(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mui/lab':
         specifier: 5.0.0-alpha.173
         version: 5.0.0-alpha.173(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-beta.5(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mui/utils':
-        specifier: 6.0.0-dev.20240529-082515-213b5e33ab
-        version: 6.0.0-dev.20240529-082515-213b5e33ab(@types/react@18.3.3)(react@18.3.1)
+        specifier: 6.0.0-beta.5
+        version: 6.0.0-beta.5(@types/react@18.3.3)(react@18.3.1)
       '@toolpad/utils':
         specifier: workspace:*
         version: link:../toolpad-utils
@@ -1215,7 +1212,7 @@ importers:
         specifier: 14.2.5
         version: 14.2.5(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
-        specifier: beta
+        specifier: 5.0.0-beta.20
         version: 5.0.0-beta.20(next@14.2.5(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       react:
         specifier: 18.3.1
@@ -1257,7 +1254,7 @@ importers:
         specifier: 14.2.5
         version: 14.2.5(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
-        specifier: beta
+        specifier: 5.0.0-beta.20
         version: 5.0.0-beta.20(next@14.2.5(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       react:
         specifier: 18.3.1
@@ -3001,10 +2998,10 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/85a3b55d22570881db6ac1b99181ef79c18fc58d':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/85a3b55d22570881db6ac1b99181ef79c18fc58d}
-    version: 6.0.0-beta.4
-    engines: {pnpm: 9.5.0}
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/b9a041d089cb50067b853b18fe2b140b2e2f0810':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/b9a041d089cb50067b853b18fe2b140b2e2f0810}
+    version: 6.0.0-beta.5
+    engines: {pnpm: 9.6.0}
 
   '@mui/private-theming@5.16.6':
     resolution: {integrity: sha512-rAk+Rh8Clg7Cd7shZhyt2HGTTE5wYKNSJ5sspf28Fqm/PZ69Er9o6KX25g03/FG2dfpg5GCwZh/xOojiTfm3hw==}
@@ -3163,16 +3160,6 @@ packages:
 
   '@mui/utils@6.0.0-beta.5':
     resolution: {integrity: sha512-QidRa70STALSsTTeeJ7ddyyVbEAK3cVOK350L8tAJLzag79XzNE+lSpU4+UnIna9ftuI9sIJHVxZK6wVw7ATug==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      '@types/react': ^17.0.0 || ^18.0.0
-      react: ^17.0.0 || ^18.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
-  '@mui/utils@6.0.0-dev.20240529-082515-213b5e33ab':
-    resolution: {integrity: sha512-jyNcB0drDhYcoq5MHNTiEc63GfVE1GZK+CVUd8tlLzk5q631RPYJ5jONSOszLiUOXBmI8Uu1SBJUwrG3j2YG2A==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0
@@ -12168,7 +12155,7 @@ snapshots:
       '@emotion/styled': 11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@types/react': 18.3.3
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/85a3b55d22570881db6ac1b99181ef79c18fc58d(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/b9a041d089cb50067b853b18fe2b140b2e2f0810(encoding@0.1.13)':
     dependencies:
       '@googleapis/sheets': 8.0.0(encoding@0.1.13)
       '@netlify/functions': 2.8.1
@@ -12345,16 +12332,6 @@ snapshots:
       '@mui/types': 7.2.15(@types/react@18.3.3)
       '@types/prop-types': 15.7.12
       clsx: 2.1.1
-      prop-types: 15.8.1
-      react: 18.3.1
-      react-is: 18.3.1
-    optionalDependencies:
-      '@types/react': 18.3.3
-
-  '@mui/utils@6.0.0-dev.20240529-082515-213b5e33ab(@types/react@18.3.3)(react@18.3.1)':
-    dependencies:
-      '@babel/runtime': 7.25.0
-      '@types/prop-types': 15.7.12
       prop-types: 15.8.1
       react: 18.3.1
       react-is: 18.3.1

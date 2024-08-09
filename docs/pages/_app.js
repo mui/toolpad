@@ -19,6 +19,8 @@ import findActivePage from 'docs/src/modules/utils/findActivePage';
 import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
 import getProductInfoFromUrl from 'docs/src/modules/utils/getProductInfoFromUrl';
 import toolpadPkgJson from '@toolpad/studio/package.json';
+// TODO: figure out eslint resolution errors for this file
+// eslint-disable-next-line import/no-unresolved
 import toolpadCorePkgJson from '@toolpad/core/package.json';
 import { DocsProvider } from '@mui/docs/DocsProvider';
 import toolpadStudioPages from '../data/toolpad/studio/pages';

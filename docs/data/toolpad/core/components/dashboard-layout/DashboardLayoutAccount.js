@@ -47,7 +47,7 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-function AccountWithDashboard(props) {
+function DashboardLayoutAccount(props) {
   const { window } = props;
 
   const [session, setSession] = React.useState({
@@ -106,7 +106,7 @@ function AccountWithDashboard(props) {
   );
 }
 
-AccountWithDashboard.propTypes = {
+DashboardLayoutAccount.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -114,4 +114,4 @@ AccountWithDashboard.propTypes = {
   window: PropTypes.func,
 };
 
-export default AccountWithDashboard;
+export default DashboardLayoutAccount;

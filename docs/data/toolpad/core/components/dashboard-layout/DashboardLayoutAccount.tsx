@@ -51,7 +51,7 @@ interface DemoProps {
   window?: () => Window;
 }
 
-export default function AccountWithDashboard(props: DemoProps) {
+export default function DashboardLayoutAccount(props: DemoProps) {
   const { window } = props;
 
   const [session, setSession] = React.useState<Session | null>({

@@ -90,4 +90,4 @@ The `DashboardLayout` comes integrated with the [`<Account />`](/toolpad/core/re
 The use of an `iframe` may cause some spacing issues in the following demo.
 :::
 
-{{"demo": "../account/AccountWithDashboard.js", "height": 400, "iframe": true}}
+{{"demo": "DashboardLayoutAccount.js", "height": 400, "iframe": true}}

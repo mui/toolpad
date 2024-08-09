@@ -65,7 +65,7 @@ const NAVIGATION: Navigation = [
 function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('/dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {
@@ -159,7 +159,7 @@ const PlaceHolder = styled('div')<{ height: number }>(({ theme, height }) => ({
 function DashboardLayoutBasic(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/page');
+  const [pathname, setPathname] = React.useState('/dashboard');
 
   const router = React.useMemo<Router>(() => {
     return {

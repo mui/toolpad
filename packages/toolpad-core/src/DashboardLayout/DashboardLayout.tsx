@@ -384,7 +384,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     <Box sx={{ display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
         {
-          // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
+          // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
         }
         <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
           <Box sx={{ display: { xs: 'block', md: 'none' } }}>

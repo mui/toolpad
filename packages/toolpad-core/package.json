@@ -10,12 +10,12 @@
     ".": {
       "types": "./index.d.ts",
       "import": "./index.js",
-      "require": null
+      "require": "./node/index.js"
     },
     "./*": {
       "types": "./*/index.d.ts",
       "import": "./*/index.js",
-      "require": null
+      "require": "./node/*/index.js"
     }
   },
   "keywords": [
@@ -41,7 +41,7 @@
     "clean": "rimraf build",
     "prebuild": "pnpm clean",
     "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files && pnpm esmify",
-    "esmify": "rm -rf ./build/node && rm -rf ./build/*/package.json",
+    "esmify": "rm -rf ./build/*/package.json",
     "build:node": "node ../../scripts/build.mjs node",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",

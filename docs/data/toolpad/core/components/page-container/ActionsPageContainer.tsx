@@ -9,7 +9,8 @@ import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 import Button from '@mui/material/Button';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import dayjs from 'dayjs';
-import { Paper, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
 import PageContent from './PageContent';
 
 const NAVIGATION = [

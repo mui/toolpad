@@ -4,15 +4,11 @@ import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDo
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
 import type { JSONSchema7, JSONSchema7Definition } from 'json-schema';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
-import {
-  ButtonBase,
-  Collapse,
-  Tooltip,
-  TooltipProps,
-  Typography,
-  styled,
-  tooltipClasses,
-} from '@mui/material';
+import ButtonBase from '@mui/material/ButtonBase';
+import Collapse from '@mui/material/Collapse';
+import Tooltip, { tooltipClasses, TooltipProps } from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
+import { styled } from '@mui/material/styles';
 import invariant from 'invariant';
 import clsx from 'clsx';
 import { SectionTitle } from '@mui/docs/SectionTitle';

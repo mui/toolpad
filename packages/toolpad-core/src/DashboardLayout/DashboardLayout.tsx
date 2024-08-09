@@ -52,6 +52,7 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderStyle: 'solid',
   borderColor: (theme.vars ?? theme).palette.divider,
   boxShadow: 'none',
+  // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
   left: 0,
   zIndex: theme.zIndex.drawer + 1,
 }));
@@ -382,7 +383,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
-        <Toolbar sx={{ backgroundColor: 'inherit', width: '100vw' }}>
+        {
+          // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
+        }
+        <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
           <Box sx={{ display: { xs: 'block', md: 'none' } }}>
             <Tooltip
               title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
@@ -470,6 +474,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         component="main"
         sx={{
           flexGrow: 1,
+          // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
           minWidth: { xs: isMobileNavigationOpen ? '100vw' : 'auto', md: 'auto' },
         }}
       >

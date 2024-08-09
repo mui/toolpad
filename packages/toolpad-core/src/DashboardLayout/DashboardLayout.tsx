@@ -363,10 +363,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     setIsMobileNavigationOpen((previousOpen) => !previousOpen);
   }, []);
 
-  const handleNavigationItemClick = React.useCallback((item: NavigationPageItem) => {
-    if (!item.children) {
-      setIsMobileNavigationOpen(false);
-    }
+  const handleNavigationItemClick = React.useCallback(() => {
+    setIsMobileNavigationOpen(false);
   }, []);
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need

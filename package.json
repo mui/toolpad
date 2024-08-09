@@ -11,7 +11,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "proptypes": "tsx ./scripts/generateProptypes.ts",
-    "install:codesandbox": "corepack enable && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install --no-frozen-lockfile",
+    "install:codesandbox": "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install",
     "markdownlint": "markdownlint-cli2 \"**/*.md\"",
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
@@ -57,7 +57,7 @@
     "@mui/internal-markdown": "1.0.9",
     "@mui/internal-scripts": "1.0.15",
     "@mui/monorepo": "github:mui/material-ui#b9a041d089cb50067b853b18fe2b140b2e2f0810",
-    "@mui/x-charts": "7.12.0",
+    "@mui/x-charts": "7.12.1",
     "@next/eslint-plugin-next": "14.2.5",
     "@playwright/test": "1.45.3",
     "@testing-library/jest-dom": "^6.4.8",

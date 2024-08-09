@@ -61,19 +61,19 @@ export default withDocsInfra({
           'docs-toolpad': path.resolve(WORKSPACE_ROOT, './docs'),
           ...MONOREPO_PACKAGES,
           '@toolpad/studio-components': path.resolve(
-            currentDirectory,
-            '../packages/toolpad-studio-components/src',
+            WORKSPACE_ROOT,
+            './packages/toolpad-studio-components/src',
           ),
           '@toolpad/studio-runtime': path.resolve(
-            currentDirectory,
-            '../packages/toolpad-studio-runtime/src',
+            WORKSPACE_ROOT,
+            './packages/toolpad-studio-runtime/src',
           ),
-          '@toolpad/utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
+          '@toolpad/utils': path.resolve(WORKSPACE_ROOT, './packages/toolpad-utils/src'),
           '@toolpad/core/package.json': path.resolve(
-            currentDirectory,
-            '../packages/toolpad-core/package.json',
+            WORKSPACE_ROOT,
+            './packages/toolpad-core/package.json',
           ),
-          '@toolpad/core': path.resolve(currentDirectory, '../packages/toolpad-core/src'),
+          '@toolpad/core': path.resolve(WORKSPACE_ROOT, './packages/toolpad-core/src'),
         },
       },
       module: {

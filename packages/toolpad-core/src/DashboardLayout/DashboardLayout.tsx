@@ -149,7 +149,7 @@ interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
-  onSidebarLinkClick: () => void;
+  onLinkClick: () => void;
   validatedItemIds: Set<string>;
   uniqueItemPaths: Set<string>;
 }
@@ -158,7 +158,7 @@ function DashboardSidebarSubNavigation({
   subNavigation,
   basePath = '',
   depth = 0,
-  onSidebarLinkClick,
+  onLinkClick,
   validatedItemIds,
   uniqueItemPaths,
 }: DashboardSidebarSubNavigationProps) {
@@ -254,7 +254,7 @@ function DashboardSidebarSubNavigation({
                 : {
                     LinkComponent: Link,
                     href: navigationItemFullPath,
-                    onClick: onSidebarLinkClick,
+                    onClick: onLinkClick,
                   })}
             >
               {navigationItem.icon ? (
@@ -300,7 +300,7 @@ function DashboardSidebarSubNavigation({
                   subNavigation={navigationItem.children}
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
-                  onSidebarLinkClick={onSidebarLinkClick}
+                  onLinkClick={onLinkClick}
                   validatedItemIds={validatedItemIds}
                   uniqueItemPaths={uniqueItemPaths}
                 />
@@ -371,7 +371,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}>
         <DashboardSidebarSubNavigation
           subNavigation={navigation}
-          onSidebarLinkClick={handleNavigationLinkClick}
+          onLinkClick={handleNavigationLinkClick}
           validatedItemIds={validatedItemIdsRef.current}
           uniqueItemPaths={uniqueItemPathsRef.current}
         />

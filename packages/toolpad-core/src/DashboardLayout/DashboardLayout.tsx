@@ -35,7 +35,7 @@ import {
   RouterContext,
   WindowContext,
 } from '../shared/context';
-import type { Navigation, NavigationPageItem } from '../AppProvider';
+import type { Navigation } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
 import {
   getItemTitle,
@@ -52,6 +52,7 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderStyle: 'solid',
   borderColor: (theme.vars ?? theme).palette.divider,
   boxShadow: 'none',
+  // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
   left: 0,
   zIndex: theme.zIndex.drawer + 1,
 }));
@@ -148,7 +149,7 @@ interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
-  onSidebarLinkClick?: (item: NavigationPageItem) => void;
+  onLinkClick: () => void;
   validatedItemIds: Set<string>;
   uniqueItemPaths: Set<string>;
 }
@@ -157,7 +158,7 @@ function DashboardSidebarSubNavigation({
   subNavigation,
   basePath = '',
   depth = 0,
-  onSidebarLinkClick,
+  onLinkClick,
   validatedItemIds,
   uniqueItemPaths,
 }: DashboardSidebarSubNavigationProps) {
@@ -181,15 +182,6 @@ function DashboardSidebarSubNavigation({
 
   const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState(
     initialExpandedSidebarItemIds,
-  );
-
-  const handleLinkClick = React.useCallback(
-    (item: NavigationPageItem) => () => {
-      if (onSidebarLinkClick) {
-        onSidebarLinkClick(item);
-      }
-    },
-    [onSidebarLinkClick],
   );
 
   const handleOpenFolderClick = React.useCallback(
@@ -262,7 +254,7 @@ function DashboardSidebarSubNavigation({
                 : {
                     LinkComponent: Link,
                     href: navigationItemFullPath,
-                    onClick: handleLinkClick(navigationItem),
+                    onClick: onLinkClick,
                   })}
             >
               {navigationItem.icon ? (
@@ -308,7 +300,7 @@ function DashboardSidebarSubNavigation({
                   subNavigation={navigationItem.children}
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
-                  onSidebarLinkClick={onSidebarLinkClick}
+                  onLinkClick={onLinkClick}
                   validatedItemIds={validatedItemIds}
                   uniqueItemPaths={uniqueItemPaths}
                 />
@@ -362,10 +354,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     setIsMobileNavigationOpen((previousOpen) => !previousOpen);
   }, []);
 
-  const handleNavigationItemClick = React.useCallback((item: NavigationPageItem) => {
-    if (!item.children) {
-      setIsMobileNavigationOpen(false);
-    }
+  const handleNavigationLinkClick = React.useCallback(() => {
+    setIsMobileNavigationOpen(false);
   }, []);
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
@@ -381,7 +371,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}>
         <DashboardSidebarSubNavigation
           subNavigation={navigation}
-          onSidebarLinkClick={handleNavigationItemClick}
+          onLinkClick={handleNavigationLinkClick}
           validatedItemIds={validatedItemIdsRef.current}
           uniqueItemPaths={uniqueItemPathsRef.current}
         />
@@ -392,7 +382,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
-        <Toolbar sx={{ backgroundColor: 'inherit', width: '100vw' }}>
+        {
+          // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
+        }
+        <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
           <Box sx={{ display: { xs: 'block', md: 'none' } }}>
             <Tooltip
               title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
@@ -476,9 +469,16 @@ function DashboardLayout(props: DashboardLayoutProps) {
       >
         {drawerContent}
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
+          minWidth: { xs: isMobileNavigationOpen ? '100vw' : 'auto', md: 'auto' },
+        }}
+      >
         <Toolbar />
-        <div>{children}</div>
+        {children}
       </Box>
     </Box>
   );

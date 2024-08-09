@@ -183,7 +183,7 @@ function DashboardSidebarSubNavigation({
     initialExpandedSidebarItemIds,
   );
 
-  const handleNavigationLinkClick = React.useCallback(
+  const handleLinkClick = React.useCallback(
     (item: NavigationPageItem) => () => {
       if (onSidebarLinkClick) {
         onSidebarLinkClick(item);
@@ -262,7 +262,7 @@ function DashboardSidebarSubNavigation({
                 : {
                     LinkComponent: Link,
                     href: navigationItemFullPath,
-                    onClick: handleNavigationLinkClick(navigationItem),
+                    onClick: handleLinkClick(navigationItem),
                   })}
             >
               {navigationItem.icon ? (

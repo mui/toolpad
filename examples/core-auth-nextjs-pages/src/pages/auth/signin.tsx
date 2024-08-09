@@ -44,7 +44,6 @@ export default function SignIn({
           return {};
         } catch (error) {
           // An error boundary must exist to handle unknown errors
-          console.log('Is this happening');
           return {
             error: 'Something went wrong.',
             type: 'UnknownError',

@@ -47,8 +47,6 @@ describe('PageContainer', () => {
   });
 
   test('renders nested', async () => {
-    const user = await userEvent.setup();
-
     const navigation = [
       {
         segment: 'home',

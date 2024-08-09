@@ -17,7 +17,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import Stack from '@mui/material/Stack';
-import { BrandingContext, DocsContext } from '../shared/context';
+import { BrandingContext, DocsContext, RouterContext } from '../shared/context';
 
 const IconProviderMap = new Map<string, React.ReactNode>([
   ['github', <GitHubIcon key="github" />],
@@ -136,10 +136,9 @@ function SignInPage(props: SignInPageProps) {
     error: '',
   });
 
-  const callbackUrl =
-    typeof window !== 'undefined'
-      ? (new URLSearchParams(window.location.search).get('callbackUrl') ?? '/')
-      : '/';
+  const router = React.useContext(RouterContext);
+
+  const callbackUrl = router?.searchParams.get('callbackUrl') ?? '/';
 
   const singleProvider = React.useMemo(() => providers?.length === 1, [providers]);
 

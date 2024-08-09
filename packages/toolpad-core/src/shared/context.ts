@@ -2,7 +2,16 @@ import * as React from 'react';
 import type { PaletteMode } from '@mui/material';
 import type { Branding, Navigation, Router } from '../AppProvider';
 
-export const BrandingContext = React.createContext<Branding | null>(null);
+if ((globalThis as any).BrandingContext) {
+  console.error(
+    'WARNING: module is being loaded more than once, multiple contexts will be created.',
+  );
+}
+
+(globalThis as any).BrandingContext =
+  (globalThis as any).BrandingContext ?? React.createContext<Branding | null>(null);
+
+export const BrandingContext: React.Context<Branding | null> = (globalThis as any).BrandingContext;
 
 export const NavigationContext = React.createContext<Navigation>([]);
 

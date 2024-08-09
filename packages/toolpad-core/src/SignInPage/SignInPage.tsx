@@ -141,12 +141,6 @@ function SignInPage(props: SignInPageProps) {
       ? (new URLSearchParams(window.location.search).get('callbackUrl') ?? '/')
       : '/';
 
-  const [isClient, setIsClient] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   const singleProvider = React.useMemo(() => providers?.length === 1, [providers]);
 
   return (
@@ -159,7 +153,7 @@ function SignInPage(props: SignInPageProps) {
           alignItems: 'center',
         }}
       >
-        {isClient && branding?.logo ? (
+        {branding?.logo ? (
           branding.logo
         ) : (
           <Avatar sx={{ my: 1, mb: 2, bgcolor: 'primary.main' }}>
@@ -168,7 +162,7 @@ function SignInPage(props: SignInPageProps) {
         )}
 
         <Typography variant="h5" color="textPrimary" gutterBottom>
-          Sign in {isClient && branding?.title ? `to ${branding.title}` : ''}
+          Sign in {branding?.title ? `to ${branding.title}` : ''}
         </Typography>
 
         <Typography variant="body2" color="textSecondary" gutterBottom>

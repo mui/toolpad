@@ -3,19 +3,19 @@
   "version": "0.5.0",
   "author": "Toolpad Team",
   "description": "Dashboard framework powered by MUI.",
-  "main": "./build/node/index.js",
-  "module": "./build/index.js",
+  "main": "./node/index.js",
+  "module": "./index.js",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./build/index.d.ts",
-      "import": "./build/index.js",
-      "require": "./build/node/index.js"
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./node/index.js"
     },
     "./*": {
-      "types": "./build/*/index.d.ts",
-      "import": "./build/*/index.js",
-      "require": "./build/node/*/index.js"
+      "types": "./*/index.d.ts",
+      "import": "./*/index.js",
+      "require": "./node/*/index.js"
     }
   },
   "keywords": [
@@ -91,13 +91,9 @@
   },
   "sideEffects": false,
   "publishConfig": {
-    "access": "public",
-    "directory": "build"
+    "access": "public"
   },
   "engines": {
     "node": ">=14.0.0"
-  },
-  "files": [
-    "build"
-  ]
+  }
 }

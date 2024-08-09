@@ -7,7 +7,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { useDemoRouter } from '@toolpad/core/internals';
 import Grid from '@mui/material/Grid2';
-import { extendTheme, styled, useTheme } from '@mui/material/styles';
+import { createTheme, styled, useTheme } from '@mui/material/styles';
 
 const code = `
 <PageContainer>
@@ -31,7 +31,10 @@ function PageContainerDemp() {
   const theme = useTheme();
   const demoTheme = React.useMemo(
     () =>
-      extendTheme({
+      createTheme({
+        cssVariables: {
+          colorSchemeSelector: 'data-toolpad-color-scheme',
+        },
         colorSchemes: {
           [theme.palette.mode === 'light' ? 'light' : 'dark']: true,
         },

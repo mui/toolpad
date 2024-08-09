@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNonNullableContext } from '@toolpad/utils/react';
-import { useSlotProps } from '@mui/base/utils';
+import useSlotProps from '@mui/utils/useSlotProps';
 import { NotificationsContext } from './NotificationsContext';
 import type {
   CloseNotification,

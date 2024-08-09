@@ -6,7 +6,7 @@ import Container, { ContainerProps } from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { useSlotProps } from '@mui/base/utils';
+import useSlotProps from '@mui/utils/useSlotProps';
 import { styled } from '@mui/material';
 import { Link as ToolpadLink } from '../shared/Link';
 import { PageContainerToolbar, PageContainerToolbarProps } from './PageContainerToolbar';

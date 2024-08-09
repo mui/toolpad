@@ -8,11 +8,13 @@
     "./package.json": "./package.json",
     ".": {
       "types": "./build/index.d.ts",
-      "default": "./build/index.js"
+      "import": "./build/index.js",
+      "require": "./build/node/index.js"
     },
     "./*": {
       "types": "./build/*/index.d.ts",
-      "default": "./build/*/index.js"
+      "import": "./build/*/index.js",
+      "require": "./build/node/*/index.js"
     }
   },
   "keywords": [
@@ -51,17 +53,16 @@
     "test:browser:dev": "vitest --browser.enabled"
   },
   "dependencies": {
-    "@mui/base": "5.0.0-beta.40",
-    "@mui/lab": "5.0.0-alpha.172",
-    "@mui/utils": "6.0.0-beta.1",
+    "@mui/lab": "5.0.0-alpha.173",
+    "@mui/utils": "6.0.0-beta.5",
     "@toolpad/utils": "workspace:*",
     "client-only": "^0.0.1",
     "invariant": "2.2.4",
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "6.0.0-beta.2",
-    "@mui/material": "6.0.0-beta.2",
+    "@mui/icons-material": "next",
+    "@mui/material": "next",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.12",
     "@types/react": "18.3.3",

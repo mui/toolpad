@@ -10,6 +10,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core';
+import theme from '../theme';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;  
@@ -38,6 +39,7 @@ const NAVIGATION: Navigation = [
 
 const BRANDING = {
   title: 'My Toolpad Core App',
+  logo: <DashboardIcon />,
 };
 
 
@@ -59,7 +61,8 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       </Head>
       <AppProvider
         navigation={NAVIGATION}
-        branding={BRANDING}                
+        branding={BRANDING}          
+        theme={theme}      
       >
         {children}
       </AppProvider>

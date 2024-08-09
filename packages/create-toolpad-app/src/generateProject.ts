@@ -1,23 +1,28 @@
+// Common files for all apps
 import theme from './templates/theme';
 import eslintConfig from './templates/eslintConfig';
 import nextConfig from './templates/nextConfig';
 import nextTypes from './templates/nextTypes';
 import tsConfig from './templates/tsConfig';
-import packageJson from './templates/packageJson';
 import readme from './templates/readme';
 import gitignore from './templates/gitignore';
 
+// App router specific files
+import packageJsonApp from './templates/packageJson';
 import rootLayout from './templates/rootLayout';
 import rootPage from './templates/rootPage';
 import NavigateButton from './templates/navigateButton';
 import dashboardLayout from './templates/dashboardLayout';
 import dashboardPage from './templates/dashboardPage';
 
+// Pages router specific files
+import packageJsonPages from './templates/nextjs-pages/packageJson';
 import indexPage from './templates/nextjs-pages/indexPage';
 import ordersPage from './templates/nextjs-pages/ordersPage';
 import app from './templates/nextjs-pages/app';
 import document from './templates/nextjs-pages/document';
 
+// Auth specific files for all apps
 import providerImport from './templates/auth/providerImport';
 import credentialsProvider from './templates/auth/credentialsProvider';
 import oAuthProvider from './templates/auth/oAuthProvider';
@@ -29,12 +34,15 @@ import authEnv from './templates/auth/env';
 import authProviderEnv from './templates/auth/providerEnv';
 import middleware from './templates/auth/middleware';
 
+// Auth files for app router
 import routeHandler from './templates/auth/nextjs-app/route';
 import signInPage from './templates/auth/nextjs-app/signInPage';
-import packageJsonAuth from './templates/auth/packageJson';
+import packageJsonAuthApp from './templates/auth/nextjs-app/packageJson';
 import dashboardPageAuthApp from './templates/auth/nextjs-app/dashboardPage';
 import rootLayoutAuthApp from './templates/auth/nextjs-app/rootLayout';
 
+// Auth files for pages router
+import packageJsonAuthPages from './templates/auth/nextjs-pages/packageJson';
 import appAuthPages from './templates/auth/nextjs-pages/app';
 import signInPagePagesRouter from './templates/auth/nextjs-pages/signIn';
 
@@ -83,7 +91,6 @@ export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
   // Add app name to package.json
-  const packageJsonContent = packageJson(options.name, options.coreVersion);
 
   // Default files, common to all apps
   const files = new Map<string, { content: string }>([
@@ -92,14 +99,15 @@ export default function generateProject(
     ['next.config.mjs', { content: nextConfig.content }],
     ['.eslintrc.json', { content: eslintConfig.content }],
     ['tsconfig.json', { content: tsConfig.content }],
-    ['package.json', { content: JSON.stringify(packageJsonContent, null, 2) }],
     ['README.md', { content: readme.content }],
     ['.gitignore', { content: gitignore.content }],
   ]);
 
   switch (options.router) {
     case 'nextjs-pages': {
+      const packageJsonPagesContent = packageJsonPages(options.name, options.coreVersion);
       const nextJsPagesRouterStarter = new Map([
+        ['package.json', { content: JSON.stringify(packageJsonPagesContent, null, 2) }],
         ['pages/index.tsx', { content: indexPage.content }],
         ['pages/orders/index.tsx', { content: ordersPage.content }],
         ['pages/_app.tsx', { content: app.content }],
@@ -107,14 +115,14 @@ export default function generateProject(
       ]);
       if (options.auth) {
         const { authContent, envContent } = generateAuthContent(options.authProviders);
-        const packageJsonAuthContent = packageJsonAuth(options.name, options.coreVersion);
+        const packageJsonAuthPagesContent = packageJsonAuthPages(options.name, options.coreVersion);
         const authFiles = new Map([
           ['auth.ts', { content: authContent }],
           ['.env.local', { content: envContent }],
           ['middleware.ts', { content: middleware.content }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler.content }],
           ['pages/auth/signin.tsx', { content: signInPagePagesRouter.content }],
-          ['package.json', { content: JSON.stringify(packageJsonAuthContent, null, 2) }],
+          ['package.json', { content: JSON.stringify(packageJsonAuthPagesContent, null, 2) }],
           ['pages/_app.tsx', { content: appAuthPages.content }],
         ]);
         return new Map([...files, ...nextJsPagesRouterStarter, ...authFiles]);
@@ -123,7 +131,9 @@ export default function generateProject(
     }
     case 'nextjs-app':
     default: {
+      const packageJsonAppContent = packageJsonApp(options.name, options.coreVersion);
       const nextJsAppRouterStarter = new Map([
+        ['package.json', { content: JSON.stringify(packageJsonAppContent, null, 2) }],
         ['app/(dashboard)/layout.tsx', { content: dashboardLayout.content }],
         ['app/layout.tsx', { content: rootLayout.content }],
         ['app/page.tsx', { content: rootPage.content }],
@@ -132,7 +142,7 @@ export default function generateProject(
       ]);
       if (options.auth) {
         const { authContent, envContent } = generateAuthContent(options.authProviders);
-        const packageJsonAuthContent = packageJsonAuth(options.name, options.coreVersion);
+        const packageJsonAuthAppContent = packageJsonAuthApp(options.name, options.coreVersion);
 
         const authFiles = new Map([
           ['auth.ts', { content: authContent }],
@@ -140,7 +150,7 @@ export default function generateProject(
           ['middleware.ts', { content: middleware.content }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler.content }],
           ['app/auth/signin/page.tsx', { content: signInPage.content }],
-          ['package.json', { content: JSON.stringify(packageJsonAuthContent, null, 2) }],
+          ['package.json', { content: JSON.stringify(packageJsonAuthAppContent, null, 2) }],
           ['app/(dashboard)/page.tsx', { content: dashboardPageAuthApp.content }],
           ['app/layout.tsx', { content: rootLayoutAuthApp.content }],
         ]);

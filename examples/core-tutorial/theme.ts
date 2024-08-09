@@ -1,32 +1,13 @@
 'use client';
 import { createTheme } from '@mui/material/styles';
 
-const theme = createTheme({
-  cssVariables: {
-    colorSchemeSelector: 'data-toolpad-color-scheme',
-  },
-  colorSchemes: {
-    light: {
-      palette: {
-        background: {
-          default: 'var(--mui-palette-grey-50)',
-          defaultChannel: 'var(--mui-palette-grey-50)',
-        },
-      },
-    },
-    dark: {
-      palette: {
-        background: {
-          default: 'var(--mui-palette-grey-900)',
-          defaultChannel: 'var(--mui-palette-grey-900)',
-        },
-        text: {
-          primary: 'var(--mui-palette-grey-200)',
-          primaryChannel: 'var(--mui-palette-grey-200)',
-        },
-      },
-    },
-  },
-});
+const lightTheme = createTheme();
+
+const darkTheme = createTheme({ palette: { mode: 'dark' } });
+
+const theme = {
+  light: lightTheme,
+  dark: darkTheme,
+};
 
 export default theme;

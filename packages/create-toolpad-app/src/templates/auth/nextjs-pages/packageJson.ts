@@ -1,4 +1,4 @@
-import { PackageJsonTemplate } from '../../types';
+import { PackageJsonTemplate } from '../../../types';
 
 const packageJson: PackageJsonTemplate = (appName, coreVersion) => ({
   name: appName,
@@ -10,15 +10,17 @@ const packageJson: PackageJsonTemplate = (appName, coreVersion) => ({
     lint: 'next lint',
   },
   dependencies: {
-    '@emotion/react': '^11.11.4',
-    '@emotion/styled': '^11.11.5',
+    '@emotion/react': '^11',
+    '@emotion/styled': '^11',
+    '@emotion/cache': '^11',
+    '@emotion/server': '^11',
     '@mui/icons-material': '^5',
     '@mui/lab': '^5',
     '@mui/material': '^5',
     '@mui/material-nextjs': '^5',
     '@toolpad/core': coreVersion ?? 'latest',
     next: '^14',
-    'next-auth': 'beta',
+    'next-auth': '5.0.0-beta.20',
     react: '^18',
     'react-dom': '^18',
   },

@@ -4,7 +4,7 @@ title: Toolpad Overview
 
 # Toolpad Core
 
-<p class="description">A framework to build full-stack apps, fast. It can be used as a Next.js starter, or integrated within an existing React project to build dashboards and internal tools. </p>
+<p class="description">A framework to build full-stack apps faster.</p>
 
 This framework leverages the existing suite of components offered by MUI, and ties them together with the most commonly-used backend integrations to help you create dashboards fast. Imagine a React dashboard template but with backend features like authentication, role-based access control and data fetching already included. It comes with the guarantee of MUI's enterprise-tested components, and the Toolpad team's focus on using the latest stable libraries, and prioritising razor-sharp performance.
 

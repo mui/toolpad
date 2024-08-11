@@ -132,7 +132,7 @@
     "react-hook-form": "7.52.2",
     "react-inspector": "6.0.2",
     "react-is": "18.3.1",
-    "react-resizable-panels": "2.0.22",
+    "react-resizable-panels": "2.0.23",
     "react-router-dom": "6.24.1",
     "semver": "7.6.3",
     "serialize-javascript": "6.0.2",

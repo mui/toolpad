@@ -1,5 +1,42 @@
 # Changelog
 
+## v0.5.1
+
+<!-- generated comparing v0.5.0..master -->
+
+_Aug 9, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
+- Fix theme switcher in documentation examples
+- Fix DashboardLayout bugs with theming and mobile navigation
+- Fix some file handling restrictions in `@toolpad/studio`
+
+### `@toolpad/core`
+
+- &#8203;<!-- 08 --> Replace `CssVarsProvider` with `ThemeProvider` (#3872) @siriwatknp
+- &#8203;<!-- 03 --> Match v5 compatibility (#3906) @bharatkashyap
+- &#8203;<!-- 12 --> Fix some DashboardLayout bugs and make some docs examples more consistent (#3905) @apedroferreira
+- &#8203;<!-- 11 --> Refix mobile menu closing when link is clicked (#3915) @apedroferreira
+- &#8203;<!-- 09 --> Remove @mui/base dependency from @toolpad/core (#3912) @Janpot
+- &#8203;<!-- 01 --> Add test for nested routes in PageContainer (#3840) @Janpot
+
+### `@toolpad/studio`
+
+- &#8203;<!-- 13 --> Increase body-parser limit (#3903) @Janpot
+- &#8203;<!-- 02 --> Support Blob in js expressions (#3907) @Janpot
+
+### Core
+
+- &#8203;<!-- 14 --> Support `require` (#3908) @bharatkashyap
+- &#8203;<!-- 10 --> Port fixes from Material UI v6 migration branch (#3910) @Janpot
+- &#8203;<!-- 07 --> Upgrade monorepo (#3911) @Janpot
+- &#8203;<!-- 06 --> Clarify security policy @oliviertassinari
+- &#8203;<!-- 04 --> Update smoke test instructions (#3899) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @siriwatknp
+
 ## v0.5.0
 
 <!-- generated comparing v0.4.0..master -->

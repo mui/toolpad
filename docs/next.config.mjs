@@ -19,6 +19,9 @@ const MONOREPO_PACKAGES = {
   '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
 };
 
+const toolpadCorePkg = require('../packages/toolpad-core/package.json');
+const toolpadStudioPkg = require('../packages/toolpad-studio/package.json');
+
 export default withDocsInfra({
   transpilePackages: [
     // TODO, those shouldn't be needed in the first place
@@ -38,6 +41,8 @@ export default withDocsInfra({
     GITHUB_TEMPLATE_DOCS_FEEDBACK: '4.docs-feedback.yml',
     // Toolpad related
     // …
+    TOOLPAD_CORE_VERSION: toolpadCorePkg.version,
+    TOOLPAD_STUDIO_VERSION: toolpadStudioPkg.version,
   },
   webpack: (config, options) => {
     return {
@@ -61,19 +66,15 @@ export default withDocsInfra({
           'docs-toolpad': path.resolve(WORKSPACE_ROOT, './docs'),
           ...MONOREPO_PACKAGES,
           '@toolpad/studio-components': path.resolve(
-            currentDirectory,
-            '../packages/toolpad-studio-components/src',
+            WORKSPACE_ROOT,
+            './packages/toolpad-studio-components/src',
           ),
           '@toolpad/studio-runtime': path.resolve(
-            currentDirectory,
-            '../packages/toolpad-studio-runtime/src',
+            WORKSPACE_ROOT,
+            './packages/toolpad-studio-runtime/src',
           ),
-          '@toolpad/utils': path.resolve(currentDirectory, '../packages/toolpad-utils/src'),
-          '@toolpad/core/package.json': path.resolve(
-            currentDirectory,
-            '../packages/toolpad-core/package.json',
-          ),
-          '@toolpad/core': path.resolve(currentDirectory, '../packages/toolpad-core/src'),
+          '@toolpad/utils': path.resolve(WORKSPACE_ROOT, './packages/toolpad-utils/src'),
+          '@toolpad/core': path.resolve(WORKSPACE_ROOT, './packages/toolpad-core/src'),
         },
       },
       module: {

@@ -25,18 +25,13 @@ export default function SignIn({
               : { callbackUrl: callbackUrl ?? '/' },
           );
           if (signInResponse && signInResponse.error) {
-            // Workaround for "Configuration" being returned as an error
-            // in case of invalid credentials when using credentials provider
-            // https://github.com/nextauthjs/next-auth/issues/11190
-            if (signInResponse.error === 'Configuration' && provider.id === 'credentials') {
-              return {
-                error: 'Invalid credentials.',
-                type: 'CredentialsSignin',
-              };
-            }
+            // Handle Auth.js errors
             return {
-              error: signInResponse.error,
-              type: 'AuthError',
+              error:
+                signInResponse.error === 'CredentialsSignin'
+                  ? 'Invalid credentials'
+                  : 'An error with Auth.js occurred',
+              type: signInResponse.error,
             };
           }
           // If the sign in was successful,

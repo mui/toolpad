@@ -64,7 +64,7 @@ yarn && yarn dev
 1. To add a new page and make it appear in the sidebar navigation, create a new folder within the `(dashboard)` directory titled `page-2` and add the following content to `page.tsx` inside it:
 
 ```tsx title="./(dashboard)/page-2/page.tsx"
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 export default function Home() {
   return (

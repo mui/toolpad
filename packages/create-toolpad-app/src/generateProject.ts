@@ -6,6 +6,7 @@ import nextTypes from './templates/nextTypes';
 import tsConfig from './templates/tsConfig';
 import readme from './templates/readme';
 import gitignore from './templates/gitignore';
+import ordersPage from './templates/ordersPage';
 
 // App router specific files
 import packageJsonApp from './templates/packageJson';
@@ -18,7 +19,7 @@ import dashboardPage from './templates/dashboardPage';
 // Pages router specific files
 import packageJsonPages from './templates/nextjs-pages/packageJson';
 import indexPage from './templates/nextjs-pages/indexPage';
-import ordersPage from './templates/nextjs-pages/ordersPage';
+
 import app from './templates/nextjs-pages/app';
 import document from './templates/nextjs-pages/document';
 
@@ -139,6 +140,7 @@ export default function generateProject(
         ['app/page.tsx', { content: rootPage.content }],
         ['app/NavigateButton.tsx', { content: NavigateButton.content }],
         ['app/(dashboard)/page/page.tsx', { content: dashboardPage.content }],
+        ['app/(dashboard)/orders/page.tsx', { content: ordersPage.content }],
       ]);
       if (options.auth) {
         const { authContent, envContent } = generateAuthContent(options.authProviders);

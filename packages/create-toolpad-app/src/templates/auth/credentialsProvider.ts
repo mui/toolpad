@@ -12,7 +12,7 @@ const credentialsProvider: TemplateFile = {
       return {
         id: 'test',
         name: 'Test User',
-        email: 'test@example.com',
+        email: String(c.email),
       };
     },
   }),`,

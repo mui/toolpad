@@ -15,7 +15,6 @@ const packageJson: PackageJsonTemplate = (appName, coreVersion) => ({
     '@emotion/cache': '^11',
     '@emotion/server': '^11',
     '@mui/icons-material': '^5',
-    '@mui/lab': '^5',
     '@mui/material': '^5',
     '@mui/material-nextjs': '^5',
     '@toolpad/core': coreVersion ?? 'latest',
@@ -25,9 +24,11 @@ const packageJson: PackageJsonTemplate = (appName, coreVersion) => ({
     'react-dom': '^18',
   },
   devDependencies: {
+    typescript: '^5',
     '@types/node': '^20',
     '@types/react': '^18',
     '@types/react-dom': '^18',
+    eslint: '^8',
     'eslint-config-next': '^14',
   },
 });

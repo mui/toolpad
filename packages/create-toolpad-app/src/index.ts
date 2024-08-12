@@ -181,6 +181,15 @@ const scaffoldCoreProject = async (options: GenerateProjectOptions): Promise<voi
   );
   // eslint-disable-next-line no-console
   console.log();
+
+  if (options.auth) {
+    // eslint-disable-next-line no-console
+    console.log(
+      `${chalk.cyan('info')} - Bootstrapped ${chalk.cyan('env.local')} with empty values. See https://authjs.dev/getting-started on how to add your credentials.`,
+    );
+    // eslint-disable-next-line no-console
+    console.log();
+  }
 };
 
 // Run the CLI interaction with Inquirer.js

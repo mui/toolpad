@@ -3,9 +3,11 @@ const rootLayout: TemplateFile = {
 import { AppProvider } from '@toolpad/core/nextjs';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { Navigation } from '@toolpad/core';
 import { SessionProvider, signIn, signOut } from 'next-auth/react';
 import { auth } from '../auth';
+import theme from '../theme';
 
 const NAVIGATION: Navigation = [
   {
@@ -16,6 +18,11 @@ const NAVIGATION: Navigation = [
     segment: '',
     title: 'Dashboard',
     icon: <DashboardIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
   },
 ];
 
@@ -41,6 +48,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               branding={BRANDING}
               session={session}
               authentication={AUTHENTICATION}
+              theme={theme}
             >
               {props.children}
             </AppProvider>

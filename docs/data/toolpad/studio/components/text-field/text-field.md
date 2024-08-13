@@ -75,7 +75,7 @@ isRequired is useful when the action can't be perfomed without a user provided t
 
 ### minLength
 
-A validation check on the minimum length of the input. The below demo showcases usage of password, isRequired and minLength props. These props are available as configurations in the Toolpad Studio editor.
+A validation check on the minimum length of the input. The below demo showcases usage of password, isRequired and, minLength props. These props are available as configurations in the Toolpad Studio editor.
 
 {{"demo": "TextFieldMinlength.js", "hideToolbar": true}}
 

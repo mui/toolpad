@@ -174,7 +174,7 @@ test(
   TEST_TIMEOUT,
 );
 
-test.only(
+test(
   'create-toolpad-app can bootstrap a Toolpad Core app with authentication',
   async () => {
     testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-auth-'));

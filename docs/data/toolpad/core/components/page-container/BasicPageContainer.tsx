@@ -2,7 +2,8 @@ import * as React from 'react';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { useDemoRouter } from '@toolpad/core/internals';
-import { Paper, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
 
 const NAVIGATION = [
   { segment: '', title: 'Home' },

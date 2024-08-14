@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "author": "MUI Toolpad",
   "license": "MIT",
@@ -35,8 +35,8 @@
     "@mui/styles": "next",
     "@mui/system": "next",
     "@mui/utils": "next",
-    "@mui/x-date-pickers": "7.12.0",
-    "@mui/x-date-pickers-pro": "7.12.0",
+    "@mui/x-date-pickers": "7.12.1",
+    "@mui/x-date-pickers-pro": "7.12.1",
     "@mui/x-license": "7.12.0",
     "@toolpad/core": "workspace:*",
     "@toolpad/studio": "workspace:*",

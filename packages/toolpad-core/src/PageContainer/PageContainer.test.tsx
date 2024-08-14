@@ -45,4 +45,38 @@ describe('PageContainer', () => {
 
     expect(screen.getByText('Orders', { ignore: 'nav *' }));
   });
+
+  test('renders nested', async () => {
+    const navigation = [
+      {
+        segment: 'home',
+        title: 'Home',
+        children: [
+          {
+            segment: 'orders',
+            title: 'Orders',
+          },
+        ],
+      },
+    ];
+
+    const router = {
+      pathname: '/home/orders',
+      searchParams: new URLSearchParams(),
+      navigate: vi.fn(),
+    };
+
+    const branding = { title: 'ACME' };
+    render(
+      <AppProvider branding={branding} navigation={navigation} router={router}>
+        <PageContainer />
+      </AppProvider>,
+    );
+
+    const breadCrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
+
+    expect(within(breadCrumbs).getByText('ACME')).toBeTruthy();
+    expect(within(breadCrumbs).getByText('Home')).toBeTruthy();
+    expect(within(breadCrumbs).getByText('Orders')).toBeTruthy();
+  });
 });

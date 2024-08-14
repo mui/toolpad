@@ -24,8 +24,8 @@ The project requires an `.env.local` with the following variables:
 
 ```bash
 AUTH_SECRET=
-AUTH_GITHUB_ID=
-AUTH_GITHUB_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
 ```
 
 ### AUTH_SECRET

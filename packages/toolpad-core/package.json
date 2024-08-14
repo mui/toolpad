@@ -1,18 +1,21 @@
 {
   "name": "@toolpad/core",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Toolpad Team",
   "description": "Dashboard framework powered by MUI.",
-  "main": "./build/index.js",
+  "main": "./node/index.js",
+  "module": "./index.js",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./build/index.d.ts",
-      "default": "./build/index.js"
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./node/index.js"
     },
     "./*": {
-      "types": "./build/*/index.d.ts",
-      "default": "./build/*/index.js"
+      "types": "./*/index.d.ts",
+      "import": "./*/index.js",
+      "require": "./node/*/index.js"
     }
   },
   "keywords": [
@@ -37,7 +40,8 @@
   "scripts": {
     "clean": "rimraf build",
     "prebuild": "pnpm clean",
-    "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
+    "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files && pnpm esmify",
+    "esmify": "rm -rf ./build/*/package.json",
     "build:node": "node ../../scripts/build.mjs node",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
@@ -51,7 +55,7 @@
     "test:browser:dev": "vitest --browser.enabled"
   },
   "dependencies": {
-    "@mui/base": "5.0.0-beta.40",
+    "@babel/runtime": "^7.25.0",
     "@mui/lab": "next",
     "@mui/utils": "next",
     "@toolpad/utils": "workspace:*",
@@ -87,12 +91,10 @@
   },
   "sideEffects": false,
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "build"
   },
   "engines": {
-    "node": ">=18"
-  },
-  "files": [
-    "build"
-  ]
+    "node": ">=14.0.0"
+  }
 }

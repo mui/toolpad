@@ -6,6 +6,8 @@ const providers = [
   { id: 'github', name: 'GitHub' },
   { id: 'google', name: 'Google' },
   { id: 'facebook', name: 'Facebook' },
+  { id: 'twitter', name: 'Twitter' },
+  { id: 'linkedin', name: 'LinkedIn' },
 ];
 
 // preview-end

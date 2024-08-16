@@ -191,7 +191,7 @@ importers:
         version: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-2eea4a6-20240814(eslint@8.57.0)
+        version: 0.0.0-experimental-d0e920e-20240815(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -2064,7 +2064,7 @@ packages:
     resolution: {integrity: sha512-SyXRe3OdWwIwalxDg5UtJnJQO+YPcTfwiIY2B0Xlddh9o7jpWLvv8X1RthIeDOxQ+O1ML5BLPCONToObyVQVuQ==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
-      '@babel/core': ^7.0.0-0
+      '@babel/core': ^7.25.2
 
   '@babel/register@7.24.6':
     resolution: {integrity: sha512-WSuFCc2wCqMeXkz/i3yfAAsxwWflEgbVkZzivgAmXl/MxrXeoYFZOOPllbC8R8WTF7u61wSRQtDVZ1879cdu6w==}
@@ -5824,8 +5824,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-2eea4a6-20240814:
-    resolution: {integrity: sha512-K7m16uG6UT1fuLJyLk29a024LcuzgNvPC2fuVz4rKCRBUJEz9xab19g05MuoyOTPsYyIae8ZP5JA9sgGGfaL6w==}
+  eslint-plugin-react-compiler@0.0.0-experimental-d0e920e-20240815:
+    resolution: {integrity: sha512-ICIcejquXmO2ednUy2wZ1I0i8NgExZeS+eYMQmygTpUEihxw0pxsKCCzIVBcwzdHYqPzrgkP/GLUEYgPQn2iQA==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -15574,7 +15574,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-2eea4a6-20240814(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-d0e920e-20240815(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.3

@@ -24,6 +24,8 @@ import app from './templates/nextjs-pages/app';
 import document from './templates/nextjs-pages/document';
 
 // Auth specific files for all apps
+import credentialsProvider from './templates/auth/credentialsProvider';
+import callbacks from './templates/auth/callbacks';
 import providerImport from './templates/auth/providerImport';
 import oAuthProvider from './templates/auth/oAuthProvider';
 import providerSetup from './templates/auth/providerSetup';
@@ -64,13 +66,19 @@ function generateAuthContent(authProviders: SupportedAuthProvider[]) {
 
   authProviders.forEach((provider) => {
     providerImports += providerImport(provider).content;
-
-    providerContent += oAuthProvider(provider).content;
-    envProviderContent += authProviderEnv(provider).content;
+    if (provider === 'Credentials') {
+      providerContent += credentialsProvider.content;
+      envProviderContent += '';
+    } else {
+      providerContent += oAuthProvider(provider).content;
+      envProviderContent += authProviderEnv(provider).content;
+    }
   });
 
-  const authContent = `${authImport.content}${providerImports}${providerSetup.content}${providerContent}${providerMap.content}});        
-  `;
+  const authCallbacksContent = callbacks;
+
+  const authContent = `${authImport.content}${providerImports}${providerSetup.content}${providerContent}${providerMap.content}${authCallbacksContent.content}});`;
+
   const envContent = `${authEnv.content}${envProviderContent}`;
 
   return {
@@ -94,6 +102,7 @@ export default function generateProject(
     ['README.md', { content: readme.content }],
     ['.gitignore', { content: gitignore.content }],
   ]);
+  const hasCredentialsProvider = options.authProviders.includes('Credentials');
 
   switch (options.router) {
     case 'nextjs-pages': {
@@ -113,7 +122,10 @@ export default function generateProject(
           ['.env.local', { content: envContent }],
           ['middleware.ts', { content: middleware.content }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler.content }],
-          ['pages/auth/signin.tsx', { content: signInPagePagesRouter.content }],
+          [
+            'pages/auth/signin.tsx',
+            { content: signInPagePagesRouter(hasCredentialsProvider).content },
+          ],
           ['package.json', { content: JSON.stringify(packageJsonAuthPagesContent, null, 2) }],
           ['pages/_app.tsx', { content: appAuthPages.content }],
         ]);
@@ -142,7 +154,7 @@ export default function generateProject(
           ['.env.local', { content: envContent }],
           ['middleware.ts', { content: middleware.content }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler.content }],
-          ['app/auth/signin/page.tsx', { content: signInPage.content }],
+          ['app/auth/signin/page.tsx', { content: signInPage(hasCredentialsProvider).content }],
           ['package.json', { content: JSON.stringify(packageJsonAuthAppContent, null, 2) }],
           ['app/(dashboard)/page.tsx', { content: dashboardPageAuthApp.content }],
           ['app/layout.tsx', { content: rootLayoutAuthApp.content }],

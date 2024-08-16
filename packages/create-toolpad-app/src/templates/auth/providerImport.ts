@@ -1,6 +1,6 @@
-import { Template } from '../../types';
+import { ProviderTemplate } from '../../types';
 
-const providerImport: Template = (provider) => ({
+const providerImport: ProviderTemplate = (provider) => ({
   content: `
   import ${provider} from 'next-auth/providers/${provider?.toLowerCase()}';`,
 });

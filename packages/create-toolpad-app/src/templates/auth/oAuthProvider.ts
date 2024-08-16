@@ -1,6 +1,6 @@
-import { Template } from '../../types';
+import { ProviderTemplate } from '../../types';
 
-const oaAuthProvider: Template = (provider) => ({
+const oaAuthProvider: ProviderTemplate = (provider) => ({
   content: `
   ${provider}({
     clientId: process.env.${provider?.toUpperCase()}_CLIENT_ID,

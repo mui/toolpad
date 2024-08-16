@@ -1,4 +1,6 @@
-const signInPage: TemplateFile = {
+import { BooleanTemplate } from '../../../types';
+
+const signInPage: BooleanTemplate = (hasCredentialsProvider) => ({
   content: `import * as React from 'react';
 import type { AuthProvider } from '@toolpad/core';
 import { SignInPage } from '@toolpad/core/SignInPage';
@@ -28,7 +30,12 @@ export default function SignIn() {
           // Handle Auth.js errors
           if (error instanceof AuthError) {
             return {
-              error: 'An error with Auth.js occurred.',
+              error: ${
+                hasCredentialsProvider
+                  ? `error.type === 'CredentialsSignin' ? 'Invalid credentials.'
+              : 'An error with Auth.js occurred.',`
+                  : `'An error with Auth.js occurred.'`
+              },
               type: error.type,
             };
           }
@@ -42,6 +49,6 @@ export default function SignIn() {
     />
   );
 }`,
-};
+});
 
 export default signInPage;

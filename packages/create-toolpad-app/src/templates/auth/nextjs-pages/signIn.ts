@@ -1,4 +1,6 @@
-const signIn: TemplateFile = {
+import { BooleanTemplate } from '../../../types';
+
+const signIn: BooleanTemplate = (hasCredentialsProvider) => ({
   content: `import * as React from 'react';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { SignInPage } from '@toolpad/core/SignInPage';
@@ -22,10 +24,16 @@ export default function SignIn({
           if (signInResponse && signInResponse.error) {
             // Handle Auth.js errors
             return {
-              error: 'An error with Auth.js occurred',
+              error: ${
+                hasCredentialsProvider
+                  ? `error.type === 'CredentialsSignIn' ? 'Invalid credentials.'
+              : 'An error with Auth.js occurred.'`
+                  : `'An error with Auth.js occurred'`
+              },
               type: signInResponse.error,
             };
           }         
+          ${hasCredentialsProvider ? `router.push(callbackUrl ?? '/');` : ''}
           return {};
         } catch (error) {
           // An error boundary must exist to handle unknown errors
@@ -59,6 +67,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   };
 }`,
-};
+});
 
 export default signIn;

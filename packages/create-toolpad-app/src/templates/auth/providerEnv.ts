@@ -1,6 +1,6 @@
-import { Template } from '../../types';
+import { ProviderTemplate } from '../../types';
 
-const providerEnv: Template = (provider) => ({
+const providerEnv: ProviderTemplate = (provider) => ({
   content: `
 ${provider?.toUpperCase()}_CLIENT_ID=
 ${provider?.toUpperCase()}_CLIENT_SECRET=

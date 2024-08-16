@@ -4,6 +4,7 @@ import SvgToolpadLogo from 'docs/src/icons/SvgToolpadCoreLogo';
 import Box from '@mui/material/Box';
 import GradientText from 'docs/src/components/typography/GradientText';
 import Container from '@mui/material/Container';
+import { Typewriter } from 'react-simple-typewriter';
 import GetStartedButtons from './GetStartedButtons';
 
 export default function Hero() {
@@ -49,9 +50,18 @@ export default function Hero() {
           }}
         >
           <Typography variant="h1" sx={{ my: 2 }}>
-            Open-source dashboard
-            <br />
-            <GradientText> framework </GradientText> for React
+            <GradientText>Full stack</GradientText> components <br />
+            for React{' '}
+            <GradientText>
+              <Typewriter
+                loop
+                cursor
+                typeSpeed={100}
+                deleteSpeed={80}
+                delaySpeed={2000}
+                words={['dashboards', 'admin panels', 'internal tools']}
+              />
+            </GradientText>
           </Typography>
           <Typography
             color="text.secondary"

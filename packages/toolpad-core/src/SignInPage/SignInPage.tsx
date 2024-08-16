@@ -302,6 +302,7 @@ function SignInPage(props: SignInPageProps) {
                     {...slotProps?.emailField}
                   />
                 )}
+
                 {slots?.passwordField ? (
                   <slots.passwordField {...slotProps?.passwordField} />
                 ) : (
@@ -325,6 +326,7 @@ function SignInPage(props: SignInPageProps) {
                     {...slotProps?.passwordField}
                   />
                 )}
+
                 <FormControlLabel
                   control={<Checkbox value="remember" color="primary" />}
                   label="Remember me"
@@ -400,7 +402,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
    */
   signIn: PropTypes.func,
   /**
-   * Props to pass to the constituent components in the credentials form
+   * Props to pass to internal components
    * @default {}
    * @example { email: { autoFocus: false } }
    * @example { password: { variant: 'outlined' } }
@@ -408,8 +410,23 @@ SignInPage.propTypes /* remove-proptypes */ = {
    */
   slotProps: PropTypes.shape({
     emailField: PropTypes.object,
+    forgotPasswordLink: PropTypes.object,
     passwordField: PropTypes.object,
+    signUpLink: PropTypes.object,
     submitButton: PropTypes.object,
+  }),
+  /**
+   * Custom components to override internal components
+   * @default {}
+   * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
+   * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
+   */
+  slots: PropTypes.shape({
+    emailField: PropTypes.elementType,
+    forgotPasswordLink: PropTypes.elementType,
+    passwordField: PropTypes.elementType,
+    signUpLink: PropTypes.elementType,
+    submitButton: PropTypes.elementType,
   }),
 } as any;
 

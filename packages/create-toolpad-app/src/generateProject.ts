@@ -25,10 +25,8 @@ import document from './templates/nextjs-pages/document';
 
 // Auth specific files for all apps
 import providerImport from './templates/auth/providerImport';
-import credentialsProvider from './templates/auth/credentialsProvider';
 import oAuthProvider from './templates/auth/oAuthProvider';
 import providerSetup from './templates/auth/providerSetup';
-import callbacks from './templates/auth/callbacks';
 import providerMap from './templates/auth/providerMap';
 import authImport from './templates/auth/import';
 import authEnv from './templates/auth/env';
@@ -66,25 +64,18 @@ function generateAuthContent(authProviders: SupportedAuthProvider[]) {
 
   authProviders.forEach((provider) => {
     providerImports += providerImport(provider).content;
-    if (provider === 'Credentials') {
-      providerContent += credentialsProvider.content;
-      envProviderContent += '';
-    } else {
-      providerContent += oAuthProvider(provider).content;
-      envProviderContent += authProviderEnv(provider).content;
-    }
+
+    providerContent += oAuthProvider(provider).content;
+    envProviderContent += authProviderEnv(provider).content;
   });
 
-  const authCallbacksContent = authProviders.includes('Credentials') ? callbacks : { content: '' };
-
-  const authContent = `${authImport.content}${providerImports}${providerSetup.content}${providerContent}${providerMap.content}${authCallbacksContent.content}});        
+  const authContent = `${authImport.content}${providerImports}${providerSetup.content}${providerContent}${providerMap.content}});        
   `;
   const envContent = `${authEnv.content}${envProviderContent}`;
 
   return {
     authContent,
     envContent,
-    authCallbacksContent,
   };
 }
 

@@ -1,4 +1,6 @@
 coverage:
+  ignore:
+    - '*/icons/*'
   status:
     project:
       default:

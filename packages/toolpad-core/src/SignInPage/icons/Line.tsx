@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+/**
+ * @ignore - internal component.
+ */
+
 export default function LineIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 377.8 377.8" height="24" width="24">

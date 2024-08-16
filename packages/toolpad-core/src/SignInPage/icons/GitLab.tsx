@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+/**
+ * @ignore - internal component.
+ */
+
 export default function GitLabIcon() {
   return (
     <svg height="24" viewBox="-.1 .5 960.2 923.9" width="24" xmlns="http://www.w3.org/2000/svg">

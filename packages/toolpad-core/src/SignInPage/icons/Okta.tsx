@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+/**
+ * @ignore - internal component.
+ */
+
 export default function OktaIcon() {
   return (
     <svg

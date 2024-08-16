@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+/**
+ * @ignore - internal component.
+ */
 function Auth0Icon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 64 64">

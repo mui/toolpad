@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+/**
+ * @ignore - internal component.
+ */
+
 function CognitoIcon() {
   return (
     <svg height="24" width="24" viewBox="-.1 1.1 304.9 179.8" xmlns="http://www.w3.org/2000/svg">

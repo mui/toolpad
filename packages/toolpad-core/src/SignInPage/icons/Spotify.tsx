@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+/**
+ * @ignore - internal component.
+ */
+
 function SpotifyIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2931 2931" width="24" height="24">

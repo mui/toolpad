@@ -1,8 +1,5 @@
 import * as React from 'react';
 import { AppProvider, SignInPage } from '@toolpad/core';
-import { createTheme } from '@mui/material/styles';
-import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
-import { getDesignTokens } from './brandingTheme';
 
 const providers = [
   { id: 'github', name: 'GitHub' },
@@ -34,20 +31,9 @@ const signIn = async (provider) => {
 };
 
 export default function BrandingSignInPage() {
-  const { mode, systemMode } = useColorSchemeShim();
-  const calculatedMode = (mode === 'system' ? systemMode : mode) ?? 'light';
-  const brandingDesignTokens = getDesignTokens(calculatedMode);
-  const THEME = createTheme({
-    ...brandingDesignTokens,
-    palette: {
-      ...brandingDesignTokens.palette,
-      mode: calculatedMode,
-    },
-  });
-
   return (
     // preview-start
-    <AppProvider branding={BRANDING} theme={THEME}>
+    <AppProvider branding={BRANDING}>
       <SignInPage signIn={signIn} providers={providers} />
     </AppProvider>
     // preview-end

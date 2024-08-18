@@ -191,7 +191,7 @@ importers:
         version: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-d0e920e-20240815(eslint@8.57.0)
+        version: 0.0.0-experimental-9aef357-20240815(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -545,8 +545,8 @@ importers:
         specifier: 5.3.0
         version: 5.3.0
       execa:
-        specifier: 9.3.0
-        version: 9.3.0
+        specifier: 9.3.1
+        version: 9.3.1
       invariant:
         specifier: 2.2.4
         version: 2.2.4
@@ -792,8 +792,8 @@ importers:
         specifier: 0.23.0
         version: 0.23.0
       execa:
-        specifier: 9.3.0
-        version: 9.3.0
+        specifier: 9.3.1
+        version: 9.3.1
       express:
         specifier: 4.19.2
         version: 4.19.2
@@ -5866,8 +5866,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-d0e920e-20240815:
-    resolution: {integrity: sha512-ICIcejquXmO2ednUy2wZ1I0i8NgExZeS+eYMQmygTpUEihxw0pxsKCCzIVBcwzdHYqPzrgkP/GLUEYgPQn2iQA==}
+  eslint-plugin-react-compiler@0.0.0-experimental-9aef357-20240815:
+    resolution: {integrity: sha512-2IgS9nY34TMqSKRC8wBvt3Lm3RGduHqa1prpEKaNkr7Fc1HUnRVIodaV6C6VcuWXt/WgeWo6Avqr5kX3MKTT2w==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -6002,6 +6002,10 @@ packages:
 
   execa@9.3.0:
     resolution: {integrity: sha512-l6JFbqnHEadBoVAVpN5dl2yCyfX28WoBAGaoQcNmLLSedOxTxcn2Qa83s8I/PA5i56vWru2OHOtrwF7Om2vqlg==}
+    engines: {node: ^18.19.0 || >=20.5.0}
+
+  execa@9.3.1:
+    resolution: {integrity: sha512-gdhefCCNy/8tpH/2+ajP9IQc14vXchNdd0weyzSJEFURhRMGncQ+zKFxwjAufIewPEJm9BPOaJnvg2UtlH2gPQ==}
     engines: {node: ^18.19.0 || >=20.5.0}
 
   exponential-backoff@3.1.1:
@@ -6569,6 +6573,10 @@ packages:
 
   human-signals@7.0.0:
     resolution: {integrity: sha512-74kytxOUSvNbjrT9KisAbaTZ/eJwD/LrbM/kh5j0IhPuJzwuA19dWvniFGwBzN9rVjg+O/e+F310PjObDXS+9Q==}
+    engines: {node: '>=18.18.0'}
+
+  human-signals@8.0.0:
+    resolution: {integrity: sha512-/1/GPCpDUCCYwlERiYjxoczfP0zfvZMU/OWgQPMya9AbAE24vseigFdhAMObpc8Q4lc/kjutPfUddDYyAmejnA==}
     engines: {node: '>=18.18.0'}
 
   hyphenate-style-name@1.1.0:
@@ -12200,7 +12208,7 @@ snapshots:
       '@googleapis/sheets': 8.0.0(encoding@0.1.13)
       '@netlify/functions': 2.8.1
       '@slack/bolt': 3.19.0
-      execa: 9.3.0
+      execa: 9.3.1
       google-auth-library: 9.11.0(encoding@0.1.13)
     transitivePeerDependencies:
       - bufferutil
@@ -15691,7 +15699,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-d0e920e-20240815(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-9aef357-20240815(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.3
@@ -15928,6 +15936,21 @@ snapshots:
       figures: 6.1.0
       get-stream: 9.0.1
       human-signals: 7.0.0
+      is-plain-obj: 4.1.0
+      is-stream: 4.0.1
+      npm-run-path: 5.3.0
+      pretty-ms: 9.0.0
+      signal-exit: 4.1.0
+      strip-final-newline: 4.0.0
+      yoctocolors: 2.1.0
+
+  execa@9.3.1:
+    dependencies:
+      '@sindresorhus/merge-streams': 4.0.0
+      cross-spawn: 7.0.3
+      figures: 6.1.0
+      get-stream: 9.0.1
+      human-signals: 8.0.0
       is-plain-obj: 4.1.0
       is-stream: 4.0.1
       npm-run-path: 5.3.0
@@ -16627,6 +16650,8 @@ snapshots:
   human-signals@5.0.0: {}
 
   human-signals@7.0.0: {}
+
+  human-signals@8.0.0: {}
 
   hyphenate-style-name@1.1.0: {}
 

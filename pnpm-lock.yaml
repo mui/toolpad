@@ -191,13 +191,13 @@ importers:
         version: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-d0e920e-20240815(eslint@8.57.0)
+        version: 0.0.0-experimental-9aef357-20240815(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
       eslint-plugin-testing-library:
-        specifier: ^6.2.2
-        version: 6.2.2(eslint@8.57.0)(typescript@5.5.4)
+        specifier: ^6.3.0
+        version: 6.3.0(eslint@8.57.0)(typescript@5.5.4)
       eslint-plugin-typescript-enum:
         specifier: 2.1.0
         version: 2.1.0(eslint@8.57.0)(typescript@5.5.4)
@@ -5866,8 +5866,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-d0e920e-20240815:
-    resolution: {integrity: sha512-ICIcejquXmO2ednUy2wZ1I0i8NgExZeS+eYMQmygTpUEihxw0pxsKCCzIVBcwzdHYqPzrgkP/GLUEYgPQn2iQA==}
+  eslint-plugin-react-compiler@0.0.0-experimental-9aef357-20240815:
+    resolution: {integrity: sha512-2IgS9nY34TMqSKRC8wBvt3Lm3RGduHqa1prpEKaNkr7Fc1HUnRVIodaV6C6VcuWXt/WgeWo6Avqr5kX3MKTT2w==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -5884,8 +5884,8 @@ packages:
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7
 
-  eslint-plugin-testing-library@6.2.2:
-    resolution: {integrity: sha512-1E94YOTUDnOjSLyvOwmbVDzQi/WkKm3WVrMXu6SmBr6DN95xTGZmI6HJ/eOkSXh/DlheRsxaPsJvZByDBhWLVQ==}
+  eslint-plugin-testing-library@6.3.0:
+    resolution: {integrity: sha512-GYcEErTt6EGwE0bPDY+4aehfEBpB2gDBFKohir8jlATSUvzStEyzCx8QWB/14xeKc/AwyXkzScSzMHnFojkWrA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0, npm: '>=6'}
     peerDependencies:
       eslint: ^7.5.0 || ^8.0.0
@@ -15691,7 +15691,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-d0e920e-20240815(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-9aef357-20240815(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.3
@@ -15729,7 +15729,7 @@ snapshots:
       string.prototype.matchall: 4.0.11
       string.prototype.repeat: 1.0.0
 
-  eslint-plugin-testing-library@6.2.2(eslint@8.57.0)(typescript@5.5.4):
+  eslint-plugin-testing-library@6.3.0(eslint@8.57.0)(typescript@5.5.4):
     dependencies:
       '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.5.4)
       eslint: 8.57.0

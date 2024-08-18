@@ -131,10 +131,10 @@
   },
   "engines": {
     "node": ">=18",
-    "pnpm": "9.4.0"
+    "pnpm": "9.7.1"
   },
   "resolutions": {
     "google-auth-library": "*"
   },
-  "packageManager": "pnpm@9.4.0"
+  "packageManager": "pnpm@9.7.1"
 }

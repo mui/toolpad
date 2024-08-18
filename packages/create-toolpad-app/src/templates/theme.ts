@@ -1,5 +1,4 @@
-const theme: TemplateFile = {
-  content: `
+const theme = `
   "use client";
   import { createTheme } from '@mui/material/styles';
   const lightTheme = createTheme();
@@ -11,7 +10,6 @@ const theme: TemplateFile = {
   };
 
   export default theme;
-  `,
-};
+  `;
 
 export default theme;

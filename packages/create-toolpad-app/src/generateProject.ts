@@ -24,15 +24,8 @@ import app from './templates/nextjs-pages/app';
 import document from './templates/nextjs-pages/document';
 
 // Auth specific files for all apps
-import credentialsProvider from './templates/auth/credentialsProvider';
-import callbacks from './templates/auth/callbacks';
-import providerImport from './templates/auth/providerImport';
-import oAuthProvider from './templates/auth/oAuthProvider';
-import providerSetup from './templates/auth/providerSetup';
-import providerMap from './templates/auth/providerMap';
-import authImport from './templates/auth/import';
-import authEnv from './templates/auth/env';
-import authProviderEnv from './templates/auth/providerEnv';
+import auth from './templates/auth/auth';
+import envLocal from './templates/auth/envLocal';
 import middleware from './templates/auth/middleware';
 
 // Auth files for app router
@@ -58,35 +51,6 @@ export interface GenerateProjectOptions {
   router: SupportedRouter;
 }
 
-function generateAuthContent(authProviders: SupportedAuthProvider[]) {
-  // Add additional specific to authentication
-  let providerImports = '';
-  let providerContent = '';
-  let envProviderContent = '';
-
-  authProviders.forEach((provider) => {
-    providerImports += providerImport(provider).content;
-    if (provider === 'Credentials') {
-      providerContent += credentialsProvider.content;
-      envProviderContent += '';
-    } else {
-      providerContent += oAuthProvider(provider).content;
-      envProviderContent += authProviderEnv(provider).content;
-    }
-  });
-
-  const authCallbacksContent = callbacks;
-
-  const authContent = `${authImport.content}${providerImports}${providerSetup.content}${providerContent}${providerMap.content}${authCallbacksContent.content}});`;
-
-  const envContent = `${authEnv.content}${envProviderContent}`;
-
-  return {
-    authContent,
-    envContent,
-  };
-}
-
 export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
@@ -94,13 +58,13 @@ export default function generateProject(
 
   // Default files, common to all apps
   const files = new Map<string, { content: string }>([
-    ['theme.ts', { content: theme.content }],
-    ['next-env.d.ts', { content: nextTypes.content }],
-    ['next.config.mjs', { content: nextConfig.content }],
-    ['.eslintrc.json', { content: eslintConfig.content }],
-    ['tsconfig.json', { content: tsConfig.content }],
-    ['README.md', { content: readme.content }],
-    ['.gitignore', { content: gitignore.content }],
+    ['theme.ts', { content: theme }],
+    ['next-env.d.ts', { content: nextTypes }],
+    ['next.config.mjs', { content: nextConfig }],
+    ['.eslintrc.json', { content: eslintConfig }],
+    ['tsconfig.json', { content: tsConfig }],
+    ['README.md', { content: readme }],
+    ['.gitignore', { content: gitignore }],
   ]);
   const hasCredentialsProvider = options.authProviders.includes('Credentials');
 
@@ -109,25 +73,21 @@ export default function generateProject(
       const packageJsonPagesContent = packageJsonPages(options.name, options.coreVersion);
       const nextJsPagesRouterStarter = new Map([
         ['package.json', { content: JSON.stringify(packageJsonPagesContent, null, 2) }],
-        ['pages/index.tsx', { content: indexPage.content }],
-        ['pages/orders/index.tsx', { content: ordersPage.content }],
-        ['pages/_app.tsx', { content: app.content }],
-        ['pages/_document.tsx', { content: document.content }],
+        ['pages/index.tsx', { content: indexPage }],
+        ['pages/orders/index.tsx', { content: ordersPage }],
+        ['pages/_app.tsx', { content: app }],
+        ['pages/_document.tsx', { content: document }],
       ]);
       if (options.auth) {
-        const { authContent, envContent } = generateAuthContent(options.authProviders);
         const packageJsonAuthPagesContent = packageJsonAuthPages(options.name, options.coreVersion);
         const authFiles = new Map([
-          ['auth.ts', { content: authContent }],
-          ['.env.local', { content: envContent }],
-          ['middleware.ts', { content: middleware.content }],
-          ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler.content }],
-          [
-            'pages/auth/signin.tsx',
-            { content: signInPagePagesRouter(hasCredentialsProvider).content },
-          ],
+          ['auth.ts', { content: auth(options.authProviders) }],
+          ['.env.local', { content: envLocal(options.authProviders) }],
+          ['middleware.ts', { content: middleware }],
+          ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
+          ['pages/auth/signin.tsx', { content: signInPagePagesRouter(hasCredentialsProvider) }],
           ['package.json', { content: JSON.stringify(packageJsonAuthPagesContent, null, 2) }],
-          ['pages/_app.tsx', { content: appAuthPages.content }],
+          ['pages/_app.tsx', { content: appAuthPages }],
         ]);
         return new Map([...files, ...nextJsPagesRouterStarter, ...authFiles]);
       }
@@ -138,26 +98,25 @@ export default function generateProject(
       const packageJsonAppContent = packageJsonApp(options.name, options.coreVersion);
       const nextJsAppRouterStarter = new Map([
         ['package.json', { content: JSON.stringify(packageJsonAppContent, null, 2) }],
-        ['app/(dashboard)/layout.tsx', { content: dashboardLayout.content }],
-        ['app/layout.tsx', { content: rootLayout.content }],
-        ['app/page.tsx', { content: rootPage.content }],
-        ['app/NavigateButton.tsx', { content: NavigateButton.content }],
-        ['app/(dashboard)/page/page.tsx', { content: dashboardPage.content }],
-        ['app/(dashboard)/orders/page.tsx', { content: ordersPage.content }],
+        ['app/(dashboard)/layout.tsx', { content: dashboardLayout }],
+        ['app/layout.tsx', { content: rootLayout }],
+        ['app/page.tsx', { content: rootPage }],
+        ['app/NavigateButton.tsx', { content: NavigateButton }],
+        ['app/(dashboard)/page/page.tsx', { content: dashboardPage }],
+        ['app/(dashboard)/orders/page.tsx', { content: ordersPage }],
       ]);
       if (options.auth) {
-        const { authContent, envContent } = generateAuthContent(options.authProviders);
         const packageJsonAuthAppContent = packageJsonAuthApp(options.name, options.coreVersion);
 
         const authFiles = new Map([
-          ['auth.ts', { content: authContent }],
-          ['.env.local', { content: envContent }],
-          ['middleware.ts', { content: middleware.content }],
-          ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler.content }],
-          ['app/auth/signin/page.tsx', { content: signInPage(hasCredentialsProvider).content }],
+          ['auth.ts', { content: auth(options.authProviders) }],
+          ['.env.local', { content: auth(options.authProviders) }],
+          ['middleware.ts', { content: middleware }],
+          ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
+          ['app/auth/signin/page.tsx', { content: signInPage(hasCredentialsProvider) }],
           ['package.json', { content: JSON.stringify(packageJsonAuthAppContent, null, 2) }],
-          ['app/(dashboard)/page.tsx', { content: dashboardPageAuthApp.content }],
-          ['app/layout.tsx', { content: rootLayoutAuthApp.content }],
+          ['app/(dashboard)/page.tsx', { content: dashboardPageAuthApp }],
+          ['app/layout.tsx', { content: rootLayoutAuthApp }],
         ]);
 
         nextJsAppRouterStarter.delete('app/page.tsx');

@@ -1,5 +1,4 @@
-const rootPage: TemplateFile = {
-  content: `
+const rootPage = `
   "use client";
   import Link from 'next/link';
   import { Container, Typography, Box } from '@mui/material';
@@ -21,7 +20,6 @@ const rootPage: TemplateFile = {
       </Container>
     );
   }  
-  `,
-};
+  `;
 
 export default rootPage;

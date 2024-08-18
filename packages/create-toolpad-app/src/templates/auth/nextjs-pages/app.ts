@@ -1,5 +1,4 @@
-const app: TemplateFile = {
-  content: `import * as React from 'react';
+const app = `import * as React from 'react';
   import { AppProvider } from '@toolpad/core/nextjs';
   import { DashboardLayout } from '@toolpad/core/DashboardLayout';
   import { PageContainer } from '@toolpad/core/PageContainer';
@@ -108,7 +107,6 @@ const app: TemplateFile = {
       </AppCacheProvider>
     );
   }  
-`,
-};
+`;
 
 export default app;

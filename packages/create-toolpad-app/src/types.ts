@@ -4,14 +4,10 @@ export type SupportedAuthProvider = 'Credentials' | 'Google' | 'GitHub' | 'Faceb
 export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';
 export type PackageManager = 'npm' | 'pnpm' | 'yarn';
 
-declare global {
-  interface TemplateFile {
-    content: string;
-  }
-}
+export type ProviderTemplate = (provider: SupportedAuthProvider) => string;
 
-export type ProviderTemplate = (provider: SupportedAuthProvider) => TemplateFile;
+export type ProvidersTemplate = (providers: SupportedAuthProvider[]) => string;
 
-export type BooleanTemplate = (value: boolean) => TemplateFile;
+export type BooleanTemplate = (value: boolean) => string;
 
 export type PackageJsonTemplate = (appName: string, coreVersion?: string) => PackageJson;

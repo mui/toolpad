@@ -1,7 +1,6 @@
 import { BooleanTemplate } from '../../../types';
 
-const signIn: BooleanTemplate = (hasCredentialsProvider) => ({
-  content: `import * as React from 'react';
+const signIn: BooleanTemplate = (hasCredentialsProvider) => `import * as React from 'react';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { signIn } from 'next-auth/react';
@@ -66,7 +65,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       providers: providerMap,
     },
   };
-}`,
-});
+}`;
 
 export default signIn;

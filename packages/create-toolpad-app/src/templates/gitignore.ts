@@ -1,5 +1,4 @@
-const gitignore: TemplateFile = {
-  content: `
+const gitignore = `
   # Logs
   logs
   *.log
@@ -129,7 +128,6 @@ const gitignore: TemplateFile = {
   .yarn/unplugged
   .yarn/build-state.yml
   .yarn/install-state.gz
-  `,
-};
+  `;
 
 export default gitignore;

@@ -1,5 +1,4 @@
-const rootLayout: TemplateFile = {
-  content: `import * as React from 'react';
+const rootLayout = `import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -58,7 +57,6 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
     </html>
   );
 }
-`,
-};
+`;
 
 export default rootLayout;

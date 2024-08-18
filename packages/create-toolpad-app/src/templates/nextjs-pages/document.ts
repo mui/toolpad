@@ -1,5 +1,4 @@
-const document: TemplateFile = {
-  content: `import * as React from 'react';
+const document = `import * as React from 'react';
 import { Html, Head, Main, NextScript, DocumentProps, DocumentContext } from 'next/document';
 import {
   DocumentHeadTags,
@@ -26,7 +25,6 @@ Document.getInitialProps = async (ctx: DocumentContext) => {
   const finalProps = await documentGetInitialProps(ctx);
   return finalProps;
 };
-`,
-};
+`;
 
 export default document;

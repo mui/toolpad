@@ -1,0 +1,22 @@
+import { ProvidersTemplate } from '../../types';
+
+const env: ProvidersTemplate = (providers) => {
+  const oAuthProviders = providers.filter((provider) => provider !== 'Credentials');
+  return `
+# Generate a secret with \`npx auth secret\`
+# and replace the value below with it
+AUTH_SECRET=secret
+
+# Add the CLIENT_ID and CLIENT_SECRET from your OAuth provider
+# to the .env.local file
+${oAuthProviders
+  .map(
+    (provider) => `
+${provider?.toUpperCase()}_CLIENT_ID=
+${provider?.toUpperCase()}_CLIENT_SECRET=`,
+  )
+  .join('\n')}    
+`;
+};
+
+export default env;

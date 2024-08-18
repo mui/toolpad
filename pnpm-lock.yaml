@@ -604,8 +604,8 @@ importers:
         specifier: 5.0.0-alpha.173
         version: 5.0.0-alpha.173(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-beta.6(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mui/utils':
-        specifier: 6.0.0-dev.20240529-082515-213b5e33ab
-        version: 6.0.0-dev.20240529-082515-213b5e33ab(@types/react@18.3.3)(react@18.3.1)
+        specifier: 6.0.0-beta.5
+        version: 6.0.0-beta.5(@types/react@18.3.3)(react@18.3.1)
       '@toolpad/utils':
         specifier: workspace:*
         version: link:../toolpad-utils
@@ -3165,22 +3165,22 @@ packages:
       '@types/react':
         optional: true
 
+  '@mui/utils@6.0.0-beta.5':
+    resolution: {integrity: sha512-QidRa70STALSsTTeeJ7ddyyVbEAK3cVOK350L8tAJLzag79XzNE+lSpU4+UnIna9ftuI9sIJHVxZK6wVw7ATug==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      '@types/react': ^17.0.0 || ^18.0.0
+      react: ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@mui/utils@6.0.0-beta.6':
     resolution: {integrity: sha512-HsEDqZ/4K8zWkSiT2816pNUeoLj91l5w4XkYAIuz8//dKeSz67XfYZgZsc9OMferz/cYOflqBbCPxl2A5vWHeQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
-  '@mui/utils@6.0.0-dev.20240529-082515-213b5e33ab':
-    resolution: {integrity: sha512-jyNcB0drDhYcoq5MHNTiEc63GfVE1GZK+CVUd8tlLzk5q631RPYJ5jONSOszLiUOXBmI8Uu1SBJUwrG3j2YG2A==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      '@types/react': ^17.0.0 || ^18.0.0
-      react: ^17.0.0 || ^18.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -12373,7 +12373,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.3
 
-  '@mui/utils@6.0.0-beta.6(@types/react@18.3.3)(react@18.3.1)':
+  '@mui/utils@6.0.0-beta.5(@types/react@18.3.3)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.25.0
       '@mui/types': 7.2.15(@types/react@18.3.3)
@@ -12385,10 +12385,12 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.3
 
-  '@mui/utils@6.0.0-dev.20240529-082515-213b5e33ab(@types/react@18.3.3)(react@18.3.1)':
+  '@mui/utils@6.0.0-beta.6(@types/react@18.3.3)(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.25.0
+      '@mui/types': 7.2.15(@types/react@18.3.3)
       '@types/prop-types': 15.7.12
+      clsx: 2.1.1
       prop-types: 15.8.1
       react: 18.3.1
       react-is: 18.3.1

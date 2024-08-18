@@ -118,7 +118,7 @@
     "nanoid": "5.0.7",
     "node-fetch": "2.7.0",
     "node-fetch-har": "1.0.1",
-    "open-editor": "4.1.1",
+    "open-editor": "5.0.0",
     "path-to-regexp": "7.1.0",
     "perf-cascade": "3.0.3",
     "pg": "8.12.0",

@@ -10,7 +10,7 @@ export default function generateStudioProject(
 
   const files = new Map<string, { content: string }>([
     ['package.json', { content: JSON.stringify(packageJson, null, 2) }],
-    ['.gitignore', { content: gitignore.content }],
+    ['.gitignore', { content: gitignore }],
   ]);
 
   return files;

@@ -89,7 +89,7 @@
     "eslint-plugin-react": "7.35.0",
     "eslint-plugin-react-compiler": "latest",
     "eslint-plugin-react-hooks": "4.6.2",
-    "eslint-plugin-testing-library": "^6.2.2",
+    "eslint-plugin-testing-library": "^6.3.0",
     "eslint-plugin-typescript-enum": "2.1.0",
     "execa": "9.3.0",
     "fast-glob": "^3.3.2",

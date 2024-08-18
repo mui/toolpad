@@ -45,8 +45,8 @@ importers:
         specifier: 8.1.0
         version: 8.1.0(postcss@8.4.41)(typescript@5.5.4)
       tsx:
-        specifier: 4.16.5
-        version: 4.16.5
+        specifier: 4.17.0
+        version: 4.17.0
       vitest:
         specifier: 2.0.5
         version: 2.0.5(@types/node@20.15.0)(@vitest/browser@2.0.5)(jsdom@24.1.1)(terser@5.31.1)
@@ -9632,8 +9632,8 @@ packages:
     peerDependencies:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
 
-  tsx@4.16.5:
-    resolution: {integrity: sha512-ArsiAQHEW2iGaqZ8fTA1nX0a+lN5mNTyuGRRO6OW3H/Yno1y9/t1f9YOI1Cfoqz63VAthn++ZYcbDP7jPflc+A==}
+  tsx@4.17.0:
+    resolution: {integrity: sha512-eN4mnDA5UMKDt4YZixo9tBioibaMBpoxBkD+rIPAjVmYERSG0/dWEY1CEFuV89CgASlKL499q8AhmkMnnjtOJg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -19995,9 +19995,9 @@ snapshots:
       tslib: 1.14.1
       typescript: 5.5.4
 
-  tsx@4.16.5:
+  tsx@4.17.0:
     dependencies:
-      esbuild: 0.21.5
+      esbuild: 0.23.0
       get-tsconfig: 4.7.5
     optionalDependencies:
       fsevents: 2.3.3

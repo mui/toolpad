@@ -4,7 +4,7 @@ title: useNotifications
 components: NotificationsProvider
 ---
 
-# Notifications
+# useNotifications
 
 <p class="description">Imperative APIs to show and interact with application notifications.</p>
 

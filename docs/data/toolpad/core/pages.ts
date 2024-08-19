@@ -85,7 +85,7 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/core/react-persistent-state',
-            title: 'Peristent storage state',
+            title: 'Persisted state',
           },
         ],
       },

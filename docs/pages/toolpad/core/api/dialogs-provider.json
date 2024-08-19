@@ -8,6 +8,6 @@
   "muiName": "DialogsProvider",
   "filename": "/packages/toolpad-core/src/useDialogs/DialogsProvider.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-use-dialogs/\">Dialogs</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-use-dialogs/\">useDialogs</a></li></ul>",
   "cssComponent": false
 }

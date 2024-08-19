@@ -123,7 +123,7 @@ You can use any package available on `npm` to extend your Toolpad Studio applica
 <li>
 
 :::info
-Look at the `@react-three/fiber` [documentation](https://docs.pmnd.rs/react-three-fiber/getting-started/introduction) for more details on components and properties you can use.
+Look at the [`@react-three/fiber`](https://github.com/pmndrs/react-three-fiber) documentation for more details on components and properties you can use.
 :::
 
 <li>

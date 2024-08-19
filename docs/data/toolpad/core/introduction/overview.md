@@ -34,7 +34,7 @@ The framework follows the open-core model, with some features being available un
 ## Upcoming Features 🚧
 
 :::info
-Visit the [roadmap](/toolpad/core/introduction/roadmap/) to see more details around upcoming features.
+Visit the [roadmap](/toolpad/core/introduction/roadmap/) to see more details about upcoming features.
 :::
 
 - [Role-based Access Control](/)

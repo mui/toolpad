@@ -1,6 +1,6 @@
 {
   "name": "playground-nextjs-pages",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,8 +9,8 @@
   "devDependencies": {
     "@emotion/react": "11.13.0",
     "@emotion/styled": "11.13.0",
-    "@mui/icons-material": "5.16.6",
-    "@mui/material": "5.16.6",
+    "@mui/icons-material": "5.16.7",
+    "@mui/material": "5.16.7",
     "@mui/material-nextjs": "5.16.6",
     "@toolpad/core": "workspace:*",
     "@types/react": "18.3.3",

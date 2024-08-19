@@ -17,7 +17,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import Stack from '@mui/material/Stack';
-import { BrandingContext, DocsContext } from '../shared/context';
+import { BrandingContext, DocsContext, RouterContext } from '../shared/context';
 
 const IconProviderMap = new Map<string, React.ReactNode>([
   ['github', <GitHubIcon key="github" />],
@@ -125,6 +125,7 @@ function SignInPage(props: SignInPageProps) {
   const { providers, signIn, slotProps } = props;
   const branding = React.useContext(BrandingContext);
   const docs = React.useContext(DocsContext);
+  const router = React.useContext(RouterContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const [{ loading, providerId, error }, setFormStatus] = React.useState<{
     loading: boolean;
@@ -136,10 +137,7 @@ function SignInPage(props: SignInPageProps) {
     error: '',
   });
 
-  const callbackUrl =
-    typeof window !== 'undefined'
-      ? (new URLSearchParams(window.location.search).get('callbackUrl') ?? '/')
-      : '/';
+  const callbackUrl = router?.searchParams.get('callbackUrl') ?? '/';
 
   const singleProvider = React.useMemo(() => providers?.length === 1, [providers]);
 

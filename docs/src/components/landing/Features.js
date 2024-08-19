@@ -21,10 +21,10 @@ export default function ToolpadComponents() {
             overline="Features"
             title={
               <Typography variant="h2">
-                Fullstack <GradientText> dashboard </GradientText> components
+                Components which integrate the <GradientText> full stack </GradientText>
               </Typography>
             }
-            description="Quickly build admin dashboard interfaces with a set of components that are designed to work together."
+            description="Quickly build admin interfaces with a set of components that are designed to work together."
           />
           <ToolpadFeaturesSwitcher tab={tab} setTab={setTab} />
         </Grid>

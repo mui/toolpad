@@ -8,6 +8,6 @@
     "start": "NODE_OPTIONS='--max-old-space-size=396' toolpad-studio start"
   },
   "dependencies": {
-    "@toolpad/studio": "0.5.0"
+    "@toolpad/studio": "0.5.1"
   }
 }

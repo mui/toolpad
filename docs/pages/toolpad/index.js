@@ -18,8 +18,7 @@ export default function Home() {
       <Head
         title="Toolpad Core: Components for React dashboards"
         description="Toolpad Core offers the components needed for your next admin panel and internal tools project."
-        // TODO: create this image
-        // card="/static/toolpad/marketing/toolpad-og.jpg"
+        card="/static/toolpad/marketing/toolpad-core-og.jpg"
       />
       <CssBaseline />
       <AppHeaderBanner />

@@ -4,9 +4,9 @@ title: useNotifications
 components: NotificationsProvider
 ---
 
-# Notifications
+# useNotifications
 
-<p class="description">Imperative APIs to show and interact with application notifications</p>
+<p class="description">Imperative APIs to show and interact with application notifications.</p>
 
 Toolpad core offers a set of abstractions that make it easier to interact with notifications. Notifications are used to give short updates to the user about things that are happening during the application lifetime. They appear at the bottom of the screen. The Toolpad API allows for opening multiple notifications concurrenlty.
 

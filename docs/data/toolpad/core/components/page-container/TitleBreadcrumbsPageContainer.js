@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 
 const NAVIGATION = [
   {
-    segment: 'home',
+    segment: 'inbox',
     title: 'Home',
     children: [
       {
@@ -19,7 +19,7 @@ const NAVIGATION = [
 ];
 
 export default function TitleBreadcrumbsPageContainer() {
-  const router = useDemoRouter('/home/orders');
+  const router = useDemoRouter('/inbox/orders');
 
   const theme = useTheme();
 

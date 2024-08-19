@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Switch from '@mui/material/Switch';
@@ -7,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import SvgMuiLogo from 'docs/src/icons/SvgMuiLogomark';
 import BrushIcon from '@mui/icons-material/Brush';
+import { Typewriter } from 'react-simple-typewriter';
 import GradientText from 'docs/src/components/typography/GradientText';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 import GithubStars from './GithubStars';
@@ -71,41 +71,8 @@ const Img = styled('img')(({ theme }) => [
 
 const words = ['APIs', 'scripts', 'SQL'];
 
-const LETTER_DELAY = 100;
 const FRAME_DELAY = 3000;
 const FRAMES = 6;
-
-function TypingAnimation({ wordIndex, setWordIndex }) {
-  const [text, setText] = React.useState(words[wordIndex]);
-  const [fullText, setFullText] = React.useState(words[wordIndex]);
-  const [letterIndex, setLetterIndex] = React.useState(fullText.length);
-  const count = React.useRef(0);
-
-  React.useEffect(() => {
-    let timer;
-    if (letterIndex < fullText.length) {
-      timer = setTimeout(() => {
-        setText(text + fullText[letterIndex]);
-        setLetterIndex(letterIndex + 1);
-      }, LETTER_DELAY);
-    } else {
-      timer = setTimeout(
-        () => {
-          const nextIndex = (wordIndex + 1) % words.length;
-          setWordIndex(nextIndex);
-          setFullText(words[nextIndex]);
-          setText('');
-          setLetterIndex(0);
-          count.current += 1;
-        },
-        2 * FRAME_DELAY - (count.current ? LETTER_DELAY * fullText.length : 0),
-      );
-    }
-    return () => clearTimeout(timer);
-  }, [letterIndex, wordIndex, fullText, text, setWordIndex]);
-
-  return <span>{text}</span>;
-}
 
 export default function Hero() {
   const [heroAppMode, setHeroAppMode] = React.useState(false);
@@ -114,7 +81,6 @@ export default function Hero() {
   const handleModeChange = React.useCallback((event) => {
     setHeroAppMode(event.target.checked);
   }, []);
-  const [wordIndex, setWordIndex] = React.useState(0);
   const [frameIndex, setFrameIndex] = React.useState(0);
 
   const [pauseHeroAnimation, setPauseHeroAnimation] = React.useState(false);
@@ -164,7 +130,15 @@ export default function Hero() {
           </Box>
         </Typography>
         <Typography variant="h1" sx={{ my: 2, minWidth: { xs: 'auto', sm: 600 } }}>
-          Turn your <TypingAnimation wordIndex={wordIndex} setWordIndex={setWordIndex} />
+          Turn your{' '}
+          <Typewriter
+            loop
+            cursor
+            typeSpeed={100}
+            deleteSpeed={80}
+            delaySpeed={5200}
+            words={words}
+          />
           <br />
           <GradientText>into UIs</GradientText>
         </Typography>
@@ -288,8 +262,3 @@ export default function Hero() {
     </ToolpadHeroContainer>
   );
 }
-
-TypingAnimation.propTypes = {
-  setWordIndex: PropTypes.func,
-  wordIndex: PropTypes.number,
-};

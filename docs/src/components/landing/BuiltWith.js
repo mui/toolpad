@@ -30,10 +30,10 @@ const content = [
       'Next.js sets the industry standard for modern React applications. Building over it is a leverage that makes Toolpad efficient.',
   },
   {
-    icon: <img src="https://mui.com/static/logo.png" width={30} alt="MUI" />,
-    title: 'MUI',
+    icon: <img src="https://mui.com/static/logo.png" width={30} alt="Material UI" />,
+    title: 'Material UI',
     description:
-      'A tight integration with MUI ensures you get all the latest features from our list of Material UI components.',
+      'A tight integration with Material UI ensures you get all the latest features from our list of Material UI components.',
   },
 ];
 

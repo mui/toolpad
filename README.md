@@ -5,7 +5,7 @@
 
 <h1 align="center">Toolpad</h1>
 
-- [Toolpad Core](https://mui.com/toolpad/core/introduction/) is a set of full-stack react components that leverages existing [Material UI](http://github.com/mui/material-ui) components, and ties them with the commonly-used backend integrations to help you create responsive dashboards and internal tools.
+- [Toolpad Core](https://mui.com/toolpad/core/introduction/) is a set of full-stack React components that leverages existing [Material UI](http://github.com/mui/material-ui) components, and ties them with the commonly-used backend integrations to help you create responsive dashboards and internal tools.
 - [Toolpad Studio](https://mui.com/toolpad/studio/getting-started/) is a self-hosted low-code admin builder designed to extend the Toolpad Core React components. It's for developers of all trades who want to save time building internal applications. Drag and drop from a catalog of pre-built components, connect to any data source and build apps quickly.
 
 <div align="center">

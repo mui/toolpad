@@ -5,7 +5,7 @@
 
 <h1 align="center">Toolpad</h1>
 
-- [Toolpad Core](https://mui.com/toolpad/core/introduction/) is a framework approach to internal tools. Through high-level components and data management interfaces, It's tightly integrated with [MUI X](http://github.com/mui/mui-x) and MUI's core libraries like [Material UI](http://github.com/mui/material-ui). You can use it as a framework for admin dashboards and CRUD apps!
+- [Toolpad Core](https://mui.com/toolpad/core/introduction/) is a set of full-stack React components that leverages existing [Material UI](http://github.com/mui/material-ui) components, and ties them with the commonly-used backend integrations to help you create responsive dashboards and internal tools.
 - [Toolpad Studio](https://mui.com/toolpad/studio/getting-started/) is a self-hosted low-code admin builder designed to extend the Toolpad Core React components. It's for developers of all trades who want to save time building internal applications. Drag and drop from a catalog of pre-built components, connect to any data source and build apps quickly.
 
 <div align="center">
@@ -22,21 +22,27 @@
 
 </div>
 
-## We are making some changes
-
-A [big addition](https://github.com/mui/mui-toolpad/discussions/3311) is happening. We're working on Toolpad Core, a framework approach to internal tools. Through high-level components and data management interfaces, we aim to revamp the app building experience that involves tabular data. It will be tightly integrated with MUI X and Core libraries, and would act as your go to framework for admin dashboards and CRUD apps!
-
 ## Product walkthrough
 
 ![readme_video](https://github.com/prakhargupta1/mui-toolpad/assets/92228082/efcab7c7-4f34-487c-8a62-e059b5e58bcc)
 
 ## Notice
 
-Toolpad Studio is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.
+Toolpad is in its beta stages of development. Feel free to run this application to try it out for your use cases, and share any feedback, bug reports or feature requests that you come across.
 
 ## Quick setup locally
 
-Run:
+Toolpad Core:
+
+```bash
+npx create-toolpad-app@latest
+# or
+pnpm create toolpad-app
+# or
+yarn create toolpad-app
+```
+
+Toolpad Studio:
 
 ```bash
 npx create-toolpad-app@latest --studio my-toolpad-studio-app

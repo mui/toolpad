@@ -295,8 +295,8 @@ const run = async () => {
         message: 'Select authentication providers to enable:',
         required: true,
         choices: [
-          { name: 'Google', value: 'Google' },
-          { name: 'GitHub', value: 'GitHub' },
+          { name: 'Google', value: 'google' },
+          { name: 'GitHub', value: 'github' },
         ],
       });
     }

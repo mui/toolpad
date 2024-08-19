@@ -1,7 +1,9 @@
 const rootPage = `
   "use client";
   import Link from 'next/link';
-  import { Container, Typography, Box } from '@mui/material';
+  import Container from '@mui/material/Container';
+  import Typography from '@mui/material/Typography';
+  import Box from '@mui/material/Box';
   import NavigateButton from './NavigateButton';
   
   export default function Home() {

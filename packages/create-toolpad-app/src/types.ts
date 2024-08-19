@@ -1,6 +1,11 @@
 import { PackageJson } from './templates/packageType';
 
-export type SupportedAuthProvider = 'Credentials' | 'Google' | 'GitHub' | 'Facebook';
+// https://authjs.dev/reference/core/providers#oauthconfigprofile
+type SupportedOAuthProvider = 'facebook' | 'github' | 'google';
+
+// https://authjs.dev/reference/core/providers#providertype
+export type SupportedAuthProvider = SupportedOAuthProvider | 'credentials';
+
 export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';
 export type PackageManager = 'npm' | 'pnpm' | 'yarn';
 

@@ -66,7 +66,7 @@ export default function generateProject(
     ['README.md', { content: readme }],
     ['.gitignore', { content: gitignore }],
   ]);
-  const hasCredentialsProvider = options.authProviders.includes('Credentials');
+  const hasCredentialsProvider = options.authProviders.includes('credentials');
 
   switch (options.router) {
     case 'nextjs-pages': {
@@ -110,7 +110,7 @@ export default function generateProject(
 
         const authFiles = new Map([
           ['auth.ts', { content: auth(options.authProviders) }],
-          ['.env.local', { content: auth(options.authProviders) }],
+          ['.env.local', { content: envLocal(options.authProviders) }],
           ['middleware.ts', { content: middleware }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
           ['app/auth/signin/page.tsx', { content: signInPage(hasCredentialsProvider) }],

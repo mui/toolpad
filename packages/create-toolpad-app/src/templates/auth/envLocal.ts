@@ -1,7 +1,8 @@
+import { kebabToConstant } from '@toolpad/utils/strings';
 import { ProvidersTemplate } from '../../types';
 
 const env: ProvidersTemplate = (providers) => {
-  const oAuthProviders = providers.filter((provider) => provider !== 'Credentials');
+  const oAuthProviders = providers.filter((provider) => provider !== 'credentials');
   return `
 # Generate a secret with \`npx auth secret\`
 # and replace the value below with it
@@ -12,8 +13,8 @@ AUTH_SECRET=secret
 ${oAuthProviders
   .map(
     (provider) => `
-${provider?.toUpperCase()}_CLIENT_ID=
-${provider?.toUpperCase()}_CLIENT_SECRET=`,
+${kebabToConstant(provider)}_CLIENT_ID=
+${kebabToConstant(provider)}_CLIENT_SECRET=`,
   )
   .join('\n')}    
 `;

@@ -340,35 +340,43 @@ function QueryEditor({
 
                 <Divider sx={{ mb: 1.5 }} />
                 <TabPanel value="parameters" disableGutters sx={{ ml: 1 }}>
-                  <Grid display="grid" gridTemplateColumns={'1fr 1fr 1fr'} gap={2}>
+                  <Grid container spacing={2}>
                     {Object.entries(parameterDefs).map(([name, definiton]) => {
                       const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
-                      return Control ? (
-                        <BindableEditor
-                          key={name}
-                          liveBinding={liveBindings[name]}
-                          globalScope={globalScope}
-                          globalScopeMeta={globalScopeMeta}
-                          label={name}
-                          propType={definiton}
-                          jsRuntime={jsBrowserRuntime}
-                          renderControl={(renderControlParams) => (
-                            <Control {...renderControlParams} propType={definiton} />
-                          )}
-                          value={paramsObject[name]}
-                          onChange={(newValue) => {
-                            const paramKeys = Object.keys(parameterDefs);
-                            const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
-                              const paramValue = key === name ? newValue : paramsObject[key];
-                              return paramValue ? [[key, paramValue]] : [];
-                            });
-                            appStateApi.updateQueryDraft((draft) => ({
-                              ...draft,
-                              params: newParams,
-                            }));
-                          }}
-                        />
-                      ) : null;
+                      if (!Control) {
+                        return (
+                          <Grid size={4} key={name} sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography>Can&apos;t configure {name}</Typography>
+                          </Grid>
+                        );
+                      }
+                      return (
+                        <Grid size={4} key={name}>
+                          <BindableEditor
+                            liveBinding={liveBindings[name]}
+                            globalScope={globalScope}
+                            globalScopeMeta={globalScopeMeta}
+                            label={name}
+                            propType={definiton}
+                            jsRuntime={jsBrowserRuntime}
+                            renderControl={(renderControlParams) => (
+                              <Control {...renderControlParams} propType={definiton} />
+                            )}
+                            value={paramsObject[name]}
+                            onChange={(newValue) => {
+                              const paramKeys = Object.keys(parameterDefs);
+                              const newParams: BindableAttrEntries = paramKeys.flatMap((key) => {
+                                const paramValue = key === name ? newValue : paramsObject[key];
+                                return paramValue ? [[key, paramValue]] : [];
+                              });
+                              appStateApi.updateQueryDraft((draft) => ({
+                                ...draft,
+                                params: newParams,
+                              }));
+                            }}
+                          />
+                        </Grid>
+                      );
                     })}
                   </Grid>
                 </TabPanel>

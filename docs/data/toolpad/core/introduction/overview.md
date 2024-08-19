@@ -4,7 +4,7 @@ title: Toolpad Overview
 
 # Toolpad Core
 
-<p class="description">A set of full-stack components to build dashboards with React.</p>
+<p class="description">A set of components to build dashboards with React.</p>
 
 Toolpad Core is a set of full-stack react components that leverages existing MUI components, and ties them with the commonly-used backend integrations to help you create responsive dashboards and internal tools. It comes with the guarantee of MUI's enterprise-tested components, and the Toolpad team's focus on using the latest stable libraries, and prioritising razor-sharp performance.
 

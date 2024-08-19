@@ -5,7 +5,7 @@
 
 <h1 align="center">Toolpad Core</h1>
 
-Toolpad Core is a set of full-stack components for building react dashboards, internal tools, and B2B web applications. It is built on top of Next.js and offers a suite of components such as layout, navigation, authentication, and data management interfaces to help you build scalable dashboards fast.
+Toolpad Core is a set of full-stack components for building dashboards, internal tools, and B2B web applications with React. It is built on top of Next.js and offers a suite of components such as layout, navigation, authentication, and data management interfaces to help you build scalable dashboards fast.
 
 ## Installation
 

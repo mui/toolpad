@@ -103,14 +103,14 @@ export default function BindableEditor<V>({
 
   return (
     <EditorRoot sx={sx}>
-      <React.Fragment>
-        {renderControl({
-          label,
-          propType,
-          disabled: disabled || !!hasBinding,
-          value: constValue,
-          onChange: handlePropConstChange,
-        })}
+      {renderControl({
+        label,
+        propType,
+        disabled: disabled || !!hasBinding,
+        value: constValue,
+        onChange: handlePropConstChange,
+      })}
+      {propType.control?.bindable === false ? null : (
         <BindingEditor<V>
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
@@ -125,7 +125,7 @@ export default function BindableEditor<V>({
           env={env}
           declaredEnvKeys={declaredEnvKeys}
         />
-      </React.Fragment>
+      )}
     </EditorRoot>
   );
 }

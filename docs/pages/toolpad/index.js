@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Head from 'docs/src/modules/components/Head';
 import BrandingCssVarsProvider from 'docs/src/BrandingCssVarsProvider';
 import Divider from '@mui/material/Divider';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,6 +15,11 @@ import StudioIntro from '../../src/components/landing/StudioIntro';
 export default function Home() {
   return (
     <BrandingCssVarsProvider>
+      <Head
+        title="Toolpad Core: React components for dashboards"
+        description="Toolpad Core offers the components needed for your next admin panel and internal tools project."
+        card="/static/toolpad/marketing/toolpad-core-og.jpg"
+      />
       <CssBaseline />
       <AppHeaderBanner />
       <AppHeader gitHubRepository="https://github.com/mui/mui-toolpad" />

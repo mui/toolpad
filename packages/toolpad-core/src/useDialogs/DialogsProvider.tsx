@@ -24,7 +24,7 @@ export interface DialogProviderProps {
  *
  * Demos:
  *
- * - [Dialogs](https://mui.com/toolpad/core/react-use-dialogs/)
+ * - [useDialogs](https://mui.com/toolpad/core/react-use-dialogs/)
  *
  * API:
  *

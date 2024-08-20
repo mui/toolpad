@@ -122,28 +122,26 @@ export interface SignInPageProps {
     submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
     /**
      * The custom forgot password link component used in the credentials form.
-     * @default Link
+     * @default null;
      */
     forgotPasswordLink?: React.JSXElementConstructor<LinkProps>;
     /**
      * The custom sign up link component used in the credentials form.
-     * @default Link
+     * @default null;
      */
     signUpLink?: React.JSXElementConstructor<LinkProps>;
   };
   /**
    * Props to pass to internal components
    * @default {}
-   * @example { email: { autoFocus: false } }
-   * @example { password: { variant: 'outlined' } }
-   * @example { email: { autoFocus: false }, password: { variant: 'outlined' } }
+   * @example { emailField: { autoFocus: false } }
+   * @example { passwordField: { variant: 'outlined' } }
+   * @example { emailField: { autoFocus: false }, passwordField: { variant: 'outlined' } }
    */
   slotProps?: {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
     submitButton?: LoadingButtonProps;
-    forgotPasswordLink?: LinkProps;
-    signUpLink?: LinkProps;
   };
 }
 
@@ -358,14 +356,11 @@ function SignInPage(props: SignInPageProps) {
                     Sign in
                   </LoadingButton>
                 )}
-
                 {slots?.forgotPasswordLink || slots?.signUpLink ? (
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    {slots?.forgotPasswordLink ? (
-                      <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
-                    ) : null}
+                    {slots?.forgotPasswordLink ? <slots.forgotPasswordLink /> : null}
 
-                    {slots?.signUpLink ? <slots.signUpLink {...slotProps?.signUpLink} /> : null}
+                    {slots?.signUpLink ? <slots.signUpLink /> : null}
                   </Box>
                 ) : null}
               </Box>

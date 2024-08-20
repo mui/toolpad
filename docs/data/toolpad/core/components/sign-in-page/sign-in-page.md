@@ -49,7 +49,7 @@ This renders an alert with the `error` string as the message.
 
 The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "alt": "Auth.js & Next.js with Toolpad Core sign in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign In page", "zoom": true, "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "srcDark": "/static/toolpad/docs/core/auth-next-dark.png", "alt": "Auth.js & Next.js with Toolpad Core sign in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign In page", "zoom": true, "indent": 1 }}
 
 #### Setting up
 
@@ -136,23 +136,29 @@ If you're using the default [Next.js app directory example](https://github.com/m
 
 You can add your own branding elements to the `SignInPage` through the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/)
 
-{{"demo": "BrandingSignInPage.js", "iframe": true, "height": 360 }}
+{{"demo": "BrandingSignInPage.js", "height": 360 }}
 
 ### Theme
 
 Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be deeply customized to match any theme
 
-{{"demo": "ThemeSignInPage.js", "iframe": true, "height": 700 }}
+{{"demo": "ThemeSignInPage.js", "height": 700 }}
 
-### Components
+### Slot Props
 
-`SignInPage` can be customized by passing in `slotProps` to the underlying components of the credentials form.
+You can use the `slotProps` prop to customize the underlying components of the `SignInPage`:
 
-{{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 540 }}
+{{"demo": "SlotPropsSignIn.js", "height": 540 }}
 
-#### 🚧 Composition
+### Slots
 
-To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs and buttons. This is in progress.
+To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs and buttons.
+
+:::info
+Make sure to use the `name` attribute on the custom components with values `email` and `password` to enable data capture by the form action.
+:::
+
+{{"demo": "SlotsSignIn.js", "height": 540 }}
 
 ### 🚧 Layouts
 

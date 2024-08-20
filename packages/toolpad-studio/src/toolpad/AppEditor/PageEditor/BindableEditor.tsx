@@ -14,6 +14,7 @@ import {
   JsRuntime,
   ScopeMeta,
   EnvAttrValue,
+  ArgTypeDefinition,
 } from '@toolpad/studio-runtime';
 import { WithControlledProp } from '@toolpad/utils/types';
 import { getBindingType } from '../../../runtime/bindings';
@@ -43,7 +44,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   bindable?: boolean;
   disabled?: boolean;
   jsRuntime: JsRuntime;
-  propType: PropValueType;
+  propType: ArgTypeDefinition<any>;
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;

@@ -24,13 +24,14 @@ function CustomEmailField() {
       label="Username"
       name="email"
       type="email"
+      size="small"
       required
       fullWidth
       slotProps={{
         input: {
           startAdornment: (
             <InputAdornment position="start">
-              <AccountCircle />
+              <AccountCircle fontSize="inherit" />
             </InputAdornment>
           ),
         },
@@ -51,11 +52,14 @@ function CustomPasswordField() {
 
   return (
     <FormControl sx={{ my: 2 }} fullWidth variant="outlined">
-      <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+      <InputLabel size="small" htmlFor="outlined-adornment-password">
+        Password
+      </InputLabel>
       <OutlinedInput
         id="outlined-adornment-password"
         type={showPassword ? 'text' : 'password'}
         name="password"
+        size="small"
         endAdornment={
           <InputAdornment position="end">
             <IconButton
@@ -63,8 +67,13 @@ function CustomPasswordField() {
               onClick={handleClickShowPassword}
               onMouseDown={handleMouseDownPassword}
               edge="end"
+              size="small"
             >
-              {showPassword ? <VisibilityOff /> : <Visibility />}
+              {showPassword ? (
+                <VisibilityOff fontSize="inherit" />
+              ) : (
+                <Visibility fontSize="inherit" />
+              )}
             </IconButton>
           </InputAdornment>
         }
@@ -80,6 +89,7 @@ function CustomButton() {
       type="submit"
       variant="outlined"
       color="info"
+      size="small"
       disableElevation
       fullWidth
       sx={{ my: 2 }}
@@ -90,11 +100,19 @@ function CustomButton() {
 }
 
 function SignUpLink() {
-  return <Link href="/signup" variant="body2" />;
+  return (
+    <Link href="/" variant="body2">
+      Sign up
+    </Link>
+  );
 }
 
 function ForgotPasswordLink() {
-  return <Link href="/forgot-password" variant="body2" />;
+  return (
+    <Link href="/" variant="body2">
+      Forgot password?
+    </Link>
+  );
 }
 
 export default function SlotsSignIn() {

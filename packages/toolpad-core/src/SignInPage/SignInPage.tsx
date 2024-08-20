@@ -99,7 +99,7 @@ export interface SignInPageProps {
     callbackUrl?: string,
   ) => void | Promise<AuthResponse>;
   /**
-   * Custom components to override internal components
+   * The components used for each slot inside.
    * @default {}
    * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
    * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
@@ -132,7 +132,7 @@ export interface SignInPageProps {
     signUpLink?: React.JSXElementConstructor<LinkProps>;
   };
   /**
-   * Props to pass to internal components
+   * The props used for each slot inside.
    * @default {}
    * @example { email: { autoFocus: false } }
    * @example { password: { variant: 'outlined' } }
@@ -402,7 +402,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
    */
   signIn: PropTypes.func,
   /**
-   * Props to pass to internal components
+   * The props used for each slot inside.
    * @default {}
    * @example { email: { autoFocus: false } }
    * @example { password: { variant: 'outlined' } }
@@ -416,7 +416,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
     submitButton: PropTypes.object,
   }),
   /**
-   * Custom components to override internal components
+   * The components used for each slot inside.
    * @default {}
    * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
    * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }

@@ -69,19 +69,25 @@ Disabled property shows the state of the component so that end user is aware tha
 
 ## Validation
 
+The validation props offer the option to create an interactive text field component for various scenarios. These are available as a checkbox configurations in the Toolpad Studio editor.
+
 ### isRequired
 
-isRequired is useful when the action can't be perfomed without a user provided text value.
+isRequired prop is useful when the action can't be perfomed without a user provided text value. It can be used to assign mandatory fields.
+
+{{"demo": "TextFieldIsRequired.js", "hideToolbar": true}}
 
 ### minLength
 
-A validation check on the minimum length of the input. The below demo showcases usage of password, isRequired and, minLength props. These props are available as configurations in the Toolpad Studio editor.
+A check on the minimum length of the input. In the below demo the input should be more than six characters long else it throws a validation error. It can be used to ensure passwords are long enough.
 
 {{"demo": "TextFieldMinlength.js", "hideToolbar": true}}
 
 ### maxLength
 
-A validation check on the maximum length of the input.
+A validation check on the maximum length of the input. The below demo shows a validation error when the input breaches the limit of ten characters. In combination with other props, it can be used for zip codes, phone numbers, etc.
+
+{{"demo": "TextFieldMaxlength.js", "hideToolbar": true}}
 
 ## API
 

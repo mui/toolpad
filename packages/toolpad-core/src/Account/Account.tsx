@@ -46,7 +46,8 @@ export interface AccountProps {
  *
  * - [Account API](https://mui.com/toolpad/core/api/account)
  */
-function Account({ slotProps, signInLabel = 'Sign In', signOutLabel = 'Sign Out' }: AccountProps) {
+function Account(props: AccountProps) {
+  const { slotProps, signInLabel = 'Sign In', signOutLabel = 'Sign Out' } = props;
   const session = React.useContext(SessionContext);
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);

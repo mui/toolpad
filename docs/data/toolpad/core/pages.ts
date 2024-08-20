@@ -85,7 +85,7 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/core/react-persistent-state',
-            title: 'Peristent State',
+            title: 'Persisted state',
           },
         ],
       },
@@ -97,6 +97,7 @@ const pages: MuiPage[] = [
     children: [
       {
         pathname: '/toolpad/core/api/components-group',
+        inSideNav: false,
         subheader: 'Components',
         children: [
           ...pagesApi,

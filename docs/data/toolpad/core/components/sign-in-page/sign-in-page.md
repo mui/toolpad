@@ -49,7 +49,7 @@ This renders an alert with the `error` string as the message.
 
 The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "srcDark": "/static/toolpad/docs/core/auth-next-dark.png", "alt": "Auth.js & Next.js with Toolpad Core sign in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign In page", "zoom": true, "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "srcDark": "/static/toolpad/docs/core/auth-next-dark.png", "alt": "Auth.js & Next.js with Toolpad Core sign in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign In page", "zoom": true, "indent": 1, "aspectRatio": "1.428" }}
 
 #### Setting up
 
@@ -136,7 +136,7 @@ If you're using the default [Next.js app directory example](https://github.com/m
 
 You can add your own branding elements to the `SignInPage` through the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/)
 
-{{"demo": "BrandingSignInPage.js", "height": 360 }}
+{{"demo": "BrandingSignInPage.js", "iframe": true, "height": 360 }}
 
 ### Theme
 

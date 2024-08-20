@@ -122,12 +122,12 @@ export interface SignInPageProps {
     submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
     /**
      * The custom forgot password link component used in the credentials form.
-     * @default null;
+     * @default Link
      */
     forgotPasswordLink?: React.JSXElementConstructor<LinkProps>;
     /**
      * The custom sign up link component used in the credentials form.
-     * @default null;
+     * @default Link
      */
     signUpLink?: React.JSXElementConstructor<LinkProps>;
   };
@@ -142,6 +142,8 @@ export interface SignInPageProps {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
     submitButton?: LoadingButtonProps;
+    forgotPasswordLink?: LinkProps;
+    signUpLink?: LinkProps;
   };
 }
 
@@ -356,11 +358,14 @@ function SignInPage(props: SignInPageProps) {
                     Sign in
                   </LoadingButton>
                 )}
+
                 {slots?.forgotPasswordLink || slots?.signUpLink ? (
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                    {slots?.forgotPasswordLink ? <slots.forgotPasswordLink /> : null}
+                    {slots?.forgotPasswordLink ? (
+                      <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
+                    ) : null}
 
-                    {slots?.signUpLink ? <slots.signUpLink /> : null}
+                    {slots?.signUpLink ? <slots.signUpLink {...slotProps?.signUpLink} /> : null}
                   </Box>
                 ) : null}
               </Box>

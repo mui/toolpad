@@ -10,8 +10,8 @@
         "callbackUrl": "The URL to redirect to after signing in."
       }
     },
-    "slotProps": { "description": "Props to pass to internal components" },
-    "slots": { "description": "Custom components to override internal components" }
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." }
   },
   "classDescriptions": {}
 }

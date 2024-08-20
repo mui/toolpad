@@ -15,7 +15,7 @@ export const layoutBoxArgTypes: {
     enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
     default: 'start',
     label: 'Horizontal alignment',
-    control: { type: 'HorizontalAlign', hideLabel: true },
+    control: { type: 'HorizontalAlign', hideLabel: true, bindable: false },
   },
   verticalAlign: {
     helperText: 'Vertical alignment of the component.',
@@ -23,6 +23,6 @@ export const layoutBoxArgTypes: {
     enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
     default: 'start',
     label: 'Vertical alignment',
-    control: { type: 'VerticalAlign', hideLabel: true },
+    control: { type: 'VerticalAlign', hideLabel: true, bindable: false },
   },
 };

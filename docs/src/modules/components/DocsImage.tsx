@@ -13,6 +13,7 @@ const Root = styled('div')({
 
 interface DocsImageProps {
   src: string;
+  srcDark?: string;
   alt: string;
   caption?: string;
   zoom?: boolean;
@@ -158,7 +159,7 @@ export default function DocsImage(props: DocsImageProps) {
         ) : null}
         <ImageCaption indent={indent}>{caption}</ImageCaption>
       </Root>
-      <ImageViewer open={open} src={src} alt={alt} handleClose={handleViewerClose} />
+      <ImageViewer open={open} src={computedSrc} alt={alt} handleClose={handleViewerClose} />
     </React.Fragment>
   );
 }

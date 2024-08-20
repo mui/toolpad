@@ -12,7 +12,7 @@ The `Account` component is a quick and easy way to display an account management
 
 ## States
 
-When signed out, the component renders as an inline sign in button within the dashboard layout. If a `session` object is present, the component is rendered as a dropdown containing the user's account details as well as an option to sign out.
+If a `session` object is present, the component is rendered as a dropdown containing the user's account details as well as an option to sign out. When signed out, the component renders as an inline sign in button within the dashboard layout.
 
 {{"demo": "AccountDemo.js", "bg": "gradient" }}
 

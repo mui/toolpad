@@ -81,13 +81,13 @@ isRequired prop is useful when the action can't be perfomed without a user provi
 
 A check on the minimum length of the input. In the below demo the input should be more than six characters long else it throws a validation error. It can be used to ensure passwords are long enough.
 
-{{"demo": "TextFieldMinlength.js", "hideToolbar": true}}
+{{"demo": "TextFieldMinLength.js", "hideToolbar": true}}
 
 ### maxLength
 
 A validation check on the maximum length of the input. The below demo shows a validation error when the input breaches the limit of ten characters. In combination with other props, it can be used for zip codes, phone numbers, etc.
 
-{{"demo": "TextFieldMaxlength.js", "hideToolbar": true}}
+{{"demo": "TextFieldMaxLength.js", "hideToolbar": true}}
 
 ## API
 

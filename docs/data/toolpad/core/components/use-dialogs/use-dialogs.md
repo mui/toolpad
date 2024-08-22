@@ -4,7 +4,7 @@ title: useDialogs
 components: DialogsProvider
 ---
 
-# Dialogs
+# useDialogs
 
 <p class="description">Imperative APIs to open and interact with dialogs.</p>
 

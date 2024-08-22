@@ -164,7 +164,7 @@ export interface SignInPageProps {
  *
  * Demos:
  *
- * - [Sign In Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
  *
  * API:
  *

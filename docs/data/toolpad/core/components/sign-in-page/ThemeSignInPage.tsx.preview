@@ -1,0 +1,13 @@
+const THEME = createTheme({
+  ...brandingDesignTokens,
+  palette: {
+    ...brandingDesignTokens.palette,
+    mode: calculatedMode,
+  },
+});
+
+// ...
+
+<AppProvider theme={THEME}>
+  <SignInPage signIn={signIn} providers={providers} />
+</AppProvider>

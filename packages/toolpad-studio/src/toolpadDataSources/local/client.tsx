@@ -340,7 +340,7 @@ function QueryEditor({
 
                 <Divider sx={{ mb: 1.5 }} />
                 <TabPanel value="parameters" disableGutters sx={{ ml: 1 }}>
-                  <Grid container spacing={2}>
+                  <Grid container spacing={1}>
                     {Object.entries(parameterDefs).map(([name, definiton]) => {
                       const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
                       if (!Control) {

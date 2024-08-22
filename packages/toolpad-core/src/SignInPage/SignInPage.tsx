@@ -17,6 +17,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import Stack from '@mui/material/Stack';
+import { LinkProps } from '@mui/material/Link';
 import { BrandingContext, DocsContext, RouterContext } from '../shared/context';
 
 const IconProviderMap = new Map<string, React.ReactNode>([
@@ -98,7 +99,40 @@ export interface SignInPageProps {
     callbackUrl?: string,
   ) => void | Promise<AuthResponse>;
   /**
-   * Props to pass to the constituent components in the credentials form
+   * The components used for each slot inside.
+   * @default {}
+   * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
+   * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
+   */
+  slots?: {
+    /**
+     * The custom email field component used in the credentials form.
+     * @default TextField
+     */
+    emailField?: React.JSXElementConstructor<TextFieldProps>;
+    /**
+     * The custom password field component used in the credentials form.
+     * @default TextField
+     */
+    passwordField?: React.JSXElementConstructor<TextFieldProps>;
+    /**
+     * The custom submit button component used in the credentials form.
+     * @default LoadingButton
+     */
+    submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
+    /**
+     * The custom forgot password link component used in the credentials form.
+     * @default Link
+     */
+    forgotPasswordLink?: React.JSXElementConstructor<LinkProps>;
+    /**
+     * The custom sign up link component used in the credentials form.
+     * @default Link
+     */
+    signUpLink?: React.JSXElementConstructor<LinkProps>;
+  };
+  /**
+   * The props used for each slot inside.
    * @default {}
    * @example { email: { autoFocus: false } }
    * @example { password: { variant: 'outlined' } }
@@ -108,6 +142,8 @@ export interface SignInPageProps {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
     submitButton?: LoadingButtonProps;
+    forgotPasswordLink?: LinkProps;
+    signUpLink?: LinkProps;
   };
 }
 
@@ -122,7 +158,7 @@ export interface SignInPageProps {
  * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
  */
 function SignInPage(props: SignInPageProps) {
-  const { providers, signIn, slotProps } = props;
+  const { providers, signIn, slots, slotProps } = props;
   const branding = React.useContext(BrandingContext);
   const docs = React.useContext(DocsContext);
   const router = React.useContext(RouterContext);
@@ -179,7 +215,7 @@ function SignInPage(props: SignInPageProps) {
                     const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
                     setFormStatus((prev) => ({
                       ...prev,
-                      loading: false,
+                      loading: oauthResponse?.error || docs ? false : prev.loading,
                       error: oauthResponse?.error,
                     }));
                   }}
@@ -242,68 +278,96 @@ function SignInPage(props: SignInPageProps) {
                   }));
                 }}
               >
-                <TextField
-                  margin="dense"
-                  required
-                  inputProps={{
-                    sx: { paddingTop: '12px', paddingBottom: '12px' },
-                  }}
-                  InputLabelProps={{
-                    sx: { lineHeight: '1rem' },
-                  }}
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  autoFocus={docs ? false : singleProvider}
-                  {...slotProps?.emailField}
-                />
-                <TextField
-                  margin="dense"
-                  required
-                  fullWidth
-                  inputProps={{
-                    sx: { paddingTop: '12px', paddingBottom: '12px' },
-                  }}
-                  InputLabelProps={{
-                    sx: { lineHeight: '1rem' },
-                  }}
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  {...slotProps?.passwordField}
-                />
+                {slots?.emailField ? (
+                  <slots.emailField {...slotProps?.emailField} />
+                ) : (
+                  <TextField
+                    margin="dense"
+                    required
+                    slotProps={{
+                      htmlInput: {
+                        sx: { paddingTop: '12px', paddingBottom: '12px' },
+                      },
+                      inputLabel: {
+                        sx: { lineHeight: '1rem' },
+                      },
+                    }}
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    autoFocus={docs ? false : singleProvider}
+                    {...slotProps?.emailField}
+                  />
+                )}
+
+                {slots?.passwordField ? (
+                  <slots.passwordField {...slotProps?.passwordField} />
+                ) : (
+                  <TextField
+                    margin="dense"
+                    required
+                    fullWidth
+                    slotProps={{
+                      htmlInput: {
+                        sx: { paddingTop: '12px', paddingBottom: '12px' },
+                      },
+                      inputLabel: {
+                        sx: { lineHeight: '1rem' },
+                      },
+                    }}
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    {...slotProps?.passwordField}
+                  />
+                )}
+
                 <FormControlLabel
                   control={<Checkbox value="remember" color="primary" />}
                   label="Remember me"
                   slotProps={{ typography: { color: 'textSecondary' } }}
                 />
-                <LoadingButton
-                  type="submit"
-                  fullWidth
-                  size="large"
-                  variant="contained"
-                  disableElevation
-                  color={singleProvider ? 'primary' : 'inherit'}
-                  loading={loading && providerId === credentialsProvider.id}
-                  sx={{
-                    mt: 3,
-                    mb: 2,
-                    textTransform: 'capitalize',
-                    filter: 'opacity(0.9)',
-                    transition: 'filter 0.2s ease-in',
-                    '&:hover': {
-                      filter: 'opacity(1)',
-                    },
-                  }}
-                  {...slotProps?.submitButton}
-                >
-                  Sign in
-                </LoadingButton>
+                {slots?.submitButton ? (
+                  <slots.submitButton {...slotProps?.submitButton} />
+                ) : (
+                  <LoadingButton
+                    type="submit"
+                    fullWidth
+                    size="large"
+                    variant="contained"
+                    disableElevation
+                    color={singleProvider ? 'primary' : 'inherit'}
+                    loading={loading && providerId === credentialsProvider.id}
+                    sx={{
+                      mt: 3,
+                      mb: 2,
+                      textTransform: 'capitalize',
+                      filter: 'opacity(0.9)',
+                      transition: 'filter 0.2s ease-in',
+                      '&:hover': {
+                        filter: 'opacity(1)',
+                      },
+                    }}
+                    {...slotProps?.submitButton}
+                  >
+                    Sign in
+                  </LoadingButton>
+                )}
+
+                {slots?.forgotPasswordLink || slots?.signUpLink ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                    {slots?.forgotPasswordLink ? (
+                      <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
+                    ) : null}
+
+                    {slots?.signUpLink ? <slots.signUpLink {...slotProps?.signUpLink} /> : null}
+                  </Box>
+                ) : null}
               </Box>
             </React.Fragment>
           ) : null}
@@ -338,7 +402,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
    */
   signIn: PropTypes.func,
   /**
-   * Props to pass to the constituent components in the credentials form
+   * The props used for each slot inside.
    * @default {}
    * @example { email: { autoFocus: false } }
    * @example { password: { variant: 'outlined' } }
@@ -346,8 +410,23 @@ SignInPage.propTypes /* remove-proptypes */ = {
    */
   slotProps: PropTypes.shape({
     emailField: PropTypes.object,
+    forgotPasswordLink: PropTypes.object,
     passwordField: PropTypes.object,
+    signUpLink: PropTypes.object,
     submitButton: PropTypes.object,
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
+   * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
+   */
+  slots: PropTypes.shape({
+    emailField: PropTypes.elementType,
+    forgotPasswordLink: PropTypes.elementType,
+    passwordField: PropTypes.elementType,
+    signUpLink: PropTypes.elementType,
+    submitButton: PropTypes.elementType,
   }),
 } as any;
 

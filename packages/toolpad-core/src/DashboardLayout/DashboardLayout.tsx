@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme } from '@mui/material';
+import { styled } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -19,24 +19,20 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import useSsr from '@toolpad/utils/hooks/useSsr';
-import { Account } from '../Account';
 import { Link } from '../shared/Link';
 import {
   BrandingContext,
   NavigationContext,
-  PaletteModeContext,
   RouterContext,
   WindowContext,
 } from '../shared/context';
 import type { Navigation } from '../AppProvider';
 import { ToolpadLogo } from './ToolpadLogo';
+import { ToolbarActions } from '../layout/ToolbarActions';
 import {
   getItemTitle,
   getPageItemFullPath,
@@ -85,65 +81,6 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
     color: (theme.vars ?? theme).palette.action.active,
   },
 }));
-
-function ThemeSwitcher() {
-  const isSsr = useSsr();
-  const theme = useTheme();
-
-  const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
-
-  const toggleMode = React.useCallback(() => {
-    setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
-  }, [paletteMode, setPaletteMode]);
-
-  return isDualTheme ? (
-    <Tooltip
-      title={isSsr ? 'Switch mode' : `${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`}
-      enterDelay={1000}
-    >
-      <div>
-        <IconButton
-          aria-label={
-            isSsr
-              ? 'Switch theme mode'
-              : `Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`
-          }
-          onClick={toggleMode}
-          sx={{
-            color: (theme.vars ?? theme).palette.primary.dark,
-            padding: 1,
-            marginRight: 1,
-          }}
-        >
-          {theme.getColorSchemeSelector ? (
-            <React.Fragment>
-              <DarkModeIcon
-                sx={{
-                  display: 'inline',
-                  [theme.getColorSchemeSelector('dark')]: {
-                    display: 'none',
-                  },
-                }}
-              />
-              <LightModeIcon
-                sx={{
-                  display: 'none',
-                  [theme.getColorSchemeSelector('dark')]: {
-                    display: 'inline',
-                  },
-                }}
-              />
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              {isSsr || paletteMode !== 'dark' ? <DarkModeIcon /> : <LightModeIcon />}
-            </React.Fragment>
-          )}
-        </IconButton>
-      </div>
-    </Tooltip>
-  ) : null;
-}
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
@@ -318,6 +255,20 @@ export interface DashboardLayoutProps {
    * The content of the dashboard.
    */
   children: React.ReactNode;
+  /**
+   * Overridable components.
+   * @default {}
+   */
+  slots?: {
+    /**
+     * Toolbar actions component rendered in the layout header.
+     * @default ToolbarActions
+     */
+    toolbarActions?: React.JSXElementConstructor<{}>;
+  };
+  slotProps?: {
+    toolbarActions?: {};
+  };
 }
 
 /**
@@ -331,7 +282,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children } = props;
+  const { children, slots, slotProps } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
@@ -428,8 +379,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <ThemeSwitcher />
-          <Account />
+          {slots?.toolbarActions ? (
+            <slots.toolbarActions {...slotProps?.toolbarActions} />
+          ) : (
+            <ToolbarActions {...slotProps?.toolbarActions} />
+          )}
         </Toolbar>
       </AppBar>
       <Drawer

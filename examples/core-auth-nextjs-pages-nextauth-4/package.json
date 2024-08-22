@@ -1,0 +1,24 @@
+{
+  "name": "playground-nextjs-pages-nextauth-4",
+  "version": "0.5.1",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "lint": "next lint"
+  },
+  "devDependencies": {
+    "@emotion/react": "11.13.0",
+    "@emotion/styled": "11.13.0",
+    "@mui/icons-material": "5.16.7",
+    "@mui/material": "5.16.7",
+    "@mui/material-nextjs": "5.16.6",
+    "@toolpad/core": "workspace:*",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "eslint-config-next": "14.2.5",
+    "next": "14.2.5",
+    "next-auth": "^4.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

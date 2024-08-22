@@ -149,7 +149,7 @@ let nextId = 1;
  *
  * Demos:
  *
- * - [Sign In Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
  * - [useNotifications](https://mui.com/toolpad/core/react-use-notifications/)
  *
  * API:

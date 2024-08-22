@@ -1,12 +1,12 @@
 ---
 productId: toolpad-core
-title: Sign In Page
+title: Sign-in Page
 components: SignInPage, Account, NotificationsProvider
 ---
 
-# Sign In Page
+# Sign-in Page
 
-<p class="description">A customizable sign in UI component that abstracts away the pain needed to wire together a secure authentication page for your application.</p>
+<p class="description">A customizable sign-in UI component that abstracts away the pain needed to wire together a secure authentication page for your application.</p>
 
 The `SignInPage` component is a quick way to generate a ready-to-use authentication page with multiple OAuth providers, or a credentials form.
 
@@ -49,7 +49,7 @@ This renders an alert with the `error` string as the message.
 
 The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "srcDark": "/static/toolpad/docs/core/auth-next-dark.png", "alt": "Auth.js & Next.js with Toolpad Core sign in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign In page", "zoom": true, "indent": 1, "aspectRatio": "1.428" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "srcDark": "/static/toolpad/docs/core/auth-next-dark.png", "alt": "Auth.js & Next.js with Toolpad Core sign-in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign-in page", "zoom": true, "indent": 1, "aspectRatio": "1.428" }}
 
 #### Setting up
 
@@ -61,7 +61,7 @@ To get the required credentials, create an application in the GitHub developer s
 
 ##### Server Configuration
 
-The `SignInPage` component can slot in as a custom sign in page inside Auth.js:
+The `SignInPage` component can slot in as a custom sign-in page inside Auth.js:
 
 ```ts title="./auth.ts"
 // ...
@@ -74,7 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 // ...
 ```
 
-You can then have a fully built GitHub sign in page appear at `/auth/signin` by adding `SignInPage` to `page.tsx`:
+You can then have a fully built GitHub sign-in page appear at `/auth/signin` by adding `SignInPage` to `page.tsx`:
 
 ```tsx title="./app/auth/signin/page.tsx"
 // ...
@@ -127,7 +127,7 @@ export default function SignIn() {
 ```
 
 :::info
-If you're using the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), all of this is already configured for you. Otherwise, follow the [custom sign in page instructions](https://authjs.dev/guides/pages/signin).
+If you're using the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), all of this is already configured for you. Otherwise, follow the [custom sign-in page instructions](https://authjs.dev/guides/pages/signin).
 :::
 
 ## Customization

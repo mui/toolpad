@@ -14,6 +14,7 @@ import {
   JsRuntime,
   ScopeMeta,
   EnvAttrValue,
+  ArgTypeDefinition,
 } from '@toolpad/studio-runtime';
 import { WithControlledProp } from '@toolpad/utils/types';
 import { getBindingType } from '../../../runtime/bindings';
@@ -43,7 +44,7 @@ export interface BindableEditorProps<V> extends WithControlledProp<BindableAttrV
   bindable?: boolean;
   disabled?: boolean;
   jsRuntime: JsRuntime;
-  propType: PropValueType;
+  propType: ArgTypeDefinition<any>;
   renderControl?: (params: RenderControlParams<any>) => React.ReactNode;
   liveBinding?: LiveBinding;
   globalScope?: Record<string, unknown>;
@@ -103,14 +104,14 @@ export default function BindableEditor<V>({
 
   return (
     <EditorRoot sx={sx}>
-      <React.Fragment>
-        {renderControl({
-          label,
-          propType,
-          disabled: disabled || !!hasBinding,
-          value: constValue,
-          onChange: handlePropConstChange,
-        })}
+      {renderControl({
+        label,
+        propType,
+        disabled: disabled || !!hasBinding,
+        value: constValue,
+        onChange: handlePropConstChange,
+      })}
+      {propType.control?.bindable === false ? null : (
         <BindingEditor<V>
           globalScope={globalScope}
           globalScopeMeta={globalScopeMeta}
@@ -125,7 +126,7 @@ export default function BindableEditor<V>({
           env={env}
           declaredEnvKeys={declaredEnvKeys}
         />
-      </React.Fragment>
+      )}
     </EditorRoot>
   );
 }

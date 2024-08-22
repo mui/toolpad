@@ -1,12 +1,12 @@
 ---
 productId: toolpad-core
-title: Sign In Page
+title: Sign-in Page
 components: SignInPage, Account, NotificationsProvider
 ---
 
-# Sign In Page
+# Sign-in Page
 
-<p class="description">A customizable sign in UI component that abstracts away the pain needed to wire together a secure authentication page for your application.</p>
+<p class="description">A customizable sign-in UI component that abstracts away the pain needed to wire together a secure authentication page for your application.</p>
 
 The `SignInPage` component is a quick way to generate a ready-to-use authentication page with multiple OAuth providers, or a credentials form.
 
@@ -49,7 +49,7 @@ This renders an alert with the `error` string as the message.
 
 The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "alt": "Auth.js & Next.js with Toolpad Core sign in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign In page", "zoom": true, "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "alt": "Auth.js & Next.js with Toolpad Core sign-in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign-in page", "zoom": true, "indent": 1 }}
 
 #### Setting up
 
@@ -78,7 +78,7 @@ If you're using [`create-toolpad-app`](/toolpad/core/installation/), or the defa
 
 Otherwise, follow the [custom sign in page instructions](https://authjs.dev/guides/pages/signin) to set up the server configuration.
 
-The `SignInPage` component can slot in as a custom sign in page inside Auth.js:
+The `SignInPage` component can slot in as a custom sign-in page inside Auth.js:
 
 ```ts title="./auth.ts"
 // ...

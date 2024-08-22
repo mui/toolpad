@@ -161,11 +161,17 @@ If you're using the default [Next.js app directory example](https://github.com/m
 
 ## Customization
 
-### Theme and Branding
+### Branding
 
-Through the `branding` and `theme` props in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be customized to match your own styles.
+You can add your own branding elements to the `SignInPage` through the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/)
 
-{{"demo": "BrandingSignInPage.js", "iframe": true, "height": 700 }}
+{{"demo": "BrandingSignInPage.js", "iframe": true, "height": 360 }}
+
+### Theme
+
+Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be deeply customized to match any theme
+
+{{"demo": "ThemeSignInPage.js", "iframe": true, "height": 700 }}
 
 ### Components
 

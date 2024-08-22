@@ -16,9 +16,9 @@ export default function Home() {
   return (
     <BrandingCssVarsProvider>
       <Head
-        title="Toolpad Core: Components for React admin panels"
+        title="Toolpad Core: React components for dashboards"
         description="Toolpad Core offers the components needed for your next admin panel and internal tools project."
-        // card="/static/toolpad/marketing/toolpad-og.jpg"
+        card="/static/toolpad/marketing/toolpad-core-og.jpg"
       />
       <CssBaseline />
       <AppHeaderBanner />

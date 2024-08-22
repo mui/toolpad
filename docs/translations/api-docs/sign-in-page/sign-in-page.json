@@ -10,9 +10,8 @@
         "callbackUrl": "The URL to redirect to after signing in."
       }
     },
-    "slotProps": {
-      "description": "Props to pass to the constituent components in the credentials form"
-    }
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." }
   },
   "classDescriptions": {}
 }

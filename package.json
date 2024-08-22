@@ -16,7 +16,7 @@
     "prettier": "pretty-quick --ignore-path .eslintignore",
     "prettier:all": "prettier --write . --ignore-path .eslintignore",
     "dev": "dotenv cross-env FORCE_COLOR=1 lerna -- run dev --stream --parallel --ignore docs --ignore playground-nextjs --ignore playground-nextjs-pages",
-    "docs:dev": "pnpm --filter docs dev",
+    "docs:dev": "./pre-docs-dev.sh && pnpm --filter docs dev",
     "docs:build": "pnpm --filter docs build",
     "docs:build:api:core": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildCoreApiDocs/index.ts",
     "docs:build:api:studio": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildStudioApi.ts",

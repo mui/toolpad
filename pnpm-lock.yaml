@@ -2825,9 +2825,6 @@ packages:
   '@mui/core-downloads-tracker@5.16.7':
     resolution: {integrity: sha512-RtsCt4Geed2/v74sbihWzzRs+HsIQCfclHeORh5Ynu2fS4icIKozcSubwuG7vtzq2uW3fOR1zITSP84TNt2GoQ==}
 
-  '@mui/core-downloads-tracker@6.0.0-dev.240424162023-9968b4889d':
-    resolution: {integrity: sha512-doh3M3U7HUGSBIWGe1yvesSbfDguMRjP0N09ogWSBM2hovXAlgULhMgcRTepAZLLwfRxFII0bCohq6B9NqoKuw==}
-
   '@mui/core-downloads-tracker@6.0.0-rc.0':
     resolution: {integrity: sha512-s8mH/SmSivkE+1w1rgMgLUSt56nVaf4zUzlc7wUpNqUgUk32qP1mZuf1HN2mJv+W784fkyFWifpFoE411OudAA==}
 
@@ -12052,8 +12049,6 @@ snapshots:
 
   '@mui/core-downloads-tracker@5.16.7': {}
 
-  '@mui/core-downloads-tracker@6.0.0-dev.240424162023-9968b4889d': {}
-
   '@mui/core-downloads-tracker@6.0.0-rc.0': {}
 
   '@mui/docs@6.0.0-rc.0(fe2zmsquvgbierymkjzs3pmmei)':
@@ -12129,7 +12124,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.25.0
       '@mui/base': 5.0.0-beta.51(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@mui/core-downloads-tracker': 6.0.0-dev.240424162023-9968b4889d
+      '@mui/core-downloads-tracker': 6.0.0-rc.0
       '@mui/system': 6.0.0-alpha.13(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@mui/types': 7.2.15(@types/react@18.3.3)
       '@mui/utils': 6.0.0-alpha.13(@types/react@18.3.3)(react@18.3.1)

@@ -39,6 +39,6 @@
   "muiName": "SignInPage",
   "filename": "/packages/toolpad-core/src/SignInPage/SignInPage.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign In Page</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign-in Page</a></li></ul>",
   "cssComponent": false
 }

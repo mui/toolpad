@@ -38,9 +38,13 @@ export default function AccountCustom() {
                 color: 'primaryDark',
                 fontFamily: 'Inter',
                 fontSize: '1em',
+                textTransform: 'capitalize',
               },
             },
-            signOutButton: { color: 'primary', variant: 'outlined' },
+            signOutButton: {
+              color: 'primary',
+              variant: 'outlined',
+            },
           }}
           signInLabel="Login"
           signOutLabel="Logout"

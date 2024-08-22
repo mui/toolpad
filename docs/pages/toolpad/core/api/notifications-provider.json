@@ -16,6 +16,6 @@
   "muiName": "NotificationsProvider",
   "filename": "/packages/toolpad-core/src/useNotifications/NotificationsProvider.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign In Page</a></li>\n<li><a href=\"/toolpad/core/react-use-notifications/\">useNotifications</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign-in Page</a></li>\n<li><a href=\"/toolpad/core/react-use-notifications/\">useNotifications</a></li></ul>",
   "cssComponent": false
 }

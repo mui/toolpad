@@ -96,7 +96,7 @@ export default function NodeAttributeEditor<P extends object>({
       propType={argType}
       jsRuntime={jsBrowserRuntime}
       renderControl={(params) => (
-        <Box sx={{ flex: 1, maxWidth: '100%' }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
           <Control nodeId={node.id} {...params} propType={argType} />
         </Box>
       )}

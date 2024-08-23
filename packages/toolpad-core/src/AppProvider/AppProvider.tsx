@@ -39,6 +39,7 @@ export interface NavigationPageItem {
   segment?: string;
   title?: string;
   icon?: React.ReactNode;
+  pattern?: string;
   action?: React.ReactNode;
   children?: Navigation;
 }

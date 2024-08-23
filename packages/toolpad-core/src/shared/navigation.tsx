@@ -1,3 +1,4 @@
+import { match } from 'path-to-regexp';
 import type { NavigationItem, NavigationPageItem, NavigationSubheaderItem } from '../AppProvider';
 
 export const getItemKind = (item: NavigationItem) => item.kind ?? 'page';
@@ -11,6 +12,16 @@ export const getItemTitle = (item: NavigationPageItem | NavigationSubheaderItem)
 
 export function getPageItemFullPath(basePath: string, navigationItem: NavigationPageItem) {
   return `${basePath}${basePath && !navigationItem.segment ? '' : '/'}${navigationItem.segment ?? ''}`;
+}
+
+export function isPageItemSelected(
+  navigationItem: NavigationPageItem,
+  basePath: string,
+  pathname: string,
+) {
+  return navigationItem.pattern
+    ? match(navigationItem.pattern)(pathname)
+    : getPageItemFullPath(basePath, navigationItem) === pathname;
 }
 
 export function hasSelectedNavigationChildren(
@@ -34,12 +45,7 @@ export function hasSelectedNavigationChildren(
         );
       }
 
-      const nestedNavigationItemFullPath = getPageItemFullPath(
-        navigationItemFullPath,
-        nestedNavigationItem,
-      );
-
-      return nestedNavigationItemFullPath === pathname;
+      return isPageItemSelected(nestedNavigationItem, basePath, pathname);
     });
   }
 

@@ -21,6 +21,16 @@ const NAVIGATION: Navigation = [
     title: 'Orders',
     icon: <ShoppingCartIcon />,
   },
+  {
+    segment: 'public',
+    title: 'Public',
+    icon: <ShoppingCartIcon />,
+  },
+  {
+    segment: 'public2',
+    title: 'Public 2',
+    icon: <ShoppingCartIcon />,
+  },
 ];
 
 const BRANDING = {

@@ -2,7 +2,7 @@
   "componentDescription": "",
   "propDescriptions": {
     "children": { "description": "The content of the dashboard." },
-    "slotProps": { "description": "The components used for each slot inside." },
+    "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." }
   },
   "classDescriptions": {},

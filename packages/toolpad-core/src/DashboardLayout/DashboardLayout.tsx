@@ -456,7 +456,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * The components used for each slot inside.
+   * The props used for each slot inside.
    * @default {}
    */
   slotProps: PropTypes.shape({

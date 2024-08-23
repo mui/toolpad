@@ -11,6 +11,7 @@ import {
 } from '@toolpad/studio-runtime';
 import { ExactEntriesOf } from '@toolpad/utils/types';
 import * as appDom from '@toolpad/studio-runtime/appDom';
+import Box from '@mui/system/Box';
 import NodeAttributeEditor from './NodeAttributeEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { useToolpadComponent } from '../toolpadComponents';
@@ -106,7 +107,15 @@ function ComponentPropsEditor<P extends object>({
 
           <div className={classes.control}>
             <Typography variant="body2">Alignment:</Typography>
-            <Stack direction="row">
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 1,
+              }}
+            >
               {hasLayoutHorizontalControls ? (
                 <NodeAttributeEditor
                   node={node}
@@ -124,7 +133,7 @@ function ComponentPropsEditor<P extends object>({
                   argType={layoutBoxArgTypes.verticalAlign}
                 />
               ) : null}
-            </Stack>
+            </Box>
           </div>
 
           <Divider sx={{ mt: 1 }} />

@@ -21,6 +21,6 @@
   "muiName": "Account",
   "filename": "/packages/toolpad-core/src/Account/Account.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-account/\">Account</a></li>\n<li><a href=\"/toolpad/core/react-dashboard-layout/\">Dashboard Layout</a></li>\n<li><a href=\"/toolpad/core/react-sign-in-page/\">Sign In Page</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-account/\">Account</a></li>\n<li><a href=\"/toolpad/core/react-dashboard-layout/\">Dashboard Layout</a></li>\n<li><a href=\"/toolpad/core/react-sign-in-page/\">Sign-in Page</a></li></ul>",
   "cssComponent": false
 }

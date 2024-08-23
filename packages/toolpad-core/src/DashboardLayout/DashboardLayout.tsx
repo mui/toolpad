@@ -270,7 +270,7 @@ export interface DashboardLayoutProps {
    */
   slots?: DashboardLayoutSlots;
   /**
-   * The components used for each slot inside.
+   * The props used for each slot inside.
    * @default {}
    */
   slotProps?: {

@@ -8,8 +8,6 @@ import {
   BrandingContext,
   NavigationContext,
   RouterContext,
-  AuthenticationContext,
-  SessionContext,
   WindowContext,
 } from '../shared/context';
 import { AppThemeProvider } from './AppThemeProvider';
@@ -71,6 +69,10 @@ export interface Authentication {
   signIn: () => void;
   signOut: () => void;
 }
+
+export const AuthenticationContext = React.createContext<Authentication | null>(null);
+
+export const SessionContext = React.createContext<Session | null>(null);
 
 export type AppTheme = Theme | { light: Theme; dark: Theme };
 

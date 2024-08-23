@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { PaletteMode } from '@mui/material';
-import type { Branding, Navigation, Router, Authentication, Session } from '../AppProvider';
+import type { Branding, Navigation, Router } from '../AppProvider';
 
 export const BrandingContext = React.createContext<Branding | null>(null);
 
@@ -17,10 +17,6 @@ export const PaletteModeContext = React.createContext<{
 });
 
 export const RouterContext = React.createContext<Router | null>(null);
-
-export const AuthenticationContext = React.createContext<Authentication | null>(null);
-
-export const SessionContext = React.createContext<Session | null>(null);
 
 export const WindowContext = React.createContext<Window | undefined>(undefined);
 

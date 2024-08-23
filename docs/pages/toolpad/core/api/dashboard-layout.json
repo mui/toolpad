@@ -1,9 +1,28 @@
 {
-  "props": { "children": { "type": { "name": "node" }, "required": true } },
+  "props": {
+    "children": { "type": { "name": "node" }, "required": true },
+    "slotProps": {
+      "type": { "name": "shape", "description": "{ toolbarActions?: object }" },
+      "default": "{}"
+    },
+    "slots": {
+      "type": { "name": "shape", "description": "{ toolbarActions?: elementType }" },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
+  },
   "name": "DashboardLayout",
   "imports": [
     "import { DashboardLayout } from '@toolpad/core/DashboardLayout';",
     "import { DashboardLayout } from '@toolpad/core';"
+  ],
+  "slots": [
+    {
+      "name": "toolbarActions",
+      "description": "The toolbar actions component used in the layout header.",
+      "default": "ToolbarActions",
+      "class": null
+    }
   ],
   "classes": [],
   "spread": true,

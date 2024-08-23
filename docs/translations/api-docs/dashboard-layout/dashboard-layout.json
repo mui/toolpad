@@ -1,5 +1,12 @@
 {
   "componentDescription": "",
-  "propDescriptions": { "children": { "description": "The content of the dashboard." } },
-  "classDescriptions": {}
+  "propDescriptions": {
+    "children": { "description": "The content of the dashboard." },
+    "slotProps": { "description": "The components used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." }
+  },
+  "classDescriptions": {},
+  "slotDescriptions": {
+    "toolbarActions": "The toolbar actions component used in the layout header."
+  }
 }

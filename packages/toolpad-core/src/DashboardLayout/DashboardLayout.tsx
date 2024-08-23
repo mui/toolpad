@@ -31,8 +31,9 @@ import {
   WindowContext,
 } from '../shared/context';
 import type { Navigation } from '../AppProvider';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { ToolbarActions } from './ToolbarActions';
 import { ToolpadLogo } from './ToolpadLogo';
-import { ToolbarActions } from '../layout/ToolbarActions';
 import {
   getItemTitle,
   getPageItemFullPath,
@@ -250,22 +251,28 @@ function DashboardSidebarSubNavigation({
   );
 }
 
+export interface DashboardLayoutSlots {
+  /**
+   * The toolbar actions component used in the layout header.
+   * @default ToolbarActions
+   */
+  toolbarActions?: React.JSXElementConstructor<{}>;
+}
+
 export interface DashboardLayoutProps {
   /**
    * The content of the dashboard.
    */
   children: React.ReactNode;
   /**
-   * Overridable components.
+   * The components used for each slot inside.
    * @default {}
    */
-  slots?: {
-    /**
-     * Toolbar actions component rendered in the layout header.
-     * @default ToolbarActions
-     */
-    toolbarActions?: React.JSXElementConstructor<{}>;
-  };
+  slots?: DashboardLayoutSlots;
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
   slotProps?: {
     toolbarActions?: {};
   };
@@ -379,6 +386,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
+          <ThemeSwitcher />
           {slots?.toolbarActions ? (
             <slots.toolbarActions {...slotProps?.toolbarActions} />
           ) : (
@@ -447,6 +455,20 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    toolbarActions: PropTypes.object,
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots: PropTypes.shape({
+    toolbarActions: PropTypes.elementType,
+  }),
 } as any;
 
 export { DashboardLayout };

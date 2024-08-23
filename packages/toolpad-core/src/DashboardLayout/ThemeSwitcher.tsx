@@ -8,6 +8,9 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import useSsr from '@toolpad/utils/hooks/useSsr';
 import { PaletteModeContext } from '../shared/context';
 
+/**
+ * @ignore - internal component.
+ */
 function ThemeSwitcher() {
   const isSsr = useSsr();
   const theme = useTheme();

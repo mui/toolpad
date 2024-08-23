@@ -15,9 +15,17 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: object, passwordField?: object, submitButton?: object }"
+        "description": "{ emailField?: object, forgotPasswordLink?: object, passwordField?: object, signUpLink?: object, submitButton?: object }"
       },
       "default": "{}"
+    },
+    "slots": {
+      "type": {
+        "name": "shape",
+        "description": "{ emailField?: elementType, forgotPasswordLink?: elementType, passwordField?: elementType, signUpLink?: elementType, submitButton?: elementType }"
+      },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
     }
   },
   "name": "SignInPage",
@@ -31,6 +39,6 @@
   "muiName": "SignInPage",
   "filename": "/packages/toolpad-core/src/SignInPage/SignInPage.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign In Page</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign-in Page</a></li></ul>",
   "cssComponent": false
 }

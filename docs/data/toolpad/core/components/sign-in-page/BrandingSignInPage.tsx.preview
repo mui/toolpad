@@ -11,6 +11,6 @@ const BRANDING = {
 
 // ...
 
-<AppProvider branding={BRANDING} theme={THEME}>
+<AppProvider branding={BRANDING}>
   <SignInPage signIn={signIn} providers={providers} />
 </AppProvider>

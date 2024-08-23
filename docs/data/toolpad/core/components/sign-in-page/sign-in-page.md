@@ -1,12 +1,12 @@
 ---
 productId: toolpad-core
-title: Sign In Page
+title: Sign-in Page
 components: SignInPage, Account, NotificationsProvider
 ---
 
-# Sign In Page
+# Sign-in Page
 
-<p class="description">A customizable sign in UI component that abstracts away the pain needed to wire together a secure authentication page for your application.</p>
+<p class="description">A customizable sign-in UI component that abstracts away the pain needed to wire together a secure authentication page for your application.</p>
 
 The `SignInPage` component is a quick way to generate a ready-to-use authentication page with multiple OAuth providers, or a credentials form.
 
@@ -49,19 +49,36 @@ This renders an alert with the `error` string as the message.
 
 The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "alt": "Auth.js & Next.js with Toolpad Core sign in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign In page", "zoom": true, "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "alt": "Auth.js & Next.js with Toolpad Core sign-in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign-in page", "zoom": true, "indent": 1 }}
 
 #### Setting up
 
-If you're using the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), Auth.js is already installed. Otherwise, follow the [installation instructions](https://authjs.dev/getting-started/installation).
+If you're using [`create-toolpad-app`](/toolpad/core/installation/), or the [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), Auth.js is already installed. To proceed, add `AUTH_SECRET` to the environment variables by running:
+
+```bash
+npx auth secret
+```
+
+Otherwise, follow the detailed [Auth.js installation instructions](https://authjs.dev/getting-started/installation).
 
 ##### GitHub configuration
 
 To get the required credentials, create an application in the GitHub developer settings. Read this [guide on Auth.js](https://authjs.dev/guides/configuring-github#adding-environment-variables) on how to obtain those.
 
+If you already have a `CLIENT_ID` and `CLIENT_SECRET`, you can skip this step and add them to the environment variables, like so:
+
+```bash title=".env.local"
+GITHUB_CLIENT_ID=<your-client-id>
+GITHUB_CLIENT_SECRET=<your-client-secret>
+```
+
 ##### Server Configuration
 
-The `SignInPage` component can slot in as a custom sign in page inside Auth.js:
+If you're using [`create-toolpad-app`](/toolpad/core/installation/), or the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), this server configuration is already set up for you.
+
+Otherwise, follow the [custom sign in page instructions](https://authjs.dev/guides/pages/signin) to set up the server configuration.
+
+The `SignInPage` component can slot in as a custom sign-in page inside Auth.js:
 
 ```ts title="./auth.ts"
 // ...
@@ -74,7 +91,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 // ...
 ```
 
-You can then have a fully built GitHub sign in page appear at `/auth/signin` by adding `SignInPage` to `page.tsx`:
+To have a fully built "Sign in with GitHub" page appear at the `/auth/signin` route, add `SignInPage` to `page.tsx`:
 
 ```tsx title="./app/auth/signin/page.tsx"
 // ...
@@ -126,17 +143,19 @@ export default function SignIn() {
 }
 ```
 
-:::info
-If you're using the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), all of this is already configured for you. Otherwise, follow the [custom sign in page instructions](https://authjs.dev/guides/pages/signin).
-:::
-
 ## Customization
 
-### Theme and Branding
+### Branding
 
-Through the `branding` and `theme` props in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be customized to match your own styles.
+You can add your own branding elements to the `SignInPage` through the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/)
 
-{{"demo": "BrandingSignInPage.js", "iframe": true, "height": 700 }}
+{{"demo": "BrandingSignInPage.js", "iframe": true, "height": 360 }}
+
+### Theme
+
+Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be deeply customized to match any theme
+
+{{"demo": "ThemeSignInPage.js", "iframe": true, "height": 700 }}
 
 ### Components
 

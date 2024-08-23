@@ -1,9 +1,18 @@
 import * as React from 'react';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import Link from '@mui/material/Link';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { auth, providerMap } from '../../auth';
+
+function ForgotPasswordLink() {
+  return <Link href="/auth/forgot-password">Forgot password?</Link>;
+}
+
+function SignUpLink() {
+  return <Link href="/auth/signup">Sign up</Link>;
+}
 
 export default function SignIn({
   providers,
@@ -50,6 +59,7 @@ export default function SignIn({
           };
         }
       }}
+      slots={{ forgotPasswordLink: ForgotPasswordLink, signUpLink: SignUpLink }}
     />
   );
 }

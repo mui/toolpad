@@ -40,7 +40,7 @@ export interface AccountProps {
  *
  * - [Account](https://mui.com/toolpad/core/react-account/)
  * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
- * - [Sign In Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
  *
  * API:
  *

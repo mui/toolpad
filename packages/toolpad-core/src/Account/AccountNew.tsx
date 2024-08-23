@@ -21,12 +21,19 @@ interface AccountProps {
   slots?: {
     /**
      * The component used for the sign in button.
+     * @default Button
      */
     signInButton?: React.ComponentType<ButtonProps>;
     /**
      * The component used for the sign out button.
+     * @default MenuItem
      */
     signOutButton?: React.ComponentType<ButtonProps>;
+    /**
+     * The component used for the custom menu items
+     * @default null
+     */
+    menuItems?: React.JSXElementConstructor<{}>;
   };
   /**
    * The props used for each slot inside.
@@ -106,8 +113,8 @@ function Account(props: AccountProps) {
         anchorEl={anchorEl}
         id="account-menu"
         open={open}
-        onClose={handleClose}
         onClick={handleClose}
+        onClose={handleClose}
         slotProps={{
           paper: {
             elevation: 0,
@@ -150,13 +157,15 @@ function Account(props: AccountProps) {
               <Typography variant="caption">{session.user.email}</Typography>
             </div>
           </Box>
-          <Divider />
+          <Divider sx={{ mb: 1 }} />
+          {slots?.menuItems ? <slots.menuItems /> : null}
           {slots?.signOutButton ? (
             <slots.signOutButton onClick={authentication?.signOut} />
           ) : (
             <MenuItem
               onClick={authentication?.signOut}
-              sx={{ justifyContent: 'center', mt: 1 }}
+              sx={{ justifyContent: 'center', width: '100%' }}
+              component="button"
               {...slotProps?.signOutButton}
             >
               <ListItemIcon>

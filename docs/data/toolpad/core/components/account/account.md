@@ -18,12 +18,14 @@ If a `session` object is present, the component is rendered as a dropdown contai
 
 ## Customization
 
-### Components
+### Slot Props
 
 `Account` can take different labels for the sign in and sign out buttons through the `signInLabel` and `signOutLabel` props. Deeper changes can be made by passing in `slotProps` to the underlying components.
 
 {{"demo": "AccountCustom.js", "bg": "gradient" }}
 
-### 🚧 Composition
+### Slots
 
-The `Account` component allows adding your own menu options, including deeply nested options. This is in progress.
+You can pass in your own items to the `Account` menu through the `menuItems` slot to create larger, more complex menus:
+
+{{"demo": "AccountSlots.js", "bg": "gradient"}}

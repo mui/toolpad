@@ -1,0 +1,9 @@
+<AuthenticationContext.Provider value={authentication}>
+  <SessionContext.Provider value={session}>
+    <Account
+      slots={{
+        menuItems: CustomMenuItems,
+      }}
+    />
+  </SessionContext.Provider>
+</AuthenticationContext.Provider>

@@ -73,7 +73,7 @@ The validation props offer the option to create an interactive text field compon
 
 ### isRequired
 
-isRequired prop is useful when the action can't be perfomed without a user provided text value. It can be used to assign mandatory fields.
+The `isRequired` prop is useful to display an error message when a value is not provided. It can be used for mandatory fields.
 
 {{"demo": "TextFieldIsRequired.js", "hideToolbar": true}}
 
@@ -85,7 +85,9 @@ A check on the minimum length of the input. In the below demo the input should b
 
 ### maxLength
 
-A validation check on the maximum length of the input. The below demo shows a validation error when the input breaches the limit of ten characters. In combination with other props, it can be used for zip codes, phone numbers, etc.
+Shows an error message according to the maximum required length for the provided text value. In combination with other props, it can be used to enforce the length of zip codes or phone numbers, for example.
+
+In the demo below, the input must be no more than 6 characters long, otherwise a validation error is shown.
 
 {{"demo": "TextFieldMaxLength.js", "hideToolbar": true}}
 

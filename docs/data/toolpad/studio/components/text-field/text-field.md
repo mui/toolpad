@@ -79,7 +79,9 @@ The `isRequired` prop is useful to display an error message when a value is not 
 
 ### minLength
 
-A check on the minimum length of the input. In the below demo the input should be more than six characters long else it throws a validation error. It can be used to ensure passwords are long enough.
+Shows an error message according to the minimum required length for the provided text value. It can be used to ensure that a provided password is long enough, for example.
+
+In the demo below, the input must be more than 6 characters long, otherwise a validation error is shown.
 
 {{"demo": "TextFieldMinLength.js", "hideToolbar": true}}
 

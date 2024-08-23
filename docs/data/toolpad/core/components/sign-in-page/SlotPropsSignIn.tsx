@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { AppProvider, SignInPage } from '@toolpad/core';
+import { useTheme } from '@mui/material/styles';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
 
 export default function SlotPropsSignIn() {
+  const theme = useTheme();
   return (
-    <AppProvider>
+    <AppProvider theme={theme}>
       <SignInPage
         signIn={(provider, formData) =>
           alert(

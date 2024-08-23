@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
+import { styled, alpha, useTheme } from '@mui/material/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 
@@ -13,6 +13,7 @@ const Root = styled('div')({
 
 interface DocsImageProps {
   src: string;
+  srcDark?: string;
   alt: string;
   caption?: string;
   zoom?: boolean;
@@ -108,7 +109,9 @@ function ImageViewer({ open, src, alt, handleClose }: ImageViewerProps) {
 }
 
 export default function DocsImage(props: DocsImageProps) {
-  const { src, alt, caption, zoom = true, indent = 0, width, aspectRatio } = props;
+  const { src, srcDark, alt, caption, zoom = true, indent = 0, width, aspectRatio } = props;
+  const theme = useTheme();
+  const computedSrc = theme?.palette?.mode === 'dark' && srcDark ? srcDark : src;
   const [open, setOpen] = React.useState(false);
 
   const handleClick = React.useCallback(() => {
@@ -126,7 +129,7 @@ export default function DocsImage(props: DocsImageProps) {
     <React.Fragment>
       <Root>
         <Img
-          src={src}
+          src={computedSrc}
           alt={alt}
           zoom={zoom}
           indent={indent}
@@ -156,7 +159,7 @@ export default function DocsImage(props: DocsImageProps) {
         ) : null}
         <ImageCaption indent={indent}>{caption}</ImageCaption>
       </Root>
-      <ImageViewer open={open} src={src} alt={alt} handleClose={handleViewerClose} />
+      <ImageViewer open={open} src={computedSrc} alt={alt} handleClose={handleViewerClose} />
     </React.Fragment>
   );
 }

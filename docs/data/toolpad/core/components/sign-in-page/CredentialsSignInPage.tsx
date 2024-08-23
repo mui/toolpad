@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { AuthProvider, AppProvider, SignInPage } from '@toolpad/core';
+import { useTheme } from '@mui/material/styles';
 
 // preview-start
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
@@ -21,9 +22,10 @@ const signIn: (provider: AuthProvider, formData: FormData) => void = async (
 };
 
 export default function CredentialsSignInPage() {
+  const theme = useTheme();
   return (
     // preview-start
-    <AppProvider>
+    <AppProvider theme={theme}>
       <SignInPage signIn={signIn} providers={providers} />
     </AppProvider>
     // preview-end

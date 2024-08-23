@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AuthProvider, AppProvider, SignInPage } from '@toolpad/core';
-
+import { useTheme } from '@mui/material/styles';
 // preview-start
 const providers = [
   { id: 'github', name: 'GitHub' },
@@ -20,9 +20,10 @@ const signIn: (provider: AuthProvider) => void = async (provider) => {
 };
 
 export default function OAuthSignInPage() {
+  const theme = useTheme();
   return (
     // preview-start
-    <AppProvider>
+    <AppProvider theme={theme}>
       <SignInPage signIn={signIn} providers={providers} />
     </AppProvider>
     // preview-end

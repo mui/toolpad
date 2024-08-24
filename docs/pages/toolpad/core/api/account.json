@@ -5,9 +5,15 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ avatar?: object, iconButton?: object, signInButton?: object, signOutButton?: object }"
+        "description": "{ iconButton?: object, signInButton?: object, signOutButton?: object }"
+      }
+    },
+    "slots": {
+      "type": {
+        "name": "shape",
+        "description": "{ menuItems?: elementType, signInButton?: func, signOutButton?: func }"
       },
-      "default": "{}"
+      "additionalInfo": { "slotsApi": true }
     }
   },
   "name": "Account",

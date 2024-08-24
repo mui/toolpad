@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
 import MenuList from '@mui/material/MenuList';
@@ -54,7 +55,18 @@ interface AccountProps {
    */
   signOutLabel?: string;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [Account](https://mui.com/toolpad/core/react-account/)
+ * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
+ * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ *
+ * API:
+ *
+ * - [Account API](https://mui.com/toolpad/core/api/account)
+ */
 function Account(props: AccountProps) {
   const { slots, slotProps, signInLabel = 'Sign In', signOutLabel = 'Sign Out' } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
@@ -183,5 +195,38 @@ function Account(props: AccountProps) {
     </React.Fragment>
   );
 }
+
+Account.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * The label for the sign in button.
+   * @default 'Sign In'
+   */
+  signInLabel: PropTypes.string,
+  /**
+   * The label for the sign out button.
+   * @default 'Sign Out'
+   */
+  signOutLabel: PropTypes.string,
+  /**
+   * The props used for each slot inside.
+   */
+  slotProps: PropTypes.shape({
+    iconButton: PropTypes.object,
+    signInButton: PropTypes.object,
+    signOutButton: PropTypes.object,
+  }),
+  /**
+   * The components used for each slot inside.
+   */
+  slots: PropTypes.shape({
+    menuItems: PropTypes.elementType,
+    signInButton: PropTypes.func,
+    signOutButton: PropTypes.func,
+  }),
+} as any;
 
 export { Account };

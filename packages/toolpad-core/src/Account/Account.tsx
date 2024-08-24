@@ -6,7 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Button, { ButtonProps } from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
+import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Logout from '@mui/icons-material/Logout';
 
@@ -41,6 +41,7 @@ interface AccountProps {
   slotProps?: {
     signInButton?: ButtonProps;
     signOutButton?: ButtonProps;
+    iconButton?: IconButtonProps;
   };
   /**
    * The label for the sign in button.
@@ -100,10 +101,13 @@ function Account(props: AccountProps) {
         <Tooltip title="Account">
           <IconButton
             onClick={handleClick}
+            aria-describedby="account-menu"
+            aria-label="Current User"
             size="small"
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
+            {...slotProps?.iconButton}
           >
             <SessionAvatar session={session} sx={{ width: 32, height: 32 }} />
           </IconButton>

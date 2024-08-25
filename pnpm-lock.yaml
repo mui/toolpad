@@ -1216,8 +1216,8 @@ importers:
         specifier: 18.3.0
         version: 18.3.0
       eslint-config-next:
-        specifier: 14.2.5
-        version: 14.2.5(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.93.0(esbuild@0.23.1)))(eslint@8.57.0)(typescript@5.5.4)
+        specifier: 14.2.6
+        version: 14.2.6(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.93.0(esbuild@0.23.1)))(eslint@8.57.0)(typescript@5.5.4)
       next:
         specifier: 14.2.6
         version: 14.2.6(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1258,8 +1258,8 @@ importers:
         specifier: 18.3.0
         version: 18.3.0
       eslint-config-next:
-        specifier: 14.2.5
-        version: 14.2.5(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.93.0(esbuild@0.23.1)))(eslint@8.57.0)(typescript@5.5.4)
+        specifier: 14.2.6
+        version: 14.2.6(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.93.0(esbuild@0.23.1)))(eslint@8.57.0)(typescript@5.5.4)
       next:
         specifier: 14.2.6
         version: 14.2.6(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.45.3)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3359,9 +3359,6 @@ packages:
 
   '@next/env@14.2.6':
     resolution: {integrity: sha512-bs5DFKV+08EjWrl8EB+KKqev1ZTNONH1vFCaHh911aaB362NnP32UDTbE9VQhyiAgbFqJsfDkSxFERNDDb3j0g==}
-
-  '@next/eslint-plugin-next@14.2.5':
-    resolution: {integrity: sha512-LY3btOpPh+OTIpviNojDpUdIbHW9j0JBYBjsIp8IxtDFfYFyORvw3yNq6N231FVqQA7n7lwaf7xHbVJlA1ED7g==}
 
   '@next/eslint-plugin-next@14.2.6':
     resolution: {integrity: sha512-d3+p4AjIYmhqzYHhhmkRYYN6ZU35TwZAKX08xKRfnHkz72KhWL2kxMFsDptpZs5e8bBGdepn7vn1+9DaF8iX+A==}
@@ -5808,8 +5805,8 @@ packages:
       eslint-plugin-react: ^7.28.0
       eslint-plugin-react-hooks: ^4.3.0
 
-  eslint-config-next@14.2.5:
-    resolution: {integrity: sha512-zogs9zlOiZ7ka+wgUnmcM0KBEDjo4Jis7kxN1jvC0N4wynQ2MIx/KBkg4mVF63J5EK4W0QMCn7xO3vNisjaAoA==}
+  eslint-config-next@14.2.6:
+    resolution: {integrity: sha512-z0URA5LO6y8lS/YLN0EDW/C4LEkDODjJzA37dvLVdzCPzuewjzTe1os5g3XclZAZrQ8X8hPaSMQ2JuVWwMmrTA==}
     peerDependencies:
       eslint: ^7.23.0 || ^8.0.0
       typescript: '>=3.3.1'
@@ -12681,10 +12678,6 @@ snapshots:
 
   '@next/env@14.2.6': {}
 
-  '@next/eslint-plugin-next@14.2.5':
-    dependencies:
-      glob: 10.3.10
-
   '@next/eslint-plugin-next@14.2.6':
     dependencies:
       glob: 10.3.10
@@ -15603,9 +15596,9 @@ snapshots:
       object.assign: 4.1.5
       object.entries: 1.1.8
 
-  eslint-config-next@14.2.5(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.93.0(esbuild@0.23.1)))(eslint@8.57.0)(typescript@5.5.4):
+  eslint-config-next@14.2.6(eslint-import-resolver-webpack@0.13.8(eslint-plugin-import@2.29.1)(webpack@5.93.0(esbuild@0.23.1)))(eslint@8.57.0)(typescript@5.5.4):
     dependencies:
-      '@next/eslint-plugin-next': 14.2.5
+      '@next/eslint-plugin-next': 14.2.6
       '@rushstack/eslint-patch': 1.10.3
       '@typescript-eslint/parser': 7.2.0(eslint@8.57.0)(typescript@5.5.4)
       eslint: 8.57.0

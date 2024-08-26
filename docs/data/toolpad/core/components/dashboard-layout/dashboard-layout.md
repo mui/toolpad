@@ -85,12 +85,12 @@ Navigation links have an optional `action` prop to render any content on the rig
 ### Navigation Pattern Matching
 
 Navigation links have an optional `pattern` prop to define a pattern to be matched for the item to be marked as selected.
-Any path supported the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library is supported, such as:
+Any path supported by the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library can be used, such as:
 
 - Standard paths: `/foo`
-- Named parameters: (`/:foo/:bar`)
-- Unnamed parameters: (`/:foo/(.*)`)
-- Optional parameters: (`/:foo{/:bar}?`)
+- Named parameters: `/:foo/:bar`
+- Unnamed parameters: `/:foo/(.*)`
+- Optional parameters: `/:foo{/:bar}?`
 
 ## Account
 

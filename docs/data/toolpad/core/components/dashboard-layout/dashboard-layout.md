@@ -78,9 +78,19 @@ Nested navigation structures can be placed in the sidebar as items with the form
 
 ### Navigation Actions
 
-Navigation links have an optional `action` prop that can be used to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
+Navigation links have an optional `action` prop to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
 
 {{"demo": "DashboardLayoutNavigationActions.js", "height": 400, "iframe": true}}
+
+### Navigation Pattern Matching
+
+Navigation links have an optional `pattern` prop to define a pattern to be matched for the item to be marked as selected.
+Any path supported the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library is supported, such as:
+
+- Standard paths: `/foo`
+- Named parameters: (`/:foo/:bar`)
+- Unnamed parameters: (`/:foo/(.*)`)
+- Optional parameters: (`/:foo{/:bar}?`)
 
 ## Account
 

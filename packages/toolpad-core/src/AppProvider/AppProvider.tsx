@@ -222,6 +222,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
+        pattern: PropTypes.string,
         segment: PropTypes.string,
         title: PropTypes.string,
       }),

@@ -242,20 +242,20 @@ function DashboardSidebarSubNavigation({
           <ExpandMoreIcon />
         );
 
-        const isSelectable = isPageItemSelected(navigationItem, basePath, pathname);
+        const isSelected = isPageItemSelected(navigationItem, basePath, pathname);
 
-        if (process.env.NODE_ENV !== 'production' && isSelectable && selectedItemId) {
+        if (process.env.NODE_ENV !== 'production' && isSelected && selectedItemId) {
           console.warn(`Duplicate selected path in navigation: ${navigationItemFullPath}`);
         }
 
-        if (isSelectable && !selectedItemId) {
+        if (isSelected && !selectedItemId) {
           selectedItemId = navigationItemId;
         }
 
         const listItem = (
           <ListItem sx={{ pt: 0, pb: 0 }}>
             <NavigationListItemButton
-              selected={navigationItemId === selectedItemId}
+              selected={isSelected}
               {...(navigationItem.children
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),

@@ -25,11 +25,19 @@ const NAVIGATION: Navigation = [
     segment: 'public',
     title: 'Public',
     icon: <ShoppingCartIcon />,
-  },
-  {
-    segment: 'public2',
-    title: 'Public 2',
-    icon: <ShoppingCartIcon />,
+    children: [
+      {
+        segment: 'public',
+        title: 'Public',
+        icon: <ShoppingCartIcon />,
+        pattern: '/public',
+      },
+      {
+        segment: 'public2',
+        title: 'Public 2',
+        icon: <ShoppingCartIcon />,
+      },
+    ],
   },
 ];
 

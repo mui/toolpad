@@ -3,7 +3,7 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import { render, within, screen } from '@testing-library/react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -126,32 +126,130 @@ describe('DashboardLayout', () => {
 
     const navigation = screen.getByRole('navigation');
 
-    // Check list subheaders
+    // List subheaders are present
 
     expect(within(navigation).getByText('Main items')).toBeTruthy();
     expect(within(navigation).getByText('Analytics')).toBeTruthy();
 
-    // Check list items and their links
+    // List items and their links are present
 
-    const dashboardItem = within(navigation).getByRole('link', { name: 'Dashboard' });
-    const ordersItem = within(navigation).getByRole('link', { name: 'Orders' });
+    const dashboardLink = within(navigation).getByRole('link', { name: 'Dashboard' });
+    const ordersLink = within(navigation).getByRole('link', { name: 'Orders' });
 
-    expect(dashboardItem.getAttribute('href')).toBe('/dashboard');
-    expect(ordersItem.getAttribute('href')).toBe('/orders');
+    expect(dashboardLink.getAttribute('href')).toBe('/dashboard');
+    expect(ordersLink.getAttribute('href')).toBe('/orders');
 
     const reportsItem = within(navigation).getByText('Reports');
 
     expect(reportsItem).toBeTruthy();
     expect(within(navigation).getByText('Integrations')).toBeTruthy();
 
+    // Nested list items show when parent item is clicked
+
     expect(within(navigation).queryByText('Sales')).toBeNull();
     expect(within(navigation).queryByText('Traffic')).toBeNull();
 
-    // Check nested list items
     await user.click(reportsItem);
 
     expect(within(navigation).getByText('Sales')).toBeTruthy();
     expect(within(navigation).getByText('Traffic')).toBeTruthy();
+  });
+
+  test('starts with parent items expanded if any of their children is the current page', () => {
+    const NAVIGATION: Navigation = [
+      {
+        segment: 'reports',
+        title: 'Reports',
+        icon: <BarChartIcon />,
+        children: [
+          {
+            segment: 'sales',
+            title: 'Sales',
+            icon: <DescriptionIcon />,
+          },
+          {
+            segment: 'traffic',
+            title: 'Traffic',
+            icon: <DescriptionIcon />,
+          },
+        ],
+      },
+    ];
+
+    const mockRouter = {
+      pathname: '/reports/sales',
+      searchParams: new URLSearchParams(),
+      navigate: vi.fn(),
+    };
+
+    render(
+      <AppProvider navigation={NAVIGATION} router={mockRouter}>
+        <DashboardLayout>Hello world</DashboardLayout>
+      </AppProvider>,
+    );
+
+    const navigation = screen.getByRole('navigation');
+
+    expect(within(navigation).getByText('Sales')).toBeTruthy();
+    expect(within(navigation).getByText('Traffic')).toBeTruthy();
+  });
+
+  test('shows correct selected page item', () => {
+    const NAVIGATION: Navigation = [
+      {
+        title: 'Dashboard',
+        segment: 'dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        title: 'Orders',
+        segment: 'orders',
+        icon: <ShoppingCartIcon />,
+      },
+      {
+        segment: 'reports',
+        title: 'Reports',
+        icon: <BarChartIcon />,
+        pattern: '/reports/:reportId',
+      },
+    ];
+
+    function AppWithPathname({ pathname }: { pathname: string }) {
+      const mockRouter = {
+        pathname,
+        searchParams: new URLSearchParams(),
+        navigate: vi.fn(),
+      };
+
+      return (
+        <AppProvider navigation={NAVIGATION} router={mockRouter}>
+          <DashboardLayout>Hello world</DashboardLayout>
+        </AppProvider>
+      );
+    }
+
+    const { rerender } = render(<AppWithPathname pathname="/dashboard" />);
+
+    const navigation = screen.getByRole('navigation');
+
+    expect(within(navigation).getByRole('link', { name: 'Dashboard' })).toHaveClass('Mui-selected');
+
+    rerender(<AppWithPathname pathname="/orders" />);
+
+    expect(within(navigation).getByRole('link', { name: 'Dashboard' })).not.toHaveClass(
+      'Mui-selected',
+    );
+    expect(within(navigation).getByRole('link', { name: 'Orders' })).toHaveClass('Mui-selected');
+
+    rerender(<AppWithPathname pathname="/reports/123" />);
+
+    expect(within(navigation).getByRole('link', { name: 'Dashboard' })).not.toHaveClass(
+      'Mui-selected',
+    );
+    expect(within(navigation).getByRole('link', { name: 'Orders' })).not.toHaveClass(
+      'Mui-selected',
+    );
+    expect(within(navigation).getByRole('link', { name: 'Reports' })).toHaveClass('Mui-selected');
   });
 
   test('renders navigation actions', async () => {

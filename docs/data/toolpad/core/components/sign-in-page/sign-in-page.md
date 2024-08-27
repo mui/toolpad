@@ -49,17 +49,34 @@ This renders an alert with the `error` string as the message.
 
 The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "alt": "Auth.js & Next.js with Toolpad Core sign-in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign-in page", "zoom": true, "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "srcDark": "/static/toolpad/docs/core/auth-next-dark.png", "alt": "Auth.js & Next.js with Toolpad Core sign-in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign-in page", "zoom": true, "indent": 1, "aspectRatio": "1.428" }}
 
 #### Setting up
 
-If you're using the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), Auth.js is already installed. Otherwise, follow the [installation instructions](https://authjs.dev/getting-started/installation).
+If you're using [`create-toolpad-app`](/toolpad/core/installation/), or the [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), Auth.js is already installed. To proceed, add `AUTH_SECRET` to the environment variables by running:
+
+```bash
+npx auth secret
+```
+
+Otherwise, follow the detailed [Auth.js installation instructions](https://authjs.dev/getting-started/installation).
 
 ##### GitHub configuration
 
 To get the required credentials, create an application in the GitHub developer settings. Read this [guide on Auth.js](https://authjs.dev/guides/configuring-github#adding-environment-variables) on how to obtain those.
 
+If you already have a `CLIENT_ID` and `CLIENT_SECRET`, you can skip this step and add them to the environment variables, like so:
+
+```bash title=".env.local"
+GITHUB_CLIENT_ID=<your-client-id>
+GITHUB_CLIENT_SECRET=<your-client-secret>
+```
+
 ##### Server Configuration
+
+If you're using [`create-toolpad-app`](/toolpad/core/installation/), or the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), this server configuration is already set up for you.
+
+Otherwise, follow the [custom sign in page instructions](https://authjs.dev/guides/pages/signin) to set up the server configuration.
 
 The `SignInPage` component can slot in as a custom sign-in page inside Auth.js:
 
@@ -74,7 +91,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 // ...
 ```
 
-You can then have a fully built GitHub sign-in page appear at `/auth/signin` by adding `SignInPage` to `page.tsx`:
+To have a fully built "Sign in with GitHub" page appear at the `/auth/signin` route, add `SignInPage` to `page.tsx`:
 
 ```tsx title="./app/auth/signin/page.tsx"
 // ...
@@ -126,10 +143,6 @@ export default function SignIn() {
 }
 ```
 
-:::info
-If you're using the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), all of this is already configured for you. Otherwise, follow the [custom sign-in page instructions](https://authjs.dev/guides/pages/signin).
-:::
-
 ## Customization
 
 ### Branding
@@ -142,17 +155,23 @@ You can add your own branding elements to the `SignInPage` through the `branding
 
 Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be deeply customized to match any theme
 
-{{"demo": "ThemeSignInPage.js", "iframe": true, "height": 700 }}
+{{"demo": "ThemeSignInPage.js", "height": 700 }}
 
-### Components
+### Slot Props
 
-`SignInPage` can be customized by passing in `slotProps` to the underlying components of the credentials form.
+You can use the `slotProps` prop to customize the underlying components of the `SignInPage`:
 
-{{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 540 }}
+{{"demo": "SlotPropsSignIn.js", "height": 540 }}
 
-#### 🚧 Composition
+### Slots
 
-To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs and buttons. This is in progress.
+To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs and buttons.
+
+:::info
+Make sure to use the `name` attribute on the custom components with values `email` and `password` to enable data capture by the form action.
+:::
+
+{{"demo": "SlotsSignIn.js", "height": 540 }}
 
 ### 🚧 Layouts
 

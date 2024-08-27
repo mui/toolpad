@@ -61,6 +61,12 @@ const pages: MuiPage[] = [
             pathname: '/toolpad/core/react-page-container',
             title: 'Page Container',
           },
+        ],
+      },
+      {
+        pathname: '/toolpad/core/authentication-group',
+        subheader: 'Authentication',
+        children: [
           {
             pathname: '/toolpad/core/react-sign-in-page',
             title: 'Sign-in Page',
@@ -97,24 +103,27 @@ const pages: MuiPage[] = [
     children: [
       {
         pathname: '/toolpad/core/api/components-group',
-        inSideNav: false,
         subheader: 'Components',
+        children: pagesApi,
+      },
+      {
+        pathname: '/toolpad/core/api/hooks-group',
+        subheader: 'Hooks',
         children: [
-          ...pagesApi,
           {
-            pathname: '/toolpad/core/react-use-notifications/api/',
+            pathname: '/toolpad/core/react-use-notifications/api',
             title: 'useNotifications',
           },
           {
-            pathname: '/toolpad/core/react-use-dialogs/api/',
+            pathname: '/toolpad/core/react-use-dialogs/api',
             title: 'useDialogs',
           },
           {
-            pathname: '/toolpad/core/react-persistent-state/use-local-storage-state-api/',
+            pathname: '/toolpad/core/react-persistent-state/use-local-storage-state-api',
             title: 'useLocalStorageState',
           },
           {
-            pathname: '/toolpad/core/react-persistent-state/use-session-storage-state-api/',
+            pathname: '/toolpad/core/react-persistent-state/use-session-storage-state-api',
             title: 'useSessionStorageState',
           },
         ],

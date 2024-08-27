@@ -1,9 +1,15 @@
+// @ts-check
+/**
+ * @typedef {import('@babel/core')} babel
+ */
+
 const productionPlugins = [
   ['babel-plugin-react-remove-properties', { properties: ['data-mui-test'] }],
 ];
 
+/** @type {babel.ConfigFunction} */
 module.exports = function getBabelConfig(api) {
-  const useCommonjs = api.env(['node']);
+  const useESModules = !api.env(['node']);
 
   const presets = [
     [
@@ -12,7 +18,7 @@ module.exports = function getBabelConfig(api) {
         bugfixes: true,
         browserslistEnv: process.env.BABEL_ENV || process.env.NODE_ENV,
         debug: process.env.MUI_BUILD_VERBOSE === 'true',
-        modules: useCommonjs ? 'commonjs' : false,
+        modules: useESModules ? false : 'commonjs',
       },
     ],
     [
@@ -24,11 +30,14 @@ module.exports = function getBabelConfig(api) {
     '@babel/preset-typescript',
   ];
 
+  const outFileExtension = '.js';
+
+  /** @type {babel.PluginItem[]} */
   const plugins = [
     [
       '@babel/plugin-transform-runtime',
       {
-        useESModules: !useCommonjs,
+        useESModules,
         // any package needs to declare 7.4.4 as a runtime dependency. default is ^7.0.0
         version: '^7.4.4',
       },
@@ -43,6 +52,17 @@ module.exports = function getBabelConfig(api) {
 
   if (process.env.NODE_ENV === 'production') {
     plugins.push(...productionPlugins);
+  }
+
+  if (useESModules) {
+    plugins.push([
+      '@mui/internal-babel-plugin-resolve-imports',
+      {
+        // Don't replace the extension when we're using aliases.
+        // Essentially only replace in production builds.
+        outExtension: outFileExtension,
+      },
+    ]);
   }
 
   return {

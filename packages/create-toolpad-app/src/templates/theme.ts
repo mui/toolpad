@@ -1,13 +1,11 @@
 const theme = `
   "use client";
   import { createTheme } from '@mui/material/styles';
-  const lightTheme = createTheme();
-  
-  const darkTheme = createTheme({ palette: { mode: 'dark' } });
-  const theme = {
-    light: lightTheme,
-    dark: darkTheme
-  };
+
+  const theme = createTheme({
+    colorSchemes: { light: true, dark: true },
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  });
 
   export default theme;
   `;

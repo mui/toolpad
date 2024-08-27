@@ -56,16 +56,16 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.25.0",
-    "@mui/lab": "next",
-    "@mui/utils": "next",
+    "@mui/lab": "6.0.0-beta.8",
+    "@mui/utils": "6.0.0",
     "@toolpad/utils": "workspace:*",
     "client-only": "^0.0.1",
     "invariant": "2.2.4",
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "next",
-    "@mui/material": "next",
+    "@mui/icons-material": "6.0.0",
+    "@mui/material": "6.0.0",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.12",
     "@types/react": "18.3.3",

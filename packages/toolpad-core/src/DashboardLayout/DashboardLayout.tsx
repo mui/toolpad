@@ -254,7 +254,7 @@ function DashboardSidebarSubNavigation({
 
 export interface DashboardLayoutSlots {
   /**
-   * The toolbar account component used in the layout header.
+   * The toolbar actions component used in the layout header.
    * @default ToolbarActions
    */
   toolbarActions?: React.JSXElementConstructor<{}>;

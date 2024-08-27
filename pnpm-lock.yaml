@@ -100,8 +100,8 @@ importers:
         specifier: 1.0.17
         version: 1.0.17
       '@mui/monorepo':
-        specifier: github:mui/material-ui#cbb6f8d3b1b72732d51f5628765cfd7e75bd5747
-        version: https://codeload.github.com/mui/material-ui/tar.gz/cbb6f8d3b1b72732d51f5628765cfd7e75bd5747(encoding@0.1.13)
+        specifier: github:alexfauquette/material-ui#926c6ccf0ad73929e92b1dd14b9081238eb9a7fe
+        version: https://codeload.github.com/alexfauquette/material-ui/tar.gz/926c6ccf0ad73929e92b1dd14b9081238eb9a7fe(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.14.0
         version: 7.14.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-rc.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -194,7 +194,7 @@ importers:
         version: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-72f06b2-20240822(eslint@8.57.0)
+        version: 0.0.0-experimental-3f2f4f0-20240826(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -2064,7 +2064,7 @@ packages:
     resolution: {integrity: sha512-AAH4lEkpmzFWrGVlHaxJB7RLH21uPQ9+He+eFLWHmF9IuFQVugz8eAsamaW0DXRrTfco5zj1wWtpdcXJUOfsag==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
-      '@babel/core': ^7.0.0-0
+      '@babel/core': ^7.24.8
 
   '@babel/preset-typescript@7.24.7':
     resolution: {integrity: sha512-SyXRe3OdWwIwalxDg5UtJnJQO+YPcTfwiIY2B0Xlddh9o7jpWLvv8X1RthIeDOxQ+O1ML5BLPCONToObyVQVuQ==}
@@ -2137,7 +2137,7 @@ packages:
   '@docsearch/react@3.6.0':
     resolution: {integrity: sha512-HUFut4ztcVNmqy9gp/wxNbC7pTOHhgVVkHVGCACTuLhUKUhKAF9KYHJtMiLUJxEqiFLQiuri1fWF8zqwM/cu1w==}
     peerDependencies:
-      '@types/react': '>= 16.8.0 < 19.0.0'
+      '@types/react': 18.3.3
       react: '>= 16.8.0 < 19.0.0'
       react-dom: '>= 16.8.0 < 19.0.0'
       search-insights: '>= 1 < 3'
@@ -2548,10 +2548,6 @@ packages:
 
   '@googleapis/drive@8.11.1':
     resolution: {integrity: sha512-tkkjD7/CjypS6esQ/YhP3kEh86F4pEKa3YgvNMCI4Jg/eZzhBTvLQw+TqEfT/C/BoCF6jw2sgBoJQ9h8Qm2oIg==}
-    engines: {node: '>=12.0.0'}
-
-  '@googleapis/sheets@8.0.0':
-    resolution: {integrity: sha512-EwLC+bMLTz3n2EDJMhMdrNR+aTxDBPpcq3k6Ibc4eKrp8UbytNAEB0VgfQFOGJN7+BTCcjiojt08O/cwn+YnHg==}
     engines: {node: '>=12.0.0'}
 
   '@googleapis/sheets@9.1.0':
@@ -3013,10 +3009,10 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/cbb6f8d3b1b72732d51f5628765cfd7e75bd5747':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/cbb6f8d3b1b72732d51f5628765cfd7e75bd5747}
-    version: 6.0.0-beta.6
-    engines: {pnpm: 9.6.0}
+  '@mui/monorepo@https://codeload.github.com/alexfauquette/material-ui/tar.gz/926c6ccf0ad73929e92b1dd14b9081238eb9a7fe':
+    resolution: {tarball: https://codeload.github.com/alexfauquette/material-ui/tar.gz/926c6ccf0ad73929e92b1dd14b9081238eb9a7fe}
+    version: 6.0.0-rc.0
+    engines: {pnpm: 9.7.1}
 
   '@mui/private-theming@5.16.6':
     resolution: {integrity: sha512-rAk+Rh8Clg7Cd7shZhyt2HGTTE5wYKNSJ5sspf28Fqm/PZ69Er9o6KX25g03/FG2dfpg5GCwZh/xOojiTfm3hw==}
@@ -3832,8 +3828,8 @@ packages:
   '@sinonjs/text-encoding@0.7.2':
     resolution: {integrity: sha512-sXXKG+uL9IrKqViTtao2Ws6dy0znu9sOaP1di/jKGW1M6VssO8vlpXCQcpZ+jisQ1tTFAC5Jo/EOzFbggBagFQ==}
 
-  '@slack/bolt@3.19.0':
-    resolution: {integrity: sha512-P5Yup/PbO8sE5xsuqkBkpSPkxEkfWZ6yo5ZlmBGxRhhoU1usUSU2w0bgZoiDX4WFm7ZX+3x2Dyf4VMa9kzfmVQ==}
+  '@slack/bolt@3.21.1':
+    resolution: {integrity: sha512-cql+f8DypIE96mgFTREslP1DfsTUMyVR76whdepcQ1BpP2vXO1TZJxwJHnDKcnJ+NTg8KNGfPIjDfHZUMETCKw==}
     engines: {node: '>=12.13.0', npm: '>=6.12.0'}
 
   '@slack/logger@3.0.0':
@@ -3844,20 +3840,20 @@ packages:
     resolution: {integrity: sha512-Wz7QYfPAlG/DR+DfABddUZeNgoeY7d1J39OCR2jR+v7VBsB8ezulDK5szTnDDPDwLH5IWhLvXIHlCFZV7MSKgA==}
     engines: {node: '>= 18', npm: '>= 8.6.0'}
 
-  '@slack/oauth@2.6.2':
-    resolution: {integrity: sha512-2R3MyB/R63hTRXzk5J6wcui59TBxXzhk+Uh2/Xu3Wp3O4pXg/BNucQhP/DQbL/ScVhLvFtMXirLrKi0Yo5gIVw==}
+  '@slack/oauth@2.6.3':
+    resolution: {integrity: sha512-1amXs6xRkJpoH6zSgjVPgGEJXCibKNff9WNDijcejIuVy1HFAl1adh7lehaGNiHhTWfQkfKxBiF+BGn56kvoFw==}
     engines: {node: '>=12.13.0', npm: '>=6.12.0'}
 
-  '@slack/socket-mode@1.3.5':
-    resolution: {integrity: sha512-m2J2hVCIxEvBinkNINNmizDZWBa6D9taFD930aknEDi+2DtzFSMhmxci/VeN7DJVUe+ovLl3lPlvLK9p4hd5CQ==}
+  '@slack/socket-mode@1.3.6':
+    resolution: {integrity: sha512-G+im7OP7jVqHhiNSdHgv2VVrnN5U7KY845/5EZimZkrD4ZmtV0P3BiWkgeJhPtdLuM7C7i6+M6h6Bh+S4OOalA==}
     engines: {node: '>=12.13.0', npm: '>=6.12.0'}
 
   '@slack/types@2.12.0':
     resolution: {integrity: sha512-yFewzUomYZ2BYaGJidPuIgjoYj5wqPDmi7DLSaGIkf+rCi4YZ2Z3DaiYIbz7qb/PL2NmamWjCvB7e9ArI5HkKg==}
     engines: {node: '>= 12.13.0', npm: '>= 6.12.0'}
 
-  '@slack/web-api@6.12.0':
-    resolution: {integrity: sha512-RPw6F8rWfGveGkZEJ4+4jUin5iazxRK2q3FpQDz/FvdgzC3nZmPyLx8WRzc6nh0w3MBjEbphNnp2VZksfhpBIQ==}
+  '@slack/web-api@6.12.1':
+    resolution: {integrity: sha512-dXHyHkvvziqkDdZlPRnUl/H2uvnUmdJ5B7kxiH1HIgHe18vcbUk1zjU/XCZgJFhxGeq5Zwa95Z+SbNW9mbRhtw==}
     engines: {node: '>= 12.13.0', npm: '>= 6.12.0'}
 
   '@swc/counter@0.1.3':
@@ -4751,8 +4747,8 @@ packages:
     resolution: {integrity: sha512-QbUdXJVTpvUTHU7871ppZkdOLBeGUKBQWHkHrvN2V9IQWGMt61zf3B45BtzjxEJzYuj0JBjBZP/hmYS/R9pmAw==}
     engines: {node: '>=4'}
 
-  axios@1.7.2:
-    resolution: {integrity: sha512-2A8QhOMrbomlDuiLeK9XibIBzuHeRcqqNOHp0Cyp5EoJ1IFDh+XZH3A6BkXtv0K4gFGCI0Y4BM7B1wOEi0Rmgw==}
+  axios@1.7.5:
+    resolution: {integrity: sha512-fZu86yCo+svH3uqJ/yTdQ0QHpQu5oL+/QE+QPSv6BZSkDAoky9vytxp7u5qk83OJFS3kEBcesWni9WTZAv3tSw==}
 
   axobject-query@3.1.1:
     resolution: {integrity: sha512-goKlv8DZrK9hUh975fnHzhNIO4jUnFCfv/dszV5VwUGDFjI6vQ2VwoyjYjYNEbBE8AH87TduWP5uyDR1D+Iteg==}
@@ -5891,8 +5887,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-72f06b2-20240822:
-    resolution: {integrity: sha512-tmcPYVSeSCktvNgGNE/CKY5Gn29wMMSdHMb/IglSTWoddtDZ5YhAoGgiTAerKN+rmB0bBtjFSRjh1ZjmgH+mhQ==}
+  eslint-plugin-react-compiler@0.0.0-experimental-3f2f4f0-20240826:
+    resolution: {integrity: sha512-ONy+bA9sGbASAVqzv7ZvgySdiByGr06rS5clbnC7aFa8MBlWZWInRzJ7mIMKThlVkW8FTNWsZaqstQcILMKaeg==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -10363,7 +10359,7 @@ snapshots:
   '@argos-ci/core@2.4.1':
     dependencies:
       '@argos-ci/util': 2.1.0
-      axios: 1.7.2(debug@4.3.5)
+      axios: 1.7.5(debug@4.3.5)
       convict: 6.2.4
       debug: 4.3.5
       fast-glob: 3.3.2
@@ -11665,13 +11661,6 @@ snapshots:
       - encoding
       - supports-color
 
-  '@googleapis/sheets@8.0.0(encoding@0.1.13)':
-    dependencies:
-      googleapis-common: 7.2.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-
   '@googleapis/sheets@9.1.0(encoding@0.1.13)':
     dependencies:
       googleapis-common: 7.2.0(encoding@0.1.13)
@@ -12245,11 +12234,11 @@ snapshots:
       '@emotion/styled': 11.13.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@types/react': 18.3.3
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/cbb6f8d3b1b72732d51f5628765cfd7e75bd5747(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/alexfauquette/material-ui/tar.gz/926c6ccf0ad73929e92b1dd14b9081238eb9a7fe(encoding@0.1.13)':
     dependencies:
-      '@googleapis/sheets': 8.0.0(encoding@0.1.13)
+      '@googleapis/sheets': 9.1.0(encoding@0.1.13)
       '@netlify/functions': 2.8.1
-      '@slack/bolt': 3.19.0
+      '@slack/bolt': 3.21.1
       execa: 9.3.1
       google-auth-library: 9.11.0(encoding@0.1.13)
     transitivePeerDependencies:
@@ -13175,17 +13164,17 @@ snapshots:
 
   '@sinonjs/text-encoding@0.7.2': {}
 
-  '@slack/bolt@3.19.0':
+  '@slack/bolt@3.21.1':
     dependencies:
       '@slack/logger': 4.0.0
-      '@slack/oauth': 2.6.2
-      '@slack/socket-mode': 1.3.5
+      '@slack/oauth': 2.6.3
+      '@slack/socket-mode': 1.3.6
       '@slack/types': 2.12.0
-      '@slack/web-api': 6.12.0
+      '@slack/web-api': 6.12.1
       '@types/express': 4.17.21
       '@types/promise.allsettled': 1.0.6
       '@types/tsscmp': 1.0.2
-      axios: 1.7.2(debug@4.3.5)
+      axios: 1.7.5(debug@4.3.5)
       express: 4.19.2
       path-to-regexp: 6.2.2
       please-upgrade-node: 3.2.0
@@ -13206,10 +13195,10 @@ snapshots:
     dependencies:
       '@types/node': 22.4.0
 
-  '@slack/oauth@2.6.2':
+  '@slack/oauth@2.6.3':
     dependencies:
       '@slack/logger': 3.0.0
-      '@slack/web-api': 6.12.0
+      '@slack/web-api': 6.12.1
       '@types/jsonwebtoken': 8.5.9
       '@types/node': 22.4.0
       jsonwebtoken: 9.0.2
@@ -13217,10 +13206,10 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@slack/socket-mode@1.3.5':
+  '@slack/socket-mode@1.3.6':
     dependencies:
       '@slack/logger': 3.0.0
-      '@slack/web-api': 6.12.0
+      '@slack/web-api': 6.12.1
       '@types/node': 22.4.0
       '@types/ws': 7.4.7
       eventemitter3: 5.0.1
@@ -13233,13 +13222,13 @@ snapshots:
 
   '@slack/types@2.12.0': {}
 
-  '@slack/web-api@6.12.0':
+  '@slack/web-api@6.12.1':
     dependencies:
       '@slack/logger': 3.0.0
       '@slack/types': 2.12.0
       '@types/is-stream': 1.1.0
       '@types/node': 22.4.0
-      axios: 1.7.2(debug@4.3.5)
+      axios: 1.7.5(debug@4.3.5)
       eventemitter3: 3.1.2
       form-data: 2.5.1
       is-electron: 2.2.2
@@ -14383,7 +14372,7 @@ snapshots:
 
   axe-core@4.9.1: {}
 
-  axios@1.7.2(debug@4.3.5):
+  axios@1.7.5(debug@4.3.5):
     dependencies:
       follow-redirects: 1.15.6(debug@4.3.5)
       form-data: 4.0.0
@@ -15752,7 +15741,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-72f06b2-20240822(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-3f2f4f0-20240826(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.3
@@ -18113,7 +18102,7 @@ snapshots:
       '@yarnpkg/lockfile': 1.1.0
       '@yarnpkg/parsers': 3.0.0-rc.46
       '@zkochan/js-yaml': 0.0.7
-      axios: 1.7.2(debug@4.3.5)
+      axios: 1.7.5(debug@4.3.5)
       chalk: 4.1.2
       cli-cursor: 3.1.0
       cli-spinners: 2.6.1

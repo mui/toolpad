@@ -163,6 +163,11 @@
       "matchFiles": ["examples/*/package.json"],
       "schedule": ["at any time"],
       "automerge": true
+    },
+    {
+      "groupName": "node-18-incompatible",
+      "description": "These dependencies require a Node.js version higher than 18.",
+      "matchPackageNames": ["rimraf", "glob"]
     }
   ],
   "postUpdateOptions": ["pnpmDedupe"],

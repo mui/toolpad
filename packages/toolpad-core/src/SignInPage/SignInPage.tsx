@@ -38,7 +38,32 @@ import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
 import { BrandingContext, DocsContext, RouterContext } from '../shared/context';
 
-const IconProviderMap = new Map<string, React.ReactNode>([
+type SupportedOAuthProvider =
+  | 'github'
+  | 'google'
+  | 'facebook'
+  | 'gitlab'
+  | 'twitter'
+  | 'apple'
+  | 'instagram'
+  | 'tiktok'
+  | 'linkedin'
+  | 'slack'
+  | 'spotify'
+  | 'twitch'
+  | 'discord'
+  | 'line'
+  | 'auth0'
+  | 'cognito'
+  | 'keycloak'
+  | 'okta'
+  | 'fusionauth'
+  | 'microsoft-entra-id';
+
+// https://authjs.dev/reference/core/providers#providertype
+export type SupportedAuthProvider = SupportedOAuthProvider | 'credentials';
+
+const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([
   ['github', <GitHubIcon key="github" />],
   ['credentials', <PasswordIcon key="credentials" />],
   ['google', <GoogleIcon key="google" />],
@@ -69,7 +94,7 @@ export interface AuthProvider {
    * @example 'google'
    * @example 'github'
    */
-  id: string;
+  id: SupportedAuthProvider;
   /**
    * The name of the authentication provider.
    * @default ''
@@ -178,10 +203,10 @@ function SignInPage(props: SignInPageProps) {
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const [{ loading, providerId, error }, setFormStatus] = React.useState<{
     loading: boolean;
-    providerId: string;
+    providerId?: SupportedAuthProvider;
     error?: string;
   }>({
-    providerId: '',
+    providerId: undefined,
     loading: false,
     error: '',
   });
@@ -401,7 +426,29 @@ SignInPage.propTypes /* remove-proptypes */ = {
    */
   providers: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      id: PropTypes.oneOf([
+        'apple',
+        'auth0',
+        'cognito',
+        'credentials',
+        'discord',
+        'facebook',
+        'fusionauth',
+        'github',
+        'gitlab',
+        'google',
+        'instagram',
+        'keycloak',
+        'line',
+        'linkedin',
+        'microsoft-entra-id',
+        'okta',
+        'slack',
+        'spotify',
+        'tiktok',
+        'twitch',
+        'twitter',
+      ]).isRequired,
       name: PropTypes.string.isRequired,
     }),
   ),

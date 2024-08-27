@@ -1,10 +1,6 @@
+import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
+
 import { PackageJson } from './templates/packageType';
-
-// https://authjs.dev/reference/core/providers#oauthconfigprofile
-type SupportedOAuthProvider = 'facebook' | 'github' | 'google';
-
-// https://authjs.dev/reference/core/providers#providertype
-export type SupportedAuthProvider = SupportedOAuthProvider | 'credentials';
 
 export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';
 export type PackageManager = 'npm' | 'pnpm' | 'yarn';

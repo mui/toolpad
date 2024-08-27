@@ -12,12 +12,13 @@ import { satisfies } from 'semver';
 import { readJsonFile } from '@toolpad/utils/fs';
 import invariant from 'invariant';
 import { bashResolvePath } from '@toolpad/utils/cli';
+import type { SupportedAuthProvider } from '@toolpad/core';
 import generateProject, { GenerateProjectOptions } from './generateProject';
 import generateStudioProject from './generateStudioProject';
 import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
 import type { PackageJson } from './templates/packageType';
-import type { SupportedRouter, SupportedAuthProvider, PackageManager } from './types';
+import type { SupportedRouter, PackageManager } from './types';
 
 /**
  * Find package.json of the create-toolpad-app package
@@ -297,6 +298,24 @@ const run = async () => {
         choices: [
           { name: 'Google', value: 'google' },
           { name: 'GitHub', value: 'github' },
+          { name: 'GitLab', value: 'gitlab' },
+          { name: 'Twitter', value: 'twitter' },
+          { name: 'Facebook', value: 'facebook' },
+          { name: 'Cognito', value: 'cognito' },
+          { name: 'Microsoft Entra ID', value: 'microsoft-entra-id' },
+          { name: 'Apple', value: 'apple' },
+          { name: 'Instagram', value: 'instagram' },
+          { name: 'TikTok', value: 'tiktok' },
+          { name: 'LinkedIn', value: 'linkedin' },
+          { name: 'Slack', value: 'slack' },
+          { name: 'Spotify', value: 'spotify' },
+          { name: 'Twitch', value: 'twitch' },
+          { name: 'Discord', value: 'discord' },
+          { name: 'Line', value: 'line' },
+          { name: 'Auth0', value: 'auth0' },
+          { name: 'Keycloak', value: 'keycloak' },
+          { name: 'Okta', value: 'okta' },
+          { name: 'FusionAuth', value: 'fusionauth' },
         ],
       });
     }

@@ -1,3 +1,5 @@
+import type { SupportedAuthProvider } from '@toolpad/core';
+
 // Common files for all apps
 import theme from './templates/theme';
 import eslintConfig from './templates/eslintConfig';
@@ -40,7 +42,7 @@ import packageJsonAuthPages from './templates/auth/nextjs-pages/packageJson';
 import appAuthPages from './templates/auth/nextjs-pages/app';
 import signInPagePagesRouter from './templates/auth/nextjs-pages/signIn';
 
-import { SupportedAuthProvider, SupportedRouter } from './types';
+import { SupportedRouter } from './types';
 
 export interface GenerateProjectOptions {
   name: string;

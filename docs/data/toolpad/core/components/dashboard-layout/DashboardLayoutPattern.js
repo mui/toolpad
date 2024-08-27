@@ -1,19 +1,14 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-
-const NAVIGATION = [
-  {
-    segment: 'dashboard',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
-];
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -31,7 +26,7 @@ const demoTheme = createTheme({
   },
 });
 
-function DemoPageContent({ pathname }) {
+function DemoPageContent({ pathname, navigate }) {
   return (
     <Box
       sx={{
@@ -42,52 +37,56 @@ function DemoPageContent({ pathname }) {
         textAlign: 'center',
       }}
     >
-      <Typography>Dashboard content for {pathname}</Typography>
+      <Typography>
+        <p>Dashboard content for {pathname}</p>
+      </Typography>
+      {pathname.startsWith('/orders') ? (
+        <Stack direction="row" spacing={1} sx={{ pt: 1 }}>
+          <Button
+            onClick={() => {
+              navigate('/orders/1');
+            }}
+          >
+            Order 1
+          </Button>
+          <Button
+            onClick={() => {
+              navigate('/orders/2');
+            }}
+          >
+            Order 2
+          </Button>
+          <Button
+            onClick={() => {
+              navigate('/orders/3');
+            }}
+          >
+            Order 3
+          </Button>
+        </Stack>
+      ) : null}
     </Box>
   );
 }
 
 DemoPageContent.propTypes = {
+  navigate: PropTypes.func.isRequired,
   pathname: PropTypes.string.isRequired,
 };
 
-function DashboardLayoutAccount(props) {
+function DashboardLayoutPattern(props) {
   const { window } = props;
 
-  const [session, setSession] = React.useState({
-    user: {
-      name: 'Bharat Kashyap',
-      email: 'bharatkashyap@outlook.com',
-      image: 'https://avatars.githubusercontent.com/u/19550456',
-    },
-  });
-
-  const authentication = React.useMemo(() => {
-    return {
-      signIn: () => {
-        setSession({
-          user: {
-            name: 'Bharat Kashyap',
-            email: 'bharatkashyap@outlook.com',
-            image: 'https://avatars.githubusercontent.com/u/19550456',
-          },
-        });
-      },
-      signOut: () => {
-        setSession(null);
-      },
-    };
-  }, []);
-
-  const [pathname, setPathname] = React.useState('/dashboard');
+  const [pathname, setPathname] = React.useState('/orders');
+  const navigate = React.useCallback((path) => setPathname(String(path)), []);
 
   const router = React.useMemo(() => {
     return {
       pathname,
       searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
+      navigate,
     };
-  }, [pathname]);
+  }, [pathname, navigate]);
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
@@ -95,22 +94,32 @@ function DashboardLayoutAccount(props) {
   return (
     // preview-start
     <AppProvider
-      session={session}
-      authentication={authentication}
-      navigation={NAVIGATION}
+      navigation={[
+        {
+          segment: 'dashboard',
+          title: 'Dashboard',
+          icon: <DashboardIcon />,
+        },
+        {
+          segment: 'orders',
+          title: 'Orders',
+          icon: <ShoppingCartIcon />,
+          pattern: '/orders{/:orderId}*',
+        },
+      ]}
       router={router}
       theme={demoTheme}
       window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={pathname} navigate={navigate} />
       </DashboardLayout>
     </AppProvider>
     // preview-end
   );
 }
 
-DashboardLayoutAccount.propTypes = {
+DashboardLayoutPattern.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -118,4 +127,4 @@ DashboardLayoutAccount.propTypes = {
   window: PropTypes.func,
 };
 
-export default DashboardLayoutAccount;
+export default DashboardLayoutPattern;

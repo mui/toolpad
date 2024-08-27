@@ -1,8 +1,8 @@
 {
-  "name": "mui-toolpad",
+  "name": "toolpad-project",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "Build MUI apps quickly",
+  "description": "Components and tools for building dashboards and internal tools",
   "repository": "https://github.com/mui/mui-toolpad.git",
   "private": true,
   "bin": {
@@ -57,9 +57,9 @@
     "@mui/internal-docs-utils": "1.0.11",
     "@mui/internal-markdown": "1.0.11",
     "@mui/internal-scripts": "1.0.17",
-    "@mui/monorepo": "github:mui/material-ui#cbb6f8d3b1b72732d51f5628765cfd7e75bd5747",
+    "@mui/monorepo": "github:mui/material-ui#7407132c10c057336a212b6fb287807ba37009bc",
     "@mui/x-charts": "7.14.0",
-    "@next/eslint-plugin-next": "14.2.5",
+    "@next/eslint-plugin-next": "14.2.6",
     "@playwright/test": "1.45.3",
     "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/react": "16.0.0",

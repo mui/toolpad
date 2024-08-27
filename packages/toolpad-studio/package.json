@@ -103,7 +103,7 @@
     "find-up": "7.0.0",
     "fractional-indexing": "3.2.0",
     "get-port": "7.1.0",
-    "glob": "10.4.5",
+    "glob": "11.0.0",
     "google-auth-library": "9.14.0",
     "http-proxy-middleware": "3.0.0",
     "invariant": "2.2.4",

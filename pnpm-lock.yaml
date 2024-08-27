@@ -100,8 +100,8 @@ importers:
         specifier: 1.0.17
         version: 1.0.17
       '@mui/monorepo':
-        specifier: github:alexfauquette/material-ui#926c6ccf0ad73929e92b1dd14b9081238eb9a7fe
-        version: https://codeload.github.com/alexfauquette/material-ui/tar.gz/926c6ccf0ad73929e92b1dd14b9081238eb9a7fe(encoding@0.1.13)
+        specifier: github:mui/material-ui#7407132c10c057336a212b6fb287807ba37009bc
+        version: https://codeload.github.com/mui/material-ui/tar.gz/7407132c10c057336a212b6fb287807ba37009bc(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.14.0
         version: 7.14.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@mui/material@6.0.0-rc.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -814,7 +814,7 @@ importers:
         version: 10.4.5
       google-auth-library:
         specifier: '*'
-        version: 9.11.0(encoding@0.1.13)
+        version: 9.14.0(encoding@0.1.13)
       http-proxy-middleware:
         specifier: 3.0.0
         version: 3.0.0
@@ -3009,9 +3009,9 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/alexfauquette/material-ui/tar.gz/926c6ccf0ad73929e92b1dd14b9081238eb9a7fe':
-    resolution: {tarball: https://codeload.github.com/alexfauquette/material-ui/tar.gz/926c6ccf0ad73929e92b1dd14b9081238eb9a7fe}
-    version: 6.0.0-rc.0
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/7407132c10c057336a212b6fb287807ba37009bc':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/7407132c10c057336a212b6fb287807ba37009bc}
+    version: 6.0.0
     engines: {pnpm: 9.7.1}
 
   '@mui/private-theming@5.16.6':
@@ -6273,8 +6273,8 @@ packages:
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
 
-  gaxios@6.7.0:
-    resolution: {integrity: sha512-DSrkyMTfAnAm4ks9Go20QGOcXEyW/NmZhvTYBU2rb4afBB393WIMQPWPEDMl/k8xqiNN9HYq2zao3oWXsdl2Tg==}
+  gaxios@6.7.1:
+    resolution: {integrity: sha512-LDODD4TMYx7XXdpwxAVRAIAuB0bzv0s+ywFonY46k126qzQHT9ygyoa9tncmOiQmmDrik65UYsEkv3lbfqQ3yQ==}
     engines: {node: '>=14'}
 
   gcp-metadata@6.1.0:
@@ -6430,8 +6430,8 @@ packages:
     resolution: {integrity: sha512-4kKdWXTtgQ4biIo7hZA396HT062nDVVHPjQcurNZ3o/voYN+o5FUC5kOwuORbpExp3XbTJ3SU7iRipiIhQtovw==}
     engines: {node: '>=14'}
 
-  google-auth-library@9.11.0:
-    resolution: {integrity: sha512-epX3ww/mNnhl6tL45EQ/oixsY8JLEgUFoT4A5E/5iAR4esld9Kqv6IJGk7EmGuOgDvaarwF95hU2+v7Irql9lw==}
+  google-auth-library@9.14.0:
+    resolution: {integrity: sha512-Y/eq+RWVs55Io/anIsm24sDS8X79Tq948zVLGaa7+KlJYYqaGwp1YI37w48nzrNi12RgnzMrQD4NzdmCowT90g==}
     engines: {node: '>=14'}
 
   googleapis-common@7.2.0:
@@ -12234,13 +12234,13 @@ snapshots:
       '@emotion/styled': 11.13.0(@emotion/react@11.13.3(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1)
       '@types/react': 18.3.3
 
-  '@mui/monorepo@https://codeload.github.com/alexfauquette/material-ui/tar.gz/926c6ccf0ad73929e92b1dd14b9081238eb9a7fe(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/7407132c10c057336a212b6fb287807ba37009bc(encoding@0.1.13)':
     dependencies:
       '@googleapis/sheets': 9.1.0(encoding@0.1.13)
       '@netlify/functions': 2.8.1
       '@slack/bolt': 3.21.1
       execa: 9.3.1
-      google-auth-library: 9.11.0(encoding@0.1.13)
+      google-auth-library: 9.14.0(encoding@0.1.13)
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -16279,20 +16279,20 @@ snapshots:
 
   functions-have-names@1.2.3: {}
 
-  gaxios@6.7.0(encoding@0.1.13):
+  gaxios@6.7.1(encoding@0.1.13):
     dependencies:
       extend: 3.0.2
       https-proxy-agent: 7.0.5
       is-stream: 2.0.1
       node-fetch: 2.7.0(encoding@0.1.13)
-      uuid: 10.0.0
+      uuid: 9.0.1
     transitivePeerDependencies:
       - encoding
       - supports-color
 
   gcp-metadata@6.1.0(encoding@0.1.13):
     dependencies:
-      gaxios: 6.7.0(encoding@0.1.13)
+      gaxios: 6.7.1(encoding@0.1.13)
       json-bigint: 1.0.0
     transitivePeerDependencies:
       - encoding
@@ -16487,11 +16487,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  google-auth-library@9.11.0(encoding@0.1.13):
+  google-auth-library@9.14.0(encoding@0.1.13):
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 6.7.0(encoding@0.1.13)
+      gaxios: 6.7.1(encoding@0.1.13)
       gcp-metadata: 6.1.0(encoding@0.1.13)
       gtoken: 7.1.0(encoding@0.1.13)
       jws: 4.0.0
@@ -16502,8 +16502,8 @@ snapshots:
   googleapis-common@7.2.0(encoding@0.1.13):
     dependencies:
       extend: 3.0.2
-      gaxios: 6.7.0(encoding@0.1.13)
-      google-auth-library: 9.11.0(encoding@0.1.13)
+      gaxios: 6.7.1(encoding@0.1.13)
+      google-auth-library: 9.14.0(encoding@0.1.13)
       qs: 6.12.2
       url-template: 2.0.8
       uuid: 9.0.1
@@ -16525,7 +16525,7 @@ snapshots:
 
   gtoken@7.1.0(encoding@0.1.13):
     dependencies:
-      gaxios: 6.7.0(encoding@0.1.13)
+      gaxios: 6.7.1(encoding@0.1.13)
       jws: 4.0.0
     transitivePeerDependencies:
       - encoding

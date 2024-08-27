@@ -7,6 +7,7 @@
   },
   "classDescriptions": {},
   "slotDescriptions": {
-    "toolbarActions": "The toolbar actions component used in the layout header."
+    "toolbarAccount": "The toolbar account component used in the layout header.",
+    "toolbarActions": "The toolbar account component used in the layout header."
   }
 }

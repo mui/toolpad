@@ -31,15 +31,16 @@ import {
   WindowContext,
 } from '../shared/context';
 import type { Navigation } from '../AppProvider';
-import { ThemeSwitcher } from './ThemeSwitcher';
-import { ToolbarActions } from './ToolbarActions';
-import { ToolpadLogo } from './ToolpadLogo';
+import { Account, type AccountProps } from '../Account';
 import {
   getItemTitle,
   getPageItemFullPath,
   hasSelectedNavigationChildren,
 } from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
+import { ToolbarActions } from './ToolbarActions';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { ToolpadLogo } from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320; // px
 
@@ -253,10 +254,15 @@ function DashboardSidebarSubNavigation({
 
 export interface DashboardLayoutSlots {
   /**
-   * The toolbar actions component used in the layout header.
+   * The toolbar account component used in the layout header.
    * @default ToolbarActions
    */
   toolbarActions?: React.JSXElementConstructor<{}>;
+  /**
+   * The toolbar account component used in the layout header.
+   * @default Account
+   */
+  toolbarAccount?: React.JSXElementConstructor<AccountProps>;
 }
 
 export interface DashboardLayoutProps {
@@ -275,6 +281,7 @@ export interface DashboardLayoutProps {
    */
   slotProps?: {
     toolbarActions?: {};
+    toolbarAccount?: AccountProps;
   };
 }
 
@@ -337,6 +344,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
     </React.Fragment>
   );
 
+  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
+  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
+
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
@@ -386,12 +396,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
+          <ToolbarActionsSlot {...slotProps?.toolbarActions} />
           <ThemeSwitcher />
-          {slots?.toolbarActions ? (
-            <slots.toolbarActions {...slotProps?.toolbarActions} />
-          ) : (
-            <ToolbarActions {...slotProps?.toolbarActions} />
-          )}
+          <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
         </Toolbar>
       </AppBar>
       <Drawer
@@ -460,6 +467,16 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
+    toolbarAccount: PropTypes.shape({
+      signInLabel: PropTypes.string,
+      signOutLabel: PropTypes.string,
+      slotProps: PropTypes.shape({
+        avatar: PropTypes.object,
+        iconButton: PropTypes.object,
+        signInButton: PropTypes.object,
+        signOutButton: PropTypes.object,
+      }),
+    }),
     toolbarActions: PropTypes.object,
   }),
   /**
@@ -467,6 +484,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slots: PropTypes.shape({
+    toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,
   }),
 } as any;

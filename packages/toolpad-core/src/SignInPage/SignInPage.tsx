@@ -147,9 +147,9 @@ export interface SignInPageProps {
   /**
    * The props used for each slot inside.
    * @default {}
-   * @example { email: { autoFocus: false } }
-   * @example { password: { variant: 'outlined' } }
-   * @example { email: { autoFocus: false }, password: { variant: 'outlined' } }
+   * @example { emailField: { autoFocus: false } }
+   * @example { passwordField: { variant: 'outlined' } }
+   * @example { emailField: { autoFocus: false }, passwordField: { variant: 'outlined' } }
    */
   slotProps?: {
     emailField?: TextFieldProps;
@@ -417,9 +417,9 @@ SignInPage.propTypes /* remove-proptypes */ = {
   /**
    * The props used for each slot inside.
    * @default {}
-   * @example { email: { autoFocus: false } }
-   * @example { password: { variant: 'outlined' } }
-   * @example { email: { autoFocus: false }, password: { variant: 'outlined' } }
+   * @example { emailField: { autoFocus: false } }
+   * @example { passwordField: { variant: 'outlined' } }
+   * @example { emailField: { autoFocus: false }, passwordField: { variant: 'outlined' } }
    */
   slotProps: PropTypes.shape({
     emailField: PropTypes.object,

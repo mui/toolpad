@@ -8,6 +8,6 @@ const providers = [
 
 // ...
 
-<AppProvider>
+<AppProvider theme={theme}>
   <SignInPage signIn={signIn} providers={providers} />
 </AppProvider>

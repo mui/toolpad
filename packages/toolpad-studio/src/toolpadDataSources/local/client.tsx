@@ -7,7 +7,7 @@ import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
 import { errorFrom } from '@toolpad/utils/errors';
 import { useQuery } from '@tanstack/react-query';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid2';
 import TabPanel from '../../components/TabPanel';
 import { ClientDataSource, QueryEditorProps } from '../../types';
 import { LocalPrivateApi, LocalQuery, LocalConnectionParams } from './types';
@@ -345,13 +345,13 @@ function QueryEditor({
                       const Control = getDefaultControl(propTypeControls, definiton, liveBindings);
                       if (!Control) {
                         return (
-                          <Grid xs={4} key={name} sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Grid size={4} key={name} sx={{ display: 'flex', alignItems: 'center' }}>
                             <Typography>Can&apos;t configure {name}</Typography>
                           </Grid>
                         );
                       }
                       return (
-                        <Grid xs={4} key={name}>
+                        <Grid size={4} key={name}>
                           <BindableEditor
                             liveBinding={liveBindings[name]}
                             globalScope={globalScope}

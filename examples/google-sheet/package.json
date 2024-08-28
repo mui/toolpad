@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@toolpad/studio": "0.5.2",
-    "googleapis": "140.0.1"
+    "googleapis": "143.0.0"
   }
 }

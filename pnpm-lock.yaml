@@ -100,8 +100,8 @@ importers:
         specifier: 1.0.18
         version: 1.0.18
       '@mui/monorepo':
-        specifier: github:mui/material-ui#7407132c10c057336a212b6fb287807ba37009bc
-        version: https://codeload.github.com/mui/material-ui/tar.gz/7407132c10c057336a212b6fb287807ba37009bc(encoding@0.1.13)
+        specifier: github:mui/material-ui#20fa6b93c3afb4c5fa293aec299b1f9190e26e03
+        version: https://codeload.github.com/mui/material-ui/tar.gz/20fa6b93c3afb4c5fa293aec299b1f9190e26e03(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.14.0
         version: 7.14.0(@emotion/react@11.13.3(@types/react@18.3.4)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.4)(react@18.3.1))(@types/react@18.3.4)(react@18.3.1))(@mui/material@6.0.0(@emotion/react@11.13.3(@types/react@18.3.4)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.4)(react@18.3.1))(@types/react@18.3.4)(react@18.3.1))(@types/react@18.3.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2554,6 +2554,10 @@ packages:
     resolution: {integrity: sha512-P4ao9holdrrBGzPulP1kAhZvP9jE30kkxPAKJMPl86hlLR1gIJZa4N37+wPJEj8JMkrKL0ei2svP7sn5/XyUAQ==}
     engines: {node: '>=12.0.0'}
 
+  '@googleapis/sheets@9.3.0':
+    resolution: {integrity: sha512-JfL3TWk//ZlVEWr73rrMuxQyQtAc4/mgvEUXu3o2jvAYzf5euzL25P3Yl12T67v5xJMm36fjdv/snuANGPQfGQ==}
+    engines: {node: '>=12.0.0'}
+
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
     engines: {node: '>=10.10.0'}
@@ -2934,8 +2938,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/7407132c10c057336a212b6fb287807ba37009bc':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/7407132c10c057336a212b6fb287807ba37009bc}
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/20fa6b93c3afb4c5fa293aec299b1f9190e26e03':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/20fa6b93c3afb4c5fa293aec299b1f9190e26e03}
     version: 6.0.0
     engines: {pnpm: 9.7.1}
 
@@ -11551,6 +11555,13 @@ snapshots:
       - encoding
       - supports-color
 
+  '@googleapis/sheets@9.3.0(encoding@0.1.13)':
+    dependencies:
+      googleapis-common: 7.2.0(encoding@0.1.13)
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
@@ -12029,9 +12040,9 @@ snapshots:
       '@emotion/styled': 11.13.0(@emotion/react@11.13.3(@types/react@18.3.4)(react@18.3.1))(@types/react@18.3.4)(react@18.3.1)
       '@types/react': 18.3.4
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/7407132c10c057336a212b6fb287807ba37009bc(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/20fa6b93c3afb4c5fa293aec299b1f9190e26e03(encoding@0.1.13)':
     dependencies:
-      '@googleapis/sheets': 9.1.0(encoding@0.1.13)
+      '@googleapis/sheets': 9.3.0(encoding@0.1.13)
       '@netlify/functions': 2.8.1
       '@slack/bolt': 3.21.1
       execa: 9.3.1

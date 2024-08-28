@@ -88,8 +88,8 @@ importers:
         specifier: 7.24.7
         version: 7.24.7(@babel/core@7.25.2)
       '@mui/internal-babel-plugin-resolve-imports':
-        specifier: 1.0.16-dev.20240822-123416-f4a704707a
-        version: 1.0.16-dev.20240822-123416-f4a704707a(@babel/core@7.25.2)
+        specifier: 1.0.17
+        version: 1.0.17(@babel/core@7.25.2)
       '@mui/internal-docs-utils':
         specifier: 1.0.11
         version: 1.0.11
@@ -97,8 +97,8 @@ importers:
         specifier: 1.0.11
         version: 1.0.11
       '@mui/internal-scripts':
-        specifier: 1.0.17
-        version: 1.0.17
+        specifier: 1.0.18
+        version: 1.0.18
       '@mui/monorepo':
         specifier: github:mui/material-ui#7407132c10c057336a212b6fb287807ba37009bc
         version: https://codeload.github.com/mui/material-ui/tar.gz/7407132c10c057336a212b6fb287807ba37009bc(encoding@0.1.13)
@@ -2844,8 +2844,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/internal-babel-plugin-resolve-imports@1.0.16-dev.20240822-123416-f4a704707a':
-    resolution: {integrity: sha512-zfxISMMAgZucsirZgqWqJXXCosnpKS+ZflBDKXyfbkNwWk5YUVwHNBfhQJ6yBLL+ZQIpXj22nCPC+38rkG76Pg==}
+  '@mui/internal-babel-plugin-resolve-imports@1.0.17':
+    resolution: {integrity: sha512-HwPNM9sVKwos4njiVIG40kOUtA47xAuVGyn2wdjCW2Tkj/YJPo5Nck3kh69uqwvN4nu1ntSW15iMVIpQG5vp3A==}
     peerDependencies:
       '@babel/core': '7'
 
@@ -2855,8 +2855,8 @@ packages:
   '@mui/internal-markdown@1.0.11':
     resolution: {integrity: sha512-eKinbHo+/qlNkpuvnG0w7eBZApWM10DcNSK909aPv2AaWgAJ6ObCjcbpNCf8OfLb92xQrNcHFBVhEWcsddwflg==}
 
-  '@mui/internal-scripts@1.0.17':
-    resolution: {integrity: sha512-WM79D3ftbAv845OzAAQQ/htsI4s9cG6LVBC1pJDyPGKgdhiA3hFgCmblPWKFCHPK1EYIsKtMuoSKWtNqzjvhVA==}
+  '@mui/internal-scripts@1.0.18':
+    resolution: {integrity: sha512-4qgDg1u0beQnR1KySBcexfh/JDOobpdsHYLkKicb4tZxVzvDlW/cZ2zYS2gQVYqkpJfhiKhRbeafns5LYSQgXg==}
 
   '@mui/joy@5.0.0-beta.48':
     resolution: {integrity: sha512-OhTvjuGl9I5IvpBr0BQyDehIW/xb2yteW6YglHJMdOb/279nItn76X1NBtPV9ImldNlBjReGwvpOXmBTTGER9w==}
@@ -11951,7 +11951,7 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.3
 
-  '@mui/internal-babel-plugin-resolve-imports@1.0.16-dev.20240822-123416-f4a704707a(@babel/core@7.25.2)':
+  '@mui/internal-babel-plugin-resolve-imports@1.0.17(@babel/core@7.25.2)':
     dependencies:
       '@babel/core': 7.25.2
       resolve: 1.22.8
@@ -11968,7 +11968,7 @@ snapshots:
       marked: 13.0.3
       prismjs: 1.29.0
 
-  '@mui/internal-scripts@1.0.17':
+  '@mui/internal-scripts@1.0.18':
     dependencies:
       '@babel/core': 7.25.2
       '@babel/plugin-syntax-class-properties': 7.12.13(@babel/core@7.25.2)

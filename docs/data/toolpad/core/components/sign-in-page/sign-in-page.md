@@ -18,7 +18,29 @@ The `SignInPage` component can be set up with an OAuth provider by passing in a 
 
 :::info
 
-Find the list of supported providers in the [API reference](/toolpad/core/api/sign-in-page/#sign-in-page-prop-providers).
+The following providers are supported and maintained by default:
+
+- Google
+- GitHub
+- Facebook
+- Microsoft (Entra ID)
+- Apple
+- Auth0
+- AWS Cognito
+- GitLab
+- Instagram
+- LINE
+- Okta
+- FusionAuth
+- Twitter
+- TikTok
+- LinkedIn
+- Slack
+- Spotify
+- Twitch
+- Discord
+- Keycloak
+- Credentials (username/password)
 
 Find details on how to set up each provider in the [Auth.js documentation](https://authjs.dev/getting-started/authentication/oauth/).
 :::

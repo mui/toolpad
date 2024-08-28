@@ -90,7 +90,7 @@ const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([
 export interface AuthProvider {
   /**
    * The unique identifier of the authentication provider.
-   * @default ''
+   * @default undefined
    * @example 'google'
    * @example 'github'
    */
@@ -201,12 +201,12 @@ function SignInPage(props: SignInPageProps) {
   const docs = React.useContext(DocsContext);
   const router = React.useContext(RouterContext);
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
-  const [{ loading, providerId, error }, setFormStatus] = React.useState<{
+  const [{ loading, selectedProviderId, error }, setFormStatus] = React.useState<{
     loading: boolean;
-    providerId?: SupportedAuthProvider;
+    selectedProviderId?: SupportedAuthProvider;
     error?: string;
   }>({
-    providerId: undefined,
+    selectedProviderId: undefined,
     loading: false,
     error: '',
   });
@@ -239,7 +239,9 @@ function SignInPage(props: SignInPageProps) {
         </Typography>
         <Box sx={{ mt: 2 }}>
           <Stack spacing={1}>
-            {error && providerId !== 'credentials' ? <Alert severity="error">{error}</Alert> : null}
+            {error && selectedProviderId !== 'credentials' ? (
+              <Alert severity="error">{error}</Alert>
+            ) : null}
             {Object.values(providers ?? {}).map((provider) => {
               if (provider.id === 'credentials') {
                 return null;
@@ -249,7 +251,7 @@ function SignInPage(props: SignInPageProps) {
                   key={provider.id}
                   onSubmit={async (event) => {
                     event.preventDefault();
-                    setFormStatus({ error: '', providerId: provider.id, loading: true });
+                    setFormStatus({ error: '', selectedProviderId: provider.id, loading: true });
                     const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
                     setFormStatus((prev) => ({
                       ...prev,
@@ -267,7 +269,7 @@ function SignInPage(props: SignInPageProps) {
                     disableElevation
                     name={'provider'}
                     color={singleProvider ? 'primary' : 'inherit'}
-                    loading={loading && providerId === provider.id}
+                    loading={loading && selectedProviderId === provider.id}
                     value={provider.id}
                     startIcon={IconProviderMap.get(provider.id)}
                     sx={{
@@ -289,7 +291,7 @@ function SignInPage(props: SignInPageProps) {
           {credentialsProvider ? (
             <React.Fragment>
               {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
-              {error && providerId === 'credentials' ? (
+              {error && selectedProviderId === 'credentials' ? (
                 <Alert sx={{ my: 2 }} severity="error">
                   {error}
                 </Alert>
@@ -299,7 +301,7 @@ function SignInPage(props: SignInPageProps) {
                 onSubmit={async (event) => {
                   setFormStatus({
                     error: '',
-                    providerId: credentialsProvider.id,
+                    selectedProviderId: credentialsProvider.id,
                     loading: true,
                   });
                   event.preventDefault();
@@ -380,7 +382,7 @@ function SignInPage(props: SignInPageProps) {
                     variant="contained"
                     disableElevation
                     color={singleProvider ? 'primary' : 'inherit'}
-                    loading={loading && providerId === credentialsProvider.id}
+                    loading={loading && selectedProviderId === credentialsProvider.id}
                     sx={{
                       mt: 3,
                       mb: 2,

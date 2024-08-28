@@ -2,7 +2,7 @@
   "name": "toolpad-project",
   "version": "0.0.1",
   "license": "MIT",
-  "description": "Components and tools for building dashboards and internal tools",
+  "description": "Components and APIs for building dashboards and internal tools",
   "repository": "https://github.com/mui/mui-toolpad.git",
   "private": true,
   "bin": {

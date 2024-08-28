@@ -3,7 +3,9 @@ import dynamic from 'next/dynamic';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
 import AutoAwesomeMosaic from '@mui/icons-material/AutoAwesomeMosaic';
+import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import AutoAwesomeMotion from '@mui/icons-material/AutoAwesomeMotion';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
@@ -16,11 +18,13 @@ function ComponentItem({
   icon,
   name,
   description,
+  link,
 }: {
   // label: string;
   icon: React.ReactNode;
   name: React.ReactNode;
   description?: React.ReactNode;
+  link?: React.ReactNode;
 }) {
   return (
     <Box
@@ -57,6 +61,12 @@ function ComponentItem({
             {description}
           </Typography>
         )}
+        {link && (
+          <Link href={link.toString()} underline="hover" variant="body2" target="_blank">
+            View docs
+            <KeyboardArrowRightRounded fontSize="small" />
+          </Link>
+        )}
       </div>
     </Box>
   );
@@ -70,6 +80,7 @@ const componentElement = new Map([
       description:
         'The Layout component provides a standard structure for functional apps, including customizable nav bar, header bar and more.',
       icon: <AutoAwesomeMosaic />,
+      link: '/toolpad/core/react-dashboard-layout/',
     },
   ],
   [
@@ -79,6 +90,7 @@ const componentElement = new Map([
       description:
         'Our authentication components help you set up complex authentication flows quickly, without subscription costs.',
       icon: <LockOpenIcon />,
+      link: '/toolpad/core/react-sign-in-page/',
     },
   ],
   [
@@ -87,6 +99,7 @@ const componentElement = new Map([
       name: 'Page container',
       description: 'Sets up breadcrumbs, title, toolbar and a responsive container for your pages.',
       icon: <AutoAwesomeMotion />,
+      link: '/toolpad/core/react-page-container/',
     },
   ],
   [
@@ -96,6 +109,7 @@ const componentElement = new Map([
       description:
         'Toolpad Core exports an imperative API to manage dialogs in your application. System dialogs that adapt to your application theme are also included.',
       icon: <NotificationsIcon />,
+      link: '/toolpad/core/react-use-dialogs/',
     },
   ],
   [
@@ -105,6 +119,7 @@ const componentElement = new Map([
       description:
         'We offer imperative APIs to deal with snackbars an notifications around your application.',
       icon: <NotificationsIcon />,
+      link: '/toolpad/core/react-use-notifications/',
     },
   ],
 ]);

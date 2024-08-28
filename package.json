@@ -97,7 +97,7 @@
     "format-util": "1.0.5",
     "fs-extra": "11.2.0",
     "globby": "14.0.2",
-    "jsdom": "24.1.1",
+    "jsdom": "25.0.0",
     "lerna": "8.1.8",
     "markdownlint-cli2": "0.13.0",
     "prettier": "3.3.3",

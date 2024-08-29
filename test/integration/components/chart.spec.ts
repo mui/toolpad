@@ -7,8 +7,11 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
-    // Intentionally thrown
-    /BOOM!/,
+    [
+      // Intentionally thrown
+      /BOOM!/,
+    ],
+    { scope: 'test' },
   ],
 });
 

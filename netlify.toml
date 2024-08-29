@@ -9,7 +9,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  # Not using `playwright` when building docs.
+  PNPM_FLAGS = "--frozen-lockfile"
 
 [[plugins]]
   package = "./node_modules/@mui/monorepo/packages/netlify-plugin-cache-docs"

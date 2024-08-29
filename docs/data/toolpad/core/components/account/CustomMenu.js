@@ -91,9 +91,8 @@ export default function CustomMenu() {
   }, []);
 
   return (
-    <React.Fragment>
+    <MenuList dense disablePadding>
       <MenuItem
-        selected={subMenuOpen}
         onMouseEnter={handleTriggerEnter}
         onMouseLeave={handleTriggerLeave}
         component="button"
@@ -129,6 +128,6 @@ export default function CustomMenu() {
         handleLeave={handleSubMenuLeave}
         handleMenuClose={handleSubMenuClose}
       />
-    </React.Fragment>
+    </MenuList>
   );
 }

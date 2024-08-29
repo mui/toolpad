@@ -61,7 +61,7 @@
     "@toolpad/utils": "workspace:*",
     "client-only": "^0.0.1",
     "invariant": "2.2.4",
-    "path-to-regexp": "7.1.0",
+    "path-to-regexp": "6.2.2",
     "prop-types": "15.8.1"
   },
   "devDependencies": {

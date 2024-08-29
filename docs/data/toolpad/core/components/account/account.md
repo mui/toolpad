@@ -12,9 +12,17 @@ The `Account` component is a quick and easy way to display an account management
 
 ## States
 
-If a `session` object is present, the component is rendered as a dropdown containing the user's account details as well as an option to sign out. When signed out, the component renders as an inline sign in button within the dashboard layout.
+### Signed In
 
-{{"demo": "AccountDemo.js", "bg": "gradient" }}
+If a `session` object is present, the component is rendered as a dropdown containing the user's account details as well as an option to sign out.
+
+{{"demo": "AccountDemoSignedIn.js", "bg": "outlined" }}
+
+### Signed Out
+
+When signed out, the component renders as an inline sign in button within the dashboard layout.
+
+{{"demo": "AccountDemoSignedOut.js", "bg": "outlined" }}
 
 ## Customization
 
@@ -22,7 +30,7 @@ If a `session` object is present, the component is rendered as a dropdown contai
 
 `Account` can take different labels for the sign in and sign out buttons through the `signInLabel` and `signOutLabel` props. Deeper changes can be made by passing in `slotProps` to the underlying components.
 
-{{"demo": "AccountCustom.js", "bg": "gradient" }}
+{{"demo": "AccountCustom.js", "bg": "outlined" }}
 
 ### 🚧 Composition
 

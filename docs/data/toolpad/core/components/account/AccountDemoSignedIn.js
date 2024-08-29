@@ -1,10 +1,5 @@
 import * as React from 'react';
-import {
-  Account,
-  AuthenticationContext,
-  SessionContext,
-  Session,
-} from '@toolpad/core';
+import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
 
 const demoSession = {
   user: {
@@ -14,8 +9,8 @@ const demoSession = {
   },
 };
 
-export default function AccountDemo() {
-  const [session, setSession] = React.useState<Session | null>(demoSession);
+export default function AccountDemoSignedIn() {
+  const [session, setSession] = React.useState(demoSession);
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {

@@ -9,8 +9,8 @@ const demoSession = {
   },
 };
 
-export default function AccountDemo() {
-  const [session, setSession] = React.useState(demoSession);
+export default function AccountDemoSignedOut() {
+  const [session, setSession] = React.useState(null);
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {

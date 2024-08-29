@@ -12,7 +12,7 @@
     "@mui/icons-material": "5.16.7",
     "@mui/material": "5.16.7",
     "@mui/material-nextjs": "5.16.6",
-    "@toolpad/core": "workspace:*",
+    "@toolpad/core": "latest",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "eslint-config-next": "14.2.5",

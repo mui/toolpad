@@ -1,6 +1,6 @@
 {
   "name": "playground-nextjs",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,13 +9,13 @@
   "devDependencies": {
     "@emotion/react": "11.13.3",
     "@emotion/styled": "11.13.0",
-    "@mui/icons-material": "5.16.7",
-    "@mui/lab": "5.0.0-alpha.173",
-    "@mui/material": "5.16.7",
-    "@mui/material-nextjs": "5.16.6",
+    "@mui/icons-material": "6.0.1",
+    "@mui/lab": "6.0.0-beta.8",
+    "@mui/material": "6.0.1",
+    "@mui/material-nextjs": "6.0.1",
     "@toolpad/core": "workspace:*",
     "@types/node": "22.4.0",
-    "@types/react": "18.3.3",
+    "@types/react": "18.3.4",
     "@types/react-dom": "18.3.0",
     "eslint-config-next": "14.2.6",
     "next": "14.2.6",

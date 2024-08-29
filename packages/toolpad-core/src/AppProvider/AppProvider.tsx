@@ -70,9 +70,9 @@ export interface Authentication {
   signOut: () => void;
 }
 
-export const SessionContext = React.createContext<Session | null>(null);
-
 export const AuthenticationContext = React.createContext<Authentication | null>(null);
+
+export const SessionContext = React.createContext<Session | null>(null);
 
 export type AppTheme = Theme | { light: Theme; dark: Theme };
 

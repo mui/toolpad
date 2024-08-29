@@ -178,9 +178,11 @@ function Account(props: AccountProps) {
             sx={{ display: 'flex', flexDirection: 'row', padding: 1, justifyContent: 'flex-end' }}
           >
             <Button
-              onClick={authentication?.signOut}
+              disabled={!authentication}
               variant="outlined"
               size="small"
+              disableElevation
+              onClick={authentication?.signOut}
               sx={{
                 textTransform: 'capitalize',
                 fontWeight: 'normal',

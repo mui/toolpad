@@ -33,6 +33,38 @@
     "import { SignInPage } from '@toolpad/core/SignInPage';",
     "import { SignInPage } from '@toolpad/core';"
   ],
+  "slots": [
+    {
+      "name": "emailField",
+      "description": "The custom email field component used in the credentials form.",
+      "default": "TextField",
+      "class": null
+    },
+    {
+      "name": "passwordField",
+      "description": "The custom password field component used in the credentials form.",
+      "default": "TextField",
+      "class": null
+    },
+    {
+      "name": "submitButton",
+      "description": "The custom submit button component used in the credentials form.",
+      "default": "LoadingButton",
+      "class": null
+    },
+    {
+      "name": "forgotPasswordLink",
+      "description": "The custom forgot password link component used in the credentials form.",
+      "default": "Link",
+      "class": null
+    },
+    {
+      "name": "signUpLink",
+      "description": "The custom sign up link component used in the credentials form.",
+      "default": "Link",
+      "class": null
+    }
+  ],
   "classes": [],
   "spread": true,
   "themeDefaultProps": false,

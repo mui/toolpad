@@ -7,10 +7,12 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
-    // Chrome
-    /Unexpected token '\)'/,
-    // Firefox
-    /expected property name, got '\)'/,
+    [
+      // Chrome
+      /Unexpected token '\)'/,
+      // Firefox
+      /expected property name, got '\)'/,
+    ],
   ],
 });
 

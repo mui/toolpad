@@ -6,7 +6,7 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
-    /Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+    [/Failed to load resource: the server responded with a status of 404 \(Not Found\)/],
   ],
 });
 

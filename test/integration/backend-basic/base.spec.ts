@@ -9,9 +9,11 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
-    // eslint-disable-next-line material-ui/straight-quotes
-    /The page’s settings blocked the loading of a resource \(img-src\) at http:\/\/localhost:\d+\/favicon\.ico/,
-    /Failed to load resource: the server responded with a status of 404/,
+    [
+      // eslint-disable-next-line material-ui/straight-quotes
+      /The page’s settings blocked the loading of a resource \(img-src\) at http:\/\/localhost:\d+\/favicon\.ico/,
+      /Failed to load resource: the server responded with a status of 404/,
+    ],
   ],
 });
 

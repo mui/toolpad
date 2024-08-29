@@ -23,6 +23,52 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 - git
 - node.js
 
+### Developing on Toolpad Core
+
+This uses the local version of Toolpad Core as built in the mono-repository, and allows for quickly testing out changes and their results.
+
+Some application examples for different JavaScript frameworks (such as Next.js, Vite…) are present in the `playground` folder that can be used to quickly develop on Toolpad Core on a live application.
+
+1. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+2. Run the built-in watch mode
+
+   ```bash
+   pnpm dev
+   ```
+
+3. Run any application in the `playground` folder in development mode, such as `nextjs`
+
+   ```bash
+   cd playground/nextjs
+   ```
+
+   ```bash
+   pnpm dev
+   ```
+
+### Test changes to Toolpad Core on a live application
+
+To test changes to Toolpad Core on a live application, you can run the apps in the `playground` folder.
+
+1. Run Toolpad Core locally
+
+   ```bash
+   pnpm --filter @toolpad/core dev
+   ```
+
+2. Run the playground app
+
+   ```bash
+   pnpm --filter playground-nextjs dev
+   ```
+
+You should now be able to test changes to Toolpad Core on a live application. Follow similar steps to run apps in the `examples` folder after adding them to the workspace in `pnpm-workspace.yaml`.
+
 ### Running Toolpad Studio apps inside the monorepo (recommended)
 
 This uses the local version of Toolpad Studio as built in the mono-repository.
@@ -150,34 +196,6 @@ pnpm install
    ```
 
 </details>
-
-### Developing on Toolpad Core
-
-This uses the local version of Toolpad Core as built in the mono-repository, and allows for quickly testing out changes and their results.
-
-Some application examples for different JavaScript frameworks (such as Next.js, Vite…) are present in the `playground` folder that can be used to quickly develop on Toolpad Core on a live application.
-
-1. Install dependencies:
-
-   ```bash
-   pnpm install
-   ```
-
-2. Run the built-in watch mode
-
-   ```bash
-   pnpm dev
-   ```
-
-3. Run any application in the `playground` folder in development mode, such as `nextjs`
-
-   ```bash
-   cd playground/nextjs
-   ```
-
-   ```bash
-   pnpm dev
-   ```
 
 ## Running integration tests
 

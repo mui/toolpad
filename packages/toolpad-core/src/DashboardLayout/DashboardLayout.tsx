@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme, Theme } from '@mui/material';
+import { styled, Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -19,30 +19,28 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import useSsr from '@toolpad/utils/hooks/useSsr';
-import { Account } from '../Account';
 import { Link } from '../shared/Link';
 import {
   BrandingContext,
   NavigationContext,
-  PaletteModeContext,
   RouterContext,
   WindowContext,
 } from '../shared/context';
 import type { Navigation } from '../AppProvider';
-import { ToolpadLogo } from './ToolpadLogo';
+import { Account, type AccountProps } from '../Account';
 import {
   getItemTitle,
   getPageItemFullPath,
   hasSelectedNavigationChildren,
 } from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
+import { ToolbarActions } from './ToolbarActions';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { ToolpadLogo } from './ToolpadLogo';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -92,65 +90,6 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
     color: (theme.vars ?? theme).palette.action.active,
   },
 }));
-
-function ThemeSwitcher() {
-  const isSsr = useSsr();
-  const theme = useTheme();
-
-  const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
-
-  const toggleMode = React.useCallback(() => {
-    setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
-  }, [paletteMode, setPaletteMode]);
-
-  return isDualTheme ? (
-    <Tooltip
-      title={isSsr ? 'Switch mode' : `${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`}
-      enterDelay={1000}
-    >
-      <div>
-        <IconButton
-          aria-label={
-            isSsr
-              ? 'Switch theme mode'
-              : `Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`
-          }
-          onClick={toggleMode}
-          sx={{
-            color: (theme.vars ?? theme).palette.primary.dark,
-            padding: 1,
-            marginRight: 1,
-          }}
-        >
-          {theme.getColorSchemeSelector ? (
-            <React.Fragment>
-              <DarkModeIcon
-                sx={{
-                  display: 'inline',
-                  [theme.getColorSchemeSelector('dark')]: {
-                    display: 'none',
-                  },
-                }}
-              />
-              <LightModeIcon
-                sx={{
-                  display: 'none',
-                  [theme.getColorSchemeSelector('dark')]: {
-                    display: 'inline',
-                  },
-                }}
-              />
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              {isSsr || paletteMode !== 'dark' ? <DarkModeIcon /> : <LightModeIcon />}
-            </React.Fragment>
-          )}
-        </IconButton>
-      </div>
-    </Tooltip>
-  ) : null;
-}
 
 type DashboardSidebarVariant = 'standard' | 'mini';
 
@@ -361,6 +300,19 @@ function DashboardSidebarSubNavigation({
   );
 }
 
+export interface DashboardLayoutSlots {
+  /**
+   * The toolbar actions component used in the layout header.
+   * @default ToolbarActions
+   */
+  toolbarActions?: React.JSXElementConstructor<{}>;
+  /**
+   * The toolbar account component used in the layout header.
+   * @default Account
+   */
+  toolbarAccount?: React.JSXElementConstructor<AccountProps>;
+}
+
 export interface DashboardLayoutProps {
   /**
    * The content of the dashboard.
@@ -370,6 +322,19 @@ export interface DashboardLayoutProps {
    * Sidebar variant to use.
    */
   sidebarVariant?: DashboardSidebarVariant;
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots?: DashboardLayoutSlots;
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps?: {
+    toolbarActions?: {};
+    toolbarAccount?: AccountProps;
+  };
 }
 
 /**
@@ -383,7 +348,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, sidebarVariant = 'standard' } = props;
+  const { children, sidebarVariant = 'standard', slots, slotProps } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
@@ -447,6 +412,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const expandMenuActionText = isMiniSidebarVariant ? 'Expand' : 'Open';
   const collapseMenuActionText = isMiniSidebarVariant ? 'Collapse' : 'Close';
 
+  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
+  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
+
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
@@ -502,8 +470,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
+          <ToolbarActionsSlot {...slotProps?.toolbarActions} />
           <ThemeSwitcher />
-          <Account />
+          <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
         </Toolbar>
       </AppBar>
       {!isMiniSidebarVariant ? (
@@ -574,6 +543,31 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    toolbarAccount: PropTypes.shape({
+      signInLabel: PropTypes.string,
+      signOutLabel: PropTypes.string,
+      slotProps: PropTypes.shape({
+        avatar: PropTypes.object,
+        iconButton: PropTypes.object,
+        signInButton: PropTypes.object,
+        signOutButton: PropTypes.object,
+      }),
+    }),
+    toolbarActions: PropTypes.object,
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots: PropTypes.shape({
+    toolbarAccount: PropTypes.elementType,
+    toolbarActions: PropTypes.elementType,
+  }),
 } as any;
 
 export { DashboardLayout };

@@ -63,7 +63,7 @@ function ComponentItem({
         )}
         {link && (
           <Link href={link.toString()} underline="hover" variant="body2" target="_blank">
-            View docs
+            View the docs
             <KeyboardArrowRightRounded fontSize="small" />
           </Link>
         )}

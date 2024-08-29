@@ -130,10 +130,9 @@ function Account(props: AccountProps) {
           <Stack direction="row" sx={{ p: 1, justifyContent: 'right' }}>
             <Button
               disabled={!authentication}
-              variant="contained"
+              variant="outlined"
               size="small"
               disableElevation
-              color="inherit"
               startIcon={<LogoutIcon />}
               {...slotProps?.signOutButton}
               onClick={authentication?.signOut}

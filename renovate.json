@@ -26,10 +26,6 @@
       "description": "At the top so other rules can overwrite it"
     },
     {
-      "groupName": "Docs",
-      "matchFileNames": ["docs/**"]
-    },
-    {
       "groupName": "babel",
       "matchPackagePatterns": ["^@babel/", "^@types/babel"]
     },
@@ -155,7 +151,8 @@
     },
     {
       "groupName": "Examples",
-      "matchFileNames": ["examples/**"]
+      "matchFileNames": ["examples/**"],
+      "allowedVersions": "!/.*/"
     },
     {
       "groupName": "Update @toolpad/studio in examples",
@@ -163,6 +160,11 @@
       "matchFiles": ["examples/*/package.json"],
       "schedule": ["at any time"],
       "automerge": true
+    },
+    {
+      "groupName": "node-18-incompatible",
+      "description": "These dependencies require a Node.js version higher than 18.",
+      "matchPackageNames": ["rimraf", "glob"]
     }
   ],
   "postUpdateOptions": ["pnpmDedupe"],

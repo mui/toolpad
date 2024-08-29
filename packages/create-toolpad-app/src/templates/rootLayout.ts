@@ -25,7 +25,7 @@ const rootLayout = `
   
   export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {      
     return (
-      <html lang="en" data-toolpad-color-scheme="light">
+      <html lang="en" data-toolpad-color-scheme="light" suppressHydrationWarning>
         <body>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
             <AppProvider theme={theme} navigation={NAVIGATION}>

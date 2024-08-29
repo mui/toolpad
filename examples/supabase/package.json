@@ -8,7 +8,7 @@
     "start": "toolpad-studio start"
   },
   "dependencies": {
-    "@toolpad/studio": "0.5.1",
+    "@toolpad/studio": "0.5.2",
     "@supabase/supabase-js": "2.44.2"
   }
 }

@@ -12,6 +12,7 @@ test.use({
       /NetworkError when attempting to fetch resource./,
       /The operation was aborted./,
     ],
+    { scope: 'test' },
   ],
 });
 

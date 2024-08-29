@@ -8,6 +8,7 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 test.use({
   ignoreConsoleErrors: [
     [/Failed to load resource: the server responded with a status of 401 \(Unauthorized\)/],
+    { scope: 'test' },
   ],
 });
 

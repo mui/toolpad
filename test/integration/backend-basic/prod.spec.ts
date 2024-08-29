@@ -16,6 +16,7 @@ test.use({
       // Intentionally thrown
       /BOOM!/,
     ],
+    { scope: 'test' },
   ],
 });
 

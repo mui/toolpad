@@ -13,6 +13,7 @@ test.use({
       // Firefox
       /expected property name, got '\)'/,
     ],
+    { scope: 'test' },
   ],
 });
 

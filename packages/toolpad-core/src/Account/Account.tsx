@@ -1,11 +1,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import Menu from '@mui/material/Menu';
-import MenuList from '@mui/material/MenuList';
-import MenuItem from '@mui/material/MenuItem';
+import Popover from '@mui/material/Popover';
 import Divider from '@mui/material/Divider';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import Button, { ButtonProps } from '@mui/material/Button';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -125,7 +122,7 @@ function Account(props: AccountProps) {
           </IconButton>
         </Tooltip>
       </Box>
-      <Menu
+      <Popover
         anchorEl={anchorEl}
         id="account-menu"
         open={open}
@@ -157,41 +154,50 @@ function Account(props: AccountProps) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuList dense disablePadding>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            padding: 2,
+            gap: 4,
+          }}
+        >
+          <SessionAvatar session={session} sx={{ height: 48, width: 48 }} />
+          <div>
+            <Typography fontWeight="bolder">{session.user.name}</Typography>
+            <Typography variant="caption">{session.user.email}</Typography>
+          </div>
+        </Box>
+        <Divider sx={{ mb: 1 }} />
+        {slots?.menuItems ? <slots.menuItems /> : null}
+        {slots?.signOutButton ? (
+          <slots.signOutButton onClick={authentication?.signOut} />
+        ) : (
           <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              padding: 2,
-              gap: 4,
-            }}
+            sx={{ display: 'flex', flexDirection: 'row', padding: 1, justifyContent: 'flex-end' }}
           >
-            <SessionAvatar session={session} sx={{ height: 48, width: 48 }} />
-            <div>
-              <Typography fontWeight="bolder">{session.user.name}</Typography>
-              <Typography variant="caption">{session.user.email}</Typography>
-            </div>
-          </Box>
-          <Divider sx={{ mb: 1 }} />
-          {slots?.menuItems ? <slots.menuItems /> : null}
-          {slots?.signOutButton ? (
-            <slots.signOutButton onClick={authentication?.signOut} />
-          ) : (
-            <MenuItem
+            <Button
               onClick={authentication?.signOut}
-              sx={{ justifyContent: 'center', width: '100%' }}
-              component="button"
+              variant="outlined"
+              size="small"
+              sx={{
+                textTransform: 'capitalize',
+                fontWeight: 'normal',
+                filter: 'opacity(0.9)',
+                transition: 'filter 0.2s ease-in',
+                '&:hover': {
+                  filter: 'opacity(1)',
+                },
+              }}
+              startIcon={<Logout />}
               {...slotProps?.signOutButton}
             >
-              <ListItemIcon>
-                <Logout fontSize="inherit" />
-              </ListItemIcon>
               {signOutLabel}
-            </MenuItem>
-          )}
-        </MenuList>
-      </Menu>
+            </Button>
+          </Box>
+        )}
+      </Popover>
     </React.Fragment>
   );
 }

@@ -1,5 +1,49 @@
 # Changelog
 
+## v0.5.2
+
+<!-- generated comparing v0.5.1..master -->
+
+_Aug 27, 2024_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+- Add authentication when bootstrapping a new project using `create-toolpad-app`
+- Fix some layout issues in the component attribute editor for Studio
+- Docs and website improvements
+
+### `@toolpad/core`
+
+- &#8203;<!-- 16 -->Bootstrap authentication from `create-toolpad-app` (#3860) @bharatkashyap
+- &#8203;<!-- 14 -->Polish `SignInPage` and docs (#3935) @bharatkashyap
+
+### `@toolpad/studio`
+
+- &#8203;<!-- 05 -->Fix layout issues in the component attribute editor (#3966) @Janpot
+
+### Docs
+
+- &#8203;<!-- 13 -->Clarify contribution guide references @oliviertassinari
+- &#8203;<!-- 12 -->Fix description of eslint-plugin-material-ui @oliviertassinari
+- &#8203;<!-- 11 -->Fix Core docs navigation sidebar links (#3986) @bharatkashyap
+- &#8203;<!-- 10 -->Follow theme on `SignInPage` docs demos (#3968) @bharatkashyap
+- &#8203;<!-- 09 -->Sign-in page grammar (#3977) @bharatkashyap
+- &#8203;<!-- 08 -->Improve docs and address some ahrefs reported 404s (#3928) @Janpot
+- &#8203;<!-- 07 -->Fix redirection to react tree fiber @oliviertassinari
+- &#8203;<!-- 06 -->Update to have API page URLs built correctly (#3999) @bharatkashyap
+- &#8203;<!-- 04 -->Add og image (#3965) @prakhargupta1
+- &#8203;<!-- 03 -->Add missing <Head> (#3939) @oliviertassinari
+- &#8203;<!-- 02 -->Fix brand copy (#3938) @bharatkashyap
+- &#8203;<!-- 01 -->Improve hero (#3936) @bharatkashyap
+
+### Core
+
+- &#8203;<!-- 18 -->Update renovate.json @Janpot
+- &#8203;<!-- 17 -->Update renovate.json @Janpot
+- &#8203;<!-- 15 -->Fully resolve imports in ESM target (#3975) @Janpot
+
+All contributors of this release in alphabetical order: @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
 ## v0.5.1
 
 <!-- generated comparing v0.5.0..master -->

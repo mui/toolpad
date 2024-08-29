@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/utils",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Shared utilities used by Toolpad packages.",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/mui-toolpad#readme",
@@ -68,7 +68,7 @@
   "devDependencies": {
     "@types/express": "4.17.21",
     "@types/invariant": "2.2.37",
-    "@types/react": "18.3.3",
+    "@types/react": "18.3.4",
     "@types/react-is": "18.3.0",
     "@types/title": "3.4.3"
   }

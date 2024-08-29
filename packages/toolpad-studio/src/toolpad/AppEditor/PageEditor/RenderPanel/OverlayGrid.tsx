@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Grid, styled } from '@mui/material';
+import { styled } from '@mui/material';
+import Grid from '@mui/material/Grid2';
 import invariant from 'invariant';
 import { usePageEditorState } from '../PageEditorProvider';
 import { useAppState } from '../../../AppState';
@@ -79,7 +80,7 @@ export const OverlayGrid = React.forwardRef<OverlayGridHandle>(
       <GridContainer style={{ ...absolutePositionCss(pageChildrenSlotRect), height: '100%' }}>
         <StyledGrid ref={gridRef} container columnSpacing={appTheme.spacing(GRID_COLUMN_GAP)}>
           {[...Array(GRID_NUMBER_OF_COLUMNS)].map((column, index) => (
-            <Grid key={index} item xs={1}>
+            <Grid key={index} size={{ xs: 1 }}>
               <StyledGridColumn />
             </Grid>
           ))}

@@ -35,7 +35,7 @@ export default withDocsInfra({
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
   env: {
     // docs-infra
-    LIB_VERSION: pkg.version,
+    LIB_VERSION: toolpadCorePkg.version,
     SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
     SOURCE_GITHUB_BRANCH: 'master', // #default-branch-switch
     GITHUB_TEMPLATE_DOCS_FEEDBACK: '4.docs-feedback.yml',

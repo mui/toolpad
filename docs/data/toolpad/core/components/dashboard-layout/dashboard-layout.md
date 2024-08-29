@@ -82,6 +82,12 @@ Navigation links have an optional `action` prop that can be used to render any c
 
 {{"demo": "DashboardLayoutNavigationActions.js", "height": 400, "iframe": true}}
 
+### Mini variant sidebar
+
+In this variant of the layout sidebar it shows as a compact mini-drawer with icons only that can be expanded/collapsed in any screen size to show more details. The sidebar always persists alongside the page content.
+
+{{"demo": "DashboardLayoutMiniSidebar.js", "height": 400, "iframe": true}}
+
 ## Account
 
 The `DashboardLayout` comes integrated with the [`<Account />`](/toolpad/core/react-account/) component. It renders as an account management menu when a user is signed in – a `session` object is present – and a button when not.

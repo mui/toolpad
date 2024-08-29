@@ -1,0 +1,10 @@
+<AppProvider
+  navigation={NAVIGATION}
+  router={router}
+  theme={demoTheme}
+  window={demoWindow}
+>
+  <DashboardLayout sidebarVariant="mini">
+    <DemoPageContent pathname={pathname} />
+  </DashboardLayout>
+</AppProvider>

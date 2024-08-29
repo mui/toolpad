@@ -320,6 +320,7 @@ export interface DashboardLayoutProps {
   children: React.ReactNode;
   /**
    * Sidebar variant to use.
+   * @default 'standard'
    */
   sidebarVariant?: DashboardSidebarVariant;
   /**
@@ -543,6 +544,11 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * Sidebar variant to use.
+   * @default 'standard'
+   */
+  sidebarVariant: PropTypes.oneOf(['mini', 'standard']),
   /**
    * The props used for each slot inside.
    * @default {}

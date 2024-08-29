@@ -1,6 +1,10 @@
 {
   "props": {
     "children": { "type": { "name": "node" }, "required": true },
+    "sidebarVariant": {
+      "type": { "name": "enum", "description": "'mini'<br>&#124;&nbsp;'standard'" },
+      "default": "'standard'"
+    },
     "slotProps": {
       "type": {
         "name": "shape",

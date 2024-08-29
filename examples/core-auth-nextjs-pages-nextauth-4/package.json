@@ -1,6 +1,6 @@
 {
-  "name": "playground-nextjs-pages-nextauth-4",
-  "version": "0.5.1",
+  "name": "core-auth-nextjs-pages-nextauth-4",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

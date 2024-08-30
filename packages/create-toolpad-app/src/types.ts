@@ -1,4 +1,4 @@
-import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
+import type { SupportedAuthProvider } from '@toolpad/core';
 
 import { PackageJson } from './templates/packageType';
 

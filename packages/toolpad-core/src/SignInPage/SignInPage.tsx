@@ -117,6 +117,34 @@ export interface AuthResponse {
   type?: string;
 }
 
+export interface SignInPageSlots {
+  /**
+   * The custom email field component used in the credentials form.
+   * @default TextField
+   */
+  emailField?: React.JSXElementConstructor<TextFieldProps>;
+  /**
+   * The custom password field component used in the credentials form.
+   * @default TextField
+   */
+  passwordField?: React.JSXElementConstructor<TextFieldProps>;
+  /**
+   * The custom submit button component used in the credentials form.
+   * @default LoadingButton
+   */
+  submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
+  /**
+   * The custom forgot password link component used in the credentials form.
+   * @default Link
+   */
+  forgotPasswordLink?: React.JSXElementConstructor<LinkProps>;
+  /**
+   * The custom sign up link component used in the credentials form.
+   * @default Link
+   */
+  signUpLink?: React.JSXElementConstructor<LinkProps>;
+}
+
 export interface SignInPageProps {
   /**
    * The list of authentication providers to display.
@@ -142,33 +170,7 @@ export interface SignInPageProps {
    * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
    * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
    */
-  slots?: {
-    /**
-     * The custom email field component used in the credentials form.
-     * @default TextField
-     */
-    emailField?: React.JSXElementConstructor<TextFieldProps>;
-    /**
-     * The custom password field component used in the credentials form.
-     * @default TextField
-     */
-    passwordField?: React.JSXElementConstructor<TextFieldProps>;
-    /**
-     * The custom submit button component used in the credentials form.
-     * @default LoadingButton
-     */
-    submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
-    /**
-     * The custom forgot password link component used in the credentials form.
-     * @default Link
-     */
-    forgotPasswordLink?: React.JSXElementConstructor<LinkProps>;
-    /**
-     * The custom sign up link component used in the credentials form.
-     * @default Link
-     */
-    signUpLink?: React.JSXElementConstructor<LinkProps>;
-  };
+  slots?: SignInPageSlots;
   /**
    * The props used for each slot inside.
    * @default {}

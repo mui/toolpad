@@ -26,7 +26,7 @@ const SignOutContainer = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-interface AccountProps {
+export interface AccountProps {
   /**
    * The components used for each slot inside.
    */

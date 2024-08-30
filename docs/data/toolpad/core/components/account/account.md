@@ -28,7 +28,9 @@ When signed out, the component renders as an inline sign in button within the da
 
 ### Slot Props
 
-`Account` can take different labels for the sign in and sign out buttons through the `signInLabel` and `signOutLabel` props. Deeper changes can be made by passing in `slotProps` to the underlying components.
+The underlying `signInButton`, `signOutButton` and `iconButton` components can be customized by passing in `slotProps` to the `Account` component.
+
+Labels for the sign in and sign out buttons through the `signInLabel` and `signOutLabel` props.
 
 {{"demo": "AccountCustom.js", "bg": "outlined" }}
 

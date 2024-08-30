@@ -1,20 +1,19 @@
 <Account
   slotProps={{
-    signOutButton: {
+    signInButton: {
       color: 'info',
       variant: 'outlined',
       sx: {
+        margin: 'auto',
         color: 'primaryDark',
+        textTransform: 'capitalize',
         fontFamily: 'Inter',
         fontSize: '1em',
+        height: 'fit-content',
+        maxHeight: 'max-content',
       },
     },
-    iconButton: {
-      sx: {
-        width: 'fit-content',
-        margin: 'auto',
-      },
-    },
+    signOutButton: { color: 'primary', variant: 'outlined' },
   }}
   signInLabel="Login"
   signOutLabel="Logout"

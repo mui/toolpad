@@ -17,7 +17,11 @@ const demoSession = {
 
 export default function AccountCustom() {
   const [session, setSession] = React.useState<Session | null>(demoSession);
-  const authentication = React.useMemo(() => {
+  const [signedOutSession, setSignedOutSession] = React.useState<Session | null>(
+    null,
+  );
+
+  const authenticationSignedIn = React.useMemo(() => {
     return {
       signIn: () => {
         setSession({
@@ -30,6 +34,18 @@ export default function AccountCustom() {
       },
       signOut: () => {
         setSession(null);
+        setSignedOutSession(null);
+      },
+    };
+  }, []);
+
+  const authenticationSignedOut = React.useMemo(() => {
+    return {
+      signIn: () => {
+        setSignedOutSession(demoSession);
+      },
+      signOut: () => {
+        setSignedOutSession(null);
       },
     };
   }, []);
@@ -43,7 +59,7 @@ export default function AccountCustom() {
         columnGap: '2rem',
       }}
     >
-      <AuthenticationContext.Provider value={authentication}>
+      <AuthenticationContext.Provider value={authenticationSignedIn}>
         <Typography
           variant="body2"
           sx={{ color: 'text.secondary', fontStyle: 'italic', margin: 'auto' }}
@@ -51,7 +67,6 @@ export default function AccountCustom() {
           Signed in
         </Typography>
         <SessionContext.Provider value={session}>
-          {/* preview-start */}
           <Account
             slotProps={{
               signOutButton: {
@@ -59,6 +74,7 @@ export default function AccountCustom() {
                 variant: 'outlined',
                 sx: {
                   color: 'primaryDark',
+                  textTransform: 'capitalize',
                   fontFamily: 'Inter',
                   fontSize: '1em',
                 },
@@ -73,7 +89,6 @@ export default function AccountCustom() {
             signInLabel="Login"
             signOutLabel="Logout"
           />
-          {/* preview-end */}
         </SessionContext.Provider>
 
         <Typography
@@ -82,7 +97,10 @@ export default function AccountCustom() {
         >
           Signed out
         </Typography>
-        <SessionContext.Provider value={null}>
+      </AuthenticationContext.Provider>
+      <AuthenticationContext.Provider value={authenticationSignedOut}>
+        <SessionContext.Provider value={signedOutSession}>
+          {/* preview-start */}
           <Account
             slotProps={{
               signInButton: {
@@ -91,6 +109,7 @@ export default function AccountCustom() {
                 sx: {
                   margin: 'auto',
                   color: 'primaryDark',
+                  textTransform: 'capitalize',
                   fontFamily: 'Inter',
                   fontSize: '1em',
                   height: 'fit-content',
@@ -102,6 +121,7 @@ export default function AccountCustom() {
             signInLabel="Login"
             signOutLabel="Logout"
           />
+          {/* preview-end */}
         </SessionContext.Provider>
       </AuthenticationContext.Provider>
     </div>

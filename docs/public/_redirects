@@ -7,7 +7,6 @@
 /toolpad/getting-started/tutorial/ /toolpad/studio/getting-started/ 301
 /toolpad/data-fetching/rest/ /toolpad/studio/concepts/http-requests/ 301
 /toolpad/data-fetching/google-sheets/ /toolpad/studio/how-to-guides/connect-to-googlesheets/ 301
-
 # 2023
 /toolpad/getting-started/quickstart/ /toolpad/studio/getting-started/first-app/ 301
 /toolpad/schema-reference/ /toolpad/studio/reference/file-schema/ 301
@@ -35,9 +34,7 @@
 /toolpad/concepts/managing-state/ /toolpad/studio/concepts/event-handling/ 301
 /toolpad/reference/components/datagrid/ /toolpad/studio/reference/components/data-grid/ 301
 /toolpad/getting-started/overview/ /toolpad/studio/getting-started/ 301
-
 # 2024
-
 # Separate Studio and Core
 /toolpad/getting-started/* /toolpad/studio/getting-started/:splat 301
 /toolpad/examples/* /toolpad/studio/examples/:splat 301
@@ -45,6 +42,7 @@
 /toolpad/components/* /toolpad/studio/components/:splat 301
 /toolpad/how-to-guides/* /toolpad/studio/how-to-guides/:splat 301
 /toolpad/reference/* /toolpad/studio/reference/:splat 301
+/toolpad/core/installation/ /toolpad/core/introduction/installation/ 301
 
 # Create separate namespace on https://mui.com
 / /toolpad/

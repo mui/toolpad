@@ -44,7 +44,7 @@
     "@types/lodash": "4.17.7",
     "@types/react-router-dom": "5.3.3",
     "ast-types": "0.14.2",
-    "autoprefixer": "10.4.19",
+    "autoprefixer": "10.4.20",
     "babel-plugin-module-resolver": "5.0.2",
     "babel-plugin-optimize-clsx": "2.6.2",
     "babel-plugin-preval": "5.1.0",

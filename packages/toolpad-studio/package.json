@@ -105,7 +105,7 @@
     "get-port": "7.1.0",
     "glob": "10.4.5",
     "google-auth-library": "9.14.0",
-    "http-proxy-middleware": "3.0.0",
+    "http-proxy-middleware": "3.0.1",
     "invariant": "2.2.4",
     "json-to-ts": "2.1.0",
     "json5": "2.2.3",

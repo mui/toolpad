@@ -194,7 +194,7 @@ importers:
         version: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-0924e7a-20240827(eslint@8.57.0)
+        version: 0.0.0-experimental-b8a7b48-20240830(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -274,8 +274,8 @@ importers:
         specifier: 3.0.0
         version: 3.0.0(date-fns-jalali@2.29.3-0)
       '@docsearch/react':
-        specifier: 3.6.0
-        version: 3.6.0(@algolia/client-search@4.24.0)(@types/react@18.3.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.14.0)
+        specifier: 3.6.1
+        version: 3.6.1(@algolia/client-search@4.24.0)(@types/react@18.3.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.14.0)
       '@emotion/cache':
         specifier: 11.13.1
         version: 11.13.1
@@ -2131,11 +2131,11 @@ packages:
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
     engines: {node: '>=10.0.0'}
 
-  '@docsearch/css@3.6.0':
-    resolution: {integrity: sha512-+sbxb71sWre+PwDK7X2T8+bhS6clcVMLwBPznX45Qu6opJcgRjAp7gYSDzVFp187J+feSj5dNBN1mJoi6ckkUQ==}
+  '@docsearch/css@3.6.1':
+    resolution: {integrity: sha512-VtVb5DS+0hRIprU2CO6ZQjK2Zg4QU5HrDM1+ix6rT0umsYvFvatMAnf97NHZlVWDaaLlx7GRfR/7FikANiM2Fg==}
 
-  '@docsearch/react@3.6.0':
-    resolution: {integrity: sha512-HUFut4ztcVNmqy9gp/wxNbC7pTOHhgVVkHVGCACTuLhUKUhKAF9KYHJtMiLUJxEqiFLQiuri1fWF8zqwM/cu1w==}
+  '@docsearch/react@3.6.1':
+    resolution: {integrity: sha512-qXZkEPvybVhSXj0K7U3bXc233tk5e8PfhoZ6MhPOiik/qUQxYC+Dn9DnoS7CxHQQhHfCvTiN0eY9M12oRghEXw==}
     peerDependencies:
       '@types/react': '>= 16.8.0 < 19.0.0'
       react: '>= 16.8.0 < 19.0.0'
@@ -5781,8 +5781,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-0924e7a-20240827:
-    resolution: {integrity: sha512-+4TR1/HqOQ8c3OlmMmOVRXOVpjFjYXp94k7LMNjWTM6biT3zvX1+uj3lNtmUFs4h8n/E1pnAEXx3Y+ypJmbe4g==}
+  eslint-plugin-react-compiler@0.0.0-experimental-b8a7b48-20240830:
+    resolution: {integrity: sha512-5AMC4eCj3egh0l2MACmYR3gu1m8i9kDx5K2PNiwRvNTb92kurNS1YSMHJmfYhWx2o/ZKlPvYIZstXTi+ZIKOCA==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -11229,13 +11229,13 @@ snapshots:
 
   '@discoveryjs/json-ext@0.5.7': {}
 
-  '@docsearch/css@3.6.0': {}
+  '@docsearch/css@3.6.1': {}
 
-  '@docsearch/react@3.6.0(@algolia/client-search@4.24.0)(@types/react@18.3.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.14.0)':
+  '@docsearch/react@3.6.1(@algolia/client-search@4.24.0)(@types/react@18.3.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.14.0)':
     dependencies:
       '@algolia/autocomplete-core': 1.9.3(@algolia/client-search@4.24.0)(algoliasearch@4.24.0)(search-insights@2.14.0)
       '@algolia/autocomplete-preset-algolia': 1.9.3(@algolia/client-search@4.24.0)(algoliasearch@4.24.0)
-      '@docsearch/css': 3.6.0
+      '@docsearch/css': 3.6.1
       algoliasearch: 4.24.0
     optionalDependencies:
       '@types/react': 18.3.4
@@ -15496,7 +15496,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-0924e7a-20240827(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-b8a7b48-20240830(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.3

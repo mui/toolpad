@@ -6,18 +6,20 @@ import {
   Session,
 } from '@toolpad/core';
 
-export default function AccountDemo() {
+const demoSession = {
+  user: {
+    name: 'Bharat Kashyap',
+    email: 'bharatkashyap@outlook.com',
+    image: 'https://avatars.githubusercontent.com/u/19550456',
+  },
+};
+
+export default function AccountDemoSignedOut() {
   const [session, setSession] = React.useState<Session | null>(null);
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        setSession({
-          user: {
-            name: 'Bharat Kashyap',
-            email: 'bharatkashyap@outlook.com',
-            image: 'https://avatars.githubusercontent.com/u/19550456',
-          },
-        });
+        setSession(demoSession);
       },
       signOut: () => {
         setSession(null);

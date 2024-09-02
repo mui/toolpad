@@ -94,7 +94,7 @@ interface DashboardSidebarSubNavigationProps {
   basePath?: string;
   depth?: number;
   onLinkClick: () => void;
-  isExpanded?: boolean;
+  isMini?: boolean;
   validatedItemIds: Set<string>;
   uniqueItemPaths: Set<string>;
 }
@@ -104,7 +104,7 @@ function DashboardSidebarSubNavigation({
   basePath = '',
   depth = 0,
   onLinkClick,
-  isExpanded = false,
+  isMini = false,
   validatedItemIds,
   uniqueItemPaths,
 }: DashboardSidebarSubNavigationProps) {
@@ -145,7 +145,7 @@ function DashboardSidebarSubNavigation({
     <List sx={{ padding: 0, mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
       {subNavigation.map((navigationItem, navigationItemIndex) => {
         if (navigationItem.kind === 'header') {
-          return isExpanded ? (
+          return !isMini ? (
             <ListSubheader
               component="div"
               sx={{
@@ -173,7 +173,7 @@ function DashboardSidebarSubNavigation({
                 borderBottomWidth: 2,
                 mx: 2,
                 mt: 1,
-                mb: isExpanded && nextItem?.kind === 'header' ? 0 : 1,
+                mb: !isMini && nextItem?.kind === 'header' ? 0 : 1,
               }}
             />
           );
@@ -199,18 +199,16 @@ function DashboardSidebarSubNavigation({
               pt: 0,
               pb: 0,
               pl: 1,
-              pr: isExpanded ? undefined : 1,
+              pr: isMini ? 1 : undefined,
               overflowX: 'hidden',
             }}
           >
             <NavigationListItemButton
-              selected={
-                pathname === navigationItemFullPath && (!isExpanded || !navigationItem.children)
-              }
+              selected={pathname === navigationItemFullPath && (isMini || !navigationItem.children)}
               sx={{
                 height: 48,
               }}
-              {...(isExpanded && navigationItem.children
+              {...(!isMini && navigationItem.children
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),
                   }
@@ -240,7 +238,7 @@ function DashboardSidebarSubNavigation({
                   </Avatar>
                 )}
               </ListItemIcon>
-              {isExpanded ? (
+              {!isMini ? (
                 <ListItemText
                   key={`navigation-item-text-${navigationItemId}`}
                   primary={navigationItemTitle}
@@ -253,7 +251,7 @@ function DashboardSidebarSubNavigation({
                 />
               ) : null}
               {navigationItem.action ?? null}
-              {isExpanded && navigationItem.children ? nestedNavigationCollapseIcon : null}
+              {!isMini && navigationItem.children ? nestedNavigationCollapseIcon : null}
             </NavigationListItemButton>
           </ListItem>
         );
@@ -270,15 +268,15 @@ function DashboardSidebarSubNavigation({
 
         return (
           <React.Fragment key={navigationItemId}>
-            {isExpanded ? (
-              listItem
-            ) : (
+            {isMini ? (
               <Tooltip title={navigationItemTitle} placement="right">
                 {listItem}
               </Tooltip>
+            ) : (
+              listItem
             )}
 
-            {isExpanded && navigationItem.children ? (
+            {!isMini && navigationItem.children ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
                   subNavigation={navigationItem.children}
@@ -317,6 +315,11 @@ export interface DashboardLayoutProps {
    */
   children: React.ReactNode;
   /**
+   * Whether the sidebar should be collapsible to a mini variant in non-mobile viewports.
+   * @default 'standard'
+   */
+  enableMiniSidebar?: boolean;
+  /**
    * The components used for each slot inside.
    * @default {}
    */
@@ -342,7 +345,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, slots, slotProps } = props;
+  const { children, enableMiniSidebar = false, slots, slotProps } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
@@ -383,13 +386,16 @@ function DashboardLayout(props: DashboardLayoutProps) {
         component="nav"
         sx={{
           overflow: 'auto',
-          pt: isNavigationExpanded && navigation[0]?.kind === 'header' ? 0 : 2,
+          pt:
+            (!enableMiniSidebar || isNavigationExpanded) && navigation[0]?.kind === 'header'
+              ? 0
+              : 2,
         }}
       >
         <DashboardSidebarSubNavigation
           subNavigation={navigation}
           onLinkClick={handleNavigationLinkClick}
-          isExpanded={isNavigationExpanded}
+          isMini={enableMiniSidebar && !isNavigationExpanded}
           validatedItemIds={validatedItemIdsRef.current}
           uniqueItemPaths={uniqueItemPathsRef.current}
         />
@@ -397,7 +403,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     </React.Fragment>
   );
 
-  const drawerWidth = isNavigationExpanded ? 320 : 74;
+  const drawerWidth = enableMiniSidebar && !isNavigationExpanded ? 74 : 320;
 
   const expandMenuActionText = 'Expand';
   const collapseMenuActionText = 'Collapse';
@@ -414,8 +420,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
           <Box
             sx={{
-              display: { xs: 'block', sm: 'block' },
-              mr: 2,
+              display: { md: enableMiniSidebar ? 'block' : 'none' },
+              mr: enableMiniSidebar ? 2 : 0,
             }}
           >
             <Tooltip
@@ -428,7 +434,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   aria-label={`${isNavigationExpanded ? collapseMenuActionText : expandMenuActionText} navigation menu`}
                   onClick={toggleNavigationExpanded}
                   edge="start"
-                  sx={{ ml: { xs: 0, sm: -1 } }}
+                  sx={{
+                    ml: { xs: 0, sm: -1 },
+                  }}
                 >
                   {isNavigationExpanded ? <MenuOpenIcon /> : <MenuIcon />}
                 </IconButton>
@@ -474,7 +482,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
           keepMounted: true, // Better open performance on mobile.
         }}
         sx={{
-          display: { xs: 'block', sm: 'none' },
+          display: {
+            xs: 'block',
+            sm: enableMiniSidebar ? 'none' : 'block',
+            md: 'none',
+          },
           width: drawerWidth,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
@@ -490,7 +502,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <Drawer
         variant="permanent"
         sx={{
-          display: { xs: 'none', sm: 'block' },
+          display: {
+            xs: 'none',
+            sm: enableMiniSidebar ? 'block' : 'none',
+            md: 'block',
+          },
           width: drawerWidth,
           flexShrink: 0,
           overflowX: 'hidden',
@@ -510,7 +526,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           flexGrow: 1,
           // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
           minWidth: {
-            xs: isNavigationExpanded ? '100vw' : 'auto',
+            xs: !enableMiniSidebar && isNavigationExpanded ? '100vw' : 'auto',
             md: 'auto',
           },
         }}

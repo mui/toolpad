@@ -1,8 +1,9 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, Theme } from '@mui/material';
+import { styled } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
@@ -61,15 +62,6 @@ const LogoContainer = styled('div')({
   },
 });
 
-const drawerWidthTransitionMixin = {
-  transition: (theme: Theme) =>
-    theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  overflowX: 'hidden',
-};
-
 const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: 8,
   '&.Mui-selected': {
@@ -82,6 +74,9 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
     '& .MuiSvgIcon-root': {
       color: (theme.vars ?? theme).palette.primary.dark,
     },
+    '& .MuiAvatar-root': {
+      backgroundColor: (theme.vars ?? theme).palette.primary.dark,
+    },
     '& .MuiTouchRipple-child': {
       backgroundColor: (theme.vars ?? theme).palette.primary.dark,
     },
@@ -89,12 +84,12 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   '& .MuiSvgIcon-root': {
     color: (theme.vars ?? theme).palette.action.active,
   },
+  '& .MuiAvatar-root': {
+    backgroundColor: (theme.vars ?? theme).palette.action.active,
+  },
 }));
 
-type DashboardSidebarVariant = 'standard' | 'mini';
-
 interface DashboardSidebarSubNavigationProps {
-  variant?: DashboardSidebarVariant;
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
@@ -105,7 +100,6 @@ interface DashboardSidebarSubNavigationProps {
 }
 
 function DashboardSidebarSubNavigation({
-  variant = 'standard',
   subNavigation,
   basePath = '',
   depth = 0,
@@ -147,26 +141,18 @@ function DashboardSidebarSubNavigation({
     [],
   );
 
-  const isMiniVariant = variant === 'mini';
-  const isCollapsedMiniVariant = isMiniVariant && !isExpanded;
-
   return (
     <List sx={{ padding: 0, mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
       {subNavigation.map((navigationItem, navigationItemIndex) => {
         if (navigationItem.kind === 'header') {
-          if (isCollapsedMiniVariant) {
-            return null;
-          }
-
-          return (
+          return isExpanded ? (
             <ListSubheader
-              key={`subheader-${depth}-${navigationItemIndex}`}
               component="div"
               sx={{
                 fontSize: 12,
                 fontWeight: '700',
                 height: 40,
-                px: isMiniVariant ? 3 : 4,
+                px: 3,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -174,7 +160,7 @@ function DashboardSidebarSubNavigation({
             >
               {getItemTitle(navigationItem)}
             </ListSubheader>
-          );
+          ) : null;
         }
 
         if (navigationItem.kind === 'divider') {
@@ -187,15 +173,15 @@ function DashboardSidebarSubNavigation({
                 borderBottomWidth: 2,
                 mx: 2,
                 mt: 1,
-                mb: !isCollapsedMiniVariant && nextItem?.kind === 'header' ? 0 : 1,
+                mb: isExpanded && nextItem?.kind === 'header' ? 0 : 1,
               }}
             />
           );
         }
 
         const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
-
         const navigationItemId = `${depth}-${navigationItemIndex}`;
+        const navigationItemTitle = getItemTitle(navigationItem);
 
         const isNestedNavigationExpanded = expandedSidebarItemIds.includes(navigationItemId);
 
@@ -205,25 +191,26 @@ function DashboardSidebarSubNavigation({
           <ExpandMoreIcon />
         );
 
+        const listItemIconSize = 34;
+
         const listItem = (
           <ListItem
             sx={{
               pt: 0,
               pb: 0,
-              pl: isMiniVariant ? 1 : undefined,
-              pr: isCollapsedMiniVariant ? 1 : undefined,
+              pl: 1,
+              pr: isExpanded ? undefined : 1,
               overflowX: 'hidden',
             }}
           >
             <NavigationListItemButton
               selected={
-                pathname === navigationItemFullPath &&
-                (isCollapsedMiniVariant || !navigationItem.children)
+                pathname === navigationItemFullPath && (!isExpanded || !navigationItem.children)
               }
               sx={{
                 height: 48,
               }}
-              {...(!isCollapsedMiniVariant && navigationItem.children
+              {...(isExpanded && navigationItem.children
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),
                   }
@@ -233,18 +220,30 @@ function DashboardSidebarSubNavigation({
                     onClick: onLinkClick,
                   })}
             >
-              {navigationItem.icon ? (
-                <ListItemIcon
-                  sx={{
-                    minWidth: 34,
-                  }}
-                >
-                  {navigationItem.icon}
-                </ListItemIcon>
-              ) : null}
-              {!isCollapsedMiniVariant ? (
+              <ListItemIcon
+                sx={{
+                  minWidth: listItemIconSize,
+                }}
+              >
+                {navigationItem.icon ?? (
+                  <Avatar
+                    sx={{
+                      width: listItemIconSize - 7,
+                      height: listItemIconSize - 7,
+                      fontSize: 12,
+                      ml: '-2px',
+                    }}
+                  >
+                    {navigationItemTitle
+                      .split(' ')
+                      .map((itemTitleWord) => itemTitleWord.charAt(0).toUpperCase())}
+                  </Avatar>
+                )}
+              </ListItemIcon>
+              {isExpanded ? (
                 <ListItemText
-                  primary={getItemTitle(navigationItem)}
+                  key={`navigation-item-text-${navigationItemId}`}
+                  primary={navigationItemTitle}
                   sx={{
                     '& .MuiTypography-root': {
                       fontWeight: '500',
@@ -254,9 +253,7 @@ function DashboardSidebarSubNavigation({
                 />
               ) : null}
               {navigationItem.action ?? null}
-              {!isCollapsedMiniVariant && navigationItem.children
-                ? nestedNavigationCollapseIcon
-                : null}
+              {isExpanded && navigationItem.children ? nestedNavigationCollapseIcon : null}
             </NavigationListItemButton>
           </ListItem>
         );
@@ -273,21 +270,22 @@ function DashboardSidebarSubNavigation({
 
         return (
           <React.Fragment key={navigationItemId}>
-            {isCollapsedMiniVariant ? (
-              <Tooltip title={getItemTitle(navigationItem)} placement="right">
+            {isExpanded ? (
+              listItem
+            ) : (
+              <Tooltip title={navigationItemTitle} placement="right">
                 {listItem}
               </Tooltip>
-            ) : (
-              listItem
             )}
 
-            {!isCollapsedMiniVariant && navigationItem.children ? (
+            {isExpanded && navigationItem.children ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
                   subNavigation={navigationItem.children}
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
+                  isExpanded
                   validatedItemIds={validatedItemIds}
                   uniqueItemPaths={uniqueItemPaths}
                 />
@@ -319,11 +317,6 @@ export interface DashboardLayoutProps {
    */
   children: React.ReactNode;
   /**
-   * Sidebar variant to use.
-   * @default 'standard'
-   */
-  sidebarVariant?: DashboardSidebarVariant;
-  /**
    * The components used for each slot inside.
    * @default {}
    */
@@ -349,7 +342,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, sidebarVariant = 'standard', slots, slotProps } = props;
+  const { children, slots, slotProps } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
@@ -383,9 +376,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
-  const isMiniSidebarVariant = sidebarVariant === 'mini';
-  const isCollapsedMiniSidebarVariant = isMiniSidebarVariant && !isNavigationExpanded;
-
   const drawerContent = (
     <React.Fragment>
       <Toolbar />
@@ -393,11 +383,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
         component="nav"
         sx={{
           overflow: 'auto',
-          pt: !isCollapsedMiniSidebarVariant && navigation[0]?.kind === 'header' ? 0 : 2,
+          pt: isNavigationExpanded && navigation[0]?.kind === 'header' ? 0 : 2,
         }}
       >
         <DashboardSidebarSubNavigation
-          variant={sidebarVariant}
           subNavigation={navigation}
           onLinkClick={handleNavigationLinkClick}
           isExpanded={isNavigationExpanded}
@@ -408,10 +397,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
     </React.Fragment>
   );
 
-  const drawerWidth = isCollapsedMiniSidebarVariant ? 74 : 320;
+  const drawerWidth = isNavigationExpanded ? 320 : 74;
 
-  const expandMenuActionText = isMiniSidebarVariant ? 'Expand' : 'Open';
-  const collapseMenuActionText = isMiniSidebarVariant ? 'Collapse' : 'Close';
+  const expandMenuActionText = 'Expand';
+  const collapseMenuActionText = 'Collapse';
 
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
@@ -425,8 +414,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
           <Box
             sx={{
-              display: { xs: 'block', md: isMiniSidebarVariant ? 'block' : 'none' },
-              mr: isMiniSidebarVariant ? 3 : 0,
+              display: { xs: 'block', sm: 'block' },
+              mr: 2,
             }}
           >
             <Tooltip
@@ -439,7 +428,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   aria-label={`${isNavigationExpanded ? collapseMenuActionText : expandMenuActionText} navigation menu`}
                   onClick={toggleNavigationExpanded}
                   edge="start"
-                  sx={{ ml: isMiniSidebarVariant ? -1 : 0 }}
+                  sx={{ ml: { xs: 0, sm: -1 } }}
                 >
                   {isNavigationExpanded ? <MenuOpenIcon /> : <MenuIcon />}
                 </IconButton>
@@ -476,42 +465,40 @@ function DashboardLayout(props: DashboardLayoutProps) {
           <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
         </Toolbar>
       </AppBar>
-      {!isMiniSidebarVariant ? (
-        <Drawer
-          container={appWindow?.document.body}
-          variant="temporary"
-          open={isNavigationExpanded}
-          onClose={handleSetNavigationExpanded(false)}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            width: drawerWidth,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: {
-              width: drawerWidth,
-              boxSizing: 'border-box',
-              backgroundImage: 'none',
-              borderRight: (theme) => `1px solid ${(theme.vars ?? theme).palette.divider}`,
-            },
-          }}
-        >
-          {drawerContent}
-        </Drawer>
-      ) : null}
       <Drawer
-        variant="permanent"
+        container={appWindow?.document.body}
+        variant="temporary"
+        open={isNavigationExpanded}
+        onClose={handleSetNavigationExpanded(false)}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
         sx={{
-          display: { xs: !isMiniSidebarVariant ? 'none' : 'block', md: 'block' },
+          display: { xs: 'block', sm: 'none' },
           width: drawerWidth,
           flexShrink: 0,
-          ...drawerWidthTransitionMixin,
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: 'border-box',
             backgroundImage: 'none',
-            ...drawerWidthTransitionMixin,
+            borderRight: (theme) => `1px solid ${(theme.vars ?? theme).palette.divider}`,
+          },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', sm: 'block' },
+          width: drawerWidth,
+          flexShrink: 0,
+          overflowX: 'hidden',
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            backgroundImage: 'none',
+            overflowX: 'hidden',
           },
         }}
       >
@@ -523,7 +510,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           flexGrow: 1,
           // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
           minWidth: {
-            xs: !isMiniSidebarVariant && isNavigationExpanded ? '100vw' : 'auto',
+            xs: isNavigationExpanded ? '100vw' : 'auto',
             md: 'auto',
           },
         }}
@@ -544,11 +531,6 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
-  /**
-   * Sidebar variant to use.
-   * @default 'standard'
-   */
-  sidebarVariant: PropTypes.oneOf(['mini', 'standard']),
   /**
    * The props used for each slot inside.
    * @default {}

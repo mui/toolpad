@@ -173,7 +173,7 @@ function DashboardSidebarSubNavigation({
                 borderBottomWidth: 2,
                 mx: 2,
                 mt: 1,
-                mb: !isMini && nextItem?.kind === 'header' ? 0 : 1,
+                mb: nextItem?.kind === 'header' && !isMini ? 0 : 1,
               }}
             />
           );
@@ -196,19 +196,17 @@ function DashboardSidebarSubNavigation({
         const listItem = (
           <ListItem
             sx={{
-              pt: 0,
-              pb: 0,
-              pl: 1,
-              pr: isMini ? 1 : undefined,
+              py: 0,
+              px: 1,
               overflowX: 'hidden',
             }}
           >
             <NavigationListItemButton
-              selected={pathname === navigationItemFullPath && (isMini || !navigationItem.children)}
+              selected={pathname === navigationItemFullPath && (!navigationItem.children || isMini)}
               sx={{
                 height: 48,
               }}
-              {...(!isMini && navigationItem.children
+              {...(navigationItem.children && !isMini
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),
                   }
@@ -218,26 +216,30 @@ function DashboardSidebarSubNavigation({
                     onClick: onLinkClick,
                   })}
             >
-              <ListItemIcon
-                sx={{
-                  minWidth: listItemIconSize,
-                }}
-              >
-                {navigationItem.icon ?? (
-                  <Avatar
-                    sx={{
-                      width: listItemIconSize - 7,
-                      height: listItemIconSize - 7,
-                      fontSize: 12,
-                      ml: '-2px',
-                    }}
-                  >
-                    {navigationItemTitle
-                      .split(' ')
-                      .map((itemTitleWord) => itemTitleWord.charAt(0).toUpperCase())}
-                  </Avatar>
-                )}
-              </ListItemIcon>
+              {navigationItem.icon || isMini ? (
+                <ListItemIcon
+                  sx={{
+                    minWidth: listItemIconSize,
+                  }}
+                >
+                  {navigationItem.icon ?? null}
+                  {!navigationItem.icon && isMini ? (
+                    <Avatar
+                      sx={{
+                        width: listItemIconSize - 7,
+                        height: listItemIconSize - 7,
+                        fontSize: 12,
+                        ml: '-2px',
+                      }}
+                    >
+                      {navigationItemTitle
+                        .split(' ')
+                        .slice(0, 2)
+                        .map((itemTitleWord) => itemTitleWord.charAt(0).toUpperCase())}
+                    </Avatar>
+                  ) : null}
+                </ListItemIcon>
+              ) : null}
               {!isMini ? (
                 <ListItemText
                   key={`navigation-item-text-${navigationItemId}`}
@@ -251,7 +253,7 @@ function DashboardSidebarSubNavigation({
                 />
               ) : null}
               {navigationItem.action ?? null}
-              {!isMini && navigationItem.children ? nestedNavigationCollapseIcon : null}
+              {navigationItem.children && !isMini ? nestedNavigationCollapseIcon : null}
             </NavigationListItemButton>
           </ListItem>
         );
@@ -275,15 +277,13 @@ function DashboardSidebarSubNavigation({
             ) : (
               listItem
             )}
-
-            {!isMini && navigationItem.children ? (
+            {navigationItem.children && !isMini ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
                   subNavigation={navigationItem.children}
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
-                  isExpanded
                   validatedItemIds={validatedItemIds}
                   uniqueItemPaths={uniqueItemPaths}
                 />
@@ -379,6 +379,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
+  const isMini = enableMiniSidebar && !isNavigationExpanded;
+
   const drawerContent = (
     <React.Fragment>
       <Toolbar />
@@ -386,16 +388,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
         component="nav"
         sx={{
           overflow: 'auto',
-          pt:
-            (!enableMiniSidebar || isNavigationExpanded) && navigation[0]?.kind === 'header'
-              ? 0
-              : 2,
+          pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
         }}
       >
         <DashboardSidebarSubNavigation
           subNavigation={navigation}
           onLinkClick={handleNavigationLinkClick}
-          isMini={enableMiniSidebar && !isNavigationExpanded}
+          isMini={isMini}
           validatedItemIds={validatedItemIdsRef.current}
           uniqueItemPaths={uniqueItemPathsRef.current}
         />
@@ -435,7 +434,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   onClick={toggleNavigationExpanded}
                   edge="start"
                   sx={{
-                    ml: { xs: 0, sm: -1 },
+                    ml: -1,
                   }}
                 >
                   {isNavigationExpanded ? <MenuOpenIcon /> : <MenuIcon />}

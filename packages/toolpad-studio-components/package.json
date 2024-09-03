@@ -40,13 +40,13 @@
     "url": "https://github.com/mui/mui-toolpad/issues"
   },
   "dependencies": {
-    "@mui/icons-material": "6.0.0",
-    "@mui/lab": "6.0.0-beta.8",
-    "@mui/material": "6.0.0",
-    "@mui/x-charts": "7.14.0",
-    "@mui/x-data-grid-premium": "7.14.0",
-    "@mui/x-date-pickers": "7.14.0",
-    "@mui/x-license": "7.14.0",
+    "@mui/icons-material": "6.0.2",
+    "@mui/lab": "6.0.0-beta.9",
+    "@mui/material": "6.0.2",
+    "@mui/x-charts": "7.15.0",
+    "@mui/x-data-grid-premium": "7.15.0",
+    "@mui/x-date-pickers": "7.15.0",
+    "@mui/x-license": "7.15.0",
     "@tanstack/react-query": "5.51.23",
     "@toolpad/studio-runtime": "workspace:*",
     "@toolpad/utils": "workspace:*",
@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@types/invariant": "2.2.37",
-    "@types/react": "18.3.4",
+    "@types/react": "18.3.5",
     "react": "18.3.1"
   },
   "peerDependencies": {

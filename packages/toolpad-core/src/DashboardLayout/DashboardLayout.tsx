@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme } from '@mui/material';
+import { styled } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -19,30 +19,29 @@ import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import useSsr from '@toolpad/utils/hooks/useSsr';
-import { Account } from '../Account';
 import { Link } from '../shared/Link';
 import {
   BrandingContext,
   NavigationContext,
-  PaletteModeContext,
   RouterContext,
   WindowContext,
 } from '../shared/context';
 import type { Navigation } from '../AppProvider';
-import { ToolpadLogo } from './ToolpadLogo';
+import { Account, type AccountProps } from '../Account';
 import {
   getItemTitle,
   getPageItemFullPath,
   hasSelectedNavigationChildren,
+  isPageItemSelected,
 } from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
+import { ToolbarActions } from './ToolbarActions';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { ToolpadLogo } from './ToolpadLogo';
 
 const DRAWER_WIDTH = 320; // px
 
@@ -86,72 +85,12 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   },
 }));
 
-function ThemeSwitcher() {
-  const isSsr = useSsr();
-  const theme = useTheme();
-
-  const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
-
-  const toggleMode = React.useCallback(() => {
-    setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
-  }, [paletteMode, setPaletteMode]);
-
-  return isDualTheme ? (
-    <Tooltip
-      title={isSsr ? 'Switch mode' : `${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`}
-      enterDelay={1000}
-    >
-      <div>
-        <IconButton
-          aria-label={
-            isSsr
-              ? 'Switch theme mode'
-              : `Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`
-          }
-          onClick={toggleMode}
-          sx={{
-            color: (theme.vars ?? theme).palette.primary.dark,
-            padding: 1,
-            marginRight: 1,
-          }}
-        >
-          {theme.getColorSchemeSelector ? (
-            <React.Fragment>
-              <DarkModeIcon
-                sx={{
-                  display: 'inline',
-                  [theme.getColorSchemeSelector('dark')]: {
-                    display: 'none',
-                  },
-                }}
-              />
-              <LightModeIcon
-                sx={{
-                  display: 'none',
-                  [theme.getColorSchemeSelector('dark')]: {
-                    display: 'inline',
-                  },
-                }}
-              />
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              {isSsr || paletteMode !== 'dark' ? <DarkModeIcon /> : <LightModeIcon />}
-            </React.Fragment>
-          )}
-        </IconButton>
-      </div>
-    </Tooltip>
-  ) : null;
-}
-
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
   onLinkClick: () => void;
-  validatedItemIds: Set<string>;
-  uniqueItemPaths: Set<string>;
+  selectedItemId: string;
 }
 
 function DashboardSidebarSubNavigation({
@@ -159,8 +98,7 @@ function DashboardSidebarSubNavigation({
   basePath = '',
   depth = 0,
   onLinkClick,
-  validatedItemIds,
-  uniqueItemPaths,
+  selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
 
@@ -243,10 +181,20 @@ function DashboardSidebarSubNavigation({
           <ExpandMoreIcon />
         );
 
+        const isSelected = isPageItemSelected(navigationItem, basePath, pathname);
+
+        if (process.env.NODE_ENV !== 'production' && isSelected && selectedItemId) {
+          console.warn(`Duplicate selected path in navigation: ${navigationItemFullPath}`);
+        }
+
+        if (isSelected && !selectedItemId) {
+          selectedItemId = navigationItemId;
+        }
+
         const listItem = (
           <ListItem sx={{ pt: 0, pb: 0 }}>
             <NavigationListItemButton
-              selected={pathname === navigationItemFullPath && !navigationItem.children}
+              selected={isSelected}
               {...(navigationItem.children
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),
@@ -280,16 +228,6 @@ function DashboardSidebarSubNavigation({
           </ListItem>
         );
 
-        if (process.env.NODE_ENV !== 'production' && !validatedItemIds.has(navigationItemId)) {
-          if (!uniqueItemPaths.has(navigationItemFullPath)) {
-            uniqueItemPaths.add(navigationItemFullPath);
-          } else {
-            console.warn(`Duplicate path in navigation: ${navigationItemFullPath}`);
-          }
-
-          validatedItemIds.add(navigationItemId);
-        }
-
         return (
           <React.Fragment key={navigationItemId}>
             {listItem}
@@ -301,8 +239,7 @@ function DashboardSidebarSubNavigation({
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
-                  validatedItemIds={validatedItemIds}
-                  uniqueItemPaths={uniqueItemPaths}
+                  selectedItemId={selectedItemId}
                 />
               </Collapse>
             ) : null}
@@ -313,11 +250,37 @@ function DashboardSidebarSubNavigation({
   );
 }
 
+export interface DashboardLayoutSlots {
+  /**
+   * The toolbar actions component used in the layout header.
+   * @default ToolbarActions
+   */
+  toolbarActions?: React.JSXElementConstructor<{}>;
+  /**
+   * The toolbar account component used in the layout header.
+   * @default Account
+   */
+  toolbarAccount?: React.JSXElementConstructor<AccountProps>;
+}
+
 export interface DashboardLayoutProps {
   /**
    * The content of the dashboard.
    */
   children: React.ReactNode;
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots?: DashboardLayoutSlots;
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps?: {
+    toolbarActions?: {};
+    toolbarAccount?: AccountProps;
+  };
 }
 
 /**
@@ -331,7 +294,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children } = props;
+  const { children, slots, slotProps } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
@@ -340,8 +303,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
 
-  const validatedItemIdsRef = React.useRef(new Set<string>());
-  const uniqueItemPathsRef = React.useRef(new Set<string>());
+  const selectedItemIdRef = React.useRef('');
 
   const handleSetMobileNavigationOpen = React.useCallback(
     (newOpen: boolean) => () => {
@@ -355,13 +317,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
   }, []);
 
   const handleNavigationLinkClick = React.useCallback(() => {
+    selectedItemIdRef.current = '';
     setIsMobileNavigationOpen(false);
   }, []);
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
   React.useMemo(() => {
-    validatedItemIdsRef.current = new Set();
-    uniqueItemPathsRef.current = new Set();
+    selectedItemIdRef.current = '';
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
@@ -372,12 +334,14 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <DashboardSidebarSubNavigation
           subNavigation={navigation}
           onLinkClick={handleNavigationLinkClick}
-          validatedItemIds={validatedItemIdsRef.current}
-          uniqueItemPaths={uniqueItemPathsRef.current}
+          selectedItemId={selectedItemIdRef.current}
         />
       </Box>
     </React.Fragment>
   );
+
+  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
+  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -428,8 +392,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
+          <ToolbarActionsSlot {...slotProps?.toolbarActions} />
           <ThemeSwitcher />
-          <Account />
+          <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
         </Toolbar>
       </AppBar>
       <Drawer
@@ -493,6 +458,31 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    toolbarAccount: PropTypes.shape({
+      signInLabel: PropTypes.string,
+      signOutLabel: PropTypes.string,
+      slotProps: PropTypes.shape({
+        avatar: PropTypes.object,
+        iconButton: PropTypes.object,
+        signInButton: PropTypes.object,
+        signOutButton: PropTypes.object,
+      }),
+    }),
+    toolbarActions: PropTypes.object,
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots: PropTypes.shape({
+    toolbarAccount: PropTypes.elementType,
+    toolbarActions: PropTypes.elementType,
+  }),
 } as any;
 
 export { DashboardLayout };

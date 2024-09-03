@@ -53,7 +53,7 @@ The component is composable with any authentication library you might want to us
 
 #### Setting up
 
-If you're using [`create-toolpad-app`](/toolpad/core/installation/), or the [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), Auth.js is already installed. To proceed, add `AUTH_SECRET` to the environment variables by running:
+If you're using [`create-toolpad-app`](/toolpad/core/introduction/installation/), or the [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), Auth.js is already installed. To proceed, add `AUTH_SECRET` to the environment variables by running:
 
 ```bash
 npx auth secret
@@ -74,7 +74,7 @@ GITHUB_CLIENT_SECRET=<your-client-secret>
 
 ##### Server Configuration
 
-If you're using [`create-toolpad-app`](/toolpad/core/installation/), or the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), this server configuration is already set up for you.
+If you're using [`create-toolpad-app`](/toolpad/core/introduction/installation/), or the default [Next.js app directory example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), this server configuration is already set up for you.
 
 Otherwise, follow the [custom sign in page instructions](https://authjs.dev/guides/pages/signin) to set up the server configuration.
 
@@ -142,6 +142,14 @@ export default function SignIn() {
   );
 }
 ```
+
+:::success
+If you're using the default [Next.js example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), all of this is already configured for you. Otherwise, follow the [custom sign-in page instructions](https://authjs.dev/guides/pages/signin).
+:::
+
+:::info
+If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-pages-nextauth-4/) to get started.
+:::
 
 ## Customization
 

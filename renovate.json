@@ -162,9 +162,9 @@
       "automerge": true
     },
     {
-      "groupName": "node-18-incompatible",
-      "description": "These dependencies require a Node.js version higher than 18.",
-      "matchPackageNames": ["rimraf", "glob"]
+      "groupName": "@types/node",
+      "matchPackageNames": ["@types/node"],
+      "allowedVersions": "< 21.0.0"
     }
   ],
   "postUpdateOptions": ["pnpmDedupe"],

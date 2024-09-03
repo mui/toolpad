@@ -146,6 +146,7 @@ function DashboardSidebarSubNavigation({
         if (navigationItem.kind === 'header') {
           return !isMini ? (
             <ListSubheader
+              key={`subheader-${depth}-${navigationItemIndex}`}
               component="div"
               sx={{
                 fontSize: 12,
@@ -251,7 +252,6 @@ function DashboardSidebarSubNavigation({
               ) : null}
               {!isMini ? (
                 <ListItemText
-                  key={`navigation-item-text-${navigationItemId}`}
                   primary={navigationItemTitle}
                   sx={{
                     '& .MuiTypography-root': {

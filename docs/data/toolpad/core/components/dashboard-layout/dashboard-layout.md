@@ -84,7 +84,7 @@ Navigation links have an optional `action` prop that can be used to render any c
 
 ### Mini variant sidebar
 
-In this variant of the layout sidebar it shows as a compact mini-drawer with icons only that can be expanded/collapsed in any screen size to show more details. The sidebar always persists alongside the page content.
+In this variant of the layout sidebar it defaults to a compact mini-drawer with icons only in desktop and tablet viewports that can be expanded/collapsed to show more details.
 
 {{"demo": "DashboardLayoutMiniSidebar.js", "height": 400, "iframe": true}}
 

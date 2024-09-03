@@ -277,6 +277,7 @@ function DashboardSidebarSubNavigation({
             ) : (
               listItem
             )}
+
             {navigationItem.children && !isMini ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
@@ -315,8 +316,8 @@ export interface DashboardLayoutProps {
    */
   children: React.ReactNode;
   /**
-   * Whether the sidebar should be collapsible to a mini variant in non-mobile viewports.
-   * @default 'standard'
+   * Whether the sidebar should be collapsible to a mini variant in desktop and tablet viewports.
+   * @default false
    */
   enableMiniSidebar?: boolean;
   /**
@@ -546,6 +547,11 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * Whether the sidebar should be collapsible to a mini variant in desktop and tablet viewports.
+   * @default false
+   */
+  enableMiniSidebar: PropTypes.bool,
   /**
    * The props used for each slot inside.
    * @default {}

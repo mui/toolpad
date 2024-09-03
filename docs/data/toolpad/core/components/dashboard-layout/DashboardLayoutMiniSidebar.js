@@ -87,7 +87,7 @@ function DashboardLayoutMiniSidebar(props) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout sidebarVariant="mini">
+      <DashboardLayout enableMiniSidebar>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>

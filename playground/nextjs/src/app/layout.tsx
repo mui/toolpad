@@ -17,32 +17,9 @@ const NAVIGATION: Navigation = [
     icon: <DashboardIcon />,
   },
   {
-    segment: 'public',
+    segment: 'orders',
     title: 'Orders',
-  },
-  {
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-    children: [
-      {
-        title: 'Dashboard',
-        icon: <DashboardIcon />,
-      },
-      {
-        segment: 'orders',
-        title: 'Orders',
-        children: [
-          {
-            kind: 'header',
-            title: 'Main items',
-          },
-          {
-            title: 'Dashboard',
-            icon: <DashboardIcon />,
-          },
-        ],
-      },
-    ],
+    icon: <ShoppingCartIcon />,
   },
 ];
 

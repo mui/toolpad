@@ -91,7 +91,7 @@ export default function DashboardLayoutMiniSidebar(props: DemoProps) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout sidebarVariant="mini">
+      <DashboardLayout enableMiniSidebar>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>

@@ -51,23 +51,31 @@ Some application examples for different JavaScript frameworks (such as Next.js, 
    pnpm dev
    ```
 
-### Test changes to Toolpad Core on a live application
+### Testing the example apps
 
-To test changes to Toolpad Core on a live application, you can run the apps in the `playground` folder.
+You can also test the example apps to make sure they work as expected.
 
-1. Run Toolpad Core locally
+1. Add the example app to the workspace
+
+   ```yaml
+   packages:
+     - 'packages/*'
+     - 'docs'
+     - 'test'
+     - 'examples/nextjs'
+   ```
+
+2. Run Toolpad Core locally
 
    ```bash
    pnpm --filter @toolpad/core dev
    ```
 
-2. Run the playground app
+3. Run the example app
 
    ```bash
-   pnpm --filter playground-nextjs dev
+   pnpm --filter core-nextjs dev
    ```
-
-You should now be able to test changes to Toolpad Core on a live application. Follow similar steps to run apps in the `examples` folder after adding them to the workspace in `pnpm-workspace.yaml`.
 
 ### Running Toolpad Studio apps inside the monorepo (recommended)
 

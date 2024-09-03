@@ -39,6 +39,7 @@ export interface NavigationPageItem {
   segment?: string;
   title?: string;
   icon?: React.ReactNode;
+  pattern?: string;
   action?: React.ReactNode;
   children?: Navigation;
 }
@@ -221,6 +222,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
+        pattern: PropTypes.string,
         segment: PropTypes.string,
         title: PropTypes.string,
       }),

@@ -78,9 +78,22 @@ Nested navigation structures can be placed in the sidebar as items with the form
 
 ### Navigation Actions
 
-Navigation links have an optional `action` prop that can be used to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
+Navigation links have an optional `action` prop to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
 
 {{"demo": "DashboardLayoutNavigationActions.js", "height": 400, "iframe": true}}
+
+### Navigation Pattern Matching
+
+Navigation links have an optional `pattern` prop to define a pattern to be matched for the item to be marked as selected.
+This feature is built on top of the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library. Some examples:
+
+- Constant path: `/orders`
+- Dynamic segment: `/orders/:segment`
+- Zero or more segments: `/orders{/:segment}*`
+- One or more segments: `/orders{/:segment}+`
+- Optional segment: `/orders{/:segment}+?`
+
+{{"demo": "DashboardLayoutPattern.js", "height": 400, "iframe": true}}
 
 ## Account
 
@@ -91,3 +104,10 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 :::
 
 {{"demo": "DashboardLayoutAccount.js", "height": 400, "iframe": true}}
+
+## Customization
+
+Some areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
+For example, this allows you to add new items to the toolbar in the header, such as a search bar.
+
+{{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}

@@ -39,6 +39,7 @@ export interface NavigationPageItem {
   segment?: string;
   title?: string;
   icon?: React.ReactNode;
+  pattern?: string;
   action?: React.ReactNode;
   children?: Navigation;
 }
@@ -70,9 +71,9 @@ export interface Authentication {
   signOut: () => void;
 }
 
-export const SessionContext = React.createContext<Session | null>(null);
-
 export const AuthenticationContext = React.createContext<Authentication | null>(null);
+
+export const SessionContext = React.createContext<Session | null>(null);
 
 export type AppTheme = Theme | { light: Theme; dark: Theme };
 
@@ -221,6 +222,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
         ),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
+        pattern: PropTypes.string,
         segment: PropTypes.string,
         title: PropTypes.string,
       }),

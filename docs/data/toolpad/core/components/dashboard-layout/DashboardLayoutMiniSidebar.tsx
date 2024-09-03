@@ -84,7 +84,6 @@ export default function DashboardLayoutMiniSidebar(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    // preview-start
     <AppProvider
       navigation={NAVIGATION}
       router={router}
@@ -95,6 +94,5 @@ export default function DashboardLayoutMiniSidebar(props: DemoProps) {
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
-    // preview-end
   );
 }

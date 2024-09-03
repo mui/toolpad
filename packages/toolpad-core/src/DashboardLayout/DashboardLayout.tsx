@@ -37,6 +37,7 @@ import {
   getItemTitle,
   getPageItemFullPath,
   hasSelectedNavigationChildren,
+  isPageItemSelected,
 } from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
 import { ToolbarActions } from './ToolbarActions';
@@ -95,8 +96,7 @@ interface DashboardSidebarSubNavigationProps {
   depth?: number;
   onLinkClick: () => void;
   isMini?: boolean;
-  validatedItemIds: Set<string>;
-  uniqueItemPaths: Set<string>;
+  selectedItemId: string;
 }
 
 function DashboardSidebarSubNavigation({
@@ -105,8 +105,7 @@ function DashboardSidebarSubNavigation({
   depth = 0,
   onLinkClick,
   isMini = false,
-  validatedItemIds,
-  uniqueItemPaths,
+  selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
 
@@ -193,6 +192,16 @@ function DashboardSidebarSubNavigation({
 
         const listItemIconSize = 34;
 
+        const isSelected = isPageItemSelected(navigationItem, basePath, pathname);
+
+        if (process.env.NODE_ENV !== 'production' && isSelected && selectedItemId) {
+          console.warn(`Duplicate selected path in navigation: ${navigationItemFullPath}`);
+        }
+
+        if (isSelected && !selectedItemId) {
+          selectedItemId = navigationItemId;
+        }
+
         const listItem = (
           <ListItem
             sx={{
@@ -202,7 +211,7 @@ function DashboardSidebarSubNavigation({
             }}
           >
             <NavigationListItemButton
-              selected={pathname === navigationItemFullPath && (!navigationItem.children || isMini)}
+              selected={isSelected && (!navigationItem.children || isMini)}
               sx={{
                 height: 48,
               }}
@@ -258,16 +267,6 @@ function DashboardSidebarSubNavigation({
           </ListItem>
         );
 
-        if (process.env.NODE_ENV !== 'production' && !validatedItemIds.has(navigationItemId)) {
-          if (!uniqueItemPaths.has(navigationItemFullPath)) {
-            uniqueItemPaths.add(navigationItemFullPath);
-          } else {
-            console.warn(`Duplicate path in navigation: ${navigationItemFullPath}`);
-          }
-
-          validatedItemIds.add(navigationItemId);
-        }
-
         return (
           <React.Fragment key={navigationItemId}>
             {isMini ? (
@@ -285,8 +284,7 @@ function DashboardSidebarSubNavigation({
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
-                  validatedItemIds={validatedItemIds}
-                  uniqueItemPaths={uniqueItemPaths}
+                  selectedItemId={selectedItemId}
                 />
               </Collapse>
             ) : null}
@@ -355,8 +353,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isNavigationExpanded, setIsNavigationExpanded] = React.useState(false);
 
-  const validatedItemIdsRef = React.useRef(new Set<string>());
-  const uniqueItemPathsRef = React.useRef(new Set<string>());
+  const selectedItemIdRef = React.useRef('');
 
   const handleSetNavigationExpanded = React.useCallback(
     (newExpanded: boolean) => () => {
@@ -370,13 +367,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
   }, []);
 
   const handleNavigationLinkClick = React.useCallback(() => {
+    selectedItemIdRef.current = '';
     setIsNavigationExpanded(false);
   }, []);
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
   React.useMemo(() => {
-    validatedItemIdsRef.current = new Set();
-    uniqueItemPathsRef.current = new Set();
+    selectedItemIdRef.current = '';
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
@@ -396,8 +393,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           subNavigation={navigation}
           onLinkClick={handleNavigationLinkClick}
           isMini={isMini}
-          validatedItemIds={validatedItemIdsRef.current}
-          uniqueItemPaths={uniqueItemPathsRef.current}
+          selectedItemId={selectedItemIdRef.current}
         />
       </Box>
     </React.Fragment>

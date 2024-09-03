@@ -1,7 +1,9 @@
 {
   "props": {
-    "signInLabel": { "type": { "name": "string" }, "default": "'Sign In'" },
-    "signOutLabel": { "type": { "name": "string" }, "default": "'Sign Out'" },
+    "localeText": {
+      "type": { "name": "shape", "description": "{ signInLabel: string, signOutLabel: string }" },
+      "default": "DEFAULT_LABELS"
+    },
     "slotProps": {
       "type": {
         "name": "shape",

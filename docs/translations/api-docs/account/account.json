@@ -1,8 +1,7 @@
 {
   "componentDescription": "",
   "propDescriptions": {
-    "signInLabel": { "description": "The label for the sign in button." },
-    "signOutLabel": { "description": "The label for the sign out button." },
+    "localeText": { "description": "The labels for the account component." },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." }
   },

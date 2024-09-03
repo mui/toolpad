@@ -10,6 +10,7 @@ import Logout from '@mui/icons-material/Logout';
 import { Typography } from '@mui/material';
 import { SessionAvatar } from './SessionAvatar';
 import { SessionContext, AuthenticationContext } from '../AppProvider/AppProvider';
+import DEFAULT_LABELS from '../shared/labels/en';
 
 const AccountInfoContainer = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -56,15 +57,10 @@ export interface AccountProps {
     iconButton?: IconButtonProps;
   };
   /**
-   * The label for the sign in button.
-   * @default 'Sign In'
+   * The labels for the account component.
+   * @default DEFAULT_LABELS
    */
-  signInLabel?: string;
-  /**
-   * The label for the sign out button.
-   * @default 'Sign Out'
-   */
-  signOutLabel?: string;
+  localeText?: typeof DEFAULT_LABELS;
 }
 /**
  *
@@ -79,7 +75,7 @@ export interface AccountProps {
  * - [Account API](https://mui.com/toolpad/core/api/account)
  */
 function Account(props: AccountProps) {
-  const { slots, slotProps, signInLabel = 'Sign In', signOutLabel = 'Sign Out' } = props;
+  const { slots, slotProps, localeText = DEFAULT_LABELS } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const session = React.useContext(SessionContext);
   const authentication = React.useContext(AuthenticationContext);
@@ -114,7 +110,7 @@ function Account(props: AccountProps) {
         }}
         {...slotProps?.signInButton}
       >
-        {signInLabel}
+        {localeText?.signInLabel}
       </Button>
     );
   }
@@ -199,7 +195,7 @@ function Account(props: AccountProps) {
               startIcon={<Logout />}
               {...slotProps?.signOutButton}
             >
-              {signOutLabel}
+              {localeText?.signOutLabel}
             </Button>
           </SignOutContainer>
         )}
@@ -214,15 +210,13 @@ Account.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * The label for the sign in button.
-   * @default 'Sign In'
+   * The labels for the account component.
+   * @default DEFAULT_LABELS
    */
-  signInLabel: PropTypes.string,
-  /**
-   * The label for the sign out button.
-   * @default 'Sign Out'
-   */
-  signOutLabel: PropTypes.string,
+  localeText: PropTypes.shape({
+    signInLabel: PropTypes.string.isRequired,
+    signOutLabel: PropTypes.string.isRequired,
+  }),
   /**
    * The props used for each slot inside.
    */

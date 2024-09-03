@@ -403,7 +403,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     </React.Fragment>
   );
 
-  const drawerWidth = enableMiniSidebar && !isNavigationExpanded ? 74 : 320;
+  const drawerWidth = isMini ? 74 : 320;
 
   const expandMenuActionText = 'Expand';
   const collapseMenuActionText = 'Collapse';

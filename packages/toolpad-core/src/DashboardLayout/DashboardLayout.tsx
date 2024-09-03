@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material';
+import { styled, type Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -19,6 +19,7 @@ import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -314,10 +315,10 @@ export interface DashboardLayoutProps {
    */
   children: React.ReactNode;
   /**
-   * Whether the sidebar should be collapsible to a mini variant in desktop and tablet viewports.
+   * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
    * @default false
    */
-  enableMiniSidebar?: boolean;
+  disableMiniSidebar?: boolean;
   /**
    * The components used for each slot inside.
    * @default {}
@@ -344,14 +345,32 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, enableMiniSidebar = false, slots, slotProps } = props;
+  const { children, disableMiniSidebar = false, slots, slotProps } = props;
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
   const appWindow = React.useContext(WindowContext);
   const applicationTitle = useApplicationTitle();
 
-  const [isNavigationExpanded, setIsNavigationExpanded] = React.useState(false);
+  const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] = React.useState(true);
+  const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] = React.useState(false);
+
+  const isDesktopViewport = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
+
+  const isNavigationExpanded = isDesktopViewport
+    ? isDesktopNavigationExpanded
+    : isMobileNavigationExpanded;
+
+  const setIsNavigationExpanded = React.useCallback(
+    (newExpanded: boolean) => {
+      if (isDesktopViewport) {
+        setIsDesktopNavigationExpanded(newExpanded);
+      } else {
+        setIsMobileNavigationExpanded(newExpanded);
+      }
+    },
+    [isDesktopViewport],
+  );
 
   const selectedItemIdRef = React.useRef('');
 
@@ -359,17 +378,17 @@ function DashboardLayout(props: DashboardLayoutProps) {
     (newExpanded: boolean) => () => {
       setIsNavigationExpanded(newExpanded);
     },
-    [],
+    [setIsNavigationExpanded],
   );
 
   const toggleNavigationExpanded = React.useCallback(() => {
-    setIsNavigationExpanded((previousOpen) => !previousOpen);
-  }, []);
+    setIsNavigationExpanded(!isNavigationExpanded);
+  }, [isNavigationExpanded, setIsNavigationExpanded]);
 
   const handleNavigationLinkClick = React.useCallback(() => {
     selectedItemIdRef.current = '';
     setIsNavigationExpanded(false);
-  }, []);
+  }, [setIsNavigationExpanded]);
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
   React.useMemo(() => {
@@ -377,29 +396,47 @@ function DashboardLayout(props: DashboardLayoutProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
-  const isMini = enableMiniSidebar && !isNavigationExpanded;
+  const isDesktopMini = !disableMiniSidebar && !isDesktopNavigationExpanded;
+  const isMobileMini = !disableMiniSidebar && !isMobileNavigationExpanded;
 
-  const drawerContent = (
-    <React.Fragment>
-      <Toolbar />
-      <Box
-        component="nav"
-        sx={{
-          overflow: 'auto',
-          pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
-        }}
-      >
-        <DashboardSidebarSubNavigation
-          subNavigation={navigation}
-          onLinkClick={handleNavigationLinkClick}
-          isMini={isMini}
-          selectedItemId={selectedItemIdRef.current}
-        />
-      </Box>
-    </React.Fragment>
+  const getDrawerContent = React.useCallback(
+    (isMini: boolean) => (
+      <React.Fragment>
+        <Toolbar />
+        <Box
+          component="nav"
+          sx={{
+            overflow: 'auto',
+            pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
+          }}
+        >
+          <DashboardSidebarSubNavigation
+            subNavigation={navigation}
+            onLinkClick={handleNavigationLinkClick}
+            isMini={isMini}
+            selectedItemId={selectedItemIdRef.current}
+          />
+        </Box>
+      </React.Fragment>
+    ),
+    [handleNavigationLinkClick, navigation],
   );
 
-  const drawerWidth = isMini ? 74 : 320;
+  const getDrawerSharedSx = React.useCallback((isMini: boolean) => {
+    const drawerWidth = isMini ? 74 : 320;
+
+    return {
+      width: drawerWidth,
+      flexShrink: 0,
+      overflowX: 'hidden',
+      [`& .MuiDrawer-paper`]: {
+        width: drawerWidth,
+        boxSizing: 'border-box',
+        backgroundImage: 'none',
+        overflowX: 'hidden',
+      },
+    };
+  }, []);
 
   const expandMenuActionText = 'Expand';
   const collapseMenuActionText = 'Collapse';
@@ -416,8 +453,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
           <Box
             sx={{
-              display: { md: enableMiniSidebar ? 'block' : 'none' },
-              mr: enableMiniSidebar ? 2 : 0,
+              display: { md: disableMiniSidebar ? 'none' : 'block' },
+              mr: disableMiniSidebar ? 0 : 2,
             }}
           >
             <Tooltip
@@ -480,41 +517,38 @@ function DashboardLayout(props: DashboardLayoutProps) {
         sx={{
           display: {
             xs: 'block',
-            sm: enableMiniSidebar ? 'none' : 'block',
+            sm: disableMiniSidebar ? 'block' : 'none',
             md: 'none',
           },
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundImage: 'none',
-            borderRight: (theme) => `1px solid ${(theme.vars ?? theme).palette.divider}`,
-          },
+          ...getDrawerSharedSx(isMobileMini),
         }}
       >
-        {drawerContent}
+        {getDrawerContent(isMobileMini)}
       </Drawer>
       <Drawer
         variant="permanent"
         sx={{
           display: {
             xs: 'none',
-            sm: enableMiniSidebar ? 'block' : 'none',
-            md: 'block',
+            sm: disableMiniSidebar ? 'none' : 'block',
+            md: 'none',
           },
-          width: drawerWidth,
-          flexShrink: 0,
-          overflowX: 'hidden',
-          [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            backgroundImage: 'none',
-            overflowX: 'hidden',
-          },
+          ...getDrawerSharedSx(isMobileMini),
         }}
       >
-        {drawerContent}
+        {getDrawerContent(isMobileMini)}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: {
+            xs: 'none',
+            md: 'block',
+          },
+          ...getDrawerSharedSx(isDesktopMini),
+        }}
+      >
+        {getDrawerContent(isDesktopMini)}
       </Drawer>
       <Box
         component="main"
@@ -522,7 +556,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           flexGrow: 1,
           // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
           minWidth: {
-            xs: !enableMiniSidebar && isNavigationExpanded ? '100vw' : 'auto',
+            xs: disableMiniSidebar && isNavigationExpanded ? '100vw' : 'auto',
             md: 'auto',
           },
         }}

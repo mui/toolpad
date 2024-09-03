@@ -143,6 +143,14 @@ export default function SignIn() {
 }
 ```
 
+:::success
+If you're using the default [Next.js example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs/), all of this is already configured for you. Otherwise, follow the [custom sign-in page instructions](https://authjs.dev/guides/pages/signin).
+:::
+
+:::info
+If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-pages-nextauth-4/) to get started.
+:::
+
 ## Customization
 
 ### Branding

@@ -269,6 +269,7 @@ function DashboardSidebarSubNavigation({
               <ListItemText
                 primary={navigationItemTitle}
                 sx={{
+                  whiteSpace: 'nowrap',
                   zIndex: 1,
                   '& .MuiTypography-root': {
                     fontWeight: '500',
@@ -532,7 +533,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 sm: disableMiniSidebar ? 'none' : 'block',
                 md: 'none',
               },
-              mr: disableMiniSidebar ? 0 : 2,
+              mr: disableMiniSidebar ? 0 : 3,
             }}
           >
             {getMenuIcon(isMobileNavigationExpanded)}
@@ -543,7 +544,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 xs: 'none',
                 md: 'block',
               },
-              mr: disableMiniSidebar ? 0 : 2,
+              mr: disableMiniSidebar ? 0 : 3,
             }}
           >
             {getMenuIcon(isDesktopNavigationExpanded)}

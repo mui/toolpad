@@ -18,7 +18,33 @@ const CredentialsProviderTemplate = `Credentials({
   },
 }),`;
 
-const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `${provider}({
+const checkEnvironmentVariables = (providers: SupportedAuthProvider[]) => `
+const missingVars: string[] = [];
+${providers
+  .filter((p) => p !== 'credentials')
+  .map(
+    (provider) => `
+if (!process.env.${kebabToConstant(provider)}_CLIENT_ID) {
+  missingVars.push('${kebabToConstant(provider)}_CLIENT_ID');
+}
+if (!process.env.${kebabToConstant(provider)}_CLIENT_SECRET) {
+  missingVars.push('${kebabToConstant(provider)}_CLIENT_SECRET');
+}`,
+  )
+  .join('\n')}
+
+if (missingVars.length > 0) {
+  const message = \`Authentication is configured but the following environment variables are missing: \${missingVars.join(', ')}\`;
+  
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(message);
+  } else {
+    console.warn(message);
+  }
+}`;
+
+const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `
+${provider}({
   clientId: process.env.${kebabToConstant(provider)}_CLIENT_ID,
   clientSecret: process.env.${kebabToConstant(provider)}_CLIENT_SECRET,
 }),`;
@@ -40,6 +66,8 @@ const providers: Provider[] = [
       })
       .join('\n')}
 ];
+
+${checkEnvironmentVariables(providers)}
 
 export const providerMap = providers.map((provider) => {
   if (typeof provider === 'function') {

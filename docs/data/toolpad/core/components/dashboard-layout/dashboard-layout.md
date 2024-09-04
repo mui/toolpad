@@ -95,11 +95,11 @@ This feature is built on top of the [path-to-regexp](https://www.npmjs.com/packa
 
 {{"demo": "DashboardLayoutPattern.js", "height": 400, "iframe": true}}
 
-### Mini variant sidebar
+### Disabling collapsible sidebar
 
-In this variant of the layout sidebar it defaults to a compact mini-drawer with icons only in desktop and tablet viewports that can be expanded/collapsed to show more details.
+The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop and tablet viewports. This behavior can be disabled with the `disableMiniSidebar` prop.
 
-{{"demo": "DashboardLayoutMiniSidebar.js", "height": 400, "iframe": true}}
+{{"demo": "DashboardLayoutNoMiniSidebar.js", "height": 400, "iframe": true}}
 
 ## Account
 

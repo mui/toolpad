@@ -1,7 +1,7 @@
 {
   "props": {
     "children": { "type": { "name": "node" }, "required": true },
-    "enableMiniSidebar": { "type": { "name": "bool" }, "default": "false" },
+    "disableMiniSidebar": { "type": { "name": "bool" }, "default": "false" },
     "slotProps": {
       "type": {
         "name": "shape",

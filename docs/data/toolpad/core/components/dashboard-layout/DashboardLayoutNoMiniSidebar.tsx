@@ -67,7 +67,7 @@ interface DemoProps {
   window?: () => Window;
 }
 
-export default function DashboardLayoutMiniSidebar(props: DemoProps) {
+export default function DashboardLayoutNoMiniSidebar(props: DemoProps) {
   const { window } = props;
 
   const [pathname, setPathname] = React.useState('/dashboard');
@@ -90,7 +90,7 @@ export default function DashboardLayoutMiniSidebar(props: DemoProps) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout enableMiniSidebar>
+      <DashboardLayout disableMiniSidebar>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>

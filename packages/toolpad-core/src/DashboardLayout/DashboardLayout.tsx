@@ -275,7 +275,7 @@ function DashboardSidebarSubNavigation({
                   },
                 }}
               />
-              {navigationItem.action ?? null}
+              {navigationItem.action && !isMini && isFullyExpanded ? navigationItem.action : null}
               {navigationItem.children && !isMini && isFullyExpanded
                 ? nestedNavigationCollapseIcon
                 : null}
@@ -515,6 +515,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </Box>
           <Box
             sx={{
+              ml: { xs: undefined, sm: -1.5 },
               position: { xs: 'absolute', md: 'static' },
               left: { xs: '50%', md: 'auto' },
               transform: { xs: 'translateX(-50%)', md: 'none' },
@@ -615,10 +616,10 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * Whether the sidebar should be collapsible to a mini variant in desktop and tablet viewports.
+   * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
    * @default false
    */
-  enableMiniSidebar: PropTypes.bool,
+  disableMiniSidebar: PropTypes.bool,
   /**
    * The props used for each slot inside.
    * @default {}

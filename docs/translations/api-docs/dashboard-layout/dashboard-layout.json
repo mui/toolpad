@@ -2,8 +2,8 @@
   "componentDescription": "",
   "propDescriptions": {
     "children": { "description": "The content of the dashboard." },
-    "enableMiniSidebar": {
-      "description": "Whether the sidebar should be collapsible to a mini variant in desktop and tablet viewports."
+    "disableMiniSidebar": {
+      "description": "Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports."
     },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." }

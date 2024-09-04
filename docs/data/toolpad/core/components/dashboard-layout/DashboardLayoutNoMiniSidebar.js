@@ -63,7 +63,7 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-function DashboardLayoutMiniSidebar(props) {
+function DashboardLayoutNoMiniSidebar(props) {
   const { window } = props;
 
   const [pathname, setPathname] = React.useState('/dashboard');
@@ -86,14 +86,14 @@ function DashboardLayoutMiniSidebar(props) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout enableMiniSidebar>
+      <DashboardLayout disableMiniSidebar>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
   );
 }
 
-DashboardLayoutMiniSidebar.propTypes = {
+DashboardLayoutNoMiniSidebar.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -101,4 +101,4 @@ DashboardLayoutMiniSidebar.propTypes = {
   window: PropTypes.func,
 };
 
-export default DashboardLayoutMiniSidebar;
+export default DashboardLayoutNoMiniSidebar;

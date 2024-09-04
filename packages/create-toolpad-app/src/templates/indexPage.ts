@@ -34,12 +34,10 @@ import Typography from '@mui/material/Typography';`;
 export default ${isAsync}function HomePage() {
   ${sessionHandling}
 
-  return (
-    <main>
+  return (    
       <Typography>
         ${welcomeMessage}
       </Typography>
-    </main>
   );
 }${requireAuth}
 `;

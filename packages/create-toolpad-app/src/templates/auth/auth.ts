@@ -34,12 +34,12 @@ if (!process.env.${kebabToConstant(provider)}_CLIENT_SECRET) {
   .join('\n')}
 
 if (missingVars.length > 0) {
-  const message = \`Authentication is configured but the following environment variables are missing: \${missingVars.join(', ')}\`;
+  const baseMessage = 'Authentication is configured but the following environment variables are missing:';
   
   if (process.env.NODE_ENV === 'production') {
-    throw new Error(message);
+    throw new Error(\`error: \${baseMessage} \${missingVars.join(', ')}\`);
   } else {
-    console.warn(message);
+    console.warn(\`\\u001b[33mwarn:\\u001b[0m \${baseMessage} \\u001b[31m\${missingVars.join(', ')}\\u001b[0m\`);
   }
 }`;
 

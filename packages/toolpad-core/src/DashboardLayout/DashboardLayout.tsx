@@ -420,8 +420,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const handleNavigationLinkClick = React.useCallback(() => {
     selectedItemIdRef.current = '';
-    setIsNavigationExpanded(false);
-  }, [setIsNavigationExpanded]);
+    setIsMobileNavigationExpanded(false);
+  }, [setIsMobileNavigationExpanded]);
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
   React.useMemo(() => {

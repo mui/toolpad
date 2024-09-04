@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, type Theme } from '@mui/material';
+import { styled, useTheme, type Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -64,6 +64,17 @@ const LogoContainer = styled('div')({
   },
 });
 
+const getDrawerWidthTransitionMixin = (isExpanded: boolean) => ({
+  transition: (theme: Theme) =>
+    theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: isExpanded
+        ? theme.transitions.duration.enteringScreen
+        : theme.transitions.duration.leavingScreen,
+    }),
+  overflowX: 'hidden',
+});
+
 const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: 8,
   '&.Mui-selected': {
@@ -97,6 +108,7 @@ interface DashboardSidebarSubNavigationProps {
   depth?: number;
   onLinkClick: () => void;
   isMini?: boolean;
+  isFullyExpanded?: boolean;
   selectedItemId: string;
 }
 
@@ -106,6 +118,7 @@ function DashboardSidebarSubNavigation({
   depth = 0,
   onLinkClick,
   isMini = false,
+  isFullyExpanded = false,
   selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
@@ -215,6 +228,7 @@ function DashboardSidebarSubNavigation({
             <NavigationListItemButton
               selected={isSelected && (!navigationItem.children || isMini)}
               sx={{
+                px: 1.4,
                 height: 48,
               }}
               {...(navigationItem.children && !isMini
@@ -231,6 +245,7 @@ function DashboardSidebarSubNavigation({
                 <ListItemIcon
                   sx={{
                     minWidth: listItemIconSize,
+                    mr: 1.2,
                   }}
                 >
                   {navigationItem.icon ?? null}
@@ -251,19 +266,19 @@ function DashboardSidebarSubNavigation({
                   ) : null}
                 </ListItemIcon>
               ) : null}
-              {!isMini ? (
-                <ListItemText
-                  primary={navigationItemTitle}
-                  sx={{
-                    '& .MuiTypography-root': {
-                      fontWeight: '500',
-                    },
-                    zIndex: 1,
-                  }}
-                />
-              ) : null}
+              <ListItemText
+                primary={navigationItemTitle}
+                sx={{
+                  zIndex: 1,
+                  '& .MuiTypography-root': {
+                    fontWeight: '500',
+                  },
+                }}
+              />
               {navigationItem.action ?? null}
-              {navigationItem.children && !isMini ? nestedNavigationCollapseIcon : null}
+              {navigationItem.children && !isMini && isFullyExpanded
+                ? nestedNavigationCollapseIcon
+                : null}
             </NavigationListItemButton>
           </ListItem>
         );
@@ -347,6 +362,8 @@ export interface DashboardLayoutProps {
 function DashboardLayout(props: DashboardLayoutProps) {
   const { children, disableMiniSidebar = false, slots, slotProps } = props;
 
+  const theme = useTheme();
+
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
   const appWindow = React.useContext(WindowContext);
@@ -355,7 +372,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] = React.useState(true);
   const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] = React.useState(false);
 
-  const isDesktopViewport = useMediaQuery((theme: Theme) => theme.breakpoints.up('md'));
+  const isDesktopViewport = useMediaQuery(theme.breakpoints.up('md'));
 
   const isNavigationExpanded = isDesktopViewport
     ? isDesktopNavigationExpanded
@@ -371,6 +388,22 @@ function DashboardLayout(props: DashboardLayoutProps) {
     },
     [isDesktopViewport],
   );
+
+  const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
+    React.useState(!isNavigationExpanded);
+
+  // eslint-disable-next-line consistent-return
+  React.useEffect(() => {
+    if (isNavigationExpanded) {
+      const drawerWidthTransitionTimeout = setTimeout(() => {
+        setIsNavigationFullyExpanded(isNavigationExpanded);
+      }, theme.transitions.duration.enteringScreen);
+
+      return () => clearTimeout(drawerWidthTransitionTimeout);
+    }
+
+    setIsNavigationFullyExpanded(false);
+  }, [isNavigationExpanded, theme]);
 
   const selectedItemIdRef = React.useRef('');
 
@@ -414,29 +447,33 @@ function DashboardLayout(props: DashboardLayoutProps) {
             subNavigation={navigation}
             onLinkClick={handleNavigationLinkClick}
             isMini={isMini}
+            isFullyExpanded={isNavigationFullyExpanded}
             selectedItemId={selectedItemIdRef.current}
           />
         </Box>
       </React.Fragment>
     ),
-    [handleNavigationLinkClick, navigation],
+    [handleNavigationLinkClick, isNavigationFullyExpanded, navigation],
   );
 
-  const getDrawerSharedSx = React.useCallback((isMini: boolean) => {
-    const drawerWidth = isMini ? 74 : 320;
+  const getDrawerSharedSx = React.useCallback(
+    (isMini: boolean) => {
+      const drawerWidth = isMini ? 64 : 320;
 
-    return {
-      width: drawerWidth,
-      flexShrink: 0,
-      overflowX: 'hidden',
-      [`& .MuiDrawer-paper`]: {
+      return {
         width: drawerWidth,
-        boxSizing: 'border-box',
-        backgroundImage: 'none',
-        overflowX: 'hidden',
-      },
-    };
-  }, []);
+        flexShrink: 0,
+        ...getDrawerWidthTransitionMixin(isNavigationExpanded),
+        [`& .MuiDrawer-paper`]: {
+          width: drawerWidth,
+          boxSizing: 'border-box',
+          backgroundImage: 'none',
+          ...getDrawerWidthTransitionMixin(isNavigationExpanded),
+        },
+      };
+    },
+    [isNavigationExpanded],
+  );
 
   const expandMenuActionText = 'Expand';
   const collapseMenuActionText = 'Collapse';
@@ -468,7 +505,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   onClick={toggleNavigationExpanded}
                   edge="start"
                   sx={{
-                    ml: -1,
+                    ml: { xs: -0.75, sm: -1.5 },
                   }}
                 >
                   {isNavigationExpanded ? <MenuOpenIcon /> : <MenuIcon />}
@@ -489,7 +526,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 <Typography
                   variant="h6"
                   sx={{
-                    color: (theme) => (theme.vars ?? theme).palette.primary.main,
+                    color: (theme.vars ?? theme).palette.primary.main,
                     fontWeight: '700',
                     ml: 0.5,
                     whiteSpace: 'nowrap',

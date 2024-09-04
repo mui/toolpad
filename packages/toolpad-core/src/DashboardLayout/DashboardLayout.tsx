@@ -118,7 +118,7 @@ function DashboardSidebarSubNavigation({
   depth = 0,
   onLinkClick,
   isMini = false,
-  isFullyExpanded = false,
+  isFullyExpanded = true,
   selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
@@ -372,31 +372,31 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] = React.useState(true);
   const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] = React.useState(false);
 
-  const isDesktopViewport = useMediaQuery(theme.breakpoints.up('md'));
+  const isMobileViewport = useMediaQuery(theme.breakpoints.down('md'));
 
-  const isNavigationExpanded = isDesktopViewport
-    ? isDesktopNavigationExpanded
-    : isMobileNavigationExpanded;
+  const isNavigationExpanded = isMobileViewport
+    ? isMobileNavigationExpanded
+    : isDesktopNavigationExpanded;
 
   const setIsNavigationExpanded = React.useCallback(
     (newExpanded: boolean) => {
-      if (isDesktopViewport) {
-        setIsDesktopNavigationExpanded(newExpanded);
-      } else {
+      if (isMobileViewport) {
         setIsMobileNavigationExpanded(newExpanded);
+      } else {
+        setIsDesktopNavigationExpanded(newExpanded);
       }
     },
-    [isDesktopViewport],
+    [isMobileViewport],
   );
 
   const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
-    React.useState(!isNavigationExpanded);
+    React.useState(isNavigationExpanded);
 
   // eslint-disable-next-line consistent-return
   React.useEffect(() => {
     if (isNavigationExpanded) {
       const drawerWidthTransitionTimeout = setTimeout(() => {
-        setIsNavigationFullyExpanded(isNavigationExpanded);
+        setIsNavigationFullyExpanded(true);
       }, theme.transitions.duration.enteringScreen);
 
       return () => clearTimeout(drawerWidthTransitionTimeout);
@@ -431,6 +431,35 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const isDesktopMini = !disableMiniSidebar && !isDesktopNavigationExpanded;
   const isMobileMini = !disableMiniSidebar && !isMobileNavigationExpanded;
+
+  const getMenuIcon = React.useCallback(
+    (isExpanded: boolean) => {
+      const expandMenuActionText = 'Expand';
+      const collapseMenuActionText = 'Collapse';
+
+      return (
+        <Tooltip
+          title={`${isExpanded ? collapseMenuActionText : expandMenuActionText} menu`}
+          placement="right"
+          enterDelay={1000}
+        >
+          <div>
+            <IconButton
+              aria-label={`${isExpanded ? collapseMenuActionText : expandMenuActionText} navigation menu`}
+              onClick={toggleNavigationExpanded}
+              edge="start"
+              sx={{
+                ml: { xs: -0.75, sm: -1.5 },
+              }}
+            >
+              {isExpanded ? <MenuOpenIcon /> : <MenuIcon />}
+            </IconButton>
+          </div>
+        </Tooltip>
+      );
+    },
+    [toggleNavigationExpanded],
+  );
 
   const getDrawerContent = React.useCallback(
     (isMini: boolean) => (
@@ -475,9 +504,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [isNavigationExpanded],
   );
 
-  const expandMenuActionText = 'Expand';
-  const collapseMenuActionText = 'Collapse';
-
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
 
@@ -490,28 +516,37 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
           <Box
             sx={{
-              display: { md: disableMiniSidebar ? 'none' : 'block' },
+              display: {
+                xs: 'block',
+                sm: disableMiniSidebar ? 'block' : 'none',
+                md: 'none',
+              },
+            }}
+          >
+            {getMenuIcon(isMobileNavigationExpanded)}
+          </Box>
+          <Box
+            sx={{
+              display: {
+                xs: 'none',
+                sm: disableMiniSidebar ? 'none' : 'block',
+                md: 'none',
+              },
               mr: disableMiniSidebar ? 0 : 2,
             }}
           >
-            <Tooltip
-              title={`${isNavigationExpanded ? collapseMenuActionText : expandMenuActionText} menu`}
-              placement="right"
-              enterDelay={1000}
-            >
-              <div>
-                <IconButton
-                  aria-label={`${isNavigationExpanded ? collapseMenuActionText : expandMenuActionText} navigation menu`}
-                  onClick={toggleNavigationExpanded}
-                  edge="start"
-                  sx={{
-                    ml: { xs: -0.75, sm: -1.5 },
-                  }}
-                >
-                  {isNavigationExpanded ? <MenuOpenIcon /> : <MenuIcon />}
-                </IconButton>
-              </div>
-            </Tooltip>
+            {getMenuIcon(isMobileNavigationExpanded)}
+          </Box>
+          <Box
+            sx={{
+              display: {
+                xs: 'none',
+                md: 'block',
+              },
+              mr: disableMiniSidebar ? 0 : 2,
+            }}
+          >
+            {getMenuIcon(isDesktopNavigationExpanded)}
           </Box>
           <Box
             sx={{

@@ -166,7 +166,7 @@ function DashboardSidebarSubNavigation({
                 fontSize: 12,
                 fontWeight: '700',
                 height: 40,
-                px: 3,
+                px: 2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -185,7 +185,7 @@ function DashboardSidebarSubNavigation({
               key={`divider-${depth}-${navigationItemIndex}`}
               sx={{
                 borderBottomWidth: 2,
-                mx: 2,
+                mx: 1,
                 mt: 1,
                 mb: nextItem?.kind === 'header' && !isMini ? 0 : 1,
               }}

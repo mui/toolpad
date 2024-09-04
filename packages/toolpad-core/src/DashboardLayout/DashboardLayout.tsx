@@ -582,7 +582,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <Drawer
         container={appWindow?.document.body}
         variant="temporary"
-        open={isNavigationExpanded}
+        open={isMobileNavigationExpanded}
         onClose={handleSetNavigationExpanded(false)}
         ModalProps={{
           keepMounted: true, // Better open performance on mobile.

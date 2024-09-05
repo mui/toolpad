@@ -9,19 +9,15 @@ import tsConfig from './templates/tsConfig';
 import readme from './templates/readme';
 import gitignore from './templates/gitignore';
 import ordersPage from './templates/ordersPage';
+import packageJson from './templates/packageJson';
+import indexPage from './templates/indexPage';
 
 // App router specific files
-import packageJsonApp from './templates/packageJson';
-import rootLayout from './templates/rootLayout';
-import rootPage from './templates/rootPage';
-import NavigateButton from './templates/navigateButton';
-import dashboardLayout from './templates/dashboardLayout';
-import dashboardPage from './templates/dashboardPage';
+import rootLayout from './templates/nextjs-app/rootLayout';
+import NavigateButton from './templates/nextjs-app/navigateButton';
+import dashboardLayout from './templates/nextjs-app/dashboardLayout';
 
 // Pages router specific files
-import packageJsonPages from './templates/nextjs-pages/packageJson';
-import indexPage from './templates/nextjs-pages/indexPage';
-
 import app from './templates/nextjs-pages/app';
 import document from './templates/nextjs-pages/document';
 
@@ -29,17 +25,12 @@ import document from './templates/nextjs-pages/document';
 import auth from './templates/auth/auth';
 import envLocal from './templates/auth/envLocal';
 import middleware from './templates/auth/middleware';
+import routeHandler from './templates/auth/route';
 
 // Auth files for app router
-import routeHandler from './templates/auth/nextjs-app/route';
 import signInPage from './templates/auth/nextjs-app/signInPage';
-import packageJsonAuthApp from './templates/auth/nextjs-app/packageJson';
-import dashboardPageAuthApp from './templates/auth/nextjs-app/dashboardPage';
-import rootLayoutAuthApp from './templates/auth/nextjs-app/rootLayout';
 
 // Auth files for pages router
-import packageJsonAuthPages from './templates/auth/nextjs-pages/packageJson';
-import appAuthPages from './templates/auth/nextjs-pages/app';
 import signInPagePagesRouter from './templates/auth/nextjs-pages/signIn';
 
 import { SupportedRouter } from './types';
@@ -67,29 +58,36 @@ export default function generateProject(
     ['tsconfig.json', { content: tsConfig }],
     ['README.md', { content: readme }],
     ['.gitignore', { content: gitignore }],
+    [
+      'package.json',
+      {
+        content: JSON.stringify(
+          packageJson(options.name, 'core', options.router, options.auth, options.coreVersion),
+        ),
+      },
+    ],
   ]);
+  const indexPageContent = indexPage(options.auth, options.router);
   const hasCredentialsProvider = options.authProviders.includes('credentials');
 
   switch (options.router) {
     case 'nextjs-pages': {
-      const packageJsonPagesContent = packageJsonPages(options.name, options.coreVersion);
       const nextJsPagesRouterStarter = new Map([
-        ['package.json', { content: JSON.stringify(packageJsonPagesContent, null, 2) }],
-        ['pages/index.tsx', { content: indexPage }],
+        ['pages/index.tsx', { content: indexPageContent }],
         ['pages/orders/index.tsx', { content: ordersPage }],
-        ['pages/_app.tsx', { content: app }],
         ['pages/_document.tsx', { content: document }],
+        ['pages/_app.tsx', { content: app(options.auth) }],
       ]);
       if (options.auth) {
-        const packageJsonAuthPagesContent = packageJsonAuthPages(options.name, options.coreVersion);
         const authFiles = new Map([
           ['auth.ts', { content: auth(options.authProviders) }],
           ['.env.local', { content: envLocal(options.authProviders) }],
           ['middleware.ts', { content: middleware }],
+          // next-auth v5 does not provide an API route, so this file must be in the app router
+          // even if the rest of the app is using pages router
+          // https://authjs.dev/getting-started/installation#configure
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
           ['pages/auth/signin.tsx', { content: signInPagePagesRouter(hasCredentialsProvider) }],
-          ['package.json', { content: JSON.stringify(packageJsonAuthPagesContent, null, 2) }],
-          ['pages/_app.tsx', { content: appAuthPages }],
         ]);
         return new Map([...files, ...nextJsPagesRouterStarter, ...authFiles]);
       }
@@ -97,32 +95,21 @@ export default function generateProject(
     }
     case 'nextjs-app':
     default: {
-      const packageJsonAppContent = packageJsonApp(options.name, options.coreVersion);
       const nextJsAppRouterStarter = new Map([
-        ['package.json', { content: JSON.stringify(packageJsonAppContent, null, 2) }],
         ['app/(dashboard)/layout.tsx', { content: dashboardLayout }],
-        ['app/layout.tsx', { content: rootLayout }],
-        ['app/page.tsx', { content: rootPage }],
+        ['app/layout.tsx', { content: rootLayout(options.auth) }],
         ['app/NavigateButton.tsx', { content: NavigateButton }],
-        ['app/(dashboard)/page/page.tsx', { content: dashboardPage }],
+        ['app/(dashboard)/page.tsx', { content: indexPageContent }],
         ['app/(dashboard)/orders/page.tsx', { content: ordersPage }],
       ]);
       if (options.auth) {
-        const packageJsonAuthAppContent = packageJsonAuthApp(options.name, options.coreVersion);
-
         const authFiles = new Map([
           ['auth.ts', { content: auth(options.authProviders) }],
           ['.env.local', { content: envLocal(options.authProviders) }],
           ['middleware.ts', { content: middleware }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
           ['app/auth/signin/page.tsx', { content: signInPage(hasCredentialsProvider) }],
-          ['package.json', { content: JSON.stringify(packageJsonAuthAppContent, null, 2) }],
-          ['app/(dashboard)/page.tsx', { content: dashboardPageAuthApp }],
-          ['app/layout.tsx', { content: rootLayoutAuthApp }],
         ]);
-
-        nextJsAppRouterStarter.delete('app/page.tsx');
-        nextJsAppRouterStarter.delete('app/(dashboard)/page/page.tsx');
 
         return new Map([...files, ...nextJsAppRouterStarter, ...authFiles]);
       }

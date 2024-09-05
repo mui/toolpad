@@ -6,7 +6,6 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { Navigation } from '@toolpad/core';
 import { SessionProvider, signIn, signOut } from 'next-auth/react';
 import { auth } from '../auth';
-import theme from '../theme';
 
 const NAVIGATION: Navigation = [
   {
@@ -26,7 +25,7 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: 'My Toolpad Core App',
+  title: 'My Toolpad Core Next.js App',
 };
 
 const AUTHENTICATION = {
@@ -46,7 +45,6 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               navigation={NAVIGATION}
               branding={BRANDING}
               session={session}
-              theme={theme}
               authentication={AUTHENTICATION}
             >
               {props.children}

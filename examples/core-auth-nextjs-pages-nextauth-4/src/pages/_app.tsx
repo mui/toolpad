@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -27,7 +27,6 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    segment: '',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
@@ -39,7 +38,7 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: 'My Toolpad Core Next.js Pages App',
+  title: 'My Toolpad Core Next.js Pages next-auth 4 App',
 };
 
 const AUTHENTICATION = {
@@ -48,18 +47,19 @@ const AUTHENTICATION = {
 };
 
 function getDefaultLayout(page: React.ReactElement) {
-  return (
-    <DashboardLayout>
-      <PageContainer>{page}</PageContainer>
-    </DashboardLayout>
-  );
+  return <DashboardLayout>{page}</DashboardLayout>;
 }
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { status } = useSession();
+  const router = useRouter();
 
   if (status === 'loading') {
     return <LinearProgress />;
+  }
+
+  if (status === 'unauthenticated') {
+    router.push('/auth/signin');
   }
 
   return children;

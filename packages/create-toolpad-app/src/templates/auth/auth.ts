@@ -24,7 +24,32 @@ const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `${kebabToPas
 clientId: process.env.${kebabToConstant(provider)}_CLIENT_ID,
 clientSecret: process.env.${kebabToConstant(provider)}_CLIENT_SECRET,
 ${requiresIssuer(provider) ? `issuer: process.env.${kebabToConstant(provider)}_ISSUER,\n` : ''}${requiresTenantId(provider) ? `tenantId: process.env.${kebabToConstant(provider)}_TENANT_ID,` : ''}
-}),`;
+})`;
+
+const checkEnvironmentVariables = (providers: SupportedAuthProvider[]) => `
+const missingVars: string[] = [];
+${providers
+  .filter((p) => p !== 'credentials')
+  .map(
+    (provider) => `
+if (!process.env.${kebabToConstant(provider)}_CLIENT_ID) {
+  missingVars.push('${kebabToConstant(provider)}_CLIENT_ID');
+}
+if (!process.env.${kebabToConstant(provider)}_CLIENT_SECRET) {
+  missingVars.push('${kebabToConstant(provider)}_CLIENT_SECRET');
+}`,
+  )
+  .join('\n')}
+
+if (missingVars.length > 0) {
+  const baseMessage = 'Authentication is configured but the following environment variables are missing:';
+  
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(\`error: \${baseMessage} \${missingVars.join(', ')}\`);
+  } else {
+    console.warn(\`\\u001b[33mwarn:\\u001b[0m \${baseMessage} \\u001b[31m\${missingVars.join(', ')}\\u001b[0m\`);
+  }
+}`;
 
 const auth: ProvidersTemplate = (providers) => {
   return `import NextAuth from 'next-auth';
@@ -43,6 +68,8 @@ const providers: Provider[] = [
       })
       .join('\n')}
 ];
+
+${checkEnvironmentVariables(providers)}
 
 export const providerMap = providers.map((provider) => {
   if (typeof provider === 'function') {

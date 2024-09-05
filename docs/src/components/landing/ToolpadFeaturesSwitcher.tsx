@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
+import { Link } from '@mui/docs/Link';
 import AutoAwesomeMosaic from '@mui/icons-material/AutoAwesomeMosaic';
 import KeyboardArrowRightRounded from '@mui/icons-material/KeyboardArrowRightRounded';
 import AutoAwesomeMotion from '@mui/icons-material/AutoAwesomeMotion';

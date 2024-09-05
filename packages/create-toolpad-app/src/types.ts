@@ -10,16 +10,17 @@ export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';
 export type PackageManager = 'npm' | 'pnpm' | 'yarn';
 type ProjectType = 'core' | 'studio';
 
-export type ProviderTemplate = (provider: SupportedAuthProvider) => string;
+export interface GenerateProjectOptions {
+  name: string;
+  absolutePath: string;
+  auth?: boolean;
+  authProviders?: SupportedAuthProvider[];
+  router?: SupportedRouter;
+  coreVersion?: string;
+  projectType?: ProjectType;
+  packageManager?: PackageManager;
+}
 
-export type ProvidersTemplate = (providers: SupportedAuthProvider[]) => string;
+export type Template = (options: GenerateProjectOptions) => string;
 
-export type BooleanTemplate = (value: boolean) => string;
-
-export type PackageJsonTemplate = (
-  appName: string,
-  projectType: ProjectType,
-  routerType?: SupportedRouter,
-  authOption?: boolean,
-  coreVersion?: string,
-) => PackageJson;
+export type PackageJsonTemplate = (options: GenerateProjectOptions) => PackageJson;

@@ -1,4 +1,9 @@
-const app = (authEnabled: boolean) => `import * as React from 'react';
+import type { Template } from '../../types';
+
+const app: Template = (options) => {
+  const authEnabled = options.auth;
+
+  return `import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -128,5 +133,6 @@ export default function App(props: AppPropsWithLayout) {
   );
 }
 `;
+};
 
 export default app;

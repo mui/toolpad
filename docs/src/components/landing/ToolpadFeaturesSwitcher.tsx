@@ -62,7 +62,7 @@ function ComponentItem({
           </Typography>
         )}
         {link && (
-          <Link href={link.toString()} underline="hover" variant="body2" target="_blank">
+          <Link href={link.toString()} underline="hover" variant="body2">
             View the docs
             <KeyboardArrowRightRounded fontSize="small" />
           </Link>

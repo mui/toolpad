@@ -549,6 +549,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               {getMenuIcon(isDesktopNavigationExpanded)}
             </Box>
           )}
+
           <Box
             sx={{
               ml: { xs: undefined, sm: -1.5 },
@@ -618,6 +619,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           {getDrawerContent(isDesktopMini)}
         </Drawer>
       )}
+
       <Box
         component="main"
         sx={{

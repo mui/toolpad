@@ -90,7 +90,7 @@ export default function DashboardLayoutNoMiniSidebar(props: DemoProps) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout disableMiniSidebar>
+      <DashboardLayout disableCollapsibleSidebar>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>

@@ -97,7 +97,7 @@ This feature is built on top of the [path-to-regexp](https://www.npmjs.com/packa
 
 ### Disabling collapsible sidebar
 
-The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop and tablet viewports. This behavior can be disabled with the `disableMiniSidebar` prop.
+The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop and tablet viewports. This behavior can be disabled with the `disableCollapsibleSidebar` prop.
 
 {{"demo": "DashboardLayoutNoMiniSidebar.js", "height": 400, "iframe": true}}
 

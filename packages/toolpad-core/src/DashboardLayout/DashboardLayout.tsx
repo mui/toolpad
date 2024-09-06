@@ -334,7 +334,7 @@ export interface DashboardLayoutProps {
    * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
    * @default false
    */
-  disableMiniSidebar?: boolean;
+  disableCollapsibleSidebar?: boolean;
   /**
    * The components used for each slot inside.
    * @default {}
@@ -361,7 +361,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, disableMiniSidebar = false, slots, slotProps } = props;
+  const { children, disableCollapsibleSidebar = false, slots, slotProps } = props;
 
   const theme = useTheme();
 
@@ -430,8 +430,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
-  const isDesktopMini = !disableMiniSidebar && !isDesktopNavigationExpanded;
-  const isMobileMini = !disableMiniSidebar && !isMobileNavigationExpanded;
+  const isDesktopMini = !disableCollapsibleSidebar && !isDesktopNavigationExpanded;
+  const isMobileMini = !disableCollapsibleSidebar && !isMobileNavigationExpanded;
 
   const getMenuIcon = React.useCallback(
     (isExpanded: boolean) => {
@@ -515,40 +515,40 @@ function DashboardLayout(props: DashboardLayoutProps) {
           // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
         }
         <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
-          <Box
-            sx={{
-              display: {
-                xs: 'block',
-                sm: disableMiniSidebar ? 'block' : 'none',
-                md: 'none',
-              },
-            }}
-          >
-            {getMenuIcon(isMobileNavigationExpanded)}
-          </Box>
-          <Box
-            sx={{
-              display: {
-                xs: 'none',
-                sm: disableMiniSidebar ? 'none' : 'block',
-                md: 'none',
-              },
-              mr: disableMiniSidebar ? 0 : 3,
-            }}
-          >
-            {getMenuIcon(isMobileNavigationExpanded)}
-          </Box>
-          <Box
-            sx={{
-              display: {
-                xs: 'none',
-                md: 'block',
-              },
-              mr: disableMiniSidebar ? 0 : 3,
-            }}
-          >
-            {getMenuIcon(isDesktopNavigationExpanded)}
-          </Box>
+          {isMobileViewport ? (
+            <React.Fragment>
+              <Box
+                sx={{
+                  display: {
+                    xs: 'block',
+                    sm: disableCollapsibleSidebar ? 'block' : 'none',
+                  },
+                }}
+              >
+                {getMenuIcon(isMobileNavigationExpanded)}
+              </Box>
+              <Box
+                sx={{
+                  display: {
+                    xs: 'none',
+                    sm: disableCollapsibleSidebar ? 'none' : 'block',
+                  },
+                  mr: disableCollapsibleSidebar ? 0 : 3,
+                }}
+              >
+                {getMenuIcon(isMobileNavigationExpanded)}
+              </Box>
+            </React.Fragment>
+          ) : (
+            <Box
+              sx={{
+                display: disableCollapsibleSidebar ? 'none' : 'block',
+                mr: disableCollapsibleSidebar ? 0 : 3,
+              }}
+            >
+              {getMenuIcon(isDesktopNavigationExpanded)}
+            </Box>
+          )}
           <Box
             sx={{
               ml: { xs: undefined, sm: -1.5 },
@@ -580,57 +580,51 @@ function DashboardLayout(props: DashboardLayoutProps) {
           <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
         </Toolbar>
       </AppBar>
-      <Drawer
-        container={appWindow?.document.body}
-        variant="temporary"
-        open={isMobileNavigationExpanded}
-        onClose={handleSetNavigationExpanded(false)}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
-        sx={{
-          display: {
-            xs: 'block',
-            sm: disableMiniSidebar ? 'block' : 'none',
-            md: 'none',
-          },
-          ...getDrawerSharedSx(isMobileMini),
-        }}
-      >
-        {getDrawerContent(isMobileMini)}
-      </Drawer>
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: {
-            xs: 'none',
-            sm: disableMiniSidebar ? 'none' : 'block',
-            md: 'none',
-          },
-          ...getDrawerSharedSx(isMobileMini),
-        }}
-      >
-        {getDrawerContent(isMobileMini)}
-      </Drawer>
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: {
-            xs: 'none',
-            md: 'block',
-          },
-          ...getDrawerSharedSx(isDesktopMini),
-        }}
-      >
-        {getDrawerContent(isDesktopMini)}
-      </Drawer>
+      {isMobileViewport ? (
+        <React.Fragment>
+          <Drawer
+            container={appWindow?.document.body}
+            variant="temporary"
+            open={isMobileNavigationExpanded}
+            onClose={handleSetNavigationExpanded(false)}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+            sx={{
+              display: {
+                xs: 'block',
+                sm: disableCollapsibleSidebar ? 'block' : 'none',
+              },
+              ...getDrawerSharedSx(isMobileMini),
+            }}
+          >
+            {getDrawerContent(isMobileMini)}
+          </Drawer>
+          <Drawer
+            variant="permanent"
+            sx={{
+              display: {
+                xs: 'none',
+                sm: disableCollapsibleSidebar ? 'none' : 'block',
+              },
+              ...getDrawerSharedSx(isMobileMini),
+            }}
+          >
+            {getDrawerContent(isMobileMini)}
+          </Drawer>
+        </React.Fragment>
+      ) : (
+        <Drawer variant="permanent" sx={getDrawerSharedSx(isDesktopMini)}>
+          {getDrawerContent(isDesktopMini)}
+        </Drawer>
+      )}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
           minWidth: {
-            xs: disableMiniSidebar && isNavigationExpanded ? '100vw' : 'auto',
+            xs: disableCollapsibleSidebar && isNavigationExpanded ? '100vw' : 'auto',
             md: 'auto',
           },
         }}
@@ -655,7 +649,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
    * @default false
    */
-  disableMiniSidebar: PropTypes.bool,
+  disableCollapsibleSidebar: PropTypes.bool,
   /**
    * The props used for each slot inside.
    * @default {}

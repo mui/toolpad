@@ -194,7 +194,7 @@ importers:
         version: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-b8a7b48-20240830(eslint@8.57.0)
+        version: 0.0.0-experimental-8d8bd53-20240905(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -654,10 +654,10 @@ importers:
         version: 2.0.5(playwright@1.46.1)(typescript@5.5.4)(vitest@2.0.5)
       next:
         specifier: ^14.2.7
-        version: 14.2.7(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.7(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.7(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 0.9.13(next@14.2.7(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       playwright:
         specifier: ^1.46.1
         version: 1.46.1
@@ -1307,7 +1307,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       recharts:
         specifier: alpha
-        version: 2.13.0-alpha.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 2.13.0-alpha.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
 packages:
 
@@ -5778,8 +5778,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-b8a7b48-20240830:
-    resolution: {integrity: sha512-5AMC4eCj3egh0l2MACmYR3gu1m8i9kDx5K2PNiwRvNTb92kurNS1YSMHJmfYhWx2o/ZKlPvYIZstXTi+ZIKOCA==}
+  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240905:
+    resolution: {integrity: sha512-iWgFnhAJcckBOF3FcQ5RdR9Q2NN6gmYpu+ALljft5pMmIJasZR3asshIUYadHG+46ZaZWoa+Rhk9ouIj/O8qIQ==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -8694,8 +8694,8 @@ packages:
   recharts-scale@0.4.5:
     resolution: {integrity: sha512-kivNFO+0OcUNu7jQquLXAxz1FIwZj8nrj+YkOKc5694NbjCvcT6aSZiIzNzd2Kul4o4rTto8QVR9lMNtxD4G1w==}
 
-  recharts@2.13.0-alpha.4:
-    resolution: {integrity: sha512-K9naL6F7pEcDYJE6yFQASSCQecSLPP0JagnvQ9hPtA/aHgsxsnIOjouLP5yrFZehxzfCkV5TEORr7/uNtSr7Qw==}
+  recharts@2.13.0-alpha.5:
+    resolution: {integrity: sha512-mm8ORfDusDhyWlrY/2NntUAsNeYukteplvRqKGkBEmqNPwqYq9GoEzaVsVDYj8bjGSKJynWGhjEO1NFcntl29g==}
     engines: {node: '>=14'}
     peerDependencies:
       react: ^16.0.0 || ^17.0.0 || ^18.0.0
@@ -15448,7 +15448,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-b8a7b48-20240830(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240905(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.3
@@ -17621,9 +17621,9 @@ snapshots:
     optionalDependencies:
       nodemailer: 6.9.14
 
-  next-router-mock@0.9.13(next@14.2.7(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  next-router-mock@0.9.13(next@14.2.7(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
-      next: 14.2.7(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 14.2.7(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
   next@14.2.7(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
@@ -17637,6 +17637,33 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       styled-jsx: 5.1.1(@babel/core@7.25.2)(babel-plugin-macros@3.1.0)(react@18.3.1)
+    optionalDependencies:
+      '@next/swc-darwin-arm64': 14.2.7
+      '@next/swc-darwin-x64': 14.2.7
+      '@next/swc-linux-arm64-gnu': 14.2.7
+      '@next/swc-linux-arm64-musl': 14.2.7
+      '@next/swc-linux-x64-gnu': 14.2.7
+      '@next/swc-linux-x64-musl': 14.2.7
+      '@next/swc-win32-arm64-msvc': 14.2.7
+      '@next/swc-win32-ia32-msvc': 14.2.7
+      '@next/swc-win32-x64-msvc': 14.2.7
+      '@opentelemetry/api': 1.9.0
+      '@playwright/test': 1.46.1
+    transitivePeerDependencies:
+      - '@babel/core'
+      - babel-plugin-macros
+
+  next@14.2.7(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@next/env': 14.2.7
+      '@swc/helpers': 0.5.5
+      busboy: 1.6.0
+      caniuse-lite: 1.0.30001655
+      graceful-fs: 4.2.11
+      postcss: 8.4.31
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      styled-jsx: 5.1.1(react@18.3.1)
     optionalDependencies:
       '@next/swc-darwin-arm64': 14.2.7
       '@next/swc-darwin-x64': 14.2.7
@@ -18784,7 +18811,7 @@ snapshots:
     dependencies:
       decimal.js-light: 2.5.1
 
-  recharts@2.13.0-alpha.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  recharts@2.13.0-alpha.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       clsx: 2.1.1
       eventemitter3: 4.0.7
@@ -19455,6 +19482,11 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.25.2
       babel-plugin-macros: 3.1.0
+
+  styled-jsx@5.1.1(react@18.3.1):
+    dependencies:
+      client-only: 0.0.1
+      react: 18.3.1
 
   stylis-plugin-rtl@2.1.1(stylis@4.3.4):
     dependencies:

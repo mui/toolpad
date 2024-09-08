@@ -271,8 +271,8 @@ importers:
         specifier: 7.25.0
         version: 7.25.0
       '@date-io/date-fns-jalali':
-        specifier: 3.0.0
-        version: 3.0.0(date-fns-jalali@2.29.3-0)
+        specifier: 3.1.1
+        version: 3.1.1(date-fns-jalali@2.29.3-0)
       '@docsearch/react':
         specifier: 3.6.1
         version: 3.6.1(@algolia/client-search@4.24.0)(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(search-insights@2.14.0)
@@ -2122,10 +2122,10 @@ packages:
   '@date-io/core@3.0.0':
     resolution: {integrity: sha512-S3j+IAQVBYNkQzchVVhX40eBkGDreBpScy9RXwTS5j2+k07+62pMVPisQ44Gq76Rqy5AOG/EZXCwBpY/jbemvA==}
 
-  '@date-io/date-fns-jalali@3.0.0':
-    resolution: {integrity: sha512-8ZQy7wSelouC4nunewGZhUUhKrqmX5v2GD9cUHYGrCaXHkn5PvBku/z8f42X+y4zASaoxZBrZnogUKbF5JfxyA==}
+  '@date-io/date-fns-jalali@3.1.1':
+    resolution: {integrity: sha512-VK0QmbelDLEqgGNYYn+8iHTdf91b28leg/vbR5dvYYcEjXsRW/zs5ZWUPtLq6M9vxbMY6fqiIkqt2o7FqhMmsw==}
     peerDependencies:
-      date-fns-jalali: ^2.13.0-0
+      date-fns-jalali: ^3.2.0-0
     peerDependenciesMeta:
       date-fns-jalali:
         optional: true
@@ -11248,7 +11248,7 @@ snapshots:
 
   '@date-io/core@3.0.0': {}
 
-  '@date-io/date-fns-jalali@3.0.0(date-fns-jalali@2.29.3-0)':
+  '@date-io/date-fns-jalali@3.1.1(date-fns-jalali@2.29.3-0)':
     dependencies:
       '@date-io/core': 3.0.0
     optionalDependencies:

@@ -687,11 +687,11 @@ importers:
         specifier: 11.13.0
         version: 11.13.0(@emotion/react@11.13.3(@types/react@18.3.5)(react@18.3.1))(@types/react@18.3.5)(react@18.3.1)
       '@googleapis/drive':
-        specifier: 8.11.1
-        version: 8.11.1(encoding@0.1.13)
+        specifier: 8.14.0
+        version: 8.14.0(encoding@0.1.13)
       '@googleapis/sheets':
-        specifier: 9.1.0
-        version: 9.1.0(encoding@0.1.13)
+        specifier: 9.3.1
+        version: 9.3.1(encoding@0.1.13)
       '@mui/icons-material':
         specifier: 6.0.2
         version: 6.0.2(@mui/material@6.0.2(@emotion/react@11.13.3(@types/react@18.3.5)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.5)(react@18.3.1))(@types/react@18.3.5)(react@18.3.1))(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.5)(react@18.3.1)
@@ -2549,16 +2549,12 @@ packages:
   '@floating-ui/utils@0.2.4':
     resolution: {integrity: sha512-dWO2pw8hhi+WrXq1YJy2yCuWoL20PddgGaqTgVe4cOS9Q6qklXCiA1tJEqX6BEwRNSCP84/afac9hd4MS+zEUA==}
 
-  '@googleapis/drive@8.11.1':
-    resolution: {integrity: sha512-tkkjD7/CjypS6esQ/YhP3kEh86F4pEKa3YgvNMCI4Jg/eZzhBTvLQw+TqEfT/C/BoCF6jw2sgBoJQ9h8Qm2oIg==}
+  '@googleapis/drive@8.14.0':
+    resolution: {integrity: sha512-AOokfpP6pCdcJXWA8khaCEgbGpWYavWTdAAhL4idbbf2VCQcJ2f7vPalAYNu6a4Sfj0Ly4Ehnd1xw9J9TixB1A==}
     engines: {node: '>=12.0.0'}
 
-  '@googleapis/sheets@9.1.0':
-    resolution: {integrity: sha512-P4ao9holdrrBGzPulP1kAhZvP9jE30kkxPAKJMPl86hlLR1gIJZa4N37+wPJEj8JMkrKL0ei2svP7sn5/XyUAQ==}
-    engines: {node: '>=12.0.0'}
-
-  '@googleapis/sheets@9.3.0':
-    resolution: {integrity: sha512-JfL3TWk//ZlVEWr73rrMuxQyQtAc4/mgvEUXu3o2jvAYzf5euzL25P3Yl12T67v5xJMm36fjdv/snuANGPQfGQ==}
+  '@googleapis/sheets@9.3.1':
+    resolution: {integrity: sha512-nPgzOiDs/FSFhE+dX2KfkmsmkXM3WfXYP06FoW8cXvHshwxHSI3FbXwe5XJYstDAWXP9YA7AMSvmwnuD4OAl2w==}
     engines: {node: '>=12.0.0'}
 
   '@humanwhocodes/config-array@0.11.14':
@@ -11575,21 +11571,14 @@ snapshots:
 
   '@floating-ui/utils@0.2.4': {}
 
-  '@googleapis/drive@8.11.1(encoding@0.1.13)':
+  '@googleapis/drive@8.14.0(encoding@0.1.13)':
     dependencies:
       googleapis-common: 7.2.0(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  '@googleapis/sheets@9.1.0(encoding@0.1.13)':
-    dependencies:
-      googleapis-common: 7.2.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-
-  '@googleapis/sheets@9.3.0(encoding@0.1.13)':
+  '@googleapis/sheets@9.3.1(encoding@0.1.13)':
     dependencies:
       googleapis-common: 7.2.0(encoding@0.1.13)
     transitivePeerDependencies:
@@ -12076,7 +12065,7 @@ snapshots:
 
   '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/20fa6b93c3afb4c5fa293aec299b1f9190e26e03(encoding@0.1.13)':
     dependencies:
-      '@googleapis/sheets': 9.3.0(encoding@0.1.13)
+      '@googleapis/sheets': 9.3.1(encoding@0.1.13)
       '@netlify/functions': 2.8.1
       '@slack/bolt': 3.21.1
       execa: 9.3.1

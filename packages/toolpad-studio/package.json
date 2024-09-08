@@ -142,7 +142,7 @@
     "vm-browserify": "1.1.2",
     "whatwg-url": "14.0.0",
     "ws": "8.18.0",
-    "yaml": "2.5.0",
+    "yaml": "2.5.1",
     "yaml-diff-patch": "2.0.0",
     "yargs": "17.7.2",
     "zod": "3.23.8",

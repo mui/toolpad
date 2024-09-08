@@ -194,7 +194,7 @@ importers:
         version: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-8d8bd53-20240904(eslint@8.57.0)
+        version: 0.0.0-experimental-8d8bd53-20240905(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -687,11 +687,11 @@ importers:
         specifier: 11.13.0
         version: 11.13.0(@emotion/react@11.13.3(@types/react@18.3.5)(react@18.3.1))(@types/react@18.3.5)(react@18.3.1)
       '@googleapis/drive':
-        specifier: 8.11.1
-        version: 8.11.1(encoding@0.1.13)
+        specifier: 8.14.0
+        version: 8.14.0(encoding@0.1.13)
       '@googleapis/sheets':
-        specifier: 9.1.0
-        version: 9.1.0(encoding@0.1.13)
+        specifier: 9.3.1
+        version: 9.3.1(encoding@0.1.13)
       '@mui/icons-material':
         specifier: 6.0.2
         version: 6.0.2(@mui/material@6.0.2(@emotion/react@11.13.3(@types/react@18.3.5)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.5)(react@18.3.1))(@types/react@18.3.5)(react@18.3.1))(@types/react@18.3.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.5)(react@18.3.1)
@@ -1307,7 +1307,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       recharts:
         specifier: alpha
-        version: 2.13.0-alpha.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 2.13.0-alpha.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
 packages:
 
@@ -2549,16 +2549,12 @@ packages:
   '@floating-ui/utils@0.2.4':
     resolution: {integrity: sha512-dWO2pw8hhi+WrXq1YJy2yCuWoL20PddgGaqTgVe4cOS9Q6qklXCiA1tJEqX6BEwRNSCP84/afac9hd4MS+zEUA==}
 
-  '@googleapis/drive@8.11.1':
-    resolution: {integrity: sha512-tkkjD7/CjypS6esQ/YhP3kEh86F4pEKa3YgvNMCI4Jg/eZzhBTvLQw+TqEfT/C/BoCF6jw2sgBoJQ9h8Qm2oIg==}
+  '@googleapis/drive@8.14.0':
+    resolution: {integrity: sha512-AOokfpP6pCdcJXWA8khaCEgbGpWYavWTdAAhL4idbbf2VCQcJ2f7vPalAYNu6a4Sfj0Ly4Ehnd1xw9J9TixB1A==}
     engines: {node: '>=12.0.0'}
 
-  '@googleapis/sheets@9.1.0':
-    resolution: {integrity: sha512-P4ao9holdrrBGzPulP1kAhZvP9jE30kkxPAKJMPl86hlLR1gIJZa4N37+wPJEj8JMkrKL0ei2svP7sn5/XyUAQ==}
-    engines: {node: '>=12.0.0'}
-
-  '@googleapis/sheets@9.3.0':
-    resolution: {integrity: sha512-JfL3TWk//ZlVEWr73rrMuxQyQtAc4/mgvEUXu3o2jvAYzf5euzL25P3Yl12T67v5xJMm36fjdv/snuANGPQfGQ==}
+  '@googleapis/sheets@9.3.1':
+    resolution: {integrity: sha512-nPgzOiDs/FSFhE+dX2KfkmsmkXM3WfXYP06FoW8cXvHshwxHSI3FbXwe5XJYstDAWXP9YA7AMSvmwnuD4OAl2w==}
     engines: {node: '>=12.0.0'}
 
   '@humanwhocodes/config-array@0.11.14':
@@ -5778,8 +5774,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240904:
-    resolution: {integrity: sha512-cNX0NrvzY7cEg5LOGJrRjM4pxzUhav0C1RZqwwuMxki1jUggLhE0DFD/KF4T1pZ+FwWLdRRDKdtK4S4OfK4I6g==}
+  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240905:
+    resolution: {integrity: sha512-iWgFnhAJcckBOF3FcQ5RdR9Q2NN6gmYpu+ALljft5pMmIJasZR3asshIUYadHG+46ZaZWoa+Rhk9ouIj/O8qIQ==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -8694,8 +8690,8 @@ packages:
   recharts-scale@0.4.5:
     resolution: {integrity: sha512-kivNFO+0OcUNu7jQquLXAxz1FIwZj8nrj+YkOKc5694NbjCvcT6aSZiIzNzd2Kul4o4rTto8QVR9lMNtxD4G1w==}
 
-  recharts@2.13.0-alpha.4:
-    resolution: {integrity: sha512-K9naL6F7pEcDYJE6yFQASSCQecSLPP0JagnvQ9hPtA/aHgsxsnIOjouLP5yrFZehxzfCkV5TEORr7/uNtSr7Qw==}
+  recharts@2.13.0-alpha.5:
+    resolution: {integrity: sha512-mm8ORfDusDhyWlrY/2NntUAsNeYukteplvRqKGkBEmqNPwqYq9GoEzaVsVDYj8bjGSKJynWGhjEO1NFcntl29g==}
     engines: {node: '>=14'}
     peerDependencies:
       react: ^16.0.0 || ^17.0.0 || ^18.0.0
@@ -11548,21 +11544,14 @@ snapshots:
 
   '@floating-ui/utils@0.2.4': {}
 
-  '@googleapis/drive@8.11.1(encoding@0.1.13)':
+  '@googleapis/drive@8.14.0(encoding@0.1.13)':
     dependencies:
       googleapis-common: 7.2.0(encoding@0.1.13)
     transitivePeerDependencies:
       - encoding
       - supports-color
 
-  '@googleapis/sheets@9.1.0(encoding@0.1.13)':
-    dependencies:
-      googleapis-common: 7.2.0(encoding@0.1.13)
-    transitivePeerDependencies:
-      - encoding
-      - supports-color
-
-  '@googleapis/sheets@9.3.0(encoding@0.1.13)':
+  '@googleapis/sheets@9.3.1(encoding@0.1.13)':
     dependencies:
       googleapis-common: 7.2.0(encoding@0.1.13)
     transitivePeerDependencies:
@@ -12049,7 +12038,7 @@ snapshots:
 
   '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/20fa6b93c3afb4c5fa293aec299b1f9190e26e03(encoding@0.1.13)':
     dependencies:
-      '@googleapis/sheets': 9.3.0(encoding@0.1.13)
+      '@googleapis/sheets': 9.3.1(encoding@0.1.13)
       '@netlify/functions': 2.8.1
       '@slack/bolt': 3.21.1
       execa: 9.3.1
@@ -15454,7 +15443,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240904(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240905(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.3
@@ -18790,7 +18779,7 @@ snapshots:
     dependencies:
       decimal.js-light: 2.5.1
 
-  recharts@2.13.0-alpha.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  recharts@2.13.0-alpha.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       clsx: 2.1.1
       eventemitter3: 4.0.7

@@ -43,7 +43,7 @@ importers:
         version: 7.6.3
       tsup:
         specifier: 8.2.4
-        version: 8.2.4(postcss@8.4.42)(tsx@4.17.0)(typescript@5.5.4)(yaml@2.5.0)
+        version: 8.2.4(postcss@8.4.45)(tsx@4.17.0)(typescript@5.5.4)(yaml@2.5.0)
       tsx:
         specifier: 4.17.0
         version: 4.17.0
@@ -194,7 +194,7 @@ importers:
         version: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-8d8bd53-20240904(eslint@8.57.0)
+        version: 0.0.0-experimental-8d8bd53-20240905(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -350,7 +350,7 @@ importers:
         version: 0.14.2
       autoprefixer:
         specifier: 10.4.20
-        version: 10.4.20(postcss@8.4.42)
+        version: 10.4.20(postcss@8.4.45)
       babel-plugin-module-resolver:
         specifier: 5.0.2
         version: 5.0.2
@@ -424,8 +424,8 @@ importers:
         specifier: 0.2.0
         version: 0.2.0
       postcss:
-        specifier: 8.4.42
-        version: 8.4.42
+        specifier: 8.4.45
+        version: 8.4.45
       prismjs:
         specifier: 1.29.0
         version: 1.29.0
@@ -1307,7 +1307,7 @@ importers:
         version: 18.3.1(react@18.3.1)
       recharts:
         specifier: alpha
-        version: 2.13.0-alpha.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 2.13.0-alpha.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
 packages:
 
@@ -5778,8 +5778,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240904:
-    resolution: {integrity: sha512-cNX0NrvzY7cEg5LOGJrRjM4pxzUhav0C1RZqwwuMxki1jUggLhE0DFD/KF4T1pZ+FwWLdRRDKdtK4S4OfK4I6g==}
+  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240905:
+    resolution: {integrity: sha512-iWgFnhAJcckBOF3FcQ5RdR9Q2NN6gmYpu+ALljft5pMmIJasZR3asshIUYadHG+46ZaZWoa+Rhk9ouIj/O8qIQ==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -8294,8 +8294,8 @@ packages:
     resolution: {integrity: sha512-Wglpdk03BSfXkHoQa3b/oulrotAkwrlLDRSOb9D0bN86FdRyE9lppSp33aHNPgBa0JKCoB+drFLZkQoRRYae5A==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postcss@8.4.42:
-    resolution: {integrity: sha512-hywKUQB9Ra4dR1mGhldy5Aj1X3MWDSIA1cEi+Uy0CjheLvP6Ual5RlwMCh8i/X121yEDLDIKBsrCQ8ba3FDMfQ==}
+  postcss@8.4.45:
+    resolution: {integrity: sha512-7KTLTdzdZZYscUc65XmjFiB73vBhBfbPztCYdUNvlaso9PrzjzcmjqBPR0lNGkcVlcO4BjiO5rK/qNz+XAen1Q==}
     engines: {node: ^10 || ^12 || >=14}
 
   postgres-array@2.0.0:
@@ -8694,8 +8694,8 @@ packages:
   recharts-scale@0.4.5:
     resolution: {integrity: sha512-kivNFO+0OcUNu7jQquLXAxz1FIwZj8nrj+YkOKc5694NbjCvcT6aSZiIzNzd2Kul4o4rTto8QVR9lMNtxD4G1w==}
 
-  recharts@2.13.0-alpha.4:
-    resolution: {integrity: sha512-K9naL6F7pEcDYJE6yFQASSCQecSLPP0JagnvQ9hPtA/aHgsxsnIOjouLP5yrFZehxzfCkV5TEORr7/uNtSr7Qw==}
+  recharts@2.13.0-alpha.5:
+    resolution: {integrity: sha512-mm8ORfDusDhyWlrY/2NntUAsNeYukteplvRqKGkBEmqNPwqYq9GoEzaVsVDYj8bjGSKJynWGhjEO1NFcntl29g==}
     engines: {node: '>=14'}
     peerDependencies:
       react: ^16.0.0 || ^17.0.0 || ^18.0.0
@@ -14069,14 +14069,14 @@ snapshots:
 
   at-least-node@1.0.0: {}
 
-  autoprefixer@10.4.20(postcss@8.4.42):
+  autoprefixer@10.4.20(postcss@8.4.45):
     dependencies:
       browserslist: 4.23.3
       caniuse-lite: 1.0.30001655
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.0.1
-      postcss: 8.4.42
+      postcss: 8.4.45
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:
@@ -15454,7 +15454,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240904(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240905(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.3
@@ -18316,11 +18316,11 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-load-config@6.0.1(postcss@8.4.42)(tsx@4.17.0)(yaml@2.5.0):
+  postcss-load-config@6.0.1(postcss@8.4.45)(tsx@4.17.0)(yaml@2.5.0):
     dependencies:
       lilconfig: 3.1.2
     optionalDependencies:
-      postcss: 8.4.42
+      postcss: 8.4.45
       tsx: 4.17.0
       yaml: 2.5.0
 
@@ -18343,7 +18343,7 @@ snapshots:
       picocolors: 1.0.1
       source-map-js: 1.2.0
 
-  postcss@8.4.42:
+  postcss@8.4.45:
     dependencies:
       nanoid: 3.3.7
       picocolors: 1.0.1
@@ -18790,7 +18790,7 @@ snapshots:
     dependencies:
       decimal.js-light: 2.5.1
 
-  recharts@2.13.0-alpha.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  recharts@2.13.0-alpha.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       clsx: 2.1.1
       eventemitter3: 4.0.7
@@ -19702,7 +19702,7 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
-  tsup@8.2.4(postcss@8.4.42)(tsx@4.17.0)(typescript@5.5.4)(yaml@2.5.0):
+  tsup@8.2.4(postcss@8.4.45)(tsx@4.17.0)(typescript@5.5.4)(yaml@2.5.0):
     dependencies:
       bundle-require: 5.0.0(esbuild@0.23.1)
       cac: 6.7.14
@@ -19714,14 +19714,14 @@ snapshots:
       globby: 11.1.0
       joycon: 3.1.1
       picocolors: 1.0.1
-      postcss-load-config: 6.0.1(postcss@8.4.42)(tsx@4.17.0)(yaml@2.5.0)
+      postcss-load-config: 6.0.1(postcss@8.4.45)(tsx@4.17.0)(yaml@2.5.0)
       resolve-from: 5.0.0
       rollup: 4.20.0
       source-map: 0.8.0-beta.0
       sucrase: 3.35.0
       tree-kill: 1.2.2
     optionalDependencies:
-      postcss: 8.4.42
+      postcss: 8.4.45
       typescript: 5.5.4
     transitivePeerDependencies:
       - jiti
@@ -20013,7 +20013,7 @@ snapshots:
   vite@5.4.1(@types/node@22.5.1)(terser@5.31.1):
     dependencies:
       esbuild: 0.21.5
-      postcss: 8.4.42
+      postcss: 8.4.45
       rollup: 4.20.0
     optionalDependencies:
       '@types/node': 22.5.1

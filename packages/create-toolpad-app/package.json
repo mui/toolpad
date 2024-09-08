@@ -30,7 +30,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@inquirer/prompts": "^5.3.8",
+    "@inquirer/prompts": "^5.5.0",
     "@toolpad/utils": "workspace:*",
     "chalk": "5.3.0",
     "execa": "9.3.1",

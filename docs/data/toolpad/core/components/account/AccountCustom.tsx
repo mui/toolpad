@@ -68,6 +68,10 @@ export default function AccountCustom() {
         </Typography>
         <SessionContext.Provider value={session}>
           <Account
+            localeText={{
+              signInLabel: 'Login',
+              signOutLabel: 'Logout',
+            }}
             slotProps={{
               signOutButton: {
                 color: 'info',
@@ -86,8 +90,6 @@ export default function AccountCustom() {
                 },
               },
             }}
-            signInLabel="Login"
-            signOutLabel="Logout"
           />
         </SessionContext.Provider>
 
@@ -102,6 +104,10 @@ export default function AccountCustom() {
         <SessionContext.Provider value={signedOutSession}>
           {/* preview-start */}
           <Account
+            localeText={{
+              signInLabel: 'Login',
+              signOutLabel: 'Logout',
+            }}
             slotProps={{
               signInButton: {
                 color: 'info',
@@ -118,8 +124,6 @@ export default function AccountCustom() {
               },
               signOutButton: { color: 'primary', variant: 'outlined' },
             }}
-            signInLabel="Login"
-            signOutLabel="Logout"
           />
           {/* preview-end */}
         </SessionContext.Provider>

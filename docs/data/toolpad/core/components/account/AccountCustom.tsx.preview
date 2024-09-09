@@ -1,4 +1,8 @@
 <Account
+  localeText={{
+    signInLabel: 'Login',
+    signOutLabel: 'Logout',
+  }}
   slotProps={{
     signInButton: {
       color: 'info',
@@ -15,6 +19,4 @@
     },
     signOutButton: { color: 'primary', variant: 'outlined' },
   }}
-  signInLabel="Login"
-  signOutLabel="Logout"
 />

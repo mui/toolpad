@@ -47,7 +47,7 @@ export async function downloadAndExtractExample(root: string, name: string) {
     file: tempFile,
     cwd: root,
     strip: 2 + name.split('/').length,
-    filter: (p) => p.includes(`mui-toolpad-master/examples/${name}/`),
+    filter: (p) => p.includes(`toolpad-master/examples/${name}/`),
   });
 
   // eslint-disable-next-line no-console

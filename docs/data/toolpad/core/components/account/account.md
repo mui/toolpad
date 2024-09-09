@@ -36,6 +36,6 @@ Labels for the sign in and sign out buttons through the `signInLabel` and `signO
 
 ### Slots
 
-You can pass in your own items to the `Account` menu through the `menuItems` slot to create larger, more complex menus:
+You can pass in your own items to the `Account` menu through the `menuItems` slot to add additional menu items in the space between the user's account details and the sign out button, to create larger, more complex menus:
 
 {{"demo": "AccountSlots.js", "bg": "gradient"}}

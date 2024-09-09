@@ -100,7 +100,7 @@ export default function CustomMenu() {
         onMouseLeave={handleTriggerLeave}
         component="button"
         sx={{
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           width: '100%',
         }}
       >
@@ -113,8 +113,7 @@ export default function CustomMenu() {
         onClick={handleMenuNavigation('/add-account')}
         component="button"
         sx={{
-          justifyContent: 'center',
-          // justifyContent: 'flex-end',
+          justifyContent: 'flex-start',
           width: '100%',
         }}
       >

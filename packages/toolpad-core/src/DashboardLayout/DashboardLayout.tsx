@@ -475,8 +475,8 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
       }),
       slots: PropTypes.shape({
         menuItems: PropTypes.elementType,
-        signInButton: PropTypes.func,
-        signOutButton: PropTypes.func,
+        signInButton: PropTypes.elementType,
+        signOutButton: PropTypes.elementType,
       }),
     }),
     toolbarActions: PropTypes.object,

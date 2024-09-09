@@ -10,14 +10,14 @@ import Logout from '@mui/icons-material/Logout';
 import { Typography } from '@mui/material';
 import { SessionAvatar } from './SessionAvatar';
 import { SessionContext, AuthenticationContext } from '../AppProvider/AppProvider';
-import DEFAULT_LABELS from '../shared/labels/en';
+import DEFAULT_LOCALE_TEXT from '../shared/locales/en';
 
 const AccountInfoContainer = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
   padding: theme.spacing(2),
-  gap: theme.spacing(4),
+  gap: theme.spacing(2),
 }));
 
 const SignOutContainer = styled('div')(({ theme }) => ({
@@ -27,27 +27,29 @@ const SignOutContainer = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
+export interface AccountSlots {
+  /**
+   * The component used for the sign in button.
+   * @default Button
+   */
+  signInButton?: React.ElementType;
+  /**
+   * The component used for the sign out button.
+   * @default MenuItem
+   */
+  signOutButton?: React.ElementType;
+  /**
+   * The component used for the custom menu items.
+   * @default null
+   */
+  menuItems?: React.ElementType;
+}
+
 export interface AccountProps {
   /**
    * The components used for each slot inside.
    */
-  slots?: {
-    /**
-     * The component used for the sign in button.
-     * @default Button
-     */
-    signInButton?: React.ComponentType<ButtonProps>;
-    /**
-     * The component used for the sign out button.
-     * @default MenuItem
-     */
-    signOutButton?: React.ComponentType<ButtonProps>;
-    /**
-     * The component used for the custom menu items
-     * @default null
-     */
-    menuItems?: React.JSXElementConstructor<{}>;
-  };
+  slots?: AccountSlots;
   /**
    * The props used for each slot inside.
    */
@@ -58,9 +60,9 @@ export interface AccountProps {
   };
   /**
    * The labels for the account component.
-   * @default DEFAULT_LABELS
+   * @default DEFAULT_LOCALE_TEXT
    */
-  localeText?: typeof DEFAULT_LABELS;
+  localeText?: typeof DEFAULT_LOCALE_TEXT;
 }
 /**
  *
@@ -75,7 +77,7 @@ export interface AccountProps {
  * - [Account API](https://mui.com/toolpad/core/api/account)
  */
 function Account(props: AccountProps) {
-  const { slots, slotProps, localeText = DEFAULT_LABELS } = props;
+  const { slots, slotProps, localeText = DEFAULT_LOCALE_TEXT } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const session = React.useContext(SessionContext);
   const authentication = React.useContext(AuthenticationContext);
@@ -211,7 +213,7 @@ Account.propTypes /* remove-proptypes */ = {
   // └─────────────────────────────────────────────────────────────────────┘
   /**
    * The labels for the account component.
-   * @default DEFAULT_LABELS
+   * @default DEFAULT_LOCALE_TEXT
    */
   localeText: PropTypes.shape({
     signInLabel: PropTypes.string.isRequired,
@@ -230,8 +232,8 @@ Account.propTypes /* remove-proptypes */ = {
    */
   slots: PropTypes.shape({
     menuItems: PropTypes.elementType,
-    signInButton: PropTypes.func,
-    signOutButton: PropTypes.func,
+    signInButton: PropTypes.elementType,
+    signOutButton: PropTypes.elementType,
   }),
 } as any;
 

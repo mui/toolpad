@@ -22,28 +22,9 @@ The `SignInPage` component can be set up to use [Passkeys](https://passkeys.dev)
 
 {{"demo": "PasskeySignInPage.js", "iframe": true}}
 
-The [Toolpad Core Passkey example app](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-passkey/) comes with a working example using `next-auth/webauthn`, by adding the following code to the `signIn` function:
-
-```tsx title="./app/auth/signin/page.tsx"
-// ...
-import { signIn as webauthnSignIn } from 'next-auth/webauthn';
-// ...
-if (provider.id === 'passkey') {
-  try {
-    return await webauthnSignIn('passkey', {
-      email: formData.get('email'),
-      callbackUrl: callbackUrl || '/',
-    });
-  } catch (error) {
-    console.error(error);
-    return {
-      error: (error as Error)?.message || 'Something went wrong',
-      type: 'WebAuthnError',
-    };
-  }
-}
-// ...
-```
+:::info
+The [Toolpad Core Passkey example app](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-passkey/) comes with a working app using `next-auth/webauthn`, Prisma and PostgreSQL.
+:::
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next-passkey.png", "srcDark": "/static/toolpad/docs/core/auth-next-passkey-dark.png", "alt": "Auth.js Passkeys & Next.js with Toolpad Core sign-in page", "caption": "Auth.js Passkeys & Next.js app router with Toolpad Core Sign-in page", "zoom": true,  "aspectRatio": "1.428" }}
 

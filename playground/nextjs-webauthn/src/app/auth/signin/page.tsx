@@ -12,6 +12,7 @@ const signIn = async (provider: AuthProvider, formData: FormData, callbackUrl?: 
     try {
       return await webauthnSignIn('passkey', {
         email: formData.get('email'),
+        callbackUrl: callbackUrl || '/',
       });
     } catch (error) {
       console.error(error);
@@ -26,5 +27,6 @@ const signIn = async (provider: AuthProvider, formData: FormData, callbackUrl?: 
 };
 
 export default function SignIn() {
+  // TODO: Fix this
   return <SignInPage providers={providerMap} signIn={signIn} />;
 }

@@ -18,56 +18,39 @@ The `SignInPage` component can be set up with an OAuth provider by passing in a 
 
 ## Passkey
 
-The `SignInPage` component can be set up to use [passkeys](https://passkeys.dev) by passing in a a provider with `passkey` as the `id` property in the `providers` prop. The following code shows how to set up a `SignInPage` with a passkey provider using the `next-auth/webauthn` package:
+The `SignInPage` component can be set up to use [Passkeys](https://passkeys.dev) by passing in a provider with `passkey` as the `id`:
 
-```ts title="./app/auth/signin/page.tsx"
-'use client';
-import * as React from 'react';
-import Link from '@mui/material/Link';
-import type { AuthProvider } from '@toolpad/core';
-import { SignInPage } from '@toolpad/core/SignInPage';
+{{"demo": "PasskeySignInPage.js", "iframe": true}}
+
+The [Toolpad Core Passkey example app](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-passkey/) comes with a working example using `next-auth/webauthn`, by adding the following code to the `signIn` function:
+
+```tsx title="./app/auth/signin/page.tsx"
+// ...
 import { signIn as webauthnSignIn } from 'next-auth/webauthn';
-import { providerMap } from '../../../auth';
-import serverSignIn from './actions';
-
-// Create a wrapper function for signIn
-const signIn = async (provider: AuthProvider, formData: FormData, callbackUrl?: string) => {
-  if (provider.id === 'passkey') {
-    try {
-      return await webauthnSignIn('passkey', {
-        email: formData.get('email'),
-      });
-    } catch (error) {
-      return {
-        error: (error as Error)?.message || 'Something went wrong',
-        type: 'WebAuthnError',
-      };
-    }
+// ...
+if (provider.id === 'passkey') {
+  try {
+    return await webauthnSignIn('passkey', {
+      email: formData.get('email'),
+      callbackUrl: callbackUrl || '/',
+    });
+  } catch (error) {
+    console.error(error);
+    return {
+      error: (error as Error)?.message || 'Something went wrong',
+      type: 'WebAuthnError',
+    };
   }
-  // Use regular signIn for other providers
-  return serverSignIn(provider, formData, callbackUrl);
-};
-
-export default function SignIn() {
-  return (
-    <SignInPage
-      providers={providerMap}
-      signIn={signIn}
-      slots={{
-        forgotPasswordLink: ForgotPasswordLink,
-        signUpLink: SignUpLink,
-      }}
-    />
-  );
 }
+// ...
 ```
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next-passkey.gif", "srcDark": "/static/toolpad/docs/core/auth-next-passkey-dark.gif", "alt": "Auth.js Passkeys & Next.js with Toolpad Core sign-in page", "caption": "Auth.js Passkeys & Next.js app router with Toolpad Core Sign-in page", "zoom": true, "indent": 1, "aspectRatio": "1.428" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next-passkey.png", "srcDark": "/static/toolpad/docs/core/auth-next-passkey-dark.png", "alt": "Auth.js Passkeys & Next.js with Toolpad Core sign-in page", "caption": "Auth.js Passkeys & Next.js app router with Toolpad Core Sign-in page", "zoom": true,  "aspectRatio": "1.428" }}
 
 ## Credentials
 
 :::warning
-It is recommended to use the OAuth provider for more robust maintenance, support, and security.
+It is recommended to use the OAuth or Passkey provider for more robust maintenance, support, and security.
 :::
 
 To render a username password form, pass in a provider with `credentials` as the `id` property. The `signIn` function accepts a `formData` parameter in this case.

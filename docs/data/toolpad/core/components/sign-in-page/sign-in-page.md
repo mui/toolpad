@@ -155,13 +155,13 @@ If you're not on the Next Auth v5 version yet, see the [example with Next Auth v
 
 ### Branding
 
-You can add your own branding elements to the `SignInPage` through the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/)
+You can add your own branding elements to the `SignInPage` through the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/):
 
 {{"demo": "BrandingSignInPage.js", "iframe": true, "height": 360 }}
 
 ### Theme
 
-Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be deeply customized to match any theme
+Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be deeply customized to match any theme:
 
 {{"demo": "ThemeSignInPage.js", "height": 700 }}
 

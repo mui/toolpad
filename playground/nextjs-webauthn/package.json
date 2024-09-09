@@ -1,0 +1,31 @@
+{
+  "name": "playground-webauthn",
+  "version": "0.5.2",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "lint": "next lint"
+  },
+  "devDependencies": {
+    "@emotion/react": "11.13.3",
+    "@emotion/styled": "11.13.0",
+    "@mui/icons-material": "6.0.2",
+    "@mui/lab": "6.0.0-beta.9",
+    "@mui/material": "6.0.2",
+    "@mui/material-nextjs": "6.0.2",
+    "@toolpad/core": "workspace:*",
+    "@types/node": "22.5.1",
+    "@types/react": "18.3.5",
+    "@types/react-dom": "18.3.0",
+    "@simplewebauthn/browser": "9.0.1",
+    "@simplewebauthn/server": "9.0.3",
+    "eslint-config-next": "14.2.7",
+    "next": "14.2.7",
+    "next-auth": "5.0.0-beta.20",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "prisma": "5.19.1",
+    "@prisma/client": "5.19.1",
+    "@auth/prisma-adapter": "2.4.2"
+  }
+}

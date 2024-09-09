@@ -14,7 +14,7 @@ export default function GithubStars() {
 
   const fetchStars = React.useCallback(async () => {
     setFetching(true);
-    const response = await fetch('https://api.github.com/repos/mui/mui-toolpad');
+    const response = await fetch('https://api.github.com/repos/mui/toolpad');
     const data = await response.json();
     setFetching(false);
     if (response.status !== 200) {

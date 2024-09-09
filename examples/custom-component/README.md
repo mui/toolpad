@@ -20,7 +20,7 @@ pnpm create toolpad-app --example custom-component
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/custom-component)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/custom-component)
 
 ## What's inside
 
@@ -30,4 +30,4 @@ This app demonstrates the following capabilities of Toolpad Studio:
 
 ## The source
 
-[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/custom-component)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/custom-component)

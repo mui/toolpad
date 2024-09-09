@@ -235,7 +235,7 @@ const run = async () => {
     .option('example', {
       type: 'string',
       describe:
-        'The name of one of the available examples. See https://github.com/mui/mui-toolpad/tree/master/examples.',
+        'The name of one of the available examples. See https://github.com/mui/toolpad/tree/master/examples.',
     })
     .help().argv;
 

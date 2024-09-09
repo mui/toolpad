@@ -13,10 +13,10 @@
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
 [![npm latest package](https://img.shields.io/npm/v/@toolpad/core/latest.svg)](https://www.npmjs.com/package/@toolpad/core)
 [![npm downloads](https://img.shields.io/npm/dm/@toolpad/core.svg)](https://www.npmjs.com/package/@toolpad/core)
-[![GitHub branch status](https://img.shields.io/github/checks-status/mui/mui-toolpad/HEAD)](https://github.com/mui/mui-toolpad/commits/HEAD/)
+[![GitHub branch status](https://img.shields.io/github/checks-status/mui/toolpad/HEAD)](https://github.com/mui/toolpad/commits/HEAD/)
 [![Follow on X](https://img.shields.io/twitter/follow/Toolpad_.svg?label=follow+Toolpad)](https://x.com/Toolpad_)
-[![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-toolpad/issues/8)
-[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/mui-toolpad.svg)](https://isitmaintained.com/project/mui/mui-toolpad 'Average time to resolve an issue')
+[![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/toolpad/issues/8)
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/toolpad.svg)](https://isitmaintained.com/project/mui/toolpad 'Average time to resolve an issue')
 [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui-org)](https://opencollective.com/mui-org)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/6294/badge?v2)](https://www.bestpractices.dev/projects/6294)
 
@@ -70,7 +70,7 @@ Although we love giving you the opportunity to put your stamp on MUI, we also ar
 
 ## Changelog
 
-The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly updated to reflect what's changed in each new release.
+The [changelog](https://github.com/mui/toolpad/releases) is regularly updated to reflect what's changed in each new release.
 
 ## Roadmap
 

@@ -27,7 +27,7 @@ export default withDocsInfra({
     // TODO, those shouldn't be needed in the first place
     '@mui/monorepo', // Migrate everything to @mui/docs until the @mui/monorepo dependency becomes obsolete
     '@mui/x-charts', // Fix ESM module support https://github.com/mui/mui-x/issues/9826#issuecomment-1658333978
-    // Fix trailingSlash support https://github.com/mui/mui-toolpad/pull/3301#issuecomment-2054213837
+    // Fix trailingSlash support https://github.com/mui/toolpad/pull/3301#issuecomment-2054213837
     // Migrate everything from @mui/monorepo to @mui/docs
     '@mui/docs',
   ],
@@ -36,7 +36,7 @@ export default withDocsInfra({
   env: {
     // docs-infra
     LIB_VERSION: toolpadCorePkg.version,
-    SOURCE_CODE_REPO: 'https://github.com/mui/mui-toolpad',
+    SOURCE_CODE_REPO: 'https://github.com/mui/toolpad',
     SOURCE_GITHUB_BRANCH: 'master', // #default-branch-switch
     GITHUB_TEMPLATE_DOCS_FEEDBACK: '4.docs-feedback.yml',
     // Toolpad related

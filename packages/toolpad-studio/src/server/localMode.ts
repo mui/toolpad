@@ -792,7 +792,7 @@ function extractApplicationFromDom(dom: appDom.AppDom): Application | null {
 }
 
 function getSchemaUrl(obj: string) {
-  return `https://raw.githubusercontent.com/mui/mui-toolpad/v${packageInfo.version}/docs/schemas/v1/definitions.json#properties/${obj}`;
+  return `https://raw.githubusercontent.com/mui/toolpad/v${packageInfo.version}/docs/schemas/v1/definitions.json#properties/${obj}`;
 }
 
 async function writePagesToFiles(root: string, pages: PagesContent) {

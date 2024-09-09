@@ -29,14 +29,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/mui/mui-toolpad.git",
+    "url": "https://github.com/mui/toolpad.git",
     "directory": "packages/toolpad-core"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mui/mui-toolpad/issues"
+    "url": "https://github.com/mui/toolpad/issues"
   },
-  "homepage": "https://github.com/mui/mui-toolpad#readme",
+  "homepage": "https://github.com/mui/toolpad#readme",
   "scripts": {
     "clean": "rimraf build",
     "prebuild": "pnpm clean",

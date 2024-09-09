@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Components and APIs for building dashboards and internal tools",
-  "repository": "https://github.com/mui/mui-toolpad.git",
+  "repository": "https://github.com/mui/toolpad.git",
   "private": true,
   "bin": {
     "toolpad-studio": "./dist/index.js"

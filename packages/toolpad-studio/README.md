@@ -30,7 +30,7 @@ Our documentation contains more [examples](https://mui.com/toolpad/studio/exampl
 
 ## Changelog
 
-The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly updated to reflect what's changed in each new release.
+The [changelog](https://github.com/mui/toolpad/releases) is regularly updated to reflect what's changed in each new release.
 
 ## Roadmap
 

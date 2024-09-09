@@ -2,7 +2,7 @@
   "props": {
     "localeText": {
       "type": { "name": "shape", "description": "{ signInLabel: string, signOutLabel: string }" },
-      "default": "DEFAULT_LABELS"
+      "default": "DEFAULT_LOCALE_TEXT"
     },
     "slotProps": {
       "type": {
@@ -13,7 +13,7 @@
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ menuItems?: elementType, signInButton?: func, signOutButton?: func }"
+        "description": "{ menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType }"
       },
       "additionalInfo": { "slotsApi": true }
     }
@@ -22,6 +22,26 @@
   "imports": [
     "import { Account } from '@toolpad/core/Account';",
     "import { Account } from '@toolpad/core';"
+  ],
+  "slots": [
+    {
+      "name": "signInButton",
+      "description": "The component used for the sign in button.",
+      "default": "Button",
+      "class": null
+    },
+    {
+      "name": "signOutButton",
+      "description": "The component used for the sign out button.",
+      "default": "MenuItem",
+      "class": null
+    },
+    {
+      "name": "menuItems",
+      "description": "The component used for the custom menu items.",
+      "default": "null",
+      "class": null
+    }
   ],
   "classes": [],
   "spread": true,

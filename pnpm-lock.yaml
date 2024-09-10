@@ -194,7 +194,7 @@ importers:
         version: 7.35.2(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-8d8bd53-20240905(eslint@8.57.0)
+        version: 0.0.0-experimental-b6997ec-20240910(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -619,8 +619,8 @@ importers:
         specifier: 2.2.4
         version: 2.2.4
       path-to-regexp:
-        specifier: 6.2.2
-        version: 6.2.2
+        specifier: 8.0.0
+        version: 8.0.0
       prop-types:
         specifier: 15.8.1
         version: 15.8.1
@@ -861,8 +861,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
       path-to-regexp:
-        specifier: 7.1.0
-        version: 7.1.0
+        specifier: 8.0.0
+        version: 8.0.0
       perf-cascade:
         specifier: 3.0.3
         version: 3.0.3
@@ -5789,8 +5789,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240905:
-    resolution: {integrity: sha512-iWgFnhAJcckBOF3FcQ5RdR9Q2NN6gmYpu+ALljft5pMmIJasZR3asshIUYadHG+46ZaZWoa+Rhk9ouIj/O8qIQ==}
+  eslint-plugin-react-compiler@0.0.0-experimental-b6997ec-20240910:
+    resolution: {integrity: sha512-5VLQr2Lvxo4Ktf7TKC/0cPRJIKg4F34BreQmth5vHOc1aR8I6IZ84hY7T3ci2VlrfTKOHkEDEjGfOJWSoM9aZQ==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -8135,8 +8135,8 @@ packages:
   path-to-regexp@6.2.2:
     resolution: {integrity: sha512-GQX3SSMokngb36+whdpRXE+3f9V8UzyAorlYvOGx87ufGHehNTn5lCxrKtLyZ4Yl/wEKnNnr98ZzOwwDZV5ogw==}
 
-  path-to-regexp@7.1.0:
-    resolution: {integrity: sha512-ZToe+MbUF4lBqk6dV8GKot4DKfzrxXsplOddH8zN3YK+qw9/McvP7+4ICjZvOne0jQhN4eJwHsX6tT0Ns19fvw==}
+  path-to-regexp@8.0.0:
+    resolution: {integrity: sha512-GAWaqWlTjYK/7SVpIUA6CTxmcg65SP30sbjdCvyYReosRkk7Z/LyHWwkK3Vu0FcIi0FNTADUs4eh1AsU5s10cg==}
     engines: {node: '>=16'}
 
   path-type@3.0.0:
@@ -15510,7 +15510,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-8d8bd53-20240905(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-b6997ec-20240910(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.6
@@ -18255,7 +18255,7 @@ snapshots:
 
   path-to-regexp@6.2.2: {}
 
-  path-to-regexp@7.1.0: {}
+  path-to-regexp@8.0.0: {}
 
   path-type@3.0.0:
     dependencies:

@@ -64,14 +64,18 @@ const LogoContainer = styled('div')({
   },
 });
 
-const getDrawerWidthTransitionMixin = (isExpanded: boolean) => ({
+const getDrawerSxTransitionMixin = (isExpanded: boolean, property: string) => ({
   transition: (theme: Theme) =>
-    theme.transitions.create('width', {
+    theme.transitions.create(property, {
       easing: theme.transitions.easing.sharp,
       duration: isExpanded
         ? theme.transitions.duration.enteringScreen
         : theme.transitions.duration.leavingScreen,
     }),
+});
+
+const getDrawerWidthTransitionMixin = (isExpanded: boolean) => ({
+  ...getDrawerSxTransitionMixin(isExpanded, 'width'),
   overflowX: 'hidden',
 });
 
@@ -158,14 +162,15 @@ function DashboardSidebarSubNavigation({
     <List sx={{ padding: 0, mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
       {subNavigation.map((navigationItem, navigationItemIndex) => {
         if (navigationItem.kind === 'header') {
-          return !isMini ? (
+          return (
             <ListSubheader
               key={`subheader-${depth}-${navigationItemIndex}`}
               component="div"
               sx={{
                 fontSize: 12,
                 fontWeight: '700',
-                height: 40,
+                height: isMini ? 0 : 40,
+                ...getDrawerSxTransitionMixin(isFullyExpanded, 'height'),
                 px: 2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -174,7 +179,7 @@ function DashboardSidebarSubNavigation({
             >
               {getItemTitle(navigationItem)}
             </ListSubheader>
-          ) : null;
+          );
         }
 
         if (navigationItem.kind === 'divider') {
@@ -441,7 +446,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
       return (
         <Tooltip
           title={`${isExpanded ? collapseMenuActionText : expandMenuActionText} menu`}
-          placement="right"
           enterDelay={1000}
         >
           <div>
@@ -471,6 +475,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           sx={{
             overflow: 'auto',
             pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
+            ...getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding'),
           }}
         >
           <DashboardSidebarSubNavigation

@@ -91,7 +91,7 @@
     },
     {
       "groupName": "MUI Monorepo",
-      "matchPackagePatterns": ["@mui/monorepo"],
+      "matchPackageNames": ["@mui/monorepo"],
       "schedule": ["on sunday before 6:00am"]
     },
     {

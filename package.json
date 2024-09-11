@@ -105,7 +105,7 @@
     "react-docgen": "5.4.3",
     "react-inspector": "6.0.2",
     "regenerator-runtime": "0.14.1",
-    "remark": "13.0.0",
+    "remark": "15.0.1",
     "rimraf": "5.0.10",
     "typescript": "5.5.4",
     "unist-util-visit": "2.0.3",

@@ -132,11 +132,6 @@
       "allowedVersions": "< 3.0.0"
     },
     {
-      "groupName": "remark - incompatible versions",
-      "matchPackageNames": ["remark"],
-      "allowedVersions": "< 14.0.0"
-    },
-    {
       "groupName": "react-docgen - incompatible versions",
       "matchPackageNames": ["react-docgen"],
       "allowedVersions": "< 6.0.0"

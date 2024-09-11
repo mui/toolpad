@@ -135,7 +135,8 @@
     "pnpm": "9.7.1"
   },
   "resolutions": {
-    "google-auth-library": "*"
+    "google-auth-library": "*",
+    "@types/node": "22.5.4"
   },
   "packageManager": "pnpm@9.7.1"
 }

@@ -194,7 +194,7 @@ importers:
         version: 7.35.2(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-b6997ec-20240910(eslint@8.57.0)
+        version: 0.0.0-experimental-5c9a529-20240911(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -253,8 +253,8 @@ importers:
         specifier: 5.5.4
         version: 5.5.4
       unist-util-visit:
-        specifier: 2.0.3
-        version: 2.0.3
+        specifier: 5.0.0
+        version: 5.0.0
       vitest-dom:
         specifier: 0.1.1
         version: 0.1.1(vitest@2.0.5(@types/node@22.5.4)(@vitest/browser@2.0.5)(jsdom@25.0.0)(terser@5.31.1))
@@ -2128,7 +2128,7 @@ packages:
   '@docsearch/react@3.6.1':
     resolution: {integrity: sha512-qXZkEPvybVhSXj0K7U3bXc233tk5e8PfhoZ6MhPOiik/qUQxYC+Dn9DnoS7CxHQQhHfCvTiN0eY9M12oRghEXw==}
     peerDependencies:
-      '@types/react': ^18.3.4
+      '@types/react': '>= 16.8.0 < 19.0.0'
       react: '>= 16.8.0 < 19.0.0'
       react-dom: '>= 16.8.0 < 19.0.0'
       search-insights: '>= 1 < 3'
@@ -2783,7 +2783,7 @@ packages:
     resolution: {integrity: sha512-I/lGHztkCzvwlXpjD2+SNmvNQvB4227xBXhISPjEaJUXGImOQ9f3D2Yj/T3KasSI/h0MLWy74X0J6clhPmsRbQ==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
-      '@types/react': ^18.3.4
+      '@types/react': ^17.0.0 || ^18.0.0
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
     peerDependenciesMeta:
@@ -3988,8 +3988,8 @@ packages:
   '@types/node@14.18.63':
     resolution: {integrity: sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ==}
 
-  '@types/node@20.16.5':
-    resolution: {integrity: sha512-VwYCweNo3ERajwy0IUlqqcyZ8/A7Zwa9ZP3MnENWcB11AejO+tLy3pu850goUW2FC/IJMdZUfKpX/yxL1gymCA==}
+  '@types/node@18.19.50':
+    resolution: {integrity: sha512-xonK+NRrMBRtkL1hVCc3G+uXtjh1Al4opBLjqVmipe5ZAaBYWW6cNAiBVZ1BvmkBhep698rP3UM3aRAdSALuhg==}
 
   '@types/node@22.5.4':
     resolution: {integrity: sha512-FDuKUJQm/ju9fT/SeX/6+gBzoPzlVCzfzmGkwKvRHQVxi4BntVbyIwf6a4Xn62mrvndLiml6z/UBXIdEVjQLXg==}
@@ -4098,9 +4098,6 @@ packages:
 
   '@types/uglify-js@3.17.5':
     resolution: {integrity: sha512-TU+fZFBTBcXj/GpDpDaBmgWk/gn96kMZ+uocaFUlV2f8a6WdMzzI44QBCmGcCiYR0Y6ZlNRiyUyKKt5nl/lbzQ==}
-
-  '@types/unist@2.0.10':
-    resolution: {integrity: sha512-IfYcSBWE3hLpBg8+X2SEa8LVkJdJEkT2Ese2aaLs3ptGdVtABxndrMaxuFlQ1qdFf9Q5rDvDpxI3WwgvKFAsQA==}
 
   '@types/unist@3.0.3':
     resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
@@ -5801,8 +5798,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-b6997ec-20240910:
-    resolution: {integrity: sha512-5VLQr2Lvxo4Ktf7TKC/0cPRJIKg4F34BreQmth5vHOc1aR8I6IZ84hY7T3ci2VlrfTKOHkEDEjGfOJWSoM9aZQ==}
+  eslint-plugin-react-compiler@0.0.0-experimental-5c9a529-20240911:
+    resolution: {integrity: sha512-QZV0rNLl4bKS3PIyApBeH/3EoMVh9NgpPFJGpKpfG2WWQWF/jkb9buRSxvyNhS0zSJeSR7pTPQFsSKDXNQNMhw==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -9715,6 +9712,9 @@ packages:
   unbox-primitive@1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
 
+  undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
   undici-types@6.19.6:
     resolution: {integrity: sha512-e/vggGopEfTKSvj4ihnOLTsqhrKRN3LeO6qSN/GxohhuRv8qH9bNQ4B8W7e/vFL+0XTnmHPB4/kegunZGA4Org==}
 
@@ -9749,23 +9749,14 @@ packages:
     resolution: {integrity: sha512-WrcA6AyEfqDX5bWige/4NQfPZMtASNVxdmWR76WESYQVAACSgWcR6e9i0mofqqBxYFtL4oAxPIptY73/0YE1DQ==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
-  unist-util-is@4.1.0:
-    resolution: {integrity: sha512-ZOQSsnce92GrxSqlnEEseX0gi7GH9zTJZ0p9dtu87WRb/37mMPO2Ilx1s/t9vBHrFhbgweUwb+t7cIn5dxPhZg==}
-
   unist-util-is@6.0.0:
     resolution: {integrity: sha512-2qCTHimwdxLfz+YzdGfkqNlH0tLi9xjTnHddPmJwtIG9MGsdbutfTc4P+haPD7l7Cjxf/WZj+we5qfVPvvxfYw==}
 
   unist-util-stringify-position@4.0.0:
     resolution: {integrity: sha512-0ASV06AAoKCDkS2+xw5RXJywruurpbC4JZSm7nr7MOt1ojAzvyyaO+UxZf18j8FCF6kmzCZKcAgN/yu2gm2XgQ==}
 
-  unist-util-visit-parents@3.1.1:
-    resolution: {integrity: sha512-1KROIZWo6bcMrZEwiH2UrXDyalAa0uqzWCxCJj6lPOvTve2WkfgCytoDTPaMnodXh1WrXOq0haVYHj99ynJlsg==}
-
   unist-util-visit-parents@6.0.1:
     resolution: {integrity: sha512-L/PqWzfTP9lzzEa6CKs0k2nARxTdZduw3zyh8d2NVBnsyvHjSX4TWse388YrrQKbvI8w20fGjGlhgT96WwKykw==}
-
-  unist-util-visit@2.0.3:
-    resolution: {integrity: sha512-iJ4/RczbJMkD0712mGktuGpm/U4By4FfDonL7N/9tATGIF4imikjOuagyMY53tnZq3NP6BcmlrHhEKAfGWjh7Q==}
 
   unist-util-visit@5.0.0:
     resolution: {integrity: sha512-MR04uvD+07cwl/yhVuVWAtw+3GOR/knlL55Nd/wAdblk27GCVt3lqpTivy/tkJcZoNPzTwS1Y+KMojlLDhoTzg==}
@@ -11570,7 +11561,7 @@ snapshots:
 
   '@fast-csv/parse@4.3.6':
     dependencies:
-      '@types/node': 20.16.5
+      '@types/node': 18.19.50
       lodash.escaperegexp: 4.1.2
       lodash.groupby: 4.6.0
       lodash.isfunction: 3.0.9
@@ -13256,7 +13247,7 @@ snapshots:
 
   '@types/mdast@4.0.4':
     dependencies:
-      '@types/unist': 2.0.10
+      '@types/unist': 3.0.3
 
   '@types/mime@1.3.5': {}
 
@@ -13279,9 +13270,9 @@ snapshots:
 
   '@types/node@14.18.63': {}
 
-  '@types/node@20.16.5':
+  '@types/node@18.19.50':
     dependencies:
-      undici-types: 6.19.6
+      undici-types: 5.26.5
 
   '@types/node@22.5.4':
     dependencies:
@@ -13405,8 +13396,6 @@ snapshots:
   '@types/uglify-js@3.17.5':
     dependencies:
       source-map: 0.6.1
-
-  '@types/unist@2.0.10': {}
 
   '@types/unist@3.0.3': {}
 
@@ -15576,7 +15565,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-b6997ec-20240910(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-5c9a529-20240911(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.6
@@ -20080,6 +20069,8 @@ snapshots:
       has-symbols: 1.0.3
       which-boxed-primitive: 1.0.2
 
+  undici-types@5.26.5: {}
+
   undici-types@6.19.6: {}
 
   unicode-canonical-property-names-ecmascript@2.0.0: {}
@@ -20113,8 +20104,6 @@ snapshots:
     dependencies:
       imurmurhash: 0.1.4
 
-  unist-util-is@4.1.0: {}
-
   unist-util-is@6.0.0:
     dependencies:
       '@types/unist': 3.0.3
@@ -20123,21 +20112,10 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
-  unist-util-visit-parents@3.1.1:
-    dependencies:
-      '@types/unist': 2.0.10
-      unist-util-is: 4.1.0
-
   unist-util-visit-parents@6.0.1:
     dependencies:
       '@types/unist': 3.0.3
       unist-util-is: 6.0.0
-
-  unist-util-visit@2.0.3:
-    dependencies:
-      '@types/unist': 2.0.10
-      unist-util-is: 4.1.0
-      unist-util-visit-parents: 3.1.1
 
   unist-util-visit@5.0.0:
     dependencies:

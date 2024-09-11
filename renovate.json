@@ -127,11 +127,6 @@
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
     },
     {
-      "groupName": "unist-util-visit - incompatible versions",
-      "matchPackageNames": ["unist-util-visit"],
-      "allowedVersions": "< 3.0.0"
-    },
-    {
       "groupName": "react-docgen - incompatible versions",
       "matchPackageNames": ["react-docgen"],
       "allowedVersions": "< 6.0.0"

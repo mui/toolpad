@@ -108,7 +108,7 @@
     "remark": "15.0.1",
     "rimraf": "5.0.10",
     "typescript": "5.5.4",
-    "unist-util-visit": "2.0.3",
+    "unist-util-visit": "5.0.0",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.7.0"
   },

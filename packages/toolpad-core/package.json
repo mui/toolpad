@@ -76,7 +76,7 @@
     "next": "^14.2.8",
     "next-router-mock": "^0.9.13",
     "playwright": "^1.46.1",
-    "sinon": "^18.0.0",
+    "sinon": "^18.0.1",
     "vitest": "2.0.5"
   },
   "peerDependencies": {

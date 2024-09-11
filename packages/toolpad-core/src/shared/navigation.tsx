@@ -20,7 +20,7 @@ export function isPageItemSelected(
   pathname: string,
 ) {
   return navigationItem.pattern
-    ? pathToRegexp(`${basePath}${navigationItem.pattern}`).test(pathname)
+    ? pathToRegexp(`${basePath}${navigationItem.pattern}`).regexp.test(pathname)
     : getPageItemFullPath(basePath, navigationItem) === pathname;
 }
 

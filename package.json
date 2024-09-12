@@ -57,7 +57,7 @@
     "@mui/internal-docs-utils": "1.0.12",
     "@mui/internal-markdown": "1.0.13",
     "@mui/internal-scripts": "1.0.20",
-    "@mui/monorepo": "github:mui/material-ui#20fa6b93c3afb4c5fa293aec299b1f9190e26e03",
+    "@mui/monorepo": "github:mui/material-ui#94cc3d0a66456713e6e25edf9a1ba35ad8df88bc",
     "@mui/x-charts": "7.16.0",
     "@next/eslint-plugin-next": "14.2.8",
     "@playwright/test": "1.46.1",
@@ -105,10 +105,10 @@
     "react-docgen": "5.4.3",
     "react-inspector": "6.0.2",
     "regenerator-runtime": "0.14.1",
-    "remark": "13.0.0",
+    "remark": "15.0.1",
     "rimraf": "5.0.10",
     "typescript": "5.6.2",
-    "unist-util-visit": "2.0.3",
+    "unist-util-visit": "5.0.0",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.7.1"
   },
@@ -135,7 +135,8 @@
     "pnpm": "9.7.1"
   },
   "resolutions": {
-    "google-auth-library": "*"
+    "google-auth-library": "*",
+    "@types/node": "22.5.4"
   },
   "packageManager": "pnpm@9.7.1"
 }

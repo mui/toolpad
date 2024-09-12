@@ -11,7 +11,6 @@ import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core';
 import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import LinearProgress from '@mui/material/LinearProgress';
-import theme from '../theme';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
@@ -28,7 +27,6 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    segment: '',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
@@ -40,7 +38,7 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: 'My Toolpad Core App',
+  title: 'My Toolpad Core Next.js Pages App',
 };
 
 const AUTHENTICATION = {
@@ -78,7 +76,6 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         branding={BRANDING}
         session={session}
         authentication={AUTHENTICATION}
-        theme={theme}
       >
         {children}
       </AppProvider>

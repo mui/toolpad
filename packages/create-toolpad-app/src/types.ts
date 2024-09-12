@@ -1,18 +1,22 @@
+import type { SupportedAuthProvider } from '@toolpad/core';
+
 import { PackageJson } from './templates/packageType';
-
-// https://authjs.dev/reference/core/providers#oauthconfigprofile
-type SupportedOAuthProvider = 'facebook' | 'github' | 'google';
-
-// https://authjs.dev/reference/core/providers#providertype
-export type SupportedAuthProvider = SupportedOAuthProvider | 'credentials';
 
 export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';
 export type PackageManager = 'npm' | 'pnpm' | 'yarn';
+type ProjectType = 'core' | 'studio';
 
-export type ProviderTemplate = (provider: SupportedAuthProvider) => string;
+export interface GenerateProjectOptions {
+  name: string;
+  absolutePath: string;
+  auth?: boolean;
+  authProviders?: SupportedAuthProvider[];
+  router?: SupportedRouter;
+  coreVersion?: string;
+  projectType?: ProjectType;
+  packageManager?: PackageManager;
+}
 
-export type ProvidersTemplate = (providers: SupportedAuthProvider[]) => string;
+export type Template = (options: GenerateProjectOptions) => string;
 
-export type BooleanTemplate = (value: boolean) => string;
-
-export type PackageJsonTemplate = (appName: string, coreVersion?: string) => PackageJson;
+export type PackageJsonTemplate = (options: GenerateProjectOptions) => PackageJson;

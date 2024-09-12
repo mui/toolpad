@@ -195,6 +195,7 @@ function DashboardSidebarSubNavigation({
                 mx: 1,
                 mt: 1,
                 mb: nextItem?.kind === 'header' && !isMini ? 0 : 1,
+                ...(isMobileViewport ? {} : getDrawerSxTransitionMixin(isFullyExpanded, 'margin')),
               }}
             />
           );

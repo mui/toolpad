@@ -38,7 +38,7 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: 'My Toolpad Core App',
+  title: 'My Toolpad Core Next.js Pages next-auth 4 App',
 };
 
 const AUTHENTICATION = {

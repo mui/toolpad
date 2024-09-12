@@ -542,6 +542,9 @@ importers:
       '@inquirer/prompts':
         specifier: ^5.5.0
         version: 5.5.0
+      '@toolpad/core':
+        specifier: workspace:*
+        version: link:../toolpad-core/build
       '@toolpad/utils':
         specifier: workspace:*
         version: link:../toolpad-utils

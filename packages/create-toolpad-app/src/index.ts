@@ -12,12 +12,17 @@ import { satisfies } from 'semver';
 import { readJsonFile } from '@toolpad/utils/fs';
 import invariant from 'invariant';
 import { bashResolvePath } from '@toolpad/utils/cli';
-import generateProject, { GenerateProjectOptions } from './generateProject';
+import generateProject from './generateProject';
 import generateStudioProject from './generateStudioProject';
 import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
 import type { PackageJson } from './templates/packageType';
-import type { SupportedRouter, SupportedAuthProvider, PackageManager } from './types';
+import type {
+  SupportedRouter,
+  SupportedAuthProvider,
+  PackageManager,
+  GenerateProjectOptions,
+} from './types';
 
 /**
  * Find package.json of the create-toolpad-app package
@@ -129,8 +134,14 @@ const scaffoldStudioProject = async (absolutePath: string, installFlag: boolean)
   );
   // eslint-disable-next-line no-console
   console.log();
+  const options: GenerateProjectOptions = {
+    name: path.basename(absolutePath),
+    absolutePath,
+    projectType: 'studio',
+    packageManager,
+  };
+  const files = generateStudioProject(options);
 
-  const files = generateStudioProject(packageManager, path.basename(absolutePath));
   await writeFiles(absolutePath, files);
 
   if (installFlag) {

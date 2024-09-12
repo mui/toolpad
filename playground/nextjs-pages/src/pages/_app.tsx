@@ -27,6 +27,7 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
+    segment: '',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
@@ -38,7 +39,7 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: 'My Toolpad Core App',
+  title: 'My Toolpad Core Next.js Pages App',
 };
 
 const AUTHENTICATION = {

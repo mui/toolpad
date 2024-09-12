@@ -1,4 +1,9 @@
-const app = `import * as React from 'react';
+import type { Template } from '../../types';
+
+const app: Template = (options) => {
+  const authEnabled = options.auth;
+
+  return `import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -9,10 +14,17 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core';
+${
+  authEnabled
+    ? `import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
+import LinearProgress from '@mui/material/LinearProgress';`
+    : ''
+}
 import theme from '../theme';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: React.ReactElement) => React.ReactNode;  
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+  ${authEnabled ? 'requireAuth?: boolean;' : ''}
 };
 
 type AppPropsWithLayout = AppProps & {
@@ -37,11 +49,29 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: 'My Toolpad Core App',
-  logo: <DashboardIcon />,
+  title: 'My Toolpad Core Next.js Pages App',
 };
 
+${
+  authEnabled
+    ? `
+const AUTHENTICATION = {
+  signIn,
+  signOut,
+};
 
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { status } = useSession();
+
+  if (status === 'loading') {
+    return <LinearProgress />;
+  }
+
+  return children;
+}
+`
+    : ''
+}
 
 function getDefaultLayout(page: React.ReactElement) {
   return (
@@ -51,8 +81,8 @@ function getDefaultLayout(page: React.ReactElement) {
   );
 }
 
-
-function AppLayout({ children }: { children: React.ReactNode }) {  
+function AppLayout({ children }: { children: React.ReactNode }) {
+  ${authEnabled ? `const { data: session } = useSession();` : ''}
   return (
     <React.Fragment>
       <Head>
@@ -60,8 +90,14 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       </Head>
       <AppProvider
         navigation={NAVIGATION}
-        branding={BRANDING}          
-        theme={theme}      
+        branding={BRANDING}
+        ${
+          authEnabled
+            ? `session={session}
+        authentication={AUTHENTICATION}`
+            : ''
+        }
+        theme={theme}
       >
         {children}
       </AppProvider>
@@ -72,20 +108,31 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 export default function App(props: AppPropsWithLayout) {
   const {
     Component,
-    pageProps,
+    pageProps${authEnabled ? `: { session, ...pageProps }` : ''},
   } = props;
 
   const getLayout = Component.getLayout ?? getDefaultLayout;
+  ${
+    authEnabled
+      ? `const requireAuth = Component.requireAuth ?? true;
 
-  let pageContent = getLayout(<Component {...pageProps} />);  
+  let pageContent = getLayout(<Component {...pageProps} />);
+  if (requireAuth) {
+    pageContent = <RequireAuth>{pageContent}</RequireAuth>;
+  }`
+      : `let pageContent = getLayout(<Component {...pageProps} />);`
+  }
   pageContent = <AppLayout>{pageContent}</AppLayout>;
 
   return (
     <AppCacheProvider {...props}>
-      {pageContent}
+      ${authEnabled ? `<SessionProvider session={session}>` : ''}
+        {pageContent}
+      ${authEnabled ? `</SessionProvider>` : ''}
     </AppCacheProvider>
   );
 }
 `;
+};
 
 export default app;

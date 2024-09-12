@@ -4,7 +4,7 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ toolbarAccount?: { signInLabel?: string, signOutLabel?: string, slotProps?: { avatar?: object, iconButton?: object, signInButton?: object, signOutButton?: object } }, toolbarActions?: object }"
+        "description": "{ toolbarAccount?: { localeText?: { signInLabel: string, signOutLabel: string }, slotProps?: { iconButton?: object, signInButton?: object, signOutButton?: object }, slots?: { menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
       },
       "default": "{}"
     },

@@ -256,8 +256,16 @@ describe('DashboardLayout', () => {
     );
     expect(within(navigation).getByRole('link', { name: 'Orders' })).toHaveClass('Mui-selected');
 
+    rerender(<AppWithPathname pathname="/dynamic" />);
+    expect(within(navigation).getByRole('link', { name: 'Dynamic' })).not.toHaveClass(
+      'Mui-selected',
+    );
     rerender(<AppWithPathname pathname="/dynamic/123" />);
     expect(within(navigation).getByRole('link', { name: 'Dynamic' })).toHaveClass('Mui-selected');
+    rerender(<AppWithPathname pathname="/dynamic/123/456" />);
+    expect(within(navigation).getByRole('link', { name: 'Dynamic' })).not.toHaveClass(
+      'Mui-selected',
+    );
 
     rerender(<AppWithPathname pathname="/oneormore" />);
     expect(within(navigation).getByRole('link', { name: 'One or more' })).not.toHaveClass(
@@ -276,6 +284,10 @@ describe('DashboardLayout', () => {
     expect(within(navigation).getByRole('link', { name: 'Optional' })).toHaveClass('Mui-selected');
     rerender(<AppWithPathname pathname="/optional/123" />);
     expect(within(navigation).getByRole('link', { name: 'Optional' })).toHaveClass('Mui-selected');
+    rerender(<AppWithPathname pathname="/optional/123/456" />);
+    expect(within(navigation).getByRole('link', { name: 'Optional' })).not.toHaveClass(
+      'Mui-selected',
+    );
 
     rerender(<AppWithPathname pathname="/zeroormore" />);
     expect(within(navigation).getByRole('link', { name: 'Zero or more' })).toHaveClass(

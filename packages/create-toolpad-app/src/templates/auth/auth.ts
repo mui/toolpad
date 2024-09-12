@@ -1,5 +1,5 @@
-import { kebabToConstant } from '@toolpad/utils/strings';
-import { ProvidersTemplate, SupportedAuthProvider } from '../../types';
+import { kebabToConstant, capitalize } from '@toolpad/utils/strings';
+import { Template, SupportedAuthProvider } from '../../types';
 
 const CredentialsProviderTemplate = `Credentials({
   credentials: {
@@ -18,21 +18,56 @@ const CredentialsProviderTemplate = `Credentials({
   },
 }),`;
 
-const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `${provider}({
+const checkEnvironmentVariables = (providers: SupportedAuthProvider[] | undefined) => `
+
+const missingVars: string[] = [];
+
+const isMissing = (name: string, envVar: string | undefined) => {
+  if (!envVar) {
+    missingVars.push(name);
+  }
+};
+
+
+${providers
+  ?.filter((p) => p !== 'credentials')
+  .map(
+    (provider) =>
+      `isMissing('${kebabToConstant(provider)}_CLIENT_ID', process.env.${kebabToConstant(provider)}_CLIENT_ID);\nisMissing('${kebabToConstant(provider)}_CLIENT_SECRET', process.env.${kebabToConstant(provider)}_CLIENT_SECRET)`,
+  )
+  .join('\n')}
+
+if (missingVars.length > 0) {
+  const baseMessage = 'Authentication is configured but the following environment variables are missing:';
+  
+  if (process.env.NODE_ENV === 'production') {
+    console.warn(\`warn: \${baseMessage} \${missingVars.join(', ')}\`);
+  } else {
+    console.warn(\`\\u001b[33mwarn:\\u001b[0m \${baseMessage} \\u001b[31m\${missingVars.join(', ')}\\u001b[0m\`);
+  }
+}`;
+
+const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `
+${capitalize(provider)}({
   clientId: process.env.${kebabToConstant(provider)}_CLIENT_ID,
   clientSecret: process.env.${kebabToConstant(provider)}_CLIENT_SECRET,
 }),`;
 
-const auth: ProvidersTemplate = (providers) => {
+const auth: Template = (options) => {
+  const providers = options.authProviders;
+
   return `import NextAuth from 'next-auth';
   ${providers
-    .map((provider) => `import ${provider} from 'next-auth/providers/${provider.toLowerCase()}';`)
+    ?.map(
+      (provider) =>
+        `import ${capitalize(provider)} from 'next-auth/providers/${provider.toLowerCase()}';`,
+    )
     .join('\n')}
 import type { Provider } from 'next-auth/providers';
 
 const providers: Provider[] = [
     ${providers
-      .map((provider) => {
+      ?.map((provider) => {
         if (provider === 'credentials') {
           return CredentialsProviderTemplate;
         }
@@ -40,6 +75,8 @@ const providers: Provider[] = [
       })
       .join('\n')}
 ];
+
+${checkEnvironmentVariables(providers)}
 
 export const providerMap = providers.map((provider) => {
   if (typeof provider === 'function') {

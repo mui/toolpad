@@ -1,6 +1,10 @@
-import { BooleanTemplate } from '../../../types';
+import { Template } from '../../../types';
 
-const signInPage: BooleanTemplate = (hasCredentialsProvider) => `import * as React from 'react';
+const signInPage: Template = (options) => {
+  const { authProviders: providers } = options;
+  const hasCredentialsProvider = providers?.includes('credentials');
+
+  return `import * as React from 'react';
 import type { AuthProvider } from '@toolpad/core';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { AuthError } from 'next-auth';
@@ -48,5 +52,6 @@ export default function SignIn() {
     />
   );
 }`;
+};
 
 export default signInPage;

@@ -608,10 +608,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 xs: 'block',
                 sm: disableCollapsibleSidebar ? 'block' : 'none',
               },
-              ...getDrawerSharedSx(isMobileMini),
+              ...getDrawerSharedSx(false),
             }}
           >
-            {getDrawerContent(isMobileMini)}
+            {getDrawerContent(false)}
           </Drawer>
           <Drawer
             variant="permanent"

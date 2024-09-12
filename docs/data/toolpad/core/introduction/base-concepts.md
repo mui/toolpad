@@ -8,7 +8,7 @@ title: Toolpad Core - Base Concepts
 
 ## Imports
 
-Toolpad Core components can be imported directly from the `@toolpad/core` package. This allows you to use them alongside your existing Material UI or other components.
+Toolpad Core components can be imported directly from the `@toolpad/core` package. This allows you to use them alongside your existing Material UI or other components.
 
 ```tsx
 import { Button } from '@mui/material';

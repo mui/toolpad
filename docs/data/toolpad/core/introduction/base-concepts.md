@@ -41,7 +41,7 @@ By wrapping your application with `AppProvider`, you ensure that all other Toolp
 
 The `AppProvider` component accepts the following props:
 
-- `theme`: The theme to be used by the app in light/dark mode. If you are using [Material UI with a custom theme](https://mui.com/material-ui/customization/theming/), you can directly pass it here.
+- `theme`: The theme to be used by the app in light/dark mode. If you are using [Material UI with a custom theme](https://mui.com/material-ui/customization/theming/), you can directly pass it here.
 
   ```tsx
   import { createTheme } from '@mui/material';

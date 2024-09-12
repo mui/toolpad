@@ -30,7 +30,7 @@ When signed out, the component renders as an inline sign in button within the da
 
 The underlying `signInButton`, `signOutButton` and `iconButton` components can be customized by passing in `slotProps` to the `Account` component.
 
-Labels for the sign in and sign out buttons through the `localeText` prop.
+Labels for the sign in and sign out buttons can be customized through the `localeText` prop.
 
 {{"demo": "AccountCustom.js", "bg": "outlined" }}
 

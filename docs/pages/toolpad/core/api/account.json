@@ -1,19 +1,47 @@
 {
   "props": {
-    "signInLabel": { "type": { "name": "string" }, "default": "'Sign In'" },
-    "signOutLabel": { "type": { "name": "string" }, "default": "'Sign Out'" },
+    "localeText": {
+      "type": { "name": "shape", "description": "{ signInLabel: string, signOutLabel: string }" },
+      "default": "DEFAULT_LOCALE_TEXT"
+    },
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ avatar?: object, iconButton?: object, signInButton?: object, signOutButton?: object }"
+        "description": "{ iconButton?: object, signInButton?: object, signOutButton?: object }"
+      }
+    },
+    "slots": {
+      "type": {
+        "name": "shape",
+        "description": "{ menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType }"
       },
-      "default": "{}"
+      "additionalInfo": { "slotsApi": true }
     }
   },
   "name": "Account",
   "imports": [
     "import { Account } from '@toolpad/core/Account';",
     "import { Account } from '@toolpad/core';"
+  ],
+  "slots": [
+    {
+      "name": "signInButton",
+      "description": "The component used for the sign in button.",
+      "default": "Button",
+      "class": null
+    },
+    {
+      "name": "signOutButton",
+      "description": "The component used for the sign out button.",
+      "default": "MenuItem",
+      "class": null
+    },
+    {
+      "name": "menuItems",
+      "description": "The component used for the custom menu items.",
+      "default": "null",
+      "class": null
+    }
   ],
   "classes": [],
   "spread": true,

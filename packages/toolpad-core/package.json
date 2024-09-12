@@ -48,7 +48,7 @@
     "build:types": "tsc -b tsconfig.build.json",
     "predev": "pnpm clean",
     "dev": "concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch --preserveWatchOutput\"",
-    "check-types": "tsc --noEmit",
+    "check-types": "pnpm build:types && tsc --noEmit",
     "test": "vitest run --coverage",
     "test:dev": "vitest",
     "test:browser": "vitest run --browser.enabled",

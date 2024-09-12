@@ -195,10 +195,10 @@ function SignInPage(props: SignInPageProps) {
           </Avatar>
         )}
 
-        <Typography variant="h5" color="textPrimary" gutterBottom>
+        <Typography variant="h5" color="textPrimary" gutterBottom textAlign="center">
           Sign in {branding?.title ? `to ${branding.title}` : null}
         </Typography>
-        <Typography variant="body2" color="textSecondary" gutterBottom>
+        <Typography variant="body2" color="textSecondary" gutterBottom textAlign="center">
           Welcome user, please sign in to continue
         </Typography>
         <Box sx={{ mt: 2 }}>

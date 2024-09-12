@@ -30,12 +30,16 @@ When signed out, the component renders as an inline sign in button within the da
 
 ## Customization
 
-### Components
+### Slot Props
 
-`Account` can take different labels for the sign in and sign out buttons through the `signInLabel` and `signOutLabel` props. Deeper changes can be made by passing in `slotProps` to the underlying components.
+The underlying `signInButton`, `signOutButton` and `iconButton` components can be customized by passing in `slotProps` to the `Account` component.
+
+Labels for the sign in and sign out buttons can be customized through the `localeText` prop.
 
 {{"demo": "AccountCustom.js", "bg": "outlined" }}
 
-### 🚧 Composition
+### Slots
 
-The `Account` component allows adding your own menu options, including deeply nested options. This is in progress.
+You can pass in your own items to the `Account` menu through the `menuItems` slot to add additional menu items in the space between the user's account details and the sign out button, to create larger, more complex menus:
+
+{{"demo": "AccountSlots.js", "bg": "gradient"}}

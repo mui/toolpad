@@ -60,7 +60,6 @@ type SupportedOAuthProvider =
   | 'fusionauth'
   | 'microsoft-entra-id';
 
-// https://authjs.dev/reference/core/providers#providertype
 export type SupportedAuthProvider = SupportedOAuthProvider | 'credentials';
 
 const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([

@@ -1,5 +1,7 @@
-import { kebabToConstant, capitalize } from '@toolpad/utils/strings';
-import { Template, SupportedAuthProvider } from '../../types';
+import type { SupportedAuthProvider } from '@toolpad/core';
+import { kebabToConstant, kebabToPascal } from '@toolpad/utils/strings';
+import { requiresIssuer, requiresTenantId } from './utils';
+import { Template } from '../../types';
 
 const CredentialsProviderTemplate = `Credentials({
   credentials: {
@@ -17,6 +19,12 @@ const CredentialsProviderTemplate = `Credentials({
     };
   },
 }),`;
+
+const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `${kebabToPascal(provider)}({
+  clientId: process.env.${kebabToConstant(provider)}_CLIENT_ID,
+  clientSecret: process.env.${kebabToConstant(provider)}_CLIENT_SECRET,
+  ${requiresIssuer(provider) ? `issuer: process.env.${kebabToConstant(provider)}_ISSUER,\n` : ''}${requiresTenantId(provider) ? `tenantId: process.env.${kebabToConstant(provider)}_TENANT_ID,` : ''}
+  })`;
 
 const checkEnvironmentVariables = (providers: SupportedAuthProvider[] | undefined) => `
 
@@ -47,12 +55,6 @@ if (missingVars.length > 0) {
   }
 }`;
 
-const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `
-${capitalize(provider)}({
-  clientId: process.env.${kebabToConstant(provider)}_CLIENT_ID,
-  clientSecret: process.env.${kebabToConstant(provider)}_CLIENT_SECRET,
-}),`;
-
 const auth: Template = (options) => {
   const providers = options.authProviders;
 
@@ -60,7 +62,7 @@ const auth: Template = (options) => {
   ${providers
     ?.map(
       (provider) =>
-        `import ${capitalize(provider)} from 'next-auth/providers/${provider.toLowerCase()}';`,
+        `import ${kebabToPascal(provider)} from 'next-auth/providers/${provider.toLowerCase()}';`,
     )
     .join('\n')}
 import type { Provider } from 'next-auth/providers';

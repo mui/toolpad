@@ -8,7 +8,7 @@ title: Persistent storage state
 <p class="description">Hooks for synchronizing React state with browser storage.</p>
 
 :::info
-If this is your first time using Toolpad Core, you might want to start with the [base concepts](/docs/data/toolpad/core/introduction/base-concepts/) instead.
+If this is your first time using Toolpad Core, you might want to start with the [base concepts](/toolpad/core/introduction/base-concepts/) instead.
 :::
 
 Toolpad Core provides a set of primitives that harmonize how you deal with persisting global state in the browser. Through our hooks you can synchronise React state with local storage or session storage, or in the url as a query parameter. These hooks all follow a similar philosophy: they identify their data with a unique key and support rich data types through the use of codecs.

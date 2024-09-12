@@ -9,7 +9,7 @@ components: AppProvider, DashboardLayout, Account
 <p class="description">The dashboard layout component provides a customizable out-of-the-box layout for a typical dashboard page.</p>
 
 :::info
-If this is your first time using Toolpad Core, you might want to start with the [base concepts](/docs/data/toolpad/core/introduction/base-concepts/) instead.
+If this is your first time using Toolpad Core, you might want to start with the [base concepts](/toolpad/core/introduction/base-concepts/) instead.
 :::
 
 The `DashboardLayout` component is a quick, easy way to provide a standard full-screen layout with a header and sidebar to any dashboard page, as well as ready-to-use and easy to customize navigation and branding.

@@ -1,13 +1,12 @@
 import packageJson from './templates/packageJson';
 import gitignore from './templates/gitignore';
-import type { PackageManager } from './types';
+import type { GenerateProjectOptions } from './types';
 
 export default function generateStudioProject(
-  packageManager: PackageManager,
-  name: string,
+  options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
   const files = new Map<string, { content: string }>([
-    ['package.json', { content: JSON.stringify(packageJson(name, 'studio'), null, 2) }],
+    ['package.json', { content: JSON.stringify(packageJson(options), null, 2) }],
     ['.gitignore', { content: gitignore }],
   ]);
 

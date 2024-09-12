@@ -1,12 +1,8 @@
 import { PackageJsonTemplate } from '../types';
 
-const packageJson: PackageJsonTemplate = (
-  appName,
-  projectType,
-  routerType,
-  authOption,
-  coreVersion,
-) => {
+const packageJson: PackageJsonTemplate = (options) => {
+  const { name: appName, projectType, router: routerType, auth: authOption, coreVersion } = options;
+
   if (projectType === 'studio') {
     return {
       name: appName,

@@ -1,4 +1,9 @@
-const rootLayout = (authEnabled: boolean) => `import * as React from 'react';
+import { Template } from '../../types';
+
+const rootLayout: Template = (options) => {
+  const authEnabled = options.auth;
+
+  return `import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -72,5 +77,6 @@ export default ${authEnabled ? 'async ' : ''}function RootLayout(props: { childr
   );
 }
 `;
+};
 
 export default rootLayout;

@@ -1,6 +1,9 @@
-import { SupportedRouter } from '../types';
+import { Template } from '../types';
 
-const indexPage = (authEnabled: boolean, routerType: SupportedRouter) => {
+const indexPage: Template = (options) => {
+  const authEnabled = options.auth;
+  const routerType = options.router;
+
   let imports = `import * as React from 'react';
 import Typography from '@mui/material/Typography';`;
 

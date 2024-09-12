@@ -1,5 +1,3 @@
-import type { SupportedAuthProvider } from '@toolpad/core';
-
 // Common files for all apps
 import theme from './templates/theme';
 import eslintConfig from './templates/eslintConfig';
@@ -33,16 +31,7 @@ import signInPage from './templates/auth/nextjs-app/signInPage';
 // Auth files for pages router
 import signInPagePagesRouter from './templates/auth/nextjs-pages/signIn';
 
-import { SupportedRouter } from './types';
-
-export interface GenerateProjectOptions {
-  name: string;
-  absolutePath: string;
-  auth: boolean;
-  authProviders: SupportedAuthProvider[];
-  coreVersion?: string;
-  router: SupportedRouter;
-}
+import { GenerateProjectOptions } from './types';
 
 export default function generateProject(
   options: GenerateProjectOptions,
@@ -61,14 +50,11 @@ export default function generateProject(
     [
       'package.json',
       {
-        content: JSON.stringify(
-          packageJson(options.name, 'core', options.router, options.auth, options.coreVersion),
-        ),
+        content: JSON.stringify(packageJson(options)),
       },
     ],
   ]);
-  const indexPageContent = indexPage(options.auth, options.router);
-  const hasCredentialsProvider = options.authProviders.includes('credentials');
+  const indexPageContent = indexPage(options);
 
   switch (options.router) {
     case 'nextjs-pages': {
@@ -76,18 +62,18 @@ export default function generateProject(
         ['pages/index.tsx', { content: indexPageContent }],
         ['pages/orders/index.tsx', { content: ordersPage }],
         ['pages/_document.tsx', { content: document }],
-        ['pages/_app.tsx', { content: app(options.auth) }],
+        ['pages/_app.tsx', { content: app(options) }],
       ]);
       if (options.auth) {
         const authFiles = new Map([
-          ['auth.ts', { content: auth(options.authProviders) }],
-          ['.env.local', { content: envLocal(options.authProviders) }],
+          ['auth.ts', { content: auth(options) }],
+          ['.env.local', { content: envLocal(options) }],
           ['middleware.ts', { content: middleware }],
           // next-auth v5 does not provide an API route, so this file must be in the app router
           // even if the rest of the app is using pages router
           // https://authjs.dev/getting-started/installation#configure
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
-          ['pages/auth/signin.tsx', { content: signInPagePagesRouter(hasCredentialsProvider) }],
+          ['pages/auth/signin.tsx', { content: signInPagePagesRouter(options) }],
         ]);
         return new Map([...files, ...nextJsPagesRouterStarter, ...authFiles]);
       }
@@ -97,18 +83,18 @@ export default function generateProject(
     default: {
       const nextJsAppRouterStarter = new Map([
         ['app/(dashboard)/layout.tsx', { content: dashboardLayout }],
-        ['app/layout.tsx', { content: rootLayout(options.auth) }],
+        ['app/layout.tsx', { content: rootLayout(options) }],
         ['app/NavigateButton.tsx', { content: NavigateButton }],
         ['app/(dashboard)/page.tsx', { content: indexPageContent }],
         ['app/(dashboard)/orders/page.tsx', { content: ordersPage }],
       ]);
       if (options.auth) {
         const authFiles = new Map([
-          ['auth.ts', { content: auth(options.authProviders) }],
-          ['.env.local', { content: envLocal(options.authProviders) }],
+          ['auth.ts', { content: auth(options) }],
+          ['.env.local', { content: envLocal(options) }],
           ['middleware.ts', { content: middleware }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
-          ['app/auth/signin/page.tsx', { content: signInPage(hasCredentialsProvider) }],
+          ['app/auth/signin/page.tsx', { content: signInPage(options) }],
         ]);
 
         return new Map([...files, ...nextJsAppRouterStarter, ...authFiles]);

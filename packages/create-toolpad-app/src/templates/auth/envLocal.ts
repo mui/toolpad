@@ -1,10 +1,10 @@
 import { kebabToConstant } from '@toolpad/utils/strings';
-import { ProvidersTemplate } from '../../types';
 import { requiresIssuer, requiresTenantId } from './utils';
+import { Template } from '../../types';
 
-const env: ProvidersTemplate = (providers) => {
-  const nonCredentialProviders = providers.filter((provider) => provider !== 'credentials');
-
+const env: Template = (options) => {
+  const { authProviders: providers } = options;
+  const nonCredentialProviders = providers?.filter((provider) => provider !== 'credentials');
   return `
 # Generate a secret with \`npx auth secret\`
 # and replace the value below with it
@@ -13,7 +13,7 @@ AUTH_SECRET=secret
 # Add secrets for your auth providers to the .env.local file
 
 ${nonCredentialProviders
-  .map(
+  ?.map(
     (provider) => `
 ${kebabToConstant(provider)}_CLIENT_ID=
 ${kebabToConstant(provider)}_CLIENT_SECRET=

@@ -122,7 +122,7 @@ If you want to add authentication, you can use Auth.js with Toolpad Core. Here's
 npm install next-auth@beta
 ```
 
-#### b. Create an `auth.ts` file:
+#### b. Create an `auth.ts` file
 
 ```ts title="auth.ts"
 import NextAuth from 'next-auth';
@@ -457,7 +457,7 @@ If you want to add authentication, you can use Auth.js with Toolpad Core. Here's
 npm install next-auth@beta
 ```
 
-#### b. Create an `auth.ts` file:
+#### b. Create an `auth.ts` file
 
 ```ts title="auth.ts"
 import NextAuth from 'next-auth';

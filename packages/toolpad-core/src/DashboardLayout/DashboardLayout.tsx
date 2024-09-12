@@ -464,13 +464,19 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   slotProps: PropTypes.shape({
     toolbarAccount: PropTypes.shape({
-      signInLabel: PropTypes.string,
-      signOutLabel: PropTypes.string,
+      localeText: PropTypes.shape({
+        signInLabel: PropTypes.string.isRequired,
+        signOutLabel: PropTypes.string.isRequired,
+      }),
       slotProps: PropTypes.shape({
-        avatar: PropTypes.object,
         iconButton: PropTypes.object,
         signInButton: PropTypes.object,
         signOutButton: PropTypes.object,
+      }),
+      slots: PropTypes.shape({
+        menuItems: PropTypes.elementType,
+        signInButton: PropTypes.elementType,
+        signOutButton: PropTypes.elementType,
       }),
     }),
     toolbarActions: PropTypes.object,

@@ -113,6 +113,7 @@ interface DashboardSidebarSubNavigationProps {
   onLinkClick: () => void;
   isMini?: boolean;
   isFullyExpanded?: boolean;
+  isMobileViewport?: boolean;
   selectedItemId: string;
 }
 
@@ -123,6 +124,7 @@ function DashboardSidebarSubNavigation({
   onLinkClick,
   isMini = false,
   isFullyExpanded = true,
+  isMobileViewport = false,
   selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
@@ -170,7 +172,7 @@ function DashboardSidebarSubNavigation({
                 fontSize: 12,
                 fontWeight: '700',
                 height: isMini ? 0 : 40,
-                ...getDrawerSxTransitionMixin(isFullyExpanded, 'height'),
+                ...(isMobileViewport ? {} : getDrawerSxTransitionMixin(isFullyExpanded, 'height')),
                 px: 2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -307,6 +309,7 @@ function DashboardSidebarSubNavigation({
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
                   selectedItemId={selectedItemId}
+                  isMobileViewport={isMobileViewport}
                 />
               </Collapse>
             ) : null}
@@ -452,10 +455,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
             <IconButton
               aria-label={`${isExpanded ? collapseMenuActionText : expandMenuActionText} navigation menu`}
               onClick={toggleNavigationExpanded}
-              edge="start"
-              sx={{
-                ml: { xs: -0.75, sm: -1.5 },
-              }}
             >
               {isExpanded ? <MenuOpenIcon /> : <MenuIcon />}
             </IconButton>
@@ -475,7 +474,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
           sx={{
             overflow: 'auto',
             pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
-            ...getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding'),
+            ...(isMobileViewport
+              ? {}
+              : getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')),
           }}
         >
           <DashboardSidebarSubNavigation
@@ -483,12 +484,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
             onLinkClick={handleNavigationLinkClick}
             isMini={isMini}
             isFullyExpanded={isNavigationFullyExpanded}
+            isMobileViewport={isMobileViewport}
             selectedItemId={selectedItemIdRef.current}
           />
         </Box>
       </React.Fragment>
     ),
-    [handleNavigationLinkClick, isNavigationFullyExpanded, navigation],
+    [handleNavigationLinkClick, isMobileViewport, isNavigationFullyExpanded, navigation],
   );
 
   const getDrawerSharedSx = React.useCallback(
@@ -519,7 +521,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
         {
           // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
         }
-        <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
+        <Toolbar
+          sx={{ backgroundColor: 'inherit', minWidth: '100vw', mx: { xs: -0.75, sm: -1.5 } }}
+        >
           {isMobileViewport ? (
             <React.Fragment>
               <Box
@@ -538,7 +542,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                     xs: 'none',
                     sm: disableCollapsibleSidebar ? 'none' : 'block',
                   },
-                  mr: disableCollapsibleSidebar ? 0 : 3,
+                  mr: disableCollapsibleSidebar ? 0 : 2,
                 }}
               >
                 {getMenuIcon(isMobileNavigationExpanded)}
@@ -548,7 +552,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             <Box
               sx={{
                 display: disableCollapsibleSidebar ? 'none' : 'block',
-                mr: disableCollapsibleSidebar ? 0 : 3,
+                mr: disableCollapsibleSidebar ? 0 : 2,
               }}
             >
               {getMenuIcon(isDesktopNavigationExpanded)}
@@ -581,9 +585,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <ToolbarActionsSlot {...slotProps?.toolbarActions} />
-          <ThemeSwitcher />
-          <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+          <Stack direction="row" spacing={1}>
+            <ToolbarActionsSlot {...slotProps?.toolbarActions} />
+            <ThemeSwitcher />
+            <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+          </Stack>
         </Toolbar>
       </AppBar>
       {isMobileViewport ? (

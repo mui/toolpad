@@ -207,10 +207,25 @@ describe('DashboardLayout', () => {
         icon: <ShoppingCartIcon />,
       },
       {
-        segment: 'reports',
-        title: 'Reports',
+        segment: 'dynamic',
+        title: 'Dynamic',
         icon: <BarChartIcon />,
-        pattern: '/reports/:reportId',
+        pattern: '/dynamic/:dynamicId',
+      },
+      {
+        segment: 'oneOrMore',
+        title: 'One or more',
+        pattern: '/oneormore/*oneormoreId',
+      },
+      {
+        segment: 'optional',
+        title: 'Optional',
+        pattern: '/optional{/:optionalId}',
+      },
+      {
+        segment: 'zeroOrMore',
+        title: 'Zero or more',
+        pattern: '/zeroormore{/*zeroormoreId}',
       },
     ];
 
@@ -241,15 +256,39 @@ describe('DashboardLayout', () => {
     );
     expect(within(navigation).getByRole('link', { name: 'Orders' })).toHaveClass('Mui-selected');
 
-    rerender(<AppWithPathname pathname="/reports/123" />);
+    rerender(<AppWithPathname pathname="/dynamic/123" />);
+    expect(within(navigation).getByRole('link', { name: 'Dynamic' })).toHaveClass('Mui-selected');
 
-    expect(within(navigation).getByRole('link', { name: 'Dashboard' })).not.toHaveClass(
+    rerender(<AppWithPathname pathname="/oneormore" />);
+    expect(within(navigation).getByRole('link', { name: 'One or more' })).not.toHaveClass(
       'Mui-selected',
     );
-    expect(within(navigation).getByRole('link', { name: 'Orders' })).not.toHaveClass(
+    rerender(<AppWithPathname pathname="/oneormore/123" />);
+    expect(within(navigation).getByRole('link', { name: 'One or more' })).toHaveClass(
       'Mui-selected',
     );
-    expect(within(navigation).getByRole('link', { name: 'Reports' })).toHaveClass('Mui-selected');
+    rerender(<AppWithPathname pathname="/oneormore/123/456" />);
+    expect(within(navigation).getByRole('link', { name: 'One or more' })).toHaveClass(
+      'Mui-selected',
+    );
+
+    rerender(<AppWithPathname pathname="/optional" />);
+    expect(within(navigation).getByRole('link', { name: 'Optional' })).toHaveClass('Mui-selected');
+    rerender(<AppWithPathname pathname="/optional/123" />);
+    expect(within(navigation).getByRole('link', { name: 'Optional' })).toHaveClass('Mui-selected');
+
+    rerender(<AppWithPathname pathname="/zeroormore" />);
+    expect(within(navigation).getByRole('link', { name: 'Zero or more' })).toHaveClass(
+      'Mui-selected',
+    );
+    rerender(<AppWithPathname pathname="/zeroormore/123" />);
+    expect(within(navigation).getByRole('link', { name: 'Zero or more' })).toHaveClass(
+      'Mui-selected',
+    );
+    rerender(<AppWithPathname pathname="/zeroormore/123/456" />);
+    expect(within(navigation).getByRole('link', { name: 'Zero or more' })).toHaveClass(
+      'Mui-selected',
+    );
   });
 
   test('renders navigation actions', async () => {

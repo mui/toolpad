@@ -89,9 +89,9 @@ This feature is built on top of the [path-to-regexp](https://www.npmjs.com/packa
 
 - Constant path: `/orders`
 - Dynamic segment: `/orders/:segment`
-- Zero or more segments: `/orders{/:segment}*`
-- One or more segments: `/orders{/:segment}+`
-- Optional segment: `/orders{/:segment}+?`
+- One or more segments: `/orders/*segment`
+- Optional segment: `/orders{/:segment}`
+- Zero or more segments: `/orders{/*segment}`
 
 {{"demo": "DashboardLayoutPattern.js", "height": 400, "iframe": true}}
 

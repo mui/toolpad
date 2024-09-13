@@ -37,9 +37,9 @@ function MyApp({ Component, pageProps }) {
 
 By wrapping your application with `AppProvider`, you ensure that all other Toolpad components you use have access to the necessary context and functionality.
 
-#### AppProvider Props
+#### AppProvider Customization
 
-The `AppProvider` component accepts the following props:
+The `AppProvider` component accepts props to configure the app's theme, branding, router, authentication, and session. Here's a quick overview of what you can do with some of them:
 
 - `theme`: The theme to be used by the app in light/dark mode. If you are using [Material UI with a custom theme](https://mui.com/material-ui/customization/theming/), you can directly pass it here.
 
@@ -63,35 +63,6 @@ The `AppProvider` component accepts the following props:
 
   function MyApp({ Component, pageProps }) {
     return <AppProvider theme={theme}>/* Your App */</AppProvider>;
-  }
-  ```
-
-- `branding`: Branding options for the app.
-
-  ```tsx
-  import { AppProvider } from '@toolpad/core/AppProvider';
-
-  function MyApp({ Component, pageProps }) {
-    return <AppProvider branding={{ title: 'My Company Name' }}>..</AppProvider>;
-  }
-  ```
-
-- `navigation`: The navigation structure for the app.
-
-  ```tsx
-  import { ShoppingCartIcon } from '@mui/icons-material';
-  import { AppProvider } from '@toolpad/core/AppProvider';
-
-  const NAVIGATION: Navigation = [
-    {
-      segment: 'orders',
-      title: 'Orders',
-      icon: <ShoppingCartIcon />,
-    },
-  ];
-
-  function MyApp({ Component, pageProps }) {
-    return <AppProvider navigation={NAVIGATION}>..</AppProvider>;
   }
   ```
 
@@ -130,10 +101,8 @@ The `AppProvider` component accepts the following props:
   }
   ```
 
-It is important to note that the `AppProvider` component does not perform routing or authentication by itself. It integrates with any of your existing implementations for the same.
-
 :::info
-The [AppProvider](/toolpad/core/react-app-provider/) page contains more details and examples of the usage of these props.
+See the [AppProvider](/toolpad/core/react-app-provider/) page for more details and examples of the usage of all props.
 :::
 
 ## Slots

@@ -10,7 +10,11 @@ components: AppProvider, DashboardLayout, Account
 
 The `DashboardLayout` component is a quick, easy way to provide a standard full-screen layout with a header and sidebar to any dashboard page, as well as ready-to-use and easy to customize navigation and branding.
 
-Many features of this component are configurable through the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) component that should wrap it.
+Many features of this component are configurable through the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) component that must wrap it to provide the necessary context.
+
+:::info
+For more information on the `AppProvider` component that must wrap this `DashboardLayout`, please check out the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) component documentation.
+:::
 
 ## Demo
 
@@ -108,6 +112,6 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 ## Customization
 
 Some areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
-For example, this allows you to add new items to the toolbar in the header, such as a search bar.
+For example, this allows you to add new items to the toolbar in the header, such as a search bar or a button.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}

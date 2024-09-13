@@ -9,8 +9,9 @@ _Sep 13, 2024_
 A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
 
 - Migrate to Material UI v6
-- Collapsible sidebar in DashboardLayout component with mini drawer variant
+- Collapsible sidebar in `DashboardLayout` component with mini drawer variant
 - Support route patterns in navigation
+- Add more OAuth providers to `SignInPage`
 - Docs and website improvements
 
 ### `@toolpad/core`

@@ -531,6 +531,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
         'linkedin',
         'microsoft-entra-id',
         'okta',
+        'passkey',
         'slack',
         'spotify',
         'tiktok',

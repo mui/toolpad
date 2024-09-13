@@ -99,6 +99,12 @@ This feature is built on top of the [path-to-regexp](https://www.npmjs.com/packa
 
 {{"demo": "DashboardLayoutPattern.js", "height": 400, "iframe": true}}
 
+### Disabling collapsible sidebar
+
+The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop and tablet viewports. This behavior can be disabled with the `disableCollapsibleSidebar` prop.
+
+{{"demo": "DashboardLayoutNoMiniSidebar.js", "height": 400, "iframe": true}}
+
 ## Account
 
 The `DashboardLayout` comes integrated with the [`<Account />`](/toolpad/core/react-account/) component. It renders as an account management menu when a user is signed in – a `session` object is present – and a button when not.

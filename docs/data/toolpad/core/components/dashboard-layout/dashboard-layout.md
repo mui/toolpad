@@ -112,6 +112,6 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 ## Customization
 
 Some areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
-For example, this allows you to add new items to the toolbar in the header, such as a search bar.
+For example, this allows you to add new items to the toolbar in the header, such as a search bar or a button.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}

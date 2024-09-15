@@ -195,7 +195,7 @@ importers:
         version: 7.35.2(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-5c9a529-20240912(eslint@8.57.0)
+        version: 0.0.0-experimental-75b9fd4-20240912(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -449,11 +449,11 @@ importers:
         specifier: 18.3.1
         version: 18.3.1
       react-router:
-        specifier: 6.26.1
-        version: 6.26.1(react@18.3.1)
+        specifier: 6.26.2
+        version: 6.26.2(react@18.3.1)
       react-router-dom:
-        specifier: 6.26.1
-        version: 6.26.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.26.2
+        version: 6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-runner:
         specifier: 1.0.5
         version: 1.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -907,8 +907,8 @@ importers:
         specifier: 2.1.2
         version: 2.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-router-dom:
-        specifier: 6.26.1
-        version: 6.26.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 6.26.2
+        version: 6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       semver:
         specifier: 7.6.3
         version: 7.6.3
@@ -3572,8 +3572,8 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
 
-  '@remix-run/router@1.19.1':
-    resolution: {integrity: sha512-S45oynt/WH19bHbIXjtli6QmwNYvaz+vtnubvNpNDvUOoA/OWh6j1OikIP3G+v5GHdxyC6EXoChG3HgYGEUfcg==}
+  '@remix-run/router@1.19.2':
+    resolution: {integrity: sha512-baiMx18+IMuD1yyvOGaHM9QrVUPGGG0jC+z+IPHnRJWUAUvaKuWKyE8gjDj2rzv3sz9zOGoRSPgeBVHRhZnBlA==}
     engines: {node: '>=14.0.0'}
 
   '@rollup/rollup-android-arm-eabi@4.20.0':
@@ -5796,8 +5796,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-5c9a529-20240912:
-    resolution: {integrity: sha512-/fi7oVQvdq1rlnGOrqXog0jK1YTnn4Z+cgyYCi48hmo1oh3J+3fVsbz6TOGqRICBIgi7RKN+Ikt/hPycYvLr0A==}
+  eslint-plugin-react-compiler@0.0.0-experimental-75b9fd4-20240912:
+    resolution: {integrity: sha512-RDwZfd3leJZu/mLbFnv2H6991PG1eQLmpCx+6z/TUQxrIxpObplrsw5Bsb0SnxrGNuzkPkaNQDEJXszewF1Ycw==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -8629,15 +8629,15 @@ packages:
       react: ^16.14.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.14.0 || ^17.0.0 || ^18.0.0
 
-  react-router-dom@6.26.1:
-    resolution: {integrity: sha512-veut7m41S1fLql4pLhxeSW3jlqs+4MtjRLj0xvuCEXsxusJCbs6I8yn9BxzzDX2XDgafrccY6hwjmd/bL54tFw==}
+  react-router-dom@6.26.2:
+    resolution: {integrity: sha512-z7YkaEW0Dy35T3/QKPYB1LjMK2R1fxnHO8kWpUMTBdfVzZrWOiY9a7CtN8HqdWtDUWd5FY6Dl8HFsqVwH4uOtQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       react: '>=16.8'
       react-dom: '>=16.8'
 
-  react-router@6.26.1:
-    resolution: {integrity: sha512-kIwJveZNwp7teQRI5QmwWo39A5bXRyqpH0COKKmPnyD2vBvDwgFXSqDUYtt1h+FEyfnE8eXr7oe0MxRzVwCcvQ==}
+  react-router@6.26.2:
+    resolution: {integrity: sha512-tvN1iuT03kHgOFnLPfLJ8V95eijteveqdOSk+srqfePtQvqCExB8eHOYnlilbOcyJyKnYkr1vJvf7YqotAJu1A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       react: '>=16.8'
@@ -12808,7 +12808,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@remix-run/router@1.19.1': {}
+  '@remix-run/router@1.19.2': {}
 
   '@rollup/rollup-android-arm-eabi@4.20.0':
     optional: true
@@ -15563,7 +15563,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-5c9a529-20240912(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-75b9fd4-20240912(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.6
@@ -18845,16 +18845,16 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  react-router-dom@6.26.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router-dom@6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@remix-run/router': 1.19.1
+      '@remix-run/router': 1.19.2
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-router: 6.26.1(react@18.3.1)
+      react-router: 6.26.2(react@18.3.1)
 
-  react-router@6.26.1(react@18.3.1):
+  react-router@6.26.2(react@18.3.1):
     dependencies:
-      '@remix-run/router': 1.19.1
+      '@remix-run/router': 1.19.2
       react: 18.3.1
 
   react-runner@1.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):

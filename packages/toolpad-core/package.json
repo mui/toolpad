@@ -72,12 +72,12 @@
     "@types/react": "18.3.5",
     "@types/react-dom": "18.3.0",
     "@types/sinon": "^17.0.3",
-    "@vitest/browser": "2.0.5",
+    "@vitest/browser": "2.1.1",
     "next": "^14.2.8",
     "next-router-mock": "^0.9.13",
     "playwright": "^1.46.1",
     "sinon": "^18.0.1",
-    "vitest": "2.0.5"
+    "vitest": "2.1.1"
   },
   "peerDependencies": {
     "@mui/icons-material": "5 - 6",

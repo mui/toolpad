@@ -128,7 +128,7 @@
     "vitest": "2.1.1",
     "yargs": "17.7.2",
     "zod": "3.23.8",
-    "zod-to-json-schema": "3.23.2"
+    "zod-to-json-schema": "3.23.3"
   },
   "engines": {
     "node": ">=18",

@@ -61,7 +61,7 @@
     "prettier": "3.3.3",
     "react-is": "18.3.1",
     "title": "3.5.3",
-    "vitest": "2.0.5",
+    "vitest": "2.1.1",
     "yaml": "2.5.1",
     "yaml-diff-patch": "2.0.0"
   },

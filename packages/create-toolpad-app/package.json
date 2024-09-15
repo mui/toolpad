@@ -43,7 +43,7 @@
   "devDependencies": {
     "@types/inquirer": "9.0.7",
     "@types/invariant": "2.2.37",
-    "@types/node": "22.5.4",
+    "@types/node": "22.5.5",
     "@types/semver": "7.5.8",
     "@types/tar": "6.1.13",
     "@types/yargs": "17.0.33",

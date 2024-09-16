@@ -4,7 +4,7 @@ title: Toolpad Core - Base Concepts
 
 # Base Concepts
 
-<p class="description">Understanding the fundamental concepts of Toolpad Core to effectively integrate and use it in your projects.</p>
+<p class="description">Understand the fundamental concepts of Toolpad Core to effectively integrate and use it in your projects.</p>
 
 ## Imports
 

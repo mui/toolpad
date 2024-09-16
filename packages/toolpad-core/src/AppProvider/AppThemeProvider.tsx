@@ -12,8 +12,13 @@ const COLOR_SCHEME_ATTRIBUTE = 'data-toolpad-color-scheme';
 const COLOR_SCHEME_STORAGE_KEY = 'mui-toolpad-color-scheme';
 const MODE_STORAGE_KEY = 'mui-toolpad-mode';
 
-function usePreferredMode() {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+function usePreferredMode(window?: Window) {
+  const prefersDarkMode = useMediaQuery(
+    '(prefers-color-scheme: dark)',
+    window && {
+      matchMedia: window.matchMedia,
+    },
+  );
   return prefersDarkMode ? 'dark' : 'light';
 }
 
@@ -42,7 +47,7 @@ function LegacyThemeProvider(props: LegacyThemeProviderProps) {
 
   const isDualTheme = 'light' in theme || 'dark' in theme;
 
-  const preferredMode = usePreferredMode();
+  const preferredMode = usePreferredMode(appWindow);
   const [userMode, setUserMode] = useLocalStorageState<ThemeMode>(MODE_STORAGE_KEY, 'system');
 
   const paletteMode = !userMode || userMode === 'system' ? preferredMode : userMode;
@@ -82,8 +87,15 @@ function LegacyThemeProvider(props: LegacyThemeProviderProps) {
   );
 }
 
-function CssVarsPaletteModeProvider(props: { children: React.ReactNode }) {
-  const preferredMode = usePreferredMode();
+interface CssVarsPaletteModeProviderProps {
+  children: React.ReactNode;
+  window?: Window;
+}
+
+function CssVarsPaletteModeProvider(props: CssVarsPaletteModeProviderProps) {
+  const { children, window: appWindow } = props;
+
+  const preferredMode = usePreferredMode(appWindow);
   const { mode, setMode, allColorSchemes } = useColorScheme();
 
   // The v6 API, based on `useColorScheme`
@@ -95,7 +107,11 @@ function CssVarsPaletteModeProvider(props: { children: React.ReactNode }) {
     };
   }, [allColorSchemes, mode, preferredMode, setMode]);
 
-  return <PaletteModeContext.Provider value={paletteModeContextValue} {...props} />;
+  return (
+    <PaletteModeContext.Provider value={paletteModeContextValue}>
+      {children}
+    </PaletteModeContext.Provider>
+  );
 }
 
 interface CssVarsThemeProviderProps {
@@ -122,7 +138,7 @@ function CssVarsThemeProvider(props: CssVarsThemeProviderProps) {
         colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
         modeStorageKey={MODE_STORAGE_KEY}
       />
-      <CssVarsPaletteModeProvider>
+      <CssVarsPaletteModeProvider window={appWindow}>
         <CssBaseline enableColorScheme />
         {children}
       </CssVarsPaletteModeProvider>

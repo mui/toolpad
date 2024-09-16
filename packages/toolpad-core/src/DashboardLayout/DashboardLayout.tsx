@@ -392,7 +392,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     },
   );
   const isOverSmViewport = useMediaQuery(
-    theme.breakpoints.down('sm'),
+    theme.breakpoints.up('sm'),
     appWindow && {
       matchMedia: appWindow.matchMedia,
     },

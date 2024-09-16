@@ -56,4 +56,4 @@ The Page Container component inherits the properties of the Material&nbsp;UI [Co
 
 ### maxWidth
 
-Determine the max-width of the container. The container width grows with the size of the screen. Set to `false` to disable `maxWidth`.
+Determine the max-width of the container. The container width grows with the size of the screen. Set `maxWidth` to `false` to disable it.

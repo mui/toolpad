@@ -1,20 +1,22 @@
-<AuthenticationContext.Provider value={authentication}>
-  <SessionContext.Provider value={session}>
-    <Account
-      slotProps={{
-        signInButton: {
-          color: 'info',
-          variant: 'outlined',
-          sx: {
-            color: 'primaryDark',
-            fontFamily: 'Inter',
-            fontSize: '1em',
-          },
-        },
-        signOutButton: { color: 'primary', variant: 'outlined' },
-      }}
-      signInLabel="Login"
-      signOutLabel="Logout"
-    />
-  </SessionContext.Provider>
-</AuthenticationContext.Provider>
+<Account
+  localeText={{
+    signInLabel: 'Login',
+    signOutLabel: 'Logout',
+  }}
+  slotProps={{
+    signInButton: {
+      color: 'info',
+      variant: 'outlined',
+      sx: {
+        margin: 'auto',
+        color: 'primaryDark',
+        textTransform: 'capitalize',
+        fontFamily: 'Inter',
+        fontSize: '1em',
+        height: 'fit-content',
+        maxHeight: 'max-content',
+      },
+    },
+    signOutButton: { color: 'primary', variant: 'outlined' },
+  }}
+/>

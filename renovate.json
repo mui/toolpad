@@ -26,10 +26,6 @@
       "description": "At the top so other rules can overwrite it"
     },
     {
-      "groupName": "Docs",
-      "matchFileNames": ["docs/**"]
-    },
-    {
       "groupName": "babel",
       "matchPackagePatterns": ["^@babel/", "^@types/babel"]
     },
@@ -95,7 +91,7 @@
     },
     {
       "groupName": "MUI Monorepo",
-      "matchPackagePatterns": ["@mui/monorepo"],
+      "matchDepNames": ["@mui/monorepo"],
       "schedule": ["on sunday before 6:00am"]
     },
     {
@@ -131,16 +127,6 @@
       "description": "they added a feature that breaks our app: https://github.com/blitz-js/superjson/pull/267. See https://github.com/blitz-js/superjson/issues/279"
     },
     {
-      "groupName": "unist-util-visit - incompatible versions",
-      "matchPackageNames": ["unist-util-visit"],
-      "allowedVersions": "< 3.0.0"
-    },
-    {
-      "groupName": "remark - incompatible versions",
-      "matchPackageNames": ["remark"],
-      "allowedVersions": "< 14.0.0"
-    },
-    {
       "groupName": "react-docgen - incompatible versions",
       "matchPackageNames": ["react-docgen"],
       "allowedVersions": "< 6.0.0"
@@ -155,7 +141,8 @@
     },
     {
       "groupName": "Examples",
-      "matchFileNames": ["examples/**"]
+      "matchFileNames": ["examples/**"],
+      "allowedVersions": "!/.*/"
     },
     {
       "groupName": "Update @toolpad/studio in examples",

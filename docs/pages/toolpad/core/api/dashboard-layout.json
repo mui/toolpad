@@ -1,9 +1,41 @@
 {
-  "props": { "children": { "type": { "name": "node" }, "required": true } },
+  "props": {
+    "children": { "type": { "name": "node" }, "required": true },
+    "disableCollapsibleSidebar": { "type": { "name": "bool" }, "default": "false" },
+    "slotProps": {
+      "type": {
+        "name": "shape",
+        "description": "{ toolbarAccount?: { localeText?: { signInLabel: string, signOutLabel: string }, slotProps?: { iconButton?: object, signInButton?: object, signOutButton?: object }, slots?: { menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
+      },
+      "default": "{}"
+    },
+    "slots": {
+      "type": {
+        "name": "shape",
+        "description": "{ toolbarAccount?: elementType, toolbarActions?: elementType }"
+      },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
+  },
   "name": "DashboardLayout",
   "imports": [
     "import { DashboardLayout } from '@toolpad/core/DashboardLayout';",
     "import { DashboardLayout } from '@toolpad/core';"
+  ],
+  "slots": [
+    {
+      "name": "toolbarActions",
+      "description": "The toolbar actions component used in the layout header.",
+      "default": "ToolbarActions",
+      "class": null
+    },
+    {
+      "name": "toolbarAccount",
+      "description": "The toolbar account component used in the layout header.",
+      "default": "Account",
+      "class": null
+    }
   ],
   "classes": [],
   "spread": true,

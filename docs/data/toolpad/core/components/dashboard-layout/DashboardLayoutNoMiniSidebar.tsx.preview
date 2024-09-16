@@ -1,0 +1,3 @@
+<DashboardLayout disableCollapsibleSidebar>
+  <DemoPageContent pathname={pathname} />
+</DashboardLayout>

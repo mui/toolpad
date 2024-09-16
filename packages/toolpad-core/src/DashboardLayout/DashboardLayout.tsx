@@ -1,8 +1,9 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme } from '@mui/material';
+import { styled, useTheme, type Theme } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
+import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
@@ -18,33 +19,31 @@ import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import useSsr from '@toolpad/utils/hooks/useSsr';
-import { Account } from '../Account';
 import { Link } from '../shared/Link';
 import {
   BrandingContext,
   NavigationContext,
-  PaletteModeContext,
   RouterContext,
   WindowContext,
 } from '../shared/context';
 import type { Navigation } from '../AppProvider';
-import { ToolpadLogo } from './ToolpadLogo';
+import { Account, type AccountProps } from '../Account';
 import {
   getItemTitle,
   getPageItemFullPath,
   hasSelectedNavigationChildren,
+  isPageItemSelected,
 } from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
-
-const DRAWER_WIDTH = 320; // px
+import { ToolbarActions } from './ToolbarActions';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { ToolpadLogo } from './ToolpadLogo';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -65,6 +64,21 @@ const LogoContainer = styled('div')({
   },
 });
 
+const getDrawerSxTransitionMixin = (isExpanded: boolean, property: string) => ({
+  transition: (theme: Theme) =>
+    theme.transitions.create(property, {
+      easing: theme.transitions.easing.sharp,
+      duration: isExpanded
+        ? theme.transitions.duration.enteringScreen
+        : theme.transitions.duration.leavingScreen,
+    }),
+});
+
+const getDrawerWidthTransitionMixin = (isExpanded: boolean) => ({
+  ...getDrawerSxTransitionMixin(isExpanded, 'width'),
+  overflowX: 'hidden',
+});
+
 const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: 8,
   '&.Mui-selected': {
@@ -77,6 +91,9 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
     '& .MuiSvgIcon-root': {
       color: (theme.vars ?? theme).palette.primary.dark,
     },
+    '& .MuiAvatar-root': {
+      backgroundColor: (theme.vars ?? theme).palette.primary.dark,
+    },
     '& .MuiTouchRipple-child': {
       backgroundColor: (theme.vars ?? theme).palette.primary.dark,
     },
@@ -84,74 +101,20 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   '& .MuiSvgIcon-root': {
     color: (theme.vars ?? theme).palette.action.active,
   },
+  '& .MuiAvatar-root': {
+    backgroundColor: (theme.vars ?? theme).palette.action.active,
+  },
 }));
-
-function ThemeSwitcher() {
-  const isSsr = useSsr();
-  const theme = useTheme();
-
-  const { paletteMode, setPaletteMode, isDualTheme } = React.useContext(PaletteModeContext);
-
-  const toggleMode = React.useCallback(() => {
-    setPaletteMode(paletteMode === 'dark' ? 'light' : 'dark');
-  }, [paletteMode, setPaletteMode]);
-
-  return isDualTheme ? (
-    <Tooltip
-      title={isSsr ? 'Switch mode' : `${paletteMode === 'dark' ? 'Light' : 'Dark'} mode`}
-      enterDelay={1000}
-    >
-      <div>
-        <IconButton
-          aria-label={
-            isSsr
-              ? 'Switch theme mode'
-              : `Switch to ${paletteMode === 'dark' ? 'light' : 'dark'} mode`
-          }
-          onClick={toggleMode}
-          sx={{
-            color: (theme.vars ?? theme).palette.primary.dark,
-            padding: 1,
-            marginRight: 1,
-          }}
-        >
-          {theme.getColorSchemeSelector ? (
-            <React.Fragment>
-              <DarkModeIcon
-                sx={{
-                  display: 'inline',
-                  [theme.getColorSchemeSelector('dark')]: {
-                    display: 'none',
-                  },
-                }}
-              />
-              <LightModeIcon
-                sx={{
-                  display: 'none',
-                  [theme.getColorSchemeSelector('dark')]: {
-                    display: 'inline',
-                  },
-                }}
-              />
-            </React.Fragment>
-          ) : (
-            <React.Fragment>
-              {isSsr || paletteMode !== 'dark' ? <DarkModeIcon /> : <LightModeIcon />}
-            </React.Fragment>
-          )}
-        </IconButton>
-      </div>
-    </Tooltip>
-  ) : null;
-}
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
   basePath?: string;
   depth?: number;
   onLinkClick: () => void;
-  validatedItemIds: Set<string>;
-  uniqueItemPaths: Set<string>;
+  isMini?: boolean;
+  isFullyExpanded?: boolean;
+  isMobileViewport?: boolean;
+  selectedItemId: string;
 }
 
 function DashboardSidebarSubNavigation({
@@ -159,8 +122,10 @@ function DashboardSidebarSubNavigation({
   basePath = '',
   depth = 0,
   onLinkClick,
-  validatedItemIds,
-  uniqueItemPaths,
+  isMini = false,
+  isFullyExpanded = true,
+  isMobileViewport = false,
+  selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
 
@@ -206,8 +171,12 @@ function DashboardSidebarSubNavigation({
               sx={{
                 fontSize: 12,
                 fontWeight: '700',
-                height: 40,
-                pl: 4,
+                height: isMini ? 0 : 40,
+                ...(isMobileViewport ? {} : getDrawerSxTransitionMixin(isFullyExpanded, 'height')),
+                px: 2,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
               }}
             >
               {getItemTitle(navigationItem)}
@@ -223,17 +192,18 @@ function DashboardSidebarSubNavigation({
               key={`divider-${depth}-${navigationItemIndex}`}
               sx={{
                 borderBottomWidth: 2,
-                mx: 2,
+                mx: 1,
                 mt: 1,
-                mb: nextItem?.kind === 'header' ? 0 : 1,
+                mb: nextItem?.kind === 'header' && !isMini ? 0 : 1,
+                ...(isMobileViewport ? {} : getDrawerSxTransitionMixin(isFullyExpanded, 'margin')),
               }}
             />
           );
         }
 
         const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
-
         const navigationItemId = `${depth}-${navigationItemIndex}`;
+        const navigationItemTitle = getItemTitle(navigationItem);
 
         const isNestedNavigationExpanded = expandedSidebarItemIds.includes(navigationItemId);
 
@@ -243,11 +213,33 @@ function DashboardSidebarSubNavigation({
           <ExpandMoreIcon />
         );
 
+        const listItemIconSize = 34;
+
+        const isSelected = isPageItemSelected(navigationItem, basePath, pathname);
+
+        if (process.env.NODE_ENV !== 'production' && isSelected && selectedItemId) {
+          console.warn(`Duplicate selected path in navigation: ${navigationItemFullPath}`);
+        }
+
+        if (isSelected && !selectedItemId) {
+          selectedItemId = navigationItemId;
+        }
+
         const listItem = (
-          <ListItem sx={{ pt: 0, pb: 0 }}>
+          <ListItem
+            sx={{
+              py: 0,
+              px: 1,
+              overflowX: 'hidden',
+            }}
+          >
             <NavigationListItemButton
-              selected={pathname === navigationItemFullPath && !navigationItem.children}
-              {...(navigationItem.children
+              selected={isSelected && (!navigationItem.children || isMini)}
+              sx={{
+                px: 1.4,
+                height: 48,
+              }}
+              {...(navigationItem.children && !isMini
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),
                   }
@@ -257,52 +249,68 @@ function DashboardSidebarSubNavigation({
                     onClick: onLinkClick,
                   })}
             >
-              {navigationItem.icon ? (
+              {navigationItem.icon || isMini ? (
                 <ListItemIcon
                   sx={{
-                    minWidth: 34,
+                    minWidth: listItemIconSize,
+                    mr: 1.2,
                   }}
                 >
-                  {navigationItem.icon}
+                  {navigationItem.icon ?? null}
+                  {!navigationItem.icon && isMini ? (
+                    <Avatar
+                      sx={{
+                        width: listItemIconSize - 7,
+                        height: listItemIconSize - 7,
+                        fontSize: 12,
+                        ml: '-2px',
+                      }}
+                    >
+                      {navigationItemTitle
+                        .split(' ')
+                        .slice(0, 2)
+                        .map((itemTitleWord) => itemTitleWord.charAt(0).toUpperCase())}
+                    </Avatar>
+                  ) : null}
                 </ListItemIcon>
               ) : null}
               <ListItemText
-                primary={getItemTitle(navigationItem)}
+                primary={navigationItemTitle}
                 sx={{
+                  whiteSpace: 'nowrap',
+                  zIndex: 1,
                   '& .MuiTypography-root': {
                     fontWeight: '500',
                   },
                 }}
               />
-              {navigationItem.action ?? null}
-              {navigationItem.children ? nestedNavigationCollapseIcon : null}
+              {navigationItem.action && !isMini && isFullyExpanded ? navigationItem.action : null}
+              {navigationItem.children && !isMini && isFullyExpanded
+                ? nestedNavigationCollapseIcon
+                : null}
             </NavigationListItemButton>
           </ListItem>
         );
 
-        if (process.env.NODE_ENV !== 'production' && !validatedItemIds.has(navigationItemId)) {
-          if (!uniqueItemPaths.has(navigationItemFullPath)) {
-            uniqueItemPaths.add(navigationItemFullPath);
-          } else {
-            console.warn(`Duplicate path in navigation: ${navigationItemFullPath}`);
-          }
-
-          validatedItemIds.add(navigationItemId);
-        }
-
         return (
           <React.Fragment key={navigationItemId}>
-            {listItem}
+            {isMini ? (
+              <Tooltip title={navigationItemTitle} placement="right">
+                {listItem}
+              </Tooltip>
+            ) : (
+              listItem
+            )}
 
-            {navigationItem.children ? (
+            {navigationItem.children && !isMini ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
                   subNavigation={navigationItem.children}
                   basePath={navigationItemFullPath}
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
-                  validatedItemIds={validatedItemIds}
-                  uniqueItemPaths={uniqueItemPaths}
+                  selectedItemId={selectedItemId}
+                  isMobileViewport={isMobileViewport}
                 />
               </Collapse>
             ) : null}
@@ -313,11 +321,42 @@ function DashboardSidebarSubNavigation({
   );
 }
 
+export interface DashboardLayoutSlots {
+  /**
+   * The toolbar actions component used in the layout header.
+   * @default ToolbarActions
+   */
+  toolbarActions?: React.JSXElementConstructor<{}>;
+  /**
+   * The toolbar account component used in the layout header.
+   * @default Account
+   */
+  toolbarAccount?: React.JSXElementConstructor<AccountProps>;
+}
+
 export interface DashboardLayoutProps {
   /**
    * The content of the dashboard.
    */
   children: React.ReactNode;
+  /**
+   * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
+   * @default false
+   */
+  disableCollapsibleSidebar?: boolean;
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots?: DashboardLayoutSlots;
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps?: {
+    toolbarActions?: {};
+    toolbarAccount?: AccountProps;
+  };
 }
 
 /**
@@ -331,53 +370,151 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children } = props;
+  const { children, disableCollapsibleSidebar = false, slots, slotProps } = props;
+
+  const theme = useTheme();
 
   const branding = React.useContext(BrandingContext);
   const navigation = React.useContext(NavigationContext);
   const appWindow = React.useContext(WindowContext);
   const applicationTitle = useApplicationTitle();
 
-  const [isMobileNavigationOpen, setIsMobileNavigationOpen] = React.useState(false);
+  const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] = React.useState(true);
+  const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] = React.useState(false);
 
-  const validatedItemIdsRef = React.useRef(new Set<string>());
-  const uniqueItemPathsRef = React.useRef(new Set<string>());
+  const isMobileViewport = useMediaQuery(theme.breakpoints.down('md'));
 
-  const handleSetMobileNavigationOpen = React.useCallback(
-    (newOpen: boolean) => () => {
-      setIsMobileNavigationOpen(newOpen);
+  const isNavigationExpanded = isMobileViewport
+    ? isMobileNavigationExpanded
+    : isDesktopNavigationExpanded;
+
+  const setIsNavigationExpanded = React.useCallback(
+    (newExpanded: boolean) => {
+      if (isMobileViewport) {
+        setIsMobileNavigationExpanded(newExpanded);
+      } else {
+        setIsDesktopNavigationExpanded(newExpanded);
+      }
     },
-    [],
+    [isMobileViewport],
   );
 
-  const toggleMobileNavigation = React.useCallback(() => {
-    setIsMobileNavigationOpen((previousOpen) => !previousOpen);
-  }, []);
+  const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
+    React.useState(isNavigationExpanded);
+
+  // eslint-disable-next-line consistent-return
+  React.useEffect(() => {
+    if (isNavigationExpanded) {
+      const drawerWidthTransitionTimeout = setTimeout(() => {
+        setIsNavigationFullyExpanded(true);
+      }, theme.transitions.duration.enteringScreen);
+
+      return () => clearTimeout(drawerWidthTransitionTimeout);
+    }
+
+    setIsNavigationFullyExpanded(false);
+  }, [isNavigationExpanded, theme]);
+
+  const selectedItemIdRef = React.useRef('');
+
+  const handleSetNavigationExpanded = React.useCallback(
+    (newExpanded: boolean) => () => {
+      setIsNavigationExpanded(newExpanded);
+    },
+    [setIsNavigationExpanded],
+  );
+
+  const toggleNavigationExpanded = React.useCallback(() => {
+    setIsNavigationExpanded(!isNavigationExpanded);
+  }, [isNavigationExpanded, setIsNavigationExpanded]);
 
   const handleNavigationLinkClick = React.useCallback(() => {
-    setIsMobileNavigationOpen(false);
-  }, []);
+    selectedItemIdRef.current = '';
+    setIsMobileNavigationExpanded(false);
+  }, [setIsMobileNavigationExpanded]);
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
   React.useMemo(() => {
-    validatedItemIdsRef.current = new Set();
-    uniqueItemPathsRef.current = new Set();
+    selectedItemIdRef.current = '';
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation]);
 
-  const drawerContent = (
-    <React.Fragment>
-      <Toolbar />
-      <Box component="nav" sx={{ overflow: 'auto', pt: navigation[0]?.kind === 'header' ? 0 : 2 }}>
-        <DashboardSidebarSubNavigation
-          subNavigation={navigation}
-          onLinkClick={handleNavigationLinkClick}
-          validatedItemIds={validatedItemIdsRef.current}
-          uniqueItemPaths={uniqueItemPathsRef.current}
-        />
-      </Box>
-    </React.Fragment>
+  const isDesktopMini = !disableCollapsibleSidebar && !isDesktopNavigationExpanded;
+  const isMobileMini = !disableCollapsibleSidebar && !isMobileNavigationExpanded;
+
+  const getMenuIcon = React.useCallback(
+    (isExpanded: boolean) => {
+      const expandMenuActionText = 'Expand';
+      const collapseMenuActionText = 'Collapse';
+
+      return (
+        <Tooltip
+          title={`${isExpanded ? collapseMenuActionText : expandMenuActionText} menu`}
+          enterDelay={1000}
+        >
+          <div>
+            <IconButton
+              aria-label={`${isExpanded ? collapseMenuActionText : expandMenuActionText} navigation menu`}
+              onClick={toggleNavigationExpanded}
+            >
+              {isExpanded ? <MenuOpenIcon /> : <MenuIcon />}
+            </IconButton>
+          </div>
+        </Tooltip>
+      );
+    },
+    [toggleNavigationExpanded],
   );
+
+  const getDrawerContent = React.useCallback(
+    (isMini: boolean) => (
+      <React.Fragment>
+        <Toolbar />
+        <Box
+          component="nav"
+          sx={{
+            overflow: 'auto',
+            pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
+            ...(isMobileViewport
+              ? {}
+              : getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')),
+          }}
+        >
+          <DashboardSidebarSubNavigation
+            subNavigation={navigation}
+            onLinkClick={handleNavigationLinkClick}
+            isMini={isMini}
+            isFullyExpanded={isNavigationFullyExpanded}
+            isMobileViewport={isMobileViewport}
+            selectedItemId={selectedItemIdRef.current}
+          />
+        </Box>
+      </React.Fragment>
+    ),
+    [handleNavigationLinkClick, isMobileViewport, isNavigationFullyExpanded, navigation],
+  );
+
+  const getDrawerSharedSx = React.useCallback(
+    (isMini: boolean) => {
+      const drawerWidth = isMini ? 64 : 320;
+
+      return {
+        width: drawerWidth,
+        flexShrink: 0,
+        ...getDrawerWidthTransitionMixin(isNavigationExpanded),
+        [`& .MuiDrawer-paper`]: {
+          width: drawerWidth,
+          boxSizing: 'border-box',
+          backgroundImage: 'none',
+          ...getDrawerWidthTransitionMixin(isNavigationExpanded),
+        },
+      };
+    },
+    [isNavigationExpanded],
+  );
+
+  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
+  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -385,27 +522,47 @@ function DashboardLayout(props: DashboardLayoutProps) {
         {
           // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
         }
-        <Toolbar sx={{ backgroundColor: 'inherit', minWidth: '100vw' }}>
-          <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-            <Tooltip
-              title={`${isMobileNavigationOpen ? 'Close' : 'Open'} menu`}
-              placement="right"
-              enterDelay={1000}
+        <Toolbar
+          sx={{ backgroundColor: 'inherit', minWidth: '100vw', mx: { xs: -0.75, sm: -1.5 } }}
+        >
+          {isMobileViewport ? (
+            <React.Fragment>
+              <Box
+                sx={{
+                  display: {
+                    xs: 'block',
+                    sm: disableCollapsibleSidebar ? 'block' : 'none',
+                  },
+                }}
+              >
+                {getMenuIcon(isMobileNavigationExpanded)}
+              </Box>
+              <Box
+                sx={{
+                  display: {
+                    xs: 'none',
+                    sm: disableCollapsibleSidebar ? 'none' : 'block',
+                  },
+                  mr: disableCollapsibleSidebar ? 0 : 2,
+                }}
+              >
+                {getMenuIcon(isMobileNavigationExpanded)}
+              </Box>
+            </React.Fragment>
+          ) : (
+            <Box
+              sx={{
+                display: disableCollapsibleSidebar ? 'none' : 'block',
+                mr: disableCollapsibleSidebar ? 0 : 2,
+              }}
             >
-              <div>
-                <IconButton
-                  aria-label={`${isMobileNavigationOpen ? 'Close' : 'Open'} navigation menu`}
-                  onClick={toggleMobileNavigation}
-                  edge="start"
-                  sx={{ ml: 0 }}
-                >
-                  {isMobileNavigationOpen ? <MenuOpenIcon /> : <MenuIcon />}
-                </IconButton>
-              </div>
-            </Tooltip>
-          </Box>
+              {getMenuIcon(isDesktopNavigationExpanded)}
+            </Box>
+          )}
+
           <Box
             sx={{
+              ml: { xs: undefined, sm: -1.5 },
               position: { xs: 'absolute', md: 'static' },
               left: { xs: '50%', md: 'auto' },
               transform: { xs: 'translateX(-50%)', md: 'none' },
@@ -417,9 +574,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 <Typography
                   variant="h6"
                   sx={{
-                    color: (theme) => (theme.vars ?? theme).palette.primary.main,
+                    color: (theme.vars ?? theme).palette.primary.main,
                     fontWeight: '700',
                     ml: 0.5,
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {applicationTitle}
@@ -428,53 +586,61 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Link>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <ThemeSwitcher />
-          <Account />
+          <Stack direction="row" spacing={1}>
+            <ToolbarActionsSlot {...slotProps?.toolbarActions} />
+            <ThemeSwitcher />
+            <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+          </Stack>
         </Toolbar>
       </AppBar>
-      <Drawer
-        container={appWindow?.document.body}
-        variant="temporary"
-        open={isMobileNavigationOpen}
-        onClose={handleSetMobileNavigationOpen(false)}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
-        sx={{
-          display: { xs: 'block', md: 'none' },
-          width: DRAWER_WIDTH,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: DRAWER_WIDTH,
-            boxSizing: 'border-box',
-            backgroundImage: 'none',
-            borderRight: (theme) => `1px solid ${(theme.vars ?? theme).palette.divider}`,
-          },
-        }}
-      >
-        {drawerContent}
-      </Drawer>
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: 'none', md: 'block' },
-          width: DRAWER_WIDTH,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: DRAWER_WIDTH,
-            boxSizing: 'border-box',
-            backgroundImage: 'none',
-          },
-        }}
-      >
-        {drawerContent}
-      </Drawer>
+      {isMobileViewport ? (
+        <React.Fragment>
+          <Drawer
+            container={appWindow?.document.body}
+            variant="temporary"
+            open={isMobileNavigationExpanded}
+            onClose={handleSetNavigationExpanded(false)}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+            sx={{
+              display: {
+                xs: 'block',
+                sm: disableCollapsibleSidebar ? 'block' : 'none',
+              },
+              ...getDrawerSharedSx(false),
+            }}
+          >
+            {getDrawerContent(false)}
+          </Drawer>
+          <Drawer
+            variant="permanent"
+            sx={{
+              display: {
+                xs: 'none',
+                sm: disableCollapsibleSidebar ? 'none' : 'block',
+              },
+              ...getDrawerSharedSx(isMobileMini),
+            }}
+          >
+            {getDrawerContent(isMobileMini)}
+          </Drawer>
+        </React.Fragment>
+      ) : (
+        <Drawer variant="permanent" sx={getDrawerSharedSx(isDesktopMini)}>
+          {getDrawerContent(isDesktopMini)}
+        </Drawer>
+      )}
+
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
-          minWidth: { xs: isMobileNavigationOpen ? '100vw' : 'auto', md: 'auto' },
+          minWidth: {
+            xs: disableCollapsibleSidebar && isNavigationExpanded ? '100vw' : 'auto',
+            md: 'auto',
+          },
         }}
       >
         <Toolbar />
@@ -493,6 +659,42 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
+   * @default false
+   */
+  disableCollapsibleSidebar: PropTypes.bool,
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    toolbarAccount: PropTypes.shape({
+      localeText: PropTypes.shape({
+        signInLabel: PropTypes.string.isRequired,
+        signOutLabel: PropTypes.string.isRequired,
+      }),
+      slotProps: PropTypes.shape({
+        iconButton: PropTypes.object,
+        signInButton: PropTypes.object,
+        signOutButton: PropTypes.object,
+      }),
+      slots: PropTypes.shape({
+        menuItems: PropTypes.elementType,
+        signInButton: PropTypes.elementType,
+        signOutButton: PropTypes.elementType,
+      }),
+    }),
+    toolbarActions: PropTypes.object,
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots: PropTypes.shape({
+    toolbarAccount: PropTypes.elementType,
+    toolbarActions: PropTypes.elementType,
+  }),
 } as any;
 
 export { DashboardLayout };

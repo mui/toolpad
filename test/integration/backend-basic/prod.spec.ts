@@ -8,12 +8,15 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 test.use({
   ignoreConsoleErrors: [
-    // Chrome:
-    /Cannot read properties of null/,
-    // firefox:
-    /throws\.error is null/,
-    // Intentionally thrown
-    /BOOM!/,
+    [
+      // Chrome:
+      /Cannot read properties of null/,
+      // firefox:
+      /throws\.error is null/,
+      // Intentionally thrown
+      /BOOM!/,
+    ],
+    { scope: 'test' },
   ],
 });
 

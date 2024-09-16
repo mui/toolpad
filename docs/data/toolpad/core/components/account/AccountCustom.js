@@ -1,9 +1,20 @@
 import * as React from 'react';
+import Typography from '@mui/material/Typography';
 import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
 
+const demoSession = {
+  user: {
+    name: 'Bharat Kashyap',
+    email: 'bharatkashyap@outlook.com',
+    image: 'https://avatars.githubusercontent.com/u/19550456',
+  },
+};
+
 export default function AccountCustom() {
-  const [session, setSession] = React.useState(null);
-  const authentication = React.useMemo(() => {
+  const [session, setSession] = React.useState(demoSession);
+  const [signedOutSession, setSignedOutSession] = React.useState(null);
+
+  const authenticationSignedIn = React.useMemo(() => {
     return {
       signIn: () => {
         setSession({
@@ -16,32 +27,100 @@ export default function AccountCustom() {
       },
       signOut: () => {
         setSession(null);
+        setSignedOutSession(null);
+      },
+    };
+  }, []);
+
+  const authenticationSignedOut = React.useMemo(() => {
+    return {
+      signIn: () => {
+        setSignedOutSession(demoSession);
+      },
+      signOut: () => {
+        setSignedOutSession(null);
       },
     };
   }, []);
 
   return (
-    // preview-start
-    <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={session}>
-        <Account
-          slotProps={{
-            signInButton: {
-              color: 'info',
-              variant: 'outlined',
-              sx: {
-                color: 'primaryDark',
-                fontFamily: 'Inter',
-                fontSize: '1em',
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        rowGap: '2rem',
+        columnGap: '2rem',
+      }}
+    >
+      <AuthenticationContext.Provider value={authenticationSignedIn}>
+        <Typography
+          variant="body2"
+          sx={{ color: 'text.secondary', fontStyle: 'italic', margin: 'auto' }}
+        >
+          Signed in
+        </Typography>
+        <SessionContext.Provider value={session}>
+          <Account
+            localeText={{
+              signInLabel: 'Login',
+              signOutLabel: 'Logout',
+            }}
+            slotProps={{
+              signOutButton: {
+                color: 'info',
+                variant: 'outlined',
+                sx: {
+                  color: 'primaryDark',
+                  textTransform: 'capitalize',
+                  fontFamily: 'Inter',
+                  fontSize: '1em',
+                },
               },
-            },
-            signOutButton: { color: 'primary', variant: 'outlined' },
-          }}
-          signInLabel="Login"
-          signOutLabel="Logout"
-        />
-      </SessionContext.Provider>
-    </AuthenticationContext.Provider>
-    // preview-end
+              iconButton: {
+                sx: {
+                  width: 'fit-content',
+                  margin: 'auto',
+                },
+              },
+            }}
+          />
+        </SessionContext.Provider>
+
+        <Typography
+          variant="body2"
+          sx={{ color: 'text.secondary', fontStyle: 'italic', margin: 'auto' }}
+        >
+          Signed out
+        </Typography>
+      </AuthenticationContext.Provider>
+      <AuthenticationContext.Provider value={authenticationSignedOut}>
+        <SessionContext.Provider value={signedOutSession}>
+          {/* preview-start */}
+          <Account
+            localeText={{
+              signInLabel: 'Login',
+              signOutLabel: 'Logout',
+            }}
+            slotProps={{
+              signInButton: {
+                color: 'info',
+                variant: 'outlined',
+                sx: {
+                  margin: 'auto',
+                  color: 'primaryDark',
+                  textTransform: 'capitalize',
+                  fontFamily: 'Inter',
+                  fontSize: '1em',
+                  height: 'fit-content',
+                  maxHeight: 'max-content',
+                },
+              },
+              signOutButton: { color: 'primary', variant: 'outlined' },
+            }}
+          />
+          {/* preview-end */}
+        </SessionContext.Provider>
+      </AuthenticationContext.Provider>
+    </div>
   );
 }

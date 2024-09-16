@@ -8,9 +8,9 @@
   "dependencies": {
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
-    "@mui/icons-material": "^5",
-    "@mui/material": "^5",
-    "@mui/material-nextjs": "^5",
+    "@mui/icons-material": "^6",
+    "@mui/material": "^6",
+    "@mui/material-nextjs": "^6",
     "@toolpad/core": "latest",
     "next": "^14",
     "next-auth": "5.0.0-beta.20",

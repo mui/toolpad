@@ -31,7 +31,7 @@ Use the following steps to integrate Toolpad Core into your Next.js app:
 
 ### 1. Wrap your application with `AppProvider`
 
-1. In your root layout file (e.g., `app/layout.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (e.g., `app/layout.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="app/layout.tsx"
 import { AppProvider } from '@toolpad/core';

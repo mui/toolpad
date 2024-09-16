@@ -124,7 +124,7 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
-    const navigation = screen.getByRole('navigation');
+    const navigation = screen.getAllByRole('navigation').at(-1)!;
 
     // List subheaders are present
 
@@ -188,7 +188,7 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
-    const navigation = screen.getByRole('navigation');
+    const navigation = screen.getAllByRole('navigation').at(-1)!;
 
     expect(within(navigation).getByText('Sales')).toBeTruthy();
     expect(within(navigation).getByText('Traffic')).toBeTruthy();
@@ -230,7 +230,7 @@ describe('DashboardLayout', () => {
 
     const { rerender } = render(<AppWithPathname pathname="/dashboard" />);
 
-    const navigation = screen.getByRole('navigation');
+    const navigation = screen.getAllByRole('navigation').at(-1)!;
 
     expect(within(navigation).getByRole('link', { name: 'Dashboard' })).toHaveClass('Mui-selected');
 
@@ -274,7 +274,7 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
-    const navigation = screen.getByRole('navigation');
+    const navigation = screen.getAllByRole('navigation').at(-1)!;
 
     expect(within(navigation).getByText('Action 1')).toBeTruthy();
     expect(within(navigation).getByText('Action 2')).toBeTruthy();

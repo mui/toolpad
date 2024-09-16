@@ -69,7 +69,6 @@ function Search() {
           <IconButton
             type="button"
             aria-label="search"
-            size="small"
             sx={{
               display: { xs: 'inline', md: 'none' },
             }}

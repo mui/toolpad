@@ -2,7 +2,7 @@
 title: Toolpad Core - Base Concepts
 ---
 
-# Base Concepts
+# Base concepts
 
 <p class="description">Understand the fundamental concepts of Toolpad Core to effectively integrate and use it in your projects.</p>
 

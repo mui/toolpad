@@ -173,8 +173,8 @@ function DashboardSidebarSubNavigation({
                 fontWeight: '700',
                 height: isMini ? 0 : 40,
                 ...(hasDrawerTransitions
-                  ? {}
-                  : getDrawerSxTransitionMixin(isFullyExpanded, 'height')),
+                  ? getDrawerSxTransitionMixin(isFullyExpanded, 'height')
+                  : {}),
                 px: 2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -198,8 +198,8 @@ function DashboardSidebarSubNavigation({
                 mt: 1,
                 mb: nextItem?.kind === 'header' && !isMini ? 0 : 1,
                 ...(hasDrawerTransitions
-                  ? {}
-                  : getDrawerSxTransitionMixin(isFullyExpanded, 'margin')),
+                  ? getDrawerSxTransitionMixin(isFullyExpanded, 'margin')
+                  : {}),
               }}
             />
           );
@@ -480,7 +480,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [toggleNavigationExpanded],
   );
 
-  const hasDrawerTransitions = isUnderMdViewport && isOverSmViewport;
+  const hasDrawerTransitions =
+    isOverSmViewport && (disableCollapsibleSidebar || !isUnderMdViewport);
 
   const getDrawerContent = React.useCallback(
     (isMini: boolean) => (
@@ -492,8 +493,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
             overflow: 'auto',
             pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
             ...(hasDrawerTransitions
-              ? {}
-              : getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')),
+              ? getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')
+              : {}),
           }}
         >
           <DashboardSidebarSubNavigation
@@ -590,40 +591,38 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </Stack>
         </Toolbar>
       </AppBar>
-      <React.Fragment>
-        <Drawer
-          container={appWindow?.document.body}
-          variant="temporary"
-          open={isMobileNavigationExpanded}
-          onClose={handleSetNavigationExpanded(false)}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: {
-              xs: 'block',
-              sm: disableCollapsibleSidebar ? 'block' : 'none',
-              md: 'none',
-            },
-            ...getDrawerSharedSx(false),
-          }}
-        >
-          {getDrawerContent(false)}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: {
-              xs: 'none',
-              sm: disableCollapsibleSidebar ? 'none' : 'block',
-              md: 'none',
-            },
-            ...getDrawerSharedSx(isMobileMini),
-          }}
-        >
-          {getDrawerContent(isMobileMini)}
-        </Drawer>
-      </React.Fragment>
+      <Drawer
+        container={appWindow?.document.body}
+        variant="temporary"
+        open={isMobileNavigationExpanded}
+        onClose={handleSetNavigationExpanded(false)}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: {
+            xs: 'block',
+            sm: disableCollapsibleSidebar ? 'block' : 'none',
+            md: 'none',
+          },
+          ...getDrawerSharedSx(false),
+        }}
+      >
+        {getDrawerContent(false)}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: {
+            xs: 'none',
+            sm: disableCollapsibleSidebar ? 'none' : 'block',
+            md: 'none',
+          },
+          ...getDrawerSharedSx(isMobileMini),
+        }}
+      >
+        {getDrawerContent(isMobileMini)}
+      </Drawer>
       <Drawer
         variant="permanent"
         sx={{ display: { xs: 'none', md: 'block' }, ...getDrawerSharedSx(isDesktopMini) }}

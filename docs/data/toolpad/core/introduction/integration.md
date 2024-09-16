@@ -281,7 +281,7 @@ To integrate Toolpad Core into your Next.js Pages Router app, follow these steps
 
 ### 1. Wrap your application with `AppProvider`
 
-1. In your root layout file (e.g., `pages/_app.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (e.g., `pages/_app.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="pages/_app.tsx"
 import { AppProvider } from '@toolpad/core/nextjs';

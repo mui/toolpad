@@ -14,7 +14,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/core/introduction/base-concepts',
-        title: 'Base Concepts',
+        title: 'Base concepts',
       },
       {
         pathname: '/toolpad/core/introduction/installation',

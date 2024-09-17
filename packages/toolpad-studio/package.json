@@ -28,11 +28,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui/mui-toolpad.git",
+    "url": "https://github.com/mui/toolpad.git",
     "directory": "packages/toolpad-studio"
   },
   "bugs": {
-    "url": "https://github.com/mui/mui-toolpad/issues"
+    "url": "https://github.com/mui/toolpad/issues"
   },
   "homepage": "https://mui.com/toolpad/",
   "files": [

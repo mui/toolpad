@@ -4,7 +4,7 @@
 
 ## Demo
 
-https://github.com/mui/mui-toolpad/assets/19550456/bd327963-c061-4a75-906d-22acdd696211
+https://github.com/mui/toolpad/assets/19550456/bd327963-c061-4a75-906d-22acdd696211
 
 ## How to run
 
@@ -38,4 +38,4 @@ The app involves the following workflow:
 
 ## The source
 
-[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/stripe-script)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/stripe-script)

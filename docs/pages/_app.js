@@ -39,7 +39,7 @@ function getMuiPackageVersion(packageName, commitRef) {
     return 'latest';
   }
   const shortSha = commitRef.slice(0, 8);
-  return `https://pkg.csb.dev/mui/mui-toolpad/commit/${shortSha}/${packageName}`;
+  return `https://pkg.csb.dev/mui/toolpad/commit/${shortSha}/${packageName}`;
 }
 
 ponyfillGlobal.muiDocConfig = {

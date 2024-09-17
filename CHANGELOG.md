@@ -310,7 +310,7 @@ _Jun 3, 2024_
 
 A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
 
-First components in @toolpad/core: [DashboardLayout](https://github.com/mui/mui-toolpad/discussions/3309#:~:text=per%20authentication%20page.-,Dashboard%20layout,-provides%20UI%20for), DataGrid and LineChart. Initial [data providers](https://github.com/mui/mui-toolpad/discussions/3311) implementation.
+First components in @toolpad/core: [DashboardLayout](https://github.com/mui/toolpad/discussions/3309#:~:text=per%20authentication%20page.-,Dashboard%20layout,-provides%20UI%20for), DataGrid and LineChart. Initial [data providers](https://github.com/mui/toolpad/discussions/3311) implementation.
 
 - &#8203;<!-- 31 -->Lock file maintenance (#3622) @renovate[bot]
 - &#8203;<!-- 30 -->Lock file maintenance Examples (#3624) @renovate[bot]
@@ -1872,7 +1872,7 @@ _Mar 20, 2023_
 
 A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
 
-Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. Read more [here](https://github.com/mui/mui-toolpad/discussions/1748).
+Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. Read more [here](https://github.com/mui/toolpad/discussions/1748).
 
 - &#8203;<!-- 8 -->Add create-toolpad-app CLI (#1700) @bharatkashyap
 - &#8203;<!-- 7 -->Direction 13 (#1651) @Janpot

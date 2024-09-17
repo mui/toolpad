@@ -42,7 +42,7 @@ The following providers are supported and maintained by default:
 - Keycloak
 - Credentials (username/password)
 
-Find details on how to set up each provider in the [Auth.js documentation](https://authjs.dev/getting-started/authentication/oauth/).
+Find details on how to set up each provider in the [Auth.js documentation](https://authjs.dev/getting-started/authentication/oauth).
 :::
 
 ## Passkey

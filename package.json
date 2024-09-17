@@ -57,9 +57,9 @@
     "@mui/internal-docs-utils": "1.0.12",
     "@mui/internal-markdown": "1.0.13",
     "@mui/internal-scripts": "1.0.20",
-    "@mui/monorepo": "github:mui/material-ui#94cc3d0a66456713e6e25edf9a1ba35ad8df88bc",
-    "@mui/x-charts": "7.16.0",
-    "@next/eslint-plugin-next": "14.2.8",
+    "@mui/monorepo": "github:mui/material-ui#b47d30f334871a43e2750ebb56c2436f099ff215",
+    "@mui/x-charts": "7.17.0",
+    "@next/eslint-plugin-next": "14.2.11",
     "@playwright/test": "1.46.1",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "16.0.1",
@@ -68,11 +68,11 @@
     "@types/fs-extra": "11.0.4",
     "@types/gtag.js": "0.0.20",
     "@types/invariant": "2.2.37",
-    "@types/node": "22.5.4",
+    "@types/node": "^20.14.8",
     "@types/yargs": "17.0.33",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
-    "@vitest/coverage-v8": "2.0.5",
+    "@vitest/coverage-v8": "2.1.1",
     "babel-plugin-react-remove-properties": "0.3.0",
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
     "chalk": "5.3.0",
@@ -114,7 +114,7 @@
   },
   "dependencies": {
     "@types/lodash": "4.17.7",
-    "@vitest/browser": "2.0.5",
+    "@vitest/browser": "2.1.1",
     "archiver": "7.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.4.2",
@@ -125,18 +125,18 @@
     "semver": "7.6.3",
     "tsup": "8.2.4",
     "tsx": "4.17.0",
-    "vitest": "2.0.5",
+    "vitest": "2.1.1",
     "yargs": "17.7.2",
     "zod": "3.23.8",
-    "zod-to-json-schema": "3.23.2"
+    "zod-to-json-schema": "3.23.3"
   },
   "engines": {
-    "node": ">=18",
+    "node": ">=20",
     "pnpm": "9.7.1"
   },
   "resolutions": {
     "google-auth-library": "*",
-    "@types/node": "22.5.4"
+    "@types/node": "22.5.5"
   },
   "packageManager": "pnpm@9.7.1"
 }

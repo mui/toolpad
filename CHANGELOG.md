@@ -1,5 +1,56 @@
 # Changelog
 
+## v0.6.0
+
+<!-- generated comparing v0.5.2..master -->
+
+_Sep 13, 2024_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+- Migrate to Material UI v6
+- Collapsible sidebar in `DashboardLayout` component with mini drawer variant
+- Support route patterns in navigation
+- Add more OAuth providers to `SignInPage`
+- Docs and website improvements
+
+### `@toolpad/core`
+
+- &#8203;<!-- 23 -->Use outlined button for logout (#4016) @Janpot
+- &#8203;<!-- 22 -->Clean templates, fix a bunch of issues in generated apps (#4040) @bharatkashyap
+- &#8203;<!-- 19 -->Add mini drawer variant to DashboardLayout (#4017) @apedroferreira
+- &#8203;<!-- 18 -->Add more OAuth providers to `SignInPage` (#3933) @bharatkashyap
+- &#8203;<!-- 17 -->Refactor `<Account />` (#3992) @bharatkashyap
+- &#8203;<!-- 16 -->Add toolbarActions and toolbarAccount slots to DashboardLayout (#3984)
+- &#8203;<!-- 15 -->Migrate to Material UI v6 (#3862) @Janpot
+- &#8203;<!-- 14 -->Support route patterns in navigation (#3991) @apedroferreira
+
+### Docs
+
+- &#8203;<!-- 29 -->Adjust DashboardLayout documentation to link to AppProvider more clearly (#4083) @apedroferreira
+- &#8203;<!-- 13 -->Fix 301 link @oliviertassinari
+- &#8203;<!-- 12 -->Add missing end of sentence ponctuation @oliviertassinari
+- &#8203;<!-- 11 -->Link docs from component demos on Toolpad Core landing page (#4013) @prakhargupta1
+- &#8203;<!-- 10 -->Remove the list of upcoming features (#4041) @prakhargupta1
+- &#8203;<!-- 09 -->Add `next-auth` v4 example (#3982) @bharatkashyap
+- &#8203;<!-- 08 -->Fix 404 links @oliviertassinari
+- &#8203;<!-- 07 -->Add signed in state as default on `<Account />` docs (#3970) @bharatkashyap
+- &#8203;<!-- 06 -->Strengthen CSP (#4075) @oliviertassinari
+- &#8203;<!-- 02 -->Explain props of text-field component with demos (#4012) @prakhargupta1
+
+### Core
+
+- &#8203;<!-- 28 -->Update renovate.json @Janpot
+- &#8203;<!-- 24 -->Update package.json @Janpot
+- &#8203;<!-- 21 -->Update netlify.toml to install with `--frozen-lockfile` (#4014) @Janpot
+- &#8203;<!-- 20 -->Upgrade monorepo (#4010) @Janpot @apedroferreira
+- &#8203;<!-- 05 -->Remove unnecessary lock file (#4011) @Janpot
+- &#8203;<!-- 04 -->Adds reusable workflow for new issue cleanup (#4077) @michelengelen
+- &#8203;<!-- 03 -->Adds reusable workflow for closing messages (#4076) @michelengelen
+- &#8203;<!-- 01 -->Fix Calendly link for Toolpad Studio demo (#4035) @prakhargupta1
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @michelengelen, @oliviertassinari, @prakhargupta1
+
 ## v0.5.2
 
 <!-- generated comparing v0.5.1..master -->

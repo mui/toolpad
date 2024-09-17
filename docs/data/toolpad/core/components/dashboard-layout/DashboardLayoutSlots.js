@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -64,25 +65,41 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-function SearchBar() {
+function Search() {
   return (
-    <TextField
-      id="search"
-      label="Search"
-      variant="outlined"
-      size="small"
-      slotProps={{
-        input: {
-          endAdornment: (
-            <IconButton type="button" aria-label="search" size="small">
-              <SearchIcon />
-            </IconButton>
-          ),
-          sx: { pr: 0.5 },
-        },
-      }}
-      sx={{ mr: 1 }}
-    />
+    <React.Fragment>
+      <Tooltip title="Search" enterDelay={1000}>
+        <div>
+          <IconButton
+            type="button"
+            aria-label="search"
+            size="small"
+            sx={{
+              display: { xs: 'inline-block', md: 'none' },
+            }}
+          >
+            <SearchIcon />
+          </IconButton>
+        </div>
+      </Tooltip>
+      <TextField
+        id="search"
+        label="Search"
+        variant="outlined"
+        size="small"
+        slotProps={{
+          input: {
+            endAdornment: (
+              <IconButton type="button" aria-label="search" size="small">
+                <SearchIcon />
+              </IconButton>
+            ),
+            sx: { pr: 0.5 },
+          },
+        }}
+        sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
+      />
+    </React.Fragment>
   );
 }
 
@@ -109,7 +126,7 @@ function DashboardLayoutSlots(props) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout slots={{ toolbarActions: SearchBar }}>
+      <DashboardLayout slots={{ toolbarActions: Search }}>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>

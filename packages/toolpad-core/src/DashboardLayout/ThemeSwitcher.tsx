@@ -36,8 +36,6 @@ function ThemeSwitcher() {
           onClick={toggleMode}
           sx={{
             color: (theme.vars ?? theme).palette.primary.dark,
-            padding: 1,
-            marginRight: 1,
           }}
         >
           {theme.getColorSchemeSelector ? (

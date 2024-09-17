@@ -1,3 +1,3 @@
-<DashboardLayout slots={{ toolbarActions: SearchBar }}>
+<DashboardLayout slots={{ toolbarActions: Search }}>
   <DemoPageContent pathname={pathname} />
 </DashboardLayout>

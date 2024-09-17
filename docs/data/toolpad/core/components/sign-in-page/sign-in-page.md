@@ -14,7 +14,36 @@ The `SignInPage` component is a quick way to generate a ready-to-use authenticat
 
 The `SignInPage` component can be set up with an OAuth provider by passing in a list of providers in the `providers` prop, along with a `signIn` function that accepts the `provider` as a parameter.
 
-{{"demo": "OAuthSignInPage.js", "iframe": true}}
+{{"demo": "OAuthSignInPage.js", "iframe": true, "height": 500}}
+
+:::info
+
+The following providers are supported and maintained by default:
+
+- Google
+- GitHub
+- Facebook
+- Microsoft (Entra ID)
+- Apple
+- Auth0
+- AWS Cognito
+- GitLab
+- Instagram
+- LINE
+- Okta
+- FusionAuth
+- Twitter
+- TikTok
+- LinkedIn
+- Slack
+- Spotify
+- Twitch
+- Discord
+- Keycloak
+- Credentials (username/password)
+
+Find details on how to set up each provider in the [Auth.js documentation](https://authjs.dev/getting-started/authentication/oauth).
+:::
 
 ## Credentials
 
@@ -155,13 +184,13 @@ If you're not on the Next Auth v5 version yet, see the [example with Next Auth v
 
 ### Branding
 
-You can add your own branding elements to the `SignInPage` through the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/)
+You can add your own branding elements to the `SignInPage` through the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/):
 
 {{"demo": "BrandingSignInPage.js", "iframe": true, "height": 360 }}
 
 ### Theme
 
-Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be deeply customized to match any theme
+Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be deeply customized to match any theme:
 
 {{"demo": "ThemeSignInPage.js", "height": 700 }}
 

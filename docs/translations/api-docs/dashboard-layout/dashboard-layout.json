@@ -2,6 +2,9 @@
   "componentDescription": "",
   "propDescriptions": {
     "children": { "description": "The content of the dashboard." },
+    "disableCollapsibleSidebar": {
+      "description": "Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports."
+    },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." }
   },

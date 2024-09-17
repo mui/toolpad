@@ -48,7 +48,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-You can find details on the `AppProvider` props in the [base concepts](/toolpad/core/introduction/base-concepts/#app-provider) section. The [Material UI Next.js App Router integration](https://mui.com/material-ui/integrations/nextjs/) has more details on the `AppRouterCacheProvider`.
+You can find details on the `AppProvider` props on the [AppProvider](/toolpad/core/react-app-provider/) page.
+
+:::info
+The `AppRouterCacheProvider` component is not required to use Toolpad Core, but it's recommended to use it to ensure that the styles are appended to the `<head>` and not rendering in the `<body>`.
+
+See the [Material UI Next.js integration docs](https://mui.com/material-ui/integrations/nextjs/) for more details.
+:::
 
 ### 2. Create a dashboard layout
 
@@ -183,7 +189,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 :::warning
 
-This file is only for demonstration purposes and allows signing in with `password` as the password. You should use a more secure method for authentication in a production environment, preferably OAuth with your own `CLIENT_ID` and `CLIENT_SECRET`. Find more details on to get these values in the [NextAuth documentation](https://authjs.dev/guides/configuring-github).
+This file is only for demonstration purposes and allows signing in with `password` as the password. You should use a more secure method for authentication in a production environment, preferably OAuth with your own `CLIENT_ID` and `CLIENT_SECRET`. Find more details on to get these values in the [Auth.js documentation](https://authjs.dev/guides/configuring-github).
 
 :::
 
@@ -366,6 +372,12 @@ export default function App(props: AppPropsWithLayout) {
 }
 ```
 
+:::info
+The `AppCacheProvider` component is not required to use Toolpad Core, but it's recommended.
+
+See the [Material UI Next.js Pages Router integration docs](https://mui.com/material-ui/integrations/nextjs/#configuration-2) for more details.
+:::
+
 ### 2. Modify `_document.tsx`
 
 Modify `_document.tsx` to include the `DocumentHeadTags` component:
@@ -519,7 +531,7 @@ export const { handlers, auth } = NextAuth({
 
 :::warning
 
-This file is only for demonstration purposes and allows signing in with `password` as the password. You should use a more secure method for authentication in a production environment, preferably OAuth with your own `CLIENT_ID` and `CLIENT_SECRET`. Find more details on to get these values in the [NextAuth documentation](https://authjs.dev/guides/configuring-github).
+This file is only for demonstration purposes and allows signing in with `password` as the password. You should use a more secure method for authentication in a production environment, preferably OAuth with your own `CLIENT_ID` and `CLIENT_SECRET`. Find more details on to get these values in the [Auth.js documentation](https://authjs.dev/guides/configuring-github).
 
 :::
 

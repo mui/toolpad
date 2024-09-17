@@ -11,7 +11,7 @@ title: Toolpad Core - Base Concepts
 Toolpad Core components can be imported directly from the `@toolpad/core` package. This allows you to use them alongside your existing Material UI or other components.
 
 ```tsx
-import { Button } from '@mui/material';
+import Button from '@mui/material/Button';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 ```
 
@@ -37,72 +37,33 @@ function MyApp({ Component, pageProps }) {
 
 By wrapping your application with `AppProvider`, you ensure that all other Toolpad components you use have access to the necessary context and functionality.
 
-#### AppProvider Customization
+The `AppProvider` component accepts props to configure the app's navigation, theme, branding, router, authentication, and session, like so:
 
-The `AppProvider` component accepts props to configure the app's theme, branding, router, authentication, and session. Here's a quick overview of what you can do with some of them:
+```tsx
+<AppProvider
+  navigation={NAVIGATION}
+  theme={theme}
+  branding={BRANDING}
+  router={router}
+  authentication={AUTHENTICATION}
+  session={session}
+>
+  {props.children}
+</AppProvider>
+```
 
-- `theme`: The theme to be used by the app in light/dark mode. If you are using [Material UI with a custom theme](https://mui.com/material-ui/customization/theming/), you can directly pass it here.
-
-  ```tsx
-  import { createTheme } from '@mui/material';
-  import { AppProvider } from '@toolpad/core/AppProvider';
-
-  const customTheme = createTheme({
-    cssVariables: {
-      colorSchemeSelector: 'data-toolpad-color-scheme',
-    },
-    colorSchemes: {
-      light: {
-        // ...
-      },
-      dark: {
-        // ...
-      },
-    },
-  });
-
-  function MyApp({ Component, pageProps }) {
-    return <AppProvider theme={theme}>/* Your App */</AppProvider>;
-  }
-  ```
-
-- `router`: Router implementation used to navigate between pages. This is the same router that you use in your application.
-
-  :::info
-  Toolpad Core doesn't handle routing itself. Instead, it's designed to integrate seamlessly with your existing routing solution, whether you're using:
-
-  - Next.js App Router
-  - Next.js Pages Router
-  - React Router
-  - Or any other routing library which implements the same interface
-
-  You can pass the router implementation to the `AppProvider` component using the `router` prop. You do not need to pass this prop if you are using Next.js, since it has a file-system based router.
-
-  :::
-
-- `authentication`: Authentication implementation used inside Toolpad components.
-
-- `session`: Session implementation used inside Toolpad components.
-
-  ```tsx
-  import { AppProvider } from '@toolpad/core/AppProvider';
-  import { SessionProvider, signIn, signOut } from 'next-auth/react';
-  import { auth } from '../auth';
-
-  function MyApp({ Component, pageProps }) {
-    const session = await auth();
-    return (
-      <SessionProvider session={session}>
-        <AppProvider authentication={{ signIn, signOut }} session={session}>
-          ..
-        </AppProvider>
-      </SessionProvider>
-    );
-  }
-  ```
+Head over to the [AppProvider](/toolpad/core/react-app-provider/) page for more details and examples of the usage of all props.
 
 :::info
-See the [AppProvider](/toolpad/core/react-app-provider/) page for more details and examples of the usage of all props.
+Toolpad Core doesn't handle routing itself. Instead, it's designed to integrate seamlessly with your existing routing solution, whether you're using:
+
+- Next.js App Router
+- Next.js Pages Router
+- React Router
+- Or any other routing library which implements the same interface
+
+You can pass the router implementation to the `AppProvider` component using the `router` prop. You do not need to pass this prop if you are using Next.js, since it has a file-system based router.
+
 :::
 
 ## Slots

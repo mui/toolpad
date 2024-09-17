@@ -8,7 +8,7 @@ const providers = [{ id: 'passkey', name: 'Passkey' }];
 const signIn = async (provider) => {
   const promise = new Promise((resolve) => {
     setTimeout(() => {
-      console.log(`Sign in with ${provider.id}`);
+      alert(`Signing in with ${provider.id}`);
       resolve();
     }, 500);
   });

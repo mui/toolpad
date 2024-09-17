@@ -52,8 +52,4 @@ You can configure additional actions in the area that is reserved on the right. 
 
 ## Responsiveness
 
-The Page Container component inherits the properties of the Material&nbsp;UI [Container](https://mui.com/material-ui/react-container/) component. You can use its `maxWidth` and `fixed` properties to control the bounds of the page.
-
-### maxWidth
-
-Determine the max-width of the container. The container width grows with the size of the screen. Set `maxWidth` to `false` to disable it.
+The Page Container component inherits the properties of the Material&nbsp;UI [Container](https://mui.com/material-ui/react-container/) component. You can use its [`maxWidth`](https://mui.com/material-ui/api/container/#container-prop-maxWidth) and [`fixed`](https://mui.com/material-ui/api/container/#container-prop-fixed) properties to control the bounds of the page. Set `maxWidth` to `false` to disable the container altogether and have the content bleed right up to the edges of the page.

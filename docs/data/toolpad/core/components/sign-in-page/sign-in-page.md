@@ -41,7 +41,7 @@ The following OAuth providers are supported and maintained by default:
 - Discord
 - Keycloak
 
-Find details on how to set up each provider in the [Auth.js documentation](https://authjs.dev/getting-started/authentication/oauth/).
+Find details on how to set up each provider in the [Auth.js documentation](https://authjs.dev/getting-started/authentication/oauth).
 :::
 
 ## Magic Link

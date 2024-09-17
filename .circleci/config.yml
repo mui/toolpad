@@ -6,7 +6,7 @@ default-job: &default-job
   working_directory: /tmp/mui-toolpad
   resource_class: medium
   docker:
-    - image: cimg/node:18.19.1
+    - image: cimg/node:20.17
   environment:
     # Keep in sync with "Save playwright cache"
     PLAYWRIGHT_BROWSERS_PATH: /tmp/pw-browsers

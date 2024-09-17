@@ -1,7 +1,7 @@
 {
   "installCommand": "install:codesandbox",
   "buildCommand": "release:build",
-  "node": "18",
+  "node": "20",
   "packages": [
     "packages/create-toolpad-app",
     "packages/toolpad-core",

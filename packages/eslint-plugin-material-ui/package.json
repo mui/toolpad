@@ -14,7 +14,7 @@
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui/material-ui.git"
+    "url": "github:mui/material-ui"
   },
   "license": "MIT"
 }

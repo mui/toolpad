@@ -28,7 +28,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui/toolpad.git"
+    "url": "github:mui/toolpad",
+    "directory": "packages/toolpad-studio-components"
   },
   "scripts": {
     "build": "tsup",

@@ -9,7 +9,7 @@
   "description": "Create Toolpad apps with one command",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mui/toolpad",
+    "url": "github:mui/toolpad",
     "directory": "packages/create-toolpad-app"
   },
   "author": "Toolpad Team",

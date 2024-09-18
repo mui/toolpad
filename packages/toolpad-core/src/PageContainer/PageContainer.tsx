@@ -10,76 +10,15 @@ import useSlotProps from '@mui/utils/useSlotProps';
 import { styled } from '@mui/material';
 import { Link as ToolpadLink } from '../shared/Link';
 import { PageContainerToolbar, PageContainerToolbarProps } from './PageContainerToolbar';
-import { NavigationContext, RouterContext } from '../shared/context';
-import { getItemTitle, isPageItem } from '../shared/navigation';
-import { NavigationItem, NavigationPageItem, Navigation } from '../AppProvider';
-import { useApplicationTitle } from '../shared/branding';
+import { getItemTitle } from '../shared/navigation';
+import { useActivePage } from '../useActivePage';
 
 const PageContentHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
-  jusifyCOntent: 'space-between',
+  jusifyContent: 'space-between',
   gap: theme.spacing(2),
 }));
-
-const isRootPage = (item: NavigationItem) => isPageItem(item) && !item.segment;
-
-interface BreadCrumbItem extends NavigationPageItem {
-  path: string;
-}
-
-function createPageLookup(
-  navigation: Navigation,
-  segments: BreadCrumbItem[] = [],
-  base = '',
-): Map<string, BreadCrumbItem[]> {
-  const result = new Map<string, BreadCrumbItem[]>();
-
-  const resolveSegment = (segment?: string) => `${base}${segment ? `/${segment}` : ''}` || '/';
-
-  const root = navigation.find((item) => isRootPage(item)) as NavigationPageItem | undefined;
-  const rootCrumb = root ? { path: resolveSegment(''), ...root } : undefined;
-
-  for (const item of navigation) {
-    if (!isPageItem(item)) {
-      continue;
-    }
-
-    const isNonProdEnv = process.env.NODE_ENV !== 'production';
-
-    const path = resolveSegment(item.segment);
-    if (isNonProdEnv && result.has(path)) {
-      console.warn(`Duplicate path in navigation: ${path}`);
-    }
-
-    const itemCrumb: BreadCrumbItem = { path, ...item };
-
-    const navigationSegments: BreadCrumbItem[] = [
-      ...segments,
-      ...(rootCrumb && !isRootPage(item) ? [rootCrumb] : []),
-      itemCrumb,
-    ];
-
-    result.set(path, navigationSegments);
-
-    if (item.children) {
-      const childrenLookup = createPageLookup(item.children, navigationSegments, path);
-      for (const [childPath, childItems] of childrenLookup) {
-        if (isNonProdEnv && result.has(childPath)) {
-          console.warn(`Duplicate path in navigation: ${childPath}`);
-        }
-        result.set(childPath, childItems);
-      }
-    }
-  }
-
-  return result;
-}
-
-function matchPath(navigation: Navigation, path: string): BreadCrumbItem[] | null {
-  const lookup = createPageLookup(navigation);
-  return lookup.get(path) ?? null;
-}
 
 export interface PageContainerSlotProps {
   toolbar: PageContainerToolbarProps;
@@ -93,12 +32,19 @@ export interface PageContainerSlots {
   toolbar: React.ElementType;
 }
 
+export interface BreadCrumb {
+  title: string;
+  path: string;
+}
+
 export interface PageContainerProps extends ContainerProps {
   children?: React.ReactNode;
   title?: string;
+  breadCrumbs?: BreadCrumb[];
   slots?: PageContainerSlots;
   slotProps?: PageContainerSlotProps;
 }
+
 /**
  *
  * Demos:
@@ -111,28 +57,11 @@ export interface PageContainerProps extends ContainerProps {
  */
 function PageContainer(props: PageContainerProps) {
   const { children, slots, slotProps, ...rest } = props;
-  const routerContext = React.useContext(RouterContext);
-  const navigationContext = React.useContext(NavigationContext);
-  const pathname = routerContext?.pathname ?? '/';
-  const applicationTitle = useApplicationTitle();
-  const breadCrumbs = React.useMemo(() => {
-    let crumbs = matchPath(navigationContext, pathname) ?? [];
 
-    if (crumbs.length <= 0 || crumbs[0].path !== '/') {
-      crumbs = [
-        {
-          segment: '',
-          path: '/',
-          title: applicationTitle,
-        },
-        ...crumbs,
-      ];
-    }
-    return crumbs;
-  }, [navigationContext, pathname, applicationTitle]);
+  const activePage = useActivePage();
 
-  const title =
-    (breadCrumbs ? getItemTitle(breadCrumbs[breadCrumbs.length - 1]) : '') ?? props.title;
+  const breadCrumbs = props.breadCrumbs ?? activePage?.breadCrumbs ?? [];
+  const title = props.title ?? activePage?.title ?? '';
 
   const ToolbarComponent = props?.slots?.toolbar ?? PageContainerToolbar;
   const toolbarSlotProps = useSlotProps({

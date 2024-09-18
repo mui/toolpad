@@ -22,7 +22,6 @@ For example, under the following navigation structure:
 
 ```tsx
 <AppProvider
-  branding={{ title: 'ACME' }}
   navigation={[
     {
       segment: 'home',
@@ -43,6 +42,12 @@ For example, under the following navigation structure:
 The breadcrumbs contains **ACME / Home / Orders** when you visit the path **/home/orders**, and the page has a title of **Orders**.
 
 {{"demo": "TitleBreadcrumbsPageContainer.js", "height": 300, "hideToolbar": true}}
+
+## Dynamic Routes
+
+When you use the `PageContainer` on a dynamic route, you'll likely want to set a title and breadcrumbs belonging to the specific path. You can achieve this with the `title` and `breadCrumbs` property of the `PageContainer`:
+
+{{"demo": "CustomPageContainer.js", "height": 300}}
 
 ## Actions
 

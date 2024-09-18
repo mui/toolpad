@@ -8,7 +8,7 @@ _Sep 13, 2024_
 
 A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
 
-- Migrate to Material UI v6
+- Migrate to Material UI v6
 - Collapsible sidebar in `DashboardLayout` component with mini drawer variant
 - Support route patterns in navigation
 - Add more OAuth providers to `SignInPage`
@@ -22,7 +22,7 @@ A big thanks to the 6 contributors who made this release possible. Here are some
 - &#8203;<!-- 18 -->Add more OAuth providers to `SignInPage` (#3933) @bharatkashyap
 - &#8203;<!-- 17 -->Refactor `<Account />` (#3992) @bharatkashyap
 - &#8203;<!-- 16 -->Add toolbarActions and toolbarAccount slots to DashboardLayout (#3984)
-- &#8203;<!-- 15 -->Migrate to Material UI v6 (#3862) @Janpot
+- &#8203;<!-- 15 -->Migrate to Material UI v6 (#3862) @Janpot
 - &#8203;<!-- 14 -->Support route patterns in navigation (#3991) @apedroferreira
 
 ### Docs
@@ -103,7 +103,7 @@ _Aug 9, 2024_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
+- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
 - Fix theme switcher in documentation examples
 - Fix DashboardLayout bugs with theming and mobile navigation
 - Fix some file handling restrictions in `@toolpad/studio`
@@ -125,7 +125,7 @@ A big thanks to the 5 contributors who made this release possible. Here are some
 ### Core
 
 - &#8203;<!-- 14 --> Support `require` (#3908) @bharatkashyap
-- &#8203;<!-- 10 --> Port fixes from Material UI v6 migration branch (#3910) @Janpot
+- &#8203;<!-- 10 --> Port fixes from Material UI v6 migration branch (#3910) @Janpot
 - &#8203;<!-- 07 --> Upgrade monorepo (#3911) @Janpot
 - &#8203;<!-- 06 --> Clarify security policy @oliviertassinari
 - &#8203;<!-- 04 --> Update smoke test instructions (#3899) @Janpot
@@ -157,7 +157,7 @@ Please use the `--studio` flag to generate a Toolpad Studio project.
 - &#8203;<!-- 09 --> Add authentication to Toolpad Core (#3609) @bharatkashyap
 - &#8203;<!-- 01 --> Make Core the default project (#3868) @bharatkashyap
 - &#8203;<!-- 11 --> Make navigation item segments optional (#3838) @apedroferreira
-- &#8203;<!-- 17 --> Ensure Material UI v5 compatibility (#3894) @Janpot
+- &#8203;<!-- 17 --> Ensure Material UI v5 compatibility (#3894) @Janpot
 - &#8203;<!-- 10 --> Bring in some fixes from the next update branch (#3866) @Janpot
 
 ### Docs
@@ -310,7 +310,7 @@ _Jun 3, 2024_
 
 A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
 
-First components in @toolpad/core: [DashboardLayout](https://github.com/mui/mui-toolpad/discussions/3309#:~:text=per%20authentication%20page.-,Dashboard%20layout,-provides%20UI%20for), DataGrid and LineChart. Initial [data providers](https://github.com/mui/mui-toolpad/discussions/3311) implementation.
+First components in @toolpad/core: [DashboardLayout](https://github.com/mui/toolpad/discussions/3309#:~:text=per%20authentication%20page.-,Dashboard%20layout,-provides%20UI%20for), DataGrid and LineChart. Initial [data providers](https://github.com/mui/toolpad/discussions/3311) implementation.
 
 - &#8203;<!-- 31 -->Lock file maintenance (#3622) @renovate[bot]
 - &#8203;<!-- 30 -->Lock file maintenance Examples (#3624) @renovate[bot]
@@ -335,9 +335,9 @@ First components in @toolpad/core: [DashboardLayout](https://github.com/mui/mui-
 - &#8203;<!-- 11 -->[DataProvider] Support custom Id field (#3613) @Janpot
 - &#8203;<!-- 10 -->[docs] Start Toolpad Core docs (#3383) @bharatkashyap
 - &#8203;<!-- 09 -->[docs] Add Toolpad core tutorial example (#3617) @bharatkashyap
-- &#8203;<!-- 08 -->[docs] Add badges like in Material UI @oliviertassinari
-- &#8203;<!-- 07 -->[docs] Add badges like in Material UI @oliviertassinari
-- &#8203;<!-- 06 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 08 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 07 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Add badges like in Material UI @oliviertassinari
 - &#8203;<!-- 05 -->[docs] Update twitter.com to x.com @oliviertassinari
 - &#8203;<!-- 04 -->[docs] Support demo previews with comments (#3577) @Janpot
 - &#8203;<!-- 03 -->[docs] Fix demo codesandbox dependencies (#3578) @Janpot
@@ -1872,7 +1872,7 @@ _Mar 20, 2023_
 
 A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
 
-Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. Read more [here](https://github.com/mui/mui-toolpad/discussions/1748).
+Today we're taking a big step. We're making Toolpad focus much more on integrating with your IDE, while providing the ease of building UI fast with a drag and drop. Read more [here](https://github.com/mui/toolpad/discussions/1748).
 
 - &#8203;<!-- 8 -->Add create-toolpad-app CLI (#1700) @bharatkashyap
 - &#8203;<!-- 7 -->Direction 13 (#1651) @Janpot

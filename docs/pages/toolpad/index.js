@@ -22,7 +22,7 @@ export default function Home() {
       />
       <CssBaseline />
       <AppHeaderBanner />
-      <AppHeader gitHubRepository="https://github.com/mui/mui-toolpad" />
+      <AppHeader gitHubRepository="https://github.com/mui/toolpad" />
       <main id="main-content">
         <Hero />
         <Features />

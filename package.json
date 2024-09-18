@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "description": "Components and APIs for building dashboards and internal tools",
-  "repository": "https://github.com/mui/mui-toolpad.git",
+  "repository": "https://github.com/mui/toolpad.git",
   "private": true,
   "bin": {
     "toolpad-studio": "./dist/index.js"
@@ -27,7 +27,7 @@
     "release:build": "lerna run --ignore docs --stream build --concurrency 1",
     "release:version": "lerna version --exact --no-changelog --no-push --no-git-tag-version",
     "release:publish": "pnpm dedupe && pnpm release:build && pnpm publish --recursive --tag latest",
-    "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo mui-toolpad",
+    "release:changelog": "dotenv -- node ./scripts/releaseChangelog.mjs --repo toolpad",
     "test:build": "lerna run build --scope @toolpad/studio-runtime --scope @toolpad/studio-components --stream",
     "test:integration": "rimraf ./node_modules/.vite && playwright test --config ./test/playwright.config.ts",
     "test:browser": "FORCE_COLOR=1 pnpm run -r test:browser",

@@ -17,7 +17,7 @@ importers:
         version: 4.17.7
       '@vitest/browser':
         specifier: 2.1.1
-        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)
+        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)
       archiver:
         specifier: 7.0.1
         version: 7.0.1
@@ -147,7 +147,7 @@ importers:
         version: 7.18.0(eslint@8.57.0)(typescript@5.6.2)
       '@vitest/coverage-v8':
         specifier: 2.1.1
-        version: 2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1))(vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))
+        version: 2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1))(vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))
       babel-plugin-react-remove-properties:
         specifier: 0.3.0
         version: 0.3.0
@@ -195,7 +195,7 @@ importers:
         version: 7.35.2(eslint@8.57.0)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-1e9896a-20240916(eslint@8.57.0)
+        version: 0.0.0-experimental-ca16900-20240916(eslint@8.57.0)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.0)
@@ -261,7 +261,7 @@ importers:
         version: 0.1.1(vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))
       vitest-fail-on-console:
         specifier: 0.7.1
-        version: 0.7.1(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))
+        version: 0.7.1(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))
 
   docs:
     dependencies:
@@ -655,7 +655,7 @@ importers:
         version: 17.0.3
       '@vitest/browser':
         specifier: 2.1.1
-        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)
+        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)
       next:
         specifier: ^14.2.11
         version: 14.2.11(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -761,7 +761,7 @@ importers:
         version: 9.0.15
       '@vitejs/plugin-react':
         specifier: 4.3.1
-        version: 4.3.1(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))
+        version: 4.3.1(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))
       '@webcontainer/env':
         specifier: 1.1.1
         version: 1.1.1
@@ -922,8 +922,8 @@ importers:
         specifier: 5.5.4
         version: 5.5.4
       vite:
-        specifier: 5.4.5
-        version: 5.4.5(@types/node@22.5.5)(terser@5.31.1)
+        specifier: 5.4.6
+        version: 5.4.6(@types/node@22.5.5)(terser@5.31.1)
       vm-browserify:
         specifier: 1.1.2
         version: 1.1.2
@@ -5824,8 +5824,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-1e9896a-20240916:
-    resolution: {integrity: sha512-5ufMeea/UloEmp5vFD/8JsA6dU4omJ6Ebp4xzXMMGG1qa7t2RuS/6JlmeqzL5HEL/rh9JWNq6oNTsrupqPiZ9w==}
+  eslint-plugin-react-compiler@0.0.0-experimental-ca16900-20240916:
+    resolution: {integrity: sha512-T3iL6Veei4EMNdBtn9p/kUDlXFZAXVQ0scfF1hOjJE88Lmlg7f1zHRAcGQ4Z6ClVPnOikZ1/yGNB4l/ui47Anw==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -9853,8 +9853,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite@5.4.5:
-    resolution: {integrity: sha512-pXqR0qtb2bTwLkev4SE3r4abCNioP3GkjvIDLlzziPpXtHgiJIjuKl+1GN6ESOT3wMjG3JTeARopj2SwYaHTOA==}
+  vite@5.4.6:
+    resolution: {integrity: sha512-IeL5f8OO5nylsgzd9tq4qD2QqI0k2CQLGrWD0rCN0EQJZpBK5vJAx0I+GDkMOXxQX/OfFHMuLIx6ddAxGX/k+Q==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -13681,22 +13681,22 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react@4.3.1(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))':
+  '@vitejs/plugin-react@4.3.1(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))':
     dependencies:
       '@babel/core': 7.25.2
       '@babel/plugin-transform-react-jsx-self': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-transform-react-jsx-source': 7.24.7(@babel/core@7.25.2)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 5.4.5(@types/node@22.5.5)(terser@5.31.1)
+      vite: 5.4.6(@types/node@22.5.5)(terser@5.31.1)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)':
+  '@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.5.2(@testing-library/dom@10.4.0)
-      '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))
+      '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))
       '@vitest/utils': 2.1.1
       magic-string: 0.30.11
       msw: 2.3.5(typescript@5.6.2)
@@ -13713,7 +13713,7 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/coverage-v8@2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1))(vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))':
+  '@vitest/coverage-v8@2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1))(vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -13729,7 +13729,7 @@ snapshots:
       tinyrainbow: 1.2.0
       vitest: 2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1)
     optionalDependencies:
-      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)
+      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -13740,14 +13740,14 @@ snapshots:
       chai: 5.1.1
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))':
+  '@vitest/mocker@2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))':
     dependencies:
       '@vitest/spy': 2.1.1
       estree-walker: 3.0.3
       magic-string: 0.30.11
     optionalDependencies:
       msw: 2.3.5(typescript@5.6.2)
-      vite: 5.4.5(@types/node@22.5.5)(terser@5.31.1)
+      vite: 5.4.6(@types/node@22.5.5)(terser@5.31.1)
 
   '@vitest/pretty-format@2.1.1':
     dependencies:
@@ -15598,7 +15598,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-1e9896a-20240916(eslint@8.57.0):
+  eslint-plugin-react-compiler@0.0.0-experimental-ca16900-20240916(eslint@8.57.0):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.6
@@ -20244,7 +20244,7 @@ snapshots:
       cac: 6.7.14
       debug: 4.3.6
       pathe: 1.1.2
-      vite: 5.4.5(@types/node@22.5.5)(terser@5.31.1)
+      vite: 5.4.6(@types/node@22.5.5)(terser@5.31.1)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -20256,7 +20256,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.4.5(@types/node@22.5.5)(terser@5.31.1):
+  vite@5.4.6(@types/node@22.5.5)(terser@5.31.1):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.47
@@ -20276,16 +20276,16 @@ snapshots:
       redent: 4.0.0
       vitest: 2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1)
 
-  vitest-fail-on-console@0.7.1(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1)):
+  vitest-fail-on-console@0.7.1(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1)):
     dependencies:
       chalk: 5.3.0
-      vite: 5.4.5(@types/node@22.5.5)(terser@5.31.1)
+      vite: 5.4.6(@types/node@22.5.5)(terser@5.31.1)
       vitest: 2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1)
 
   vitest@2.1.1(@types/node@22.5.5)(@vitest/browser@2.1.1)(jsdom@25.0.0)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1):
     dependencies:
       '@vitest/expect': 2.1.1
-      '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))
+      '@vitest/mocker': 2.1.1(@vitest/spy@2.1.1)(msw@2.3.5(typescript@5.6.2))(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))
       '@vitest/pretty-format': 2.1.1
       '@vitest/runner': 2.1.1
       '@vitest/snapshot': 2.1.1
@@ -20300,12 +20300,12 @@ snapshots:
       tinyexec: 0.3.0
       tinypool: 1.0.0
       tinyrainbow: 1.2.0
-      vite: 5.4.5(@types/node@22.5.5)(terser@5.31.1)
+      vite: 5.4.6(@types/node@22.5.5)(terser@5.31.1)
       vite-node: 2.1.1(@types/node@22.5.5)(terser@5.31.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.5.5
-      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.5(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)
+      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))(vitest@2.1.1)
       jsdom: 25.0.0
     transitivePeerDependencies:
       - less

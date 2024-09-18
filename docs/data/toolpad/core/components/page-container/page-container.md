@@ -12,7 +12,7 @@ components: PageContainer, PageContainerToolbar
 If this is your first time using Toolpad Core, you might want to start with the [base concepts](/toolpad/core/introduction/base-concepts/) instead.
 :::
 
-`PageContent` is the ideal wrapper for the content of your dashboard. It shows the current page title, and provides breadcrumbs to navigate back into the current hierarchy. It makes your page responsive through the use of the Material&nbsp;UI Container component under the hood.
+`PageContainer` is the ideal wrapper for the content of your dashboard. It shows the current page title, and provides breadcrumbs to navigate back into the current hierarchy. It makes your page responsive through the use of the Material&nbsp;UI Container component under the hood.
 
 Just like [`DashboardLayout`](/toolpad/core/react-dashboard-layout/), `PageContainer` uses the navigation structure that is defined in the [`AppProvider`](/toolpad/core/react-app-provider/) to build up its breadcrumbs and title.
 
@@ -56,4 +56,4 @@ You can configure additional actions in the area that is reserved on the right. 
 
 ## Responsiveness
 
-The Page Container component inherits the properties of the Material&nbsp;UI [Container](https://mui.com/material-ui/react-container/) component. You can use its `maxWidth` and `fixed` properties to control the bounds of the page.
+The Page Container component inherits the properties of the Material&nbsp;UI [Container](https://mui.com/material-ui/react-container/) component. You can use its [`maxWidth`](https://mui.com/material-ui/api/container/#container-prop-maxWidth) and [`fixed`](https://mui.com/material-ui/api/container/#container-prop-fixed) properties to control the bounds of the page. Set `maxWidth` to `false` to disable the container altogether and have the content bleed right up to the edges of the page.

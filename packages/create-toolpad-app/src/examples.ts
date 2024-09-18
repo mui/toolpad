@@ -41,13 +41,13 @@ export async function downloadAndExtractExample(root: string, name: string) {
   console.log(`${chalk.cyan('info')} - Downloading example "${name}" to ${chalk.cyan(root)}`);
   // eslint-disable-next-line no-console
   console.log();
-  const tempFile = await downloadTar('https://codeload.github.com/mui/mui-toolpad/tar.gz/master');
+  const tempFile = await downloadTar('https://codeload.github.com/mui/toolpad/tar.gz/master');
 
   await tar.x({
     file: tempFile,
     cwd: root,
     strip: 2 + name.split('/').length,
-    filter: (p) => p.includes(`mui-toolpad-master/examples/${name}/`),
+    filter: (p) => p.includes(`toolpad-master/examples/${name}/`),
   });
 
   // eslint-disable-next-line no-console

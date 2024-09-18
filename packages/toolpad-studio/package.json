@@ -28,11 +28,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui/mui-toolpad.git",
+    "url": "github:mui/toolpad",
     "directory": "packages/toolpad-studio"
   },
   "bugs": {
-    "url": "https://github.com/mui/mui-toolpad/issues"
+    "url": "https://github.com/mui/toolpad/issues"
   },
   "homepage": "https://mui.com/toolpad/",
   "files": [
@@ -138,7 +138,7 @@
     "serialize-javascript": "6.0.2",
     "superjson": "2.0.0",
     "typescript": "5.5.4",
-    "vite": "5.4.5",
+    "vite": "5.4.6",
     "vm-browserify": "1.1.2",
     "whatwg-url": "14.0.0",
     "ws": "8.18.0",

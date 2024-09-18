@@ -3,7 +3,7 @@
   "version": "0.6.0",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
-  "homepage": "https://github.com/mui/mui-toolpad#readme",
+  "homepage": "https://github.com/mui/toolpad#readme",
   "license": "MIT",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -31,7 +31,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui/mui-toolpad.git"
+    "url": "github:mui/toolpad",
+    "directory": "packages/toolpad-studio-runtime"
   },
   "scripts": {
     "build": "tsup",
@@ -39,7 +40,7 @@
     "check-types": "tsup && tsc --noEmit"
   },
   "bugs": {
-    "url": "https://github.com/mui/mui-toolpad/issues"
+    "url": "https://github.com/mui/toolpad/issues"
   },
   "dependencies": {
     "@auth/core": "0.34.2",

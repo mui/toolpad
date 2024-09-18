@@ -1,6 +1,6 @@
 # datagrid-premium in Toolpad Studio
 
-<p class="description">A Toolpad Studio app that shows how to use use the MUI X premium grid in a custom component.</p>
+<p class="description">A Toolpad Studio app that shows how to use use the MUI X Premium grid in a custom component.</p>
 
 ## How to run
 
@@ -22,8 +22,8 @@ pnpm create toolpad-app --example datagrid-premium
 
 This app demonstrates the following capabilities of Toolpad Studio:
 
-1. Using the MUI x premium DataGrid in a custom component.
+1. Using the MUI X Premium DataGrid in a custom component.
 
 ## The source
 
-[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/datagrid-premium)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/datagrid-premium)

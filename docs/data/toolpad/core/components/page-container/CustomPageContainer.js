@@ -45,7 +45,7 @@ Content.propTypes = {
     navigate: PropTypes.func.isRequired,
     pathname: PropTypes.string.isRequired,
     searchParams: PropTypes.shape({
-      '__@iterator@334': PropTypes.func.isRequired,
+      '__@iterator@271': PropTypes.func.isRequired,
       append: PropTypes.func.isRequired,
       delete: PropTypes.func.isRequired,
       entries: PropTypes.func.isRequired,

@@ -44,22 +44,7 @@ Content.propTypes = {
   router: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
     pathname: PropTypes.string.isRequired,
-    searchParams: PropTypes.shape({
-      '__@iterator@271': PropTypes.func.isRequired,
-      append: PropTypes.func.isRequired,
-      delete: PropTypes.func.isRequired,
-      entries: PropTypes.func.isRequired,
-      forEach: PropTypes.func.isRequired,
-      get: PropTypes.func.isRequired,
-      getAll: PropTypes.func.isRequired,
-      has: PropTypes.func.isRequired,
-      keys: PropTypes.func.isRequired,
-      set: PropTypes.func.isRequired,
-      size: PropTypes.number.isRequired,
-      sort: PropTypes.func.isRequired,
-      toString: PropTypes.func.isRequired,
-      values: PropTypes.func.isRequired,
-    }).isRequired,
+    searchParams: PropTypes.instanceOf(URLSearchParams).isRequired,
   }).isRequired,
 };
 

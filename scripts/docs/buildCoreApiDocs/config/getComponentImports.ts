@@ -23,14 +23,25 @@ export function getComponentImports(name: string, filename: string) {
     const nextjsRelativePath = path.resolve(relativePath, '../../nextjs');
     const hasNextJsVersion = fs.existsSync(`${nextjsRelativePath}/${name}.tsx`);
 
+    const reactRouterDOMRelativePath = path.resolve(relativePath, '../../react-router-dom');
+    const hasReactRouterDOMVersion = fs.existsSync(`${reactRouterDOMRelativePath}/${name}.tsx`);
+
     return [
       `import { ${name} } from '@toolpad/core/${name}';${
         hasNextJsVersion
           ? `\nimport { ${name} } from '@toolpad/core/nextjs/${name}'; // Next.js`
           : ''
+      }${
+        hasReactRouterDOMVersion
+          ? `\nimport { ${name} } from '@toolpad/core/react-router-dom/${name}'; // react-router-dom`
+          : ''
       }`,
       `import { ${name} } from '@toolpad/core';${
         hasNextJsVersion ? `\nimport { ${name} } from '@toolpad/core/nextjs'; // Next.js` : ''
+      }${
+        hasReactRouterDOMVersion
+          ? `\nimport { ${name} } from '@toolpad/core/react-router-dom'; // react-router-dom`
+          : ''
       }`,
     ];
   }

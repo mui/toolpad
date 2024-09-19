@@ -31,6 +31,7 @@ import {
 import { PageViewState, NodeInfo, SlotsState } from '../../../types';
 import { useAppStateApi } from '../../AppState';
 import { FONTS_URL } from '../../../runtime/constants';
+import { scrollIntoViewIfNeeded } from '../../../utils/dom';
 
 // Interface to communicate between editor and canvas
 export interface ToolpadBridge {
@@ -254,7 +255,10 @@ export default function EditorCanvasHost({
               return;
             }
             const node = appRoot.querySelector(`[data-node-id='${nodeId}']`);
-            node?.scrollIntoView({ behavior: 'instant', block: 'end', inline: 'end' });
+
+            if (node) {
+              scrollIntoViewIfNeeded(node, { behavior: 'instant', block: 'center', inline: 'end' });
+            }
           },
         },
       };

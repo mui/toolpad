@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme, type Theme } from '@mui/material';
+import { styled, useTheme, type Theme, SxProps } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -357,6 +357,10 @@ export interface DashboardLayoutProps {
     toolbarActions?: {};
     toolbarAccount?: AccountProps;
   };
+  /**
+   * The system prop that allows defining system overrides as well as additional CSS styles.
+   */
+  sx?: SxProps<Theme>;
 }
 
 /**
@@ -370,7 +374,7 @@ export interface DashboardLayoutProps {
  * - [DashboardLayout API](https://mui.com/toolpad/core/api/dashboard-layout)
  */
 function DashboardLayout(props: DashboardLayoutProps) {
-  const { children, disableCollapsibleSidebar = false, slots, slotProps } = props;
+  const { children, disableCollapsibleSidebar = false, slots, slotProps, sx } = props;
 
   const theme = useTheme();
 
@@ -517,7 +521,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ ...sx, display: 'flex' }}>
       <AppBar color="inherit" position="fixed">
         {
           // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244

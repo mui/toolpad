@@ -1571,8 +1571,7 @@ function ToolpadAppLayout({ children }: ToolpadAppLayoutProps) {
     <AppLayout
       activePageSlug={activePageSlug}
       pages={navEntries}
-      hasNavigation={!appHost.isCanvas}
-      hasHeader={hasAuthentication && !appHost.isCanvas}
+      hasLayout={!appHost.isCanvas}
       clipped={clipped}
     >
       {children}

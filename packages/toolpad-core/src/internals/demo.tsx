@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
 import { Router } from '../AppProvider';
 
 /**
@@ -30,53 +29,6 @@ export function useDemoRouter(initialUrl: string = '/') {
   }, [url.pathname, url.search, url.searchParams]);
 
   return router;
-}
-
-const BrowserRoot = styled('div')(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  height: '100%',
-  alignItems: 'stretch',
-  borderRadius: theme.shape.borderRadius,
-  overflow: 'hidden',
-}));
-
-const BrowserBar = styled('div')(({ theme }) => ({
-  padding: theme.spacing(1),
-  backgroundColor: theme.palette.grey[400],
-}));
-
-const UrlField = styled('div')(({ theme }) => ({
-  fontSize: theme.typography.caption.fontSize,
-  color: 'black',
-  padding: '0.1rem 12px',
-  backgroundColor: 'white',
-  borderRadius: '1em',
-}));
-
-const BrowserContent = styled('div')(({ theme }) => ({
-  flex: 1,
-  border: `1px solid ${theme.palette.divider}`,
-  borderTop: 0,
-  backgroundColor: theme.palette.background.default,
-}));
-
-export interface DemoBrowserProps {
-  router: Router;
-  children?: React.ReactNode;
-}
-
-export function DemoBrowser({ router, children }: DemoBrowserProps) {
-  const search = router.searchParams.toString();
-  return (
-    <BrowserRoot>
-      <BrowserBar>
-        <UrlField>{router.pathname + (search ? `?${search}` : '')}</UrlField>
-      </BrowserBar>
-      <BrowserContent>{children}</BrowserContent>
-    </BrowserRoot>
-  );
 }
 
 export { Link } from '../shared/Link';

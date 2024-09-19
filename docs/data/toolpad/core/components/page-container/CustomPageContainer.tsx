@@ -1,10 +1,11 @@
 import * as React from 'react';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { AppProvider, Router } from '@toolpad/core/AppProvider';
-import { DemoBrowser, Link, useDemoRouter } from '@toolpad/core/internals';
+import { Link, useDemoRouter } from '@toolpad/core/internals';
 import { useActivePage } from '@toolpad/core/useActivePage';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 
 const NAVIGATION = [
   {
@@ -57,10 +58,8 @@ export default function CustomPageContainer() {
   }
 
   return (
-    <DemoBrowser router={router}>
-      <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
-        {content}
-      </AppProvider>
-    </DemoBrowser>
+    <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
+      <Paper sx={{ width: '100%' }}>{content}</Paper>
+    </AppProvider>
   );
 }

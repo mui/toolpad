@@ -1,10 +1,12 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { DemoBrowser, Link, useDemoRouter } from '@toolpad/core/internals';
+import { Link, useDemoRouter } from '@toolpad/core/internals';
 import { useActivePage } from '@toolpad/core/useActivePage';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 
 const NAVIGATION = [
   {
@@ -37,6 +39,29 @@ function Content({ router }) {
   );
 }
 
+Content.propTypes = {
+  router: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    pathname: PropTypes.string.isRequired,
+    searchParams: PropTypes.shape({
+      '__@iterator@334': PropTypes.func.isRequired,
+      append: PropTypes.func.isRequired,
+      delete: PropTypes.func.isRequired,
+      entries: PropTypes.func.isRequired,
+      forEach: PropTypes.func.isRequired,
+      get: PropTypes.func.isRequired,
+      getAll: PropTypes.func.isRequired,
+      has: PropTypes.func.isRequired,
+      keys: PropTypes.func.isRequired,
+      set: PropTypes.func.isRequired,
+      size: PropTypes.number.isRequired,
+      sort: PropTypes.func.isRequired,
+      toString: PropTypes.func.isRequired,
+      values: PropTypes.func.isRequired,
+    }).isRequired,
+  }).isRequired,
+};
+
 export default function CustomPageContainer() {
   const router = useDemoRouter('/inbox/123');
 
@@ -53,10 +78,8 @@ export default function CustomPageContainer() {
   }
 
   return (
-    <DemoBrowser router={router}>
-      <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
-        {content}
-      </AppProvider>
-    </DemoBrowser>
+    <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
+      <Paper sx={{ width: '100%' }}>{content}</Paper>
+    </AppProvider>
   );
 }

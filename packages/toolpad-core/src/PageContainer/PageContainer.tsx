@@ -116,6 +116,15 @@ PageContainer.propTypes /* remove-proptypes */ = {
   /**
    * @ignore
    */
+  breadCrumbs: PropTypes.arrayOf(
+    PropTypes.shape({
+      path: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+    }),
+  ),
+  /**
+   * @ignore
+   */
   children: PropTypes.node,
   /**
    * @ignore

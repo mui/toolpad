@@ -58,7 +58,10 @@ export function hasSelectedNavigationChildren(
   return false;
 }
 
-// maps navigation items to their full path
+/**
+ * Builds a map of navigation page items to their respective paths. This map is used to quickly
+ * lookup the path of a navigation item. It will be cached for the lifetime of the navigation.
+ */
 function buildItemToPathMap(navigation: Navigation): Map<NavigationPageItem, string> {
   const map = new Map<NavigationPageItem, string>();
 
@@ -82,6 +85,10 @@ function buildItemToPathMap(navigation: Navigation): Map<NavigationPageItem, str
 }
 
 const itemToPathMapCache = new WeakMap<Navigation, Map<NavigationPageItem, string>>();
+
+/**
+ * Gets the cached map of navigation page items to their respective paths.
+ */
 function getItemToPathMap(navigation: Navigation) {
   let map = itemToPathMapCache.get(navigation);
   if (!map) {
@@ -91,6 +98,10 @@ function getItemToPathMap(navigation: Navigation) {
   return map;
 }
 
+/**
+ * Build a lookup map of paths to navigation items. This map is used to match paths against
+ * to find the active page.
+ */
 function buildItemLookup(navigation: Navigation) {
   const map = new Map<string | RegExp, NavigationPageItem>();
   const visit = (item: NavigationItem) => {
@@ -125,6 +136,10 @@ function getItemLookup(navigation: Navigation) {
   return map;
 }
 
+/**
+ * Matches a path against the navigation to find the active page. i.e. the page that should be
+ * marked as selected in the navigation.
+ */
 export function matchPath(navigation: Navigation, path: string): NavigationPageItem | null {
   const lookup = getItemLookup(navigation);
 
@@ -140,11 +155,9 @@ export function matchPath(navigation: Navigation, path: string): NavigationPageI
   return null;
 }
 
-export function getItemByPath(navigation: Navigation, path: string): NavigationPageItem | null {
-  const map = getItemLookup(navigation);
-  return map.get(path) ?? null;
-}
-
+/**
+ * Gets the path for a specific navigation page item.
+ */
 export function getItemPath(navigation: Navigation, item: NavigationPageItem): string {
   const map = getItemToPathMap(navigation);
   const path = map.get(item);

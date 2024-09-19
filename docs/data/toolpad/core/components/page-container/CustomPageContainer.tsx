@@ -6,6 +6,7 @@ import { useActivePage } from '@toolpad/core/useActivePage';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import invariant from 'invariant';
 
 const NAVIGATION = [
   {
@@ -22,13 +23,16 @@ interface ContentProps {
 function Content({ router }: ContentProps) {
   const id = Number(router.pathname.replace('/inbox/', ''));
 
-  const title = `Item ${id}`;
-
   const activePage = useActivePage();
-  const breadCrumbs = [
-    ...(activePage?.breadCrumbs ?? []),
-    { title, path: `/inbox/${id}` },
-  ];
+  invariant(
+    activePage,
+    'This component must be used on a page within the app navigation',
+  );
+
+  const title = `Item ${id}`;
+  const path = `${activePage.path}/${id}`;
+
+  const breadCrumbs = [...activePage.breadCrumbs, { title, path }];
 
   return (
     // preview-start

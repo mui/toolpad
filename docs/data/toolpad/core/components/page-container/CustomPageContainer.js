@@ -21,10 +21,7 @@ function Content({ router }) {
   const id = Number(router.pathname.replace('/inbox/', ''));
 
   const activePage = useActivePage();
-  invariant(
-    activePage,
-    'This component must be used on a page within the app navigation',
-  );
+  invariant(activePage, 'No navigation match');
 
   const title = `Item ${id}`;
   const path = `${activePage.path}/${id}`;

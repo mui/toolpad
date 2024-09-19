@@ -33,19 +33,38 @@ export interface PageContainerSlots {
 }
 
 export interface BreadCrumb {
+  /**
+   * The title of the breadcrumb segment.
+   */
   title: string;
+  /**
+   * The path the breadcrumb links to.
+   */
   path: string;
 }
 
 export interface PageContainerProps extends ContainerProps {
   children?: React.ReactNode;
+  /**
+   * The title of the page. Leave blank to use the active page title.
+   */
   title?: string;
+  /**
+   * The breadcrumbs of the page. Leave blank to use the active page breadcrumbs.
+   */
   breadCrumbs?: BreadCrumb[];
+  /**
+   * The components used for each slot inside.
+   */
   slots?: PageContainerSlots;
+  /**
+   * The props used for each slot inside.
+   */
   slotProps?: PageContainerSlotProps;
 }
 
 /**
+ * A container component to provide a title and breadcrumbs for your pages.
  *
  * Demos:
  *
@@ -114,7 +133,7 @@ PageContainer.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * @ignore
+   * The breadcrumbs of the page. Leave blank to use the active page breadcrumbs.
    */
   breadCrumbs: PropTypes.arrayOf(
     PropTypes.shape({
@@ -127,7 +146,7 @@ PageContainer.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * @ignore
+   * The props used for each slot inside.
    */
   slotProps: PropTypes.shape({
     toolbar: PropTypes.shape({
@@ -135,13 +154,13 @@ PageContainer.propTypes /* remove-proptypes */ = {
     }).isRequired,
   }),
   /**
-   * @ignore
+   * The components used for each slot inside.
    */
   slots: PropTypes.shape({
     toolbar: PropTypes.elementType,
   }),
   /**
-   * @ignore
+   * The title of the page. Leave blank to use the active page title.
    */
   title: PropTypes.string,
 } as any;

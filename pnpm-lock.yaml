@@ -98,8 +98,8 @@ importers:
         specifier: 1.0.14
         version: 1.0.14
       '@mui/internal-scripts':
-        specifier: https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-scripts
-        version: https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-scripts
+        specifier: 1.0.21-dev.20240919-130050-82a6448768
+        version: 1.0.21-dev.20240919-130050-82a6448768
       '@mui/monorepo':
         specifier: github:mui/material-ui#3732be30e0ae3287b55dc6a96cf1ffcfdc194906
         version: https://codeload.github.com/mui/material-ui/tar.gz/3732be30e0ae3287b55dc6a96cf1ffcfdc194906(encoding@0.1.13)
@@ -2849,16 +2849,11 @@ packages:
   '@mui/internal-docs-utils@1.0.13':
     resolution: {integrity: sha512-q+EVFiJGqAbNtYQrRqRiE6EEtVyIgEPfM0QpMJ5ws/QY8wZterExWHLbtBP5eX60fIXqaVccfMBro8RPaeuvDQ==}
 
-  '@mui/internal-docs-utils@https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-docs-utils':
-    resolution: {tarball: https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-docs-utils}
-    version: 1.0.13
-
   '@mui/internal-markdown@1.0.14':
     resolution: {integrity: sha512-Df8Uo54TyE7Lm3otWWxw2OQzv3ztbdhRJMJ2sCYrTDqluAvGe/65KpVr95/AcY/An3qWpvBrbn5k5Oj/NG/lXw==}
 
-  '@mui/internal-scripts@https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-scripts':
-    resolution: {tarball: https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-scripts}
-    version: 1.0.21
+  '@mui/internal-scripts@1.0.21-dev.20240919-130050-82a6448768':
+    resolution: {integrity: sha512-feyp1s9pHvSOdO+ERv8oPGp2qGUCnngTt0+Yb+yTBo1tH8DN1Ks5JA7gIQR/elTnDusrbBQPpI7IAG5ZPrYlzQ==}
 
   '@mui/joy@5.0.0-beta.48':
     resolution: {integrity: sha512-OhTvjuGl9I5IvpBr0BQyDehIW/xb2yteW6YglHJMdOb/279nItn76X1NBtPV9ImldNlBjReGwvpOXmBTTGER9w==}
@@ -12038,11 +12033,6 @@ snapshots:
       rimraf: 6.0.1
       typescript: 5.6.2
 
-  '@mui/internal-docs-utils@https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-docs-utils':
-    dependencies:
-      rimraf: 6.0.1
-      typescript: 5.6.2
-
   '@mui/internal-markdown@1.0.14':
     dependencies:
       '@babel/runtime': 7.25.6
@@ -12050,14 +12040,14 @@ snapshots:
       marked: 13.0.3
       prismjs: 1.29.0
 
-  '@mui/internal-scripts@https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-scripts':
+  '@mui/internal-scripts@1.0.21-dev.20240919-130050-82a6448768':
     dependencies:
       '@babel/core': 7.25.2
       '@babel/plugin-syntax-class-properties': 7.12.13(@babel/core@7.25.2)
       '@babel/plugin-syntax-jsx': 7.24.7(@babel/core@7.25.2)
       '@babel/plugin-syntax-typescript': 7.25.4(@babel/core@7.25.2)
       '@babel/types': 7.25.6
-      '@mui/internal-docs-utils': https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-docs-utils
+      '@mui/internal-docs-utils': 1.0.13
       doctrine: 3.0.0
       lodash: 4.17.21
       typescript: 5.6.2

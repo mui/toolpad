@@ -56,7 +56,7 @@
     "@mui/internal-babel-plugin-resolve-imports": "1.0.18",
     "@mui/internal-docs-utils": "1.0.13",
     "@mui/internal-markdown": "1.0.14",
-    "@mui/internal-scripts": "https://pkg.csb.dev/mui/material-ui/commit/9bd6acae/@mui/internal-scripts",
+    "@mui/internal-scripts": "1.0.21-dev.20240919-130050-82a6448768",
     "@mui/monorepo": "github:mui/material-ui#3732be30e0ae3287b55dc6a96cf1ffcfdc194906",
     "@mui/x-charts": "7.17.0",
     "@next/eslint-plugin-next": "14.2.11",

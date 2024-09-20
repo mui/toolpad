@@ -484,11 +484,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
     isOverSmViewport && (disableCollapsibleSidebar || !isUnderMdViewport);
 
   const getDrawerContent = React.useCallback(
-    (isMini: boolean) => (
+    (isMini: boolean, ariaLabel: string) => (
       <React.Fragment>
         <Toolbar />
         <Box
           component="nav"
+          aria-label={ariaLabel}
           sx={{
             overflow: 'auto',
             pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
@@ -608,7 +609,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           ...getDrawerSharedSx(false),
         }}
       >
-        {getDrawerContent(false)}
+        {getDrawerContent(false, 'Phone')}
       </Drawer>
       <Drawer
         variant="permanent"
@@ -621,13 +622,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
           ...getDrawerSharedSx(isMobileMini),
         }}
       >
-        {getDrawerContent(isMobileMini)}
+        {getDrawerContent(isMobileMini, 'Tablet')}
       </Drawer>
       <Drawer
         variant="permanent"
         sx={{ display: { xs: 'none', md: 'block' }, ...getDrawerSharedSx(isDesktopMini) }}
       >
-        {getDrawerContent(isDesktopMini)}
+        {getDrawerContent(isDesktopMini, 'Desktop')}
       </Drawer>
 
       <Box

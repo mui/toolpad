@@ -48,6 +48,7 @@ describe('PageContainer', () => {
 
   test('renders nested', async () => {
     const navigation = [
+      { segment: '', title: 'ACME' },
       {
         segment: 'home',
         title: 'Home',
@@ -78,5 +79,37 @@ describe('PageContainer', () => {
     expect(within(breadCrumbs).getByText('ACME')).toBeTruthy();
     expect(within(breadCrumbs).getByText('Home')).toBeTruthy();
     expect(within(breadCrumbs).getByText('Orders')).toBeTruthy();
+  });
+
+  test('renders dynamic correctly', async () => {
+    const user = await userEvent.setup();
+    const router = {
+      pathname: '/orders/123',
+      searchParams: new URLSearchParams(),
+      navigate: vi.fn(),
+    };
+    render(
+      <AppProvider
+        navigation={[
+          { segment: '', title: 'Home' },
+          { segment: 'orders', title: 'Orders', pattern: '/orders/:id' },
+        ]}
+        router={router}
+      >
+        <PageContainer />
+      </AppProvider>,
+    );
+
+    const breadCrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
+
+    const homeLink = within(breadCrumbs).getByRole('link', { name: 'Home' });
+    await user.click(homeLink);
+
+    expect(router.navigate).toHaveBeenCalledWith('/', expect.objectContaining({}));
+    router.navigate.mockClear();
+
+    expect(within(breadCrumbs).getByText('Orders')).toBeTruthy();
+
+    expect(screen.getByText('Orders', { ignore: 'nav *' }));
   });
 });

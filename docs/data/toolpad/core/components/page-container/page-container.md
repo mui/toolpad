@@ -22,7 +22,6 @@ For example, under the following navigation structure:
 
 ```tsx
 <AppProvider
-  branding={{ title: 'ACME' }}
   navigation={[
     {
       segment: 'home',
@@ -43,6 +42,59 @@ For example, under the following navigation structure:
 The breadcrumbs contains **ACME / Home / Orders** when you visit the path **/home/orders**, and the page has a title of **Orders**.
 
 {{"demo": "TitleBreadcrumbsPageContainer.js", "height": 300, "hideToolbar": true}}
+
+## Dynamic Routes
+
+When you use the `PageContainer` on a dynamic route, you'll likely want to set a title and breadcrumbs belonging to the specific path. You can achieve this with the `title` and `breadCrumbs` property of the `PageContainer`
+
+{{"demo": "CustomPageContainer.js", "height": 300}}
+
+You can use the `useActivePage` hook to retrieve the title and breadcrumbs of the active page. This way you can extend the existing values.
+
+```tsx
+import { useActivePage } from '@toolpad/core/useActivePage';
+import { BreadCrumb } from '@toolpad/core/PageContainer';
+
+// Pass the id from your router of choice
+function useDynamicBreadCrumbs(id: string): BreadCrumb[] {
+  const activePage = useActivePage();
+  invariant(activePage, 'No navigation match');
+
+  const title = `Item ${id}`;
+  const path = `${activePage.path}/${id}`;
+
+  return [...activePage.breadCrumbs, { title, path }];
+}
+```
+
+For example, under the Next.js app router you would be able to obtain breadcrumbs for a dynamic route as follows:
+
+```tsx
+// ./src/app/example/[id]/page.tsx
+'use client';
+
+import { useParams } from 'next/navigation';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import invariant from 'invariant';
+import { useActivePage } from '@toolpad/core/useActivePage';
+
+export default function Example() {
+  const params = useParams<{ id: string }>();
+  const activePage = useActivePage();
+  invariant(activePage, 'No navigation match');
+
+  const title = `Item ${params.id}`;
+  const path = `${activePage.path}/${params.id}`;
+
+  const breadCrumbs = [...activePage.breadCrumbs, { title, path }];
+
+  return (
+    <PageContainer title={title} breadCrumbs={breadCrumbs}>
+      ...
+    </PageContainer>
+  );
+}
+```
 
 ## Actions
 

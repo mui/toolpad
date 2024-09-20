@@ -239,10 +239,10 @@ AppProvider.propTypes /* remove-proptypes */ = {
    * Router implementation used inside Toolpad components.
    * @default null
    */
-  router: PropTypes /* @typescript-to-proptypes-ignore */.shape({
+  router: PropTypes.shape({
     navigate: PropTypes.func.isRequired,
     pathname: PropTypes.string.isRequired,
-    searchParams: PropTypes.instanceOf(URLSearchParams),
+    searchParams: PropTypes.instanceOf(URLSearchParams).isRequired,
   }),
   /**
    * Session info about the current user.

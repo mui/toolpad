@@ -91,11 +91,11 @@ Navigation links have an optional `action` prop to render any content on the rig
 Navigation links have an optional `pattern` prop to define a pattern to be matched for the item to be marked as selected.
 This feature is built on top of the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library. Some examples:
 
-- Constant path: `/orders`
-- Dynamic segment: `/orders/:segment`
-- Zero or more segments: `/orders{/:segment}*`
-- One or more segments: `/orders{/:segment}+`
-- Optional segment: `/orders{/:segment}+?`
+- Constant path: `orders`
+- Dynamic segment: `orders/:segment`
+- Optional segment: `orders{/:segment}?`
+- One or more segments: `orders{/:segment}+`
+- Zero or more segments: `orders{/:segment}*`
 
 {{"demo": "DashboardLayoutPattern.js", "height": 400, "iframe": true}}
 

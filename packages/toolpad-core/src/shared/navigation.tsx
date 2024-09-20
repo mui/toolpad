@@ -19,8 +19,6 @@ export function isPageItemSelected(
   basePath: string,
   pathname: string,
 ) {
-  console.log(`${basePath}/${navigationItem.pattern}`);
-
   return navigationItem.pattern
     ? pathToRegexp(`${basePath}/${navigationItem.pattern}`).test(pathname)
     : getPageItemFullPath(basePath, navigationItem) === pathname;

@@ -112,7 +112,8 @@ function buildItemLookup(navigation: Navigation) {
       }
       map.set(path, item);
       if (item.pattern) {
-        map.set(pathToRegexp(item.pattern), item);
+        const { regexp } = pathToRegexp(item.pattern);
+        map.set(regexp, item);
       }
       if (item.children) {
         for (const child of item.children) {

@@ -3,7 +3,7 @@
 ## Toolpad vs. MUI organization
 
 Toolpad is an open-source project of the MUI organization. The repositories are part of the same codebase.
-`mui/mui-toolpad` imports the code infrastructure from [`mui/material-ui`](https://github.com/mui/material-ui).
+`mui/toolpad` imports the code infrastructure from [`mui/material-ui`](https://github.com/mui/material-ui).
 You can find the "contributing" guide for the main repository in [mui/material-ui/CONTRIBUTING.md](https://github.com/mui/material-ui/blob/HEAD/CONTRIBUTING.md).
 
 Most of the content in the main repository "contributing" guide applies to this repository.
@@ -278,7 +278,7 @@ Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn
 
    ```json
    "dependencies": {
-      "@toolpad/studio": "https://pkg.csb.dev/mui/mui-toolpad/commit/<commit>/@toolpad/studio"
+      "@toolpad/studio": "https://pkg.csb.dev/mui/toolpad/commit/<commit>/@toolpad/studio"
    }
    ```
 

@@ -71,7 +71,7 @@ function Cell({ highlighted = false, sx, ...props }) {
         justifyContent: 'center',
         ...(highlighted && {
           // Remove borders since there are only two plans
-          // https://github.com/mui/mui-toolpad/pull/809#issuecomment-1221026428
+          // https://github.com/mui/toolpad/pull/809#issuecomment-1221026428
           borderWidth: '0 1px 0 1px',
           borderStyle: 'solid',
           borderColor: (theme.vars || theme).palette.divider,

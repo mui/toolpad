@@ -5,18 +5,15 @@
 
 <h1 align="center">Toolpad</h1>
 
-- [Toolpad Core](https://mui.com/toolpad/core/introduction/) is a set of full-stack React components that leverages existing [Material UI](http://github.com/mui/material-ui) components, and ties them with the commonly-used backend integrations to help you create responsive dashboards and internal tools.
-- [Toolpad Studio](https://mui.com/toolpad/studio/getting-started/) is a self-hosted low-code admin builder designed to extend the Toolpad Core React components. It's for developers of all trades who want to save time building internal applications. Drag and drop from a catalog of pre-built components, connect to any data source and build apps quickly.
-
 <div align="center">
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/mui/material-ui/blob/HEAD/LICENSE)
 [![npm latest package](https://img.shields.io/npm/v/@toolpad/core/latest.svg)](https://www.npmjs.com/package/@toolpad/core)
 [![npm downloads](https://img.shields.io/npm/dm/@toolpad/core.svg)](https://www.npmjs.com/package/@toolpad/core)
-[![GitHub branch status](https://img.shields.io/github/checks-status/mui/mui-toolpad/HEAD)](https://github.com/mui/mui-toolpad/commits/HEAD/)
+[![GitHub branch status](https://img.shields.io/github/checks-status/mui/toolpad/HEAD)](https://github.com/mui/toolpad/commits/HEAD/)
 [![Follow on X](https://img.shields.io/twitter/follow/Toolpad_.svg?label=follow+Toolpad)](https://x.com/Toolpad_)
-[![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/mui-toolpad/issues/8)
-[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/mui-toolpad.svg)](https://isitmaintained.com/project/mui/mui-toolpad 'Average time to resolve an issue')
+[![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/toolpad/issues/8)
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/toolpad.svg)](https://isitmaintained.com/project/mui/toolpad 'Average time to resolve an issue')
 [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui-org)](https://opencollective.com/mui-org)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/6294/badge?v2)](https://www.bestpractices.dev/projects/6294)
 
@@ -24,7 +21,13 @@
 
 ## Product walkthrough
 
-![readme_video](https://github.com/prakhargupta1/mui-toolpad/assets/92228082/efcab7c7-4f34-487c-8a62-e059b5e58bcc)
+- [Toolpad Core](https://mui.com/toolpad/core/introduction/) is a set of high level React components that abstract common concepts such as layout navigation and routing. It aims at helping you build and maintain dashboards and internal tooling faster. It's built on top of [Material UI](http://github.com/mui/material-ui/).
+
+https://github.com/user-attachments/assets/d2a7ff8e-2dd6-4313-98d2-5f136513f9a9/
+
+- [Toolpad Studio](https://mui.com/toolpad/studio/getting-started/) is a self-hosted low-code admin builder designed to extend the Toolpad Core React components. It's for developers of all trades who want to save time building internal applications. Drag and drop from a catalog of pre-built components, connect to any data source and build apps quickly.
+
+https://github.com/user-attachments/assets/f47466df-3790-4a05-8f38-f1aaa13a49f3/
 
 ## Notice
 
@@ -70,7 +73,7 @@ Although we love giving you the opportunity to put your stamp on MUI, we also ar
 
 ## Changelog
 
-The [changelog](https://github.com/mui/mui-toolpad/releases) is regularly updated to reflect what's changed in each new release.
+The [changelog](https://github.com/mui/toolpad/releases) is regularly updated to reflect what's changed in each new release.
 
 ## Roadmap
 

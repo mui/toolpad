@@ -72,7 +72,7 @@ module.exports = {
     // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94
     'react/jsx-key': ['error', { checkKeyMustBeforeSpread: true, warnOnDuplicates: true }],
     // This got turned of in the mono-repo:
-    // See https://github.com/mui/mui-toolpad/pull/866#discussion_r957222171
+    // See https://github.com/mui/toolpad/pull/866#discussion_r957222171
     'react/no-unused-prop-types': [
       'error',
       {

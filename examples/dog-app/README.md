@@ -28,7 +28,7 @@ pnpm create toolpad-app --example dog-app
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/dog-app)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/dog-app)
 
 ## What's inside
 
@@ -38,4 +38,4 @@ To build this app step-by-step, visit the [docs](https://mui.com/toolpad/studio/
 
 ## The source
 
-[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/dog-app)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/dog-app)

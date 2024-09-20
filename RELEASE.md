@@ -63,14 +63,14 @@
 
 1. Open a PR to the `master` branch with the proposed changes. Add the "release" label.
 
-1. Smoke test the release with the [CodeSandbox CI](https://ci.codesandbox.io/status/mui/mui-toolpad) package of the PR branch:
+1. Smoke test the release with the [CodeSandbox CI](https://ci.codesandbox.io/status/mui/toolpad) package of the PR branch:
 
    a. Run Toolpad Core
 
    ```bash
-   pnpm dlx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app smoke --core-version https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@toolpad/core
+   pnpm dlx https://pkg.csb.dev/mui/toolpad/commit/<build>/create-toolpad-app smoke --core-version https://pkg.csb.dev/mui/toolpad/commit/<build>/@toolpad/core
    cd smoke
-   pnpm add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@toolpad/core -S
+   pnpm add https://pkg.csb.dev/mui/toolpad/commit/<build>/@toolpad/core -S
    pnpm dedupe && pnpm dev
    ```
 
@@ -79,9 +79,9 @@
    b. Run Toolpad Studio
 
    ```bash
-   pnpm dlx https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/create-toolpad-app --studio smoke
+   pnpm dlx https://pkg.csb.dev/mui/toolpad/commit/<build>/create-toolpad-app --studio smoke
    cd smoke
-   pnpm add https://pkg.csb.dev/mui/mui-toolpad/commit/<build>/@toolpad/studio -S
+   pnpm add https://pkg.csb.dev/mui/toolpad/commit/<build>/@toolpad/studio -S
    pnpm dedupe && pnpm dev
    ```
 
@@ -117,7 +117,7 @@
 
    You can follow the deployment process on the [Netlify Dashboard](https://app.netlify.com/sites/mui-toolpad-docs/deploys?filter=docs-latest). Once deployed, it will be accessible at https://mui-toolpad-docs.netlify.app/.
 
-1. [Create a new GitHub release](https://github.com/mui/mui-toolpad/releases/new).
+1. [Create a new GitHub release](https://github.com/mui/toolpad/releases/new).
 
    1. Use `<version number>` to **Choose a tag** (when you enter new version GH UI will pop a suggestion `Create new tag: *** on publish`)
    1. Use `<commit of merged PR>` as the **target**

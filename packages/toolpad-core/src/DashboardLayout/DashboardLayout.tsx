@@ -113,7 +113,7 @@ interface DashboardSidebarSubNavigationProps {
   onLinkClick: () => void;
   isMini?: boolean;
   isFullyExpanded?: boolean;
-  isMobileViewport?: boolean;
+  hasDrawerTransitions?: boolean;
   selectedItemId: string;
 }
 
@@ -124,7 +124,7 @@ function DashboardSidebarSubNavigation({
   onLinkClick,
   isMini = false,
   isFullyExpanded = true,
-  isMobileViewport = false,
+  hasDrawerTransitions = false,
   selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
@@ -172,7 +172,9 @@ function DashboardSidebarSubNavigation({
                 fontSize: 12,
                 fontWeight: '700',
                 height: isMini ? 0 : 40,
-                ...(isMobileViewport ? {} : getDrawerSxTransitionMixin(isFullyExpanded, 'height')),
+                ...(hasDrawerTransitions
+                  ? getDrawerSxTransitionMixin(isFullyExpanded, 'height')
+                  : {}),
                 px: 2,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -195,7 +197,9 @@ function DashboardSidebarSubNavigation({
                 mx: 1,
                 mt: 1,
                 mb: nextItem?.kind === 'header' && !isMini ? 0 : 1,
-                ...(isMobileViewport ? {} : getDrawerSxTransitionMixin(isFullyExpanded, 'margin')),
+                ...(hasDrawerTransitions
+                  ? getDrawerSxTransitionMixin(isFullyExpanded, 'margin')
+                  : {}),
               }}
             />
           );
@@ -310,7 +314,6 @@ function DashboardSidebarSubNavigation({
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
                   selectedItemId={selectedItemId}
-                  isMobileViewport={isMobileViewport}
                 />
               </Collapse>
             ) : null}
@@ -382,21 +385,32 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] = React.useState(true);
   const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] = React.useState(false);
 
-  const isMobileViewport = useMediaQuery(theme.breakpoints.down('md'));
+  const isUnderMdViewport = useMediaQuery(
+    theme.breakpoints.down('md'),
+    appWindow && {
+      matchMedia: appWindow.matchMedia,
+    },
+  );
+  const isOverSmViewport = useMediaQuery(
+    theme.breakpoints.up('sm'),
+    appWindow && {
+      matchMedia: appWindow.matchMedia,
+    },
+  );
 
-  const isNavigationExpanded = isMobileViewport
+  const isNavigationExpanded = isUnderMdViewport
     ? isMobileNavigationExpanded
     : isDesktopNavigationExpanded;
 
   const setIsNavigationExpanded = React.useCallback(
     (newExpanded: boolean) => {
-      if (isMobileViewport) {
+      if (isUnderMdViewport) {
         setIsMobileNavigationExpanded(newExpanded);
       } else {
         setIsDesktopNavigationExpanded(newExpanded);
       }
     },
-    [isMobileViewport],
+    [isUnderMdViewport],
   );
 
   const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
@@ -466,18 +480,22 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [toggleNavigationExpanded],
   );
 
+  const hasDrawerTransitions =
+    isOverSmViewport && (disableCollapsibleSidebar || !isUnderMdViewport);
+
   const getDrawerContent = React.useCallback(
-    (isMini: boolean) => (
+    (isMini: boolean, ariaLabel: string) => (
       <React.Fragment>
         <Toolbar />
         <Box
           component="nav"
+          aria-label={ariaLabel}
           sx={{
             overflow: 'auto',
             pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
-            ...(isMobileViewport
-              ? {}
-              : getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')),
+            ...(hasDrawerTransitions
+              ? getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')
+              : {}),
           }}
         >
           <DashboardSidebarSubNavigation
@@ -485,13 +503,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
             onLinkClick={handleNavigationLinkClick}
             isMini={isMini}
             isFullyExpanded={isNavigationFullyExpanded}
-            isMobileViewport={isMobileViewport}
+            hasDrawerTransitions={hasDrawerTransitions}
             selectedItemId={selectedItemIdRef.current}
           />
         </Box>
       </React.Fragment>
     ),
-    [handleNavigationLinkClick, isMobileViewport, isNavigationFullyExpanded, navigation],
+    [handleNavigationLinkClick, hasDrawerTransitions, isNavigationFullyExpanded, navigation],
   );
 
   const getDrawerSharedSx = React.useCallback(
@@ -525,44 +543,25 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar
           sx={{ backgroundColor: 'inherit', minWidth: '100vw', mx: { xs: -0.75, sm: -1.5 } }}
         >
-          {isMobileViewport ? (
-            <React.Fragment>
-              <Box
-                sx={{
-                  display: {
-                    xs: 'block',
-                    sm: disableCollapsibleSidebar ? 'block' : 'none',
-                  },
-                }}
-              >
-                {getMenuIcon(isMobileNavigationExpanded)}
-              </Box>
-              <Box
-                sx={{
-                  display: {
-                    xs: 'none',
-                    sm: disableCollapsibleSidebar ? 'none' : 'block',
-                  },
-                  mr: disableCollapsibleSidebar ? 0 : 2,
-                }}
-              >
-                {getMenuIcon(isMobileNavigationExpanded)}
-              </Box>
-            </React.Fragment>
-          ) : (
-            <Box
-              sx={{
-                display: disableCollapsibleSidebar ? 'none' : 'block',
-                mr: disableCollapsibleSidebar ? 0 : 2,
-              }}
-            >
-              {getMenuIcon(isDesktopNavigationExpanded)}
-            </Box>
-          )}
+          <Box
+            sx={{
+              mr: { sm: disableCollapsibleSidebar ? 0 : 1 },
+              display: { md: 'none' },
+            }}
+          >
+            {getMenuIcon(isMobileNavigationExpanded)}
+          </Box>
+          <Box
+            sx={{
+              display: { xs: 'none', md: disableCollapsibleSidebar ? 'none' : 'block' },
+              mr: disableCollapsibleSidebar ? 0 : 1,
+            }}
+          >
+            {getMenuIcon(isDesktopNavigationExpanded)}
+          </Box>
 
           <Box
             sx={{
-              ml: { xs: undefined, sm: -1.5 },
               position: { xs: 'absolute', md: 'static' },
               left: { xs: '50%', md: 'auto' },
               transform: { xs: 'translateX(-50%)', md: 'none' },
@@ -593,44 +592,44 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </Stack>
         </Toolbar>
       </AppBar>
-      {isMobileViewport ? (
-        <React.Fragment>
-          <Drawer
-            container={appWindow?.document.body}
-            variant="temporary"
-            open={isMobileNavigationExpanded}
-            onClose={handleSetNavigationExpanded(false)}
-            ModalProps={{
-              keepMounted: true, // Better open performance on mobile.
-            }}
-            sx={{
-              display: {
-                xs: 'block',
-                sm: disableCollapsibleSidebar ? 'block' : 'none',
-              },
-              ...getDrawerSharedSx(false),
-            }}
-          >
-            {getDrawerContent(false)}
-          </Drawer>
-          <Drawer
-            variant="permanent"
-            sx={{
-              display: {
-                xs: 'none',
-                sm: disableCollapsibleSidebar ? 'none' : 'block',
-              },
-              ...getDrawerSharedSx(isMobileMini),
-            }}
-          >
-            {getDrawerContent(isMobileMini)}
-          </Drawer>
-        </React.Fragment>
-      ) : (
-        <Drawer variant="permanent" sx={getDrawerSharedSx(isDesktopMini)}>
-          {getDrawerContent(isDesktopMini)}
-        </Drawer>
-      )}
+      <Drawer
+        container={appWindow?.document.body}
+        variant="temporary"
+        open={isMobileNavigationExpanded}
+        onClose={handleSetNavigationExpanded(false)}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: {
+            xs: 'block',
+            sm: disableCollapsibleSidebar ? 'block' : 'none',
+            md: 'none',
+          },
+          ...getDrawerSharedSx(false),
+        }}
+      >
+        {getDrawerContent(false, 'Phone')}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: {
+            xs: 'none',
+            sm: disableCollapsibleSidebar ? 'none' : 'block',
+            md: 'none',
+          },
+          ...getDrawerSharedSx(isMobileMini),
+        }}
+      >
+        {getDrawerContent(isMobileMini, 'Tablet')}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{ display: { xs: 'none', md: 'block' }, ...getDrawerSharedSx(isDesktopMini) }}
+      >
+        {getDrawerContent(isDesktopMini, 'Desktop')}
+      </Drawer>
 
       <Box
         component="main"

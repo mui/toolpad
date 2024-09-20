@@ -367,7 +367,7 @@ function SignInPage(props: SignInPageProps) {
                     }}
                     {...slotProps?.submitButton}
                   >
-                    Sign in with PassKey
+                    Sign in with {passkeyProvider.name || 'Passkey'}
                   </LoadingButton>
                 )}
               </Box>

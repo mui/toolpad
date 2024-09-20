@@ -3,8 +3,9 @@ import { Box, useTheme } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { AppProvider } from '@toolpad/core/react-router-dom';
-import { PREVIEW_HEADER_HEIGHT } from './constants';
+import useDebouncedHandler from '@toolpad/utils/hooks/useDebouncedHandler';
 import { AuthContext } from './useAuth';
+import { PREVIEW_HEADER_MIN_HEIGHT } from './constants';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -68,13 +69,35 @@ export function AppLayout({
 
   const signIn = React.useCallback(() => {
     navigate('/signin');
-  }, []);
+  }, [navigate]);
 
   const layoutContent = (
     <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>
       {children}
     </Box>
   );
+
+  const [previewHeaderHeight, setPreviewHeaderHeight] = React.useState(PREVIEW_HEADER_MIN_HEIGHT);
+
+  const updatePreviewHeaderHeight = React.useCallback(() => {
+    if (clipped) {
+      const previewHeader = document.getElementById('preview-header');
+      if (previewHeader) {
+        setPreviewHeaderHeight(previewHeader.getBoundingClientRect().height);
+      }
+    }
+  }, [clipped]);
+
+  const debouncedUpdatePreviewHeaderHeight = useDebouncedHandler(updatePreviewHeaderHeight, 150);
+
+  // Preview header height can be higher in mobile viewports
+  React.useEffect(() => {
+    updatePreviewHeaderHeight();
+    window.addEventListener('resize', debouncedUpdatePreviewHeaderHeight);
+    return () => {
+      window.removeEventListener('resize', debouncedUpdatePreviewHeaderHeight);
+    };
+  }, [debouncedUpdatePreviewHeaderHeight, updatePreviewHeaderHeight]);
 
   return (
     <AppProvider
@@ -93,10 +116,10 @@ export function AppLayout({
         <DashboardLayout
           sx={{
             '& .MuiAppBar-root': {
-              pt: clipped ? `${PREVIEW_HEADER_HEIGHT}px` : undefined,
+              pt: clipped ? `${previewHeaderHeight}px` : undefined,
             },
             '& .MuiDrawer-paper': {
-              pt: clipped ? `${PREVIEW_HEADER_HEIGHT}px` : undefined,
+              pt: clipped ? `${previewHeaderHeight}px` : undefined,
             },
           }}
         >

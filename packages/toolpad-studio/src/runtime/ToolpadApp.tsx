@@ -84,7 +84,6 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { useDataQuery, UseFetch } from './useDataQuery';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
@@ -1679,12 +1678,7 @@ export function ToolpadAppProvider({
                 <AppThemeProvider dom={dom}>
                   <CssBaseline enableColorScheme />
                   {showPreviewHeader ? <PreviewHeader /> : null}
-                  <AppRoot
-                    ref={rootRef}
-                    sx={{
-                      paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
-                    }}
-                  >
+                  <AppRoot ref={rootRef}>
                     <ErrorBoundary FallbackComponent={AppError}>
                       <React.Suspense fallback={<AppLoading />}>{children}</React.Suspense>
                     </ErrorBoundary>

@@ -66,8 +66,8 @@ You can pass the router implementation to the `AppProvider` component using the 
 
 :::
 
-:::warning
-You do not need to pass the `router` prop if you are using Next.js, since Toolpad Core has an AppProvider exported from `@toolpad/core/nextjs` that sets it up automatically.
+:::success
+If you are using Next.js, use the `AppProvider` exported from `@toolpad/core/nextjs`. This automatically sets up the router for you and you do not need to pass the `router` prop.
 :::
 
 ## Slots

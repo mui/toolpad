@@ -1,1 +1,1 @@
-export * from 'next/compat/router';
+export { useRouter } from 'next/compat/router';

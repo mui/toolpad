@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Box, useTheme } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AppProvider } from '@toolpad/core/react-router-dom/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { AppProvider } from '@toolpad/core/react-router-dom';
 import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { AuthContext } from './useAuth';
 

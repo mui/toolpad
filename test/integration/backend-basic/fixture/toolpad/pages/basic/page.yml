@@ -248,4 +248,4 @@ spec:
         headers: []
         method: GET
         searchParams: []
-  display: standalone
+  display: shell

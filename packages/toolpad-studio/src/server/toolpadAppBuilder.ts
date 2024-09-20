@@ -270,14 +270,6 @@ if (import.meta.hot) {
               : // load compiled
                 path.resolve(currentDirectory, '../exports'),
           },
-          {
-            find: '@toolpad/core',
-            replacement: toolpadDevMode
-              ? // load source
-                path.resolve(currentDirectory, '../../../toolpad-core/src')
-              : // load compiled
-                path.resolve(currentDirectory, '../../../toolpad-core/build'),
-          },
           ...(dev
             ? [
                 {

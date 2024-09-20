@@ -124,7 +124,7 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
-    const desktopNavigation = screen.getAllByRole('navigation', { name: 'Desktop' })[0];
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
 
     // List subheaders are present
 
@@ -188,7 +188,7 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
-    const desktopNavigation = screen.getAllByRole('navigation', { name: 'Desktop' })[0];
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
 
     expect(within(desktopNavigation).getByText('Sales')).toBeTruthy();
     expect(within(desktopNavigation).getByText('Traffic')).toBeTruthy();
@@ -230,7 +230,7 @@ describe('DashboardLayout', () => {
 
     const { rerender } = render(<AppWithPathname pathname="/dashboard" />);
 
-    const desktopNavigation = screen.getAllByRole('navigation', { name: 'Desktop' })[0];
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
 
     expect(within(desktopNavigation).getByRole('link', { name: 'Dashboard' })).toHaveClass(
       'Mui-selected',
@@ -280,7 +280,7 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
-    const desktopNavigation = screen.getAllByRole('navigation', { name: 'Desktop' })[0];
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
 
     expect(within(desktopNavigation).getByText('Action 1')).toBeTruthy();
     expect(within(desktopNavigation).getByText('Action 2')).toBeTruthy();

@@ -402,7 +402,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
     React.useState(isNavigationExpanded);
 
-  // eslint-disable-next-line consistent-return
   React.useEffect(() => {
     if (isNavigationExpanded) {
       const drawerWidthTransitionTimeout = setTimeout(() => {
@@ -413,6 +412,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     }
 
     setIsNavigationFullyExpanded(false);
+
+    return () => {};
   }, [isNavigationExpanded, theme]);
 
   const selectedItemIdRef = React.useRef('');
@@ -435,8 +436,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
   React.useMemo(() => {
-    selectedItemIdRef.current = '';
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (navigation) {
+      selectedItemIdRef.current = '';
+    }
   }, [navigation]);
 
   const isDesktopMini = !disableCollapsibleSidebar && !isDesktopNavigationExpanded;

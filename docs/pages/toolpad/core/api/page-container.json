@@ -1,5 +1,15 @@
 {
-  "props": {},
+  "props": {
+    "breadCrumbs": {
+      "type": { "name": "arrayOf", "description": "Array&lt;{ path: string, title: string }&gt;" }
+    },
+    "slotProps": { "type": { "name": "shape", "description": "{ toolbar: { children?: node } }" } },
+    "slots": {
+      "type": { "name": "shape", "description": "{ toolbar?: elementType }" },
+      "additionalInfo": { "slotsApi": true }
+    },
+    "title": { "type": { "name": "string" } }
+  },
   "name": "PageContainer",
   "imports": [
     "import { PageContainer } from '@toolpad/core/PageContainer';",

@@ -19,7 +19,7 @@
     "router": {
       "type": {
         "name": "shape",
-        "description": "{ navigate: func, pathname: string, searchParams?: URLSearchParams }"
+        "description": "{ navigate: func, pathname: string, searchParams: URLSearchParams }"
       },
       "default": "null"
     },

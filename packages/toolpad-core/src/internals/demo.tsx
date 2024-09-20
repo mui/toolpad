@@ -30,3 +30,5 @@ export function useDemoRouter(initialUrl: string = '/') {
 
   return router;
 }
+
+export { Link } from '../shared/Link';

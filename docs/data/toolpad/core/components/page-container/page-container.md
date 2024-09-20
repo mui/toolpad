@@ -9,7 +9,7 @@ components: PageContainer, PageContainerToolbar
 <p class="description">A component that wraps page content and provides a title, breadcrumbs, and page actions.</p>
 
 :::info
-If this is your first time using Toolpad Core, you might want to start with the [base concepts](/toolpad/core/introduction/base-concepts/) instead.
+If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
 :::
 
 `PageContainer` is the ideal wrapper for the content of your dashboard. It shows the current page title, and provides breadcrumbs to navigate back into the current hierarchy. It makes your page responsive through the use of the Material&nbsp;UI Container component under the hood.

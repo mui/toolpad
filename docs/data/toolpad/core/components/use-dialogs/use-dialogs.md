@@ -9,7 +9,7 @@ components: DialogsProvider
 <p class="description">Imperative APIs to open and interact with dialogs.</p>
 
 :::info
-If this is your first time using Toolpad Core, you might want to start with the [base concepts](/toolpad/core/introduction/base-concepts/) instead.
+If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
 :::
 
 Toolpad Core offers a set of abstractions that makes interacting with dialogs simpler. It has an imperative API to open and close dialogs, and allows dialogs to be stacked on top of each other.

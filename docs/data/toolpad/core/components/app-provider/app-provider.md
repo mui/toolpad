@@ -9,7 +9,7 @@ components: AppProvider
 <p class="description">The app provider component provides the necessary context to easily set up a Toolpad application.</p>
 
 :::info
-If this is your first time using Toolpad Core, you might want to start with the [base concepts](/toolpad/core/introduction/base-concepts/) instead.
+If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
 :::
 
 By wrapping an application at the root level with an `AppProvider` component, many of Toolpad's features (such as routing, navigation and theming) can be automatically enabled to their fullest extent, abstracting away complexity and helping you focus on the details that matter.

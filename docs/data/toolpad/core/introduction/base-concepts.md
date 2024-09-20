@@ -17,7 +17,7 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 
 ## Component Hierarchy
 
-The Toolpad Core library is designed to work within your existing React application structure. The key component in this hierarchy is the `AppProvider`.
+The Toolpad Core library is designed to work under different React runtimes such as Next.js, Vite, or even your custom setup. Many of its components rely on functionality of the specific runtime they are used under. The key component in making the components runtime-aware is the `AppProvider`.
 
 ### App Provider
 
@@ -62,8 +62,12 @@ Toolpad Core doesn't handle routing itself. Instead, it's designed to integrate 
 - React Router
 - Or any other routing library which implements the same interface
 
-You can pass the router implementation to the `AppProvider` component using the `router` prop. You do not need to pass this prop if you are using Next.js, since it has a file-system based router.
+You can pass the router implementation to the `AppProvider` component using the `router` prop.
 
+:::
+
+:::warning
+You do not need to pass the `router` prop if you are using Next.js, since Toolpad Core has an AppProvider exported from `@toolpad/core/nextjs` that sets it up automatically.
 :::
 
 ## Slots

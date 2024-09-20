@@ -67,6 +67,35 @@ function useDynamicBreadCrumbs(id: string): BreadCrumb[] {
 }
 ```
 
+For example, under the Next.js app router you would be able to obtain breadcrumbs for a dynamic route as follows:
+
+```tsx
+// ./src/app/example/[id]/page.tsx
+'use client';
+
+import { useParams } from 'next/navigation';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import invariant from 'invariant';
+import { useActivePage } from '@toolpad/core/useActivePage';
+
+export default function Example() {
+  const params = useParams<{ id: string }>();
+  const activePage = useActivePage();
+  invariant(activePage, 'No navigation match');
+
+  const title = `Item ${params.id}`;
+  const path = `${activePage.path}/${params.id}`;
+
+  const breadCrumbs = [...activePage.breadCrumbs, { title, path }];
+
+  return (
+    <PageContainer title={title} breadCrumbs={breadCrumbs}>
+      ...
+    </PageContainer>
+  );
+}
+```
+
 ## Actions
 
 You can configure additional actions in the area that is reserved on the right. To do so provide the `toolbar` slot to the `PageContainer` component. You can wrap the `PageContainerToolbar` component to create a custom toolbar component, as shown here:

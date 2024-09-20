@@ -98,8 +98,8 @@ importers:
         specifier: 1.0.14
         version: 1.0.14
       '@mui/internal-scripts':
-        specifier: 1.0.21-dev.20240919-130050-82a6448768
-        version: 1.0.21-dev.20240919-130050-82a6448768
+        specifier: 1.0.21
+        version: 1.0.21
       '@mui/monorepo':
         specifier: github:mui/material-ui#3732be30e0ae3287b55dc6a96cf1ffcfdc194906
         version: https://codeload.github.com/mui/material-ui/tar.gz/3732be30e0ae3287b55dc6a96cf1ffcfdc194906(encoding@0.1.13)
@@ -2852,8 +2852,8 @@ packages:
   '@mui/internal-markdown@1.0.14':
     resolution: {integrity: sha512-Df8Uo54TyE7Lm3otWWxw2OQzv3ztbdhRJMJ2sCYrTDqluAvGe/65KpVr95/AcY/An3qWpvBrbn5k5Oj/NG/lXw==}
 
-  '@mui/internal-scripts@1.0.21-dev.20240919-130050-82a6448768':
-    resolution: {integrity: sha512-feyp1s9pHvSOdO+ERv8oPGp2qGUCnngTt0+Yb+yTBo1tH8DN1Ks5JA7gIQR/elTnDusrbBQPpI7IAG5ZPrYlzQ==}
+  '@mui/internal-scripts@1.0.21':
+    resolution: {integrity: sha512-nVjt+Yjjff83C+urxDD63LmUhIR1bMbGVexHdFq1v9odyVKXw3tgL1yiCoEETLUfOkBbXECmjuRcbw+meWu5+g==}
 
   '@mui/joy@5.0.0-beta.48':
     resolution: {integrity: sha512-OhTvjuGl9I5IvpBr0BQyDehIW/xb2yteW6YglHJMdOb/279nItn76X1NBtPV9ImldNlBjReGwvpOXmBTTGER9w==}
@@ -12040,7 +12040,7 @@ snapshots:
       marked: 13.0.3
       prismjs: 1.29.0
 
-  '@mui/internal-scripts@1.0.21-dev.20240919-130050-82a6448768':
+  '@mui/internal-scripts@1.0.21':
     dependencies:
       '@babel/core': 7.25.2
       '@babel/plugin-syntax-class-properties': 7.12.13(@babel/core@7.25.2)

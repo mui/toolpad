@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 import { AppProvider } from './AppProvider';
 import { Router } from '../AppProvider';
 
-vi.mock('./nextNavigation', () => {
+vi.mock('next/navigation', () => {
   const searchParams = new URLSearchParams();
   const push = () => {};
   const replace = () => {};
@@ -20,9 +20,9 @@ vi.mock('./nextNavigation', () => {
   };
 });
 
-vi.mock('./nextRouter', () => ({ useRouter: () => null }));
+vi.mock('next/router', () => ({ useRouter: () => null }));
 
-vi.mock('./nextCompatRouter', () => ({ useRouter: () => null }));
+vi.mock('next/compat/router', () => ({ useRouter: () => null }));
 
 interface RouterTestProps {
   children: React.ReactNode;

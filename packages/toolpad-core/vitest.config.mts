@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  plugins: [react()],
   test: {
     setupFiles: ['../../test/setupVitest.ts', '@testing-library/jest-dom/vitest'],
     browser: {
@@ -18,14 +20,5 @@ export default defineConfig({
       reportsDirectory: './.coverage',
       reporter: ['text', 'lcov'],
     },
-  },
-  resolve: {
-    alias: [
-      {
-        // FIXME(https://github.com/mui/material-ui/issues/35233)
-        find: /^@mui\/icons-material\/(?!esm\/)([^/]*)/,
-        replacement: '@mui/icons-material/esm/$1',
-      },
-    ],
   },
 });

@@ -616,6 +616,9 @@ importers:
       '@toolpad/utils':
         specifier: workspace:*
         version: link:../toolpad-utils
+      '@vitejs/plugin-react':
+        specifier: 4.3.1
+        version: 4.3.1(vite@5.4.6(@types/node@22.5.5)(terser@5.31.1))
       client-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -623,8 +626,8 @@ importers:
         specifier: 2.2.4
         version: 2.2.4
       path-to-regexp:
-        specifier: 6.2.2
-        version: 6.2.2
+        specifier: 6.3.0
+        version: 6.3.0
       prop-types:
         specifier: 15.8.1
         version: 15.8.1
@@ -865,8 +868,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
       path-to-regexp:
-        specifier: 7.1.0
-        version: 7.1.0
+        specifier: 6.3.0
+        version: 6.3.0
       perf-cascade:
         specifier: 3.0.3
         version: 3.0.3
@@ -8202,12 +8205,8 @@ packages:
   path-to-regexp@0.1.10:
     resolution: {integrity: sha512-7lf7qcQidTku0Gu3YDPc8DJ1q7OOucfa/BSsIwjuh56VU7katFvuM8hULfkwB3Fns/rsVF7PwPKVw1sl5KQS9w==}
 
-  path-to-regexp@6.2.2:
-    resolution: {integrity: sha512-GQX3SSMokngb36+whdpRXE+3f9V8UzyAorlYvOGx87ufGHehNTn5lCxrKtLyZ4Yl/wEKnNnr98ZzOwwDZV5ogw==}
-
-  path-to-regexp@7.1.0:
-    resolution: {integrity: sha512-ZToe+MbUF4lBqk6dV8GKot4DKfzrxXsplOddH8zN3YK+qw9/McvP7+4ICjZvOne0jQhN4eJwHsX6tT0Ns19fvw==}
-    engines: {node: '>=16'}
+  path-to-regexp@6.3.0:
+    resolution: {integrity: sha512-Yhpw4T9C6hPpgPeA28us07OJeqZ5EzQTkbfwuhsUg0c237RomFoETJgmp2sa3F/41gfLE6G5cqcYwznmeEeOlQ==}
 
   path-to-regexp@8.1.0:
     resolution: {integrity: sha512-Bqn3vc8CMHty6zuD+tG23s6v2kwxslHEhTj4eYaVKGIEB+YX/2wd0/rgXLFD9G9id9KCtbVy/3ZgmvZjpa0UdQ==}
@@ -17847,7 +17846,7 @@ snapshots:
       headers-polyfill: 4.0.3
       is-node-process: 1.2.0
       outvariant: 1.4.2
-      path-to-regexp: 6.2.2
+      path-to-regexp: 6.3.0
       strict-event-emitter: 0.5.1
       type-fest: 4.20.1
       yargs: 17.7.2
@@ -17959,7 +17958,7 @@ snapshots:
       '@sinonjs/fake-timers': 11.2.2
       '@sinonjs/text-encoding': 0.7.2
       just-extend: 6.2.0
-      path-to-regexp: 6.2.2
+      path-to-regexp: 6.3.0
 
   node-addon-api@3.2.1:
     optional: true
@@ -18484,9 +18483,7 @@ snapshots:
 
   path-to-regexp@0.1.10: {}
 
-  path-to-regexp@6.2.2: {}
-
-  path-to-regexp@7.1.0: {}
+  path-to-regexp@6.3.0: {}
 
   path-to-regexp@8.1.0: {}
 

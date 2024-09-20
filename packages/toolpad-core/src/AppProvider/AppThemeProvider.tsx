@@ -9,8 +9,8 @@ import { PaletteModeContext } from '../shared/context';
 import type { AppTheme } from './AppProvider';
 
 const COLOR_SCHEME_ATTRIBUTE = 'data-toolpad-color-scheme';
-const COLOR_SCHEME_STORAGE_KEY = 'mui-toolpad-color-scheme';
-const MODE_STORAGE_KEY = 'mui-toolpad-mode';
+const COLOR_SCHEME_STORAGE_KEY = 'toolpad-color-scheme';
+const MODE_STORAGE_KEY = 'toolpad-mode';
 
 function usePreferredMode(window?: Window) {
   const prefersDarkMode = useMediaQuery(

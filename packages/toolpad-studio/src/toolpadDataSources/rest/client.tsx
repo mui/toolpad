@@ -744,7 +744,7 @@ function QueryEditor({
 function getInitialQueryValue(): FetchQuery {
   return {
     method: 'GET',
-    url: 'https://raw.githubusercontent.com/mui/mui-toolpad/master/public/movies.json',
+    url: 'https://raw.githubusercontent.com/mui/toolpad/master/public/movies.json',
     headers: [],
     browser: false,
   };

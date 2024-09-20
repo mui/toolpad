@@ -53,9 +53,9 @@ export default createDataProvider({
 
 ### Cursor based
 
-This is the strategy where your data is paginated by when it returns data based on a cursor and a page size. The `getRecords` method will receive `cursor` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. You indicate the cursor of the next page with a `cursor` property in the result. Pass `null` to signal the end of the collection. You can enable Cursor based pagination by setting `paginationMode` to `'cursor'`.
+This is the strategy where your data is paginated by when it returns data based on a cursor and a page size. The `getRecords` method receives `cursor` and `pageSize` values in its `paginationModel` parameter and returns a set of records representing the page. You indicate the cursor of the next page with a `cursor` property in the result. Pass `null` to signal the end of the collection. You can enable Cursor based pagination by setting `paginationMode` to `'cursor'`.
 
-The `cursor` property of the `paginationModel` is `null` when Toolpad Studio fetches the initial page. Any result set returned from the `getRecords` function must be accompanied with a `cursor` property, a string which contains a reference to the next page. This value will be passed as the `cursor` parameter in the `paginationModel` when fetching the subsequent page. Return `null` for this value to indicate the end of the sequence.
+The `cursor` property of the `paginationModel` is `null` when Toolpad Studio fetches the initial page. Any result set returned from the `getRecords` function must be accompanied with a `cursor` property, a string which contains a reference to the next page. The `cursor` parameter in the `paginationModel` contains this value when fetching the subsequent page. Return `null` for this value to indicate the end of the sequence.
 
 ```tsx
 export default createDataProvider({
@@ -98,7 +98,7 @@ For example, this could print the following if the corresponding column filters 
 }
 ```
 
-Now the data grid filter UI will be hooked up to your backend function in the data provider.
+Now the backend function receives the grid filter from the UI in its parameters.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/filtering.mp4" type="video/mp4">
@@ -121,13 +121,13 @@ export default createDataProvider({
 });
 ```
 
-Depending on which column has been set to sort by, this will result in:
+Depending on which column has been set to sort by, this results in:
 
 ```tsx
 [{ field: 'name', sort: 'asc' }];
 ```
 
-Now the data grid sorting UI will be hooked up to your backend function in the data provider.
+Now the backend function receives the grid sorting model from the UI in its parameters.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/sorting.mp4" type="video/mp4">
@@ -140,7 +140,7 @@ Uncheck the column option "sortable" if you want to disable sorting for a certai
 
 ## Row editing
 
-The data provider can be extended to automatically support row editing. To enable this, you'll have to add a `updateRecord` method to the data provider interface that accepts the `id` of the row that is to be deleted, and an object containing all the updated fields from the row editing operation.
+The data provider can be extended to automatically support row editing. To enable this, you'll have to add a `updateRecord` method to the data provider interface that accepts the `id` of the row that is to be edited, and an object containing all the updated fields from the row editing operation.
 
 ```tsx
 export default createDataProvider({
@@ -154,7 +154,7 @@ export default createDataProvider({
 });
 ```
 
-When this method is available in the data provider, each row will have an edit button. This edit button brings the row in edit mode. To commit the changes press the save button on the row that is in edit mode. To discard the changes use the cancel button.
+When this method is available in the data provider, each row gets an edit button. This edit button brings the row in edit mode. To commit the changes press the save button on the row that is in edit mode. To discard the changes use the cancel button.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/editing.mp4" type="video/mp4">
@@ -167,7 +167,7 @@ You can disable the editing functionality for specific columns by unchecking the
 
 ## Row creation
 
-The data provider can be extended to support creating new rows. To enable this, you have to add a `createRecord` method to the data provider interface. This method will receive an object with all values provided by the user in the creation UI.
+The data provider can be extended to support creating new rows. To enable this, you have to add a `createRecord` method to the data provider interface. This method receives an object with all values provided by the user in the creation UI.
 
 ```tsx
 export default createDataProvider({
@@ -181,7 +181,7 @@ export default createDataProvider({
 });
 ```
 
-After you make this method available in the data provider, an "Add record" button will appear in the data grid toolbar. Click this button and a new editable row appears at the top of the grid. Fill in the values and click the "Save" button to finish creating the row. You'll have to return the newly created row from the `createRecord` method so that the grid can update accordingly.
+After you make this method available in the data provider, an "Add record" button appears in the data grid toolbar. Click this button and a new editable row appears at the top of the grid. Fill in the values and click the "Save" button to finish creating the row. You'll have to return the newly created row from the `createRecord` method so that the grid can update accordingly.
 
 <video controls width="auto" height="100%" style="contain" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/creating.mp4" type="video/mp4">
@@ -204,7 +204,7 @@ export default createDataProvider({
 });
 ```
 
-When a data provider contains a `deleteRecord` method, each row will have a delete button. When the user clicks that delete button, the delete method will be called with the id of that row and after successful deletion, the data will be reloaded.
+When a data provider contains a `deleteRecord` method, each row has a delete button. When the user clicks that delete button, the delete method gets called with the id of that row and after successful deletion, the data is reloaded.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/connecting-to-data/data-providers-delete.png", "alt": "Data provider delete", "caption": "Delete action in data provider" }}
 

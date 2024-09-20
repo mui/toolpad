@@ -29,14 +29,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui/mui-toolpad.git",
+    "url": "github:mui/toolpad",
     "directory": "packages/toolpad-core"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mui/mui-toolpad/issues"
+    "url": "https://github.com/mui/toolpad/issues"
   },
-  "homepage": "https://github.com/mui/mui-toolpad#readme",
+  "homepage": "https://github.com/mui/toolpad#readme",
   "scripts": {
     "clean": "rimraf build",
     "prebuild": "pnpm clean",
@@ -56,17 +56,18 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.25.6",
-    "@mui/lab": "6.0.0-beta.9",
-    "@mui/utils": "6.1.0",
+    "@mui/lab": "6.0.0-beta.10",
+    "@mui/utils": "6.1.1",
     "@toolpad/utils": "workspace:*",
+    "@vitejs/plugin-react": "4.3.1",
     "client-only": "^0.0.1",
     "invariant": "2.2.4",
-    "path-to-regexp": "6.2.2",
+    "path-to-regexp": "6.3.0",
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "6.1.0",
-    "@mui/material": "6.1.0",
+    "@mui/icons-material": "6.1.1",
+    "@mui/material": "6.1.1",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.12",
     "@types/react": "18.3.5",

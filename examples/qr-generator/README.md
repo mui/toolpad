@@ -28,7 +28,7 @@ pnpm create toolpad-app --example qr-generator
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/mui-toolpad/tree/master/examples/qr-generator)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/qr-generator)
 
 ## What's inside
 
@@ -41,4 +41,4 @@ This app demonstrates the following capabilities of Toolpad Studio:
 
 ## The source
 
-[Check out the source code](https://github.com/mui/mui-toolpad/tree/master/examples/qr-generator)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/qr-generator)

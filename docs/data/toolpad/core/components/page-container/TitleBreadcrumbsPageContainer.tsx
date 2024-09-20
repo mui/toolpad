@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 
 const NAVIGATION = [
+  { segment: '', title: 'ACME' },
   {
     segment: 'inbox',
     title: 'Home',
@@ -24,12 +25,7 @@ export default function TitleBreadcrumbsPageContainer() {
   const theme = useTheme();
 
   return (
-    <AppProvider
-      branding={{ title: 'ACME' }}
-      navigation={NAVIGATION}
-      router={router}
-      theme={theme}
-    >
+    <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
       <Paper sx={{ width: '100%' }}>
         <PageContainer />
       </Paper>

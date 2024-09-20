@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { usePathname, useSearchParams, useRouter } from './nextNavigation';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { AppProvider } from '../AppProvider';
 import type { AppProviderProps, Navigate, Router } from '../AppProvider';
 

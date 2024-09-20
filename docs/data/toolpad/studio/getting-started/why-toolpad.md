@@ -99,4 +99,4 @@ This means you can store your entire Toolpad app the same way you store your oth
 
 ## How is Toolpad Studio different from other tools?
 
-🚧 Work in progress, [issue #2853](https://github.com/mui/mui-toolpad/issues/2853).
+🚧 Work in progress, [issue #2853](https://github.com/mui/toolpad/issues/2853).

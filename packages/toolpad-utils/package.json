@@ -3,7 +3,7 @@
   "version": "0.6.0",
   "description": "Shared utilities used by Toolpad packages.",
   "author": "MUI Toolpad team",
-  "homepage": "https://github.com/mui/mui-toolpad#readme",
+  "homepage": "https://github.com/mui/toolpad#readme",
   "license": "MIT",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -39,7 +39,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui/mui-toolpad.git"
+    "url": "github:mui/toolpad",
+    "directory": "packages/toolpad-studio-utils"
   },
   "scripts": {
     "build": "tsup",
@@ -48,7 +49,7 @@
     "test": "vitest run --coverage"
   },
   "bugs": {
-    "url": "https://github.com/mui/mui-toolpad/issues"
+    "url": "https://github.com/mui/toolpad/issues"
   },
   "peerDependencies": {
     "react": "^18.0.0"

@@ -1,8 +1,8 @@
 const ROUTES = {
-  toolpadRepo: 'https://github.com/mui/mui-toolpad',
+  toolpadRepo: 'https://github.com/mui/toolpad',
   toolpadQuickstart: '/toolpad/studio/getting-started/first-app/',
   toolpadDocs: '/toolpad/studio/getting-started/installation/',
-  toolpadUpvote: 'https://github.com/mui/mui-toolpad/labels/waiting%20for%20%F0%9F%91%8D',
+  toolpadUpvote: 'https://github.com/mui/toolpad/labels/waiting%20for%20%F0%9F%91%8D',
   toolpadBetaBlog: 'https://mui.com/blog/2023-toolpad-beta-announcement/',
   toolpadDemoBooking: 'https://calendly.com/prakhar-mui/',
   // https://docs.netlify.com/site-deploys/overview/#deploy-contexts

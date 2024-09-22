@@ -853,8 +853,8 @@ importers:
         specifier: 0.50.0
         version: 0.50.0
       mysql2:
-        specifier: 3.11.2
-        version: 3.11.2
+        specifier: 3.11.3
+        version: 3.11.3
       nanoid:
         specifier: 5.0.7
         version: 5.0.7
@@ -7705,8 +7705,8 @@ packages:
     resolution: {integrity: sha512-avsJQhyd+680gKXyG/sQc0nXaC6rBkPOfyHYcFb9+hdkqQkR9bdnkJ0AMZhke0oesPqIO+mFFJ+IdBc7mst4IA==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
-  mysql2@3.11.2:
-    resolution: {integrity: sha512-3jhjAk4NHs3rcKjOiFTqmU76kdib/KDOC+lshrYa76QWkcfF1GbYGK4d5PqPljVmIAc0ChozCRmeYIlNp5bz5w==}
+  mysql2@3.11.3:
+    resolution: {integrity: sha512-Qpu2ADfbKzyLdwC/5d4W7+5Yz7yBzCU05YWt5npWzACST37wJsB23wgOSo00qi043urkiRwXtEvJc9UnuLX/MQ==}
     engines: {node: '>= 8.0'}
 
   mz@2.7.0:
@@ -17991,7 +17991,7 @@ snapshots:
 
   mute-stream@1.0.0: {}
 
-  mysql2@3.11.2:
+  mysql2@3.11.3:
     dependencies:
       aws-ssl-profiles: 1.1.1
       denque: 2.1.0

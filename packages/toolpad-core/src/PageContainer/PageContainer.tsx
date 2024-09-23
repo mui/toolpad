@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import warnOnce from '@toolpad/utils/warnOnce';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Container, { ContainerProps } from '@mui/material/Container';
 import Link from '@mui/material/Link';
@@ -32,7 +33,7 @@ export interface PageContainerSlots {
   toolbar: React.ElementType;
 }
 
-export interface BreadCrumb {
+export interface Breadcrumb {
   /**
    * The title of the breadcrumb segment.
    */
@@ -43,6 +44,12 @@ export interface BreadCrumb {
   path: string;
 }
 
+// TODO: Remove in the next major version
+/**
+ * @deprecated Use `Breadcrumb` instead.
+ */
+export type BreadCrumb = Breadcrumb;
+
 export interface PageContainerProps extends ContainerProps {
   children?: React.ReactNode;
   /**
@@ -52,7 +59,12 @@ export interface PageContainerProps extends ContainerProps {
   /**
    * The breadcrumbs of the page. Leave blank to use the active page breadcrumbs.
    */
-  breadCrumbs?: BreadCrumb[];
+  breadcrumbs?: Breadcrumb[];
+  // TODO: Remove in the next major version
+  /**
+   * @deprecated Use `breadcrumbs` instead.
+   */
+  breadCrumbs?: Breadcrumb[];
   /**
    * The components used for each slot inside.
    */
@@ -77,9 +89,14 @@ export interface PageContainerProps extends ContainerProps {
 function PageContainer(props: PageContainerProps) {
   const { children, slots, slotProps, ...rest } = props;
 
+  if (process.env.NODE_ENV !== 'production' && props.breadCrumbs) {
+    warnOnce('The PageContainer `breadCrumbs` prop is deprecated. Use `breadcrumbs` instead.');
+  }
+
   const activePage = useActivePage();
 
-  const breadCrumbs = props.breadCrumbs ?? activePage?.breadCrumbs ?? [];
+  // TODO: Remove `props.breadCrumbs` in the next major version
+  const breadcrumbs = props.breadcrumbs ?? props.breadCrumbs ?? activePage?.breadcrumbs ?? [];
   const title = props.title ?? activePage?.title ?? '';
 
   const ToolbarComponent = props?.slots?.toolbar ?? PageContainerToolbar;
@@ -95,9 +112,9 @@ function PageContainer(props: PageContainerProps) {
       <Stack sx={{ my: 2 }} spacing={2}>
         <Stack>
           <Breadcrumbs aria-label="breadcrumb">
-            {breadCrumbs
-              ? breadCrumbs.map((item, index) => {
-                  return index < breadCrumbs.length - 1 ? (
+            {breadcrumbs
+              ? breadcrumbs.map((item, index) => {
+                  return index < breadcrumbs.length - 1 ? (
                     <Link
                       key={item.path}
                       component={ToolpadLink}
@@ -134,6 +151,15 @@ PageContainer.propTypes /* remove-proptypes */ = {
   // └─────────────────────────────────────────────────────────────────────┘
   /**
    * The breadcrumbs of the page. Leave blank to use the active page breadcrumbs.
+   */
+  breadcrumbs: PropTypes.arrayOf(
+    PropTypes.shape({
+      path: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+    }),
+  ),
+  /**
+   * @deprecated Use `breadcrumbs` instead.
    */
   breadCrumbs: PropTypes.arrayOf(
     PropTypes.shape({

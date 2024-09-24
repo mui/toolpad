@@ -49,7 +49,7 @@ The breadcrumbs contains **ACME / Home / Orders** when you visit the path **/hom
 
 ## Dynamic Routes
 
-When you use the `PageContainer` on a dynamic route, you'll likely want to set a title and breadcrumbs belonging to the specific path. You can achieve this with the `title` and `breadCrumbs` property of the `PageContainer`
+When you use the `PageContainer` on a dynamic route, you'll likely want to set a title and breadcrumbs belonging to the specific path. You can achieve this with the `title` and `breadcrumbs` property of the `PageContainer`
 
 {{"demo": "CustomPageContainer.js", "height": 300}}
 
@@ -57,17 +57,17 @@ You can use the `useActivePage` hook to retrieve the title and breadcrumbs of th
 
 ```tsx
 import { useActivePage } from '@toolpad/core/useActivePage';
-import { BreadCrumb } from '@toolpad/core/PageContainer';
+import { Breadcrumb } from '@toolpad/core/PageContainer';
 
 // Pass the id from your router of choice
-function useDynamicBreadCrumbs(id: string): BreadCrumb[] {
+function useDynamicBreadcrumbs(id: string): Breadcrumb[] {
   const activePage = useActivePage();
   invariant(activePage, 'No navigation match');
 
   const title = `Item ${id}`;
   const path = `${activePage.path}/${id}`;
 
-  return [...activePage.breadCrumbs, { title, path }];
+  return [...activePage.breadcrumbs, { title, path }];
 }
 ```
 
@@ -90,10 +90,10 @@ export default function Example() {
   const title = `Item ${params.id}`;
   const path = `${activePage.path}/${params.id}`;
 
-  const breadCrumbs = [...activePage.breadCrumbs, { title, path }];
+  const breadcrumbs = [...activePage.breadcrumbs, { title, path }];
 
   return (
-    <PageContainer title={title} breadCrumbs={breadCrumbs}>
+    <PageContainer title={title} breadcrumbs={breadcrumbs}>
       ...
     </PageContainer>
   );

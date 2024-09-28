@@ -21,7 +21,7 @@ function CustomEmailField() {
   return (
     <TextField
       id="input-with-icon-textfield"
-      label="Username"
+      label="Email"
       name="email"
       type="email"
       size="small"

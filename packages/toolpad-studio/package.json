@@ -76,7 +76,7 @@
     "@mui/x-date-pickers-pro": "7.18.0",
     "@mui/x-tree-view": "7.18.0",
     "@tanstack/react-query": "5.56.2",
-    "@tanstack/react-query-devtools": "5.56.2",
+    "@tanstack/react-query-devtools": "5.58.0",
     "@toolpad/studio-components": "workspace:*",
     "@toolpad/studio-runtime": "workspace:*",
     "@toolpad/utils": "workspace:*",

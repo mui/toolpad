@@ -152,7 +152,7 @@
     "@types/babel__code-frame": "7.0.6",
     "@types/compression": "^1.7.5",
     "@types/express": "4.17.21",
-    "@types/express-serve-static-core": "4.19.5",
+    "@types/express-serve-static-core": "4.19.6",
     "@types/formidable": "3.4.5",
     "@types/glob": "8.1.0",
     "@types/har-format": "1.2.15",

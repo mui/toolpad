@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@types/lodash':
-        specifier: 4.17.7
-        version: 4.17.7
+        specifier: 4.17.9
+        version: 4.17.9
       '@vitest/browser':
         specifier: 2.1.1
         version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.7(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)
@@ -341,8 +341,8 @@ importers:
         specifier: 0.5.5
         version: 0.5.5(react@18.3.1)
       '@types/lodash':
-        specifier: 4.17.7
-        version: 4.17.7
+        specifier: 4.17.9
+        version: 4.17.9
       '@types/react-router-dom':
         specifier: 5.3.3
         version: 5.3.3
@@ -962,8 +962,8 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       '@types/express-serve-static-core':
-        specifier: 4.19.5
-        version: 4.19.5
+        specifier: 4.19.6
+        version: 4.19.6
       '@types/formidable':
         specifier: 3.4.5
         version: 3.4.5
@@ -3921,8 +3921,8 @@ packages:
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
 
-  '@types/express-serve-static-core@4.19.5':
-    resolution: {integrity: sha512-y6W03tvrACO72aijJ5uF02FRq5cgDR9lUxddQ8vyF+GvmjJQqbzDcJngEjURc+ZsG31VI3hODNZJ2URj86pzmg==}
+  '@types/express-serve-static-core@4.19.6':
+    resolution: {integrity: sha512-N4LZ2xG7DatVqhCZzOGb1Yi5lMbXSZcmdLDe9EzSndPV2HpWYWzRbaerl2n27irrm94EPpprqa8KpskPT085+A==}
 
   '@types/express@4.17.21':
     resolution: {integrity: sha512-ejlPM315qwLpaQlQDTjPdsUFSc6ZsP4AN6AlWnogPjQ7CVi7PYF3YVz+CY3jE2pwYf7E/7HlDAN0rV2GxTG0HQ==}
@@ -3987,8 +3987,8 @@ packages:
   '@types/lodash-es@4.17.12':
     resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
 
-  '@types/lodash@4.17.7':
-    resolution: {integrity: sha512-8wTvZawATi/lsmNu10/j2hk1KEP0IvjubqPE3cu1Xz7xfXXt5oCq3SNUz4fMIP4XGF9Ky+Ue2tBA3hcS7LSBlA==}
+  '@types/lodash@4.17.9':
+    resolution: {integrity: sha512-w9iWudx1XWOHW5lQRS9iKpK/XuRhnN+0T7HvdCCd802FYkT1AMTnxndJHGrNJwRoRHkslGr4S29tjm1cT7x/7w==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -13152,7 +13152,7 @@ snapshots:
 
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
-      '@types/express-serve-static-core': 4.19.5
+      '@types/express-serve-static-core': 4.19.6
       '@types/node': 20.16.10
 
   '@types/connect@3.4.38':
@@ -13204,7 +13204,7 @@ snapshots:
 
   '@types/estree@1.0.5': {}
 
-  '@types/express-serve-static-core@4.19.5':
+  '@types/express-serve-static-core@4.19.6':
     dependencies:
       '@types/node': 20.16.10
       '@types/qs': 6.9.15
@@ -13214,7 +13214,7 @@ snapshots:
   '@types/express@4.17.21':
     dependencies:
       '@types/body-parser': 1.19.5
-      '@types/express-serve-static-core': 4.19.5
+      '@types/express-serve-static-core': 4.19.6
       '@types/qs': 6.9.15
       '@types/serve-static': 1.15.7
 
@@ -13285,9 +13285,9 @@ snapshots:
 
   '@types/lodash-es@4.17.12':
     dependencies:
-      '@types/lodash': 4.17.7
+      '@types/lodash': 4.17.9
 
-  '@types/lodash@4.17.7': {}
+  '@types/lodash@4.17.9': {}
 
   '@types/mdast@4.0.4':
     dependencies:

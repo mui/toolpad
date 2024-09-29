@@ -174,7 +174,7 @@ importers:
         version: 9.1.0(eslint@8.57.1)
       eslint-import-resolver-webpack:
         specifier: 0.13.9
-        version: 0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1))
+        version: 0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1))
       eslint-plugin-filenames:
         specifier: 1.3.2
         version: 1.3.2(eslint@8.57.1)
@@ -195,7 +195,7 @@ importers:
         version: 7.36.1(eslint@8.57.1)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-92aaa43-20240919(eslint@8.57.1)
+        version: 0.0.0-experimental-f444e11-20240926(eslint@8.57.1)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.1)
@@ -890,7 +890,7 @@ importers:
         version: 18.3.1
       react-dev-utils:
         specifier: 12.0.1
-        version: 12.0.1(eslint@8.57.1)(typescript@5.5.4)(webpack@5.94.0(esbuild@0.23.1))
+        version: 12.0.1(eslint@8.57.1)(typescript@5.5.4)(webpack@5.95.0(esbuild@0.23.1))
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
@@ -1028,8 +1028,8 @@ importers:
         specifier: 4.4.5
         version: 4.4.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       webpack:
-        specifier: 5.94.0
-        version: 5.94.0(esbuild@0.23.1)
+        specifier: 5.95.0
+        version: 5.95.0(esbuild@0.23.1)
 
   packages/toolpad-studio-components:
     dependencies:
@@ -1227,13 +1227,13 @@ importers:
         version: 18.3.0
       eslint-config-next:
         specifier: 14.2.13
-        version: 14.2.13(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint@8.57.1)(typescript@5.6.2)
+        version: 14.2.13(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint@8.57.1)(typescript@5.6.2)
       next:
         specifier: 14.2.13
         version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
-        specifier: 5.0.0-beta.21
-        version: 5.0.0-beta.21(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1)
+        specifier: 5.0.0-beta.22
+        version: 5.0.0-beta.22(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -1269,13 +1269,13 @@ importers:
         version: 18.3.0
       eslint-config-next:
         specifier: 14.2.13
-        version: 14.2.13(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint@8.57.1)(typescript@5.6.2)
+        version: 14.2.13(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint@8.57.1)(typescript@5.6.2)
       next:
         specifier: 14.2.13
         version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
-        specifier: 5.0.0-beta.21
-        version: 5.0.0-beta.21(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1)
+        specifier: 5.0.0-beta.22
+        version: 5.0.0-beta.22(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -1404,6 +1404,20 @@ packages:
 
   '@auth/core@0.35.0':
     resolution: {integrity: sha512-XvMALiYn5ZQd1hVeG1t+jCU89jRrc7ortl/05wkBrPHnRWZScxAK5jKuzBz+AOBQXewDjYcMpzeF5tTqg6rDhQ==}
+    peerDependencies:
+      '@simplewebauthn/browser': ^9.0.1
+      '@simplewebauthn/server': ^9.0.2
+      nodemailer: ^6.8.0
+    peerDependenciesMeta:
+      '@simplewebauthn/browser':
+        optional: true
+      '@simplewebauthn/server':
+        optional: true
+      nodemailer:
+        optional: true
+
+  '@auth/core@0.35.3':
+    resolution: {integrity: sha512-g6qfiqU4OtyvIEZ8J7UoIwAxEnNnLJV0/f/DW41U+4G5nhBlaCrnKhawJIJpU0D3uavXLeDT3B0BkjtiimvMDA==}
     peerDependencies:
       '@simplewebauthn/browser': ^9.0.1
       '@simplewebauthn/server': ^9.0.2
@@ -5769,8 +5783,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-92aaa43-20240919:
-    resolution: {integrity: sha512-l1tEUmxnZcMNkpUffbyNPAV91kZMZYLVeCCRZajK/s1QdP9FquunJQ9uT4c3f0RqdV6n0kloVfnJ0lPD1FTPlg==}
+  eslint-plugin-react-compiler@0.0.0-experimental-f444e11-20240926:
+    resolution: {integrity: sha512-0eky+cIXkelvC+uYG8P82UzWjA7kf62VrutYfiNl/xMYMRWHGeNmBnpk6oM35sc/1YbHKIRlWPBOaLXN6yf41g==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -7666,8 +7680,8 @@ packages:
   nested-error-stacks@2.1.1:
     resolution: {integrity: sha512-9iN1ka/9zmX1ZvLV9ewJYEk9h7RyRRtqdK0woXcqohu8EWIerfPUjYJPg0ULy0UqP7cslmdGc8xKDJcojlKiaw==}
 
-  next-auth@5.0.0-beta.21:
-    resolution: {integrity: sha512-VrT6LV9u/o5tMuWxRDN5d/K1OgPskrMHy+aITTwasVfIrkIaU/8UVg3TXH8ynJgzhfzlDx/3hLWGhi+eXQw4qg==}
+  next-auth@5.0.0-beta.22:
+    resolution: {integrity: sha512-QGBo9HGOjmnJBHGXvtFztl0tM5tL0porDlk74HVoCCzXd986ApOlIW3EmiCuho7YzEopgkFiwwmcXpoCrHAtYw==}
     peerDependencies:
       '@simplewebauthn/browser': ^9.0.1
       '@simplewebauthn/server': ^9.0.2
@@ -9954,8 +9968,8 @@ packages:
     resolution: {integrity: sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==}
     engines: {node: '>=10.13.0'}
 
-  webpack@5.94.0:
-    resolution: {integrity: sha512-KcsGn50VT+06JH/iunZJedYGUJS5FGjow8wb9c0v5n1Om8O1g4L6LjtfxwlXIATopoQu+vOXXa7gYisWxCoPyg==}
+  webpack@5.95.0:
+    resolution: {integrity: sha512-2t3XstrKULz41MNMBF+cJ97TyHdyQ8HCt//pqErqDvNjU9YQBnZxIHa11VXsi7F3mb5/aO2tuDxdeTPdU7xu9Q==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     peerDependencies:
@@ -10316,6 +10330,18 @@ snapshots:
   '@argos-ci/util@2.1.1': {}
 
   '@auth/core@0.35.0(nodemailer@6.9.14)':
+    dependencies:
+      '@panva/hkdf': 1.2.0
+      '@types/cookie': 0.6.0
+      cookie: 0.6.0
+      jose: 5.6.2
+      oauth4webapi: 2.11.1
+      preact: 10.11.3
+      preact-render-to-string: 5.2.3(preact@10.11.3)
+    optionalDependencies:
+      nodemailer: 6.9.14
+
+  '@auth/core@0.35.3(nodemailer@6.9.14)':
     dependencies:
       '@panva/hkdf': 1.2.0
       '@types/cookie': 0.6.0
@@ -15322,7 +15348,7 @@ snapshots:
       object.assign: 4.1.5
       object.entries: 1.1.8
 
-  eslint-config-next@14.2.13(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint@8.57.1)(typescript@5.6.2):
+  eslint-config-next@14.2.13(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint@8.57.1)(typescript@5.6.2):
     dependencies:
       '@next/eslint-plugin-next': 14.2.13
       '@rushstack/eslint-patch': 1.10.3
@@ -15330,7 +15356,7 @@ snapshots:
       '@typescript-eslint/parser': 7.18.0(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1)
       eslint-plugin-import: 2.30.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.9)(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.0(eslint@8.57.1)
       eslint-plugin-react: 7.36.1(eslint@8.57.1)
@@ -15359,12 +15385,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1):
     dependencies:
       debug: 4.3.6
       enhanced-resolve: 5.17.1
       eslint: 8.57.1
-      eslint-module-utils: 2.11.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1))(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint@8.57.1)
+      eslint-module-utils: 2.11.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1))(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint@8.57.1)
       eslint-plugin-import: 2.30.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-webpack@0.13.9)(eslint@8.57.1)
       fast-glob: 3.3.2
       get-tsconfig: 4.7.5
@@ -15376,7 +15402,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)):
+  eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)):
     dependencies:
       debug: 3.2.7
       enhanced-resolve: 0.9.1
@@ -15389,19 +15415,19 @@ snapshots:
       lodash: 4.17.21
       resolve: 2.0.0-next.5
       semver: 5.7.2
-      webpack: 5.94.0(esbuild@0.23.1)
+      webpack: 5.95.0(esbuild@0.23.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.11.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1))(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint@8.57.1):
+  eslint-module-utils@2.11.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1))(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 7.18.0(eslint@8.57.1)(typescript@5.6.2)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1)
-      eslint-import-resolver-webpack: 0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1))
+      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1)
+      eslint-import-resolver-webpack: 0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1))
     transitivePeerDependencies:
       - supports-color
 
@@ -15424,7 +15450,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.11.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1))(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.94.0(esbuild@0.23.1)))(eslint@8.57.1)
+      eslint-module-utils: 2.11.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint-plugin-import@2.30.0)(eslint@8.57.1))(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -15468,7 +15494,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-92aaa43-20240919(eslint@8.57.1):
+  eslint-plugin-react-compiler@0.0.0-experimental-f444e11-20240926(eslint@8.57.1):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.6
@@ -15935,7 +15961,7 @@ snapshots:
       cross-spawn: 7.0.3
       signal-exit: 4.1.0
 
-  fork-ts-checker-webpack-plugin@6.5.3(eslint@8.57.1)(typescript@5.5.4)(webpack@5.94.0(esbuild@0.23.1)):
+  fork-ts-checker-webpack-plugin@6.5.3(eslint@8.57.1)(typescript@5.5.4)(webpack@5.95.0(esbuild@0.23.1)):
     dependencies:
       '@babel/code-frame': 7.24.7
       '@types/json-schema': 7.0.15
@@ -15951,7 +15977,7 @@ snapshots:
       semver: 7.6.3
       tapable: 1.1.3
       typescript: 5.5.4
-      webpack: 5.94.0(esbuild@0.23.1)
+      webpack: 5.95.0(esbuild@0.23.1)
     optionalDependencies:
       eslint: 8.57.1
 
@@ -17795,9 +17821,9 @@ snapshots:
 
   nested-error-stacks@2.1.1: {}
 
-  next-auth@5.0.0-beta.21(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1):
+  next-auth@5.0.0-beta.22(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1):
     dependencies:
-      '@auth/core': 0.35.0(nodemailer@6.9.14)
+      '@auth/core': 0.35.3(nodemailer@6.9.14)
       next: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
     optionalDependencies:
@@ -18693,7 +18719,7 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
 
-  react-dev-utils@12.0.1(eslint@8.57.1)(typescript@5.5.4)(webpack@5.94.0(esbuild@0.23.1)):
+  react-dev-utils@12.0.1(eslint@8.57.1)(typescript@5.5.4)(webpack@5.95.0(esbuild@0.23.1)):
     dependencies:
       '@babel/code-frame': 7.24.7
       address: 1.2.2
@@ -18704,7 +18730,7 @@ snapshots:
       escape-string-regexp: 4.0.0
       filesize: 8.0.7
       find-up: 5.0.0
-      fork-ts-checker-webpack-plugin: 6.5.3(eslint@8.57.1)(typescript@5.5.4)(webpack@5.94.0(esbuild@0.23.1))
+      fork-ts-checker-webpack-plugin: 6.5.3(eslint@8.57.1)(typescript@5.5.4)(webpack@5.95.0(esbuild@0.23.1))
       global-modules: 2.0.0
       globby: 11.1.0
       gzip-size: 6.0.0
@@ -18719,7 +18745,7 @@ snapshots:
       shell-quote: 1.8.1
       strip-ansi: 6.0.1
       text-table: 0.2.0
-      webpack: 5.94.0(esbuild@0.23.1)
+      webpack: 5.95.0(esbuild@0.23.1)
     optionalDependencies:
       typescript: 5.5.4
     transitivePeerDependencies:
@@ -19755,14 +19781,14 @@ snapshots:
     dependencies:
       ps-tree: 1.2.0
 
-  terser-webpack-plugin@5.3.10(esbuild@0.23.1)(webpack@5.94.0(esbuild@0.23.1)):
+  terser-webpack-plugin@5.3.10(esbuild@0.23.1)(webpack@5.95.0(esbuild@0.23.1)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.25
       jest-worker: 27.5.1
       schema-utils: 3.3.0
       serialize-javascript: 6.0.2
       terser: 5.31.1
-      webpack: 5.94.0(esbuild@0.23.1)
+      webpack: 5.95.0(esbuild@0.23.1)
     optionalDependencies:
       esbuild: 0.23.1
 
@@ -20334,7 +20360,7 @@ snapshots:
 
   webpack-sources@3.2.3: {}
 
-  webpack@5.94.0(esbuild@0.23.1):
+  webpack@5.95.0(esbuild@0.23.1):
     dependencies:
       '@types/estree': 1.0.5
       '@webassemblyjs/ast': 1.12.1
@@ -20356,7 +20382,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 3.3.0
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.10(esbuild@0.23.1)(webpack@5.94.0(esbuild@0.23.1))
+      terser-webpack-plugin: 5.3.10(esbuild@0.23.1)(webpack@5.95.0(esbuild@0.23.1))
       watchpack: 2.4.1
       webpack-sources: 3.2.3
     transitivePeerDependencies:

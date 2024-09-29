@@ -679,8 +679,8 @@ importers:
   packages/toolpad-studio:
     dependencies:
       '@auth/core':
-        specifier: 0.35.0
-        version: 0.35.0(nodemailer@6.9.14)
+        specifier: 0.35.3
+        version: 0.35.3(nodemailer@6.9.14)
       '@emotion/cache':
         specifier: 11.13.1
         version: 11.13.1
@@ -1092,8 +1092,8 @@ importers:
   packages/toolpad-studio-runtime:
     dependencies:
       '@auth/core':
-        specifier: 0.35.0
-        version: 0.35.0(nodemailer@6.9.14)
+        specifier: 0.35.3
+        version: 0.35.3(nodemailer@6.9.14)
       '@mui/material':
         specifier: 6.1.1
         version: 6.1.1(@emotion/react@11.13.3(@types/react@18.3.8)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.8)(react@18.3.1))(@types/react@18.3.8)(react@18.3.1))(@types/react@18.3.8)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

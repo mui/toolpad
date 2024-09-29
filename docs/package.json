@@ -41,7 +41,7 @@
     "@toolpad/core": "workspace:*",
     "@toolpad/studio": "workspace:*",
     "@trendmicro/react-interpolate": "0.5.5",
-    "@types/lodash": "4.17.7",
+    "@types/lodash": "4.17.9",
     "@types/react-router-dom": "5.3.3",
     "ast-types": "0.14.2",
     "autoprefixer": "10.4.20",

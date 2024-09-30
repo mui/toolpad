@@ -1,1 +1,1 @@
-<PageContainer title={title} breadCrumbs={breadCrumbs}>
+<PageContainer title={title} breadcrumbs={breadcrumbs}>

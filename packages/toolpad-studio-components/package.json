@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/studio-components",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/toolpad#readme",
@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@types/invariant": "2.2.37",
-    "@types/react": "18.3.5",
+    "@types/react": "18.3.10",
     "react": "18.3.1"
   },
   "peerDependencies": {

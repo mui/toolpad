@@ -46,8 +46,8 @@ function devServerPlugin(): Plugin {
             });
 
             res.setHeader('content-type', 'text/html; charset=utf-8').end(html);
-          } catch (e) {
-            next(e);
+          } catch (error) {
+            next(error);
           }
         });
       };

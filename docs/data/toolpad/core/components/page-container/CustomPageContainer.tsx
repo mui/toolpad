@@ -29,11 +29,11 @@ function Content({ router }: ContentProps) {
   const title = `Item ${id}`;
   const path = `${activePage.path}/${id}`;
 
-  const breadCrumbs = [...activePage.breadCrumbs, { title, path }];
+  const breadcrumbs = [...activePage.breadcrumbs, { title, path }];
 
   return (
     // preview-start
-    <PageContainer title={title} breadCrumbs={breadCrumbs}>
+    <PageContainer title={title} breadcrumbs={breadcrumbs}>
       {/* preview-end */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Link href={`/inbox/${id - 1}`}>previous</Link>

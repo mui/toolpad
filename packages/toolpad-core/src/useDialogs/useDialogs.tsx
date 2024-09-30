@@ -279,7 +279,7 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
           fullWidth
           variant="standard"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(event) => setInput(event.target.value)}
         />
       </DialogContent>
       <DialogActions>

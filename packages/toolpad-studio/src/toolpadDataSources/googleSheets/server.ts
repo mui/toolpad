@@ -273,12 +273,12 @@ export default function createDatasource(): ServerDataSource<
             return res.redirect(`/_toolpad/app/connections/${encodeURIComponent(connectionId)}`);
           }
           return res.status(404).send('No handler exists for given path');
-        } catch (e) {
-          if (e instanceof Error) {
-            console.error(e.message);
-            return res.status(500).send(e.message);
+        } catch (error) {
+          if (error instanceof Error) {
+            console.error(error.message);
+            return res.status(500).send(error.message);
           }
-          return res.status(500).send(e);
+          return res.status(500).send(error);
         }
       };
     },

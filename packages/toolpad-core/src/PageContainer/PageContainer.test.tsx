@@ -33,15 +33,15 @@ describe('PageContainer', () => {
       </AppProvider>,
     );
 
-    const breadCrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
+    const breadcrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
 
-    const homeLink = within(breadCrumbs).getByRole('link', { name: 'Home' });
+    const homeLink = within(breadcrumbs).getByRole('link', { name: 'Home' });
     await user.click(homeLink);
 
     expect(router.navigate).toHaveBeenCalledWith('/', expect.objectContaining({}));
     router.navigate.mockClear();
 
-    expect(within(breadCrumbs).getByText('Orders')).toBeTruthy();
+    expect(within(breadcrumbs).getByText('Orders')).toBeTruthy();
 
     expect(screen.getByText('Orders', { ignore: 'nav *' }));
   });
@@ -74,11 +74,11 @@ describe('PageContainer', () => {
       </AppProvider>,
     );
 
-    const breadCrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
+    const breadcrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
 
-    expect(within(breadCrumbs).getByText('ACME')).toBeTruthy();
-    expect(within(breadCrumbs).getByText('Home')).toBeTruthy();
-    expect(within(breadCrumbs).getByText('Orders')).toBeTruthy();
+    expect(within(breadcrumbs).getByText('ACME')).toBeTruthy();
+    expect(within(breadcrumbs).getByText('Home')).toBeTruthy();
+    expect(within(breadcrumbs).getByText('Orders')).toBeTruthy();
   });
 
   test('renders dynamic correctly', async () => {
@@ -100,15 +100,15 @@ describe('PageContainer', () => {
       </AppProvider>,
     );
 
-    const breadCrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
+    const breadcrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
 
-    const homeLink = within(breadCrumbs).getByRole('link', { name: 'Home' });
+    const homeLink = within(breadcrumbs).getByRole('link', { name: 'Home' });
     await user.click(homeLink);
 
     expect(router.navigate).toHaveBeenCalledWith('/', expect.objectContaining({}));
     router.navigate.mockClear();
 
-    expect(within(breadCrumbs).getByText('Orders')).toBeTruthy();
+    expect(within(breadcrumbs).getByText('Orders')).toBeTruthy();
 
     expect(screen.getByText('Orders', { ignore: 'nav *' }));
   });

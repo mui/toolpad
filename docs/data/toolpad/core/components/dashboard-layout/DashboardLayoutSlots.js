@@ -73,9 +73,8 @@ function Search() {
           <IconButton
             type="button"
             aria-label="search"
-            size="small"
             sx={{
-              display: { xs: 'inline-block', md: 'none' },
+              display: { xs: 'inline', md: 'none' },
             }}
           >
             <SearchIcon />
@@ -83,7 +82,6 @@ function Search() {
         </div>
       </Tooltip>
       <TextField
-        id="search"
         label="Search"
         variant="outlined"
         size="small"

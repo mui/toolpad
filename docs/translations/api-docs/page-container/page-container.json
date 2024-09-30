@@ -1,7 +1,7 @@
 {
   "componentDescription": "A container component to provide a title and breadcrumbs for your pages.",
   "propDescriptions": {
-    "breadCrumbs": {
+    "breadcrumbs": {
       "description": "The breadcrumbs of the page. Leave blank to use the active page breadcrumbs."
     },
     "slotProps": { "description": "The props used for each slot inside." },

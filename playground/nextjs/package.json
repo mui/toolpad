@@ -1,6 +1,6 @@
 {
   "name": "playground-nextjs",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -14,12 +14,12 @@
     "@mui/material": "6.1.1",
     "@mui/material-nextjs": "6.1.1",
     "@toolpad/core": "workspace:*",
-    "@types/node": "^20.14.8",
-    "@types/react": "18.3.5",
+    "@types/node": "^20.16.10",
+    "@types/react": "18.3.10",
     "@types/react-dom": "18.3.0",
-    "eslint-config-next": "14.2.11",
-    "next": "14.2.11",
-    "next-auth": "5.0.0-beta.20",
+    "eslint-config-next": "14.2.13",
+    "next": "14.2.13",
+    "next-auth": "5.0.0-beta.22",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   }

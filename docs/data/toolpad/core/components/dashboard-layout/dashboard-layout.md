@@ -8,6 +8,10 @@ components: AppProvider, DashboardLayout, Account
 
 <p class="description">The dashboard layout component provides a customizable out-of-the-box layout for a typical dashboard page.</p>
 
+:::info
+If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
+:::
+
 The `DashboardLayout` component is a quick, easy way to provide a standard full-screen layout with a header and sidebar to any dashboard page, as well as ready-to-use and easy to customize navigation and branding.
 
 Many features of this component are configurable through the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) component that must wrap it to provide the necessary context.
@@ -91,11 +95,11 @@ Navigation links have an optional `action` prop to render any content on the rig
 Navigation links have an optional `pattern` prop to define a pattern to be matched for the item to be marked as selected.
 This feature is built on top of the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library. Some examples:
 
-- Constant path: `/orders`
-- Dynamic segment: `/orders/:segment`
-- Zero or more segments: `/orders{/:segment}*`
-- One or more segments: `/orders{/:segment}+`
-- Optional segment: `/orders{/:segment}+?`
+- Constant path: `orders`
+- Dynamic segment: `orders/:segment`
+- Optional segment: `orders{/:segment}?`
+- One or more segments: `orders{/:segment}+`
+- Zero or more segments: `orders{/:segment}*`
 
 {{"demo": "DashboardLayoutPattern.js", "height": 400, "iframe": true}}
 

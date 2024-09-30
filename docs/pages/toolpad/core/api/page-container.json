@@ -1,6 +1,6 @@
 {
   "props": {
-    "breadCrumbs": {
+    "breadcrumbs": {
       "type": { "name": "arrayOf", "description": "Array&lt;{ path: string, title: string }&gt;" }
     },
     "slotProps": { "type": { "name": "shape", "description": "{ toolbar: { children?: node } }" } },

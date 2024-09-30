@@ -64,10 +64,10 @@ export async function downloadPDF(limit: number = 100) {
               }
             )
           );
-        } catch (e) {
-          console.log(e.stack);
+        } catch (error) {
+          console.log(error.stack);
           console.log("Failed to process invoice id:", invoice.id);
-          throw e;
+          throw error;
         }
       })
     );

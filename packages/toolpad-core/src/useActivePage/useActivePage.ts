@@ -2,9 +2,19 @@
 import * as React from 'react';
 import { NavigationContext, RouterContext } from '../shared/context';
 import { getItemPath, getItemTitle, matchPath } from '../shared/navigation';
-import type { BreadCrumb } from '../PageContainer';
+import type { Breadcrumb } from '../PageContainer';
 
-export function useActivePage() {
+export interface ActivePage {
+  title: string;
+  path: string;
+  /**
+   * @deprecated Use `breadcrumbs` instead.
+   */
+  breadCrumbs: Breadcrumb[];
+  breadcrumbs: Breadcrumb[];
+}
+
+export function useActivePage(): ActivePage | null {
   const navigationContext = React.useContext(NavigationContext);
   const routerContext = React.useContext(RouterContext);
   const pathname = routerContext?.pathname ?? '/';
@@ -17,10 +27,10 @@ export function useActivePage() {
       return null;
     }
 
-    const breadCrumbs: BreadCrumb[] = [];
+    const breadcrumbs: Breadcrumb[] = [];
 
     if (rootItem) {
-      breadCrumbs.push({
+      breadcrumbs.push({
         title: getItemTitle(rootItem),
         path: '/',
       });
@@ -36,9 +46,9 @@ export function useActivePage() {
         continue;
       }
       const itemPath = getItemPath(navigationContext, item);
-      const lastCrumb = breadCrumbs[breadCrumbs.length - 1];
+      const lastCrumb = breadcrumbs[breadcrumbs.length - 1];
       if (lastCrumb?.path !== itemPath) {
-        breadCrumbs.push({
+        breadcrumbs.push({
           title: getItemTitle(item),
           path: itemPath,
         });
@@ -48,7 +58,9 @@ export function useActivePage() {
     return {
       title: getItemTitle(activeItem),
       path: getItemPath(navigationContext, activeItem),
-      breadCrumbs,
+      breadcrumbs,
+      // TODO: Remove in the next major version
+      breadCrumbs: breadcrumbs,
     };
   }, [activeItem, rootItem, pathname, navigationContext]);
 }

@@ -104,7 +104,7 @@ function DashboardLayoutPattern(props) {
           segment: 'orders',
           title: 'Orders',
           icon: <ShoppingCartIcon />,
-          pattern: '/orders{/:orderId}*',
+          pattern: 'orders{/:orderId}*',
         },
       ]}
       router={router}

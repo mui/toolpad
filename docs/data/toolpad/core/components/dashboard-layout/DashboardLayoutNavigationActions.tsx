@@ -49,13 +49,13 @@ function DemoPageContent({ pathname }: { pathname: string }) {
 
 const CALLS_NAVIGATION: Navigation = [
   {
-    segment: '/made',
+    segment: 'made',
     title: 'Made',
     icon: <CallMadeIcon />,
     action: <Chip label={12} color="success" size="small" />,
   },
   {
-    segment: '/received',
+    segment: 'received',
     title: 'Received',
     icon: <CallReceivedIcon />,
     action: <Chip label={4} color="error" size="small" />,

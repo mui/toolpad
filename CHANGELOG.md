@@ -1,5 +1,44 @@
 # Changelog
 
+## v0.7.0
+
+<!-- generated comparing v0.6.0..master -->
+
+_Sep 20, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- **BREAKING** Dynamic navigation segments can't have a leading slash (`/orders/:id` should be `orders/:id`)
+- Make it possible to override title and breadcrumbs in PageContainer for dynamic routes.
+- Upgrade `path-to-regexp` to fix vulnerabilities.
+
+### `@toolpad/core`
+
+- &#8203;<!-- 16 -->Fixes for docs and DashboardLayout component (#4104) @apedroferreira
+- &#8203;<!-- 01 -->Make PageContainer customizable for dynamic routes (#4114) @Janpot
+
+### Docs
+
+- &#8203;<!-- 14 -->Add Toolpad Core readme video (#4006) @prakhargupta1
+- &#8203;<!-- 07 -->Add integration, base concepts (#4080) @bharatkashyap
+- &#8203;<!-- 04 -->add maxwidth section in the page container docs (#4103) @prakhargupta1
+- &#8203;<!-- 03 -->Fix typo from feedback (#4105) @Janpot
+
+### Core
+
+- &#8203;<!-- 15 -->Update/correct toolpad repository links in package.json (#4113) @Janpot
+- &#8203;<!-- 13 -->Update path-to-regexp to 6.3.0 (#4126) @Janpot
+- &#8203;<!-- 12 -->Rename repo to mui/toolpad (#4062) @Janpot
+- &#8203;<!-- 11 -->Bring CI to node 20 (#4038) @Janpot
+- &#8203;<!-- 10 -->Fix redirection @oliviertassinari
+- &#8203;<!-- 09 -->Fix 301 link to Next.js and git diff @oliviertassinari
+- &#8203;<!-- 06 -->Copy vale-action.yml from main repo @oliviertassinari
+- &#8203;<!-- 05 -->Fix Vale error @oliviertassinari
+- &#8203;<!-- 08 -->[core] Fix package.json repository rule @oliviertassinari
+- &#8203;<!-- 02 -->Fix 301 link to authjs @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
 ## v0.6.0
 
 <!-- generated comparing v0.5.2..master -->

@@ -542,7 +542,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
 
-  const layoutRef = React.useRef<HTMLElement | null>(null);
+  const layoutRef = React.useRef<Element | null>(null);
 
   return (
     <Box

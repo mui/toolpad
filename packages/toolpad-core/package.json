@@ -76,7 +76,7 @@
     "@vitest/browser": "2.1.1",
     "next": "^14.2.13",
     "next-router-mock": "^0.9.13",
-    "playwright": "^1.46.1",
+    "playwright": "^1.47.2",
     "sinon": "^18.0.1",
     "vitest": "2.1.1"
   },

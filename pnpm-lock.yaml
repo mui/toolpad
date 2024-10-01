@@ -17,7 +17,7 @@ importers:
         version: 4.17.9
       '@vitest/browser':
         specifier: 2.1.1
-        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)
+        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)
       archiver:
         specifier: 7.0.1
         version: 7.0.1
@@ -110,8 +110,8 @@ importers:
         specifier: 14.2.13
         version: 14.2.13
       '@playwright/test':
-        specifier: 1.46.1
-        version: 1.46.1
+        specifier: 1.47.2
+        version: 1.47.2
       '@testing-library/jest-dom':
         specifier: ^6.5.0
         version: 6.5.0
@@ -147,7 +147,7 @@ importers:
         version: 7.18.0(eslint@8.57.1)(typescript@5.6.2)
       '@vitest/coverage-v8':
         specifier: 2.1.1
-        version: 2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1))(vitest@2.1.1(@types/node@20.16.10)(@vitest/browser@2.1.1)(jsdom@25.0.1)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))
+        version: 2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1))(vitest@2.1.1(@types/node@20.16.10)(@vitest/browser@2.1.1)(jsdom@25.0.1)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))
       babel-plugin-react-remove-properties:
         specifier: 0.3.0
         version: 0.3.0
@@ -195,7 +195,7 @@ importers:
         version: 7.37.0(eslint@8.57.1)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-f444e11-20240926(eslint@8.57.1)
+        version: 0.0.0-experimental-939a02d-20240930(eslint@8.57.1)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.1)
@@ -294,7 +294,7 @@ importers:
         version: 5.0.0-beta.58(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mui/docs':
         specifier: 6.1.1
-        version: 6.1.1(uwgsguy7yj7baxzdfy3n2hukem)
+        version: 6.1.1(2qmgo6jmqp5ar64j35mjyjvgjy)
       '@mui/icons-material':
         specifier: 6.1.1
         version: 6.1.1(@mui/material@6.1.1(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@types/react@18.3.10)(react@18.3.1))(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.10)(react@18.3.1)
@@ -312,7 +312,7 @@ importers:
         version: 6.1.1(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@types/react@18.3.10)(react@18.3.1))(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mui/material-nextjs':
         specifier: 6.1.1
-        version: 6.1.1(@emotion/cache@11.13.1)(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/server@11.11.0)(@types/react@18.3.10)(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 6.1.1(@emotion/cache@11.13.1)(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/server@11.11.0)(@types/react@18.3.10)(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@mui/styles':
         specifier: 6.1.1
         version: 6.1.1(@types/react@18.3.10)(react@18.3.1)
@@ -420,7 +420,7 @@ importers:
         version: 7.4.7(react@18.3.1)
       next:
         specifier: ^14.2.13
-        version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nprogress:
         specifier: 0.2.0
         version: 0.2.0
@@ -658,16 +658,16 @@ importers:
         version: 17.0.3
       '@vitest/browser':
         specifier: 2.1.1
-        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)
+        version: 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)
       next:
         specifier: ^14.2.13
-        version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 0.9.13(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       playwright:
-        specifier: ^1.46.1
-        version: 1.46.1
+        specifier: ^1.47.2
+        version: 1.47.2
       sinon:
         specifier: ^18.0.1
         version: 18.0.1
@@ -1212,7 +1212,7 @@ importers:
         version: 6.1.1(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@types/react@18.3.10)(react@18.3.1))(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mui/material-nextjs':
         specifier: 6.1.1
-        version: 6.1.1(@emotion/cache@11.13.1)(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/server@11.11.0)(@types/react@18.3.10)(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 6.1.1(@emotion/cache@11.13.1)(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/server@11.11.0)(@types/react@18.3.10)(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
@@ -1230,10 +1230,10 @@ importers:
         version: 14.2.13(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint@8.57.1)(typescript@5.6.2)
       next:
         specifier: 14.2.13
-        version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: 5.0.0-beta.22
-        version: 5.0.0-beta.22(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1)
+        version: 5.0.0-beta.22(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -1257,7 +1257,7 @@ importers:
         version: 6.1.1(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@types/react@18.3.10)(react@18.3.1))(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@mui/material-nextjs':
         specifier: 6.1.1
-        version: 6.1.1(@emotion/cache@11.13.1)(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/server@11.11.0)(@types/react@18.3.10)(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 6.1.1(@emotion/cache@11.13.1)(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/server@11.11.0)(@types/react@18.3.10)(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
@@ -1272,10 +1272,10 @@ importers:
         version: 14.2.13(eslint-import-resolver-webpack@0.13.9(eslint-plugin-import@2.30.0)(webpack@5.95.0(esbuild@0.23.1)))(eslint@8.57.1)(typescript@5.6.2)
       next:
         specifier: 14.2.13
-        version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: 5.0.0-beta.22
-        version: 5.0.0-beta.22(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1)
+        version: 5.0.0-beta.22(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -3678,8 +3678,8 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@playwright/test@1.46.1':
-    resolution: {integrity: sha512-Fq6SwLujA/DOIvNC2EL/SojJnkKf/rAwJ//APpJJHRyMi1PdKrY3Az+4XNQ51N4RTbItbIByQ0jgd1tayq1aeA==}
+  '@playwright/test@1.47.2':
+    resolution: {integrity: sha512-jTXRsoSPONAs8Za9QEQdyjFn+0ZQFjCiIztAIF6bi1HqhBzG9Ma7g1WotyiGqFSBRZjIEqMdT8RUlbk1QVhzCQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -5918,8 +5918,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-f444e11-20240926:
-    resolution: {integrity: sha512-0eky+cIXkelvC+uYG8P82UzWjA7kf62VrutYfiNl/xMYMRWHGeNmBnpk6oM35sc/1YbHKIRlWPBOaLXN6yf41g==}
+  eslint-plugin-react-compiler@0.0.0-experimental-939a02d-20240930:
+    resolution: {integrity: sha512-vBfN+FK71xyUbeKjQ5jC6RzMpIyOG9/BBOjQKJTVnSxybWgkfL3PVUZZSNUAXP50+6MqkMNfNJANBjHsn85jcQ==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -8424,13 +8424,13 @@ packages:
     resolution: {integrity: sha512-nDywThFk1i4BQK4twPQ6TA4RT8bDY96yeuCVBWL3ePARCiEKDRSrNGbFIgUJpLp+XeIR65v8ra7WuJOFUBtkMA==}
     engines: {node: '>=8'}
 
-  playwright-core@1.46.1:
-    resolution: {integrity: sha512-h9LqIQaAv+CYvWzsZ+h3RsrqCStkBHlgo6/TJlFst3cOTlLghBQlJwPOZKQJTKNaD3QIB7aAVQ+gfWbN3NXB7A==}
+  playwright-core@1.47.2:
+    resolution: {integrity: sha512-3JvMfF+9LJfe16l7AbSmU555PaTl2tPyQsVInqm3id16pdDfvZ8TTZ/pyzmkbDrZTQefyzU7AIHlZqQnxpqHVQ==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.46.1:
-    resolution: {integrity: sha512-oPcr1yqoXLCkgKtD5eNUPLiN40rYEM39odNpIb6VE6S7/15gJmA1NzVv6zJYusV0e7tzvkU/utBFNa/Kpxmwng==}
+  playwright@1.47.2:
+    resolution: {integrity: sha512-nx1cLMmQWqmA3UsnjaaokyoUpdVaaDhJhMoxX2qj3McpjnsqFHs516QAKYhqHAgOP+oCFTEOCOAaD1RgD/RQfA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -12182,7 +12182,7 @@ snapshots:
 
   '@mui/core-downloads-tracker@6.1.1': {}
 
-  '@mui/docs@6.1.1(uwgsguy7yj7baxzdfy3n2hukem)':
+  '@mui/docs@6.1.1(2qmgo6jmqp5ar64j35mjyjvgjy)':
     dependencies:
       '@babel/runtime': 7.25.6
       '@mui/base': 5.0.0-beta.58(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -12194,7 +12194,7 @@ snapshots:
       clipboard-copy: 4.0.1
       clsx: 2.1.1
       csstype: 3.1.3
-      next: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       nprogress: 0.2.0
       prop-types: 15.8.1
       react: 18.3.1
@@ -12275,11 +12275,11 @@ snapshots:
       '@emotion/styled': 11.13.0(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@types/react@18.3.10)(react@18.3.1)
       '@types/react': 18.3.10
 
-  '@mui/material-nextjs@6.1.1(@emotion/cache@11.13.1)(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/server@11.11.0)(@types/react@18.3.10)(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
+  '@mui/material-nextjs@6.1.1(@emotion/cache@11.13.1)(@emotion/react@11.13.3(@types/react@18.3.10)(react@18.3.1))(@emotion/server@11.11.0)(@types/react@18.3.10)(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.25.6
       '@emotion/react': 11.13.3(@types/react@18.3.10)(react@18.3.1)
-      next: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
     optionalDependencies:
       '@emotion/cache': 11.13.1
@@ -12989,9 +12989,9 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@playwright/test@1.46.1':
+  '@playwright/test@1.47.2':
     dependencies:
-      playwright: 1.46.1
+      playwright: 1.47.2
 
   '@pnpm/config.env-replace@1.1.0': {}
 
@@ -13822,7 +13822,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)':
+  '@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)':
     dependencies:
       '@testing-library/dom': 10.4.0
       '@testing-library/user-event': 14.5.2(@testing-library/dom@10.4.0)
@@ -13835,7 +13835,7 @@ snapshots:
       vitest: 2.1.1(@types/node@20.16.10)(@vitest/browser@2.1.1)(jsdom@25.0.1)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1)
       ws: 8.18.0
     optionalDependencies:
-      playwright: 1.46.1
+      playwright: 1.47.2
     transitivePeerDependencies:
       - '@vitest/spy'
       - bufferutil
@@ -13843,7 +13843,7 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/coverage-v8@2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1))(vitest@2.1.1(@types/node@20.16.10)(@vitest/browser@2.1.1)(jsdom@25.0.1)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))':
+  '@vitest/coverage-v8@2.1.1(@vitest/browser@2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1))(vitest@2.1.1(@types/node@20.16.10)(@vitest/browser@2.1.1)(jsdom@25.0.1)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -13859,7 +13859,7 @@ snapshots:
       tinyrainbow: 1.2.0
       vitest: 2.1.1(@types/node@20.16.10)(@vitest/browser@2.1.1)(jsdom@25.0.1)(msw@2.3.5(typescript@5.6.2))(terser@5.31.1)
     optionalDependencies:
-      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)
+      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)
     transitivePeerDependencies:
       - supports-color
 
@@ -15716,7 +15716,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-f444e11-20240926(eslint@8.57.1):
+  eslint-plugin-react-compiler@0.0.0-experimental-939a02d-20240930(eslint@8.57.1):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/parser': 7.25.6
@@ -18043,20 +18043,20 @@ snapshots:
 
   nested-error-stacks@2.1.1: {}
 
-  next-auth@5.0.0-beta.22(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1):
+  next-auth@5.0.0-beta.22(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.14)(react@18.3.1):
     dependencies:
       '@auth/core': 0.35.3(nodemailer@6.9.14)
-      next: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
     optionalDependencies:
       nodemailer: 6.9.14
 
-  next-router-mock@0.9.13(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  next-router-mock@0.9.13(next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
-      next: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      next: 14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
 
-  next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.46.1)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  next@14.2.13(@babel/core@7.25.2)(@opentelemetry/api@1.9.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@next/env': 14.2.13
       '@swc/helpers': 0.5.5
@@ -18078,7 +18078,7 @@ snapshots:
       '@next/swc-win32-ia32-msvc': 14.2.13
       '@next/swc-win32-x64-msvc': 14.2.13
       '@opentelemetry/api': 1.9.0
-      '@playwright/test': 1.46.1
+      '@playwright/test': 1.47.2
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
@@ -18724,11 +18724,11 @@ snapshots:
     dependencies:
       find-up: 3.0.0
 
-  playwright-core@1.46.1: {}
+  playwright-core@1.47.2: {}
 
-  playwright@1.46.1:
+  playwright@1.47.2:
     dependencies:
-      playwright-core: 1.46.1
+      playwright-core: 1.47.2
     optionalDependencies:
       fsevents: 2.3.2
 
@@ -20533,7 +20533,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 20.16.10
-      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.46.1)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)
+      '@vitest/browser': 2.1.1(@vitest/spy@2.1.1)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.10)(terser@5.31.1))(vitest@2.1.1)
       jsdom: 25.0.1
     transitivePeerDependencies:
       - less

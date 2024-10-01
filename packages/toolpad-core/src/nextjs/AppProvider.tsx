@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { useRouter } from './nextCompatRouter';
+import { useRouter } from 'next/compat/router';
 import { AppProviderNextApp } from './AppProviderNextApp';
 import { AppProviderNextPages } from './AppProviderNextPages';
 import type { AppProviderProps } from '../AppProvider';

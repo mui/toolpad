@@ -1,11 +1,11 @@
 {
   "name": "eslint-plugin-material-ui",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "description": "Custom eslint rules for Material UI.",
   "main": "src/index.js",
   "dependencies": {
-    "emoji-regex": "10.3.0"
+    "emoji-regex": "10.4.0"
   },
   "devDependencies": {
     "@types/eslint": "9.6.1",
@@ -14,7 +14,7 @@
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mui/material-ui.git"
+    "url": "github:mui/material-ui"
   },
   "license": "MIT"
 }

@@ -116,7 +116,7 @@ export default function DashboardLayoutPattern(props: DemoProps) {
           segment: 'orders',
           title: 'Orders',
           icon: <ShoppingCartIcon />,
-          pattern: '/orders{/:orderId}*',
+          pattern: 'orders{/:orderId}*',
         },
       ]}
       router={router}

@@ -1,5 +1,44 @@
 # Changelog
 
+## v0.7.0
+
+<!-- generated comparing v0.6.0..master -->
+
+_Sep 20, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- **BREAKING** Dynamic navigation segments can't have a leading slash (`/orders/:id` should be `orders/:id`)
+- Make it possible to override title and breadcrumbs in PageContainer for dynamic routes.
+- Upgrade `path-to-regexp` to fix vulnerabilities.
+
+### `@toolpad/core`
+
+- &#8203;<!-- 16 -->Fixes for docs and DashboardLayout component (#4104) @apedroferreira
+- &#8203;<!-- 01 -->Make PageContainer customizable for dynamic routes (#4114) @Janpot
+
+### Docs
+
+- &#8203;<!-- 14 -->Add Toolpad Core readme video (#4006) @prakhargupta1
+- &#8203;<!-- 07 -->Add integration, base concepts (#4080) @bharatkashyap
+- &#8203;<!-- 04 -->add maxwidth section in the page container docs (#4103) @prakhargupta1
+- &#8203;<!-- 03 -->Fix typo from feedback (#4105) @Janpot
+
+### Core
+
+- &#8203;<!-- 15 -->Update/correct toolpad repository links in package.json (#4113) @Janpot
+- &#8203;<!-- 13 -->Update path-to-regexp to 6.3.0 (#4126) @Janpot
+- &#8203;<!-- 12 -->Rename repo to mui/toolpad (#4062) @Janpot
+- &#8203;<!-- 11 -->Bring CI to node 20 (#4038) @Janpot
+- &#8203;<!-- 10 -->Fix redirection @oliviertassinari
+- &#8203;<!-- 09 -->Fix 301 link to Next.js and git diff @oliviertassinari
+- &#8203;<!-- 06 -->Copy vale-action.yml from main repo @oliviertassinari
+- &#8203;<!-- 05 -->Fix Vale error @oliviertassinari
+- &#8203;<!-- 08 -->[core] Fix package.json repository rule @oliviertassinari
+- &#8203;<!-- 02 -->Fix 301 link to authjs @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @Janpot, @oliviertassinari, @prakhargupta1
+
 ## v0.6.0
 
 <!-- generated comparing v0.5.2..master -->
@@ -8,7 +47,7 @@ _Sep 13, 2024_
 
 A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
 
-- Migrate to Material UI v6
+- Migrate to Material UI v6
 - Collapsible sidebar in `DashboardLayout` component with mini drawer variant
 - Support route patterns in navigation
 - Add more OAuth providers to `SignInPage`
@@ -22,7 +61,7 @@ A big thanks to the 6 contributors who made this release possible. Here are some
 - &#8203;<!-- 18 -->Add more OAuth providers to `SignInPage` (#3933) @bharatkashyap
 - &#8203;<!-- 17 -->Refactor `<Account />` (#3992) @bharatkashyap
 - &#8203;<!-- 16 -->Add toolbarActions and toolbarAccount slots to DashboardLayout (#3984)
-- &#8203;<!-- 15 -->Migrate to Material UI v6 (#3862) @Janpot
+- &#8203;<!-- 15 -->Migrate to Material UI v6 (#3862) @Janpot
 - &#8203;<!-- 14 -->Support route patterns in navigation (#3991) @apedroferreira
 
 ### Docs
@@ -103,7 +142,7 @@ _Aug 9, 2024_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
+- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
 - Fix theme switcher in documentation examples
 - Fix DashboardLayout bugs with theming and mobile navigation
 - Fix some file handling restrictions in `@toolpad/studio`
@@ -125,7 +164,7 @@ A big thanks to the 5 contributors who made this release possible. Here are some
 ### Core
 
 - &#8203;<!-- 14 --> Support `require` (#3908) @bharatkashyap
-- &#8203;<!-- 10 --> Port fixes from Material UI v6 migration branch (#3910) @Janpot
+- &#8203;<!-- 10 --> Port fixes from Material UI v6 migration branch (#3910) @Janpot
 - &#8203;<!-- 07 --> Upgrade monorepo (#3911) @Janpot
 - &#8203;<!-- 06 --> Clarify security policy @oliviertassinari
 - &#8203;<!-- 04 --> Update smoke test instructions (#3899) @Janpot
@@ -157,7 +196,7 @@ Please use the `--studio` flag to generate a Toolpad Studio project.
 - &#8203;<!-- 09 --> Add authentication to Toolpad Core (#3609) @bharatkashyap
 - &#8203;<!-- 01 --> Make Core the default project (#3868) @bharatkashyap
 - &#8203;<!-- 11 --> Make navigation item segments optional (#3838) @apedroferreira
-- &#8203;<!-- 17 --> Ensure Material UI v5 compatibility (#3894) @Janpot
+- &#8203;<!-- 17 --> Ensure Material UI v5 compatibility (#3894) @Janpot
 - &#8203;<!-- 10 --> Bring in some fixes from the next update branch (#3866) @Janpot
 
 ### Docs
@@ -335,9 +374,9 @@ First components in @toolpad/core: [DashboardLayout](https://github.com/mui/tool
 - &#8203;<!-- 11 -->[DataProvider] Support custom Id field (#3613) @Janpot
 - &#8203;<!-- 10 -->[docs] Start Toolpad Core docs (#3383) @bharatkashyap
 - &#8203;<!-- 09 -->[docs] Add Toolpad core tutorial example (#3617) @bharatkashyap
-- &#8203;<!-- 08 -->[docs] Add badges like in Material UI @oliviertassinari
-- &#8203;<!-- 07 -->[docs] Add badges like in Material UI @oliviertassinari
-- &#8203;<!-- 06 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 08 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 07 -->[docs] Add badges like in Material UI @oliviertassinari
+- &#8203;<!-- 06 -->[docs] Add badges like in Material UI @oliviertassinari
 - &#8203;<!-- 05 -->[docs] Update twitter.com to x.com @oliviertassinari
 - &#8203;<!-- 04 -->[docs] Support demo previews with comments (#3577) @Janpot
 - &#8203;<!-- 03 -->[docs] Fix demo codesandbox dependencies (#3578) @Janpot

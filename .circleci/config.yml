@@ -8,8 +8,7 @@ default-job: &default-job
   docker:
     - image: cimg/node:20.17
   environment:
-    # Keep in sync with "Save playwright cache"
-    PLAYWRIGHT_BROWSERS_PATH: /tmp/pw-browsers
+    COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
 
 default-context: &default-context
   context:
@@ -36,27 +35,18 @@ commands:
       - when:
           condition: << parameters.browsers >>
           steps:
-            - run: corepack enable
+            - run:
+                name: Install pnpm package manager
+                command: corepack enable
       - when:
           condition:
             not: << parameters.browsers >>
           steps:
-            # See https://stackoverflow.com/a/73411601
-            - run: corepack enable --install-directory ~/bin
-
-      - when:
-          condition: << parameters.browsers >>
-          steps:
             - run:
-                name: Prepare playwright hash
-                command: pnpm list --json --filter playwright > /tmp/playwright_info.json
-            - store_artifacts:
-                name: Debug playwright hash
-                path: /tmp/playwright_info.json
-            - restore_cache:
-                name: Restore playwright cache
-                keys:
-                  - v5-playwright-{{ arch }}-{{ checksum "/tmp/playwright_info.json" }}
+                name: Install pnpm package manager
+                # See https://stackoverflow.com/a/73411601
+                command: corepack enable --install-directory ~/bin
+
       - run:
           name: View install environment
           command: |
@@ -65,20 +55,6 @@ commands:
       - run:
           name: Install js dependencies
           command: pnpm install
-      - when:
-          condition: << parameters.browsers >>
-          steps:
-            - run:
-                name: Install playwright browsers
-                command: pnpm playwright install --with-deps
-
-            - save_cache:
-                name: Save playwright cache
-                key: v5-playwright-{{ arch }}-{{ checksum "/tmp/playwright_info.json" }}
-                paths:
-                  # Keep path in sync with "PLAYWRIGHT_BROWSERS_PATH"
-                  # Can't use environment variables for `save_cache` paths (tested in https://app.circleci.com/pipelines/github/mui/material-ui/37813/workflows/5b1e207f-ac8b-44e7-9ba4-d0f9a01f5c55/jobs/223370)
-                  - /tmp/pw-browsers
 
 jobs:
   checkout:
@@ -175,7 +151,7 @@ jobs:
   test_unit_browser:
     <<: *default-job
     docker:
-      - image: mcr.microsoft.com/playwright:v1.46.1-focal
+      - image: mcr.microsoft.com/playwright:v1.47.2-focal
         environment:
           NODE_ENV: test
 
@@ -197,7 +173,7 @@ jobs:
     resource_class: 'large'
     parallelism: 2
     docker:
-      - image: mcr.microsoft.com/playwright:v1.46.1-focal
+      - image: mcr.microsoft.com/playwright:v1.47.2-focal
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

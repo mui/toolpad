@@ -141,7 +141,12 @@ export interface NotificationsProviderProps {
   slotProps?: Partial<NotificationsProviderSlotProps>;
 }
 
-let nextId = 1;
+let nextId = 0;
+const generateId = () => {
+  const id = nextId;
+  nextId += 1;
+  return id;
+};
 
 /**
  * Provider for Notifications. The subtree of this component can use the `useNotifications` hook to
@@ -161,8 +166,7 @@ function NotificationsProvider(props: NotificationsProviderProps) {
   const [state, setState] = React.useState<NotificationsState>({ queue: [] });
 
   const show = React.useCallback<ShowNotification>((message, options = {}) => {
-    const notificationKey = options.key ?? `::toolpad-internal::notification::${nextId}`;
-    nextId += 1;
+    const notificationKey = options.key ?? `::toolpad-internal::notification::${generateId()}`;
     setState((prev) => {
       if (prev.queue.some((n) => n.notificationKey === notificationKey)) {
         // deduplicate by key

@@ -10,6 +10,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import type { Navigation, Router } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {
@@ -68,9 +69,8 @@ function Search() {
           <IconButton
             type="button"
             aria-label="search"
-            size="small"
             sx={{
-              display: { xs: 'inline-block', md: 'none' },
+              display: { xs: 'inline', md: 'none' },
             }}
           >
             <SearchIcon />
@@ -78,7 +78,6 @@ function Search() {
         </div>
       </Tooltip>
       <TextField
-        id="search"
         label="Search"
         variant="outlined"
         size="small"

@@ -124,35 +124,35 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
-    const navigation = screen.getByRole('navigation');
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
 
     // List subheaders are present
 
-    expect(within(navigation).getByText('Main items')).toBeTruthy();
-    expect(within(navigation).getByText('Analytics')).toBeTruthy();
+    expect(within(desktopNavigation).getByText('Main items')).toBeTruthy();
+    expect(within(desktopNavigation).getByText('Analytics')).toBeTruthy();
 
     // List items and their links are present
 
-    const dashboardLink = within(navigation).getByRole('link', { name: 'Dashboard' });
-    const ordersLink = within(navigation).getByRole('link', { name: 'Orders' });
+    const dashboardLink = within(desktopNavigation).getByRole('link', { name: 'Dashboard' });
+    const ordersLink = within(desktopNavigation).getByRole('link', { name: 'Orders' });
 
     expect(dashboardLink.getAttribute('href')).toBe('/dashboard');
     expect(ordersLink.getAttribute('href')).toBe('/orders');
 
-    const reportsItem = within(navigation).getByText('Reports');
+    const reportsItem = within(desktopNavigation).getByText('Reports');
 
     expect(reportsItem).toBeTruthy();
-    expect(within(navigation).getByText('Integrations')).toBeTruthy();
+    expect(within(desktopNavigation).getByText('Integrations')).toBeTruthy();
 
     // Nested list items show when parent item is clicked
 
-    expect(within(navigation).queryByText('Sales')).toBeNull();
-    expect(within(navigation).queryByText('Traffic')).toBeNull();
+    expect(within(desktopNavigation).queryByText('Sales')).toBeNull();
+    expect(within(desktopNavigation).queryByText('Traffic')).toBeNull();
 
     await user.click(reportsItem);
 
-    expect(within(navigation).getByText('Sales')).toBeTruthy();
-    expect(within(navigation).getByText('Traffic')).toBeTruthy();
+    expect(within(desktopNavigation).getByText('Sales')).toBeTruthy();
+    expect(within(desktopNavigation).getByText('Traffic')).toBeTruthy();
   });
 
   test('starts with parent items expanded if any of their children is the current page', () => {
@@ -188,10 +188,10 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
-    const navigation = screen.getByRole('navigation');
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
 
-    expect(within(navigation).getByText('Sales')).toBeTruthy();
-    expect(within(navigation).getByText('Traffic')).toBeTruthy();
+    expect(within(desktopNavigation).getByText('Sales')).toBeTruthy();
+    expect(within(desktopNavigation).getByText('Traffic')).toBeTruthy();
   });
 
   test('shows correct selected page item', () => {
@@ -207,10 +207,25 @@ describe('DashboardLayout', () => {
         icon: <ShoppingCartIcon />,
       },
       {
-        segment: 'reports',
-        title: 'Reports',
+        segment: 'dynamic',
+        title: 'Dynamic',
         icon: <BarChartIcon />,
-        pattern: '/reports/:reportId',
+        pattern: 'dynamic/:dynamicId',
+      },
+      {
+        segment: 'optional',
+        title: 'Optional',
+        pattern: 'optional{/:optionalId}?',
+      },
+      {
+        segment: 'oneOrMore',
+        title: 'One or more',
+        pattern: 'oneormore{/:oneormoreId}+',
+      },
+      {
+        segment: 'zeroOrMore',
+        title: 'Zero or more',
+        pattern: 'zeroormore{/:zeroormoreId}*',
       },
     ];
 
@@ -230,26 +245,72 @@ describe('DashboardLayout', () => {
 
     const { rerender } = render(<AppWithPathname pathname="/dashboard" />);
 
-    const navigation = screen.getByRole('navigation');
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
 
-    expect(within(navigation).getByRole('link', { name: 'Dashboard' })).toHaveClass('Mui-selected');
+    expect(within(desktopNavigation).getByRole('link', { name: 'Dashboard' })).toHaveClass(
+      'Mui-selected',
+    );
 
     rerender(<AppWithPathname pathname="/orders" />);
 
-    expect(within(navigation).getByRole('link', { name: 'Dashboard' })).not.toHaveClass(
+    expect(within(desktopNavigation).getByRole('link', { name: 'Dashboard' })).not.toHaveClass(
       'Mui-selected',
     );
-    expect(within(navigation).getByRole('link', { name: 'Orders' })).toHaveClass('Mui-selected');
+    expect(within(desktopNavigation).getByRole('link', { name: 'Orders' })).toHaveClass(
+      'Mui-selected',
+    );
 
-    rerender(<AppWithPathname pathname="/reports/123" />);
+    rerender(<AppWithPathname pathname="/dynamic" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Dynamic' })).not.toHaveClass(
+      'Mui-selected',
+    );
+    rerender(<AppWithPathname pathname="/dynamic/123" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Dynamic' })).toHaveClass(
+      'Mui-selected',
+    );
+    rerender(<AppWithPathname pathname="/dynamic/123/456" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Dynamic' })).not.toHaveClass(
+      'Mui-selected',
+    );
 
-    expect(within(navigation).getByRole('link', { name: 'Dashboard' })).not.toHaveClass(
+    rerender(<AppWithPathname pathname="/optional" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Optional' })).toHaveClass(
       'Mui-selected',
     );
-    expect(within(navigation).getByRole('link', { name: 'Orders' })).not.toHaveClass(
+    rerender(<AppWithPathname pathname="/optional/123" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Optional' })).toHaveClass(
       'Mui-selected',
     );
-    expect(within(navigation).getByRole('link', { name: 'Reports' })).toHaveClass('Mui-selected');
+    rerender(<AppWithPathname pathname="/optional/123/456" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Optional' })).not.toHaveClass(
+      'Mui-selected',
+    );
+
+    rerender(<AppWithPathname pathname="/oneormore" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'One or more' })).not.toHaveClass(
+      'Mui-selected',
+    );
+    rerender(<AppWithPathname pathname="/oneormore/123" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'One or more' })).toHaveClass(
+      'Mui-selected',
+    );
+    rerender(<AppWithPathname pathname="/oneormore/123/456" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'One or more' })).toHaveClass(
+      'Mui-selected',
+    );
+
+    rerender(<AppWithPathname pathname="/zeroormore" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Zero or more' })).toHaveClass(
+      'Mui-selected',
+    );
+    rerender(<AppWithPathname pathname="/zeroormore/123" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Zero or more' })).toHaveClass(
+      'Mui-selected',
+    );
+    rerender(<AppWithPathname pathname="/zeroormore/123/456" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Zero or more' })).toHaveClass(
+      'Mui-selected',
+    );
   });
 
   test('renders navigation actions', async () => {
@@ -274,9 +335,9 @@ describe('DashboardLayout', () => {
       </AppProvider>,
     );
 
-    const navigation = screen.getByRole('navigation');
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
 
-    expect(within(navigation).getByText('Action 1')).toBeTruthy();
-    expect(within(navigation).getByText('Action 2')).toBeTruthy();
+    expect(within(desktopNavigation).getByText('Action 1')).toBeTruthy();
+    expect(within(desktopNavigation).getByText('Action 2')).toBeTruthy();
   });
 });

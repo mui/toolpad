@@ -523,6 +523,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       const drawerWidth = isMini ? 64 : 320;
 
       return {
+        position: 'absolute',
         width: drawerWidth,
         flexShrink: 0,
         ...getDrawerWidthTransitionMixin(isNavigationExpanded),
@@ -541,8 +542,13 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
 
+  const layoutRef = React.useRef<HTMLElement | null>(null);
+
   return (
-    <Box sx={{ position: 'relative', display: 'flex', height: '100vh', overflow: 'hidden', ...sx }}>
+    <Box
+      ref={layoutRef}
+      sx={{ position: 'relative', display: 'flex', height: '100vh', overflow: 'hidden', ...sx }}
+    >
       <AppBar color="inherit" position="absolute">
         {
           // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
@@ -600,7 +606,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         </Toolbar>
       </AppBar>
       <Drawer
-        container={appWindow?.document.body}
+        container={layoutRef.current}
         variant="temporary"
         open={isMobileNavigationExpanded}
         onClose={handleSetNavigationExpanded(false)}

@@ -170,6 +170,7 @@ function isEqual(
 }
 
 const AppRoot = styled('div')({
+  overflow: 'auto' /* Prevents margins from collapsing into root */,
   position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
   display: 'flex',
   flexDirection: 'column',

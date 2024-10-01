@@ -519,14 +519,14 @@ function DashboardLayout(props: DashboardLayoutProps) {
   );
 
   const getDrawerSharedSx = React.useCallback(
-    (isMini: boolean) => {
+    (isMini: boolean, isTemporary: boolean) => {
       const drawerWidth = isMini ? 64 : 320;
 
       return {
-        position: 'absolute',
         width: drawerWidth,
         flexShrink: 0,
         ...getDrawerWidthTransitionMixin(isNavigationExpanded),
+        ...(isTemporary ? { position: 'absolute' } : {}),
         [`& .MuiDrawer-paper`]: {
           position: 'absolute',
           width: drawerWidth,
@@ -619,7 +619,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             sm: disableCollapsibleSidebar ? 'block' : 'none',
             md: 'none',
           },
-          ...getDrawerSharedSx(false),
+          ...getDrawerSharedSx(false, true),
         }}
       >
         {getDrawerContent(false, 'Phone')}
@@ -632,7 +632,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             sm: disableCollapsibleSidebar ? 'none' : 'block',
             md: 'none',
           },
-          ...getDrawerSharedSx(isMobileMini),
+          ...getDrawerSharedSx(isMobileMini, false),
         }}
       >
         {getDrawerContent(isMobileMini, 'Tablet')}
@@ -641,7 +641,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         variant="permanent"
         sx={{
           display: { xs: 'none', md: 'block' },
-          ...getDrawerSharedSx(isDesktopMini),
+          ...getDrawerSharedSx(isDesktopMini, false),
         }}
       >
         {getDrawerContent(isDesktopMini, 'Desktop')}

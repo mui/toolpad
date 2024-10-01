@@ -527,6 +527,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         flexShrink: 0,
         ...getDrawerWidthTransitionMixin(isNavigationExpanded),
         [`& .MuiDrawer-paper`]: {
+          position: 'absolute',
           width: drawerWidth,
           boxSizing: 'border-box',
           backgroundImage: 'none',
@@ -541,8 +542,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
 
   return (
-    <Box sx={{ ...sx, display: 'flex' }}>
-      <AppBar color="inherit" position="fixed">
+    <Box sx={{ position: 'relative', display: 'flex', height: '100vh', overflow: 'hidden', ...sx }}>
+      <AppBar color="inherit" position="absolute">
         {
           // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
         }
@@ -632,7 +633,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
       </Drawer>
       <Drawer
         variant="permanent"
-        sx={{ display: { xs: 'none', md: 'block' }, ...getDrawerSharedSx(isDesktopMini) }}
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          ...getDrawerSharedSx(isDesktopMini),
+        }}
       >
         {getDrawerContent(isDesktopMini, 'Desktop')}
       </Drawer>
@@ -640,7 +644,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <Box
         component="main"
         sx={{
+          display: 'flex',
+          flexDirection: 'column',
           flexGrow: 1,
+          overflow: 'auto',
           // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
           minWidth: {
             xs: disableCollapsibleSidebar && isNavigationExpanded ? '100vw' : 'auto',

@@ -88,7 +88,7 @@ export function AppLayout({
     }
   }, [clipped]);
 
-  const debouncedUpdatePreviewHeaderHeight = useDebouncedHandler(updatePreviewHeaderHeight, 150);
+  const debouncedUpdatePreviewHeaderHeight = useDebouncedHandler(updatePreviewHeaderHeight, 120);
 
   // Preview header height can be higher in mobile viewports
   React.useEffect(() => {
@@ -114,14 +114,7 @@ export function AppLayout({
     >
       {hasLayout ? (
         <DashboardLayout
-          sx={{
-            '& .MuiAppBar-root': {
-              pt: clipped ? `${previewHeaderHeight}px` : undefined,
-            },
-            '& .MuiDrawer-paper': {
-              pt: clipped ? `${previewHeaderHeight}px` : undefined,
-            },
-          }}
+          sx={{ height: clipped ? `calc(100vh - ${previewHeaderHeight}px)` : '100vh' }}
         >
           {layoutContent}
         </DashboardLayout>

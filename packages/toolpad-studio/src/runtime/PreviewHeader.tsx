@@ -37,7 +37,6 @@ export default function PreviewHeader() {
     <Box
       id="preview-header"
       sx={{
-        position: 'fixed',
         width: '100%',
         minHeight: PREVIEW_HEADER_MIN_HEIGHT,
         zIndex: theme.zIndex.drawer + 2,

@@ -59,7 +59,7 @@ Toolpad Core doesn't handle routing itself. Instead, it's designed to integrate 
 
 - Next.js App Router
 - Next.js Pages Router
-- React Router
+- React Router DOM
 - Or any other routing library which implements the same interface
 
 You can pass the router implementation to the `AppProvider` component using the `router` prop.
@@ -67,7 +67,9 @@ You can pass the router implementation to the `AppProvider` component using the 
 :::
 
 :::success
-If you are using Next.js, use the `AppProvider` exported from `@toolpad/core/nextjs`. This automatically sets up the router for you and you do not need to pass the `router` prop.
+If you are using Next.js, use the `AppProvider` exported from `@toolpad/core/nextjs`.
+Or if you are building a single-page application, use the `AppProvider` exported from `@toolpad/core/react-router-dom`.
+This automatically sets up the router for you, so that you don't need to pass the `router` prop.
 :::
 
 ## Slots

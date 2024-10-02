@@ -648,12 +648,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
       </Drawer>
 
       <Box
-        component="main"
         sx={{
           display: 'flex',
           flexDirection: 'column',
           flexGrow: 1,
-          overflow: 'auto',
           // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
           minWidth: {
             xs: disableCollapsibleSidebar && isNavigationExpanded ? '100vw' : 'auto',
@@ -662,7 +660,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
         }}
       >
         <Toolbar />
-        {children}
+        <Box
+          component="main"
+          sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'auto' }}
+        >
+          {children}
+        </Box>
       </Box>
     </Box>
   );

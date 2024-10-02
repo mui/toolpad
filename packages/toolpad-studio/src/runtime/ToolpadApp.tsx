@@ -1559,19 +1559,12 @@ function ToolpadAppLayout({ children }: ToolpadAppLayoutProps) {
 
   const appHost = useAppHost();
 
-  const clipped = shouldShowPreviewHeader(appHost);
-
   if (!appHost.isCanvas && !session?.user && hasAuthentication) {
     return <AppLoading />;
   }
 
   return (
-    <AppLayout
-      activePageSlug={activePageSlug}
-      pages={navEntries}
-      hasLayout={!appHost.isCanvas}
-      clipped={clipped}
-    >
+    <AppLayout activePageSlug={activePageSlug} pages={navEntries} hasLayout={!appHost.isCanvas}>
       {children}
     </AppLayout>
   );
@@ -1676,13 +1669,15 @@ export function ToolpadAppProvider({
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <AppThemeProvider dom={dom}>
                   <CssBaseline enableColorScheme />
-                  {showPreviewHeader ? <PreviewHeader /> : null}
-                  <AppRoot ref={rootRef}>
-                    <ErrorBoundary FallbackComponent={AppError}>
-                      <React.Suspense fallback={<AppLoading />}>{children}</React.Suspense>
-                    </ErrorBoundary>
-                    <EditorOverlay ref={canvasHooks.overlayRef} />
-                  </AppRoot>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+                    {showPreviewHeader ? <PreviewHeader /> : null}
+                    <AppRoot ref={rootRef}>
+                      <ErrorBoundary FallbackComponent={AppError}>
+                        <React.Suspense fallback={<AppLoading />}>{children}</React.Suspense>
+                      </ErrorBoundary>
+                      <EditorOverlay ref={canvasHooks.overlayRef} />
+                    </AppRoot>
+                  </Box>
                 </AppThemeProvider>
               </ResetNodeErrorsKeyProvider>
             </AuthContext.Provider>

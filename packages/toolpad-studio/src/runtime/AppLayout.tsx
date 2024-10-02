@@ -3,9 +3,7 @@ import { Box, useTheme } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { AppProvider } from '@toolpad/core/react-router-dom';
-import useDebouncedHandler from '@toolpad/utils/hooks/useDebouncedHandler';
 import { AuthContext } from './useAuth';
-import { PREVIEW_HEADER_MIN_HEIGHT } from './constants';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
 
@@ -23,7 +21,6 @@ export interface ToolpadAppLayoutProps {
   pages?: NavigationEntry[];
   hasLayout?: boolean;
   children?: React.ReactNode;
-  clipped?: boolean;
 }
 
 export function AppLayout({
@@ -31,7 +28,6 @@ export function AppLayout({
   pages = [],
   hasLayout: hasLayoutProp = true,
   children,
-  clipped,
 }: ToolpadAppLayoutProps) {
   const theme = useTheme();
 
@@ -77,28 +73,6 @@ export function AppLayout({
     </Box>
   );
 
-  const [previewHeaderHeight, setPreviewHeaderHeight] = React.useState(PREVIEW_HEADER_MIN_HEIGHT);
-
-  const updatePreviewHeaderHeight = React.useCallback(() => {
-    if (clipped) {
-      const previewHeader = document.getElementById('preview-header');
-      if (previewHeader) {
-        setPreviewHeaderHeight(previewHeader.getBoundingClientRect().height);
-      }
-    }
-  }, [clipped]);
-
-  const debouncedUpdatePreviewHeaderHeight = useDebouncedHandler(updatePreviewHeaderHeight, 120);
-
-  // Preview header height can be higher in mobile viewports
-  React.useEffect(() => {
-    updatePreviewHeaderHeight();
-    window.addEventListener('resize', debouncedUpdatePreviewHeaderHeight);
-    return () => {
-      window.removeEventListener('resize', debouncedUpdatePreviewHeaderHeight);
-    };
-  }, [debouncedUpdatePreviewHeaderHeight, updatePreviewHeaderHeight]);
-
   return (
     <AppProvider
       theme={theme}
@@ -112,15 +86,7 @@ export function AppLayout({
       }}
       session={session}
     >
-      {hasLayout ? (
-        <DashboardLayout
-          sx={{ height: clipped ? `calc(100vh - ${previewHeaderHeight}px)` : '100vh' }}
-        >
-          {layoutContent}
-        </DashboardLayout>
-      ) : (
-        layoutContent
-      )}
+      {hasLayout ? <DashboardLayout>{layoutContent}</DashboardLayout> : layoutContent}
     </AppProvider>
   );
 }

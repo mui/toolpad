@@ -545,10 +545,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const layoutRef = React.useRef<Element | null>(null);
 
   return (
-    <Box
-      ref={layoutRef}
-      sx={{ position: 'relative', display: 'flex', height: '100vh', overflow: 'hidden', ...sx }}
-    >
+    <Box ref={layoutRef} sx={{ position: 'relative', display: 'flex', overflow: 'hidden', ...sx }}>
       <AppBar color="inherit" position="absolute">
         {
           // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
@@ -651,7 +648,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          flexGrow: 1,
+          flex: 1,
           // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
           minWidth: {
             xs: disableCollapsibleSidebar && isNavigationExpanded ? '100vw' : 'auto',
@@ -662,7 +659,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar />
         <Box
           component="main"
-          sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'auto' }}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            overflow: 'auto',
+          }}
         >
           {children}
         </Box>

@@ -173,6 +173,7 @@ const AppRoot = styled('div')({
   overflow: 'auto' /* Prevents margins from collapsing into root */,
   position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
   display: 'flex',
+  flex: 1,
   flexDirection: 'column',
 });
 
@@ -1669,7 +1670,13 @@ export function ToolpadAppProvider({
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <AppThemeProvider dom={dom}>
                   <CssBaseline enableColorScheme />
-                  <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '100vh',
+                    }}
+                  >
                     {showPreviewHeader ? <PreviewHeader /> : null}
                     <AppRoot ref={rootRef}>
                       <ErrorBoundary FallbackComponent={AppError}>

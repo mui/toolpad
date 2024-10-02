@@ -545,7 +545,16 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const layoutRef = React.useRef<Element | null>(null);
 
   return (
-    <Box ref={layoutRef} sx={{ position: 'relative', display: 'flex', overflow: 'hidden', ...sx }}>
+    <Box
+      ref={layoutRef}
+      sx={{
+        position: 'relative',
+        display: 'flex',
+        overflow: 'hidden',
+        height: '100%',
+        ...sx,
+      }}
+    >
       <AppBar color="inherit" position="absolute">
         {
           // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244

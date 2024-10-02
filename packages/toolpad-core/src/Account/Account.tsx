@@ -35,7 +35,7 @@ export interface AccountSlots {
   signInButton?: React.ElementType;
   /**
    * The component used for the sign out button.
-   * @default MenuItem
+   * @default Button
    */
   signOutButton?: React.ElementType;
   /**

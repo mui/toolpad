@@ -33,7 +33,7 @@
     {
       "name": "signOutButton",
       "description": "The component used for the sign out button.",
-      "default": "MenuItem",
+      "default": "Button",
       "class": null
     },
     {

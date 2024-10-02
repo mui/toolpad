@@ -101,7 +101,7 @@ function AccountSwitcher(props: AccountSwitcherProps) {
   );
 }
 
-export default function CustomContent() {
+export default function CustomMenu() {
   const handleMenuNavigation = (route: string) => () => {
     console.log(
       'Toolpad Core Account Demo --- CustomContent --- handleMenuNavigation --- route: ',

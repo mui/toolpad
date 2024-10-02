@@ -102,7 +102,7 @@ AccountSwitcher.propTypes = {
   open: PropTypes.bool.isRequired,
 };
 
-export default function CustomContent() {
+export default function CustomMenu() {
   const handleMenuNavigation = (route) => () => {
     console.log(
       'Toolpad Core Account Demo --- CustomContent --- handleMenuNavigation --- route: ',

@@ -27,20 +27,12 @@ export function getComponentImports(name: string, filename: string) {
     const hasReactRouterDOMVersion = fs.existsSync(`${reactRouterDOMRelativePath}/${name}.tsx`);
 
     return [
-      `import { ${name} } from '@toolpad/core/${name}';${
-        hasNextJsVersion
-          ? `\nimport { ${name} } from '@toolpad/core/nextjs/${name}'; // Next.js`
-          : ''
-      }${
-        hasReactRouterDOMVersion
-          ? `\nimport { ${name} } from '@toolpad/core/react-router-dom/${name}'; // react-router-dom`
-          : ''
-      }`,
+      `import { ${name} } from '@toolpad/core/${name}';`,
       `import { ${name} } from '@toolpad/core';${
         hasNextJsVersion ? `\nimport { ${name} } from '@toolpad/core/nextjs'; // Next.js` : ''
       }${
         hasReactRouterDOMVersion
-          ? `\nimport { ${name} } from '@toolpad/core/react-router-dom'; // react-router-dom`
+          ? `\nimport { ${name} } from '@toolpad/core/react-router-dom'; // React Router DOM`
           : ''
       }`,
     ];

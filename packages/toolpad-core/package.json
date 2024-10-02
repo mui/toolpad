@@ -29,7 +29,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "github:mui/toolpad",
+    "url": "git+https://github.com/mui/toolpad.git",
     "directory": "packages/toolpad-core"
   },
   "license": "MIT",

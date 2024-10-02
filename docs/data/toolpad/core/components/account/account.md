@@ -40,6 +40,16 @@ Labels for the sign in and sign out buttons can be customized through the `local
 
 ### Slots
 
-You can pass in your own items to the `Account` menu through the `menuItems` slot to add additional menu items in the space between the user's account details and the sign out button, to create larger, more complex menus:
+#### Content
 
-{{"demo": "AccountSlots.js", "bg": "gradient"}}
+You can pass in your own menu items to the `Account` popover through the `content` slot to add any additional options in the space between the user's account details and the sign out button, to create larger, more complex menus:
+
+##### Account Switcher
+
+{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "gradient"}}
+
+The `content` prop can take any React component, so you can use it to display information instead of adding menu items:
+
+##### Crypto Wallet
+
+{{"demo": "AccountSlotsInfo.js", "bg": "outlined" }}

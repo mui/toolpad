@@ -681,7 +681,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
         signOutButton: PropTypes.object,
       }),
       slots: PropTypes.shape({
-        menuItems: PropTypes.elementType,
+        content: PropTypes.elementType,
         signInButton: PropTypes.elementType,
         signOutButton: PropTypes.elementType,
       }),

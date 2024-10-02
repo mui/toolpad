@@ -42,7 +42,7 @@ export interface AccountSlots {
    * The component used for the custom menu items.
    * @default null
    */
-  menuItems?: React.ElementType;
+  content?: React.ElementType;
 }
 
 export interface AccountProps {
@@ -174,7 +174,7 @@ function Account(props: AccountProps) {
           </div>
         </AccountInfoContainer>
         <Divider sx={{ mb: 1 }} />
-        {slots?.menuItems ? <slots.menuItems /> : null}
+        {slots?.content ? <slots.content /> : null}
         {slots?.signOutButton ? (
           <slots.signOutButton onClick={authentication?.signOut} />
         ) : (
@@ -231,7 +231,7 @@ Account.propTypes /* remove-proptypes */ = {
    * The components used for each slot inside.
    */
   slots: PropTypes.shape({
-    menuItems: PropTypes.elementType,
+    content: PropTypes.elementType,
     signInButton: PropTypes.elementType,
     signOutButton: PropTypes.elementType,
   }),

@@ -13,7 +13,7 @@
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType }"
+        "description": "{ content?: elementType, signInButton?: elementType, signOutButton?: elementType }"
       },
       "additionalInfo": { "slotsApi": true }
     }
@@ -37,7 +37,7 @@
       "class": null
     },
     {
-      "name": "menuItems",
+      "name": "content",
       "description": "The component used for the custom menu items.",
       "default": "null",
       "class": null

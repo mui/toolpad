@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {
   Avatar,
-  Divider,
   Button,
+  Divider,
   Typography,
   Stack,
   IconButton,
@@ -36,13 +36,17 @@ const mockData = {
 function CryptoWalletInfo() {
   return (
     <div>
-      <div style={{ width: 300, padding: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-          <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-            <WalletIcon fontSize="medium" />
+      <Stack spacing={2} sx={{ width: 300, p: 2 }}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Avatar sx={{ bgcolor: 'primary.main' }}>
+            <WalletIcon />
           </Avatar>
-          <div style={{ marginLeft: '1rem' }}>
-            <Typography variant="subtitle1" fontWeight="bold">
+          <Stack>
+            <Typography
+              variant="subtitle1"
+              fontWeight="bold"
+              sx={{ display: 'flex', alignItems: 'center' }}
+            >
               {mockData.address}
               <IconButton size="small" sx={{ ml: 1 }}>
                 <CopyIcon fontSize="small" />
@@ -51,30 +55,38 @@ function CryptoWalletInfo() {
             <Typography variant="body2" color="text.secondary">
               Main Account
             </Typography>
-          </div>
-        </div>
-        <div style={{ marginBottom: '1rem' }}>
+          </Stack>
+        </Stack>
+        <Divider />
+        <Stack>
           <Typography variant="h6" fontWeight="bold">
             {mockData.balance}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {mockData.usdBalance}
           </Typography>
-        </div>
-        <Stack direction="row" justifyContent="space-evenly">
+        </Stack>
+
+        <Stack direction="row" spacing={2}>
           <Button
             variant="contained"
+            fullWidth
             disableElevation
             color="primary"
             startIcon={<SendIcon />}
           >
             Send
           </Button>
-          <Button variant="outlined" disableElevation startIcon={<ShoppingCart />}>
+          <Button
+            variant="outlined"
+            fullWidth
+            disableElevation
+            startIcon={<ShoppingCart />}
+          >
             Buy
           </Button>
         </Stack>
-      </div>
+      </Stack>
       <Divider />
     </div>
   );
@@ -99,6 +111,18 @@ export default function AccountSlotsInfo() {
         <Account
           slots={{
             content: CryptoWalletInfo,
+          }}
+          slotProps={{
+            userDetailsContainer: {
+              sx: {
+                justifyContent: 'flex-start',
+                '& .Account-userDetailsContainer': {
+                  display: 'flex',
+                  flexDirection: 'column',
+                  rowGap: 0,
+                },
+              },
+            },
           }}
         />
       </SessionContext.Provider>

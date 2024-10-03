@@ -679,11 +679,13 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
         iconButton: PropTypes.object,
         signInButton: PropTypes.object,
         signOutButton: PropTypes.object,
+        userDetailsContainer: PropTypes.object,
       }),
       slots: PropTypes.shape({
         content: PropTypes.elementType,
         signInButton: PropTypes.elementType,
         signOutButton: PropTypes.elementType,
+        userDetailsContainer: PropTypes.elementType,
       }),
     }),
     toolbarActions: PropTypes.object,

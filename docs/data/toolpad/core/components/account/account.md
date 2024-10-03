@@ -30,19 +30,25 @@ When signed out, the component renders as an inline sign in button within the da
 
 ## Customization
 
-### Slot Props
-
-The underlying `signInButton`, `signOutButton` and `iconButton` components can be customized by passing in `slotProps` to the `Account` component.
+### Locale Text
 
 Labels for the sign in and sign out buttons can be customized through the `localeText` prop.
+
+{{"demo": "AccountLocale.js", "bg": "outlined" }}
+
+### Slot Props
+
+The underlying `signInButton`, `signOutButton`, `iconButton` and `userDetailsContainer` sections can be customized by passing in `slotProps` to the `Account` component.
 
 {{"demo": "AccountCustom.js", "bg": "outlined" }}
 
 ### Slots
 
+You can pass in your own components to completely override the default components inside the `Account` popover through the `slots` prop.
+
 #### Content
 
-You can pass in your own menu items to the `Account` popover through the `content` slot to add any additional options in the space between the user's account details and the sign out button, to create larger, more complex menus:
+Use the `content` slot to add any additional options in the space between the user's account details and the sign out button, to create larger, more complex menus:
 
 ##### Account Switcher
 
@@ -53,3 +59,11 @@ The `content` prop can take any React component, so you can use it to display in
 ##### Crypto Wallet
 
 {{"demo": "AccountSlotsInfo.js", "bg": "outlined" }}
+
+#### User Details Container
+
+You can override the section which displays the signed-in user's details with a custom component. This component receives a `session` prop which contains the current authentication session:
+
+##### Enterprise Profile
+
+{{"demo": "AccountCustomUserDetails.js", "bg": "outlined" }}

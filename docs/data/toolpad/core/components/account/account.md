@@ -64,6 +64,23 @@ The `content` prop can take any React component, so you can use it to display in
 
 By passing a custom component to the `userDetailsContainer` slot, you can override the section which displays the signed-in user's details. The custom component receives a `session` prop which contains the current authentication session:
 
+```tsx
+// ...
+import { Session } from '@toolpad/core';
+
+interface CustomSession extends Session {
+  org: {
+    name: string;
+    url: string;
+    logo: string;
+  };
+}
+
+function UserDetailsContainer({ session }: UserDetailsContainerProps) {
+  // ...
+}
+```
+
 ##### Enterprise Profile
 
 {{"demo": "AccountCustomUserDetails.js", "bg": "outlined" }}

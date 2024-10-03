@@ -1,7 +1,12 @@
 'use client';
 import * as React from 'react';
 import { useSearchParams, useLocation, useNavigate } from 'react-router-dom';
-import  { AppProvider as AppProviderComponent, type AppProviderProps, Navigate, Router } from '../AppProvider';
+import {
+  AppProvider as AppProviderComponent,
+  type AppProviderProps,
+  Navigate,
+  Router,
+} from '../AppProvider';
 
 /**
  * @ignore - internal component.

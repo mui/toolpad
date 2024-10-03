@@ -78,7 +78,7 @@ export default function App(props) {
 
 ## Client-side Routing
 
-The `AppProvider` for React Router DOM includes routing out-of-the-box for projects using [react-router-dom](https://www.npmjs.com/package/react-router-dom).
+The `AppProvider` for React Router includes routing out-of-the-box for projects using [react-router-dom](https://www.npmjs.com/package/react-router-dom).
 
 This specific `AppProvider` is recommended when building single-page applications with tools such as [Vite](https://vite.dev/), as you do not have to manually configure your app routing, making the integration automatic and seamless.
 

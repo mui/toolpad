@@ -32,7 +32,7 @@ export function getComponentImports(name: string, filename: string) {
         hasNextJsVersion ? `\nimport { ${name} } from '@toolpad/core/nextjs'; // Next.js` : ''
       }${
         hasReactRouterDOMVersion
-          ? `\nimport { ${name} } from '@toolpad/core/react-router-dom'; // React Router DOM`
+          ? `\nimport { ${name} } from '@toolpad/core/react-router-dom'; // React Router`
           : ''
       }`,
     ];

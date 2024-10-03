@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { AppProvider } from './AppProvider';
 
-describe('React Router DOM AppProvider', () => {
+describe('React Router AppProvider', () => {
   test('renders content correctly', async () => {
     // placeholder test
     render(

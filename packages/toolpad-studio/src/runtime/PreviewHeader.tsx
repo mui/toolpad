@@ -34,7 +34,6 @@ export default function PreviewHeader() {
 
   return appContext ? (
     <Box
-      id="preview-header"
       sx={{
         position: 'relative',
         width: '100%',

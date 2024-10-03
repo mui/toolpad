@@ -69,7 +69,7 @@ You can pass the router implementation to the `AppProvider` component using the 
 :::success
 If you are using Next.js, use the `AppProvider` exported from `@toolpad/core/nextjs`.
 
-If you are building a single-page application with React Router DOM for routing, the `AppProvider` exported from `@toolpad/core/react-router-dom` is probably the best fit.
+If you are building a single-page application with React Router DOM for routing, use the `AppProvider` exported from `@toolpad/core/react-router-dom`.
 
 This automatically sets up the router for you, so that you don't need to pass the `router` prop.
 :::

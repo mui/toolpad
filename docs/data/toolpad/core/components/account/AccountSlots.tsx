@@ -5,7 +5,7 @@ import {
   SessionContext,
   Session,
 } from '@toolpad/core';
-import CustomMenuItems from './CustomMenu';
+import CustomMenu from './CustomMenu';
 
 const demoSession = {
   user: {
@@ -33,7 +33,7 @@ export default function AccountSlots() {
       <SessionContext.Provider value={session}>
         <Account
           slots={{
-            menuItems: CustomMenuItems,
+            content: CustomMenu,
           }}
         />
       </SessionContext.Provider>

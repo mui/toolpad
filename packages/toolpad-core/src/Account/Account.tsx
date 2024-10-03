@@ -42,7 +42,7 @@ export interface AccountSlots {
    * The component used for the custom menu items.
    * @default null
    */
-  menuItems?: React.ElementType;
+  content?: React.ElementType;
 }
 
 export interface AccountProps {
@@ -168,13 +168,13 @@ function Account(props: AccountProps) {
       >
         <AccountInfoContainer>
           <SessionAvatar session={session} sx={{ height: 48, width: 48 }} />
-          <div>
+          <div style={{ justifyContent: 'flex-start' }}>
             <Typography fontWeight="bolder">{session.user.name}</Typography>
             <Typography variant="caption">{session.user.email}</Typography>
           </div>
         </AccountInfoContainer>
         <Divider sx={{ mb: 1 }} />
-        {slots?.menuItems ? <slots.menuItems /> : null}
+        {slots?.content ? <slots.content /> : null}
         {slots?.signOutButton ? (
           <slots.signOutButton onClick={authentication?.signOut} />
         ) : (

@@ -29,7 +29,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "github:mui/toolpad",
+    "url": "git+https://github.com/mui/toolpad.git",
     "directory": "packages/toolpad-core"
   },
   "license": "MIT",
@@ -56,7 +56,7 @@
   "dependencies": {
     "@babel/runtime": "^7.25.6",
     "@mui/lab": "6.0.0-beta.10",
-    "@mui/utils": "6.1.1",
+    "@mui/utils": "6.1.2",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.1",
     "client-only": "^0.0.1",
@@ -65,8 +65,8 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "6.1.1",
-    "@mui/material": "6.1.1",
+    "@mui/icons-material": "6.1.2",
+    "@mui/material": "6.1.2",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.13",
     "@types/react": "18.3.10",

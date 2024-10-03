@@ -28,7 +28,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "github:mui/toolpad",
+    "url": "git+https://github.com/mui/toolpad.git",
     "directory": "packages/toolpad-studio-components"
   },
   "scripts": {
@@ -41,9 +41,9 @@
     "url": "https://github.com/mui/toolpad/issues"
   },
   "dependencies": {
-    "@mui/icons-material": "6.1.1",
+    "@mui/icons-material": "6.1.2",
     "@mui/lab": "6.0.0-beta.10",
-    "@mui/material": "6.1.1",
+    "@mui/material": "6.1.2",
     "@mui/x-charts": "7.18.0",
     "@mui/x-data-grid-premium": "7.18.0",
     "@mui/x-date-pickers": "7.18.0",

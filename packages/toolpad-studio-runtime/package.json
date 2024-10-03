@@ -31,7 +31,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "github:mui/toolpad",
+    "url": "git+https://github.com/mui/toolpad.git",
     "directory": "packages/toolpad-studio-runtime"
   },
   "scripts": {
@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@auth/core": "0.35.3",
-    "@mui/material": "6.1.1",
+    "@mui/material": "6.1.2",
     "@tanstack/react-query": "5.56.2",
     "@toolpad/utils": "workspace:*",
     "@types/json-schema": "7.0.15",

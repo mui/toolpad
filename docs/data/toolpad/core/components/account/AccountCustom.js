@@ -68,6 +68,10 @@ export default function AccountCustom() {
               userDetailsContainer: {
                 sx: {
                   p: 2,
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  gap: 2,
                   '& .MuiStack-root': {
                     color: theme.palette.grey[700],
                   },

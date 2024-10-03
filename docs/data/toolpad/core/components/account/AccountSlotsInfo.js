@@ -110,12 +110,11 @@ export default function AccountSlotsInfo() {
           slotProps={{
             userDetailsContainer: {
               sx: {
+                p: 2,
+                gap: 2,
+                display: 'flex',
+                flexDirection: 'row',
                 justifyContent: 'flex-start',
-                '& .Account-userDetailsContainer': {
-                  display: 'flex',
-                  flexDirection: 'column',
-                  rowGap: 0,
-                },
               },
             },
           }}

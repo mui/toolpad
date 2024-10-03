@@ -82,6 +82,8 @@ The `AppProvider` for React Router DOM includes routing out-of-the-box using [re
 
 This specific `AppProvider` is recommended when building single-page applications with tools such as [Vite](https://vite.dev/), as you do not have to manually configure your app routing, making the integration automatic and seamless.
 
+You must install [react-router-dom](https://www.npmjs.com/package/react-router-dom) as a dependency in your project in order to use this `AppProvider`.
+
 ```tsx
 import { AppProvider } from '@toolpad/core/react-router-dom';
 ```

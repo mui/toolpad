@@ -15,7 +15,7 @@ const demoSession = {
   },
 };
 
-export default function AccountSlots() {
+export default function AccountSlotsAccountSwitcher() {
   const [session, setSession] = React.useState<Session | null>(demoSession);
   const authentication = React.useMemo(() => {
     return {

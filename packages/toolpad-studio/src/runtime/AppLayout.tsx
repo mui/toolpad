@@ -87,7 +87,7 @@ export function AppLayout({
       session={session}
     >
       {hasLayout ? (
-        <DashboardLayout sx={{ height: '100%' }}>{layoutContent}</DashboardLayout>
+        <DashboardLayout sx={{ height: 'auto' }}>{layoutContent}</DashboardLayout>
       ) : (
         layoutContent
       )}

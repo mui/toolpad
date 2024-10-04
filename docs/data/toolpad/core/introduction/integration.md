@@ -767,3 +767,134 @@ export const config = {
 That's it! You now have Toolpad Core integrated into your Next.js Pages Router app with authentication setup:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-nextjs-pages.png", "srcDark": "/static/toolpad/docs/core/integration-nextjs-pages-dark.png", "alt": "Next.js Pages Router with Toolpad Core", "caption": "Next.js Pages Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}
+
+## React Router
+
+To integrate Toolpad Core into a single-page app using React Router, follow these steps:
+
+### 1. Wrap your application with `AppProvider`
+
+In your root layout file (e.g.: `src/main.tsx`), wrap your application with the `AppProvider` from `@toolpad/core/react-router-dom`.
+
+Make sure that this `AppProvider` is nested inside the React Router context (e.g.: `BrowserRouter`).
+
+```tsx title="src/main.tsx"
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { createTheme } from '@mui/material/styles';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { AppProvider } from '@toolpad/core/react-router-dom';
+import type { Navigation } from '@toolpad/core';
+import App from './App';
+
+const NAVIGATION: Navigation = [
+  {
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
+];
+
+const BRANDING = {
+  title: 'My Toolpad Core App',
+};
+
+const theme = createTheme();
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <AppProvider navigation={NAVIGATION} branding={BRANDING} theme={theme}>
+        <App />
+      </AppProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
+);
+```
+
+### 2. Create a dashboard layout
+
+Create a layout file for your dashboard pages (e.g.: `src/layouts/dashboard.tsx`):
+
+```tsx title="src/layouts/dashboard.tsx"
+import * as React from 'react';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
+
+export default function Layout(props: { children: React.ReactNode }) {
+  return (
+    <DashboardLayout>
+      <PageContainer>{props.children}</PageContainer>
+    </DashboardLayout>
+  );
+}
+```
+
+The [`DashboardLayout`](/toolpad/core/react-dashboard-layout/) component provides a consistent layout for your dashboard pages, including a sidebar, navigation, and header. The [`PageContainer`](/toolpad/core/react-page-container/) component is used to wrap the page content, and provides breadcrumbs for navigation.
+
+### 3. Add a dashboard page
+
+Create a dashboard page (e.g.: `src/pages/index.tsx`).
+
+Wrap the page with the layout component you previously created in order for it to use it.
+
+```tsx title="src/pages/index.tsx"
+import * as React from 'react';
+import Typography from '@mui/material/Typography';
+import Layout from '../layouts/dashboard';
+
+export default function DashboardPage() {
+  return (
+    <Layout>
+      <Typography>Welcome to Toolpad!</Typography>
+    </Layout>
+  );
+}
+```
+
+### 4. Add a second page
+
+Create a new page in the dashboard, for example, `src/pages/orders.tsx`:
+
+```tsx title="src/pages/orders.tsx"
+import * as React from 'react';
+import Typography from '@mui/material/Typography';
+import Layout from '../layouts/dashboard';
+
+export default function OrdersPage() {
+  return (
+    <Layout>
+      <Typography>Welcome to the orders page!</Typography>
+    </Layout>
+  );
+}
+```
+
+### 5. Define app routes
+
+Define your application routes in a root file (e.g.: `src/App.tsx`):
+
+import { Route, Routes } from 'react-router-dom';
+import DashboardPage from './pages';
+import OrdersPage from './pages/orders';
+
+```tsx title="src/App.tsx"
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" Component={DashboardPage} />
+      <Route path="/orders" Component={OrdersPage} />
+    </Routes>
+  );
+}
+```
+
+That's it! You now have Toolpad Core integrated into your single-page app with React Router:
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-react-router.png", "srcDark": "/static/toolpad/docs/core/integration-react-router-dark.png", "alt": "React Router with Toolpad Core", "caption": "React Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}

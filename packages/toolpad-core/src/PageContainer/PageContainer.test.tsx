@@ -112,4 +112,21 @@ describe('PageContainer', () => {
 
     expect(screen.getByText('Orders', { ignore: 'nav *' }));
   });
+
+  test('renders custom breadcrumbs', async () => {
+    render(
+      <PageContainer
+        breadcrumbs={[
+          { title: 'Hello', path: '/hello' },
+          { title: 'World', path: '/world' },
+        ]}
+      />,
+    );
+
+    const breadcrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
+
+    const helloLink = within(breadcrumbs).getByRole('link', { name: 'Hello' });
+    expect(helloLink.getAttribute('href')).toBe('/hello');
+    expect(within(breadcrumbs).getByText('World')).toBeTruthy();
+  });
 });

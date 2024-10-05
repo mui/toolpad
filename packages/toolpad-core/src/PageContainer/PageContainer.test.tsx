@@ -92,7 +92,7 @@ describe('PageContainer', () => {
       <AppProvider
         navigation={[
           { segment: '', title: 'Home' },
-          { segment: 'orders', title: 'Orders', pattern: '/orders/:id' },
+          { segment: 'orders', title: 'Orders', pattern: 'orders/:id' },
         ]}
         router={router}
       >

@@ -416,8 +416,8 @@ importers:
         specifier: 1.5.0
         version: 1.5.0
       markdown-to-jsx:
-        specifier: 7.4.7
-        version: 7.4.7(react@18.3.1)
+        specifier: 7.5.0
+        version: 7.5.0(react@18.3.1)
       next:
         specifier: ^14.2.14
         version: 14.2.14(@babel/core@7.25.2)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -844,8 +844,8 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       markdown-to-jsx:
-        specifier: 7.4.7
-        version: 7.4.7(react@18.3.1)
+        specifier: 7.5.0
+        version: 7.5.0(react@18.3.1)
       mime:
         specifier: 4.0.4
         version: 4.0.4
@@ -1070,8 +1070,8 @@ importers:
         specifier: 2.2.4
         version: 2.2.4
       markdown-to-jsx:
-        specifier: 7.4.7
-        version: 7.4.7(react@18.3.1)
+        specifier: 7.5.0
+        version: 7.5.0(react@18.3.1)
       react-error-boundary:
         specifier: 4.0.13
         version: 4.0.13(react@18.3.1)
@@ -7590,8 +7590,8 @@ packages:
     resolution: {integrity: sha512-a54IwgWPaeBCAAsv13YgmALOF1elABB08FxO9i+r4VFk5Vl4pKokRPeX8u5TCgSsPi6ec1otfLjdOpVcgbpshg==}
     hasBin: true
 
-  markdown-to-jsx@7.4.7:
-    resolution: {integrity: sha512-0+ls1IQZdU6cwM1yu0ZjjiVWYtkbExSyUIFU2ZeDIFuZM1W42Mh4OlJ4nb4apX4H8smxDHRdFaoIVJGwfv5hkg==}
+  markdown-to-jsx@7.5.0:
+    resolution: {integrity: sha512-RrBNcMHiFPcz/iqIj0n3wclzHXjwS7mzjBNWecKKVhNTIxQepIix6Il/wZCn2Cg5Y1ow2Qi84+eJrryFRWBEWw==}
     engines: {node: '>= 10'}
     peerDependencies:
       react: '>= 0.14.0'
@@ -17752,7 +17752,7 @@ snapshots:
       punycode.js: 2.3.1
       uc.micro: 2.1.0
 
-  markdown-to-jsx@7.4.7(react@18.3.1):
+  markdown-to-jsx@7.5.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 

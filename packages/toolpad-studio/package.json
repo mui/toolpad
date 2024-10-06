@@ -113,7 +113,7 @@
     "lodash-es": "4.17.21",
     "markdown-to-jsx": "7.4.7",
     "mime": "4.0.4",
-    "monaco-editor": "0.50.0",
+    "monaco-editor": "0.52.0",
     "mysql2": "3.11.3",
     "nanoid": "5.0.7",
     "node-fetch": "2.7.0",

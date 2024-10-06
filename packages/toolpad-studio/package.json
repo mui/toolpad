@@ -171,7 +171,7 @@
     "ajv": "8.17.1",
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-import": "2.30.0",
+    "eslint-plugin-import": "2.31.0",
     "formidable": "3.5.1",
     "react-transition-group": "4.4.5",
     "webpack": "5.95.0"

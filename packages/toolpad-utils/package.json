@@ -39,7 +39,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "github:mui/toolpad",
+    "url": "git+https://github.com/mui/toolpad.git",
     "directory": "packages/toolpad-studio-utils"
   },
   "scripts": {
@@ -62,14 +62,14 @@
     "prettier": "3.3.3",
     "react-is": "18.3.1",
     "title": "3.5.3",
-    "vitest": "2.1.1",
+    "vitest": "2.1.2",
     "yaml": "2.5.1",
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
-    "@types/express": "4.17.21",
+    "@types/express": "5.0.0",
     "@types/invariant": "2.2.37",
-    "@types/react": "18.3.10",
+    "@types/react": "18.3.11",
     "@types/react-is": "18.3.0",
     "@types/title": "3.4.3"
   }

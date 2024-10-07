@@ -15,7 +15,7 @@ import DEFAULT_LOCALE_TEXT from '../shared/locales/en';
 const AccountInfoContainer = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'space-between',
+  justifyContent: 'flex-start',
   padding: theme.spacing(2),
   gap: theme.spacing(2),
 }));
@@ -231,7 +231,7 @@ Account.propTypes /* remove-proptypes */ = {
    * The components used for each slot inside.
    */
   slots: PropTypes.shape({
-    menuItems: PropTypes.elementType,
+    content: PropTypes.elementType,
     signInButton: PropTypes.elementType,
     signOutButton: PropTypes.elementType,
   }),

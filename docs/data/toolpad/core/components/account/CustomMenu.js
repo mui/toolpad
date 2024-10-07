@@ -1,11 +1,54 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { Menu, MenuItem, MenuList, Divider, ListItemIcon } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
+import {
+  Menu,
+  MenuItem,
+  MenuList,
+  Button,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Avatar,
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
-function CustomSettingsMenu(props) {
-  const { open, anchorEl, handleMenuClose, handleEnter, handleLeave } = props;
+// Function to generate a random color
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i += 1) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
+const accounts = [
+  {
+    id: 1,
+    name: 'Bharat Kashyap',
+    email: 'bharatkashyap@outlook.com',
+    image: 'https://avatars.githubusercontent.com/u/19550456',
+    color: getRandomColor(),
+    projects: [
+      {
+        id: 3,
+        title: 'Project X',
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Bharat MUI',
+    email: 'bharat@mui.com',
+    color: getRandomColor(),
+    projects: [{ id: 4, title: 'Project A' }],
+  },
+];
+
+function ProjectsList(props) {
+  const { open, anchorEl, handleMenuClose, handleEnter, handleLeave, projects } =
+    props;
 
   return (
     <Menu
@@ -24,45 +67,82 @@ function CustomSettingsMenu(props) {
       }}
     >
       <MenuList
-        dense
+        sx={{
+          pointerEvents: 'auto',
+          minWidth: 200,
+        }}
         disablePadding
-        sx={{ pointerEvents: 'auto' }}
         onMouseEnter={() => {
           handleEnter();
         }}
         onMouseLeave={handleLeave}
       >
-        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+        <Typography variant="caption" padding={1}>
+          Projects
+        </Typography>
+        <Divider />
+        {projects?.map((project) => (
+          <MenuItem
+            key={project.id}
+            onClick={handleMenuClose}
+            sx={{ px: 1, my: 1, columnGap: '1.25rem' }}
+          >
+            <ListItemText
+              primary={project.title}
+              primaryTypographyProps={{ variant: 'body2' }}
+            />
+          </MenuItem>
+        ))}
+        <Divider />
+        <Button
+          variant="text"
+          sx={{ textTransform: 'capitalize', mx: 2 }}
+          size="small"
+          startIcon={<AddIcon />}
+          disableElevation
+        >
+          Create new
+        </Button>
       </MenuList>
     </Menu>
   );
 }
 
-CustomSettingsMenu.propTypes = {
+ProjectsList.propTypes = {
   anchorEl: PropTypes.object,
   handleEnter: PropTypes.func.isRequired,
   handleLeave: PropTypes.func.isRequired,
   handleMenuClose: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
+  projects: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
 };
 
 export default function CustomMenu() {
-  const handleMenuNavigation = (route) => () => {
-    console.log(
-      'Toolpad Core Account Demo --- CustomMenuItems --- handleMenuNavigation --- route: ',
-      route,
-    );
-  };
-
   const mouseOnSubMenu = React.useRef(false);
+
+  const [selectedProjects, setSelectedProjects] = React.useState([]);
+
+  const handleSelectProjects = React.useCallback((id) => {
+    setSelectedProjects(
+      accounts.find((account) => account.id === id)?.projects ?? [],
+    );
+  }, []);
 
   const [subMenuAnchorEl, setSubMenuAnchorEl] = React.useState(null);
   const subMenuOpen = Boolean(subMenuAnchorEl);
 
-  const handleTriggerEnter = React.useCallback((event) => {
-    setSubMenuAnchorEl(event.currentTarget);
-  }, []);
+  const handleTriggerEnter = React.useCallback(
+    (event, id) => {
+      handleSelectProjects(id);
+      setSubMenuAnchorEl(event.currentTarget);
+    },
+    [handleSelectProjects],
+  );
 
   const handleTriggerLeave = React.useCallback(() => {
     // Wait for 300ms to see if the mouse has moved to the sub menu
@@ -92,41 +172,59 @@ export default function CustomMenu() {
 
   return (
     <MenuList dense disablePadding>
-      <MenuItem
-        onMouseEnter={handleTriggerEnter}
-        onMouseLeave={handleTriggerLeave}
-        component="button"
-        sx={{
-          justifyContent: 'flex-start',
-          width: '100%',
-        }}
-      >
-        <ListItemIcon>
-          <SettingsIcon />
-        </ListItemIcon>
-        Settings
-      </MenuItem>
-      <MenuItem
-        onClick={handleMenuNavigation('/add-account')}
-        component="button"
-        sx={{
-          justifyContent: 'flex-start',
-          width: '100%',
-        }}
-      >
-        <ListItemIcon>
-          <AddIcon />
-        </ListItemIcon>
-        Add another account
-      </MenuItem>
+      <Typography variant="body2" margin={1}>
+        Accounts
+      </Typography>
+      {accounts.map((account) => (
+        <MenuItem
+          key={account.id}
+          component="button"
+          sx={{
+            justifyContent: 'flex-start',
+            width: '100%',
+            columnGap: 2,
+          }}
+          // onClick={() => handleSelectProjects(account.id)}
+          onMouseEnter={(event) => handleTriggerEnter(event, account.id)}
+          onMouseLeave={handleTriggerLeave}
+        >
+          <ListItemIcon>
+            <Avatar
+              sx={{
+                width: 32,
+                height: 32,
+                fontSize: '0.95rem',
+                bgcolor: account.color,
+              }}
+              src={account.image ?? ''}
+              alt={account.name ?? ''}
+            >
+              {account.name[0]}
+            </Avatar>
+          </ListItemIcon>
+          <ListItemText
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              width: '100%',
+            }}
+            primary={account.name}
+            secondary={account.email}
+            primaryTypographyProps={{ variant: 'body2' }}
+            secondaryTypographyProps={{ variant: 'caption' }}
+          />
+        </MenuItem>
+      ))}
 
       <Divider />
-      <CustomSettingsMenu
+      <ProjectsList
         open={subMenuOpen}
         anchorEl={subMenuAnchorEl}
         handleEnter={handleSubMenuEnter}
         handleLeave={handleSubMenuLeave}
         handleMenuClose={handleSubMenuClose}
+        projects={selectedProjects}
       />
     </MenuList>
   );

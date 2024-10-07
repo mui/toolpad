@@ -11,6 +11,7 @@ import {
   Typography,
   Avatar,
 } from '@mui/material';
+import FolderIcon from '@mui/icons-material/Folder';
 import AddIcon from '@mui/icons-material/Add';
 
 interface Project {
@@ -27,23 +28,12 @@ interface ProjectsListProps {
   projects: Project[];
 }
 
-// Function to generate a random color
-const getRandomColor = () => {
-  const letters = '0123456789ABCDEF';
-  let color = '#';
-  for (let i = 0; i < 6; i += 1) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
-
 const accounts = [
   {
     id: 1,
     name: 'Bharat Kashyap',
     email: 'bharatkashyap@outlook.com',
     image: 'https://avatars.githubusercontent.com/u/19550456',
-    color: getRandomColor(),
     projects: [
       {
         id: 3,
@@ -55,7 +45,7 @@ const accounts = [
     id: 2,
     name: 'Bharat MUI',
     email: 'bharat@mui.com',
-    color: getRandomColor(),
+    color: '#8B4513', // Brown color
     projects: [{ id: 4, title: 'Project A' }],
   },
 ];
@@ -101,6 +91,9 @@ function ProjectsList(props: ProjectsListProps) {
             onClick={handleMenuClose}
             sx={{ px: 1, my: 1, columnGap: '1.25rem' }}
           >
+            <ListItemIcon sx={{ minWidth: 24 }}>
+              <FolderIcon fontSize="small" />
+            </ListItemIcon>
             <ListItemText
               primary={project.title}
               primaryTypographyProps={{ variant: 'body2' }}
@@ -110,7 +103,7 @@ function ProjectsList(props: ProjectsListProps) {
         <Divider />
         <Button
           variant="text"
-          sx={{ textTransform: 'capitalize', mx: 2 }}
+          sx={{ textTransform: 'capitalize', display: 'flex', mx: 'auto' }}
           size="small"
           startIcon={<AddIcon />}
           disableElevation
@@ -124,6 +117,7 @@ function ProjectsList(props: ProjectsListProps) {
 
 export default function CustomMenu() {
   const mouseOnSubMenu = React.useRef<boolean>(false);
+  const mouseOnMenuItem = React.useRef<boolean>(false);
 
   const [selectedProjects, setSelectedProjects] = React.useState<Project[]>([]);
 
@@ -141,18 +135,26 @@ export default function CustomMenu() {
     (event: React.MouseEvent<HTMLButtonElement>, id: number) => {
       handleSelectProjects(id);
       setSubMenuAnchorEl(event.currentTarget);
+      // Wait for 300ms to see if the mouse has moved to a menu item
+      setTimeout(() => {
+        mouseOnMenuItem.current = true;
+      }, 300);
     },
     [handleSelectProjects],
   );
 
   const handleTriggerLeave = React.useCallback(() => {
-    // Wait for 300ms to see if the mouse has moved to the sub menu
+    mouseOnMenuItem.current = false;
+    // Wait for 320ms to see if the mouse has moved to the sub menu
+    // Timeout must be > 300ms to allow for `mouseOnMenuItem.current` to update
+    // inside `handleTriggerEnter`
     setTimeout(() => {
-      if (mouseOnSubMenu.current) {
+      if (mouseOnSubMenu.current || mouseOnMenuItem.current) {
         return;
       }
+
       setSubMenuAnchorEl(null);
-    }, 300);
+    }, 320);
   }, []);
 
   const handleSubMenuEnter = React.useCallback(() => {

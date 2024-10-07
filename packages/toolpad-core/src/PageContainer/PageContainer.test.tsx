@@ -92,7 +92,7 @@ describe('PageContainer', () => {
       <AppProvider
         navigation={[
           { segment: '', title: 'Home' },
-          { segment: 'orders', title: 'Orders', pattern: '/orders/:id' },
+          { segment: 'orders', title: 'Orders', pattern: 'orders/:id' },
         ]}
         router={router}
       >
@@ -111,6 +111,34 @@ describe('PageContainer', () => {
     expect(within(breadcrumbs).getByText('Orders')).toBeTruthy();
 
     expect(screen.getByText('Orders', { ignore: 'nav *' }));
+  });
+
+  test('renders nested dynamic correctly', async () => {
+    const router = {
+      pathname: '/users/invoices/123',
+      searchParams: new URLSearchParams(),
+      navigate: vi.fn(),
+    };
+    render(
+      <AppProvider
+        navigation={[
+          {
+            segment: 'users',
+            title: 'Users',
+            children: [{ segment: 'invoices', title: 'Invoices', pattern: 'invoices/:id' }],
+          },
+        ]}
+        router={router}
+      >
+        <PageContainer />
+      </AppProvider>,
+    );
+
+    const breadcrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
+
+    const homeLink = within(breadcrumbs).getByRole('link', { name: 'Users' });
+    expect(homeLink.getAttribute('href')).toBe('/users');
+    expect(within(breadcrumbs).getByText('Invoices')).toBeTruthy();
   });
 
   test('renders custom breadcrumbs', async () => {

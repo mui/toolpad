@@ -269,8 +269,8 @@ const run = async () => {
 
   if (!pathArg) {
     projectPath = await input({
-      message: args.example
-        ? `Enter path of directory to download example "${chalk.cyan(args.example)}" into`
+      message: example
+        ? `Enter path of directory to download example "${chalk.cyan(example)}" into`
         : 'Enter path of directory to bootstrap new app',
       validate: validatePath,
       default: '.',
@@ -280,7 +280,7 @@ const run = async () => {
   const absolutePath = bashResolvePath(projectPath);
 
   // If the user has provided an example, download and extract it
-  if (args.example) {
+  if (example) {
     await downloadAndExtractExample(absolutePath, example);
   }
 

@@ -340,4 +340,35 @@ describe('DashboardLayout', () => {
     expect(within(desktopNavigation).getByText('Action 1')).toBeTruthy();
     expect(within(desktopNavigation).getByText('Action 2')).toBeTruthy();
   });
+
+  test('renders without the navigation and toggle button', async () => {
+    const NAVIGATION: Navigation = [
+      {
+        title: 'Dashboard',
+        segment: 'dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        title: 'Orders',
+        segment: 'orders',
+        icon: <ShoppingCartIcon />,
+      },
+    ];
+  
+    render(
+      <AppProvider navigation={NAVIGATION}>
+        <DashboardLayout hideNavigation>Hello world</DashboardLayout>
+      </AppProvider>,
+    );
+  
+    const desktopNavigation = screen.queryByRole('navigation', { name: 'Desktop' });
+    const navigationToggle = screen.queryByLabelText('Collapse menu');
+  
+    // Expect that the navigation and toggle button is not rendered
+    expect(desktopNavigation).toBeNull();
+    expect(navigationToggle).toBeNull();
+    
+    // Ensure the main content is still rendered
+    expect(screen.getByText('Hello world')).toBeTruthy();
+  })
 });

@@ -109,6 +109,12 @@ The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop 
 
 {{"demo": "DashboardLayoutNoMiniSidebar.js", "height": 400, "iframe": true}}
 
+### Hiding the sidebar
+
+The layout sidebar can be hidden if needed using the `hideNavigation` prop.
+
+{{"demo": "DashboardLayoutSidebarHidden.js", "height": 400, "iframe": true}}
+
 ## Account
 
 The `DashboardLayout` comes integrated with the [`<Account />`](/toolpad/core/react-account/) component. It renders as an account management menu when a user is signed in – a `session` object is present – and a button when not.

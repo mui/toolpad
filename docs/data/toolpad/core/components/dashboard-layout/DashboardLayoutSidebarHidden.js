@@ -1,13 +1,10 @@
 import * as React from 'react';
-
 import { AppProvider } from '@toolpad/core/AppProvider';
 import Box from '@mui/material/Box';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
-
-const NAVIGATION = [];
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -48,32 +45,18 @@ DemoPageContent.propTypes = {
 function DashboardLayoutSidebarHidden(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
-
-  const router = React.useMemo(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
-
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    // preview-start
     <AppProvider
-      navigation={NAVIGATION}
-      router={router}
       theme={demoTheme}
       window={demoWindow}
     >
       <DashboardLayout hideNavigation>
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent />
       </DashboardLayout>
     </AppProvider>
-    // preview-end
   );
 }
 

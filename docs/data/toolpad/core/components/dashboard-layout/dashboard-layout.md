@@ -111,7 +111,7 @@ The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop 
 
 ### Hiding the sidebar
 
-The layout sidebar can be hidden if needed using the `hideNavigation` prop.
+The layout sidebar can be hidden if needed with the `hideNavigation` prop.
 
 {{"demo": "DashboardLayoutSidebarHidden.js", "height": 400, "iframe": true}}
 

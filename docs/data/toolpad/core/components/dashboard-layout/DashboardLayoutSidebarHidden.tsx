@@ -8,7 +8,7 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
 
-const NAVIGATION: Navigation = []
+const NAVIGATION: Navigation = [];
 
 const demoTheme = createTheme({
   cssVariables: {

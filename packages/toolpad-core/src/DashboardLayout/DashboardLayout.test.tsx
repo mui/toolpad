@@ -354,21 +354,21 @@ describe('DashboardLayout', () => {
         icon: <ShoppingCartIcon />,
       },
     ];
-  
+
     render(
       <AppProvider navigation={NAVIGATION}>
         <DashboardLayout hideNavigation>Hello world</DashboardLayout>
       </AppProvider>,
     );
-  
+
     const desktopNavigation = screen.queryByRole('navigation', { name: 'Desktop' });
     const navigationToggle = screen.queryByLabelText('Collapse menu');
-  
+
     // Expect that the navigation and toggle button are not rendered
     expect(desktopNavigation).toBeNull();
     expect(navigationToggle).toBeNull();
-    
+
     // Ensure the main content is still rendered
     expect(screen.getByText('Hello world')).toBeTruthy();
-  })
+  });
 });

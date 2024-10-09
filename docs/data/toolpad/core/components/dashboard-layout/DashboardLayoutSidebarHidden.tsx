@@ -1,14 +1,10 @@
 import * as React from 'react';
-
-import type { Navigation, Router } from '@toolpad/core';
-
-import { AppProvider } from '@toolpad/core/AppProvider';
-import Box from '@mui/material/Box';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
-
-const NAVIGATION: Navigation = [];
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import type { Router } from '@toolpad/core';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -67,17 +63,10 @@ export default function DashboardLayoutSidebarHidden(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    // preview-start
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
+    <AppProvider router={router} theme={demoTheme} window={demoWindow}>
       <DashboardLayout hideNavigation>
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
-    // preview-end
   );
 }

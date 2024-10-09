@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material/styles';
 import MapIcon from '@mui/icons-material/Map';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation } from '@toolpad/core';
+import type { Router, Navigation } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {
@@ -40,11 +40,26 @@ interface DemoProps {
 export default function DashboardLayoutFullScreen(props: DemoProps) {
   const { window } = props;
 
+  const [pathname, setPathname] = React.useState('/dashboard');
+
+  const router = React.useMemo<Router>(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
+
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <AppProvider navigation={NAVIGATION} theme={demoTheme} window={demoWindow}>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={demoTheme}
+      window={demoWindow}
+    >
       <DashboardLayout>
         <iframe
           title="Google Map"

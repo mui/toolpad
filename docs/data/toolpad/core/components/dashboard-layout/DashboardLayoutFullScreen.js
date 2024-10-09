@@ -32,11 +32,26 @@ const demoTheme = createTheme({
 function DashboardLayoutFullScreen(props) {
   const { window } = props;
 
+  const [pathname, setPathname] = React.useState('/dashboard');
+
+  const router = React.useMemo(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
+
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <AppProvider navigation={NAVIGATION} theme={demoTheme} window={demoWindow}>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={demoTheme}
+      window={demoWindow}
+    >
       <DashboardLayout>
         <iframe
           title="Google Map"

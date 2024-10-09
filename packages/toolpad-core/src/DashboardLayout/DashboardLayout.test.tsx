@@ -364,11 +364,11 @@ describe('DashboardLayout', () => {
     const desktopNavigation = screen.queryByRole('navigation', { name: 'Desktop' });
     const navigationToggle = screen.queryByLabelText('Collapse menu');
 
-    // Expect that the navigation and toggle button are not rendered
+    // Expect that navigation and menu button are not rendered
     expect(desktopNavigation).toBeNull();
     expect(navigationToggle).toBeNull();
 
-    // Ensure the main content is still rendered
+    // Ensure that main content is still rendered
     expect(screen.getByText('Hello world')).toBeTruthy();
   });
 
@@ -379,25 +379,19 @@ describe('DashboardLayout', () => {
         segment: 'dashboard',
         icon: <DashboardIcon />,
       },
-      {
-        title: 'Orders',
-        segment: 'orders',
-        icon: <ShoppingCartIcon />,
-      },
     ];
 
     render(
       <AppProvider navigation={NAVIGATION}>
-        <DashboardLayout defaultDrawerCollapsed>Hello world</DashboardLayout>
+        <DashboardLayout defaultSidebarCollapsed>Hello world</DashboardLayout>
       </AppProvider>,
     );
 
-    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
+    // Expect that menu button has expand action
+    expect(screen.getAllByLabelText('Expand menu')).toBeTruthy();
+    expect(screen.queryByLabelText('Collapse menu')).toBeNull();
 
-    // Expect that the navigation and toggle button are not rendered
-    expect(within(desktopNavigation).getByText('Dashboard')).toBeNull;
-
-    // Ensure the main content is still rendered
+    // Ensure that main content is still rendered
     expect(screen.getByText('Hello world')).toBeTruthy();
   });
 });

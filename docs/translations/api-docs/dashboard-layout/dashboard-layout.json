@@ -2,7 +2,7 @@
   "componentDescription": "",
   "propDescriptions": {
     "children": { "description": "The content of the dashboard." },
-    "defaultDrawerCollapsed": {
+    "defaultSidebarCollapsed": {
       "description": "Whether the sidebar should start collapsed or not in desktop size screens."
     },
     "disableCollapsibleSidebar": {

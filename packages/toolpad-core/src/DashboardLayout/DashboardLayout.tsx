@@ -348,6 +348,11 @@ export interface DashboardLayoutProps {
    */
   disableCollapsibleSidebar?: boolean;
   /**
+   * Whether the sidebar should start collapsed or not in desktop size screens.
+   * @default false
+   */
+  defaultDrawerCollapsed?: boolean;
+  /**
    * The components used for each slot inside.
    * @default {}
    */
@@ -381,9 +386,15 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const {
     children,
     disableCollapsibleSidebar = false,
+<<<<<<< HEAD
     slots,
     slotProps,
     hideNavigation = false,
+=======
+    defaultDrawerCollapsed = false,
+    slots,
+    slotProps,
+>>>>>>> 030236fe5 (Add prop, partial test)
   } = props;
 
   const theme = useTheme();
@@ -393,7 +404,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const appWindow = React.useContext(WindowContext);
   const applicationTitle = useApplicationTitle();
 
-  const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] = React.useState(true);
+  const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
+    React.useState(!defaultDrawerCollapsed);
   const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] = React.useState(false);
 
   const isUnderMdViewport = useMediaQuery(
@@ -679,6 +691,11 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * The content of the dashboard.
    */
   children: PropTypes.node,
+  /**
+   * Whether the sidebar should start collapsed or not in desktop size screens.
+   * @default false
+   */
+  defaultDrawerCollapsed: PropTypes.bool,
   /**
    * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
    * @default false

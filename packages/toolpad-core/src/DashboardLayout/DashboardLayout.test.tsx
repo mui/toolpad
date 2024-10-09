@@ -371,4 +371,33 @@ describe('DashboardLayout', () => {
     // Ensure the main content is still rendered
     expect(screen.getByText('Hello world')).toBeTruthy();
   });
+
+  test('renders without default collapsed navigation on desktop', async () => {
+    const NAVIGATION: Navigation = [
+      {
+        title: 'Dashboard',
+        segment: 'dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        title: 'Orders',
+        segment: 'orders',
+        icon: <ShoppingCartIcon />,
+      },
+    ];
+
+    render(
+      <AppProvider navigation={NAVIGATION}>
+        <DashboardLayout defaultDrawerCollapsed>Hello world</DashboardLayout>
+      </AppProvider>,
+    );
+
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
+
+    // Expect that the navigation and toggle button are not rendered
+    expect(within(desktopNavigation).getByText('Dashboard')).toBeNull;
+
+    // Ensure the main content is still rendered
+    expect(screen.getByText('Hello world')).toBeTruthy();
+  });
 });

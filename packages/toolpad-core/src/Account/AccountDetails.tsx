@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import { SessionContext } from '../AppProvider';
 
-export/**
+/**
  *
  * Demos:
  *
@@ -14,7 +14,9 @@ export/**
  * API:
  *
  * - [AccountDetails API](https://mui.com/toolpad/core/api/account-details)
- */ function AccountDetails(props: AvatarProps) {
+ */
+
+function AccountDetails(props: AvatarProps) {
   const session = React.useContext(SessionContext);
 
   if (!session) {
@@ -39,3 +41,5 @@ export/**
     </Stack>
   );
 }
+
+export { AccountDetails };

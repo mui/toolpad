@@ -44,11 +44,26 @@ You can pass in your own components to completely override the default component
 
 #### Content
 
-Use the `content` slot to completely override the content of the popover. You can compose the `<AccountDetails />` component with your own components to create a custom account popover, as shown in the following demo:
+Use the `content` slot to customize the content of the popover. You can use the `AccountDetails` component inside your custom account popover:
+
+```tsx
+import { AccountDetails } from '@toolpad/core';
+
+function CustomAccount() {
+  return (
+    <Stack direction="column">
+      <AccountDetails />
+      <MenuList dense disablePadding>
+        // ...
+      </MenuList>
+    </Stack>
+  );
+}
+```
 
 ##### Account Switcher
 
-{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "gradient"}}
+{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
 
 The `content` prop can take any React component, so you can use it to display information instead of adding menu items:
 

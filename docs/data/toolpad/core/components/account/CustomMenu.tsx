@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
   Menu,
-  Box,
   MenuItem,
   MenuList,
   Button,

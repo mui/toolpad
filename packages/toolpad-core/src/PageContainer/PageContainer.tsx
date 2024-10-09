@@ -87,16 +87,16 @@ export interface PageContainerProps extends ContainerProps {
  * - [PageContainer API](https://mui.com/toolpad/core/api/page-container)
  */
 function PageContainer(props: PageContainerProps) {
-  const { children, slots, slotProps, ...rest } = props;
+  const { children, slots, slotProps, breadcrumbs, breadCrumbs, ...rest } = props;
 
-  if (process.env.NODE_ENV !== 'production' && props.breadCrumbs) {
+  if (process.env.NODE_ENV !== 'production' && breadCrumbs) {
     warnOnce('The PageContainer `breadCrumbs` prop is deprecated. Use `breadcrumbs` instead.');
   }
 
   const activePage = useActivePage();
 
   // TODO: Remove `props.breadCrumbs` in the next major version
-  const breadcrumbs = props.breadcrumbs ?? props.breadCrumbs ?? activePage?.breadcrumbs ?? [];
+  const resolvedBreadcrumbs = breadcrumbs ?? breadCrumbs ?? activePage?.breadcrumbs ?? [];
   const title = props.title ?? activePage?.title ?? '';
 
   const ToolbarComponent = props?.slots?.toolbar ?? PageContainerToolbar;
@@ -112,9 +112,9 @@ function PageContainer(props: PageContainerProps) {
       <Stack sx={{ my: 2 }} spacing={2}>
         <Stack>
           <Breadcrumbs aria-label="breadcrumb">
-            {breadcrumbs
-              ? breadcrumbs.map((item, index) => {
-                  return index < breadcrumbs.length - 1 ? (
+            {resolvedBreadcrumbs
+              ? resolvedBreadcrumbs.map((item, index) => {
+                  return index < resolvedBreadcrumbs.length - 1 ? (
                     <Link
                       key={item.path}
                       component={ToolpadLink}

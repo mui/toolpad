@@ -173,15 +173,17 @@ const scaffoldCoreProject = async (options: GenerateProjectOptions): Promise<voi
   const files = generateProject(options);
   await writeFiles(options.absolutePath, files);
 
-  // eslint-disable-next-line no-console
-  console.log(`${chalk.cyan('info')} - Installing dependencies`);
-  // eslint-disable-next-line no-console
-  console.log();
+  if (options.install) {
+    // eslint-disable-next-line no-console
+    console.log(`${chalk.cyan('info')} - Installing dependencies`);
+    // eslint-disable-next-line no-console
+    console.log();
 
-  await execa(packageManager, ['install'], { stdio: 'inherit', cwd: options.absolutePath });
+    await execa(packageManager, ['install'], { stdio: 'inherit', cwd: options.absolutePath });
 
-  // eslint-disable-next-line no-console
-  console.log();
+    // eslint-disable-next-line no-console
+    console.log();
+  }
   // eslint-disable-next-line no-console
   console.log(
     `${chalk.green('success')} - Created Toolpad Core project at ${chalk.cyan(options.absolutePath)}`,
@@ -249,6 +251,7 @@ const run = async () => {
   const pathArg = args._?.[0] as string;
   const installFlag = args.install as boolean;
   const studioFlag = args.studio as boolean;
+  const example = args.example as string;
 
   if (pathArg) {
     const pathValidOrError = await validatePath(pathArg);
@@ -266,7 +269,9 @@ const run = async () => {
 
   if (!pathArg) {
     projectPath = await input({
-      message: 'Enter path for new project directory:',
+      message: example
+        ? `Enter path of directory to download example "${chalk.cyan(example)}" into`
+        : 'Enter path of directory to bootstrap new app',
       validate: validatePath,
       default: '.',
     });
@@ -275,8 +280,8 @@ const run = async () => {
   const absolutePath = bashResolvePath(projectPath);
 
   // If the user has provided an example, download and extract it
-  if (args.example) {
-    await downloadAndExtractExample(absolutePath, args.example);
+  if (example) {
+    await downloadAndExtractExample(absolutePath, example);
   }
 
   // If the studio flag is set, create a new project with Toolpad Studio
@@ -331,6 +336,7 @@ const run = async () => {
       coreVersion: args.coreVersion,
       router: routerOption,
       auth: authFlag,
+      install: installFlag,
       authProviders: authProviderOptions,
     };
     await scaffoldCoreProject(options);
@@ -345,7 +351,7 @@ const run = async () => {
       ? `  cd ${path.relative(process.cwd(), absolutePath)}\n`
       : '';
 
-  const installInstruction = installFlag ? '' : `  ${packageManager} install\n`;
+  const installInstruction = example || !installFlag ? `  ${packageManager} install\n` : '';
 
   const message = `Run the following to get started: \n\n${chalk.magentaBright(
     `${changeDirectoryInstruction}${installInstruction}  ${packageManager}${

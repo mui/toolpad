@@ -348,7 +348,7 @@ export interface DashboardLayoutProps {
    */
   disableCollapsibleSidebar?: boolean;
   /**
-   * Whether the sidebar should start collapsed or not in desktop size screens.
+   * Whether the sidebar should start collapsed in desktop size screens.
    * @default false
    */
   defaultSidebarCollapsed?: boolean;
@@ -687,7 +687,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * Whether the sidebar should start collapsed or not in desktop size screens.
+   * Whether the sidebar should start collapsed in desktop size screens.
    * @default false
    */
   defaultSidebarCollapsed: PropTypes.bool,

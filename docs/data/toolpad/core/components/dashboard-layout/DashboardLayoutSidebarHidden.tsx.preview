@@ -1,0 +1,3 @@
+<DashboardLayout hideNavigation>
+  <DemoPageContent pathname={pathname} />
+</DashboardLayout>

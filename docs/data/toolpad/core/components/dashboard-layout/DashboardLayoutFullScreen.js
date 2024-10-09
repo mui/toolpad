@@ -32,7 +32,7 @@ const demoTheme = createTheme({
 function DashboardLayoutFullScreen(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
+  const [pathname, setPathname] = React.useState('/map');
 
   const router = React.useMemo(() => {
     return {

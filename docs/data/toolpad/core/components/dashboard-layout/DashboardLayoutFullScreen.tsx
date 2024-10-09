@@ -40,7 +40,7 @@ interface DemoProps {
 export default function DashboardLayoutFullScreen(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
+  const [pathname, setPathname] = React.useState('/map');
 
   const router = React.useMemo<Router>(() => {
     return {

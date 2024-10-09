@@ -1,5 +1,6 @@
 import { AppProvider } from '@toolpad/core/nextjs';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import type { Navigation } from '@toolpad/core';
 import theme from '../theme';
@@ -10,9 +11,14 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    segment: 'page',
-    title: 'Page',
+    segment: '',
+    title: 'Dashboard',
     icon: <DashboardIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
   },
 ];
 

@@ -19,7 +19,7 @@ npx create-toolpad-app@latest --example core-tutorial
 ```
 
 ```bash pnpm
-pnpm create toolpad-app --example core-tutorial
+pnpm dlx create toolpad-app --example core-tutorial
 ```
 
 ```bash yarn
@@ -51,9 +51,9 @@ yarn && yarn dev
 
 3. The following splash screen appears:
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/installation-1.png", "alt": "Toolpad Core entry point", "caption": "Starting with Toolpad Core", "zoom": true, "indent": 1 }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/bootstrap.png", "srcDark": "/static/toolpad/docs/core/bootstrap-dark.png", "alt": "Toolpad Core entry point", "caption": "Starting with Toolpad Core", "zoom": true, "indent": 1 }}
 
-4. The app has one page already created, which can be viewed by clicking on the "Go to page" button. The following page should appear:
+4. The app has two pages already created in a dashboard layout, with routing, breadcrumbs and theming already set up:
 
 {{"demo": "TutorialDefault.js", "iframe": true, "hideToolbar": true }}
 
@@ -84,15 +84,6 @@ import TimelineIcon from '@mui/icons-material/TimelineIcon';
 // ...
 
 const NAVIGATION: Navigation = [
-  {
-    kind: 'header',
-    title: 'Main items',
-  },
-  {
-    segment: 'page',
-    title: 'Page',
-    icon: <DashboardIcon />,
-  },
   // Add the following new item:
   {
     segment: 'page-2',

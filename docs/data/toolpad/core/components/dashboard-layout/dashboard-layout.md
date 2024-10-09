@@ -109,7 +109,7 @@ The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop 
 
 {{"demo": "DashboardLayoutNoMiniSidebar.js", "height": 400, "iframe": true}}
 
-### Full-Screen Content
+### Full-screen Content
 
 The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.
 

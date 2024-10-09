@@ -36,15 +36,3 @@ It follows the open-core model, with some features being available under the MIT
 :::info
 Visit the [roadmap](/toolpad/core/introduction/roadmap/) to see more details about upcoming releases.
 :::
-
-If any the following potential features interests you, leave an upvote as it will help us in the prioritzation:
-
-- [CRUD page](https://github.com/mui/toolpad/issues/4146)
-- [SignUp/Register page](https://github.com/mui/toolpad/issues/4068)
-- [Notification center](https://github.com/mui/toolpad/issues/4148)
-- [Stat Card component](https://github.com/mui/toolpad/issues/4069)
-- [Appbar Search component](https://github.com/mui/toolpad/issues/4107)
-- [Role-based Access Control](https://github.com/mui/toolpad/issues/4120)
-- [Audit Logs](https://github.com/mui/toolpad/issues/4173)
-- [Error pages](https://github.com/mui/toolpad/issues/4174)
-- [Forms](/)

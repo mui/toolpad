@@ -1,39 +1,28 @@
-/* eslint-disable react-refresh/only-export-components */
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { AppProvider } from '@toolpad/core/react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
-import type { Navigation } from '@toolpad/core';
+import DashboardPage from './pages';
+import OrdersPage from './pages/orders';
 
-const NAVIGATION: Navigation = [
+const router = createBrowserRouter([
   {
-    kind: 'header',
-    title: 'Main items',
+    Component: App,
+    children: [
+      {
+        path: '/',
+        Component: DashboardPage,
+      },
+      {
+        path: '/orders',
+        Component: OrdersPage,
+      },
+    ],
   },
-  {
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-];
-
-const BRANDING = {
-  title: 'My Toolpad Core App',
-};
+]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <AppProvider navigation={NAVIGATION} branding={BRANDING}>
-        <App />
-      </AppProvider>
-    </BrowserRouter>
+    <RouterProvider router={router} />
   </React.StrictMode>,
 );

@@ -772,24 +772,55 @@ That's it! You now have Toolpad Core integrated into your Next.js Pages Router a
 
 To integrate Toolpad Core into a single-page app using React Router, follow these steps:
 
-### 1. Wrap your application with `AppProvider`
+### 1. Wrap all your pages in an `AppProvider` using a layout route
 
-In your root layout file (e.g.: `src/main.tsx`), wrap your application with the `AppProvider` from `@toolpad/core/react-router-dom`.
+In your router configuration (e.g.: `src/main.tsx`), use a shared component or element (e.g.: `src/App.tsx`) as a root **layout route** that wraps pages in the `AppProvider` from `@toolpad/core/react-router-dom`.
 
-Make sure that this `AppProvider` is nested inside the React Router context (e.g.: `BrowserRouter`).
+You must use the `<Outlet />` component from `react-router-dom` in the root layout element or component.
 
 ```tsx title="src/main.tsx"
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { createTheme } from '@mui/material/styles';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import App from './App';
+import DashboardPage from './pages';
+import OrdersPage from './pages/orders';
+
+const router = createBrowserRouter([
+  {
+    Component: App, // root layout route
+    children: [
+      {
+        path: '/',
+        Component: DashboardPage,
+      },
+      {
+        path: '/orders',
+        Component: OrdersPage,
+      },
+    ],
+  },
+]);
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>,
+);
+```
+
+```tsx title="src/App.tsx"
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/react-router-dom';
+import { Outlet } from 'react-router-dom';
 import type { Navigation } from '@toolpad/core';
-import App from './App';
 
 const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Main items',
+  },
   {
     title: 'Dashboard',
     icon: <DashboardIcon />,
@@ -805,17 +836,13 @@ const BRANDING = {
   title: 'My Toolpad Core App',
 };
 
-const theme = createTheme();
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <AppProvider navigation={NAVIGATION} branding={BRANDING} theme={theme}>
-        <App />
-      </AppProvider>
-    </BrowserRouter>
-  </React.StrictMode>,
-);
+export default function App() {
+  return (
+    <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+      <Outlet />
+    </AppProvider>
+  );
+}
 ```
 
 ### 2. Create a dashboard layout
@@ -838,11 +865,11 @@ export default function Layout(props: { children: React.ReactNode }) {
 
 The [`DashboardLayout`](/toolpad/core/react-dashboard-layout/) component provides a consistent layout for your dashboard pages, including a sidebar, navigation, and header. The [`PageContainer`](/toolpad/core/react-page-container/) component is used to wrap the page content, and provides breadcrumbs for navigation.
 
-### 3. Add a dashboard page
+### 3. Create pages
 
-Create a dashboard page (e.g.: `src/pages/index.tsx`).
+As defined in your router configuration, create a dashboard page (e.g.: `src/pages/index.tsx`) and an orders page (`src/pages/orders.tsx`).
 
-Wrap the page with the layout component you previously created in order for it to use it.
+Wrap the pages with the layout component you previously created in order for them to use it.
 
 ```tsx title="src/pages/index.tsx"
 import * as React from 'react';
@@ -858,10 +885,6 @@ export default function DashboardPage() {
 }
 ```
 
-### 4. Add a second page
-
-Create a new page in the dashboard, for example, `src/pages/orders.tsx`:
-
 ```tsx title="src/pages/orders.tsx"
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
@@ -872,25 +895,6 @@ export default function OrdersPage() {
     <Layout>
       <Typography>Welcome to the orders page!</Typography>
     </Layout>
-  );
-}
-```
-
-### 5. Define app routes
-
-Define your application routes in a root file (e.g.: `src/App.tsx`):
-
-import { Route, Routes } from 'react-router-dom';
-import DashboardPage from './pages';
-import OrdersPage from './pages/orders';
-
-```tsx title="src/App.tsx"
-export default function App() {
-  return (
-    <Routes>
-      <Route path="/" Component={DashboardPage} />
-      <Route path="/orders" Component={OrdersPage} />
-    </Routes>
   );
 }
 ```

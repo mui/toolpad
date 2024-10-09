@@ -28,7 +28,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "github:mui/toolpad",
+    "url": "git+https://github.com/mui/toolpad.git",
     "directory": "packages/toolpad-studio-components"
   },
   "scripts": {
@@ -41,25 +41,25 @@
     "url": "https://github.com/mui/toolpad/issues"
   },
   "dependencies": {
-    "@mui/icons-material": "6.1.1",
+    "@mui/icons-material": "6.1.2",
     "@mui/lab": "6.0.0-beta.10",
-    "@mui/material": "6.1.1",
-    "@mui/x-charts": "7.18.0",
-    "@mui/x-data-grid-premium": "7.18.0",
-    "@mui/x-date-pickers": "7.18.0",
+    "@mui/material": "6.1.2",
+    "@mui/x-charts": "7.19.0",
+    "@mui/x-data-grid-premium": "7.19.0",
+    "@mui/x-date-pickers": "7.19.0",
     "@mui/x-license": "7.18.0",
-    "@tanstack/react-query": "5.56.2",
+    "@tanstack/react-query": "5.59.0",
     "@toolpad/studio-runtime": "workspace:*",
     "@toolpad/utils": "workspace:*",
     "dayjs": "1.11.13",
     "invariant": "2.2.4",
-    "markdown-to-jsx": "7.4.7",
+    "markdown-to-jsx": "7.5.0",
     "react-error-boundary": "4.0.13",
-    "react-hook-form": "7.52.2"
+    "react-hook-form": "7.53.0"
   },
   "devDependencies": {
     "@types/invariant": "2.2.37",
-    "@types/react": "18.3.10",
+    "@types/react": "18.3.11",
     "react": "18.3.1"
   },
   "peerDependencies": {

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Typography } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
@@ -15,9 +16,14 @@ const NAVIGATION = [
     title: 'Main items',
   },
   {
-    segment: 'page',
-    title: 'Page',
+    segment: '',
+    title: 'Dashboard',
     icon: <DashboardIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
   },
   // Add the following new item:
   {
@@ -45,8 +51,10 @@ const demoTheme = createTheme({
 
 function DemoPageContent({ pathname }) {
   switch (pathname) {
-    case '/page':
+    case '/':
       return <PageContainer>Hello world!</PageContainer>;
+    case '/orders':
+      return <PageContainer>Orders page</PageContainer>;
     case '/page-2':
       return (
         <PageContainer>

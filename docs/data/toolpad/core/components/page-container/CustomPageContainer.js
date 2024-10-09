@@ -13,7 +13,7 @@ const NAVIGATION = [
   {
     segment: 'inbox',
     title: 'Orders',
-    pattern: '/inbox/:id',
+    pattern: 'inbox/:id',
   },
 ];
 

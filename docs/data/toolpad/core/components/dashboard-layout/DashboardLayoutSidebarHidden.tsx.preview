@@ -7,4 +7,4 @@
   <DashboardLayout hideNavigation>
     <DemoPageContent pathname={pathname} />
   </DashboardLayout>
-</AppProvider>
+</AppProvider>

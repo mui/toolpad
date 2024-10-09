@@ -85,3 +85,4 @@ DashboardLayoutSidebarHidden.propTypes = {
 };
 
 export default DashboardLayoutSidebarHidden;
+

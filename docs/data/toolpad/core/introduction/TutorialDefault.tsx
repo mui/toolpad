@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -9,9 +10,14 @@ import type { Navigation } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {
-    segment: 'page',
-    title: 'Page',
+    segment: '',
+    title: 'Dashboard',
     icon: <DashboardIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
   },
 ];
 
@@ -33,8 +39,10 @@ const demoTheme = createTheme({
 
 function DemoPageContent({ pathname }: { pathname: string }) {
   switch (pathname) {
-    case '/page':
+    case '/':
       return <PageContainer>Hello world!</PageContainer>;
+    case '/orders':
+      return <PageContainer>Orders page</PageContainer>;
     default:
       return null;
   }

@@ -14,6 +14,7 @@ import CopyIcon from '@mui/icons-material/ContentCopy';
 
 import {
   Account,
+  AccountDetails,
   AuthenticationContext,
   SessionContext,
   Session,
@@ -35,7 +36,8 @@ const mockData = {
 
 function CryptoWalletInfo() {
   return (
-    <div>
+    <Stack direction="column">
+      <AccountDetails />
       <Stack spacing={2} sx={{ width: 300, p: 2 }}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -88,7 +90,7 @@ function CryptoWalletInfo() {
         </Stack>
       </Stack>
       <Divider />
-    </div>
+    </Stack>
   );
 }
 

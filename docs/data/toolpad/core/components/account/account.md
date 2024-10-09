@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Account
-components: Account
+components: Account, AccountDetails
 ---
 
 # Account
@@ -44,7 +44,7 @@ You can pass in your own components to completely override the default component
 
 #### Content
 
-Use the `content` slot to add any additional options in the space between the user's account details and the sign out button, to create larger, more complex menus:
+Use the `content` slot to completely override the content of the popover. You can compose the `<AccountDetails />` component with your own components to create a custom account popover, as shown in the following demo:
 
 ##### Account Switcher
 

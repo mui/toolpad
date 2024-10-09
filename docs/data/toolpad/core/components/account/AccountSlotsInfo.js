@@ -12,7 +12,12 @@ import SendIcon from '@mui/icons-material/Send';
 import ShoppingCart from '@mui/icons-material/ShoppingCart';
 import CopyIcon from '@mui/icons-material/ContentCopy';
 
-import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
+import {
+  Account,
+  AccountDetails,
+  AuthenticationContext,
+  SessionContext,
+} from '@toolpad/core';
 
 const demoSession = {
   user: {
@@ -30,7 +35,8 @@ const mockData = {
 
 function CryptoWalletInfo() {
   return (
-    <div>
+    <Stack direction="column">
+      <AccountDetails />
       <Stack spacing={2} sx={{ width: 300, p: 2 }}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -83,7 +89,7 @@ function CryptoWalletInfo() {
         </Stack>
       </Stack>
       <Divider />
-    </div>
+    </Stack>
   );
 }
 

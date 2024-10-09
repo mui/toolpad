@@ -10,7 +10,9 @@ import {
   ListItemText,
   Typography,
   Avatar,
+  Stack,
 } from '@mui/material';
+import { AccountDetails } from '@toolpad/core';
 import FolderIcon from '@mui/icons-material/Folder';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -173,61 +175,64 @@ export default function CustomMenu() {
   }, []);
 
   return (
-    <MenuList dense disablePadding>
-      <Typography variant="body2" margin={1}>
-        Accounts
-      </Typography>
-      {accounts.map((account) => (
-        <MenuItem
-          key={account.id}
-          component="button"
-          sx={{
-            justifyContent: 'flex-start',
-            width: '100%',
-            columnGap: 2,
-          }}
-          // onClick={() => handleSelectProjects(account.id)}
-          onMouseEnter={(event) => handleTriggerEnter(event, account.id)}
-          onMouseLeave={handleTriggerLeave}
-        >
-          <ListItemIcon>
-            <Avatar
-              sx={{
-                width: 32,
-                height: 32,
-                fontSize: '0.95rem',
-                bgcolor: account.color,
-              }}
-              src={account.image ?? ''}
-              alt={account.name ?? ''}
-            >
-              {account.name[0]}
-            </Avatar>
-          </ListItemIcon>
-          <ListItemText
+    <Stack direction="column">
+      <AccountDetails />
+      <MenuList dense disablePadding>
+        <Typography variant="body2" margin={1}>
+          Accounts
+        </Typography>
+        {accounts.map((account) => (
+          <MenuItem
+            key={account.id}
+            component="button"
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
+              justifyContent: 'flex-start',
               width: '100%',
+              columnGap: 2,
             }}
-            primary={account.name}
-            secondary={account.email}
-            primaryTypographyProps={{ variant: 'body2' }}
-            secondaryTypographyProps={{ variant: 'caption' }}
-          />
-        </MenuItem>
-      ))}
+            // onClick={() => handleSelectProjects(account.id)}
+            onMouseEnter={(event) => handleTriggerEnter(event, account.id)}
+            onMouseLeave={handleTriggerLeave}
+          >
+            <ListItemIcon>
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  fontSize: '0.95rem',
+                  bgcolor: account.color,
+                }}
+                src={account.image ?? ''}
+                alt={account.name ?? ''}
+              >
+                {account.name[0]}
+              </Avatar>
+            </ListItemIcon>
+            <ListItemText
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                width: '100%',
+              }}
+              primary={account.name}
+              secondary={account.email}
+              primaryTypographyProps={{ variant: 'body2' }}
+              secondaryTypographyProps={{ variant: 'caption' }}
+            />
+          </MenuItem>
+        ))}
 
-      <Divider />
-      <ProjectsList
-        open={subMenuOpen}
-        anchorEl={subMenuAnchorEl}
-        handleEnter={handleSubMenuEnter}
-        handleLeave={handleSubMenuLeave}
-        handleMenuClose={handleSubMenuClose}
-        projects={selectedProjects}
-      />
-    </MenuList>
+        <Divider />
+        <ProjectsList
+          open={subMenuOpen}
+          anchorEl={subMenuAnchorEl}
+          handleEnter={handleSubMenuEnter}
+          handleLeave={handleSubMenuLeave}
+          handleMenuClose={handleSubMenuClose}
+          projects={selectedProjects}
+        />
+      </MenuList>
+    </Stack>
   );
 }

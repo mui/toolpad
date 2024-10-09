@@ -1,8 +1,9 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
+
 import { AppProvider } from '@toolpad/core/AppProvider';
 import Box from '@mui/material/Box';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
 

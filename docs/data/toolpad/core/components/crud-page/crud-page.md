@@ -5,7 +5,7 @@ title: CRUD Page
 
 # CRUD Page 🚧
 
-<p class="description">CRUD component extends a data grid by offering create, read, update and delete functionality externally.</p>
+<p class="description">The CRUD component provides a UI for editable data sources. With deep-linkable, form-based pages.</p>
 
 :::warning
 The CRUD component isn't available yet, but you can upvote [**this GitHub issue**](https://github.com/mui/toolpad/issues/4146) to see it arrive sooner.

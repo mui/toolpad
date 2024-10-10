@@ -9,7 +9,7 @@
   "description": "Create Toolpad apps with one command",
   "repository": {
     "type": "git",
-    "url": "github:mui/toolpad",
+    "url": "git+https://github.com/mui/toolpad.git",
     "directory": "packages/create-toolpad-app"
   },
   "author": "Toolpad Team",
@@ -30,7 +30,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "@inquirer/prompts": "^5.5.0",
+    "@inquirer/prompts": "^6.0.1",
     "@toolpad/core": "workspace:*",
     "@toolpad/utils": "workspace:*",
     "chalk": "5.3.0",

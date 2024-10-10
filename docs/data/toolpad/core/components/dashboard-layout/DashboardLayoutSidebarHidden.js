@@ -1,25 +1,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
-import { useDemoRouter } from '@toolpad/core/internals';
-
-const NAVIGATION = [
-  {
-    segment: '',
-    title: 'Dashboard',
-    icon: <DashboardIcon />,
-  },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-];
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -38,43 +23,51 @@ const demoTheme = createTheme({
 });
 
 function DemoPageContent({ pathname }) {
-  switch (pathname) {
-    case '/':
-      return <PageContainer>Hello world!</PageContainer>;
-    case '/orders':
-      return <PageContainer>Orders page</PageContainer>;
-    default:
-      return null;
-  }
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
 }
 
 DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-function TutorialDefault(props) {
+function DashboardLayoutSidebarHidden(props) {
   const { window } = props;
+
+  const [pathname, setPathname] = React.useState('/dashboard');
+
+  const router = React.useMemo(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const demoRouter = useDemoRouter('/page');
-
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={demoRouter}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout>
-        <DemoPageContent pathname={demoRouter.pathname} />
+    <AppProvider router={router} theme={demoTheme} window={demoWindow}>
+      <DashboardLayout hideNavigation>
+        <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
   );
 }
 
-TutorialDefault.propTypes = {
+DashboardLayoutSidebarHidden.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -82,4 +75,4 @@ TutorialDefault.propTypes = {
   window: PropTypes.func,
 };
 
-export default TutorialDefault;
+export default DashboardLayoutSidebarHidden;

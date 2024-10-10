@@ -9,7 +9,10 @@
       "description": "Whether the navigation bar and menu icon should be hidden"
     },
     "slotProps": { "description": "The props used for each slot inside." },
-    "slots": { "description": "The components used for each slot inside." }
+    "slots": { "description": "The components used for each slot inside." },
+    "sx": {
+      "description": "The system prop that allows defining system overrides as well as additional CSS styles."
+    }
   },
   "classDescriptions": {},
   "slotDescriptions": {

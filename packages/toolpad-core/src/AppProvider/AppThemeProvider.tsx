@@ -71,14 +71,7 @@ function LegacyThemeProvider(props: LegacyThemeProviderProps) {
   );
 
   return (
-    <ThemeProvider
-      theme={dualAwareTheme}
-      documentNode={appWindow?.document}
-      colorSchemeNode={appWindow?.document?.body}
-      disableNestedContext
-      colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
-      modeStorageKey={MODE_STORAGE_KEY}
-    >
+    <ThemeProvider theme={dualAwareTheme}>
       <PaletteModeContext.Provider value={paletteModeContextValue}>
         <CssBaseline enableColorScheme />
         {children}

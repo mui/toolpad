@@ -103,7 +103,7 @@ This feature is built on top of the [path-to-regexp](https://www.npmjs.com/packa
 
 {{"demo": "DashboardLayoutPattern.js", "height": 400, "iframe": true}}
 
-### Disabling collapsible sidebar
+### Disable collapsible sidebar
 
 The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop and tablet viewports. This behavior can be disabled with the `disableCollapsibleSidebar` prop.
 
@@ -114,6 +114,12 @@ The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop 
 The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.
 
 {{"demo": "DashboardLayoutFullScreen.js", "height": 400, "iframe": true}}
+
+### Hide navigation
+
+The layout sidebar can be hidden if needed with the `hideNavigation` prop.
+
+{{"demo": "DashboardLayoutSidebarHidden.js", "height": 400, "iframe": true}}
 
 ## Account
 

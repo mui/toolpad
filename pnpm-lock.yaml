@@ -1310,10 +1310,10 @@ importers:
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
       '@types/react':
-        specifier: ^18.3.10
+        specifier: 18.3.11
         version: 18.3.11
       '@types/react-dom':
-        specifier: ^18.3.0
+        specifier: 18.3.0
         version: 18.3.0
       '@vitejs/plugin-react':
         specifier: ^4.3.2
@@ -1321,9 +1321,6 @@ importers:
       eslint:
         specifier: ^9.11.1
         version: 9.12.0
-      eslint-plugin-react-hooks:
-        specifier: ^5.1.0-rc.0
-        version: 5.1.0-rc-fb9a90fa48-20240614(eslint@9.12.0)
       eslint-plugin-react-refresh:
         specifier: ^0.4.12
         version: 0.4.12(eslint@9.12.0)
@@ -1331,17 +1328,14 @@ importers:
         specifier: ^15.9.0
         version: 15.11.0
       react:
-        specifier: ^18.3.1
+        specifier: 18.3.1
         version: 18.3.1
       react-dom:
-        specifier: ^18.3.1
+        specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
       react-router-dom:
         specifier: 6.26.2
         version: 6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      typescript:
-        specifier: ^5.5.3
-        version: 5.6.2
       typescript-eslint:
         specifier: ^8.7.0
         version: 8.8.1(eslint@9.12.0)(typescript@5.6.2)
@@ -6255,12 +6249,6 @@ packages:
     engines: {node: '>=10'}
     peerDependencies:
       eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
-
-  eslint-plugin-react-hooks@5.1.0-rc-fb9a90fa48-20240614:
-    resolution: {integrity: sha512-xsiRwaDNF5wWNC4ZHLut+x/YcAxksUd9Rizt7LaEn3bV8VyYRpXnRJQlLOfYaVy9esk4DFP4zPPnoNVjq5Gc0w==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
 
   eslint-plugin-react-refresh@0.4.12:
     resolution: {integrity: sha512-9neVjoGv20FwYtCP6CB1dzR1vr57ZDNOXst21wd2xJ/cTlM2xLq0GWVlSNTdMn/4BtP6cHYBMCSp1wFBJ9jBsg==}
@@ -16469,10 +16457,6 @@ snapshots:
       eslint: 8.57.1
 
   eslint-plugin-react-hooks@4.6.2(eslint@9.12.0):
-    dependencies:
-      eslint: 9.12.0
-
-  eslint-plugin-react-hooks@5.1.0-rc-fb9a90fa48-20240614(eslint@9.12.0):
     dependencies:
       eslint: 9.12.0
 

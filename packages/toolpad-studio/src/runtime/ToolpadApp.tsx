@@ -84,7 +84,6 @@ import evalJsBindings, {
   EvaluatedBinding,
   ParsedBinding,
 } from './evalJsBindings';
-import { PREVIEW_HEADER_HEIGHT } from './constants';
 import { layoutBoxArgTypes } from './toolpadComponents/layoutBox';
 import { useDataQuery, UseFetch } from './useDataQuery';
 import { CanvasHooksContext, NavigateToPage } from './CanvasHooksContext';
@@ -173,8 +172,8 @@ function isEqual(
 const AppRoot = styled('div')({
   overflow: 'auto' /* Prevents margins from collapsing into root */,
   position: 'relative' /* Makes sure that the editor overlay that renders inside sizes correctly */,
-  minHeight: '100vh',
   display: 'flex',
+  flex: 1,
   flexDirection: 'column',
 });
 
@@ -1561,20 +1560,12 @@ function ToolpadAppLayout({ children }: ToolpadAppLayoutProps) {
 
   const appHost = useAppHost();
 
-  const clipped = shouldShowPreviewHeader(appHost);
-
   if (!appHost.isCanvas && !session?.user && hasAuthentication) {
     return <AppLoading />;
   }
 
   return (
-    <AppLayout
-      activePageSlug={activePageSlug}
-      pages={navEntries}
-      hasNavigation={!appHost.isCanvas}
-      hasHeader={hasAuthentication && !appHost.isCanvas}
-      clipped={clipped}
-    >
+    <AppLayout activePageSlug={activePageSlug} pages={navEntries} hasLayout={!appHost.isCanvas}>
       {children}
     </AppLayout>
   );
@@ -1679,18 +1670,21 @@ export function ToolpadAppProvider({
               <ResetNodeErrorsKeyProvider value={resetNodeErrorsKey}>
                 <AppThemeProvider dom={dom}>
                   <CssBaseline enableColorScheme />
-                  {showPreviewHeader ? <PreviewHeader /> : null}
-                  <AppRoot
-                    ref={rootRef}
+                  <Box
                     sx={{
-                      paddingTop: showPreviewHeader ? `${PREVIEW_HEADER_HEIGHT}px` : 0,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '100vh',
                     }}
                   >
-                    <ErrorBoundary FallbackComponent={AppError}>
-                      <React.Suspense fallback={<AppLoading />}>{children}</React.Suspense>
-                    </ErrorBoundary>
-                    <EditorOverlay ref={canvasHooks.overlayRef} />
-                  </AppRoot>
+                    {showPreviewHeader ? <PreviewHeader /> : null}
+                    <AppRoot ref={rootRef}>
+                      <ErrorBoundary FallbackComponent={AppError}>
+                        <React.Suspense fallback={<AppLoading />}>{children}</React.Suspense>
+                      </ErrorBoundary>
+                      <EditorOverlay ref={canvasHooks.overlayRef} />
+                    </AppRoot>
+                  </Box>
                 </AppThemeProvider>
               </ResetNodeErrorsKeyProvider>
             </AuthContext.Provider>

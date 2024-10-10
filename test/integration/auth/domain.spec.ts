@@ -58,7 +58,7 @@ test('Must be authenticated with valid domain to access app', async ({ page, req
   await page.waitForURL(/\/prod\/pages\/mypage/);
 
   // Sign out
-  await page.getByText('Mr. MUI 2024').click();
+  await page.getByRole('button', { name: 'Current User' }).click();
   await page.getByText('Sign out').click();
 
   await page.waitForURL(/\/prod\/signin/);

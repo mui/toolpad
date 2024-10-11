@@ -45,4 +45,19 @@ describe('SignInPage', () => {
     expect(signIn.mock.calls[0][1].get('email')).toBe('john@example.com');
     expect(signIn.mock.calls[0][1].get('password')).toBe('thepassword');
   });
+
+  test('renders nodemailer provider', async () => {
+    const signIn = vi.fn();
+    render(<SignInPage signIn={signIn} providers={[{ id: 'nodemailer', name: 'Email' }]} />);
+
+    const emailField = screen.getByRole('textbox', { name: 'Email Address' });
+    const signInButton = screen.getByRole('button', { name: 'Sign in with Email' });
+
+    await userEvent.type(emailField, 'john@example.com');
+    await userEvent.click(signInButton);
+
+    expect(signIn).toHaveBeenCalled();
+    expect(signIn.mock.calls[0][0]).toHaveProperty('id', 'nodemailer');
+    expect(signIn.mock.calls[0][1].get('email')).toBe('john@example.com');
+  });
 });

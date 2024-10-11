@@ -6,7 +6,7 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ sidebarFooter?: object, toolbarAccount?: { localeText?: { signInLabel: string, signOutLabel: string }, slotProps?: { iconButton?: object, signInButton?: object, signOutButton?: object }, slots?: { menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
+        "description": "{ sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: { signInLabel: string, signOutLabel: string }, slotProps?: { iconButton?: object, signInButton?: object, signOutButton?: object }, slots?: { menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
       },
       "default": "{}"
     },

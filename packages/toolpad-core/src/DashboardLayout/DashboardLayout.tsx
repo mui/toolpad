@@ -177,6 +177,7 @@ function DashboardSidebarSubNavigation({
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                zIndex: 2,
               }}
             >
               {getItemTitle(navigationItem)}

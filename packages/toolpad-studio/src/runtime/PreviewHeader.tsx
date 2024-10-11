@@ -3,7 +3,6 @@ import { Button, Typography, Box, useTheme, Alert, ButtonProps } from '@mui/mate
 import EditIcon from '@mui/icons-material/Edit';
 import { Link, useMatch } from 'react-router-dom';
 import { useAppHost } from '@toolpad/studio-runtime';
-import { PREVIEW_HEADER_HEIGHT } from './constants';
 
 function OpenInEditorButton<C extends React.ElementType>({
   children = 'Open in editor',
@@ -36,9 +35,8 @@ export default function PreviewHeader() {
   return appContext ? (
     <Box
       sx={{
-        position: 'fixed',
+        position: 'relative',
         width: '100%',
-        height: PREVIEW_HEADER_HEIGHT,
         zIndex: theme.zIndex.drawer + 2,
       }}
     >

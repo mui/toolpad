@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import path from 'path';
 import {
-  createModulePackages,
   createPackageFile,
   includeFileInBuild,
   prepend,
@@ -53,8 +52,6 @@ async function run() {
     );
 
     await addLicense(packageData);
-
-    await createModulePackages({ from: srcPath, to: buildPath });
   } catch (err) {
     console.error(err);
     process.exit(1);

@@ -31,8 +31,6 @@ The `AppProvider` for Next.js applications includes some Next.js integrations ou
 By using the specific `AppProvider` for Next.js you do not have to manually configure the integration between some Toolpad features and the corresponding Next.js features (such as routing), making the integration automatic and seamless.
 
 ```tsx
-import { AppProvider } from '@toolpad/core/nextjs/AppProvider';
-// or
 import { AppProvider } from '@toolpad/core/nextjs';
 ```
 
@@ -43,7 +41,7 @@ When using the **Next.js App Router**, the most typical file where to import and
 ```tsx
 // app/layout.tsx
 
-import { AppProvider } from '@toolpad/core/nextjs/AppProvider';
+import { AppProvider } from '@toolpad/core/nextjs';
 
 export default function Layout(props) {
   const { children } = props;
@@ -65,7 +63,7 @@ When using the **Next.js Pages Router**, the most typical file where to import a
 ```tsx
 // pages/_app.tsx
 
-import { AppProvider } from '@toolpad/core/nextjs/AppProvider';
+import { AppProvider } from '@toolpad/core/nextjs';
 
 export default function App(props) {
   const { Component, pageProps } = props;
@@ -76,6 +74,16 @@ export default function App(props) {
     </AppProvider>
   );
 }
+```
+
+## Client-side Routing
+
+The `AppProvider` for React Router includes routing out-of-the-box for projects using [react-router-dom](https://www.npmjs.com/package/react-router-dom).
+
+This specific `AppProvider` is recommended when building single-page applications with tools such as [Vite](https://vite.dev/), as you do not have to manually configure your app routing, making the integration automatic and seamless.
+
+```tsx
+import { AppProvider } from '@toolpad/core/react-router-dom';
 ```
 
 ## Theming

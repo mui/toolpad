@@ -9,8 +9,7 @@
   "dependencies": {
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
-    "@mui/icons-material": "^6",
-    "@mui/lab": "^6",
+    "@mui/icons-material": "^6",    
     "@mui/material": "^6",
     "@mui/material-nextjs": "^6",
     "@toolpad/core": "latest",

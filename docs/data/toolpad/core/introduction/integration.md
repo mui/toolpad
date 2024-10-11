@@ -133,28 +133,12 @@ npm install next-auth@beta
 ```ts title="auth.ts"
 import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
-import Credentials from 'next-auth/providers/credentials';
 import type { Provider } from 'next-auth/providers';
+
 const providers: Provider[] = [
   GitHub({
     clientId: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  }),
-  Credentials({
-    credentials: {
-      email: { label: 'Email Address', type: 'email' },
-      password: { label: 'Password', type: 'password' },
-    },
-    authorize(c) {
-      if (c.password !== 'password') {
-        return null;
-      }
-      return {
-        id: 'test',
-        name: 'Test User',
-        email: String(c.email),
-      };
-    },
   }),
 ];
 
@@ -187,12 +171,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 });
 ```
 
-:::warning
-
-This file is only for demonstration purposes and allows signing in with `password` as the password. You should use a more secure method for authentication in a production environment, preferably OAuth with your own `CLIENT_ID` and `CLIENT_SECRET`. Find more details on to get these values in the [Auth.js documentation](https://authjs.dev/guides/configuring-github).
-
-:::
-
 #### c. Create a sign-in page
 
 Use the `SignInPage` component to add a sign-in page to your app. For example, `app/auth/signin/page.tsx`:
@@ -216,10 +194,6 @@ export default function SignIn() {
         'use server';
         try {
           return await signIn(provider.id, {
-            ...(formData && {
-              email: formData.get('email'),
-              password: formData.get('password'),
-            }),
             redirectTo: callbackUrl ?? '/',
           });
         } catch (error) {
@@ -235,10 +209,7 @@ export default function SignIn() {
           // Handle Auth.js errors
           if (error instanceof AuthError) {
             return {
-              error:
-                error.type === 'CredentialsSignin'
-                  ? 'Invalid credentials.'
-                  : 'An error with Auth.js occurred.',
+              error: 'An error with Auth.js occurred.',
               type: error.type,
             };
           }
@@ -280,6 +251,10 @@ export const config = {
 That's it! You now have Toolpad Core integrated into your Next.js App Router app with authentication setup:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-nextjs-app.png", "srcDark": "/static/toolpad/docs/core/integration-nextjs-app-dark.png", "alt": "Next.js App Router with Toolpad Core", "caption": "Next.js App Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}
+
+:::info
+For a full working example with authentication included, see the [Toolpad Core Next.js App with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs)
+:::
 
 ## Next.js Pages Router
 
@@ -436,29 +411,12 @@ npm install next-auth@beta
 ```ts title="auth.ts"
 import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
-import Credentials from 'next-auth/providers/credentials';
 import type { Provider } from 'next-auth/providers';
 
 const providers: Provider[] = [
   GitHub({
     clientId: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  }),
-  Credentials({
-    credentials: {
-      email: { label: 'Email Address', type: 'email' },
-      password: { label: 'Password', type: 'password' },
-    },
-    authorize(c) {
-      if (c.password !== 'password') {
-        return null;
-      }
-      return {
-        id: 'test',
-        name: 'Test User',
-        email: String(c.email),
-      };
-    },
   }),
 ];
 
@@ -490,12 +448,6 @@ export const { handlers, auth } = NextAuth({
   },
 });
 ```
-
-:::warning
-
-This file is only for demonstration purposes and allows signing in with `password` as the password. You should use a more secure method for authentication in a production environment, preferably OAuth with your own `CLIENT_ID` and `CLIENT_SECRET`. Find more details on to get these values in the [Auth.js documentation](https://authjs.dev/guides/configuring-github).
-
-:::
 
 #### c. Modify `_app.tsx`
 
@@ -633,32 +585,15 @@ export default function SignIn({
       providers={providers}
       signIn={async (provider, formData, callbackUrl) => {
         try {
-          const signInResponse = await signIn(
-            provider.id,
-            formData
-              ? {
-                  email: formData.get('email') as string,
-                  password: formData.get('password') as string,
-                  redirect: false,
-                }
-              : { callbackUrl: callbackUrl ?? '/' },
-          );
+          const signInResponse = await signIn(provider.id, {
+            callbackUrl: callbackUrl ?? '/',
+          });
           if (signInResponse && signInResponse.error) {
             // Handle Auth.js errors
             return {
-              error:
-                signInResponse.error === 'CredentialsSignin'
-                  ? 'Invalid credentials'
-                  : 'An error with Auth.js occurred',
+              error: 'An error with Auth.js occurred',
               type: signInResponse.error,
             };
-          }
-          // If the sign in was successful,
-          // manually redirect to the callback URL
-          // since the `redirect: false` option was used
-          // to be able to display error messages on the same page without a full page reload
-          if (provider.id === 'credentials') {
-            router.push(callbackUrl ?? '/');
           }
           return {};
         } catch (error) {
@@ -727,3 +662,7 @@ export const config = {
 That's it! You now have Toolpad Core integrated into your Next.js Pages Router app with authentication setup:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-nextjs-pages.png", "srcDark": "/static/toolpad/docs/core/integration-nextjs-pages-dark.png", "alt": "Next.js Pages Router with Toolpad Core", "caption": "Next.js Pages Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}
+
+:::info
+For a full working example with authentication included, see the [Toolpad Core Next.js Pages app with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs-pages)
+:::

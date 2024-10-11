@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import warnOnce from '@toolpad/utils/warnOnce';
+// import warnOnce from '@toolpad/utils/warnOnce';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Container, { ContainerProps } from '@mui/material/Container';
 import Link from '@mui/material/Link';

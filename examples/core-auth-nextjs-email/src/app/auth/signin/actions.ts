@@ -9,18 +9,18 @@ async function signIn(provider: AuthProvider, formData: FormData, callbackUrl?: 
       ...(formData && { email: formData.get('email'), password: formData.get('password') }),
       redirectTo: callbackUrl ?? '/',
     });
-  } catch (error) {
+  } catch (error) {    
     // The desired flow for successful sign in in all cases
     // and unsuccessful sign in for OAuth providers will cause a `redirect`,
     // and `redirect` is a throwing function, so we need to re-throw
     // to allow the redirect to happen
     // Source: https://github.com/vercel/next.js/issues/49298#issuecomment-1542055642
     // Detect a `NEXT_REDIRECT` error and re-throw it
-    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {      
       // For the nodemailer provider, we want to return a success message
-      // if the error is a 'verify-request' error, instead of redirecting
-      // to a `verify-request` page
-      if (provider.id === 'nodemailer' && (error as any).digest?.includes('verify-request')) {
+      // instead of redirecting to a `verify-request` page
+      console.log("error", Object.keys(error), error.message, JSON.stringify(error), (error as any).digest)
+      if (provider.id === 'nodemailer' &&  (error as any).digest?.includes('verify-request')) {
         return {
           success: 'Check your email for a verification link.',
         };

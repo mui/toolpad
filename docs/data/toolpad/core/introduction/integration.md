@@ -298,19 +298,7 @@ import Head from 'next/head';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import type { NextPage } from 'next';
-import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core';
-import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
-
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: React.ReactElement) => React.ReactNode;
-  requireAuth?: boolean;
-};
-
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
-};
 
 const NAVIGATION: Navigation = [
   {
@@ -322,63 +310,25 @@ const NAVIGATION: Navigation = [
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
 ];
 
 const BRANDING = {
   title: 'My Toolpad Core App',
 };
 
-const AUTHENTICATION = {
-  signIn,
-  signOut,
-};
-
-function getDefaultLayout(page: React.ReactElement) {
+export default function App({ Component }: { Component: React.ElementType }) {
   return (
-    <DashboardLayout>
-      <PageContainer>{page}</PageContainer>
-    </DashboardLayout>
-  );
-}
-
-function AppLayout({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession();
-  return (
-    <React.Fragment>
+    <AppCacheProvider>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AppProvider
-        navigation={NAVIGATION}
-        branding={BRANDING}
-        session={session}
-        authentication={AUTHENTICATION}
-      >
-        {children}
+      <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+        <DashboardLayout>
+          <PageContainer>
+            <Component />
+          </PageContainer>
+        </DashboardLayout>
       </AppProvider>
-    </React.Fragment>
-  );
-}
-
-export default function App(props: AppPropsWithLayout) {
-  const {
-    Component,
-    pageProps: { session, ...pageProps },
-  } = props;
-
-  const getLayout = Component.getLayout ?? getDefaultLayout;
-
-  let pageContent = getLayout(<Component {...pageProps} />);
-  pageContent = <AppLayout>{pageContent}</AppLayout>;
-
-  return (
-    <AppCacheProvider {...props}>
-      <SessionProvider session={session}>{pageContent}</SessionProvider>
     </AppCacheProvider>
   );
 }

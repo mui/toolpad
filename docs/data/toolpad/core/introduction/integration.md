@@ -290,14 +290,18 @@ To integrate Toolpad Core into your Next.js Pages Router app, follow these steps
 In your root layout file (e.g., `pages/_app.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="pages/_app.tsx"
+import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Head from 'next/head';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { createTheme } from '@mui/material/styles';
+import type { NextPage } from 'next';
+import type { AppProps } from 'next/app';
+import type { Navigation } from '@toolpad/core';
+import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
@@ -326,27 +330,35 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: 'My Toolpad Core App',
+  title: 'My Toolpad Core Next.js Pages App',
 };
 
-const lightTheme = createTheme();
-
-const darkTheme = createTheme({ palette: { mode: 'dark' } });
-
-const theme = {
-  light: lightTheme,
-  dark: darkTheme,
+const AUTHENTICATION = {
+  signIn,
+  signOut,
 };
 
-export default theme;
+function getDefaultLayout(page: React.ReactElement) {
+  return (
+    <DashboardLayout>
+      <PageContainer>{page}</PageContainer>
+    </DashboardLayout>
+  );
+}
 
-export default function AppLayout({ Component, pageProps }: AppPropsWithLayout) {
+function AppLayout({ children }: { children: React.ReactNode }) {
+  const { data: session } = useSession();
   return (
     <React.Fragment>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AppProvider navigation={NAVIGATION} branding={BRANDING} theme={theme}>
+      <AppProvider
+        navigation={NAVIGATION}
+        branding={BRANDING}
+        session={session}
+        authentication={AUTHENTICATION}
+      >
         {children}
       </AppProvider>
     </React.Fragment>
@@ -553,7 +565,6 @@ import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core';
 import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import LinearProgress from '@mui/material/LinearProgress';
-import theme from '../theme';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
@@ -620,7 +631,6 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         branding={BRANDING}
         session={session}
         authentication={AUTHENTICATION}
-        theme={theme}
       >
         {children}
       </AppProvider>

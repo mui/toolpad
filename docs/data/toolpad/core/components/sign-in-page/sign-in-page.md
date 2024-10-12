@@ -60,7 +60,6 @@ To render a magic link form, pass in a provider with `nodemailer` as the `id` pr
 
 {{"demo": "MagicLinkSignInPage.js", "iframe": true, "height": 400}}
 
-
 ### Alerts
 
 The `SignInPage` component can display a success alert if the email is sent successfully. You can enable this by passing a `success` property in the

@@ -500,7 +500,7 @@ function SignInPage(props: SignInPageProps) {
                     }}
                     {...slotProps?.submitButton}
                   >
-                    Sign in with email
+                    Sign in with {emailProvider.name}
                   </LoadingButton>
                 )}
               </Box>

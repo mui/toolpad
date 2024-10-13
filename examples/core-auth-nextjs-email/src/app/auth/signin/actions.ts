@@ -18,7 +18,7 @@ async function signIn(provider: AuthProvider, formData: FormData, callbackUrl?: 
     // Detect a `NEXT_REDIRECT` error and re-throw it
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
       // For the nodemailer provider, we want to return a success message
-      // instead of redirecting to a `verify-request` page     
+      // instead of redirecting to a `verify-request` page
       if (provider.id === 'nodemailer' && (error as any).digest?.includes('verify-request')) {
         return {
           success: 'Check your email for a verification link.',

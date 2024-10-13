@@ -62,4 +62,10 @@ The `content` prop can take any React component, so you can use it to display in
 
 ##### Custom User Details
 
+You can use a `useSession` hook exported by `@toolpad/core` to extend the default session and display any additional user details:
+
+:::info
+More details on how to use this hook are available in the [`useSession` docs](/toolpad/core/react-use-session/).
+:::
+
 {{"demo": "AccountCustomUserDetails.js", "bg":"outlined"}}

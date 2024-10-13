@@ -129,6 +129,10 @@ const pages: MuiPage[] = [
             title: 'useNotifications',
           },
           {
+            pathname: '/toolpad/core/react-use-session',
+            title: 'useSession'
+          },
+          {
             pathname: '/toolpad/core/react-persistent-state',
             title: 'Persisted state',
           },
@@ -160,6 +164,10 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-persistent-state/use-local-storage-state-api',
             title: 'useLocalStorageState',
+          },
+          {
+            pathname: '/toolpad/core/react-use-session/api',
+            title: 'useSession',
           },
           {
             pathname: '/toolpad/core/react-persistent-state/use-session-storage-state-api',

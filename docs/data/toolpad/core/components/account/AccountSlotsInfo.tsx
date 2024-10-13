@@ -38,6 +38,7 @@ function CryptoWalletInfo() {
   return (
     <Stack direction="column">
       <AccountDetails />
+      <Divider />
       <Stack spacing={2} sx={{ width: 300, p: 2 }}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -97,7 +98,6 @@ function CryptoWalletInfo() {
           </Button>
         </Stack>
       </Stack>
-      <Divider />
     </Stack>
   );
 }

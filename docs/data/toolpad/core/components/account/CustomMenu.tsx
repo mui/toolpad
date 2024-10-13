@@ -177,6 +177,7 @@ export default function CustomMenu() {
   return (
     <Stack direction="column">
       <AccountDetails />
+      <Divider />
       <MenuList dense disablePadding>
         <Typography variant="body2" margin={1}>
           Accounts
@@ -188,9 +189,8 @@ export default function CustomMenu() {
             sx={{
               justifyContent: 'flex-start',
               width: '100%',
-              columnGap: 2,            
+              columnGap: 2,
             }}
-            // onClick={() => handleSelectProjects(account.id)}
             onMouseEnter={(event) => handleTriggerEnter(event, account.id)}
             onMouseLeave={handleTriggerLeave}
           >
@@ -222,8 +222,6 @@ export default function CustomMenu() {
             />
           </MenuItem>
         ))}
-
-        <Divider />
         <ProjectsList
           open={subMenuOpen}
           anchorEl={subMenuAnchorEl}

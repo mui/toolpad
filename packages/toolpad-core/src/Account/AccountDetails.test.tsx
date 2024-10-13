@@ -33,7 +33,7 @@ describe('AccountDetails', () => {
     render(
       <SessionContext.Provider value={session}>
         <AccountDetails />
-      </SessionContext.Provider>
+      </SessionContext.Provider>,
     );
 
     const avatar = screen.getByRole('img', { name: 'John Doe' });
@@ -55,9 +55,9 @@ describe('AccountDetails', () => {
     render(
       <SessionContext.Provider value={session}>
         <AccountDetails />
-      </SessionContext.Provider>
+      </SessionContext.Provider>,
     );
-            
+
     expect(screen.getByText('Jane Smith')).toBeInTheDocument();
     expect(screen.getByText('jane@example.com')).toBeInTheDocument();
   });

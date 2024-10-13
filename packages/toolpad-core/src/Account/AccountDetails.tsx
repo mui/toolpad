@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Avatar, { AvatarProps } from '@mui/material/Avatar';
-import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import { SessionContext } from '../AppProvider';
@@ -36,8 +35,7 @@ function AccountDetails(props: AvatarProps) {
           <Typography fontWeight="bolder">{session.user?.name}</Typography>
           <Typography variant="caption">{session.user?.email}</Typography>
         </div>
-      </Stack>
-      <Divider />
+      </Stack>      
     </Stack>
   );
 }

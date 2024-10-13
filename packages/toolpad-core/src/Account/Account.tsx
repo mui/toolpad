@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import Popover from '@mui/material/Popover';
 import Avatar from '@mui/material/Avatar';
+import Divider from '@mui/material/Divider';
 import Button, { ButtonProps } from '@mui/material/Button';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -171,6 +172,7 @@ function Account(props: AccountProps) {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         {slots?.content ? <slots.content /> : <AccountDetails />}
+        <Divider />
         {slots?.signOutButton ? (
           <slots.signOutButton onClick={authentication?.signOut} />
         ) : (

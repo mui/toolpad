@@ -28,7 +28,7 @@ function AccountDetails(props: AvatarProps) {
         <Avatar
           src={session.user?.image || ''}
           alt={session.user?.name || session.user?.email || ''}
-          sx={{ height: 48, width: 48 }}
+          sx={{ height: 48, width: 48, ...props.sx }}
           {...props}
         />
         <div>

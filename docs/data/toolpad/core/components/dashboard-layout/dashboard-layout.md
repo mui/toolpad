@@ -140,3 +140,5 @@ This allows you to add, for example:
 - footer content in the sidebar.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
+
+{{"demo": "DashboardLayoutAccountSidebar.js", "height": 400, "iframe": true}}

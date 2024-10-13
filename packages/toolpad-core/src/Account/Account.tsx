@@ -60,6 +60,11 @@ export interface AccountProps {
    * @default DEFAULT_LOCALE_TEXT
    */
   localeText?: typeof DEFAULT_LOCALE_TEXT;
+  /**
+   * The variant of the component.
+   * @default 'toolbar'
+   */
+  variant?: 'toolbar' | 'sidebar';
 }
 /**
  *
@@ -74,7 +79,7 @@ export interface AccountProps {
  * - [Account API](https://mui.com/toolpad/core/api/account)
  */
 function Account(props: AccountProps) {
-  const { slots, slotProps, localeText = DEFAULT_LOCALE_TEXT } = props;
+  const { slots, slotProps, localeText = DEFAULT_LOCALE_TEXT, variant } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const session = React.useContext(SessionContext);
   const authentication = React.useContext(AuthenticationContext);
@@ -111,6 +116,11 @@ function Account(props: AccountProps) {
       >
         {localeText?.signInLabel}
       </Button>
+    );
+  }
+  if (variant === 'sidebar') {
+    return (      
+        <AccountDetails />            
     );
   }
   return (

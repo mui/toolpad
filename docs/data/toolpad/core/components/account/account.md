@@ -48,22 +48,7 @@ You can pass in your own components to completely override the default component
 
 #### Content
 
-Use the `content` slot to customize the content of the popover. You can use the `AccountDetails` component inside your custom account popover:
-
-```tsx
-import { AccountDetails } from '@toolpad/core';
-
-function CustomAccount() {
-  return (
-    <Stack direction="column">
-      <AccountDetails />
-      <MenuList dense disablePadding>
-        // ...
-      </MenuList>
-    </Stack>
-  );
-}
-```
+Use the `content` slot to customize the entire content of the account popover. If you want to continue using the default account details section along with your custom content, you can use the `AccountDetails` component exported by `@toolpad/core` in your custom component:
 
 ##### Account Switcher
 

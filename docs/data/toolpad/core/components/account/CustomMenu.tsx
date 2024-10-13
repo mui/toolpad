@@ -188,7 +188,7 @@ export default function CustomMenu() {
             sx={{
               justifyContent: 'flex-start',
               width: '100%',
-              columnGap: 2,
+              columnGap: 2,            
             }}
             // onClick={() => handleSelectProjects(account.id)}
             onMouseEnter={(event) => handleTriggerEnter(event, account.id)}

@@ -12,7 +12,12 @@ import SendIcon from '@mui/icons-material/Send';
 import ShoppingCart from '@mui/icons-material/ShoppingCart';
 import CopyIcon from '@mui/icons-material/ContentCopy';
 
-import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
+import {
+  Account,
+  AccountDetails,
+  AuthenticationContext,
+  SessionContext,
+} from '@toolpad/core';
 
 const demoSession = {
   user: {
@@ -23,26 +28,35 @@ const demoSession = {
 };
 
 const mockData = {
-  address: '0x1234...5678',
+  address: '0xb794f5ea0ba39494ce839613fffba74279579268',
   balance: '1,234.56 ETH',
   usdBalance: '$2,345,678.90 USD',
 };
 
 function CryptoWalletInfo() {
   return (
-    <div>
+    <Stack direction="column">
+      <AccountDetails />
       <Stack spacing={2} sx={{ width: 300, p: 2 }}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Avatar sx={{ bgcolor: 'primary.main' }}>
             <WalletIcon />
           </Avatar>
-          <Stack>
+          <Stack sx={{ flexGrow: 1, minWidth: 0 }}>
             <Typography
               variant="subtitle1"
               fontWeight="bold"
-              sx={{ display: 'flex', alignItems: 'center' }}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
             >
-              {mockData.address}
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {mockData.address}
+              </span>
               <IconButton size="small" sx={{ ml: 1 }}>
                 <CopyIcon fontSize="small" />
               </IconButton>
@@ -83,7 +97,7 @@ function CryptoWalletInfo() {
         </Stack>
       </Stack>
       <Divider />
-    </div>
+    </Stack>
   );
 }
 
@@ -106,17 +120,6 @@ export default function AccountSlotsInfo() {
         <Account
           slots={{
             content: CryptoWalletInfo,
-          }}
-          slotProps={{
-            userDetailsContainer: {
-              sx: {
-                p: 2,
-                gap: 2,
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-              },
-            },
           }}
         />
       </SessionContext.Provider>

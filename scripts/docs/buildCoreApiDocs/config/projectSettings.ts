@@ -26,7 +26,7 @@ export const projectSettings: ProjectSettings = {
     const relativePath = path.relative(repositoryRoot, filename);
     const directories = path.dirname(relativePath).split(path.sep);
 
-    return directories[3] === 'nextjs';
+    return directories[3] === 'nextjs' || directories[3] === 'react-router-dom';
   },
   skipSlotsAndClasses: false,
   translationPagesDirectory: 'docs/translations/api-docs',

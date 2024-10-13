@@ -34,5 +34,5 @@ It follows the open-core model, with some features being available under the MIT
 ## Upcoming Features 🚧
 
 :::info
-Visit the [roadmap](/toolpad/core/introduction/roadmap/) to see more details about upcoming features.
+Visit the [roadmap](/toolpad/core/introduction/roadmap/) to see more details about upcoming releases.
 :::

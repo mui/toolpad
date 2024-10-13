@@ -2,18 +2,22 @@ import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import PropTypes from 'prop-types';
 import Popover from '@mui/material/Popover';
-import Divider from '@mui/material/Divider';
-import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
+import Avatar from '@mui/material/Avatar';
 import Button, { ButtonProps } from '@mui/material/Button';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Logout from '@mui/icons-material/Logout';
-import { Box, BoxProps, Typography } from '@mui/material';
-import { SessionAvatar } from './SessionAvatar';
+import { AccountDetails } from './AccountDetails';
 import { SessionContext, AuthenticationContext } from '../AppProvider/AppProvider';
 import DEFAULT_LOCALE_TEXT from '../shared/locales/en';
 
 export interface AccountSlots {
+  /**
+   * The component used for the icon button
+   * @default IconButton
+   */
+  iconButton?: React.ElementType;
   /**
    * The component used for the sign in button.
    * @default Button
@@ -25,15 +29,10 @@ export interface AccountSlots {
    */
   signOutButton?: React.ElementType;
   /**
-   * The component used for custom content in the account popover
+   * The component used for the content of the popover
    * @default null
    */
   content?: React.ElementType;
-  /**
-   * The component used for the user details section in the account popover
-   * @default Box
-   */
-  userDetailsContainer?: React.ElementType;
 }
 
 export interface AccountProps {
@@ -48,7 +47,6 @@ export interface AccountProps {
     signInButton?: ButtonProps;
     signOutButton?: ButtonProps;
     iconButton?: IconButtonProps;
-    userDetailsContainer?: BoxProps;
   };
   /**
    * The labels for the account component.
@@ -113,18 +111,26 @@ function Account(props: AccountProps) {
     <React.Fragment>
       <div style={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
         <Tooltip title={session.user.name ?? 'Account'}>
-          <IconButton
-            onClick={handleClick}
-            aria-describedby="account-menu"
-            aria-label="Current User"
-            size="small"
-            aria-controls={open ? 'account-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            {...slotProps?.iconButton}
-          >
-            <SessionAvatar session={session} sx={{ width: 32, height: 32 }} />
-          </IconButton>
+          {slots?.iconButton ? (
+            <slots.iconButton />
+          ) : (
+            <IconButton
+              onClick={handleClick}
+              aria-describedby="account-menu"
+              aria-label="Current User"
+              size="small"
+              aria-controls={open ? 'account-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? 'true' : undefined}
+              {...slotProps?.iconButton}
+            >
+              <Avatar
+                sx={{ height: 32, width: 32 }}
+                src={session.user.image || ''}
+                alt={session.user.name || ''}
+              />
+            </IconButton>
+          )}
         </Tooltip>
       </div>
       <Popover
@@ -159,28 +165,7 @@ function Account(props: AccountProps) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {slots?.userDetailsContainer ? (
-          <slots.userDetailsContainer session={session} />
-        ) : (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              padding: theme.spacing(2),
-              gap: theme.spacing(2),
-            }}
-            {...slotProps?.userDetailsContainer}
-          >
-            <SessionAvatar session={session} sx={{ height: 48, width: 48 }} />
-            <Stack>
-              <Typography fontWeight="bolder">{session.user.name}</Typography>
-              <Typography variant="caption">{session.user.email}</Typography>
-            </Stack>
-          </Box>
-        )}
-        <Divider sx={{ mb: 1 }} />
-        {slots?.content ? <slots.content /> : null}
+        {slots?.content ? <slots.content /> : <AccountDetails />}
         {slots?.signOutButton ? (
           <slots.signOutButton onClick={authentication?.signOut} />
         ) : (
@@ -239,16 +224,15 @@ Account.propTypes /* remove-proptypes */ = {
     iconButton: PropTypes.object,
     signInButton: PropTypes.object,
     signOutButton: PropTypes.object,
-    userDetailsContainer: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
    */
   slots: PropTypes.shape({
     content: PropTypes.elementType,
+    iconButton: PropTypes.elementType,
     signInButton: PropTypes.elementType,
     signOutButton: PropTypes.elementType,
-    userDetailsContainer: PropTypes.elementType,
   }),
 } as any;
 

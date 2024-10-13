@@ -69,7 +69,7 @@ export default function StudioIntro() {
             <CardMedia
               component="a"
               image="https://mui.com/static/toolpad/docs/studio/examples/npm-stats.png"
-              href="https://mui-toolpad-npm-stats-production.up.railway.app/prod/pages/page"
+              href="/toolpad/studio/examples/npm-stats/"
               target="_blank"
               rel="nofollow"
               sx={(theme) => ({

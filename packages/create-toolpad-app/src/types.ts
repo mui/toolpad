@@ -11,6 +11,7 @@ export interface GenerateProjectOptions {
   absolutePath: string;
   auth?: boolean;
   authProviders?: SupportedAuthProvider[];
+  install?: boolean;
   router?: SupportedRouter;
   coreVersion?: string;
   projectType?: ProjectType;

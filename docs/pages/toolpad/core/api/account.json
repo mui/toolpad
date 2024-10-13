@@ -7,13 +7,13 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ iconButton?: object, signInButton?: object, signOutButton?: object, userDetailsContainer?: object }"
+        "description": "{ iconButton?: object, signInButton?: object, signOutButton?: object }"
       }
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ content?: elementType, signInButton?: elementType, signOutButton?: elementType, userDetailsContainer?: elementType }"
+        "description": "{ content?: elementType, iconButton?: elementType, signInButton?: elementType, signOutButton?: elementType }"
       },
       "additionalInfo": { "slotsApi": true }
     }
@@ -24,6 +24,12 @@
     "import { Account } from '@toolpad/core';"
   ],
   "slots": [
+    {
+      "name": "iconButton",
+      "description": "The component used for the icon button",
+      "default": "IconButton",
+      "class": null
+    },
     {
       "name": "signInButton",
       "description": "The component used for the sign in button.",
@@ -38,14 +44,8 @@
     },
     {
       "name": "content",
-      "description": "The component used for custom content in the account popover",
+      "description": "The component used for the content of the popover",
       "default": "null",
-      "class": null
-    },
-    {
-      "name": "userDetailsContainer",
-      "description": "The component used for the user details section in the account popover",
-      "default": "Box",
       "class": null
     }
   ],

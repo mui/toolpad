@@ -46,20 +46,20 @@
   "devDependencies": {
     "@argos-ci/core": "2.8.1",
     "@babel/cli": "7.25.7",
-    "@babel/core": "7.25.7",
+    "@babel/core": "7.25.8",
     "@babel/node": "7.25.7",
     "@babel/plugin-transform-react-constant-elements": "7.25.7",
     "@babel/plugin-transform-runtime": "7.25.7",
-    "@babel/preset-env": "7.25.7",
+    "@babel/preset-env": "7.25.8",
     "@babel/preset-react": "7.25.7",
     "@babel/preset-typescript": "7.25.7",
     "@mui/internal-babel-plugin-resolve-imports": "1.0.18",
     "@mui/internal-docs-utils": "1.0.14",
-    "@mui/internal-markdown": "1.0.15",
-    "@mui/internal-scripts": "1.0.22",
-    "@mui/monorepo": "github:mui/material-ui#e73c8a90ccb113881b2696319f9a198aa5721b58",
-    "@mui/x-charts": "7.19.0",
-    "@next/eslint-plugin-next": "14.2.14",
+    "@mui/internal-markdown": "1.0.16",
+    "@mui/internal-scripts": "1.0.23",
+    "@mui/monorepo": "github:mui/material-ui#a49333cc4988f60e8d402ba069a65345c92a6c8d",
+    "@mui/x-charts": "7.20.0",
+    "@next/eslint-plugin-next": "14.2.15",
     "@playwright/test": "1.47.2",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "16.0.1",
@@ -68,7 +68,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/gtag.js": "0.0.20",
     "@types/invariant": "2.2.37",
-    "@types/node": "^20.16.10",
+    "@types/node": "^20.16.11",
     "@types/yargs": "17.0.33",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
@@ -132,11 +132,11 @@
   },
   "engines": {
     "node": ">=20",
-    "pnpm": "9.12.0"
+    "pnpm": "9.12.1"
   },
   "resolutions": {
     "google-auth-library": "*",
-    "@types/node": "^20.16.10"
+    "@types/node": "^20.16.11"
   },
-  "packageManager": "pnpm@9.12.0"
+  "packageManager": "pnpm@9.12.1"
 }

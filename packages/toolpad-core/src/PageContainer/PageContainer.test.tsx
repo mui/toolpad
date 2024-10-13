@@ -140,4 +140,44 @@ describe('PageContainer', () => {
     expect(homeLink.getAttribute('href')).toBe('/users');
     expect(within(breadcrumbs).getByText('Invoices')).toBeTruthy();
   });
+
+  test('renders custom breadcrumbs', async () => {
+    render(
+      <PageContainer
+        breadcrumbs={[
+          { title: 'Hello', path: '/hello' },
+          { title: 'World', path: '/world' },
+        ]}
+      />,
+    );
+
+    const breadcrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
+
+    const helloLink = within(breadcrumbs).getByRole('link', { name: 'Hello' });
+    expect(helloLink.getAttribute('href')).toBe('/hello');
+    expect(within(breadcrumbs).getByText('World')).toBeTruthy();
+  });
+
+  // TODO: Remove in the next major version
+  test('renders legacy breadcrumbs prop', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <PageContainer
+        breadCrumbs={[
+          { title: 'Hello', path: '/hello' },
+          { title: 'World', path: '/world' },
+        ]}
+      />,
+    );
+
+    const breadcrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
+
+    const helloLink = within(breadcrumbs).getByRole('link', { name: 'Hello' });
+    expect(helloLink.getAttribute('href')).toBe('/hello');
+    expect(within(breadcrumbs).getByText('World')).toBeTruthy();
+    expect(console.warn).toHaveBeenCalledOnce();
+    expect(console.warn).toHaveBeenCalledWith(
+      'The PageContainer `breadCrumbs` prop is deprecated. Use `breadcrumbs` instead.',
+    );
+  });
 });

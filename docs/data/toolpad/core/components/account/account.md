@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Account
-components: Account
+components: Account, AccountDetails
 ---
 
 # Account
@@ -48,39 +48,29 @@ You can pass in your own components to completely override the default component
 
 #### Content
 
-Use the `content` slot to add any additional options in the space between the user's account details and the sign out button, to create larger, more complex menus:
+Use the `content` slot to customize the content of the popover. You can use the `AccountDetails` component inside your custom account popover:
+
+```tsx
+import { AccountDetails } from '@toolpad/core';
+
+function CustomAccount() {
+  return (
+    <Stack direction="column">
+      <AccountDetails />
+      <MenuList dense disablePadding>
+        // ...
+      </MenuList>
+    </Stack>
+  );
+}
+```
 
 ##### Account Switcher
 
-{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "gradient"}}
+{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
 
 The `content` prop can take any React component, so you can use it to display information instead of adding menu items:
 
 ##### Crypto Wallet
 
 {{"demo": "AccountSlotsInfo.js", "bg": "outlined" }}
-
-#### User Details Container
-
-By passing a custom component to the `userDetailsContainer` slot, you can override the section which displays the signed-in user's details. The custom component receives a `session` prop which contains the current authentication session:
-
-```tsx
-// ...
-import { Session } from '@toolpad/core';
-
-interface CustomSession extends Session {
-  org: {
-    name: string;
-    url: string;
-    logo: string;
-  };
-}
-
-function UserDetailsContainer({ session }: UserDetailsContainerProps) {
-  // ...
-}
-```
-
-##### Enterprise Profile
-
-{{"demo": "AccountCustomUserDetails.js", "bg": "outlined" }}

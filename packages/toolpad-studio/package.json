@@ -100,7 +100,7 @@
     "dotenv": "16.4.5",
     "esbuild": "0.24.0",
     "execa": "9.4.0",
-    "express": "4.21.0",
+    "express": "4.21.1",
     "find-up": "7.0.0",
     "fractional-indexing": "3.2.0",
     "get-port": "7.1.0",

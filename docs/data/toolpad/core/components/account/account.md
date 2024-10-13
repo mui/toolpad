@@ -59,3 +59,7 @@ The `content` prop can take any React component, so you can use it to display in
 ##### Crypto Wallet
 
 {{"demo": "AccountSlotsInfo.js", "bg": "outlined" }}
+
+##### Custom User Details
+
+{{"demo": "AccountCustomUserDetails.js", "bg":"outlined"}}

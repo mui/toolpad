@@ -1,5 +1,7 @@
-<Account
-  slots={{
-    userDetailsContainer: UserDetailsContainer,
-  }}
-/>
+<SessionContext.Provider value={customSession}>        
+  <Account
+    slots={{
+      content: UserDetails,
+    }}
+  />        
+</SessionContext.Provider>

@@ -5,6 +5,8 @@ import {
   AuthenticationContext,
   SessionContext,
   Session,
+  AccountDetails,
+  useSession,
 } from '@toolpad/core';
 
 interface CustomSession extends Session {
@@ -28,31 +30,20 @@ const demoSession: CustomSession = {
   },
 };
 
-interface UserDetailsContainerProps {
-  session: CustomSession;
-}
-
-function UserDetailsContainer({ session }: UserDetailsContainerProps) {
+function UserDetails() {
+  const session = useSession<CustomSession>();
   if (!session?.user) {
     return <Typography>No user session available</Typography>;
   }
-  const { name, email, image } = session.user;
-  const { logo: orgLogo, name: orgName, url: orgUrl } = session.org;
+  
+  const { logo: orgLogo, name: orgName, url: orgUrl } = session.org;  
 
   return (
     <Box sx={{ p: 2 }}>
       <Stack>
-        <Stack flexDirection="row" gap={2} justifyContent="flex-start" mb={2}>
-          <Avatar src={image ?? ''} alt={name ?? ''} />
-          <Stack>
-            <Typography fontWeight="bolder">{name}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {email}
-            </Typography>
-          </Stack>
-        </Stack>
+        <AccountDetails />
         {session.org && (
-          <Stack>
+          <Stack mt={1}>
             <Typography textAlign="center" fontSize="0.625rem" gutterBottom>
               This account is managed by
             </Typography>
@@ -85,29 +76,29 @@ function UserDetailsContainer({ session }: UserDetailsContainerProps) {
 }
 
 export default function AccountCustomUserDetails() {
-  const [session, setSession] = React.useState<CustomSession | null>(demoSession);
+  const [customSession, setCustomSession] = React.useState<CustomSession | null>(demoSession);
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        setSession(demoSession);
+        setCustomSession(demoSession);
       },
       signOut: () => {
-        setSession(null);
+        setCustomSession(null);
       },
     };
   }, []);
 
   return (
     <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={session}>
-        {/* preview-start */}
+      {/* preview-start */}
+      <SessionContext.Provider value={customSession}>        
         <Account
           slots={{
-            userDetailsContainer: UserDetailsContainer,
+            content: UserDetails,
           }}
-        />
-        {/* preview-end */}
+        />        
       </SessionContext.Provider>
+      {/* preview-end */}
     </AuthenticationContext.Provider>
   );
 }

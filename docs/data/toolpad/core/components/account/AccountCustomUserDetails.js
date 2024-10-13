@@ -1,7 +1,12 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { Box, Stack, Typography, Avatar, Link } from '@mui/material';
-import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
+import {
+  Account,
+  AuthenticationContext,
+  SessionContext,
+  AccountDetails,
+  useSession,
+} from '@toolpad/core';
 
 const demoSession = {
   user: {
@@ -16,27 +21,20 @@ const demoSession = {
   },
 };
 
-function UserDetailsContainer({ session }) {
+function UserDetails() {
+  const session = useSession();
   if (!session?.user) {
     return <Typography>No user session available</Typography>;
   }
-  const { name, email, image } = session.user;
+
   const { logo: orgLogo, name: orgName, url: orgUrl } = session.org;
 
   return (
     <Box sx={{ p: 2 }}>
       <Stack>
-        <Stack flexDirection="row" gap={2} justifyContent="flex-start" mb={2}>
-          <Avatar src={image ?? ''} alt={name ?? ''} />
-          <Stack>
-            <Typography fontWeight="bolder">{name}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {email}
-            </Typography>
-          </Stack>
-        </Stack>
+        <AccountDetails />
         {session.org && (
-          <Stack>
+          <Stack mt={1}>
             <Typography textAlign="center" fontSize="0.625rem" gutterBottom>
               This account is managed by
             </Typography>
@@ -68,46 +66,30 @@ function UserDetailsContainer({ session }) {
   );
 }
 
-UserDetailsContainer.propTypes = {
-  session: PropTypes.shape({
-    org: PropTypes.shape({
-      logo: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-    }).isRequired,
-    user: PropTypes.shape({
-      email: PropTypes.string,
-      id: PropTypes.string,
-      image: PropTypes.string,
-      name: PropTypes.string,
-    }),
-  }).isRequired,
-};
-
 export default function AccountCustomUserDetails() {
-  const [session, setSession] = React.useState(demoSession);
+  const [customSession, setCustomSession] = React.useState(demoSession);
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        setSession(demoSession);
+        setCustomSession(demoSession);
       },
       signOut: () => {
-        setSession(null);
+        setCustomSession(null);
       },
     };
   }, []);
 
   return (
     <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={session}>
-        {/* preview-start */}
+      {/* preview-start */}
+      <SessionContext.Provider value={customSession}>
         <Account
           slots={{
-            userDetailsContainer: UserDetailsContainer,
+            content: UserDetails,
           }}
         />
-        {/* preview-end */}
       </SessionContext.Provider>
+      {/* preview-end */}
     </AuthenticationContext.Provider>
   );
 }

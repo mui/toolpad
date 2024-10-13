@@ -10,7 +10,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation, Router } from '@toolpad/core';
+import type { Navigation, Router, SidebarFooterProps } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {
@@ -97,6 +97,17 @@ function Search() {
   );
 }
 
+function SidebarFooter({ mini }: SidebarFooterProps) {
+  return (
+    <Typography
+      variant="caption"
+      sx={{ m: 1, whiteSpace: 'nowrap', overflow: 'hidden' }}
+    >
+      {mini ? '© MUI' : `© ${new Date().getFullYear()} Made with love by MUI`}
+    </Typography>
+  );
+}
+
 interface DemoProps {
   /**
    * Injected by the documentation to work in an iframe.
@@ -128,7 +139,9 @@ export default function DashboardLayoutSlots(props: DemoProps) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout slots={{ toolbarActions: Search }}>
+      <DashboardLayout
+        slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
+      >
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>

@@ -8,7 +8,7 @@ import Button, { ButtonProps } from '@mui/material/Button';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Logout from '@mui/icons-material/Logout';
-import { AccountDetails } from './AccountDetails';
+import { AccountDetails } from '../AccountDetails/AccountDetails';
 import { SessionContext, AuthenticationContext } from '../AppProvider/AppProvider';
 import DEFAULT_LOCALE_TEXT from '../shared/locales/en';
 

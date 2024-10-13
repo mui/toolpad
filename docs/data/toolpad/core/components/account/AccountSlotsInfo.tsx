@@ -97,7 +97,7 @@ function CryptoWalletInfo() {
             Buy
           </Button>
         </Stack>
-      </Stack>      
+      </Stack>
     </Stack>
   );
 }

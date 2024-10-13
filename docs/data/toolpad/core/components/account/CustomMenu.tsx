@@ -189,8 +189,8 @@ export default function CustomMenu() {
             sx={{
               justifyContent: 'flex-start',
               width: '100%',
-              columnGap: 2,                                       
-            }}            
+              columnGap: 2,
+            }}
             onMouseEnter={(event) => handleTriggerEnter(event, account.id)}
             onMouseLeave={handleTriggerLeave}
           >
@@ -221,7 +221,7 @@ export default function CustomMenu() {
               secondaryTypographyProps={{ variant: 'caption' }}
             />
           </MenuItem>
-        ))}        
+        ))}
         <ProjectsList
           open={subMenuOpen}
           anchorEl={subMenuAnchorEl}

@@ -35,7 +35,7 @@ function AccountDetails(props: AvatarProps) {
           <Typography fontWeight="bolder">{session.user?.name}</Typography>
           <Typography variant="caption">{session.user?.email}</Typography>
         </div>
-      </Stack>      
+      </Stack>
     </Stack>
   );
 }

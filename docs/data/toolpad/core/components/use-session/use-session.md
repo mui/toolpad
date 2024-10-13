@@ -16,9 +16,7 @@ If this is your first time using Toolpad Core, it's recommended to read about th
 When using authentication features inside Toolpad Core, a `SessionContext` is created to share session information among all Toolpad Core components. This accepts a default value from the `session` prop of the `AppProvider`.
 
 ```js
-<AppProvider session={session}>
-    {props.children}
-</AppProvider>
+<AppProvider session={session}>{props.children}</AppProvider>
 ```
 
 The `session` can be created using any authentication provider of your choice. You can access the current value of the `SessionContext` inside Toolpad Core components by invoking the hook:
@@ -46,6 +44,7 @@ function CustomAccountDetails() {
   )
 }
 ```
+
 The following example demonstrates this behaviour clearly:
 
 {{"demo": "../account/AccountCustomUserDetails.js", "bg":"outlined"}}

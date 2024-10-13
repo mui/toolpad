@@ -130,7 +130,7 @@ const pages: MuiPage[] = [
           },
           {
             pathname: '/toolpad/core/react-use-session',
-            title: 'useSession'
+            title: 'useSession',
           },
           {
             pathname: '/toolpad/core/react-persistent-state',

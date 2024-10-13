@@ -1,12 +1,7 @@
 import * as React from 'react';
-import {
-  Account,
-  AuthenticationContext,
-  SessionContext,
-} from '@toolpad/core';
+import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
 
 import { UserOrg, CustomSession } from '../UserOrg';
-
 
 const demoSession: CustomSession = {
   user: {
@@ -21,9 +16,10 @@ const demoSession: CustomSession = {
   },
 };
 
-
 export default function AccountCustomUserDetails() {
-  const [customSession, setCustomSession] = React.useState<CustomSession | null>(demoSession);
+  const [customSession, setCustomSession] = React.useState<CustomSession | null>(
+    demoSession,
+  );
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
@@ -36,16 +32,16 @@ export default function AccountCustomUserDetails() {
   }, []);
 
   return (
-    <AuthenticationContext.Provider value={authentication}>     
-      <SessionContext.Provider value={customSession}>        
+    <AuthenticationContext.Provider value={authentication}>
+      <SessionContext.Provider value={customSession}>
         {/* preview-start */}
         <Account
           slots={{
             content: UserOrg,
           }}
-        />        
+        />
         {/* preview-end */}
-      </SessionContext.Provider>      
+      </SessionContext.Provider>
     </AuthenticationContext.Provider>
   );
 }

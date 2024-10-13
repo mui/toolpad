@@ -2,22 +2,21 @@ import * as React from 'react';
 import { Box, Stack, Typography, Avatar, Link } from '@mui/material';
 import { AccountDetails, Session, useSession } from '@toolpad/core';
 
- export interface CustomSession extends Session {
-    org: {
-      name: string;
-      url: string;
-      logo: string;
-    };
-  }
-  
+export interface CustomSession extends Session {
+  org: {
+    name: string;
+    url: string;
+    logo: string;
+  };
+}
 
 export function UserOrg() {
   const session = useSession<CustomSession>();
   if (!session?.user) {
     return <Typography>No user session available</Typography>;
   }
-  
-  const { logo: orgLogo, name: orgName, url: orgUrl } = session.org;  
+
+  const { logo: orgLogo, name: orgName, url: orgUrl } = session.org;
 
   return (
     <Box sx={{ p: 2 }}>

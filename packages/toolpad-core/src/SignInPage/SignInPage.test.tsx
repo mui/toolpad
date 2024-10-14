@@ -45,4 +45,20 @@ describe('SignInPage', () => {
     expect(signIn.mock.calls[0][1].get('email')).toBe('john@example.com');
     expect(signIn.mock.calls[0][1].get('password')).toBe('thepassword');
   });
+
+  test('renders passkey sign-in option when available', async () => {    
+    const signIn = vi.fn();
+
+    render(<SignInPage signIn={signIn} providers={[{ id: 'passkey', name: 'Passkey '}]} />);
+
+    const emailField = screen.getByRole('textbox', { name: 'Email Address' });
+    const signInButton = screen.getByRole('button', { name: 'Sign in with Passkey' });
+
+    await userEvent.type(emailField, 'john@example.com');
+    await userEvent.click(signInButton);
+
+    expect(signIn).toHaveBeenCalled();
+    expect(signIn.mock.calls[0][0]).toHaveProperty('id', 'passkey');
+    expect(signIn.mock.calls[0][1].get('email')).toBe('john@example.com');
+  });
 });

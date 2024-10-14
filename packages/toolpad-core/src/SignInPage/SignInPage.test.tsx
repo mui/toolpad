@@ -46,10 +46,10 @@ describe('SignInPage', () => {
     expect(signIn.mock.calls[0][1].get('password')).toBe('thepassword');
   });
 
-  test('renders passkey sign-in option when available', async () => {    
+  test('renders passkey sign-in option when available', async () => {
     const signIn = vi.fn();
 
-    render(<SignInPage signIn={signIn} providers={[{ id: 'passkey', name: 'Passkey '}]} />);
+    render(<SignInPage signIn={signIn} providers={[{ id: 'passkey', name: 'Passkey ' }]} />);
 
     const emailField = screen.getByRole('textbox', { name: 'Email Address' });
     const signInButton = screen.getByRole('button', { name: 'Sign in with Passkey' });

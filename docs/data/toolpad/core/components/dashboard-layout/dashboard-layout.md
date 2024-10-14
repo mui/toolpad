@@ -103,13 +103,19 @@ This feature is built on top of the [path-to-regexp](https://www.npmjs.com/packa
 
 {{"demo": "DashboardLayoutPattern.js", "height": 400, "iframe": true}}
 
-### Disabling collapsible sidebar
+### Disable collapsible sidebar
 
 The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop and tablet viewports. This behavior can be disabled with the `disableCollapsibleSidebar` prop.
 
 {{"demo": "DashboardLayoutNoMiniSidebar.js", "height": 400, "iframe": true}}
 
-### Hiding the sidebar
+### Full-size content
+
+The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.
+
+{{"demo": "DashboardLayoutFullScreen.js", "height": 400, "iframe": true}}
+
+### Hide navigation
 
 The layout sidebar can be hidden if needed with the `hideNavigation` prop.
 
@@ -128,6 +134,9 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 ## Customization
 
 Some areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
-For example, this allows you to add new items to the toolbar in the header, such as a search bar or a button.
+This allows you to add, for example:
+
+- new items to the toolbar in the header, such as a search bar or button;
+- footer content in the sidebar.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}

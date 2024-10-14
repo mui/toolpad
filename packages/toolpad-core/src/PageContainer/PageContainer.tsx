@@ -17,7 +17,7 @@ import { useActivePage } from '../useActivePage';
 const PageContentHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
-  jusifyContent: 'space-between',
+  justifyContent: 'space-between',
   gap: theme.spacing(2),
 }));
 

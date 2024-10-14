@@ -31,13 +31,15 @@ test('Must have required roles to access pages', async ({ page }) => {
   // Sign in without admin role
   await tryCredentialsSignIn(page, 'test', 'test');
 
-  await expect(page.getByText('Admin Page')).toBeHidden();
+  const desktopNavigation = page.getByRole('navigation', { name: 'Desktop' });
+
+  await expect(desktopNavigation.getByText('Admin Page')).toBeHidden();
 
   // Sign in with admin role
-  await page.getByText('Miss Test').click();
+  await page.getByRole('button', { name: 'Current User' }).click();
   await page.getByText('Sign out').click();
   await tryCredentialsSignIn(page, 'admin', 'admin');
 
-  await expect(page.getByText('Admin Page')).toBeVisible();
+  await expect(desktopNavigation.getByText('Admin Page')).toBeVisible();
   await expect(page.getByText('message: hello world')).toBeVisible();
 });

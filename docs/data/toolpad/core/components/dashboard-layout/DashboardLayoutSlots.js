@@ -101,6 +101,21 @@ function Search() {
   );
 }
 
+function SidebarFooter({ mini }) {
+  return (
+    <Typography
+      variant="caption"
+      sx={{ m: 1, whiteSpace: 'nowrap', overflow: 'hidden' }}
+    >
+      {mini ? '© MUI' : `© ${new Date().getFullYear()} Made with love by MUI`}
+    </Typography>
+  );
+}
+
+SidebarFooter.propTypes = {
+  mini: PropTypes.bool.isRequired,
+};
+
 function DashboardLayoutSlots(props) {
   const { window } = props;
 
@@ -124,7 +139,9 @@ function DashboardLayoutSlots(props) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout slots={{ toolbarActions: Search }}>
+      <DashboardLayout
+        slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
+      >
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>

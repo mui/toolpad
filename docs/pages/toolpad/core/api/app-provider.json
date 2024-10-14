@@ -35,8 +35,8 @@
   },
   "name": "AppProvider",
   "imports": [
-    "import { AppProvider } from '@toolpad/core/AppProvider';\nimport { AppProvider } from '@toolpad/core/nextjs/AppProvider'; // Next.js",
-    "import { AppProvider } from '@toolpad/core';\nimport { AppProvider } from '@toolpad/core/nextjs'; // Next.js"
+    "import { AppProvider } from '@toolpad/core/AppProvider';",
+    "import { AppProvider } from '@toolpad/core';\nimport { AppProvider } from '@toolpad/core/nextjs'; // Next.js\nimport { AppProvider } from '@toolpad/core/react-router-dom'; // React Router"
   ],
   "classes": [],
   "spread": true,

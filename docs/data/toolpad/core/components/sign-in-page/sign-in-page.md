@@ -68,7 +68,7 @@ response object of the `signIn` prop.
 {{"demo": "MagicLinkAlertSignInPage.js", "iframe": true, "height": 400}}
 
 :::info
-Check out the complete [Next.js App Router Nodemailer example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-email/) example for a working implementation of a magic link sign-in page with Auth.js, Nodemailer, Prisma and PostgreSQL.
+Check out the complete [Next.js Auth.js Magic Link example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-email/) example for a working implementation of a magic link sign-in page with Auth.js, Nodemailer, Prisma and PostgreSQL.
 :::
 
 ## Credentials

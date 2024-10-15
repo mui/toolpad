@@ -209,7 +209,7 @@ export default function SignIn() {
           // Handle Auth.js errors
           if (error instanceof AuthError) {
             return {
-              error: 'An error with Auth.js occurred.',
+              error: error.message,
               type: error.type,
             };
           }
@@ -273,7 +273,7 @@ import Head from 'next/head';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import type { Navigation } from '@toolpad/core';
+import type { Navigation } from '@toolpad/core/AppProvider';
 
 const NAVIGATION: Navigation = [
   {
@@ -464,7 +464,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
-import type { Navigation } from '@toolpad/core';
+import type { Navigation } from '@toolpad/core/AppProvider';
 import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import LinearProgress from '@mui/material/LinearProgress';
 
@@ -591,7 +591,7 @@ export default function SignIn({
           if (signInResponse && signInResponse.error) {
             // Handle Auth.js errors
             return {
-              error: 'An error with Auth.js occurred',
+              error: signInResponse.error.message,
               type: signInResponse.error,
             };
           }

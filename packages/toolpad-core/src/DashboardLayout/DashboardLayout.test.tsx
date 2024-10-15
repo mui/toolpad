@@ -341,6 +341,22 @@ describe('DashboardLayout', () => {
     expect(within(desktopNavigation).getByText('Action 2')).toBeTruthy();
   });
 
+  test('renders sidebar footer slot content', async () => {
+    function SidebarFooter() {
+      return <div>I am footer</div>;
+    }
+
+    render(
+      <AppProvider>
+        <DashboardLayout slots={{ sidebarFooter: SidebarFooter }}>Hello world</DashboardLayout>
+      </AppProvider>,
+    );
+
+    const desktopNavigation = screen.getByRole('navigation', { name: 'Desktop' });
+
+    expect(within(desktopNavigation).getByText('I am footer')).toBeTruthy();
+  });
+
   test('renders without the navigation and toggle button', async () => {
     const NAVIGATION: Navigation = [
       {

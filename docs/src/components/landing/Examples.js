@@ -159,7 +159,7 @@ export default function Examples() {
               <Typography variant="body" color="text.secondary" textAlign="center">
                 Learn how to build these and many other apps using Toolpad Core!
               </Typography>
-              <Link href="/toolpad/studio/examples/" variant="body" sx={{ mt: 1 }}>
+              <Link href="/toolpad/core/introduction/examples/" variant="body" sx={{ mt: 1 }}>
                 Check out docs
                 <KeyboardArrowRightRounded fontSize="small" />
               </Link>

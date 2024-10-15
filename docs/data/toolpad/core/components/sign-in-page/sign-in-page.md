@@ -50,11 +50,7 @@ Find details on how to set up each provider in the [Auth.js documentation](https
 
 ## Magic Link
 
-:::warning
-To use magic links, you must configure a database and pass in the required environment variables to send emails. See more details in the Auth.js docs on [database setup for email](https://authjs.dev/getting-started/authentication/email) and [Nodemailer configuration](https://authjs.dev/getting-started/providers/nodemailer/).
-:::
-
-You can use the `SignInPage` component to quickly set up authentication via one-time verification links. It uses Nodemailer under the hood to send the verification link to the user's email address.
+The `SignIn` page component supports magic links. To enable this, you will have to set up a provider such as Auth.js NodeMailer. See more details in the Auth.js docs on [database setup for email](https://authjs.dev/getting-started/authentication/email) and [Nodemailer configuration](https://authjs.dev/getting-started/providers/nodemailer/).
 
 To render a magic link form, pass in a provider with `nodemailer` as the `id` property.
 

@@ -1,7 +1,5 @@
 import NextAuth from 'next-auth';
-import { AuthProvider, SupportedAuthProvider } from '@toolpad/core';
 import GitHub from 'next-auth/providers/github';
-// import Credentials from 'next-auth/providers/credentials';
 
 import Nodemailer from 'next-auth/providers/nodemailer';
 import { PrismaAdapter } from '@auth/prisma-adapter';
@@ -13,22 +11,6 @@ const providers: Provider[] = [
     clientId: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
   }),
-  // Credentials({
-  //   credentials: {
-  //     email: { label: 'Email Address', type: 'email' },
-  //     password: { label: 'Password', type: 'password' },
-  //   },
-  //   authorize(c) {
-  //     if (c.password !== 'password') {
-  //       return null;
-  //     }
-  //     return {
-  //       id: 'test',
-  //       name: 'Test User',
-  //       email: String(c.email),
-  //     };
-  //   },
-  // }),
   Nodemailer({
     server: {
       host: process.env.EMAIL_SERVER_HOST,
@@ -47,33 +29,18 @@ export const providerMap = providers.map((provider) => {
   if (typeof provider === 'function') {
     const providerData = provider();
     return {
-      id: providerData.id as SupportedAuthProvider,
+      id: providerData.id,
       name: providerData.name,
-    } satisfies AuthProvider;
+    };
   }
-  return { id: provider.id as SupportedAuthProvider, name: provider.name } satisfies AuthProvider;
+  return { id: provider.id, name: provider.name };
 });
 
-const missingVars: string[] = [];
-
 if (!process.env.GITHUB_CLIENT_ID) {
-  missingVars.push('GITHUB_CLIENT_ID');
+  console.warn('Missing environment variable "GITHUB_CLIENT_ID"');
 }
 if (!process.env.GITHUB_CLIENT_SECRET) {
-  missingVars.push('GITHUB_CLIENT_SECRET');
-}
-
-if (missingVars.length > 0) {
-  const baseMessage =
-    'Authentication is configured but the following environment variables are missing:';
-
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(`error - ${baseMessage} ${missingVars.join(', ')}`);
-  } else {
-    console.warn(
-      `\u001b[33mwarn\u001b[0m - ${baseMessage} \u001b[31m${missingVars.join(', ')}\u001b[0m`,
-    );
-  }
+  console.warn('Missing environment variable "GITHUB_CLIENT_ID"');
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({

@@ -23,40 +23,40 @@ const CredentialsProviderTemplate = `Credentials({
 const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `
   ${kebabToPascal(provider)}({
     clientId: process.env.${kebabToConstant(provider)}_CLIENT_ID,
-    clientSecret: process.env.${kebabToConstant(provider)}_CLIENT_SECRET,${requiresIssuer(provider) ? `\nissuer: process.env.${kebabToConstant(provider)}_ISSUER,\n` : ''}${requiresTenantId(provider) ? `tenantId: process.env.${kebabToConstant(provider)}_TENANT_ID,` : ''}
+    clientSecret: process.env.${kebabToConstant(provider)}_CLIENT_SECRET,${requiresIssuer(provider) ? `\n\t\tissuer: process.env.${kebabToConstant(provider)}_ISSUER,` : ''}${requiresTenantId(provider) ? `\n\t\ttenantId: process.env.${kebabToConstant(provider)}_TENANT_ID,` : ''}
   }),`;
-const checkEnvironmentVariables = (
-  providers: SupportedAuthProvider[] | undefined,
-) => `const missingVars: string[] = [];
-
-const isMissing = (name: string, envVar: string | undefined) => {
-  if (!envVar) {
-    missingVars.push(name);
-  }
-};
-
-${providers
+const checkEnvironmentVariables = (providers: SupportedAuthProvider[] | undefined) => `${providers
   ?.filter((p) => p !== 'credentials')
   .map(
     (provider) =>
-      `isMissing('${kebabToConstant(provider)}_CLIENT_ID', process.env.${kebabToConstant(provider)}_CLIENT_ID);\nisMissing('${kebabToConstant(provider)}_CLIENT_SECRET', process.env.${kebabToConstant(provider)}_CLIENT_SECRET)`,
+      `if(!process.env.${kebabToConstant(provider)}_CLIENT_ID) { 
+  console.warn('Missing environment variable "${kebabToConstant(provider)}_CLIENT_ID"');
+}
+if(!process.env.${kebabToConstant(provider)}_CLIENT_SECRET) {
+  console.warn('Missing environment variable "${kebabToConstant(provider)}_CLIENT_SECRET"');
+}${
+        requiresTenantId(provider)
+          ? `
+if(!process.env.${kebabToConstant(provider)}_TENANT_ID) { 
+  console.warn('Missing environment variable "${kebabToConstant(provider)}_TENANT_ID"');
+}`
+          : ''
+      }${
+        requiresIssuer(provider)
+          ? `
+if(!process.env.${kebabToConstant(provider)}_ISSUER) {
+  console.warn('Missing environment variable "${kebabToConstant(provider)}_ISSUER"');
+}`
+          : ''
+      }`,
   )
   .join('\n')}
-
-if (missingVars.length > 0) {
-  const baseMessage = 'Authentication is configured but the following environment variables are missing:';
-  
-  if (process.env.NODE_ENV === 'production') {
-    console.warn(\`warn: \${baseMessage} \${missingVars.join(', ')}\`);
-  } else {
-    console.warn(\`\\u001b[33mwarn:\\u001b[0m \${baseMessage} \\u001b[31m\${missingVars.join(', ')}\\u001b[0m\`);
-  }
-}`;
+`;
 
 const auth: Template = (options) => {
   const providers = options.authProviders;
 
-  return `import NextAuth from 'next-auth';\nimport { AuthProvider, SupportedAuthProvider } from '@toolpad/core';\n${providers
+  return `import NextAuth from 'next-auth';\n${providers
     ?.map(
       (provider) =>
         `import ${kebabToPascal(provider)} from 'next-auth/providers/${provider.toLowerCase()}';`,
@@ -79,9 +79,9 @@ ${checkEnvironmentVariables(providers)}
 export const providerMap = providers.map((provider) => {
   if (typeof provider === 'function') {
     const providerData = provider();
-      return { id: providerData.id as SupportedAuthProvider, name: providerData.name } satisfies AuthProvider;
+      return { id: providerData.id, name: providerData.name };
   }
-  return { id: provider.id as SupportedAuthProvider, name: provider.name } satisfies AuthProvider;
+  return { id: provider.id, name: provider.name };
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({

@@ -26,23 +26,11 @@ const providers: Provider[] = [
   }),
 ];
 
-const missingVars: string[] = [];
-
 if (!process.env.GITHUB_CLIENT_ID) {
-  missingVars.push('GITHUB_CLIENT_ID');
+  console.warn('Missing environment variable "GITHUB_CLIENT_ID"');
 }
 if (!process.env.GITHUB_CLIENT_SECRET) {
-  missingVars.push('GITHUB_CLIENT_SECRET');
-}
-
-if (missingVars.length > 0) {
-  const message = `Authentication is configured but the following environment variables are missing: ${missingVars.join(', ')}`;
-
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error(message);
-  } else {
-    console.warn(message);
-  }
+  console.warn('Missing environment variable "GITHUB_CLIENT_SECRET"');
 }
 
 export const providerMap = providers.map((provider) => {

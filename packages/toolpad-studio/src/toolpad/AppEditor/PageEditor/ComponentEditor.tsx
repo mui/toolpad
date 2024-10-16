@@ -11,7 +11,7 @@ import {
 } from '@toolpad/studio-runtime';
 import { ExactEntriesOf } from '@toolpad/utils/types';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import Box from '@mui/system/Box';
+import Box from '@mui/material/Box';
 import NodeAttributeEditor from './NodeAttributeEditor';
 import { usePageEditorState } from './PageEditorProvider';
 import { useToolpadComponent } from '../toolpadComponents';

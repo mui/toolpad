@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { PaletteMode, ScopedCssBaseline } from '@mui/material';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
-import { deepmerge } from '@mui/utils';
+import deepmerge from '@mui/utils/deepmerge';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { getDesignTokens, getMetaThemeColor, getThemedComponents } from './theme';
 import useLocalStorageState from './utils/useLocalStorageState';

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { queryClient } from '@toolpad/studio-runtime';
-// TODO: move this rpc logic to @mui/utils
+// TODO: move this rpc logic to @toolpad/utils
 // eslint-disable-next-line import/no-restricted-paths
 import { ApiClient, createRpcApi } from '../rpcClient';
 

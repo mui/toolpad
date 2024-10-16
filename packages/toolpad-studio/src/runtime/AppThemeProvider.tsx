@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createTheme, Theme, ThemeProvider, ThemeOptions } from '@mui/material';
-import { deepmerge } from '@mui/utils';
+import deepmerge from '@mui/utils/deepmerge';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 
 declare module '@mui/material/styles' {

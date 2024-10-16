@@ -1173,9 +1173,6 @@ importers:
       title:
         specifier: 3.5.3
         version: 3.5.3
-      vitest:
-        specifier: 2.1.2
-        version: 2.1.2(@types/node@20.16.11)(@vitest/browser@2.1.2)(jsdom@25.0.1)(msw@2.4.9(typescript@5.6.2))(terser@5.34.1)
       yaml:
         specifier: 2.5.1
         version: 2.5.1
@@ -1198,6 +1195,9 @@ importers:
       '@types/title':
         specifier: 3.4.3
         version: 3.4.3
+      vitest:
+        specifier: 2.1.2
+        version: 2.1.2(@types/node@20.16.11)(@vitest/browser@2.1.2)(jsdom@25.0.1)(msw@2.4.9(typescript@5.6.2))(terser@5.34.1)
 
   playground/nextjs:
     devDependencies:

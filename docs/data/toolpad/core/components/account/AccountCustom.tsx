@@ -1,11 +1,11 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import { Account } from '@toolpad/core/Account';
-import type {
+import {
   AuthenticationContext,
   SessionContext,
-  Session,
+  type Session,
 } from '@toolpad/core/AppProvider';
+import { Account } from '@toolpad/core/Account';
 
 const demoSession = {
   user: {

@@ -2,9 +2,30 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internals';
+import type { Router, Navigation } from '@toolpad/core';
+
+const NAVIGATION: Navigation = [
+  {
+    segment: 'dashboard',
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
+  {
+    segment: 'reports',
+    title: 'Reports',
+    icon: <BarChartIcon />,
+  },
+];
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -46,18 +67,31 @@ interface DemoProps {
   window?: () => Window;
 }
 
-export default function DashboardLayoutSidebarHidden(props: DemoProps) {
+export default function DashboardLayoutSidebarCollapsed(props: DemoProps) {
   const { window } = props;
 
-  const router = useDemoRouter('/dashboard');
+  const [pathname, setPathname] = React.useState('/dashboard');
+
+  const router = React.useMemo<Router>(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <AppProvider router={router} theme={demoTheme} window={demoWindow}>
-      <DashboardLayout hideNavigation>
-        <DemoPageContent pathname={router.pathname} />
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={demoTheme}
+      window={demoWindow}
+    >
+      <DashboardLayout defaultSidebarCollapsed>
+        <DemoPageContent pathname={pathname} />
       </DashboardLayout>
     </AppProvider>
   );

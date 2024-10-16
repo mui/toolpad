@@ -70,7 +70,7 @@ Check out the complete [Next.js Auth.js Magic Link example](https://github.com/m
 ## Credentials
 
 :::warning
-The Credentials provider is not the most secure way to authenticate users. We recommend using any of the other providers for a more robust solution.
+The Credentials provider is not the most secure way to authenticate users. It's recommended to use any of the other providers for a more robust solution.
 :::
 
 To render a username password form, pass in a provider with `credentials` as the `id` property. The `signIn` function accepts a `formData` parameter in this case.

@@ -859,7 +859,7 @@ export default function Layout() {
 
 The [`DashboardLayout`](/toolpad/core/react-dashboard-layout/) component provides a consistent layout for your dashboard pages, including a sidebar, navigation, and header. The [`PageContainer`](/toolpad/core/react-page-container/) component is used to wrap the page content, and provides breadcrumbs for navigation.
 
-You can then add this layout component to your React Router configuration (e.g.: `src/main.tsx`), as a child of the root layout route previously created.
+You can then add this layout component to your React Router configuration (e.g.: `src/main.tsx`), as a child of the root layout route created in step 1.
 
 ```tsx title="src/main.tsx"
 import Layout from './layouts/dashboard';

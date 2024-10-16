@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme, type Theme } from '@mui/material';
+import { styled, useTheme, type Theme, SxProps } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
@@ -51,8 +51,6 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderStyle: 'solid',
   borderColor: (theme.vars ?? theme).palette.divider,
   boxShadow: 'none',
-  // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
-  left: 0,
   zIndex: theme.zIndex.drawer + 1,
 }));
 
@@ -179,6 +177,7 @@ function DashboardSidebarSubNavigation({
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                zIndex: 2,
               }}
             >
               {getItemTitle(navigationItem)}
@@ -324,6 +323,16 @@ function DashboardSidebarSubNavigation({
   );
 }
 
+export interface SidebarFooterProps {
+  mini: boolean;
+}
+
+export interface DashboardLayoutSlotProps {
+  toolbarActions?: {};
+  toolbarAccount?: AccountProps;
+  sidebarFooter?: SidebarFooterProps;
+}
+
 export interface DashboardLayoutSlots {
   /**
    * The toolbar actions component used in the layout header.
@@ -335,6 +344,11 @@ export interface DashboardLayoutSlots {
    * @default Account
    */
   toolbarAccount?: React.JSXElementConstructor<AccountProps>;
+  /**
+   * Optional footer component used in the layout sidebar.
+   * @default null
+   */
+  sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
 }
 
 export interface DashboardLayoutProps {
@@ -353,6 +367,11 @@ export interface DashboardLayoutProps {
    */
   defaultSidebarCollapsed?: boolean;
   /**
+   * Whether the navigation bar and menu icon should be hidden
+   * @default false
+   */
+  hideNavigation?: boolean;
+  /**
    * The components used for each slot inside.
    * @default {}
    */
@@ -361,15 +380,11 @@ export interface DashboardLayoutProps {
    * The props used for each slot inside.
    * @default {}
    */
-  slotProps?: {
-    toolbarActions?: {};
-    toolbarAccount?: AccountProps;
-  };
+  slotProps?: DashboardLayoutSlotProps;
   /**
-   * Whether the navigation bar and menu icon should be hidden
-   * @default false
+   * The system prop that allows defining system overrides as well as additional CSS styles.
    */
-  hideNavigation?: boolean;
+  sx?: SxProps<Theme>;
 }
 
 /**
@@ -390,6 +405,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     hideNavigation = false,
     slots,
     slotProps,
+    sx,
   } = props;
 
   const theme = useTheme();
@@ -503,14 +519,22 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const hasDrawerTransitions =
     isOverSmViewport && (disableCollapsibleSidebar || !isUnderMdViewport);
 
+  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
+  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
+  const SidebarFooterSlot = slots?.sidebarFooter ?? null;
+
   const getDrawerContent = React.useCallback(
-    (isMini: boolean, ariaLabel: string) => (
+    (isMini: boolean, viewport: 'phone' | 'tablet' | 'desktop') => (
       <React.Fragment>
         <Toolbar />
         <Box
           component="nav"
-          aria-label={ariaLabel}
+          aria-label={`${viewport.charAt(0).toUpperCase()}${viewport.slice(1)}`}
           sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
             overflow: 'auto',
             pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
             ...(hasDrawerTransitions
@@ -526,21 +550,33 @@ function DashboardLayout(props: DashboardLayoutProps) {
             hasDrawerTransitions={hasDrawerTransitions}
             selectedItemId={selectedItemIdRef.current}
           />
+          {SidebarFooterSlot ? (
+            <SidebarFooterSlot mini={isMini} {...slotProps?.sidebarFooter} />
+          ) : null}
         </Box>
       </React.Fragment>
     ),
-    [handleNavigationLinkClick, hasDrawerTransitions, isNavigationFullyExpanded, navigation],
+    [
+      SidebarFooterSlot,
+      handleNavigationLinkClick,
+      hasDrawerTransitions,
+      isNavigationFullyExpanded,
+      navigation,
+      slotProps?.sidebarFooter,
+    ],
   );
 
   const getDrawerSharedSx = React.useCallback(
-    (isMini: boolean) => {
+    (isMini: boolean, isTemporary: boolean) => {
       const drawerWidth = isMini ? 64 : 320;
 
       return {
         width: drawerWidth,
         flexShrink: 0,
         ...getDrawerWidthTransitionMixin(isNavigationExpanded),
+        ...(isTemporary ? { position: 'absolute' } : {}),
         [`& .MuiDrawer-paper`]: {
+          position: 'absolute',
           width: drawerWidth,
           boxSizing: 'border-box',
           backgroundImage: 'none',
@@ -551,18 +587,22 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [isNavigationExpanded],
   );
 
-  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
-  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
+  const layoutRef = React.useRef<Element | null>(null);
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AppBar color="inherit" position="fixed">
-        {
-          // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
-        }
-        <Toolbar
-          sx={{ backgroundColor: 'inherit', minWidth: '100vw', mx: { xs: -0.75, sm: -1.5 } }}
-        >
+    <Box
+      ref={layoutRef}
+      sx={{
+        position: 'relative',
+        display: 'flex',
+        overflow: 'hidden',
+        height: '100vh',
+        width: '100vw',
+        ...sx,
+      }}
+    >
+      <AppBar color="inherit" position="absolute">
+        <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
           {!hideNavigation ? (
             <React.Fragment>
               <Box
@@ -616,10 +656,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
           </Stack>
         </Toolbar>
       </AppBar>
+
       {!hideNavigation ? (
         <React.Fragment>
           <Drawer
-            container={appWindow?.document.body}
+            container={layoutRef.current}
             variant="temporary"
             open={isMobileNavigationExpanded}
             onClose={handleSetNavigationExpanded(false)}
@@ -632,10 +673,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 sm: disableCollapsibleSidebar ? 'block' : 'none',
                 md: 'none',
               },
-              ...getDrawerSharedSx(false),
+              ...getDrawerSharedSx(false, true),
             }}
           >
-            {getDrawerContent(false, 'Phone')}
+            {getDrawerContent(false, 'phone')}
           </Drawer>
           <Drawer
             variant="permanent"
@@ -645,33 +686,42 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 sm: disableCollapsibleSidebar ? 'none' : 'block',
                 md: 'none',
               },
-              ...getDrawerSharedSx(isMobileMini),
+              ...getDrawerSharedSx(isMobileMini, false),
             }}
           >
-            {getDrawerContent(isMobileMini, 'Tablet')}
+            {getDrawerContent(isMobileMini, 'tablet')}
           </Drawer>
           <Drawer
             variant="permanent"
-            sx={{ display: { xs: 'none', md: 'block' }, ...getDrawerSharedSx(isDesktopMini) }}
+            sx={{
+              display: { xs: 'none', md: 'block' },
+              ...getDrawerSharedSx(isDesktopMini, false),
+            }}
           >
-            {getDrawerContent(isDesktopMini, 'Desktop')}
+            {getDrawerContent(isDesktopMini, 'desktop')}
           </Drawer>
         </React.Fragment>
       ) : null}
 
       <Box
-        component="main"
         sx={{
-          flexGrow: 1,
-          // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
-          minWidth: {
-            xs: disableCollapsibleSidebar && isNavigationExpanded ? '100vw' : 'auto',
-            md: 'auto',
-          },
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
         }}
       >
         <Toolbar />
-        {children}
+        <Box
+          component="main"
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            overflow: 'auto',
+          }}
+        >
+          {children}
+        </Box>
       </Box>
     </Box>
   );
@@ -706,6 +756,9 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
+    sidebarFooter: PropTypes.shape({
+      mini: PropTypes.bool.isRequired,
+    }),
     toolbarAccount: PropTypes.shape({
       localeText: PropTypes.shape({
         signInLabel: PropTypes.string.isRequired,
@@ -729,9 +782,18 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slots: PropTypes.shape({
+    sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,
   }),
+  /**
+   * The system prop that allows defining system overrides as well as additional CSS styles.
+   */
+  sx: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
+    PropTypes.func,
+    PropTypes.object,
+  ]),
 } as any;
 
 export { DashboardLayout };

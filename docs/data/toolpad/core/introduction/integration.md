@@ -133,28 +133,12 @@ npm install next-auth@beta
 ```ts title="auth.ts"
 import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
-import Credentials from 'next-auth/providers/credentials';
 import type { Provider } from 'next-auth/providers';
+
 const providers: Provider[] = [
   GitHub({
     clientId: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  }),
-  Credentials({
-    credentials: {
-      email: { label: 'Email Address', type: 'email' },
-      password: { label: 'Password', type: 'password' },
-    },
-    authorize(c) {
-      if (c.password !== 'password') {
-        return null;
-      }
-      return {
-        id: 'test',
-        name: 'Test User',
-        email: String(c.email),
-      };
-    },
   }),
 ];
 
@@ -187,12 +171,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 });
 ```
 
-:::warning
-
-This file is only for demonstration purposes and allows signing in with `password` as the password. You should use a more secure method for authentication in a production environment, preferably OAuth with your own `CLIENT_ID` and `CLIENT_SECRET`. Find more details on to get these values in the [Auth.js documentation](https://authjs.dev/guides/configuring-github).
-
-:::
-
 #### c. Create a sign-in page
 
 Use the `SignInPage` component to add a sign-in page to your app. For example, `app/auth/signin/page.tsx`:
@@ -216,10 +194,6 @@ export default function SignIn() {
         'use server';
         try {
           return await signIn(provider.id, {
-            ...(formData && {
-              email: formData.get('email'),
-              password: formData.get('password'),
-            }),
             redirectTo: callbackUrl ?? '/',
           });
         } catch (error) {
@@ -235,10 +209,7 @@ export default function SignIn() {
           // Handle Auth.js errors
           if (error instanceof AuthError) {
             return {
-              error:
-                error.type === 'CredentialsSignin'
-                  ? 'Invalid credentials.'
-                  : 'An error with Auth.js occurred.',
+              error: error.message,
               type: error.type,
             };
           }
@@ -281,6 +252,10 @@ That's it! You now have Toolpad Core integrated into your Next.js App Router app
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-nextjs-app.png", "srcDark": "/static/toolpad/docs/core/integration-nextjs-app-dark.png", "alt": "Next.js App Router with Toolpad Core", "caption": "Next.js App Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}
 
+:::info
+For a full working example with authentication included, see the [Toolpad Core Next.js App with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs)
+:::
+
 ## Next.js Pages Router
 
 To integrate Toolpad Core into your Next.js Pages Router app, follow these steps:
@@ -290,23 +265,15 @@ To integrate Toolpad Core into your Next.js Pages Router app, follow these steps
 In your root layout file (e.g., `pages/_app.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="pages/_app.tsx"
+import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Head from 'next/head';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { createTheme } from '@mui/material/styles';
-
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: React.ReactElement) => React.ReactNode;
-  requireAuth?: boolean;
-};
-
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
-};
+import type { Navigation } from '@toolpad/core/AppProvider';
 
 const NAVIGATION: Navigation = [
   {
@@ -318,55 +285,25 @@ const NAVIGATION: Navigation = [
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
 ];
 
 const BRANDING = {
   title: 'My Toolpad Core App',
 };
 
-const lightTheme = createTheme();
-
-const darkTheme = createTheme({ palette: { mode: 'dark' } });
-
-const theme = {
-  light: lightTheme,
-  dark: darkTheme,
-};
-
-export default theme;
-
-export default function AppLayout({ Component, pageProps }: AppPropsWithLayout) {
+export default function App({ Component }: { Component: React.ElementType }) {
   return (
-    <React.Fragment>
+    <AppCacheProvider>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AppProvider navigation={NAVIGATION} branding={BRANDING} theme={theme}>
-        {children}
+      <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+        <DashboardLayout>
+          <PageContainer>
+            <Component />
+          </PageContainer>
+        </DashboardLayout>
       </AppProvider>
-    </React.Fragment>
-  );
-}
-
-export default function App(props: AppPropsWithLayout) {
-  const {
-    Component,
-    pageProps: { session, ...pageProps },
-  } = props;
-
-  const getLayout = Component.getLayout ?? getDefaultLayout;
-
-  let pageContent = getLayout(<Component {...pageProps} />);
-  pageContent = <AppLayout>{pageContent}</AppLayout>;
-
-  return (
-    <AppCacheProvider {...props}>
-      <SessionProvider session={session}>{pageContent}</SessionProvider>
     </AppCacheProvider>
   );
 }
@@ -474,29 +411,12 @@ npm install next-auth@beta
 ```ts title="auth.ts"
 import NextAuth from 'next-auth';
 import GitHub from 'next-auth/providers/github';
-import Credentials from 'next-auth/providers/credentials';
 import type { Provider } from 'next-auth/providers';
 
 const providers: Provider[] = [
   GitHub({
     clientId: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-  }),
-  Credentials({
-    credentials: {
-      email: { label: 'Email Address', type: 'email' },
-      password: { label: 'Password', type: 'password' },
-    },
-    authorize(c) {
-      if (c.password !== 'password') {
-        return null;
-      }
-      return {
-        id: 'test',
-        name: 'Test User',
-        email: String(c.email),
-      };
-    },
   }),
 ];
 
@@ -529,12 +449,6 @@ export const { handlers, auth } = NextAuth({
 });
 ```
 
-:::warning
-
-This file is only for demonstration purposes and allows signing in with `password` as the password. You should use a more secure method for authentication in a production environment, preferably OAuth with your own `CLIENT_ID` and `CLIENT_SECRET`. Find more details on to get these values in the [Auth.js documentation](https://authjs.dev/guides/configuring-github).
-
-:::
-
 #### c. Modify `_app.tsx`
 
 Modify `_app.tsx` to include the `authentication` prop and other helpers:
@@ -550,10 +464,9 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
-import type { Navigation } from '@toolpad/core';
+import type { Navigation } from '@toolpad/core/AppProvider';
 import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import LinearProgress from '@mui/material/LinearProgress';
-import theme from '../theme';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
@@ -620,7 +533,6 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         branding={BRANDING}
         session={session}
         authentication={AUTHENTICATION}
-        theme={theme}
       >
         {children}
       </AppProvider>
@@ -673,32 +585,15 @@ export default function SignIn({
       providers={providers}
       signIn={async (provider, formData, callbackUrl) => {
         try {
-          const signInResponse = await signIn(
-            provider.id,
-            formData
-              ? {
-                  email: formData.get('email') as string,
-                  password: formData.get('password') as string,
-                  redirect: false,
-                }
-              : { callbackUrl: callbackUrl ?? '/' },
-          );
+          const signInResponse = await signIn(provider.id, {
+            callbackUrl: callbackUrl ?? '/',
+          });
           if (signInResponse && signInResponse.error) {
             // Handle Auth.js errors
             return {
-              error:
-                signInResponse.error === 'CredentialsSignin'
-                  ? 'Invalid credentials'
-                  : 'An error with Auth.js occurred',
+              error: signInResponse.error.message,
               type: signInResponse.error,
             };
-          }
-          // If the sign in was successful,
-          // manually redirect to the callback URL
-          // since the `redirect: false` option was used
-          // to be able to display error messages on the same page without a full page reload
-          if (provider.id === 'credentials') {
-            router.push(callbackUrl ?? '/');
           }
           return {};
         } catch (error) {
@@ -767,3 +662,7 @@ export const config = {
 That's it! You now have Toolpad Core integrated into your Next.js Pages Router app with authentication setup:
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-nextjs-pages.png", "srcDark": "/static/toolpad/docs/core/integration-nextjs-pages-dark.png", "alt": "Next.js Pages Router with Toolpad Core", "caption": "Next.js Pages Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}
+
+:::info
+For a full working example with authentication included, see the [Toolpad Core Next.js Pages app with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs-pages)
+:::

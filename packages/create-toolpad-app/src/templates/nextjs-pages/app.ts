@@ -13,7 +13,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
-import type { Navigation } from '@toolpad/core';
+import type { Navigation } from '@toolpad/core/AppProvider';
 ${
   authEnabled
     ? `import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';

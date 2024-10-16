@@ -195,7 +195,7 @@ importers:
         version: 7.37.1(eslint@8.57.1)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-fa06e2c-20241014(eslint@8.57.1)
+        version: 0.0.0-experimental-605e95c-20241015(eslint@8.57.1)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.1)
@@ -3126,7 +3126,7 @@ packages:
   '@mui/types@7.2.18':
     resolution: {integrity: sha512-uvK9dWeyCJl/3ocVnTOS6nlji/Knj8/tVqVX03UVTpdmTJYu/s4jtDd9Kvv0nRGE0CUSNW1UYAci7PYypjealg==}
     peerDependencies:
-      '@types/react': ^18.3.11
+      '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -5991,8 +5991,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-fa06e2c-20241014:
-    resolution: {integrity: sha512-tHntZz8Kx/6RgCLn7aDGfBQizqTUUfHEDaBcrvJi1GhKzgDxmAbdn85Y6z8eGSh4s0gufNWyO9WRCYLf0hP0ow==}
+  eslint-plugin-react-compiler@0.0.0-experimental-605e95c-20241015:
+    resolution: {integrity: sha512-YefQd/ZGYx5UWRRusUyf8PDmf2MPHrOGj2vZQbhJc9zUoGD3RGEJueTsIl4EZTGXjJOIe/TnuznDAa1laUyMYQ==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -15788,7 +15788,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-fa06e2c-20241014(eslint@8.57.1):
+  eslint-plugin-react-compiler@0.0.0-experimental-605e95c-20241015(eslint@8.57.1):
     dependencies:
       '@babel/core': 7.25.8
       '@babel/parser': 7.25.8

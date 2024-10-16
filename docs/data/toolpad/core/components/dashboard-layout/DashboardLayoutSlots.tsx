@@ -8,9 +8,12 @@ import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
-import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Navigation, Router, SidebarFooterProps } from '@toolpad/core';
+import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
+import {
+  DashboardLayout,
+  type SidebarFooterProps,
+} from '@toolpad/core/DashboardLayout';
+import { useDemoRouter } from '@toolpad/core/internals';
 
 const NAVIGATION: Navigation = [
   {
@@ -119,15 +122,7 @@ interface DemoProps {
 export default function DashboardLayoutSlots(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
-
-  const router = React.useMemo<Router>(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const router = useDemoRouter('/dashboard');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
@@ -142,7 +137,7 @@ export default function DashboardLayoutSlots(props: DemoProps) {
       <DashboardLayout
         slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
       >
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
     </AppProvider>
   );

@@ -6,6 +6,7 @@ import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { useDemoRouter } from '@toolpad/core/internals';
 
 const NAVIGATION = [
   {
@@ -79,15 +80,7 @@ function DashboardLayoutAccount(props) {
     };
   }, []);
 
-  const [pathname, setPathname] = React.useState('/dashboard');
-
-  const router = React.useMemo(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const router = useDemoRouter('/dashboard');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
@@ -103,7 +96,7 @@ function DashboardLayoutAccount(props) {
       window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end

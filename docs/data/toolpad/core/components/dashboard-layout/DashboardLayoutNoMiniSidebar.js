@@ -8,6 +8,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { useDemoRouter } from '@toolpad/core/internals';
 
 const NAVIGATION = [
   {
@@ -66,15 +67,7 @@ DemoPageContent.propTypes = {
 function DashboardLayoutNoMiniSidebar(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
-
-  const router = React.useMemo(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const router = useDemoRouter('/dashboard');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
@@ -87,7 +80,7 @@ function DashboardLayoutNoMiniSidebar(props) {
       window={demoWindow}
     >
       <DashboardLayout disableCollapsibleSidebar>
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
     </AppProvider>
   );

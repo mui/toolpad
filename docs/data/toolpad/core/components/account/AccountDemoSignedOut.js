@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
+import { Account } from '@toolpad/core/Account';
 
 const demoSession = {
   user: {

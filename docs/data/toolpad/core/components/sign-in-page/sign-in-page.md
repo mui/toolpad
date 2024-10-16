@@ -238,4 +238,4 @@ The `SignInPage` component has versions with different layouts for authenticatio
 
 ## 🚧 Other authentication Flows
 
-The `SignInPage` will be accompanied by other components to allow users to sign up, and reset passwords. This is in progress.
+Besides the `SignInPage` , the team is planning work on several other components that enable new workflows such as [sign up](https://github.com/mui/toolpad/issues/4068) and [password reset](https://github.com/mui/toolpad/issues/4265).

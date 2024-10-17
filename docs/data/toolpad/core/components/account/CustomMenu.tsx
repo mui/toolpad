@@ -11,10 +11,13 @@ import {
   Avatar,
   Stack,
 } from '@mui/material';
-import { AccountPreview, SignOutButton } from '@toolpad/core';
+import {
+  AccountPreview,
+  SignOutButton,
+  AccountPopoverFooter,
+} from '@toolpad/core/Account';
 import FolderIcon from '@mui/icons-material/Folder';
 import AddIcon from '@mui/icons-material/Add';
-import { AccountPopoverFooter } from '../../../../../../packages/toolpad-core/src/Account/AccountPopoverFooter';
 
 interface Project {
   id: number;

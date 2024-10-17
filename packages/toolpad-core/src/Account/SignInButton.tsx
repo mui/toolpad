@@ -3,7 +3,7 @@ import Button, { ButtonProps } from '@mui/material/Button';
 import { AuthenticationContext } from '../AppProvider/AppProvider';
 import { useLocaleText } from '../shared/locales/LocaleContext';
 
-export/**
+export /**
  *
  * Demos:
  *

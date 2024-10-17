@@ -1,11 +1,11 @@
 import * as React from 'react';
 import Logout from '@mui/icons-material/Logout';
+import { Account } from '@toolpad/core/Account';
 import {
-  Account,
   AuthenticationContext,
   SessionContext,
   Session,
-} from '@toolpad/core';
+} from '@toolpad/core/AppProvider';
 
 const demoSession = {
   user: {

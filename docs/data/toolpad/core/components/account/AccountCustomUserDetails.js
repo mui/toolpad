@@ -1,36 +1,44 @@
 import * as React from 'react';
 import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
-import CustomMenuItems from './CustomMenu';
+
+import { UserOrg } from '../UserOrg';
 
 const demoSession = {
   user: {
     name: 'Bharat Kashyap',
-    email: 'bharatkashyap@outlook.com',
+    email: 'bharat@mui.com',
     image: 'https://avatars.githubusercontent.com/u/19550456',
+  },
+  org: {
+    name: 'MUI Inc.',
+    url: 'https://mui.com',
+    logo: 'https://mui.com/static/logo.svg',
   },
 };
 
-export default function AccountSlots() {
-  const [session, setSession] = React.useState(demoSession);
+export default function AccountCustomUserDetails() {
+  const [customSession, setCustomSession] = React.useState(demoSession);
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        setSession(demoSession);
+        setCustomSession(demoSession);
       },
       signOut: () => {
-        setSession(null);
+        setCustomSession(null);
       },
     };
   }, []);
 
   return (
     <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={session}>
+      <SessionContext.Provider value={customSession}>
+        {/* preview-start */}
         <Account
           slots={{
-            menuItems: CustomMenuItems,
+            content: UserOrg,
           }}
         />
+        {/* preview-end */}
       </SessionContext.Provider>
     </AuthenticationContext.Provider>
   );

@@ -13,7 +13,7 @@
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType }"
+        "description": "{ content?: elementType, iconButton?: elementType, signInButton?: elementType, signOutButton?: elementType }"
       },
       "additionalInfo": { "slotsApi": true }
     }
@@ -25,6 +25,12 @@
   ],
   "slots": [
     {
+      "name": "iconButton",
+      "description": "The component used for the icon button",
+      "default": "IconButton",
+      "class": null
+    },
+    {
       "name": "signInButton",
       "description": "The component used for the sign in button.",
       "default": "Button",
@@ -33,12 +39,12 @@
     {
       "name": "signOutButton",
       "description": "The component used for the sign out button.",
-      "default": "MenuItem",
+      "default": "Button",
       "class": null
     },
     {
-      "name": "menuItems",
-      "description": "The component used for the custom menu items.",
+      "name": "content",
+      "description": "The component used for the content of the popover",
       "default": "null",
       "class": null
     }

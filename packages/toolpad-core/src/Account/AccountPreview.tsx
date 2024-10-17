@@ -26,7 +26,7 @@ export interface AccountPreviewSlots {
    * The component used for the avatar icon button in the condensed variant
    * @default IconButton
    */
-  avatarIconButton: React.ElementType;
+  avatarIconButton?: React.ElementType;
 }
 
 export interface AccountPreviewProps {
@@ -127,7 +127,7 @@ function AccountPreview(props: AccountPreviewProps) {
       ) : (
         <IconButton
           onClick={handleClick}
-          aria-label={localeText.iconButtonAriaLabel || 'Current user'}
+          aria-label={localeText.iconButtonAriaLabel || 'Current User'}
           size="small"
           aria-controls={open ? 'account-menu' : undefined}
           aria-haspopup="true"

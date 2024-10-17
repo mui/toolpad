@@ -41,7 +41,7 @@
   ],
   "classes": [],
   "spread": true,
-  "themeDefaultProps": false,
+  "themeDefaultProps": null,
   "muiName": "AccountPreview",
   "filename": "/packages/toolpad-core/src/Account/AccountPreview.tsx",
   "inheritance": null,

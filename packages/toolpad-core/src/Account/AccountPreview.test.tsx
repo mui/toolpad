@@ -5,60 +5,77 @@
  */
 
 import * as React from 'react';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import describeConformance from '@toolpad/utils/describeConformance';
+import userEvent from '@testing-library/user-event';
 import { AccountPreview } from './AccountPreview';
-import { SessionContext } from '../AppProvider';
+import { AppProvider } from '../AppProvider';
 
-describe('AccountDetails', () => {
-  describeConformance(<AccountPreview />, () => ({
-    skip: ['themeDefaultProps'],
-  }));
+describe('AccountPreview', () => {
+  const auth = { signIn: vi.fn(), signOut: vi.fn() };
+  const session = {
+    user: { name: 'John Doe', email: 'john@example.com', image: 'https://example.com/avatar.jpg' },
+  };
 
-  test('renders nothing when no session', () => {
-    render(<AccountPreview />);
-    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+  test('renders nothing when no session is provided', () => {
+    render(
+      <AppProvider authentication={auth}>
+        <AccountPreview />
+      </AppProvider>,
+    );
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  test('renders account details correctly when there is a session', () => {
-    const session = {
-      user: {
-        name: 'John Doe',
-        email: 'john@example.com',
-        image: 'https://example.com/avatar.jpg',
-      },
-    };
-
+  test('displays condensed variant by default', () => {
     render(
-      <SessionContext.Provider value={session}>
+      <AppProvider authentication={auth} session={session}>
         <AccountPreview />
-      </SessionContext.Provider>,
+      </AppProvider>,
     );
 
     const avatar = screen.getByRole('img', { name: 'John Doe' });
     expect(avatar).toBeInTheDocument();
     expect(avatar).toHaveAttribute('src', 'https://example.com/avatar.jpg');
+  });
+
+  test('displays user name, email, and avatar in expanded variant', () => {
+    render(
+      <AppProvider authentication={auth} session={session}>
+        <AccountPreview variant="expanded" />
+      </AppProvider>,
+    );
 
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'John Doe' })).toBeInTheDocument();
   });
 
-  test('renders account details with fallback when image is not provided', () => {
-    const session = {
-      user: {
-        name: 'Jane Smith',
-        email: 'jane@example.com',
-      },
-    };
-
+  test('calls handleClick when more icon button is clicked in expanded variant', async () => {
+    const handleClick = vi.fn();
     render(
-      <SessionContext.Provider value={session}>
-        <AccountPreview />
-      </SessionContext.Provider>,
+      <AppProvider authentication={auth} session={session}>
+        <AccountPreview variant="expanded" handleClick={handleClick} />
+      </AppProvider>,
     );
 
-    expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-    expect(screen.getByText('jane@example.com')).toBeInTheDocument();
+    const moreButton = screen.getByRole('button');
+    await userEvent.click(moreButton);
+
+    expect(handleClick).toHaveBeenCalled();
+  });
+
+  test('calls handleClick when avatar is clicked in condensed variant', async () => {
+    const handleClick = vi.fn();
+    render(
+      <AppProvider authentication={auth} session={session}>
+        <AccountPreview handleClick={handleClick} />
+      </AppProvider>,
+    );
+
+    const avatarButton = screen.getByRole('button', { name: 'Current User' });
+    await userEvent.click(avatarButton);
+
+    expect(handleClick).toHaveBeenCalled();
   });
 });

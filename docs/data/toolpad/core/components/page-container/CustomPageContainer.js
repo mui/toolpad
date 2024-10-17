@@ -2,7 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { Link, useDemoRouter } from '@toolpad/core/internals';
+import { Link, useDemoRouter } from '@toolpad/core/internal';
 import { useActivePage } from '@toolpad/core/useActivePage';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';

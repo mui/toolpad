@@ -6,7 +6,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internals';
+import { useDemoRouter } from '@toolpad/core/internal';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import type { Navigation } from '@toolpad/core/AppProvider';
 

@@ -34,7 +34,7 @@ Use the following steps to integrate Toolpad Core into your Next.js app:
 In your root layout file (e.g., `app/layout.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="app/layout.tsx"
-import { AppProvider } from '@toolpad/core';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -177,8 +177,7 @@ Use the `SignInPage` component to add a sign-in page to your app. For example, `
 
 ```tsx title="app/auth/signin/page.tsx"
 import * as React from 'react';
-import type { AuthProvider } from '@toolpad/core';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import { AuthError } from 'next-auth';
 import { providerMap, signIn } from '../../../auth';
 

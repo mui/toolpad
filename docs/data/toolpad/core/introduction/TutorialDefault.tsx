@@ -5,7 +5,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { useDemoRouter } from '@toolpad/core/internals';
+import { useDemoRouter } from '@toolpad/core/internal';
 import type { Navigation } from '@toolpad/core/AppProvider';
 
 const NAVIGATION: Navigation = [

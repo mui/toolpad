@@ -7,7 +7,7 @@ import { createMemoryRouter, RouterProvider, Outlet } from 'react-router-dom';
 import { AppProvider } from '@toolpad/core/react-router-dom';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import type { Navigation } from '@toolpad/core';
+import type { Navigation } from '@toolpad/core/AppProvider';
 
 function Layout() {
   return (

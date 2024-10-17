@@ -2,7 +2,8 @@ import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
-import { AuthProvider, AppProvider, SignInPage } from '@toolpad/core';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import Frame from '../../modules/components/Frame';
 
 const NOOP = () => {};

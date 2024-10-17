@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { useLocalStorageState, Codec } from '@toolpad/core';
+import { useLocalStorageState } from '@toolpad/core/useLocalStorageState';
 import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import { z } from 'zod';
+import type { Codec } from '@toolpad/core/persistence/codec';
 
 // preview-start
 const schema = z.enum(['foo', 'bar', 'baz']).default('foo');

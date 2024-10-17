@@ -2,8 +2,7 @@
 
 import * as React from 'react';
 import { AuthError } from 'next-auth';
-import type { AuthProvider } from '@toolpad/core';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import { providerMap, signIn } from './auth';
 
 export default function AuthJsSignInApp() {

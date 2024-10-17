@@ -1,0 +1,25 @@
+<Account
+  slotProps={{
+    signInButton: {
+      color: 'success',
+    },
+    signOutButton: {
+      color: 'success',
+      startIcon: <Logout />,
+    },
+    preview: {
+      variant: 'expanded',
+      slotProps: {
+        avatarIconButton: {
+          sx: {
+            width: 'fit-content',
+            margin: 'auto',
+          },
+        },
+        avatar: {
+          variant: 'rounded',
+        },
+      },
+    },
+  }}
+/>

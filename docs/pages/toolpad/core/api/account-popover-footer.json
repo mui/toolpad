@@ -1,0 +1,11 @@
+{
+  "props": {},
+  "name": "AccountPopoverFooter",
+  "imports": ["import { AccountPopoverFooter } from '@toolpad/core/Account';"],
+  "classes": [],
+  "muiName": "AccountPopoverFooter",
+  "filename": "/packages/toolpad-core/src/Account/AccountPopoverFooter.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-account/\">Account</a></li></ul>",
+  "cssComponent": false
+}

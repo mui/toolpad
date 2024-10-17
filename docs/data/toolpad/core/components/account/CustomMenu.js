@@ -179,7 +179,7 @@ export default function CustomMenu() {
     <Stack direction="column">
       <AccountPreview variant="expanded" />
       <Divider />
-      <Typography variant="body2" margin={1}>
+      <Typography variant="body2" mx={2} mt={1}>
         Accounts
       </Typography>
       <MenuList>

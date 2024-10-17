@@ -767,11 +767,13 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
       }),
       slotProps: PropTypes.shape({
         popover: PropTypes.object,
+        popoverContent: PropTypes.object,
         preview: PropTypes.object,
         signInButton: PropTypes.object,
         signOutButton: PropTypes.object,
       }),
       slots: PropTypes.shape({
+        popover: PropTypes.elementType,
         popoverContent: PropTypes.elementType,
         preview: PropTypes.elementType,
         signInButton: PropTypes.elementType,

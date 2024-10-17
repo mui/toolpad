@@ -36,6 +36,7 @@ describe('AccountPreview', () => {
 
     const avatar = screen.getByRole('img', { name: 'John Doe' });
     expect(avatar).toBeInTheDocument();
+    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
     expect(avatar).toHaveAttribute('src', 'https://example.com/avatar.jpg');
   });
 

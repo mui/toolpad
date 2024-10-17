@@ -15,12 +15,15 @@ import CopyIcon from '@mui/icons-material/ContentCopy';
 import {
   Account,
   AccountPreview,
+  AccountPopoverFooter,
+  SignOutButton,
+} from '@toolpad/core/Account';
+
+import {
   AuthenticationContext,
   SessionContext,
   Session,
-  SignOutButton,
-} from '@toolpad/core';
-import { AccountPopoverFooter } from '../../../../../../packages/toolpad-core/src/Account/AccountPopoverFooter';
+} from '@toolpad/core/AppProvider';
 
 const demoSession = {
   user: {
@@ -41,7 +44,7 @@ function CryptoWalletInfo() {
     <Stack direction="column">
       <AccountPreview variant="expanded" />
       <Divider />
-      <Stack spacing={2} sx={{ width: 300, p: 2 }}>
+      <Stack spacing={2} sx={{ width: 320, p: 2 }}>
         <Stack direction="row" spacing={2} alignItems="center">
           <Avatar sx={{ bgcolor: 'primary.main' }}>
             <WalletIcon />

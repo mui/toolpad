@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Popover from '@mui/material/Popover';
 import Divider from '@mui/material/Divider';
+import Stack from '@mui/material/Stack';
 import { SignInButton } from './SignInButton';
 import { SignOutButton } from './SignOutButton';
 import { AccountPreview, AccountPreviewProps } from './AccountPreview';
@@ -18,8 +19,13 @@ export interface AccountSlots {
    */
   preview?: React.ElementType;
   /**
-   * The component used for the content of account popover
+   * The component used for the account popover menu
    * @default Popover
+   */
+  popover?: React.ElementType;
+  /**
+   * The component used for the content of account popover
+   * @default Stack
    */
   popoverContent?: React.ElementType;
   /**
@@ -45,6 +51,7 @@ export interface AccountProps {
   slotProps?: {
     preview?: AccountPreviewProps;
     popover?: React.ComponentProps<typeof Popover>;
+    popoverContent?: React.ComponentProps<typeof Stack>;
     signInButton?: React.ComponentProps<typeof SignInButton>;
     signOutButton?: React.ComponentProps<typeof Button>;
   };
@@ -93,53 +100,57 @@ function AccountContent(props: Omit<AccountProps, 'localeText'>) {
           {...slotProps?.preview}
         />
       )}
-      <Popover
-        anchorEl={anchorEl}
-        id="account-menu"
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        slotProps={{
-          paper: {
-            elevation: 0,
-            sx: {
-              overflow: 'visible',
-              filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
-              mt: 1,
-              '&::before': {
-                content: '""',
-                display: 'block',
-                position: 'absolute',
-                top: 0,
-                right: 14,
-                width: 10,
-                height: 10,
-                bgcolor: 'background.paper',
-                transform: 'translateY(-50%) rotate(45deg)',
-                zIndex: 0,
+      {slots?.popover ? (
+        <slots.popover />
+      ) : (
+        <Popover
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={open}
+          onClose={handleClose}
+          onClick={handleClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          {...slotProps?.popover}
+          slotProps={{
+            paper: {
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                mt: 1,
+                '&::before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: 'background.paper',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  zIndex: 0,
+                },
               },
             },
-          },
-          ...slotProps?.popover?.slotProps,
-        }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        {...slotProps?.popover}
-      >
-        {slots?.popoverContent ? (
-          <slots.popoverContent />
-        ) : (
-          <React.Fragment>
-            <AccountPopoverHeader>
-              <AccountPreview variant="expanded" />
-            </AccountPopoverHeader>
-            <Divider />
-            <AccountPopoverFooter>
-              <SignOutButton {...slotProps?.signOutButton} />
-            </AccountPopoverFooter>
-          </React.Fragment>
-        )}
-      </Popover>
+            ...slotProps?.popover?.slotProps,
+          }}
+        >
+          {slots?.popoverContent ? (
+            <slots.popoverContent />
+          ) : (
+            <Stack direction="column" {...slotProps?.popoverContent}>
+              <AccountPopoverHeader>
+                <AccountPreview variant="expanded" />
+              </AccountPopoverHeader>
+              <Divider />
+              <AccountPopoverFooter>
+                <SignOutButton {...slotProps?.signOutButton} />
+              </AccountPopoverFooter>
+            </Stack>
+          )}
+        </Popover>
+      )}
     </React.Fragment>
   );
 }
@@ -220,6 +231,7 @@ Account.propTypes /* remove-proptypes */ = {
    */
   slotProps: PropTypes.shape({
     popover: PropTypes.object,
+    popoverContent: PropTypes.object,
     preview: PropTypes.shape({
       handleClick: PropTypes.func,
       open: PropTypes.bool,
@@ -242,6 +254,7 @@ Account.propTypes /* remove-proptypes */ = {
    * The components used for each slot inside.
    */
   slots: PropTypes.shape({
+    popover: PropTypes.elementType,
     popoverContent: PropTypes.elementType,
     preview: PropTypes.elementType,
     signInButton: PropTypes.elementType,

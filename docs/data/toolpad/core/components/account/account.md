@@ -47,12 +47,6 @@ The `AccountPreview` component has two variants, `condensed` (the default) and `
 
 {{"demo": "AccountCustomSlotProps.js", "bg": "outlined" }}
 
-### Labels
-
-You can pass in custom labels – including of different languages – using the `localeText` prop.
-
-{{"demo": "AccountCustomLocaleText.js", "bg": "outlined" }}
-
 ### Slots
 
 You can pass in your own components inside the `Account` popover through the `slots` prop.
@@ -61,14 +55,20 @@ You can pass in your own components inside the `Account` popover through the `sl
 
 You can wrap the default sub-components – such as `SignOutButton` and `AccountPreview` – and wrap them in `AccountPopoverHeader` and `AccountPopoverFooter` components to create custom account popovers, as shown in the following demos:
 
+##### Account Switcher
+
+You can build advanced menus – such as a tenant switcher – by passing in a component that wraps `AccountPreview` and `SignOutButton` with a custom menu:
+
+{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
+
 ##### Crypto Wallet
 
 You can wrap the default `SignOutButton` with your own action buttons inside `AccountPopoverFooter` to customize the popover footer section:
 
 {{"demo": "AccountSlotsWallet.js", "bg": "outlined" }}
 
-##### Account Switcher
+### Labels
 
-You can build advanced menus – such as a tenant switcher – by passing in a component that wraps `AccountPreview` and `SignOutButton` with a custom menu:
+You can pass in custom labels – including of different languages – using the `localeText` prop.
 
-{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
+{{"demo": "AccountCustomLocaleText.js", "bg": "outlined" }}

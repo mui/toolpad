@@ -9,13 +9,13 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ popover?: object, preview?: { handleClick?: func, open?: bool, slotProps?: { avatar?: object, avatarIconButton?: object, moreIconButton?: object }, slots?: { avatar?: elementType, avatarIconButton?: elementType, moreIconButton?: elementType }, variant?: 'condensed'<br>&#124;&nbsp;'expanded' }, signInButton?: object, signOutButton?: object }"
+        "description": "{ popover?: object, popoverContent?: object, preview?: { handleClick?: func, open?: bool, slotProps?: { avatar?: object, avatarIconButton?: object, moreIconButton?: object }, slots?: { avatar?: elementType, avatarIconButton?: elementType, moreIconButton?: elementType }, variant?: 'condensed'<br>&#124;&nbsp;'expanded' }, signInButton?: object, signOutButton?: object }"
       }
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType }"
+        "description": "{ popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType }"
       },
       "additionalInfo": { "slotsApi": true }
     }
@@ -33,9 +33,15 @@
       "class": null
     },
     {
+      "name": "popover",
+      "description": "The component used for the account popover menu",
+      "default": "Popover",
+      "class": null
+    },
+    {
       "name": "popoverContent",
       "description": "The component used for the content of account popover",
-      "default": "Popover",
+      "default": "Stack",
       "class": null
     },
     {

@@ -14,10 +14,13 @@ import CopyIcon from '@mui/icons-material/ContentCopy';
 
 import {
   Account,
-  AccountDetails,
+  AccountPreview,
   AuthenticationContext,
   SessionContext,
+  Session,
+  SignOutButton,
 } from '@toolpad/core';
+import { AccountPopoverFooter } from '../../../../../../packages/toolpad-core/src/Account/AccountPopoverFooter';
 
 const demoSession = {
   user: {
@@ -36,7 +39,7 @@ const mockData = {
 function CryptoWalletInfo() {
   return (
     <Stack direction="column">
-      <AccountDetails />
+      <AccountPreview variant="expanded" />
       <Divider />
       <Stack spacing={2} sx={{ width: 300, p: 2 }}>
         <Stack direction="row" spacing={2} alignItems="center">
@@ -76,33 +79,29 @@ function CryptoWalletInfo() {
             {mockData.usdBalance}
           </Typography>
         </Stack>
-
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant="contained"
-            fullWidth
-            disableElevation
-            color="primary"
-            startIcon={<SendIcon />}
-          >
-            Send
-          </Button>
-          <Button
-            variant="outlined"
-            fullWidth
-            disableElevation
-            startIcon={<ShoppingCart />}
-          >
-            Buy
-          </Button>
-        </Stack>
       </Stack>
+      <Divider />
+      <AccountPopoverFooter sx={{ gap: 2, px: 2, justifyContent: 'center' }}>
+        <Button
+          variant="contained"
+          disableElevation
+          size="small"
+          color="primary"
+          startIcon={<SendIcon />}
+        >
+          Send
+        </Button>
+        <Button variant="outlined" disableElevation startIcon={<ShoppingCart />}>
+          Buy
+        </Button>
+        <SignOutButton color="info" sx={{ textTransform: 'uppercase' }} />
+      </AccountPopoverFooter>
     </Stack>
   );
 }
 
-export default function AccountSlotsInfo() {
-  const [session, setSession] = React.useState(demoSession);
+export default function AccountSlotsWallet() {
+  const [session, setSession] = React.useState<Session | null>(demoSession);
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
@@ -119,7 +118,7 @@ export default function AccountSlotsInfo() {
       <SessionContext.Provider value={session}>
         <Account
           slots={{
-            content: CryptoWalletInfo,
+            popoverContent: CryptoWalletInfo,
           }}
         />
       </SessionContext.Provider>

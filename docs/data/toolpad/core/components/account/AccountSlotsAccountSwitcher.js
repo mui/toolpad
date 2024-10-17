@@ -28,7 +28,7 @@ export default function AccountSlotsAccountSwitcher() {
       <SessionContext.Provider value={session}>
         <Account
           slots={{
-            content: CustomMenu,
+            popoverContent: CustomMenu,
           }}
         />
       </SessionContext.Provider>

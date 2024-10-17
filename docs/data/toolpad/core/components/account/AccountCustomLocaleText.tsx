@@ -5,7 +5,6 @@ import {
   SessionContext,
   Session,
 } from '@toolpad/core';
-import CustomMenu from './CustomMenu';
 
 const demoSession = {
   user: {
@@ -15,12 +14,19 @@ const demoSession = {
   },
 };
 
-export default function AccountSlotsAccountSwitcher() {
+export default function AccountCustomLocaleText() {
   const [session, setSession] = React.useState<Session | null>(demoSession);
+
   const authentication = React.useMemo(() => {
     return {
       signIn: () => {
-        setSession(demoSession);
+        setSession({
+          user: {
+            name: 'Bharat Kashyap',
+            email: 'bharatkashyap@outlook.com',
+            image: 'https://avatars.githubusercontent.com/u/19550456',
+          },
+        });
       },
       signOut: () => {
         setSession(null);
@@ -31,11 +37,14 @@ export default function AccountSlotsAccountSwitcher() {
   return (
     <AuthenticationContext.Provider value={authentication}>
       <SessionContext.Provider value={session}>
+        {/* preview-start */}
         <Account
-          slots={{
-            popoverContent: CustomMenu,
+          localeText={{
+            signInLabel: 'लॉग इन',
+            signOutLabel: 'लॉग आउट',
           }}
         />
+        {/* preview-end */}
       </SessionContext.Provider>
     </AuthenticationContext.Provider>
   );

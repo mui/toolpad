@@ -8,16 +8,16 @@ import * as React from 'react';
 import { describe, test, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import describeConformance from '@toolpad/utils/describeConformance';
-import { AccountDetails } from './AccountDetails';
+import { AccountPreview } from './AccountPreview';
 import { SessionContext } from '../AppProvider';
 
 describe('AccountDetails', () => {
-  describeConformance(<AccountDetails />, () => ({
+  describeConformance(<AccountPreview />, () => ({
     skip: ['themeDefaultProps'],
   }));
 
   test('renders nothing when no session', () => {
-    render(<AccountDetails />);
+    render(<AccountPreview />);
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
 
@@ -32,7 +32,7 @@ describe('AccountDetails', () => {
 
     render(
       <SessionContext.Provider value={session}>
-        <AccountDetails />
+        <AccountPreview />
       </SessionContext.Provider>,
     );
 
@@ -54,7 +54,7 @@ describe('AccountDetails', () => {
 
     render(
       <SessionContext.Provider value={session}>
-        <AccountDetails />
+        <AccountPreview />
       </SessionContext.Provider>,
     );
 

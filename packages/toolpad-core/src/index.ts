@@ -6,8 +6,6 @@ export * from './SignInPage';
 
 export * from './Account';
 
-export * from './AccountDetails';
-
 export * from './PageContainer';
 
 export * from './useActivePage';

@@ -2,7 +2,7 @@
   <SessionContext.Provider value={session}>
     <Account
       slots={{
-        content: CryptoWalletInfo,
+        popoverContent: CryptoWalletInfo,
       }}
     />
   </SessionContext.Provider>

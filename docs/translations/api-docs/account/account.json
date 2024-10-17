@@ -7,8 +7,8 @@
   },
   "classDescriptions": {},
   "slotDescriptions": {
-    "content": "The component used for the content of the popover",
-    "iconButton": "The component used for the icon button",
+    "popoverContent": "The component used for the content of account popover",
+    "preview": "The component used for the account preview",
     "signInButton": "The component used for the sign in button.",
     "signOutButton": "The component used for the sign out button."
   }

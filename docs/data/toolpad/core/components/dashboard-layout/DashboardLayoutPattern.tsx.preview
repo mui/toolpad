@@ -17,6 +17,6 @@
   window={demoWindow}
 >
   <DashboardLayout>
-    <DemoPageContent pathname={pathname} navigate={navigate} />
+    <DemoPageContent pathname={router.pathname} navigate={router.navigate} />
   </DashboardLayout>
 </AppProvider>

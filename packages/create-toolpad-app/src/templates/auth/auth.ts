@@ -1,4 +1,4 @@
-import type { SupportedAuthProvider } from '@toolpad/core';
+import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
 import { kebabToConstant, kebabToPascal } from '@toolpad/utils/strings';
 import { requiresIssuer, requiresTenantId } from './utils';
 import { Template } from '../../types';
@@ -56,7 +56,7 @@ if (missingVars.length > 0) {
 const auth: Template = (options) => {
   const providers = options.authProviders;
 
-  return `import NextAuth from 'next-auth';\nimport { AuthProvider, SupportedAuthProvider } from '@toolpad/core';\n${providers
+  return `import NextAuth from 'next-auth';\nimport { AuthProvider, SupportedAuthProvider } from '@toolpad/core/SignInPage';\n${providers
     ?.map(
       (provider) =>
         `import ${kebabToPascal(provider)} from 'next-auth/providers/${provider.toLowerCase()}';`,

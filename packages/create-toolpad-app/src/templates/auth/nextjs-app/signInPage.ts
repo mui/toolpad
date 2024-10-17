@@ -5,8 +5,7 @@ const signInPage: Template = (options) => {
   const hasCredentialsProvider = providers?.includes('credentials');
 
   return `import * as React from 'react';
-import type { AuthProvider } from '@toolpad/core';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import { AuthError } from 'next-auth';
 import { providerMap, signIn } from '../../../auth';
 

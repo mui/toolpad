@@ -9,6 +9,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { useDemoRouter } from '@toolpad/core/internal';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -77,16 +78,7 @@ DemoPageContent.propTypes = {
 function DashboardLayoutPattern(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/orders');
-  const navigate = React.useCallback((path) => setPathname(String(path)), []);
-
-  const router = React.useMemo(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate,
-    };
-  }, [pathname, navigate]);
+  const router = useDemoRouter('/orders');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
@@ -112,7 +104,7 @@ function DashboardLayoutPattern(props) {
       window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} navigate={navigate} />
+        <DemoPageContent pathname={router.pathname} navigate={router.navigate} />
       </DashboardLayout>
     </AppProvider>
     // preview-end

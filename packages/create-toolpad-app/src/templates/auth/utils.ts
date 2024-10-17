@@ -1,4 +1,4 @@
-import type { SupportedAuthProvider } from '@toolpad/core';
+import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
 
 export function requiresIssuer(provider: SupportedAuthProvider) {
   return (

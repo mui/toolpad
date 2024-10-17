@@ -5,9 +5,12 @@ import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import {
+  AppProvider,
+  type Router,
+  type Navigation,
+} from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Router, Navigation } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
   {

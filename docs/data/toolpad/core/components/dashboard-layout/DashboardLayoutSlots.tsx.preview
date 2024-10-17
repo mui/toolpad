@@ -1,5 +1,5 @@
 <DashboardLayout
   slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
 >
-  <DemoPageContent pathname={pathname} />
+  <DemoPageContent pathname={router.pathname} />
 </DashboardLayout>

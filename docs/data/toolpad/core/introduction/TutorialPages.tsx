@@ -8,7 +8,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internals';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import type { Navigation } from '@toolpad/core';
+import type { Navigation } from '@toolpad/core/AppProvider';
 
 const NAVIGATION: Navigation = [
   {

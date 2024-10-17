@@ -4,7 +4,7 @@ import { createTheme } from '@mui/material/styles';
 import MapIcon from '@mui/icons-material/Map';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internals';
+import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {

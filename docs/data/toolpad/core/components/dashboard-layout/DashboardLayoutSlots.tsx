@@ -13,7 +13,7 @@ import {
   DashboardLayout,
   type SidebarFooterProps,
 } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internals';
+import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {

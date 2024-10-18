@@ -165,6 +165,7 @@ AccountContent.propTypes /* remove-proptypes */ = {
    */
   slotProps: PropTypes.shape({
     popover: PropTypes.object,
+    popoverContent: PropTypes.object,
     preview: PropTypes.shape({
       handleClick: PropTypes.func,
       open: PropTypes.bool,
@@ -175,6 +176,8 @@ AccountContent.propTypes /* remove-proptypes */ = {
       }),
       slots: PropTypes.shape({
         avatar: PropTypes.elementType,
+        avatarIconButton: PropTypes.elementType,
+        moreIconButton: PropTypes.elementType,
       }),
       variant: PropTypes.oneOf(['condensed', 'expanded']),
     }),
@@ -185,12 +188,14 @@ AccountContent.propTypes /* remove-proptypes */ = {
    * The components used for each slot inside.
    */
   slots: PropTypes.shape({
+    popover: PropTypes.elementType,
     popoverContent: PropTypes.elementType,
     preview: PropTypes.elementType,
     signInButton: PropTypes.elementType,
     signOutButton: PropTypes.elementType,
   }),
 } as any;
+
 /**
  *
  * Demos:

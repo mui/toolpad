@@ -1,21 +1,20 @@
 import * as React from 'react';
+import {
+  AuthProvider,
+  SignInPage,
+  SupportedAuthProvider,
+} from '@toolpad/core/SignInPage';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 
 // preview-start
-const providers = [
-  { id: 'github', name: 'GitHub' },
-  { id: 'google', name: 'Google' },
-  { id: 'facebook', name: 'Facebook' },
-  { id: 'twitter', name: 'Twitter' },
-  { id: 'linkedin', name: 'LinkedIn' },
+const providers: { id: SupportedAuthProvider; name: string }[] = [
+  { id: 'nodemailer', name: 'Email' },
 ];
-
 // preview-end
 
-const signIn = async (provider) => {
-  const promise = new Promise((resolve) => {
+const signIn: (provider: AuthProvider) => void = async (provider) => {
+  const promise = new Promise<void>((resolve) => {
     setTimeout(() => {
       console.log(`Sign in with ${provider.id}`);
       resolve();
@@ -24,7 +23,7 @@ const signIn = async (provider) => {
   return promise;
 };
 
-export default function OAuthSignInPage() {
+export default function MagicLinkSignInPage() {
   const theme = useTheme();
   return (
     // preview-start

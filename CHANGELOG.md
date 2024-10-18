@@ -1,5 +1,64 @@
 # Changelog
 
+## v0.8.0
+
+<!-- generated comparing v0.7.0..master -->
+
+_Oct 19, 2024_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+- **BREAKING** Replaces the `menuItems` slot on the `Account` component with a more exhaustive `popoverContent` slot
+- Adds a `sidebarFooter` slot and a `hideNavigation` prop to `DashboardLayout`
+- Adds a React-Router integration example for `DashboardLayout`
+- Increased customizability of the `Account` component using new slots `preview` and `popoverContent`
+- Adds `passkey` support to the `SignInPage`, and an integration example to the docs
+- Integrates Toolpad Core components in the Toolpad Studio runtime
+
+### `@toolpad/core`
+
+- Added page-container to all components page also reordered based on the side-nav (#4178) @prakhargupta1
+- New slots and sub-components on the Account component (#4181) @bharatkashyap
+- Fix `auth.ts` file generation (#4237) @bharatkashyap
+- Add `passkey` provider support and example (#4063) @bharatkashyap
+- Support collapsed mini-drawer by default (#4234) @apedroferreira
+- Add `sidebarFooter` slot (#4236) @apedroferreira
+- Add hideNavigation prop (#4231) @vikasgurjar
+- Avoid React invalid props warning for PageContainer (#4189) @Janpot
+- Remove leading slash from patterns for PageContainer (#4191) @Janpot
+- Rename breadCrumbs to breadcrumbs (#4143) @Janpot
+- Toolpad Core website was linking to Toolpad Studio examples (#4238) @prakhargupta1
+
+### `@toolpad/studio`
+
+- Integrate Toolpad Core in Toolpad Studio runtime (#4119) @apedroferreira
+
+### Docs
+
+- Improve tutorial example, docs, CLI installation (#4225) @bharatkashyap
+- Docs/demo cleanup (#4268) @apedroferreira
+- Full documentation for React Router integration (#4185) @apedroferreira
+- Fix integration docs `_app.tsx` (#4239) @bharatkashyap
+- Use production URL to demo production use @oliviertassinari
+- Add placeholders for upcoming features (#4175) @prakhargupta1
+- Update package screenshot in contributing.md (#4230) @prakhargupta1
+- Fix input.label in SlotsSignIn (#4157) @djedu28
+
+### Core
+
+- Update README.md @apedroferreira
+- Move vitest to dev dependency in `@toolpad/utils` (#4267) @Janpot
+- Revert "Bump typescript to 5.6.2" (#4228) @Janpot
+- Lock file maintenance (#4176) @renovate[bot]
+- Remove custom playwright installation steps (#4154) @Janpot
+- remove e identifier (#4152) @Janpot
+- Enable React compiler eslint plugin (#4121) @Janpot
+- Remove <-- from changelog (#4232) @oliviertassinari
+- Make git repo easier to go to from IDE @oliviertassinari
+- Increase the minimum Node.js version support to 14.0.0 (#4171) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @djedu28, @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot], @vikasgurjar
+
 ## v0.7.0
 
 <!-- generated comparing v0.6.0..master -->

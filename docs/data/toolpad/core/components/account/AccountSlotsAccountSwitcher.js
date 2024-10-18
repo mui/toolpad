@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
 import { Account } from '@toolpad/core/Account';
+import CustomMenu from './CustomMenu';
 
 const demoSession = {
   user: {
@@ -10,7 +11,7 @@ const demoSession = {
   },
 };
 
-export default function AccountDemoSignedIn() {
+export default function AccountSlotsAccountSwitcher() {
   const [session, setSession] = React.useState(demoSession);
   const authentication = React.useMemo(() => {
     return {
@@ -27,7 +28,11 @@ export default function AccountDemoSignedIn() {
     <AuthenticationContext.Provider value={authentication}>
       <SessionContext.Provider value={session}>
         {/* preview-start */}
-        <Account />
+        <Account
+          slots={{
+            popoverContent: CustomMenu,
+          }}
+        />
         {/* preview-end */}
       </SessionContext.Provider>
     </AuthenticationContext.Provider>

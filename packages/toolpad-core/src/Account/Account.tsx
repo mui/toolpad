@@ -204,11 +204,100 @@ AccountContent.propTypes /* remove-proptypes */ = {
  * - [Account API](https://mui.com/toolpad/core/api/account)
  */
 function Account(props: AccountProps) {
-  const { localeText, ...rest } = props;
+  const { localeText } = props;
+  const { slots, slotProps } = props;
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const session = React.useContext(SessionContext);
+  const authentication = React.useContext(AuthenticationContext);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  if (!authentication) {
+    return null;
+  }
+
+  if (!session?.user) {
+    return (
+      <LocaleProvider localeText={localeText}>
+        {slots?.signInButton ? (
+          <slots.signInButton onClick={authentication.signIn} />
+        ) : (
+          <SignInButton {...slotProps?.signInButton} />
+        )}
+      </LocaleProvider>
+    );
+  }
 
   return (
     <LocaleProvider localeText={localeText}>
-      <AccountContent {...rest} />
+      {slots?.preview ? (
+        <slots.preview handleClick={handleClick} open={open} />
+      ) : (
+        <AccountPreview
+          variant="condensed"
+          handleClick={handleClick}
+          open={open}
+          {...slotProps?.preview}
+        />
+      )}
+      {slots?.popover ? (
+        <slots.popover {...slotProps?.popover} />
+      ) : (
+        <Popover
+          anchorEl={anchorEl}
+          id="account-menu"
+          open={open}
+          onClose={handleClose}
+          onClick={handleClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          {...slotProps?.popover}
+          slotProps={{
+            paper: {
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                mt: 1,
+                '&::before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  top: 0,
+                  right: 14,
+                  width: 10,
+                  height: 10,
+                  bgcolor: 'background.paper',
+                  transform: 'translateY(-50%) rotate(45deg)',
+                  zIndex: 0,
+                },
+              },
+            },
+            ...slotProps?.popover?.slotProps,
+          }}
+        >
+          {slots?.popoverContent ? (
+            <slots.popoverContent {...slotProps?.popoverContent} />
+          ) : (
+            <Stack direction="column" {...slotProps?.popoverContent}>
+              <AccountPopoverHeader>
+                <AccountPreview variant="expanded" />
+              </AccountPopoverHeader>
+              <Divider />
+              <AccountPopoverFooter>
+                <SignOutButton {...slotProps?.signOutButton} />
+              </AccountPopoverFooter>
+            </Stack>
+          )}
+        </Popover>
+      )}
     </LocaleProvider>
   );
 }

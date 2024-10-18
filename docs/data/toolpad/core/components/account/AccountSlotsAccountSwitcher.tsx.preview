@@ -1,9 +1,5 @@
-<AuthenticationContext.Provider value={authentication}>
-  <SessionContext.Provider value={session}>
-    <Account
-      slots={{
-        popoverContent: CustomMenu,
-      }}
-    />
-  </SessionContext.Provider>
-</AuthenticationContext.Provider>
+<Account
+  slots={{
+    popoverContent: CustomMenu,
+  }}
+/>

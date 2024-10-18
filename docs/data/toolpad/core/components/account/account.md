@@ -26,7 +26,7 @@ If a `session` object is present, the component is rendered as a dropdown contai
 
 When signed out, the component renders as an inline sign in button within the dashboard layout.
 
-{{"demo": "AccountDemoSignedOut.js", "bg": "outlined" }}
+{{"demo": "AccountDemoSignedOut.js", "bg": "outlined", "defaultCodeOpen": false }}
 
 ## Customization
 
@@ -61,22 +61,8 @@ You can build advanced menus – such as a tenant switcher – by passing in a c
 
 {{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
 
-##### Crypto Wallet
-
-You can wrap the default `SignOutButton` with your own action buttons inside `AccountPopoverFooter` to customize the popover footer section:
-
-{{"demo": "AccountSlotsWallet.js", "bg": "outlined" }}
-
 ### Labels
 
 You can pass in custom labels – including of different languages – using the `localeText` prop.
 
 {{"demo": "AccountCustomLocaleText.js", "bg": "outlined" }}
-
-### Session
-
-You can use the `useSession` hook to extend the existing session and add additional user details:
-
-{{"demo": "./AccountCustomUserDetails.js", "bg": "outlined", "defaultCodeOpen": false}}
-
-You can find more details on the [`useSession` docs page](/toolopad/core/react-use-session/).

@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import DEFAULT_LOCALE_TEXT from './en';
 

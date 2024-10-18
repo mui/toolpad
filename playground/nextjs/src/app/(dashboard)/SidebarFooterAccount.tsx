@@ -1,21 +1,32 @@
+'use client';
+
 import * as React from 'react';
-import {
-  MenuItem,
-  MenuList,
-  Button,
-  Divider,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-  Avatar,
-  Stack,
-} from '@mui/material';
+
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Avatar from '@mui/material/Avatar';
+import Divider from '@mui/material/Divider';
+
 import {
   AccountPreview,
-  SignOutButton,
   AccountPopoverFooter,
+  SignOutButton,
+  AccountPreviewProps,
 } from '@toolpad/core/Account';
-import AddIcon from '@mui/icons-material/Add';
+
+export function AccountSidebarPreview(props: AccountPreviewProps) {
+  const { handleClick, open } = props;
+  return (
+    <Stack direction="column">
+      <Divider />
+      <AccountPreview variant="expanded" handleClick={handleClick} open={open} />
+    </Stack>
+  );
+}
 
 const accounts = [
   {
@@ -23,20 +34,25 @@ const accounts = [
     name: 'Bharat Kashyap',
     email: 'bharatkashyap@outlook.com',
     image: 'https://avatars.githubusercontent.com/u/19550456',
+    projects: [
+      {
+        id: 3,
+        title: 'Project X',
+      },
+    ],
   },
   {
     id: 2,
     name: 'Bharat MUI',
     email: 'bharat@mui.com',
     color: '#8B4513', // Brown color
+    projects: [{ id: 4, title: 'Project A' }],
   },
 ];
 
-export default function CustomMenu() {
+export function SidebarFooterAccountPopover() {
   return (
     <Stack direction="column">
-      <AccountPreview variant="expanded" />
-      <Divider />
       <Typography variant="body2" mx={2} mt={1}>
         Accounts
       </Typography>
@@ -79,18 +95,7 @@ export default function CustomMenu() {
             />
           </MenuItem>
         ))}
-        <Divider />
-        <Button
-          variant="text"
-          sx={{ textTransform: 'capitalize', display: 'flex', mx: 'auto' }}
-          size="small"
-          startIcon={<AddIcon />}
-          disableElevation
-        >
-          Add new
-        </Button>
       </MenuList>
-      <Divider />
       <AccountPopoverFooter>
         <SignOutButton />
       </AccountPopoverFooter>

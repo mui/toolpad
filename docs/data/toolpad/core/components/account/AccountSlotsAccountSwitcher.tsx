@@ -31,11 +31,13 @@ export default function AccountSlotsAccountSwitcher() {
   return (
     <AuthenticationContext.Provider value={authentication}>
       <SessionContext.Provider value={session}>
+        {/* preview-start */}
         <Account
           slots={{
             popoverContent: CustomMenu,
           }}
         />
+        {/* preview-end */}
       </SessionContext.Provider>
     </AuthenticationContext.Provider>
   );

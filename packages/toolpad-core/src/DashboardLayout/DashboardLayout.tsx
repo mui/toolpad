@@ -26,24 +26,20 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { Link } from '../shared/Link';
-import {
-  BrandingContext,
-  NavigationContext,
-  RouterContext,
-  WindowContext,
-} from '../shared/context';
+import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
 import type { Navigation } from '../AppProvider';
 import { Account, type AccountProps } from '../Account';
 import {
+  getItemPath,
   getItemTitle,
-  getPageItemFullPath,
   hasSelectedNavigationChildren,
-  isPageItemSelected,
+  isPageItem,
 } from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
 import { ToolbarActions } from './ToolbarActions';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { ToolpadLogo } from './ToolpadLogo';
+import { useActivePage } from '../useActivePage';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -106,28 +102,24 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
-  basePath?: string;
   depth?: number;
   onLinkClick: () => void;
   isMini?: boolean;
   isFullyExpanded?: boolean;
   hasDrawerTransitions?: boolean;
-  selectedItemId: string;
 }
 
 function DashboardSidebarSubNavigation({
   subNavigation,
-  basePath = '',
   depth = 0,
   onLinkClick,
   isMini = false,
   isFullyExpanded = true,
   hasDrawerTransitions = false,
-  selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
-  const routerContext = React.useContext(RouterContext);
+  const navigationContext = React.useContext(NavigationContext);
 
-  const pathname = routerContext?.pathname ?? '/';
+  const activePage = useActivePage();
 
   const initialExpandedSidebarItemIds = React.useMemo(
     () =>
@@ -136,11 +128,14 @@ function DashboardSidebarSubNavigation({
           navigationItem,
           originalIndex: navigationItemIndex,
         }))
-        .filter(({ navigationItem }) =>
-          hasSelectedNavigationChildren(navigationItem, basePath, pathname),
+        .filter(
+          ({ navigationItem }) =>
+            isPageItem(navigationItem) &&
+            !!activePage &&
+            hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path),
         )
         .map(({ originalIndex }) => `${depth}-${originalIndex}`),
-    [basePath, depth, pathname, subNavigation],
+    [activePage, depth, navigationContext, subNavigation],
   );
 
   const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState(
@@ -204,7 +199,7 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
+        const navigationItemFullPath = getItemPath(navigationContext, navigationItem);
         const navigationItemId = `${depth}-${navigationItemIndex}`;
         const navigationItemTitle = getItemTitle(navigationItem);
 
@@ -218,15 +213,8 @@ function DashboardSidebarSubNavigation({
 
         const listItemIconSize = 34;
 
-        const isSelected = isPageItemSelected(navigationItem, basePath, pathname);
-
-        if (process.env.NODE_ENV !== 'production' && isSelected && selectedItemId) {
-          console.warn(`Duplicate selected path in navigation: ${navigationItemFullPath}`);
-        }
-
-        if (isSelected && !selectedItemId) {
-          selectedItemId = navigationItemId;
-        }
+        const isSelected =
+          !!activePage && activePage.path === getItemPath(navigationContext, navigationItem);
 
         const listItem = (
           <ListItem
@@ -309,10 +297,8 @@ function DashboardSidebarSubNavigation({
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
                   subNavigation={navigationItem.children}
-                  basePath={navigationItemFullPath}
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
-                  selectedItemId={selectedItemId}
                 />
               </Collapse>
             ) : null}
@@ -464,8 +450,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
     return () => {};
   }, [isNavigationExpanded, theme]);
 
-  const selectedItemIdRef = React.useRef('');
-
   const handleSetNavigationExpanded = React.useCallback(
     (newExpanded: boolean) => () => {
       setIsNavigationExpanded(newExpanded);
@@ -478,16 +462,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   }, [isNavigationExpanded, setIsNavigationExpanded]);
 
   const handleNavigationLinkClick = React.useCallback(() => {
-    selectedItemIdRef.current = '';
     setIsMobileNavigationExpanded(false);
   }, [setIsMobileNavigationExpanded]);
-
-  // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
-  React.useMemo(() => {
-    if (navigation) {
-      selectedItemIdRef.current = '';
-    }
-  }, [navigation]);
 
   const isDesktopMini = !disableCollapsibleSidebar && !isDesktopNavigationExpanded;
   const isMobileMini = !disableCollapsibleSidebar && !isMobileNavigationExpanded;
@@ -548,7 +524,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
             isMini={isMini}
             isFullyExpanded={isNavigationFullyExpanded}
             hasDrawerTransitions={hasDrawerTransitions}
-            selectedItemId={selectedItemIdRef.current}
           />
           {SidebarFooterSlot ? (
             <SidebarFooterSlot mini={isMini} {...slotProps?.sidebarFooter} />

@@ -84,6 +84,18 @@ function AccountSidebarPreview(props) {
   );
 }
 
+AccountSidebarPreview.propTypes = {
+  /**
+   * The handler used when the preview is expanded
+   */
+  handleClick: PropTypes.func,
+  /**
+   * The state of the Account popover
+   * @default false
+   */
+  open: PropTypes.bool,
+};
+
 const accounts = [
   {
     id: 1,

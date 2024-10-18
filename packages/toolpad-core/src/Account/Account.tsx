@@ -60,7 +60,18 @@ export interface AccountProps {
    */
   localeText?: Partial<ReturnType<typeof useLocaleText>>;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [Account](https://mui.com/toolpad/core/react-account/)
+ * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
+ * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ *
+ * API:
+ *
+ * - [Account API](https://mui.com/toolpad/core/api/account)
+ */
 function Account(props: AccountProps) {
   const { localeText } = props;
   const { slots, slotProps } = props;

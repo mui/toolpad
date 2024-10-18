@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { AuthError } from 'next-auth';
-
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { providerMap, signIn } from './auth';
 

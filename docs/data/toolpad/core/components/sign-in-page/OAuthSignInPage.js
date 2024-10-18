@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { AppProvider, SignInPage } from '@toolpad/core';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { SignInPage } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 // preview-start
 const providers = [

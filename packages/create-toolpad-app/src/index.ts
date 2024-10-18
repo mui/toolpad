@@ -12,7 +12,7 @@ import { satisfies } from 'semver';
 import { readJsonFile } from '@toolpad/utils/fs';
 import invariant from 'invariant';
 import { bashResolvePath } from '@toolpad/utils/cli';
-import type { SupportedAuthProvider } from '@toolpad/core';
+import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
 import generateProject from './generateProject';
 import generateStudioProject from './generateStudioProject';
 import writeFiles from './writeFiles';

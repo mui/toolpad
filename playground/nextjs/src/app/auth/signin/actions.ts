@@ -1,6 +1,6 @@
 'use server';
 import { AuthError } from 'next-auth';
-import type { AuthProvider } from '@toolpad/core';
+import type { AuthProvider } from '@toolpad/core/SignInPage';
 import { signIn as signInAction } from '../../../auth';
 
 async function signIn(provider: AuthProvider, formData: FormData, callbackUrl?: string) {

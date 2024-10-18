@@ -5,7 +5,7 @@ import { createTheme } from '@mui/material/styles';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Router } from '@toolpad/core';
+import { useDemoRouter } from '@toolpad/core/internal';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -50,15 +50,7 @@ interface DemoProps {
 export default function DashboardLayoutNavigationHeadings(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/lion');
-
-  const router = React.useMemo<Router>(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const router = useDemoRouter('/lion');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
@@ -91,7 +83,7 @@ export default function DashboardLayoutNavigationHeadings(props: DemoProps) {
       window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end

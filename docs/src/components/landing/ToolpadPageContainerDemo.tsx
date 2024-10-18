@@ -5,7 +5,7 @@ import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { useDemoRouter } from '@toolpad/core/internals';
+import { useDemoRouter } from '@toolpad/core/internal';
 import Grid from '@mui/material/Grid2';
 import { createTheme, styled, useTheme } from '@mui/material/styles';
 

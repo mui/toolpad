@@ -8,6 +8,7 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import useSsr from '@toolpad/utils/hooks/useSsr';
 import { PaletteModeContext } from '../shared/context';
 
+// TODO: When we use this component as the default for a slot, make it non-internal
 /**
  * @ignore - internal component.
  */

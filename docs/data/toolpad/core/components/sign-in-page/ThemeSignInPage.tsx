@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { AuthProvider, AppProvider, SignInPage } from '@toolpad/core';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import { createTheme } from '@mui/material/styles';
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
 import { getDesignTokens } from './brandingTheme';

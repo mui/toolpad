@@ -16,6 +16,8 @@ export * from './useNotifications';
 
 export * from './useLocalStorageState';
 
+export * from './useSession';
+
 export * from './useSessionStorageState';
 
 export * from './persistence/codec';

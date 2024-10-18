@@ -101,7 +101,7 @@ function AccountContent(props: Omit<AccountProps, 'localeText'>) {
         />
       )}
       {slots?.popover ? (
-        <slots.popover />
+        <slots.popover {...slotProps?.popover} />
       ) : (
         <Popover
           anchorEl={anchorEl}
@@ -137,7 +137,7 @@ function AccountContent(props: Omit<AccountProps, 'localeText'>) {
           }}
         >
           {slots?.popoverContent ? (
-            <slots.popoverContent />
+            <slots.popoverContent {...slotProps?.popoverContent} />
           ) : (
             <Stack direction="column" {...slotProps?.popoverContent}>
               <AccountPopoverHeader>

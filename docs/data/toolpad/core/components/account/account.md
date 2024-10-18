@@ -26,7 +26,7 @@ If a `session` object is present, the component is rendered as a dropdown contai
 
 When signed out, the component renders as an inline sign in button within the dashboard layout.
 
-{{"demo": "AccountDemoSignedOut.js", "bg": "outlined" }}
+{{"demo": "AccountDemoSignedOut.js", "bg": "outlined", "defaultCodeOpen": false }}
 
 ## Customization
 
@@ -60,12 +60,6 @@ You can wrap the default sub-components – such as `SignOutButton` and `Account
 You can build advanced menus – such as a tenant switcher – by passing in a component that wraps `AccountPreview` and `SignOutButton` with a custom menu:
 
 {{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
-
-##### Crypto Wallet
-
-You can wrap the default `SignOutButton` with your own action buttons inside `AccountPopoverFooter` to customize the popover footer section:
-
-{{"demo": "AccountSlotsWallet.js", "bg": "outlined" }}
 
 ### Labels
 

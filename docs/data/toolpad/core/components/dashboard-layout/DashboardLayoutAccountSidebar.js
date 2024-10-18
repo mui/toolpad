@@ -1,19 +1,25 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { Account } from '@toolpad/core';
+import {
+  Account,
+  AccountPreview,
+  AccountPopoverFooter,
+  SignOutButton,
+} from '@toolpad/core/Account';
 
 const NAVIGATION = [
   {
@@ -68,48 +74,99 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-function Search() {
+function AccountSidebarPreview(props) {
+  const { handleClick, open } = props;
   return (
-    <React.Fragment>
-      <Tooltip title="Search" enterDelay={1000}>
-        <div>
-          <IconButton
-            type="button"
-            aria-label="search"
-            sx={{
-              display: { xs: 'inline', md: 'none' },
-            }}
-          >
-            <SearchIcon />
-          </IconButton>
-        </div>
-      </Tooltip>
-      <TextField
-        label="Search"
-        variant="outlined"
-        size="small"
-        slotProps={{
-          input: {
-            endAdornment: (
-              <IconButton type="button" aria-label="search" size="small">
-                <SearchIcon />
-              </IconButton>
-            ),
-            sx: { pr: 0.5 },
-          },
-        }}
-        sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
-      />
-    </React.Fragment>
+    <Stack direction="column">
+      <Divider />
+      <AccountPreview variant="expanded" handleClick={handleClick} open={open} />
+    </Stack>
   );
 }
 
-function SidebarFooter() {
+const accounts = [
+  {
+    id: 1,
+    name: 'Bharat Kashyap',
+    email: 'bharatkashyap@outlook.com',
+    image: 'https://avatars.githubusercontent.com/u/19550456',
+    projects: [
+      {
+        id: 3,
+        title: 'Project X',
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Bharat MUI',
+    email: 'bharat@mui.com',
+    color: '#8B4513', // Brown color
+    projects: [{ id: 4, title: 'Project A' }],
+  },
+];
+
+function SidebarFooterAccountPopover() {
   return (
-    <Stack>
-      <Divider />
-      <Account variant="sidebar" />
+    <Stack direction="column">
+      <Typography variant="body2" mx={2} mt={1}>
+        Accounts
+      </Typography>
+      <MenuList>
+        {accounts.map((account) => (
+          <MenuItem
+            key={account.id}
+            component="button"
+            sx={{
+              justifyContent: 'flex-start',
+              width: '100%',
+              columnGap: 2,
+            }}
+          >
+            <ListItemIcon>
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  fontSize: '0.95rem',
+                  bgcolor: account.color,
+                }}
+                src={account.image ?? ''}
+                alt={account.name ?? ''}
+              >
+                {account.name[0]}
+              </Avatar>
+            </ListItemIcon>
+            <ListItemText
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                width: '100%',
+              }}
+              primary={account.name}
+              secondary={account.email}
+              primaryTypographyProps={{ variant: 'body2' }}
+              secondaryTypographyProps={{ variant: 'caption' }}
+            />
+          </MenuItem>
+        ))}
+      </MenuList>
+      <AccountPopoverFooter>
+        <SignOutButton />
+      </AccountPopoverFooter>
     </Stack>
+  );
+}
+
+function SidebarFooterAccount() {
+  return (
+    <Account
+      slots={{
+        preview: AccountSidebarPreview,
+        popoverContent: SidebarFooterAccountPopover,
+      }}
+    />
   );
 }
 
@@ -159,7 +216,7 @@ function DashboardLayoutAccountSidebar(props) {
       session={session}
     >
       <DashboardLayout
-        slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
+        slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
       >
         <DemoPageContent pathname={pathname} />
       </DashboardLayout>

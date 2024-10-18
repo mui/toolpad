@@ -10,7 +10,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
 ```
 
-2. For the database created above, the connection string will be `postgresql://postgres:postgres@localhost:5432/postgres`.
+2. For the database created above, the connection string is `postgresql://postgres:postgres@localhost:5432/postgres`.
 
 3. Update the `DATABASE_URL` environment variable in the `.env` file with the connection string for the database you created above.
 
@@ -47,4 +47,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Check out the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

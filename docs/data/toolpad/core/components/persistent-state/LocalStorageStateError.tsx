@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { Codec, useLocalStorageState } from '@toolpad/core';
+import { useLocalStorageState } from '@toolpad/core/useLocalStorageState';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import type { Codec } from '@toolpad/core/persistence/codec';
 
 // preview-start
 const CODEC_JSON: Codec<unknown> = {

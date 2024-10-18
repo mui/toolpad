@@ -2,6 +2,11 @@ const baseline = require('@mui/monorepo/.eslintrc');
 const path = require('path');
 const lodash = require('lodash');
 
+const OneLevelImportMessage = [
+  'Prefer one level nested imports to avoid bundling everything in dev mode or breaking CJS/ESM split.',
+  'See https://github.com/mui/material-ui/pull/24147 for the kind of win it can unlock.',
+].join('\n');
+
 const ALLOWED_LODASH_METHODS = new Set(['throttle', 'debounce', 'set']);
 
 const noRestrictedImports = {
@@ -194,6 +199,22 @@ module.exports = {
     {
       files: ['packages/toolpad-studio/src/**/*'],
       rules: { 'react-compiler/react-compiler': 'off' },
+    },
+    {
+      files: ['docs/**/*{.ts,.tsx,.js}'],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: [
+              {
+                name: '@toolpad/core',
+                message: OneLevelImportMessage,
+              },
+            ],
+          },
+        ],
+      },
     },
   ],
 };

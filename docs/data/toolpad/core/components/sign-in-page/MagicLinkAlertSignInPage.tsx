@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {
   AuthProvider,
-  AppProvider,
   SignInPage,
-  AuthResponse,
   SupportedAuthProvider,
-} from '@toolpad/core';
+  AuthResponse,
+} from '@toolpad/core/SignInPage';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { useTheme } from '@mui/material/styles';
 
 const providers: { id: SupportedAuthProvider; name: string }[] = [

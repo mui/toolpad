@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { AppProvider, SignInPage } from '@toolpad/core';
+import { SignInPage } from '@toolpad/core/SignInPage';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { useTheme } from '@mui/material/styles';
 
 const providers = [{ id: 'nodemailer', name: 'Email' }];

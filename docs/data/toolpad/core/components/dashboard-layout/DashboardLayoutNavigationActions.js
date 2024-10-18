@@ -14,6 +14,7 @@ import CallMadeIcon from '@mui/icons-material/CallMade';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { useDemoRouter } from '@toolpad/core/internal';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -69,15 +70,7 @@ const CALLS_NAVIGATION = [
 function DashboardLayoutNavigationActions(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/contacts');
-
-  const router = React.useMemo(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const router = useDemoRouter('/contacts');
 
   const [popoverAnchorEl, setPopoverAnchorEl] = React.useState(null);
 
@@ -143,7 +136,7 @@ function DashboardLayoutNavigationActions(props) {
       window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end

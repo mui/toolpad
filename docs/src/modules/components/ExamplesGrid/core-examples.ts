@@ -22,5 +22,12 @@ export default function examples() {
       src: '/static/toolpad/docs/core/auth-next.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs-pages',
     },
+    {
+      title: 'Vite with React Router',
+      description:
+        'This app shows you to how to get started using Toolpad Core with Vite and React Router',
+      src: '/static/toolpad/docs/core/vite-react-router.png',
+      source: 'https://github.com/mui/toolpad/tree/master/examples/core-vite',
+    },
   ];
 }

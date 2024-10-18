@@ -109,17 +109,23 @@ The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop 
 
 {{"demo": "DashboardLayoutNoMiniSidebar.js", "height": 400, "iframe": true}}
 
-### Full-size content
+### Start with mini-drawer on desktop
 
-The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.
+The layout sidebar can default to a collapsed mini-drawer on desktop viewport sizes with the `defaultSidebarCollapsed` prop.
 
-{{"demo": "DashboardLayoutFullScreen.js", "height": 400, "iframe": true}}
+{{"demo": "DashboardLayoutSidebarCollapsed.js", "height": 400, "iframe": true}}
 
 ### Hide navigation
 
 The layout sidebar can be hidden if needed with the `hideNavigation` prop.
 
 {{"demo": "DashboardLayoutSidebarHidden.js", "height": 400, "iframe": true}}
+
+### Full-size content
+
+The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.
+
+{{"demo": "DashboardLayoutFullScreen.js", "height": 400, "iframe": true}}
 
 ## Account
 

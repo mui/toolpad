@@ -37,7 +37,8 @@ import GitLabIcon from './icons/GitLab';
 import KeycloakIcon from './icons/Keycloak';
 import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
-import { BrandingContext, DocsContext, RouterContext } from '../shared/context';
+import { BrandingContext, RouterContext } from '../shared/context';
+import { DocsContext } from '../internal/context';
 
 type SupportedOAuthProvider =
   | 'github'

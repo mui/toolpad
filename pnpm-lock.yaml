@@ -195,7 +195,7 @@ importers:
         version: 7.37.1(eslint@8.57.1)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 0.0.0-experimental-07a2ff2-20241017(eslint@8.57.1)
+        version: 19.0.0-beta-9ee70a1-20241017(eslint@8.57.1)
       eslint-plugin-react-hooks:
         specifier: 4.6.2
         version: 4.6.2(eslint@8.57.1)
@@ -2052,7 +2052,7 @@ packages:
     resolution: {integrity: sha512-GjV0/mUEEXpi1U5ZgDprMRRgajGMRW3G5FjMr5KLKD8nT2fTG8+h/klV3+6Dm5739QE+K5+2e91qFKAYI3pmRg==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
-      '@babel/core': ^7.0.0-0
+      '@babel/core': ^7.25.8
 
   '@babel/preset-typescript@7.25.7':
     resolution: {integrity: sha512-rkkpaXJZOFN45Fb+Gki0c+KMIglk4+zZXOoMJuyEK8y8Kkc8Jd3BDmP7qPsz0zQMJj+UD7EprF+AqAXcILnexw==}
@@ -2944,7 +2944,7 @@ packages:
     resolution: {integrity: sha512-P0E7ZrxOuyYqBvVv9w8k7wm+Xzx/KRu+BGgFcR2htTsGCpJNQJCSUXNUZ50MUmSU9hzqhwbQWNXhV1MBTl6F7A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
-      '@types/react': ^17.0.0 || ^18.0.0
+      '@types/react': ^18.3.11
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
     peerDependenciesMeta:
@@ -6099,8 +6099,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@0.0.0-experimental-07a2ff2-20241017:
-    resolution: {integrity: sha512-rQq5RmA2ifLTh5XVdxksCfCzcisedUehoB0RX79pqt/c9yZO+p1ob4e2XFQ/ztz9hJmKuhPnu5g3zGZCXc7g1A==}
+  eslint-plugin-react-compiler@19.0.0-beta-9ee70a1-20241017:
+    resolution: {integrity: sha512-GdJHMa9Wqfc/JPiv4WW5JjQsuSISdBo7oM/6IjRO8uxaZncDrKK/RyFqbPvgEiNFzDcX8ZZvR8dgfSGvxh2Qpw==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -16013,7 +16013,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@0.0.0-experimental-07a2ff2-20241017(eslint@8.57.1):
+  eslint-plugin-react-compiler@19.0.0-beta-9ee70a1-20241017(eslint@8.57.1):
     dependencies:
       '@babel/core': 7.25.8
       '@babel/parser': 7.25.8

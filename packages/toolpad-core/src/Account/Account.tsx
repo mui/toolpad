@@ -61,7 +61,8 @@ export interface AccountProps {
   localeText?: Partial<ReturnType<typeof useLocaleText>>;
 }
 
-function AccountContent(props: Omit<AccountProps, 'localeText'>) {
+function Account(props: AccountProps) {
+  const { localeText } = props;
   const { slots, slotProps } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const session = React.useContext(SessionContext);
@@ -81,15 +82,19 @@ function AccountContent(props: Omit<AccountProps, 'localeText'>) {
   }
 
   if (!session?.user) {
-    return slots?.signInButton ? (
-      <slots.signInButton onClick={authentication.signIn} />
-    ) : (
-      <SignInButton {...slotProps?.signInButton} />
+    return (
+      <LocaleProvider localeText={localeText}>
+        {slots?.signInButton ? (
+          <slots.signInButton onClick={authentication.signIn} />
+        ) : (
+          <SignInButton {...slotProps?.signInButton} />
+        )}
+      </LocaleProvider>
     );
   }
 
   return (
-    <React.Fragment>
+    <LocaleProvider localeText={localeText}>
       {slots?.preview ? (
         <slots.preview handleClick={handleClick} open={open} />
       ) : (
@@ -151,64 +156,6 @@ function AccountContent(props: Omit<AccountProps, 'localeText'>) {
           )}
         </Popover>
       )}
-    </React.Fragment>
-  );
-}
-
-AccountContent.propTypes /* remove-proptypes */ = {
-  // ┌────────────────────────────── Warning ──────────────────────────────┐
-  // │ These PropTypes are generated from the TypeScript type definitions. │
-  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
-  // └─────────────────────────────────────────────────────────────────────┘
-  /**
-   * The props used for each slot inside.
-   */
-  slotProps: PropTypes.shape({
-    popover: PropTypes.object,
-    preview: PropTypes.shape({
-      handleClick: PropTypes.func,
-      open: PropTypes.bool,
-      slotProps: PropTypes.shape({
-        avatar: PropTypes.object,
-        avatarIconButton: PropTypes.object,
-        moreIconButton: PropTypes.object,
-      }),
-      slots: PropTypes.shape({
-        avatar: PropTypes.elementType,
-      }),
-      variant: PropTypes.oneOf(['condensed', 'expanded']),
-    }),
-    signInButton: PropTypes.object,
-    signOutButton: PropTypes.object,
-  }),
-  /**
-   * The components used for each slot inside.
-   */
-  slots: PropTypes.shape({
-    popoverContent: PropTypes.elementType,
-    preview: PropTypes.elementType,
-    signInButton: PropTypes.elementType,
-    signOutButton: PropTypes.elementType,
-  }),
-} as any;
-/**
- *
- * Demos:
- *
- * - [Account](https://mui.com/toolpad/core/react-account/)
- * - [Dashboard Layout](https://mui.com/toolpad/core/react-dashboard-layout/)
- * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
- *
- * API:
- *
- * - [Account API](https://mui.com/toolpad/core/api/account)
- */
-function Account(props: AccountProps) {
-  const { localeText, ...rest } = props;
-
-  return (
-    <LocaleProvider localeText={localeText}>
-      <AccountContent {...rest} />
     </LocaleProvider>
   );
 }

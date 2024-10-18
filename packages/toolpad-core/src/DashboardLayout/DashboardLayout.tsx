@@ -362,6 +362,11 @@ export interface DashboardLayoutProps {
    */
   disableCollapsibleSidebar?: boolean;
   /**
+   * Whether the sidebar should start collapsed in desktop size screens.
+   * @default false
+   */
+  defaultSidebarCollapsed?: boolean;
+  /**
    * Whether the navigation bar and menu icon should be hidden
    * @default false
    */
@@ -396,6 +401,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const {
     children,
     disableCollapsibleSidebar = false,
+    defaultSidebarCollapsed = false,
     hideNavigation = false,
     slots,
     slotProps,
@@ -409,7 +415,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const appWindow = React.useContext(WindowContext);
   const applicationTitle = useApplicationTitle();
 
-  const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] = React.useState(true);
+  const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
+    React.useState(!defaultSidebarCollapsed);
   const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] = React.useState(false);
 
   const isUnderMdViewport = useMediaQuery(
@@ -730,6 +737,11 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
+   * Whether the sidebar should start collapsed in desktop size screens.
+   * @default false
+   */
+  defaultSidebarCollapsed: PropTypes.bool,
+  /**
    * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
    * @default false
    */
@@ -749,17 +761,21 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
     }),
     toolbarAccount: PropTypes.shape({
       localeText: PropTypes.shape({
-        signInLabel: PropTypes.string.isRequired,
-        signOutLabel: PropTypes.string.isRequired,
+        iconButtonAriaLabel: PropTypes.string,
+        signInLabel: PropTypes.string,
+        signOutLabel: PropTypes.string,
       }),
       slotProps: PropTypes.shape({
-        iconButton: PropTypes.object,
+        popover: PropTypes.object,
+        popoverContent: PropTypes.object,
+        preview: PropTypes.object,
         signInButton: PropTypes.object,
         signOutButton: PropTypes.object,
       }),
       slots: PropTypes.shape({
-        content: PropTypes.elementType,
-        iconButton: PropTypes.elementType,
+        popover: PropTypes.elementType,
+        popoverContent: PropTypes.elementType,
+        preview: PropTypes.elementType,
         signInButton: PropTypes.elementType,
         signOutButton: PropTypes.elementType,
       }),

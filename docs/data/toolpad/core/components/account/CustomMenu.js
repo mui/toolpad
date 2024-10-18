@@ -12,7 +12,11 @@ import {
   Avatar,
   Stack,
 } from '@mui/material';
-import { AccountDetails } from '@toolpad/core';
+import {
+  AccountPreview,
+  SignOutButton,
+  AccountPopoverFooter,
+} from '@toolpad/core/Account';
 import FolderIcon from '@mui/icons-material/Folder';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -176,12 +180,12 @@ export default function CustomMenu() {
 
   return (
     <Stack direction="column">
-      <AccountDetails />
+      <AccountPreview variant="expanded" />
       <Divider />
-      <MenuList dense disablePadding>
-        <Typography variant="body2" margin={1}>
-          Accounts
-        </Typography>
+      <Typography variant="body2" mx={2} mt={1}>
+        Accounts
+      </Typography>
+      <MenuList>
         {accounts.map((account) => (
           <MenuItem
             key={account.id}
@@ -231,6 +235,10 @@ export default function CustomMenu() {
           projects={selectedProjects}
         />
       </MenuList>
+      <Divider />
+      <AccountPopoverFooter>
+        <SignOutButton />
+      </AccountPopoverFooter>
     </Stack>
   );
 }

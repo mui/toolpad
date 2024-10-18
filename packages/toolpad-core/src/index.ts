@@ -6,8 +6,6 @@ export * from './SignInPage';
 
 export * from './Account';
 
-export * from './AccountDetails';
-
 export * from './PageContainer';
 
 export * from './useActivePage';
@@ -17,6 +15,8 @@ export * from './useDialogs';
 export * from './useNotifications';
 
 export * from './useLocalStorageState';
+
+export * from './useSession';
 
 export * from './useSessionStorageState';
 

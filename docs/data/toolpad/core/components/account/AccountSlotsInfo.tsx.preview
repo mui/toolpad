@@ -1,9 +1,0 @@
-<AuthenticationContext.Provider value={authentication}>
-  <SessionContext.Provider value={session}>
-    <Account
-      slots={{
-        content: CryptoWalletInfo,
-      }}
-    />
-  </SessionContext.Provider>
-</AuthenticationContext.Provider>

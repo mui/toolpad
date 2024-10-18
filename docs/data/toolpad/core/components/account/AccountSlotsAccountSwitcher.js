@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
+import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
+import { Account } from '@toolpad/core/Account';
 import CustomMenu from './CustomMenu';
 
 const demoSession = {
@@ -28,7 +29,7 @@ export default function AccountSlotsAccountSwitcher() {
       <SessionContext.Provider value={session}>
         <Account
           slots={{
-            content: CustomMenu,
+            popoverContent: CustomMenu,
           }}
         />
       </SessionContext.Provider>

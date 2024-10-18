@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Account
-components: Account, AccountDetails
+components: Account, AccountPreview, AccountPopoverHeader, AccountPopoverFooter, SignInButton, SignOutButton
 ---
 
 # Account
@@ -30,28 +30,53 @@ When signed out, the component renders as an inline sign in button within the da
 
 ## Customization
 
+The `<Account />` component is composed of multiple sub-components:
+
+- `<SignInButton />`
+- `<AccountPreview />`
+- `<Popover />`
+- `<SignOutButton />`
+
+You can pass extra props to them through the `slotProps` prop on the `<Account />` component. You may also completely override them by passing your own custom components to `<Account />` through the `slots` prop.
+
+The labels can be customized through the `localeText` prop.
+
 ### Slot Props
 
-The underlying `signInButton`, `signOutButton` and `iconButton` components can be customized by passing in `slotProps` to the `Account` component.
+The `AccountPreview` component has two variants, `condensed` (the default) and `expanded`. You can change the variant used inside `<Account />` by passing in custom props through `slotProps`:
 
-Labels for the sign in and sign out buttons can be customized through the `localeText` prop.
-
-{{"demo": "AccountCustom.js", "bg": "outlined" }}
+{{"demo": "AccountCustomSlotProps.js", "bg": "outlined" }}
 
 ### Slots
 
-You can pass in your own components to completely override the default components inside the `Account` popover through the `slots` prop.
+You can pass in your own components inside the `Account` popover through the `slots` prop.
 
-#### Content
+#### Popover Content
 
-Use the `content` slot to customize the entire content of the account popover. If you want to continue using the default account details section along with your custom content, you can use the `AccountDetails` component exported by `@toolpad/core` in your custom component:
+You can wrap the default sub-components – such as `SignOutButton` and `AccountPreview` – and wrap them in `AccountPopoverHeader` and `AccountPopoverFooter` components to create custom account popovers, as shown in the following demos:
 
 ##### Account Switcher
 
-{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
+You can build advanced menus – such as a tenant switcher – by passing in a component that wraps `AccountPreview` and `SignOutButton` with a custom menu:
 
-The `content` prop can take any React component, so you can use it to display information instead of adding menu items:
+{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
 
 ##### Crypto Wallet
 
-{{"demo": "AccountSlotsInfo.js", "bg": "outlined" }}
+You can wrap the default `SignOutButton` with your own action buttons inside `AccountPopoverFooter` to customize the popover footer section:
+
+{{"demo": "AccountSlotsWallet.js", "bg": "outlined" }}
+
+### Labels
+
+You can pass in custom labels – including of different languages – using the `localeText` prop.
+
+{{"demo": "AccountCustomLocaleText.js", "bg": "outlined" }}
+
+### Session
+
+You can use the `useSession` hook to extend the existing session and add additional user details:
+
+{{"demo": "./AccountCustomUserDetails.js", "bg": "outlined", "defaultCodeOpen": false}}
+
+You can find more details on the [`useSession` docs page](/toolopad/core/react-use-session/).

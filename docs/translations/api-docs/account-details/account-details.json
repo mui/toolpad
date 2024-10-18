@@ -1,9 +1,0 @@
-{
-  "componentDescription": "",
-  "propDescriptions": {
-    "slotProps": { "description": "The props used for each slot inside." },
-    "slots": { "description": "The components used for each slot inside." }
-  },
-  "classDescriptions": {},
-  "slotDescriptions": { "avatar": "The component used for the Avatar" }
-}

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
-
+import { Account } from '@toolpad/core/Account';
+import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
 import { UserOrg, CustomSession } from '../UserOrg';
 
 const demoSession: CustomSession = {
@@ -37,7 +37,7 @@ export default function AccountCustomUserDetails() {
         {/* preview-start */}
         <Account
           slots={{
-            content: UserOrg,
+            popoverContent: UserOrg,
           }}
         />
         {/* preview-end */}

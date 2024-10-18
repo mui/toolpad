@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useLocalStorageState } from '@toolpad/core';
+import { useLocalStorageState } from '@toolpad/core/useLocalStorageState';
 import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';

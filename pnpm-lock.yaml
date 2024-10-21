@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@types/lodash':
-        specifier: 4.17.10
-        version: 4.17.10
+        specifier: 4.17.12
+        version: 4.17.12
       '@vitest/browser':
         specifier: 2.1.2
         version: 2.1.2(@vitest/spy@2.1.2)(playwright@1.47.2)(typescript@5.6.2)(vite@5.4.8(@types/node@20.16.13)(terser@5.34.1))(vitest@2.1.2)
@@ -341,8 +341,8 @@ importers:
         specifier: 0.5.5
         version: 0.5.5(react@18.3.1)
       '@types/lodash':
-        specifier: 4.17.10
-        version: 4.17.10
+        specifier: 4.17.12
+        version: 4.17.12
       '@types/react-router-dom':
         specifier: 5.3.3
         version: 5.3.3
@@ -1310,8 +1310,8 @@ importers:
         specifier: 18.3.11
         version: 18.3.11
       '@types/react-dom':
-        specifier: 18.3.0
-        version: 18.3.0
+        specifier: 18.3.1
+        version: 18.3.1
       '@vitejs/plugin-react':
         specifier: 4.3.2
         version: 4.3.2(vite@5.4.8(@types/node@20.16.13)(terser@5.34.1))
@@ -4232,8 +4232,8 @@ packages:
   '@types/lodash-es@4.17.12':
     resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
 
-  '@types/lodash@4.17.10':
-    resolution: {integrity: sha512-YpS0zzoduEhuOWjAotS6A5AVCva7X4lVlYLF0FYHAY9sdraBfnatttHItlWeZdGhuEkf+OzMNg2ZYAx8t+52uQ==}
+  '@types/lodash@4.17.12':
+    resolution: {integrity: sha512-sviUmCE8AYdaF/KIHLDJBQgeYzPBI0vf/17NaYehBJfYD1j6/L95Slh07NlyK2iNyBNaEkb3En2jRt+a8y3xZQ==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -4285,9 +4285,6 @@ packages:
 
   '@types/react-dev-utils@9.0.15':
     resolution: {integrity: sha512-JSZZtC8f5FD3FvlT8F6dPojPH6u0f+E/+g9DqXgQo/7GvCdPYiK+Q+mMajZClqH/f5SjyYop7v6uiLyfgnyLQA==}
-
-  '@types/react-dom@18.3.0':
-    resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
 
   '@types/react-dom@18.3.1':
     resolution: {integrity: sha512-qW1Mfv8taImTthu4KoXgDfLuk4bydU6Q/TkADnDWWHwi4NX4BR+LWfTp2sVmTqRrsHvyDDTelgelxJ+SsejKKQ==}
@@ -13675,9 +13672,9 @@ snapshots:
 
   '@types/lodash-es@4.17.12':
     dependencies:
-      '@types/lodash': 4.17.10
+      '@types/lodash': 4.17.12
 
-  '@types/lodash@4.17.10': {}
+  '@types/lodash@4.17.12': {}
 
   '@types/mdast@4.0.4':
     dependencies:
@@ -13734,10 +13731,6 @@ snapshots:
       '@types/webpack-dev-server': 3.11.6
     transitivePeerDependencies:
       - debug
-
-  '@types/react-dom@18.3.0':
-    dependencies:
-      '@types/react': 18.3.11
 
   '@types/react-dom@18.3.1':
     dependencies:

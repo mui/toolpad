@@ -85,7 +85,7 @@
     "@types/json-schema": "7.0.15",
     "@types/node": "^20.16.13",
     "@types/react-dev-utils": "9.0.15",
-    "@vitejs/plugin-react": "4.3.2",
+    "@vitejs/plugin-react": "4.3.3",
     "@webcontainer/env": "1.1.1",
     "abort-controller": "3.0.0",
     "basic-auth": "2.0.1",

@@ -552,8 +552,8 @@ importers:
         specifier: 5.3.0
         version: 5.3.0
       execa:
-        specifier: 9.4.0
-        version: 9.4.0
+        specifier: 9.4.1
+        version: 9.4.1
       invariant:
         specifier: 2.2.4
         version: 2.2.4
@@ -811,8 +811,8 @@ importers:
         specifier: 0.24.0
         version: 0.24.0
       execa:
-        specifier: 9.4.0
-        version: 9.4.0
+        specifier: 9.4.1
+        version: 9.4.1
       express:
         specifier: 4.21.1
         version: 4.21.1
@@ -6188,6 +6188,10 @@ packages:
 
   execa@9.4.0:
     resolution: {integrity: sha512-yKHlle2YGxZE842MERVIplWwNH5VYmqqcPFgtnlU//K8gxuFFXu0pwd/CrfXTumFpeEiufsP7+opT/bPJa1yVw==}
+    engines: {node: ^18.19.0 || >=20.5.0}
+
+  execa@9.4.1:
+    resolution: {integrity: sha512-5eo/BRqZm3GYce+1jqX/tJ7duA2AnE39i88fuedNFUV8XxGxUpF3aWkBRfbUcjV49gCkvS/pzc0YrCPhaIewdg==}
     engines: {node: ^18.19.0 || >=20.5.0}
 
   exponential-backoff@3.1.1:
@@ -12375,7 +12379,7 @@ snapshots:
       '@googleapis/sheets': 9.3.1(encoding@0.1.13)
       '@netlify/functions': 2.8.2
       '@slack/bolt': 3.22.0
-      execa: 9.4.0
+      execa: 9.4.1
       google-auth-library: 9.14.1(encoding@0.1.13)
     transitivePeerDependencies:
       - bufferutil
@@ -16157,6 +16161,21 @@ snapshots:
       strip-final-newline: 4.0.0
       yoctocolors: 2.1.1
 
+  execa@9.4.1:
+    dependencies:
+      '@sindresorhus/merge-streams': 4.0.0
+      cross-spawn: 7.0.3
+      figures: 6.1.0
+      get-stream: 9.0.1
+      human-signals: 8.0.0
+      is-plain-obj: 4.1.0
+      is-stream: 4.0.1
+      npm-run-path: 6.0.0
+      pretty-ms: 9.1.0
+      signal-exit: 4.1.0
+      strip-final-newline: 4.0.0
+      yoctocolors: 2.1.1
+
   exponential-backoff@3.1.1: {}
 
   express@4.21.0:
@@ -18558,7 +18577,7 @@ snapshots:
   open-editor@5.0.0:
     dependencies:
       env-editor: 1.1.0
-      execa: 9.4.0
+      execa: 9.4.1
       line-column-path: 3.0.0
       open: 10.1.0
 

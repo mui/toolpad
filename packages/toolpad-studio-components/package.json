@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/studio-components",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Build MUI apps quickly",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/toolpad#readme",
@@ -41,9 +41,9 @@
     "url": "https://github.com/mui/toolpad/issues"
   },
   "dependencies": {
-    "@mui/icons-material": "6.1.3",
-    "@mui/lab": "6.0.0-beta.11",
-    "@mui/material": "6.1.3",
+    "@mui/icons-material": "6.1.4",
+    "@mui/lab": "6.0.0-beta.12",
+    "@mui/material": "6.1.4",
     "@mui/x-charts": "7.21.0",
     "@mui/x-data-grid-premium": "7.21.0",
     "@mui/x-date-pickers": "7.21.0",

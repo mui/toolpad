@@ -67,6 +67,18 @@ response object of the `signIn` prop.
 Check out the complete [Next.js Auth.js Magic Link example](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-email/) example for a working implementation of a magic link sign-in page with Auth.js, Nodemailer, Prisma and PostgreSQL.
 :::
 
+## Passkey
+
+The `SignInPage` component can be set up to use [Passkeys](https://passkeys.dev) by passing in a provider with `passkey` as the `id`:
+
+{{"demo": "PasskeySignInPage.js", "iframe": true}}
+
+:::info
+The [Toolpad Core Passkey example app](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-passkey/) comes with a working app using `next-auth/webauthn`, Prisma and PostgreSQL.
+:::
+
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next-passkey.png", "srcDark": "/static/toolpad/docs/core/auth-next-passkey-dark.png", "alt": "Auth.js Passkeys & Next.js with Toolpad Core sign-in page", "caption": "Auth.js Passkeys & Next.js app router with Toolpad Core Sign-in page", "zoom": true,  "aspectRatio": "1.428" }}
+
 ## Credentials
 
 :::warning

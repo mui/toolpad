@@ -71,6 +71,6 @@
     "@types/react": "18.3.11",
     "@types/react-is": "18.3.0",
     "@types/title": "3.4.3",
-    "vitest": "2.1.2"
+    "vitest": "2.1.3"
   }
 }

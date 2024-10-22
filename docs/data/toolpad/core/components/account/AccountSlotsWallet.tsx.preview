@@ -1,0 +1,9 @@
+<AuthenticationContext.Provider value={authentication}>
+  <SessionContext.Provider value={session}>
+    <Account
+      slots={{
+        popoverContent: CryptoWalletInfo,
+      }}
+    />
+  </SessionContext.Provider>
+</AuthenticationContext.Provider>

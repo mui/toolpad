@@ -682,8 +682,8 @@ importers:
   packages/toolpad-studio:
     dependencies:
       '@auth/core':
-        specifier: 0.37.0
-        version: 0.37.0(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))
+        specifier: 0.37.2
+        version: 0.37.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))
       '@emotion/cache':
         specifier: 11.13.1
         version: 11.13.1
@@ -1098,8 +1098,8 @@ importers:
   packages/toolpad-studio-runtime:
     dependencies:
       '@auth/core':
-        specifier: 0.37.0
-        version: 0.37.0(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))
+        specifier: 0.37.2
+        version: 0.37.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))
       '@mui/material':
         specifier: 6.1.5
         version: 6.1.5(@emotion/react@11.13.3(@types/react@18.3.11)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.11)(react@18.3.1))(@types/react@18.3.11)(react@18.3.1))(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1461,8 +1461,8 @@ packages:
       nodemailer:
         optional: true
 
-  '@auth/core@0.37.0':
-    resolution: {integrity: sha512-LybAgfFC5dta3Mu3al0UbnzMGVBpZRqLMvvXupQOfETtPNlL7rXgTO13EVRTCdvPqMQrVYjODUDvgVfQM1M3Qg==}
+  '@auth/core@0.37.2':
+    resolution: {integrity: sha512-kUvzyvkcd6h1vpeMAojK2y7+PAV5H+0Cc9+ZlKYDFhDY31AlvsB+GW5vNO4qE3Y07KeQgvNO9U0QUx/fN62kBw==}
     peerDependencies:
       '@simplewebauthn/browser': ^9.0.1
       '@simplewebauthn/server': ^9.0.2
@@ -10656,7 +10656,7 @@ snapshots:
       '@simplewebauthn/browser': 9.0.1
       '@simplewebauthn/server': 9.0.3(encoding@0.1.13)
 
-  '@auth/core@0.37.0(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))':
+  '@auth/core@0.37.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))':
     dependencies:
       '@panva/hkdf': 1.2.1
       '@types/cookie': 0.6.0

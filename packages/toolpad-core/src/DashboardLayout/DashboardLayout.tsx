@@ -3,47 +3,26 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { styled, useTheme, type Theme, SxProps } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
-import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
-import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import ListSubheader from '@mui/material/ListSubheader';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { Link } from '../shared/Link';
-import {
-  BrandingContext,
-  NavigationContext,
-  RouterContext,
-  WindowContext,
-} from '../shared/context';
-import type { Navigation } from '../AppProvider';
+import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
 import { Account, type AccountProps } from '../Account';
-import {
-  getItemTitle,
-  getPageItemFullPath,
-  hasSelectedNavigationChildren,
-  isPageItemSelected,
-} from '../shared/navigation';
 import { useApplicationTitle } from '../shared/branding';
+import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { ToolpadLogo } from './ToolpadLogo';
+import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -51,8 +30,6 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderStyle: 'solid',
   borderColor: (theme.vars ?? theme).palette.divider,
   boxShadow: 'none',
-  // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
-  left: 0,
   zIndex: theme.zIndex.drawer + 1,
 }));
 
@@ -64,264 +41,14 @@ const LogoContainer = styled('div')({
   },
 });
 
-const getDrawerSxTransitionMixin = (isExpanded: boolean, property: string) => ({
-  transition: (theme: Theme) =>
-    theme.transitions.create(property, {
-      easing: theme.transitions.easing.sharp,
-      duration: isExpanded
-        ? theme.transitions.duration.enteringScreen
-        : theme.transitions.duration.leavingScreen,
-    }),
-});
-
-const getDrawerWidthTransitionMixin = (isExpanded: boolean) => ({
-  ...getDrawerSxTransitionMixin(isExpanded, 'width'),
-  overflowX: 'hidden',
-});
-
-const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
-  borderRadius: 8,
-  '&.Mui-selected': {
-    '& .MuiListItemIcon-root': {
-      color: (theme.vars ?? theme).palette.primary.dark,
-    },
-    '& .MuiTypography-root': {
-      color: (theme.vars ?? theme).palette.primary.dark,
-    },
-    '& .MuiSvgIcon-root': {
-      color: (theme.vars ?? theme).palette.primary.dark,
-    },
-    '& .MuiAvatar-root': {
-      backgroundColor: (theme.vars ?? theme).palette.primary.dark,
-    },
-    '& .MuiTouchRipple-child': {
-      backgroundColor: (theme.vars ?? theme).palette.primary.dark,
-    },
-  },
-  '& .MuiSvgIcon-root': {
-    color: (theme.vars ?? theme).palette.action.active,
-  },
-  '& .MuiAvatar-root': {
-    backgroundColor: (theme.vars ?? theme).palette.action.active,
-  },
-}));
-
-interface DashboardSidebarSubNavigationProps {
-  subNavigation: Navigation;
-  basePath?: string;
-  depth?: number;
-  onLinkClick: () => void;
-  isMini?: boolean;
-  isFullyExpanded?: boolean;
-  hasDrawerTransitions?: boolean;
-  selectedItemId: string;
+export interface SidebarFooterProps {
+  mini: boolean;
 }
 
-function DashboardSidebarSubNavigation({
-  subNavigation,
-  basePath = '',
-  depth = 0,
-  onLinkClick,
-  isMini = false,
-  isFullyExpanded = true,
-  hasDrawerTransitions = false,
-  selectedItemId,
-}: DashboardSidebarSubNavigationProps) {
-  const routerContext = React.useContext(RouterContext);
-
-  const pathname = routerContext?.pathname ?? '/';
-
-  const initialExpandedSidebarItemIds = React.useMemo(
-    () =>
-      subNavigation
-        .map((navigationItem, navigationItemIndex) => ({
-          navigationItem,
-          originalIndex: navigationItemIndex,
-        }))
-        .filter(({ navigationItem }) =>
-          hasSelectedNavigationChildren(navigationItem, basePath, pathname),
-        )
-        .map(({ originalIndex }) => `${depth}-${originalIndex}`),
-    [basePath, depth, pathname, subNavigation],
-  );
-
-  const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState(
-    initialExpandedSidebarItemIds,
-  );
-
-  const handleOpenFolderClick = React.useCallback(
-    (itemId: string) => () => {
-      setExpandedSidebarItemIds((previousValue) =>
-        previousValue.includes(itemId)
-          ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
-          : [...previousValue, itemId],
-      );
-    },
-    [],
-  );
-
-  return (
-    <List sx={{ padding: 0, mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
-      {subNavigation.map((navigationItem, navigationItemIndex) => {
-        if (navigationItem.kind === 'header') {
-          return (
-            <ListSubheader
-              key={`subheader-${depth}-${navigationItemIndex}`}
-              component="div"
-              sx={{
-                fontSize: 12,
-                fontWeight: '700',
-                height: isMini ? 0 : 40,
-                ...(hasDrawerTransitions
-                  ? getDrawerSxTransitionMixin(isFullyExpanded, 'height')
-                  : {}),
-                px: 2,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {getItemTitle(navigationItem)}
-            </ListSubheader>
-          );
-        }
-
-        if (navigationItem.kind === 'divider') {
-          const nextItem = subNavigation[navigationItemIndex + 1];
-
-          return (
-            <Divider
-              key={`divider-${depth}-${navigationItemIndex}`}
-              sx={{
-                borderBottomWidth: 2,
-                mx: 1,
-                mt: 1,
-                mb: nextItem?.kind === 'header' && !isMini ? 0 : 1,
-                ...(hasDrawerTransitions
-                  ? getDrawerSxTransitionMixin(isFullyExpanded, 'margin')
-                  : {}),
-              }}
-            />
-          );
-        }
-
-        const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
-        const navigationItemId = `${depth}-${navigationItemIndex}`;
-        const navigationItemTitle = getItemTitle(navigationItem);
-
-        const isNestedNavigationExpanded = expandedSidebarItemIds.includes(navigationItemId);
-
-        const nestedNavigationCollapseIcon = isNestedNavigationExpanded ? (
-          <ExpandLessIcon />
-        ) : (
-          <ExpandMoreIcon />
-        );
-
-        const listItemIconSize = 34;
-
-        const isSelected = isPageItemSelected(navigationItem, basePath, pathname);
-
-        if (process.env.NODE_ENV !== 'production' && isSelected && selectedItemId) {
-          console.warn(`Duplicate selected path in navigation: ${navigationItemFullPath}`);
-        }
-
-        if (isSelected && !selectedItemId) {
-          selectedItemId = navigationItemId;
-        }
-
-        const listItem = (
-          <ListItem
-            sx={{
-              py: 0,
-              px: 1,
-              overflowX: 'hidden',
-            }}
-          >
-            <NavigationListItemButton
-              selected={isSelected && (!navigationItem.children || isMini)}
-              sx={{
-                px: 1.4,
-                height: 48,
-              }}
-              {...(navigationItem.children && !isMini
-                ? {
-                    onClick: handleOpenFolderClick(navigationItemId),
-                  }
-                : {
-                    LinkComponent: Link,
-                    href: navigationItemFullPath,
-                    onClick: onLinkClick,
-                  })}
-            >
-              {navigationItem.icon || isMini ? (
-                <ListItemIcon
-                  sx={{
-                    minWidth: listItemIconSize,
-                    mr: 1.2,
-                  }}
-                >
-                  {navigationItem.icon ?? null}
-                  {!navigationItem.icon && isMini ? (
-                    <Avatar
-                      sx={{
-                        width: listItemIconSize - 7,
-                        height: listItemIconSize - 7,
-                        fontSize: 12,
-                        ml: '-2px',
-                      }}
-                    >
-                      {navigationItemTitle
-                        .split(' ')
-                        .slice(0, 2)
-                        .map((itemTitleWord) => itemTitleWord.charAt(0).toUpperCase())}
-                    </Avatar>
-                  ) : null}
-                </ListItemIcon>
-              ) : null}
-              <ListItemText
-                primary={navigationItemTitle}
-                sx={{
-                  whiteSpace: 'nowrap',
-                  zIndex: 1,
-                  '& .MuiTypography-root': {
-                    fontWeight: '500',
-                  },
-                }}
-              />
-              {navigationItem.action && !isMini && isFullyExpanded ? navigationItem.action : null}
-              {navigationItem.children && !isMini && isFullyExpanded
-                ? nestedNavigationCollapseIcon
-                : null}
-            </NavigationListItemButton>
-          </ListItem>
-        );
-
-        return (
-          <React.Fragment key={navigationItemId}>
-            {isMini ? (
-              <Tooltip title={navigationItemTitle} placement="right">
-                {listItem}
-              </Tooltip>
-            ) : (
-              listItem
-            )}
-
-            {navigationItem.children && !isMini ? (
-              <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
-                <DashboardSidebarSubNavigation
-                  subNavigation={navigationItem.children}
-                  basePath={navigationItemFullPath}
-                  depth={depth + 1}
-                  onLinkClick={onLinkClick}
-                  selectedItemId={selectedItemId}
-                />
-              </Collapse>
-            ) : null}
-          </React.Fragment>
-        );
-      })}
-    </List>
-  );
+export interface DashboardLayoutSlotProps {
+  toolbarActions?: {};
+  toolbarAccount?: AccountProps;
+  sidebarFooter?: SidebarFooterProps;
 }
 
 export interface DashboardLayoutSlots {
@@ -335,6 +62,11 @@ export interface DashboardLayoutSlots {
    * @default Account
    */
   toolbarAccount?: React.JSXElementConstructor<AccountProps>;
+  /**
+   * Optional footer component used in the layout sidebar.
+   * @default null
+   */
+  sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
 }
 
 export interface DashboardLayoutProps {
@@ -347,6 +79,11 @@ export interface DashboardLayoutProps {
    * @default false
    */
   disableCollapsibleSidebar?: boolean;
+  /**
+   * Whether the sidebar should start collapsed in desktop size screens.
+   * @default false
+   */
+  defaultSidebarCollapsed?: boolean;
   /**
    * Whether the navigation bar and menu icon should be hidden
    * @default false
@@ -361,10 +98,7 @@ export interface DashboardLayoutProps {
    * The props used for each slot inside.
    * @default {}
    */
-  slotProps?: {
-    toolbarActions?: {};
-    toolbarAccount?: AccountProps;
-  };
+  slotProps?: DashboardLayoutSlotProps;
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
@@ -385,6 +119,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const {
     children,
     disableCollapsibleSidebar = false,
+    defaultSidebarCollapsed = false,
     hideNavigation = false,
     slots,
     slotProps,
@@ -398,7 +133,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const appWindow = React.useContext(WindowContext);
   const applicationTitle = useApplicationTitle();
 
-  const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] = React.useState(true);
+  const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
+    React.useState(!defaultSidebarCollapsed);
   const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] = React.useState(false);
 
   const isUnderMdViewport = useMediaQuery(
@@ -501,14 +237,22 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const hasDrawerTransitions =
     isOverSmViewport && (disableCollapsibleSidebar || !isUnderMdViewport);
 
+  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
+  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
+  const SidebarFooterSlot = slots?.sidebarFooter ?? null;
+
   const getDrawerContent = React.useCallback(
-    (isMini: boolean, ariaLabel: string) => (
+    (isMini: boolean, viewport: 'phone' | 'tablet' | 'desktop') => (
       <React.Fragment>
         <Toolbar />
         <Box
           component="nav"
-          aria-label={ariaLabel}
+          aria-label={`${viewport.charAt(0).toUpperCase()}${viewport.slice(1)}`}
           sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
             overflow: 'auto',
             pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
             ...(hasDrawerTransitions
@@ -524,10 +268,20 @@ function DashboardLayout(props: DashboardLayoutProps) {
             hasDrawerTransitions={hasDrawerTransitions}
             selectedItemId={selectedItemIdRef.current}
           />
+          {SidebarFooterSlot ? (
+            <SidebarFooterSlot mini={isMini} {...slotProps?.sidebarFooter} />
+          ) : null}
         </Box>
       </React.Fragment>
     ),
-    [handleNavigationLinkClick, hasDrawerTransitions, isNavigationFullyExpanded, navigation],
+    [
+      SidebarFooterSlot,
+      handleNavigationLinkClick,
+      hasDrawerTransitions,
+      isNavigationFullyExpanded,
+      navigation,
+      slotProps?.sidebarFooter,
+    ],
   );
 
   const getDrawerSharedSx = React.useCallback(
@@ -551,9 +305,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [isNavigationExpanded],
   );
 
-  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
-  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
-
   const layoutRef = React.useRef<Element | null>(null);
 
   return (
@@ -569,12 +320,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       }}
     >
       <AppBar color="inherit" position="absolute">
-        {
-          // TODO: (minWidth: 100vw) Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
-        }
-        <Toolbar
-          sx={{ backgroundColor: 'inherit', minWidth: '100vw', mx: { xs: -0.75, sm: -1.5 } }}
-        >
+        <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
           {!hideNavigation ? (
             <React.Fragment>
               <Box
@@ -648,7 +394,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               ...getDrawerSharedSx(false, true),
             }}
           >
-            {getDrawerContent(false, 'Phone')}
+            {getDrawerContent(false, 'phone')}
           </Drawer>
           <Drawer
             variant="permanent"
@@ -661,7 +407,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               ...getDrawerSharedSx(isMobileMini, false),
             }}
           >
-            {getDrawerContent(isMobileMini, 'Tablet')}
+            {getDrawerContent(isMobileMini, 'tablet')}
           </Drawer>
           <Drawer
             variant="permanent"
@@ -670,7 +416,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               ...getDrawerSharedSx(isDesktopMini, false),
             }}
           >
-            {getDrawerContent(isDesktopMini, 'Desktop')}
+            {getDrawerContent(isDesktopMini, 'desktop')}
           </Drawer>
         </React.Fragment>
       ) : null}
@@ -680,11 +426,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
-          // TODO: Temporary fix to issue reported in https://github.com/mui/material-ui/issues/43244
-          minWidth: {
-            xs: disableCollapsibleSidebar && isNavigationExpanded ? '100vw' : 'auto',
-            md: 'auto',
-          },
         }}
       >
         <Toolbar />
@@ -714,6 +455,11 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
+   * Whether the sidebar should start collapsed in desktop size screens.
+   * @default false
+   */
+  defaultSidebarCollapsed: PropTypes.bool,
+  /**
    * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
    * @default false
    */
@@ -728,18 +474,26 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
+    sidebarFooter: PropTypes.shape({
+      mini: PropTypes.bool.isRequired,
+    }),
     toolbarAccount: PropTypes.shape({
       localeText: PropTypes.shape({
-        signInLabel: PropTypes.string.isRequired,
-        signOutLabel: PropTypes.string.isRequired,
+        iconButtonAriaLabel: PropTypes.string,
+        signInLabel: PropTypes.string,
+        signOutLabel: PropTypes.string,
       }),
       slotProps: PropTypes.shape({
-        iconButton: PropTypes.object,
+        popover: PropTypes.object,
+        popoverContent: PropTypes.object,
+        preview: PropTypes.object,
         signInButton: PropTypes.object,
         signOutButton: PropTypes.object,
       }),
       slots: PropTypes.shape({
-        menuItems: PropTypes.elementType,
+        popover: PropTypes.elementType,
+        popoverContent: PropTypes.elementType,
+        preview: PropTypes.elementType,
         signInButton: PropTypes.elementType,
         signOutButton: PropTypes.elementType,
       }),
@@ -751,6 +505,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slots: PropTypes.shape({
+    sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,
   }),

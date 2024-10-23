@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { Account, AuthenticationContext, SessionContext } from '@toolpad/core';
+import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
+import { Account } from '@toolpad/core/Account';
 
 const demoSession = {
   user: {
@@ -25,7 +26,9 @@ export default function AccountDemoSignedIn() {
   return (
     <AuthenticationContext.Provider value={authentication}>
       <SessionContext.Provider value={session}>
+        {/* preview-start */}
         <Account />
+        {/* preview-end */}
       </SessionContext.Provider>
     </AuthenticationContext.Provider>
   );

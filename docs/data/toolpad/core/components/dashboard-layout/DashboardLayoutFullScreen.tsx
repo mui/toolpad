@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { createTheme } from '@mui/material/styles';
 import MapIcon from '@mui/icons-material/Map';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Router, Navigation } from '@toolpad/core';
+import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
@@ -40,15 +40,7 @@ interface DemoProps {
 export default function DashboardLayoutFullScreen(props: DemoProps) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/map');
-
-  const router = React.useMemo<Router>(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const router = useDemoRouter('/map');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;

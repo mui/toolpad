@@ -24,6 +24,6 @@
   window={demoWindow}
 >
   <DashboardLayout>
-    <DemoPageContent pathname={pathname} />
+    <DemoPageContent pathname={router.pathname} />
   </DashboardLayout>
 </AppProvider>

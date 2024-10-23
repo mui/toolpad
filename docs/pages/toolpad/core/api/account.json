@@ -1,19 +1,21 @@
 {
   "props": {
     "localeText": {
-      "type": { "name": "shape", "description": "{ signInLabel: string, signOutLabel: string }" },
-      "default": "DEFAULT_LOCALE_TEXT"
+      "type": {
+        "name": "shape",
+        "description": "{ iconButtonAriaLabel?: string, signInLabel?: string, signOutLabel?: string }"
+      }
     },
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ iconButton?: object, signInButton?: object, signOutButton?: object }"
+        "description": "{ popover?: object, popoverContent?: object, preview?: { handleClick?: func, open?: bool, slotProps?: { avatar?: object, avatarIconButton?: object, moreIconButton?: object }, slots?: { avatar?: elementType, avatarIconButton?: elementType, moreIconButton?: elementType }, variant?: 'condensed'<br>&#124;&nbsp;'expanded' }, signInButton?: object, signOutButton?: object }"
       }
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType }"
+        "description": "{ popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType }"
       },
       "additionalInfo": { "slotsApi": true }
     }
@@ -25,6 +27,24 @@
   ],
   "slots": [
     {
+      "name": "preview",
+      "description": "The component used for the account preview",
+      "default": "AccountPreview",
+      "class": null
+    },
+    {
+      "name": "popover",
+      "description": "The component used for the account popover menu",
+      "default": "Popover",
+      "class": null
+    },
+    {
+      "name": "popoverContent",
+      "description": "The component used for the content of account popover",
+      "default": "Stack",
+      "class": null
+    },
+    {
       "name": "signInButton",
       "description": "The component used for the sign in button.",
       "default": "Button",
@@ -33,13 +53,7 @@
     {
       "name": "signOutButton",
       "description": "The component used for the sign out button.",
-      "default": "MenuItem",
-      "class": null
-    },
-    {
-      "name": "menuItems",
-      "description": "The component used for the custom menu items.",
-      "default": "null",
+      "default": "Button",
       "class": null
     }
   ],

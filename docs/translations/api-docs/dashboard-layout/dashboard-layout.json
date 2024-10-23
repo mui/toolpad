@@ -2,6 +2,9 @@
   "componentDescription": "",
   "propDescriptions": {
     "children": { "description": "The content of the dashboard." },
+    "defaultSidebarCollapsed": {
+      "description": "Whether the sidebar should start collapsed in desktop size screens."
+    },
     "disableCollapsibleSidebar": {
       "description": "Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports."
     },
@@ -16,6 +19,7 @@
   },
   "classDescriptions": {},
   "slotDescriptions": {
+    "sidebarFooter": "Optional footer component used in the layout sidebar.",
     "toolbarAccount": "The toolbar account component used in the layout header.",
     "toolbarActions": "The toolbar actions component used in the layout header."
   }

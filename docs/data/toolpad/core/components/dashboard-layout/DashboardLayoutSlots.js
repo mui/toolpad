@@ -11,6 +11,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -101,18 +102,25 @@ function Search() {
   );
 }
 
+function SidebarFooter({ mini }) {
+  return (
+    <Typography
+      variant="caption"
+      sx={{ m: 1, whiteSpace: 'nowrap', overflow: 'hidden' }}
+    >
+      {mini ? '© MUI' : `© ${new Date().getFullYear()} Made with love by MUI`}
+    </Typography>
+  );
+}
+
+SidebarFooter.propTypes = {
+  mini: PropTypes.bool.isRequired,
+};
+
 function DashboardLayoutSlots(props) {
   const { window } = props;
 
-  const [pathname, setPathname] = React.useState('/dashboard');
-
-  const router = React.useMemo(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const router = useDemoRouter('/dashboard');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
@@ -124,8 +132,10 @@ function DashboardLayoutSlots(props) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout slots={{ toolbarActions: Search }}>
-        <DemoPageContent pathname={pathname} />
+      <DashboardLayout
+        slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
+      >
+        <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
     </AppProvider>
   );

@@ -1,11 +1,10 @@
 import * as React from 'react';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import Link from '@mui/material/Link';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import { getProviders, signIn } from 'next-auth/react';
 import { getServerSession } from 'next-auth/next';
 import { useRouter } from 'next/router';
-import type { AuthProvider } from '@toolpad/core';
 import { authOptions } from '../api/auth/[...nextauth]';
 
 function ForgotPasswordLink() {

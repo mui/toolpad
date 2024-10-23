@@ -1,19 +1,20 @@
 {
   "props": {
     "children": { "type": { "name": "node" }, "required": true },
+    "defaultSidebarCollapsed": { "type": { "name": "bool" }, "default": "false" },
     "disableCollapsibleSidebar": { "type": { "name": "bool" }, "default": "false" },
     "hideNavigation": { "type": { "name": "bool" }, "default": "false" },
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ toolbarAccount?: { localeText?: { signInLabel: string, signOutLabel: string }, slotProps?: { iconButton?: object, signInButton?: object, signOutButton?: object }, slots?: { menuItems?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
+        "description": "{ sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: { iconButtonAriaLabel?: string, signInLabel?: string, signOutLabel?: string }, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
       },
       "default": "{}"
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ toolbarAccount?: elementType, toolbarActions?: elementType }"
+        "description": "{ sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -42,6 +43,12 @@
       "name": "toolbarAccount",
       "description": "The toolbar account component used in the layout header.",
       "default": "Account",
+      "class": null
+    },
+    {
+      "name": "sidebarFooter",
+      "description": "Optional footer component used in the layout sidebar.",
+      "default": "null",
       "class": null
     }
   ],

@@ -3,9 +3,13 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import {
+  AppProvider,
+  type Session,
+  type Navigation,
+} from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import type { Session, Router, Navigation } from '@toolpad/core';
+import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
@@ -83,15 +87,7 @@ export default function DashboardLayoutAccount(props: DemoProps) {
     };
   }, []);
 
-  const [pathname, setPathname] = React.useState('/dashboard');
-
-  const router = React.useMemo<Router>(() => {
-    return {
-      pathname,
-      searchParams: new URLSearchParams(),
-      navigate: (path) => setPathname(String(path)),
-    };
-  }, [pathname]);
+  const router = useDemoRouter('/dashboard');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
@@ -107,7 +103,7 @@ export default function DashboardLayoutAccount(props: DemoProps) {
       window={demoWindow}
     >
       <DashboardLayout>
-        <DemoPageContent pathname={pathname} />
+        <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
     </AppProvider>
     // preview-end

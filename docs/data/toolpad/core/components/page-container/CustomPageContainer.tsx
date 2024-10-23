@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { AppProvider, Router } from '@toolpad/core/AppProvider';
-import { Link, useDemoRouter } from '@toolpad/core/internals';
+import { Link, useDemoRouter } from '@toolpad/core/internal';
 import { useActivePage } from '@toolpad/core/useActivePage';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';

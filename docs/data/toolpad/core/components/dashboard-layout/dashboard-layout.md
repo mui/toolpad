@@ -109,17 +109,23 @@ The layout sidebar is collapsible to a mini-drawer (with icons only) in desktop 
 
 {{"demo": "DashboardLayoutNoMiniSidebar.js", "height": 400, "iframe": true}}
 
-### Full-size content
+### Start with mini-drawer on desktop
 
-The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.
+The layout sidebar can default to a collapsed mini-drawer on desktop viewport sizes with the `defaultSidebarCollapsed` prop.
 
-{{"demo": "DashboardLayoutFullScreen.js", "height": 400, "iframe": true}}
+{{"demo": "DashboardLayoutSidebarCollapsed.js", "height": 400, "iframe": true}}
 
 ### Hide navigation
 
 The layout sidebar can be hidden if needed with the `hideNavigation` prop.
 
 {{"demo": "DashboardLayoutSidebarHidden.js", "height": 400, "iframe": true}}
+
+### Full-size content
+
+The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.
+
+{{"demo": "DashboardLayoutFullScreen.js", "height": 400, "iframe": true}}
 
 ## Account
 
@@ -134,6 +140,9 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 ## Customization
 
 Some areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
-For example, this allows you to add new items to the toolbar in the header, such as a search bar or a button.
+This allows you to add, for example:
+
+- new items to the toolbar in the header, such as a search bar or button;
+- footer content in the sidebar.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}

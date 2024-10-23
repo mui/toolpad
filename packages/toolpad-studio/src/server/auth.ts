@@ -134,7 +134,7 @@ export function createAuthHandler(project: ToolpadProject): Router {
   const azureADProvider = AzureADProvider({
     clientId: process.env.TOOLPAD_AZURE_AD_CLIENT_ID,
     clientSecret: process.env.TOOLPAD_AZURE_AD_CLIENT_SECRET,
-    tenantId: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
+    issuer: process.env.TOOLPAD_AZURE_AD_TENANT_ID,
   });
 
   const credentialsProvider = CredentialsProvider({

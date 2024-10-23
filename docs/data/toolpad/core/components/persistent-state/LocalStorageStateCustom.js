@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useLocalStorageState } from '@toolpad/core';
+import { useLocalStorageState } from '@toolpad/core/useLocalStorageState';
 import dayjs from 'dayjs';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';

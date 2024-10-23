@@ -24,8 +24,7 @@ describe('SignInPage', () => {
 
     await userEvent.click(signInButton);
 
-    expect(signIn).toHaveBeenCalled();
-    expect(signIn.mock.calls[0][0]).toHaveProperty('id', 'github');
+    expect(signIn).toHaveBeenCalledWith({ id: 'github' });
   });
 
   test('renders credentials provider', async () => {
@@ -40,10 +39,11 @@ describe('SignInPage', () => {
     await userEvent.type(passwordField, 'thepassword');
     await userEvent.click(signInButton);
 
-    expect(signIn).toHaveBeenCalled();
-    expect(signIn.mock.calls[0][0]).toHaveProperty('id', 'credentials');
-    expect(signIn.mock.calls[0][1].get('email')).toBe('john@example.com');
-    expect(signIn.mock.calls[0][1].get('password')).toBe('thepassword');
+    const expectedFormData = new FormData();
+    expectedFormData.append('email', 'john@example.com');
+    expectedFormData.append('password', 'thepassword');
+
+    expect(signIn).toHaveBeenCalledWith({ id: 'credentials' }, expectedFormData);
   });
 
   test('renders nodemailer provider', async () => {
@@ -56,9 +56,10 @@ describe('SignInPage', () => {
     await userEvent.type(emailField, 'john@example.com');
     await userEvent.click(signInButton);
 
-    expect(signIn).toHaveBeenCalled();
-    expect(signIn.mock.calls[0][0]).toHaveProperty('id', 'nodemailer');
-    expect(signIn.mock.calls[0][1].get('email')).toBe('john@example.com');
+    const expectedFormData = new FormData();
+    expectedFormData.append('email', 'john@example.com');
+
+    expect(signIn).toHaveBeenCalledWith({ id: 'nodemailer' }, expectedFormData);
   });
 
   test('renders passkey sign-in option when available', async () => {
@@ -72,8 +73,9 @@ describe('SignInPage', () => {
     await userEvent.type(emailField, 'john@example.com');
     await userEvent.click(signInButton);
 
-    expect(signIn).toHaveBeenCalled();
-    expect(signIn.mock.calls[0][0]).toHaveProperty('id', 'passkey');
-    expect(signIn.mock.calls[0][1].get('email')).toBe('john@example.com');
+    const expectedFormData = new FormData();
+    expectedFormData.append('email', 'john@example.com');
+
+    expect(signIn).toHaveBeenCalledWith({ id: 'passkey' }, expectedFormData);
   });
 });

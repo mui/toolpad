@@ -231,8 +231,12 @@ function SignInPage(props: SignInPageProps) {
   });
 
   const callbackUrl = router?.searchParams.get('callbackUrl') ?? '/';
-
   const singleProvider = React.useMemo(() => providers?.length === 1, [providers]);
+  const isOauthProvider = React.useCallback(
+    (provider?: SupportedAuthProvider) =>
+      provider && provider !== 'credentials' && provider !== 'nodemailer' && provider !== 'passkey',
+    [],
+  );
 
   return (
     <Container component="main" maxWidth="xs">
@@ -258,60 +262,52 @@ function SignInPage(props: SignInPageProps) {
         </Typography>
         <Box sx={{ mt: 2, width: '100%' }}>
           <Stack spacing={1}>
-            {error &&
-            selectedProviderId !== 'credentials' &&
-            selectedProviderId !== 'passkey' &&
-            selectedProviderId !== 'nodemailer' ? (
+            {error && isOauthProvider(selectedProviderId) ? (
               <Alert severity="error">{error}</Alert>
             ) : null}
-            {Object.values(providers ?? {}).map((provider) => {
-              if (
-                provider.id === 'credentials' ||
-                provider.id === 'passkey' ||
-                provider.id === 'nodemailer'
-              ) {
-                return null;
-              }
-              return (
-                <form
-                  key={provider.id}
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    setFormStatus({ error: '', selectedProviderId: provider.id, loading: true });
-                    const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
-                    setFormStatus((prev) => ({
-                      ...prev,
-                      loading: oauthResponse?.error || docs ? false : prev.loading,
-                      error: oauthResponse?.error,
-                    }));
-                  }}
-                >
-                  <LoadingButton
+            {Object.values(providers ?? {})
+              .filter((provider) => isOauthProvider(provider.id))
+              .map((provider) => {
+                return (
+                  <form
                     key={provider.id}
-                    variant="contained"
-                    type="submit"
-                    fullWidth
-                    size="large"
-                    disableElevation
-                    name={'provider'}
-                    color={singleProvider ? 'primary' : 'inherit'}
-                    loading={loading && selectedProviderId === provider.id}
-                    value={provider.id}
-                    startIcon={IconProviderMap.get(provider.id)}
-                    sx={{
-                      textTransform: 'capitalize',
-                      filter: 'opacity(0.9)',
-                      transition: 'filter 0.2s ease-in',
-                      '&:hover': {
-                        filter: 'opacity(1)',
-                      },
+                    onSubmit={async (event) => {
+                      event.preventDefault();
+                      setFormStatus({ error: '', selectedProviderId: provider.id, loading: true });
+                      const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
+                      setFormStatus((prev) => ({
+                        ...prev,
+                        loading: oauthResponse?.error || docs ? false : prev.loading,
+                        error: oauthResponse?.error,
+                      }));
                     }}
                   >
-                    <span>Sign in with {provider.name}</span>
-                  </LoadingButton>
-                </form>
-              );
-            })}
+                    <LoadingButton
+                      key={provider.id}
+                      variant="contained"
+                      type="submit"
+                      fullWidth
+                      size="large"
+                      disableElevation
+                      name={'provider'}
+                      color={singleProvider ? 'primary' : 'inherit'}
+                      loading={loading && selectedProviderId === provider.id}
+                      value={provider.id}
+                      startIcon={IconProviderMap.get(provider.id)}
+                      sx={{
+                        textTransform: 'capitalize',
+                        filter: 'opacity(0.9)',
+                        transition: 'filter 0.2s ease-in',
+                        '&:hover': {
+                          filter: 'opacity(1)',
+                        },
+                      }}
+                    >
+                      <span>Sign in with {provider.name}</span>
+                    </LoadingButton>
+                  </form>
+                );
+              })}
           </Stack>
 
           {passkeyProvider ? (
@@ -348,10 +344,15 @@ function SignInPage(props: SignInPageProps) {
                     required
                     slotProps={{
                       htmlInput: {
-                        sx: { paddingTop: '12px', paddingBottom: '12px' },
+                        sx: (theme) => ({
+                          paddingTop: theme.spacing(1.5),
+                          paddingBottom: theme.spacing(1.5),
+                        }),
                       },
                       inputLabel: {
-                        sx: { lineHeight: '1rem' },
+                        sx: (theme) => ({
+                          lineHeight: theme.typography.pxToRem(16),
+                        }),
                       },
                     }}
                     fullWidth
@@ -434,10 +435,15 @@ function SignInPage(props: SignInPageProps) {
                     required
                     slotProps={{
                       htmlInput: {
-                        sx: { paddingTop: '12px', paddingBottom: '12px' },
+                        sx: (theme) => ({
+                          paddingTop: theme.spacing(1.5),
+                          paddingBottom: theme.spacing(1.5),
+                        }),
                       },
                       inputLabel: {
-                        sx: { lineHeight: '1rem' },
+                        sx: (theme) => ({
+                          lineHeight: theme.typography.pxToRem(16),
+                        }),
                       },
                     }}
                     fullWidth
@@ -460,10 +466,15 @@ function SignInPage(props: SignInPageProps) {
                     fullWidth
                     slotProps={{
                       htmlInput: {
-                        sx: { paddingTop: '12px', paddingBottom: '12px' },
+                        sx: (theme) => ({
+                          paddingTop: theme.spacing(1.5),
+                          paddingBottom: theme.spacing(1.5),
+                        }),
                       },
                       inputLabel: {
-                        sx: { lineHeight: '1rem' },
+                        sx: (theme) => ({
+                          lineHeight: theme.typography.pxToRem(16),
+                        }),
                       },
                     }}
                     name="password"
@@ -558,10 +569,15 @@ function SignInPage(props: SignInPageProps) {
                   fullWidth
                   slotProps={{
                     htmlInput: {
-                      sx: { paddingTop: '12px', paddingBottom: '12px' },
+                      sx: (theme) => ({
+                        paddingTop: theme.spacing(1.5),
+                        paddingBottom: theme.spacing(1.5),
+                      }),
                     },
                     inputLabel: {
-                      sx: { lineHeight: '1rem' },
+                      sx: (theme) => ({
+                        lineHeight: theme.typography.pxToRem(16),
+                      }),
                     },
                   }}
                   name="email"

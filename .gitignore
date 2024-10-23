@@ -62,7 +62,7 @@ packages/toolpad-studio/public/typings.json
 .toolpad-generated
 
 # examples
-examples/*/yarn.lock
+examples/*/*/yarn.lock
 
 
 # tests

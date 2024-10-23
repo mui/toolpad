@@ -22,13 +22,16 @@ When using authentication features inside Toolpad Core, a `SessionContext` is cr
 The `session` can be created using any authentication provider of your choice. You can access the current value of the `SessionContext` inside Toolpad Core components by invoking the hook:
 
 ```js
+import { useSession } from '@toolpad/core/useSession';
 const session = useSession();
 ```
 
-If your session has additional data which you want to display in the account popover, you an create custom components for user information display with the session object:
+If your session has additional data which you want to display in the account popover, you can create custom components for user information display with the session object:
 
 ```ts
-interface CustomSession  {
+import { Session } from '@toolpad/core/AppProvider';
+
+interface CustomSession extends Session  {
   org: {
     name: string;
     url: string;
@@ -45,7 +48,7 @@ function CustomAccountDetails() {
 }
 ```
 
-The following example demonstrates this behaviour clearly:
+The following example demonstrates this behavior:
 
 {{"demo": "../account/AccountCustomUserDetails.js", "bg":"outlined"}}
 

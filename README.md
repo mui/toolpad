@@ -61,6 +61,12 @@ Check out our [documentation](https://mui.com/toolpad/studio/getting-started/).
 
 ## Examples
 
+### Core
+
+Find a [list of example apps](https://mui.com/toolpad/core/introduction/examples/) on our docs to help you get started with Toolpad Core quickly.
+
+### Studio
+
 Check out our [mui-public](https://tools-public.mui.com/prod/pages/OverviewPage) app to see how a Toolpad Studio app looks in production.
 Our documentation contains more [examples](https://mui.com/toolpad/studio/examples/) to help you get started.
 

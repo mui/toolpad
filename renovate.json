@@ -147,7 +147,7 @@
     {
       "groupName": "Update @toolpad/studio in examples",
       "matchPackageNames": ["@toolpad/studio"],
-      "matchFiles": ["examples/*/package.json"],
+      "matchFiles": ["examples/**/package.json"],
       "schedule": ["at any time"],
       "automerge": true
     },

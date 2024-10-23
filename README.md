@@ -63,7 +63,7 @@ Check out our [documentation](https://mui.com/toolpad/studio/getting-started/).
 
 ### Core
 
-Find a [list of example apps](https://mui.com/toolpad/core/introduction/examples/) on our docs to help you get started with Toolpad Core quickly.
+Find a [list of example apps](https://mui.com/toolpad/core/introduction/examples/) on the docs to help you get started with Toolpad Core quickly.
 
 ### Studio
 

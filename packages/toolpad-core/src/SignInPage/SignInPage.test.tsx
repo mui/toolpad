@@ -24,7 +24,7 @@ describe('SignInPage', () => {
 
     await userEvent.click(signInButton);
 
-    expect(signIn).toHaveBeenCalledWith({ id: 'github' });
+    expect(signIn).toHaveBeenCalledWith({ id: 'github', name: 'GitHub' }, undefined, '/');
   });
 
   test('renders credentials provider', async () => {
@@ -43,7 +43,11 @@ describe('SignInPage', () => {
     expectedFormData.append('email', 'john@example.com');
     expectedFormData.append('password', 'thepassword');
 
-    expect(signIn).toHaveBeenCalledWith({ id: 'credentials' }, expectedFormData);
+    expect(signIn).toHaveBeenCalledWith(
+      { id: 'credentials', name: 'Credentials' },
+      expectedFormData,
+      '/',
+    );
   });
 
   test('renders nodemailer provider', async () => {
@@ -59,13 +63,13 @@ describe('SignInPage', () => {
     const expectedFormData = new FormData();
     expectedFormData.append('email', 'john@example.com');
 
-    expect(signIn).toHaveBeenCalledWith({ id: 'nodemailer' }, expectedFormData);
+    expect(signIn).toHaveBeenCalledWith({ id: 'nodemailer', name: 'Email' }, expectedFormData, '/');
   });
 
   test('renders passkey sign-in option when available', async () => {
     const signIn = vi.fn();
 
-    render(<SignInPage signIn={signIn} providers={[{ id: 'passkey', name: 'Passkey ' }]} />);
+    render(<SignInPage signIn={signIn} providers={[{ id: 'passkey', name: 'Passkey' }]} />);
 
     const emailField = screen.getByRole('textbox', { name: 'Email Address' });
     const signInButton = screen.getByRole('button', { name: 'Sign in with Passkey' });
@@ -76,6 +80,6 @@ describe('SignInPage', () => {
     const expectedFormData = new FormData();
     expectedFormData.append('email', 'john@example.com');
 
-    expect(signIn).toHaveBeenCalledWith({ id: 'passkey' }, expectedFormData);
+    expect(signIn).toHaveBeenCalledWith({ id: 'passkey', name: 'Passkey' }, expectedFormData, '/');
   });
 });

@@ -90,6 +90,11 @@ export interface DashboardLayoutProps {
    */
   hideNavigation?: boolean;
   /**
+   * Width of the sidebar when expanded, in pixels.
+   * @default 320
+   */
+  sidebarExpandedWidth?: number;
+  /**
    * The components used for each slot inside.
    * @default {}
    */
@@ -121,6 +126,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     disableCollapsibleSidebar = false,
     defaultSidebarCollapsed = false,
     hideNavigation = false,
+    sidebarExpandedWidth = 320,
     slots,
     slotProps,
     sx,
@@ -286,7 +292,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const getDrawerSharedSx = React.useCallback(
     (isMini: boolean, isTemporary: boolean) => {
-      const drawerWidth = isMini ? 64 : 320;
+      const drawerWidth = isMini ? 64 : sidebarExpandedWidth;
 
       return {
         width: drawerWidth,
@@ -302,7 +308,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         },
       };
     },
-    [isNavigationExpanded],
+    [isNavigationExpanded, sidebarExpandedWidth],
   );
 
   const layoutRef = React.useRef<Element | null>(null);

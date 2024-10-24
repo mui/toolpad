@@ -90,7 +90,8 @@ export interface DashboardLayoutProps {
    */
   hideNavigation?: boolean;
   /**
-   * The width in pixel of the sidebar when expanded, default value is 320.
+   * Width of the sidebar when expanded, in pixels.
+   * @default 320
    */
   sidebarExpandedWidth?: number;
   /**
@@ -307,7 +308,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         },
       };
     },
-    [isNavigationExpanded],
+    [isNavigationExpanded, sidebarExpandedWidth],
   );
 
   const layoutRef = React.useRef<Element | null>(null);

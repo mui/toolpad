@@ -100,11 +100,11 @@ function ReactRouter(props) {
               Component: Layout,
               children: [
                 {
-                  path: '/',
+                  path: '',
                   Component: DashboardPage,
                 },
                 {
-                  path: '/orders',
+                  path: 'orders',
                   Component: OrdersPage,
                 },
               ],

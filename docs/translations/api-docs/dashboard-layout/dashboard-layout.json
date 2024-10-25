@@ -11,6 +11,7 @@
     "hideNavigation": {
       "description": "Whether the navigation bar and menu icon should be hidden"
     },
+    "sidebarExpandedWidth": { "description": "Width of the sidebar when expanded." },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." },
     "sx": {

@@ -102,7 +102,7 @@ importers:
         version: 1.0.25
       '@mui/monorepo':
         specifier: github:mui/material-ui#0d6aceb162ed87ea8b29e5e0ab487f5401542894
-        version: git+https://git@github.com:mui/material-ui.git#0d6aceb162ed87ea8b29e5e0ab487f5401542894(encoding@0.1.13)
+        version: https://codeload.github.com/mui/material-ui/tar.gz/0d6aceb162ed87ea8b29e5e0ab487f5401542894(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.21.0
         version: 7.21.0(@emotion/react@11.13.3(@types/react@18.3.11)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.11)(react@18.3.1))(@types/react@18.3.11)(react@18.3.1))(@mui/material@6.1.5(@emotion/react@11.13.3(@types/react@18.3.11)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.11)(react@18.3.1))(@types/react@18.3.11)(react@18.3.1))(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mui/system@6.1.5(@emotion/react@11.13.3(@types/react@18.3.11)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.11)(react@18.3.1))(@types/react@18.3.11)(react@18.3.1))(@types/react@18.3.11)(react@18.3.1))(@types/react@18.3.11)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2052,7 +2052,7 @@ packages:
     resolution: {integrity: sha512-GjV0/mUEEXpi1U5ZgDprMRRgajGMRW3G5FjMr5KLKD8nT2fTG8+h/klV3+6Dm5739QE+K5+2e91qFKAYI3pmRg==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
-      '@babel/core': ^7.0.0-0
+      '@babel/core': ^7.25.8
 
   '@babel/preset-typescript@7.25.7':
     resolution: {integrity: sha512-rkkpaXJZOFN45Fb+Gki0c+KMIglk4+zZXOoMJuyEK8y8Kkc8Jd3BDmP7qPsz0zQMJj+UD7EprF+AqAXcILnexw==}
@@ -2122,7 +2122,7 @@ packages:
   '@docsearch/react@3.6.2':
     resolution: {integrity: sha512-rtZce46OOkVflCQH71IdbXSFK+S8iJZlUF56XBW5rIgx/eG5qoomC7Ag3anZson1bBac/JFQn7XOBfved/IMRA==}
     peerDependencies:
-      '@types/react': '>= 16.8.0 < 19.0.0'
+      '@types/react': ^18.3.11
       react: '>= 16.8.0 < 19.0.0'
       react-dom: '>= 16.8.0 < 19.0.0'
       search-insights: '>= 1 < 3'
@@ -2944,7 +2944,7 @@ packages:
     resolution: {integrity: sha512-w8twR3qCUI+uJHO5xDOuc1yB5l46KFbvNsTwIvEW9tQkKxVaiEFf2GAXHuvFJiHfZLqjzett6drZjghy8D1Z1A==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
-      '@types/react': ^17.0.0 || ^18.0.0
+      '@types/react': ^18.3.11
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
     peerDependenciesMeta:
@@ -3075,8 +3075,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@git+https://git@github.com:mui/material-ui.git#0d6aceb162ed87ea8b29e5e0ab487f5401542894':
-    resolution: {commit: 0d6aceb162ed87ea8b29e5e0ab487f5401542894, repo: git@github.com:mui/material-ui.git, type: git}
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/0d6aceb162ed87ea8b29e5e0ab487f5401542894':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/0d6aceb162ed87ea8b29e5e0ab487f5401542894}
     version: 6.1.4
     engines: {pnpm: 9.12.1}
 
@@ -4044,8 +4044,8 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@testing-library/dom': ^10.0.0
-      '@types/react': ^18.0.0
-      '@types/react-dom': ^18.0.0
+      '@types/react': ^18.3.11
+      '@types/react-dom': 18.3.1
       react: ^18.0.0
       react-dom: ^18.0.0
     peerDependenciesMeta:
@@ -12416,7 +12416,7 @@ snapshots:
       '@emotion/styled': 11.13.0(@emotion/react@11.13.3(@types/react@18.3.11)(react@18.3.1))(@types/react@18.3.11)(react@18.3.1)
       '@types/react': 18.3.11
 
-  '@mui/monorepo@git+https://git@github.com:mui/material-ui.git#0d6aceb162ed87ea8b29e5e0ab487f5401542894(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/0d6aceb162ed87ea8b29e5e0ab487f5401542894(encoding@0.1.13)':
     dependencies:
       '@googleapis/sheets': 9.3.1(encoding@0.1.13)
       '@netlify/functions': 2.8.2

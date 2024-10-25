@@ -213,7 +213,7 @@ function DashboardSidebarSubNavigation({
 
         const listItemIconSize = 34;
 
-        const isSelected =
+        const isActive =
           !!activePage && activePage.path === getItemPath(navigationContext, navigationItem);
 
         const listItem = (
@@ -225,7 +225,15 @@ function DashboardSidebarSubNavigation({
             }}
           >
             <NavigationListItemButton
-              selected={isSelected && (!navigationItem.children || isMini)}
+              selected={
+                activePage && navigationItem.children && isMini
+                  ? hasSelectedNavigationChildren(
+                      navigationContext,
+                      navigationItem,
+                      activePage.path,
+                    )
+                  : isActive && !navigationItem.children
+              }
               sx={{
                 px: 1.4,
                 height: 48,

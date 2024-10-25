@@ -90,10 +90,10 @@ export interface DashboardLayoutProps {
    */
   hideNavigation?: boolean;
   /**
-   * Width of the sidebar when expanded, in pixels.
+   * Width of the sidebar when expanded.
    * @default 320
    */
-  sidebarExpandedWidth?: number;
+  sidebarExpandedWidth?: number | string;
   /**
    * The components used for each slot inside.
    * @default {}
@@ -475,6 +475,11 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default false
    */
   hideNavigation: PropTypes.bool,
+  /**
+   * Width of the sidebar when expanded.
+   * @default 320
+   */
+  sidebarExpandedWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   /**
    * The props used for each slot inside.
    * @default {}

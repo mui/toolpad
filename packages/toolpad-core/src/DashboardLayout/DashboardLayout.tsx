@@ -353,7 +353,7 @@ export interface DashboardLayoutProps {
    */
   disableCollapsibleSidebar?: boolean;
   /**
-   * Whether the navigation bar and menu icon should be hidden
+   * Whether the navigation bar and menu icon should be hidden.
    * @default false
    */
   hideNavigation?: boolean;

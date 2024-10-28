@@ -334,16 +334,14 @@ function DashboardSidebarSubNavigation({
                   },
                 }}
               >
-                <Grow in>
-                  <Paper sx={{ pt: 0.5, pb: 0.5 }}>
-                    <DashboardSidebarSubNavigation
-                      subNavigation={navigationItem.children}
-                      depth={depth + 1}
-                      onLinkClick={onLinkClick}
-                      isPopover
-                    />
-                  </Paper>
-                </Grow>
+                <Paper sx={{ pt: 0.5, pb: 0.5 }}>
+                  <DashboardSidebarSubNavigation
+                    subNavigation={navigationItem.children}
+                    depth={depth + 1}
+                    onLinkClick={onLinkClick}
+                    isPopover
+                  />
+                </Paper>
               </Box>
             ) : null}
           </ListItem>

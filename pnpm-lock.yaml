@@ -1116,8 +1116,8 @@ importers:
         specifier: 1.1.1
         version: 1.1.1
       cookie:
-        specifier: 1.0.0
-        version: 1.0.0
+        specifier: 1.0.1
+        version: 1.0.1
       fractional-indexing:
         specifier: 3.2.0
         version: 3.2.0
@@ -5393,8 +5393,8 @@ packages:
     resolution: {integrity: sha512-6DnInpx7SJ2AK3+CTUE/ZM0vWTUboZCegxhC2xiIydHR9jNuTAASBrfEpHhiGOZw/nX51bHt6YQl8jsGo4y/0w==}
     engines: {node: '>= 0.6'}
 
-  cookie@1.0.0:
-    resolution: {integrity: sha512-bsSztFoaR8bw9MlFCrTHzc1wOKCUKOBsbgFdoDilZDkETAOOjKSqV7L+EQLbTaylwvZasd9vM4MGKotJaUfSpA==}
+  cookie@1.0.1:
+    resolution: {integrity: sha512-Xd8lFX4LM9QEEwxQpF9J9NTUh8pmdJO0cyRJhFiDoLTk2eH8FXlRv2IFGYVadZpqI3j8fhNrSdKCeYPxiAhLXw==}
     engines: {node: '>=18'}
 
   copy-anything@3.0.5:
@@ -15242,7 +15242,7 @@ snapshots:
 
   cookie@0.7.1: {}
 
-  cookie@1.0.0: {}
+  cookie@1.0.1: {}
 
   copy-anything@3.0.5:
     dependencies:

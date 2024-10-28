@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
+import Grow from '@mui/material/Grow';
 import IconButton from '@mui/material/IconButton';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -15,13 +16,13 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
+import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
@@ -105,7 +106,9 @@ interface DashboardSidebarSubNavigationProps {
   depth?: number;
   onLinkClick: () => void;
   isMini?: boolean;
+  isPopover?: boolean;
   isFullyExpanded?: boolean;
+  isFullyCollapsed?: boolean;
   hasDrawerTransitions?: boolean;
 }
 
@@ -114,7 +117,9 @@ function DashboardSidebarSubNavigation({
   depth = 0,
   onLinkClick,
   isMini = false,
+  isPopover = false,
   isFullyExpanded = true,
+  isFullyCollapsed = false,
   hasDrawerTransitions = false,
 }: DashboardSidebarSubNavigationProps) {
   const navigationContext = React.useContext(NavigationContext);
@@ -154,7 +159,15 @@ function DashboardSidebarSubNavigation({
   );
 
   return (
-    <List sx={{ padding: 0, mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
+    <List
+      sx={{
+        padding: 0,
+        mt: isPopover ? 1 : 0,
+        mb: depth === 0 && !isPopover ? 4 : 1,
+        pl: isPopover ? 0 : 2 * depth,
+        minWidth: isPopover ? 240 : 'auto',
+      }}
+    >
       {subNavigation.map((navigationItem, navigationItemIndex) => {
         if (navigationItem.kind === 'header') {
           return (
@@ -205,16 +218,30 @@ function DashboardSidebarSubNavigation({
 
         const isNestedNavigationExpanded = expandedSidebarItemIds.includes(navigationItemId);
 
-        const nestedNavigationCollapseIcon = isNestedNavigationExpanded ? (
-          <ExpandLessIcon />
-        ) : (
-          <ExpandMoreIcon />
-        );
-
         const listItemIconSize = 34;
 
         const isActive =
           !!activePage && activePage.path === getItemPath(navigationContext, navigationItem);
+
+        let nestedNavigationCollapseSx: SxProps<Theme> = { display: 'none' };
+        if (isMini && isFullyCollapsed) {
+          nestedNavigationCollapseSx = {
+            fontSize: 18,
+            position: 'absolute',
+            top: '50%',
+            right: '-2px',
+            transform: 'translateY(-50%) rotate(-90deg)',
+          };
+        } else if (!isMini && isFullyExpanded) {
+          nestedNavigationCollapseSx = {
+            transform: `rotate(${isNestedNavigationExpanded ? 0 : -90}deg)`,
+            transition: (theme: Theme) =>
+              theme.transitions.create('transform', {
+                easing: theme.transitions.easing.sharp,
+                duration: 100,
+              }),
+          };
+        }
 
         const listItem = (
           <ListItem
@@ -222,6 +249,12 @@ function DashboardSidebarSubNavigation({
               py: 0,
               px: 1,
               overflowX: 'hidden',
+              '> .MuiBox-root': {
+                display: 'none',
+              },
+              '&:hover > .MuiBox-root': {
+                display: 'block',
+              },
             }}
           >
             <NavigationListItemButton
@@ -242,11 +275,14 @@ function DashboardSidebarSubNavigation({
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),
                   }
-                : {
+                : {})}
+              {...(!navigationItem.children
+                ? {
                     LinkComponent: Link,
                     href: navigationItemFullPath,
                     onClick: onLinkClick,
-                  })}
+                  }
+                : {})}
             >
               {navigationItem.icon || isMini ? (
                 <ListItemIcon
@@ -284,16 +320,38 @@ function DashboardSidebarSubNavigation({
                 }}
               />
               {navigationItem.action && !isMini && isFullyExpanded ? navigationItem.action : null}
-              {navigationItem.children && !isMini && isFullyExpanded
-                ? nestedNavigationCollapseIcon
-                : null}
+              {navigationItem.children ? <ExpandMoreIcon sx={nestedNavigationCollapseSx} /> : null}
             </NavigationListItemButton>
+            {navigationItem.children && isMini ? (
+              <Box
+                sx={{
+                  position: 'fixed',
+                  left: 62,
+                  pl: '6px',
+                  transform: (theme) => `translateY(calc(50% - ${theme.spacing(3)}))`,
+                  '&:hover': {
+                    display: 'block',
+                  },
+                }}
+              >
+                <Grow in>
+                  <Paper sx={{ pt: 0.5, pb: 0.5 }}>
+                    <DashboardSidebarSubNavigation
+                      subNavigation={navigationItem.children}
+                      depth={depth + 1}
+                      onLinkClick={onLinkClick}
+                      isPopover
+                    />
+                  </Paper>
+                </Grow>
+              </Box>
+            ) : null}
           </ListItem>
         );
 
         return (
           <React.Fragment key={navigationItemId}>
-            {isMini ? (
+            {isMini && !navigationItem.children ? (
               <Tooltip title={navigationItemTitle} placement="right">
                 {listItem}
               </Tooltip>
@@ -443,6 +501,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
     React.useState(isNavigationExpanded);
+  const [isNavigationFullyCollapsed, setIsNavigationFullyCollapsed] =
+    React.useState(!isNavigationExpanded);
 
   React.useEffect(() => {
     if (isNavigationExpanded) {
@@ -454,6 +514,20 @@ function DashboardLayout(props: DashboardLayoutProps) {
     }
 
     setIsNavigationFullyExpanded(false);
+
+    return () => {};
+  }, [isNavigationExpanded, theme]);
+
+  React.useEffect(() => {
+    if (!isNavigationExpanded) {
+      const drawerWidthTransitionTimeout = setTimeout(() => {
+        setIsNavigationFullyCollapsed(true);
+      }, theme.transitions.duration.leavingScreen);
+
+      return () => clearTimeout(drawerWidthTransitionTimeout);
+    }
+
+    setIsNavigationFullyCollapsed(false);
 
     return () => {};
   }, [isNavigationExpanded, theme]);
@@ -531,6 +605,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             onLinkClick={handleNavigationLinkClick}
             isMini={isMini}
             isFullyExpanded={isNavigationFullyExpanded}
+            isFullyCollapsed={isNavigationFullyCollapsed}
             hasDrawerTransitions={hasDrawerTransitions}
           />
           {SidebarFooterSlot ? (
@@ -543,6 +618,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       SidebarFooterSlot,
       handleNavigationLinkClick,
       hasDrawerTransitions,
+      isNavigationFullyCollapsed,
       isNavigationFullyExpanded,
       navigation,
       slotProps?.sidebarFooter,

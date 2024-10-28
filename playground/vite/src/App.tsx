@@ -38,6 +38,17 @@ const NAVIGATION: Navigation = [
         segment: 'orders',
         title: 'Orders',
         icon: <ShoppingCartIcon />,
+        children: [
+          {
+            title: 'Dashboard',
+            icon: <DashboardIcon />,
+          },
+          {
+            segment: 'orders',
+            title: 'Orders',
+            icon: <ShoppingCartIcon />,
+          },
+        ],
       },
     ],
   },

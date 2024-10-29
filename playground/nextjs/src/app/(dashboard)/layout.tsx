@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
@@ -95,6 +96,7 @@ function SidebarFooterAccountPopover() {
           </MenuItem>
         ))}
       </MenuList>
+      <Divider />
       <AccountPopoverFooter>
         <SignOutButton />
       </AccountPopoverFooter>
@@ -109,13 +111,29 @@ function SidebarFooterAccount() {
         preview: AccountSidebarPreview,
         popoverContent: SidebarFooterAccountPopover,
       }}
+      slotProps={{
+        popover: {
+          transformOrigin: { horizontal: 'left', vertical: 'top' },
+          anchorOrigin: { horizontal: 'left', vertical: 'bottom' },
+          slotProps: {
+            paper: {
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                mt: 1,
+              },
+            },
+          },
+        },
+      }}
     />
   );
 }
 
 export default function DashboardPagesLayout(props: { children: React.ReactNode }) {
   return (
-    <DashboardLayout slots={{ sidebarFooter: SidebarFooterAccount }}>
+    <DashboardLayout slots={{ sidebarFooter: SidebarFooterAccount, toolbarAccount: () => null }}>
       <PageContainer>{props.children}</PageContainer>
     </DashboardLayout>
   );

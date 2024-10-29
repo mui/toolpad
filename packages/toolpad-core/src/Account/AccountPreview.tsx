@@ -93,15 +93,17 @@ function AccountPreview(props: AccountPreviewProps) {
 
   if (variant === 'expanded') {
     return (
-      <Stack direction="row" justifyContent="flex-start" spacing={2} padding={2}>
-        {avatarContent}
-        <Stack direction="column" justifyContent="space-evenly">
-          <Typography variant="body2" fontWeight="bolder" noWrap>
-            {session.user?.name}
-          </Typography>
-          <Typography variant="caption" noWrap>
-            {session.user?.email}
-          </Typography>
+      <Stack direction="row" justifyContent="space-between" spacing={2} padding={2}>
+        <Stack direction="row" justifyContent="flex-start" spacing={2}>
+          {avatarContent}
+          <Stack direction="column" justifyContent="space-evenly">
+            <Typography variant="body2" fontWeight="bolder" noWrap>
+              {session.user?.name}
+            </Typography>
+            <Typography variant="caption" noWrap>
+              {session.user?.email}
+            </Typography>
+          </Stack>
         </Stack>
         {handleClick &&
           (slots?.moreIconButton ? (

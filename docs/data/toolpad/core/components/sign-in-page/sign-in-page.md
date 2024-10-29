@@ -195,6 +195,10 @@ If you're using the default [Next.js example](https://github.com/mui/toolpad/tre
 If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs-pages-nextauth-4/) to get started.
 :::
 
+:::info
+If you're using Vite with React Router, check out the [example with Vite and React Router](https://github.com/mui/toolpad/tree/master/examples/core-vite-auth/) that showcases how to use `SignInPage` along with any external authentication library of your choice.
+:::
+
 ## Customization
 
 ### Branding

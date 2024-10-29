@@ -102,7 +102,7 @@ importers:
         version: 1.0.25
       '@mui/monorepo':
         specifier: github:mui/material-ui#c4b48a6d7dcae1c6ba94a952d3389e84f1fc1e37
-        version: https://codeload.github.com/mui/material-ui/tar.gz/c4b48a6d7dcae1c6ba94a952d3389e84f1fc1e37(encoding@0.1.13)
+        version: git+https://git@github.com:mui/material-ui.git#c4b48a6d7dcae1c6ba94a952d3389e84f1fc1e37(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.22.0
         version: 7.22.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@mui/material@6.1.5(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mui/system@6.1.5(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3077,8 +3077,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/c4b48a6d7dcae1c6ba94a952d3389e84f1fc1e37':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/c4b48a6d7dcae1c6ba94a952d3389e84f1fc1e37}
+  '@mui/monorepo@git+https://git@github.com:mui/material-ui.git#c4b48a6d7dcae1c6ba94a952d3389e84f1fc1e37':
+    resolution: {commit: c4b48a6d7dcae1c6ba94a952d3389e84f1fc1e37, repo: git@github.com:mui/material-ui.git, type: git}
     version: 6.1.5
     engines: {pnpm: 9.12.2}
 
@@ -12411,7 +12411,7 @@ snapshots:
       '@emotion/styled': 11.13.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1)
       '@types/react': 18.3.12
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/c4b48a6d7dcae1c6ba94a952d3389e84f1fc1e37(encoding@0.1.13)':
+  '@mui/monorepo@git+https://git@github.com:mui/material-ui.git#c4b48a6d7dcae1c6ba94a952d3389e84f1fc1e37(encoding@0.1.13)':
     dependencies:
       '@googleapis/sheets': 9.3.1(encoding@0.1.13)
       '@netlify/functions': 2.8.2

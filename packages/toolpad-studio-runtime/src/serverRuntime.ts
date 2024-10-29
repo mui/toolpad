@@ -16,7 +16,7 @@ export interface ServerContext {
   /**
    * A dictionary mapping cookie name to cookie value.
    */
-  cookies: Record<string, string>;
+  cookies: Record<string, string | undefined>;
   /**
    * Use to set a cookie `name` with `value`.
    */

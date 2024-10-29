@@ -76,7 +76,7 @@ export default function App(props) {
 }
 ```
 
-## Client-side Routing
+## Client-side routing
 
 The `AppProvider` for React Router includes routing out-of-the-box for projects using [react-router-dom](https://www.npmjs.com/package/react-router-dom).
 

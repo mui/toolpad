@@ -26,4 +26,4 @@ pnpm create toolpad-app --example datagrid-columns
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/datagrid-columns)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/studio/datagrid-columns)

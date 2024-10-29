@@ -28,7 +28,7 @@ pnpm create toolpad-app --example graphql
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/graphql)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/studio/graphql)
 
 ## What's inside
 
@@ -40,4 +40,4 @@ A Toolpad Studio app that shows how to:
 
 ## The source
 
-[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/graphql)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/studio/graphql)

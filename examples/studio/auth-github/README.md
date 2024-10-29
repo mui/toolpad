@@ -32,4 +32,4 @@ pnpm create toolpad-app --example auth-github
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/auth-github)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/studio/auth-github)

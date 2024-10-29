@@ -26,4 +26,4 @@ pnpm create toolpad-app --example custom-server-nextjs
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/custom-server-nextjs)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/studio/custom-server-nextjs)

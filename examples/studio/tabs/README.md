@@ -20,7 +20,7 @@ pnpm create toolpad-app --example tabs
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/tabs)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/studio/tabs)
 
 ## What's inside
 
@@ -31,4 +31,4 @@ This app demonstrates the following capabilities of Toolpad:
 
 ## The source
 
-[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/tabs)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/studio/tabs)

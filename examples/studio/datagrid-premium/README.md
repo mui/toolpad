@@ -26,4 +26,4 @@ This app demonstrates the following capabilities of Toolpad Studio:
 
 ## The source
 
-[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/datagrid-premium)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/studio/datagrid-premium)

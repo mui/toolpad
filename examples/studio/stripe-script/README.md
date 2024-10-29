@@ -38,4 +38,4 @@ The app involves the following workflow:
 
 ## The source
 
-[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/stripe-script)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/studio/stripe-script)

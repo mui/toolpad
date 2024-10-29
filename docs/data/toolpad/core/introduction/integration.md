@@ -837,3 +837,157 @@ That's it! You now have Toolpad Core integrated into your single-page app with R
 :::info
 For a full working example, see the [Toolpad Core Vite app with React Router example](https://github.com/mui/toolpad/tree/master/examples/core-vite)
 :::
+
+### 4. (Optional) Set up authentication
+
+You can use the `SignInPage` component to add authentication along with an external authentication provider of your choice. The following code demonstrates the code required to set up authentication with a mock provider.
+
+#### a. Define a `SessionContext` to hold the authentication session
+
+```tsx title="src/SessionContext.ts"
+import * as React from 'react';
+import type { Session } from '@toolpad/core';
+
+export interface SessionContextValue {
+  session: Session | null;
+  setSession: (session: Session | null) => void;
+}
+
+export const SessionContext = React.createContext<SessionContextValue>({
+  session: {},
+  setSession: () => {},
+});
+
+export function useSession() {
+  return React.useContext(SessionContext);
+}
+```
+
+#### b. Protect routes inside the dashboard layout
+
+```tsx title="src/layouts/dashboard.tsx"
+import * as React from 'react';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import { useSession } from '../SessionContext';
+
+export default function Layout() {
+  const { session } = useSession();
+  const location = useLocation();
+
+  if (!session) {
+    // Add the `callbackUrl` search parameter
+    const redirectTo = `/sign-in?callbackUrl=${encodeURIComponent(location.pathname)}`;
+
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  return (
+    <DashboardLayout>
+      <PageContainer>
+        <Outlet />
+      </PageContainer>
+    </DashboardLayout>
+  );
+}
+```
+
+#### c. Use the `SignInPage` component to create a sign-in page
+
+```tsx title="src/pages/signIn.tsx"
+'use client';
+import * as React from 'react';
+import { SignInPage } from '@toolpad/core/SignInPage';
+import type { Session } from '@toolpad/core/AppProvider';
+import { useNavigate } from 'react-router-dom';
+import { useSession } from '../SessionContext';
+
+const fakeAsyncGetSession = async (formData: any): Promise<Session> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (formData.get('password') === 'password') {
+        resolve({
+          user: {
+            name: 'Bharat Kashyap',
+            email: formData.get('email') || '',
+            image: 'https://avatars.githubusercontent.com/u/19550456',
+          },
+        });
+      }
+      reject(new Error('Incorrect credentials.'));
+    }, 1000);
+  });
+};
+
+export default function SignIn() {
+  const { setSession } = useSession();
+  const navigate = useNavigate();
+  return (
+    <SignInPage
+      providers={[{ id: 'credentials', name: 'Credentials' }]}
+      signIn={async (provider, formData, callbackUrl) => {
+        // Demo session
+        try {
+          const session = await fakeAsyncGetSession(formData);
+          if (session) {
+            setSession(session);
+            navigate(callbackUrl || '/', { replace: true });
+            return {};
+          }
+        } catch (error) {
+          return {
+            error: error instanceof Error ? error.message : 'An error occurred',
+          };
+        }
+        return {};
+      }}
+    />
+  );
+}
+```
+
+#### d. Add the sign in page to the router
+
+```tsx title="src/main.tsx"
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import App from './App';
+import Layout from './layouts/dashboard';
+import DashboardPage from './pages';
+import OrdersPage from './pages/orders';
+import SignInPage from './pages/signIn';
+
+const router = createBrowserRouter([
+  {
+    Component: App,
+    children: [
+      {
+        path: '/',
+        Component: Layout,
+        children: [
+          {
+            path: '/',
+            Component: DashboardPage,
+          },
+          {
+            path: '/orders',
+            Component: OrdersPage,
+          },
+        ],
+      },
+      {
+        path: '/sign-in',
+        Component: SignInPage,
+      },
+    ],
+  },
+]);
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>,
+);
+```

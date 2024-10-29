@@ -295,6 +295,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       const drawerWidth = isMini ? 64 : sidebarExpandedWidth;
 
       return {
+        displayPrint: 'none',
         width: drawerWidth,
         flexShrink: 0,
         ...getDrawerWidthTransitionMixin(isNavigationExpanded),
@@ -325,7 +326,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         ...sx,
       }}
     >
-      <AppBar color="inherit" position="absolute">
+      <AppBar color="inherit" position="absolute" sx={{ displayPrint: 'none' }}>
         <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
           {!hideNavigation ? (
             <React.Fragment>

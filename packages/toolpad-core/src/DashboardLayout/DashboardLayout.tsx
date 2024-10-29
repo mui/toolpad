@@ -435,7 +435,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           flex: 1,
         }}
       >
-        <Toolbar />
+        <Toolbar sx={{ displayPrint: 'none' }} />
         <Box
           component="main"
           sx={{

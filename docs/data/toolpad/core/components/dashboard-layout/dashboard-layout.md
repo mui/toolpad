@@ -42,7 +42,7 @@ The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-ap
 
 The flexibility in composing and ordering these different elements allows for a great variety of navigation structures to fit your use case.
 
-### Navigation Links
+### Navigation links
 
 Navigation links can be placed in the sidebar as items with the format:
 
@@ -52,7 +52,7 @@ Navigation links can be placed in the sidebar as items with the format:
 
 {{"demo": "DashboardLayoutNavigationLinks.js", "height": 400, "iframe": true}}
 
-### Navigation Headings
+### Navigation headings
 
 Navigation headings can be placed in the sidebar as items with the format:
 
@@ -62,7 +62,7 @@ Navigation headings can be placed in the sidebar as items with the format:
 
 {{"demo": "DashboardLayoutNavigationHeadings.js", "height": 400, "iframe": true}}
 
-### Navigation Dividers
+### Navigation dividers
 
 Dividers can can be placed between items in the sidebar as items with the format:
 
@@ -74,7 +74,7 @@ Dividers can can be placed between items in the sidebar as items with the format
 
 {{"demo": "DashboardLayoutNavigationDividers.js", "height": 400, "iframe": true}}
 
-### Nested Navigation
+### Nested navigation
 
 Nested navigation structures can be placed in the sidebar as items with the format:
 
@@ -84,13 +84,13 @@ Nested navigation structures can be placed in the sidebar as items with the form
 
 {{"demo": "DashboardLayoutNavigationNested.js", "height": 400, "iframe": true}}
 
-### Navigation Actions
+### Navigation actions
 
 Navigation links have an optional `action` prop to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
 
 {{"demo": "DashboardLayoutNavigationActions.js", "height": 400, "iframe": true}}
 
-### Navigation Pattern Matching
+### Navigation pattern matching
 
 Navigation links have an optional `pattern` prop to define a pattern to be matched for the item to be marked as selected.
 This feature is built on top of the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library. Some examples:
@@ -121,7 +121,7 @@ The layout sidebar can be hidden if needed with the `hideNavigation` prop.
 
 {{"demo": "DashboardLayoutSidebarHidden.js", "height": 400, "iframe": true}}
 
-### Full-size content
+## Full-size content
 
 The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.
 

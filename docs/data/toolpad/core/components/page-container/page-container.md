@@ -20,7 +20,7 @@ Just like [`DashboardLayout`](/toolpad/core/react-dashboard-layout/), `PageConta
 
 ## Title and Breadcrumbs
 
-The breacrumbs are formed by matching the current pathname with the navigation structure defined in the [`AppProvider`](/toolpad/core/react-app-provider/). The title of the matched segment is used as the page title. You can override the page title with the `title` property.
+The breadcrumbs are formed by matching the current pathname with the navigation structure defined in the [`AppProvider`](/toolpad/core/react-app-provider/). The title of the matched segment is used as the page title. You can override the page title with the `title` property.
 
 For example, under the following navigation structure:
 

@@ -22,7 +22,7 @@ The `SignInPage` component can be set up with an OAuth provider by passing in a 
 
 :::info
 
-The following providers are supported and maintained by default:
+The following OAuth providers are supported and maintained by default:
 
 - Google
 - GitHub
@@ -44,9 +44,27 @@ The following providers are supported and maintained by default:
 - Twitch
 - Discord
 - Keycloak
-- Credentials (username/password)
 
 Find details on how to set up each provider in the [Auth.js documentation](https://authjs.dev/getting-started/authentication/oauth).
+:::
+
+## Magic Link
+
+The `SignIn` page component supports magic links. To enable this, you have to set up a provider such as Auth.js NodeMailer. See more details in the Auth.js docs on [database setup for email](https://authjs.dev/getting-started/authentication/email) and [Nodemailer configuration](https://authjs.dev/getting-started/providers/nodemailer/).
+
+To render a magic link form, pass in a provider with `nodemailer` as the `id` property.
+
+{{"demo": "MagicLinkSignInPage.js", "iframe": true, "height": 400}}
+
+### Alerts
+
+The `SignInPage` component can display a success alert if the email is sent successfully. You can enable this by passing a `success` property in the
+response object of the `signIn` prop.
+
+{{"demo": "MagicLinkAlertSignInPage.js", "iframe": true, "height": 400}}
+
+:::info
+Check out the complete [Next.js Auth.js Magic Link example](https://github.com/mui/mui-toolpad/tree/master/examples/core/auth-nextjs-email/) example for a working implementation of a magic link sign-in page with Auth.js, Nodemailer, Prisma and PostgreSQL.
 :::
 
 ## Passkey
@@ -64,7 +82,7 @@ The [Toolpad Core Passkey example app](https://github.com/mui/mui-toolpad/tree/m
 ## Credentials
 
 :::warning
-It is recommended to use the OAuth or Passkey provider for more robust maintenance, support, and security.
+The Credentials provider is not the most secure way to authenticate users. It's recommended to use any of the other providers for a more robust solution.
 :::
 
 To render a username password form, pass in a provider with `credentials` as the `id` property. The `signIn` function accepts a `formData` parameter in this case.
@@ -231,4 +249,4 @@ The `SignInPage` component has versions with different layouts for authenticatio
 
 ## 🚧 Other authentication Flows
 
-The `SignInPage` will be accompanied by other components to allow users to sign up, verify emails and reset passwords. This is in progress.
+Besides the `SignInPage` , the team is planning work on several other components that enable new workflows such as [sign up](https://github.com/mui/toolpad/issues/4068) and [password reset](https://github.com/mui/toolpad/issues/4265).

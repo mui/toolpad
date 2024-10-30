@@ -35,6 +35,7 @@ import { GenerateProjectOptions } from './types';
 export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
+  const hasNodemailerProvider = options.authProviders?.includes('nodemailer');
   // Add app name to package.json
 
   // Default files, common to all apps
@@ -74,6 +75,10 @@ export default function generateProject(
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
           ['pages/auth/signin.tsx', { content: signInPagePagesRouter(options) }],
         ]);
+        if (hasNodemailerProvider) {
+          // Prisma adapater support requires removal of middleware
+          authFiles.delete('middleware.ts');
+        }
         return new Map([...files, ...nextJsPagesRouterStarter, ...authFiles]);
       }
       return new Map([...files, ...nextJsPagesRouterStarter]);
@@ -94,6 +99,10 @@ export default function generateProject(
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
           ['app/auth/signin/page.tsx', { content: signInPage(options) }],
         ]);
+        if (hasNodemailerProvider) {
+          // Prisma adapater support requires removal of middleware
+          authFiles.delete('middleware.ts');
+        }
 
         return new Map([...files, ...nextJsAppRouterStarter, ...authFiles]);
       }

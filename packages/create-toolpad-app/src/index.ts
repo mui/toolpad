@@ -309,6 +309,9 @@ const run = async () => {
         choices: [
           { name: 'Google', value: 'google' },
           { name: 'GitHub', value: 'github' },
+          { name: 'Passkey', value: 'passkey' },
+          { name: 'Magic Link', value: 'nodemailer' },
+          { name: 'Credentials', value: 'credentials' },
           { name: 'GitLab', value: 'gitlab' },
           { name: 'Twitter', value: 'twitter' },
           { name: 'Facebook', value: 'facebook' },

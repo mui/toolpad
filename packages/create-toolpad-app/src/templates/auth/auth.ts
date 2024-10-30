@@ -20,6 +20,19 @@ const CredentialsProviderTemplate = `Credentials({
   },
 }),`;
 
+const NodemailerTemplate = `Nodemailer({
+    server: {
+      host: process.env.EMAIL_SERVER_HOST,
+      port: process.env.EMAIL_SERVER_PORT,
+      auth: {
+        user: process.env.EMAIL_SERVER_USER,
+        pass: process.env.EMAIL_SERVER_PASSWORD,
+      },
+      secure: true,
+    },
+    from: process.env.EMAIL_FROM,
+  }),`;
+
 const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `
   ${kebabToPascal(provider)}({
     clientId: process.env.${kebabToConstant(provider)}_CLIENT_ID,
@@ -27,34 +40,38 @@ const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `
   }),`;
 const checkEnvironmentVariables = (providers: SupportedAuthProvider[] | undefined) => `${providers
   ?.filter((p) => p !== 'credentials')
-  .map(
-    (provider) =>
-      `if(!process.env.${kebabToConstant(provider)}_CLIENT_ID) { 
+  .map((provider) => {
+    if (provider === 'nodemailer') {
+      return `if(!process.env.DATABASE_URL || !process.env.EMAIL_SERVER_HOST) {
+      console.warn('The nodemailer provider requires configuring a database and an email server.")}`;
+    }
+    return `if(!process.env.${kebabToConstant(provider)}_CLIENT_ID) { 
   console.warn('Missing environment variable "${kebabToConstant(provider)}_CLIENT_ID"');
 }
 if(!process.env.${kebabToConstant(provider)}_CLIENT_SECRET) {
   console.warn('Missing environment variable "${kebabToConstant(provider)}_CLIENT_SECRET"');
 }${
-        requiresTenantId(provider)
-          ? `
+      requiresTenantId(provider)
+        ? `
 if(!process.env.${kebabToConstant(provider)}_TENANT_ID) { 
   console.warn('Missing environment variable "${kebabToConstant(provider)}_TENANT_ID"');
 }`
-          : ''
-      }${
-        requiresIssuer(provider)
-          ? `
+        : ''
+    }${
+      requiresIssuer(provider)
+        ? `
 if(!process.env.${kebabToConstant(provider)}_ISSUER) {
   console.warn('Missing environment variable "${kebabToConstant(provider)}_ISSUER"');
 }`
-          : ''
-      }`,
-  )
+        : ''
+    }`;
+  })
   .join('\n')}
 `;
 
 const auth: Template = (options) => {
   const providers = options.authProviders;
+  const hasNodemailerProvider = providers?.includes('nodemailer');
 
   return `import NextAuth from 'next-auth';\n${providers
     ?.map(
@@ -63,11 +80,15 @@ const auth: Template = (options) => {
     )
     .join('\n')}
 import type { Provider } from 'next-auth/providers';
+${hasNodemailerProvider ? `\nimport { PrismaAdapter } from '@auth/prisma-adapter';\nimport { prisma } from './prisma';` : ''}
 
 const providers: Provider[] = [${providers
     ?.map((provider) => {
       if (provider === 'credentials') {
         return CredentialsProviderTemplate;
+      }
+      if (provider === 'nodemailer') {
+        return NodemailerTemplate;
       }
       return oAuthProviderTemplate(provider);
     })
@@ -86,6 +107,12 @@ export const providerMap = providers.map((provider) => {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
+  ${
+    hasNodemailerProvider
+      ? `\nadapter: PrismaAdapter(prisma),
+  session: { strategy: 'jwt' },`
+      : ''
+  }  
   secret: process.env.AUTH_SECRET,
   pages: {
     signIn: '/auth/signin',

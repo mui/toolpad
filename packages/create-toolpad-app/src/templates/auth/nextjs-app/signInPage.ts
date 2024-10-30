@@ -3,6 +3,7 @@ import { Template } from '../../../types';
 const signInPage: Template = (options) => {
   const { authProviders: providers } = options;
   const hasCredentialsProvider = providers?.includes('credentials');
+  const hasNodemailerProvider = providers?.includes('nodemailer');
 
   return `import * as React from 'react';
 import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
@@ -27,6 +28,17 @@ export default function SignIn() {
           // Source: https://github.com/vercel/next.js/issues/49298#issuecomment-1542055642
           // Detect a \`NEXT_REDIRECT\` error and re-throw it
           if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+           ${
+             hasNodemailerProvider
+               ? `// For the nodemailer provider, we want to return a success message
+            // instead of redirecting to a \`verify-request\` page
+            if (provider.id === 'nodemailer' && (error as any).digest?.includes('verify-request')) {
+              return {
+                success: 'Check your email for a verification link.',
+                };
+              }`
+               : ''
+           }           
             throw error;
           }
           // Handle Auth.js errors

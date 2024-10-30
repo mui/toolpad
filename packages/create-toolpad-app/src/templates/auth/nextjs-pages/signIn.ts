@@ -3,6 +3,7 @@ import { Template } from '../../../types';
 const signIn: Template = (options) => {
   const { authProviders: providers } = options;
   const hasCredentialsProvider = providers?.includes('credentials');
+  const hasNodemailerProvider = providers?.includes('nodemailer');
 
   return `import * as React from 'react';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
@@ -24,6 +25,22 @@ export default function SignIn({
             provider.id,            
             { callbackUrl: callbackUrl ?? '/' },
           );
+          ${
+            hasNodemailerProvider
+              ? `\n// For the nodemailer provider, we want to return a success message
+            // instead of redirecting to a \`verify-request\` page
+            if (
+              provider.id === "nodemailer" &&
+              signInResponse &&
+              signInResponse.url?.includes("verify-request")
+            ) {
+              return {
+                success: "Check your email for a verification link.",
+              };
+            }
+            `
+              : ''
+          }
           if (signInResponse && signInResponse.error) {
             // Handle Auth.js errors
             return {

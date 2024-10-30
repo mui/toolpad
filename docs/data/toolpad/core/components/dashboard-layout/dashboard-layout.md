@@ -154,4 +154,6 @@ Some possibly useful slots:
 
 #### Settings menu with custom theme switcher
 
+The `useColorScheme` hook can be used to create a custom theme switcher.
+
 {{"demo": "DashboardLayoutCustomThemeSwitcher.js", "height": 400, "iframe": true}}

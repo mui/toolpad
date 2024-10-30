@@ -683,7 +683,7 @@ importers:
     dependencies:
       '@auth/core':
         specifier: 0.37.2
-        version: 0.37.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))
+        version: 0.37.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(nodemailer@6.9.15)
       '@emotion/cache':
         specifier: 11.13.1
         version: 11.13.1
@@ -1099,7 +1099,7 @@ importers:
     dependencies:
       '@auth/core':
         specifier: 0.37.2
-        version: 0.37.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))
+        version: 0.37.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(nodemailer@6.9.15)
       '@mui/material':
         specifier: 6.1.5
         version: 6.1.5(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1239,7 +1239,7 @@ importers:
         version: 14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: 5.0.0-beta.22
-        version: 5.0.0-beta.22(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(next@14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 5.0.0-beta.22(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(next@14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.15)(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -1281,7 +1281,7 @@ importers:
         version: 14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: 5.0.0-beta.22
-        version: 5.0.0-beta.22(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(next@14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 5.0.0-beta.22(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(next@14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.15)(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -8060,6 +8060,10 @@ packages:
   node-releases@2.0.18:
     resolution: {integrity: sha512-d9VeXT4SJ7ZeOqGX6R5EM022wpL+eWPooLI+5UpWn2jCT1aosUQEhQP214x33Wkwx3JQMvIm+tIoVOdodFS40g==}
 
+  nodemailer@6.9.15:
+    resolution: {integrity: sha512-AHf04ySLC6CIfuRtRiEYtGEXgRfa6INgWGluDhnxTZhHSKvrBu7lc1VVchQ0d8nPc4cFaZoPq8vkyNoZr0TpGQ==}
+    engines: {node: '>=6.0.0'}
+
   nopt@7.2.1:
     resolution: {integrity: sha512-taM24ViiimT/XntxbPyJQzCG+p4EKOpgD3mxFwW38mGjVUrfERQOeY4EDHjdnptttfHuHQXFx+lTP08Q+mLa/w==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
@@ -10638,7 +10642,7 @@ snapshots:
 
   '@argos-ci/util@2.1.1': {}
 
-  '@auth/core@0.35.3(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))':
+  '@auth/core@0.35.3(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(nodemailer@6.9.15)':
     dependencies:
       '@panva/hkdf': 1.2.1
       '@types/cookie': 0.6.0
@@ -10650,8 +10654,9 @@ snapshots:
     optionalDependencies:
       '@simplewebauthn/browser': 9.0.1
       '@simplewebauthn/server': 9.0.3(encoding@0.1.13)
+      nodemailer: 6.9.15
 
-  '@auth/core@0.37.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))':
+  '@auth/core@0.37.2(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(nodemailer@6.9.15)':
     dependencies:
       '@panva/hkdf': 1.2.1
       '@types/cookie': 0.6.0
@@ -10663,6 +10668,7 @@ snapshots:
     optionalDependencies:
       '@simplewebauthn/browser': 9.0.1
       '@simplewebauthn/server': 9.0.3(encoding@0.1.13)
+      nodemailer: 6.9.15
 
   '@babel/cli@7.25.9(@babel/core@7.26.0)':
     dependencies:
@@ -18451,14 +18457,15 @@ snapshots:
 
   nested-error-stacks@2.1.1: {}
 
-  next-auth@5.0.0-beta.22(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(next@14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  next-auth@5.0.0-beta.22(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(next@14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@6.9.15)(react@18.3.1):
     dependencies:
-      '@auth/core': 0.35.3(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))
+      '@auth/core': 0.35.3(@simplewebauthn/browser@9.0.1)(@simplewebauthn/server@9.0.3(encoding@0.1.13))(nodemailer@6.9.15)
       next: 14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
     optionalDependencies:
       '@simplewebauthn/browser': 9.0.1
       '@simplewebauthn/server': 9.0.3(encoding@0.1.13)
+      nodemailer: 6.9.15
 
   next-router-mock@0.9.13(next@14.2.16(@babel/core@7.26.0)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -18545,6 +18552,9 @@ snapshots:
   node-machine-id@1.1.12: {}
 
   node-releases@2.0.18: {}
+
+  nodemailer@6.9.15:
+    optional: true
 
   nopt@7.2.1:
     dependencies:

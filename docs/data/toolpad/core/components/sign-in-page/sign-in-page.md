@@ -74,7 +74,7 @@ The `SignInPage` component can be set up to use [Passkeys](https://passkeys.dev)
 {{"demo": "PasskeySignInPage.js", "iframe": true}}
 
 :::info
-The [Toolpad Core Passkey example app](https://github.com/mui/mui-toolpad/tree/master/examples/core-auth-nextjs-passkey/) comes with a working app using `next-auth/webauthn`, Prisma and PostgreSQL.
+The [Toolpad Core Passkey example app](https://github.com/mui/mui-toolpad/tree/master/examples/core/auth-nextjs-passkey/) comes with a working app using `next-auth/webauthn`, Prisma and PostgreSQL.
 :::
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next-passkey.png", "srcDark": "/static/toolpad/docs/core/auth-next-passkey-dark.png", "alt": "Auth.js Passkeys & Next.js with Toolpad Core sign-in page", "caption": "Auth.js Passkeys & Next.js app router with Toolpad Core Sign-in page", "zoom": true,  "aspectRatio": "1.428" }}
@@ -116,7 +116,7 @@ The component is composable with any authentication library you might want to us
 
 #### Setting up
 
-If you're using [`create-toolpad-app`](/toolpad/core/introduction/installation/), or the [Next.js app directory example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs/), Auth.js is already installed. To proceed, add `AUTH_SECRET` to the environment variables by running:
+If you're using [`create-toolpad-app`](/toolpad/core/introduction/installation/), or the [Next.js app directory example](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/), Auth.js is already installed. To proceed, add `AUTH_SECRET` to the environment variables by running:
 
 ```bash
 npx auth secret
@@ -137,7 +137,7 @@ GITHUB_CLIENT_SECRET=<your-client-secret>
 
 ##### Server Configuration
 
-If you're using [`create-toolpad-app`](/toolpad/core/introduction/installation/), or the default [Next.js app directory example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs/), this server configuration is already set up for you.
+If you're using [`create-toolpad-app`](/toolpad/core/introduction/installation/), or the default [Next.js app directory example](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/), this server configuration is already set up for you.
 
 Otherwise, follow the [custom sign in page instructions](https://authjs.dev/guides/pages/signin) to set up the server configuration.
 
@@ -206,11 +206,11 @@ export default function SignIn() {
 ```
 
 :::success
-If you're using the default [Next.js example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs/), all of this is already configured for you. Otherwise, follow the [custom sign-in page instructions](https://authjs.dev/guides/pages/signin).
+If you're using the default [Next.js example](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/), all of this is already configured for you. Otherwise, follow the [custom sign-in page instructions](https://authjs.dev/guides/pages/signin).
 :::
 
 :::info
-If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs-pages-nextauth-4/) to get started.
+If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4/) to get started.
 :::
 
 ## Customization

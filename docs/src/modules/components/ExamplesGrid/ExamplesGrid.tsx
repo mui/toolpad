@@ -6,7 +6,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { alpha } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
@@ -16,6 +16,7 @@ interface Example {
   title: string;
   description: string;
   src: string;
+  srcDark?: string;
   href: string;
   source: string;
   codesandbox?: string;
@@ -52,96 +53,106 @@ function Templates({ examplesFile }: TemplatesProps) {
     };
     importExamples();
   }, [examplesFile]);
+  const docsTheme = useTheme();
 
   return (
     <Grid container spacing={2} sx={{ pt: 2, pb: 4 }}>
-      {examples.map((example) => (
-        <Grid item xs={12} sm={4} sx={{ flexGrow: 1 }} key={example.title}>
-          <Card
-            sx={(theme) => ({
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              px: 2,
-              pt: 2,
-              pb: 1,
-              gap: 1.5,
-              borderRadius: 1,
-              backgroundColor: `${alpha(theme.palette.grey[50], 0.4)}`,
-              borderColor: 'divider',
-              ...theme.applyStyles('dark', {
-                backgroundColor: `${alpha(theme.palette.primary.dark, 0.1)}`,
-                borderColor: 'divider',
-              }),
-            })}
-            variant="outlined"
-          >
-            <CardMedia
-              component="a"
-              image={example.src}
-              title={example.description}
-              href={example.href || example.source}
-              rel="nofollow"
+      {examples.map((example) => {
+        const computedSrc =
+          docsTheme?.palette?.mode === 'dark' && example.srcDark ? example.srcDark : example.src;
+        return (
+          <Grid item xs={12} sm={4} sx={{ flexGrow: 1 }} key={example.title}>
+            <Card
               sx={(theme) => ({
-                height: 0,
-                pt: '65%',
-                borderRadius: 0.5,
-                bgcolor: 'currentColor',
-                border: '1px solid',
-                borderColor: 'grey.100',
-                color: 'grey.100',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                px: 2,
+                pt: 2,
+                pb: 1,
+                gap: 1.5,
+                borderRadius: 1,
+                backgroundColor: `${alpha(theme.palette.grey[50], 0.4)}`,
+                borderColor: 'divider',
                 ...theme.applyStyles('dark', {
-                  borderColor: 'grey.900',
-                  color: 'primaryDark.900',
+                  backgroundColor: `${alpha(theme.palette.primary.dark, 0.1)}`,
+                  borderColor: 'divider',
                 }),
               })}
-            />
-            <CardContent sx={{ flexGrow: 1, p: 0 }}>
-              <Typography component="h2" variant="h6" fontWeight={600} gutterBottom>
-                {example.title}
-              </Typography>
-              <Typography component="p" variant="body2" color="text.secondary">
-                {example.description}
-              </Typography>
-            </CardContent>
-            <CardActions
-              sx={{ p: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+              variant="outlined"
             >
-              <Button component="a" href={example.source} size="small" target="_blank">
-                Source
-              </Button>
-              <Stack direction="row" spacing={1}>
-                {example.codesandbox && (
-                  <Tooltip title="Edit in CodeSandbox">
-                    <IconButton
-                      component="a"
-                      href={example.codesandbox}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      size="small"
-                    >
-                      <CodeSandboxIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {example.stackblitz && (
-                  <Tooltip title="Edit in StackBlitz">
-                    <IconButton
-                      component="a"
-                      href={example.stackblitz}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      size="small"
-                    >
-                      <StackBlitzIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </Stack>
-            </CardActions>
-          </Card>
-        </Grid>
-      ))}
+              <CardMedia
+                component="a"
+                image={computedSrc}
+                title={example.description}
+                href={example.href || example.source}
+                rel="nofollow"
+                sx={(theme) => ({
+                  height: 0,
+                  pt: '65%',
+                  borderRadius: 0.5,
+                  bgcolor: 'currentColor',
+                  border: '1px solid',
+                  borderColor: 'grey.100',
+                  color: 'grey.100',
+                  ...theme.applyStyles('dark', {
+                    borderColor: 'grey.900',
+                    color: 'primaryDark.900',
+                  }),
+                })}
+              />
+              <CardContent sx={{ flexGrow: 1, p: 0 }}>
+                <Typography component="h2" variant="h6" fontWeight={600} gutterBottom>
+                  {example.title}
+                </Typography>
+                <Typography component="p" variant="body2" color="text.secondary">
+                  {example.description}
+                </Typography>
+              </CardContent>
+              <CardActions
+                sx={{
+                  p: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Button component="a" href={example.source} size="small" target="_blank">
+                  Source
+                </Button>
+                <Stack direction="row" spacing={1}>
+                  {example.codesandbox && (
+                    <Tooltip title="Edit in CodeSandbox">
+                      <IconButton
+                        component="a"
+                        href={example.codesandbox}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        size="small"
+                      >
+                        <CodeSandboxIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {example.stackblitz && (
+                    <Tooltip title="Edit in StackBlitz">
+                      <IconButton
+                        component="a"
+                        href={example.stackblitz}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        size="small"
+                      >
+                        <StackBlitzIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </Stack>
+              </CardActions>
+            </Card>
+          </Grid>
+        );
+      })}
     </Grid>
   );
 }

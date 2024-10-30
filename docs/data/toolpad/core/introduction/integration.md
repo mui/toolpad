@@ -252,7 +252,7 @@ That's it! You now have Toolpad Core integrated into your Next.js App Router app
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-nextjs-app.png", "srcDark": "/static/toolpad/docs/core/integration-nextjs-app-dark.png", "alt": "Next.js App Router with Toolpad Core", "caption": "Next.js App Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}
 
 :::info
-For a full working example with authentication included, see the [Toolpad Core Next.js App with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs)
+For a full working example with authentication included, see the [Toolpad Core Next.js App with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/)
 :::
 
 ## Next.js Pages Router
@@ -663,7 +663,7 @@ That's it! You now have Toolpad Core integrated into your Next.js Pages Router a
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-nextjs-pages.png", "srcDark": "/static/toolpad/docs/core/integration-nextjs-pages-dark.png", "alt": "Next.js Pages Router with Toolpad Core", "caption": "Next.js Pages Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}
 
 :::info
-For a full working example with authentication included, see the [Toolpad Core Next.js Pages app with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs-pages)
+For a full working example with authentication included, see the [Toolpad Core Next.js Pages app with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages/)
 :::
 
 ## React Router
@@ -815,11 +815,11 @@ const router = createBrowserRouter([
         Component: Layout,
         children: [
           {
-            path: '/',
+            path: '',
             Component: DashboardPage,
           },
           {
-            path: '/orders',
+            path: 'orders',
             Component: OrdersPage,
           },
         ],
@@ -835,5 +835,5 @@ That's it! You now have Toolpad Core integrated into your single-page app with R
 {{"demo": "ReactRouter.js", "height": 500, "iframe": true, "hideToolbar": true}}
 
 :::info
-For a full working example, see the [Toolpad Core Vite app with React Router example](https://github.com/mui/toolpad/tree/master/examples/core-vite)
+For a full working example, see the [Toolpad Core Vite app with React Router example](https://github.com/mui/toolpad/tree/master/examples/core/vite/)
 :::

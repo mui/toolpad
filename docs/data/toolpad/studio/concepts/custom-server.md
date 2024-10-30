@@ -9,7 +9,7 @@ An improved integration method is being worked on. You'll be able to run Toolpad
 The Toolpad Studio `dev` command comes with its own built-in server. However, sometimes you'd want more control over the way Toolpad Studio applications are hosted within your application. The Toolpad Studio custom server integration API allows you to run a Toolpad Studio application programmatically within an existing node.js server.
 
 :::info
-Check out the [example on GitHub](https://github.com/mui/toolpad/tree/master/examples/custom-server) for a full demonstration of how to set up a custom server integration.
+Check out the [example on GitHub](https://github.com/mui/toolpad/tree/master/examples/studio/custom-server/) for a full demonstration of how to set up a custom server integration.
 :::
 
 The following code illustrates how it works:

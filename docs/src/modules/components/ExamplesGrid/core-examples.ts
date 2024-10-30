@@ -38,7 +38,11 @@ export default function examples() {
       description:
         'This app shows you to how to get started using Toolpad Core with Auth.js Magic Links and the Next.js App router',
       src: '/static/toolpad/docs/core/auth-next.png',
-      source: 'https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs-email',
+      source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
+      codesandbox:
+        'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
+      stackblitz:
+        'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
     },
     {
       title: 'Vite with React Router',

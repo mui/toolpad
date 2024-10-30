@@ -60,6 +60,7 @@ export interface AccountProps {
    */
   localeText?: Partial<ReturnType<typeof useLocaleText>>;
 }
+
 /**
  *
  * Demos:

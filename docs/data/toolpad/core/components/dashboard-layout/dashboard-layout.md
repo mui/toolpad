@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Dashboard Layout
-components: AppProvider, DashboardLayout, Account
+components: AppProvider, DashboardLayout, ToolbarActions, ThemeSwitcher, Account
 ---
 
 # Dashboard Layout
@@ -139,10 +139,19 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 
 ## Customization
 
-Some areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
-This allows you to add, for example:
+### Slots
 
-- new items to the toolbar in the header, such as a search bar or button;
-- footer content in the sidebar.
+Certain areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
+Some possibly useful slots:
+
+- `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
+
+- `sidebarFooter`: allows you to add footer content in the sidebar.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
+
+### Examples
+
+#### Settings menu with custom theme switcher
+
+{{"demo": "DashboardLayoutCustomThemeSwitcher.js", "height": 400, "iframe": true}}

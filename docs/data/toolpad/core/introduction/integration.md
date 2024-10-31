@@ -842,7 +842,7 @@ For a full working example, see the [Toolpad Core Vite app with React Router exa
 
 You can use the `SignInPage` component to add authentication along with an external authentication provider of your choice. The following code demonstrates the code required to set up authentication with a mock provider.
 
-#### a. Define a `SessionContext` to hold the authentication session
+#### a. Define a `SessionContext` to act as the mock authentication provider
 
 ```tsx title="src/SessionContext.ts"
 import * as React from 'react';
@@ -863,7 +863,71 @@ export function useSession() {
 }
 ```
 
-#### b. Protect routes inside the dashboard layout
+### b. Add the mock authentication and session data to the `AppProvider`
+
+```tsx title="src/App.tsx"
+import * as React from 'react';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { AppProvider } from '@toolpad/core/react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import type { Navigation, Session } from '@toolpad/core';
+import { SessionContext } from './SessionContext';
+
+const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Main items',
+  },
+  {
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
+];
+
+const BRANDING = {
+  title: 'My Toolpad Core App',
+};
+
+export default function App() {
+  const [session, setSession] = React.useState<Session | null>(null);
+  const navigate = useNavigate();
+
+  const signIn = React.useCallback(() => {
+    navigate('/sign-in');
+  }, [navigate]);
+
+  const signOut = React.useCallback(() => {
+    setSession(null);
+    navigate('/sign-in');
+  }, [navigate]);
+
+  const sessionContextValue = React.useMemo(
+    () => ({ session, setSession }),
+    [session, setSession],
+  );
+
+  return (
+    <SessionContext.Provider value={sessionContextValue}>
+      <AppProvider
+        navigation={NAVIGATION}
+        branding={BRANDING}
+        session={session}
+        authentication={{ signIn, signOut }}
+      >
+        <Outlet />
+      </AppProvider>
+    </SessionContext.Provider>
+  );
+}
+```
+
+#### c. Protect routes inside the dashboard layout
 
 ```tsx title="src/layouts/dashboard.tsx"
 import * as React from 'react';
@@ -893,7 +957,9 @@ export default function Layout() {
 }
 ```
 
-#### c. Use the `SignInPage` component to create a sign-in page
+You can protect any page or groups of pages through this mechanism.
+
+#### d. Use the `SignInPage` component to create a sign-in page
 
 ```tsx title="src/pages/signIn.tsx"
 'use client';
@@ -947,7 +1013,7 @@ export default function SignIn() {
 }
 ```
 
-#### d. Add the sign in page to the router
+#### e. Add the sign in page to the router
 
 ```tsx title="src/main.tsx"
 import * as React from 'react';
@@ -993,5 +1059,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 ```
 
 :::info
-For a full working example, see the [Toolpad Core Vite app with React Router and authentication example](https://github.com/mui/toolpad/tree/master/examples/core-vite-auth)
+For a full working example, see the [Toolpad Core Vite app with React Router and authentication example](https://github.com/mui/toolpad/tree/master/examples/core/auth-vite/)
 :::

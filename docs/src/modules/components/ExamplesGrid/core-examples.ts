@@ -83,7 +83,7 @@ export default function examples() {
       description:
         'This app shows you to how to get started using Toolpad Core with Vite, React Router and any external authentication provider',
       src: '/static/toolpad/docs/core/vite-react-router.png',
-      source: 'https://github.com/mui/toolpad/tree/master/examples/core-vite-auth',
+      source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-vite',
     },
   ];
 }

@@ -75,11 +75,15 @@ DemoPageContent.propTypes = {
 };
 
 function AccountSidebarPreview(props) {
-  const { handleClick, open } = props;
+  const { handleClick, open, mini } = props;
   return (
-    <Stack direction="column">
+    <Stack direction="column" p={0} overflow="hidden">
       <Divider />
-      <AccountPreview variant="expanded" handleClick={handleClick} open={open} />
+      <AccountPreview
+        variant={mini ? 'condensed' : 'expanded'}
+        handleClick={handleClick}
+        open={open}
+      />
     </Stack>
   );
 }
@@ -89,6 +93,7 @@ AccountSidebarPreview.propTypes = {
    * The handler used when the preview is expanded
    */
   handleClick: PropTypes.func,
+  mini: PropTypes.bool.isRequired,
   /**
    * The state of the Account popover
    * @default false
@@ -164,23 +169,58 @@ function SidebarFooterAccountPopover() {
           </MenuItem>
         ))}
       </MenuList>
+      <Divider />
       <AccountPopoverFooter>
         <SignOutButton />
       </AccountPopoverFooter>
     </Stack>
   );
 }
-
-function SidebarFooterAccount() {
+function SidebarFooterAccount({ mini }) {
   return (
     <Account
       slots={{
-        preview: AccountSidebarPreview,
+        preview: ({ handleClick, open }) => (
+          <AccountSidebarPreview handleClick={handleClick} open={open} mini={mini} />
+        ),
         popoverContent: SidebarFooterAccountPopover,
+      }}
+      slotProps={{
+        popover: {
+          transformOrigin: { horizontal: 'left', vertical: 'top' },
+          anchorOrigin: { horizontal: 'right', vertical: 'bottom' },
+          slotProps: {
+            paper: {
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: (theme) =>
+                  `drop-shadow(0px 2px 8px ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.32)'})`,
+                mt: 1,
+                '&::before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  bottom: 10,
+                  left: 0,
+                  width: 10,
+                  height: 10,
+                  bgcolor: 'background.paper',
+                  transform: 'translate(-50%, -50%) rotate(45deg)',
+                  zIndex: 0,
+                },
+              },
+            },
+          },
+        },
       }}
     />
   );
 }
+
+SidebarFooterAccount.propTypes = {
+  mini: PropTypes.bool.isRequired,
+};
 
 const demoSession = {
   user: {

@@ -1,9 +1,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@mui/material/Button';
-import Popover from '@mui/material/Popover';
+import Button, { ButtonProps } from '@mui/material/Button';
+import Popover, { PopoverProps } from '@mui/material/Popover';
 import Divider from '@mui/material/Divider';
-import Stack from '@mui/material/Stack';
+import Stack, { StackProps } from '@mui/material/Stack';
 import { SignInButton } from './SignInButton';
 import { SignOutButton } from './SignOutButton';
 import { AccountPreview, AccountPreviewProps } from './AccountPreview';
@@ -17,27 +17,27 @@ export interface AccountSlots {
    * The component used for the account preview
    * @default AccountPreview
    */
-  preview?: React.ElementType;
+  preview?: React.JSXElementConstructor<AccountPreviewProps>;
   /**
    * The component used for the account popover menu
    * @default Popover
    */
-  popover?: React.ElementType;
+  popover?: React.JSXElementConstructor<PopoverProps>;
   /**
    * The component used for the content of account popover
    * @default Stack
    */
-  popoverContent?: React.ElementType;
+  popoverContent?: React.JSXElementConstructor<StackProps>;
   /**
    * The component used for the sign in button.
    * @default Button
    */
-  signInButton?: React.ElementType;
+  signInButton?: React.JSXElementConstructor<ButtonProps>;
   /**
    * The component used for the sign out button.
    * @default Button
    */
-  signOutButton?: React.ElementType;
+  signOutButton?: React.JSXElementConstructor<ButtonProps>;
 }
 
 export interface AccountProps {
@@ -50,7 +50,7 @@ export interface AccountProps {
    */
   slotProps?: {
     preview?: AccountPreviewProps;
-    popover?: React.ComponentProps<typeof Popover>;
+    popover?: Omit<React.ComponentProps<typeof Popover>, 'open'>;
     popoverContent?: React.ComponentProps<typeof Stack>;
     signInButton?: React.ComponentProps<typeof SignInButton>;
     signOutButton?: React.ComponentProps<typeof Button>;
@@ -118,7 +118,12 @@ function Account(props: AccountProps) {
         />
       )}
       {slots?.popover ? (
-        <slots.popover {...slotProps?.popover} />
+        <slots.popover
+          open={open}
+          onClick={handleClick}
+          onClose={handleClose}
+          {...slotProps?.popover}
+        />
       ) : (
         <Popover
           anchorEl={anchorEl}
@@ -126,6 +131,7 @@ function Account(props: AccountProps) {
           open={open}
           onClose={handleClose}
           onClick={handleClose}
+          disableAutoFocus
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           {...slotProps?.popover}
@@ -134,7 +140,8 @@ function Account(props: AccountProps) {
               elevation: 0,
               sx: {
                 overflow: 'visible',
-                filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
+                filter: (theme) =>
+                  `drop-shadow(0px 2px 8px ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.32)'})`,
                 mt: 1,
                 '&::before': {
                   content: '""',
@@ -204,6 +211,11 @@ Account.propTypes /* remove-proptypes */ = {
         avatarIconButton: PropTypes.elementType,
         moreIconButton: PropTypes.elementType,
       }),
+      sx: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
+        PropTypes.func,
+        PropTypes.object,
+      ]),
       variant: PropTypes.oneOf(['condensed', 'expanded']),
     }),
     signInButton: PropTypes.object,

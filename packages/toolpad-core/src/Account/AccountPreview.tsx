@@ -8,6 +8,7 @@ import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { SessionContext } from '../AppProvider';
 import { useLocaleText } from '../shared/locales/LocaleContext';
+import type { SxProps } from '@mui/material/styles';
 
 export type AccountPreviewVariant = 'condensed' | 'expanded';
 
@@ -58,6 +59,10 @@ export interface AccountPreviewProps {
    * @default false
    */
   open?: boolean;
+  /**
+   * To override the default `sx` value on the `Stack` component in the "expanded" variant
+   */
+  sx?: SxProps;
 }
 
 /**
@@ -72,7 +77,7 @@ export interface AccountPreviewProps {
  * - [AccountPreview API](https://mui.com/toolpad/core/api/account-preview)
  */
 function AccountPreview(props: AccountPreviewProps) {
-  const { slots, variant = 'condensed', slotProps, open, handleClick } = props;
+  const { slots, variant = 'condensed', slotProps, open, handleClick, sx } = props;
   const session = React.useContext(SessionContext);
   const localeText = useLocaleText();
 
@@ -93,7 +98,7 @@ function AccountPreview(props: AccountPreviewProps) {
 
   if (variant === 'expanded') {
     return (
-      <Stack direction="row" justifyContent="space-between" spacing={2} padding={2}>
+      <Stack direction="row" justifyContent="space-between" sx={{ py: 1, px: 2, gap: 2, ...sx }}>
         <Stack direction="row" justifyContent="flex-start" spacing={2}>
           {avatarContent}
           <Stack direction="column" justifyContent="space-evenly">
@@ -113,7 +118,7 @@ function AccountPreview(props: AccountPreviewProps) {
               size="small"
               onClick={handleClick}
               {...slotProps?.moreIconButton}
-              sx={{ alignSelf: 'flex-start', ...slotProps?.moreIconButton?.sx }}
+              sx={{ alignSelf: 'center', ...slotProps?.moreIconButton?.sx }}
             >
               <MoreVertIcon fontSize="small" />
             </IconButton>
@@ -131,6 +136,7 @@ function AccountPreview(props: AccountPreviewProps) {
           onClick={handleClick}
           aria-label={localeText.iconButtonAriaLabel || 'Current User'}
           size="small"
+          sx={{ width: 'fit-content', margin: '0 auto' }}
           aria-controls={open ? 'account-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
@@ -170,7 +176,17 @@ AccountPreview.propTypes /* remove-proptypes */ = {
    */
   slots: PropTypes.shape({
     avatar: PropTypes.elementType,
+    avatarIconButton: PropTypes.elementType,
+    moreIconButton: PropTypes.elementType,
   }),
+  /**
+   * To override the default `sx` value on the `Stack` component in the "expanded" variant
+   */
+  sx: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
+    PropTypes.func,
+    PropTypes.object,
+  ]),
   /**
    * The type of account details to display.
    * @property {'condensed'} condensed - Shows only the user's avatar.

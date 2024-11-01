@@ -66,7 +66,7 @@ export interface DashboardLayoutSlots {
    * Optional footer component used in the layout sidebar.
    * @default null
    */
-  sidebarFooter?: React.ElementType;
+  sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
 }
 
 export interface DashboardLayoutProps {

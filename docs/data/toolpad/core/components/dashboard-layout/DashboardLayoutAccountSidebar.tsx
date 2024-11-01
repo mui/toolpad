@@ -12,7 +12,7 @@ import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { DashboardLayout, SidebarFooterProps } from '@toolpad/core/DashboardLayout';
 import {
   Account,
   AccountPreview,
@@ -70,13 +70,16 @@ function DemoPageContent({ pathname }: { pathname: string }) {
     </Box>
   );
 }
-
-function AccountSidebarPreview(props: AccountPreviewProps) {
-  const { handleClick, open } = props;
+function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
+  const { handleClick, open, mini } = props;
   return (
-    <Stack direction="column">
+    <Stack direction="column" p={0} overflow="hidden">
       <Divider />
-      <AccountPreview variant="expanded" handleClick={handleClick} open={open} />
+      <AccountPreview
+        variant={mini ? 'condensed' : 'expanded'}
+        handleClick={handleClick}
+        open={open}
+      />
     </Stack>
   );
 }
@@ -149,19 +152,50 @@ function SidebarFooterAccountPopover() {
           </MenuItem>
         ))}
       </MenuList>
+      <Divider />
       <AccountPopoverFooter>
         <SignOutButton />
       </AccountPopoverFooter>
     </Stack>
   );
 }
-
-function SidebarFooterAccount() {
+function SidebarFooterAccount({ mini }: SidebarFooterProps) {
   return (
     <Account
       slots={{
-        preview: AccountSidebarPreview,
+        preview: ({ handleClick, open }) => (
+          <AccountSidebarPreview handleClick={handleClick} open={open} mini={mini} />
+        ),
         popoverContent: SidebarFooterAccountPopover,
+      }}
+      slotProps={{
+        popover: {
+          transformOrigin: { horizontal: 'right', vertical: 'bottom' },
+          anchorOrigin: { horizontal: 'right', vertical: 'bottom' },
+          slotProps: {
+            paper: {
+              elevation: 0,
+              sx: {
+                overflow: 'visible',
+                filter: (theme) =>
+                  `drop-shadow(0px 2px 8px ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.32)'})`,
+                mt: 1,
+                '&::before': {
+                  content: '""',
+                  display: 'block',
+                  position: 'absolute',
+                  bottom: 10,
+                  left: 0,
+                  width: 10,
+                  height: 10,
+                  bgcolor: 'background.paper',
+                  transform: 'translate(-50%, -50%) rotate(45deg)',
+                  zIndex: 0,
+                },
+              },
+            },
+          },
+        },
       }}
     />
   );

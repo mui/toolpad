@@ -348,31 +348,22 @@ function DashboardLayout(props: DashboardLayoutProps) {
               </Box>
             </React.Fragment>
           ) : null}
-
-          <Box
-            sx={{
-              position: { xs: 'absolute', md: 'static' },
-              left: { xs: '50%', md: 'auto' },
-              transform: { xs: 'translateX(-50%)', md: 'none' },
-            }}
-          >
-            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-              <Stack direction="row" alignItems="center">
-                <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: (theme.vars ?? theme).palette.primary.main,
-                    fontWeight: '700',
-                    ml: 0.5,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {applicationTitle}
-                </Typography>
-              </Stack>
-            </Link>
-          </Box>
+          <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+            <Stack direction="row" alignItems="center">
+              <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
+              <Typography
+                variant="h6"
+                sx={{
+                  color: (theme.vars ?? theme).palette.primary.main,
+                  fontWeight: '700',
+                  ml: 0.5,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {applicationTitle}
+              </Typography>
+            </Stack>
+          </Link>
           <Box sx={{ flexGrow: 1 }} />
           <Stack direction="row" spacing={1}>
             <ToolbarActionsSlot {...slotProps?.toolbarActions} />

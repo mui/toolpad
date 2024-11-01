@@ -247,6 +247,6 @@ Make sure to use the `name` attribute on the custom components with values `emai
 
 The `SignInPage` component has versions with different layouts for authentication - one column, two column and others such. The APIs of these components are identical. This is in progress.
 
-## 🚧 Other authentication Flows
+## 🚧 Other authentication flows
 
 Besides the `SignInPage` , the team is planning work on several other components that enable new workflows such as [sign up](https://github.com/mui/toolpad/issues/4068) and [password reset](https://github.com/mui/toolpad/issues/4265).

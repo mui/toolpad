@@ -120,7 +120,7 @@ const gitignore = `
   # TernJS port file
   .tern-port
   
-  # Stores VS Code versions used for testing VS Code extensions
+  # Stores VS Code versions used for testing VS Code extensions
   .vscode-test
   
   # yarn v2

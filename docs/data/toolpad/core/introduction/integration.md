@@ -1,11 +1,10 @@
 ---
 title: Toolpad Core - Integration
-description: How to integrate Toolpad Core into your existing project.
 ---
 
 # Integration
 
-This guide will walk you through the process of adding Toolpad Core to an existing project.
+<p class="descripton">This guide will walk you through the process of adding Toolpad Core to an existing project.</p>
 
 ## Installation
 

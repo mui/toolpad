@@ -12,15 +12,15 @@ This guide will walk you through the process of adding Toolpad Core to an existi
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npm install -S @toolpad/core
-```
-
-```bash yarn
-yarn add @toolpad/core
+npm install @toolpad/core
 ```
 
 ```bash pnpm
 pnpm add @toolpad/core
+```
+
+```bash yarn
+yarn add @toolpad/core
 ```
 
 </codeblock>
@@ -31,7 +31,7 @@ Use the following steps to integrate Toolpad Core into your Next.js app:
 
 ### 1. Wrap your application with `AppProvider`
 
-In your root layout file (e.g., `app/layout.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (for example, `app/layout.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="app/layout.tsx"
 import { AppProvider } from '@toolpad/core/AppProvider';

@@ -47,7 +47,7 @@ function Templates({ examplesFile }: TemplatesProps) {
   // @ts-ignore
   const req = require.context('./', false);
   // TODO: When migrating away from webpack, or when we have time, to create dedicate files for each
-  // demo. We shouldn't do this dynamic imports in the first place ⬇️
+  // demo. We shouldn't do those dynamic imports in the first place ⬇️
   const examples = req(`./${examplesFile}`).default() as Example[];
   const docsTheme = useTheme();
 

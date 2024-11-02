@@ -131,7 +131,6 @@ function Account(props: AccountProps) {
           open={open}
           onClose={handleClose}
           onClick={handleClose}
-          disableAutoFocus
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           {...slotProps?.popover}
@@ -211,11 +210,6 @@ Account.propTypes /* remove-proptypes */ = {
         avatarIconButton: PropTypes.elementType,
         moreIconButton: PropTypes.elementType,
       }),
-      sx: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
-        PropTypes.func,
-        PropTypes.object,
-      ]),
       variant: PropTypes.oneOf(['condensed', 'expanded']),
     }),
     signInButton: PropTypes.object,

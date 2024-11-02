@@ -5,9 +5,6 @@
     "open": { "description": "The state of the Account popover" },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." },
-    "sx": {
-      "description": "To override the default <code>sx</code> value on the <code>Stack</code> component in the &quot;expanded&quot; variant"
-    },
     "variant": { "description": "The type of account details to display." }
   },
   "classDescriptions": {},

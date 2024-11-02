@@ -108,13 +108,19 @@ function SidebarFooterAccountPopover() {
   );
 }
 
+const createPreviewComponent = (mini: boolean) => {
+  function PreviewComponent(props: AccountPreviewProps) {
+    return <AccountSidebarPreview {...props} mini={mini} />;
+  }
+  return PreviewComponent;
+};
+
 function SidebarFooterAccount({ mini }: SidebarFooterProps) {
+  const PreviewComponent = React.useMemo(() => createPreviewComponent(mini), [mini]);
   return (
     <Account
       slots={{
-        preview: ({ handleClick, open }) => (
-          <AccountSidebarPreview handleClick={handleClick} open={open} mini={mini} />
-        ),
+        preview: PreviewComponent,
         popoverContent: SidebarFooterAccountPopover,
       }}
       slotProps={{

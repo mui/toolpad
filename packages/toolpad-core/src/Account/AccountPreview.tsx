@@ -6,7 +6,6 @@ import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import type { SxProps } from '@mui/material/styles';
 import { SessionContext } from '../AppProvider';
 import { useLocaleText } from '../shared/locales/LocaleContext';
 

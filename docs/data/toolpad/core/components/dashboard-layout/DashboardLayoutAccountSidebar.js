@@ -196,6 +196,7 @@ function SidebarFooterAccount({ mini }) {
         popover: {
           transformOrigin: { horizontal: 'left', vertical: 'bottom' },
           anchorOrigin: { horizontal: 'right', vertical: 'bottom' },
+          disableAutoFocus: true,
           slotProps: {
             paper: {
               elevation: 0,

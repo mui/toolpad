@@ -15,7 +15,7 @@ import Button from '@mui/material/Button';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 ```
 
-## Component Hierarchy
+## Component hierarchy
 
 The Toolpad Core library is designed to work under different React runtimes such as Next.js, Vite, or even your custom setup. Many of its components rely on functionality of the specific runtime they are used under. The key component in making the components runtime-aware is the `AppProvider`.
 
@@ -106,6 +106,6 @@ In this example:
 - The `slots` prop allows you to replace entire parts of the component.
 - The `slotProps` prop lets you pass additional props to specific slots.
 
-## Next Steps
+## Next steps
 
 Now that you understand the basic concepts of Toolpad Core, you're ready to start integrating it into your project. Head over to the [integration docs](/toolpad/core/introduction/integration/) to learn more.

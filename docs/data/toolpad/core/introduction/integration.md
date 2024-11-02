@@ -53,12 +53,12 @@ You can find details on the `AppProvider` props on the [AppProvider](/toolpad/co
 :::info
 The `AppRouterCacheProvider` component is not required to use Toolpad Core, but it's recommended to use it to ensure that the styles are appended to the `<head>` and not rendering in the `<body>`.
 
-See the [Material UI Next.js integration docs](https://mui.com/material-ui/integrations/nextjs/) for more details.
+See the [Material UI Next.js integration docs](https://mui.com/material-ui/integrations/nextjs/) for more details.
 :::
 
 ### 2. Create a dashboard layout
 
-Create a layout file for your dashboard pages (e.g., `app/(dashboard)/layout.tsx`):
+Create a layout file for your dashboard pages (for example, `app/(dashboard)/layout.tsx`):
 
 ```tsx title="app/(dashboard)/layout.tsx"
 import * as React from 'react';
@@ -261,7 +261,7 @@ To integrate Toolpad Core into your Next.js Pages Router app, follow these steps
 
 ### 1. Wrap your application with `AppProvider`
 
-In your root layout file (e.g., `pages/_app.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (for example, `pages/_app.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="pages/_app.tsx"
 import * as React from 'react';
@@ -357,7 +357,7 @@ Document.getInitialProps = async (ctx: DocumentContext) => {
 
 ### 3. Add a dashboard page
 
-Create a dashboard page (e.g., `pages/index.tsx`):
+Create a dashboard page (for example, `pages/index.tsx`):
 
 ```tsx title="pages/index.tsx"
 import * as React from 'react';

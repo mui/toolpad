@@ -26,6 +26,10 @@ Install required depdencies via:
 npm install
 ```
 
+```bash pnpm
+pnpm install
+```
+
 ```bash yarn
 yarn
 ```
@@ -42,12 +46,12 @@ This command will create an optimized production build for the Toolpad Studio ap
 npm run build
 ```
 
-```bash yarn
-yarn build
-```
-
 ```bash pnpm
 pnpm build
+```
+
+```bash yarn
+yarn build
 ```
 
 </codeblock>
@@ -62,6 +66,10 @@ To serve the app once built, run:
 
 ```bash npm
 npm run start
+```
+
+```bash pnpm
+pnpm start
 ```
 
 ```bash yarn

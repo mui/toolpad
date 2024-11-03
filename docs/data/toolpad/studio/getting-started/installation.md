@@ -13,12 +13,12 @@ Then run the command:
 npx create-toolpad-app@latest --studio my-toolpad-app
 ```
 
-```bash yarn
-yarn create toolpad-app --studio my-toolpad-app
-```
-
 ```bash pnpm
 pnpm create toolpad-app --studio my-toolpad-app
+```
+
+```bash yarn
+yarn create toolpad-app --studio my-toolpad-app
 ```
 
 </codeblock>
@@ -41,12 +41,12 @@ Then start the development mode
 npm run dev
 ```
 
-```bash yarn
-yarn dev
-```
-
 ```bash pnpm
 pnpm dev
+```
+
+```bash yarn
+yarn dev
 ```
 
 </codeblock>
@@ -60,15 +60,15 @@ Start by installing the required dependencies:
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npm install -S @toolpad/studio
-```
-
-```bash yarn
-yarn add @toolpad/studio
+npm install @toolpad/studio
 ```
 
 ```bash pnpm
 pnpm add @toolpad/studio
+```
+
+```bash yarn
+yarn add @toolpad/studio
 ```
 
 </codeblock>
@@ -94,12 +94,12 @@ Now you can start your Toolpad Studio application using one of the commands:
 npm run toolpad-studio:dev
 ```
 
-```bash yarn
-yarn toolpad-studio:dev
-```
-
 ```bash pnpm
 pnpm toolpad-studio:dev
+```
+
+```bash yarn
+yarn toolpad-studio:dev
 ```
 
 </codeblock>

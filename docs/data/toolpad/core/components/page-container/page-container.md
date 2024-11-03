@@ -47,7 +47,7 @@ The breadcrumbs contains **ACME / Home / Orders** when you visit the path **/hom
 
 {{"demo": "TitleBreadcrumbsPageContainer.js", "height": 300, "hideToolbar": true}}
 
-## Dynamic Routes
+## Dynamic routes
 
 When you use the `PageContainer` on a dynamic route, you'll likely want to set a title and breadcrumbs belonging to the specific path. You can achieve this with the `title` and `breadcrumbs` property of the `PageContainer`
 

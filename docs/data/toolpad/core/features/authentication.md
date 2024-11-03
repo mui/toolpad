@@ -1,6 +1,6 @@
 # Authentication
 
-<p class="description">Toolpad provides working authentication out of the box, with support for multiple providers</p>
+<p class="description">Toolpad provides working authentication out of the box, with support for multiple providers.</p>
 
 ## Setup authentication pages
 

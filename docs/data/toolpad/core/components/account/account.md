@@ -16,13 +16,13 @@ The `Account` component is a quick and easy way to display an account management
 
 ## States
 
-### Signed In
+### Signed in
 
 If a `session` object is present, the component is rendered as a dropdown containing the user's account details as well as an option to sign out.
 
 {{"demo": "AccountDemoSignedIn.js", "bg": "outlined" }}
 
-### Signed Out
+### Signed out
 
 When signed out, the component renders as an inline sign in button within the dashboard layout.
 
@@ -30,7 +30,7 @@ When signed out, the component renders as an inline sign in button within the da
 
 ## Customization
 
-The `<Account />` component is composed of multiple sub-components:
+The `<Account />` component is composed of multiple subcomponents:
 
 - `<SignInButton />`
 - `<AccountPreview />`
@@ -53,7 +53,7 @@ You can pass in your own components inside the `Account` popover through the `sl
 
 #### Popover Content
 
-You can wrap the default sub-components – such as `SignOutButton` and `AccountPreview` – and wrap them in `AccountPopoverHeader` and `AccountPopoverFooter` components to create custom account popovers, as shown in the following demos:
+You can wrap the default subcomponents – such as `SignOutButton` and `AccountPreview` – and wrap them in `AccountPopoverHeader` and `AccountPopoverFooter` components to create custom account popovers, as shown in the following demos:
 
 ##### Account Switcher
 
@@ -66,3 +66,11 @@ You can build advanced menus – such as a tenant switcher – by passing in a c
 You can pass in custom labels – including of different languages – using the `localeText` prop.
 
 {{"demo": "AccountCustomLocaleText.js", "bg": "outlined" }}
+
+### Session
+
+You can use the `useSession` hook to extend the existing session and add additional user details:
+
+{{"demo": "./AccountCustomUserDetails.js", "bg": "outlined", "defaultCodeOpen": false}}
+
+You can find more details on the [`useSession` docs page](/toolopad/core/react-use-session/).

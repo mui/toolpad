@@ -1,26 +1,25 @@
 ---
 title: Toolpad Core - Integration
-description: How to integrate Toolpad Core into your existing project.
 ---
 
 # Integration
 
-This guide will walk you through the process of adding Toolpad Core to an existing project.
+<p class="description">This guide walks you through adding Toolpad Core to an existing project.</p>
 
 ## Installation
 
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npm install -S @toolpad/core
-```
-
-```bash yarn
-yarn add @toolpad/core
+npm install @toolpad/core
 ```
 
 ```bash pnpm
 pnpm add @toolpad/core
+```
+
+```bash yarn
+yarn add @toolpad/core
 ```
 
 </codeblock>
@@ -31,7 +30,7 @@ Use the following steps to integrate Toolpad Core into your Next.js app:
 
 ### 1. Wrap your application with `AppProvider`
 
-In your root layout file (e.g., `app/layout.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (for example, `app/layout.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="app/layout.tsx"
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -53,12 +52,12 @@ You can find details on the `AppProvider` props on the [AppProvider](/toolpad/co
 :::info
 The `AppRouterCacheProvider` component is not required to use Toolpad Core, but it's recommended to use it to ensure that the styles are appended to the `<head>` and not rendering in the `<body>`.
 
-See the [Material UI Next.js integration docs](https://mui.com/material-ui/integrations/nextjs/) for more details.
+See the [Material UI Next.js integration docs](https://mui.com/material-ui/integrations/nextjs/) for more details.
 :::
 
 ### 2. Create a dashboard layout
 
-Create a layout file for your dashboard pages (e.g., `app/(dashboard)/layout.tsx`):
+Create a layout file for your dashboard pages (for example, `app/(dashboard)/layout.tsx`):
 
 ```tsx title="app/(dashboard)/layout.tsx"
 import * as React from 'react';
@@ -252,7 +251,7 @@ That's it! You now have Toolpad Core integrated into your Next.js App Router app
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-nextjs-app.png", "srcDark": "/static/toolpad/docs/core/integration-nextjs-app-dark.png", "alt": "Next.js App Router with Toolpad Core", "caption": "Next.js App Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}
 
 :::info
-For a full working example with authentication included, see the [Toolpad Core Next.js App with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs)
+For a full working example with authentication included, see the [Toolpad Core Next.js App with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/)
 :::
 
 ## Next.js Pages Router
@@ -261,7 +260,7 @@ To integrate Toolpad Core into your Next.js Pages Router app, follow these steps
 
 ### 1. Wrap your application with `AppProvider`
 
-In your root layout file (e.g., `pages/_app.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (for example, `pages/_app.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="pages/_app.tsx"
 import * as React from 'react';
@@ -357,7 +356,7 @@ Document.getInitialProps = async (ctx: DocumentContext) => {
 
 ### 3. Add a dashboard page
 
-Create a dashboard page (e.g., `pages/index.tsx`):
+Create a dashboard page (for example, `pages/index.tsx`):
 
 ```tsx title="pages/index.tsx"
 import * as React from 'react';
@@ -663,7 +662,7 @@ That's it! You now have Toolpad Core integrated into your Next.js Pages Router a
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/integration-nextjs-pages.png", "srcDark": "/static/toolpad/docs/core/integration-nextjs-pages-dark.png", "alt": "Next.js Pages Router with Toolpad Core", "caption": "Next.js Pages Router with Toolpad Core", "zoom": true, "aspectRatio": "1.428" }}
 
 :::info
-For a full working example with authentication included, see the [Toolpad Core Next.js Pages app with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core-auth-nextjs-pages)
+For a full working example with authentication included, see the [Toolpad Core Next.js Pages app with Auth.js example](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages/)
 :::
 
 ## React Router
@@ -815,11 +814,11 @@ const router = createBrowserRouter([
         Component: Layout,
         children: [
           {
-            path: '/',
+            path: '',
             Component: DashboardPage,
           },
           {
-            path: '/orders',
+            path: 'orders',
             Component: OrdersPage,
           },
         ],
@@ -835,5 +834,5 @@ That's it! You now have Toolpad Core integrated into your single-page app with R
 {{"demo": "ReactRouter.js", "height": 500, "iframe": true, "hideToolbar": true}}
 
 :::info
-For a full working example, see the [Toolpad Core Vite app with React Router example](https://github.com/mui/toolpad/tree/master/examples/core-vite)
+For a full working example, see the [Toolpad Core Vite app with React Router example](https://github.com/mui/toolpad/tree/master/examples/core/vite/)
 :::

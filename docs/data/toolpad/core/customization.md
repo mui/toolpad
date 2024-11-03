@@ -1,3 +1,3 @@
 # Customization
 
-<p class="description">How to customize Toolpad Core</p>
+<p class="description">How to customize Toolpad Core.</p>

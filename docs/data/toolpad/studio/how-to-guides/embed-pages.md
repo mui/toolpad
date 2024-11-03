@@ -18,9 +18,9 @@
    using
 
    ```html
-   <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq"></iframe>
+   <iframe src="https://tools-public.mui.com/prod/pages/cICompletionTime"></iframe>
    ```
 
    you can embed a Toolpad Studio page, like so:
 
-    <iframe src="https://tools-public.mui.com/prod/pages/fn03hvq?toolpad-display=standalone" loading="lazy" style="display: block; margin: auto"></iframe>
+    <iframe src="https://tools-public.mui.com/prod/pages/cICompletionTime?toolpad-display=standalone" loading="lazy" style="display: block; margin: auto"></iframe>

@@ -3,9 +3,7 @@ import { Template } from '../types';
 const indexPage: Template = (options) => {
   const authEnabled = options.auth;
   const routerType = options.router;
-  const hasNodemailerProvider = options.authProviders?.filter(
-    (provider) => provider.id === 'nodemailer',
-  );
+  const hasNodemailerProvider = options.authProviders?.includes('nodemailer');
 
   let imports = `import * as React from 'react';
 import Typography from '@mui/material/Typography';`;

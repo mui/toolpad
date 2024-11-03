@@ -790,7 +790,7 @@ importers:
         specifier: 2.1.1
         version: 2.1.1
       compression:
-        specifier: ^1.7.4
+        specifier: ^1.7.5
         version: 1.7.5
       concurrently:
         specifier: 9.0.1

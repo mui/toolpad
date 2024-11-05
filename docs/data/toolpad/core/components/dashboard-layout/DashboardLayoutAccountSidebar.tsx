@@ -1,5 +1,5 @@
-'use client';
 import * as React from 'react';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MenuList from '@mui/material/MenuList';
@@ -8,6 +8,11 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
+import { createTheme } from '@mui/material/styles';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { DashboardLayout, SidebarFooterProps } from '@toolpad/core/DashboardLayout';
 import {
   Account,
   AccountPreview,
@@ -15,8 +20,69 @@ import {
   SignOutButton,
   AccountPreviewProps,
 } from '@toolpad/core/Account';
-import { DashboardLayout, SidebarFooterProps } from '@toolpad/core/DashboardLayout';
-import { PageContainer } from '@toolpad/core/PageContainer';
+import type { Navigation, Router, Session } from '@toolpad/core/AppProvider';
+
+const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Main items',
+  },
+  {
+    segment: 'dashboard',
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
+];
+
+const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  colorSchemes: { light: true, dark: true },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
+
+function DemoPageContent({ pathname }: { pathname: string }) {
+  return (
+    <Box
+      sx={{
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+      }}
+    >
+      <Typography>Dashboard content for {pathname}</Typography>
+    </Box>
+  );
+}
+function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
+  const { handleClick, open, mini } = props;
+  return (
+    <Stack direction="column" p={0} overflow="hidden">
+      <Divider />
+      <AccountPreview
+        variant={mini ? 'condensed' : 'expanded'}
+        handleClick={handleClick}
+        open={open}
+      />
+    </Stack>
+  );
+}
 
 const accounts = [
   {
@@ -39,20 +105,6 @@ const accounts = [
     projects: [{ id: 4, title: 'Project A' }],
   },
 ];
-
-function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
-  const { handleClick, open, mini } = props;
-  return (
-    <Stack direction="column" p={0} overflow="hidden">
-      <Divider />
-      <AccountPreview
-        variant={mini ? 'condensed' : 'expanded'}
-        handleClick={handleClick}
-        open={open}
-      />
-    </Stack>
-  );
-}
 
 function SidebarFooterAccountPopover() {
   return (
@@ -125,8 +177,9 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
       }}
       slotProps={{
         popover: {
-          transformOrigin: { horizontal: 'left', vertical: 'top' },
+          transformOrigin: { horizontal: 'left', vertical: 'bottom' },
           anchorOrigin: { horizontal: 'right', vertical: 'bottom' },
+          disableAutoFocus: true,
           slotProps: {
             paper: {
               elevation: 0,
@@ -156,10 +209,64 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
   );
 }
 
-export default function DashboardPagesLayout(props: { children: React.ReactNode }) {
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+const demoSession = {
+  user: {
+    name: 'Bharat Kashyap',
+    email: 'bharatkashyap@outlook.com',
+    image: 'https://avatars.githubusercontent.com/u/19550456',
+  },
+};
+
+export default function DashboardLayoutAccountSidebar(props: DemoProps) {
+  const { window } = props;
+
+  const [pathname, setPathname] = React.useState('/dashboard');
+
+  const router = React.useMemo<Router>(() => {
+    return {
+      pathname,
+      searchParams: new URLSearchParams(),
+      navigate: (path) => setPathname(String(path)),
+    };
+  }, [pathname]);
+
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
+  const [session, setSession] = React.useState<Session | null>(demoSession);
+  const authentication = React.useMemo(() => {
+    return {
+      signIn: () => {
+        setSession(demoSession);
+      },
+      signOut: () => {
+        setSession(null);
+      },
+    };
+  }, []);
+
   return (
-    <DashboardLayout slots={{ sidebarFooter: SidebarFooterAccount, toolbarAccount: () => null }}>
-      <PageContainer>{props.children}</PageContainer>
-    </DashboardLayout>
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={demoTheme}
+      window={demoWindow}
+      authentication={authentication}
+      session={session}
+    >
+      <DashboardLayout
+        slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
+      >
+        <DemoPageContent pathname={pathname} />
+      </DashboardLayout>
+    </AppProvider>
   );
 }

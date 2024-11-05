@@ -8,6 +8,8 @@ import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -205,7 +207,7 @@ export interface SignInPageProps {
     signUpLink?: LinkProps;
   };
   /**
-   * Used to customize the styles on the `SignInPage` container
+   * The prop used to customize the styles on the `SignInPage` container
    */
   sx: SxProps;
 }
@@ -273,8 +275,7 @@ function SignInPage(props: SignInPageProps) {
             p: 4,
             border: '1px solid',
             borderColor: (theme) => alpha(theme.palette.grey[400], 0.4),
-            boxShadow:
-              '0px 5px 15px rgba(9, 11, 17, 0.05), 0px 15px 35px -5px rgba(19, 23, 32, 0.05)',
+            boxShadow: (theme) => theme.shadows[10],
           }}
         >
           {branding?.logo ?? (
@@ -284,11 +285,10 @@ function SignInPage(props: SignInPageProps) {
           )}
 
           <Typography
-            variant="h4"
-            component="h1"
+            variant="h5"
             color="textPrimary"
             sx={{
-              mb: 3,
+              mb: 1,
               fontWeight: 600,
             }}
           >
@@ -329,7 +329,7 @@ function SignInPage(props: SignInPageProps) {
                     >
                       <LoadingButton
                         key={provider.id}
-                        variant="contained"
+                        variant="outlined"
                         type="submit"
                         fullWidth
                         size="large"
@@ -341,11 +341,6 @@ function SignInPage(props: SignInPageProps) {
                         startIcon={IconProviderMap.get(provider.id)}
                         sx={{
                           textTransform: 'capitalize',
-                          filter: 'opacity(0.9)',
-                          transition: 'filter 0.2s ease-in',
-                          '&:hover': {
-                            filter: 'opacity(1)',
-                          },
                         }}
                       >
                         <span>Sign in with {provider.name}</span>
@@ -418,7 +413,7 @@ function SignInPage(props: SignInPageProps) {
                       type="submit"
                       fullWidth
                       size="large"
-                      variant="contained"
+                      variant="outlined"
                       disableElevation
                       startIcon={IconProviderMap.get(passkeyProvider.id)}
                       color={singleProvider ? 'primary' : 'inherit'}
@@ -427,11 +422,6 @@ function SignInPage(props: SignInPageProps) {
                         mt: 3,
                         mb: 2,
                         textTransform: 'capitalize',
-                        filter: 'opacity(0.9)',
-                        transition: 'filter 0.2s ease-in',
-                        '&:hover': {
-                          filter: 'opacity(1)',
-                        },
                       }}
                       {...slotProps?.submitButton}
                     >
@@ -475,60 +465,80 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
                   ) : (
-                    <TextField
-                      margin="dense"
-                      required
-                      slotProps={{
-                        htmlInput: {
-                          sx: (theme) => ({
-                            paddingTop: theme.spacing(1.5),
-                            paddingBottom: theme.spacing(1.5),
-                          }),
-                        },
-                        inputLabel: {
-                          sx: (theme) => ({
-                            lineHeight: theme.typography.pxToRem(16),
-                          }),
-                        },
-                      }}
-                      fullWidth
-                      id="email"
-                      label="Email Address"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      autoFocus={docs ? false : singleProvider}
-                      {...slotProps?.emailField}
-                    />
+                    <Box sx={{ marginBottom: (theme) => theme.spacing(1) }}>
+                      <InputLabel shrink htmlFor="email" sx={{ marginBottom: 0 }}>
+                        Email
+                      </InputLabel>
+                      <TextField
+                        required
+                        slotProps={{
+                          htmlInput: {
+                            sx: (theme) => ({
+                              paddingTop: theme.spacing(1),
+                              paddingBottom: theme.spacing(1),
+                            }),
+                          },
+                          inputLabel: {
+                            sx: (theme) => ({
+                              lineHeight: theme.typography.pxToRem(12),
+                            }),
+                          },
+                        }}
+                        placeholder="your@email.com"
+                        fullWidth
+                        id="email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        autoFocus={docs ? false : singleProvider}
+                        {...slotProps?.emailField}
+                      />
+                    </Box>
                   )}
 
                   {slots?.passwordField ? (
                     <slots.passwordField {...slotProps?.passwordField} />
                   ) : (
-                    <TextField
-                      margin="dense"
-                      required
-                      fullWidth
-                      slotProps={{
-                        htmlInput: {
-                          sx: (theme) => ({
-                            paddingTop: theme.spacing(1.5),
-                            paddingBottom: theme.spacing(1.5),
-                          }),
-                        },
-                        inputLabel: {
-                          sx: (theme) => ({
-                            lineHeight: theme.typography.pxToRem(16),
-                          }),
-                        },
-                      }}
-                      name="password"
-                      label="Password"
-                      type="password"
-                      id="password"
-                      autoComplete="current-password"
-                      {...slotProps?.passwordField}
-                    />
+                    <React.Fragment>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <InputLabel shrink htmlFor="password" sx={{ marginBottom: 0 }}>
+                          Password
+                        </InputLabel>
+
+                        {slots?.forgotPasswordLink ? (
+                          <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
+                        ) : null}
+                      </div>
+                      <TextField
+                        required
+                        fullWidth
+                        slotProps={{
+                          htmlInput: {
+                            sx: (theme) => ({
+                              paddingTop: theme.spacing(1),
+                              paddingBottom: theme.spacing(1),
+                            }),
+                          },
+                          inputLabel: {
+                            sx: (theme) => ({
+                              lineHeight: theme.typography.pxToRem(16),
+                            }),
+                          },
+                        }}
+                        name="password"
+                        type="password"
+                        id="password"
+                        placeholder="******"
+                        autoComplete="current-password"
+                        {...slotProps?.passwordField}
+                      />
+                    </React.Fragment>
                   )}
 
                   <FormControlLabel
@@ -545,17 +555,12 @@ function SignInPage(props: SignInPageProps) {
                       size="large"
                       variant="contained"
                       disableElevation
-                      color={singleProvider ? 'primary' : 'inherit'}
+                      color="primary"
                       loading={loading && selectedProviderId === credentialsProvider.id}
                       sx={{
                         mt: 3,
                         mb: 2,
                         textTransform: 'capitalize',
-                        filter: 'opacity(0.9)',
-                        transition: 'filter 0.2s ease-in',
-                        '&:hover': {
-                          filter: 'opacity(1)',
-                        },
                       }}
                       {...slotProps?.submitButton}
                     >
@@ -563,12 +568,8 @@ function SignInPage(props: SignInPageProps) {
                     </LoadingButton>
                   )}
 
-                  {slots?.forgotPasswordLink || slots?.signUpLink ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                      {slots?.forgotPasswordLink ? (
-                        <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
-                      ) : null}
-
+                  {slots?.signUpLink ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                       {slots?.signUpLink ? <slots.signUpLink {...slotProps?.signUpLink} /> : null}
                     </Box>
                   ) : null}
@@ -649,11 +650,6 @@ function SignInPage(props: SignInPageProps) {
                         mt: 3,
                         mb: 2,
                         textTransform: 'capitalize',
-                        filter: 'opacity(0.9)',
-                        transition: 'filter 0.2s ease-in',
-                        '&:hover': {
-                          filter: 'opacity(1)',
-                        },
                       }}
                       {...slotProps?.submitButton}
                     >

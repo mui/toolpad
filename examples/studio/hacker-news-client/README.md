@@ -24,7 +24,7 @@ pnpm create toolpad-app --example hacker-news-client
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/studio/hacker-news-client)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/studio/hacker-news-client)
 
 ## What's inside
 

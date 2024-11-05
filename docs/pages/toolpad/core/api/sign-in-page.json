@@ -1,5 +1,13 @@
 {
   "props": {
+    "sx": {
+      "type": {
+        "name": "union",
+        "description": "Array&lt;func<br>&#124;&nbsp;object<br>&#124;&nbsp;bool&gt;<br>&#124;&nbsp;func<br>&#124;&nbsp;object"
+      },
+      "required": true,
+      "additionalInfo": { "sx": true }
+    },
     "providers": {
       "type": {
         "name": "arrayOf",
@@ -25,7 +33,7 @@
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: elementType, forgotPasswordLink?: elementType, passwordField?: elementType, signUpLink?: elementType, submitButton?: elementType }"
+        "description": "{ emailField?: elementType, forgotPasswordLink?: elementType, headerInfo?: elementType, passwordField?: elementType, signUpLink?: elementType, submitButton?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -65,6 +73,12 @@
       "name": "signUpLink",
       "description": "The custom sign up link component used in the credentials form.",
       "default": "Link",
+      "class": null
+    },
+    {
+      "name": "headerInfo",
+      "description": "Custom information added to the top header beneath the title",
+      "default": "Typography",
       "class": null
     }
   ],

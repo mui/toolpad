@@ -739,10 +739,19 @@ SignInPage.propTypes /* remove-proptypes */ = {
   slots: PropTypes.shape({
     emailField: PropTypes.elementType,
     forgotPasswordLink: PropTypes.elementType,
+    headerInfo: PropTypes.elementType,
     passwordField: PropTypes.elementType,
     signUpLink: PropTypes.elementType,
     submitButton: PropTypes.elementType,
   }),
+  /**
+   * The prop used to customize the styles on the `SignInPage` container
+   */
+  sx: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
+    PropTypes.func,
+    PropTypes.object,
+  ]),
 } as any;
 
 export { SignInPage };

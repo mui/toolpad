@@ -11,12 +11,16 @@
       }
     },
     "slotProps": { "description": "The props used for each slot inside." },
-    "slots": { "description": "The components used for each slot inside." }
+    "slots": { "description": "The components used for each slot inside." },
+    "sx": {
+      "description": "The prop used to customize the styles on the <code>SignInPage</code> container"
+    }
   },
   "classDescriptions": {},
   "slotDescriptions": {
     "emailField": "The custom email field component used in the credentials form.",
     "forgotPasswordLink": "The custom forgot password link component used in the credentials form.",
+    "headerInfo": "Custom information added to the top header beneath the title",
     "passwordField": "The custom password field component used in the credentials form.",
     "signUpLink": "The custom sign up link component used in the credentials form.",
     "submitButton": "The custom submit button component used in the credentials form."

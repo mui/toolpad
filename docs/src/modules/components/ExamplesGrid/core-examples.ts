@@ -78,5 +78,12 @@ export default function examples() {
       stackblitz:
         'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/auth-nextjs-passkey',
     },
+    {
+      title: 'Vite with React Router and authentication',
+      description:
+        'This app shows you to how to get started using Toolpad Core with Vite, React Router and any external authentication provider',
+      src: '/static/toolpad/docs/core/vite-react-router.png',
+      source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-vite',
+    },
   ];
 }

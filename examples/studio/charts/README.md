@@ -34,4 +34,4 @@ This app demonstrates the following capabilities of Toolpad Studio:
 
 ## The source
 
-[Check out the source code](https://github.com/mui/toolpad/tree/master/studio/charts)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/studio/charts)

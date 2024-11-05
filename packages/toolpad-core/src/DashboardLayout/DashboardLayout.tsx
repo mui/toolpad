@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme, type Theme, SxProps } from '@mui/material';
+import { styled, useTheme, SxProps } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -41,6 +41,8 @@ const LogoContainer = styled('div')({
   },
 });
 
+export interface ToolbarActionsProps {}
+
 export interface SidebarFooterProps {
   mini: boolean;
 }
@@ -56,7 +58,9 @@ export interface DashboardLayoutSlots {
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
    */
-  toolbarActions?: React.JSXElementConstructor<{}>;
+  toolbarActions?:
+    | React.JSXElementConstructor<ToolbarActionsProps>
+    | React.JSXElementConstructor<ToolbarActionsProps>[];
   /**
    * The toolbar account component used in the layout header.
    * @default Account
@@ -107,7 +111,7 @@ export interface DashboardLayoutProps {
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
-  sx?: SxProps<Theme>;
+  sx?: SxProps;
 }
 
 /**
@@ -243,7 +247,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const hasDrawerTransitions =
     isOverSmViewport && (disableCollapsibleSidebar || !isUnderMdViewport);
 
-  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
 
@@ -328,47 +331,59 @@ function DashboardLayout(props: DashboardLayoutProps) {
     >
       <AppBar color="inherit" position="absolute" sx={{ displayPrint: 'none' }}>
         <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
-          {!hideNavigation ? (
-            <React.Fragment>
-              <Box
-                sx={{
-                  mr: { sm: disableCollapsibleSidebar ? 0 : 1 },
-                  display: { md: 'none' },
-                }}
-              >
-                {getMenuIcon(isMobileNavigationExpanded)}
-              </Box>
-              <Box
-                sx={{
-                  display: { xs: 'none', md: disableCollapsibleSidebar ? 'none' : 'block' },
-                  mr: disableCollapsibleSidebar ? 0 : 1,
-                }}
-              >
-                {getMenuIcon(isDesktopNavigationExpanded)}
-              </Box>
-            </React.Fragment>
-          ) : null}
-          <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-            <Stack direction="row" alignItems="center">
-              <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
-              <Typography
-                variant="h6"
-                sx={{
-                  color: (theme.vars ?? theme).palette.primary.main,
-                  fontWeight: '700',
-                  ml: 0.5,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {applicationTitle}
-              </Typography>
+          <Stack
+            direction="row"
+            sx={{ flexWrap: 'wrap', justifyContent: 'space-between', width: '100%', py: 1.5 }}
+          >
+            <Stack direction="row">
+              {!hideNavigation ? (
+                <React.Fragment>
+                  <Box
+                    sx={{
+                      mr: { sm: disableCollapsibleSidebar ? 0 : 1 },
+                      display: { md: 'none' },
+                    }}
+                  >
+                    {getMenuIcon(isMobileNavigationExpanded)}
+                  </Box>
+                  <Box
+                    sx={{
+                      display: { xs: 'none', md: disableCollapsibleSidebar ? 'none' : 'block' },
+                      mr: disableCollapsibleSidebar ? 0 : 1,
+                    }}
+                  >
+                    {getMenuIcon(isDesktopNavigationExpanded)}
+                  </Box>
+                </React.Fragment>
+              ) : null}
+              <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Stack direction="row" alignItems="center">
+                  <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: (theme.vars ?? theme).palette.primary.main,
+                      fontWeight: '700',
+                      ml: 0.5,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {applicationTitle}
+                  </Typography>
+                </Stack>
+              </Link>
             </Stack>
-          </Link>
-          <Box sx={{ flexGrow: 1 }} />
-          <Stack direction="row" spacing={1}>
-            <ToolbarActionsSlot {...slotProps?.toolbarActions} />
-            <ThemeSwitcher />
-            <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+            <Stack direction="row" spacing={1} sx={{ marginLeft: 'auto' }}>
+              {(Array.isArray(slots?.toolbarActions)
+                ? slots.toolbarActions
+                : [slots?.toolbarActions]
+              ).map((toolbarAction, index) => {
+                const ToolbarActionsSlot = toolbarAction ?? ToolbarActions;
+                return <ToolbarActionsSlot key={index} {...slotProps?.toolbarActions} />;
+              })}
+              <ThemeSwitcher />
+              <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+            </Stack>
           </Stack>
         </Toolbar>
       </AppBar>
@@ -510,7 +525,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   slots: PropTypes.shape({
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
-    toolbarActions: PropTypes.elementType,
+    toolbarActions: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.func), PropTypes.func]),
   }),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.

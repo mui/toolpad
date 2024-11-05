@@ -52,7 +52,7 @@
     "cookie": "1.0.1",
     "fractional-indexing": "3.2.0",
     "invariant": "2.2.4",
-    "nanoid": "5.0.7",
+    "nanoid": "5.0.8",
     "react-error-boundary": "4.0.13",
     "react-is": "18.3.1"
   },

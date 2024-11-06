@@ -75,12 +75,15 @@ export default function GithubStars() {
           sx={{ mt: stars ? 0.1 : 0, mr: stars ? 0.5 : 0 }}
           fontSize="small"
         />
-        {fetching ? (
-          <CircularProgress size={16} sx={{ ml: 0.25, mt: 0.1 }} />
-        ) : (
-          new Intl.NumberFormat().format(stars)
-        )}
+        {fetching ? <CircularProgress size={16} sx={{ ml: 0.25, mt: 0.1 }} /> : formatNumber(stars)}
       </Box>
     </Button>
   );
+
+  function formatNumber(num) {
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}k`;
+    }
+    return num;
+  }
 }

@@ -8,7 +8,7 @@ import DialogActions from '@mui/material/DialogActions';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 
-function MyCustomDialog({ payload, open, onClose }: DialogProps<string>) {
+function MyCustomDialog({ payload, open, onClose }: DialogProps<any>) {
   return (
     <Dialog fullWidth open={open} onClose={() => onClose()}>
       <DialogTitle>Dialog with payload</DialogTitle>

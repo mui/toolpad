@@ -63,7 +63,7 @@ Now you can call the `dialogs.open` function and pass the component as a first p
 
 ## With dialog payload
 
-You can pass a `payload` to the dialog with the second parameter. The payload stays constant for the lifetime of the dialog.
+You can pass a `payload` to the dialog as the second parameter. The `payload` can be of any type and remains constant for the lifetime of the dialog.
 
 {{"demo": "CustomDialogWithPayload.js"}}
 

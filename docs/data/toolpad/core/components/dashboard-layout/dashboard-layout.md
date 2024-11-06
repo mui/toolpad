@@ -146,3 +146,7 @@ This allows you to add, for example:
 - footer content in the sidebar.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
+
+Through this, you can also modify the position of the `<Account />` component and use it inside the sidebar:
+
+{{"demo": "DashboardLayoutAccountSidebar.js", "height": 400, "iframe": true}}

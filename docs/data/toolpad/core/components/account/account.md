@@ -30,7 +30,7 @@ When signed out, the component renders as an inline sign in button within the da
 
 ## Customization
 
-The `<Account />` component is composed of multiple sub-components:
+The `<Account />` component is composed of multiple subcomponents:
 
 - `<SignInButton />`
 - `<AccountPreview />`
@@ -53,7 +53,7 @@ You can pass in your own components inside the `Account` popover through the `sl
 
 #### Popover Content
 
-You can wrap the default sub-components – such as `SignOutButton` and `AccountPreview` – and wrap them in `AccountPopoverHeader` and `AccountPopoverFooter` components to create custom account popovers, as shown in the following demos:
+You can wrap the default subcomponents – such as `SignOutButton` and `AccountPreview` – and wrap them in `AccountPopoverHeader` and `AccountPopoverFooter` components to create custom account popovers, as shown in the following demos:
 
 ##### Account Switcher
 

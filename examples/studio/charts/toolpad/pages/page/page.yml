@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mui/mui-toolpad/v0.2.0/docs/schemas/v1/definitions.json#properties/Page
+
 apiVersion: v1
 kind: page
 spec:
@@ -87,4 +89,5 @@ spec:
         transform: return data.movies;
         transformEnabled: true
         searchParams: []
+        url: https://raw.githubusercontent.com/mui/toolpad/master/public/movies.json
   display: shell

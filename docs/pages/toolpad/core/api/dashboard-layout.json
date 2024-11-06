@@ -18,7 +18,7 @@
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: Array&lt;func&gt;<br>&#124;&nbsp;func }"
+        "description": "{ sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }

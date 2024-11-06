@@ -516,7 +516,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   slots: PropTypes.shape({
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
-    toolbarActions: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.func), PropTypes.func]),
+    toolbarActions: PropTypes.elementType,
   }),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.

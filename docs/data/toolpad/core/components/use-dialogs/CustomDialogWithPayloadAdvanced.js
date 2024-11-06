@@ -10,18 +10,7 @@ import DialogActions from '@mui/material/DialogActions';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import MenuItem from '@mui/material/MenuItem';
-
-// Create context with initial value
-const FormContext = React.createContext(null);
-
-// Custom hook to use the form context
-function useFormContext() {
-  const context = React.useContext(FormContext);
-  if (!context) {
-    throw new Error('useFormContext must be used within a FormProvider');
-  }
-  return context;
-}
+import { FormContext, useFormContext } from './TransferFormContext';
 
 function mockTransfer(formData) {
   return new Promise((resolve) => {
@@ -213,7 +202,7 @@ function DemoContent() {
   );
 }
 
-export default function CustomDialogWithPayload2() {
+export default function CustomDialogWithPayloadAdvanced() {
   const [formData, setFormData] = React.useState({
     amount: '',
     accountNumber: '',

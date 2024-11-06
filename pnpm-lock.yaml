@@ -1325,8 +1325,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
       '@types/node':
-        specifier: ^20.16.13
-        version: 20.17.5
+        specifier: ^20.17.6
+        version: 20.17.6
       '@types/react':
         specifier: ^18
         version: 18.3.12
@@ -2209,7 +2209,7 @@ packages:
   '@docsearch/react@3.6.3':
     resolution: {integrity: sha512-2munr4uBuZq1PG+Ge+F+ldIdxb3Wi8OmEIv2tQQb4RvEvvph+xtQkxwHzVIEnt5s+HecwucuXwB+3JhcZboFLg==}
     peerDependencies:
-      '@types/react': ^18.3.11
+      '@types/react': '>= 16.8.0 < 19.0.0'
       react: '>= 16.8.0 < 19.0.0'
       react-dom: '>= 16.8.0 < 19.0.0'
       search-insights: '>= 1 < 3'

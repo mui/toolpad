@@ -182,6 +182,14 @@ AccountPreview.propTypes /* remove-proptypes */ = {
     moreIconButton: PropTypes.elementType,
   }),
   /**
+   * The prop used to customize the styling of the preview
+   */
+  sx: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
+    PropTypes.func,
+    PropTypes.object,
+  ]),
+  /**
    * The type of account details to display.
    * @property {'condensed'} condensed - Shows only the user's avatar.
    * @property {'expanded'} expanded - Displays the user's avatar, name, and email if available.

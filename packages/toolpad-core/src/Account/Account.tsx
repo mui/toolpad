@@ -210,6 +210,11 @@ Account.propTypes /* remove-proptypes */ = {
         avatarIconButton: PropTypes.elementType,
         moreIconButton: PropTypes.elementType,
       }),
+      sx: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
+        PropTypes.func,
+        PropTypes.object,
+      ]),
       variant: PropTypes.oneOf(['condensed', 'expanded']),
     }),
     signInButton: PropTypes.object,

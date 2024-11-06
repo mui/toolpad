@@ -33,7 +33,7 @@
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: elementType, forgotPasswordLink?: elementType, headerInfo?: elementType, passwordField?: elementType, signUpLink?: elementType, submitButton?: elementType }"
+        "description": "{ emailField?: elementType, forgotPasswordLink?: elementType, passwordField?: elementType, signUpLink?: elementType, submitButton?: elementType, subtitle?: elementType, title?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -76,8 +76,14 @@
       "class": null
     },
     {
-      "name": "headerInfo",
-      "description": "Custom information added to the top header beneath the title",
+      "name": "title",
+      "description": "A component to override the default title section",
+      "default": "Typography",
+      "class": null
+    },
+    {
+      "name": "subtitle",
+      "description": "A component to override the default subtitle section",
       "default": "Typography",
       "class": null
     }

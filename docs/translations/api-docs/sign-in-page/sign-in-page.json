@@ -20,9 +20,10 @@
   "slotDescriptions": {
     "emailField": "The custom email field component used in the credentials form.",
     "forgotPasswordLink": "The custom forgot password link component used in the credentials form.",
-    "headerInfo": "Custom information added to the top header beneath the title",
     "passwordField": "The custom password field component used in the credentials form.",
     "signUpLink": "The custom sign up link component used in the credentials form.",
-    "submitButton": "The custom submit button component used in the credentials form."
+    "submitButton": "The custom submit button component used in the credentials form.",
+    "subtitle": "A component to override the default subtitle section",
+    "title": "A component to override the default title section"
   }
 }

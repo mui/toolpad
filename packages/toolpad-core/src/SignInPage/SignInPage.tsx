@@ -157,10 +157,15 @@ export interface SignInPageSlots {
    */
   signUpLink?: React.JSXElementConstructor<LinkProps>;
   /**
-   * Custom information added to the top header beneath the title
+   * A component to override the default title section
    * @default Typography
    */
-  headerInfo?: React.ElementType;
+  title?: React.ElementType;
+  /**
+   * A component to override the default subtitle section
+   * @default Typography
+   */
+  subtitle?: React.ElementType;
 }
 
 export interface SignInPageProps {
@@ -276,18 +281,22 @@ function SignInPage(props: SignInPageProps) {
         >
           {branding?.logo}
 
-          <Typography
-            variant="h5"
-            color="textPrimary"
-            sx={{
-              mb: 1,
-              fontWeight: 600,
-            }}
-          >
-            Sign in {branding?.title ? `to ${branding.title}` : null}
-          </Typography>
-          {slots?.headerInfo ? (
-            <slots.headerInfo />
+          {slots?.title ? (
+            <slots.title />
+          ) : (
+            <Typography
+              variant="h5"
+              color="textPrimary"
+              sx={{
+                mb: 1,
+                fontWeight: 600,
+              }}
+            >
+              Sign in {branding?.title ? `to ${branding.title}` : null}
+            </Typography>
+          )}
+          {slots?.subtitle ? (
+            <slots.subtitle />
           ) : (
             <Typography variant="body2" color="textSecondary" gutterBottom textAlign="center">
               Welcome, please sign in to continue
@@ -737,10 +746,11 @@ SignInPage.propTypes /* remove-proptypes */ = {
   slots: PropTypes.shape({
     emailField: PropTypes.elementType,
     forgotPasswordLink: PropTypes.elementType,
-    headerInfo: PropTypes.elementType,
     passwordField: PropTypes.elementType,
     signUpLink: PropTypes.elementType,
     submitButton: PropTypes.elementType,
+    subtitle: PropTypes.elementType,
+    title: PropTypes.elementType,
   }),
   /**
    * The prop used to customize the styles on the `SignInPage` container

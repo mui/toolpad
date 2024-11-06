@@ -66,7 +66,8 @@ export type SupportedAuthProvider =
   | SupportedOAuthProvider
   | 'credentials'
   | 'passkey'
-  | 'nodemailer';
+  | 'nodemailer'
+  | string;
 
 const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([
   ['github', <GitHubIcon key="github" />],
@@ -686,31 +687,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
    */
   providers: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.oneOf([
-        'apple',
-        'auth0',
-        'cognito',
-        'credentials',
-        'discord',
-        'facebook',
-        'fusionauth',
-        'github',
-        'gitlab',
-        'google',
-        'instagram',
-        'keycloak',
-        'line',
-        'linkedin',
-        'microsoft-entra-id',
-        'nodemailer',
-        'okta',
-        'passkey',
-        'slack',
-        'spotify',
-        'tiktok',
-        'twitch',
-        'twitter',
-      ]).isRequired,
+      id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
     }),
   ),

@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Avatar from '@mui/material/Avatar';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
@@ -13,13 +13,11 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import AppleIcon from '@mui/icons-material/Apple';
-import Stack from '@mui/material/Stack';
-import { alpha, SxProps } from '@mui/material/styles';
+import { alpha, useTheme, SxProps } from '@mui/material/styles';
 import { LinkProps } from '@mui/material/Link';
 import GoogleIcon from './icons/Google';
 import FacebookIcon from './icons/Facebook';
@@ -223,6 +221,7 @@ export interface SignInPageProps {
  */
 function SignInPage(props: SignInPageProps) {
   const { providers, signIn, slots, slotProps, sx } = props;
+  const theme = useTheme();
   const branding = React.useContext(BrandingContext);
   const docs = React.useContext(DocsContext);
   const router = React.useContext(RouterContext);
@@ -271,8 +270,8 @@ function SignInPage(props: SignInPageProps) {
             borderRadius: 1,
             p: 4,
             border: '1px solid',
-            borderColor: (theme) => alpha(theme.palette.grey[400], 0.4),
-            boxShadow: (theme) => theme.shadows[10],
+            borderColor: alpha(theme.palette.grey[400], 0.4),
+            boxShadow: theme.shadows[10],
           }}
         >
           {branding?.logo}
@@ -372,7 +371,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
                   ) : (
-                    <Box sx={{ marginBottom: (theme) => theme.spacing(1) }}>
+                    <Box sx={{ marginBottom: theme.spacing(1) }}>
                       <InputLabel shrink htmlFor="email-passkey" sx={{ marginBottom: 0 }}>
                         Email
                       </InputLabel>
@@ -380,15 +379,15 @@ function SignInPage(props: SignInPageProps) {
                         required
                         slotProps={{
                           htmlInput: {
-                            sx: (theme) => ({
+                            sx: {
                               paddingTop: theme.spacing(1),
                               paddingBottom: theme.spacing(1),
-                            }),
+                            },
                           },
                           inputLabel: {
-                            sx: (theme) => ({
+                            sx: {
                               lineHeight: theme.typography.pxToRem(12),
-                            }),
+                            },
                           },
                         }}
                         fullWidth
@@ -461,7 +460,7 @@ function SignInPage(props: SignInPageProps) {
                     }));
                   }}
                 >
-                  <Box sx={{ marginBottom: (theme) => theme.spacing(1) }}>
+                  <Box sx={{ marginBottom: theme.spacing(1) }}>
                     <InputLabel shrink htmlFor="email-nodemailer" sx={{ marginBottom: 0 }}>
                       Email
                     </InputLabel>
@@ -469,15 +468,15 @@ function SignInPage(props: SignInPageProps) {
                       required
                       slotProps={{
                         htmlInput: {
-                          sx: (theme) => ({
+                          sx: {
                             paddingTop: theme.spacing(1),
                             paddingBottom: theme.spacing(1),
-                          }),
+                          },
                         },
                         inputLabel: {
-                          sx: (theme) => ({
+                          sx: {
                             lineHeight: theme.typography.pxToRem(12),
-                          }),
+                          },
                         },
                       }}
                       fullWidth
@@ -550,7 +549,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
                   ) : (
-                    <Box sx={{ marginBottom: (theme) => theme.spacing(1) }}>
+                    <Box sx={{ marginBottom: theme.spacing(1) }}>
                       <InputLabel shrink htmlFor="email" sx={{ marginBottom: 0 }}>
                         Email
                       </InputLabel>
@@ -558,15 +557,15 @@ function SignInPage(props: SignInPageProps) {
                         required
                         slotProps={{
                           htmlInput: {
-                            sx: (theme) => ({
+                            sx: {
                               paddingTop: theme.spacing(1),
                               paddingBottom: theme.spacing(1),
-                            }),
+                            },
                           },
                           inputLabel: {
-                            sx: (theme) => ({
+                            sx: {
                               lineHeight: theme.typography.pxToRem(12),
-                            }),
+                            },
                           },
                         }}
                         placeholder="your@email.com"
@@ -585,35 +584,24 @@ function SignInPage(props: SignInPageProps) {
                     <slots.passwordField {...slotProps?.passwordField} />
                   ) : (
                     <React.Fragment>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <InputLabel shrink htmlFor="password" sx={{ marginBottom: 0 }}>
-                          Password
-                        </InputLabel>
+                      <InputLabel shrink htmlFor="password" sx={{ marginBottom: 0 }}>
+                        Password
+                      </InputLabel>
 
-                        {slots?.forgotPasswordLink ? (
-                          <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
-                        ) : null}
-                      </div>
                       <TextField
                         required
                         fullWidth
                         slotProps={{
                           htmlInput: {
-                            sx: (theme) => ({
+                            sx: {
                               paddingTop: theme.spacing(1),
                               paddingBottom: theme.spacing(1),
-                            }),
+                            },
                           },
                           inputLabel: {
-                            sx: (theme) => ({
+                            sx: {
                               lineHeight: theme.typography.pxToRem(16),
-                            }),
+                            },
                           },
                         }}
                         name="password"
@@ -626,11 +614,21 @@ function SignInPage(props: SignInPageProps) {
                     </React.Fragment>
                   )}
 
-                  <FormControlLabel
-                    control={<Checkbox value="remember" color="primary" />}
-                    label="Remember me"
-                    slotProps={{ typography: { color: 'textSecondary' } }}
-                  />
+                  <Stack
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    spacing={1}
+                  >
+                    <FormControlLabel
+                      control={<Checkbox value="remember" color="primary" />}
+                      label="Remember me"
+                      slotProps={{ typography: { color: 'textSecondary' } }}
+                    />
+                    {slots?.forgotPasswordLink ? (
+                      <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
+                    ) : null}
+                  </Stack>
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (

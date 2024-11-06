@@ -75,7 +75,11 @@ export default function GithubStars() {
           sx={{ mt: stars ? 0.1 : 0, mr: stars ? 0.5 : 0 }}
           fontSize="small"
         />
-        {fetching ? <CircularProgress size={16} sx={{ ml: 0.25, mt: 0.1 }} /> : stars}
+        {fetching ? (
+          <CircularProgress size={16} sx={{ ml: 0.25, mt: 0.1 }} />
+        ) : (
+          new Intl.NumberFormat().format(stars)
+        )}
       </Box>
     </Button>
   );

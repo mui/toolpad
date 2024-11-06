@@ -69,7 +69,7 @@ export default function Hero() {
           >
             From the creators of Material UI, Toolpad Core offers the components needed for your
             next admin panel and internal tools project. Bootstrap from scratch in our CLI with well
-            chosen defaults, or drop Toolpad Core into your existing Next.js or Vite* project.
+            chosen defaults, or drop Toolpad Core into your existing Next.js or Vite project.
           </Typography>
         </Box>
         <Box

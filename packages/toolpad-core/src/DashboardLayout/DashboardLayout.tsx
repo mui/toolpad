@@ -41,8 +41,6 @@ const LogoContainer = styled('div')({
   },
 });
 
-export interface ToolbarActionsProps {}
-
 export interface SidebarFooterProps {
   mini: boolean;
 }
@@ -58,9 +56,7 @@ export interface DashboardLayoutSlots {
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
    */
-  toolbarActions?:
-    | React.JSXElementConstructor<ToolbarActionsProps>
-    | React.JSXElementConstructor<ToolbarActionsProps>[];
+  toolbarActions?: React.JSXElementConstructor<{}>;
   /**
    * The toolbar account component used in the layout header.
    * @default Account
@@ -247,6 +243,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const hasDrawerTransitions =
     isOverSmViewport && (disableCollapsibleSidebar || !isUnderMdViewport);
 
+  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
 
@@ -374,13 +371,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               </Link>
             </Stack>
             <Stack direction="row" spacing={1} sx={{ marginLeft: 'auto' }}>
-              {(Array.isArray(slots?.toolbarActions)
-                ? slots.toolbarActions
-                : [slots?.toolbarActions]
-              ).map((toolbarAction, index) => {
-                const ToolbarActionsSlot = toolbarAction ?? ToolbarActions;
-                return <ToolbarActionsSlot key={index} {...slotProps?.toolbarActions} />;
-              })}
+              <ToolbarActionsSlot {...slotProps?.toolbarActions} />
               <ThemeSwitcher />
               <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
             </Stack>

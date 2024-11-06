@@ -221,8 +221,10 @@ export const inputsCustomizations: Components<Theme> = {
       }),
     },
   },
+  // @ts-ignore TODO: MuiLoadingButton is not present in the default `theme`
   MuiLoadingButton: {
     styleOverrides: {
+      // @ts-ignore
       root: ({ theme }) => ({
         '& .MuiLoadingButton-loadingIndicator': {
           color: gray[400],

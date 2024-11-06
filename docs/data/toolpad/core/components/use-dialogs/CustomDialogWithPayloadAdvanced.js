@@ -26,13 +26,21 @@ function TransactionDialog({ payload, open, onClose }) {
   const [loading, setLoading] = React.useState(false);
   const { formData } = useFormContext();
 
+  const isValidCsrf = React.useMemo(() => {
+    if (payload.data) {
+      return true;
+    }
+    return false;
+  }, [payload.data]);
+
   return (
     <Dialog fullWidth open={open} onClose={() => onClose(null)}>
       <DialogTitle>Confirm transfer</DialogTitle>
-      <DialogContent>{payload}</DialogContent>
+      <DialogContent>{payload.component}</DialogContent>
       <DialogActions>
         <LoadingButton
           loading={loading}
+          disabled={!isValidCsrf}
           onClick={async () => {
             setLoading(true);
             try {
@@ -67,7 +75,10 @@ TransactionDialog.propTypes = {
   /**
    * The payload that was passed when the dialog was opened.
    */
-  payload: PropTypes.node,
+  payload: PropTypes.shape({
+    component: PropTypes.node,
+    data: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 function PayloadIndia() {
@@ -170,7 +181,7 @@ function PayloadUSA() {
 function DemoContent() {
   const dialogs = useDialogs();
   const [country, setCountry] = React.useState('usa');
-  const Payload = country === 'usa' ? <PayloadUSA /> : <PayloadIndia />;
+  const csrfToken = crypto.randomUUID();
 
   return (
     <Stack spacing={2}>
@@ -187,8 +198,12 @@ function DemoContent() {
 
       <Button
         onClick={async () => {
-          const uuid = await dialogs.open(TransactionDialog, Payload);
-
+          // preview-start
+          const uuid = await dialogs.open(TransactionDialog, {
+            component: country === 'usa' ? <PayloadUSA /> : <PayloadIndia />,
+            data: csrfToken,
+          });
+          // preview-end
           if (uuid) {
             dialogs.alert(`The transaction was completed with ID: ${uuid}`, {
               title: 'Success',

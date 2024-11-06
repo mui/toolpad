@@ -105,9 +105,9 @@ Analog to [`window.prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Win
 
 ## Advanced Examples
 
-### Component as dialog payload
+### Complex payload
 
-The `payload` can be anything - including a React Component. This allows you to pass different payloads to the same dialog component. For instance, to render a form with location-dependent fields inside a dialog:
+The `payload` can be an object which contains anything - including a React Component. This allows you to pass arbitrary data and components to your dialog. For instance, to render a form with location-dependent fields inside a dialog:
 
 {{"demo": "CustomDialogWithPayloadAdvanced.js"}}
 

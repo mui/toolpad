@@ -103,6 +103,14 @@ Analog to [`window.prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Win
 
 {{"demo": "PromptDialog.js"}}
 
+## Advanced Examples
+
+### Component as dialog payload
+
+The `payload` can be anything - including a React Component. This allows you to pass different payloads to the same dialog component. For instance, to render a form with location-dependent fields inside a dialog:
+
+{{"demo": "CustomDialogWithPayloadAdvanced.js"}}
+
 ## Hook API
 
 - [`useDialogs()`](/toolpad/core/react-use-dialogs/api/)

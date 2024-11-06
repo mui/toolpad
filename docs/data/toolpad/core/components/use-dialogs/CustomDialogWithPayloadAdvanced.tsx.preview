@@ -1,0 +1,5 @@
+<FormContext.Provider value={contextValue}>
+  <DialogsProvider>
+    <DemoContent />
+  </DialogsProvider>
+</FormContext.Provider>

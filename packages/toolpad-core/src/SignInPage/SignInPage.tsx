@@ -211,7 +211,7 @@ export interface SignInPageProps {
   /**
    * The prop used to customize the styles on the `SignInPage` container
    */
-  sx: SxProps;
+  sx?: SxProps;
 }
 
 /**

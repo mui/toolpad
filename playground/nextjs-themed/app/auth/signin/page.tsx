@@ -19,7 +19,7 @@ function ForgotPasswordLink() {
 function SignUpLink() {
   return (
     <span style={{ fontSize: '0.8rem' }}>
-      Don't have an account?&nbsp;<Link href="/auth/signup">Sign up</Link>
+      Don&apos;t have an account?&nbsp;<Link href="/auth/signup">Sign up</Link>
     </span>
   );
 }

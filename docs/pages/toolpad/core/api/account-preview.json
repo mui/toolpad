@@ -9,7 +9,10 @@
       }
     },
     "slots": {
-      "type": { "name": "shape", "description": "{ avatar?: elementType }" },
+      "type": {
+        "name": "shape",
+        "description": "{ avatar?: elementType, avatarIconButton?: elementType, moreIconButton?: elementType }"
+      },
       "additionalInfo": { "slotsApi": true }
     },
     "variant": {

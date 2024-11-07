@@ -93,15 +93,17 @@ function AccountPreview(props: AccountPreviewProps) {
 
   if (variant === 'expanded') {
     return (
-      <Stack direction="row" justifyContent="flex-start" spacing={2} padding={2}>
-        {avatarContent}
-        <Stack direction="column" justifyContent="space-evenly">
-          <Typography variant="body2" fontWeight="bolder" noWrap>
-            {session.user?.name}
-          </Typography>
-          <Typography variant="caption" noWrap>
-            {session.user?.email}
-          </Typography>
+      <Stack direction="row" justifyContent="space-between" sx={{ py: 1, px: 2, gap: 2 }}>
+        <Stack direction="row" justifyContent="flex-start" spacing={2}>
+          {avatarContent}
+          <Stack direction="column" justifyContent="space-evenly">
+            <Typography variant="body2" fontWeight="bolder" noWrap>
+              {session.user?.name}
+            </Typography>
+            <Typography variant="caption" noWrap>
+              {session.user?.email}
+            </Typography>
+          </Stack>
         </Stack>
         {handleClick &&
           (slots?.moreIconButton ? (
@@ -111,7 +113,7 @@ function AccountPreview(props: AccountPreviewProps) {
               size="small"
               onClick={handleClick}
               {...slotProps?.moreIconButton}
-              sx={{ alignSelf: 'flex-start', ...slotProps?.moreIconButton?.sx }}
+              sx={{ alignSelf: 'center', ...slotProps?.moreIconButton?.sx }}
             >
               <MoreVertIcon fontSize="small" />
             </IconButton>
@@ -129,6 +131,7 @@ function AccountPreview(props: AccountPreviewProps) {
           onClick={handleClick}
           aria-label={localeText.iconButtonAriaLabel || 'Current User'}
           size="small"
+          sx={{ width: 'fit-content', margin: '0 auto' }}
           aria-controls={open ? 'account-menu' : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
@@ -168,6 +171,8 @@ AccountPreview.propTypes /* remove-proptypes */ = {
    */
   slots: PropTypes.shape({
     avatar: PropTypes.elementType,
+    avatarIconButton: PropTypes.elementType,
+    moreIconButton: PropTypes.elementType,
   }),
   /**
    * The type of account details to display.

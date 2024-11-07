@@ -213,6 +213,10 @@ If you're using the default [Next.js example](https://github.com/mui/toolpad/tre
 If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4/) to get started.
 :::
 
+:::info
+If you're using Vite with React Router, check out the [example with Vite and React Router](https://github.com/mui/toolpad/tree/master/examples/core/auth-vite/) that showcases how to use `SignInPage` along with any external authentication library of your choice.
+:::
+
 ## Customization
 
 ### Branding
@@ -247,6 +251,6 @@ Make sure to use the `name` attribute on the custom components with values `emai
 
 The `SignInPage` component has versions with different layouts for authentication - one column, two column and others such. The APIs of these components are identical. This is in progress.
 
-## 🚧 Other authentication Flows
+## 🚧 Other authentication flows
 
 Besides the `SignInPage` , the team is planning work on several other components that enable new workflows such as [sign up](https://github.com/mui/toolpad/issues/4068) and [password reset](https://github.com/mui/toolpad/issues/4265).

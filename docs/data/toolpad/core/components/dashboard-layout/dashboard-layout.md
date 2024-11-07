@@ -153,6 +153,10 @@ Some possibly useful slots:
 
 ### Examples
 
+#### User account in layout sidebar
+
+{{"demo": "DashboardLayoutAccountSidebar.js", "height": 400, "iframe": true}}
+
 #### Settings menu with custom theme switcher
 
 The `useColorScheme` hook can be used to create a custom theme switcher.

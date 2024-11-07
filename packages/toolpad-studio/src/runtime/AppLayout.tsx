@@ -52,7 +52,7 @@ export function AppLayout({
 
   const hasLayout = hasLayoutProp && hasShell;
 
-  const { session, signOut } = React.useContext(AuthContext);
+  const { session, signOut, hasAuthentication } = React.useContext(AuthContext);
 
   const navigation = React.useMemo(
     () =>
@@ -80,10 +80,14 @@ export function AppLayout({
       branding={{
         title: 'Toolpad Studio',
       }}
-      authentication={{
-        signIn,
-        signOut,
-      }}
+      authentication={
+        hasAuthentication
+          ? {
+              signIn,
+              signOut,
+            }
+          : undefined
+      }
       session={session}
     >
       {hasLayout ? (

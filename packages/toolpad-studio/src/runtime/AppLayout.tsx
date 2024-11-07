@@ -63,9 +63,18 @@ export function AppLayout({
     [pages, retainedSearch],
   );
 
-  const signIn = React.useCallback(() => {
-    navigate('/signin');
-  }, [navigate]);
+  const authentication = React.useMemo(
+    () =>
+      hasAuthentication
+        ? {
+            signIn: () => {
+              navigate('/signin');
+            },
+            signOut,
+          }
+        : undefined,
+    [hasAuthentication, navigate, signOut],
+  );
 
   const layoutContent = (
     <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>
@@ -80,14 +89,7 @@ export function AppLayout({
       branding={{
         title: 'Toolpad Studio',
       }}
-      authentication={
-        hasAuthentication
-          ? {
-              signIn,
-              signOut,
-            }
-          : undefined
-      }
+      authentication={authentication}
       session={session}
     >
       {hasLayout ? (

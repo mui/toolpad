@@ -20,7 +20,6 @@ import { Account, type AccountProps } from '../Account';
 import { useApplicationTitle } from '../shared/branding';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
-import { ThemeSwitcher } from './ThemeSwitcher';
 import { ToolpadLogo } from './ToolpadLogo';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 
@@ -372,7 +371,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
             </Stack>
             <Stack direction="row" spacing={1} sx={{ marginLeft: 'auto' }}>
               <ToolbarActionsSlot {...slotProps?.toolbarActions} />
-              <ThemeSwitcher />
               <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
             </Stack>
           </Stack>

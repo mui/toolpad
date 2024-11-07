@@ -1,0 +1,11 @@
+{
+  "props": {},
+  "name": "ToolbarActions",
+  "imports": ["import { ToolbarActions } from '@toolpad/core/DashboardLayout';"],
+  "classes": [],
+  "muiName": "ToolbarActions",
+  "filename": "/packages/toolpad-core/src/DashboardLayout/ToolbarActions.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-dashboard-layout/\">Dashboard Layout</a></li></ul>",
+  "cssComponent": false
+}

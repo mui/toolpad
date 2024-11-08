@@ -52,6 +52,11 @@ const NAVIGATION: Navigation = [
       },
     ],
   },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
 ];
 
 const BRANDING = {

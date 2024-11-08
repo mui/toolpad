@@ -342,7 +342,7 @@ function DashboardSidebarSubNavigation({
                     sx={{
                       pt: 0.5,
                       pb: 0.5,
-                      transform: (theme) => `translateY(calc(50% - ${theme.spacing(3)}))`,
+                      transform: (theme) => `translateY(calc(50% + ${theme.spacing(1)}))`,
                     }}
                   >
                     <DashboardSidebarSubNavigation
@@ -360,8 +360,11 @@ function DashboardSidebarSubNavigation({
 
         return (
           <React.Fragment key={navigationItemId}>
-            {isMini && !navigationItem.children ? (
-              <Tooltip title={navigationItemTitle} placement="right">
+            {isMini ? (
+              <Tooltip
+                title={navigationItemTitle}
+                placement={navigationItem.children ? 'right-start' : 'right'}
+              >
                 {listItem}
               </Tooltip>
             ) : (

@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Dashboard Layout
-components: AppProvider, DashboardLayout, Account
+components: AppProvider, DashboardLayout, ToolbarActions, ThemeSwitcher, Account
 ---
 
 # Dashboard Layout
@@ -93,7 +93,8 @@ Navigation links have an optional `action` prop to render any content on the rig
 ### Navigation pattern matching
 
 Navigation links have an optional `pattern` prop to define a pattern to be matched for the item to be marked as selected.
-This feature is built on top of the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library. Some examples:
+This feature is built on top of the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library.
+Some examples:
 
 - Constant path: `orders`
 - Dynamic segment: `orders/:segment`
@@ -139,14 +140,25 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 
 ## Customization
 
-Some areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
-This allows you to add, for example:
+### Slots
 
-- new items to the toolbar in the header, such as a search bar or button;
-- footer content in the sidebar.
+Certain areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
+Some possibly useful slots:
+
+- `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
+
+- `sidebarFooter`: allows you to add footer content in the sidebar.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
 
-Through this, you can also modify the position of the `<Account />` component and use it inside the sidebar:
+### Examples
+
+#### User account in layout sidebar
 
 {{"demo": "DashboardLayoutAccountSidebar.js", "height": 400, "iframe": true}}
+
+#### Settings menu with custom theme switcher
+
+The `useColorScheme` hook can be used to create a custom theme switcher.
+
+{{"demo": "DashboardLayoutCustomThemeSwitcher.js", "height": 400, "iframe": true}}

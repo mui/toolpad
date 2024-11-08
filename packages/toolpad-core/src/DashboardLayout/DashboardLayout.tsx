@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme, type Theme, SxProps } from '@mui/material';
+import { styled, useTheme, SxProps } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -20,7 +20,6 @@ import { Account, type AccountProps } from '../Account';
 import { useApplicationTitle } from '../shared/branding';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
-import { ThemeSwitcher } from './ThemeSwitcher';
 import { ToolpadLogo } from './ToolpadLogo';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 
@@ -107,7 +106,7 @@ export interface DashboardLayoutProps {
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.
    */
-  sx?: SxProps<Theme>;
+  sx?: SxProps;
 }
 
 /**
@@ -328,56 +327,52 @@ function DashboardLayout(props: DashboardLayoutProps) {
     >
       <AppBar color="inherit" position="absolute" sx={{ displayPrint: 'none' }}>
         <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
-          {!hideNavigation ? (
-            <React.Fragment>
-              <Box
-                sx={{
-                  mr: { sm: disableCollapsibleSidebar ? 0 : 1 },
-                  display: { md: 'none' },
-                }}
-              >
-                {getMenuIcon(isMobileNavigationExpanded)}
-              </Box>
-              <Box
-                sx={{
-                  display: { xs: 'none', md: disableCollapsibleSidebar ? 'none' : 'block' },
-                  mr: disableCollapsibleSidebar ? 0 : 1,
-                }}
-              >
-                {getMenuIcon(isDesktopNavigationExpanded)}
-              </Box>
-            </React.Fragment>
-          ) : null}
-
-          <Box
-            sx={{
-              position: { xs: 'absolute', md: 'static' },
-              left: { xs: '50%', md: 'auto' },
-              transform: { xs: 'translateX(-50%)', md: 'none' },
-            }}
+          <Stack
+            direction="row"
+            sx={{ flexWrap: 'wrap', justifyContent: 'space-between', width: '100%', py: 1.5 }}
           >
-            <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-              <Stack direction="row" alignItems="center">
-                <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: (theme.vars ?? theme).palette.primary.main,
-                    fontWeight: '700',
-                    ml: 0.5,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {applicationTitle}
-                </Typography>
-              </Stack>
-            </Link>
-          </Box>
-          <Box sx={{ flexGrow: 1 }} />
-          <Stack direction="row" spacing={1}>
-            <ToolbarActionsSlot {...slotProps?.toolbarActions} />
-            <ThemeSwitcher />
-            <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+            <Stack direction="row">
+              {!hideNavigation ? (
+                <React.Fragment>
+                  <Box
+                    sx={{
+                      mr: { sm: disableCollapsibleSidebar ? 0 : 1 },
+                      display: { md: 'none' },
+                    }}
+                  >
+                    {getMenuIcon(isMobileNavigationExpanded)}
+                  </Box>
+                  <Box
+                    sx={{
+                      display: { xs: 'none', md: disableCollapsibleSidebar ? 'none' : 'block' },
+                      mr: disableCollapsibleSidebar ? 0 : 1,
+                    }}
+                  >
+                    {getMenuIcon(isDesktopNavigationExpanded)}
+                  </Box>
+                </React.Fragment>
+              ) : null}
+              <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
+                <Stack direction="row" alignItems="center">
+                  <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: (theme.vars ?? theme).palette.primary.main,
+                      fontWeight: '700',
+                      ml: 0.5,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {applicationTitle}
+                  </Typography>
+                </Stack>
+              </Link>
+            </Stack>
+            <Stack direction="row" spacing={1} sx={{ marginLeft: 'auto' }}>
+              <ToolbarActionsSlot {...slotProps?.toolbarActions} />
+              <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+            </Stack>
           </Stack>
         </Toolbar>
       </AppBar>

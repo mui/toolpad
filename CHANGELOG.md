@@ -1,5 +1,58 @@
 # Changelog
 
+## v0.9.0
+
+<!-- generated comparing v0.8.0..master -->
+
+_Nov 8, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- Support magic links in `SignInPage`
+- Support placing `Account` component in layout sidebar
+- Improved UI integration with custom themes
+- Improved customizability of `DashboardLayout` header actions
+- Improved documentation, especially around React Router integration
+
+### `@toolpad/core`
+
+- Support magic links in `SignInPage` (#4085) @bharatkashyap
+- Add `<Account />` in `sidebarFooter` (#4255) @bharatkashyap
+- Improve default UI and customisation ability (#4370) @bharatkashyap
+- Allow theme switcher override with slots (#4340) @apedroferreira
+- Left-align header title in mobile viewport (#4346) @apedroferreira
+- Allow changing the width of the drawer in dashboard layout (#4296) @garryxiao
+- Hide layout header and sidebar when printing (#4334) @apedroferreira
+
+### Docs
+
+- Add `SignInPage` Vite + React Router example (#4335) @bharatkashyap
+- Add custom user details example (#4227) @bharatkashyap
+- Update React Router example configs (#4303) @apedroferreira
+- Make Themed example run by default on Codesandbox (#4382) @bharatkashyap
+- Add component as `payload` example to `useDialogs` docs (#4375) @bharatkashyap
+- Add sandbox links for Toolpad Core examples (#4325) @bharatkashyap
+- Separate example folders for Core and Studio (#4301) @bharatkashyap
+- Clean up examples (#4383) @bharatkashyap
+- Fix more 404s on examples page (#4368) @prakhargupta1
+- Fix tool redirection (#4366) @oliviertassinari
+- Fix missing punctuation on descriptions (#4351) @oliviertassinari
+- Sentence case (10dde48) @oliviertassinari
+- Polish to match standard (#4344) @oliviertassinari
+- Move the description to match the other pages (#4348) @oliviertassinari
+- Adjust some casings and sections in component docs (#4306) @apedroferreira
+- Fix "breadcrumbs" spelling (#4297) @bharatkashyap
+- Minor changes (#4372) @prakhargupta1
+- Replace support link from Studio to Core in the GitHub Issue template (#4272) @prakhargupta1
+
+### Core
+
+- Fix Dependabot warning in Next.js example with passkey (#4371) @apedroferreira
+- Fix Vale errors (#4347) @oliviertassinari
+- Fix VS Code reference (0520057) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @garryxiao, @oliviertassinari, @prakhargupta1
+
 ## v0.8.0
 
 <!-- generated comparing v0.7.0..master -->

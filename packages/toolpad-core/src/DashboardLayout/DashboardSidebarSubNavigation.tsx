@@ -32,7 +32,7 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
       color: (theme.vars ?? theme).palette.primary.dark,
     },
     '& .MuiTypography-root': {
-      color: (theme.vars ?? theme).palette.primary.dark,
+      color: (theme.vars ?? theme).palette.text.primary,
     },
     '& .MuiSvgIcon-root': {
       color: (theme.vars ?? theme).palette.primary.dark,

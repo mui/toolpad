@@ -9,7 +9,7 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ popover?: object, popoverContent?: object, preview?: { handleClick?: func, open?: bool, slotProps?: { avatar?: object, avatarIconButton?: object, moreIconButton?: object }, slots?: { avatar?: elementType, avatarIconButton?: elementType, moreIconButton?: elementType }, variant?: 'condensed'<br>&#124;&nbsp;'expanded' }, signInButton?: object, signOutButton?: object }"
+        "description": "{ popover?: object, popoverContent?: object, preview?: { handleClick?: func, open?: bool, slotProps?: { avatar?: object, avatarIconButton?: object, moreIconButton?: object }, slots?: { avatar?: elementType, avatarIconButton?: elementType, moreIconButton?: elementType }, sx?: Array&lt;func<br>&#124;&nbsp;object<br>&#124;&nbsp;bool&gt;<br>&#124;&nbsp;func<br>&#124;&nbsp;object, variant?: 'condensed'<br>&#124;&nbsp;'expanded' }, signInButton?: object, signOutButton?: object }"
       }
     },
     "slots": {

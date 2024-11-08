@@ -13,6 +13,14 @@ export default function CustomizedDataGrid() {
         initialState={{
           pagination: { paginationModel: { pageSize: 20 } },
         }}
+        sx={(theme) => ({
+          borderColor:
+            theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[200],
+          '& .MuiDataGrid-cell': {
+            borderColor:
+              theme.palette.mode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[200],
+          },
+        })}
         pageSizeOptions={[10, 20, 50]}
         disableColumnResize
         density="compact"

@@ -1,29 +1,32 @@
 {
-  "name": "playground-nextjs-themed",
+  "name": "auth-nextjs-themed",
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint"
   },
-  "devDependencies": {
+  "dependencies": {
     "@emotion/cache": "^11",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@mui/icons-material": "^6",
     "@mui/material": "^6",
     "@mui/material-nextjs": "^6",
+    "@mui/x-charts": "^7",
     "@mui/x-tree-view": "^7",
     "@mui/x-data-grid": "^7",
     "@mui/x-date-pickers": "^7",
     "dayjs": "^1",
     "clsx": "^2",
     "@react-spring/web": "^9",
-    "@toolpad/core": "workspace:*",
+    "@toolpad/core": "https://pkg.csb.dev/mui/toolpad/commit/179144e3/@toolpad/core",
     "next": "^14",
     "next-auth": "^5.0.0-beta.20",
     "react": "^18",
-    "react-dom": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -85,5 +85,17 @@ export default function examples() {
       src: '/static/toolpad/docs/core/vite-react-router.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-vite',
     },
+    {
+      title: 'Custom theme with Auth.js and Next.js App router',
+      description:
+        'This app shows you how to get started using Toolpad Core with Next.js, Auth.js and customize the Material UI theme',
+      src: '/static/toolpad/docs/core/auth-next-themed.png',
+      srcDark: '/static/toolpad/docs/core/auth-next-themed-dark.png',
+      source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
+      codesandbox:
+        'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
+      stackblitz:
+        'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
+    },
   ];
 }

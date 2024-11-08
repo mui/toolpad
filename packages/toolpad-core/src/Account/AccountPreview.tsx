@@ -130,18 +130,18 @@ function AccountPreview(props: AccountPreviewProps) {
   return (
     <Tooltip title={session.user.name ?? 'Account'}>
       {slots?.avatarIconButton ? (
-        <slots.avatarIconButton />
+        <slots.avatarIconButton {...slotProps?.avatarIconButton} />
       ) : (
-        <Stack sx={{ py: 1, ...sx }}>
+        <Stack sx={{ py: 0.5, ...sx }}>
           <IconButton
             onClick={handleClick}
             aria-label={localeText.iconButtonAriaLabel || 'Current User'}
             size="small"
-            sx={{ width: 'fit-content', margin: '0 auto' }}
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={open ? 'true' : undefined}
             {...slotProps?.avatarIconButton}
+            sx={{ width: 'fit-content', margin: '0 auto', ...slotProps?.avatarIconButton?.sx }}
           >
             {avatarContent}
           </IconButton>

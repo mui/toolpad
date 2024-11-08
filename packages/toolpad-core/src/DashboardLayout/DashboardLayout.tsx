@@ -146,6 +146,9 @@ function DashboardSidebarSubNavigation({
   const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState(
     initialExpandedSidebarItemIds,
   );
+  const [hoveredMiniSidebarItemId, setHoveredMiniSidebarItemId] = React.useState<string | null>(
+    null,
+  );
 
   const handleOpenFolderClick = React.useCallback(
     (itemId: string) => () => {
@@ -162,8 +165,8 @@ function DashboardSidebarSubNavigation({
     <List
       sx={{
         padding: 0,
-        mt: isPopover ? 1 : 0,
-        mb: depth === 0 && !isPopover ? 4 : 1,
+        mt: isPopover ? 0.5 : 0,
+        mb: depth === 0 && !isPopover ? 4 : 0.5,
         pl: isPopover ? 0 : 2 * depth,
         minWidth: isPopover ? 240 : 'auto',
       }}
@@ -245,16 +248,20 @@ function DashboardSidebarSubNavigation({
 
         const listItem = (
           <ListItem
+            {...(navigationItem.children && isMini
+              ? {
+                  onMouseEnter: () => {
+                    setHoveredMiniSidebarItemId(navigationItemId);
+                  },
+                  onMouseLeave: () => {
+                    setHoveredMiniSidebarItemId(null);
+                  },
+                }
+              : {})}
             sx={{
               py: 0,
               px: 1,
               overflowX: 'hidden',
-              '> .MuiBox-root': {
-                display: 'none',
-              },
-              '&:hover > .MuiBox-root': {
-                display: 'block',
-              },
             }}
           >
             <NavigationListItemButton
@@ -323,26 +330,30 @@ function DashboardSidebarSubNavigation({
               {navigationItem.children ? <ExpandMoreIcon sx={nestedNavigationCollapseSx} /> : null}
             </NavigationListItemButton>
             {navigationItem.children && isMini ? (
-              <Box
-                sx={{
-                  position: 'fixed',
-                  left: 62,
-                  pl: '6px',
-                  transform: (theme) => `translateY(calc(50% - ${theme.spacing(3)}))`,
-                  '&:hover': {
-                    display: 'block',
-                  },
-                }}
-              >
-                <Paper sx={{ pt: 0.5, pb: 0.5 }}>
-                  <DashboardSidebarSubNavigation
-                    subNavigation={navigationItem.children}
-                    depth={depth + 1}
-                    onLinkClick={onLinkClick}
-                    isPopover
-                  />
-                </Paper>
-              </Box>
+              <Grow in={navigationItemId === hoveredMiniSidebarItemId}>
+                <Box
+                  sx={{
+                    position: 'fixed',
+                    left: 62,
+                    pl: '6px',
+                  }}
+                >
+                  <Paper
+                    sx={{
+                      pt: 0.5,
+                      pb: 0.5,
+                      transform: (theme) => `translateY(calc(50% - ${theme.spacing(3)}))`,
+                    }}
+                  >
+                    <DashboardSidebarSubNavigation
+                      subNavigation={navigationItem.children}
+                      depth={depth + 1}
+                      onLinkClick={onLinkClick}
+                      isPopover
+                    />
+                  </Paper>
+                </Box>
+              </Grow>
             ) : null}
           </ListItem>
         );

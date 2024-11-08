@@ -17,7 +17,7 @@
     "@simplewebauthn/browser": "9.0.1",
     "@simplewebauthn/server": "9.0.3",
     "@toolpad/core": "workspace:*",
-    "next": "14.2.7",
+    "next": "^14",
     "next-auth": "5.0.0-beta.20",
     "react": "18.3.1",
     "react-dom": "18.3.1"
@@ -26,7 +26,7 @@
     "@types/node": "22.5.1",
     "@types/react": "18.3.5",
     "@types/react-dom": "18.3.0",
-    "eslint-config-next": "14.2.7",
+    "eslint-config-next": "^14",
     "prisma": "5.19.1"
   }
 }

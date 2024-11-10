@@ -50,7 +50,7 @@ Find details on how to set up each provider in the [Auth.js documentation](https
 
 ## Magic Link
 
-The `SignIn` page component supports magic links. To enable this, you have to set up a provider such as Auth.js NodeMailer. See more details in the Auth.js docs on [database setup for email](https://authjs.dev/getting-started/authentication/email) and [Nodemailer configuration](https://authjs.dev/getting-started/providers/nodemailer/).
+The `SignIn` page component supports magic links. To enable this, you have to set up a provider such as Auth.js NodeMailer. See more details in the Auth.js docs on [database setup for email](https://authjs.dev/getting-started/authentication/email) and [Nodemailer configuration](https://authjs.dev/getting-started/providers/nodemailer).
 
 To render a magic link form, pass in a provider with `nodemailer` as the `id` property.
 

@@ -26,7 +26,7 @@ You can change the format of a value like:
 
 You can write strings inside backticks (`) to write embedded expressions and multiline text. These can be used to read values from other components.
 
-<video controls width="100%" height="auto" style="contain" alt="button-onclick-js-expression">
+<video controls width="100%" height="auto" alt="button-onclick-js-expression">
   <source src="/static/toolpad/docs/studio/components/button/button-usage.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

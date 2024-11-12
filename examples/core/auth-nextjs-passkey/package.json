@@ -16,7 +16,7 @@
     "@prisma/client": "5.19.1",
     "@simplewebauthn/browser": "9.0.1",
     "@simplewebauthn/server": "9.0.3",
-    "@toolpad/core": "workspace:*",
+    "@toolpad/core": "latest",
     "next": "^14",
     "next-auth": "5.0.0-beta.20",
     "react": "18.3.1",

@@ -268,7 +268,6 @@ function SignInPage(props: SignInPageProps) {
       <Container component="main" maxWidth="xs">
         <Box
           sx={{
-            marginTop: 8,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -277,7 +276,7 @@ function SignInPage(props: SignInPageProps) {
             p: 4,
             border: '1px solid',
             borderColor: alpha(theme.palette.grey[400], 0.4),
-            boxShadow: theme.shadows[10],
+            boxShadow: theme.shadows[4],
           }}
         >
           {branding?.logo}
@@ -289,7 +288,7 @@ function SignInPage(props: SignInPageProps) {
               variant="h5"
               color="textPrimary"
               sx={{
-                mb: 1,
+                my: theme.spacing(1),
                 fontWeight: 600,
               }}
             >
@@ -303,7 +302,7 @@ function SignInPage(props: SignInPageProps) {
               Welcome, please sign in to continue
             </Typography>
           )}
-          <Box sx={{ mt: 2, width: '100%' }}>
+          <Box sx={{ mt: theme.spacing(1), width: '100%' }}>
             <Stack spacing={1}>
               {error && isOauthProvider(selectedProviderId) ? (
                 <Alert severity="error">{error}</Alert>
@@ -507,7 +506,7 @@ function SignInPage(props: SignInPageProps) {
                       type="submit"
                       fullWidth
                       size="large"
-                      variant="contained"
+                      variant="outlined"
                       disableElevation
                       id="submit-nodemailer"
                       color="inherit"

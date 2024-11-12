@@ -4,7 +4,7 @@
 
 The most powerful way of bringing data into Toolpad Studio is through your own code. You can define functions inside `toolpad/resources` and use them when creating a query of this type. The following video shows how you can use this feature to read data from PostgreSQL.
 
-<video controls width="auto" height="100%" style="contain" alt="custom-function">
+<video controls width="auto" height="100%" alt="custom-function">
   <source src="/static/toolpad/docs/studio/concepts/connecting-to-data/postgres.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

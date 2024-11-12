@@ -6,7 +6,7 @@ You can write a custom function to read or write data from a Google sheet. We'll
 
 There are many ways to authenticate Google APIs, as mentioned in `google-auth-library`. This guide uses JWTs (JSON Web Tokens), which are appropriate for a server-based application.
 
-<video controls width="100%" height="auto" style="contain" alt="google-sheet-app">
+<video controls width="100%" height="auto" alt="google-sheet-app">
   <source src="/static/toolpad/docs/studio/examples/google-sheet.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

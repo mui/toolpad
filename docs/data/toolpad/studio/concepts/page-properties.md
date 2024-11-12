@@ -45,7 +45,7 @@ Available values are **xs**, **sm**, **md**, **lg**, **xl**, or **None** to conf
 
 Page parameters allow you to pass external data into the Toolpad Studio page state via the URL query parameters.
 
-<video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
+<video controls width="auto" height="100%" alt="custom-component-creation">
   <source src="/static/toolpad/docs/studio/concepts/page-properties/page-parameter-1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

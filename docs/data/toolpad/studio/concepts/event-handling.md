@@ -10,7 +10,7 @@ Some event handling scenarios:
 
 ### Change component state
 
-<video controls width="100%" height="auto" style="contain" alt="change-component-state">
+<video controls width="100%" height="auto" alt="change-component-state">
   <source src="/static/toolpad/docs/studio/concepts/event-handling/change-component-state.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
@@ -25,7 +25,7 @@ You can call single or multiple queries sequentially to fetch data on the page o
 
 #### Multiple queries
 
-<video controls width="100%" height="auto" style="contain" alt="call-multiple-queries">
+<video controls width="100%" height="auto" alt="call-multiple-queries">
   <source src="/static/toolpad/docs/studio/concepts/event-handling/multiple-queries.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
@@ -38,7 +38,7 @@ See the [deleting data grid row](/toolpad/studio/how-to-guides/delete-datagrid-r
 
 Custom functions allow you to write custom code in your editor. You can write a `console.log` statement that interacts with the data on the page and prints logs.
 
-<video controls width="100%" height="auto" style="contain" alt="console-log">
+<video controls width="100%" height="auto" alt="console-log">
   <source src="/static/toolpad/docs/studio/concepts/event-handling/console-log.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

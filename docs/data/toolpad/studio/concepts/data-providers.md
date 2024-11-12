@@ -6,7 +6,7 @@ Toolpad Studio functions are great to bring some backend state to the page, but 
 
 Follow these steps to create a new data provider:
 
-<video controls width="auto" height="100%" style="contain" alt="component-library">
+<video controls width="auto" height="100%" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/data-provider-1.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
@@ -25,7 +25,7 @@ export default createDataProvider({
 });
 ```
 
-   <video controls width="auto" height="100%" style="contain" alt="component-library">
+   <video controls width="auto" height="100%" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/data-provider-2.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
@@ -100,7 +100,7 @@ For example, this could print the following if the corresponding column filters 
 
 Now the backend function receives the grid filter from the UI in its parameters.
 
-<video controls width="auto" height="100%" style="contain" alt="component-library">
+<video controls width="auto" height="100%" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/filtering.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
@@ -129,7 +129,7 @@ Depending on which column has been set to sort by, this results in:
 
 Now the backend function receives the grid sorting model from the UI in its parameters.
 
-<video controls width="auto" height="100%" style="contain" alt="component-library">
+<video controls width="auto" height="100%" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/sorting.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
@@ -156,7 +156,7 @@ export default createDataProvider({
 
 When this method is available in the data provider, each row gets an edit button. This edit button brings the row in edit mode. To commit the changes press the save button on the row that is in edit mode. To discard the changes use the cancel button.
 
-<video controls width="auto" height="100%" style="contain" alt="component-library">
+<video controls width="auto" height="100%" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/editing.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
@@ -183,7 +183,7 @@ export default createDataProvider({
 
 After you make this method available in the data provider, an "Add record" button appears in the data grid toolbar. Click this button and a new editable row appears at the top of the grid. Fill in the values and click the "Save" button to finish creating the row. You'll have to return the newly created row from the `createRecord` method so that the grid can update accordingly.
 
-<video controls width="auto" height="100%" style="contain" alt="component-library">
+<video controls width="auto" height="100%" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/data-providers/creating.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

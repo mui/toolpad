@@ -48,7 +48,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/core/integrations/nextjs-pagesrouter',
-        title: 'Next.js Page Router',
+        title: 'Next.js Pages Router',
       },
       {
         pathname: '/toolpad/core/integrations/react-router',

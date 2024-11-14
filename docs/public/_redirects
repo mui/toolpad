@@ -2,7 +2,7 @@
 /toolpad/_next/* /_next/:splat 200
 
 # Templates 
-/toolpad/core/templates/nextjs-dashboard/* https://toolpad-core-nextjs-themed.vercel.app/:splat 200
+/toolpad/core/templates/nextjs-dashboard/* https://toolpad-core-nextjs-themed.vercel.app/toolpad/core/templates/nextjs-dashboard/:splat 200
 
 # Legacy redirection
 # 2022

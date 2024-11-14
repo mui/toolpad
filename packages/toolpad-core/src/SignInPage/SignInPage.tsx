@@ -630,7 +630,7 @@ function SignInPage(props: SignInPageProps) {
                     spacing={1}
                   >
                     <FormControlLabel
-                      control={<Checkbox value="remember" color="primary" />}
+                      control={<Checkbox name="remember" value="true" color="primary" />}
                       label="Remember me"
                       slotProps={{ typography: { color: 'textSecondary' } }}
                     />

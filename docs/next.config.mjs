@@ -160,6 +160,11 @@ export default withDocsInfra({
           return [
             { source: `/:lang(${LANGUAGES.join('|')})?/:rest*`, destination: '/:rest*' },
             { source: '/api/:rest*', destination: '/api-docs/:rest*' },
+            {
+              source: '/toolpad/core/templates/nextjs-dashboard/:path*',
+              destination:
+                'https://toolpad-core-nextjs-themed.vercel.app/toolpad/core/templates/nextjs-dashboard/:path*',
+            },
           ];
         },
         redirects: async () => [

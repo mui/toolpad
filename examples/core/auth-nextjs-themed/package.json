@@ -20,7 +20,7 @@
     "dayjs": "^1",
     "clsx": "^2",
     "@react-spring/web": "^9",
-    "@toolpad/core": "https://pkg.csb.dev/mui/toolpad/commit/179144e3/@toolpad/core",
+    "@toolpad/core": "latest",
     "next": "^14",
     "next-auth": "^5.0.0-beta.20",
     "react": "^18",

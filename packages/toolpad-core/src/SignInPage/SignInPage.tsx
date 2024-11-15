@@ -377,35 +377,41 @@ function SignInPage(props: SignInPageProps) {
                     }));
                   }}
                 >
-                  {slotProps?.emailField?.label ? null : (
-                    <InputLabel shrink htmlFor="email-passkey" sx={{ marginBottom: 0 }}>
-                      Email
-                    </InputLabel>
+                  {slots?.emailField ? (
+                    <slots.emailField {...slotProps?.emailField} />
+                  ) : (
+                    <React.Fragment>
+                      {slotProps?.emailField?.label ? null : (
+                        <InputLabel shrink htmlFor="email-passkey" sx={{ marginBottom: 0 }}>
+                          Email
+                        </InputLabel>
+                      )}
+                      <TextField
+                        required
+                        slotProps={{
+                          htmlInput: {
+                            sx: {
+                              paddingTop: theme.spacing(1),
+                              paddingBottom: theme.spacing(1),
+                            },
+                          },
+                          inputLabel: {
+                            sx: {
+                              lineHeight: theme.typography.pxToRem(12),
+                            },
+                          },
+                        }}
+                        fullWidth
+                        placeholder="your@email.com"
+                        id="email-passkey"
+                        name="email"
+                        type="email"
+                        autoComplete="email-webauthn"
+                        autoFocus={docs ? false : singleProvider}
+                        {...slotProps?.emailField}
+                      />
+                    </React.Fragment>
                   )}
-                  <TextField
-                    required
-                    slotProps={{
-                      htmlInput: {
-                        sx: {
-                          paddingTop: theme.spacing(1),
-                          paddingBottom: theme.spacing(1),
-                        },
-                      },
-                      inputLabel: {
-                        sx: {
-                          lineHeight: theme.typography.pxToRem(12),
-                        },
-                      },
-                    }}
-                    fullWidth
-                    placeholder="your@email.com"
-                    id="email-passkey"
-                    name="email"
-                    type="email"
-                    autoComplete="email-webauthn"
-                    autoFocus={docs ? false : singleProvider}
-                    {...slotProps?.emailField}
-                  />
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -464,35 +470,41 @@ function SignInPage(props: SignInPageProps) {
                     }));
                   }}
                 >
-                  {slotProps?.emailField?.label ? null : (
-                    <InputLabel shrink htmlFor="email-nodemailer" sx={{ marginBottom: 0 }}>
-                      Email
-                    </InputLabel>
+                  {slots?.emailField ? (
+                    <slots.emailField {...slotProps?.emailField} />
+                  ) : (
+                    <React.Fragment>
+                      {slotProps?.emailField?.label ? null : (
+                        <InputLabel shrink htmlFor="email-nodemailer" sx={{ marginBottom: 0 }}>
+                          Email
+                        </InputLabel>
+                      )}
+                      <TextField
+                        required
+                        slotProps={{
+                          htmlInput: {
+                            sx: {
+                              paddingTop: theme.spacing(1),
+                              paddingBottom: theme.spacing(1),
+                            },
+                          },
+                          inputLabel: {
+                            sx: {
+                              lineHeight: theme.typography.pxToRem(12),
+                            },
+                          },
+                        }}
+                        fullWidth
+                        placeholder="your@email.com"
+                        name="email"
+                        id="email-nodemailer"
+                        type="email"
+                        autoComplete="email-nodemailer"
+                        autoFocus={docs ? false : singleProvider}
+                        {...slotProps?.emailField}
+                      />
+                    </React.Fragment>
                   )}
-                  <TextField
-                    required
-                    slotProps={{
-                      htmlInput: {
-                        sx: {
-                          paddingTop: theme.spacing(1),
-                          paddingBottom: theme.spacing(1),
-                        },
-                      },
-                      inputLabel: {
-                        sx: {
-                          lineHeight: theme.typography.pxToRem(12),
-                        },
-                      },
-                    }}
-                    fullWidth
-                    placeholder="your@email.com"
-                    name="email"
-                    id="email-nodemailer"
-                    type="email"
-                    autoComplete="email-nodemailer"
-                    autoFocus={docs ? false : singleProvider}
-                    {...slotProps?.emailField}
-                  />
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -549,63 +561,75 @@ function SignInPage(props: SignInPageProps) {
                     }));
                   }}
                 >
-                  {slotProps?.emailField?.label ? null : (
-                    <InputLabel shrink htmlFor="email" sx={{ marginBottom: 0 }}>
-                      Email
-                    </InputLabel>
+                  {slots?.emailField ? (
+                    <slots.emailField {...slotProps?.emailField} />
+                  ) : (
+                    <React.Fragment>
+                      {slotProps?.emailField?.label ? null : (
+                        <InputLabel shrink htmlFor="email" sx={{ marginBottom: 0 }}>
+                          Email
+                        </InputLabel>
+                      )}
+                      <TextField
+                        required
+                        slotProps={{
+                          htmlInput: {
+                            sx: {
+                              paddingTop: theme.spacing(1),
+                              paddingBottom: theme.spacing(1),
+                            },
+                          },
+                          inputLabel: {
+                            sx: {
+                              lineHeight: theme.typography.pxToRem(12),
+                            },
+                          },
+                        }}
+                        placeholder="your@email.com"
+                        fullWidth
+                        id="email"
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        autoFocus={docs ? false : singleProvider}
+                        {...slotProps?.emailField}
+                      />
+                    </React.Fragment>
                   )}
-                  <TextField
-                    required
-                    slotProps={{
-                      htmlInput: {
-                        sx: {
-                          paddingTop: theme.spacing(1),
-                          paddingBottom: theme.spacing(1),
-                        },
-                      },
-                      inputLabel: {
-                        sx: {
-                          lineHeight: theme.typography.pxToRem(12),
-                        },
-                      },
-                    }}
-                    placeholder="your@email.com"
-                    fullWidth
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    autoFocus={docs ? false : singleProvider}
-                    {...slotProps?.emailField}
-                  />
-                  {slotProps?.passwordField?.label ? null : (
-                    <InputLabel shrink htmlFor="password" sx={{ marginBottom: 0 }}>
-                      Password
-                    </InputLabel>
+                  {slots?.passwordField ? (
+                    <slots.passwordField {...slotProps?.passwordField} />
+                  ) : (
+                    <React.Fragment>
+                      {slotProps?.passwordField?.label ? null : (
+                        <InputLabel shrink htmlFor="password" sx={{ marginBottom: 0 }}>
+                          Password
+                        </InputLabel>
+                      )}
+                      <TextField
+                        required
+                        fullWidth
+                        slotProps={{
+                          htmlInput: {
+                            sx: {
+                              paddingTop: theme.spacing(1),
+                              paddingBottom: theme.spacing(1),
+                            },
+                          },
+                          inputLabel: {
+                            sx: {
+                              lineHeight: theme.typography.pxToRem(16),
+                            },
+                          },
+                        }}
+                        name="password"
+                        type="password"
+                        id="password"
+                        placeholder="******"
+                        autoComplete="current-password"
+                        {...slotProps?.passwordField}
+                      />
+                    </React.Fragment>
                   )}
-                  <TextField
-                    required
-                    fullWidth
-                    slotProps={{
-                      htmlInput: {
-                        sx: {
-                          paddingTop: theme.spacing(1),
-                          paddingBottom: theme.spacing(1),
-                        },
-                      },
-                      inputLabel: {
-                        sx: {
-                          lineHeight: theme.typography.pxToRem(16),
-                        },
-                      },
-                    }}
-                    name="password"
-                    type="password"
-                    id="password"
-                    placeholder="******"
-                    autoComplete="current-password"
-                    {...slotProps?.passwordField}
-                  />
                   <Stack
                     direction="row"
                     justifyContent="space-between"

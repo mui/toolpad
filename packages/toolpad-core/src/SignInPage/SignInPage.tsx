@@ -407,7 +407,6 @@ function SignInPage(props: SignInPageProps) {
                     autoFocus={docs ? false : singleProvider}
                     {...slotProps?.emailField}
                   />
-
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -495,7 +494,6 @@ function SignInPage(props: SignInPageProps) {
                     autoFocus={docs ? false : singleProvider}
                     {...slotProps?.emailField}
                   />
-
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -581,7 +579,6 @@ function SignInPage(props: SignInPageProps) {
                     autoFocus={docs ? false : singleProvider}
                     {...slotProps?.emailField}
                   />
-
                   {slotProps?.passwordField?.label ? null : (
                     <InputLabel shrink htmlFor="password" sx={{ marginBottom: 0 }}>
                       Password
@@ -610,7 +607,6 @@ function SignInPage(props: SignInPageProps) {
                     autoComplete="current-password"
                     {...slotProps?.passwordField}
                   />
-
                   <Stack
                     direction="row"
                     justifyContent="space-between"

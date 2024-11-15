@@ -25,6 +25,8 @@ export /**
       sx={{
         textTransform: 'capitalize',
         filter: 'opacity(0.9)',
+        width: '50%',
+        margin: (theme) => `${theme.spacing(1)} auto`,
         transition: 'filter 0.2s ease-in',
         '&:hover': {
           filter: 'opacity(1)',

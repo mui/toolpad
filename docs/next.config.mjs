@@ -154,25 +154,12 @@ export default withDocsInfra({
   ...(process.env.NODE_ENV === 'production'
     ? {
         output: 'export',
-        rewrites: async () => {
-          return [
-            {
-              source: '/toolpad/core/templates/nextjs-dashboard/:path*',
-              destination:
-                'https://toolpad-core-nextjs-themed.vercel.app/toolpad/core/templates/nextjs-dashboard/:path*',
-            },
-          ];
-        },
       }
     : {
         rewrites: async () => {
           return [
             { source: `/:lang(${LANGUAGES.join('|')})?/:rest*`, destination: '/:rest*' },
             { source: '/api/:rest*', destination: '/api-docs/:rest*' },
-            {
-              source: '/toolpad/core/templates/nextjs-dashboard/:path*',
-              destination: 'http://localhost:3000/toolpad/core/templates/nextjs-dashboard/:path*',
-            },
           ];
         },
         redirects: async () => [

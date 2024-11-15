@@ -12,7 +12,7 @@
     "@emotion/styled": "^11",
     "@mui/icons-material": "^6",
     "@mui/material": "^6",
-    "@toolpad/core": "workspace:*",
+    "@toolpad/core": "latest",
     "react": "^18",
     "react-dom": "^18",
     "react-router-dom": "^6"

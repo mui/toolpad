@@ -52,7 +52,7 @@ const pages: MuiPage[] = [
       },
       {
         pathname: '/toolpad/core/integrations/react-router',
-        title: 'React Router',
+        title: 'Vite with React Router',
       },
     ],
   },

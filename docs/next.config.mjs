@@ -163,7 +163,7 @@ export default withDocsInfra({
             {
               source: '/toolpad/core/templates/nextjs-dashboard/:path*',
               destination:
-                'https://toolpad-core-nextjs-themed.vercel.app/toolpad/core/templates/nextjs-dashboard/:path*',
+                'https://toolpad-core-nextjs-themed.netlify.app/toolpad/core/templates/nextjs-dashboard/:path*',
             },
           ];
         },

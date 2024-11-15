@@ -14,7 +14,7 @@ First, run the development server: `npm run dev`
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Run on Code Sandbox
+## Run on CodeSandbox
 
 Run this example on CodeSandbox [here](https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
 

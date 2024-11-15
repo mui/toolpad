@@ -4,6 +4,9 @@ const THEME = createTheme({
     ...brandingDesignTokens.palette,
     mode: calculatedMode,
   },
+  components: {
+    ...inputsCustomizations,
+  },
 });
 
 // ...

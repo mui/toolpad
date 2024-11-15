@@ -92,8 +92,6 @@ export default function examples() {
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
       codesandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
-      stackblitz:
-        'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
     },
   ];
 }

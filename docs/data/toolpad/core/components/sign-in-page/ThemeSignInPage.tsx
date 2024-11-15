@@ -3,7 +3,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
 import { createTheme } from '@mui/material/styles';
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
-import { getDesignTokens } from './brandingTheme';
+import { getDesignTokens, inputsCustomizations } from './customTheme';
 
 const providers = [
   { id: 'github', name: 'GitHub' },
@@ -31,6 +31,9 @@ export default function ThemeSignInPage() {
     palette: {
       ...brandingDesignTokens.palette,
       mode: calculatedMode,
+    },
+    components: {
+      ...inputsCustomizations,
     },
   });
   // preview-end

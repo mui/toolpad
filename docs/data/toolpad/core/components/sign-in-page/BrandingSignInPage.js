@@ -3,11 +3,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 
-const providers = [
-  { id: 'github', name: 'GitHub' },
-  { id: 'google', name: 'Google' },
-];
-
+const providers = [{ id: 'credentials', name: 'Credentials' }];
 // preview-start
 const BRANDING = {
   logo: (

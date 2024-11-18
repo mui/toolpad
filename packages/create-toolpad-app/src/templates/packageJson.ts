@@ -21,7 +21,7 @@ const packageJson: PackageJsonTemplate = (options) => {
   const dependencies: Record<string, string> = {
     react: '^18',
     'react-dom': '^18',
-    next: '^14',
+    next: '^15',
     '@toolpad/core': coreVersion ?? 'latest',
     '@mui/material': '^6',
     '@mui/material-nextjs': '^6',
@@ -36,7 +36,7 @@ const packageJson: PackageJsonTemplate = (options) => {
   }
 
   if (authOption) {
-    dependencies['next-auth'] = '5.0.0-beta.20';
+    dependencies['next-auth'] = '5.0.0-beta.25';
   }
 
   const devDependencies: Record<string, string> = {
@@ -45,7 +45,7 @@ const packageJson: PackageJsonTemplate = (options) => {
     '@types/react': '^18',
     '@types/react-dom': '^18',
     eslint: '^8',
-    'eslint-config-next': '^14',
+    'eslint-config-next': '^15',
   };
 
   const scripts = {

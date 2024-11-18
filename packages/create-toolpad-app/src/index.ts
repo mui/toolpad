@@ -102,6 +102,7 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
     await fs.access(absolutePath, fsConstants.F_OK);
 
     // Directory exists, verify if it's empty to proceed
+
     if (await isFolderEmpty(absolutePath)) {
       return true;
     }
@@ -272,7 +273,9 @@ const run = async () => {
       message: example
         ? `Enter path of directory to download example "${chalk.cyan(example)}" into`
         : 'Enter path of directory to bootstrap new app',
-      validate: validatePath,
+      // This check is only necessary if an empty app is being bootstrapped,
+      // not if an example is being downloaded.
+      validate: example ? () => true : validatePath,
       default: '.',
     });
   }
@@ -342,14 +345,17 @@ const run = async () => {
     await scaffoldCoreProject(options);
   }
 
-  const changeDirectoryInstruction =
-    /* `path.relative` is truth-y if the relative path
-     * between `absolutePath` and `process.cwd()`
-     * is not empty
-     */
-    path.relative(process.cwd(), absolutePath)
-      ? `  cd ${path.relative(process.cwd(), absolutePath)}\n`
-      : '';
+  let changeDirectoryInstruction = '';
+  const targetPath = example ? path.join(absolutePath, example) : absolutePath;
+  /* `path.relative` is truth-y if the relative path
+   * between `absolutePath` and `process.cwd()`
+   * is not empty
+   */
+  const hasRelativePath = path.relative(process.cwd(), targetPath);
+
+  if (hasRelativePath) {
+    changeDirectoryInstruction = `  cd ${path.relative(process.cwd(), targetPath)}\n`;
+  }
 
   const installInstruction = example || !installFlag ? `  ${packageManager} install\n` : '';
 

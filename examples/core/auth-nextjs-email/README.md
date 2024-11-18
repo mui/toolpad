@@ -42,7 +42,7 @@ pnpm dev
 bun dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the app running.
+7. Open [http://localhost:3000](http://localhost:3000) with your browser to see the app running.
 
 ## Clone using `create-toolpad-app`
 

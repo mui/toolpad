@@ -15,7 +15,7 @@
     "@prisma/client": "^5",
     "@simplewebauthn/browser": "^9",
     "@simplewebauthn/server": "^9",
-    "@toolpad/core": "https://pkg.csb.dev/mui/toolpad/commit/cf31abf3/@toolpad/core",
+    "@toolpad/core": "latest",
     "next": "^15",
     "next-auth": "5.0.0-beta.25",
     "react": "^18",

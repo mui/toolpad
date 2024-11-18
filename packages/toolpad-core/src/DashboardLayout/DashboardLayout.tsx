@@ -329,7 +329,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
           <Stack
             direction="row"
-            sx={{ flexWrap: 'wrap', justifyContent: 'space-between', width: '100%', py: 1.5 }}
+            sx={{
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              width: '100%',
+              alignItems: 'center',
+            }}
           >
             <Stack direction="row">
               {!hideNavigation ? (

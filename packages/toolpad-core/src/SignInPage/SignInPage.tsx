@@ -8,7 +8,6 @@ import Stack from '@mui/material/Stack';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import InputLabel from '@mui/material/InputLabel';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -17,7 +16,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import AppleIcon from '@mui/icons-material/Apple';
-import { alpha, useTheme, SxProps } from '@mui/material/styles';
+import { alpha, useTheme, SxProps, type Theme } from '@mui/material/styles';
 import { LinkProps } from '@mui/material/Link';
 import GoogleIcon from './icons/Google';
 import FacebookIcon from './icons/Facebook';
@@ -39,6 +38,29 @@ import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
 import { BrandingContext, RouterContext } from '../shared/context';
 import { DocsContext } from '../internal/context';
+
+const getCommonTextFieldProps = (theme: Theme, baseProps: TextFieldProps = {}): TextFieldProps => ({
+  required: true,
+  fullWidth: true,
+  ...baseProps,
+  slotProps: {
+    ...baseProps.slotProps,
+    htmlInput: {
+      sx: {
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1),
+      },
+      ...baseProps.slotProps?.htmlInput,
+    },
+    inputLabel: {
+      sx: {
+        lineHeight: theme.typography.pxToRem(12),
+        fontSize: theme.typography.pxToRem(14),
+      },
+      ...baseProps.slotProps?.inputLabel,
+    },
+  },
+});
 
 type SupportedOAuthProvider =
   | 'github'
@@ -380,37 +402,18 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
                   ) : (
-                    <React.Fragment>
-                      {slotProps?.emailField?.label ? null : (
-                        <InputLabel shrink htmlFor="email-passkey" sx={{ marginBottom: 0 }}>
-                          Email
-                        </InputLabel>
-                      )}
-                      <TextField
-                        required
-                        slotProps={{
-                          htmlInput: {
-                            sx: {
-                              paddingTop: theme.spacing(1),
-                              paddingBottom: theme.spacing(1),
-                            },
-                          },
-                          inputLabel: {
-                            sx: {
-                              lineHeight: theme.typography.pxToRem(12),
-                            },
-                          },
-                        }}
-                        fullWidth
-                        placeholder="your@email.com"
-                        id="email-passkey"
-                        name="email"
-                        type="email"
-                        autoComplete="email-webauthn"
-                        autoFocus={docs ? false : singleProvider}
-                        {...slotProps?.emailField}
-                      />
-                    </React.Fragment>
+                    <TextField
+                      {...getCommonTextFieldProps(theme, {
+                        label: 'Email',
+                        placeholder: 'your@email.com',
+                        id: 'email-passkey',
+                        name: 'email',
+                        type: 'email',
+                        autoComplete: 'email-webauthn',
+                        autoFocus: docs ? false : singleProvider,
+                        ...slotProps?.emailField,
+                      })}
+                    />
                   )}
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
@@ -473,37 +476,18 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
                   ) : (
-                    <React.Fragment>
-                      {slotProps?.emailField?.label ? null : (
-                        <InputLabel shrink htmlFor="email-nodemailer" sx={{ marginBottom: 0 }}>
-                          Email
-                        </InputLabel>
-                      )}
-                      <TextField
-                        required
-                        slotProps={{
-                          htmlInput: {
-                            sx: {
-                              paddingTop: theme.spacing(1),
-                              paddingBottom: theme.spacing(1),
-                            },
-                          },
-                          inputLabel: {
-                            sx: {
-                              lineHeight: theme.typography.pxToRem(12),
-                            },
-                          },
-                        }}
-                        fullWidth
-                        placeholder="your@email.com"
-                        name="email"
-                        id="email-nodemailer"
-                        type="email"
-                        autoComplete="email-nodemailer"
-                        autoFocus={docs ? false : singleProvider}
-                        {...slotProps?.emailField}
-                      />
-                    </React.Fragment>
+                    <TextField
+                      {...getCommonTextFieldProps(theme, {
+                        label: 'Email',
+                        placeholder: 'your@email.com',
+                        name: 'email',
+                        id: 'email-nodemailer',
+                        type: 'email',
+                        autoComplete: 'email-nodemailer',
+                        autoFocus: docs ? false : singleProvider,
+                        ...slotProps?.emailField,
+                      })}
+                    />
                   )}
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
@@ -561,85 +545,64 @@ function SignInPage(props: SignInPageProps) {
                     }));
                   }}
                 >
-                  {slots?.emailField ? (
-                    <slots.emailField {...slotProps?.emailField} />
-                  ) : (
-                    <React.Fragment>
-                      {slotProps?.emailField?.label ? null : (
-                        <InputLabel shrink htmlFor="email" sx={{ marginBottom: 0 }}>
-                          Email
-                        </InputLabel>
-                      )}
+                  <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
+                    {slots?.emailField ? (
+                      <slots.emailField {...slotProps?.emailField} />
+                    ) : (
                       <TextField
-                        required
-                        slotProps={{
-                          htmlInput: {
-                            sx: {
-                              paddingTop: theme.spacing(1),
-                              paddingBottom: theme.spacing(1),
-                            },
-                          },
-                          inputLabel: {
-                            sx: {
-                              lineHeight: theme.typography.pxToRem(12),
-                            },
-                          },
-                        }}
-                        placeholder="your@email.com"
-                        fullWidth
-                        id="email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        autoFocus={docs ? false : singleProvider}
-                        {...slotProps?.emailField}
+                        {...getCommonTextFieldProps(theme, {
+                          label: 'Email',
+                          placeholder: 'your@email.com',
+                          id: 'email',
+                          name: 'email',
+                          type: 'email',
+                          autoComplete: 'email',
+                          autoFocus: docs ? false : singleProvider,
+                          ...slotProps?.emailField,
+                        })}
                       />
-                    </React.Fragment>
-                  )}
-                  {slots?.passwordField ? (
-                    <slots.passwordField {...slotProps?.passwordField} />
-                  ) : (
-                    <React.Fragment>
-                      {slotProps?.passwordField?.label ? null : (
-                        <InputLabel shrink htmlFor="password" sx={{ marginBottom: 0 }}>
-                          Password
-                        </InputLabel>
-                      )}
+                    )}
+                    {slots?.passwordField ? (
+                      <slots.passwordField {...slotProps?.passwordField} />
+                    ) : (
                       <TextField
-                        required
-                        fullWidth
-                        slotProps={{
-                          htmlInput: {
-                            sx: {
-                              paddingTop: theme.spacing(1),
-                              paddingBottom: theme.spacing(1),
-                            },
-                          },
-                          inputLabel: {
-                            sx: {
-                              lineHeight: theme.typography.pxToRem(16),
-                            },
-                          },
-                        }}
-                        name="password"
-                        type="password"
-                        id="password"
-                        placeholder="******"
-                        autoComplete="current-password"
-                        {...slotProps?.passwordField}
+                        {...getCommonTextFieldProps(theme, {
+                          name: 'password',
+                          type: 'password',
+                          label: 'Password',
+                          id: 'password',
+                          placeholder: '*****',
+                          autoComplete: 'current-password',
+                          ...slotProps?.passwordField,
+                        })}
                       />
-                    </React.Fragment>
-                  )}
+                    )}
+                  </Stack>
                   <Stack
                     direction="row"
                     justifyContent="space-between"
                     alignItems="center"
                     spacing={1}
+                    sx={{
+                      justifyContent: 'space-between',
+                    }}
                   >
                     <FormControlLabel
-                      control={<Checkbox name="remember" value="true" color="primary" />}
+                      control={
+                        <Checkbox
+                          name="remember"
+                          value="true"
+                          color="primary"
+                          sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+                        />
+                      }
                       label="Remember me"
-                      slotProps={{ typography: { color: 'textSecondary' } }}
+                      slotProps={{
+                        typography: {
+                          color: 'textSecondary',
+                          fontSize: theme.typography.pxToRem(14),
+                        },
+                      }}
                     />
                     {slots?.forgotPasswordLink ? (
                       <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />

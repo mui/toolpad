@@ -345,17 +345,14 @@ const run = async () => {
     await scaffoldCoreProject(options);
   }
 
-  let changeDirectoryInstruction = '';
-  const targetPath = example ? path.join(absolutePath, example) : absolutePath;
-  /* `path.relative` is truth-y if the relative path
-   * between `absolutePath` and `process.cwd()`
-   * is not empty
-   */
-  const hasRelativePath = path.relative(process.cwd(), targetPath);
-
-  if (hasRelativePath) {
-    changeDirectoryInstruction = `  cd ${path.relative(process.cwd(), targetPath)}\n`;
-  }
+  const changeDirectoryInstruction =
+    /* `path.relative` is truth-y if the relative path
+     * between `absolutePath` and `process.cwd()`
+     * is not empty
+     */
+    path.relative(process.cwd(), absolutePath)
+      ? `  cd ${path.relative(process.cwd(), absolutePath)}\n`
+      : '';
 
   const installInstruction = example || !installFlag ? `  ${packageManager} install\n` : '';
 

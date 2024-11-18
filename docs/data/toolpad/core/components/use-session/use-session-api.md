@@ -6,7 +6,7 @@
 For examples and details on the usage of this React hook, visit the demo pages:
 
 - [Account](/toolpad/core/react-account/)
-- [useSession](/toolpad/core/react-use-Session/)
+- [useSession](/toolpad/core/react-use-session/)
 
 :::
 

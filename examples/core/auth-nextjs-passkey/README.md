@@ -17,7 +17,7 @@ docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgre
 4. Then, generate the Prisma Client:
 
 ```bash
-npx prisma generate --schema=./src/prisma/schema.prisma
+npx prisma migrate dev --schema=./src/prisma/schema.prisma
 ```
 
 5. Finally, run the development server:
@@ -33,6 +33,16 @@ bun dev
 ```
 
 6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the app running.
+
+## Clone using `create-toolpad-app`
+
+To copy this example and customize it for your needs, run
+
+```bash
+npx create-toolpad-app@latest --example auth-nextjs-passkey
+```
+
+and follow the instructions in the terminal.
 
 ## Learn More
 

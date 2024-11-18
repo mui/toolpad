@@ -4,7 +4,33 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+1. You need to have a Postgres database running. You can use the following docker command to start a Postgres database:
+
+```bash
+docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres
+```
+
+2. For the database created above, the connection string is `postgresql://postgres:postgres@localhost:5432/postgres`.
+
+3. Update the `DATABASE_URL` environment variable in the `.env` file with the connection string for the database you created above.
+
+4. Then, generate the Prisma Client:
+
+```bash
+npm exec prisma migrate dev --schema=./src/prisma/schema.prisma
+```
+
+5. You also need to supply the following enviroment variables for the email server to work:
+
+```bash
+EMAIL_SERVER_HOST=
+EMAIL_SERVER_PORT=
+EMAIL_SERVER_USER=
+EMAIL_SERVER_PASSWORD=
+EMAIL_FROM=
+```
+
+6. Finally, run the development server:
 
 ```bash
 npm run dev
@@ -16,7 +42,17 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the app running.
+
+## Clone using `create-toolpad-app`
+
+To copy this example and customize it for your needs, run
+
+```bash
+npx create-toolpad-app@latest --example auth-nextjs-email
+```
+
+and follow the instructions in the terminal.
 
 ## Learn More
 

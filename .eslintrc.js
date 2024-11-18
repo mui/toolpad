@@ -36,6 +36,9 @@ const noRestrictedImports = {
 
 module.exports = {
   ...baseline,
+  // TODO: Remove when there is no conflict
+  // Upgrade to Next.js 15 in the examples causes a "could not uniquely resolve" issue
+  // https://github.com/eslint/eslint/issues/13385
   root: true,
   plugins: [...baseline.plugins, 'eslint-plugin-react-compiler', 'testing-library'],
   settings: {

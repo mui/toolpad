@@ -36,11 +36,9 @@ const noRestrictedImports = {
 
 module.exports = {
   ...baseline,
+  root: true,
   plugins: [...baseline.plugins, 'eslint-plugin-react-compiler', 'testing-library'],
   settings: {
-    'react-hooks': {
-      resolve: require.resolve('eslint-plugin-react-hooks'),
-    },
     'import/resolver': {
       webpack: {
         config: path.join(__dirname, './eslintWebpackResolverConfig.js'),

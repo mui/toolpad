@@ -50,18 +50,16 @@ Find details on how to set up each provider in the [Auth.js documentation](https
 
 ## Magic Link
 
-The `SignIn` page component supports magic links. To enable this, you have to set up a provider such as Auth.js NodeMailer. See more details in the Auth.js docs on [database setup for email](https://authjs.dev/getting-started/authentication/email) and [Nodemailer configuration](https://authjs.dev/getting-started/providers/nodemailer/).
+The `SignIn` page component supports magic links. To enable this, you have to set up a provider such as Auth.js NodeMailer. See more details in the Auth.js docs on [database setup for email](https://authjs.dev/getting-started/authentication/email) and [Nodemailer configuration](https://authjs.dev/getting-started/providers/nodemailer).
 
 To render a magic link form, pass in a provider with `nodemailer` as the `id` property.
 
-{{"demo": "MagicLinkSignInPage.js", "iframe": true, "height": 400}}
-
-### Alerts
-
+:::info
 The `SignInPage` component can display a success alert if the email is sent successfully. You can enable this by passing a `success` property in the
 response object of the `signIn` prop.
+:::
 
-{{"demo": "MagicLinkAlertSignInPage.js", "iframe": true, "height": 400}}
+{{"demo": "MagicLinkAlertSignInPage.js", "iframe": true, "height": 450}}
 
 :::info
 Check out the complete [Next.js Auth.js Magic Link example](https://github.com/mui/mui-toolpad/tree/master/examples/core/auth-nextjs-email/) example for a working implementation of a magic link sign-in page with Auth.js, Nodemailer, Prisma and PostgreSQL.
@@ -213,35 +211,41 @@ If you're using the default [Next.js example](https://github.com/mui/toolpad/tre
 If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4/) to get started.
 :::
 
+:::info
+If you're using Vite with React Router, check out the [example with Vite and React Router](https://github.com/mui/toolpad/tree/master/examples/core/auth-vite/) that showcases how to use `SignInPage` along with any external authentication library of your choice.
+:::
+
 ## Customization
 
 ### Branding
 
 You can add your own branding elements to the `SignInPage` through the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/):
 
-{{"demo": "BrandingSignInPage.js", "iframe": true, "height": 360 }}
+{{"demo": "BrandingSignInPage.js", "iframe": true, "height": 600 }}
 
 ### Theme
 
 Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), the `SignInPage` can be deeply customized to match any theme:
 
-{{"demo": "ThemeSignInPage.js", "height": 700 }}
+{{"demo": "ThemeSignInPage.js", "iframe": true, "height": 700 }}
 
-### Slot Props
-
-You can use the `slotProps` prop to customize the underlying components of the `SignInPage`:
-
-{{"demo": "SlotPropsSignIn.js", "height": 540 }}
+:::info
+Find a full-fledged example using the Next.js App router, Auth.js and this theme [here](https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
+:::
 
 ### Slots
 
 To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs and buttons.
 
-:::info
-Make sure to use the `name` attribute on the custom components with values `email` and `password` to enable data capture by the form action.
+:::warning
+Make sure to pass `email` and `password` as the `name` attribute on custom email and password components, otherwise those values will not be available in the `formData` parameter of the `signIn` prop.
 :::
 
-{{"demo": "SlotsSignIn.js", "height": 540 }}
+{{"demo": "SlotsSignIn.js", "iframe": true, "height": 540 }}
+
+You can use the `slotProps` prop to pass props to the underlying components of each slot:
+
+{{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 540 }}
 
 ### 🚧 Layouts
 

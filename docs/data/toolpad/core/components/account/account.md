@@ -73,4 +73,4 @@ You can use the `useSession` hook to extend the existing session and add additio
 
 {{"demo": "./AccountCustomUserDetails.js", "bg": "outlined", "defaultCodeOpen": false}}
 
-You can find more details on the [`useSession` docs page](/toolopad/core/react-use-session/).
+You can find more details on the [`useSession` docs page](/toolpad/core/react-use-session/).

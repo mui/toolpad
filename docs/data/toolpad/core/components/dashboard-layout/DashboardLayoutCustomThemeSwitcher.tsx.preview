@@ -1,0 +1,7 @@
+<DashboardLayout
+  slots={{
+    toolbarActions: CustomThemeSwitcher,
+  }}
+>
+  <DemoPageContent pathname={router.pathname} />
+</DashboardLayout>

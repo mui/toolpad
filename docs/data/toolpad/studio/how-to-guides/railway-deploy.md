@@ -49,7 +49,7 @@ This guide walks you through the deployment of a Toolpad Studio app from a GitHu
 
 That's it! The app is up and running. Make changes, push to GitHub, and your app automatically redeploys each time. You may deploy to any other hosting provider of your choice as well.
 
-Check out the Railway documentation for more advanced settings, like adding [variables](https://docs.railway.app/guides/variables) to your app.
+Check out the Railway documentation for more advanced settings, like adding [variables](https://docs.railway.com/guides/variables) to your app.
 
 ### Common Pitfalls
 

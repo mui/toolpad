@@ -333,7 +333,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
             alignItems="center"
             sx={{
               flexWrap: 'wrap',
-
               width: '100%',
             }}
           >

@@ -14,7 +14,7 @@ import { ThemeSwitcher } from './ThemeSwitcher';
  */
 function ToolbarActions() {
   return (
-    <Stack direction="row">
+    <Stack direction="row" alignItems="center">
       <ThemeSwitcher />
     </Stack>
   );

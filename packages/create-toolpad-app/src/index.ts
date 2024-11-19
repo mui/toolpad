@@ -102,6 +102,7 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
     await fs.access(absolutePath, fsConstants.F_OK);
 
     // Directory exists, verify if it's empty to proceed
+
     if (await isFolderEmpty(absolutePath)) {
       return true;
     }
@@ -272,7 +273,9 @@ const run = async () => {
       message: example
         ? `Enter path of directory to download example "${chalk.cyan(example)}" into`
         : 'Enter path of directory to bootstrap new app',
-      validate: validatePath,
+      // This check is only necessary if an empty app is being bootstrapped,
+      // not if an example is being downloaded.
+      validate: example ? () => true : validatePath,
       default: '.',
     });
   }

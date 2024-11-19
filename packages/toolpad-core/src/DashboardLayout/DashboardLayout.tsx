@@ -329,11 +329,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
           <Stack
             direction="row"
+            justifyContent="space-between"
+            alignItems="center"
             sx={{
               flexWrap: 'wrap',
-              justifyContent: 'space-between',
+
               width: '100%',
-              alignItems: 'center',
             }}
           >
             <Stack direction="row">
@@ -374,7 +375,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 </Stack>
               </Link>
             </Stack>
-            <Stack direction="row" spacing={1} sx={{ marginLeft: 'auto' }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
               <ToolbarActionsSlot {...slotProps?.toolbarActions} />
               <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
             </Stack>

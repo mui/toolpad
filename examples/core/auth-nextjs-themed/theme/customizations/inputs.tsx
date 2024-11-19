@@ -387,6 +387,15 @@ export const inputsCustomizations: Components<Theme> = {
       },
     },
   },
+  MuiInputLabel: {
+    styleOverrides: {
+      root: {
+        [`&.${outlinedInputClasses.focused}`]: {
+          transform: 'translate(12px, -12px) scale(0.75)',
+        },
+      },
+    },
+  },
   MuiOutlinedInput: {
     styleOverrides: {
       input: {

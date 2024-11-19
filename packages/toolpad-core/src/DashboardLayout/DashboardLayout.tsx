@@ -434,6 +434,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
+          minWidth: 0,
         }}
       >
         <Toolbar sx={{ displayPrint: 'none' }} />

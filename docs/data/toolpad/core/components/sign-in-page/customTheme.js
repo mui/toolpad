@@ -237,7 +237,7 @@ export const inputsCustomizations = {
         boxSizing: 'border-box',
         transition: 'all 100ms ease-in',
         '&:focus-visible': {
-          outline: `3px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+          outline: `2px solid ${alpha(theme.palette.primary.main, 0.5)}`,
           outlineOffset: '2px',
         },
       }),
@@ -504,8 +504,9 @@ export const inputsCustomizations = {
   MuiInputLabel: {
     styleOverrides: {
       root: {
+        transform: 'translate(4px, -11px) scale(0.75)',
         [`&.${outlinedInputClasses.focused}`]: {
-          transform: 'translate(12px, -12px) scale(0.75)',
+          transform: 'translate(4px, -12px) scale(0.75)',
         },
       },
     },

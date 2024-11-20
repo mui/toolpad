@@ -357,8 +357,8 @@ const test = baseTest.extend<
     },
     { scope: 'worker', timeout: 60000 },
   ],
-  baseURL: async ({ localApp }, use) => {
-    await use(localApp?.url);
+  baseURL: async ({ localApp }, run) => {
+    await run(localApp?.url);
   },
   browserCloser: [
     async ({ browser }, use) => {

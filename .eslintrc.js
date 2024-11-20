@@ -36,12 +36,7 @@ const noRestrictedImports = {
 
 module.exports = {
   ...baseline,
-  plugins: [
-    ...baseline.plugins,
-    'eslint-plugin-react-compiler',
-    'testing-library',
-    'eslint-plugin-react-hooks',
-  ],
+  plugins: [...baseline.plugins, 'eslint-plugin-react-compiler', 'testing-library'],
   settings: {
     'import/resolver': {
       webpack: {

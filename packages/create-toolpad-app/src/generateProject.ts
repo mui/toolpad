@@ -43,7 +43,7 @@ export default function generateProject(
   const files = new Map<string, { content: string }>([
     ['theme.ts', { content: theme }],
     ['next-env.d.ts', { content: nextTypes }],
-    ['next.config.mjs', { content: nextConfig }],
+    ['next.config.mjs', { content: nextConfig(options) }],
     ['.eslintrc.json', { content: eslintConfig }],
     ['tsconfig.json', { content: tsConfig }],
     ['README.md', { content: readme }],

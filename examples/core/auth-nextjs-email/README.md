@@ -17,7 +17,7 @@ docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgre
 4. Then, generate the Prisma Client:
 
 ```bash
-npm exec prisma migrate dev --schema=./src/prisma/schema.prisma
+npx prisma migrate dev --schema=./src/prisma/schema.prisma
 ```
 
 5. You also need to supply the following enviroment variables for the email server to work:

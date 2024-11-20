@@ -24,6 +24,7 @@
   "devDependencies": {
     "@types/node": "^22",
     "@types/react": "^18",
+    "prisma": "^5",
     "@types/react-dom": "^18",
     "eslint-config-next": "^15"
   }

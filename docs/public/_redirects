@@ -1,6 +1,14 @@
 # Avoid conflicts with the other Next.js apps hosted under https://mui.com/
 /toolpad/_next/* /_next/:splat 200
 
+
+# Template app assets (_next chunks)
+/toolpad/core/templates/nextjs-dashboard/_next/* https://toolpad-core-nextjs-themed.vercel.app/_next/:splat 200
+
+# Template page routes
+/toolpad/core/templates/nextjs-dashboard/* https://toolpad-core-nextjs-themed.vercel.app/:splat 200
+
+
 # Legacy redirection
 # 2022
 /toolpad/getting-started/setup/ /toolpad/studio/getting-started/ 301

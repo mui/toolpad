@@ -329,7 +329,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
           <Stack
             direction="row"
-            sx={{ flexWrap: 'wrap', justifyContent: 'space-between', width: '100%', py: 1.5 }}
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{
+              flexWrap: 'wrap',
+              width: '100%',
+            }}
           >
             <Stack direction="row">
               {!hideNavigation ? (
@@ -369,7 +374,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 </Stack>
               </Link>
             </Stack>
-            <Stack direction="row" spacing={1} sx={{ marginLeft: 'auto' }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
               <ToolbarActionsSlot {...slotProps?.toolbarActions} />
               <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
             </Stack>
@@ -428,6 +433,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
+          minWidth: 0,
         }}
       >
         <Toolbar sx={{ displayPrint: 'none' }} />

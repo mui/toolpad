@@ -54,7 +54,6 @@ function getPackageManager(): PackageManager {
 }
 
 // From https://github.com/vercel/next.js/blob/canary/packages/create-next-app/helpers/is-folder-empty.ts
-
 async function isFolderEmpty(pathDir: string): Promise<boolean> {
   const validFiles = [
     '.DS_Store',

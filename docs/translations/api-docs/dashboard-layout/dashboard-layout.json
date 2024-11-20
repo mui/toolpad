@@ -1,6 +1,7 @@
 {
   "componentDescription": "",
   "propDescriptions": {
+    "branding": { "description": "Branding options for the dashboard." },
     "children": { "description": "The content of the dashboard." },
     "defaultSidebarCollapsed": {
       "description": "Whether the sidebar should start collapsed in desktop size screens."

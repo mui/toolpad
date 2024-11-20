@@ -19,7 +19,7 @@ import Typography from '@mui/material/Typography';`;
       if (hasNodemailerProvider) {
         imports += `\nimport { redirect } from 'next/navigation';\nimport { headers } from 'next/headers';`;
 
-        sessionHandling += `\nconst currentUrl = headers().get('referer') || 'http://localhost:3000';
+        sessionHandling += `\nconst currentUrl = (await headers()).get('referer') || process.env. 'http://localhost:3000';
   
         if (!session) {
           // Get the current URL to redirect to signIn with \`callbackUrl\`

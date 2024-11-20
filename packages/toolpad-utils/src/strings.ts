@@ -1,6 +1,6 @@
 /**
  * Simple title case implementation that capitalizes the first letter of each word
- * while keeping the rest of the letters in their original case
+ * while setting the rest of the letters to lower case
  */
 function toTitleCase(str: string): string {
   return str

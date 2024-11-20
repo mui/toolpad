@@ -1,4 +1,13 @@
-import title from 'title';
+/**
+ * Simple title case implementation that capitalizes the first letter of each word
+ * while keeping the rest of the letters in their original case
+ */
+function toTitleCase(str: string): string {
+  return str
+    .split(' ')
+    .map((word) => (word.length > 0 ? word[0].toUpperCase() + word.slice(1).toLowerCase() : ''))
+    .join(' ');
+}
 
 /**
  * Makes the first letter of [str] uppercase.
@@ -205,5 +214,5 @@ export function guessTitle(str: string): string {
   str = str.replace(/([a-zA-Z])(\d+)/g, '$1 $2');
   str = str.replace(/(\d+)([a-zA-Z])/g, '$1 $2');
 
-  return title(str);
+  return toTitleCase(str);
 }

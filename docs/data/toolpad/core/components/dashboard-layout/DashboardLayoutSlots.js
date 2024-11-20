@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
@@ -10,7 +11,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { DashboardLayout, ThemeSwitcher } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -66,9 +67,9 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-function Search() {
+function ToolbarActionsSearch() {
   return (
-    <React.Fragment>
+    <Stack direction="row">
       <Tooltip title="Search" enterDelay={1000}>
         <div>
           <IconButton
@@ -98,7 +99,8 @@ function Search() {
         }}
         sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
       />
-    </React.Fragment>
+      <ThemeSwitcher />
+    </Stack>
   );
 }
 
@@ -133,7 +135,10 @@ function DashboardLayoutSlots(props) {
       window={demoWindow}
     >
       <DashboardLayout
-        slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
+        slots={{
+          toolbarActions: ToolbarActionsSearch,
+          sidebarFooter: SidebarFooter,
+        }}
       >
         <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>

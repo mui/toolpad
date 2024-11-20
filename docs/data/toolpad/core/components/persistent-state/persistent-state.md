@@ -47,11 +47,11 @@ For complex data types you can pair these hooks with a typed validation library 
 
 {{"demo": "LocalStorageStateZod.js"}}
 
-## Session Storage
+## Session storage
 
 The `useSessionStorageState` hook works identical to the [`useLocalStorageState`](#local-storage) hook, except that it reads and writes from `window.sessionStorage` instead of `window.localStorage`.
 
-## Search Parameters
+## Search parameters
 
 🚧 Coming soon
 

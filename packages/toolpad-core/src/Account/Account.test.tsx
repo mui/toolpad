@@ -51,7 +51,7 @@ describe('AppProvider', () => {
 
     await userEvent.click(userButton);
 
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('John Doe', { selector: 'p' })).toBeInTheDocument();
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
 
     const signOutButton = screen.getByRole('button', { name: 'Sign Out' });

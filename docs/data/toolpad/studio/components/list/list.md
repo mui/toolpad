@@ -10,7 +10,7 @@ A List is an essential component in an application. It had one key property that
 
 It is the number of occurences that the list is supposed to render.
 
-<video controls width="100%" height="auto" style="contain" alt="button-onclick-js-expression">
+<video controls width="100%" height="auto" alt="button-onclick-js-expression">
   <source src="/static/toolpad/docs/studio/components/list/list.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

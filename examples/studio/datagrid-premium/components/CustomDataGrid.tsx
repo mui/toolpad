@@ -3,7 +3,7 @@ import { createComponent } from '@toolpad/studio/browser';
 import { DataGridPremium, GridColDef } from '@mui/x-data-grid-premium';
 import { LicenseInfo } from '@mui/x-license';
 
-LicenseInfo.setLicenseKey('LICENSE_KEY');
+LicenseInfo.setLicenseKey('YOUR_LICENSE_KEY');
 
 export interface CustomDataGridProps {
   rows: any[];

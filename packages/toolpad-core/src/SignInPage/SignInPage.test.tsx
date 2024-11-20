@@ -31,7 +31,7 @@ describe('SignInPage', () => {
     const signIn = vi.fn();
     render(<SignInPage signIn={signIn} providers={[{ id: 'credentials', name: 'Credentials' }]} />);
 
-    const emailField = screen.getByRole('textbox', { name: 'Email Address' });
+    const emailField = screen.getByRole('textbox', { name: 'Email' });
     const passwordField = screen.getByLabelText(/Password/);
     const signInButton = screen.getByRole('button', { name: 'Sign in' });
 
@@ -54,7 +54,7 @@ describe('SignInPage', () => {
     const signIn = vi.fn();
     render(<SignInPage signIn={signIn} providers={[{ id: 'nodemailer', name: 'Email' }]} />);
 
-    const emailField = screen.getByRole('textbox', { name: 'Email Address' });
+    const emailField = screen.getByRole('textbox', { name: 'Email' });
     const signInButton = screen.getByRole('button', { name: 'Sign in with Email' });
 
     await userEvent.type(emailField, 'john@example.com');
@@ -71,7 +71,7 @@ describe('SignInPage', () => {
 
     render(<SignInPage signIn={signIn} providers={[{ id: 'passkey', name: 'Passkey' }]} />);
 
-    const emailField = screen.getByRole('textbox', { name: 'Email Address' });
+    const emailField = screen.getByRole('textbox', { name: 'Email' });
     const signInButton = screen.getByRole('button', { name: 'Sign in with Passkey' });
 
     await userEvent.type(emailField, 'john@example.com');

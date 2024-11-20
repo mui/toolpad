@@ -1,6 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Avatar, { AvatarProps } from '@mui/material/Avatar';
+import { SxProps } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
@@ -58,6 +59,10 @@ export interface AccountPreviewProps {
    * @default false
    */
   open?: boolean;
+  /**
+   * The prop used to customize the styling of the preview
+   */
+  sx?: SxProps;
 }
 
 /**
@@ -72,7 +77,7 @@ export interface AccountPreviewProps {
  * - [AccountPreview API](https://mui.com/toolpad/core/api/account-preview)
  */
 function AccountPreview(props: AccountPreviewProps) {
-  const { slots, variant = 'condensed', slotProps, open, handleClick } = props;
+  const { slots, variant = 'condensed', slotProps, open, handleClick, sx } = props;
   const session = React.useContext(SessionContext);
   const localeText = useLocaleText();
 
@@ -93,15 +98,17 @@ function AccountPreview(props: AccountPreviewProps) {
 
   if (variant === 'expanded') {
     return (
-      <Stack direction="row" justifyContent="flex-start" spacing={2} padding={2}>
-        {avatarContent}
-        <Stack direction="column" justifyContent="space-evenly">
-          <Typography variant="body2" fontWeight="bolder" noWrap>
-            {session.user?.name}
-          </Typography>
-          <Typography variant="caption" noWrap>
-            {session.user?.email}
-          </Typography>
+      <Stack direction="row" justifyContent="space-between" sx={{ py: 1, px: 2, gap: 2, ...sx }}>
+        <Stack direction="row" justifyContent="flex-start" spacing={2}>
+          {avatarContent}
+          <Stack direction="column" justifyContent="space-evenly">
+            <Typography variant="body2" fontWeight="bolder" noWrap>
+              {session.user?.name}
+            </Typography>
+            <Typography variant="caption" noWrap>
+              {session.user?.email}
+            </Typography>
+          </Stack>
         </Stack>
         {handleClick &&
           (slots?.moreIconButton ? (
@@ -111,7 +118,7 @@ function AccountPreview(props: AccountPreviewProps) {
               size="small"
               onClick={handleClick}
               {...slotProps?.moreIconButton}
-              sx={{ alignSelf: 'flex-start', ...slotProps?.moreIconButton?.sx }}
+              sx={{ alignSelf: 'center', ...slotProps?.moreIconButton?.sx }}
             >
               <MoreVertIcon fontSize="small" />
             </IconButton>
@@ -123,19 +130,22 @@ function AccountPreview(props: AccountPreviewProps) {
   return (
     <Tooltip title={session.user.name ?? 'Account'}>
       {slots?.avatarIconButton ? (
-        <slots.avatarIconButton />
+        <slots.avatarIconButton {...slotProps?.avatarIconButton} />
       ) : (
-        <IconButton
-          onClick={handleClick}
-          aria-label={localeText.iconButtonAriaLabel || 'Current User'}
-          size="small"
-          aria-controls={open ? 'account-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
-          {...slotProps?.avatarIconButton}
-        >
-          {avatarContent}
-        </IconButton>
+        <Stack sx={{ py: 0.5, ...sx }}>
+          <IconButton
+            onClick={handleClick}
+            aria-label={localeText.iconButtonAriaLabel || 'Current User'}
+            size="small"
+            aria-controls={open ? 'account-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? 'true' : undefined}
+            {...slotProps?.avatarIconButton}
+            sx={{ width: 'fit-content', margin: '0 auto', ...slotProps?.avatarIconButton?.sx }}
+          >
+            {avatarContent}
+          </IconButton>
+        </Stack>
       )}
     </Tooltip>
   );
@@ -168,7 +178,17 @@ AccountPreview.propTypes /* remove-proptypes */ = {
    */
   slots: PropTypes.shape({
     avatar: PropTypes.elementType,
+    avatarIconButton: PropTypes.elementType,
+    moreIconButton: PropTypes.elementType,
   }),
+  /**
+   * The prop used to customize the styling of the preview
+   */
+  sx: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
+    PropTypes.func,
+    PropTypes.object,
+  ]),
   /**
    * The type of account details to display.
    * @property {'condensed'} condensed - Shows only the user's avatar.

@@ -26,12 +26,10 @@ body:
       description: |
         **⚠️ Issues that we can't reproduce can't be fixed.**
 
-        Provide a link to a live example and an unambiguous set of steps to reproduce this bug. Include code to reproduce, if relevant.
+        Please provide a link to a live example and an unambiguous set of steps to reproduce this bug.
       value: |
-        Link to live example: (required)
-
         Steps:
-        1.
+        1. Open this link to live example: (required)
         2.
         3.
   - type: textarea

@@ -106,7 +106,7 @@ const pages: MuiPage[] = [
         children: [
           {
             pathname: '/toolpad/core/react-crud-page',
-            title: 'CRUD Page',
+            title: 'CRUD',
             planned: true,
           },
           {
@@ -127,6 +127,10 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-use-notifications',
             title: 'useNotifications',
+          },
+          {
+            pathname: '/toolpad/core/react-use-session',
+            title: 'useSession',
           },
           {
             pathname: '/toolpad/core/react-persistent-state',
@@ -160,6 +164,10 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-persistent-state/use-local-storage-state-api',
             title: 'useLocalStorageState',
+          },
+          {
+            pathname: '/toolpad/core/react-use-session/api',
+            title: 'useSession',
           },
           {
             pathname: '/toolpad/core/react-persistent-state/use-session-storage-state-api',

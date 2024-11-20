@@ -28,7 +28,7 @@ pnpm create toolpad-app --example npm-stats
 
 or:
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/studio/npm-stats)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/mui/toolpad/tree/master/examples/studio/npm-stats)
 
 ## What's inside
 

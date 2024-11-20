@@ -41,8 +41,6 @@ export default function examples() {
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
       codesandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
-      stackblitz:
-        'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
     },
     {
       title: 'Vite with React Router',
@@ -75,8 +73,25 @@ export default function examples() {
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-passkey/',
       codesandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-passkey',
-      stackblitz:
-        'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/auth-nextjs-passkey',
+    },
+    {
+      title: 'Vite with React Router and authentication',
+      description:
+        'This app shows you to how to get started using Toolpad Core with Vite, React Router and any external authentication provider',
+      src: '/static/toolpad/docs/core/vite-react-router.png',
+      source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-vite',
+      codesandbox:
+        'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-vite',
+    },
+    {
+      title: 'Custom theme with Auth.js and Next.js App router',
+      description:
+        'This app shows you how to get started using Toolpad Core with Next.js, Auth.js and customize the Material UI theme',
+      src: '/static/toolpad/docs/core/auth-next-themed.png',
+      srcDark: '/static/toolpad/docs/core/auth-next-themed-dark.png',
+      source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
+      codesandbox:
+        'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
     },
   ];
 }

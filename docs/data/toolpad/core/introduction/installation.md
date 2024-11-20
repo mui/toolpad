@@ -4,22 +4,24 @@ title: Toolpad Core - Installation
 
 # Installation
 
-## Manual Installation
+<p class="description">Learn how to install Toolpad Core in your local environment.</p>
+
+## Manual installation
 
 Use your preferred package manager to install `@toolpad/core` in your project:
 
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npm install -S @toolpad/core
-```
-
-```bash yarn
-yarn add @toolpad/core
+npm install @toolpad/core
 ```
 
 ```bash pnpm
 pnpm add @toolpad/core
+```
+
+```bash yarn
+yarn add @toolpad/core
 ```
 
 </codeblock>
@@ -29,22 +31,20 @@ The Toolpad Core package has a peer dependency on `@mui/material` and `@mui/icon
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npm install -S @mui/material @mui/icons-material @emotion/react @emotion/styled
-```
-
-```bash yarn
-yarn add @mui/material @mui/icons-material @emotion/react @emotion/styled
+npm install @mui/material @mui/icons-material @emotion/react @emotion/styled
 ```
 
 ```bash pnpm
 pnpm add @mui/material @mui/icons-material @emotion/react @emotion/styled
 ```
 
+```bash yarn
+yarn add @mui/material @mui/icons-material @emotion/react @emotion/styled
+```
+
 </codeblock>
 
-## Automatic Installation
-
-<p class="description">Learn how to install Toolpad Core in your local environment.</p>
+## Automatic installation
 
 1. Run the following command to start Toolpad Core:
 

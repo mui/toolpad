@@ -17,7 +17,7 @@ Button component becomes usable through an **onClick** event handler property. I
 You can write any valid JavaScript that you want to execute on the click of button. It can change component state or call backend code.
 Below video shows how on a button click, the user input can be shown on a page in a text field component:
 
-<video controls width="100%" height="auto" style="contain" alt="button-onclick-js-expression">
+<video controls width="100%" height="auto" alt="button-onclick-js-expression">
   <source src="/static/toolpad/docs/studio/components/button/button-usage.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

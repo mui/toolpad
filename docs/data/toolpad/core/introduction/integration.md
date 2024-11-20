@@ -1,26 +1,25 @@
 ---
 title: Toolpad Core - Integration
-description: How to integrate Toolpad Core into your existing project.
 ---
 
 # Integration
 
-This guide will walk you through the process of adding Toolpad Core to an existing project.
+<p class="description">This guide walks you through adding Toolpad Core to an existing project.</p>
 
 ## Installation
 
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npm install -S @toolpad/core
-```
-
-```bash yarn
-yarn add @toolpad/core
+npm install @toolpad/core
 ```
 
 ```bash pnpm
 pnpm add @toolpad/core
+```
+
+```bash yarn
+yarn add @toolpad/core
 ```
 
 </codeblock>
@@ -31,7 +30,7 @@ Use the following steps to integrate Toolpad Core into your Next.js app:
 
 ### 1. Wrap your application with `AppProvider`
 
-In your root layout file (e.g., `app/layout.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (for example, `app/layout.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="app/layout.tsx"
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -53,12 +52,12 @@ You can find details on the `AppProvider` props on the [AppProvider](/toolpad/co
 :::info
 The `AppRouterCacheProvider` component is not required to use Toolpad Core, but it's recommended to use it to ensure that the styles are appended to the `<head>` and not rendering in the `<body>`.
 
-See the [Material UI Next.js integration docs](https://mui.com/material-ui/integrations/nextjs/) for more details.
+See the [Material UI Next.js integration docs](https://mui.com/material-ui/integrations/nextjs/) for more details.
 :::
 
 ### 2. Create a dashboard layout
 
-Create a layout file for your dashboard pages (e.g., `app/(dashboard)/layout.tsx`):
+Create a layout file for your dashboard pages (for example, `app/(dashboard)/layout.tsx`):
 
 ```tsx title="app/(dashboard)/layout.tsx"
 import * as React from 'react';
@@ -261,7 +260,7 @@ To integrate Toolpad Core into your Next.js Pages Router app, follow these steps
 
 ### 1. Wrap your application with `AppProvider`
 
-In your root layout file (e.g., `pages/_app.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (for example, `pages/_app.tsx`), wrap your application with the `AppProvider`:
 
 ```tsx title="pages/_app.tsx"
 import * as React from 'react';
@@ -357,7 +356,7 @@ Document.getInitialProps = async (ctx: DocumentContext) => {
 
 ### 3. Add a dashboard page
 
-Create a dashboard page (e.g., `pages/index.tsx`):
+Create a dashboard page (for example, `pages/index.tsx`):
 
 ```tsx title="pages/index.tsx"
 import * as React from 'react';
@@ -836,4 +835,228 @@ That's it! You now have Toolpad Core integrated into your single-page app with R
 
 :::info
 For a full working example, see the [Toolpad Core Vite app with React Router example](https://github.com/mui/toolpad/tree/master/examples/core/vite/)
+:::
+
+### 4. (Optional) Set up authentication
+
+You can use the `SignInPage` component to add authentication along with an external authentication provider of your choice. The following code demonstrates the code required to set up authentication with a mock provider.
+
+#### a. Define a `SessionContext` to act as the mock authentication provider
+
+```tsx title="src/SessionContext.ts"
+import * as React from 'react';
+import type { Session } from '@toolpad/core';
+
+export interface SessionContextValue {
+  session: Session | null;
+  setSession: (session: Session | null) => void;
+}
+
+export const SessionContext = React.createContext<SessionContextValue>({
+  session: {},
+  setSession: () => {},
+});
+
+export function useSession() {
+  return React.useContext(SessionContext);
+}
+```
+
+### b. Add the mock authentication and session data to the `AppProvider`
+
+```tsx title="src/App.tsx"
+import * as React from 'react';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { AppProvider } from '@toolpad/core/react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
+import type { Navigation, Session } from '@toolpad/core';
+import { SessionContext } from './SessionContext';
+
+const NAVIGATION: Navigation = [
+  {
+    kind: 'header',
+    title: 'Main items',
+  },
+  {
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+  },
+];
+
+const BRANDING = {
+  title: 'My Toolpad Core App',
+};
+
+export default function App() {
+  const [session, setSession] = React.useState<Session | null>(null);
+  const navigate = useNavigate();
+
+  const signIn = React.useCallback(() => {
+    navigate('/sign-in');
+  }, [navigate]);
+
+  const signOut = React.useCallback(() => {
+    setSession(null);
+    navigate('/sign-in');
+  }, [navigate]);
+
+  const sessionContextValue = React.useMemo(
+    () => ({ session, setSession }),
+    [session, setSession],
+  );
+
+  return (
+    <SessionContext.Provider value={sessionContextValue}>
+      <AppProvider
+        navigation={NAVIGATION}
+        branding={BRANDING}
+        session={session}
+        authentication={{ signIn, signOut }}
+      >
+        <Outlet />
+      </AppProvider>
+    </SessionContext.Provider>
+  );
+}
+```
+
+#### c. Protect routes inside the dashboard layout
+
+```tsx title="src/layouts/dashboard.tsx"
+import * as React from 'react';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import { useSession } from '../SessionContext';
+
+export default function Layout() {
+  const { session } = useSession();
+  const location = useLocation();
+
+  if (!session) {
+    // Add the `callbackUrl` search parameter
+    const redirectTo = `/sign-in?callbackUrl=${encodeURIComponent(location.pathname)}`;
+
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  return (
+    <DashboardLayout>
+      <PageContainer>
+        <Outlet />
+      </PageContainer>
+    </DashboardLayout>
+  );
+}
+```
+
+You can protect any page or groups of pages through this mechanism.
+
+#### d. Use the `SignInPage` component to create a sign-in page
+
+```tsx title="src/pages/signIn.tsx"
+'use client';
+import * as React from 'react';
+import { SignInPage } from '@toolpad/core/SignInPage';
+import type { Session } from '@toolpad/core/AppProvider';
+import { useNavigate } from 'react-router-dom';
+import { useSession } from '../SessionContext';
+
+const fakeAsyncGetSession = async (formData: any): Promise<Session> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (formData.get('password') === 'password') {
+        resolve({
+          user: {
+            name: 'Bharat Kashyap',
+            email: formData.get('email') || '',
+            image: 'https://avatars.githubusercontent.com/u/19550456',
+          },
+        });
+      }
+      reject(new Error('Incorrect credentials.'));
+    }, 1000);
+  });
+};
+
+export default function SignIn() {
+  const { setSession } = useSession();
+  const navigate = useNavigate();
+  return (
+    <SignInPage
+      providers={[{ id: 'credentials', name: 'Credentials' }]}
+      signIn={async (provider, formData, callbackUrl) => {
+        // Demo session
+        try {
+          const session = await fakeAsyncGetSession(formData);
+          if (session) {
+            setSession(session);
+            navigate(callbackUrl || '/', { replace: true });
+            return {};
+          }
+        } catch (error) {
+          return {
+            error: error instanceof Error ? error.message : 'An error occurred',
+          };
+        }
+        return {};
+      }}
+    />
+  );
+}
+```
+
+#### e. Add the sign in page to the router
+
+```tsx title="src/main.tsx"
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import App from './App';
+import Layout from './layouts/dashboard';
+import DashboardPage from './pages';
+import OrdersPage from './pages/orders';
+import SignInPage from './pages/signIn';
+
+const router = createBrowserRouter([
+  {
+    Component: App,
+    children: [
+      {
+        path: '/',
+        Component: Layout,
+        children: [
+          {
+            path: '/',
+            Component: DashboardPage,
+          },
+          {
+            path: '/orders',
+            Component: OrdersPage,
+          },
+        ],
+      },
+      {
+        path: '/sign-in',
+        Component: SignInPage,
+      },
+    ],
+  },
+]);
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>,
+);
+```
+
+:::info
+For a full working example, see the [Toolpad Core Vite app with React Router and authentication example](https://github.com/mui/toolpad/tree/master/examples/core/auth-vite/)
 :::

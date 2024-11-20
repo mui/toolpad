@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
@@ -11,6 +12,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import {
   DashboardLayout,
+  ThemeSwitcher,
   type SidebarFooterProps,
 } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internal';
@@ -64,9 +66,9 @@ function DemoPageContent({ pathname }: { pathname: string }) {
   );
 }
 
-function Search() {
+function ToolbarActionsSearch() {
   return (
-    <React.Fragment>
+    <Stack direction="row">
       <Tooltip title="Search" enterDelay={1000}>
         <div>
           <IconButton
@@ -96,7 +98,8 @@ function Search() {
         }}
         sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
       />
-    </React.Fragment>
+      <ThemeSwitcher />
+    </Stack>
   );
 }
 
@@ -135,7 +138,10 @@ export default function DashboardLayoutSlots(props: DemoProps) {
       window={demoWindow}
     >
       <DashboardLayout
-        slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
+        slots={{
+          toolbarActions: ToolbarActionsSearch,
+          sidebarFooter: SidebarFooter,
+        }}
       >
         <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>

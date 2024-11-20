@@ -54,7 +54,6 @@ function getPackageManager(): PackageManager {
 }
 
 // From https://github.com/vercel/next.js/blob/canary/packages/create-next-app/helpers/is-folder-empty.ts
-
 async function isFolderEmpty(pathDir: string): Promise<boolean> {
   const validFiles = [
     '.DS_Store',
@@ -102,6 +101,7 @@ const validatePath = async (relativePath: string): Promise<boolean | string> => 
     await fs.access(absolutePath, fsConstants.F_OK);
 
     // Directory exists, verify if it's empty to proceed
+
     if (await isFolderEmpty(absolutePath)) {
       return true;
     }
@@ -272,7 +272,9 @@ const run = async () => {
       message: example
         ? `Enter path of directory to download example "${chalk.cyan(example)}" into`
         : 'Enter path of directory to bootstrap new app',
-      validate: validatePath,
+      // This check is only necessary if an empty app is being bootstrapped,
+      // not if an example is being downloaded.
+      validate: example ? () => true : validatePath,
       default: '.',
     });
   }

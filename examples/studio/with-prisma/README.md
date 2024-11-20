@@ -30,4 +30,4 @@ This app demonstrates the following capabilities of Toolpad Studio:
 2. Using a Data Grid, Button and a text input component.
 3. Using CRUD operations from [Prisma Client API](https://www.prisma.io/docs/concepts/components/prisma-client/crud).
 
-[Check out the source code](https://github.com/mui/toolpad/tree/master/studio/with-prisma)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/studio/with-prisma)

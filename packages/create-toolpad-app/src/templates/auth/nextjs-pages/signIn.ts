@@ -6,6 +6,7 @@ const signIn: Template = (options) => {
   return `import * as React from 'react';
 import type { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { SignInPage } from '@toolpad/core/SignInPage';
+${hasPasskeyProvider ? "import { signIn as webauthnSignIn } from 'next-auth/webauthn';" : ''}
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { auth, providerMap } from '../../auth';
@@ -19,6 +20,24 @@ export default function SignIn({
       providers={providers}
       signIn={async (provider, formData, callbackUrl) => {
         try {
+         ${
+           hasPasskeyProvider
+             ? `if (provider.id === 'passkey') {
+            try {
+              return await webauthnSignIn('passkey', {
+                email: formData.get('email'),
+                callbackUrl: callbackUrl || '/',
+              });
+            } catch (error) {
+              console.error(error);
+              return {
+                error: (error as Error)?.message || 'Something went wrong',
+                type: 'WebAuthnError',
+              };
+            }
+          }`
+             : ''
+         }
           const signInResponse = await signIn(
             provider.id,            
             { callbackUrl: callbackUrl ?? '/' },

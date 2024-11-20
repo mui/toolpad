@@ -73,8 +73,6 @@ if(!process.env.${kebabToConstant(provider)}_ISSUER) {
 
 const auth: Template = (options) => {
   const providers = options.authProviders;
-  const hasNodemailerProvider = providers?.includes('nodemailer');
-  const hasPasskeyProvider = providers?.includes('passkeyProvider');
 
   return `import NextAuth from 'next-auth';\n${providers
     ?.map(
@@ -83,7 +81,7 @@ const auth: Template = (options) => {
     )
     .join('\n')}
 import type { Provider } from 'next-auth/providers';
-${hasNodemailerProvider ? `\nimport { PrismaAdapter } from '@auth/prisma-adapter';\nimport { prisma } from './prisma';` : ''}
+${options.hasNodemailerProvider || options.hasPasskeyProvider ? `\nimport { PrismaAdapter } from '@auth/prisma-adapter';\nimport { prisma } from './prisma';` : ''}
 
 const providers: Provider[] = [${providers
     ?.map((provider) => {
@@ -92,6 +90,9 @@ const providers: Provider[] = [${providers
       }
       if (provider === 'nodemailer') {
         return NodemailerTemplate;
+      }
+      if (provider === 'passkey') {
+        return PasskeyTemplate;
       }
       return oAuthProviderTemplate(provider);
     })
@@ -110,10 +111,10 @@ export const providerMap = providers.map((provider) => {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
-  ${hasNodemailerProvider || hasPasskeyProvider ? `\nadapter: PrismaAdapter(prisma),` : ''}
-  ${hasNodemailerProvider ? `\nsession: { strategy: 'jwt' },` : ''}
+  ${options.hasNodemailerProvider || options.hasPasskeyProvider ? `\nadapter: PrismaAdapter(prisma),` : ''}
+  ${options.hasNodemailerProvider ? `\nsession: { strategy: 'jwt' },` : ''}
   ${
-    hasNodemailerProvider
+    options.hasPasskeyProvider
       ? `\nexperimental: {
     enableWebAuthn: true,
   },`

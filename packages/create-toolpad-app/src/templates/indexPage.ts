@@ -46,10 +46,11 @@ import Typography from '@mui/material/Typography';`;
           }
           return { props: { session } };
       }`;
+      } else {
+        imports += `\nimport { useSession } from 'next-auth/react';`;
+        sessionHandling = `const { data: session } = useSession();`;
       }
-      imports += `\nimport { useSession } from 'next-auth/react';`;
-      sessionHandling = `const { data: session } = useSession();`;
-      welcomeMessage = `Welcome to Toolpad, {session?.user?.name || 'User'}!`;
+      welcomeMessage = `Welcome to Toolpad, {session?.user?.name || session?.user?.email || 'User'}!`;
     }
   } else {
     imports += `\nimport Link from 'next/link';`;

@@ -26,6 +26,7 @@ import routeHandler from './templates/auth/route';
 
 // Auth files for app router
 import signInPage from './templates/auth/nextjs-app/signInPage';
+import signInAction from './templates/auth/nextjs-app/actions';
 
 // Auth files for pages router
 import signInPagePagesRouter from './templates/auth/nextjs-pages/signIn';
@@ -35,8 +36,6 @@ import { GenerateProjectOptions } from './types';
 export default function generateProject(
   options: GenerateProjectOptions,
 ): Map<string, { content: string }> {
-  const hasNodemailerProvider = options.authProviders?.includes('nodemailer');
-  const hasPasskeyProvider = options.authProviders?.includes('passkeyProvider');
   // Add app name to package.json
 
   // Default files, common to all apps
@@ -61,7 +60,7 @@ export default function generateProject(
     case 'nextjs-pages': {
       const nextJsPagesRouterStarter = new Map([
         ['pages/index.tsx', { content: indexPageContent }],
-        ['pages/orders/index.tsx', { content: ordersPage }],
+        ['pages/orders/index.tsx', { content: ordersPage(options) }],
         ['pages/_document.tsx', { content: document }],
         ['pages/_app.tsx', { content: app(options) }],
       ]);
@@ -76,7 +75,7 @@ export default function generateProject(
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
           ['pages/auth/signin.tsx', { content: signInPagePagesRouter(options) }],
         ]);
-        if (hasNodemailerProvider || hasPasskeyProvider) {
+        if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
           // Prisma adapater support requires removal of middleware
           authFiles.delete('middleware.ts');
         }
@@ -90,7 +89,7 @@ export default function generateProject(
         ['app/(dashboard)/layout.tsx', { content: dashboardLayout }],
         ['app/layout.tsx', { content: rootLayout(options) }],
         ['app/(dashboard)/page.tsx', { content: indexPageContent }],
-        ['app/(dashboard)/orders/page.tsx', { content: ordersPage }],
+        ['app/(dashboard)/orders/page.tsx', { content: ordersPage(options) }],
       ]);
       if (options.auth) {
         const authFiles = new Map([
@@ -99,8 +98,9 @@ export default function generateProject(
           ['middleware.ts', { content: middleware }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
           ['app/auth/signin/page.tsx', { content: signInPage(options) }],
+          ['app/auth/signin/actions.ts', { content: signInAction(options) }],
         ]);
-        if (hasNodemailerProvider || hasPasskeyProvider) {
+        if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
           // Prisma adapater support requires removal of middleware
           authFiles.delete('middleware.ts');
         }

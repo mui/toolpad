@@ -1,7 +1,15 @@
 import { PackageJsonTemplate } from '../types';
 
 const packageJson: PackageJsonTemplate = (options) => {
-  const { name: appName, projectType, router: routerType, auth: authOption, coreVersion } = options;
+  const {
+    name: appName,
+    projectType,
+    router: routerType,
+    auth: authOption,
+    coreVersion,
+    hasNodemailerProvider,
+    hasPasskeyProvider,
+  } = options;
 
   if (projectType === 'studio') {
     return {
@@ -39,6 +47,20 @@ const packageJson: PackageJsonTemplate = (options) => {
     dependencies['next-auth'] = '5.0.0-beta.25';
   }
 
+  if (hasNodemailerProvider || hasPasskeyProvider) {
+    dependencies['@prisma/client'] = '^5';
+    dependencies['@auth/prisma-adapter'] = '^2';
+  }
+
+  if (hasNodemailerProvider) {
+    dependencies.nodemailer = '^6';
+  }
+
+  if (hasPasskeyProvider) {
+    dependencies['@simplewebauthn/browser'] = '^9';
+    dependencies['@simplewebauthn/server'] = '^9';
+  }
+
   const devDependencies: Record<string, string> = {
     typescript: '^5',
     '@types/node': '^20',
@@ -47,6 +69,10 @@ const packageJson: PackageJsonTemplate = (options) => {
     eslint: '^8',
     'eslint-config-next': '^15',
   };
+
+  if (hasNodemailerProvider || hasPasskeyProvider) {
+    devDependencies.prisma = '^5';
+  }
 
   const scripts = {
     dev: 'next dev',

@@ -3,7 +3,6 @@ import { Template } from '../types';
 const indexPage: Template = (options) => {
   const authEnabled = options.auth;
   const routerType = options.router;
-  const hasNodemailerProvider = options.authProviders?.includes('nodemailer');
 
   let imports = `import * as React from 'react';
 import Typography from '@mui/material/Typography';`;
@@ -13,13 +12,14 @@ import Typography from '@mui/material/Typography';`;
 
   if (authEnabled) {
     if (routerType === 'nextjs-app') {
+      if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
+        imports += `\nimport { redirect } from 'next/navigation';\nimport { headers } from 'next/headers';`;
+      }
       imports += `\nimport { auth } from '../../auth';`;
       sessionHandling = `const session = await auth();`;
       welcomeMessage = `Welcome to Toolpad, {session?.user?.name || 'User'}!`;
-      if (hasNodemailerProvider) {
-        imports += `\nimport { redirect } from 'next/navigation';\nimport { headers } from 'next/headers';`;
-
-        sessionHandling += `\nconst currentUrl = (await headers()).get('referer') || process.env. 'http://localhost:3000';
+      if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
+        sessionHandling += `\nconst currentUrl = (await headers()).get('referer') || process.env.AUTH_URL || 'http://localhost:3000';
   
         if (!session) {
           // Get the current URL to redirect to signIn with \`callbackUrl\`
@@ -31,7 +31,7 @@ import Typography from '@mui/material/Typography';`;
         `;
       }
     } else {
-      if (hasNodemailerProvider) {
+      if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
         imports += `\nimport type { InferGetServerSidePropsType, GetServerSideProps } from "next";\nimport { auth } from "../../auth";`;
         sessionHandling += `export const getServerSideProps: GetServerSideProps = async (context) => {
         const session = await auth(context);
@@ -66,7 +66,7 @@ import Typography from '@mui/material/Typography';`;
   return `${imports}
 
 export default ${isAsync}function HomePage(${
-    hasNodemailerProvider
+    options.hasNodemailerProvider || options.hasPasskeyProvider
       ? `session,
 }: InferGetServerSidePropsType<typeof getServerSideProps>`
       : ''

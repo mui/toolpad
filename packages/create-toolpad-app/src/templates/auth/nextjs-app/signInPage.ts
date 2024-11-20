@@ -1,9 +1,7 @@
 import { Template } from '../../../types';
 
 const signInPage: Template = (options) => {
-  const { authProviders: providers } = options;
-  const hasCredentialsProvider = providers?.includes('credentials');
-  const hasNodemailerProvider = providers?.includes('nodemailer');
+  const { hasCredentialsProvider, hasNodemailerProvider, hasPasskeyProvider } = options;
 
   return `import * as React from 'react';
 import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';

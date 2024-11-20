@@ -343,6 +343,9 @@ const run = async () => {
       auth: authFlag,
       install: installFlag,
       authProviders: authProviderOptions,
+      hasCredentialsProvider: authProviderOptions?.includes('credentials'),
+      hasNodemailerProvider: authProviderOptions?.includes('nodemailer'),
+      hasPasskeyProvider: authProviderOptions?.includes('passkey'),
     };
     await scaffoldCoreProject(options);
   }

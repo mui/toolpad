@@ -44,8 +44,10 @@ const checkEnvironmentVariables = (providers: SupportedAuthProvider[] | undefine
   ?.filter((p) => p !== 'credentials')
   .map((provider) => {
     if (provider === 'nodemailer') {
-      return `if(!process.env.DATABASE_URL || !process.env.EMAIL_SERVER_HOST) {
-      console.warn('The nodemailer provider requires configuring a database and an email server.")}`;
+      return `if(!process.env.DATABASE_URL || !process.env.EMAIL_SERVER_HOST) { \nconsole.warn('The Nodemailer provider requires configuring a database and an email server.')\n}`;
+    }
+    if (provider === 'passkey') {
+      return `if(!process.env.DATABASE_URL) { \nconsole.warn('The passkey provider requires configuring a database.')\n}`;
     }
     return `if(!process.env.${kebabToConstant(provider)}_CLIENT_ID) { 
   console.warn('Missing environment variable "${kebabToConstant(provider)}_CLIENT_ID"');

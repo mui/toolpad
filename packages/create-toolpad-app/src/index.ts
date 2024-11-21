@@ -281,6 +281,9 @@ const run = async () => {
 
   const absolutePath = bashResolvePath(projectPath);
 
+  let hasNodemailerProvider = false;
+  let hasPasskeyProvider = false;
+
   // If the user has provided an example, download and extract it
   if (example) {
     await downloadAndExtractExample(absolutePath, example);
@@ -334,6 +337,8 @@ const run = async () => {
           { name: 'FusionAuth', value: 'fusionauth' },
         ],
       });
+      hasNodemailerProvider = authProviderOptions?.includes('nodemailer');
+      hasPasskeyProvider = authProviderOptions?.includes('passkey');
     }
     const options = {
       name: path.basename(absolutePath),
@@ -344,8 +349,8 @@ const run = async () => {
       install: installFlag,
       authProviders: authProviderOptions,
       hasCredentialsProvider: authProviderOptions?.includes('credentials'),
-      hasNodemailerProvider: authProviderOptions?.includes('nodemailer'),
-      hasPasskeyProvider: authProviderOptions?.includes('passkey'),
+      hasNodemailerProvider,
+      hasPasskeyProvider,
     };
     await scaffoldCoreProject(options);
   }
@@ -361,11 +366,17 @@ const run = async () => {
 
   const installInstruction = example || !installFlag ? `  ${packageManager} install\n` : '';
 
+  const databaseInstruction =
+    hasNodemailerProvider || hasPasskeyProvider
+      ? `  npx prisma migrate dev --schema=prisma/schema.prisma\n`
+      : '';
+
   const message = `Run the following to get started: \n\n${chalk.magentaBright(
-    `${changeDirectoryInstruction}${installInstruction}  ${packageManager}${
+    `${changeDirectoryInstruction}${databaseInstruction}${installInstruction}  ${packageManager}${
       packageManager === 'yarn' ? '' : ' run'
     } dev`,
   )}`;
+
   // eslint-disable-next-line no-console
   console.log(message);
   // eslint-disable-next-line no-console

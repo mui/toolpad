@@ -26,7 +26,7 @@ export default function SignIn({
             try {
               return await webauthnSignIn('passkey', {
                 email: formData.get('email'),
-                callbackUrl: callbackUrl || '/',
+                callbackUrl: callbackUrl || '/',                
               });
             } catch (error) {
               console.error(error);
@@ -39,17 +39,18 @@ export default function SignIn({
              : ''
          }
           const signInResponse = await signIn(
-            provider.id,            
-            { callbackUrl: callbackUrl ?? '/' },
+            provider.id, {
+            ...(formData ? { email: formData.get('email'), password: formData.get('password')${hasNodemailerProvider || hasCredentialsProvider ? `, redirect: false` : ''}
+              } :
+            { callbackUrl: callbackUrl ?? '/' })
+          }
           );
           ${
             hasNodemailerProvider
               ? `\n// For the nodemailer provider, we want to return a success message
             // instead of redirecting to a \`verify-request\` page
             if (
-              provider.id === "nodemailer" &&
-              signInResponse &&
-              signInResponse.url?.includes("verify-request")
+              provider.id === "nodemailer"                            
             ) {
               return {
                 success: "Check your email for a verification link.",
@@ -70,7 +71,7 @@ export default function SignIn({
               type: signInResponse.error,
             };
           }         
-          ${hasCredentialsProvider ? `router.push(callbackUrl ?? '/');` : ''}
+          ${hasCredentialsProvider || hasNodemailerProvider ? `router.push(callbackUrl ?? '/');` : ''}
           return {};
         } catch (error) {
           // An error boundary must exist to handle unknown errors

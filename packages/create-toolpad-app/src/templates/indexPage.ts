@@ -8,49 +8,27 @@ const indexPage: Template = (options) => {
 import Typography from '@mui/material/Typography';`;
 
   let sessionHandling = '';
+
   let welcomeMessage = `Welcome to <Link href="https://mui.com/toolpad/core/introduction">Toolpad Core!</Link>`;
 
   if (authEnabled) {
+    welcomeMessage = `Welcome to Toolpad, {session?.user?.name || ${options.hasNodemailerProvider || options.hasPasskeyProvider ? `session?.user?.email ||` : ''}'User'}!`;
     if (routerType === 'nextjs-app') {
       if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
         imports += `\nimport { redirect } from 'next/navigation';\nimport { headers } from 'next/headers';`;
       }
       imports += `\nimport { auth } from '../../auth';`;
       sessionHandling = `const session = await auth();`;
-      welcomeMessage = `Welcome to Toolpad, {session?.user?.name || 'User'}!`;
       if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
         sessionHandling += `\nconst currentUrl = (await headers()).get('referer') || process.env.AUTH_URL || 'http://localhost:3000';
-  
-        if (!session) {
-          // Get the current URL to redirect to signIn with \`callbackUrl\`
-          const redirectUrl = new URL('/auth/signin', currentUrl);
-          redirectUrl.searchParams.set('callbackUrl', currentUrl);
-      
-          redirect(redirectUrl.toString());
+        if (!session) { // Get the current URL to redirect to signIn with \`callbackUrl\` 
+        const redirectUrl = new URL('/auth/signin', currentUrl);\nredirectUrl.searchParams.set('callbackUrl', currentUrl);\nredirect(redirectUrl.toString());
         }
-        `;
+      `;
       }
-    } else {
-      if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
-        imports += `\nimport type { InferGetServerSidePropsType, GetServerSideProps } from "next";\nimport { auth } from "../../auth";`;
-        sessionHandling += `export const getServerSideProps: GetServerSideProps = async (context) => {
-        const session = await auth(context);
-          if (!session) {        
-            return {
-              redirect: {
-                permanent: false,
-                destination: "/auth/signin",
-              },
-            props: {},
-            };
-          }
-          return { props: { session } };
-      }`;
-      } else {
-        imports += `\nimport { useSession } from 'next-auth/react';`;
-        sessionHandling = `const { data: session } = useSession();`;
-      }
-      welcomeMessage = `Welcome to Toolpad, {session?.user?.name || session?.user?.email || 'User'}!`;
+    } else if (routerType === 'nextjs-pages') {
+      imports += `\nimport { useSession } from 'next-auth/react';`;
+      sessionHandling = `const { data: session } = useSession();`;
     }
   } else {
     imports += `\nimport Link from 'next/link';`;
@@ -66,12 +44,9 @@ import Typography from '@mui/material/Typography';`;
 
   return `${imports}
 
-export default ${isAsync}function HomePage(${
-    options.hasNodemailerProvider || options.hasPasskeyProvider
-      ? `session,
-}: InferGetServerSidePropsType<typeof getServerSideProps>`
-      : ''
-  }) {
+
+
+export default ${isAsync}function HomePage() {
   ${sessionHandling}
 
   return (    

@@ -5,11 +5,10 @@ const signInPage: Template = (options) => {
 
   return `${hasPasskeyProvider ? "'use client';" : ''}
   import * as React from 'react';
-import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
-import { AuthError } from 'next-auth';
+import { SignInPage } from '@toolpad/core/SignInPage';
 ${hasPasskeyProvider ? "import { signIn as webauthnSignIn } from 'next-auth/webauthn';" : ''}
 import { providerMap } from '../../../auth';
-${hasPasskeyProvider ? `import serverSignIn from './actions';` : `import signIn from './actions;`}
+${hasPasskeyProvider ? `import serverSignIn from './actions';` : `import signIn from './actions';`}
 
 ${
   hasPasskeyProvider

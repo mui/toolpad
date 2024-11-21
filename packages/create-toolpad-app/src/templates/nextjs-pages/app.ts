@@ -67,6 +67,17 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
     return <LinearProgress />;
   }
 
+  ${
+    options.hasNodemailerProvider || options.hasPasskeyProvider
+      ? `if (!data) {
+    // Redirect to sign-in page
+    router.push("/api/auth/signin");
+    return <LinearProgress />;
+  }}`
+      : ''
+  }
+
+
   return children;
 }
 `

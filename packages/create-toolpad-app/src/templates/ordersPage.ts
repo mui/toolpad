@@ -24,21 +24,6 @@ import Typography from '@mui/material/Typography';`;
         }
         `;
       }
-    } else if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
-      imports += `\nimport type { InferGetServerSidePropsType, GetServerSideProps } from "next";\nimport { auth } from "../../../auth";`;
-      sessionHandling += `export const getServerSideProps: GetServerSideProps = async (context) => {
-        const session = await auth(context);
-          if (!session) {        
-            return {
-              redirect: {
-                permanent: false,
-                destination: "/auth/signin",
-              },
-            props: {},
-            };
-          }
-          return { props: { session } };
-      }`;
     }
   }
 
@@ -51,12 +36,8 @@ import Typography from '@mui/material/Typography';`;
 
   return `${imports}
 
-export default ${isAsync}function OrdersPage(${
-    options.hasNodemailerProvider || options.hasPasskeyProvider
-      ? `session,
-}: InferGetServerSidePropsType<typeof getServerSideProps>`
-      : ''
-  }) {
+
+export default ${isAsync}function OrdersPage() {
   ${sessionHandling}
 
   return (

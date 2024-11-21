@@ -1,13 +1,14 @@
 import { Template } from '../../../types';
 
 const signInPage: Template = (options) => {
-  const { hasPasskeyProvider } = options;
+  const { hasPasskeyProvider, hasNodemailerProvider } = options;
 
   return `${hasPasskeyProvider ? "'use client';" : ''}
   import * as React from 'react';
 import { SignInPage } from '@toolpad/core/SignInPage';
 ${hasPasskeyProvider ? "import { signIn as webauthnSignIn } from 'next-auth/webauthn';" : ''}
-import { providerMap } from '../../../auth';
+${hasPasskeyProvider && hasNodemailerProvider ? `import { getProviders } from "next-auth/react";` : `import { providerMap } from '../../../auth';`}
+import type { AuthProvider } from '@toolpad/core';}
 ${hasPasskeyProvider ? `import serverSignIn from './actions';` : `import signIn from './actions';`}
 
 ${
@@ -34,6 +35,23 @@ ${
 }
 
 export default function SignIn() {
+${
+  hasPasskeyProvider && hasNodemailerProvider
+    ? `const [providerMap, setProviderMap] = React.useState<AuthProvider[]>();
+  React.useEffect(() => {
+    const loadProviders = async () => {
+      const providers = await getProviders();
+      const providerList =
+        Object.entries(providers || {}).map(([id, data]) => ({
+          id,
+          name: data.name,
+        })) || [];
+      setProviderMap(providerList);
+    };
+    loadProviders();
+  }, []);`
+    : ''
+}
   return (
     <SignInPage
       providers={providerMap}

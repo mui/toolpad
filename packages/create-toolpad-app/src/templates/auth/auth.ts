@@ -33,7 +33,7 @@ const NodemailerTemplate = `Nodemailer({
     from: process.env.EMAIL_FROM,
   }),`;
 
-const PasskeyTemplate = 'Passkey';
+const PasskeyTemplate = 'Passkey,';
 
 const oAuthProviderTemplate = (provider: SupportedAuthProvider) => `
   ${kebabToPascal(provider)}({
@@ -114,7 +114,7 @@ export const providerMap = providers.map((provider) => {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
   ${options.hasNodemailerProvider || options.hasPasskeyProvider ? `\nadapter: PrismaAdapter(prisma),` : ''}
-  ${options.hasNodemailerProvider ? `\nsession: { strategy: 'jwt' },` : ''}
+  ${options.hasNodemailerProvider || (options.router === 'nextjs-app' && options.hasPasskeyProvider && providers && providers.length > 1) ? `\nsession: { strategy: 'jwt' },` : ''}
   ${
     options.hasPasskeyProvider
       ? `\nexperimental: {

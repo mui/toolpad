@@ -64,14 +64,21 @@ export default function SignIn({
             return {
               error: ${
                 hasCredentialsProvider
-                  ? `error.type === 'CredentialsSignIn' ? 'Invalid credentials.'
+                  ? `signInResponse.error === 'CredentialsSignin' ? 'Invalid credentials.'
               : 'An error with Auth.js occurred.'`
                   : `'An error with Auth.js occurred'`
               },
               type: signInResponse.error,
             };
           }         
-          ${hasCredentialsProvider || hasNodemailerProvider ? `router.push(callbackUrl ?? '/');` : ''}
+          ${
+            hasCredentialsProvider || hasNodemailerProvider
+              ? `
+            if(provider.id === "credentials" || provider.id === "nodemailer") {
+              router.push(callbackUrl ?? '/');
+            }`
+              : ''
+          }
           return {};
         } catch (error) {
           // An error boundary must exist to handle unknown errors

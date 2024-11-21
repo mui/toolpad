@@ -20,6 +20,11 @@ ${
 import LinearProgress from '@mui/material/LinearProgress';`
     : ''
 }
+${
+  options.hasNodemailerProvider || options.hasPasskeyProvider
+    ? `import { useRouter } from 'next/router';`
+    : ''
+}
 import theme from '../theme';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -61,8 +66,8 @@ const AUTHENTICATION = {
 };
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { status } = useSession();
-
+  const { status${options.hasNodemailerProvider || options.hasPasskeyProvider ? ',data' : ''} } = useSession();
+  ${options.hasNodemailerProvider || options.hasPasskeyProvider ? `const router = useRouter()` : ''}
   if (status === 'loading') {
     return <LinearProgress />;
   }
@@ -73,7 +78,7 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
     // Redirect to sign-in page
     router.push("/api/auth/signin");
     return <LinearProgress />;
-  }}`
+  }`
       : ''
   }
 

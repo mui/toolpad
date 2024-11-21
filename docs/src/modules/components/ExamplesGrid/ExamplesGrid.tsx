@@ -44,15 +44,11 @@ function CodeSandboxIcon() {
 }
 
 function Templates({ examplesFile }: TemplatesProps) {
-  const [examples, setExamples] = React.useState<Example[]>([]);
-
-  React.useEffect(() => {
-    const importExamples = async () => {
-      const exampleContent = await import(`./${examplesFile}`);
-      setExamples(exampleContent.default);
-    };
-    importExamples();
-  }, [examplesFile]);
+  // @ts-ignore
+  const req = require.context('./', false);
+  // TODO: When migrating away from webpack, or when we have time, to create dedicate files for each
+  // demo. We shouldn't do those dynamic imports in the first place ⬇️
+  const examples = req(`./${examplesFile}`).default() as Example[];
   const docsTheme = useTheme();
 
   return (

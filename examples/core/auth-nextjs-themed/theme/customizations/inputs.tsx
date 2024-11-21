@@ -387,6 +387,16 @@ export const inputsCustomizations: Components<Theme> = {
       },
     },
   },
+  MuiInputLabel: {
+    styleOverrides: {
+      root: {
+        transform: 'translate(4px, -11px) scale(0.75)',
+        [`&.${outlinedInputClasses.focused}`]: {
+          transform: 'translate(4px, -12px) scale(0.75)',
+        },
+      },
+    },
+  },
   MuiOutlinedInput: {
     styleOverrides: {
       input: {
@@ -403,7 +413,7 @@ export const inputsCustomizations: Components<Theme> = {
           borderColor: gray[400],
         },
         [`&.${outlinedInputClasses.focused}`]: {
-          outline: `3px solid ${alpha(brand[500], 0.5)}`,
+          outline: `2px solid ${alpha(brand[500], 0.5)}`,
           borderColor: brand[400],
         },
         ...theme.applyStyles('dark', {

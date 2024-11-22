@@ -8,7 +8,11 @@ import { useRouter } from 'next/router';
 import { authOptions } from '../api/auth/[...nextauth]';
 
 function ForgotPasswordLink() {
-  return <Link href="/auth/forgot-password">Forgot password?</Link>;
+  return (
+    <Link href="/auth/forgot-password" fontSize={14}>
+      Forgot password?
+    </Link>
+  );
 }
 
 function SignUpLink() {

@@ -8,7 +8,7 @@ title: React router - Integration
 
 ## Wrap all your pages in an `AppProvider`
 
-In your router configuration (e.g.: `src/main.tsx`), use a shared component or element (e.g.: `src/App.tsx`) as a root **layout route** that will wrap the whole application with the `AppProvider` from `@toolpad/core/react-router-dom`.
+In your router configuration (e.g.: `src/main.tsx`), use a shared component or element (e.g.: `src/App.tsx`) as a root **layout route** that wraps the whole application with the `AppProvider` from `@toolpad/core/react-router-dom`.
 
 You must use the `<Outlet />` component from `react-router-dom` in this root layout element or component.
 
@@ -93,7 +93,7 @@ export default function Layout() {
 
 The [`DashboardLayout`](/toolpad/core/react-dashboard-layout/) component provides a consistent layout for your dashboard pages, including a sidebar, navigation, and header. The [`PageContainer`](/toolpad/core/react-page-container/) component is used to wrap the page content, and provides breadcrumbs for navigation.
 
-You can then add this layout component to your React Router configuration (e.g.: `src/main.tsx`), as a child of the root layout route created in step 1.
+You can then add this layout component to your React Router configuration (e.g.: `src/main.tsx`), as a child of the root layout route created above.
 
 ```tsx title="src/main.tsx"
 import Layout from './layouts/dashboard';
@@ -135,7 +135,7 @@ export default function OrdersPage() {
 }
 ```
 
-You can then add these page components as routes to your React Router configuration (e.g.: `src/main.tsx`). By adding them as children of the layout route created in step 2, they will automatically be wrapped with that dashboard layout:
+You can then add these page components as routes to your React Router configuration (e.g.: `src/main.tsx`). By adding them as children of the layout route created above, they are automatically wrapped with that dashboard layout:
 
 ```tsx title="src/main.tsx"
 import DashboardPage from './pages';

@@ -34,7 +34,7 @@ function CodeSandboxIcon() {
   );
 }
 
-function Templates(props: ExamplesGridProps) {
+function ExamplesGrid(props: ExamplesGridProps) {
   const [examples, setExamples] = React.useState<Example[]>([]);
 
   React.useEffect(() => {
@@ -155,4 +155,4 @@ function Templates(props: ExamplesGridProps) {
   );
 }
 
-export default Templates;
+export default ExamplesGrid;

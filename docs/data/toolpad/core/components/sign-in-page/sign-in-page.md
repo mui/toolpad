@@ -18,7 +18,7 @@ The `SignInPage` component is a quick way to generate a ready-to-use authenticat
 
 The `SignInPage` component can be set up with an OAuth provider by passing in a list of providers in the `providers` prop, along with a `signIn` function that accepts the `provider` as a parameter.
 
-{{"demo": "OAuthSignInPage.js", "iframe": true, "height": 500}}
+{{"demo": "OAuthSignInPage.js", "iframe": true, "height": 600}}
 
 :::info
 
@@ -85,7 +85,7 @@ The Credentials provider is not the most secure way to authenticate users. It's 
 
 To render a username password form, pass in a provider with `credentials` as the `id` property. The `signIn` function accepts a `formData` parameter in this case.
 
-{{"demo": "CredentialsSignInPage.js", "iframe": true, "height": 500}}
+{{"demo": "CredentialsSignInPage.js", "iframe": true, "height": 600}}
 
 ### Alerts
 
@@ -245,7 +245,7 @@ Make sure to pass `email` and `password` as the `name` attribute on custom email
 
 You can use the `slotProps` prop to pass props to the underlying components of each slot:
 
-{{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 540 }}
+{{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 600 }}
 
 ### 🚧 Layouts
 

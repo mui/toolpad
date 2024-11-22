@@ -41,7 +41,16 @@ export default function ThemeSignInPage() {
   return (
     // preview-start
     <AppProvider theme={THEME}>
-      <SignInPage signIn={signIn} providers={providers} />
+      <SignInPage
+        signIn={signIn}
+        providers={providers}
+        sx={{
+          '& form > .MuiStack-root': {
+            marginTop: '2rem',
+            rowGap: '0.5rem',
+          },
+        }}
+      />
     </AppProvider>
     // preview-end
   );

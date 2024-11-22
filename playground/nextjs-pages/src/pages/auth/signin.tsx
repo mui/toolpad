@@ -7,7 +7,11 @@ import { useRouter } from 'next/router';
 import { auth, providerMap } from '../../auth';
 
 function ForgotPasswordLink() {
-  return <Link href="/auth/forgot-password">Forgot password?</Link>;
+  return (
+    <Link href="/auth/forgot-password" fontSize={14}>
+      Forgot password?
+    </Link>
+  );
 }
 
 function SignUpLink() {

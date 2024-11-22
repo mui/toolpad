@@ -8,7 +8,7 @@ const signInPage: Template = (options) => {
 import { SignInPage } from '@toolpad/core/SignInPage';
 ${hasPasskeyProvider ? "import { signIn as webauthnSignIn } from 'next-auth/webauthn';" : ''}
 ${hasPasskeyProvider && hasNodemailerProvider ? `import { getProviders } from "next-auth/react";` : `import { providerMap } from '../../../auth';`}
-import type { AuthProvider } from '@toolpad/core';}
+${hasPasskeyProvider ? `import type { AuthProvider } from '@toolpad/core';` : ''}
 ${hasPasskeyProvider ? `import serverSignIn from './actions';` : `import signIn from './actions';`}
 
 ${

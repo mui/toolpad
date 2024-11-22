@@ -40,6 +40,16 @@ npx auth secret
 
 To get the required credentials from GitHub, we need to create an application in their developer settings. Read this [detailed guide on Auth.js](https://authjs.dev/guides/configuring-github) on how to obtain those.
 
+## Clone using `create-toolpad-app`
+
+To copy this example and customize it for your needs, run
+
+```bash
+npx create-toolpad-app@latest --example auth-nextjs
+```
+
+and follow the instructions in the terminal.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

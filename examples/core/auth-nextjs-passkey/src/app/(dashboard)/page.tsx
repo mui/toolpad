@@ -7,7 +7,8 @@ import { auth } from '../../auth';
 
 export default async function HomePage() {
   const session = await auth();
-  const currentUrl = headers().get('referer') || 'http://localhost:3000';
+  const currentUrl =
+    (await headers()).get('referer') || process.env.AUTH_URL || 'http://localhost:3000';
 
   if (!session) {
     // Get the current URL to redirect to signIn with `callbackUrl`
@@ -27,7 +28,7 @@ export default async function HomePage() {
         textAlign: 'center',
       }}
     >
-      <Typography sx={{ mb: 2 }}>Welcome to Toolpad, {session?.user?.name || 'User'}!</Typography>
+      <Typography sx={{ mb: 2 }}>Welcome to Toolpad, {session?.user?.email || 'User'}!</Typography>
     </Box>
   );
 }

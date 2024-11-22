@@ -504,9 +504,9 @@ export const inputsCustomizations = {
   MuiInputLabel: {
     styleOverrides: {
       root: {
-        transform: 'translate(4px, -11px) scale(0.75)',
+        transform: 'translate(4px, -16px) scale(0.75)',
         [`&.${outlinedInputClasses.focused}`]: {
-          transform: 'translate(4px, -12px) scale(0.75)',
+          transform: 'translate(4px, -17px) scale(0.75)',
         },
       },
     },

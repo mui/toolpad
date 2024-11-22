@@ -1,6 +1,10 @@
 {
   "props": {
     "children": { "type": { "name": "node" }, "required": true },
+    "branding": {
+      "type": { "name": "shape", "description": "{ logo?: node, title?: string }" },
+      "default": "null"
+    },
     "defaultSidebarCollapsed": { "type": { "name": "bool" }, "default": "false" },
     "disableCollapsibleSidebar": { "type": { "name": "bool" }, "default": "false" },
     "hideNavigation": { "type": { "name": "bool" }, "default": "false" },

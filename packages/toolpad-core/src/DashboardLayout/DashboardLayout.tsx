@@ -22,6 +22,7 @@ import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
 import { ToolpadLogo } from './ToolpadLogo';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
+import { Branding } from '../AppProvider';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -74,6 +75,11 @@ export interface DashboardLayoutProps {
    */
   children: React.ReactNode;
   /**
+   * Branding options for the dashboard.
+   * @default null
+   */
+  branding?: Branding | null;
+  /**
    * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
    * @default false
    */
@@ -122,6 +128,7 @@ export interface DashboardLayoutProps {
 function DashboardLayout(props: DashboardLayoutProps) {
   const {
     children,
+    branding: brandingProp,
     disableCollapsibleSidebar = false,
     defaultSidebarCollapsed = false,
     hideNavigation = false,
@@ -133,10 +140,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const theme = useTheme();
 
-  const branding = React.useContext(BrandingContext);
-  const navigation = React.useContext(NavigationContext);
-  const appWindow = React.useContext(WindowContext);
+  const brandingContext = React.useContext(BrandingContext);
+  const navigationContext = React.useContext(NavigationContext);
+  const appWindowContext = React.useContext(WindowContext);
   const applicationTitle = useApplicationTitle();
+
+  const branding = brandingProp ?? brandingContext;
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
     React.useState(!defaultSidebarCollapsed);
@@ -144,14 +153,14 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const isUnderMdViewport = useMediaQuery(
     theme.breakpoints.down('md'),
-    appWindow && {
-      matchMedia: appWindow.matchMedia,
+    appWindowContext && {
+      matchMedia: appWindowContext.matchMedia,
     },
   );
   const isOverSmViewport = useMediaQuery(
     theme.breakpoints.up('sm'),
-    appWindow && {
-      matchMedia: appWindow.matchMedia,
+    appWindowContext && {
+      matchMedia: appWindowContext.matchMedia,
     },
   );
 
@@ -207,10 +216,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
   React.useMemo(() => {
-    if (navigation) {
+    if (navigationContext) {
       selectedItemIdRef.current = '';
     }
-  }, [navigation]);
+  }, [navigationContext]);
 
   const isDesktopMini = !disableCollapsibleSidebar && !isDesktopNavigationExpanded;
   const isMobileMini = !disableCollapsibleSidebar && !isMobileNavigationExpanded;
@@ -259,14 +268,14 @@ function DashboardLayout(props: DashboardLayoutProps) {
             flexDirection: 'column',
             justifyContent: 'space-between',
             overflow: 'auto',
-            pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
+            pt: navigationContext[0]?.kind === 'header' && !isMini ? 0 : 2,
             ...(hasDrawerTransitions
               ? getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')
               : {}),
           }}
         >
           <DashboardSidebarSubNavigation
-            subNavigation={navigation}
+            subNavigation={navigationContext}
             onLinkClick={handleNavigationLinkClick}
             isMini={isMini}
             isFullyExpanded={isNavigationFullyExpanded}
@@ -284,7 +293,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       handleNavigationLinkClick,
       hasDrawerTransitions,
       isNavigationFullyExpanded,
-      navigation,
+      navigationContext,
       slotProps?.sidebarFooter,
     ],
   );
@@ -329,7 +338,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
         <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
           <Stack
             direction="row"
-            sx={{ flexWrap: 'wrap', justifyContent: 'space-between', width: '100%', py: 1.5 }}
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{
+              flexWrap: 'wrap',
+              width: '100%',
+            }}
           >
             <Stack direction="row">
               {!hideNavigation ? (
@@ -360,7 +374,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                     sx={{
                       color: (theme.vars ?? theme).palette.primary.main,
                       fontWeight: '700',
-                      ml: 0.5,
+                      ml: 1,
                       whiteSpace: 'nowrap',
                     }}
                   >
@@ -369,7 +383,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 </Stack>
               </Link>
             </Stack>
-            <Stack direction="row" spacing={1} sx={{ marginLeft: 'auto' }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
               <ToolbarActionsSlot {...slotProps?.toolbarActions} />
               <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
             </Stack>
@@ -428,6 +442,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
           display: 'flex',
           flexDirection: 'column',
           flex: 1,
+          minWidth: 0,
         }}
       >
         <Toolbar sx={{ displayPrint: 'none' }} />
@@ -452,6 +467,14 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * Branding options for the dashboard.
+   * @default null
+   */
+  branding: PropTypes.shape({
+    logo: PropTypes.node,
+    title: PropTypes.string,
+  }),
   /**
    * The content of the dashboard.
    */

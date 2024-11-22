@@ -43,11 +43,11 @@ const pages: MuiPage[] = [
     title: 'Integrations',
     children: [
       {
-        pathname: '/toolpad/core/integrations/app-router',
+        pathname: '/toolpad/core/integrations/nextjs-approuter',
         title: 'Next.js App Router',
       },
       {
-        pathname: '/toolpad/core/integrations/pages-router',
+        pathname: '/toolpad/core/integrations/nextjs-pagesrouter',
         title: 'Next.js Pages Router',
       },
       {

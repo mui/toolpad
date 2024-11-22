@@ -30,7 +30,7 @@ const packageJson: PackageJsonTemplate = (options) => {
     react: '^18',
     'react-dom': '^18',
     next: '^15',
-    '@toolpad/core': 'https://pkg.csb.dev/mui/toolpad/commit/1ff60c7c/@toolpad/core' ?? 'latest',
+    '@toolpad/core': coreVersion ?? 'latest',
     '@mui/material': '^6',
     '@mui/material-nextjs': '^6',
     '@mui/icons-material': '^6',

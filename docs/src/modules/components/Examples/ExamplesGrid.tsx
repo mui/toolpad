@@ -11,20 +11,11 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
+import type { Example } from './types';
 
-interface Example {
-  title: string;
-  description: string;
-  src: string;
-  srcDark?: string;
-  href: string;
-  source: string;
-  codesandbox?: string;
-  stackblitz?: string;
-}
-
-interface TemplatesProps {
+interface ExamplesGridProps {
   examplesFile: string;
+  reverse?: boolean;
 }
 
 function StackBlitzIcon() {
@@ -43,16 +34,23 @@ function CodeSandboxIcon() {
   );
 }
 
-function Templates({ examplesFile }: TemplatesProps) {
+function Templates(props: ExamplesGridProps) {
   const [examples, setExamples] = React.useState<Example[]>([]);
 
   React.useEffect(() => {
     const importExamples = async () => {
-      const exampleContent = await import(`./${examplesFile}`);
-      setExamples(exampleContent.default);
+      let exampleContent = await import(`./${props.examplesFile}`);
+
+      exampleContent = exampleContent
+        .default()
+        .filter((example: Example) => example.featured !== true);
+      if (props.reverse) {
+        setExamples(exampleContent.reverse());
+      }
+      setExamples(exampleContent);
     };
     importExamples();
-  }, [examplesFile]);
+  }, [props.examplesFile, props.reverse]);
   const docsTheme = useTheme();
 
   return (
@@ -121,11 +119,11 @@ function Templates({ examplesFile }: TemplatesProps) {
                   Source
                 </Button>
                 <Stack direction="row" spacing={1}>
-                  {example.codesandbox && (
+                  {example.codeSandbox && (
                     <Tooltip title="Edit in CodeSandbox">
                       <IconButton
                         component="a"
-                        href={example.codesandbox}
+                        href={example.codeSandbox}
                         target="_blank"
                         rel="noopener noreferrer"
                         size="small"
@@ -134,11 +132,11 @@ function Templates({ examplesFile }: TemplatesProps) {
                       </IconButton>
                     </Tooltip>
                   )}
-                  {example.stackblitz && (
+                  {example.stackBlitz && (
                     <Tooltip title="Edit in StackBlitz">
                       <IconButton
                         component="a"
-                        href={example.stackblitz}
+                        href={example.stackBlitz}
                         target="_blank"
                         rel="noopener noreferrer"
                         size="small"

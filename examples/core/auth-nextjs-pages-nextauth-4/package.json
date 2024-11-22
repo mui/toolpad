@@ -14,8 +14,8 @@
     "@mui/material": "^6",
     "@mui/material-nextjs": "^6",
     "@toolpad/core": "latest",
-    "next": "^14",
-    "next-auth": "^4.24.7",
+    "next": "^15",
+    "next-auth": "^4.24.10",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -25,6 +25,6 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "^14"
+    "eslint-config-next": "^15"
   }
 }

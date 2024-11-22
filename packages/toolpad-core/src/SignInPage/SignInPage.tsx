@@ -331,6 +331,7 @@ function SignInPage(props: SignInPageProps) {
               color="textPrimary"
               sx={{
                 my: theme.spacing(1),
+                textAlign: 'center',
                 fontWeight: 600,
               }}
             >

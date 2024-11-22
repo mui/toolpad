@@ -27,6 +27,5 @@ const signIn = async (provider: AuthProvider, formData: FormData, callbackUrl?: 
 };
 
 export default function SignIn() {
-  // TODO: Fix this
   return <SignInPage providers={providerMap} signIn={signIn} />;
 }

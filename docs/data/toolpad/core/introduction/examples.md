@@ -9,4 +9,10 @@ title: Examples
 
 <!-- #default-branch-switch -->
 
-{{"component": "modules/components/ExamplesGrid/ExamplesGrid.tsx", "examplesFile": "core-examples.ts"}}
+## Featured Examples
+
+{{"component": "modules/components/Examples/FeaturedExamples.tsx", "examplesFile": "core-examples.ts"}}
+
+## Other Examples
+
+{{"component": "modules/components/Examples/ExamplesGrid.tsx", "examplesFile": "core-examples.ts", "reverse": true}}

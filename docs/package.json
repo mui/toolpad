@@ -106,7 +106,7 @@
     "cpy-cli": "5.0.0",
     "cross-fetch": "4.0.0",
     "gm": "1.25.0",
-    "typescript": "5.6.3",
+    "typescript": "5.7.2",
     "typescript-to-proptypes": "2.2.1"
   }
 }

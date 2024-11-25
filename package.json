@@ -43,7 +43,7 @@
     "clean": "pnpm -r exec rm -rf build dist"
   },
   "devDependencies": {
-    "@argos-ci/core": "2.10.0",
+    "@argos-ci/core": "2.11.0",
     "@babel/cli": "7.25.9",
     "@babel/core": "7.26.0",
     "@babel/node": "7.26.0",
@@ -106,7 +106,7 @@
     "regenerator-runtime": "0.14.1",
     "remark": "15.0.1",
     "rimraf": "6.0.1",
-    "typescript": "5.6.3",
+    "typescript": "5.7.2",
     "unist-util-visit": "5.0.0",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.7.1"

@@ -79,7 +79,7 @@ export default function Home() {
 
 ```tsx title="app/layout.tsx"
 // Add the following import:
-import TimelineIcon from '@mui/icons-material/TimelineIcon';
+import TimelineIcon from '@mui/icons-material/Timeline';
 
 // ...
 

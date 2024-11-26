@@ -153,7 +153,7 @@ Some possibly useful slots:
 
 - `sidebarFooter`: allows you to add footer content in the sidebar.
 
-- `branding`: allows you to pass in your own component in the branding section. The component receives the `branding` object defined in the `AppProvider` (merged with any branding overrides defined in the `DashboardLayout`) as a prop.
+- `branding`: allows you to pass in your own component in the branding section.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
 

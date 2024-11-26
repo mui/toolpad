@@ -9,11 +9,7 @@ import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
-import {
-  AppProvider,
-  type Navigation,
-  type Branding,
-} from '@toolpad/core/AppProvider';
+import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import {
   DashboardLayout,
   ThemeSwitcher,
@@ -118,7 +114,7 @@ function SidebarFooter({ mini }: SidebarFooterProps) {
   );
 }
 
-function CustomBranding(props: Branding) {
+function CustomBranding() {
   return (
     <Stack direction="column" alignItems="center">
       <img width={24} src="https://mui.com/static/logo.svg" alt="Logo" />
@@ -131,7 +127,7 @@ function CustomBranding(props: Branding) {
           whiteSpace: 'nowrap',
         }}
       >
-        {props?.title ?? 'My Co.'}
+        My Co.
       </Typography>
     </Stack>
   );

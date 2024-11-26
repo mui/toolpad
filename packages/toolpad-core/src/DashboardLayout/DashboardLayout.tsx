@@ -60,7 +60,7 @@ export interface DashboardLayoutSlots {
    * The branding component used in the layour header.
    * @default Link
    */
-  branding?: React.JSXElementConstructor<Branding>;
+  branding?: React.JSXElementConstructor<{}>;
 }
 
 export interface DashboardLayoutProps {
@@ -245,7 +245,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
-  const BrandingSlot = slots?.branding ?? BrandingComponent;
 
   const brandingProps = { ...brandingContext, ...brandingProp };
 
@@ -360,7 +359,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   </Box>
                 </React.Fragment>
               ) : null}
-              <BrandingSlot {...brandingProps} />
+              {slots?.branding ? <slots.branding /> : <BrandingComponent {...brandingProps} />}
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
               <ToolbarActionsSlot {...slotProps?.toolbarActions} />

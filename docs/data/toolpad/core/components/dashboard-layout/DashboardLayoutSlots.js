@@ -119,7 +119,7 @@ SidebarFooter.propTypes = {
   mini: PropTypes.bool.isRequired,
 };
 
-function CustomBranding(props) {
+function CustomBranding() {
   return (
     <Stack direction="column" alignItems="center">
       <img width={24} src="https://mui.com/static/logo.svg" alt="Logo" />
@@ -132,7 +132,7 @@ function CustomBranding(props) {
           whiteSpace: 'nowrap',
         }}
       >
-        {props?.title ?? 'My Co.'}
+        My Co.
       </Typography>
     </Stack>
   );

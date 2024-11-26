@@ -11,6 +11,9 @@ export interface GenerateProjectOptions {
   absolutePath: string;
   auth?: boolean;
   authProviders?: SupportedAuthProvider[];
+  hasNodemailerProvider?: boolean;
+  hasCredentialsProvider?: boolean;
+  hasPasskeyProvider?: boolean;
   install?: boolean;
   router?: SupportedRouter;
   coreVersion?: string;

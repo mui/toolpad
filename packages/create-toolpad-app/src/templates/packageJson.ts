@@ -1,7 +1,15 @@
 import { PackageJsonTemplate } from '../types';
 
 const packageJson: PackageJsonTemplate = (options) => {
-  const { name: appName, projectType, router: routerType, auth: authOption, coreVersion } = options;
+  const {
+    name: appName,
+    projectType,
+    router: routerType,
+    auth: authOption,
+    coreVersion,
+    hasNodemailerProvider,
+    hasPasskeyProvider,
+  } = options;
 
   if (projectType === 'studio') {
     return {
@@ -21,7 +29,7 @@ const packageJson: PackageJsonTemplate = (options) => {
   const dependencies: Record<string, string> = {
     react: '^18',
     'react-dom': '^18',
-    next: '^14',
+    next: '^15',
     '@toolpad/core': coreVersion ?? 'latest',
     '@mui/material': '^6',
     '@mui/material-nextjs': '^6',
@@ -36,7 +44,21 @@ const packageJson: PackageJsonTemplate = (options) => {
   }
 
   if (authOption) {
-    dependencies['next-auth'] = '5.0.0-beta.20';
+    dependencies['next-auth'] = '5.0.0-beta.25';
+  }
+
+  if (hasNodemailerProvider || hasPasskeyProvider) {
+    dependencies['@prisma/client'] = '^5';
+    dependencies['@auth/prisma-adapter'] = '^2';
+  }
+
+  if (hasNodemailerProvider) {
+    dependencies.nodemailer = '^6';
+  }
+
+  if (hasPasskeyProvider) {
+    dependencies['@simplewebauthn/browser'] = '^9';
+    dependencies['@simplewebauthn/server'] = '^9';
   }
 
   const devDependencies: Record<string, string> = {
@@ -45,8 +67,12 @@ const packageJson: PackageJsonTemplate = (options) => {
     '@types/react': '^18',
     '@types/react-dom': '^18',
     eslint: '^8',
-    'eslint-config-next': '^14',
+    'eslint-config-next': '^15',
   };
+
+  if (hasNodemailerProvider || hasPasskeyProvider) {
+    devDependencies.prisma = '^5';
+  }
 
   const scripts = {
     dev: 'next dev',

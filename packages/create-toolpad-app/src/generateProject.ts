@@ -23,9 +23,13 @@ import auth from './templates/auth/auth';
 import envLocal from './templates/auth/envLocal';
 import middleware from './templates/auth/middleware';
 import routeHandler from './templates/auth/route';
+import prisma from './templates/auth/prisma';
+import env from './templates/auth/env';
+import schemaPrisma from './templates/auth/schemaPrisma';
 
 // Auth files for app router
 import signInPage from './templates/auth/nextjs-app/signInPage';
+import signInAction from './templates/auth/nextjs-app/actions';
 
 // Auth files for pages router
 import signInPagePagesRouter from './templates/auth/nextjs-pages/signIn';
@@ -41,7 +45,7 @@ export default function generateProject(
   const files = new Map<string, { content: string }>([
     ['theme.ts', { content: theme }],
     ['next-env.d.ts', { content: nextTypes }],
-    ['next.config.mjs', { content: nextConfig }],
+    ['next.config.mjs', { content: nextConfig(options) }],
     ['.eslintrc.json', { content: eslintConfig }],
     ['tsconfig.json', { content: tsConfig }],
     ['README.md', { content: readme }],
@@ -59,7 +63,7 @@ export default function generateProject(
     case 'nextjs-pages': {
       const nextJsPagesRouterStarter = new Map([
         ['pages/index.tsx', { content: indexPageContent }],
-        ['pages/orders/index.tsx', { content: ordersPage }],
+        ['pages/orders/index.tsx', { content: ordersPage(options) }],
         ['pages/_document.tsx', { content: document }],
         ['pages/_app.tsx', { content: app(options) }],
       ]);
@@ -74,6 +78,16 @@ export default function generateProject(
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
           ['pages/auth/signin.tsx', { content: signInPagePagesRouter(options) }],
         ]);
+        if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
+          // Prisma adapter support requires removal of middleware
+          authFiles.delete('middleware.ts');
+          const prismaFiles = new Map([
+            ['prisma.ts', { content: prisma }],
+            ['.env', { content: env }],
+            ['prisma/schema.prisma', { content: schemaPrisma(options) }],
+          ]);
+          return new Map([...files, ...nextJsPagesRouterStarter, ...authFiles, ...prismaFiles]);
+        }
         return new Map([...files, ...nextJsPagesRouterStarter, ...authFiles]);
       }
       return new Map([...files, ...nextJsPagesRouterStarter]);
@@ -84,7 +98,7 @@ export default function generateProject(
         ['app/(dashboard)/layout.tsx', { content: dashboardLayout }],
         ['app/layout.tsx', { content: rootLayout(options) }],
         ['app/(dashboard)/page.tsx', { content: indexPageContent }],
-        ['app/(dashboard)/orders/page.tsx', { content: ordersPage }],
+        ['app/(dashboard)/orders/page.tsx', { content: ordersPage(options) }],
       ]);
       if (options.auth) {
         const authFiles = new Map([
@@ -93,7 +107,18 @@ export default function generateProject(
           ['middleware.ts', { content: middleware }],
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
           ['app/auth/signin/page.tsx', { content: signInPage(options) }],
+          ['app/auth/signin/actions.ts', { content: signInAction(options) }],
         ]);
+        if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
+          // Prisma adapater support requires removal of middleware
+          authFiles.delete('middleware.ts');
+          const prismaFiles = new Map([
+            ['prisma.ts', { content: prisma }],
+            ['.env', { content: env }],
+            ['prisma/schema.prisma', { content: schemaPrisma(options) }],
+          ]);
+          return new Map([...files, ...nextJsAppRouterStarter, ...authFiles, ...prismaFiles]);
+        }
 
         return new Map([...files, ...nextJsAppRouterStarter, ...authFiles]);
       }

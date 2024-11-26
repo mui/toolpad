@@ -84,13 +84,16 @@ export default function examples() {
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-vite',
     },
     {
-      title: 'Custom theme with Auth.js and Next.js App router',
+      title: 'Functional Dashboard',
       description:
-        'This app shows you how to get started using Toolpad Core with Next.js, Auth.js and customize the Material UI theme',
-      src: '/static/toolpad/docs/core/auth-next-themed.png',
-      srcDark: '/static/toolpad/docs/core/auth-next-themed-dark.png',
+        'This example shows you how to get started building a dashboard with Toolpad Core, Next.js app router, Auth.js and Material UI components in a customized theme',
+      src: '/static/toolpad/docs/core/functional-dashboard.png',
+      href: 'https://mui-toolpad-docs.netlify.app/toolpad/core/templates/nextjs-dashboard',
+      srcDark: '/static/toolpad/docs/core/functional-dashboard-dark.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
-      codesandbox:
+      featured: true,
+      new: true,
+      codeSandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
     },
   ];

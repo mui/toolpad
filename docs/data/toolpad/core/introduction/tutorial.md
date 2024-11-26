@@ -15,15 +15,15 @@ title: Tutorial
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npx create-toolpad-app@latest --example core-tutorial
+npx create-toolpad-app@latest --example tutorial
 ```
 
 ```bash pnpm
-pnpm dlx create toolpad-app --example core-tutorial
+pnpm dlx create toolpad-app --example tutorial
 ```
 
 ```bash yarn
-yarn create toolpad-app --example core-tutorial
+yarn create toolpad-app --example tutorial
 ```
 
   </codeblock>
@@ -79,7 +79,7 @@ export default function Home() {
 
 ```tsx title="app/layout.tsx"
 // Add the following import:
-import TimelineIcon from '@mui/icons-material/TimelineIcon';
+import TimelineIcon from '@mui/icons-material/Timeline';
 
 // ...
 

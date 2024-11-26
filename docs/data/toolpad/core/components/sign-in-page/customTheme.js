@@ -237,7 +237,7 @@ export const inputsCustomizations = {
         boxSizing: 'border-box',
         transition: 'all 100ms ease-in',
         '&:focus-visible': {
-          outline: `3px solid ${alpha(theme.palette.primary.main, 0.5)}`,
+          outline: `2px solid ${alpha(theme.palette.primary.main, 0.5)}`,
           outlineOffset: '2px',
         },
       }),
@@ -499,6 +499,16 @@ export const inputsCustomizations = {
           },
         }),
       }),
+    },
+  },
+  MuiInputLabel: {
+    styleOverrides: {
+      root: {
+        transform: 'translate(4px, -16px) scale(0.75)',
+        [`&.${outlinedInputClasses.focused}`]: {
+          transform: 'translate(4px, -17px) scale(0.75)',
+        },
+      },
     },
   },
   MuiOutlinedInput: {

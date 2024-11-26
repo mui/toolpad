@@ -1,5 +1,58 @@
 # Changelog
 
+## 0.10.0
+
+<!-- generated comparing v0.9.0..master -->
+
+_Nov 23, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- Upgrade to Next.js 15
+- Add Passkey and Magic Link support inside the CLI
+- Add ability to override labels on `SignInPage`
+- Multiple bug-fixes and small improvements
+- Add a functional dashboard template to the docs!
+
+### `@toolpad/core`
+
+- Fix SignInButton UI (#4421) @bharatkashyap
+- Bump Next.js to 15.0.3 (#4321) @hollandjake
+- Add branding prop as override (#4442) @apedroferreira
+- Fix app bar items alignment (#4437) @bharatkashyap
+- Add width containment on flex container (#4414) @bharatkashyap
+- SignInPage UI tweaks (#4451) @bharatkashyap
+- Allow slotProps to override all labels (#4418) @bharatkashyap
+- Fix missing "Remember Me" state from `formData` (#4404) @bharatkashyap
+
+### `create-toolpad-app`
+
+- Support Magic Link and Passkeys in CLI (#4339) @bharatkashyap
+- Skip path validation for examples (#4434) @bharatkashyap
+
+### Docs
+
+- Add a new section for Integration (#4411) @prakhargupta1
+- Update examples to Next.js 15 (#4435) @bharatkashyap
+- Add Templates listing to examples page (#4449) @bharatkashyap
+- Host themed template under mui.com (#4415) @bharatkashyap
+- Fix 301 in the docs (3ab3b4e) @oliviertassinari
+- Fix 301 redirection in docs (2404ac6) @oliviertassinari
+- Fix missed Vale error (#4419) @bharatkashyap
+- Update SignInPage docs and themed example (#4410) @bharatkashyap
+- Correct version on themed example (#4405) @bharatkashyap
+- Fix 404 link (#4401) @oliviertassinari
+
+### Core
+
+- Update lockfile (#4386) @apedroferreira
+- Simplify OpenSSF badge (b61a32c) @oliviertassinari
+- Update to match with the rest of the codebase (5ceb4f0) @oliviertassinari
+- Remove dead style contain code (#4402) @oliviertassinari
+- Improve bug template for reproductions (a84ba1e) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @hollandjake, @oliviertassinari, @prakhargupta1
+
 ## v0.9.0
 
 <!-- generated comparing v0.8.0..master -->

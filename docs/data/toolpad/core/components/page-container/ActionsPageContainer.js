@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useDemoRouter } from '@toolpad/core/internal';
-import { PageContainer, PageContainerToolbar } from '@toolpad/core/PageContainer';
+import { PageContainer, PageHeaderToolbar } from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
@@ -21,7 +21,7 @@ const NAVIGATION = [
 // preview-start
 function PageToolbar() {
   return (
-    <PageContainerToolbar>
+    <PageHeaderToolbar>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
         Export
       </Button>
@@ -32,7 +32,7 @@ function PageToolbar() {
         slotProps={{ field: { size: 'small' } }}
         label="Period"
       />
-    </PageContainerToolbar>
+    </PageHeaderToolbar>
   );
 }
 // preview-end

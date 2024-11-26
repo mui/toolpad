@@ -1,9 +1,10 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Button, { ButtonProps } from '@mui/material/Button';
 import { AuthenticationContext } from '../AppProvider/AppProvider';
 import { useLocaleText } from '../shared/locales/LocaleContext';
 
-export /**
+/**
  *
  * Demos:
  *
@@ -38,3 +39,16 @@ export /**
     </Button>
   );
 }
+
+SignInButton.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * The content of the component.
+   */
+  children: PropTypes.node,
+} as any;
+
+export { SignInButton };

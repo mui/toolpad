@@ -204,7 +204,7 @@ async function run(argv: HandlerArgv) {
         folderName = folderName.slice(9);
       }
 
-      return fileName === folderName;
+      return !fileName.endsWith('.test');
     })
     .filter((filePath) => filePattern.test(filePath));
 

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Button, { ButtonProps } from '@mui/material/Button';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AuthenticationContext } from '../AppProvider/AppProvider';
@@ -6,7 +7,7 @@ import { useLocaleText } from '../shared/locales/LocaleContext';
 
 export type SignOutButtonProps = ButtonProps;
 
-export /**
+/**
  *
  * Demos:
  *
@@ -42,3 +43,16 @@ export /**
     </Button>
   );
 }
+
+SignOutButton.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * The content of the component.
+   */
+  children: PropTypes.node,
+} as any;
+
+export { SignOutButton };

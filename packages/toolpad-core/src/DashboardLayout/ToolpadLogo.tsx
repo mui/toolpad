@@ -2,7 +2,7 @@ import * as React from 'react';
 
 /**
  * @ignore - internal component.
- */
+ */ import PropTypes from 'prop-types';
 function ToolpadLogo({ size = 40 }: { size?: number }) {
   return (
     <svg width={size} height={size} fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,5 +56,16 @@ function ToolpadLogo({ size = 40 }: { size?: number }) {
     </svg>
   );
 }
+
+ToolpadLogo.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * @ignore
+   */
+  size: PropTypes.number,
+} as any;
 
 export { ToolpadLogo };

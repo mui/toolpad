@@ -119,6 +119,25 @@ SidebarFooter.propTypes = {
   mini: PropTypes.bool.isRequired,
 };
 
+function CustomBranding(props) {
+  return (
+    <Stack direction="column" alignItems="center">
+      <img width={24} src="https://mui.com/static/logo.svg" alt="Logo" />
+      <Typography
+        variant="caption"
+        sx={{
+          fontWeight: '300',
+          ml: 1,
+          textTransform: 'capitalize',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {props?.title ?? 'My Co.'}
+      </Typography>
+    </Stack>
+  );
+}
+
 function DashboardLayoutSlots(props) {
   const { window } = props;
 
@@ -138,6 +157,7 @@ function DashboardLayoutSlots(props) {
         slots={{
           toolbarActions: ToolbarActionsSearch,
           sidebarFooter: SidebarFooter,
+          branding: CustomBranding,
         }}
       >
         <DemoPageContent pathname={router.pathname} />

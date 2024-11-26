@@ -9,7 +9,11 @@ import { createTheme } from '@mui/material/styles';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SearchIcon from '@mui/icons-material/Search';
-import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
+import {
+  AppProvider,
+  type Navigation,
+  type Branding,
+} from '@toolpad/core/AppProvider';
 import {
   DashboardLayout,
   ThemeSwitcher,
@@ -114,6 +118,25 @@ function SidebarFooter({ mini }: SidebarFooterProps) {
   );
 }
 
+function CustomBranding(props: Branding) {
+  return (
+    <Stack direction="column" alignItems="center">
+      <img width={24} src="https://mui.com/static/logo.svg" alt="Logo" />
+      <Typography
+        variant="caption"
+        sx={{
+          fontWeight: '300',
+          ml: 1,
+          textTransform: 'capitalize',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {props?.title ?? 'My Co.'}
+      </Typography>
+    </Stack>
+  );
+}
+
 interface DemoProps {
   /**
    * Injected by the documentation to work in an iframe.
@@ -141,6 +164,7 @@ export default function DashboardLayoutSlots(props: DemoProps) {
         slots={{
           toolbarActions: ToolbarActionsSearch,
           sidebarFooter: SidebarFooter,
+          branding: CustomBranding,
         }}
       >
         <DemoPageContent pathname={router.pathname} />

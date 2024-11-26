@@ -9,20 +9,17 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import { Link } from '../shared/Link';
 import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
 import { Account, type AccountProps } from '../Account';
-import { useApplicationTitle } from '../shared/branding';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
-import { ToolpadLogo } from './ToolpadLogo';
+import { BrandingComponent } from './Branding';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
-import { Branding } from '../AppProvider';
+import type { Branding } from '../AppProvider';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -32,14 +29,6 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   boxShadow: 'none',
   zIndex: theme.zIndex.drawer + 1,
 }));
-
-const LogoContainer = styled('div')({
-  position: 'relative',
-  height: 40,
-  '& img': {
-    maxHeight: 40,
-  },
-});
 
 export interface SidebarFooterProps {
   mini: boolean;
@@ -67,6 +56,11 @@ export interface DashboardLayoutSlots {
    * @default null
    */
   sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
+  /**
+   * The branding component used in the layour header.
+   * @default Link
+   */
+  branding?: React.JSXElementConstructor<Branding>;
 }
 
 export interface DashboardLayoutProps {
@@ -143,9 +137,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const brandingContext = React.useContext(BrandingContext);
   const navigationContext = React.useContext(NavigationContext);
   const appWindowContext = React.useContext(WindowContext);
-  const applicationTitle = useApplicationTitle();
-
-  const branding = brandingProp ?? brandingContext;
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
     React.useState(!defaultSidebarCollapsed);
@@ -254,6 +245,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
+  const BrandingSlot = slots?.branding ?? BrandingComponent;
+
+  const brandingProps = { ...brandingContext, ...brandingProp };
 
   const getDrawerContent = React.useCallback(
     (isMini: boolean, viewport: 'phone' | 'tablet' | 'desktop') => (
@@ -366,22 +360,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   </Box>
                 </React.Fragment>
               ) : null}
-              <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <Stack direction="row" alignItems="center">
-                  <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: (theme.vars ?? theme).palette.primary.main,
-                      fontWeight: '700',
-                      ml: 1,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {applicationTitle}
-                  </Typography>
-                </Stack>
-              </Link>
+              <BrandingSlot {...brandingProps} />
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
               <ToolbarActionsSlot {...slotProps?.toolbarActions} />
@@ -472,6 +451,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default null
    */
   branding: PropTypes.shape({
+    homeUrl: PropTypes.string,
     logo: PropTypes.node,
     title: PropTypes.string,
   }),
@@ -535,6 +515,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slots: PropTypes.shape({
+    branding: PropTypes.elementType,
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,

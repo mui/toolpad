@@ -32,9 +32,13 @@ If application [themes](https://mui.com/toolpad/core/react-app-provider/#theming
 
 Some elements of the `DashboardLayout` can be configured to match your personalized brand.
 
-This can be done via the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), which allows for setting a custom `logo` image or `title` text in the page header.
+This can be done via the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), which allows for setting a custom `logo` image, a custom `title` text in the page header, and a custom `homeUrl` which the branding component leads to on click.
 
 {{"demo": "DashboardLayoutBranding.js", "height": 400, "iframe": true}}
+
+:::info
+You may also override the default branding components by passing in your own component to the `branding` slot, as described in the [Slots section](#slots).
+:::
 
 ## Navigation
 
@@ -148,6 +152,8 @@ Some possibly useful slots:
 - `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
 
 - `sidebarFooter`: allows you to add footer content in the sidebar.
+
+- `branding`: allows you to pass in your own component in the branding section. The component receives the `branding` object defined in the `AppProvider` (merged with any branding overrides defined in the `DashboardLayout`) as a prop.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
 

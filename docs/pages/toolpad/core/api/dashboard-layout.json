@@ -2,7 +2,10 @@
   "props": {
     "children": { "type": { "name": "node" }, "required": true },
     "branding": {
-      "type": { "name": "shape", "description": "{ logo?: node, title?: string }" },
+      "type": {
+        "name": "shape",
+        "description": "{ homeUrl?: string, logo?: node, title?: string }"
+      },
       "default": "null"
     },
     "defaultSidebarCollapsed": { "type": { "name": "bool" }, "default": "false" },
@@ -22,7 +25,7 @@
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
+        "description": "{ branding?: elementType, sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -57,6 +60,12 @@
       "name": "sidebarFooter",
       "description": "Optional footer component used in the layout sidebar.",
       "default": "null",
+      "class": null
+    },
+    {
+      "name": "branding",
+      "description": "The branding component used in the layour header.",
+      "default": "Link",
       "class": null
     }
   ],

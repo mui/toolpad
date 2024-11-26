@@ -6,7 +6,10 @@
       "default": "null"
     },
     "branding": {
-      "type": { "name": "shape", "description": "{ logo?: node, title?: string }" },
+      "type": {
+        "name": "shape",
+        "description": "{ homeUrl?: string, logo?: node, title?: string }"
+      },
       "default": "null"
     },
     "navigation": {

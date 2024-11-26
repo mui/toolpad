@@ -21,6 +21,7 @@
   },
   "classDescriptions": {},
   "slotDescriptions": {
+    "branding": "The branding component used in the layour header.",
     "sidebarFooter": "Optional footer component used in the layout sidebar.",
     "toolbarAccount": "The toolbar account component used in the layout header.",
     "toolbarActions": "The toolbar actions component used in the layout header."

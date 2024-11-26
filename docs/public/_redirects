@@ -51,6 +51,7 @@
 /toolpad/how-to-guides/* /toolpad/studio/how-to-guides/:splat 301
 /toolpad/reference/* /toolpad/studio/reference/:splat 301
 /toolpad/core/installation/ /toolpad/core/introduction/installation/ 301
+/toolpad/core/introduction/integration/ /toolpad/core/integrations/nextjs-approuter/ 301
 
 # Create separate namespace on https://mui.com
 / /toolpad/

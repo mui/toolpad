@@ -6,6 +6,26 @@ title: Next.js - Integration
 
 <p class="description">This guide walks you through adding Toolpad Core to an existing Next.js app.</p>
 
+## Prerequisites
+
+Ensure that you have `@mui/material` and `next` installed. You also need the following to make the integration work correctly:
+
+<codeblock storageKey="package-manager">
+
+```bash npm
+npm install @mui/material-nextjs @emotion/cache
+```
+
+```bash pnpm
+pnpm add @mui/material-nextjs @emotion/cache
+```
+
+```bash yarn
+yarn add install @mui/material-nextjs @emotion/cache
+```
+
+</codeblock>
+
 ## Wrap your application with `AppProvider`
 
 In your root layout file (for example, `pages/_app.tsx`), wrap your application with the `AppProvider`:

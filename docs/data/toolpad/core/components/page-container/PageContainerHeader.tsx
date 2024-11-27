@@ -24,7 +24,7 @@ export default function PageContainerHeader() {
       <Paper sx={{ width: '100%' }}>
         {/* preview-start */}
         <Container sx={{ my: 2 }}>
-          <PageHeader>Page content</PageHeader>
+          <PageHeader />
           <Box sx={{ mt: 1 }}>Page content</Box>
         </Container>
         {/* preview-end */}

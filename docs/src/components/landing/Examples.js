@@ -71,7 +71,7 @@ function ContentCard({ icon, title, description, href }) {
         {description}
       </Typography>
       <Link href={href} variant="body" sx={{ mt: 0.5 }}>
-        View more
+        Visit tutorial
         <KeyboardArrowRightRounded fontSize="small" />
       </Link>
     </Box>
@@ -112,7 +112,7 @@ export default function Examples() {
             <ContentCard
               icon={<DashboardRoundedIcon fontSize="small" color="primary" />}
               title="Admin app"
-              description="This app shows you to get started with Toolpad Core and use basic layout and navigation features."
+              description="This app shows you how to get started with Toolpad Core and use basic layout and navigation features."
               href="https://mui.com/toolpad/core/introduction/tutorial/"
             />
           </Grid>
@@ -160,7 +160,7 @@ export default function Examples() {
                 Learn how to build these and many other apps using Toolpad Core!
               </Typography>
               <Link href="/toolpad/core/introduction/examples/" variant="body" sx={{ mt: 1 }}>
-                Check out docs
+                Explore more examples
                 <KeyboardArrowRightRounded fontSize="small" />
               </Link>
             </Box>

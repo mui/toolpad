@@ -112,7 +112,7 @@ The Page Container component inherits the properties of the Material&nbsp;UI [Co
 
 ## Standalone page header
 
-The `PageHeader` component included in `PageContainer` can be imported and used by itself if you wish to so, for more freedom of customization.
+The `PageHeader` component included in `PageContainer` can be imported and used by itself if you wish to do so, for more freedom of customization.
 
 {{"demo": "PageContainerHeader.js", "height": 300}}
 

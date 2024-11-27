@@ -105,7 +105,3 @@ In this example:
 
 - The `slots` prop allows you to replace entire parts of the component.
 - The `slotProps` prop lets you pass additional props to specific slots.
-
-## Next steps
-
-Now that you understand the basic concepts of Toolpad Core, you're ready to start integrating it into your project. Head over to the [integration docs](/toolpad/core/introduction/integration/) to learn more.

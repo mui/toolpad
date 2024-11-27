@@ -13,7 +13,8 @@ import { useLocaleText } from '../shared/locales/LocaleContext';
  * API:
  *
  * - [SignInButton API](https://mui.com/toolpad/core/api/sign-in-button)
- */ function SignInButton(props: ButtonProps) {
+ */
+function SignInButton(props: ButtonProps) {
   const authentication = React.useContext(AuthenticationContext);
   const localeText = useLocaleText();
 

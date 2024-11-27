@@ -15,7 +15,8 @@ export interface AccountPopoverHeaderProps extends StackProps {
  * API:
  *
  * - [AccountPopoverHeader API](https://mui.com/toolpad/core/api/account-popover-header)
- */ function AccountPopoverHeader(props: AccountPopoverHeaderProps) {
+ */
+function AccountPopoverHeader(props: AccountPopoverHeaderProps) {
   const { children, ...rest } = props;
   return <Stack {...rest}>{children}</Stack>;
 }

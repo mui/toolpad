@@ -15,7 +15,8 @@ export interface AccountPopoverFooterProps extends BoxProps {
  * API:
  *
  * - [AccountPopoverFooter API](https://mui.com/toolpad/core/api/account-popover-footer)
- */ function AccountPopoverFooter(props: AccountPopoverFooterProps) {
+ */
+function AccountPopoverFooter(props: AccountPopoverFooterProps) {
   const { children, ...rest } = props;
   return (
     <Box

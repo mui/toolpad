@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { PaletteMode, Theme, useMediaQuery } from '@mui/material';
 import { ThemeProvider, useColorScheme } from '@mui/material/styles';
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
@@ -81,16 +80,6 @@ function LegacyThemeProvider(props: LegacyThemeProviderProps) {
   );
 }
 
-LegacyThemeProvider.propTypes /* remove-proptypes */ = {
-  // ┌────────────────────────────── Warning ──────────────────────────────┐
-  // │ These PropTypes are generated from the TypeScript type definitions. │
-  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
-  // └─────────────────────────────────────────────────────────────────────┘
-  children: PropTypes.node,
-  theme: PropTypes.object.isRequired,
-  window: PropTypes.object,
-} as any;
-
 interface CssVarsPaletteModeProviderProps {
   children: React.ReactNode;
   window?: Window;
@@ -117,15 +106,6 @@ function CssVarsPaletteModeProvider(props: CssVarsPaletteModeProviderProps) {
     </PaletteModeContext.Provider>
   );
 }
-
-CssVarsPaletteModeProvider.propTypes /* remove-proptypes */ = {
-  // ┌────────────────────────────── Warning ──────────────────────────────┐
-  // │ These PropTypes are generated from the TypeScript type definitions. │
-  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
-  // └─────────────────────────────────────────────────────────────────────┘
-  children: PropTypes.node,
-  window: PropTypes.object,
-} as any;
 
 interface CssVarsThemeProviderProps {
   children: React.ReactNode;
@@ -159,16 +139,6 @@ function CssVarsThemeProvider(props: CssVarsThemeProviderProps) {
   );
 }
 
-CssVarsThemeProvider.propTypes /* remove-proptypes */ = {
-  // ┌────────────────────────────── Warning ──────────────────────────────┐
-  // │ These PropTypes are generated from the TypeScript type definitions. │
-  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
-  // └─────────────────────────────────────────────────────────────────────┘
-  children: PropTypes.node,
-  theme: PropTypes.object.isRequired,
-  window: PropTypes.object,
-} as any;
-
 interface AppThemeProviderProps {
   children: React.ReactNode;
   theme: AppTheme;
@@ -193,24 +163,5 @@ function AppThemeProvider(props: AppThemeProviderProps) {
     </LegacyThemeProvider>
   );
 }
-
-AppThemeProvider.propTypes /* remove-proptypes */ = {
-  // ┌────────────────────────────── Warning ──────────────────────────────┐
-  // │ These PropTypes are generated from the TypeScript type definitions. │
-  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
-  // └─────────────────────────────────────────────────────────────────────┘
-  /**
-   * @ignore
-   */
-  children: PropTypes.node,
-  /**
-   * @ignore
-   */
-  theme: PropTypes.object.isRequired,
-  /**
-   * @ignore
-   */
-  window: PropTypes.object,
-} as any;
 
 export { AppThemeProvider };

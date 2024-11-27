@@ -58,7 +58,6 @@
     "@mui/lab": "6.0.0-beta.15",
     "@mui/utils": "6.1.7",
     "@mui/x-data-grid": "7.22.2",
-    "@mui/x-data-grid-pro": "^7.22.3",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.3",
     "client-only": "^0.0.1",

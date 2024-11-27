@@ -30,8 +30,17 @@ export default function OrdersPage() {
             }, 1500);
           });
         },
+        deleteOne: () => {
+          return new Promise<void>((resolve) => {
+            setTimeout(() => {
+              resolve();
+            }, 1500);
+          });
+        },
       }}
-      initialPageSize={0}
+      initialPageSize={25}
+      onCreateClick={() => {}}
+      onEditClick={() => {}}
     />
   );
 }

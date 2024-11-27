@@ -3,15 +3,28 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { styled, SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
+import Button, { ButtonProps } from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import {
   DataGrid,
+  GridToolbar,
+  GridActionsCellItem,
   DataGridProps,
   GridColDef,
   GridFilterModel,
   GridPaginationModel,
   GridSortModel,
+  GridRowId,
 } from '@mui/x-data-grid';
+import AddIcon from '@mui/icons-material/Add';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useDialogs } from '../useDialogs';
+import { useNotifications } from '../useNotifications';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -30,7 +43,12 @@ const ErrorOverlay = styled('div')(({ theme }) => ({
 
 type CRUDFields = GridColDef[];
 
-type DataModel = Record<string, unknown>;
+type DataModelId = GridRowId;
+
+interface DataModel {
+  id: DataModelId;
+  [key: string]: unknown;
+}
 
 interface GetManyParams {
   paginationModel: GridPaginationModel;
@@ -60,12 +78,25 @@ export interface ListProps<D extends DataModel> {
    */
   methods: {
     getMany: (params: GetManyParams) => Promise<{ items: D[]; itemCount: number }>;
+    deleteOne?: (id: DataModelId) => Promise<void>;
   };
   /**
    * Initial number of rows to show per page.
    * @default 100
    */
   initialPageSize?: number;
+  /**
+   * Callback fired when a row is clicked. Not called if the target clicked is an interactive element added by the built-in columns.
+   */
+  onRowClick?: DataGridProps['onRowClick'];
+  /**
+   * Callback fired when the "Create" button is clicked.
+   */
+  onCreateClick?: ButtonProps['onClick'];
+  /**
+   * Callback fired when the "Create" button is clicked.
+   */
+  onEditClick?: ButtonProps['onClick'];
   /**
    * The components used for each slot inside.
    * @default {}
@@ -83,8 +114,21 @@ export interface ListProps<D extends DataModel> {
 }
 
 function List<D extends DataModel>(props: ListProps<D>) {
-  const { fields, methods, initialPageSize = 100, slots, slotProps, sx } = props;
-  const { getMany } = methods;
+  const {
+    fields,
+    methods,
+    initialPageSize = 100,
+    onRowClick,
+    onCreateClick,
+    onEditClick,
+    slots,
+    slotProps,
+    sx,
+  } = props;
+  const { getMany, deleteOne } = methods;
+
+  const dialogs = useDialogs();
+  const notifications = useNotifications();
 
   const [rowsState, setRowsState] = React.useState<{ rows: D[]; rowCount: number }>({
     rows: [],
@@ -101,28 +145,62 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<Error | null>(null);
 
-  React.useEffect(() => {
-    const fetcher = async () => {
-      setError(null);
-      setIsLoading(true);
-      try {
-        const data = await getMany({
-          paginationModel,
-          sortModel,
-          filterModel,
-        });
-        setRowsState({
-          rows: data.items,
-          rowCount: data.itemCount,
-        });
-      } catch (dataError) {
-        setError(dataError as Error);
-      }
-      setIsLoading(false);
-    };
-
-    fetcher();
+  const loadData = React.useCallback(async () => {
+    setError(null);
+    setIsLoading(true);
+    try {
+      const data = await getMany({
+        paginationModel,
+        sortModel,
+        filterModel,
+      });
+      setRowsState({
+        rows: data.items,
+        rowCount: data.itemCount,
+      });
+    } catch (dataError) {
+      setError(dataError as Error);
+    }
+    setIsLoading(false);
   }, [filterModel, getMany, paginationModel, sortModel]);
+
+  React.useEffect(() => {
+    loadData();
+  }, [filterModel, getMany, loadData, paginationModel, sortModel]);
+
+  const handleRefresh = React.useCallback(() => {
+    if (!isLoading) {
+      loadData();
+    }
+  }, [isLoading, loadData]);
+
+  const handleItemDelete = React.useCallback(
+    (itemId: DataModelId) => async () => {
+      const confirmed = await dialogs.confirm(`Do you wish to delete item "${itemId}"?`, {
+        title: 'Delete item?',
+        severity: 'error',
+        okText: 'Delete',
+        cancelText: 'Cancel',
+      });
+
+      if (confirmed) {
+        setIsLoading(true);
+        try {
+          await deleteOne?.(itemId);
+          notifications.show('Item deleted successfully.', {
+            severity: 'success',
+          });
+          loadData();
+        } catch (deleteError) {
+          notifications.show(`Failed to delete item. Reason: ${(deleteError as Error).message}`, {
+            severity: 'error',
+          });
+        }
+        setIsLoading(false);
+      }
+    },
+    [deleteOne, dialogs, loadData, notifications],
+  );
 
   const DataGridSlot = slots?.dataGrid ?? DataGrid;
 
@@ -133,32 +211,88 @@ function List<D extends DataModel>(props: ListProps<D>) {
     [initialPageSize],
   );
 
+  const columns = React.useMemo<GridColDef[]>(() => {
+    const lastField = fields[fields.length - 1];
+
+    return [
+      ...fields.slice(0, fields.length - 1),
+      {
+        ...lastField,
+        flex: lastField.flex ?? 1,
+      },
+      {
+        field: 'actions',
+        type: 'actions',
+        getActions: ({ id }) => [
+          ...(onEditClick
+            ? [
+                <GridActionsCellItem
+                  key="edit-item"
+                  icon={<EditIcon />}
+                  label="Edit"
+                  onClick={onEditClick}
+                />,
+              ]
+            : []),
+          ...(deleteOne
+            ? [
+                <GridActionsCellItem
+                  key="delete-item"
+                  icon={<DeleteIcon />}
+                  label="Delete"
+                  onClick={handleItemDelete(id)}
+                />,
+              ]
+            : []),
+        ],
+      },
+    ];
+  }, [deleteOne, fields, handleItemDelete, onEditClick]);
+
   return (
-    <Box sx={{ flex: 1, position: 'relative' }}>
-      <DataGridSlot
-        rows={rowsState.rows}
-        rowCount={rowsState.rowCount}
-        columns={fields}
-        pagination
-        sortingMode="server"
-        filterMode="server"
-        paginationMode="server"
-        onPaginationModelChange={setPaginationModel}
-        onSortModelChange={setSortModel}
-        onFilterModelChange={setFilterModel}
-        loading={isLoading}
-        initialState={initialState}
-        sx={{
-          ...sx,
-        }}
-        {...slotProps?.dataGrid}
-      />
-      {error && (
-        <ErrorOverlay>
-          <Typography variant="body1">{error.message}</Typography>
-        </ErrorOverlay>
-      )}
-    </Box>
+    <Stack sx={{ flex: 1 }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+        <Tooltip title="Reload data" placement="right" enterDelay={1000}>
+          <div>
+            <IconButton aria-label="refresh" onClick={handleRefresh}>
+              <RefreshIcon />
+            </IconButton>
+          </div>
+        </Tooltip>
+        {onCreateClick ? (
+          <Button variant="contained" onClick={onCreateClick} startIcon={<AddIcon />}>
+            Create New
+          </Button>
+        ) : null}
+      </Stack>
+      <Box sx={{ flex: 1, position: 'relative' }}>
+        <DataGridSlot
+          rows={rowsState.rows}
+          rowCount={rowsState.rowCount}
+          columns={columns}
+          pagination
+          sortingMode="server"
+          filterMode="server"
+          paginationMode="server"
+          onPaginationModelChange={setPaginationModel}
+          onSortModelChange={setSortModel}
+          onFilterModelChange={setFilterModel}
+          onRowClick={onRowClick}
+          loading={isLoading}
+          initialState={initialState}
+          slots={{ toolbar: GridToolbar }}
+          sx={{
+            ...sx,
+          }}
+          {...slotProps?.dataGrid}
+        />
+        {error && (
+          <ErrorOverlay>
+            <Typography variant="body1">{error.message}</Typography>
+          </ErrorOverlay>
+        )}
+      </Box>
+    </Stack>
   );
 }
 
@@ -170,204 +304,7 @@ List.propTypes /* remove-proptypes */ = {
   /**
    * Fields to show.
    */
-  fields: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.shape({
-        align: PropTypes.oneOf(['center', 'left', 'right']),
-        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
-        description: PropTypes.string,
-        disableColumnMenu: PropTypes.bool,
-        disableExport: PropTypes.bool,
-        disableReorder: PropTypes.bool,
-        display: PropTypes.oneOf(['flex', 'text']),
-        editable: PropTypes.bool,
-        field: PropTypes.string.isRequired,
-        filterable: PropTypes.bool,
-        filterOperators: PropTypes.arrayOf(
-          PropTypes.shape({
-            getApplyFilterFn: PropTypes.func.isRequired,
-            getValueAsString: PropTypes.func,
-            headerLabel: PropTypes.string,
-            InputComponent: PropTypes.elementType,
-            InputComponentProps: PropTypes.object,
-            label: PropTypes.string,
-            requiresFilterValue: PropTypes.bool,
-            value: PropTypes.string.isRequired,
-          }),
-        ),
-        flex: PropTypes.number,
-        getApplyQuickFilterFn: PropTypes.func,
-        getSortComparator: PropTypes.func,
-        groupable: PropTypes.bool,
-        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
-        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        headerName: PropTypes.string,
-        hideable: PropTypes.bool,
-        hideSortIcons: PropTypes.bool,
-        maxWidth: PropTypes.number,
-        minWidth: PropTypes.number,
-        pinnable: PropTypes.bool,
-        preProcessEditCellProps: PropTypes.func,
-        renderCell: PropTypes.func,
-        renderEditCell: PropTypes.func,
-        renderHeader: PropTypes.func,
-        resizable: PropTypes.bool,
-        rowSpanValueGetter: PropTypes.func,
-        sortable: PropTypes.bool,
-        sortComparator: PropTypes.func,
-        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
-        type: PropTypes.oneOf([
-          'actions',
-          'boolean',
-          'custom',
-          'date',
-          'dateTime',
-          'number',
-          'singleSelect',
-          'string',
-        ]),
-        valueFormatter: PropTypes.func,
-        valueGetter: PropTypes.func,
-        valueParser: PropTypes.func,
-        valueSetter: PropTypes.func,
-        width: PropTypes.number,
-      }),
-      PropTypes.shape({
-        align: PropTypes.oneOf(['center', 'left', 'right']),
-        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
-        description: PropTypes.string,
-        disableColumnMenu: PropTypes.bool,
-        disableExport: PropTypes.bool,
-        disableReorder: PropTypes.bool,
-        display: PropTypes.oneOf(['flex', 'text']),
-        editable: PropTypes.bool,
-        field: PropTypes.string.isRequired,
-        filterable: PropTypes.bool,
-        filterOperators: PropTypes.arrayOf(
-          PropTypes.shape({
-            getApplyFilterFn: PropTypes.func.isRequired,
-            getValueAsString: PropTypes.func,
-            headerLabel: PropTypes.string,
-            InputComponent: PropTypes.elementType,
-            InputComponentProps: PropTypes.object,
-            label: PropTypes.string,
-            requiresFilterValue: PropTypes.bool,
-            value: PropTypes.string.isRequired,
-          }),
-        ),
-        flex: PropTypes.number,
-        getActions: PropTypes.func.isRequired,
-        getApplyQuickFilterFn: PropTypes.func,
-        getSortComparator: PropTypes.func,
-        groupable: PropTypes.bool,
-        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
-        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        headerName: PropTypes.string,
-        hideable: PropTypes.bool,
-        hideSortIcons: PropTypes.bool,
-        maxWidth: PropTypes.number,
-        minWidth: PropTypes.number,
-        pinnable: PropTypes.bool,
-        preProcessEditCellProps: PropTypes.func,
-        renderCell: PropTypes.func,
-        renderEditCell: PropTypes.func,
-        renderHeader: PropTypes.func,
-        resizable: PropTypes.bool,
-        rowSpanValueGetter: PropTypes.func,
-        sortable: PropTypes.bool,
-        sortComparator: PropTypes.func,
-        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
-        type: PropTypes.oneOf([
-          /**
-           * The type of the column.
-           * @default 'actions'
-           */
-          'actions',
-        ]).isRequired,
-        valueFormatter: PropTypes.func,
-        valueGetter: PropTypes.func,
-        valueParser: PropTypes.func,
-        valueSetter: PropTypes.func,
-        width: PropTypes.number,
-      }),
-      PropTypes.shape({
-        align: PropTypes.oneOf(['center', 'left', 'right']),
-        cellClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        colSpan: PropTypes.oneOfType([PropTypes.func, PropTypes.number]),
-        description: PropTypes.string,
-        disableColumnMenu: PropTypes.bool,
-        disableExport: PropTypes.bool,
-        disableReorder: PropTypes.bool,
-        display: PropTypes.oneOf(['flex', 'text']),
-        editable: PropTypes.bool,
-        field: PropTypes.string.isRequired,
-        filterable: PropTypes.bool,
-        filterOperators: PropTypes.arrayOf(
-          PropTypes.shape({
-            getApplyFilterFn: PropTypes.func.isRequired,
-            getValueAsString: PropTypes.func,
-            headerLabel: PropTypes.string,
-            InputComponent: PropTypes.elementType,
-            InputComponentProps: PropTypes.object,
-            label: PropTypes.string,
-            requiresFilterValue: PropTypes.bool,
-            value: PropTypes.string.isRequired,
-          }),
-        ),
-        flex: PropTypes.number,
-        getApplyQuickFilterFn: PropTypes.func,
-        getOptionLabel: PropTypes.func,
-        getOptionValue: PropTypes.func,
-        getSortComparator: PropTypes.func,
-        groupable: PropTypes.bool,
-        headerAlign: PropTypes.oneOf(['center', 'left', 'right']),
-        headerClassName: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
-        headerName: PropTypes.string,
-        hideable: PropTypes.bool,
-        hideSortIcons: PropTypes.bool,
-        maxWidth: PropTypes.number,
-        minWidth: PropTypes.number,
-        pinnable: PropTypes.bool,
-        preProcessEditCellProps: PropTypes.func,
-        renderCell: PropTypes.func,
-        renderEditCell: PropTypes.func,
-        renderHeader: PropTypes.func,
-        resizable: PropTypes.bool,
-        rowSpanValueGetter: PropTypes.func,
-        sortable: PropTypes.bool,
-        sortComparator: PropTypes.func,
-        sortingOrder: PropTypes.arrayOf(PropTypes.oneOf(['asc', 'desc'])),
-        type: PropTypes.oneOf([
-          /**
-           * The type of the column.
-           * @default 'singleSelect'
-           */
-          'singleSelect',
-        ]).isRequired,
-        valueFormatter: PropTypes.func,
-        valueGetter: PropTypes.func,
-        valueOptions: PropTypes.oneOfType([
-          PropTypes.arrayOf(
-            PropTypes.oneOfType([
-              PropTypes.number,
-              PropTypes.object,
-              PropTypes.shape({
-                label: PropTypes.string.isRequired,
-                value: PropTypes.any.isRequired,
-              }),
-              PropTypes.string,
-            ]).isRequired,
-          ),
-          PropTypes.func,
-        ]),
-        valueParser: PropTypes.func,
-        valueSetter: PropTypes.func,
-        width: PropTypes.number,
-      }),
-    ]).isRequired,
-  ).isRequired,
+  fields: PropTypes.arrayOf(PropTypes.object).isRequired,
   /**
    * Initial number of rows to show per page.
    * @default 100
@@ -377,8 +314,21 @@ List.propTypes /* remove-proptypes */ = {
    * Methods to interact with server-side data.
    */
   methods: PropTypes.shape({
+    deleteOne: PropTypes.func,
     getMany: PropTypes.func.isRequired,
   }).isRequired,
+  /**
+   * Callback fired when the "Create" button is clicked.
+   */
+  onCreateClick: PropTypes.func,
+  /**
+   * Callback fired when the "Create" button is clicked.
+   */
+  onEditClick: PropTypes.func,
+  /**
+   * Callback fired when a row is clicked. Not called if the target clicked is an interactive element added by the built-in columns.
+   */
+  onRowClick: PropTypes.func,
   /**
    * The props used for each slot inside.
    * @default {}

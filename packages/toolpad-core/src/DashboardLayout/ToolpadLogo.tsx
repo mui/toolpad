@@ -1,8 +1,9 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * @ignore - internal component.
- */ import PropTypes from 'prop-types';
+ */
 function ToolpadLogo({ size = 40 }: { size?: number }) {
   return (
     <svg width={size} height={size} fill="none" xmlns="http://www.w3.org/2000/svg">

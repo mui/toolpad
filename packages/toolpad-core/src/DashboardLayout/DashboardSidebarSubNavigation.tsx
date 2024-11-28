@@ -15,6 +15,7 @@ import type {} from '@mui/material/themeCssVarsAugmentation';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from '../shared/Link';
+import { useSession } from '../useSession';
 import { RouterContext } from '../shared/context';
 import type { Navigation } from '../AppProvider';
 import {
@@ -22,6 +23,7 @@ import {
   getPageItemFullPath,
   hasSelectedNavigationChildren,
   isPageItemSelected,
+  hasMatchingRole,
 } from '../shared/navigation';
 import { getDrawerSxTransitionMixin } from './utils';
 
@@ -77,6 +79,10 @@ function DashboardSidebarSubNavigation({
   selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
   const routerContext = React.useContext(RouterContext);
+  const session = useSession();
+  const userPermissions = React.useMemo(() => {
+    return [...(session?.user?.groups ?? []), ...(session?.user?.roles ?? [])];
+  }, [session?.user?.groups, session?.user?.roles]);
 
   const pathname = routerContext?.pathname ?? '/';
 
@@ -87,9 +93,9 @@ function DashboardSidebarSubNavigation({
           navigationItem,
           originalIndex: navigationItemIndex,
         }))
-        .filter(({ navigationItem }) =>
-          hasSelectedNavigationChildren(navigationItem, basePath, pathname),
-        )
+        .filter(({ navigationItem }) => {
+          return hasSelectedNavigationChildren(navigationItem, basePath, pathname);
+        })
         .map(({ originalIndex }) => `${depth}-${originalIndex}`),
     [basePath, depth, pathname, subNavigation],
   );
@@ -153,6 +159,10 @@ function DashboardSidebarSubNavigation({
               }}
             />
           );
+        }
+
+        if (!hasMatchingRole(navigationItem, userPermissions)) {
+          return null;
         }
 
         const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);

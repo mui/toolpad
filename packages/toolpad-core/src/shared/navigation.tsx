@@ -30,6 +30,17 @@ export function isPageItemSelected(
     : getPageItemFullPath(basePath, navigationItem) === pathname;
 }
 
+export function hasMatchingRole(item: NavigationPageItem, userPermissions: string[] = []): boolean {
+  if (!isPageItem(item)) {
+    return false;
+  }
+  if (!item.roles || item.roles.length === 0) {
+    return true; // Public item, no roles defined
+  }
+
+  return item.roles.some((role) => userPermissions.includes(role));
+}
+
 export function hasSelectedNavigationChildren(
   navigationItem: NavigationItem,
   basePath: string,

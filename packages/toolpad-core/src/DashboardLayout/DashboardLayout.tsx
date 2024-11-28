@@ -3,6 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { styled, useTheme, SxProps } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -15,9 +16,16 @@ import type {} from '@mui/material/themeCssVarsAugmentation';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { Link } from '../shared/Link';
-import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
+import {
+  BrandingContext,
+  NavigationContext,
+  WindowContext,
+  RouterContext,
+} from '../shared/context';
 import { Account, type AccountProps } from '../Account';
 import { useApplicationTitle } from '../shared/branding';
+import { matchPath, hasMatchingRole } from '../shared/navigation';
+import { useSession } from '../useSession';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
 import { ToolpadLogo } from './ToolpadLogo';
@@ -141,9 +149,26 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const theme = useTheme();
 
   const brandingContext = React.useContext(BrandingContext);
+  const routerContext = React.useContext(RouterContext);
   const navigationContext = React.useContext(NavigationContext);
   const appWindowContext = React.useContext(WindowContext);
   const applicationTitle = useApplicationTitle();
+
+  const pathname = routerContext?.pathname ?? '/';
+  const currentNavigationItem = React.useMemo(
+    () => matchPath(navigationContext, pathname),
+    [navigationContext, pathname],
+  );
+
+  const session = useSession();
+  const userPermissions = React.useMemo(() => {
+    return [...(session?.user?.groups ?? []), ...(session?.user?.roles ?? [])];
+  }, [session?.user?.groups, session?.user?.roles]);
+
+  const hasAccess = React.useMemo(
+    () => (currentNavigationItem ? hasMatchingRole(currentNavigationItem, userPermissions) : false),
+    [currentNavigationItem, userPermissions],
+  );
 
   const branding = brandingProp ?? brandingContext;
 
@@ -455,7 +480,21 @@ function DashboardLayout(props: DashboardLayoutProps) {
             overflow: 'auto',
           }}
         >
-          {children}
+          {hasAccess ? (
+            children
+          ) : (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                p: 2,
+              }}
+            >
+              <Alert severity="error">404 - Page not found</Alert>
+            </Box>
+          )}
         </Box>
       </Box>
     </Box>

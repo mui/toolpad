@@ -42,6 +42,8 @@ export interface NavigationPageItem {
   pattern?: string;
   action?: React.ReactNode;
   children?: Navigation;
+  groups?: string[];
+  roles?: string[];
 }
 
 export interface NavigationSubheaderItem {
@@ -63,6 +65,8 @@ export interface Session {
     name?: string | null;
     image?: string | null;
     email?: string | null;
+    groups?: string[];
+    roles?: string[];
   };
 }
 

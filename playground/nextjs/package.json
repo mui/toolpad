@@ -11,6 +11,7 @@
     "@emotion/styled": "11.13.0",
     "@mui/icons-material": "6.1.8",
     "@mui/material": "6.1.8",
+    "@auth/core": "0.37.4",
     "@mui/material-nextjs": "6.1.8",
     "@toolpad/core": "workspace:*",
     "@types/node": "^20.17.6",

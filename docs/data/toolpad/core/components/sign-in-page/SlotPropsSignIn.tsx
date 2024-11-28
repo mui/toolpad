@@ -16,7 +16,7 @@ export default function SlotPropsSignIn() {
           )
         }
         slotProps={{
-          emailField: { variant: 'standard' },
+          emailField: { variant: 'standard', autoFocus: false },
           passwordField: { variant: 'standard' },
           submitButton: { variant: 'outlined' },
         }}

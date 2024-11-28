@@ -2,13 +2,7 @@
 
 <p class="description">A Toolpad Studio app that fetches data from Supabase and shows it in a list component.</p>
 
-<a href="https://mui-toolpad-supabase-production.up.railway.app/prod/pages/page" target="_blank">
-  <img src="https://mui.com/static/toolpad/marketing/supabase.png" alt="Supabase integration" style="aspect-ratio: 575/318;" width="1469">
-</a>
-
-## Check out the live app
-
-[Open example](https://mui-toolpad-supabase-production.up.railway.app/prod/pages/page)
+<img src="https://mui.com/static/toolpad/marketing/supabase.png" alt="Supabase integration" style="aspect-ratio: 575/318;" width="1469">
 
 ## How to run
 
@@ -32,6 +26,8 @@ This app demonstrates the following capabilities of Toolpad Studio:
 
 1. Connecting to Supabase database using custom functions.
 2. Using the list component to create a basic product catalogue manager.
+
+Note: The underlying supabase database is inactive, but you can use this configuration to setup your app.
 
 ## The source
 

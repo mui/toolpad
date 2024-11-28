@@ -93,9 +93,9 @@ function DashboardSidebarSubNavigation({
           navigationItem,
           originalIndex: navigationItemIndex,
         }))
-        .filter(({ navigationItem }) => {
-          return hasSelectedNavigationChildren(navigationItem, basePath, pathname);
-        })
+        .filter(({ navigationItem }) =>
+          hasSelectedNavigationChildren(navigationItem, basePath, pathname),
+        )
         .map(({ originalIndex }) => `${depth}-${originalIndex}`),
     [basePath, depth, pathname, subNavigation],
   );

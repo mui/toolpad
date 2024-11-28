@@ -2,6 +2,8 @@ import * as React from 'react';
 import {
   Button,
   FormControl,
+  FormControlLabel,
+  Checkbox,
   InputLabel,
   OutlinedInput,
   TextField,
@@ -129,6 +131,28 @@ function Subtitle() {
   );
 }
 
+function AgreeWithTerms() {
+  return (
+    <FormControlLabel
+      control={
+        <Checkbox
+          name="tandc"
+          value="true"
+          color="primary"
+          sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+        />
+      }
+      slotProps={{
+        typography: {
+          fontSize: 14,
+        },
+      }}
+      color="textSecondary"
+      label="I agree with the T&C"
+    />
+  );
+}
+
 export default function SlotsSignIn() {
   const theme = useTheme();
   return (
@@ -136,7 +160,7 @@ export default function SlotsSignIn() {
       <SignInPage
         signIn={(provider, formData) =>
           alert(
-            `Logging in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
+            `Logging in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}, and checkbox value: ${formData.get('tandc')}`,
           )
         }
         slots={{
@@ -146,6 +170,7 @@ export default function SlotsSignIn() {
           passwordField: CustomPasswordField,
           submitButton: CustomButton,
           signUpLink: SignUpLink,
+          rememberMe: AgreeWithTerms,
           forgotPasswordLink: ForgotPasswordLink,
         }}
         providers={providers}

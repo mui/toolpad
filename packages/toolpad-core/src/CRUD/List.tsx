@@ -17,7 +17,6 @@ import {
   GridFilterModel,
   GridPaginationModel,
   GridSortModel,
-  GridRowId,
 } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -25,6 +24,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
+import { CRUDFields, DataModel, DataModelId } from './shared';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -40,15 +40,6 @@ const ErrorOverlay = styled('div')(({ theme }) => ({
   p: 1,
   zIndex: 10,
 }));
-
-type CRUDFields = GridColDef[];
-
-type DataModelId = GridRowId;
-
-interface DataModel {
-  id: DataModelId;
-  [key: string]: unknown;
-}
 
 interface GetManyParams {
   paginationModel: GridPaginationModel;
@@ -149,17 +140,17 @@ function List<D extends DataModel>(props: ListProps<D>) {
     setError(null);
     setIsLoading(true);
     try {
-      const data = await getMany({
+      const listData = await getMany({
         paginationModel,
         sortModel,
         filterModel,
       });
       setRowsState({
-        rows: data.items,
-        rowCount: data.itemCount,
+        rows: listData.items,
+        rowCount: listData.itemCount,
       });
-    } catch (dataError) {
-      setError(dataError as Error);
+    } catch (listDataError) {
+      setError(listDataError as Error);
     }
     setIsLoading(false);
   }, [filterModel, getMany, paginationModel, sortModel]);

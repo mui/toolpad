@@ -5,6 +5,7 @@ import App from './App';
 import Layout from './layouts/dashboard';
 import DashboardPage from './pages';
 import OrdersPage from './pages/orders';
+import OrderPage from './pages/order';
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
           {
             path: 'orders',
             Component: OrdersPage,
+          },
+          {
+            path: 'orders/:orderId',
+            Component: OrderPage,
           },
         ],
       },

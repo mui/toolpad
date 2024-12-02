@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { List } from '@toolpad/core/List';
+import { useNavigate } from 'react-router-dom';
+import { List, ListProps } from '@toolpad/core/CRUD';
 
 interface Order extends Record<string, unknown> {
   id: number;
   name: string;
+  status: string;
 }
 
 const orderFields = [
@@ -13,6 +15,15 @@ const orderFields = [
 ];
 
 export default function OrdersPage() {
+  const navigate = useNavigate();
+
+  const handleRowClick = React.useCallback<ListProps<Order>['onRowClick']>(
+    ({ row }) => {
+      navigate(`/orders/${row.id}`);
+    },
+    [navigate],
+  );
+
   return (
     <List<Order>
       fields={orderFields}
@@ -24,6 +35,7 @@ export default function OrdersPage() {
                 items: Array.from({ length: paginationModel.pageSize }, (_, i) => ({
                   id: paginationModel.page * paginationModel.pageSize + i + 1,
                   name: `Order ${paginationModel.page * paginationModel.pageSize + i + 1}`,
+                  status: 'pending',
                 })).slice(0, paginationModel.pageSize),
                 itemCount: 300,
               });
@@ -39,6 +51,7 @@ export default function OrdersPage() {
         },
       }}
       initialPageSize={25}
+      onRowClick={handleRowClick}
       onCreateClick={() => {}}
       onEditClick={() => {}}
     />

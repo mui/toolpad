@@ -1,6 +1,6 @@
 function PageToolbar() {
   return (
-    <PageContainerToolbar>
+    <PageHeaderToolbar>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
         Export
       </Button>
@@ -11,6 +11,6 @@ function PageToolbar() {
         slotProps={{ field: { size: 'small' } as any }}
         label="Period"
       />
-    </PageContainerToolbar>
+    </PageHeaderToolbar>
   );
 }

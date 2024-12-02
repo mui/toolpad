@@ -1,6 +1,6 @@
 {
   "componentDescription": "",
-  "propDescriptions": {},
+  "propDescriptions": { "children": { "description": "The content of the component." } },
   "classDescriptions": {
     "colorError": {
       "description": "Styles applied to {{nodeName}} if {{conditions}}.",

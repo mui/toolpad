@@ -7,6 +7,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import useSsr from '@toolpad/utils/hooks/useSsr';
 import { PaletteModeContext } from '../shared/context';
+
 /**
  *
  * Demos:

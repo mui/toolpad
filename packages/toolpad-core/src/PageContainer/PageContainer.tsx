@@ -87,7 +87,7 @@ export interface PageContainerProps extends ContainerProps {
  * - [PageContainer API](https://mui.com/toolpad/core/api/page-container)
  */
 function PageContainer(props: PageContainerProps) {
-  const { children, slots, slotProps, breadcrumbs, breadCrumbs, ...rest } = props;
+  const { children, slots, slotProps, breadcrumbs, breadCrumbs, title, ...rest } = props;
 
   if (process.env.NODE_ENV !== 'production' && breadCrumbs) {
     warnOnce('The PageContainer `breadCrumbs` prop is deprecated. Use `breadcrumbs` instead.');
@@ -97,7 +97,7 @@ function PageContainer(props: PageContainerProps) {
 
   // TODO: Remove `props.breadCrumbs` in the next major version
   const resolvedBreadcrumbs = breadcrumbs ?? breadCrumbs ?? activePage?.breadcrumbs ?? [];
-  const title = props.title ?? activePage?.title ?? '';
+  const resolvedTitle = title ?? activePage?.title ?? '';
 
   const ToolbarComponent = props?.slots?.toolbar ?? PageContainerToolbar;
   const toolbarSlotProps = useSlotProps({
@@ -134,7 +134,7 @@ function PageContainer(props: PageContainerProps) {
           </Breadcrumbs>
 
           <PageContentHeader>
-            {title ? <Typography variant="h4">{title}</Typography> : null}
+            {resolvedTitle ? <Typography variant="h4">{resolvedTitle}</Typography> : null}
             <ToolbarComponent {...toolbarSlotProps} />
           </PageContentHeader>
         </Stack>

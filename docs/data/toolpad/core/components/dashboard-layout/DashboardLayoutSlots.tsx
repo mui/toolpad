@@ -114,7 +114,7 @@ function SidebarFooter({ mini }: SidebarFooterProps) {
   );
 }
 
-function CustomBranding() {
+function CustomAppTitle() {
   return (
     <Stack direction="column" alignItems="center">
       <img width={24} src="https://mui.com/static/logo.svg" alt="Logo" />
@@ -160,7 +160,7 @@ export default function DashboardLayoutSlots(props: DemoProps) {
         slots={{
           toolbarActions: ToolbarActionsSearch,
           sidebarFooter: SidebarFooter,
-          branding: CustomBranding,
+          appTitle: CustomAppTitle,
         }}
       >
         <DemoPageContent pathname={router.pathname} />

@@ -25,7 +25,7 @@
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ branding?: elementType, sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
+        "description": "{ appTitle?: elementType, sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -63,8 +63,8 @@
       "class": null
     },
     {
-      "name": "branding",
-      "description": "The branding component used in the layour header.",
+      "name": "appTitle",
+      "description": "The component used for the app title section in the layout header.",
       "default": "Link",
       "class": null
     }

@@ -18,7 +18,7 @@ const LogoContainer = styled('div')({
 /**
  * @ignore - internal component.
  */
-export function BrandingComponent(props: Branding) {
+export function AppTitleComponent(props: Branding) {
   const theme = useTheme();
   const defaultTitle = useApplicationTitle();
   const title = props?.title ?? defaultTitle;

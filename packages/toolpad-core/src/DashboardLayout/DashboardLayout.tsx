@@ -17,7 +17,7 @@ import { BrandingContext, NavigationContext, WindowContext } from '../shared/con
 import { Account, type AccountProps } from '../Account';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
-import { BrandingComponent } from './Branding';
+import { AppTitleComponent } from './AppTitle';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 import type { Branding } from '../AppProvider';
 
@@ -57,10 +57,10 @@ export interface DashboardLayoutSlots {
    */
   sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
   /**
-   * The branding component used in the layour header.
+   * The component used for the app title section in the layout header.
    * @default Link
    */
-  branding?: React.JSXElementConstructor<{}>;
+  appTitle?: React.JSXElementConstructor<{}>;
 }
 
 export interface DashboardLayoutProps {
@@ -246,7 +246,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
 
-  const brandingProps = { ...brandingContext, ...brandingProp };
+  const appTitleProps = { ...brandingContext, ...brandingProp };
 
   const getDrawerContent = React.useCallback(
     (isMini: boolean, viewport: 'phone' | 'tablet' | 'desktop') => (
@@ -359,7 +359,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   </Box>
                 </React.Fragment>
               ) : null}
-              {slots?.branding ? <slots.branding /> : <BrandingComponent {...brandingProps} />}
+              {slots?.appTitle ? <slots.appTitle /> : <AppTitleComponent {...appTitleProps} />}
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
               <ToolbarActionsSlot {...slotProps?.toolbarActions} />
@@ -514,7 +514,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slots: PropTypes.shape({
-    branding: PropTypes.elementType,
+    appTitle: PropTypes.elementType,
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,

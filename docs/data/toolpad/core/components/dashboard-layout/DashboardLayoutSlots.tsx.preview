@@ -2,7 +2,7 @@
   slots={{
     toolbarActions: ToolbarActionsSearch,
     sidebarFooter: SidebarFooter,
-    branding: CustomBranding,
+    appTitle: CustomAppTitle,
   }}
 >
   <DemoPageContent pathname={router.pathname} />

@@ -57,14 +57,14 @@ export default function SignIn() {
 
           if (result?.success && result?.user) {
             // Convert Firebase user to Session format
-            const session: Session = {
+            const userSession: Session = {
               user: {
                 name: result.user.displayName || '',
                 email: result.user.email || '',
                 image: result.user.photoURL || '',
               },
             };
-            setSession(session);
+            setSession(userSession);
             navigate(callbackUrl || '/', { replace: true });
             return {};
           }

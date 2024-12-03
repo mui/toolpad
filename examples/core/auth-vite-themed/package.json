@@ -20,7 +20,7 @@
     "clsx": "^2",
     "@react-spring/web": "^9",
     "@mui/material": "^6",
-    "@toolpad/core": "workspace:*",
+    "@toolpad/core": "latest",
     "react": "^18",
     "react-dom": "^18",
     "react-router-dom": "^6"

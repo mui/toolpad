@@ -111,4 +111,4 @@ yarn dev
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/bootstrap.png", "srcDark": "/static/toolpad/docs/core/bootstrap-dark.png","alt": "Toolpad Core entry point", "caption": "Starting with Toolpad Core", "zoom": true, "indent": 1 }}
 
-5. Installation is complete! Begin building your project by making edits to `(dashboard/page/page.tsx`. To understand how to leverage Toolpad Core to build dashboards quickly, [see the detailed tutorial](/toolpad/core/introduction/tutorial/).
+5. Installation is complete! Begin building your project by making edits to `(dashboard)/page/page.tsx`. To understand how to leverage Toolpad Core to build dashboards quickly, [see the detailed tutorial](/toolpad/core/introduction/tutorial/).

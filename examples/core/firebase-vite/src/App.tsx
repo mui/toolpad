@@ -7,7 +7,6 @@ import { AppProvider } from '@toolpad/core/react-router-dom';
 import type { Navigation, Authentication } from '@toolpad/core/AppProvider';
 import { firebaseSignOut, signInWithGoogle, onAuthStateChanged } from './firebase/auth';
 import SessionContext, { type Session } from './SessionContext';
-import theme from './theme';
 
 const NAVIGATION: Navigation = [
   {
@@ -72,7 +71,6 @@ export default function App() {
       navigation={NAVIGATION}
       branding={BRANDING}
       session={session}
-      theme={theme}
       authentication={AUTHENTICATION}
     >
       <SessionContext.Provider value={sessionContextValue}>

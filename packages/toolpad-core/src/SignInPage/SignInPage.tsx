@@ -37,7 +37,6 @@ import KeycloakIcon from './icons/Keycloak';
 import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
 import { BrandingContext, RouterContext } from '../shared/context';
-// import { DocsContext } from '../internal/context';
 
 const mergeSlotSx = (defaultSx: SxProps<Theme>, slotProps?: { sx?: SxProps<Theme> }) => {
   if (Array.isArray(slotProps?.sx)) {

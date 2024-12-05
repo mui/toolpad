@@ -364,7 +364,7 @@ function SignInPage(props: SignInPageProps) {
                         const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
                         setFormStatus((prev) => ({
                           ...prev,
-                          loading: false,
+                          loading: oauthResponse?.error ? false : prev.loading,
                           error: oauthResponse?.error,
                         }));
                       }}

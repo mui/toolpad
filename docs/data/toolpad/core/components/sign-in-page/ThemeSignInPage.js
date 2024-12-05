@@ -15,7 +15,7 @@ const signIn = async (provider) => {
   const promise = new Promise((resolve) => {
     setTimeout(() => {
       console.log(`Sign in with ${provider.id}`);
-      resolve();
+      resolve({ error: 'This is a mock error message.' });
     }, 500);
   });
   return promise;

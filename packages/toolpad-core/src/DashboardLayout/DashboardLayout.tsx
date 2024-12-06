@@ -89,6 +89,14 @@ export interface DashboardLayoutProps {
    * @default false
    */
   hideNavigation?: boolean;
+  /** A prop that controls the collapsed state of the sidebar.
+   * @default false
+   */
+  sidebarCollapsed?: boolean;
+  /**
+   * Callback function to be executed on sidebarCollased state change
+   */
+  onToggleSidebar?: (sidebarCollapsed: boolean) => void;
   /**
    * Width of the sidebar when expanded.
    * @default 320
@@ -131,6 +139,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     slots,
     slotProps,
     sx,
+    sidebarCollapsed,
+    onToggleSidebar,
   } = props;
 
   const theme = useTheme();
@@ -173,6 +183,15 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
     React.useState(isNavigationExpanded);
+
+  React.useEffect(() => {
+    if (typeof sidebarCollapsed === 'boolean') {
+      setIsNavigationExpanded(!sidebarCollapsed);
+      if (onToggleSidebar) {
+        onToggleSidebar(sidebarCollapsed);
+      }
+    }
+  }, [sidebarCollapsed, setIsNavigationExpanded, onToggleSidebar]);
 
   React.useEffect(() => {
     if (isNavigationExpanded) {
@@ -483,6 +502,15 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default false
    */
   hideNavigation: PropTypes.bool,
+  /**
+   * Callback function to be executed on sidebarCollased state change
+   */
+  onToggleSidebar: PropTypes.func,
+  /**
+   * A prop that controls the collapsed state of the sidebar.
+   * @default false
+   */
+  sidebarCollapsed: PropTypes.bool,
   /**
    * Width of the sidebar when expanded.
    * @default 320

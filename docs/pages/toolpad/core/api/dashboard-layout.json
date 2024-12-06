@@ -11,6 +11,8 @@
     "defaultSidebarCollapsed": { "type": { "name": "bool" }, "default": "false" },
     "disableCollapsibleSidebar": { "type": { "name": "bool" }, "default": "false" },
     "hideNavigation": { "type": { "name": "bool" }, "default": "false" },
+    "onToggleSidebar": { "type": { "name": "func" } },
+    "sidebarCollapsed": { "type": { "name": "bool" }, "default": "false" },
     "sidebarExpandedWidth": {
       "type": { "name": "union", "description": "number<br>&#124;&nbsp;string" },
       "default": "320"

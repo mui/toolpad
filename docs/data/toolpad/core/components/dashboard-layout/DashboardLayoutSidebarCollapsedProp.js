@@ -63,19 +63,7 @@ function DemoPageContent({ pathname, toggleSidebar }) {
 
 DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
-  toggleSidebar: PropTypes.shape({
-    '__@hasInstance@2095': PropTypes.func.isRequired,
-    '__@metadata@2097': PropTypes.any,
-    apply: PropTypes.func.isRequired,
-    arguments: PropTypes.any.isRequired,
-    bind: PropTypes.func.isRequired,
-    call: PropTypes.func.isRequired,
-    caller: PropTypes.object.isRequired,
-    length: PropTypes.number.isRequired,
-    name: PropTypes.string.isRequired,
-    prototype: PropTypes.any.isRequired,
-    toString: PropTypes.func.isRequired,
-  }).isRequired,
+  toggleSidebar: PropTypes.func.isRequired,
 };
 
 function DashboardLayoutSidebarCollapsedProp(props) {

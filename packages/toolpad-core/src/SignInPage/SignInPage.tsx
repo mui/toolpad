@@ -37,7 +37,6 @@ import KeycloakIcon from './icons/Keycloak';
 import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
 import { BrandingContext, RouterContext } from '../shared/context';
-import { DocsContext } from '../internal/context';
 
 const mergeSlotSx = (defaultSx: SxProps<Theme>, slotProps?: { sx?: SxProps<Theme> }) => {
   if (Array.isArray(slotProps?.sx)) {
@@ -277,7 +276,6 @@ function SignInPage(props: SignInPageProps) {
   const { providers, signIn, slots, slotProps, sx } = props;
   const theme = useTheme();
   const branding = React.useContext(BrandingContext);
-  const docs = React.useContext(DocsContext);
   const router = React.useContext(RouterContext);
   const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
@@ -372,7 +370,7 @@ function SignInPage(props: SignInPageProps) {
                         const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
                         setFormStatus((prev) => ({
                           ...prev,
-                          loading: oauthResponse?.error || docs ? false : prev.loading,
+                          loading: oauthResponse?.error ? false : prev.loading,
                           error: oauthResponse?.error,
                         }));
                       }}
@@ -437,7 +435,7 @@ function SignInPage(props: SignInPageProps) {
                         name: 'email',
                         type: 'email',
                         autoComplete: 'email-webauthn',
-                        autoFocus: docs ? false : singleProvider,
+                        autoFocus: singleProvider,
                         ...slotProps?.emailField,
                       })}
                     />
@@ -511,7 +509,7 @@ function SignInPage(props: SignInPageProps) {
                         id: 'email-nodemailer',
                         type: 'email',
                         autoComplete: 'email-nodemailer',
-                        autoFocus: docs ? false : singleProvider,
+                        autoFocus: singleProvider,
                         ...slotProps?.emailField,
                       })}
                     />
@@ -584,7 +582,7 @@ function SignInPage(props: SignInPageProps) {
                           name: 'email',
                           type: 'email',
                           autoComplete: 'email',
-                          autoFocus: docs ? false : singleProvider,
+                          autoFocus: singleProvider,
                           ...slotProps?.emailField,
                         })}
                       />

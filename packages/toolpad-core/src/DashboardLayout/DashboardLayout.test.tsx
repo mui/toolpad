@@ -410,4 +410,55 @@ describe('DashboardLayout', () => {
     // Ensure that main content is still rendered
     expect(screen.getByText('Hello world')).toBeTruthy();
   });
+
+  test('renders the sidebar in collapsed state when sidebarCollapsed is true', () => {
+    render(
+      <DashboardLayout sidebarCollapsed>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    // Expect that menu button has expand action
+    expect(screen.getAllByLabelText('Expand menu')).toBeTruthy();
+    expect(screen.queryByLabelText('Collapse menu')).toBeNull();
+  });
+
+  test('renders the sidebar in expanded state when sidebarCollapsed is false', () => {
+    render(
+      <DashboardLayout sidebarCollapsed={false}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    expect(screen.getAllByLabelText('Collapse menu')).toBeTruthy();
+  });
+
+  test('calls onToggleSidebar callback when sidebarCollapsed state changes', () => {
+    const mockToggleSidebar = vi.fn();
+    const { rerender } = render(
+      <DashboardLayout sidebarCollapsed={false} onToggleSidebar={mockToggleSidebar}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    // Trigger sidebar toggle (simulate a collapse action)
+    rerender(
+      <DashboardLayout sidebarCollapsed onToggleSidebar={mockToggleSidebar}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    // Assert the callback was called with the new state
+    expect(mockToggleSidebar).toHaveBeenCalledWith(true);
+
+    // Trigger expand action
+    rerender(
+      <DashboardLayout sidebarCollapsed={false} onToggleSidebar={mockToggleSidebar}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    // Assert the callback was called again with the updated state
+    expect(mockToggleSidebar).toHaveBeenCalledWith(false);
+  });
 });

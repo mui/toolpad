@@ -1,0 +1,6 @@
+<DashboardLayout sidebarCollapsed={sidebarCollapsed}>
+  <DemoPageContent
+    pathname={pathname}
+    toggleSidebar={() => toggleSidebar(!sidebarCollapsed)}
+  />
+</DashboardLayout>

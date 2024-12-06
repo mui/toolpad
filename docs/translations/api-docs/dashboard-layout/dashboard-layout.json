@@ -12,6 +12,12 @@
     "hideNavigation": {
       "description": "Whether the navigation bar and menu icon should be hidden"
     },
+    "onToggleSidebar": {
+      "description": "Callback function to be executed on sidebarCollased state change"
+    },
+    "sidebarCollapsed": {
+      "description": "A prop that controls the collapsed state of the sidebar."
+    },
     "sidebarExpandedWidth": { "description": "Width of the sidebar when expanded." },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." },

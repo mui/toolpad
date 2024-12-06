@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
@@ -37,7 +37,6 @@ import KeycloakIcon from './icons/Keycloak';
 import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
 import { BrandingContext, RouterContext } from '../shared/context';
-import { DocsContext } from '../internal/context';
 
 const mergeSlotSx = (defaultSx: SxProps<Theme>, slotProps?: { sx?: SxProps<Theme> }) => {
   if (Array.isArray(slotProps?.sx)) {
@@ -209,6 +208,11 @@ export interface SignInPageSlots {
    * @default Typography
    */
   subtitle?: React.ElementType;
+  /**
+   * A component to override the default "Remember me" checkbox in the Credentials form
+   * @default FormControlLabel
+   */
+  rememberMe?: React.ElementType;
 }
 
 export interface SignInPageProps {
@@ -250,6 +254,7 @@ export interface SignInPageProps {
     submitButton?: LoadingButtonProps;
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
+    rememberMe?: FormControlLabelProps;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container
@@ -271,7 +276,6 @@ function SignInPage(props: SignInPageProps) {
   const { providers, signIn, slots, slotProps, sx } = props;
   const theme = useTheme();
   const branding = React.useContext(BrandingContext);
-  const docs = React.useContext(DocsContext);
   const router = React.useContext(RouterContext);
   const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
@@ -366,7 +370,7 @@ function SignInPage(props: SignInPageProps) {
                         const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
                         setFormStatus((prev) => ({
                           ...prev,
-                          loading: oauthResponse?.error || docs ? false : prev.loading,
+                          loading: oauthResponse?.error ? false : prev.loading,
                           error: oauthResponse?.error,
                         }));
                       }}
@@ -431,7 +435,7 @@ function SignInPage(props: SignInPageProps) {
                         name: 'email',
                         type: 'email',
                         autoComplete: 'email-webauthn',
-                        autoFocus: docs ? false : singleProvider,
+                        autoFocus: singleProvider,
                         ...slotProps?.emailField,
                       })}
                     />
@@ -505,7 +509,7 @@ function SignInPage(props: SignInPageProps) {
                         id: 'email-nodemailer',
                         type: 'email',
                         autoComplete: 'email-nodemailer',
-                        autoFocus: docs ? false : singleProvider,
+                        autoFocus: singleProvider,
                         ...slotProps?.emailField,
                       })}
                     />
@@ -578,7 +582,7 @@ function SignInPage(props: SignInPageProps) {
                           name: 'email',
                           type: 'email',
                           autoComplete: 'email',
-                          autoFocus: docs ? false : singleProvider,
+                          autoFocus: singleProvider,
                           ...slotProps?.emailField,
                         })}
                       />
@@ -608,23 +612,29 @@ function SignInPage(props: SignInPageProps) {
                       justifyContent: 'space-between',
                     }}
                   >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          name="remember"
-                          value="true"
-                          color="primary"
-                          sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
-                        />
-                      }
-                      label="Remember me"
-                      slotProps={{
-                        typography: {
-                          color: 'textSecondary',
-                          fontSize: theme.typography.pxToRem(14),
-                        },
-                      }}
-                    />
+                    {slots?.rememberMe ? (
+                      <slots.rememberMe {...slotProps?.rememberMe} />
+                    ) : (
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            name="remember"
+                            value="true"
+                            color="primary"
+                            sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+                          />
+                        }
+                        label="Remember me"
+                        {...slotProps?.rememberMe}
+                        slotProps={{
+                          typography: {
+                            color: 'textSecondary',
+                            fontSize: theme.typography.pxToRem(14),
+                          },
+                          ...slotProps?.rememberMe?.slotProps,
+                        }}
+                      />
+                    )}
                     {slots?.forgotPasswordLink ? (
                       <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
                     ) : null}
@@ -701,6 +711,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
     passwordField: PropTypes.object,
+    rememberMe: PropTypes.object,
     signUpLink: PropTypes.object,
     submitButton: PropTypes.object,
   }),
@@ -714,6 +725,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
     emailField: PropTypes.elementType,
     forgotPasswordLink: PropTypes.elementType,
     passwordField: PropTypes.elementType,
+    rememberMe: PropTypes.elementType,
     signUpLink: PropTypes.elementType,
     submitButton: PropTypes.elementType,
     subtitle: PropTypes.elementType,

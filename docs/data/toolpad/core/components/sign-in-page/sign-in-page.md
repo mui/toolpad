@@ -235,11 +235,7 @@ Find a full-fledged example using the Next.js App router, Auth.js and this theme
 
 ### Slots
 
-To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs and buttons.
-
-:::warning
-Make sure to pass `email` and `password` as the `name` attribute on custom email and password components, otherwise those values will not be available in the `formData` parameter of the `signIn` prop.
-:::
+To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs, checkboxes and buttons.
 
 {{"demo": "SlotsSignIn.js", "iframe": true, "height": 540 }}
 

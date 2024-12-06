@@ -126,6 +126,12 @@ The layout sidebar can be hidden if needed with the `hideNavigation` prop.
 
 {{"demo": "DashboardLayoutSidebarHidden.js", "height": 400, "iframe": true}}
 
+### Toggle sidebar
+
+The sidebar can be toggled if needed with the `sidebarCollapsed` prop.
+
+{{"demo": "DashboardLayoutSidebarCollapsedProp.js", "height": 400, "iframe": true}}
+
 ## Full-size content
 
 The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.

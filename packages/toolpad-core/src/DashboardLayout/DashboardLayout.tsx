@@ -363,7 +363,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
               {slots?.appTitle ? (
                 <slots.appTitle {...slotProps?.appTitle} />
               ) : (
-                <AppTitle branding={appTitleBrandingProp} />
+                /* Hierarchy of application of `branding`
+                 * 1. Branding prop passed in the `slotProps.appTitle`
+                 * 2. Branding prop passed to the `DashboardLayout`
+                 * 3. Branding prop passed to the `AppProvider`
+                 */
+                <AppTitle branding={appTitleBrandingProp} {...slotProps?.appTitle} />
               )}
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>

@@ -37,7 +37,7 @@ This can be done via the `branding` prop in the [AppProvider](https://mui.com/to
 {{"demo": "DashboardLayoutBranding.js", "height": 400, "iframe": true}}
 
 :::info
-You may also override the default branding components by passing in your own component to the `appTitle` slot, as shown in the [Slots section](#slots).
+You may also override the default branding by passing in your own component to the `appTitle` slot, as shown in the [Slots section](#slots).
 :::
 
 ## Navigation

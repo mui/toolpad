@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
@@ -208,6 +208,11 @@ export interface SignInPageSlots {
    * @default Typography
    */
   subtitle?: React.ElementType;
+  /**
+   * A component to override the default "Remember me" checkbox in the Credentials form
+   * @default FormControlLabel
+   */
+  rememberMe?: React.ElementType;
 }
 
 export interface SignInPageProps {
@@ -249,6 +254,7 @@ export interface SignInPageProps {
     submitButton?: LoadingButtonProps;
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
+    rememberMe?: FormControlLabelProps;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container
@@ -606,23 +612,29 @@ function SignInPage(props: SignInPageProps) {
                       justifyContent: 'space-between',
                     }}
                   >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          name="remember"
-                          value="true"
-                          color="primary"
-                          sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
-                        />
-                      }
-                      label="Remember me"
-                      slotProps={{
-                        typography: {
-                          color: 'textSecondary',
-                          fontSize: theme.typography.pxToRem(14),
-                        },
-                      }}
-                    />
+                    {slots?.rememberMe ? (
+                      <slots.rememberMe {...slotProps?.rememberMe} />
+                    ) : (
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            name="remember"
+                            value="true"
+                            color="primary"
+                            sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+                          />
+                        }
+                        label="Remember me"
+                        {...slotProps?.rememberMe}
+                        slotProps={{
+                          typography: {
+                            color: 'textSecondary',
+                            fontSize: theme.typography.pxToRem(14),
+                          },
+                          ...slotProps?.rememberMe?.slotProps,
+                        }}
+                      />
+                    )}
                     {slots?.forgotPasswordLink ? (
                       <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
                     ) : null}
@@ -699,6 +711,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
     passwordField: PropTypes.object,
+    rememberMe: PropTypes.object,
     signUpLink: PropTypes.object,
     submitButton: PropTypes.object,
   }),
@@ -712,6 +725,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
     emailField: PropTypes.elementType,
     forgotPasswordLink: PropTypes.elementType,
     passwordField: PropTypes.elementType,
+    rememberMe: PropTypes.elementType,
     signUpLink: PropTypes.elementType,
     submitButton: PropTypes.elementType,
     subtitle: PropTypes.elementType,

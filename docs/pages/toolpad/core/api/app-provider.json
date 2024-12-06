@@ -12,7 +12,7 @@
     "navigation": {
       "type": {
         "name": "arrayOf",
-        "description": "Array&lt;{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', pattern?: string, segment?: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
+        "description": "Array&lt;{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, groups?: Array&lt;string&gt;, icon?: node, kind?: 'page', pattern?: string, roles?: Array&lt;string&gt;, segment?: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
       },
       "default": "[]"
     },
@@ -26,7 +26,7 @@
     "session": {
       "type": {
         "name": "shape",
-        "description": "{ user?: { email?: string, id?: string, image?: string, name?: string } }"
+        "description": "{ user?: { email?: string, groups?: Array&lt;string&gt;, id?: string, image?: string, name?: string, roles?: Array&lt;string&gt; } }"
       },
       "default": "null"
     },

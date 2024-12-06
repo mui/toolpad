@@ -1198,6 +1198,9 @@ importers:
 
   playground/nextjs:
     devDependencies:
+      '@auth/core':
+        specifier: 0.37.4
+        version: 0.37.4
       '@emotion/react':
         specifier: 11.13.3
         version: 11.13.3(@types/react@18.3.12)(react@18.3.1)

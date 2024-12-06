@@ -42,6 +42,8 @@ export interface NavigationPageItem {
   pattern?: string;
   action?: React.ReactNode;
   children?: Navigation;
+  groups?: string[];
+  roles?: string[];
 }
 
 export interface NavigationSubheaderItem {
@@ -63,6 +65,8 @@ export interface Session {
     name?: string | null;
     image?: string | null;
     email?: string | null;
+    groups?: string[];
+    roles?: string[];
   };
 }
 
@@ -220,9 +224,11 @@ AppProvider.propTypes /* remove-proptypes */ = {
             }),
           ]).isRequired,
         ),
+        groups: PropTypes.arrayOf(PropTypes.string),
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
         pattern: PropTypes.string,
+        roles: PropTypes.arrayOf(PropTypes.string),
         segment: PropTypes.string,
         title: PropTypes.string,
       }),
@@ -251,9 +257,11 @@ AppProvider.propTypes /* remove-proptypes */ = {
   session: PropTypes.shape({
     user: PropTypes.shape({
       email: PropTypes.string,
+      groups: PropTypes.arrayOf(PropTypes.string),
       id: PropTypes.string,
       image: PropTypes.string,
       name: PropTypes.string,
+      roles: PropTypes.arrayOf(PropTypes.string),
     }),
   }),
   /**

@@ -17,7 +17,7 @@ import { BrandingContext, NavigationContext, WindowContext } from '../shared/con
 import { Account, type AccountProps } from '../Account';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
-import { AppTitleComponent } from './AppTitle';
+import { AppTitle, AppTitleProps } from './AppTitle';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 import type { Branding } from '../AppProvider';
 
@@ -35,12 +35,18 @@ export interface SidebarFooterProps {
 }
 
 export interface DashboardLayoutSlotProps {
+  appTitle?: AppTitleProps;
   toolbarActions?: {};
   toolbarAccount?: AccountProps;
   sidebarFooter?: SidebarFooterProps;
 }
 
 export interface DashboardLayoutSlots {
+  /**
+   * The component used for the app title section in the layout header.
+   * @default Link
+   */
+  appTitle?: React.ElementType;
   /**
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
@@ -56,11 +62,6 @@ export interface DashboardLayoutSlots {
    * @default null
    */
   sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
-  /**
-   * The component used for the app title section in the layout header.
-   * @default Link
-   */
-  appTitle?: React.JSXElementConstructor<{}>;
 }
 
 export interface DashboardLayoutProps {
@@ -246,7 +247,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
 
-  const appTitleProps = { ...brandingContext, ...brandingProp };
+  const appTitleBrandingProp = { ...brandingContext, ...brandingProp };
 
   const getDrawerContent = React.useCallback(
     (isMini: boolean, viewport: 'phone' | 'tablet' | 'desktop') => (
@@ -359,7 +360,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   </Box>
                 </React.Fragment>
               ) : null}
-              {slots?.appTitle ? <slots.appTitle /> : <AppTitleComponent {...appTitleProps} />}
+              {slots?.appTitle ? (
+                <slots.appTitle {...slotProps?.appTitle} />
+              ) : (
+                <AppTitle branding={appTitleBrandingProp} />
+              )}
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
               <ToolbarActionsSlot {...slotProps?.toolbarActions} />
@@ -483,6 +488,13 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
+    appTitle: PropTypes.shape({
+      branding: PropTypes.shape({
+        homeUrl: PropTypes.string,
+        logo: PropTypes.node,
+        title: PropTypes.string,
+      }),
+    }),
     sidebarFooter: PropTypes.shape({
       mini: PropTypes.bool.isRequired,
     }),

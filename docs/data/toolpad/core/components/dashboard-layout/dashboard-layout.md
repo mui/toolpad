@@ -37,7 +37,7 @@ This can be done via the `branding` prop in the [AppProvider](https://mui.com/to
 {{"demo": "DashboardLayoutBranding.js", "height": 400, "iframe": true}}
 
 :::info
-You may also override the default branding components by passing in your own component to the `branding` slot, as described in the [Slots section](#slots).
+You may also override the default branding components by passing in your own component to the `appTitle` slot, as shown in the [Slots section](#slots).
 :::
 
 ## Navigation
@@ -149,11 +149,11 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 Certain areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
 Some possibly useful slots:
 
+- `appTitle`: allows you to cutomize the app title section in the layout header.
+
 - `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
 
 - `sidebarFooter`: allows you to add footer content in the sidebar.
-
-- `branding`: allows you to pass in your own component in the branding section.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
 

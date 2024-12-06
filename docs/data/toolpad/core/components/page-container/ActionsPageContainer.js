@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { useDemoRouter } from '@toolpad/core/internal';
 import { PageContainer, PageContainerToolbar } from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
@@ -19,12 +20,14 @@ const NAVIGATION = [
 ];
 
 // preview-start
-function PageToolbar() {
+function PageToolbar({ status }) {
   return (
     <PageContainerToolbar>
+      <p>Current status: {status}</p>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
         Export
       </Button>
+
       <DateRangePicker
         sx={{ width: 220 }}
         defaultValue={[dayjs(), dayjs().add(14, 'day')]}
@@ -37,16 +40,25 @@ function PageToolbar() {
 }
 // preview-end
 
+PageToolbar.propTypes = {
+  status: PropTypes.string.isRequired,
+};
+
 export default function ActionsPageContainer() {
   const router = useDemoRouter();
+  const status = 'supesh';
 
+  const PageToolbarComponent = React.useCallback(
+    () => <PageToolbar status={status} />,
+    [status],
+  );
   const theme = useTheme();
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
         <Paper sx={{ width: '100%' }}>
-          <PageContainer slots={{ toolbar: PageToolbar }}>
+          <PageContainer slots={{ toolbar: PageToolbarComponent }}>
             <PageContent />
           </PageContainer>
         </Paper>

@@ -149,7 +149,7 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 Certain areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
 Some possibly useful slots:
 
-- `appTitle`: allows you to cutomize the app title section in the layout header.
+- `appTitle`: allows you to customize the app title section in the layout header.
 
 - `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
 

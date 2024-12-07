@@ -128,7 +128,7 @@ The layout sidebar can be hidden if needed with the `hideNavigation` prop.
 
 ### Toggle sidebar
 
-The sidebar can be toggled if needed with the `sidebarCollapsed` prop.
+The sidebar can be toggled if needed with the `navigationMenuOpen` prop.
 
 {{"demo": "DashboardLayoutSidebarCollapsedProp.js", "height": 400, "iframe": true}}
 

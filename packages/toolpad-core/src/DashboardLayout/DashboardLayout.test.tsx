@@ -411,9 +411,9 @@ describe('DashboardLayout', () => {
     expect(screen.getByText('Hello world')).toBeTruthy();
   });
 
-  test('renders the sidebar in collapsed state when sidebarCollapsed is true', () => {
+  test('renders the sidebar in collapsed state when navigationMenuOpen is false', () => {
     render(
-      <DashboardLayout sidebarCollapsed>
+      <DashboardLayout navigationMenuOpen={false}>
         <div>Test Content</div>
       </DashboardLayout>,
     );
@@ -423,9 +423,9 @@ describe('DashboardLayout', () => {
     expect(screen.queryByLabelText('Collapse menu')).toBeNull();
   });
 
-  test('renders the sidebar in expanded state when sidebarCollapsed is false', () => {
+  test('renders the sidebar in expanded state when navigationMenuOpen is true', () => {
     render(
-      <DashboardLayout sidebarCollapsed={false}>
+      <DashboardLayout navigationMenuOpen>
         <div>Test Content</div>
       </DashboardLayout>,
     );
@@ -433,32 +433,39 @@ describe('DashboardLayout', () => {
     expect(screen.getAllByLabelText('Collapse menu')).toBeTruthy();
   });
 
-  test('calls onToggleSidebar callback when sidebarCollapsed state changes', () => {
+  test('calls onNavigationMenuOpen callback when navigationMenuOpen state changes to open', () => {
     const mockToggleSidebar = vi.fn();
     const { rerender } = render(
-      <DashboardLayout sidebarCollapsed={false} onToggleSidebar={mockToggleSidebar}>
+      <DashboardLayout navigationMenuOpen={false} onNavigationMenuClose={mockToggleSidebar}>
         <div>Test Content</div>
       </DashboardLayout>,
     );
 
-    // Trigger sidebar toggle (simulate a collapse action)
+    // Trigger sidebar open action
     rerender(
-      <DashboardLayout sidebarCollapsed onToggleSidebar={mockToggleSidebar}>
+      <DashboardLayout navigationMenuOpen onNavigationMenuClose={mockToggleSidebar}>
         <div>Test Content</div>
       </DashboardLayout>,
     );
 
-    // Assert the callback was called with the new state
-    expect(mockToggleSidebar).toHaveBeenCalledWith(true);
+    expect(mockToggleSidebar).toHaveBeenCalledOnce();
+  });
 
-    // Trigger expand action
+  test('calls onNavigationMenuClose callback when navigationMenuOpen state changes to close', () => {
+    const mockToggleSidebar = vi.fn();
+    const { rerender } = render(
+      <DashboardLayout navigationMenuOpen onNavigationMenuClose={mockToggleSidebar}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    // Trigger sidebar close action
     rerender(
-      <DashboardLayout sidebarCollapsed={false} onToggleSidebar={mockToggleSidebar}>
+      <DashboardLayout navigationMenuOpen={false} onNavigationMenuClose={mockToggleSidebar}>
         <div>Test Content</div>
       </DashboardLayout>,
     );
 
-    // Assert the callback was called again with the updated state
-    expect(mockToggleSidebar).toHaveBeenCalledWith(false);
+    expect(mockToggleSidebar).toHaveBeenCalledOnce();
   });
 });

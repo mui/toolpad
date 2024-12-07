@@ -70,7 +70,7 @@ function DashboardLayoutSidebarCollapsedProp(props) {
   const { window } = props;
 
   const [pathname, setPathname] = React.useState('/dashboard');
-  const [sidebarCollapsed, toggleSidebar] = React.useState(true);
+  const [navigationMenuOpen, toggleSidebar] = React.useState(true);
   const router = React.useMemo(() => {
     return {
       pathname,
@@ -89,10 +89,10 @@ function DashboardLayoutSidebarCollapsedProp(props) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout sidebarCollapsed={sidebarCollapsed}>
+      <DashboardLayout navigationMenuOpen={navigationMenuOpen}>
         <DemoPageContent
           pathname={pathname}
-          toggleSidebar={() => toggleSidebar(!sidebarCollapsed)}
+          toggleSidebar={() => toggleSidebar(!navigationMenuOpen)}
         />
       </DashboardLayout>
     </AppProvider>

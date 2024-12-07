@@ -1,6 +1,6 @@
-<DashboardLayout sidebarCollapsed={sidebarCollapsed}>
+<DashboardLayout navigationMenuOpen={navigationMenuOpen}>
   <DemoPageContent
     pathname={pathname}
-    toggleSidebar={() => toggleSidebar(!sidebarCollapsed)}
+    toggleSidebar={() => toggleSidebar(!navigationMenuOpen)}
   />
 </DashboardLayout>

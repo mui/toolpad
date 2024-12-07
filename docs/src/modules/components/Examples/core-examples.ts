@@ -86,12 +86,12 @@ export default function examples() {
     {
       title: 'Vite with React Router and Firebase Auth',
       description:
-        'This app shows you to how to get started using Toolpad Core with Vite, React Router, authentication using Firebase and a custom theme',
-      src: '/static/toolpad/docs/core/auth-vite-themed-light.png',
-      srcDark: '/static/toolpad/docs/core/auth-vite-themed-dark.png',
-      source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-vite-themed',
+        'This app shows you to how to get started using Toolpad Core with Vite, React Router, and authentication using Firebase',
+      src: '/static/toolpad/docs/core/firebase-vite-light.png',
+      srcDark: '/static/toolpad/docs/core/firebase-vite-dark.png',
+      source: 'https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite',
       codeSandbox:
-        'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-vite-themed',
+        'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/firebase-vite',
     },
     {
       title: 'Functional Dashboard',

@@ -32,6 +32,7 @@ export interface Router {
 export interface Branding {
   title?: string;
   logo?: React.ReactNode;
+  homeUrl?: string;
 }
 
 export interface NavigationPageItem {
@@ -193,6 +194,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
    * @default null
    */
   branding: PropTypes.shape({
+    homeUrl: PropTypes.string,
     logo: PropTypes.node,
     title: PropTypes.string,
   }),

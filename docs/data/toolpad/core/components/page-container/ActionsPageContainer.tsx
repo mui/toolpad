@@ -19,12 +19,14 @@ const NAVIGATION = [
 ];
 
 // preview-start
-function PageToolbar() {
+function PageToolbar({ status }: { status: string }) {
   return (
     <PageContainerToolbar>
+      <p>Current status: {status}</p>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
         Export
       </Button>
+
       <DateRangePicker
         sx={{ width: 220 }}
         defaultValue={[dayjs(), dayjs().add(14, 'day')]}
@@ -39,14 +41,19 @@ function PageToolbar() {
 
 export default function ActionsPageContainer() {
   const router = useDemoRouter();
+  const status = 'supesh';
 
+  const PageToolbarComponent = React.useCallback(
+    () => <PageToolbar status={status} />,
+    [status],
+  );
   const theme = useTheme();
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
         <Paper sx={{ width: '100%' }}>
-          <PageContainer slots={{ toolbar: PageToolbar }}>
+          <PageContainer slots={{ toolbar: PageToolbarComponent }}>
             <PageContent />
           </PageContainer>
         </Paper>

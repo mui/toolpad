@@ -1,9 +1,11 @@
-function PageToolbar() {
+function PageToolbar({ status }: { status: string }) {
   return (
     <PageContainerToolbar>
+      <p>Current status: {status}</p>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
         Export
       </Button>
+
       <DateRangePicker
         sx={{ width: 220 }}
         defaultValue={[dayjs(), dayjs().add(14, 'day')]}

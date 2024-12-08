@@ -21,7 +21,11 @@ export default function PasskeySignInPage() {
   return (
     // preview-start
     <AppProvider theme={theme}>
-      <SignInPage signIn={signIn} providers={providers} />
+      <SignInPage
+        signIn={signIn}
+        providers={providers}
+        slotProps={{ emailField: { autoFocus: false } }}
+      />
     </AppProvider>
     // preview-end
   );

@@ -9,20 +9,17 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import { Link } from '../shared/Link';
 import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
 import { Account, type AccountProps } from '../Account';
-import { useApplicationTitle } from '../shared/branding';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
-import { ToolpadLogo } from './ToolpadLogo';
+import { AppTitle, AppTitleProps } from './AppTitle';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
-import { Branding } from '../AppProvider';
+import type { Branding } from '../AppProvider';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -33,25 +30,23 @@ const AppBar = styled(MuiAppBar)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
 }));
 
-const LogoContainer = styled('div')({
-  position: 'relative',
-  height: 40,
-  '& img': {
-    maxHeight: 40,
-  },
-});
-
 export interface SidebarFooterProps {
   mini: boolean;
 }
 
 export interface DashboardLayoutSlotProps {
+  appTitle?: AppTitleProps;
   toolbarActions?: {};
   toolbarAccount?: AccountProps;
   sidebarFooter?: SidebarFooterProps;
 }
 
 export interface DashboardLayoutSlots {
+  /**
+   * The component used for the app title section in the layout header.
+   * @default Link
+   */
+  appTitle?: React.ElementType;
   /**
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
@@ -143,9 +138,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const brandingContext = React.useContext(BrandingContext);
   const navigationContext = React.useContext(NavigationContext);
   const appWindowContext = React.useContext(WindowContext);
-  const applicationTitle = useApplicationTitle();
-
-  const branding = brandingProp ?? brandingContext;
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
     React.useState(!defaultSidebarCollapsed);
@@ -254,6 +246,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
+
+  const appTitleBrandingProp = { ...brandingContext, ...brandingProp };
 
   const getDrawerContent = React.useCallback(
     (isMini: boolean, viewport: 'phone' | 'tablet' | 'desktop') => (
@@ -366,22 +360,16 @@ function DashboardLayout(props: DashboardLayoutProps) {
                   </Box>
                 </React.Fragment>
               ) : null}
-              <Link href="/" style={{ color: 'inherit', textDecoration: 'none' }}>
-                <Stack direction="row" alignItems="center">
-                  <LogoContainer>{branding?.logo ?? <ToolpadLogo size={40} />}</LogoContainer>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: (theme.vars ?? theme).palette.primary.main,
-                      fontWeight: '700',
-                      ml: 1,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {applicationTitle}
-                  </Typography>
-                </Stack>
-              </Link>
+              {slots?.appTitle ? (
+                <slots.appTitle {...slotProps?.appTitle} />
+              ) : (
+                /* Hierarchy of application of `branding`
+                 * 1. Branding prop passed in the `slotProps.appTitle`
+                 * 2. Branding prop passed to the `DashboardLayout`
+                 * 3. Branding prop passed to the `AppProvider`
+                 */
+                <AppTitle branding={appTitleBrandingProp} {...slotProps?.appTitle} />
+              )}
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
               <ToolbarActionsSlot {...slotProps?.toolbarActions} />
@@ -472,6 +460,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default null
    */
   branding: PropTypes.shape({
+    homeUrl: PropTypes.string,
     logo: PropTypes.node,
     title: PropTypes.string,
   }),
@@ -504,6 +493,13 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
+    appTitle: PropTypes.shape({
+      branding: PropTypes.shape({
+        homeUrl: PropTypes.string,
+        logo: PropTypes.node,
+        title: PropTypes.string,
+      }),
+    }),
     sidebarFooter: PropTypes.shape({
       mini: PropTypes.bool.isRequired,
     }),
@@ -535,6 +531,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slots: PropTypes.shape({
+    appTitle: PropTypes.elementType,
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,

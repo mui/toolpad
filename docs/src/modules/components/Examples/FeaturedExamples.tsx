@@ -80,7 +80,9 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                 borderColor: 'divider',
               }}
             >
-              <Box
+              <Link
+                href={example.href}
+                target="_blank"
                 sx={{
                   position: 'relative',
                   '&:hover > .MuiCardMedia-root': {
@@ -104,9 +106,6 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                 <Button
                   variant="text"
                   endIcon={<OpenInNewRoundedIcon />}
-                  component={Link}
-                  href={example.href}
-                  target="_blank"
                   data-ga-event-category="toolpad-core-template"
                   data-ga-event-label={example.title}
                   data-ga-event-action="preview-img"
@@ -125,7 +124,7 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                 >
                   See live preview
                 </Button>
-              </Box>
+              </Link>
               <Box
                 sx={{
                   display: 'flex',

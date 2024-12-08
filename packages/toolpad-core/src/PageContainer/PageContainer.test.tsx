@@ -180,4 +180,10 @@ describe('PageContainer', () => {
       'The PageContainer `breadCrumbs` prop is deprecated. Use `breadcrumbs` instead.',
     );
   });
+
+  test("doesn't spread title to child", async () => {
+    render(<PageContainer title="Hello World" />);
+
+    expect(screen.queryByTitle('Hello World')).not.toBeInTheDocument();
+  });
 });

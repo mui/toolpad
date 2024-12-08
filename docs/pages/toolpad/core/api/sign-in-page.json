@@ -15,14 +15,14 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: object, forgotPasswordLink?: object, passwordField?: object, signUpLink?: object, submitButton?: object }"
+        "description": "{ emailField?: object, forgotPasswordLink?: object, passwordField?: object, rememberMe?: object, signUpLink?: object, submitButton?: object }"
       },
       "default": "{}"
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: elementType, forgotPasswordLink?: elementType, passwordField?: elementType, signUpLink?: elementType, submitButton?: elementType, subtitle?: elementType, title?: elementType }"
+        "description": "{ emailField?: elementType, forgotPasswordLink?: elementType, passwordField?: elementType, rememberMe?: elementType, signUpLink?: elementType, submitButton?: elementType, subtitle?: elementType, title?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -81,6 +81,12 @@
       "name": "subtitle",
       "description": "A component to override the default subtitle section",
       "default": "Typography",
+      "class": null
+    },
+    {
+      "name": "rememberMe",
+      "description": "A component to override the default \"Remember me\" checkbox in the Credentials form",
+      "default": "FormControlLabel",
       "class": null
     }
   ],

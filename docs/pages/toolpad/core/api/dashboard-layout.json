@@ -2,7 +2,10 @@
   "props": {
     "children": { "type": { "name": "node" }, "required": true },
     "branding": {
-      "type": { "name": "shape", "description": "{ logo?: node, title?: string }" },
+      "type": {
+        "name": "shape",
+        "description": "{ homeUrl?: string, logo?: node, title?: string }"
+      },
       "default": "null"
     },
     "defaultSidebarCollapsed": { "type": { "name": "bool" }, "default": "false" },
@@ -15,14 +18,14 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: { iconButtonAriaLabel?: string, signInLabel?: string, signOutLabel?: string }, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
+        "description": "{ appTitle?: { branding?: { homeUrl?: string, logo?: node, title?: string } }, sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: { iconButtonAriaLabel?: string, signInLabel?: string, signOutLabel?: string }, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
       },
       "default": "{}"
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
+        "description": "{ appTitle?: elementType, sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -41,6 +44,12 @@
     "import { DashboardLayout } from '@toolpad/core';"
   ],
   "slots": [
+    {
+      "name": "appTitle",
+      "description": "The component used for the app title section in the layout header.",
+      "default": "Link",
+      "class": null
+    },
     {
       "name": "toolbarActions",
       "description": "The toolbar actions component used in the layout header.",

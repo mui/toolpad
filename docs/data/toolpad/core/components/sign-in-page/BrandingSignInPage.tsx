@@ -32,7 +32,11 @@ export default function BrandingSignInPage() {
   return (
     // preview-start
     <AppProvider branding={BRANDING} theme={theme}>
-      <SignInPage signIn={signIn} providers={providers} />
+      <SignInPage
+        signIn={signIn}
+        providers={providers}
+        slotProps={{ emailField: { autoFocus: false } }}
+      />
     </AppProvider>
     // preview-end
   );

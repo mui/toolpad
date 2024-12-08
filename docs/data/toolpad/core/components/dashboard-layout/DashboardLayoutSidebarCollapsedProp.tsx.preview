@@ -1,0 +1,6 @@
+<DashboardLayout navigationMenuOpen={navigationMenuOpen}>
+  <DemoPageContent
+    pathname={pathname}
+    toggleSidebar={() => toggleSidebar(!navigationMenuOpen)}
+  />
+</DashboardLayout>

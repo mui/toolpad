@@ -89,6 +89,18 @@ export interface DashboardLayoutProps {
    * @default false
    */
   hideNavigation?: boolean;
+  /** A prop that controls the collapsed state of the sidebar.
+   * @default false
+   */
+  navigationMenuOpen?: boolean;
+  /**
+   * Callback function to be executed on navigation menu state changes to open
+   */
+  onNavigationMenuOpen?: () => void;
+  /**
+   * Callback function to be executed on navigation menu state changes to closed
+   */
+  onNavigationMenuClose?: () => void;
   /**
    * Width of the sidebar when expanded.
    * @default 320
@@ -131,6 +143,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
     slots,
     slotProps,
     sx,
+    navigationMenuOpen,
+    onNavigationMenuOpen,
+    onNavigationMenuClose,
   } = props;
 
   const theme = useTheme();
@@ -173,6 +188,17 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
     React.useState(isNavigationExpanded);
+
+  React.useEffect(() => {
+    if (typeof navigationMenuOpen === 'boolean') {
+      setIsNavigationExpanded(navigationMenuOpen);
+      if (navigationMenuOpen) {
+        onNavigationMenuOpen?.();
+      } else {
+        onNavigationMenuClose?.();
+      }
+    }
+  }, [navigationMenuOpen, setIsNavigationExpanded, onNavigationMenuOpen, onNavigationMenuClose]);
 
   React.useEffect(() => {
     if (isNavigationExpanded) {
@@ -483,6 +509,19 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default false
    */
   hideNavigation: PropTypes.bool,
+  /**
+   * A prop that controls the collapsed state of the sidebar.
+   * @default false
+   */
+  navigationMenuOpen: PropTypes.bool,
+  /**
+   * Callback function to be executed on navigation menu state changes to closed
+   */
+  onNavigationMenuClose: PropTypes.func,
+  /**
+   * Callback function to be executed on navigation menu state changes to open
+   */
+  onNavigationMenuOpen: PropTypes.func,
   /**
    * Width of the sidebar when expanded.
    * @default 320

@@ -11,6 +11,9 @@
     "defaultSidebarCollapsed": { "type": { "name": "bool" }, "default": "false" },
     "disableCollapsibleSidebar": { "type": { "name": "bool" }, "default": "false" },
     "hideNavigation": { "type": { "name": "bool" }, "default": "false" },
+    "navigationMenuOpen": { "type": { "name": "bool" }, "default": "false" },
+    "onNavigationMenuClose": { "type": { "name": "func" } },
+    "onNavigationMenuOpen": { "type": { "name": "func" } },
     "sidebarExpandedWidth": {
       "type": { "name": "union", "description": "number<br>&#124;&nbsp;string" },
       "default": "320"

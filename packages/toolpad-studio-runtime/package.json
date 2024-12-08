@@ -49,7 +49,7 @@
     "@toolpad/utils": "workspace:*",
     "@types/json-schema": "7.0.15",
     "@webcontainer/env": "1.1.1",
-    "cookie": "1.0.1",
+    "cookie": "1.0.2",
     "fractional-indexing": "3.2.0",
     "invariant": "2.2.4",
     "nanoid": "5.0.8",

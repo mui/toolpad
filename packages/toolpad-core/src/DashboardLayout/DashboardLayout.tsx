@@ -240,8 +240,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [toggleNavigationExpanded],
   );
 
-  const hasDrawerTransitions =
-    isOverSmViewport && (disableCollapsibleSidebar || !isUnderMdViewport);
+  const hasDrawerTransitions = isOverSmViewport && !disableCollapsibleSidebar;
 
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;

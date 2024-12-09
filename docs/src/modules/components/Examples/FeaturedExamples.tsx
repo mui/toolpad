@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslate } from '@mui/docs/i18n';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
@@ -22,6 +23,8 @@ interface FeaturedExamplesProps {
 }
 
 export default function FeaturedExamples(props: FeaturedExamplesProps) {
+  const t = useTranslate();
+
   const [examples, setExamples] = React.useState<Example[]>([]);
   const [loading, setLoading] = React.useState(true);
 
@@ -122,7 +125,7 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                     },
                   }}
                 >
-                  See live preview
+                  {t('see-live-preview')}
                 </Button>
               </Link>
               <Box
@@ -146,7 +149,7 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                       <IconButton
                         color="primary"
                         size="small"
-                        aria-label="StackBlitz playground"
+                        aria-label={t('stackblitzPlayground')}
                         data-ga-event-category="toolpad-core-template"
                         data-ga-event-action="stackblitz"
                         onClick={() => {
@@ -164,7 +167,7 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                       <IconButton
                         color="primary"
                         size="small"
-                        aria-label="CodeSandbox playground"
+                        aria-label={t('codesandboxPlayground')}
                         data-ga-event-category="toolpad-core-template"
                         data-ga-event-action="codesandbox"
                         onClick={() => {
@@ -195,7 +198,7 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                   data-ga-event-action="preview-img"
                   sx={{ alignSelf: 'self-start' }}
                 >
-                  Live preview
+                  {t('livePreview')}
                 </Button>
               </Box>
             </Card>

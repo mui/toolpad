@@ -125,7 +125,7 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                     },
                   }}
                 >
-                  {t('see-live-preview')}
+                  {t('seeLivePreview')}
                 </Button>
               </Link>
               <Box

@@ -10,7 +10,6 @@ module.exports = {
         __dirname,
         './node_modules/@mui/monorepo/packages/api-docs-builder',
       ),
-      '@toolpad/studio': path.resolve(__dirname, './packages/toolpad-studio/src'),
       '@toolpad/studio-components': path.resolve(
         __dirname,
         './packages/toolpad-studio-components/src',

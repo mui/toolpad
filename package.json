@@ -21,7 +21,6 @@
     "docs:build:api:core": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildCoreApiDocs/index.ts",
     "docs:build:api:studio": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildStudioApi.ts",
     "docs:build:api": "concurrently \"pnpm docs:build:api:core\" \"pnpm docs:build:api:studio\"",
-    "docs:i18n": "cross-env BABEL_ENV=development babel-node --extensions \".tsx,.ts,.js\" ./docs/scripts/i18n.js",
     "docs:typescript:formatted": "tsx ./docs/scripts/formattedTSDemos",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "jsonlint": "node ./scripts/jsonlint.mjs",

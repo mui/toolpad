@@ -103,7 +103,7 @@ function PageHeader(props: PageHeaderProps) {
       </Breadcrumbs>
 
       <PageContentHeader>
-        {title ? <Typography variant="h4">{resolvedTitle}</Typography> : null}
+        {resolvedTitle ? <Typography variant="h4">{resolvedTitle}</Typography> : null}
         <ToolbarComponent {...toolbarSlotProps} />
       </PageContentHeader>
     </Stack>

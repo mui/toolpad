@@ -34,6 +34,8 @@ Some elements of the `DashboardLayout` can be configured to match your personali
 
 This can be done via the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), which allows for setting a custom `logo` image, a custom `title` text in the page header, and a custom `homeUrl` which the branding component leads to on click.
 
+Optionally, a specific `branding` can also be passed as a prop to the `DashboardLayout` component itself.
+
 {{"demo": "DashboardLayoutBranding.js", "height": 400, "iframe": true}}
 
 :::info
@@ -45,6 +47,8 @@ You may also override the default branding by passing in your own component to t
 The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) allows for setting any type of navigation structure in the `DashboardLayout` sidebar by including different navigation elements as building blocks in any order.
 
 The flexibility in composing and ordering these different elements allows for a great variety of navigation structures to fit your use case.
+
+Optionally, a specific `navigation` can also be passed as a prop to the `DashboardLayout` component itself.
 
 ### Navigation links
 

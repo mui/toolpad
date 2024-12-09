@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { useDemoRouter } from '@toolpad/core/internal';
-import { PageContainer, PageHeaderToolbar } from '@toolpad/core/PageContainer';
+import {
+  PageContainer,
+  PageHeader,
+  PageHeaderToolbar,
+} from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
@@ -19,7 +23,7 @@ const NAVIGATION = [
 ];
 
 // preview-start
-function PageToolbar() {
+function CustomPageToolbar() {
   return (
     <PageHeaderToolbar>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
@@ -35,6 +39,10 @@ function PageToolbar() {
     </PageHeaderToolbar>
   );
 }
+
+function CustomPageHeader() {
+  return <PageHeader slots={{ toolbar: CustomPageToolbar }} />;
+}
 // preview-end
 
 export default function ActionsPageContainer() {
@@ -46,7 +54,7 @@ export default function ActionsPageContainer() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
         <Paper sx={{ width: '100%' }}>
-          <PageContainer slots={{ toolbar: PageToolbar }}>
+          <PageContainer slots={{ header: CustomPageHeader }}>
             <PageContent />
           </PageContainer>
         </Paper>

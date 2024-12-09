@@ -12,6 +12,14 @@
   },
   "name": "PageHeader",
   "imports": ["import { PageHeader } from '@toolpad/core/PageContainer';"],
+  "slots": [
+    {
+      "name": "toolbar",
+      "description": "The component that renders the actions toolbar.",
+      "default": "PageHeaderToolbar",
+      "class": null
+    }
+  ],
   "classes": [],
   "muiName": "PageHeader",
   "filename": "/packages/toolpad-core/src/PageContainer/PageHeader.tsx",

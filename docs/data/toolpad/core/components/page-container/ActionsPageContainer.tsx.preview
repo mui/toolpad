@@ -1,4 +1,4 @@
-function PageToolbar() {
+function CustomPageToolbar() {
   return (
     <PageHeaderToolbar>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
@@ -13,4 +13,8 @@ function PageToolbar() {
       />
     </PageHeaderToolbar>
   );
+}
+
+function CustomPageHeader() {
+  return <PageHeader slots={{ toolbar: CustomPageToolbar }} />;
 }

@@ -8,5 +8,6 @@
     "slots": { "description": "The components used for each slot inside." },
     "title": { "description": "The title of the page. Leave blank to use the active page title." }
   },
-  "classDescriptions": {}
+  "classDescriptions": {},
+  "slotDescriptions": { "toolbar": "The component that renders the actions toolbar." }
 }

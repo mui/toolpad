@@ -14,7 +14,7 @@ describe('PageContainer', () => {
   describeConformance(<PageContainer />, () => ({
     skip: ['themeDefaultProps'],
     slots: {
-      toolbar: {},
+      header: {},
     },
   }));
 

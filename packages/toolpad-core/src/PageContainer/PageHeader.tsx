@@ -10,8 +10,8 @@ import { styled } from '@mui/material';
 import { Link as ToolpadLink } from '../shared/Link';
 import { getItemTitle } from '../shared/navigation';
 import { useActivePage } from '../useActivePage';
-import { PageHeaderToolbar } from './PageHeaderToolbar';
-import type { Breadcrumb, PageContainerSlots, PageContainerSlotProps } from './PageContainer';
+import { PageHeaderToolbar, PageHeaderToolbarProps } from './PageHeaderToolbar';
+import type { Breadcrumb } from './PageContainer';
 
 const PageContentHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -19,6 +19,18 @@ const PageContentHeader = styled('div')(({ theme }) => ({
   justifyContent: 'space-between',
   gap: theme.spacing(2),
 }));
+
+export interface PageHeaderSlotProps {
+  toolbar: PageHeaderToolbarProps;
+}
+
+export interface PageHeaderSlots {
+  /**
+   * The component that renders the actions toolbar.
+   * @default PageHeaderToolbar
+   */
+  toolbar: React.ElementType;
+}
 
 export interface PageHeaderProps {
   /**
@@ -32,11 +44,11 @@ export interface PageHeaderProps {
   /**
    * The components used for each slot inside.
    */
-  slots?: Pick<PageContainerSlots, 'toolbar'>;
+  slots?: PageHeaderSlots;
   /**
    * The props used for each slot inside.
    */
-  slotProps?: Pick<PageContainerSlotProps, 'toolbar'>;
+  slotProps?: PageHeaderSlotProps;
 }
 
 /**

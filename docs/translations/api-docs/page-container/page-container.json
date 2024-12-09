@@ -49,5 +49,5 @@
     },
     "root": { "description": "Styles applied to the root element." }
   },
-  "slotDescriptions": { "toolbar": "The component that renders the actions toolbar." }
+  "slotDescriptions": { "header": "The component that renders the page header." }
 }

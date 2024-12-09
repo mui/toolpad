@@ -1,4 +1,5 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { useDemoRouter } from '@toolpad/core/internal';
 import {
   PageContainer,
@@ -23,12 +24,14 @@ const NAVIGATION = [
 ];
 
 // preview-start
-function CustomPageToolbar() {
+function CustomPageToolbar({ status }) {
   return (
     <PageHeaderToolbar>
+      <p>Current status: {status}</p>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
         Export
       </Button>
+
       <DateRangePicker
         sx={{ width: 220 }}
         defaultValue={[dayjs(), dayjs().add(14, 'day')]}
@@ -40,21 +43,39 @@ function CustomPageToolbar() {
   );
 }
 
-function CustomPageHeader() {
-  return <PageHeader slots={{ toolbar: CustomPageToolbar }} />;
+CustomPageToolbar.propTypes = {
+  status: PropTypes.string.isRequired,
+};
+
+function CustomPageHeader({ status }) {
+  const CustomPageToolbarComponent = React.useCallback(
+    () => <CustomPageToolbar status={status} />,
+    [status],
+  );
+
+  return <PageHeader slots={{ toolbar: CustomPageToolbarComponent }} />;
 }
 // preview-end
 
+CustomPageHeader.propTypes = {
+  status: PropTypes.string.isRequired,
+};
+
 export default function ActionsPageContainer() {
   const router = useDemoRouter();
+  const status = 'supesh';
 
+  const CustomPageHeaderComponent = React.useCallback(
+    () => <CustomPageHeader status={status} />,
+    [status],
+  );
   const theme = useTheme();
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
         <Paper sx={{ width: '100%' }}>
-          <PageContainer slots={{ header: CustomPageHeader }}>
+          <PageContainer slots={{ header: CustomPageHeaderComponent }}>
             <PageContent />
           </PageContainer>
         </Paper>

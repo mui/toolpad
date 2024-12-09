@@ -157,4 +157,10 @@ describe('PageContainer', () => {
     expect(helloLink.getAttribute('href')).toBe('/hello');
     expect(within(breadcrumbs).getByText('World')).toBeTruthy();
   });
+
+  test("doesn't spread title to child", async () => {
+    render(<PageContainer title="Hello World" />);
+
+    expect(screen.queryByTitle('Hello World')).not.toBeInTheDocument();
+  });
 });

@@ -63,12 +63,12 @@ export interface PageHeaderProps {
  * - [PageHeader API](https://mui.com/toolpad/core/api/page-header)
  */
 function PageHeader(props: PageHeaderProps) {
-  const { breadcrumbs } = props;
+  const { breadcrumbs, title } = props;
 
   const activePage = useActivePage();
 
   const resolvedBreadcrumbs = breadcrumbs ?? activePage?.breadcrumbs ?? [];
-  const title = props.title ?? activePage?.title ?? '';
+  const resolvedTitle = title ?? activePage?.title ?? '';
 
   const ToolbarComponent = props?.slots?.toolbar ?? PageHeaderToolbar;
   const toolbarSlotProps = useSlotProps({
@@ -103,7 +103,7 @@ function PageHeader(props: PageHeaderProps) {
       </Breadcrumbs>
 
       <PageContentHeader>
-        {title ? <Typography variant="h4">{title}</Typography> : null}
+        {title ? <Typography variant="h4">{resolvedTitle}</Typography> : null}
         <ToolbarComponent {...toolbarSlotProps} />
       </PageContentHeader>
     </Stack>

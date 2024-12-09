@@ -7,8 +7,8 @@ export default function examples() {
       src: '/static/toolpad/docs/core/tutorial-1.png',
       href: 'https://mui.com/toolpad/core/introduction/tutorial/',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/tutorial/',
-      codesandbox: 'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/tutorial',
-      stackblitz: 'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/tutorial',
+      codeSandbox: 'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/tutorial',
+      stackBlitz: 'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/tutorial',
     },
     {
       title: 'Auth.js with Next.js App router',
@@ -17,7 +17,7 @@ export default function examples() {
       src: '/static/toolpad/docs/core/auth-next.png',
       srcDark: '/static/toolpad/docs/core/auth-next-dark.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/',
-      codesandbox:
+      codeSandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs',
       stackblitz: 'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/auth-nextjs',
     },
@@ -28,7 +28,7 @@ export default function examples() {
       src: '/static/toolpad/docs/core/auth-next.png',
       srcDark: '/static/toolpad/docs/core/auth-next-dark.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages/',
-      codesandbox:
+      codeSandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-pages',
       stackblitz:
         'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/auth-nextjs-pages',
@@ -39,7 +39,7 @@ export default function examples() {
         'This app shows you to how to get started using Toolpad Core with Auth.js Magic Links and the Next.js App router',
       src: '/static/toolpad/docs/core/auth-next.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
-      codesandbox:
+      codeSandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
     },
     {
@@ -48,7 +48,7 @@ export default function examples() {
         'This app shows you to how to get started using Toolpad Core with Vite and React Router',
       src: '/static/toolpad/docs/core/vite-react-router.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/vite/',
-      codesandbox: 'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/vite',
+      codeSandbox: 'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/vite',
       stackblitz: 'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/vite',
     },
     {
@@ -59,7 +59,7 @@ export default function examples() {
       srcDark: '/static/toolpad/docs/core/auth-next-dark.png',
       source:
         'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4/',
-      codesandbox:
+      codeSandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4',
       stackblitz:
         'https://stackblitz.com/github/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4',
@@ -71,17 +71,27 @@ export default function examples() {
       src: '/static/toolpad/docs/core/auth-next-passkey.png',
       srcDark: '/static/toolpad/docs/core/auth-next-passkey-dark.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-passkey/',
-      codesandbox:
+      codeSandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-passkey',
     },
     {
-      title: 'Vite with React Router and authentication',
+      title: 'Vite with React Router and mock authentication',
       description:
         'This app shows you to how to get started using Toolpad Core with Vite, React Router and any external authentication provider',
       src: '/static/toolpad/docs/core/vite-react-router.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-vite',
-      codesandbox:
+      codeSandbox:
         'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-vite',
+    },
+    {
+      title: 'Vite with React Router and Firebase Auth',
+      description:
+        'This app shows you to how to get started using Toolpad Core with Vite, React Router, and authentication using Firebase',
+      src: '/static/toolpad/docs/core/firebase-vite-light.png',
+      srcDark: '/static/toolpad/docs/core/firebase-vite-dark.png',
+      source: 'https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite',
+      codeSandbox:
+        'https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/firebase-vite',
     },
     {
       title: 'Functional Dashboard',

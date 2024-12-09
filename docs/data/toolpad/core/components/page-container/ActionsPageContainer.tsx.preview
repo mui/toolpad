@@ -1,9 +1,11 @@
-function CustomPageToolbar() {
+function CustomPageToolbar({ status }: { status: string }) {
   return (
     <PageHeaderToolbar>
+      <p>Current status: {status}</p>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
         Export
       </Button>
+
       <DateRangePicker
         sx={{ width: 220 }}
         defaultValue={[dayjs(), dayjs().add(14, 'day')]}
@@ -15,6 +17,11 @@ function CustomPageToolbar() {
   );
 }
 
-function CustomPageHeader() {
-  return <PageHeader slots={{ toolbar: CustomPageToolbar }} />;
+function CustomPageHeader({ status }: { status: string }) {
+  const CustomPageToolbarComponent = React.useCallback(
+    () => <CustomPageToolbar status={status} />,
+    [status],
+  );
+
+  return <PageHeader slots={{ toolbar: CustomPageToolbarComponent }} />;
 }

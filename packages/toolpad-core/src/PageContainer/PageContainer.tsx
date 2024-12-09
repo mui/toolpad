@@ -65,14 +65,14 @@ export interface PageContainerProps extends ContainerProps {
  * - [PageContainer API](https://mui.com/toolpad/core/api/page-container)
  */
 function PageContainer(props: PageContainerProps) {
-  const { children, breadcrumbs, slots, slotProps, ...rest } = props;
+  const { children, breadcrumbs, slots, slotProps, title, ...rest } = props;
 
   const PageHeaderSlot = slots?.header ?? PageHeader;
 
   return (
     <Container {...rest} sx={{ flex: 1, display: 'flex', flexDirection: 'column', ...rest.sx }}>
       <Stack sx={{ flex: 1, my: 2 }} spacing={2}>
-        <PageHeaderSlot title={props.title} breadcrumbs={breadcrumbs} {...slotProps?.header} />
+        <PageHeaderSlot title={title} breadcrumbs={breadcrumbs} {...slotProps?.header} />
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</Box>
       </Stack>
     </Container>

@@ -146,7 +146,7 @@ export function hasSelectedNavigationChildren(
         return hasSelectedNavigationChildren(navigation, nestedItem, activePagePath);
       }
 
-      return getItemPath(navigation, nestedItem) === activePagePath;
+      return activePagePath === getItemPath(navigation, nestedItem);
     });
   }
 

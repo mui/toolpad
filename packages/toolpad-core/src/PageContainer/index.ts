@@ -1,2 +1,3 @@
 export * from './PageContainer';
-export * from './PageContainerToolbar';
+export * from './PageHeader';
+export * from './PageHeaderToolbar';

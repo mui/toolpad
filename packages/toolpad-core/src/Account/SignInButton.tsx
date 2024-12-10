@@ -1,9 +1,10 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Button, { ButtonProps } from '@mui/material/Button';
 import { AuthenticationContext } from '../AppProvider/AppProvider';
 import { useLocaleText } from '../shared/locales/LocaleContext';
 
-export /**
+/**
  *
  * Demos:
  *
@@ -12,7 +13,8 @@ export /**
  * API:
  *
  * - [SignInButton API](https://mui.com/toolpad/core/api/sign-in-button)
- */ function SignInButton(props: ButtonProps) {
+ */
+function SignInButton(props: ButtonProps) {
   const authentication = React.useContext(AuthenticationContext);
   const localeText = useLocaleText();
 
@@ -38,3 +40,16 @@ export /**
     </Button>
   );
 }
+
+SignInButton.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * The content of the component.
+   */
+  children: PropTypes.node,
+} as any;
+
+export { SignInButton };

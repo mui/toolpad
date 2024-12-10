@@ -6,6 +6,9 @@
     },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." },
+    "sx": {
+      "description": "The system prop that allows defining system overrides as well as additional CSS styles."
+    },
     "title": { "description": "The title of the page. Leave blank to use the active page title." }
   },
   "classDescriptions": {
@@ -46,5 +49,5 @@
     },
     "root": { "description": "Styles applied to the root element." }
   },
-  "slotDescriptions": { "toolbar": "The component that renders the actions toolbar." }
+  "slotDescriptions": { "header": "The component that renders the page header." }
 }

@@ -1,5 +1,5 @@
 {
-  "props": {},
+  "props": { "children": { "type": { "name": "node" } } },
   "name": "SignInButton",
   "imports": ["import { SignInButton } from '@toolpad/core/Account';"],
   "classes": [

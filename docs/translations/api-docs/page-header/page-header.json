@@ -1,0 +1,13 @@
+{
+  "componentDescription": "A header component to provide a title and breadcrumbs for your pages.",
+  "propDescriptions": {
+    "breadcrumbs": {
+      "description": "The breadcrumbs of the page. Leave blank to use the active page breadcrumbs."
+    },
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." },
+    "title": { "description": "The title of the page. Leave blank to use the active page title." }
+  },
+  "classDescriptions": {},
+  "slotDescriptions": { "toolbar": "The component that renders the actions toolbar." }
+}

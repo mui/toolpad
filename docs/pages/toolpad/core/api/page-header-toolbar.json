@@ -1,0 +1,13 @@
+{
+  "props": {},
+  "name": "PageHeaderToolbar",
+  "imports": ["import { PageHeaderToolbar } from '@toolpad/core/PageContainer';"],
+  "classes": [],
+  "spread": true,
+  "themeDefaultProps": false,
+  "muiName": "PageHeaderToolbar",
+  "filename": "/packages/toolpad-core/src/PageContainer/PageHeaderToolbar.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-page-container/\">Page Container</a></li></ul>",
+  "cssComponent": false
+}

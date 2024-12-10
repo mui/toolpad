@@ -116,7 +116,7 @@
     "mime": "4.0.4",
     "monaco-editor": "0.52.0",
     "mysql2": "3.11.4",
-    "nanoid": "5.0.8",
+    "nanoid": "5.0.9",
     "node-fetch": "2.7.0",
     "node-fetch-har": "1.0.1",
     "open-editor": "5.0.0",

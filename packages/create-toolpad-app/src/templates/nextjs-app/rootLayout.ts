@@ -5,9 +5,10 @@ const rootLayout: Template = (options) => {
 
   return `import * as React from 'react';
 import { AppProvider } from '@toolpad/core/nextjs';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+${authEnabled ? '' : `import LinearProgress from '@mui/material/LinearProgress'`}
 import type { Navigation } from '@toolpad/core/AppProvider';
 ${
   authEnabled
@@ -57,6 +58,7 @@ export default ${authEnabled ? 'async ' : ''}function RootLayout(props: { childr
       <body>
         ${authEnabled ? '<SessionProvider session={session}>' : ''}
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+          ${authEnabled ? '' : '<React.Suspense fallback={<LinearProgress />}>'}
             <AppProvider
               navigation={NAVIGATION}
               branding={BRANDING}
@@ -70,6 +72,7 @@ export default ${authEnabled ? 'async ' : ''}function RootLayout(props: { childr
             >
               {props.children}
             </AppProvider>
+            ${authEnabled ? '' : '</React.Suspense>'}
           </AppRouterCacheProvider>
         ${authEnabled ? '</SessionProvider>' : ''}
       </body>

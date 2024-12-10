@@ -10,7 +10,7 @@ export function interleave(items: React.ReactNode[], separator: React.ReactNode)
   for (let i = 0; i < items.length; i += 1) {
     if (i > 0) {
       if (ReactIs.isElement(separator)) {
-        result.push(React.cloneElement(separator, { key: `separator-${i}` }));
+        result.push(React.cloneElement(separator as React.ReactElement, { key: `separator-${i}` }));
       } else {
         result.push(separator);
       }

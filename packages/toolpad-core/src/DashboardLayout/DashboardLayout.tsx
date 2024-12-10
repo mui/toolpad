@@ -19,7 +19,7 @@ import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
 import { AppTitle, AppTitleProps } from './AppTitle';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
-import type { Branding } from '../AppProvider';
+import type { Branding, Navigation } from '../AppProvider';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -75,6 +75,11 @@ export interface DashboardLayoutProps {
    */
   branding?: Branding | null;
   /**
+   * Navigation definition for the dashboard.
+   * @default []
+   */
+  navigation?: Navigation;
+  /**
    * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
    * @default false
    */
@@ -124,6 +129,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const {
     children,
     branding: brandingProp,
+    navigation: navigationProp,
     disableCollapsibleSidebar = false,
     defaultSidebarCollapsed = false,
     hideNavigation = false,
@@ -138,6 +144,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const brandingContext = React.useContext(BrandingContext);
   const navigationContext = React.useContext(NavigationContext);
   const appWindowContext = React.useContext(WindowContext);
+
+  const branding = { ...brandingContext, ...brandingProp };
+  const navigation = navigationProp ?? navigationContext;
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
     React.useState(!defaultSidebarCollapsed);
@@ -208,10 +217,10 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
   React.useMemo(() => {
-    if (navigationContext) {
+    if (navigation) {
       selectedItemIdRef.current = '';
     }
-  }, [navigationContext]);
+  }, [navigation]);
 
   const isDesktopMini = !disableCollapsibleSidebar && !isDesktopNavigationExpanded;
   const isMobileMini = !disableCollapsibleSidebar && !isMobileNavigationExpanded;
@@ -247,8 +256,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
 
-  const appTitleBrandingProp = { ...brandingContext, ...brandingProp };
-
   const getDrawerContent = React.useCallback(
     (isMini: boolean, viewport: 'phone' | 'tablet' | 'desktop') => (
       <React.Fragment>
@@ -262,14 +269,14 @@ function DashboardLayout(props: DashboardLayoutProps) {
             flexDirection: 'column',
             justifyContent: 'space-between',
             overflow: 'auto',
-            pt: navigationContext[0]?.kind === 'header' && !isMini ? 0 : 2,
+            pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
             ...(hasDrawerTransitions
               ? getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')
               : {}),
           }}
         >
           <DashboardSidebarSubNavigation
-            subNavigation={navigationContext}
+            subNavigation={navigation}
             onLinkClick={handleNavigationLinkClick}
             isMini={isMini}
             isFullyExpanded={isNavigationFullyExpanded}
@@ -287,7 +294,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       handleNavigationLinkClick,
       hasDrawerTransitions,
       isNavigationFullyExpanded,
-      navigationContext,
+      navigation,
       slotProps?.sidebarFooter,
     ],
   );
@@ -368,7 +375,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
                  * 2. Branding prop passed to the `DashboardLayout`
                  * 3. Branding prop passed to the `AppProvider`
                  */
-                <AppTitle branding={appTitleBrandingProp} {...slotProps?.appTitle} />
+                <AppTitle branding={branding} {...slotProps?.appTitle} />
               )}
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
@@ -483,6 +490,41 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default false
    */
   hideNavigation: PropTypes.bool,
+  /**
+   * Navigation definition for the dashboard.
+   * @default []
+   */
+  navigation: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({
+        action: PropTypes.node,
+        children: PropTypes.arrayOf(
+          PropTypes.oneOfType([
+            PropTypes.object,
+            PropTypes.shape({
+              kind: PropTypes.oneOf(['header']).isRequired,
+              title: PropTypes.string.isRequired,
+            }),
+            PropTypes.shape({
+              kind: PropTypes.oneOf(['divider']).isRequired,
+            }),
+          ]).isRequired,
+        ),
+        icon: PropTypes.node,
+        kind: PropTypes.oneOf(['page']),
+        pattern: PropTypes.string,
+        segment: PropTypes.string,
+        title: PropTypes.string,
+      }),
+      PropTypes.shape({
+        kind: PropTypes.oneOf(['header']).isRequired,
+        title: PropTypes.string.isRequired,
+      }),
+      PropTypes.shape({
+        kind: PropTypes.oneOf(['divider']).isRequired,
+      }),
+    ]).isRequired,
+  ),
   /**
    * Width of the sidebar when expanded.
    * @default 320

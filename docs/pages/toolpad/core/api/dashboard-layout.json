@@ -11,6 +11,13 @@
     "defaultSidebarCollapsed": { "type": { "name": "bool" }, "default": "false" },
     "disableCollapsibleSidebar": { "type": { "name": "bool" }, "default": "false" },
     "hideNavigation": { "type": { "name": "bool" }, "default": "false" },
+    "navigation": {
+      "type": {
+        "name": "arrayOf",
+        "description": "Array&lt;{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', pattern?: string, segment?: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
+      },
+      "default": "[]"
+    },
     "sidebarExpandedWidth": {
       "type": { "name": "union", "description": "number<br>&#124;&nbsp;string" },
       "default": "320"

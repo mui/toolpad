@@ -146,7 +146,6 @@ async function createDevHandler(project: ToolpadProject) {
     });
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   wsServer.on('connection', (ws: WebSocket, _request: IncomingMessage) => {
     ws.on('error', console.error);
   });

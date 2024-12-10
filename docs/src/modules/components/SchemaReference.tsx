@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslate } from '@mui/docs/i18n';
 import { MarkdownElement } from '@mui/docs/MarkdownElement';
 import AppLayoutDocs from '@mui/monorepo/docs/src/modules/components/AppLayoutDocs';
 import Ad from '@mui/monorepo/docs/src/modules/components/Ad';
@@ -154,6 +155,8 @@ interface JsonSchemaTypeDisplayProps {
 }
 
 function JsonSchemaTypeDisplay({ schema, open, onOpenChange }: JsonSchemaTypeDisplayProps) {
+  const t = useTranslate();
+
   let types: string[] = [];
   if (typeof schema.const !== 'undefined') {
     return (
@@ -182,19 +185,19 @@ function JsonSchemaTypeDisplay({ schema, open, onOpenChange }: JsonSchemaTypeDis
   if (schema.type === 'object') {
     return (
       <CollapsibleLabel open={open} onOpenChange={onOpenChange}>
-        object
+        {t('object').toLowerCase()}
       </CollapsibleLabel>
     );
   }
 
   if (schema.type === 'array') {
-    return <span className={classNames.objectLabel}>array of </span>;
+    return <span className={classNames.objectLabel}>{t('arrayOf').toLowerCase()} </span>;
   }
 
   if (schema.anyOf) {
     return (
       <CollapsibleLabel open={open} onOpenChange={onOpenChange}>
-        any of{' '}
+        {t('anyOf').toLowerCase()}{' '}
       </CollapsibleLabel>
     );
   }
@@ -471,6 +474,8 @@ const description = 'An exhaustive reference for the Toolpad Studio file formats
 
 export default function SchemaReference(props: SchemaReferenceProps) {
   const { definitions, disableAd, location } = props;
+  const t = useTranslate();
+
   const toc = [
     {
       text: 'Files',
@@ -502,12 +507,12 @@ export default function SchemaReference(props: SchemaReferenceProps) {
       disableAd={disableAd}
       disableToc={false}
       location={location}
-      title="Schema reference"
+      title={t('schemaReference')}
       toc={toc}
     >
       <SchemaContext.Provider value={definitions.definitions || EMPTY_OBJECT}>
         <MarkdownElement>
-          <h1>Schema reference</h1>
+          <h1>{t('schemaReference')}</h1>
           <Typography
             variant="h5"
             component="p"

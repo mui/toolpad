@@ -37,6 +37,8 @@ This can be done via the `branding` prop in the [AppProvider](https://mui.com/to
 {{"demo": "DashboardLayoutBranding.js", "height": 400, "iframe": true}}
 
 :::info
+Optionally, a specific `branding` can also be passed as a prop to the `DashboardLayout` component itself, which properties take precedence over any properties of the `branding` prop passed to the `AppProvider`.
+
 You may also override the default branding by passing in your own component to the `appTitle` slot, as shown in the [Slots section](#slots).
 :::
 
@@ -45,6 +47,10 @@ You may also override the default branding by passing in your own component to t
 The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/) allows for setting any type of navigation structure in the `DashboardLayout` sidebar by including different navigation elements as building blocks in any order.
 
 The flexibility in composing and ordering these different elements allows for a great variety of navigation structures to fit your use case.
+
+:::info
+Optionally, a specific `navigation` can also be passed as a prop to the `DashboardLayout` component itself, which takes complete precedence over any `navigation` prop passed to the `AppProvider`.
+:::
 
 ### Navigation links
 

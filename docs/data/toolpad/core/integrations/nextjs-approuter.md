@@ -32,14 +32,17 @@ In your root layout file (for example, `app/layout.tsx`), wrap your application 
 
 ```tsx title="app/layout.tsx"
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
+import LinearProgress from '@mui/material/LinearProgress';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-      <AppProvider navigation={NAVIGATION} branding={BRANDING}>
-        {children}
-      </AppProvider>
+      <React.Suspense fallback={<LinearProgress />}>
+        <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+          {children}
+        </AppProvider>
+      </React.Suspense>
     </AppRouterCacheProvider>
   );
 }
@@ -51,6 +54,10 @@ You can find details on the `AppProvider` props on the [AppProvider](/toolpad/co
 The `AppRouterCacheProvider` component is not required to use Toolpad Core, but it's recommended to use it to ensure that the styles are appended to the `<head>` and not rendering in the `<body>`.
 
 See the [Material UI Next.js integration docs](https://mui.com/material-ui/integrations/nextjs/) for more details.
+:::
+
+:::warning
+If your app is statically rendered, you must wrap the `AppProvider` in a `Suspense` component when using the app router. See [https://github.com/mui/toolpad/issues/4524](https://github.com/mui/toolpad/issues/4524) for more information.
 :::
 
 ## Create a dashboard layout

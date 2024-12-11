@@ -410,4 +410,62 @@ describe('DashboardLayout', () => {
     // Ensure that main content is still rendered
     expect(screen.getByText('Hello world')).toBeTruthy();
   });
+
+  test('renders the sidebar in collapsed state when navigationMenuOpen is false', () => {
+    render(
+      <DashboardLayout navigationMenuOpen={false}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    // Expect that menu button has expand action
+    expect(screen.getAllByLabelText('Expand menu')).toBeTruthy();
+    expect(screen.queryByLabelText('Collapse menu')).toBeNull();
+  });
+
+  test('renders the sidebar in expanded state when navigationMenuOpen is true', () => {
+    render(
+      <DashboardLayout navigationMenuOpen>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    expect(screen.getAllByLabelText('Collapse menu')).toBeTruthy();
+  });
+
+  test('calls onNavigationMenuOpen callback when navigationMenuOpen state changes to open', () => {
+    const mockToggleSidebar = vi.fn();
+    const { rerender } = render(
+      <DashboardLayout navigationMenuOpen={false} onNavigationMenuClose={mockToggleSidebar}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    // Trigger sidebar open action
+    rerender(
+      <DashboardLayout navigationMenuOpen onNavigationMenuClose={mockToggleSidebar}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    expect(mockToggleSidebar).toHaveBeenCalledOnce();
+  });
+
+  test('calls onNavigationMenuClose callback when navigationMenuOpen state changes to close', () => {
+    const mockToggleSidebar = vi.fn();
+    const { rerender } = render(
+      <DashboardLayout navigationMenuOpen onNavigationMenuClose={mockToggleSidebar}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    // Trigger sidebar close action
+    rerender(
+      <DashboardLayout navigationMenuOpen={false} onNavigationMenuClose={mockToggleSidebar}>
+        <div>Test Content</div>
+      </DashboardLayout>,
+    );
+
+    expect(mockToggleSidebar).toHaveBeenCalledOnce();
+  });
 });

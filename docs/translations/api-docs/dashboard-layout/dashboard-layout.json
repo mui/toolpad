@@ -12,6 +12,15 @@
     "hideNavigation": {
       "description": "Whether the navigation bar and menu icon should be hidden"
     },
+    "navigationMenuOpen": {
+      "description": "A prop that controls the collapsed state of the sidebar."
+    },
+    "onNavigationMenuClose": {
+      "description": "Callback function to be executed on navigation menu state changes to closed"
+    },
+    "onNavigationMenuOpen": {
+      "description": "Callback function to be executed on navigation menu state changes to open"
+    },
     "sidebarExpandedWidth": { "description": "Width of the sidebar when expanded." },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." },

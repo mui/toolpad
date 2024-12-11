@@ -254,7 +254,7 @@ export interface SignInPageProps {
     submitButton?: LoadingButtonProps;
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
-    rememberMe?: FormControlLabelProps;
+    rememberMe?: Partial<FormControlLabelProps>;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container

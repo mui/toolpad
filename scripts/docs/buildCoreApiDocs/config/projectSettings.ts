@@ -1,7 +1,7 @@
 import path from 'path';
 import { ProjectSettings } from '@mui-internal/api-docs-builder';
 import findApiPages from '@mui-internal/api-docs-builder/utils/findApiPages';
-import { LANGUAGES } from '../../../../docs/config';
+import { LANGUAGES } from 'docs/config';
 import { getCoreComponentInfo } from './getCoreComponentInfo';
 import { getComponentImports } from './getComponentImports';
 

@@ -1,1 +1,11 @@
-{}
+{
+  "anyOf": "Any of",
+  "arrayOf": "Array of",
+  "codesandboxPlayground": "CodeSandbox playground",
+  "livePreview": "Live preview",
+  "object": "Object",
+  "schemaReference": "Schema reference",
+  "seeLivePreview": "See live preview",
+  "source": "Source",
+  "stackblitzPlayground": "StackBlitz playground"
+}

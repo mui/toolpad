@@ -101,8 +101,8 @@ importers:
         specifier: 1.0.29
         version: 1.0.29
       '@mui/monorepo':
-        specifier: github:mui/material-ui#8615164f0d5909d23230fe1a6e1334acb5c74220
-        version: https://codeload.github.com/mui/material-ui/tar.gz/8615164f0d5909d23230fe1a6e1334acb5c74220(encoding@0.1.13)
+        specifier: github:mui/material-ui#3a8ceaead5ac4c2c4554e6500ca3d197420a04c2
+        version: https://codeload.github.com/mui/material-ui/tar.gz/3a8ceaead5ac4c2c4554e6500ca3d197420a04c2(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.22.2
         version: 7.22.2(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@mui/material@6.2.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mui/system@6.2.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -3083,10 +3083,10 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/8615164f0d5909d23230fe1a6e1334acb5c74220':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/8615164f0d5909d23230fe1a6e1334acb5c74220}
-    version: 6.1.8
-    engines: {pnpm: 9.14.2}
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/3a8ceaead5ac4c2c4554e6500ca3d197420a04c2':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/3a8ceaead5ac4c2c4554e6500ca3d197420a04c2}
+    version: 6.2.0
+    engines: {pnpm: 9.14.4}
 
   '@mui/private-theming@5.16.6':
     resolution: {integrity: sha512-rAk+Rh8Clg7Cd7shZhyt2HGTTE5wYKNSJ5sspf28Fqm/PZ69Er9o6KX25g03/FG2dfpg5GCwZh/xOojiTfm3hw==}
@@ -4027,8 +4027,8 @@ packages:
   '@sinonjs/text-encoding@0.7.3':
     resolution: {integrity: sha512-DE427ROAphMQzU4ENbliGYrBSYPXF+TtLg9S8vzeA+OF4ZKzoDdzfL8sxuMUGS/lgRhM6j1URSk9ghf7Xo1tyA==}
 
-  '@slack/bolt@4.1.0':
-    resolution: {integrity: sha512-7XlTziPVLQn8RXNuOTzsJh/wrkX4YUZr1UpX25MpfDdMpp28Y4TrtIvYDh6GV90uNscdHJhOJcpqLq6ibqfGfg==}
+  '@slack/bolt@4.1.1':
+    resolution: {integrity: sha512-Sc8QUnEHCPgRlwrMxmvOl4Vhr/7ZBDXvLR0ir6TO+W5MaDtPsrmWLxqLmb+OhCGSjDp3d4AxO6jdFlC3yNKtsg==}
     engines: {node: '>=18', npm: '>=8.6.0'}
 
   '@slack/logger@4.0.0':
@@ -6197,6 +6197,10 @@ packages:
 
   execa@9.5.1:
     resolution: {integrity: sha512-QY5PPtSonnGwhhHDNI7+3RvY285c7iuJFFB+lU+oEzMY/gEGJ808owqJsrr8Otd1E/x07po1LkUBmdAc5duPAg==}
+    engines: {node: ^18.19.0 || >=20.5.0}
+
+  execa@9.5.2:
+    resolution: {integrity: sha512-EHlpxMCpHWSAh1dgS6bVeoLAXGnJNdR93aabr4QCGbzOM73o5XmRfM/e5FUqsw3aagP8S8XEWUWFAxnRBnAF0Q==}
     engines: {node: ^18.19.0 || >=20.5.0}
 
   expect-type@1.1.0:
@@ -12472,12 +12476,12 @@ snapshots:
       '@emotion/styled': 11.13.0(@emotion/react@11.13.3(@types/react@18.3.12)(react@18.3.1))(@types/react@18.3.12)(react@18.3.1)
       '@types/react': 18.3.12
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/8615164f0d5909d23230fe1a6e1334acb5c74220(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/3a8ceaead5ac4c2c4554e6500ca3d197420a04c2(encoding@0.1.13)':
     dependencies:
       '@googleapis/sheets': 9.3.1(encoding@0.1.13)
       '@netlify/functions': 2.8.2
-      '@slack/bolt': 4.1.0
-      execa: 9.5.1
+      '@slack/bolt': 4.1.1
+      execa: 9.5.2
       google-auth-library: 9.14.2(encoding@0.1.13)
     transitivePeerDependencies:
       - bufferutil
@@ -13407,7 +13411,7 @@ snapshots:
 
   '@sinonjs/text-encoding@0.7.3': {}
 
-  '@slack/bolt@4.1.0':
+  '@slack/bolt@4.1.1':
     dependencies:
       '@slack/logger': 4.0.0
       '@slack/oauth': 3.0.1
@@ -16142,6 +16146,21 @@ snapshots:
       strip-final-newline: 3.0.0
 
   execa@9.5.1:
+    dependencies:
+      '@sindresorhus/merge-streams': 4.0.0
+      cross-spawn: 7.0.3
+      figures: 6.1.0
+      get-stream: 9.0.1
+      human-signals: 8.0.0
+      is-plain-obj: 4.1.0
+      is-stream: 4.0.1
+      npm-run-path: 6.0.0
+      pretty-ms: 9.1.0
+      signal-exit: 4.1.0
+      strip-final-newline: 4.0.0
+      yoctocolors: 2.1.1
+
+  execa@9.5.2:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
       cross-spawn: 7.0.3

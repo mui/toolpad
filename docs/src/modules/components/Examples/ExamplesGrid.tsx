@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslate } from '@mui/docs/i18n';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -35,6 +36,8 @@ function CodeSandboxIcon() {
 }
 
 function ExamplesGrid(props: ExamplesGridProps) {
+  const t = useTranslate();
+
   const [examples, setExamples] = React.useState<Example[]>([]);
 
   React.useEffect(() => {
@@ -116,7 +119,7 @@ function ExamplesGrid(props: ExamplesGridProps) {
                 }}
               >
                 <Button component="a" href={example.source} size="small" target="_blank">
-                  Source
+                  {t('source')}
                 </Button>
                 <Stack direction="row" spacing={1}>
                   {example.codeSandbox && (

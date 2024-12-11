@@ -57,7 +57,6 @@
     "@babel/runtime": "^7.26.0",
     "@mui/lab": "6.0.0-beta.15",
     "@mui/utils": "6.1.7",
-    "@mui/x-data-grid": "7.22.2",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.3",
     "client-only": "^0.0.1",
@@ -68,6 +67,7 @@
   "devDependencies": {
     "@mui/icons-material": "6.1.7",
     "@mui/material": "6.1.7",
+    "@mui/x-data-grid": "7.22.2",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.13",
     "@types/react": "18.3.12",
@@ -84,6 +84,7 @@
   "peerDependencies": {
     "@mui/icons-material": "5 - 6",
     "@mui/material": "5 - 6",
+    "@mui/x-data-grid": "^7",
     "next": "^14",
     "react": "^18",
     "react-router-dom": "^6"

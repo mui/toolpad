@@ -1,8 +1,8 @@
-import { GridColDef, GridRowId } from '@mui/x-data-grid';
+import { GridColDef } from '@mui/x-data-grid';
 
 export type CRUDFields = GridColDef[];
 
-export type DataModelId = GridRowId;
+export type DataModelId = string | number;
 
 export interface DataModel {
   id: DataModelId;

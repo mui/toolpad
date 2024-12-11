@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, SxProps } from '@mui/material';
+import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button, { ButtonProps } from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -17,6 +17,7 @@ import {
   GridFilterModel,
   GridPaginationModel,
   GridSortModel,
+  GridEventListener,
 } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -79,13 +80,13 @@ export interface ListProps<D extends DataModel> {
   /**
    * Callback fired when a row is clicked. Not called if the target clicked is an interactive element added by the built-in columns.
    */
-  onRowClick?: DataGridProps['onRowClick'];
+  onRowClick?: (id: DataModelId) => void;
   /**
    * Callback fired when the "Create" button is clicked.
    */
   onCreateClick?: ButtonProps['onClick'];
   /**
-   * Callback fired when the "Create" button is clicked.
+   * Callback fired when the "Edit" button is clicked.
    */
   onEditClick?: ButtonProps['onClick'];
   /**
@@ -98,10 +99,6 @@ export interface ListProps<D extends DataModel> {
    * @default {}
    */
   slotProps?: ListSlotProps;
-  /**
-   * The system prop that allows defining system overrides as well as additional CSS styles.
-   */
-  sx?: SxProps;
 }
 
 function List<D extends DataModel>(props: ListProps<D>) {
@@ -114,7 +111,6 @@ function List<D extends DataModel>(props: ListProps<D>) {
     onEditClick,
     slots,
     slotProps,
-    sx,
   } = props;
   const { getMany, deleteOne } = methods;
 
@@ -133,7 +129,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const [filterModel, setFilterModel] = React.useState<GridFilterModel>({ items: [] });
   const [sortModel, setSortModel] = React.useState<GridSortModel>([]);
 
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
 
   const loadData = React.useCallback(async () => {
@@ -164,6 +160,15 @@ function List<D extends DataModel>(props: ListProps<D>) {
       loadData();
     }
   }, [isLoading, loadData]);
+
+  const handleRowClick = React.useCallback<GridEventListener<'rowClick'>>(
+    ({ row }) => {
+      if (onRowClick) {
+        onRowClick(row.id);
+      }
+    },
+    [onRowClick],
+  );
 
   const handleItemDelete = React.useCallback(
     (itemId: DataModelId) => async () => {
@@ -268,13 +273,10 @@ function List<D extends DataModel>(props: ListProps<D>) {
           onPaginationModelChange={setPaginationModel}
           onSortModelChange={setSortModel}
           onFilterModelChange={setFilterModel}
-          onRowClick={onRowClick}
+          onRowClick={handleRowClick}
           loading={isLoading}
           initialState={initialState}
           slots={{ toolbar: GridToolbar }}
-          sx={{
-            ...sx,
-          }}
           {...slotProps?.dataGrid}
         />
         {error && (

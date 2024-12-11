@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { List, ListProps } from '@toolpad/core/CRUD';
+import { List } from '@toolpad/core/CRUD';
 
 interface Order extends Record<string, unknown> {
   id: number;
@@ -17,9 +17,9 @@ const orderFields = [
 export default function OrdersPage() {
   const navigate = useNavigate();
 
-  const handleRowClick = React.useCallback<ListProps<Order>['onRowClick']>(
-    ({ row }) => {
-      navigate(`/orders/${row.id}`);
+  const handleRowClick = React.useCallback(
+    (id: string | number) => {
+      navigate(`/orders/${String(id)}`);
     },
     [navigate],
   );

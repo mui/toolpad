@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Show } from '@toolpad/core/CRUD';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface Order extends Record<string, unknown> {
   id: number;
@@ -15,7 +15,12 @@ const orderFields = [
 ];
 
 export default function OrderPage() {
+  const navigate = useNavigate();
   const { orderId } = useParams();
+
+  const handleDelete = React.useCallback(() => {
+    navigate('/orders');
+  }, [navigate]);
 
   return orderId ? (
     <Show<Order>
@@ -35,7 +40,16 @@ export default function OrderPage() {
             }, 1500);
           });
         },
+        deleteOne: () => {
+          return new Promise<void>((resolve) => {
+            setTimeout(() => {
+              resolve();
+            }, 1500);
+          });
+        },
       }}
+      onEditClick={() => {}}
+      onDelete={handleDelete}
     />
   ) : null;
 }

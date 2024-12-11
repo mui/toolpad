@@ -21,13 +21,13 @@
     "@react-spring/web": "^9",
     "@mui/material": "^6",
     "@toolpad/core": "latest",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^19",
+    "react-dom": "^19",
     "react-router-dom": "^6"
   },
   "devDependencies": {
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4.3.2",
     "typescript": "^5",
     "vite": "^5.4.8"

@@ -2,15 +2,15 @@
   "name": "@toolpad/studio-tests",
   "private": true,
   "devDependencies": {
-    "@mui/material": "6.1.10",
+    "@mui/material": "6.2.0",
     "@toolpad/studio": "workspace:*",
     "@toolpad/utils": "workspace:*",
     "@types/invariant": "2.2.37",
     "express": "4.21.1",
     "get-port": "7.1.0",
     "invariant": "2.2.4",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react": "^19",
+    "react-dom": "^19",
     "recharts": "alpha"
   },
   "type": "module",

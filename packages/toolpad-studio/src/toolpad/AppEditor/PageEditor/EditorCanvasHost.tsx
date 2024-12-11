@@ -214,8 +214,8 @@ export default function EditorCanvasHost({
     [savedNodes],
   );
 
-  const appRootCleanupRef = React.useRef<() => void>();
-  const projectEventSubscriptionRef = React.useRef<() => void>();
+  const appRootCleanupRef = React.useRef<() => void>(undefined);
+  const projectEventSubscriptionRef = React.useRef<() => void>(undefined);
   const onAppRoot = React.useCallback(
     (appRoot: HTMLDivElement) => {
       appRootCleanupRef.current?.();

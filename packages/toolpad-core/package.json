@@ -55,8 +55,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.26.0",
-    "@mui/lab": "6.0.0-beta.18",
-    "@mui/utils": "6.1.10",
+    "@mui/lab": "6.0.0-beta.19",
+    "@mui/utils": "6.2.0",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",
     "client-only": "^0.0.1",
@@ -65,8 +65,8 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "6.1.10",
-    "@mui/material": "6.1.10",
+    "@mui/icons-material": "6.2.0",
+    "@mui/material": "6.2.0",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.13",
     "@types/react": "^19",

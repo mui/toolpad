@@ -44,7 +44,7 @@ export interface NodeErrorProps {
 }
 
 export interface NodeRuntimeWrapperProps {
-  children: React.ReactElement;
+  children: React.ReactElement<any>;
   nodeId: NodeId;
   nodeName: string;
   NodeError: React.ComponentType<NodeErrorProps>;

@@ -5,6 +5,6 @@ function isMac(): boolean {
   return /Mac|iPod|iPhone|iPad/.test(userAgent);
 }
 
-export function getModifierKey(): string | JSX.Element {
+export function getModifierKey(): string | React.JSX.Element {
   return isMac() ? '⌘' : <kbd>Ctrl</kbd>;
 }

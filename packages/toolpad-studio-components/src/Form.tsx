@@ -199,7 +199,7 @@ interface UseFormInputInput<V> {
 interface UseFormInputPayload<V> {
   onFormInputChange: (newValue: V) => void;
   formInputError?: FieldError;
-  renderFormInput: (element: JSX.Element) => JSX.Element;
+  renderFormInput: (element: React.JSX.Element) => React.JSX.Element;
 }
 
 export function useFormInput<V>({
@@ -290,7 +290,7 @@ export function useFormInput<V>({
   );
 
   const renderFormInput = React.useCallback(
-    (element: JSX.Element) =>
+    (element: React.JSX.Element) =>
       form ? (
         <Controller
           name={formInputName}

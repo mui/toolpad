@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/core",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "author": "Toolpad Team",
   "description": "Dashboard framework powered by MUI.",
   "main": "./node/index.js",

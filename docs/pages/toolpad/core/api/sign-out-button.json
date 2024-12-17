@@ -1,5 +1,5 @@
 {
-  "props": {},
+  "props": { "children": { "type": { "name": "node" } } },
   "name": "SignOutButton",
   "imports": ["import { SignOutButton } from '@toolpad/core/Account';"],
   "classes": [

@@ -1,6 +1,56 @@
 # Changelog
 
-## 0.10.0
+## v0.11.0
+
+<!-- generated comparing v0.10.0..master -->
+
+_Dec 12, 2024_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+- **BREAKING** `toolbar` slot in the `PageContainer` component has been moved to new `PageHeader` component, which can be used in the `header` slot in `PageContainer`. New usage example [here](https://mui.com/toolpad/core/react-page-container/#actions).
+- Add `homeUrl` to `branding` properties, and `appTitle` slot to override layout header branding.
+- Allow full-size content inside `PageContainer`.
+- Add "rememberMe" slot to `SignInPage`.
+- Add `navigation` prop override to `DashboardLayout`.
+- Add Vite example with Firebase authentication.
+
+### `@toolpad/core`
+
+- Add `homeUrl` to `branding` and `appTitle` slot (#4477) @bharatkashyap
+- Allow full-size content in `PageContainer` (#4480) @apedroferreira
+- Add "rememberMe" slot (#4487) @bharatkashyap
+- Add `navigation` prop as override (#4523) @apedroferreira
+- Do not spread `PageContainer` title to child Container (#4504) @christiancookbuzz
+- Wrap App Router `AppProvider` in Suspense (#4526) @bharatkashyap
+- Remove `docs` context from component logic (#4489) @bharatkashyap
+- Make control in rememberMe slot prop optional (#4529) @hmon
+- Do not make text bold in navigation sidebar (#4533) @apedroferreira
+
+### Docs
+
+- Add Vite example with Firebase auth (#4500) @bharatkashyap
+- Upgrade featured example to React 19 (#4517) @bharatkashyap
+- Add pre-requisites to Next integration docs (#4473) @bharatkashyap
+- Correct Tutorial code (#4467) @bharatkashyap
+- Update deployed template link (#4454) @bharatkashyap
+- Update deployed example URL (#4531) @bharatkashyap
+- Handle integration docs 404 (#4475) @prakhargupta1
+- Fix 301 link to Render docs (cdaa9b7) @oliviertassinari
+- Add 'New' badge for examples (#4481) @prakhargupta1
+- Remove the live app link (#4482) @prakhargupta1
+- Improve callout copy for layout override props (#4535) @apedroferreira
+- Update base-concepts.md (#4484) @prakhargupta1
+- Fix missed parenthesis (#4510) @bharatkashyap
+
+### Core
+
+- Remove/update offending deps (#4483) @bharatkashyap
+- Update @mui/monorepo (#4455) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @christiancookbuzz, @hmon, @oliviertassinari, @prakhargupta1
+
+## v0.10.0
 
 <!-- generated comparing v0.9.0..master -->
 

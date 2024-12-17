@@ -14,7 +14,7 @@ describe('PageContainer', () => {
   describeConformance(<PageContainer />, () => ({
     skip: ['themeDefaultProps'],
     slots: {
-      toolbar: {},
+      header: {},
     },
   }));
 
@@ -156,29 +156,6 @@ describe('PageContainer', () => {
     const helloLink = within(breadcrumbs).getByRole('link', { name: 'Hello' });
     expect(helloLink.getAttribute('href')).toBe('/hello');
     expect(within(breadcrumbs).getByText('World')).toBeTruthy();
-  });
-
-  // TODO: Remove in the next major version
-  test('renders legacy breadcrumbs prop', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    render(
-      <PageContainer
-        breadCrumbs={[
-          { title: 'Hello', path: '/hello' },
-          { title: 'World', path: '/world' },
-        ]}
-      />,
-    );
-
-    const breadcrumbs = screen.getByRole('navigation', { name: 'breadcrumb' });
-
-    const helloLink = within(breadcrumbs).getByRole('link', { name: 'Hello' });
-    expect(helloLink.getAttribute('href')).toBe('/hello');
-    expect(within(breadcrumbs).getByText('World')).toBeTruthy();
-    expect(console.warn).toHaveBeenCalledOnce();
-    expect(console.warn).toHaveBeenCalledWith(
-      'The PageContainer `breadCrumbs` prop is deprecated. Use `breadcrumbs` instead.',
-    );
   });
 
   test("doesn't spread title to child", async () => {

@@ -60,7 +60,9 @@ function Form({
 
   // Reset form in effect as suggested in https://react-hook-form.com/api/useform/reset/
   React.useEffect(() => {
-    form.reset();
+    if (isSubmitSuccessful) {
+      form.reset();
+    }
   }, [form, isSubmitSuccessful]);
 
   // Set initial form values

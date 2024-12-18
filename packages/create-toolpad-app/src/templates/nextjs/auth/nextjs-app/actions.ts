@@ -1,4 +1,4 @@
-import { Template } from '../../../types';
+import { Template } from '../../../../types';
 
 const actionsTemplate: Template = (options) => {
   const { hasCredentialsProvider, hasNodemailerProvider } = options;

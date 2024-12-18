@@ -18,7 +18,12 @@ import generateStudioProject from './generateStudioProject';
 import writeFiles from './writeFiles';
 import { downloadAndExtractExample } from './examples';
 import type { PackageJson } from './templates/packageType';
-import type { SupportedRouter, PackageManager, GenerateProjectOptions } from './types';
+import type {
+  SupportedFramework,
+  SupportedRouter,
+  PackageManager,
+  GenerateProjectOptions,
+} from './types';
 
 /**
  * Find package.json of the create-toolpad-app package
@@ -294,14 +299,28 @@ const run = async () => {
     await scaffoldStudioProject(absolutePath, installFlag);
   } else {
     // Otherwise, create a new project with Toolpad Core
-    const routerOption: SupportedRouter = await select({
-      message: 'Which router would you like to use?',
-      default: 'nextjs-app',
+    const frameworkOption: SupportedFramework = await select({
+      message: 'Which framework would you like to use?',
+      default: 'nextjs',
       choices: [
-        { name: 'Next.js App Router', value: 'nextjs-app' },
-        { name: 'Next.js Pages Router', value: 'nextjs-pages' },
+        { name: 'Next.js', value: 'nextjs' },
+        { name: 'Vite', value: 'vite' },
       ],
     });
+
+    let routerOption: SupportedRouter | undefined;
+
+    if (frameworkOption === 'nextjs') {
+      routerOption = await select({
+        message: 'Which router would you like to use?',
+        default: 'nextjs-app',
+        choices: [
+          { name: 'Next.js App Router', value: 'nextjs-app' },
+          { name: 'Next.js Pages Router', value: 'nextjs-pages' },
+        ],
+      });
+    }
+
     const authFlag = await confirm({
       message: 'Would you like to enable authentication?',
       default: true,
@@ -345,6 +364,7 @@ const run = async () => {
       absolutePath,
       coreVersion: args.coreVersion,
       router: routerOption,
+      framework: frameworkOption,
       auth: authFlag,
       install: installFlag,
       authProviders: authProviderOptions,

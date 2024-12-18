@@ -1,11 +1,18 @@
-import { GenerateProjectOptions } from '../../types';
+import { Template } from '../../types';
 
-export default function viteApp(options: GenerateProjectOptions) {
+const appTemplate: Template = (options) => {
   return `import * as React from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Outlet } from 'react-router-dom';
-import { AppProvider, type Navigation } from '@toolpad/core/react-router-dom';
+${
+  options.auth
+    ? `import { AppProvider } from '@toolpad/core/react-router-dom';
+import type { Navigation, Authentication } from '@toolpad/core/AppProvider';
+import { firebaseSignOut, onAuthStateChanged } from './firebase/auth';
+import SessionContext, { type Session } from './SessionContext';`
+    : `import { AppProvider, type Navigation } from '@toolpad/core/react-router-dom';`
+}
 
 const NAVIGATION: Navigation = [
   {
@@ -26,12 +33,69 @@ const NAVIGATION: Navigation = [
 const BRANDING = {
   title: ${JSON.stringify(options.name || 'My Toolpad Core App')},
 };
+${
+  options.auth
+    ? `
+const AUTHENTICATION: Authentication = {    
+  signOut: firebaseSignOut,
+};`
+    : ''
+}
 
 export default function App() {
+  ${
+    options.auth
+      ? `const [session, setSession] = React.useState<Session | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  const sessionContextValue = React.useMemo(
+    () => ({
+      session,
+      setSession,
+      loading,
+    }),
+    [session, loading],
+  );
+
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged((user) => {
+      if (user) {
+        setSession({
+          user: {
+            name: user.name || '',
+            email: user.email || '',
+            image: user.image || '',
+          },
+        });
+      } else {
+        setSession(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return (
+    <AppProvider
+      navigation={NAVIGATION}
+      branding={BRANDING}
+      session={session}
+      authentication={AUTHENTICATION}
+    >
+      <SessionContext.Provider value={sessionContextValue}>
+        <Outlet />
+      </SessionContext.Provider>
+    </AppProvider>
+  );`
+      : `
   return (
     <AppProvider navigation={NAVIGATION} branding={BRANDING}>
       <Outlet />
     </AppProvider>
-  );
+  );`
+  }
 }`;
-}
+};
+
+export default appTemplate;

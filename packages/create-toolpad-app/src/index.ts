@@ -330,35 +330,43 @@ const run = async () => {
       authProviderOptions = await checkbox({
         message: 'Select authentication providers to enable:',
         required: true,
-        choices: [
-          { name: 'Google', value: 'google' },
-          { name: 'GitHub', value: 'github' },
-          { name: 'Passkey', value: 'passkey' },
-          { name: 'Magic Link', value: 'nodemailer' },
-          { name: 'Credentials', value: 'credentials' },
-          { name: 'GitLab', value: 'gitlab' },
-          { name: 'Twitter', value: 'twitter' },
-          { name: 'Facebook', value: 'facebook' },
-          { name: 'Cognito', value: 'cognito' },
-          { name: 'Microsoft Entra ID', value: 'microsoft-entra-id' },
-          { name: 'Apple', value: 'apple' },
-          { name: 'Instagram', value: 'instagram' },
-          { name: 'TikTok', value: 'tiktok' },
-          { name: 'LinkedIn', value: 'linkedin' },
-          { name: 'Slack', value: 'slack' },
-          { name: 'Spotify', value: 'spotify' },
-          { name: 'Twitch', value: 'twitch' },
-          { name: 'Discord', value: 'discord' },
-          { name: 'Line', value: 'line' },
-          { name: 'Auth0', value: 'auth0' },
-          { name: 'Keycloak', value: 'keycloak' },
-          { name: 'Okta', value: 'okta' },
-          { name: 'FusionAuth', value: 'fusionauth' },
-        ],
+        choices:
+          frameworkOption === 'nextjs'
+            ? [
+                { name: 'Google', value: 'google' },
+                { name: 'GitHub', value: 'github' },
+                { name: 'Passkey', value: 'passkey' },
+                { name: 'Magic Link', value: 'nodemailer' },
+                { name: 'Credentials', value: 'credentials' },
+                { name: 'GitLab', value: 'gitlab' },
+                { name: 'Twitter', value: 'twitter' },
+                { name: 'Facebook', value: 'facebook' },
+                { name: 'Cognito', value: 'cognito' },
+                { name: 'Microsoft Entra ID', value: 'microsoft-entra-id' },
+                { name: 'Apple', value: 'apple' },
+                { name: 'Instagram', value: 'instagram' },
+                { name: 'TikTok', value: 'tiktok' },
+                { name: 'LinkedIn', value: 'linkedin' },
+                { name: 'Slack', value: 'slack' },
+                { name: 'Spotify', value: 'spotify' },
+                { name: 'Twitch', value: 'twitch' },
+                { name: 'Discord', value: 'discord' },
+                { name: 'Line', value: 'line' },
+                { name: 'Auth0', value: 'auth0' },
+                { name: 'Keycloak', value: 'keycloak' },
+                { name: 'Okta', value: 'okta' },
+                { name: 'FusionAuth', value: 'fusionauth' },
+              ]
+            : [
+                { name: 'Google', value: 'google' },
+                { name: 'GitHub', value: 'github' },
+                { name: 'Credentials', value: 'credentials' },
+              ],
       });
       hasNodemailerProvider = authProviderOptions?.includes('nodemailer');
       hasPasskeyProvider = authProviderOptions?.includes('passkey');
     }
+
     const options = {
       name: path.basename(absolutePath),
       absolutePath,

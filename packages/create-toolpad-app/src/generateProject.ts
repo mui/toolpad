@@ -15,7 +15,15 @@ import viteApp from './templates/vite/App';
 import viteConfig from './templates/vite/viteConfig';
 import viteMain from './templates/vite/main';
 import viteHtml from './templates/vite/html';
-import viteSignIn from './templates/vite/auth/signIn';
+import viteDashboardLayout from './templates/vite/dashboardLayout';
+// Vite Auth specific files
+import viteSessionContext from './templates/vite/SessionContext';
+import viteSignIn from './templates/vite/auth/signin';
+import viteEnv from './templates/vite/auth/env';
+import viteFirebaseAuth from './templates/vite/auth/firebase';
+import viteFirebaseConfig from './templates/vite/auth/firebaseConfig';
+
+// Nextjs specific files
 
 // App router specific files
 import rootLayout from './templates/nextjs/nextjs-app/rootLayout';
@@ -65,7 +73,8 @@ export default function generateProject(
     case 'vite': {
       const viteFiles = new Map([
         ['vite.config.ts', { content: viteConfig }],
-        ['src/main.tsx', { content: viteMain }],
+        ['src/main.tsx', { content: viteMain(options) }],
+        ['src/layouts/dashboard.tsx', { content: viteDashboardLayout(options) }],
         ['src/App.tsx', { content: viteApp(options) }],
         ['src/pages/index.tsx', { content: indexPage(options) }],
         ['src/pages/orders.tsx', { content: ordersPage(options) }],
@@ -74,19 +83,12 @@ export default function generateProject(
 
       if (options.auth) {
         const authFiles = new Map([
-          ['src/auth.ts', { content: auth(options) }],
-          ['.env.local', { content: envLocal(options) }],
-          ['src/pages/auth/signin.tsx', { content: viteSignIn(options) }],
+          ['src/firebase/auth.ts', { content: viteFirebaseAuth(options) }],
+          ['src/firebase/firebaseConfig.ts', { content: viteFirebaseConfig(options) }],
+          ['src/SessionContext.ts', { content: viteSessionContext }],
+          ['.env', { content: viteEnv }],
+          ['src/pages/signin.tsx', { content: viteSignIn(options) }],
         ]);
-
-        if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
-          const prismaFiles = new Map([
-            ['prisma.ts', { content: prisma }],
-            ['.env', { content: env }],
-            ['prisma/schema.prisma', { content: schemaPrisma(options) }],
-          ]);
-          return new Map([...commonFiles, ...viteFiles, ...authFiles, ...prismaFiles]);
-        }
 
         return new Map([...commonFiles, ...viteFiles, ...authFiles]);
       }

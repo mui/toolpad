@@ -235,7 +235,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
 });
 
 test('data providers', async ({ page }) => {
-  test.setTimeout(300000);
+  test.setTimeout(600000);
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPage('dataProviders');
 

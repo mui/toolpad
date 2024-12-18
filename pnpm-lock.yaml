@@ -802,8 +802,8 @@ importers:
         specifier: 1.11.13
         version: 1.11.13
       dotenv:
-        specifier: 16.4.5
-        version: 16.4.5
+        specifier: 16.4.7
+        version: 16.4.7
       esbuild:
         specifier: 0.24.0
         version: 0.24.0
@@ -5791,8 +5791,8 @@ packages:
     resolution: {integrity: sha512-8NHi73otpWsZGBSZwwknTXS5pqMOrk9+Ssrna8xCaxkzEpU9OTf9R5ArQGVw03//Zmk9MOwLPng9WwndvpAJ5g==}
     engines: {node: '>=12'}
 
-  dotenv@16.4.5:
-    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
+  dotenv@16.4.7:
+    resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
     engines: {node: '>=12'}
 
   duplexer2@0.1.4:
@@ -15471,7 +15471,7 @@ snapshots:
   dotenv-cli@7.4.2:
     dependencies:
       cross-spawn: 7.0.3
-      dotenv: 16.4.5
+      dotenv: 16.4.7
       dotenv-expand: 10.0.0
       minimist: 1.2.8
 
@@ -15479,9 +15479,9 @@ snapshots:
 
   dotenv-expand@11.0.6:
     dependencies:
-      dotenv: 16.4.5
+      dotenv: 16.4.7
 
-  dotenv@16.4.5: {}
+  dotenv@16.4.7: {}
 
   duplexer2@0.1.4:
     dependencies:
@@ -18495,7 +18495,7 @@ snapshots:
       cli-cursor: 3.1.0
       cli-spinners: 2.6.1
       cliui: 8.0.1
-      dotenv: 16.4.5
+      dotenv: 16.4.7
       dotenv-expand: 11.0.6
       enquirer: 2.3.6
       figures: 3.2.0

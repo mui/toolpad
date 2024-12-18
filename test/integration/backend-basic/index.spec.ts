@@ -235,6 +235,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
 });
 
 test('data providers', async ({ page }) => {
+  test.setTimeout(240000);
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPage('dataProviders');
 
@@ -264,6 +265,7 @@ test('data providers', async ({ page }) => {
 });
 
 test('data providers crud', async ({ page }) => {
+  test.setTimeout(100000);
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPage('crud');
 

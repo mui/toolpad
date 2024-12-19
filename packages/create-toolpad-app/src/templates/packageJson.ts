@@ -27,8 +27,8 @@ const packageJson: PackageJsonTemplate = (options) => {
   }
 
   const dependencies: Record<string, string> = {
-    react: '^18',
-    'react-dom': '^18',
+    react: '^19',
+    'react-dom': '^19',
     next: '^15',
     '@toolpad/core': coreVersion ?? 'latest',
     '@mui/material': '^6',

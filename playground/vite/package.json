@@ -10,14 +10,14 @@
   "devDependencies": {
     "@emotion/react": "11.13.3",
     "@emotion/styled": "11.13.0",
-    "@mui/icons-material": "6.2.0",
-    "@mui/material": "6.2.0",
+    "@mui/icons-material": "6.2.1",
+    "@mui/material": "6.2.1",
     "@toolpad/core": "workspace:*",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "4.3.4",
-    "react": "^19",
-    "react-dom": "^19",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-router-dom": "6.26.2",
     "vite": "5.4.11"
   }

@@ -16,14 +16,14 @@
     "@toolpad/core": "latest",
     "next": "^15",
     "next-auth": "^4.24.10",
-    "react": "^19",
-    "react-dom": "^19"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "typescript": "^5",
     "@types/node": "^20.17.6",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "eslint": "^8",
     "eslint-config-next": "^15"
   }

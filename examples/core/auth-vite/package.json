@@ -13,13 +13,13 @@
     "@mui/icons-material": "^6",
     "@mui/material": "^6",
     "@toolpad/core": "latest",
-    "react": "^19",
-    "react-dom": "^19",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-router-dom": "^6"
   },
   "devDependencies": {
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.2",
     "typescript": "^5",
     "vite": "^5.4.8"

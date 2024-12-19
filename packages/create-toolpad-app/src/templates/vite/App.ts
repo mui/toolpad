@@ -37,6 +37,7 @@ ${
   options.auth
     ? `
 const AUTHENTICATION: Authentication = {    
+  signIn: () => {},
   signOut: firebaseSignOut,
 };`
     : ''

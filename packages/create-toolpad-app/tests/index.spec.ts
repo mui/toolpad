@@ -124,6 +124,10 @@ test(
     });
     cp.stdout?.pipe(process.stdout);
     cp.stderr?.pipe(process.stderr);
+
+    // Wait for the framework prompt and select Next.js (default)
+    await waitForPromptAndRespond(cp, /Which framework/, '\n');
+
     // Wait for the router prompt and select the App Router
     await waitForPromptAndRespond(cp, /Which router/, '\n');
 
@@ -185,6 +189,9 @@ test(
     cp.stdout?.pipe(process.stdout);
     cp.stderr?.pipe(process.stderr);
 
+    // Wait for the framework prompt and select Next.js (default)
+    await waitForPromptAndRespond(cp, /Which framework/, '\n');
+
     // Wait for the router prompt and select the App Router
     await waitForPromptAndRespond(cp, /Which router/, '\n');
 
@@ -235,6 +242,134 @@ test(
     toolpadProcess.stderr?.pipe(process.stderr);
 
     const match = await waitForMatch(toolpadProcess.stdout!, /http:\/\/localhost:(\d+)/);
+
+    expect(match).toBeTruthy();
+  },
+  TEST_TIMEOUT,
+);
+
+test(
+  'create-toolpad-app can bootstrap a Toolpad Core app with Vite without authentication',
+  async () => {
+    testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-vite-'));
+    cp = execa(cliPath, [testDir, '--coreVersion', 'latest'], {
+      cwd: currentDirectory,
+    });
+    cp.stdout?.pipe(process.stdout);
+    cp.stderr?.pipe(process.stderr);
+
+    // Wait for the framework prompt and select Vite (down arrow + enter)
+    await waitForPromptAndRespond(cp, /Which framework/, '\u001b[B');
+
+    // Wait for the authentication prompt and select 'No'
+    await waitForPromptAndRespond(cp, /enable authentication/, 'n');
+
+    const result = await cp;
+    expect(result.stdout).toMatch('Run the following to get started');
+    const packageJsonContent = await fs.readFile(path.resolve(testDir, './package.json'), {
+      encoding: 'utf-8',
+    });
+    const packageJson = JSON.parse(packageJsonContent);
+    expect(packageJson).toEqual(
+      expect.objectContaining({
+        dependencies: expect.objectContaining({
+          '@toolpad/core': expect.any(String),
+        }),
+        scripts: expect.objectContaining({
+          dev: 'vite',
+          preview: 'vite preview',
+        }),
+      }),
+    );
+
+    // check that file exists or not in the directory
+    const gitignore = await fs.readFile(path.resolve(testDir, './.gitignore'), {
+      encoding: 'utf-8',
+    });
+
+    expect(gitignore.length).toBeGreaterThan(0);
+
+    toolpadProcess = execa('pnpm', ['dev'], {
+      cwd: testDir,
+      env: {
+        FORCE_COLOR: '0',
+        BROWSER: 'none',
+      },
+    });
+    toolpadProcess.stdout?.pipe(process.stdout);
+    toolpadProcess.stderr?.pipe(process.stderr);
+
+    // Add console.log to see what output we're getting
+    toolpadProcess.stdout?.on('data', (data) => {
+      console.log('Vite output:', data.toString());
+    });
+
+    // Modify the regex to be more lenient
+    const match = await waitForMatch(toolpadProcess.stdout!, /ready in/);
+
+    expect(match).toBeTruthy();
+  },
+  TEST_TIMEOUT,
+);
+
+test(
+  'create-toolpad-app can bootstrap a Toolpad Core app with Vite with authentication',
+  async () => {
+    testDir = await fs.mkdtemp(path.resolve(os.tmpdir(), './test-app-vite-auth-'));
+    cp = execa(cliPath, [testDir, '--coreVersion', 'latest'], {
+      cwd: currentDirectory,
+    });
+    cp.stdout?.pipe(process.stdout);
+    cp.stderr?.pipe(process.stderr);
+
+    // Wait for the framework prompt and select Vite (down arrow + enter)
+    await waitForPromptAndRespond(cp, /Which framework/, '\u001b[B\n');
+
+    // Wait for the authentication prompt and select 'Yes'
+    await waitForPromptAndRespond(cp, /enable authentication/, 'y');
+
+    // Wait for the auth providers prompt and select all (press 'a' then Enter)
+    await waitForPromptAndRespond(cp, /Select authentication providers/, 'a\n');
+
+    const result = await cp;
+    expect(result.stdout).toMatch('Run the following to get started');
+
+    const packageJsonContent = await fs.readFile(path.resolve(testDir, './package.json'), {
+      encoding: 'utf-8',
+    });
+    const packageJson = JSON.parse(packageJsonContent);
+    expect(packageJson).toEqual(
+      expect.objectContaining({
+        dependencies: expect.objectContaining({
+          '@toolpad/core': expect.any(String),
+          firebase: expect.any(String),
+        }),
+        scripts: expect.objectContaining({
+          dev: 'vite',
+          preview: 'vite preview',
+        }),
+      }),
+    );
+
+    // Check if auth.ts file is created
+    const authFileExists = await fs
+      .access(path.resolve(testDir, './src/firebase/auth.ts'))
+      .then(() => true)
+      .catch(() => false);
+
+    expect(authFileExists).toBe(true);
+
+    toolpadProcess = execa('pnpm', ['dev'], {
+      cwd: testDir,
+      env: {
+        FORCE_COLOR: '0',
+        BROWSER: 'none',
+      },
+    });
+    toolpadProcess.stdout?.pipe(process.stdout);
+    toolpadProcess.stderr?.pipe(process.stderr);
+
+    const match = await waitForMatch(toolpadProcess.stdout!, /ready in/);
 
     expect(match).toBeTruthy();
   },

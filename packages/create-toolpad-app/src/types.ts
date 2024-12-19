@@ -4,6 +4,8 @@ import { PackageJson } from './templates/packageType';
 
 export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';
 export type PackageManager = 'npm' | 'pnpm' | 'yarn';
+export type SupportedFramework = 'nextjs' | 'vite';
+
 type ProjectType = 'core' | 'studio';
 
 export interface GenerateProjectOptions {
@@ -16,6 +18,7 @@ export interface GenerateProjectOptions {
   hasPasskeyProvider?: boolean;
   install?: boolean;
   router?: SupportedRouter;
+  framework?: SupportedFramework;
   coreVersion?: string;
   projectType?: ProjectType;
   packageManager?: PackageManager;

@@ -1,7 +1,7 @@
 import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
 import { kebabToConstant, kebabToPascal } from '@toolpad/utils/strings';
 import { requiresIssuer, requiresTenantId } from './utils';
-import { Template } from '../../types';
+import { Template } from '../../../types';
 
 const CredentialsProviderTemplate = `Credentials({
   credentials: {

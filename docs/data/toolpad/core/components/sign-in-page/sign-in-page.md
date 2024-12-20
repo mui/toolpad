@@ -231,7 +231,7 @@ VITE_FIREBASE_APP_ID=
 You can find these in the Firebase project settings.
 
 :::info
-Head to the [integration docs](https://mui.com/toolpad/core/integrations/react-router) for code examples on integrating Firebase authentication with Vite and React Router.
+Head to the [integration docs](https://mui.com/toolpad/core/integrations/react-router/) for code examples on integrating Firebase authentication with Vite and React Router.
 :::
 
 :::success

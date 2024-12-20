@@ -211,11 +211,11 @@ If you're using the default [Next.js example](https://github.com/mui/toolpad/tre
 If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4/) to get started.
 :::
 
-## Firebase
+### Firebase
 
-### Vite with React Router
+#### Vite with React Router
 
-### Setting up
+##### Setting up
 
 You need to create a `.env` file in the root of your project directory with the following environment variables:
 
@@ -235,7 +235,7 @@ Head to the [integration docs](https://mui.com/toolpad/core/integrations/react-r
 :::
 
 :::success
-If you're using [`create-toolpad-app`](/toolpad/core/introduction/installation/), or the default [Vite with Firebase authentication example](https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite/), the integration is already set up for you.
+If you're using [create-toolpad-app](/toolpad/core/introduction/installation/), or the default [Vite with Firebase authentication example](https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite/), the integration is already set up for you.
 :::
 
 ## Customization

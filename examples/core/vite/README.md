@@ -18,6 +18,14 @@ bun dev
 
 Open [http://localhost:5173](http://localhost:5173) with your browser to see the result.
 
+## Clone using `create-toolpad-app`
+
+To copy this example and customize it for your needs, run
+
+```bash
+npx create-toolpad-app@latest --example vite
+```
+
 ## The source
 
 [Check out the source code](https://github.com/mui/toolpad/tree/master/examples/core/vite/)

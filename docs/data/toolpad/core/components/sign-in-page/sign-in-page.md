@@ -211,8 +211,31 @@ If you're using the default [Next.js example](https://github.com/mui/toolpad/tre
 If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4/) to get started.
 :::
 
+## Firebase
+
+### Vite with React Router
+
+### Setting up
+
+You need to create a `.env` file in the root of your project directory with the following environment variables:
+
+```bash
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGE_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+You can find these in the Firebase project settings.
+
 :::info
-If you're using Vite with React Router, check out the [example with Vite and React Router](https://github.com/mui/toolpad/tree/master/examples/core/auth-vite/) that showcases how to use `SignInPage` along with any external authentication library of your choice.
+Head to the [integration docs](https://mui.com/toolpad/core/integrations/react-router) for code examples on integrating Firebase authentication with Vite and React Router.
+:::
+
+:::success
+If you're using [`create-toolpad-app`](/toolpad/core/introduction/installation/), or the default [Vite with Firebase authentication example](https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite/), the integration is already set up for you.
 :::
 
 ## Customization

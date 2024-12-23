@@ -1,13 +1,13 @@
 'use client';
 import * as React from 'react';
 import { useRouter } from 'next/compat/router';
-import { NextjsAppProviderApp } from './NextjsAppProviderApp';
-import { NextjsAppProviderPages } from './NextjsAppProviderPages';
+import { NextAppProviderApp } from './NextAppProviderApp';
+import { NextAppProviderPages } from './NextAppProviderPages';
 import type { AppProviderProps } from '../AppProvider';
 
 function AppProvider(props: AppProviderProps) {
   const router = useRouter();
-  const AppProviderComponent = router ? NextjsAppProviderPages : NextjsAppProviderApp;
+  const AppProviderComponent = router ? NextAppProviderPages : NextAppProviderApp;
   return <AppProviderComponent {...props} />;
 }
 

@@ -77,7 +77,7 @@
     "react-dom": "18.3.1",
     "react-hook-form": "7.53.2",
     "react-is": "18.3.1",
-    "react-router": "6.26.2",
+    "react-router": "7.1.0",
     "react-router-dom": "6.26.2",
     "react-runner": "1.0.5",
     "react-simple-code-editor": "0.14.1",

@@ -5,15 +5,15 @@
 import * as React from 'react';
 import { describe, test, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { AppProvider } from './AppProvider';
+import { BrowserRouter } from 'react-router';
+import { ReactRouterAppProvider } from './ReactRouterAppProvider';
 
 describe('React Router AppProvider', () => {
   test('renders content correctly', async () => {
     // placeholder test
     render(
       <BrowserRouter>
-        <AppProvider>Hello</AppProvider>
+        <ReactRouterAppProvider>Hello</ReactRouterAppProvider>
       </BrowserRouter>,
     );
 

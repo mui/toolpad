@@ -912,9 +912,9 @@ importers:
       react-resizable-panels:
         specifier: 2.1.7
         version: 2.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react-router-dom:
-        specifier: 6.26.2
-        version: 6.26.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-router:
+        specifier: 7.1.0
+        version: 7.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       semver:
         specifier: 7.6.3
         version: 7.6.3

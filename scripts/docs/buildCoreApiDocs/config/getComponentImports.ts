@@ -3,6 +3,12 @@ import fs from 'fs';
 
 const repositoryRoot = path.resolve(__dirname, '../../../..');
 
+function findMatchingFileName(directory: string, name: string) {
+  const files = fs.readdirSync(directory);
+  const matchingFile = files.find((file) => file.endsWith(name));
+  return matchingFile ? matchingFile.replace(/\.[^/.]+$/, '') : null; // Remove the extension
+}
+
 export function getComponentImports(name: string, filename: string) {
   const relativePath = path.relative(repositoryRoot, filename);
   const directories = path.dirname(relativePath).split(path.sep);
@@ -21,18 +27,20 @@ export function getComponentImports(name: string, filename: string) {
   const componentDirectory = directories[3];
   if (componentDirectory === name) {
     const nextjsRelativePath = path.resolve(relativePath, '../../nextjs');
-    const hasNextJsVersion = fs.existsSync(`${nextjsRelativePath}/${name}.tsx`);
+    const nextjsFileName = findMatchingFileName(nextjsRelativePath, `${name}.tsx`);
 
     const reactRouterRelativePath = path.resolve(relativePath, '../../react-router');
-    const hasReactRouterVersion = fs.existsSync(`${reactRouterRelativePath}/${name}.tsx`);
+    const reactRouterFileName = findMatchingFileName(reactRouterRelativePath, `${name}.tsx`);
 
     return [
       `import { ${name} } from '@toolpad/core/${name}';`,
       `import { ${name} } from '@toolpad/core';${
-        hasNextJsVersion ? `\nimport { ${name} } from '@toolpad/core/nextjs'; // Next.js` : ''
+        nextjsFileName
+          ? `\nimport { ${nextjsFileName} } from '@toolpad/core/nextjs'; // Next.js`
+          : ''
       }${
-        hasReactRouterVersion
-          ? `\nimport { ${name} } from '@toolpad/core/react-router-dom'; // React Router`
+        reactRouterFileName
+          ? `\nimport { ${reactRouterFileName} } from '@toolpad/core/react-router'; // React Router`
           : ''
       }`,
     ];

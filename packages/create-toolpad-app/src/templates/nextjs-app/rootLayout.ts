@@ -4,7 +4,7 @@ const rootLayout: Template = (options) => {
   const authEnabled = options.auth;
 
   return `import * as React from 'react';
-import { NextAppProvider } from '@toolpad/core/nextjs';
+import { NextjsAppProvider } from '@toolpad/core/nextjs';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -59,7 +59,7 @@ export default ${authEnabled ? 'async ' : ''}function RootLayout(props: { childr
         ${authEnabled ? '<SessionProvider session={session}>' : ''}
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           ${authEnabled ? '' : '<React.Suspense fallback={<LinearProgress />}>'}
-            <NextAppProvider
+            <NextjsAppProvider
               navigation={NAVIGATION}
               branding={BRANDING}
               ${
@@ -71,7 +71,7 @@ export default ${authEnabled ? 'async ' : ''}function RootLayout(props: { childr
               theme={theme}
             >
               {props.children}
-            </NextAppProvider>
+            </NextjsAppProvider>
             ${authEnabled ? '' : '</React.Suspense>'}
           </AppRouterCacheProvider>
         ${authEnabled ? '</SessionProvider>' : ''}

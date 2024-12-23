@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { describe, test, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { NextAppProvider } from './NextAppProvider';
+import { NextjsAppProvider } from './NextjsAppProvider';
 import { Router } from '../AppProvider';
 
 vi.mock('next/navigation', () => {
@@ -39,7 +39,7 @@ function RouterTest({ children }: RouterTestProps) {
     };
   }, [pathname]);
 
-  return <NextAppProvider router={router}>{children}</NextAppProvider>;
+  return <NextjsAppProvider router={router}>{children}</NextjsAppProvider>;
 }
 
 describe('Nextjs AppProvider', () => {

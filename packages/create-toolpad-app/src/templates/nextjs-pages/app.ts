@@ -4,7 +4,7 @@ const app: Template = (options) => {
   const authEnabled = options.auth;
 
   return `import * as React from 'react';
-import { NextAppProvider } from '@toolpad/core/nextjs';
+import { NextjsAppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Head from 'next/head';
@@ -104,7 +104,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <NextAppProvider
+      <NextjsAppProvider
         navigation={NAVIGATION}
         branding={BRANDING}
         ${
@@ -116,7 +116,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         theme={theme}
       >
         {children}
-      </NextAppProvider>
+      </NextjsAppProvider>
     </React.Fragment>
   );
 }

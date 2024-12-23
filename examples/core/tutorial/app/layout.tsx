@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NextAppProvider } from '@toolpad/core/nextjs';
+import { NextjsAppProvider } from '@toolpad/core/nextjs';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
@@ -30,9 +30,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <AppRouterCacheProvider options={{ enableCssLayer: true }}>
           <React.Suspense fallback={<LinearProgress />}>
-            <NextAppProvider theme={theme} navigation={NAVIGATION}>
+            <NextjsAppProvider theme={theme} navigation={NAVIGATION}>
               {children}
-            </NextAppProvider>
+            </NextjsAppProvider>
           </React.Suspense>
         </AppRouterCacheProvider>
       </body>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NextAppProvider } from '@toolpad/core/nextjs';
+import { NextjsAppProvider } from '@toolpad/core/nextjs';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
@@ -36,14 +36,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body>
         <SessionProvider session={session}>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <NextAppProvider
+            <NextjsAppProvider
               theme={theme}
               navigation={NAVIGATION}
               session={session}
               authentication={AUTHENTICATION}
             >
               {children}
-            </NextAppProvider>
+            </NextjsAppProvider>
           </AppRouterCacheProvider>
         </SessionProvider>
       </body>

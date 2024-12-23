@@ -1,15 +1,27 @@
 import * as React from 'react';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import { asArray } from '@toolpad/utils/collections';
+import { useRouter } from 'next/router';
 import { AppProvider } from '../AppProvider';
 import type { AppProviderProps, Navigate, Router } from '../AppProvider';
 
 /**
  * @ignore - internal component.
  */
-export function NextAppProviderApp(props: AppProviderProps) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const { push, replace } = useRouter();
+export function NextjsAppProviderPages(props: AppProviderProps) {
+  const { push, replace, asPath, query } = useRouter();
+
+  const search = React.useMemo(() => {
+    const params = new URLSearchParams();
+    Object.entries(query ?? {}).forEach(([key, value]) => {
+      asArray(value ?? []).forEach((v) => {
+        params.append(key, v);
+      });
+    });
+    return params.toString();
+  }, [query]);
+
+  // Stable search params object
+  const searchParams = React.useMemo(() => new URLSearchParams(search), [search]);
 
   const navigate = React.useCallback<Navigate>(
     (url, { history = 'auto' } = {}) => {
@@ -26,11 +38,11 @@ export function NextAppProviderApp(props: AppProviderProps) {
 
   const routerImpl = React.useMemo<Router>(
     () => ({
-      pathname,
+      pathname: asPath,
       searchParams,
       navigate,
     }),
-    [pathname, navigate, searchParams],
+    [asPath, navigate, searchParams],
   );
 
   return <AppProvider router={routerImpl} {...props} />;

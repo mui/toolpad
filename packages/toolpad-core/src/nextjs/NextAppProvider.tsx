@@ -5,10 +5,10 @@ import { NextAppProviderApp } from './NextAppProviderApp';
 import { NextAppProviderPages } from './NextAppProviderPages';
 import type { AppProviderProps } from '../AppProvider';
 
-function AppProvider(props: AppProviderProps) {
+function NextAppProvider(props: AppProviderProps) {
   const router = useRouter();
-  const AppProviderComponent = router ? NextAppProviderPages : NextAppProviderApp;
-  return <AppProviderComponent {...props} />;
+  const AppProvider = router ? NextAppProviderPages : NextAppProviderApp;
+  return <AppProvider {...props} />;
 }
 
-export { AppProvider };
+export { NextAppProvider };

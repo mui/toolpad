@@ -73,7 +73,7 @@ function DemoPageContent({ pathname }: { pathname: string }) {
 function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
   const { handleClick, open, mini } = props;
   return (
-    <Stack direction="column" p={0} overflow="hidden">
+    <Stack direction="column" p={0}>
       <Divider />
       <AccountPreview
         variant={mini ? 'condensed' : 'expanded'}

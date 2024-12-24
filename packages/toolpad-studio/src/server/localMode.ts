@@ -1058,7 +1058,7 @@ class ToolpadProject {
       });
     }, 100);
 
-    const watchOptions: chokidar.WatchOptions = {
+    const watchOptions: chokidar.ChokidarOptions = {
       // This is needed to correctly pick up page folder renames
       // Remove this once https://github.com/paulmillr/chokidar/issues/1285 gets resolved
       usePolling: true,

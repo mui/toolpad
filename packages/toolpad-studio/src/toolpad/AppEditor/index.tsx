@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router';
 import PageEditor from './PageEditor';
 import { useAppState } from '../AppState';
 import AppEditorShell from './AppEditorShell';

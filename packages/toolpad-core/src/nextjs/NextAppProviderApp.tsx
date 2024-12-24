@@ -6,7 +6,7 @@ import type { AppProviderProps, Navigate, Router } from '../AppProvider';
 /**
  * @ignore - internal component.
  */
-export function AppProviderNextApp(props: AppProviderProps) {
+export function NextAppProviderApp(props: AppProviderProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { push, replace } = useRouter();

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppProvider } from '@toolpad/core/nextjs';
+import { NextAppProvider } from '@toolpad/core/nextjs';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Head from 'next/head';
@@ -72,14 +72,14 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AppProvider
+      <NextAppProvider
         navigation={NAVIGATION}
         branding={BRANDING}
         session={session}
         authentication={AUTHENTICATION}
       >
         {children}
-      </AppProvider>
+      </NextAppProvider>
     </React.Fragment>
   );
 }

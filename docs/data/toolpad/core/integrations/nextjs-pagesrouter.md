@@ -26,13 +26,13 @@ yarn add install @mui/material-nextjs @emotion/cache
 
 </codeblock>
 
-## Wrap your application with `AppProvider`
+## Wrap your application with `NextAppProvider`
 
-In your root layout file (for example, `pages/_app.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (for example, `pages/_app.tsx`), wrap your application with the `NextAppProvider`:
 
 ```tsx title="pages/_app.tsx"
 import * as React from 'react';
-import { AppProvider } from '@toolpad/core/nextjs';
+import { NextAppProvider } from '@toolpad/core/nextjs';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Head from 'next/head';
@@ -63,13 +63,13 @@ export default function App({ Component }: { Component: React.ElementType }) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+      <NextAppProvider navigation={NAVIGATION} branding={BRANDING}>
         <DashboardLayout>
           <PageContainer>
             <Component />
           </PageContainer>
         </DashboardLayout>
-      </AppProvider>
+      </NextAppProvider>
     </AppCacheProvider>
   );
 }
@@ -221,7 +221,7 @@ Modify `_app.tsx` to include the `authentication` prop and other helpers:
 
 ```tsx title="pages/_app.tsx"
 import * as React from 'react';
-import { AppProvider } from '@toolpad/core/nextjs';
+import { NextAppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Head from 'next/head';
@@ -294,14 +294,14 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AppProvider
+      <NextAppProvider
         navigation={NAVIGATION}
         branding={BRANDING}
         session={session}
         authentication={AUTHENTICATION}
       >
         {children}
-      </AppProvider>
+      </NextAppProvider>
     </React.Fragment>
   );
 }

@@ -1,6 +1,6 @@
 import { kebabToConstant } from '@toolpad/utils/strings';
 import { requiresIssuer, requiresTenantId } from './utils';
-import { Template } from '../../types';
+import { Template } from '../../../types';
 
 const env: Template = (options) => {
   const { authProviders: providers } = options;

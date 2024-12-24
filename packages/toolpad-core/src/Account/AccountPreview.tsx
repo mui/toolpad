@@ -99,13 +99,19 @@ function AccountPreview(props: AccountPreviewProps) {
   if (variant === 'expanded') {
     return (
       <Stack direction="row" justifyContent="space-between" sx={{ py: 1, px: 2, gap: 2, ...sx }}>
-        <Stack direction="row" justifyContent="flex-start" spacing={2}>
+        <Stack direction="row" justifyContent="flex-start" spacing={2} overflow="hidden">
           {avatarContent}
           <Stack direction="column" justifyContent="space-evenly">
-            <Typography variant="body2" fontWeight="bolder" noWrap>
+            <Typography
+              variant="body2"
+              fontWeight="bolder"
+              // Only truncate when a longer text causes the text to overflow over the MoreIconButton
+              maxWidth={handleClick ? 180 : 'unset'}
+              noWrap
+            >
               {session.user?.name}
             </Typography>
-            <Typography variant="caption" noWrap>
+            <Typography variant="caption" maxWidth={handleClick ? 180 : 'unset'} noWrap>
               {session.user?.email}
             </Typography>
           </Stack>

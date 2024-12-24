@@ -1,7 +1,11 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useDemoRouter } from '@toolpad/core/internal';
-import { PageContainer, PageContainerToolbar } from '@toolpad/core/PageContainer';
+import {
+  PageContainer,
+  PageHeader,
+  PageHeaderToolbar,
+} from '@toolpad/core/PageContainer';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
@@ -20,9 +24,9 @@ const NAVIGATION = [
 ];
 
 // preview-start
-function PageToolbar({ status }) {
+function CustomPageToolbar({ status }) {
   return (
-    <PageContainerToolbar>
+    <PageHeaderToolbar>
       <p>Current status: {status}</p>
       <Button startIcon={<FileDownloadIcon />} color="inherit">
         Export
@@ -35,21 +39,34 @@ function PageToolbar({ status }) {
         slotProps={{ field: { size: 'small' } }}
         label="Period"
       />
-    </PageContainerToolbar>
+    </PageHeaderToolbar>
   );
+}
+
+CustomPageToolbar.propTypes = {
+  status: PropTypes.string.isRequired,
+};
+
+function CustomPageHeader({ status }) {
+  const CustomPageToolbarComponent = React.useCallback(
+    () => <CustomPageToolbar status={status} />,
+    [status],
+  );
+
+  return <PageHeader slots={{ toolbar: CustomPageToolbarComponent }} />;
 }
 // preview-end
 
-PageToolbar.propTypes = {
+CustomPageHeader.propTypes = {
   status: PropTypes.string.isRequired,
 };
 
 export default function ActionsPageContainer() {
   const router = useDemoRouter();
-  const status = 'supesh';
+  const status = 'Active';
 
-  const PageToolbarComponent = React.useCallback(
-    () => <PageToolbar status={status} />,
+  const CustomPageHeaderComponent = React.useCallback(
+    () => <CustomPageHeader status={status} />,
     [status],
   );
   const theme = useTheme();
@@ -58,7 +75,7 @@ export default function ActionsPageContainer() {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <AppProvider navigation={NAVIGATION} router={router} theme={theme}>
         <Paper sx={{ width: '100%' }}>
-          <PageContainer slots={{ toolbar: PageToolbarComponent }}>
+          <PageContainer slots={{ header: CustomPageHeaderComponent }}>
             <PageContent />
           </PageContainer>
         </Paper>

@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Page Container
-components: PageContainer, PageContainerToolbar
+components: PageContainer, PageHeader, PageHeaderToolbar
 ---
 
 # Page Container
@@ -100,12 +100,24 @@ export default function Example() {
 }
 ```
 
-## Actions
-
-You can configure additional actions in the area that is reserved on the right. To do so provide the `toolbar` slot to the `PageContainer` component. You can wrap the `PageContainerToolbar` component to create a custom toolbar component, as shown here:
-
-{{"demo": "ActionsPageContainer.js", "height": 300}}
-
 ## Responsiveness
 
 The Page Container component inherits the properties of the Material&nbsp;UI [Container](https://mui.com/material-ui/react-container/) component. You can use its [`maxWidth`](https://mui.com/material-ui/api/container/#container-prop-maxWidth) and [`fixed`](https://mui.com/material-ui/api/container/#container-prop-fixed) properties to control the bounds of the page. Set `maxWidth` to `false` to disable the container altogether and have the content bleed right up to the edges of the page.
+
+## Standalone page header
+
+The `PageHeader` component included in `PageContainer` can be imported and used by itself if you wish to do so, for more freedom of customization.
+
+{{"demo": "PageContainerHeader.js", "height": 300}}
+
+## Actions
+
+You can configure additional actions in the area that is reserved on the right. To do so provide a custom `header` slot to the `PageContainer` component, where you can provide a custom `toolbar` slot to a `PageHeader`. You can wrap the `PageHeaderToolbar` component to create a custom toolbar component, as shown here:
+
+{{"demo": "ActionsPageContainer.js", "height": 300}}
+
+## Full-size content
+
+The content inside the container can take up the full remaining available area with styles such as `flex: 1` or `height: 100%`.
+
+{{"demo": "PageContainerFullScreen.js", "height": 400, "iframe": true}}

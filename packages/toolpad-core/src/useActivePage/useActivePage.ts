@@ -7,10 +7,6 @@ import type { Breadcrumb } from '../PageContainer';
 export interface ActivePage {
   title: string;
   path: string;
-  /**
-   * @deprecated Use `breadcrumbs` instead.
-   */
-  breadCrumbs: Breadcrumb[];
   breadcrumbs: Breadcrumb[];
 }
 
@@ -59,8 +55,6 @@ export function useActivePage(): ActivePage | null {
       title: getItemTitle(activeItem),
       path: getItemPath(navigationContext, activeItem),
       breadcrumbs,
-      // TODO: Remove in the next major version
-      breadCrumbs: breadcrumbs,
     };
   }, [activeItem, rootItem, pathname, navigationContext]);
 }

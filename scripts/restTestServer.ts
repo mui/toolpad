@@ -1,4 +1,4 @@
-import { startTestServer } from '../test/integration/rest-basic/testServer';
+import { startTestServer } from '@toolpad/studio-tests/integration/rest-basic/testServer';
 
 startTestServer(8080).then((server) => {
   // eslint-disable-next-line no-console

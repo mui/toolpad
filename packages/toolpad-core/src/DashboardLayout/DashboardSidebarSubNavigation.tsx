@@ -233,9 +233,6 @@ function DashboardSidebarSubNavigation({
                 sx={{
                   whiteSpace: 'nowrap',
                   zIndex: 1,
-                  '& .MuiTypography-root': {
-                    fontWeight: '500',
-                  },
                 }}
               />
               {navigationItem.action && !isMini && isFullyExpanded ? navigationItem.action : null}

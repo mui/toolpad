@@ -41,6 +41,16 @@ async function generateProptypes(
   sourceFile: string,
   tsFile: string,
 ): Promise<void> {
+  const sourceContent = await fse.readFile(sourceFile, 'utf8');
+
+  if (
+    sourceContent.match(/@ignore - internal component\./) ||
+    sourceContent.match(/@ignore - internal hook\./) ||
+    sourceContent.match(/@ignore - do not document\./)
+  ) {
+    return;
+  }
+
   const components = getPropTypesFromFile({
     filePath: tsFile,
     project,
@@ -82,7 +92,6 @@ async function generateProptypes(
     });
   });
 
-  const sourceContent = await fse.readFile(sourceFile, 'utf8');
   const isTsFile = /(\.(ts|tsx))/.test(sourceFile);
 
   // TODO remove, should only have .types.ts
@@ -204,7 +213,7 @@ async function run(argv: HandlerArgv) {
         folderName = folderName.slice(9);
       }
 
-      return fileName === folderName;
+      return !fileName.endsWith('.test');
     })
     .filter((filePath) => filePattern.test(filePath));
 

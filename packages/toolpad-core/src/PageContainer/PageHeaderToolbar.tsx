@@ -1,8 +1,17 @@
+'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import Stack, { StackProps } from '@mui/material/Stack';
+import { styled } from '@mui/material';
 
-export interface AccountPopoverHeaderProps extends StackProps {
+const PageHeaderToolbarRoot = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  gap: theme.spacing(1),
+  // Ensure the toolbar is always on the right side, even after wrapping
+  marginLeft: 'auto',
+}));
+
+export interface PageHeaderToolbarProps {
   children?: React.ReactNode;
 }
 
@@ -10,26 +19,25 @@ export interface AccountPopoverHeaderProps extends StackProps {
  *
  * Demos:
  *
- * - [Account](https://mui.com/toolpad/core/react-account/)
+ * - [Page Container](https://mui.com/toolpad/core/react-page-container/)
  *
  * API:
  *
- * - [AccountPopoverHeader API](https://mui.com/toolpad/core/api/account-popover-header)
+ * - [PageHeaderToolbar API](https://mui.com/toolpad/core/api/page-header-toolbar)
  */
-function AccountPopoverHeader(props: AccountPopoverHeaderProps) {
-  const { children, ...rest } = props;
-  return <Stack {...rest}>{children}</Stack>;
+function PageHeaderToolbar(props: PageHeaderToolbarProps) {
+  return <PageHeaderToolbarRoot {...props} />;
 }
 
-AccountPopoverHeader.propTypes /* remove-proptypes */ = {
+PageHeaderToolbar.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * The content of the component.
+   * @ignore
    */
   children: PropTypes.node,
 } as any;
 
-export { AccountPopoverHeader };
+export { PageHeaderToolbar };

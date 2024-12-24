@@ -98,7 +98,7 @@ export default function examples() {
       description:
         'This example shows you how to get started building a dashboard with Toolpad Core, Next.js app router, Auth.js and Material UI components in a customized theme',
       src: '/static/toolpad/docs/core/functional-dashboard.png',
-      href: 'https://mui-toolpad-docs.netlify.app/toolpad/core/templates/nextjs-dashboard',
+      href: 'https://mui.com/toolpad/core/templates/nextjs-dashboard',
       srcDark: '/static/toolpad/docs/core/functional-dashboard-dark.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-themed',
       featured: true,

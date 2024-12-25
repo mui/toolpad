@@ -57,10 +57,10 @@
   },
   "dependencies": {
     "@auth/core": "0.37.4",
-    "@emotion/cache": "11.13.1",
-    "@emotion/react": "11.13.3",
+    "@emotion/cache": "11.14.0",
+    "@emotion/react": "11.14.0",
     "@emotion/server": "11.11.0",
-    "@emotion/styled": "11.13.0",
+    "@emotion/styled": "11.14.0",
     "@googleapis/drive": "8.14.0",
     "@googleapis/sheets": "9.3.1",
     "@mui/icons-material": "6.2.1",

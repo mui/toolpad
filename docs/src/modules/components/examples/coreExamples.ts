@@ -1,4 +1,4 @@
-export default function examples() {
+export default function coreExamples() {
   return [
     {
       title: 'Tutorial app',

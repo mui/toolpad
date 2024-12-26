@@ -15,7 +15,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import type { Example } from './types';
 
 interface ExamplesGridProps {
-  examplesFile: string;
+  examplesFile: Example[];
   reverse?: boolean;
 }
 
@@ -38,22 +38,9 @@ function CodeSandboxIcon() {
 function ExamplesGrid(props: ExamplesGridProps) {
   const t = useTranslate();
 
-  const [examples, setExamples] = React.useState<Example[]>([]);
-
-  React.useEffect(() => {
-    const importExamples = async () => {
-      let exampleContent = await import(`./${props.examplesFile}`);
-
-      exampleContent = exampleContent
-        .default()
-        .filter((example: Example) => example.featured !== true);
-      if (props.reverse) {
-        setExamples(exampleContent.reverse());
-      }
-      setExamples(exampleContent);
-    };
-    importExamples();
-  }, [props.examplesFile, props.reverse]);
+  const examples = (props.reverse ? [...props.examplesFile].reverse() : props.examplesFile).filter(
+    (example: Example) => example.featured !== true,
+  );
   const docsTheme = useTheme();
 
   return (

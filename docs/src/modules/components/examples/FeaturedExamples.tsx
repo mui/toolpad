@@ -19,46 +19,14 @@ import { sxChip } from 'docs/src/modules/components/AppNavDrawerItem';
 import type { Example } from './types';
 
 interface FeaturedExamplesProps {
-  examplesFile: string;
+  examplesFile: Example[];
 }
 
 export default function FeaturedExamples(props: FeaturedExamplesProps) {
   const t = useTranslate();
 
-  const [examples, setExamples] = React.useState<Example[]>([]);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const importExamples = async () => {
-      setLoading(true);
-      let exampleContent = await import(`./${props.examplesFile}`);
-      exampleContent = exampleContent
-        .default()
-        .filter((example: Example) => example.featured === true);
-      setExamples(exampleContent);
-      setLoading(false);
-    };
-    importExamples();
-  }, [props.examplesFile]);
+  const examples = props.examplesFile.filter((example: Example) => example.featured === true);
   const docsTheme = useTheme();
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>
-        {[1].map((key) => (
-          <Box key={key} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Skeleton variant="text" width={200} height={32} />
-            <Skeleton variant="text" width="100%" height={24} />
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={400}
-              sx={{ aspectRatio: '16 / 9', borderRadius: 1 }}
-            />
-          </Box>
-        ))}
-      </Box>
-    );
-  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>

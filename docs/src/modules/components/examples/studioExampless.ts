@@ -1,4 +1,4 @@
-export default function examples() {
+export default function studioExamples() {
   return [
     {
       title: 'npm stats',

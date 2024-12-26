@@ -16,7 +16,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Run on CodeSandbox
 
-Run this example on CodeSandbox [here](https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
+Run this example on CodeSandbox [here](https://codesandbox.io/p/sandbox/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
 
 ## Clone using `create-toolpad-app`
 

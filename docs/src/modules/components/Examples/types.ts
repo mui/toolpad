@@ -5,8 +5,8 @@ export interface Example {
   srcDark?: string;
   href: string;
   source: string;
-  codeSandbox?: string;
-  stackBlitz?: string;
+  codeSandbox?: boolean;
+  stackBlitz?: boolean;
   new?: boolean;
   featured?: boolean;
 }

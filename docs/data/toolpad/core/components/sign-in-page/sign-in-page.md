@@ -230,7 +230,7 @@ Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react
 {{"demo": "ThemeSignInPage.js", "iframe": true, "height": 700 }}
 
 :::info
-Find a full-fledged example using the Next.js App router, Auth.js and this theme [here](https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
+Find a full-fledged example using the Next.js App router, Auth.js and this theme [here](https://codesandbox.io/p/sandbox/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
 :::
 
 ### Slots

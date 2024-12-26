@@ -122,11 +122,11 @@ function ExamplesGrid(props: ExamplesGridProps) {
                   {t('source')}
                 </Button>
                 <Stack direction="row" spacing={1}>
-                  {example.codeSandbox && (
+                  {example.codeSandbox === true && (
                     <Tooltip title="Edit in CodeSandbox">
                       <IconButton
                         component="a"
-                        href={example.codeSandbox}
+                        href={`https://codesandbox.io/p/sandbox/github/${example.source.replace('https://github.com/', '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         size="small"
@@ -135,11 +135,11 @@ function ExamplesGrid(props: ExamplesGridProps) {
                       </IconButton>
                     </Tooltip>
                   )}
-                  {example.stackBlitz && (
+                  {example.stackBlitz === true && (
                     <Tooltip title="Edit in StackBlitz">
                       <IconButton
                         component="a"
-                        href={example.stackBlitz}
+                        href={`https://stackblitz.com/github/${example.source.replace('https://github.com/', '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         size="small"

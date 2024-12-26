@@ -27,8 +27,9 @@ export default function examples() {
       src: '/static/toolpad/docs/core/auth-next.png',
       srcDark: '/static/toolpad/docs/core/auth-next-dark.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages/',
-      codeSandbox: true,
-      stackBlitz: true,
+      // infinite redirection
+      codeSandbox: false,
+      stackBlitz: false,
     },
     {
       title: 'Auth.js Magic Link with Next.js App Router',
@@ -36,6 +37,7 @@ export default function examples() {
         'This app shows you to how to get started using Toolpad Core with Auth.js Magic Links and the Next.js App router.',
       src: '/static/toolpad/docs/core/auth-next.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
+      // Fail on prisma
       codeSandbox: false,
       stackBlitz: false,
     },

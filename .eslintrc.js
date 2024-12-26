@@ -109,29 +109,6 @@ module.exports = {
       extends: ['plugin:testing-library/react'],
     },
     {
-      files: ['docs/src/modules/components/**/*.js'],
-      rules: {
-        'material-ui/no-hardcoded-labels': 'off',
-      },
-    },
-    {
-      /**
-       * TODO move to @mui/monorepo
-       *
-       * Examples are for demostration purposes and should not be considered as part of the library.
-       * They don't contain an eslint setup, so we don't want them to contain eslint directives
-       * We do however want to keep the rules in place to ensure the examples are following
-       * a reasonably similar code style as the library.
-       */
-      files: ['examples/**/*'],
-      rules: {
-        'no-console': 'off',
-        'no-underscore-dangle': 'off',
-        // no node_modules in examples as they are not installed
-        'import/no-unresolved': 'off',
-      },
-    },
-    {
       files: [
         'packages/create-toolpad-app/**/*',
         'packages/toolpad-core/**/*',

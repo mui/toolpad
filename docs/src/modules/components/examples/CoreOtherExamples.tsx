@@ -3,5 +3,5 @@ import ExamplesGrid from 'docs-toolpad/src/modules/components/examples/ExamplesG
 import coreExamples from 'docs-toolpad/src/modules/components/examples/coreExamples';
 
 export default function CoreOtherExamples() {
-  return <ExamplesGrid examplesFile={coreExamples()} reverse />;
+  return <ExamplesGrid examples={coreExamples} />;
 }

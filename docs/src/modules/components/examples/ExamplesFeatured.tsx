@@ -15,16 +15,16 @@ import CodeRoundedIcon from '@mui/icons-material/CodeRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import { useTheme } from '@mui/material/styles';
 import { sxChip } from 'docs/src/modules/components/AppNavDrawerItem';
-import type { Example } from './types';
+import { Example, versionGitHubLink } from './examplesUtils';
 
 interface FeaturedExamplesProps {
-  examplesFile: Example[];
+  examples: Example[];
 }
 
-export default function FeaturedExamples(props: FeaturedExamplesProps) {
+export default function ExamplesFeatured(props: FeaturedExamplesProps) {
   const t = useTranslate();
 
-  const examples = props.examplesFile.filter((example: Example) => example.featured === true);
+  const examples = props.examples.filter((example: Example) => example.featured === true);
   const docsTheme = useTheme();
 
   return (
@@ -51,7 +51,7 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
               }}
             >
               <Link
-                href={example.href}
+                href={versionGitHubLink(example.href)}
                 target="_blank"
                 sx={{
                   position: 'relative',
@@ -150,14 +150,19 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                     </Tooltip>
                   ) : null}
                   <Tooltip title="See source code">
-                    <IconButton component="a" href={example.source} color="primary" size="small">
+                    <IconButton
+                      component="a"
+                      href={versionGitHubLink(example.source)}
+                      color="primary"
+                      size="small"
+                    >
                       <CodeRoundedIcon />
                     </IconButton>
                   </Tooltip>
                 </Box>
                 <Button
                   component="a"
-                  href={example.href}
+                  href={versionGitHubLink(example.href)}
                   size="small"
                   variant="outlined"
                   color="primary"

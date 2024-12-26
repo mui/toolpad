@@ -122,24 +122,11 @@ function ExamplesGrid(props: ExamplesGridProps) {
                   {t('source')}
                 </Button>
                 <Stack direction="row" spacing={1}>
-                  {example.codeSandbox && (
-                    <Tooltip title="Edit in CodeSandbox">
-                      <IconButton
-                        component="a"
-                        href={example.codeSandbox}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        size="small"
-                      >
-                        <CodeSandboxIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  {example.stackBlitz && (
+                  {example.stackBlitz === true ? (
                     <Tooltip title="Edit in StackBlitz">
                       <IconButton
                         component="a"
-                        href={example.stackBlitz}
+                        href={`https://stackblitz.com/github/${example.source.replace('https://github.com/', '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         size="small"
@@ -147,7 +134,20 @@ function ExamplesGrid(props: ExamplesGridProps) {
                         <StackBlitzIcon />
                       </IconButton>
                     </Tooltip>
-                  )}
+                  ) : null}
+                  {example.codeSandbox === true ? (
+                    <Tooltip title="Edit in CodeSandbox">
+                      <IconButton
+                        component="a"
+                        href={`https://codesandbox.io/p/sandbox/github/${example.source.replace('https://github.com/', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        size="small"
+                      >
+                        <CodeSandboxIcon />
+                      </IconButton>
+                    </Tooltip>
+                  ) : null}
                 </Stack>
               </CardActions>
             </Card>

@@ -98,7 +98,7 @@ export default function examples() {
     {
       title: 'Functional dashboard',
       description:
-        'This example shows you how to get started building a dashboard with Toolpad Core, Next.js app router, Auth.js and Material UI components in a customized theme.',
+        'This example shows you how to get started building a dashboard with Toolpad Core, Next.js App Router, Auth.js and Material UI components in a customized theme.',
       src: '/static/toolpad/docs/core/functional-dashboard.png',
       href: 'https://mui.com/toolpad/core/templates/nextjs-dashboard',
       srcDark: '/static/toolpad/docs/core/functional-dashboard-dark.png',

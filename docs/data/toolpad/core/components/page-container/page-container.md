@@ -71,7 +71,7 @@ function useDynamicBreadcrumbs(id: string): Breadcrumb[] {
 }
 ```
 
-For example, under the Next.js app router you would be able to obtain breadcrumbs for a dynamic route as follows:
+For example, under the Next.js App Router you would be able to obtain breadcrumbs for a dynamic route as follows:
 
 ```tsx
 // ./src/app/example/[id]/page.tsx

@@ -108,7 +108,7 @@ This renders an alert with the `error` string as the message.
 
 #### Next.js App Directory and GitHub
 
-The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
+The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App Router and server actions.
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "srcDark": "/static/toolpad/docs/core/auth-next-dark.png", "alt": "Auth.js & Next.js with Toolpad Core sign-in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign-in page", "zoom": true, "indent": 1, "aspectRatio": "1.428" }}
 
@@ -230,7 +230,7 @@ Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react
 {{"demo": "ThemeSignInPage.js", "iframe": true, "height": 700 }}
 
 :::info
-Find a full-fledged example using the Next.js App router, Auth.js and this theme [here](https://codesandbox.io/p/sandbox/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
+Find a full-fledged example using the Next.js App Router, Auth.js and this theme [here](https://codesandbox.io/p/sandbox/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
 :::
 
 ### Slots

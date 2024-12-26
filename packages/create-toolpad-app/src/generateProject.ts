@@ -10,7 +10,7 @@ import ordersPage from './templates/ordersPage';
 import packageJson from './templates/packageJson';
 import indexPage from './templates/indexPage';
 
-// App router specific files
+// App Router specific files
 import rootLayout from './templates/nextjs-app/rootLayout';
 import dashboardLayout from './templates/nextjs-app/dashboardLayout';
 

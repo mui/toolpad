@@ -13,7 +13,7 @@ export default function examples() {
     {
       title: 'Auth.js with Next.js App Router',
       description:
-        'This app shows you to how to get started using Toolpad Core with Auth.js and the Next.js App router.',
+        'This app shows you to how to get started using Toolpad Core with Auth.js and the Next.js App Router.',
       src: '/static/toolpad/docs/core/auth-next.png',
       srcDark: '/static/toolpad/docs/core/auth-next-dark.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/',
@@ -34,10 +34,10 @@ export default function examples() {
     {
       title: 'Auth.js Magic Link with Next.js App Router',
       description:
-        'This app shows you to how to get started using Toolpad Core with Auth.js Magic Links and the Next.js App router.',
+        'This app shows you to how to get started using Toolpad Core with Auth.js Magic Links and the Next.js App Router.',
       src: '/static/toolpad/docs/core/auth-next.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-email',
-      // Fail on prisma
+      // Crash with Prisma
       codeSandbox: false,
       stackBlitz: false,
     },
@@ -48,7 +48,8 @@ export default function examples() {
       src: '/static/toolpad/docs/core/vite-react-router.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/vite/',
       codeSandbox: true,
-      stackBlitz: true,
+      // Show nothing
+      stackBlitz: false,
     },
     {
       title: 'Auth.js v4 with Next.js Pages Router',
@@ -59,17 +60,19 @@ export default function examples() {
       source:
         'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4/',
       codeSandbox: true,
-      stackBlitz: true,
+      // Show nothing
+      stackBlitz: false,
     },
     {
-      title: 'Next.js App router with Auth.js Passkey',
+      title: 'Next.js App Router with Auth.js Passkey',
       description:
-        'This app shows you to how to get started using Toolpad Core with Auth.js Passkeys and the Next.js App router.',
+        'This app shows you to how to get started using Toolpad Core with Auth.js Passkeys and the Next.js App Router.',
       src: '/static/toolpad/docs/core/auth-next-passkey.png',
       srcDark: '/static/toolpad/docs/core/auth-next-passkey-dark.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-passkey/',
-      codeSandbox: true,
-      stackBlitz: true,
+      // Crash with Prisma
+      codeSandbox: false,
+      stackBlitz: false,
     },
     {
       title: 'Vite with React Router and mock authentication',
@@ -78,7 +81,8 @@ export default function examples() {
       src: '/static/toolpad/docs/core/vite-react-router.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-vite',
       codeSandbox: true,
-      stackBlitz: true,
+      // Show nothing
+      stackBlitz: false,
     },
     {
       title: 'Vite with React Router and Firebase Auth',
@@ -87,8 +91,9 @@ export default function examples() {
       src: '/static/toolpad/docs/core/firebase-vite-light.png',
       srcDark: '/static/toolpad/docs/core/firebase-vite-dark.png',
       source: 'https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite',
-      codeSandbox: true,
-      stackBlitz: true,
+      // Show nothing
+      codeSandbox: false,
+      stackBlitz: false,
     },
     {
       title: 'Functional dashboard',

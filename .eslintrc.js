@@ -58,8 +58,6 @@ module.exports = {
     ...baseline.rules,
     // TODO move to @mui/monorepo, codebase is moving away from default exports https://github.com/mui/material-ui/issues/21862
     'import/prefer-default-export': 'off',
-    // TODO move rule into the main repo once it has upgraded
-    '@typescript-eslint/return-await': 'off',
     'no-restricted-imports': ['error', noRestrictedImports],
     'no-restricted-syntax': [
       ...baseline.rules['no-restricted-syntax'].filter((rule) => {

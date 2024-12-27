@@ -15,6 +15,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import CodeRoundedIcon from '@mui/icons-material/CodeRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import { useTheme } from '@mui/material/styles';
+// @ts-ignore
 import { sxChip } from 'docs/src/modules/components/AppNavDrawerItem';
 import type { Example } from './types';
 

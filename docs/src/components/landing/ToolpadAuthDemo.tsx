@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
+// @ts-ignore
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
@@ -16,9 +17,9 @@ const providers = [
   { id: 'facebook', name: 'Facebook' },
 ];
 
-const signIn = async (provider) => {  
-    try {  
-    await signIn(provider.id);    
+const signIn = async (provider) => {
+    try {
+      await signIn(provider.id);
     } catch (error) {
      // Handle errors
     }
@@ -28,7 +29,7 @@ export default function OAuthSignInPage() {
   return (
     <AppProvider>
       <SignInPage signIn={signIn} providers={providers} />
-    </AppProvider>    
+    </AppProvider>
   );
 }
 

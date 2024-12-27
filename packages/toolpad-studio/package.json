@@ -13,7 +13,7 @@
     "fix": "prettier --write .",
     "build:cli": "tsup",
     "dev:cli": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit",
+    "typescript": "tsup && tsc --noEmit",
     "test": "vitest run"
   },
   "keywords": [

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Paper from '@mui/material/Paper';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
-
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -10,6 +9,7 @@ import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider, type Navigation, type Router } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
+// @ts-ignore
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
 import Grid from '@mui/material/Grid2';
 import { styled } from '@mui/material/styles';

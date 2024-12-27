@@ -157,21 +157,21 @@ export default withDocsInfra({
   // Used to signal we run pnpm build
   ...(process.env.NODE_ENV === 'production'
     ? {
-      output: 'export',
-    }
+        output: 'export',
+      }
     : {
-      rewrites: async () => {
-        return [
-          { source: `/:lang(${LANGUAGES.join('|')})?/:rest*`, destination: '/:rest*' },
-          { source: '/api/:rest*', destination: '/api-docs/:rest*' },
-        ];
-      },
-      redirects: async () => [
-        {
-          source: '/',
-          destination: '/toolpad/',
-          permanent: false,
+        rewrites: async () => {
+          return [
+            { source: `/:lang(${LANGUAGES.join('|')})?/:rest*`, destination: '/:rest*' },
+            { source: '/api/:rest*', destination: '/api-docs/:rest*' },
+          ];
         },
-      ],
-    }),
+        redirects: async () => [
+          {
+            source: '/',
+            destination: '/toolpad/',
+            permanent: false,
+          },
+        ],
+      }),
 });

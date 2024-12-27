@@ -56,18 +56,22 @@ module.exports = {
    */
   rules: {
     ...baseline.rules,
-    // TODO move to @mui/monorepo, codebase is moving away from default exports https://github.com/mui/material-ui/issues/21862
+    /* TODO, trying to move to @mui/monorepo */
+    // codebase is moving away from default exports https://github.com/mui/material-ui/issues/21862
     'import/prefer-default-export': 'off',
-    'no-restricted-imports': ['error', noRestrictedImports],
+    'react-compiler/react-compiler': 'error',
+    // Turning react/jsx-key back on.
+    // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94
+    'react/jsx-key': ['error', { checkKeyMustBeforeSpread: true, warnOnDuplicates: true }],
+
+    /* Toolpad specfic */
     'no-restricted-syntax': [
       ...baseline.rules['no-restricted-syntax'].filter((rule) => {
         // Too opinionated for Toolpad
         return rule?.selector !== 'ForOfStatement';
       }),
     ],
-    // Turning react/jsx-key back on.
-    // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94
-    'react/jsx-key': ['error', { checkKeyMustBeforeSpread: true, warnOnDuplicates: true }],
+    'no-restricted-imports': ['error', noRestrictedImports],
     'import/no-unresolved': [
       'error',
       {
@@ -89,7 +93,6 @@ module.exports = {
       },
     ],
     'material-ui/no-hardcoded-labels': 'off', // We are not really translating the docs/website anymore
-    'react-compiler/react-compiler': 'error',
   },
   overrides: [
     ...baseline.overrides,

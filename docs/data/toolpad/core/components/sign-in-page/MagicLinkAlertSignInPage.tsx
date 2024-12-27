@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {
-  AuthProvider,
-  SignInPage,
-  SupportedAuthProvider,
+import { SignInPage } from '@toolpad/core/SignInPage';
+import type {
   AuthResponse,
-} from '@toolpad/core/SignInPage';
+  AuthProvider,
+  SupportedAuthProvider,
+} from '@toolpad/core/auth';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { useTheme } from '@mui/material/styles';
 

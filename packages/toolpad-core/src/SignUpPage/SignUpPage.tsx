@@ -2,13 +2,12 @@
 
 import * as React from 'react';
 import PropTypes from 'prop-types';
+
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
@@ -17,9 +16,9 @@ import { LinkProps } from '@mui/material/Link';
 import { BrandingContext, RouterContext } from '../shared/context';
 import IconProviderMap from '../shared/icons/iconProviderMap';
 import { getCommonTextFieldProps } from '../shared/utils';
-import type { AuthResponse, AuthProvider, SupportedAuthProvider } from '../auth/types';
+import type { AuthProvider, AuthResponse, SupportedAuthProvider } from '../auth/types';
 
-export interface SignInPageSlots {
+export interface SignUpPageSlots {
   /**
    * The custom email field component used in the credentials form.
    * @default TextField
@@ -35,16 +34,12 @@ export interface SignInPageSlots {
    * @default LoadingButton
    */
   submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
+
   /**
-   * The custom forgot password link component used in the credentials form.
+   * The custom sign in link component used in the credentials form.
    * @default Link
    */
-  forgotPasswordLink?: React.JSXElementConstructor<LinkProps>;
-  /**
-   * The custom sign up link component used in the credentials form.
-   * @default Link
-   */
-  signUpLink?: React.JSXElementConstructor<LinkProps>;
+  signInLink?: React.JSXElementConstructor<LinkProps>;
   /**
    * A component to override the default title section
    * @default Typography
@@ -55,28 +50,23 @@ export interface SignInPageSlots {
    * @default Typography
    */
   subtitle?: React.ElementType;
-  /**
-   * A component to override the default "Remember me" checkbox in the Credentials form
-   * @default FormControlLabel
-   */
-  rememberMe?: React.ElementType;
 }
 
-export interface SignInPageProps {
+export interface SignUpPageProps {
   /**
    * The list of authentication providers to display.
    * @default []
    */
   providers?: AuthProvider[];
   /**
-   * Callback fired when a user signs in.
+   * Callback fired when a user signs up.
    * @param {AuthProvider} provider The authentication provider.
    * @param {FormData} formData The form data if the provider id is 'credentials'.\
    * @param {string} callbackUrl The URL to redirect to after signing in.
    * @returns {void|Promise<AuthResponse>}
    * @default undefined
    */
-  signIn?: (
+  signUp?: (
     provider: AuthProvider,
     formData?: any,
     callbackUrl?: string,
@@ -84,10 +74,9 @@ export interface SignInPageProps {
   /**
    * The components used for each slot inside.
    * @default {}
-   * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
-   * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
+   * @example { signInLink: <Link href="/sign-up">Sign In</Link> }
    */
-  slots?: SignInPageSlots;
+  slots?: SignUpPageSlots;
   /**
    * The props used for each slot inside.
    * @default {}
@@ -100,33 +89,33 @@ export interface SignInPageProps {
     passwordField?: TextFieldProps;
     submitButton?: LoadingButtonProps;
     forgotPasswordLink?: LinkProps;
-    signUpLink?: LinkProps;
-    rememberMe?: Partial<FormControlLabelProps>;
+    signInLink?: LinkProps;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container
    */
   sx?: SxProps;
 }
-
 /**
  *
  * Demos:
  *
- * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ * - [Sign-up Page](https://mui.com/toolpad/core/react-sign-up-page/)
  *
  * API:
  *
- * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
+ * - [SignUpPage API](https://mui.com/toolpad/core/api/sign-up-page)
  */
-function SignInPage(props: SignInPageProps) {
-  const { providers, signIn, slots, slotProps, sx } = props;
+function SignUpPage(props: SignUpPageProps) {
+  const { providers, signUp, slots, slotProps, sx } = props;
   const theme = useTheme();
   const branding = React.useContext(BrandingContext);
   const router = React.useContext(RouterContext);
   const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
-  const emailProvider = providers?.find((provider) => provider.id === 'nodemailer');
+  const emailProvider = providers?.find(
+    (provider) => provider.id === 'nodemailer' || provider.id === 'email',
+  );
   const [{ loading, selectedProviderId, error, success }, setFormStatus] = React.useState<{
     loading: boolean;
     selectedProviderId?: SupportedAuthProvider;
@@ -143,7 +132,11 @@ function SignInPage(props: SignInPageProps) {
   const singleProvider = React.useMemo(() => providers?.length === 1, [providers]);
   const isOauthProvider = React.useCallback(
     (provider?: SupportedAuthProvider) =>
-      provider && provider !== 'credentials' && provider !== 'nodemailer' && provider !== 'passkey',
+      provider &&
+      provider !== 'credentials' &&
+      provider !== 'nodemailer' &&
+      provider !== 'email' &&
+      provider !== 'passkey',
     [],
   );
 
@@ -186,14 +179,14 @@ function SignInPage(props: SignInPageProps) {
                 fontWeight: 600,
               }}
             >
-              Sign in {branding?.title ? `to ${branding.title}` : null}
+              Sign up {branding?.title ? `to ${branding.title}` : null}
             </Typography>
           )}
           {slots?.subtitle ? (
             <slots.subtitle />
           ) : (
             <Typography variant="body2" color="textSecondary" gutterBottom textAlign="center">
-              Welcome, please sign in to continue
+              Welcome, please sign up to continue
             </Typography>
           )}
           <Box sx={{ mt: theme.spacing(1), width: '100%' }}>
@@ -214,7 +207,7 @@ function SignInPage(props: SignInPageProps) {
                           selectedProviderId: provider.id,
                           loading: true,
                         });
-                        const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
+                        const oauthResponse = await signUp?.(provider, undefined, callbackUrl);
                         setFormStatus((prev) => ({
                           ...prev,
                           loading: oauthResponse?.error ? false : prev.loading,
@@ -238,7 +231,7 @@ function SignInPage(props: SignInPageProps) {
                           textTransform: 'capitalize',
                         }}
                       >
-                        <span>Sign in with {provider.name}</span>
+                        <span>Sign up with {provider.name}</span>
                       </LoadingButton>
                     </form>
                   );
@@ -263,7 +256,7 @@ function SignInPage(props: SignInPageProps) {
                     });
                     event.preventDefault();
                     const formData = new FormData(event.currentTarget);
-                    const passkeyResponse = await signIn?.(passkeyProvider, formData, callbackUrl);
+                    const passkeyResponse = await signUp?.(passkeyProvider, formData, callbackUrl);
                     setFormStatus((prev) => ({
                       ...prev,
                       loading: false,
@@ -306,7 +299,7 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in with {passkeyProvider.name || 'Passkey'}
+                      Sign up with {passkeyProvider.name || 'Passkey'}
                     </LoadingButton>
                   )}
                 </Box>
@@ -316,12 +309,14 @@ function SignInPage(props: SignInPageProps) {
             {emailProvider ? (
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
-                {error && selectedProviderId === 'nodemailer' ? (
+                {error &&
+                (selectedProviderId === 'nodemailer' || selectedProviderId === 'email') ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
-                {success && selectedProviderId === 'nodemailer' ? (
+                {success &&
+                (selectedProviderId === 'nodemailer' || selectedProviderId === 'email') ? (
                   <Alert sx={{ my: 2 }} severity="success">
                     {success}
                   </Alert>
@@ -336,7 +331,7 @@ function SignInPage(props: SignInPageProps) {
                       loading: true,
                     });
                     const formData = new FormData(event.currentTarget);
-                    const emailResponse = await signIn?.(emailProvider, formData, callbackUrl);
+                    const emailResponse = await signUp?.(emailProvider, formData, callbackUrl);
                     setFormStatus((prev) => ({
                       ...prev,
                       loading: false,
@@ -353,9 +348,9 @@ function SignInPage(props: SignInPageProps) {
                         label: 'Email',
                         placeholder: 'your@email.com',
                         name: 'email',
-                        id: 'email-nodemailer',
+                        id: `email-nodemailer`,
                         type: 'email',
-                        autoComplete: 'email-nodemailer',
+                        autoComplete: `email-nodemailer`,
                         autoFocus: singleProvider,
                         ...slotProps?.emailField,
                       })}
@@ -380,7 +375,7 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in with Email
+                      Sign up with Email
                     </LoadingButton>
                   )}
                 </Box>
@@ -405,7 +400,7 @@ function SignInPage(props: SignInPageProps) {
                     });
                     event.preventDefault();
                     const formData = new FormData(event.currentTarget);
-                    const credentialsResponse = await signIn?.(
+                    const credentialsResponse = await signUp?.(
                       credentialsProvider,
                       formData,
                       callbackUrl,
@@ -450,42 +445,6 @@ function SignInPage(props: SignInPageProps) {
                       />
                     )}
                   </Stack>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    spacing={1}
-                    sx={{
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    {slots?.rememberMe ? (
-                      <slots.rememberMe {...slotProps?.rememberMe} />
-                    ) : (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            name="remember"
-                            value="true"
-                            color="primary"
-                            sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
-                          />
-                        }
-                        label="Remember me"
-                        {...slotProps?.rememberMe}
-                        slotProps={{
-                          typography: {
-                            color: 'textSecondary',
-                            fontSize: theme.typography.pxToRem(14),
-                          },
-                          ...slotProps?.rememberMe?.slotProps,
-                        }}
-                      />
-                    )}
-                    {slots?.forgotPasswordLink ? (
-                      <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
-                    ) : null}
-                  </Stack>
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -504,13 +463,13 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in
+                      Sign up
                     </LoadingButton>
                   )}
 
-                  {slots?.signUpLink ? (
+                  {slots?.signInLink ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {slots?.signUpLink ? <slots.signUpLink {...slotProps?.signUpLink} /> : null}
+                      {slots?.signInLink ? <slots.signInLink {...slotProps?.signInLink} /> : null}
                     </Box>
                   ) : null}
                 </Box>
@@ -523,7 +482,7 @@ function SignInPage(props: SignInPageProps) {
   );
 }
 
-SignInPage.propTypes /* remove-proptypes */ = {
+SignUpPage.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
@@ -539,14 +498,14 @@ SignInPage.propTypes /* remove-proptypes */ = {
     }),
   ),
   /**
-   * Callback fired when a user signs in.
+   * Callback fired when a user signs up.
    * @param {AuthProvider} provider The authentication provider.
    * @param {FormData} formData The form data if the provider id is 'credentials'.\
    * @param {string} callbackUrl The URL to redirect to after signing in.
    * @returns {void|Promise<AuthResponse>}
    * @default undefined
    */
-  signIn: PropTypes.func,
+  signUp: PropTypes.func,
   /**
    * The props used for each slot inside.
    * @default {}
@@ -558,22 +517,18 @@ SignInPage.propTypes /* remove-proptypes */ = {
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
     passwordField: PropTypes.object,
-    rememberMe: PropTypes.object,
-    signUpLink: PropTypes.object,
+    signInLink: PropTypes.object,
     submitButton: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
    * @default {}
-   * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
-   * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
+   * @example { signInLink: <Link href="/sign-up">Sign In</Link> }
    */
   slots: PropTypes.shape({
     emailField: PropTypes.elementType,
-    forgotPasswordLink: PropTypes.elementType,
     passwordField: PropTypes.elementType,
-    rememberMe: PropTypes.elementType,
-    signUpLink: PropTypes.elementType,
+    signInLink: PropTypes.elementType,
     submitButton: PropTypes.elementType,
     subtitle: PropTypes.elementType,
     title: PropTypes.elementType,
@@ -588,4 +543,4 @@ SignInPage.propTypes /* remove-proptypes */ = {
   ]),
 } as any;
 
-export { SignInPage };
+export { SignUpPage };

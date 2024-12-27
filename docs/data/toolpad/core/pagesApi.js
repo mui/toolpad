@@ -13,6 +13,7 @@ module.exports = [
   { pathname: '/toolpad/core/api/sign-in-button' },
   { pathname: '/toolpad/core/api/sign-in-page' },
   { pathname: '/toolpad/core/api/sign-out-button' },
+  { pathname: '/toolpad/core/api/sign-up-page' },
   { pathname: '/toolpad/core/api/theme-switcher' },
   { pathname: '/toolpad/core/api/toolbar-actions' },
 ];

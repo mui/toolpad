@@ -4,6 +4,10 @@ export * from './DashboardLayout';
 
 export * from './SignInPage';
 
+export * from './SignUpPage';
+
+export * from './auth';
+
 export * from './Account';
 
 export * from './PageContainer';

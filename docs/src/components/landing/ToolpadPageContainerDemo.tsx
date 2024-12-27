@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Frame from 'docs/src/components/action/Frame';
 import Paper from '@mui/material/Paper';
+// @ts-ignore
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
 import { HighlightedCode } from '@mui/docs/HighlightedCode';
 import { AppProvider } from '@toolpad/core/AppProvider';

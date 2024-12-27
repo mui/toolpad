@@ -45,7 +45,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit",
+    "typescript": "tsup && tsc --noEmit",
     "test": "vitest run --coverage"
   },
   "bugs": {

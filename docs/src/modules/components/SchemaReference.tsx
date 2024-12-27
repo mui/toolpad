@@ -441,16 +441,6 @@ function JsonSchemaNameValueDisplay({
   );
 }
 
-interface HeadingProps {
-  hash: string;
-  level: 'h2' | 'h3';
-  title: string;
-}
-
-function Heading({ hash, level: Level, title }: HeadingProps) {
-  return <SectionTitle title={title} id={hash} level={Level} />;
-}
-
 interface JsonSchemaDisplayProps {
   name: string;
   hash: string;
@@ -461,7 +451,7 @@ interface JsonSchemaDisplayProps {
 function JsonSchemaDisplay({ name, hash, schema, idPrefix = '' }: JsonSchemaDisplayProps) {
   return (
     <React.Fragment>
-      <Heading hash={hash} level="h3" title={name} />
+      <SectionTitle hash={hash} level="h3" title={name} />
       <Typography>{schema.description}</Typography>
       <Wrapper>
         <JsonSchemaValueDisplay schema={schema} idPrefix={idPrefix} />
@@ -525,7 +515,7 @@ export default function SchemaReference(props: SchemaReferenceProps) {
           {toc.map((tocNode) => {
             return (
               <React.Fragment key={tocNode.hash}>
-                <Heading hash={tocNode.hash} level="h2" title={tocNode.text} />
+                <SectionTitle hash={tocNode.hash} level="h2" title={tocNode.text} />
                 <Typography>{tocNode.introduction}</Typography>
                 {tocNode.children.map((tocItemNode) => {
                   invariant(typeof tocItemNode.content !== 'boolean', 'Invalid top level schema');

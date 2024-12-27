@@ -1,19 +1,17 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "bundler",
     "allowJs": true,
     "isolatedModules": true,
     /* files are emitted by babel */
     "noEmit": true,
+    "noUnusedLocals": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "types": ["react", "node"],
     "incremental": true,
-    "noImplicitAny": true,
-    "jsx": "preserve"
+    "moduleResolution": "bundler"
   },
-  "include": ["docs-env.d.ts", "pages/**/*", "src/**/*", "data/**/*", "next.config.mjs"],
-  "exclude": ["docs/.next", "docs/export"]
+  "include": ["next-env.d.ts", "next.config.mjs", "docs-env.d.ts", "src", "pages/**/*.ts*", "data"],
+  "exclude": ["docs/.next", "docs/export", "node_modules"]
 }

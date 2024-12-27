@@ -37,7 +37,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit"
+    "typescript": "tsup && tsc --noEmit"
   },
   "bugs": {
     "url": "https://github.com/mui/toolpad/issues"

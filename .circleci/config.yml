@@ -96,8 +96,8 @@ jobs:
       - checkout
       - install_js
       - run:
-          name: Check Typescript types
-          command: pnpm check-types
+          name: Tests TypeScript definitions
+          command: pnpm typescript
           environment:
             NODE_OPTIONS: --max-old-space-size=3584
   test_static:

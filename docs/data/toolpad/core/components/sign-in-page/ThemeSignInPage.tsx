@@ -6,6 +6,7 @@ import {
   type AuthResponse,
 } from '@toolpad/core/SignInPage';
 import { createTheme } from '@mui/material/styles';
+// @ts-ignore
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
 import { getDesignTokens, inputsCustomizations } from './customTheme';
 

@@ -8,10 +8,10 @@ const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
 const require = createRequire(import.meta.url);
 
+// @ts-ignore
 const withDocsInfra = require('@mui/monorepo/docs/nextConfigDocsInfra');
 
-const pkg = require('../package.json');
-const { findPages } = require('./src/modules/utils/find');
+const { findPages } = require('./src/modules/utils/find.js');
 
 const WORKSPACE_ROOT = path.resolve(currentDirectory, '../');
 const MONOREPO_PATH = path.resolve(currentDirectory, '../node_modules/@mui/monorepo');
@@ -44,6 +44,7 @@ export default withDocsInfra({
     TOOLPAD_CORE_VERSION: toolpadCorePkg.version,
     TOOLPAD_STUDIO_VERSION: toolpadStudioPkg.version,
   },
+  // @ts-ignore
   webpack: (config, options) => {
     return {
       ...config,
@@ -126,11 +127,14 @@ export default withDocsInfra({
     const pages = findPages();
     const map = {};
 
+    // @ts-ignore
     function traverse(pages2, userLanguage) {
       const prefix = userLanguage === 'en' ? '' : `/${userLanguage}`;
 
+      // @ts-ignore
       pages2.forEach((page) => {
         if (!page.children) {
+          // @ts-ignore
           map[`${prefix}${page.pathname.replace(/^\/api-docs\/(.*)/, '/api/$1')}`] = {
             page: page.pathname,
             query: {

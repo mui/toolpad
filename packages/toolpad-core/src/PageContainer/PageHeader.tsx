@@ -82,8 +82,8 @@ function PageHeader(props: PageHeaderProps) {
     <Stack>
       <Breadcrumbs aria-label="breadcrumb">
         {resolvedBreadcrumbs
-          ? resolvedBreadcrumbs.map((item, index) => {
-              return !!item.path ? (
+          ? resolvedBreadcrumbs.map((item) => {
+              return Boolean(item.path) ? (
                 <Link
                   key={item.path}
                   component={ToolpadLink}

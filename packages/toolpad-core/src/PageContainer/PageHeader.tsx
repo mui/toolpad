@@ -83,7 +83,7 @@ function PageHeader(props: PageHeaderProps) {
       <Breadcrumbs aria-label="breadcrumb">
         {resolvedBreadcrumbs
           ? resolvedBreadcrumbs.map((item, index) => {
-              return index < resolvedBreadcrumbs.length - 1 ? (
+              return !!item.path ? (
                 <Link
                   key={item.path}
                   component={ToolpadLink}
@@ -94,7 +94,7 @@ function PageHeader(props: PageHeaderProps) {
                   {getItemTitle(item)}
                 </Link>
               ) : (
-                <Typography key={item.path} color="text.primary">
+                <Typography key={item.title} color="text.primary">
                   {getItemTitle(item)}
                 </Typography>
               );

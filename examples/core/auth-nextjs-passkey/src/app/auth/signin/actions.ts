@@ -1,6 +1,6 @@
 'use server';
 import { AuthError } from 'next-auth';
-import type { AuthProvider } from '@toolpad/core';
+import type { AuthProvider } from '@toolpad/core/auth';
 
 import { signIn as signInAction } from '../../../auth';
 

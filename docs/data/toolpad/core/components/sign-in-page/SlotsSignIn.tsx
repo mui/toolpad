@@ -2,8 +2,6 @@ import * as React from 'react';
 import {
   Button,
   FormControl,
-  FormControlLabel,
-  Checkbox,
   InputLabel,
   OutlinedInput,
   TextField,
@@ -16,7 +14,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage, Remember } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
@@ -131,28 +129,6 @@ function Subtitle() {
   );
 }
 
-function AgreeWithTerms() {
-  return (
-    <FormControlLabel
-      control={
-        <Checkbox
-          name="tandc"
-          value="true"
-          color="primary"
-          sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
-        />
-      }
-      slotProps={{
-        typography: {
-          fontSize: 14,
-        },
-      }}
-      color="textSecondary"
-      label="I agree with the T&C"
-    />
-  );
-}
-
 export default function SlotsSignIn() {
   const theme = useTheme();
   return (
@@ -160,7 +136,7 @@ export default function SlotsSignIn() {
       <SignInPage
         signIn={(provider, formData) =>
           alert(
-            `Logging in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}, and checkbox value: ${formData.get('tandc')}`,
+            `Logging in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}, and checkbox value: ${formData.get('remember')}`,
           )
         }
         slots={{
@@ -170,7 +146,7 @@ export default function SlotsSignIn() {
           passwordField: CustomPasswordField,
           submitButton: CustomButton,
           signUpLink: SignUpLink,
-          rememberMe: AgreeWithTerms,
+          rememberMe: Remember,
           forgotPasswordLink: ForgotPasswordLink,
         }}
         providers={providers}

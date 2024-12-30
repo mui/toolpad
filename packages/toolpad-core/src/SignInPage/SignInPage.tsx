@@ -5,10 +5,9 @@ import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
+import { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
@@ -209,7 +208,7 @@ export interface SignInPageSlots {
    */
   subtitle?: React.ElementType;
   /**
-   * A component to override the default "Remember me" checkbox in the Credentials form
+   * A custom checkbox placed in the credentials form
    * @default FormControlLabel
    */
   rememberMe?: React.ElementType;
@@ -255,6 +254,7 @@ export interface SignInPageProps {
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
     rememberMe?: Partial<FormControlLabelProps>;
+    form?: Partial<React.FormHTMLAttributes<HTMLFormElement>>;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container
@@ -374,6 +374,7 @@ function SignInPage(props: SignInPageProps) {
                           error: oauthResponse?.error,
                         }));
                       }}
+                      {...slotProps?.form}
                     >
                       <LoadingButton
                         key={provider.id}
@@ -423,6 +424,7 @@ function SignInPage(props: SignInPageProps) {
                       error: passkeyResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -497,6 +499,7 @@ function SignInPage(props: SignInPageProps) {
                       success: emailResponse?.success,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -569,8 +572,9 @@ function SignInPage(props: SignInPageProps) {
                       error: credentialsResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
-                  <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
+                  <Stack direction="column" spacing={2} sx={{ mb: 0 }}>
                     {slots?.emailField ? (
                       <slots.emailField {...slotProps?.emailField} />
                     ) : (
@@ -603,42 +607,23 @@ function SignInPage(props: SignInPageProps) {
                       />
                     )}
                   </Stack>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    spacing={1}
-                    sx={{
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    {slots?.rememberMe ? (
-                      <slots.rememberMe {...slotProps?.rememberMe} />
-                    ) : (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            name="remember"
-                            value="true"
-                            color="primary"
-                            sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
-                          />
-                        }
-                        label="Remember me"
-                        {...slotProps?.rememberMe}
-                        slotProps={{
-                          typography: {
-                            color: 'textSecondary',
-                            fontSize: theme.typography.pxToRem(14),
-                          },
-                          ...slotProps?.rememberMe?.slotProps,
-                        }}
-                      />
-                    )}
-                    {slots?.forgotPasswordLink ? (
-                      <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
-                    ) : null}
-                  </Stack>
+                  {slots?.forgotPasswordLink || slots?.rememberMe ? (
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      spacing={1}
+                      mt={2}
+                      sx={{
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      {slots?.rememberMe ? <slots.rememberMe {...slotProps?.rememberMe} /> : null}
+                      {slots?.forgotPasswordLink ? (
+                        <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
+                      ) : null}
+                    </Stack>
+                  ) : null}
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -710,6 +695,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
   slotProps: PropTypes.shape({
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
+    form: PropTypes.object,
     passwordField: PropTypes.object,
     rememberMe: PropTypes.object,
     signUpLink: PropTypes.object,

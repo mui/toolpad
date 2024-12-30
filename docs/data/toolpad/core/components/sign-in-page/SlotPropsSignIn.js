@@ -18,6 +18,7 @@ export default function SlotPropsSignIn() {
         }
         slots={{ rememberMe: Remember }}
         slotProps={{
+          form: { noValidate: true },
           emailField: { variant: 'standard', autoFocus: false },
           passwordField: { variant: 'standard' },
           submitButton: { variant: 'outlined' },

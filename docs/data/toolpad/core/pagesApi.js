@@ -11,7 +11,6 @@ module.exports = [
   { pathname: '/toolpad/core/api/page-header' },
   { pathname: '/toolpad/core/api/page-header-toolbar' },
   { pathname: '/toolpad/core/api/remember' },
-  { pathname: '/toolpad/core/api/remember-me' },
   { pathname: '/toolpad/core/api/sign-in-button' },
   { pathname: '/toolpad/core/api/sign-in-page' },
   { pathname: '/toolpad/core/api/sign-out-button' },

@@ -1,4 +1,4 @@
-# Toolpad Core - Vite & React Router
+# Toolpad Core - Vite with React Router and mock authentication
 
 This example provides a minimal setup to get Toolpad Core working in Vite with HMR, as well as routing with React Router and a mock authentication setup.
 

@@ -56,29 +56,22 @@ module.exports = {
    */
   rules: {
     ...baseline.rules,
-    // TODO move to @mui/monorepo, codebase is moving away from default exports https://github.com/mui/material-ui/issues/21862
+    /* TODO, trying to move to @mui/monorepo */
+    // codebase is moving away from default exports https://github.com/mui/material-ui/issues/21862
     'import/prefer-default-export': 'off',
-    // TODO move rule into the main repo once it has upgraded
-    '@typescript-eslint/return-await': 'off',
-    'no-restricted-imports': ['error', noRestrictedImports],
+    'react-compiler/react-compiler': 'error',
+    // Turning react/jsx-key back on.
+    // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94
+    'react/jsx-key': ['error', { checkKeyMustBeforeSpread: true, warnOnDuplicates: true }],
+
+    /* Toolpad specfic */
     'no-restricted-syntax': [
       ...baseline.rules['no-restricted-syntax'].filter((rule) => {
         // Too opinionated for Toolpad
         return rule?.selector !== 'ForOfStatement';
       }),
     ],
-    // Turning react/jsx-key back on.
-    // https://github.com/airbnb/javascript/blob/5155aa5fc1ea9bb2c6493a06ddbd5c7a05414c86/packages/eslint-config-airbnb/rules/react.js#L94
-    'react/jsx-key': ['error', { checkKeyMustBeforeSpread: true, warnOnDuplicates: true }],
-    // This got turned of in the mono-repo:
-    // See https://github.com/mui/toolpad/pull/866#discussion_r957222171
-    'react/no-unused-prop-types': [
-      'error',
-      {
-        customValidators: [],
-        skipShapeProps: true,
-      },
-    ],
+    'no-restricted-imports': ['error', noRestrictedImports],
     'import/no-unresolved': [
       'error',
       {
@@ -100,36 +93,12 @@ module.exports = {
       },
     ],
     'material-ui/no-hardcoded-labels': 'off', // We are not really translating the docs/website anymore
-    'react-compiler/react-compiler': 'error',
   },
   overrides: [
     ...baseline.overrides,
     {
       files: ['**/*.test.js', '**/*.test.ts', '**/*.test.tsx'],
       extends: ['plugin:testing-library/react'],
-    },
-    {
-      files: ['docs/src/modules/components/**/*.js'],
-      rules: {
-        'material-ui/no-hardcoded-labels': 'off',
-      },
-    },
-    {
-      /**
-       * TODO move to @mui/monorepo
-       *
-       * Examples are for demostration purposes and should not be considered as part of the library.
-       * They don't contain an eslint setup, so we don't want them to contain eslint directives
-       * We do however want to keep the rules in place to ensure the examples are following
-       * a reasonably similar code style as the library.
-       */
-      files: ['examples/**/*'],
-      rules: {
-        'no-console': 'off',
-        'no-underscore-dangle': 'off',
-        // no node_modules in examples as they are not installed
-        'import/no-unresolved': 'off',
-      },
     },
     {
       files: [

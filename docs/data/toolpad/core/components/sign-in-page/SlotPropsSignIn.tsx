@@ -28,7 +28,7 @@ export default function SlotPropsSignIn() {
                 name="tandc"
                 value="true"
                 color="primary"
-                sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+                sx={{ py: 1, px: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
               />
             ),
             color: 'textSecondary',

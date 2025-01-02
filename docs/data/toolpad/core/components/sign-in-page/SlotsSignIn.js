@@ -123,7 +123,7 @@ function Title() {
 
 function Subtitle() {
   return (
-    <Alert sx={{ mb: 2, px: 1, py: 0.25 }} severity="warning">
+    <Alert sx={{ mb: 2, px: 1, py: 0.25, width: '100%' }} severity="warning">
       We are investigating an ongoing outage.
     </Alert>
   );
@@ -149,6 +149,7 @@ export default function SlotsSignIn() {
           rememberMe: Remember,
           forgotPasswordLink: ForgotPasswordLink,
         }}
+        slotProps={{ form: { noValidate: true } }}
         providers={providers}
       />
     </AppProvider>

@@ -312,7 +312,7 @@ function SignInPage(props: SignInPageProps) {
       }}
     >
       <Container component="main" maxWidth="xs">
-        <Box
+        <Stack
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -320,6 +320,7 @@ function SignInPage(props: SignInPageProps) {
             bgcolor: 'background.paper',
             borderRadius: 1,
             p: 4,
+            gap: 1,
             border: '1px solid',
             borderColor: alpha(theme.palette.grey[400], 0.4),
             boxShadow: theme.shadows[4],
@@ -334,7 +335,6 @@ function SignInPage(props: SignInPageProps) {
               variant="h5"
               color="textPrimary"
               sx={{
-                my: theme.spacing(1),
                 textAlign: 'center',
                 fontWeight: 600,
               }}
@@ -349,7 +349,7 @@ function SignInPage(props: SignInPageProps) {
               Welcome, please sign in to continue
             </Typography>
           )}
-          <Box sx={{ mt: theme.spacing(1), width: '100%' }}>
+          <Box sx={{ width: '100%' }}>
             <Stack spacing={1}>
               {error && isOauthProvider(selectedProviderId) ? (
                 <Alert severity="error">{error}</Alert>
@@ -403,7 +403,7 @@ function SignInPage(props: SignInPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'passkey' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
+                  <Alert sx={{ mt: 1, mb: 3 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
@@ -472,12 +472,12 @@ function SignInPage(props: SignInPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'nodemailer' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
+                  <Alert sx={{ mt: 1, mb: 2 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
                 {success && selectedProviderId === 'nodemailer' ? (
-                  <Alert sx={{ my: 2 }} severity="success">
+                  <Alert sx={{ mt: 1, mb: 2 }} severity="success">
                     {success}
                   </Alert>
                 ) : null}
@@ -547,7 +547,7 @@ function SignInPage(props: SignInPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'credentials' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
+                  <Alert sx={{ mt: 1, mb: 3 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
@@ -655,7 +655,7 @@ function SignInPage(props: SignInPageProps) {
               </React.Fragment>
             ) : null}
           </Box>
-        </Box>
+        </Stack>
       </Container>
     </Box>
   );

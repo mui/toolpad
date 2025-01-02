@@ -30,7 +30,7 @@ export default function CredentialsSignInPage() {
       <SignInPage
         signIn={signIn}
         providers={providers}
-        slotProps={{ emailField: { autoFocus: false } }}
+        slotProps={{ emailField: { autoFocus: false }, form: { noValidate: true } }}
       />
     </AppProvider>
     // preview-end

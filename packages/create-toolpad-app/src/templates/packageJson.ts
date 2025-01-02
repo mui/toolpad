@@ -5,6 +5,7 @@ const packageJson: PackageJsonTemplate = (options) => {
     name: appName,
     projectType,
     router: routerType,
+    framework,
     auth: authOption,
     coreVersion,
     hasNodemailerProvider,
@@ -29,7 +30,6 @@ const packageJson: PackageJsonTemplate = (options) => {
   const dependencies: Record<string, string> = {
     react: '^18',
     'react-dom': '^18',
-    next: '^15',
     '@toolpad/core': coreVersion ?? 'latest',
     '@mui/material': '^6',
     '@mui/material-nextjs': '^6',
@@ -38,13 +38,34 @@ const packageJson: PackageJsonTemplate = (options) => {
     '@emotion/styled': '^11',
   };
 
+  const devDependencies: Record<string, string> = {
+    typescript: '^5',
+    '@types/react': '^18',
+    '@types/react-dom': '^18',
+    eslint: '^8',
+  };
+
+  if (framework === 'nextjs') {
+    dependencies.next = '^15';
+    devDependencies['eslint-config-next'] = '^15';
+    devDependencies['@types/node'] = '^20';
+  } else if (framework === 'vite') {
+    dependencies['react-router-dom'] = '^6';
+    devDependencies['@vitejs/plugin-react'] = '^4.3.2';
+    devDependencies.vite = '^5.4.8';
+  }
+
   if (routerType === 'nextjs-pages') {
     dependencies['@emotion/cache'] = '^11';
     dependencies['@emotion/server'] = '^11';
   }
 
   if (authOption) {
-    dependencies['next-auth'] = '5.0.0-beta.25';
+    if (framework === 'nextjs') {
+      dependencies['next-auth'] = '5.0.0-beta.25';
+    } else if (framework === 'vite') {
+      dependencies.firebase = '^11';
+    }
   }
 
   if (hasNodemailerProvider || hasPasskeyProvider) {
@@ -61,25 +82,22 @@ const packageJson: PackageJsonTemplate = (options) => {
     dependencies['@simplewebauthn/server'] = '^9';
   }
 
-  const devDependencies: Record<string, string> = {
-    typescript: '^5',
-    '@types/node': '^20',
-    '@types/react': '^18',
-    '@types/react-dom': '^18',
-    eslint: '^8',
-    'eslint-config-next': '^15',
-  };
-
   if (hasNodemailerProvider || hasPasskeyProvider) {
     devDependencies.prisma = '^5';
   }
 
-  const scripts = {
-    dev: 'next dev',
-    build: 'next build',
-    start: 'next start',
-    lint: 'next lint',
-  };
+  const scripts =
+    framework === 'nextjs'
+      ? {
+          dev: 'next dev',
+          build: 'next build',
+          start: 'next start',
+          lint: 'next lint',
+        }
+      : {
+          dev: 'vite',
+          preview: 'vite preview',
+        };
 
   return {
     name: appName,

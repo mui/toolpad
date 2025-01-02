@@ -73,7 +73,7 @@
     "@types/react-dom": "18.3.1",
     "@types/sinon": "^17.0.3",
     "@vitest/browser": "2.1.7",
-    "next": "^15.1.2",
+    "next": "^15.1.3",
     "next-router-mock": "^0.9.13",
     "playwright": "^1.47.2",
     "react-router-dom": "6.26.2",

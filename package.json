@@ -58,7 +58,7 @@
     "@mui/internal-scripts": "1.0.30",
     "@mui/monorepo": "github:mui/material-ui#3570a80975bbd83bfcd0927c34faaf5fe777b5ff",
     "@mui/x-charts": "7.22.2",
-    "@next/eslint-plugin-next": "14.2.21",
+    "@next/eslint-plugin-next": "14.2.22",
     "@playwright/test": "1.47.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "16.0.1",

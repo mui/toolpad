@@ -77,7 +77,7 @@ DemoPageContent.propTypes = {
 function AccountSidebarPreview(props) {
   const { handleClick, open, mini } = props;
   return (
-    <Stack direction="column" p={0} overflow="hidden">
+    <Stack direction="column" p={0}>
       <Divider />
       <AccountPreview
         variant={mini ? 'condensed' : 'expanded'}

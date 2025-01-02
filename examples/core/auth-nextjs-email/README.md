@@ -1,4 +1,4 @@
-# Toolpad Core Next.js App Router app with email provider
+# Toolpad Core - Next.js App Router app with email provider
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 

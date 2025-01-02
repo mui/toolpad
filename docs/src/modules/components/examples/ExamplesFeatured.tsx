@@ -8,7 +8,6 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
-import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import SvgIcon from '@mui/material/SvgIcon';
 import Visibility from '@mui/icons-material/Visibility';
@@ -16,49 +15,17 @@ import CodeRoundedIcon from '@mui/icons-material/CodeRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import { useTheme } from '@mui/material/styles';
 import { sxChip } from 'docs/src/modules/components/AppNavDrawerItem';
-import type { Example } from './types';
+import { Example, versionGitHubLink } from './examplesUtils';
 
 interface FeaturedExamplesProps {
-  examplesFile: string;
+  examples: Example[];
 }
 
-export default function FeaturedExamples(props: FeaturedExamplesProps) {
+export default function ExamplesFeatured(props: FeaturedExamplesProps) {
   const t = useTranslate();
 
-  const [examples, setExamples] = React.useState<Example[]>([]);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const importExamples = async () => {
-      setLoading(true);
-      let exampleContent = await import(`./${props.examplesFile}`);
-      exampleContent = exampleContent
-        .default()
-        .filter((example: Example) => example.featured === true);
-      setExamples(exampleContent);
-      setLoading(false);
-    };
-    importExamples();
-  }, [props.examplesFile]);
+  const examples = props.examples.filter((example: Example) => example.featured === true);
   const docsTheme = useTheme();
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>
-        {[1].map((key) => (
-          <Box key={key} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Skeleton variant="text" width={200} height={32} />
-            <Skeleton variant="text" width="100%" height={24} />
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={400}
-              sx={{ aspectRatio: '16 / 9', borderRadius: 1 }}
-            />
-          </Box>
-        ))}
-      </Box>
-    );
-  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>
@@ -84,7 +51,7 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
               }}
             >
               <Link
-                href={example.href}
+                href={versionGitHubLink(example.href)}
                 target="_blank"
                 sx={{
                   position: 'relative',
@@ -144,17 +111,18 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                     gap: 1,
                   }}
                 >
-                  {example.stackBlitz ? (
+                  {example.stackBlitz === true ? (
                     <Tooltip title="Edit in StackBlitz">
                       <IconButton
+                        component="a"
+                        href={`https://stackblitz.com/github/${example.source.replace('https://github.com/', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         color="primary"
                         size="small"
                         aria-label={t('stackblitzPlayground')}
                         data-ga-event-category="toolpad-core-template"
                         data-ga-event-action="stackblitz"
-                        onClick={() => {
-                          window.open(example.stackBlitz, '_blank', 'noopener,noreferrer');
-                        }}
                       >
                         <SvgIcon viewBox="0 0 19 28">
                           <path d="M8.13378 16.1087H0L14.8696 0L10.8662 11.1522L19 11.1522L4.13043 27.2609L8.13378 16.1087Z" />
@@ -162,17 +130,18 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                       </IconButton>
                     </Tooltip>
                   ) : null}
-                  {example.codeSandbox ? (
+                  {example.codeSandbox === true ? (
                     <Tooltip title="Edit in CodeSandbox">
                       <IconButton
+                        component="a"
+                        href={`https://codesandbox.io/p/sandbox/github/${example.source.replace('https://github.com/', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         color="primary"
                         size="small"
                         aria-label={t('codesandboxPlayground')}
                         data-ga-event-category="toolpad-core-template"
                         data-ga-event-action="codesandbox"
-                        onClick={() => {
-                          window.open(example.codeSandbox, '_blank', 'noopener,noreferrer');
-                        }}
                       >
                         <SvgIcon viewBox="0 0 1080 1080">
                           <path d="M755 140.3l0.5-0.3h0.3L512 0 268.3 140h-0.3l0.8 0.4L68.6 256v512L512 1024l443.4-256V256L755 140.3z m-30 506.4v171.2L548 920.1V534.7L883.4 341v215.7l-158.4 90z m-584.4-90.6V340.8L476 534.4v385.7L300 818.5V646.7l-159.4-90.6zM511.7 280l171.1-98.3 166.3 96-336.9 194.5-337-194.6 165.7-95.7L511.7 280z" />
@@ -181,14 +150,19 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                     </Tooltip>
                   ) : null}
                   <Tooltip title="See source code">
-                    <IconButton component="a" href={example.source} color="primary" size="small">
+                    <IconButton
+                      component="a"
+                      href={versionGitHubLink(example.source)}
+                      color="primary"
+                      size="small"
+                    >
                       <CodeRoundedIcon />
                     </IconButton>
                   </Tooltip>
                 </Box>
                 <Button
                   component="a"
-                  href={example.href}
+                  href={versionGitHubLink(example.href)}
                   size="small"
                   variant="outlined"
                   color="primary"

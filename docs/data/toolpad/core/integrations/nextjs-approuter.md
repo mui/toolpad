@@ -57,7 +57,7 @@ See the [Material UI Next.js integration docs](https://mui.com/material-ui/inte
 :::
 
 :::warning
-If your app is statically rendered, you must wrap the `AppProvider` in a `Suspense` component when using the app router. See [https://github.com/mui/toolpad/issues/4524](https://github.com/mui/toolpad/issues/4524) for more information.
+If your app is statically rendered, you must wrap the `AppProvider` in a `Suspense` component when using the App Router. See [https://github.com/mui/toolpad/issues/4524](https://github.com/mui/toolpad/issues/4524) for more information.
 :::
 
 ## Create a dashboard layout

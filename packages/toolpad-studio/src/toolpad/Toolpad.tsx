@@ -1,7 +1,7 @@
 import { CircularProgress, Box, styled, CssBaseline, Button, Stack, Tooltip } from '@mui/material';
 import * as React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import CloudDoneIcon from '@mui/icons-material/CloudDone';
 import SyncIcon from '@mui/icons-material/Sync';

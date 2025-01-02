@@ -3,8 +3,8 @@ import { createTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { createMemoryRouter, RouterProvider, Outlet } from 'react-router-dom';
-import { AppProvider } from '@toolpad/core/react-router-dom';
+import { createMemoryRouter, RouterProvider, Outlet } from 'react-router';
+import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import type { Navigation } from '@toolpad/core/AppProvider';
@@ -67,14 +67,14 @@ function App(props: { window?: Window }) {
   const { window } = props;
 
   return (
-    <AppProvider
+    <ReactRouterAppProvider
       navigation={NAVIGATION}
       branding={BRANDING}
       theme={demoTheme}
       window={window}
     >
       <Outlet />
-    </AppProvider>
+    </ReactRouterAppProvider>
   );
 }
 

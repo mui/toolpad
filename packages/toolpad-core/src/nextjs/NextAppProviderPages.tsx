@@ -7,7 +7,7 @@ import type { AppProviderProps, Navigate, Router } from '../AppProvider';
 /**
  * @ignore - internal component.
  */
-export function AppProviderNextPages(props: AppProviderProps) {
+export function NextAppProviderPages(props: AppProviderProps) {
   const { push, replace, asPath, query } = useRouter();
 
   const search = React.useMemo(() => {

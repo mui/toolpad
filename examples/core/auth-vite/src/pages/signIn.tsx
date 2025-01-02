@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import type { Session } from '@toolpad/core/AppProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useSession } from '../SessionContext';
 
 const fakeAsyncGetSession = async (formData: any): Promise<Session> => {

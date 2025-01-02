@@ -1,21 +1,21 @@
 ---
-title: React router - Integration
+title: React Router - Integration
 ---
 
 # React Router
 
 <p class="description">To integrate Toolpad Core into a single-page app (with Vite, for example) using React Router, follow these steps.</p>
 
-## Wrap all your pages in an `AppProvider`
+## Wrap all your pages in a `ReactRouterAppProvider`
 
-In your router configuration (e.g.: `src/main.tsx`), use a shared component or element (e.g.: `src/App.tsx`) as a root **layout route** that wraps the whole application with the `AppProvider` from `@toolpad/core/react-router-dom`.
+In your router configuration (e.g.: `src/main.tsx`), use a shared component or element (e.g.: `src/App.tsx`) as a root **layout route** that wraps the whole application with the `ReactRouterAppProvider` from `@toolpad/core/react-router`.
 
-You must use the `<Outlet />` component from `react-router-dom` in this root layout element or component.
+You must use the `<Outlet />` component from `react-router` in this root layout element or component.
 
 ```tsx title="src/main.tsx"
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 import App from './App';
 import DashboardPage from './pages';
 import OrdersPage from './pages/orders';
@@ -37,8 +37,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 import * as React from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { AppProvider } from '@toolpad/core/react-router-dom';
-import { Outlet } from 'react-router-dom';
+import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+import { Outlet } from 'react-router';
 import type { Navigation } from '@toolpad/core';
 
 const NAVIGATION: Navigation = [
@@ -63,20 +63,20 @@ const BRANDING = {
 
 export default function App() {
   return (
-    <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+    <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING}>
       <Outlet />
-    </AppProvider>
+    </ReactRouterAppProvider>
   );
 }
 ```
 
 ## Create a dashboard layout
 
-Create a layout file for your dashboard pages (e.g.: `src/layouts/dashboard.tsx`), to also be used as a layout route with the `<Outlet />` component from `react-router-dom`:
+Create a layout file for your dashboard pages (e.g.: `src/layouts/dashboard.tsx`), to also be used as a layout route with the `<Outlet />` component from `react-router`:
 
 ```tsx title="src/layouts/dashboard.tsx"
 import * as React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 
@@ -205,8 +205,8 @@ export function useSession() {
 import * as React from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { AppProvider } from '@toolpad/core/react-router-dom';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+import { Outlet, useNavigate } from 'react-router';
 import type { Navigation, Session } from '@toolpad/core';
 import { SessionContext } from './SessionContext';
 
@@ -250,14 +250,14 @@ export default function App() {
 
   return (
     <SessionContext.Provider value={sessionContextValue}>
-      <AppProvider
+      <ReactRouterAppProvider
         navigation={NAVIGATION}
         branding={BRANDING}
         session={session}
         authentication={{ signIn, signOut }}
       >
         <Outlet />
-      </AppProvider>
+      </ReactRouterAppProvider>
     </SessionContext.Provider>
   );
 }
@@ -267,7 +267,7 @@ export default function App() {
 
 ```tsx title="src/layouts/dashboard.tsx"
 import * as React from 'react';
-import { Outlet, Navigate, useLocation } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { useSession } from '../SessionContext';
@@ -302,7 +302,7 @@ You can protect any page or groups of pages through this mechanism.
 import * as React from 'react';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import type { Session } from '@toolpad/core/AppProvider';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useSession } from '../SessionContext';
 
 const fakeAsyncGetSession = async (formData: any): Promise<Session> => {
@@ -354,7 +354,7 @@ export default function SignIn() {
 ```tsx title="src/main.tsx"
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 import App from './App';
 import Layout from './layouts/dashboard';
 import DashboardPage from './pages';

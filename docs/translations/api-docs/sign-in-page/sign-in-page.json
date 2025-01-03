@@ -21,7 +21,7 @@
     "emailField": "The custom email field component used in the credentials form.",
     "forgotPasswordLink": "The custom forgot password link component used in the credentials form.",
     "passwordField": "The custom password field component used in the credentials form.",
-    "rememberMe": "A component to override the default &quot;Remember me&quot; checkbox in the Credentials form",
+    "rememberMe": "A custom checkbox placed in the credentials form",
     "signUpLink": "The custom sign up link component used in the credentials form.",
     "submitButton": "The custom submit button component used in the credentials form.",
     "subtitle": "A component to override the default subtitle section",

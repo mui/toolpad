@@ -15,7 +15,7 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: object, forgotPasswordLink?: object, passwordField?: object, rememberMe?: object, signUpLink?: object, submitButton?: object }"
+        "description": "{ emailField?: object, forgotPasswordLink?: object, form?: object, passwordField?: object, rememberMe?: object, signUpLink?: object, submitButton?: object }"
       },
       "default": "{}"
     },
@@ -85,7 +85,7 @@
     },
     {
       "name": "rememberMe",
-      "description": "A component to override the default \"Remember me\" checkbox in the Credentials form",
+      "description": "A custom checkbox placed in the credentials form",
       "default": "FormControlLabel",
       "class": null
     }

@@ -49,10 +49,10 @@ function renderSparklineCell(params: GridCellParams<SparkLineData, any>) {
 }
 
 function renderStatus(status: 'In Stock' | 'Out of Stock' | 'Low Stock') {
-  const colors: { [index: string]: 'success' | 'error' | 'warning' } = {
+  const colors: { [index: string]: 'success' | 'error' | 'default' } = {
     'In Stock': 'success',
     'Out of Stock': 'error',
-    'Low Stock': 'warning',
+    'Low Stock': 'default',
   };
 
   return <Chip label={status} color={colors[status]} size="small" />;

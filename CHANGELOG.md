@@ -568,7 +568,7 @@ First components in @toolpad/core: [DashboardLayout](https://github.com/mui/tool
 
 - Lock file maintenance (#3622) @renovate[bot]
 - Lock file maintenance Examples (#3624) @renovate[bot]
-- Add Next.js app router Toolpad Core playground (#3587) @apedroferreira
+- Add Next.js App Router Toolpad Core playground (#3587) @apedroferreira
 - Isolate api-docs-builder deps @Janpot
 - isolate react-docgen @Janpot
 - Update renovate.json @Janpot

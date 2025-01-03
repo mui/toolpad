@@ -30,7 +30,6 @@ commands:
         type: boolean
         default: false
         description: 'Set to true if you intend to use any browser (for example with playwright).'
-
     steps:
       - when:
           condition: << parameters.browsers >>
@@ -46,7 +45,6 @@ commands:
                 name: Install pnpm package manager
                 # See https://stackoverflow.com/a/73411601
                 command: corepack enable --install-directory ~/bin
-
       - run:
           name: View install environment
           command: |
@@ -133,7 +131,6 @@ jobs:
 
   test_unit:
     <<: *default-job
-
     steps:
       - checkout
       - install_js:
@@ -154,7 +151,6 @@ jobs:
       - image: mcr.microsoft.com/playwright:v1.48.2-focal
         environment:
           NODE_ENV: test
-
     steps:
       - checkout
       - install_js:
@@ -177,7 +173,6 @@ jobs:
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1
-
     steps:
       - checkout
       - install_js:
@@ -198,6 +193,16 @@ jobs:
       - store_artifacts:
           path: test/test-results
           destination: playwright-test-results
+
+  test_bundle_size_monitor:
+    <<: *default-job
+    steps:
+      - checkout
+      - install_js
+      - run:
+          name: Run danger on PRs
+          command: pnpm danger ci --fail-on-errors
+      # TODO test bundle size, similar to https://github.com/mui/base-ui/issues/201
 
 workflows:
   pipeline:
@@ -225,6 +230,10 @@ workflows:
           requires:
             - checkout
       - test_integration:
+          <<: *default-context
+          requires:
+            - checkout
+      - test_bundle_size_monitor:
           <<: *default-context
           requires:
             - checkout

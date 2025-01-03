@@ -1,4 +1,4 @@
-# React + TypeScript + Vite
+# Toolpad Core - Vite with React Router and mock authentication
 
 This template provides a minimal setup to get React working in Vite with HMR.
 

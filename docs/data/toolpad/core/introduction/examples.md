@@ -7,12 +7,10 @@ title: Examples
 
 <p class="description">Browse a collection of Toolpad Core examples to help you get started quickly.</p>
 
-<!-- #default-branch-switch -->
+## Featured examples
 
-## Featured Examples
+{{"component": "modules/components/examples/CoreFeaturedExamples.tsx"}}
 
-{{"component": "modules/components/Examples/FeaturedExamples.tsx", "examplesFile": "core-examples.ts"}}
+## Other examples
 
-## Other Examples
-
-{{"component": "modules/components/Examples/ExamplesGrid.tsx", "examplesFile": "core-examples.ts", "reverse": true}}
+{{"component": "modules/components/examples/CoreOtherExamples.tsx"}}

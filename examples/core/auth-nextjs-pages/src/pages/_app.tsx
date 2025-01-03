@@ -13,7 +13,7 @@ import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import LinearProgress from '@mui/material/LinearProgress';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: React.ReactElement) => React.ReactNode;
+  getLayout?: (page: React.ReactElement<any>) => React.ReactNode;
   requireAuth?: boolean;
 };
 
@@ -46,7 +46,7 @@ const AUTHENTICATION = {
   signOut,
 };
 
-function getDefaultLayout(page: React.ReactElement) {
+function getDefaultLayout(page: React.ReactElement<any>) {
   return (
     <DashboardLayout>
       <PageContainer>{page}</PageContainer>

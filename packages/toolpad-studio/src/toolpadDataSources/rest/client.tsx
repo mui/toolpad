@@ -214,7 +214,7 @@ interface ResolvedPreviewProps {
 function ResolvedPreview({
   preview,
   onShowTransform,
-}: ResolvedPreviewProps): React.ReactElement | null {
+}: ResolvedPreviewProps): React.ReactElement<any> | null {
   if (!preview) {
     return (
       <Alert

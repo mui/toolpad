@@ -40,7 +40,7 @@ const StyledEditableTreeItem = styled(EditableTreeItem)({
 });
 
 interface StyledTreeItemProps extends EditableTreeItemProps {
-  ref?: React.RefObject<HTMLLIElement>;
+  ref?: React.RefObject<HTMLLIElement | null>;
   onRenameNode?: (nodeId: NodeId, updatedName: string) => void;
   onDeleteNode?: (nodeId: NodeId) => void;
   onDuplicateNode?: (nodeId: NodeId) => void;

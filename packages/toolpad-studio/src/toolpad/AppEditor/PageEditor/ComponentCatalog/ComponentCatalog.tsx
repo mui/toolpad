@@ -70,7 +70,7 @@ export default function ComponentCatalog({ className }: ComponentCatalogProps) {
     true,
   );
 
-  const closeTimeoutRef = React.useRef<NodeJS.Timeout>();
+  const closeTimeoutRef = React.useRef<NodeJS.Timeout>(undefined);
   const openDrawer = React.useCallback(() => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);

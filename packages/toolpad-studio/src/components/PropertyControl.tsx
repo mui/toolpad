@@ -4,7 +4,7 @@ import MarkdownTooltip from './MarkdownTooltip';
 
 export interface PropertyControlProps {
   propType: PropValueType;
-  children: React.ReactElement;
+  children: React.ReactElement<any>;
 }
 
 export default function PropertyControl({ propType, children }: PropertyControlProps) {

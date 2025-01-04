@@ -15,6 +15,13 @@ test.use({
   localAppConfig: {
     cmd: 'dev',
   },
+  ignoreConsoleErrors: [
+    // React setState warning inside "Recharts"
+    [/Cannot update a component \(`.*`\) while rendering a different component \(`.*`\)/],
+    {
+      scope: 'test',
+    },
+  ],
 });
 
 test('custom components can use external libraries', async ({ page }) => {

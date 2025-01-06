@@ -11,4 +11,9 @@ function NextAppProvider(props: AppProviderProps) {
   return <AppProvider {...props} />;
 }
 
-export { NextAppProvider };
+export {
+  NextAppProvider,
+  /** TODO: Old usage, remove export from v0.14.0 */
+  /** @deprecated Import `NextAppProvider` instead. */
+  NextAppProvider as AppProvider,
+};

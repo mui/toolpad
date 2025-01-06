@@ -33,4 +33,9 @@ function ReactRouterAppProvider(props: AppProviderProps) {
   return <AppProvider router={routerImpl} {...props} />;
 }
 
-export { ReactRouterAppProvider };
+export {
+  ReactRouterAppProvider,
+  /** TODO: Old usage, remove export from v0.14.0 */
+  /** @deprecated Import `ReactRouterAppProvider` instead. */
+  ReactRouterAppProvider as AppProvider,
+};

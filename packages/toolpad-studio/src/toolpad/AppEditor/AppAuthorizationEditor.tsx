@@ -463,13 +463,14 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
           return true;
         }}
         slots={{
-          toolbar: RolesToolbar,
+          toolbar:
+            RolesToolbar satisfies React.ComponentType<RolesToolbarProps> as React.ComponentType<GridToolbarProps>,
         }}
         slotProps={{
           toolbar: {
             onAddNewRole: handleAddNewRole,
             addNewRoleDisabled: !!draftRow,
-          } as GridToolbarProps,
+          } satisfies RolesToolbarProps as GridToolbarProps,
         }}
         autoHeight
       />

@@ -1010,7 +1010,7 @@ function useDataProviderDataGridProps(
           }));
           apiRef.current.scrollToIndexes({ rowIndex: 0, colIndex });
         },
-      } as GridToolbarProps,
+      } satisfies EditToolbarProps as GridToolbarProps,
     },
   };
 }
@@ -1331,7 +1331,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
               slotProps={{
                 noRowsOverlay: {
                   error: rowLoadingError,
-                } as any,
+                } satisfies NoRowsOverlayPropsX as NoRowsOverlayProps,
                 ...dataProviderSlotProps,
               }}
               onColumnResize={handleResize}

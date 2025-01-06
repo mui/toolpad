@@ -12,11 +12,10 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
-import type { Example } from './types';
+import { Example, versionGitHubLink } from './examplesUtils';
 
 interface ExamplesGridProps {
-  examplesFile: string;
-  reverse?: boolean;
+  examples: Example[];
 }
 
 function StackBlitzIcon() {
@@ -35,25 +34,10 @@ function CodeSandboxIcon() {
   );
 }
 
-function ExamplesGrid(props: ExamplesGridProps) {
+export default function ExamplesGrid(props: ExamplesGridProps) {
   const t = useTranslate();
 
-  const [examples, setExamples] = React.useState<Example[]>([]);
-
-  React.useEffect(() => {
-    const importExamples = async () => {
-      let exampleContent = await import(`./${props.examplesFile}`);
-
-      exampleContent = exampleContent
-        .default()
-        .filter((example: Example) => example.featured !== true);
-      if (props.reverse) {
-        setExamples(exampleContent.reverse());
-      }
-      setExamples(exampleContent);
-    };
-    importExamples();
-  }, [props.examplesFile, props.reverse]);
+  const examples = props.examples.filter((example: Example) => example.featured !== true);
   const docsTheme = useTheme();
 
   return (
@@ -86,7 +70,7 @@ function ExamplesGrid(props: ExamplesGridProps) {
                 component="a"
                 image={computedSrc}
                 title={example.description}
-                href={example.href || example.source}
+                href={versionGitHubLink(example.href || example.source)}
                 rel="nofollow"
                 sx={(theme) => ({
                   height: 0,
@@ -118,28 +102,20 @@ function ExamplesGrid(props: ExamplesGridProps) {
                   justifyContent: 'space-between',
                 }}
               >
-                <Button component="a" href={example.source} size="small" target="_blank">
+                <Button
+                  component="a"
+                  href={versionGitHubLink(example.source)}
+                  size="small"
+                  target="_blank"
+                >
                   {t('source')}
                 </Button>
                 <Stack direction="row" spacing={1}>
-                  {example.codeSandbox && (
-                    <Tooltip title="Edit in CodeSandbox">
-                      <IconButton
-                        component="a"
-                        href={example.codeSandbox}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        size="small"
-                      >
-                        <CodeSandboxIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  {example.stackBlitz && (
+                  {example.stackBlitz === true ? (
                     <Tooltip title="Edit in StackBlitz">
                       <IconButton
                         component="a"
-                        href={example.stackBlitz}
+                        href={`https://stackblitz.com/github/${example.source.replace('https://github.com/', '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         size="small"
@@ -147,7 +123,20 @@ function ExamplesGrid(props: ExamplesGridProps) {
                         <StackBlitzIcon />
                       </IconButton>
                     </Tooltip>
-                  )}
+                  ) : null}
+                  {example.codeSandbox === true ? (
+                    <Tooltip title="Edit in CodeSandbox">
+                      <IconButton
+                        component="a"
+                        href={`https://codesandbox.io/p/sandbox/github/${example.source.replace('https://github.com/', '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        size="small"
+                      >
+                        <CodeSandboxIcon />
+                      </IconButton>
+                    </Tooltip>
+                  ) : null}
                 </Stack>
               </CardActions>
             </Card>
@@ -157,5 +146,3 @@ function ExamplesGrid(props: ExamplesGridProps) {
     </Grid>
   );
 }
-
-export default ExamplesGrid;

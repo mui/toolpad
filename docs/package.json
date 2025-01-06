@@ -5,7 +5,7 @@
   "author": "MUI Toolpad",
   "license": "MIT",
   "scripts": {
-    "build": "rimraf docs/export && cross-env NODE_ENV=production next build --profile && pnpm build-sw",
+    "build": "rimraf ./export && cross-env NODE_ENV=production next build --profile && pnpm build-sw",
     "build:clean": "rimraf .next && pnpm build",
     "build-sw": "node ./scripts/buildServiceWorker.js",
     "dev": "next dev --port 3003",
@@ -67,7 +67,7 @@
     "lodash": "4.17.21",
     "lz-string": "1.5.0",
     "markdown-to-jsx": "7.7.0",
-    "next": "^14.2.20",
+    "next": "^14.2.21",
     "nprogress": "0.2.0",
     "postcss": "8.4.49",
     "prismjs": "1.29.0",

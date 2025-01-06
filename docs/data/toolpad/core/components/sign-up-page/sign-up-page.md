@@ -6,193 +6,127 @@ components: SignUpPage
 
 # Sign-up Page
 
-<p class="description">A customizable sign-up component that abstracts away the pain needed to wire together a secure sign-up/register page for your application.</p>
+<p class="description">A customizable sign-up UI component that abstracts away the pain needed to wire together a secure authentication page for your application.</p>
 
 :::info
 If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
 :::
 
-## Basic usage
+The `SignUpPage` component is a quick way to generate a ready-to-use registration page with multiple OAuth providers, or a credentials form.
 
-```jsx
-import { SignUpPage } from '@toolpad/core';
+## OAuth
 
-export default function App() {
+The `SignUpPage` component can be set up with an OAuth provider by passing in a list of providers in the `providers` prop, along with a `signUp` function that accepts the `provider` as a parameter.
+
+{{"demo": "OAuthSignUpPage.js", "iframe": true, "height": 600}}
+
+:::info
+The same OAuth providers supported by SignInPage are available for SignUpPage. See the [Auth.js documentation](https://authjs.dev/getting-started/authentication/oauth) for setup details.
+:::
+
+## Credentials
+
+To render a registration form with email/password, pass in a provider with `credentials` as the `id` property. The `signUp` function accepts a `formData` parameter in this case.
+
+{{"demo": "CredentialsSignUpPage.js", "iframe": true, "height": 600}}
+
+## Usage with authentication libraries
+
+### Firebase
+
+The component is composable with any authentication library. Here's an example using Firebase with Vite:
+
+```tsx title="src/pages/signup.tsx"
+'use client';
+import * as React from 'react';
+
+import Link from '@mui/material/Link';
+import LinearProgress from '@mui/material/LinearProgress';
+import { SignUpPage } from '@toolpad/core/SignUpPage';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useSession, type Session } from '../SessionContext';
+import { signInWithGoogle } from '../firebase/auth';
+
+export default function SignUp() {
+  const { session, setSession, loading } = useSession();
+  const [completing, setCompleting] = React.useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  if (loading) {
+    return <LinearProgress />;
+  }
+
+  if (session) {
+    return <Navigate to="/" />;
+  }
+
   return (
     <SignUpPage
-      onSubmit={(data) => console.log(data)}
-      providers={['google', 'github']}
+      providers={[{ id: 'google', name: 'Google' }]}
+      signUp={async (provider, formData, callbackUrl) => {
+        let result;
+        try {
+          if (provider.id === 'google') {
+            result = await signInWithGoogle();
+          }
+          if (result?.success && result?.user) {
+            // Convert Firebase user to Session format
+            const userSession: Session = {
+              user: {
+                name: result.user.displayName || '',
+                email: result.user.email || '',
+                image: result.user.photoURL || '',
+              },
+            };
+            setSession(userSession);
+            navigate(callbackUrl || '/', { replace: true });
+            return {};
+          }
+          return { error: result?.error || 'Failed to sign in' };
+        } catch (error) {
+          return {
+            error: error instanceof Error ? error.message : 'An error occurred',
+          };
+        }
+      }}
     />
   );
 }
 ```
 
-## Props
-
-### Required props
-
-| Name       | Type                         | Description                                |
-| ---------- | ---------------------------- | ------------------------------------------ |
-| `onSubmit` | `(data: SignUpData) => void` | Callback fired when the form is submitted. |
-
-### Optional props
-
-| Name          | Type        | Default     | Description                                                                                      |
-| ------------- | ----------- | ----------- | ------------------------------------------------------------------------------------------------ |
-| `providers`   | `string[]`  | `[]`        | List of OAuth providers to display. Supported values: 'google', 'github', 'twitter', 'facebook'. |
-| `title`       | `string`    | `'Sign up'` | The title displayed at the top of the page.                                                      |
-| `logo`        | `ReactNode` | `undefined` | Custom logo to display above the form.                                                           |
-| `theme`       | `Theme`     | `undefined` | Custom theme object to override default styles.                                                  |
-| `redirectUrl` | `string`    | `'/'`       | URL to redirect to after successful sign-up.                                                     |
-| `loading`     | `boolean`   | `false`     | Whether to show loading state.                                                                   |
-| `error`       | `string`    | `undefined` | Error message to display.                                                                        |
-
-## Examples
-
-### Basic sign-up with email/password
-
-```jsx
-import { SignUpPage } from '@toolpad/core';
-
-export default function SignUp() {
-  const handleSignUp = async (data) => {
-    try {
-      await createUser(data);
-      // Handle successful sign-up
-    } catch (error) {
-      // Handle error
-    }
-  };
-
-  return <SignUpPage onSubmit={handleSignUp} />;
-}
-```
-
-### With OAuth providers
-
-```jsx
-import { SignUpPage } from '@toolpad/core';
-
-export default function SignUp() {
-  return (
-    <SignUpPage
-      onSubmit={handleSignUp}
-      providers={['google', 'github', 'twitter']}
-      title="Join our platform"
-      redirectUrl="/dashboard"
-    />
-  );
-}
-```
-
-### Custom styling
-
-```jsx
-import { SignUpPage } from '@toolpad/core';
-
-const customTheme = {
-  colors: {
-    primary: '#1976d2',
-    background: '#f5f5f5',
-  },
-  borderRadius: '8px',
-};
-
-export default function SignUp() {
-  return (
-    <SignUpPage
-      onSubmit={handleSignUp}
-      theme={customTheme}
-      logo={<img src="/logo.png" alt="Company Logo" />}
-    />
-  );
-}
-```
-
-## Form Fields
-
-The default sign-up form includes the following fields:
-
-- Email (required)
-- Password (required)
-- Confirm Password (required)
-- Name (optional)
-
-## TypeScript
-
-The component includes full TypeScript support. Here are the main types you'll work with:
-
-```ts
-interface SignUpData {
-  email: string;
-  password: string;
-  name?: string;
-}
-
-interface SignUpPageProps {
-  onSubmit: (data: SignUpData) => void;
-  providers?: string[];
-  title?: string;
-  logo?: ReactNode;
-  theme?: Theme;
-  redirectUrl?: string;
-  loading?: boolean;
-  error?: string;
-}
-```
+:::info
+The [Firebase Vite example app](https://github.com/mui/mui-toolpad/tree/master/examples/core/firebase-vite/) comes with a working app using Firebase including Sign Up and Sign In flows.
+:::
 
 ## Customization
 
-### Custom Form Fields
+### Branding
 
-You can extend the default form fields using the `fields` prop:
+You can add your own branding elements through the `branding` prop in the AppProvider:
 
-```jsx
-const customFields = [
-  {
-    name: 'company',
-    label: 'Company Name',
-    type: 'text',
-    required: true,
-  },
-  {
-    name: 'role',
-    label: 'Job Role',
-    type: 'select',
-    options: ['Developer', 'Designer', 'Manager'],
-  },
-];
+{{"demo": "BrandingSignUpPage.js", "iframe": true, "height": 600 }}
 
-<SignUpPage onSubmit={handleSignUp} fields={customFields} />;
-```
+### Theme
 
-### Custom Validation
+The `SignUpPage` can be deeply customized to match any theme through the AppProvider's theme prop:
 
-The component uses Yup for form validation. You can provide custom validation rules:
+{{"demo": "ThemeSignUpPage.js", "iframe": true, "height": 700 }}
 
-```jsx
-const validationSchema = {
-  email: (value) => /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value),
-  password: (value) => value.length >= 8,
-};
+### Slots
 
-<SignUpPage onSubmit={handleSignUp} validation={validationSchema} />;
-```
+To enable deep customization, the `SignUpPage` component allows bringing your own custom granular components:
 
-## Best Practices
+{{"demo": "SlotsSignUp.js", "iframe": true, "height": 540 }}
 
-1. Always handle errors gracefully and display meaningful error messages to users.
-2. Implement proper security measures on your backend to validate and sanitize user input.
-3. Consider implementing rate limiting to prevent abuse.
-4. Use HTTPS to secure data transmission.
-5. Follow accessibility guidelines by maintaining proper contrast and keyboard navigation.
+You can use the `slotProps` prop to pass props to the underlying components of each slot:
 
-## Related Components
+{{"demo": "SlotPropsSignUp.js", "iframe": true, "height": 600 }}
 
-- [`SignInPage`](/toolpad/core/react-sign-in-page/) - For user login
-- [`PasswordResetPage`](/toolpad/core/react-password-reset-page/) - For password recovery
-- [`AuthProvider`](/toolpad/core/react-auth-provider/) - For managing authentication state
+### 🚧 Layouts
 
-## API Reference
+The `SignUpPage` component will support different layouts for authentication - one column, two column and others. The APIs of these components will be identical. This is in progress.
 
-For a complete list of props and methods, see the [API Reference](/toolpad/core/api-reference/#sign-up-page).
+## 🚧 Other authentication flows
+
+Besides the `SignUpPage`, the team is planning work on several other components that enable new workflows such as [forgot password](https://github.com/mui/toolpad/issues/4265) and [one-time code verification](https://github.com/mui/toolpad/issues/4292).

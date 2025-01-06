@@ -36,7 +36,7 @@ import { NextAppProvider } from '@toolpad/core/nextjs';
 
 ### Next.js App Router
 
-When using the **Next.js App Router**, the most typical file where to import and use `NextAppProvider` will be at the top level `layout.tsx` file that defines the layout for all the application pages.
+When using the **Next.js App Router**, the most typical file where to import and use `NextAppProvider` is the top level `layout.tsx` file that defines the layout for all the application pages.
 
 ```tsx
 // app/layout.tsx
@@ -58,7 +58,7 @@ export default function Layout(props) {
 
 ### Next.js Pages Router
 
-When using the **Next.js Pages Router**, the most typical file where to import and use `NextAppProvider` in order to wrap every page in the application will be the `pages/_app.tsx` file.
+When using the **Next.js Pages Router**, the most typical file where to import and use `NextAppProvider` in order to wrap every page in the application is the `pages/_app.tsx` file.
 
 ```tsx
 // pages/_app.tsx

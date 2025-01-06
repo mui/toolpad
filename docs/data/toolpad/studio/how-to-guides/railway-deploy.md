@@ -6,7 +6,7 @@ This guide walks you through the deployment of a Toolpad Studio app from a GitHu
 
 ## Prerequisites
 
-- A [Railway](https://railway.app/) account
+- A [Railway](https://railway.com/) account
 - A [GitHub](https://github.com) account
 - A GitHub repository containing your Toolpad Studio app. Check out [pushing your Toolpad Studio app to GitHub](/toolpad/studio/how-to-guides/render-deploy/#pushing-your-toolpad-studio-app-to-github) for this step.
 

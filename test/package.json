@@ -11,7 +11,7 @@
     "invariant": "2.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "recharts": "alpha"
+    "recharts": "^2.15.0"
   },
   "type": "module",
   "version": "0.11.0"

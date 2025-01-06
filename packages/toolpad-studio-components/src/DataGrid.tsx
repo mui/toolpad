@@ -1010,16 +1010,16 @@ function useDataProviderDataGridProps(
           }));
           apiRef.current.scrollToIndexes({ rowIndex: 0, colIndex });
         },
-      },
+      } as GridToolbarProps,
     },
   };
 }
 
 type NoRowsOverlayProps = React.ComponentProps<typeof GridNoRowsOverlay>;
 
-interface NoRowsOverlayPropsX extends NoRowsOverlayProps {
+type NoRowsOverlayPropsX = NoRowsOverlayProps & {
   error?: Error | null;
-}
+};
 
 function NoRowsOverlay(props: NoRowsOverlayPropsX) {
   if (props.error) {

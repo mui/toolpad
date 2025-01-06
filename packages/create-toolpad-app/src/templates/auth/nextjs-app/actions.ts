@@ -5,7 +5,7 @@ const actionsTemplate: Template = (options) => {
 
   return `'use server';
 import { AuthError } from 'next-auth';
-import type { AuthProvider } from '@toolpad/core';
+import type { AuthProvider } from '@toolpad/core/auth';
 import { signIn } from '../../../auth';
 
 export default async function serverSignIn(provider: AuthProvider, formData: FormData, callbackUrl?: string) {

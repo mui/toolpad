@@ -157,7 +157,8 @@ To have a fully built "Sign in with GitHub" page appear at the `/auth/signin` ro
 ```tsx title="./app/auth/signin/page.tsx"
 // ...
 import * as React from 'react';
-import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/SignInPage';
+import type { AuthProvider } from '@toolpad/core/auth';
 import { AuthError } from 'next-auth';
 import { providerMap, signIn } from '../../../auth';
 

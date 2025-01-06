@@ -1,0 +1,87 @@
+{
+  "props": {
+    "providers": {
+      "type": { "name": "arrayOf", "description": "Array&lt;{ id: string, name: string }&gt;" },
+      "default": "[]"
+    },
+    "signUp": {
+      "type": { "name": "func" },
+      "default": "undefined",
+      "signature": {
+        "type": "function(provider: AuthProvider, formData: FormData, callbackUrl: string) => void | Promise<AuthResponse>",
+        "describedArgs": ["provider", "formData", "callbackUrl"]
+      }
+    },
+    "slotProps": {
+      "type": {
+        "name": "shape",
+        "description": "{ emailField?: object, forgotPasswordLink?: object, passwordField?: object, signInLink?: object, submitButton?: object }"
+      },
+      "default": "{}"
+    },
+    "slots": {
+      "type": {
+        "name": "shape",
+        "description": "{ emailField?: elementType, passwordField?: elementType, signInLink?: elementType, submitButton?: elementType, subtitle?: elementType, title?: elementType }"
+      },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    },
+    "sx": {
+      "type": {
+        "name": "union",
+        "description": "Array&lt;func<br>&#124;&nbsp;object<br>&#124;&nbsp;bool&gt;<br>&#124;&nbsp;func<br>&#124;&nbsp;object"
+      },
+      "additionalInfo": { "sx": true }
+    }
+  },
+  "name": "SignUpPage",
+  "imports": [
+    "import { SignUpPage } from '@toolpad/core/SignUpPage';",
+    "import { SignUpPage } from '@toolpad/core';"
+  ],
+  "slots": [
+    {
+      "name": "emailField",
+      "description": "The custom email field component used in the credentials form.",
+      "default": "TextField",
+      "class": null
+    },
+    {
+      "name": "passwordField",
+      "description": "The custom password field component used in the credentials form.",
+      "default": "TextField",
+      "class": null
+    },
+    {
+      "name": "submitButton",
+      "description": "The custom submit button component used in the credentials form.",
+      "default": "LoadingButton",
+      "class": null
+    },
+    {
+      "name": "signInLink",
+      "description": "The custom sign in link component used in the credentials form.",
+      "default": "Link",
+      "class": null
+    },
+    {
+      "name": "title",
+      "description": "A component to override the default title section",
+      "default": "Typography",
+      "class": null
+    },
+    {
+      "name": "subtitle",
+      "description": "A component to override the default subtitle section",
+      "default": "Typography",
+      "class": null
+    }
+  ],
+  "classes": [],
+  "muiName": "SignUpPage",
+  "filename": "/packages/toolpad-core/src/SignUpPage/SignUpPage.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-up-page/\">Sign-up Page</a></li></ul>",
+  "cssComponent": false
+}

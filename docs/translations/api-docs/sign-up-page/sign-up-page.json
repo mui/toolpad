@@ -1,0 +1,28 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "providers": { "description": "The list of authentication providers to display." },
+    "signUp": {
+      "description": "Callback fired when a user signs up.",
+      "typeDescriptions": {
+        "provider": "The authentication provider.",
+        "formData": "The form data if the provider id is &#39;credentials&#39;.\\",
+        "callbackUrl": "The URL to redirect to after signing in."
+      }
+    },
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." },
+    "sx": {
+      "description": "The prop used to customize the styles on the <code>SignInPage</code> container"
+    }
+  },
+  "classDescriptions": {},
+  "slotDescriptions": {
+    "emailField": "The custom email field component used in the credentials form.",
+    "passwordField": "The custom password field component used in the credentials form.",
+    "signInLink": "The custom sign in link component used in the credentials form.",
+    "submitButton": "The custom submit button component used in the credentials form.",
+    "subtitle": "A component to override the default subtitle section",
+    "title": "A component to override the default title section"
+  }
+}

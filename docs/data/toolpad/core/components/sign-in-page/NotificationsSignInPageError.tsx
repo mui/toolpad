@@ -1,10 +1,7 @@
 import * as React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import {
-  SignInPage,
-  type AuthProvider,
-  type AuthResponse,
-} from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/SignInPage';
+import type { AuthResponse, AuthProvider } from '@toolpad/core/auth';
 import { useTheme } from '@mui/material/styles';
 
 const providers = [{ id: 'credentials', name: 'Email and password' }];

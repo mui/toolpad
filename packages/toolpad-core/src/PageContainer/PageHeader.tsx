@@ -82,7 +82,7 @@ function PageHeader(props: PageHeaderProps) {
     <Stack>
       <Breadcrumbs aria-label="breadcrumb">
         {resolvedBreadcrumbs
-          ? resolvedBreadcrumbs.map((item) => {
+          ? resolvedBreadcrumbs.map((item, index) => {
               return item.path ? (
                 <Link
                   key={item.path}
@@ -94,7 +94,7 @@ function PageHeader(props: PageHeaderProps) {
                   {getItemTitle(item)}
                 </Link>
               ) : (
-                <Typography key={item.title} color="text.primary">
+                <Typography key={index} color="text.primary">
                   {getItemTitle(item)}
                 </Typography>
               );

@@ -1,6 +1,7 @@
 import { afterEach, vi } from 'vitest';
 import failOnConsole from 'vitest-fail-on-console';
 import { cleanup } from '@testing-library/react';
+import mediaQuery from 'css-mediaquery';
 
 failOnConsole({
   silenceMessage: (errorMessage) => {
@@ -16,18 +17,24 @@ afterEach(cleanup);
 
 // Mocks
 
+function createMatchMedia(width: number) {
+  return (query: string) => ({
+    matches: mediaQuery.match(query, {
+      width,
+    }),
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  });
+}
+
 if (typeof window !== 'undefined' && !window.matchMedia) {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: vi.fn().mockImplementation((query) => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(), // deprecated
-      removeListener: vi.fn(), // deprecated
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
+    value: createMatchMedia(window.innerWidth),
   });
 }

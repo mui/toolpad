@@ -58,7 +58,7 @@ import {
   useParams,
   Outlet,
   BrowserRouter,
-} from 'react-router-dom';
+} from 'react-router';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import ErrorIcon from '@mui/icons-material/Error';
 import { getBrowserRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';

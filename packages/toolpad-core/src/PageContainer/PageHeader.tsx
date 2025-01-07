@@ -120,7 +120,7 @@ PageHeader.propTypes /* remove-proptypes */ = {
    */
   breadcrumbs: PropTypes.arrayOf(
     PropTypes.shape({
-      path: PropTypes.string.isRequired,
+      path: PropTypes.string,
       title: PropTypes.string.isRequired,
     }),
   ),

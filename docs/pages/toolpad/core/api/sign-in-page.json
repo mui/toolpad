@@ -15,14 +15,14 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: object, forgotPasswordLink?: object, form?: object, passwordField?: object, rememberMe?: object, signUpLink?: object, submitButton?: object }"
+        "description": "{ checkbox?: object, emailField?: object, forgotPasswordLink?: object, form?: object, passwordField?: object, signUpLink?: object, submitButton?: object }"
       },
       "default": "{}"
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: elementType, forgotPasswordLink?: elementType, passwordField?: elementType, rememberMe?: elementType, signUpLink?: elementType, submitButton?: elementType, subtitle?: elementType, title?: elementType }"
+        "description": "{ checkbox?: elementType, emailField?: elementType, forgotPasswordLink?: elementType, passwordField?: elementType, signUpLink?: elementType, submitButton?: elementType, subtitle?: elementType, title?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -84,7 +84,7 @@
       "class": null
     },
     {
-      "name": "rememberMe",
+      "name": "checkbox",
       "description": "A custom checkbox placed in the credentials form",
       "default": "FormControlLabel",
       "class": null

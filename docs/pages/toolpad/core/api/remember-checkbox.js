@@ -1,7 +1,7 @@
 import * as React from 'react';
 import ApiPage from 'docs/src/modules/components/ApiPage';
 import mapApiPageTranslations from 'docs/src/modules/utils/mapApiPageTranslations';
-import jsonPageContent from './remember.json';
+import jsonPageContent from './remember-checkbox.json';
 
 export default function Page(props) {
   const { descriptions, pageContent } = props;
@@ -10,9 +10,9 @@ export default function Page(props) {
 
 Page.getInitialProps = () => {
   const req = require.context(
-    'docs-toolpad/translations/api-docs/remember',
+    'docs-toolpad/translations/api-docs/remember-checkbox',
     false,
-    /\.\/remember.*.json$/,
+    /\.\/remember-checkbox.*.json$/,
   );
   const descriptions = mapApiPageTranslations(req);
 

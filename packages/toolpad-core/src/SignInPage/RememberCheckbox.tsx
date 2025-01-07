@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FormControlLabel, Checkbox } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-interface RememberMeProps {
+interface RememberCheckboxProps {
   slotProps?: {
     typography?: React.ComponentProps<typeof FormControlLabel>['slotProps'];
   } & Partial<React.ComponentProps<typeof FormControlLabel>>;
@@ -16,9 +16,9 @@ interface RememberMeProps {
  *
  * API:
  *
- * - [Remember API](https://mui.com/toolpad/core/api/remember)
+ * - [RememberCheckbox API](https://mui.com/toolpad/core/api/remember-checkbox)
  */
-function Remember(props: RememberMeProps) {
+function RememberCheckbox(props: RememberCheckboxProps) {
   const theme = useTheme();
   return (
     <FormControlLabel
@@ -43,15 +43,12 @@ function Remember(props: RememberMeProps) {
   );
 }
 
-Remember.propTypes /* remove-proptypes */ = {
+RememberCheckbox.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
-  /**
-   * @ignore
-   */
   slotProps: PropTypes.object,
 } as any;
 
-export { Remember };
+export { RememberCheckbox };

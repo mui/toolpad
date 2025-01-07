@@ -10,7 +10,7 @@ module.exports = [
   { pathname: '/toolpad/core/api/page-container' },
   { pathname: '/toolpad/core/api/page-header' },
   { pathname: '/toolpad/core/api/page-header-toolbar' },
-  { pathname: '/toolpad/core/api/remember' },
+  { pathname: '/toolpad/core/api/remember-checkbox' },
   { pathname: '/toolpad/core/api/sign-in-button' },
   { pathname: '/toolpad/core/api/sign-in-page' },
   { pathname: '/toolpad/core/api/sign-out-button' },

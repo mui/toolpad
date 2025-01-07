@@ -211,7 +211,7 @@ export interface SignInPageSlots {
    * A custom checkbox placed in the credentials form
    * @default FormControlLabel
    */
-  rememberMe?: React.ElementType;
+  checkbox?: React.ElementType;
 }
 
 export interface SignInPageProps {
@@ -253,7 +253,7 @@ export interface SignInPageProps {
     submitButton?: LoadingButtonProps;
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
-    rememberMe?: Partial<FormControlLabelProps>;
+    checkbox?: Partial<FormControlLabelProps>;
     form?: Partial<React.FormHTMLAttributes<HTMLFormElement>>;
   };
   /**
@@ -607,7 +607,7 @@ function SignInPage(props: SignInPageProps) {
                       />
                     )}
                   </Stack>
-                  {slots?.forgotPasswordLink || slots?.rememberMe ? (
+                  {slots?.forgotPasswordLink || slots?.checkbox ? (
                     <Stack
                       direction="row"
                       justifyContent="space-between"
@@ -618,7 +618,7 @@ function SignInPage(props: SignInPageProps) {
                         justifyContent: 'space-between',
                       }}
                     >
-                      {slots?.rememberMe ? <slots.rememberMe {...slotProps?.rememberMe} /> : null}
+                      {slots?.checkbox ? <slots.checkbox {...slotProps?.checkbox} /> : null}
                       {slots?.forgotPasswordLink ? (
                         <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
                       ) : null}
@@ -693,11 +693,11 @@ SignInPage.propTypes /* remove-proptypes */ = {
    * @example { emailField: { autoFocus: false }, passwordField: { variant: 'outlined' } }
    */
   slotProps: PropTypes.shape({
+    checkbox: PropTypes.object,
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
     form: PropTypes.object,
     passwordField: PropTypes.object,
-    rememberMe: PropTypes.object,
     signUpLink: PropTypes.object,
     submitButton: PropTypes.object,
   }),
@@ -708,10 +708,10 @@ SignInPage.propTypes /* remove-proptypes */ = {
    * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
    */
   slots: PropTypes.shape({
+    checkbox: PropTypes.elementType,
     emailField: PropTypes.elementType,
     forgotPasswordLink: PropTypes.elementType,
     passwordField: PropTypes.elementType,
-    rememberMe: PropTypes.elementType,
     signUpLink: PropTypes.elementType,
     submitButton: PropTypes.elementType,
     subtitle: PropTypes.elementType,

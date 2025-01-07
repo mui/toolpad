@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { Remember, SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage, RememberCheckbox } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
@@ -16,13 +16,13 @@ export default function SlotPropsSignIn() {
             `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')} and checkbox value: ${formData.get('tandc')}`,
           )
         }
-        slots={{ rememberMe: Remember }}
+        slots={{ checkbox: RememberCheckbox }}
         slotProps={{
           form: { noValidate: true },
           emailField: { variant: 'standard', autoFocus: false },
           passwordField: { variant: 'standard' },
           submitButton: { variant: 'outlined' },
-          rememberMe: {
+          checkbox: {
             control: (
               <Checkbox
                 name="tandc"

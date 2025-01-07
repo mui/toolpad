@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Sign-in Page
-components: SignInPage, Account, Remember, NotificationsProvider
+components: SignInPage, Account, RememberCheckbox, NotificationsProvider
 ---
 
 # Sign-in Page

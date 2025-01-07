@@ -1,9 +1,6 @@
 // Common files for all apps
 import theme from './templates/theme';
 import eslintConfig from './templates/eslintConfig';
-import nextConfig from './templates/nextConfig';
-import nextTypes from './templates/nextTypes';
-import tsConfig from './templates/tsConfig';
 import readme from './templates/readme';
 import gitignore from './templates/gitignore';
 import ordersPage from './templates/ordersPage';
@@ -24,7 +21,9 @@ import viteFirebaseAuth from './templates/vite/auth/firebase';
 import viteFirebaseConfig from './templates/vite/auth/firebaseConfig';
 
 // Nextjs specific files
-
+import tsConfig from './templates/tsConfig';
+import nextConfig from './templates/nextConfig';
+import nextTypes from './templates/nextTypes';
 // App router specific files
 import rootLayout from './templates/nextjs/nextjs-app/rootLayout';
 import dashboardLayout from './templates/nextjs/nextjs-app/dashboardLayout';
@@ -58,7 +57,6 @@ export default function generateProject(
   const commonFiles = new Map<string, { content: string }>([
     ['theme.ts', { content: theme }],
     ['.eslintrc.json', { content: eslintConfig }],
-    ['tsconfig.json', { content: tsConfig }],
     ['README.md', { content: readme }],
     ['.gitignore', { content: gitignore }],
     [
@@ -72,7 +70,7 @@ export default function generateProject(
   switch (options.framework) {
     case 'vite': {
       const viteFiles = new Map([
-        ['vite.config.ts', { content: viteConfig }],
+        ['vite.config.mts', { content: viteConfig }],
         ['src/main.tsx', { content: viteMain(options) }],
         ['src/layouts/dashboard.tsx', { content: viteDashboardLayout(options) }],
         ['src/App.tsx', { content: viteApp(options) }],
@@ -99,6 +97,7 @@ export default function generateProject(
     case 'nextjs':
     default: {
       const nextCommonFiles = new Map([
+        ['tsconfig.json', { content: tsConfig }],
         ['next-env.d.ts', { content: nextTypes }],
         ['next.config.mjs', { content: nextConfig(options) }],
       ]);

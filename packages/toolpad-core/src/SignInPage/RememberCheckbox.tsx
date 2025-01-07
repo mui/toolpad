@@ -48,6 +48,9 @@ RememberCheckbox.propTypes /* remove-proptypes */ = {
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * @ignore
+   */
   slotProps: PropTypes.object,
 } as any;
 

@@ -8,7 +8,6 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
-import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import SvgIcon from '@mui/material/SvgIcon';
 import Visibility from '@mui/icons-material/Visibility';
@@ -16,49 +15,17 @@ import CodeRoundedIcon from '@mui/icons-material/CodeRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import { useTheme } from '@mui/material/styles';
 import { sxChip } from 'docs/src/modules/components/AppNavDrawerItem';
-import type { Example } from './types';
+import { Example, versionGitHubLink } from './examplesUtils';
 
 interface FeaturedExamplesProps {
-  examplesFile: string;
+  examples: Example[];
 }
 
-export default function FeaturedExamples(props: FeaturedExamplesProps) {
+export default function ExamplesFeatured(props: FeaturedExamplesProps) {
   const t = useTranslate();
 
-  const [examples, setExamples] = React.useState<Example[]>([]);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const importExamples = async () => {
-      setLoading(true);
-      let exampleContent = await import(`./${props.examplesFile}`);
-      exampleContent = exampleContent
-        .default()
-        .filter((example: Example) => example.featured === true);
-      setExamples(exampleContent);
-      setLoading(false);
-    };
-    importExamples();
-  }, [props.examplesFile]);
+  const examples = props.examples.filter((example: Example) => example.featured === true);
   const docsTheme = useTheme();
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>
-        {[1].map((key) => (
-          <Box key={key} sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Skeleton variant="text" width={200} height={32} />
-            <Skeleton variant="text" width="100%" height={24} />
-            <Skeleton
-              variant="rectangular"
-              width="100%"
-              height={400}
-              sx={{ aspectRatio: '16 / 9', borderRadius: 1 }}
-            />
-          </Box>
-        ))}
-      </Box>
-    );
-  }
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>
@@ -84,7 +51,7 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
               }}
             >
               <Link
-                href={example.href}
+                href={versionGitHubLink(example.href)}
                 target="_blank"
                 sx={{
                   position: 'relative',
@@ -183,14 +150,19 @@ export default function FeaturedExamples(props: FeaturedExamplesProps) {
                     </Tooltip>
                   ) : null}
                   <Tooltip title="See source code">
-                    <IconButton component="a" href={example.source} color="primary" size="small">
+                    <IconButton
+                      component="a"
+                      href={versionGitHubLink(example.source)}
+                      color="primary"
+                      size="small"
+                    >
                       <CodeRoundedIcon />
                     </IconButton>
                   </Tooltip>
                 </Box>
                 <Button
                   component="a"
-                  href={example.href}
+                  href={versionGitHubLink(example.href)}
                   size="small"
                   variant="outlined"
                   color="primary"

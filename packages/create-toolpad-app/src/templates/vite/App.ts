@@ -4,14 +4,14 @@ const appTemplate: Template = (options) => {
   return `import * as React from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 ${
   options.auth
-    ? `import { AppProvider } from '@toolpad/core/react-router-dom';
+    ? `import { AppProvider } from '@toolpad/core/react-router';
 import type { Navigation, Authentication } from '@toolpad/core/AppProvider';
 import { firebaseSignOut, onAuthStateChanged } from './firebase/auth';
 import SessionContext, { type Session } from './SessionContext';`
-    : `import { AppProvider, type Navigation } from '@toolpad/core/react-router-dom';`
+    : `import { AppProvider, type Navigation } from '@toolpad/core/react-router';`
 }
 
 const NAVIGATION: Navigation = [

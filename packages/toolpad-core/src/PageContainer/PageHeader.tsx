@@ -85,7 +85,7 @@ function PageHeader(props: PageHeaderProps) {
           ? resolvedBreadcrumbs.map((item, index) => {
               return item.path ? (
                 <Link
-                  key={item.path}
+                  key={index}
                   component={ToolpadLink}
                   underline="hover"
                   color="inherit"

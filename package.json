@@ -67,11 +67,11 @@
     "@types/fs-extra": "11.0.4",
     "@types/gtag.js": "0.0.20",
     "@types/invariant": "2.2.37",
-    "@types/node": "^20.17.6",
+    "@types/node": "^20.17.12",
     "@types/yargs": "17.0.33",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
-    "@vitest/coverage-v8": "2.1.7",
+    "@vitest/coverage-v8": "2.1.8",
     "babel-plugin-react-remove-properties": "0.3.0",
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
     "chalk": "5.3.0",
@@ -114,7 +114,7 @@
   },
   "dependencies": {
     "@types/lodash": "4.17.13",
-    "@vitest/browser": "2.1.7",
+    "@vitest/browser": "2.1.8",
     "archiver": "7.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.4.4",
@@ -125,7 +125,7 @@
     "semver": "7.6.3",
     "tsup": "8.3.5",
     "tsx": "4.19.2",
-    "vitest": "2.1.7",
+    "vitest": "2.1.8",
     "yargs": "17.7.2",
     "zod": "3.23.8",
     "zod-to-json-schema": "3.23.5"
@@ -136,7 +136,7 @@
   },
   "resolutions": {
     "google-auth-library": "*",
-    "@types/node": "^20.17.6"
+    "@types/node": "^20.17.12"
   },
   "packageManager": "pnpm@9.12.3"
 }

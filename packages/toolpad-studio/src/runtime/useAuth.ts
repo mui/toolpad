@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as appDom from '@toolpad/studio-runtime/appDom';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import { useAppHost } from '@toolpad/studio-runtime';
 
 const AUTH_API_PATH = '/api/auth';

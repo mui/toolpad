@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button, Typography, Box, useTheme, Alert, ButtonProps } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import { Link, useMatch } from 'react-router-dom';
+import { Link, useMatch } from 'react-router';
 import { useAppHost } from '@toolpad/studio-runtime';
 
 function OpenInEditorButton<C extends React.ElementType>({

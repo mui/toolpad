@@ -3,7 +3,7 @@ import * as React from 'react';
 import Alert from '@mui/material/Alert';
 import LinearProgress from '@mui/material/LinearProgress';
 import { SignInPage } from '@toolpad/core/SignInPage';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router';
 import { useSession, type Session } from '../SessionContext';
 import { signInWithGoogle, signInWithGithub, signInWithCredentials } from '../firebase/auth';
 

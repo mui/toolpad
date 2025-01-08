@@ -152,32 +152,32 @@ function DashboardLayout(props: DashboardLayoutProps) {
     React.useState(!defaultSidebarCollapsed);
   const [isMobileNavigationExpanded, setIsMobileNavigationExpanded] = React.useState(false);
 
-  const isUnderMdViewport = useMediaQuery(
-    theme.breakpoints.down('md'),
-    appWindowContext && {
-      matchMedia: appWindowContext.matchMedia,
-    },
-  );
   const isOverSmViewport = useMediaQuery(
     theme.breakpoints.up('sm'),
     appWindowContext && {
       matchMedia: appWindowContext.matchMedia,
     },
   );
+  const isOverMdViewport = useMediaQuery(
+    theme.breakpoints.up('md'),
+    appWindowContext && {
+      matchMedia: appWindowContext.matchMedia,
+    },
+  );
 
-  const isNavigationExpanded = isUnderMdViewport
-    ? isMobileNavigationExpanded
-    : isDesktopNavigationExpanded;
+  const isNavigationExpanded = isOverMdViewport
+    ? isDesktopNavigationExpanded
+    : isMobileNavigationExpanded;
 
   const setIsNavigationExpanded = React.useCallback(
     (newExpanded: boolean) => {
-      if (isUnderMdViewport) {
-        setIsMobileNavigationExpanded(newExpanded);
-      } else {
+      if (isOverMdViewport) {
         setIsDesktopNavigationExpanded(newExpanded);
+      } else {
+        setIsMobileNavigationExpanded(newExpanded);
       }
     },
-    [isUnderMdViewport],
+    [isOverMdViewport],
   );
 
   const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
@@ -249,8 +249,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [toggleNavigationExpanded],
   );
 
-  const hasDrawerTransitions =
-    isOverSmViewport && (disableCollapsibleSidebar || !isUnderMdViewport);
+  const hasDrawerTransitions = isOverSmViewport && (!disableCollapsibleSidebar || isOverMdViewport);
 
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;

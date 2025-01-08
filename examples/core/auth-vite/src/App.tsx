@@ -1,9 +1,9 @@
 import * as React from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { AppProvider } from '@toolpad/core/react-router-dom';
-import { Outlet, useNavigate } from 'react-router-dom';
-import type { Navigation, Session } from '@toolpad/core';
+import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+import { Outlet, useNavigate } from 'react-router';
+import type { Navigation, Session } from '@toolpad/core/AppProvider';
 import { SessionContext } from './SessionContext';
 
 const NAVIGATION: Navigation = [
@@ -43,14 +43,14 @@ export default function App() {
 
   return (
     <SessionContext.Provider value={sessionContextValue}>
-      <AppProvider
+      <ReactRouterAppProvider
         navigation={NAVIGATION}
         branding={BRANDING}
         session={session}
         authentication={{ signIn, signOut }}
       >
         <Outlet />
-      </AppProvider>
+      </ReactRouterAppProvider>
     </SessionContext.Provider>
   );
 }

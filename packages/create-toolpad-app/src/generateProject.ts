@@ -10,7 +10,7 @@ import ordersPage from './templates/ordersPage';
 import packageJson from './templates/packageJson';
 import indexPage from './templates/indexPage';
 
-// App router specific files
+// App Router specific files
 import rootLayout from './templates/nextjs-app/rootLayout';
 import dashboardLayout from './templates/nextjs-app/dashboardLayout';
 
@@ -27,11 +27,11 @@ import prisma from './templates/auth/prisma';
 import env from './templates/auth/env';
 import schemaPrisma from './templates/auth/schemaPrisma';
 
-// Auth files for app router
+// Auth files for App Router
 import signInPage from './templates/auth/nextjs-app/signInPage';
 import signInAction from './templates/auth/nextjs-app/actions';
 
-// Auth files for pages router
+// Auth files for Pages Router
 import signInPagePagesRouter from './templates/auth/nextjs-pages/signIn';
 
 import { GenerateProjectOptions } from './types';
@@ -72,7 +72,7 @@ export default function generateProject(
           ['auth.ts', { content: auth(options) }],
           ['.env.local', { content: envLocal(options) }],
           ['middleware.ts', { content: middleware }],
-          // next-auth v5 does not provide an API route, so this file must be in the app router
+          // next-auth v5 does not provide an API route, so this file must be in the App Router
           // even if the rest of the app is using pages router
           // https://authjs.dev/getting-started/installation#configure
           ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],

@@ -26,12 +26,12 @@ yarn add install @mui/material-nextjs @emotion/cache
 
 </codeblock>
 
-## Wrap your application with `AppProvider`
+## Wrap your application with `NextAppProvider`
 
-In your root layout file (for example, `app/layout.tsx`), wrap your application with the `AppProvider`:
+In your root layout file (for example, `app/layout.tsx`), wrap your application with the `NextAppProvider`:
 
 ```tsx title="app/layout.tsx"
-import { AppProvider } from '@toolpad/core/AppProvider';
+import { NextAppProvider } from '@toolpad/core/nextjs';
 import LinearProgress from '@mui/material/LinearProgress';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
@@ -39,16 +39,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <AppRouterCacheProvider options={{ enableCssLayer: true }}>
       <React.Suspense fallback={<LinearProgress />}>
-        <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+        <NextAppProvider navigation={NAVIGATION} branding={BRANDING}>
           {children}
-        </AppProvider>
+        </NextAppProvider>
       </React.Suspense>
     </AppRouterCacheProvider>
   );
 }
 ```
 
-You can find details on the `AppProvider` props on the [AppProvider](/toolpad/core/react-app-provider/) page.
+You can find details on the `NextAppProvider` props on the [AppProvider](/toolpad/core/react-app-provider/) page.
 
 :::info
 The `AppRouterCacheProvider` component is not required to use Toolpad Core, but it's recommended to use it to ensure that the styles are appended to the `<head>` and not rendering in the `<body>`.
@@ -57,7 +57,7 @@ See the [Material UI Next.js integration docs](https://mui.com/material-ui/inte
 :::
 
 :::warning
-If your app is statically rendered, you must wrap the `AppProvider` in a `Suspense` component when using the app router. See [https://github.com/mui/toolpad/issues/4524](https://github.com/mui/toolpad/issues/4524) for more information.
+If your app is statically rendered, you must wrap the `AppProvider` in a `Suspense` component when using the App Router. See [https://github.com/mui/toolpad/issues/4524](https://github.com/mui/toolpad/issues/4524) for more information.
 :::
 
 ## Create a dashboard layout

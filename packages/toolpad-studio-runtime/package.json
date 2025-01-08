@@ -61,7 +61,7 @@
     "@types/express": "5.0.0",
     "@types/invariant": "2.2.37",
     "@types/react": "18.3.18",
-    "@types/react-is": "18.3.0"
+    "@types/react-is": "18.3.1"
   },
   "peerDependencies": {
     "react": "^18.0.0",

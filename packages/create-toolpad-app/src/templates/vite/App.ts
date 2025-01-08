@@ -7,11 +7,11 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Outlet } from 'react-router';
 ${
   options.auth
-    ? `import { AppProvider } from '@toolpad/core/react-router';
+    ? `import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import type { Navigation, Authentication } from '@toolpad/core/AppProvider';
 import { firebaseSignOut, onAuthStateChanged } from './firebase/auth';
 import SessionContext, { type Session } from './SessionContext';`
-    : `import { AppProvider, type Navigation } from '@toolpad/core/react-router';`
+    : `import { ReactRouterAppProvider } from '@toolpad/core/react-router';\nimport type { Navigation } from '@toolpad/core/AppProvider';`
 }
 
 const NAVIGATION: Navigation = [
@@ -78,7 +78,7 @@ export default function App() {
   }, []);
 
   return (
-    <AppProvider
+    <ReactRouterAppProvider
       navigation={NAVIGATION}
       branding={BRANDING}
       session={session}
@@ -87,13 +87,13 @@ export default function App() {
       <SessionContext.Provider value={sessionContextValue}>
         <Outlet />
       </SessionContext.Provider>
-    </AppProvider>
+    </ReactRouterAppProvider>
   );`
       : `
   return (
-    <AppProvider navigation={NAVIGATION} branding={BRANDING}>
+    <ReactRouterAppProvider navigation={NAVIGATION} branding={BRANDING}>
       <Outlet />
-    </AppProvider>
+    </ReactRouterAppProvider>
   );`
   }
 }`;

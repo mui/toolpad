@@ -50,7 +50,7 @@ const packageJson: PackageJsonTemplate = (options) => {
     devDependencies['eslint-config-next'] = '^15';
     devDependencies['@types/node'] = '^20';
   } else if (framework === 'vite') {
-    dependencies['react-router-dom'] = '^6';
+    dependencies['react-router'] = '^7';
     devDependencies['@vitejs/plugin-react'] = '^4.3.2';
     devDependencies.vite = '^5.4.8';
   }

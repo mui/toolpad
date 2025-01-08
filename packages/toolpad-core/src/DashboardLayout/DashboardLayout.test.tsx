@@ -322,7 +322,7 @@ describe('DashboardLayout', () => {
         action: <div>Action 1</div>,
       },
       {
-        title: 'Item',
+        title: 'Item 2',
         segment: 'item2',
         icon: <DescriptionIcon />,
         action: <div>Action 2</div>,

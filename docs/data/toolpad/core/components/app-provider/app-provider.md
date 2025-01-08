@@ -26,22 +26,22 @@ In the following example, an `AppProvider` component wrapping the page provides 
 
 ## Next.js
 
-The `AppProvider` for Next.js applications includes some Next.js integrations out-of-the-box.
+The `NextAppProvider` includes some Next.js integrations out-of-the-box.
 
-By using the specific `AppProvider` for Next.js you do not have to manually configure the integration between some Toolpad features and the corresponding Next.js features (such as routing), making the integration automatic and seamless.
+By using the specific `NextAppProvider` you do not have to manually configure the integration between some Toolpad features and the corresponding Next.js features (such as routing), making the integration automatic and seamless.
 
 ```tsx
-import { AppProvider } from '@toolpad/core/nextjs';
+import { NextAppProvider } from '@toolpad/core/nextjs';
 ```
 
 ### Next.js App Router
 
-When using the **Next.js App Router**, the most typical file where to import and use `AppProvider` will be at the top level `layout.tsx` file that defines the layout for all the application pages.
+When using the **Next.js App Router**, the most typical file where to import and use `NextAppProvider` is the top level `layout.tsx` file that defines the layout for all the application pages.
 
 ```tsx
 // app/layout.tsx
 
-import { AppProvider } from '@toolpad/core/nextjs';
+import { NextAppProvider } from '@toolpad/core/nextjs';
 
 export default function Layout(props) {
   const { children } = props;
@@ -49,7 +49,7 @@ export default function Layout(props) {
   return (
     <html lang="en">
       <body>
-        <AppProvider>{children}</AppProvider>
+        <NextAppProvider>{children}</NextAppProvider>
       </body>
     </html>
   );
@@ -58,32 +58,32 @@ export default function Layout(props) {
 
 ### Next.js Pages Router
 
-When using the **Next.js Pages Router**, the most typical file where to import and use `AppProvider` in order to wrap every page in the application will be the `pages/_app.tsx` file.
+When using the **Next.js Pages Router**, the most typical file where to import and use `NextAppProvider` in order to wrap every page in the application is the `pages/_app.tsx` file.
 
 ```tsx
 // pages/_app.tsx
 
-import { AppProvider } from '@toolpad/core/nextjs';
+import { NextAppProvider } from '@toolpad/core/nextjs';
 
 export default function App(props) {
   const { Component, pageProps } = props;
 
   return (
-    <AppProvider>
+    <NextAppProvider>
       <Component {...pageProps} />
-    </AppProvider>
+    </NextAppProvider>
   );
 }
 ```
 
 ## Client-side routing
 
-The `AppProvider` for React Router includes routing out-of-the-box for projects using [react-router-dom](https://www.npmjs.com/package/react-router-dom).
+The `ReactRouterAppProvider` includes routing out-of-the-box for projects using [react-router](https://www.npmjs.com/package/react-router).
 
-This specific `AppProvider` is recommended when building single-page applications with tools such as [Vite](https://vite.dev/), as you do not have to manually configure your app routing, making the integration automatic and seamless.
+This specific `ReactRouterAppProvider` is recommended when building single-page applications with tools such as [Vite](https://vite.dev/), as you do not have to manually configure your app routing, making the integration automatic and seamless.
 
 ```tsx
-import { AppProvider } from '@toolpad/core/react-router-dom';
+import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 ```
 
 ## Theming

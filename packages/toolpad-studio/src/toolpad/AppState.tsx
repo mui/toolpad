@@ -3,7 +3,7 @@ import { NodeHashes, NodeId } from '@toolpad/studio-runtime';
 import { createProvidedContext } from '@toolpad/utils/react';
 import invariant from 'invariant';
 import { debounce, DebouncedFunc } from 'lodash-es';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { mapValues } from '@toolpad/utils/collections';
 import useDebouncedHandler from '@toolpad/utils/hooks/useDebouncedHandler';
 import useEventCallback from '@mui/utils/useEventCallback';

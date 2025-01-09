@@ -1,6 +1,6 @@
-# Toolpad Core - Vite with React Router
+# Toolpad Core - Tutorial
 
-This example provides a minimal setup to get Toolpad Core working in Vite with HMR, as well as routing with React Router.
+This example provides a minimal setup to get Toolpad Core working with the Next.js App Router.
 
 ## Getting Started
 
@@ -23,13 +23,13 @@ Open [http://localhost:5173](http://localhost:5173) with your browser to see the
 To copy this example and customize it for your needs, run
 
 ```bash
-npx create-toolpad-app@latest --example vite
+npx create-toolpad-app@latest --example tutorial
 # or
-pnpm dlx create-toolpad-app@latest --example vite
+pnpm dlx create-toolpad-app@latest --example tutorial
 ```
 
 and follow the instructions in the terminal.
 
 ## The source
 
-[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/core/vite/)
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/core/tutorial/)

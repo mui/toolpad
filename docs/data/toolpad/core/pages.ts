@@ -106,7 +106,6 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-sign-up-page',
             title: 'Sign-up Page',
-            planned: true,
           },
           {
             pathname: '/toolpad/core/react-rbac',

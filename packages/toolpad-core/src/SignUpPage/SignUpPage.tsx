@@ -50,6 +50,11 @@ export interface SignUpPageSlots {
    * @default Typography
    */
   subtitle?: React.ElementType;
+  /*
+   * A component to add additional fields to the sign in form
+   * @default null
+   */
+  formFields?: React.ReactNode[];
 }
 
 export interface SignUpPageProps {
@@ -444,6 +449,7 @@ function SignUpPage(props: SignUpPageProps) {
                         })}
                       />
                     )}
+                    {slots?.formFields ?? null}
                   </Stack>
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />

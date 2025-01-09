@@ -105,23 +105,23 @@ The [Firebase Vite example app](https://github.com/mui/mui-toolpad/tree/master/e
 
 You can add your own branding elements through the `branding` prop in the AppProvider:
 
-{{"demo": "BrandingSignUpPage.js", "iframe": true, "height": 600 }}
+<!-- {{"demo": "BrandingSignUpPage.js", "iframe": true, "height": 600 }} -->
 
 ### Theme
 
 The `SignUpPage` can be deeply customized to match any theme through the AppProvider's theme prop:
 
-{{"demo": "ThemeSignUpPage.js", "iframe": true, "height": 700 }}
+<!-- {{"demo": "ThemeSignUpPage.js", "iframe": true, "height": 700 }} -->
 
 ### Slots
 
 To enable deep customization, the `SignUpPage` component allows bringing your own custom granular components:
 
-{{"demo": "SlotsSignUp.js", "iframe": true, "height": 540 }}
+<!-- {{"demo": "SlotsSignUp.js", "iframe": true, "height": 540 }} -->
 
 You can use the `slotProps` prop to pass props to the underlying components of each slot:
 
-{{"demo": "SlotPropsSignUp.js", "iframe": true, "height": 600 }}
+<!-- {{"demo": "SlotPropsSignUp.js", "iframe": true, "height": 600 }} -->
 
 ### 🚧 Layouts
 

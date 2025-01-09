@@ -1,6 +1,6 @@
 # Toolpad Core - Tutorial
 
-This example provides a minimal setup to get Toolpad Core working with the Next.js app router.
+This example provides a minimal setup to get Toolpad Core working with the Next.js App Router.
 
 ## Getting Started
 

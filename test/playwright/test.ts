@@ -21,7 +21,7 @@ const IGNORED_ERRORS = [
   /InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable/,
   /Failed to load resource: the server responded with a status of 504 \(Outdated Optimize Dep\)/,
   /Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-  // TODO: Figure out why this fails even with a perpetual license
+  // TODO: Figure out why this fails
   /\*{5,}\n\nMUI X: Missing license key\./,
 ];
 

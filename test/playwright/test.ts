@@ -28,6 +28,7 @@ const IGNORED_ERRORS = [
 export type Options = { ignoreConsoleErrors: RegExp[] };
 
 export const test = base.extend<Options>({
+  ignoreConsoleErrors: [[], { option: true }],
   page: async ({ page, ignoreConsoleErrors }, run) => {
     const entryPromises: Promise<ConsoleEntry>[] = [];
 

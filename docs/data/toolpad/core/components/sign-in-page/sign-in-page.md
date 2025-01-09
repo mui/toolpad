@@ -228,14 +228,12 @@ VITE_FIREBASE_MESSAGE_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 
-You can find these in the Firebase project settings.
-
 :::info
-Head to the [integration docs](https://mui.com/toolpad/core/integrations/react-router/) for code examples on integrating Firebase authentication with Vite and React Router.
+Head to the [Firebase docs](https://firebase.google.com/docs/auth/) for details around configuring authentication with Firebase. You can also find code examples in the [integration docs for Vite & React Router](https://mui.com/toolpad/core/integrations/react-router/).
 :::
 
 :::success
-If you're using [create-toolpad-app](/toolpad/core/introduction/installation/), or the default [Vite with Firebase authentication example](https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite/), the integration is already set up for you.
+If you're using [create-toolpad-app](/toolpad/core/introduction/installation/), or the default [Vite with Firebase authentication example](https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite/), the integration code is already provided.
 :::
 
 ## Customization

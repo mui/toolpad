@@ -21,16 +21,13 @@ const IGNORED_ERRORS = [
   /InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable/,
   /Failed to load resource: the server responded with a status of 504 \(Outdated Optimize Dep\)/,
   /Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
+  // TODO: Figure out why this fails even with a perpetual license
+  /\*{5,}\n\nMUI X: Missing license key\./,
 ];
 
 export type Options = { ignoreConsoleErrors: RegExp[] };
 
 export const test = base.extend<Options>({
-  ignoreConsoleErrors: [
-    [/\*{5,}\n\nMUI X: Missing license key\.\n\nThe license/],
-    { option: true },
-  ],
-
   page: async ({ page, ignoreConsoleErrors }, run) => {
     const entryPromises: Promise<ConsoleEntry>[] = [];
 

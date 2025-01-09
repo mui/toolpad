@@ -235,7 +235,7 @@ test('function editor extracted parameters', async ({ page, localApp }) => {
 });
 
 // TODO: Figure out why this times out with React 19
-test.skip('data providers', async ({ page }) => {
+test('data providers', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPage('dataProviders');
 
@@ -265,7 +265,7 @@ test.skip('data providers', async ({ page }) => {
 });
 
 // TODO: Figure out why this times out with React 19
-test.skip('data providers crud', async ({ page }) => {
+test('data providers crud', async ({ page }) => {
   const editorModel = new ToolpadEditor(page);
   await editorModel.goToPage('crud');
 

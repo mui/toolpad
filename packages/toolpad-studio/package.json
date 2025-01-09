@@ -69,6 +69,7 @@
     "@mui/system": "6.3.1",
     "@mui/types": "7.2.21",
     "@mui/utils": "6.3.1",
+    "@mui/x-license": "7.23.5",
     "@mui/x-charts": "7.23.2",
     "@mui/x-data-grid": "7.23.5",
     "@mui/x-data-grid-premium": "7.23.5",

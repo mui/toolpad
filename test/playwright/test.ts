@@ -20,9 +20,6 @@ const IGNORED_ERRORS = [
   // TODO: Comes up in firefox on CI sometimes
   /InvalidStateError: An attempt was made to use an object that is not, or is no longer, usable/,
   /Failed to load resource: the server responded with a status of 504 \(Outdated Optimize Dep\)/,
-  /Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
-  // TODO: Figure out why this fails
-  /\*{5,}\n\nMUI X: Missing license key\./,
 ];
 
 export type Options = { ignoreConsoleErrors: RegExp[] };

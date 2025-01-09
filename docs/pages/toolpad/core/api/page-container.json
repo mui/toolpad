@@ -1,12 +1,12 @@
 {
   "props": {
     "breadcrumbs": {
-      "type": { "name": "arrayOf", "description": "Array&lt;{ path: string, title: string }&gt;" }
+      "type": { "name": "arrayOf", "description": "Array&lt;{ path?: string, title: string }&gt;" }
     },
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ header: { breadcrumbs?: Array&lt;{ path: string, title: string }&gt;, slotProps?: { toolbar: object }, slots?: { toolbar?: elementType }, title?: string } }"
+        "description": "{ header: { breadcrumbs?: Array&lt;{ path?: string, title: string }&gt;, slotProps?: { toolbar: object }, slots?: { toolbar?: elementType }, title?: string } }"
       }
     },
     "slots": {

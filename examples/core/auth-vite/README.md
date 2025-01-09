@@ -2,6 +2,16 @@
 
 This example provides a minimal setup to get Toolpad Core working in Vite with HMR, as well as routing with React Router and a mock authentication setup.
 
+## Clone using `create-toolpad-app`
+
+To copy this example and customize it for your needs, run
+
+```bash
+npx create-toolpad-app@latest --example auth-vite
+# or
+pnpm dlx create-toolpad-app@latest --example auth-vite
+```
+
 ## Getting Started
 
 First, run the development server:
@@ -17,14 +27,6 @@ bun dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) with your browser to see the result.
-
-## Clone using `create-toolpad-app`
-
-To copy this example and customize it for your needs, run
-
-```bash
-npx create-toolpad-app@latest --example auth-vite
-```
 
 ## The source
 

@@ -28,13 +28,30 @@ The same OAuth providers supported by SignInPage are available for SignUpPage. S
 
 To render a registration form with email/password, pass in a provider with `credentials` as the `id` property. The `signUp` function accepts a `formData` parameter in this case.
 
-{{"demo": "CredentialsSignUpPage.js", "iframe": true, "height": 600}}
+{{"demo": "CredentialsSignUpPage.js", "iframe": true, "height": 500}}
 
 ## Usage with authentication libraries
 
 ### Firebase
 
 The component is composable with any authentication library. Here's an example using Firebase with Vite:
+
+#### Setup
+
+To use Firebase as your authentication library, you need to setup a new Firebase project and obtain the following environment variables from your project console:
+
+```bash
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGE_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+Visit the [Firebase docs](https://firebase.google.com/docs/auth) for more details on setting up and adding authentication to your project.
+
+#### Usage
 
 ```tsx title="src/pages/signup.tsx"
 'use client';
@@ -43,9 +60,9 @@ import * as React from 'react';
 import Link from '@mui/material/Link';
 import LinearProgress from '@mui/material/LinearProgress';
 import { SignUpPage } from '@toolpad/core/SignUpPage';
-import { Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation } from 'react-router';
 import { useSession, type Session } from '../SessionContext';
-import { signInWithGoogle } from '../firebase/auth';
+import { signUpWithCredentials } from '../firebase/auth';
 
 export default function SignUp() {
   const { session, setSession, loading } = useSession();
@@ -63,12 +80,19 @@ export default function SignUp() {
 
   return (
     <SignUpPage
-      providers={[{ id: 'google', name: 'Google' }]}
+      providers={[{ id: 'credentials', name: 'Email and Password' }]}
       signUp={async (provider, formData, callbackUrl) => {
         let result;
         try {
-          if (provider.id === 'google') {
-            result = await signInWithGoogle();
+          if (provider.id === 'credentials') {
+            const email = formData?.get('email') as string;
+            const password = formData?.get('password') as string;
+
+            if (!email || !password) {
+              return { error: 'Email and password are required' };
+            }
+
+            result = await signUpWithCredentials(email, password);
           }
           if (result?.success && result?.user) {
             // Convert Firebase user to Session format
@@ -96,7 +120,7 @@ export default function SignUp() {
 ```
 
 :::info
-The [Firebase Vite example app](https://github.com/mui/mui-toolpad/tree/master/examples/core/firebase-vite/) comes with a working app using Firebase including Sign Up and Sign In flows.
+The [Firebase Vite example app](https://github.com/mui/mui-toolpad/tree/master/examples/core/firebase-vite/) comes with a working app using Firebase including both `SignUpPage` and `SignInPage` flows.
 :::
 
 ## Customization
@@ -105,13 +129,13 @@ The [Firebase Vite example app](https://github.com/mui/mui-toolpad/tree/master/e
 
 You can add your own branding elements through the `branding` prop in the AppProvider:
 
-<!-- {{"demo": "BrandingSignUpPage.js", "iframe": true, "height": 600 }} -->
+{{"demo": "BrandingSignUpPage.js", "iframe": true, "height": 600 }}
 
 ### Theme
 
 The `SignUpPage` can be deeply customized to match any theme through the AppProvider's theme prop:
 
-<!-- {{"demo": "ThemeSignUpPage.js", "iframe": true, "height": 700 }} -->
+{{"demo": "ThemeSignUpPage.js", "iframe": true, "height": 700 }}
 
 ### Slots
 

@@ -1,0 +1,20 @@
+const BRANDING = {
+  logo: (
+    <img
+      src="https://mui.com/static/logo.svg"
+      alt="MUI logo"
+      style={{ height: 24 }}
+    />
+  ),
+  title: 'MUI',
+};
+
+// ...
+
+<AppProvider branding={BRANDING} theme={theme}>
+  <SignUpPage
+    signUp={signUp}
+    providers={providers}
+    slotProps={{ emailField: { autoFocus: false } }}
+  />
+</AppProvider>

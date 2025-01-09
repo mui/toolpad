@@ -172,6 +172,7 @@ export async function completeSignUpWithEmailLink() {
   }
   return {};
 }
+
 // Sign out functionality
 export const firebaseSignOut = async () => {
   try {

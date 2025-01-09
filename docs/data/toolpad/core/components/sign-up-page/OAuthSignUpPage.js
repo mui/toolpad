@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignUpPage } from '@toolpad/core/SignUpPage';
 
 import { useTheme } from '@mui/material/styles';
 
@@ -15,11 +15,11 @@ const providers = [
 
 // preview-end
 
-const signIn = async (provider) => {
+const signUp = async (provider) => {
   // preview-start
   const promise = new Promise((resolve) => {
     setTimeout(() => {
-      console.log(`Sign in with ${provider.id}`);
+      console.log(`Sign up with ${provider.id}`);
       resolve({ error: 'This is a fake error' });
     }, 500);
   });
@@ -27,12 +27,12 @@ const signIn = async (provider) => {
   return promise;
 };
 
-export default function OAuthSignInPage() {
+export default function OAuthSigUPnPage() {
   const theme = useTheme();
   return (
     // preview-start
     <AppProvider theme={theme}>
-      <SignInPage signIn={signIn} providers={providers} />
+      <SignUpPage signUp={signUp} providers={providers} />
     </AppProvider>
     // preview-end
   );

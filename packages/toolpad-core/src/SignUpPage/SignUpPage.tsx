@@ -12,7 +12,6 @@ import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
 import { alpha, useTheme, SxProps } from '@mui/material/styles';
-import { LinkProps } from '@mui/material/Link';
 import { BrandingContext, RouterContext } from '../shared/context';
 import IconProviderMap from '../shared/icons/iconProviderMap';
 import { getCommonTextFieldProps } from '../shared/utils';
@@ -36,10 +35,10 @@ export interface SignUpPageSlots {
   submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
 
   /**
-   * The custom sign in link component used in the credentials form.
-   * @default Link
+   * The custom component for the page footer.
+   * @default null
    */
-  signInLink?: React.JSXElementConstructor<LinkProps>;
+  footer?: React.ElementType;
   /**
    * A component to override the default title section
    * @default Typography
@@ -50,11 +49,21 @@ export interface SignUpPageSlots {
    * @default Typography
    */
   subtitle?: React.ElementType;
-  /*
-   * A component to add additional fields to the sign in form
+  /**
+   * A component to override the entire form section
+   * @default form
+   */
+  form?: React.JSXElementConstructor<HTMLFormElement>;
+  /**
+   * A component to add content to the space between the form fields and the submit button
    * @default null
    */
-  formFields?: React.ReactNode[];
+  formFooter?: React.ElementType;
+  /**
+   * A component to add additional fields to the form
+   * @default null
+   */
+  formFields?: React.ElementType;
 }
 
 export interface SignUpPageProps {
@@ -79,7 +88,7 @@ export interface SignUpPageProps {
   /**
    * The components used for each slot inside.
    * @default {}
-   * @example { signInLink: <Link href="/sign-up">Sign In</Link> }
+   * @example { footer: <Box display="flex" justifyContent="center" /><Link href="/sign-up">Sign In</Link></Box> }
    */
   slots?: SignUpPageSlots;
   /**
@@ -93,8 +102,10 @@ export interface SignUpPageProps {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
     submitButton?: LoadingButtonProps;
-    forgotPasswordLink?: LinkProps;
-    signInLink?: LinkProps;
+    form?: Partial<React.FormHTMLAttributes<HTMLFormElement>>;
+    formFields?: React.ComponentProps<any>;
+    formFooter?: React.ComponentProps<any>;
+    footer?: React.ComponentProps<any>;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container
@@ -119,7 +130,7 @@ function SignUpPage(props: SignUpPageProps) {
   const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const emailProvider = providers?.find(
-    (provider) => provider.id === 'nodemailer' || provider.id === 'email',
+    (provider) => provider.id === 'nodemailer' || provider.id === 'firebase-email',
   );
   const [{ loading, selectedProviderId, error, success }, setFormStatus] = React.useState<{
     loading: boolean;
@@ -140,7 +151,7 @@ function SignUpPage(props: SignUpPageProps) {
       provider &&
       provider !== 'credentials' &&
       provider !== 'nodemailer' &&
-      provider !== 'email' &&
+      provider !== 'firebase-email' &&
       provider !== 'passkey',
     [],
   );
@@ -157,7 +168,7 @@ function SignUpPage(props: SignUpPageProps) {
       }}
     >
       <Container component="main" maxWidth="xs">
-        <Box
+        <Stack
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -165,6 +176,7 @@ function SignUpPage(props: SignUpPageProps) {
             bgcolor: 'background.paper',
             borderRadius: 1,
             p: 4,
+            gap: 1,
             border: '1px solid',
             borderColor: alpha(theme.palette.grey[400], 0.4),
             boxShadow: theme.shadows[4],
@@ -194,7 +206,7 @@ function SignUpPage(props: SignUpPageProps) {
               Welcome, please sign up to continue
             </Typography>
           )}
-          <Box sx={{ mt: theme.spacing(1), width: '100%' }}>
+          <Box width="100%">
             <Stack spacing={1}>
               {error && isOauthProvider(selectedProviderId) ? (
                 <Alert severity="error">{error}</Alert>
@@ -219,7 +231,9 @@ function SignUpPage(props: SignUpPageProps) {
                           error: oauthResponse?.error,
                         }));
                       }}
+                      {...slotProps?.form}
                     >
+                      {slots?.formFooter ? <slots?.formFooter {...slotProps?.formFooter} /> : null}
                       <LoadingButton
                         key={provider.id}
                         variant="outlined"
@@ -247,7 +261,7 @@ function SignUpPage(props: SignUpPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'passkey' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
+                  <Alert sx={{ mt: 1, mb: 3 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
@@ -268,6 +282,7 @@ function SignUpPage(props: SignUpPageProps) {
                       error: passkeyResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -285,6 +300,8 @@ function SignUpPage(props: SignUpPageProps) {
                       })}
                     />
                   )}
+                  {slots?.formFields ? <slots.formFields {...slotProps?.formFields} /> : null}
+                  {slots?.formFooter ? <slots?.formFooter {...slotProps?.formFooter} /> : null}
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -315,14 +332,14 @@ function SignUpPage(props: SignUpPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error &&
-                (selectedProviderId === 'nodemailer' || selectedProviderId === 'email') ? (
-                  <Alert sx={{ my: 2 }} severity="error">
+                (selectedProviderId === 'nodemailer' || selectedProviderId === 'firebase-email') ? (
+                  <Alert sx={{ mt: 1, mb: 2 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
                 {success &&
-                (selectedProviderId === 'nodemailer' || selectedProviderId === 'email') ? (
-                  <Alert sx={{ my: 2 }} severity="success">
+                (selectedProviderId === 'nodemailer' || selectedProviderId === 'firebase-email') ? (
+                  <Alert sx={{ mt: 1, mb: 2 }} severity="success">
                     {success}
                   </Alert>
                 ) : null}
@@ -344,6 +361,7 @@ function SignUpPage(props: SignUpPageProps) {
                       success: emailResponse?.success,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -353,14 +371,16 @@ function SignUpPage(props: SignUpPageProps) {
                         label: 'Email',
                         placeholder: 'your@email.com',
                         name: 'email',
-                        id: `email-nodemailer`,
+                        id: `email-magicLink`,
                         type: 'email',
-                        autoComplete: `email-nodemailer`,
+                        autoComplete: `email-magicLink`,
                         autoFocus: singleProvider,
                         ...slotProps?.emailField,
                       })}
                     />
                   )}
+                  {slots?.formFields ? <slots.formFields {...slotProps?.formFields} /> : null}
+                  {slots?.formFooter ? <slots?.formFooter {...slotProps?.formFooter} /> : null}
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -370,7 +390,7 @@ function SignUpPage(props: SignUpPageProps) {
                       size="large"
                       variant="outlined"
                       disableElevation
-                      id="submit-nodemailer"
+                      id="submit-email"
                       color="inherit"
                       loading={loading && selectedProviderId === emailProvider.id}
                       sx={{
@@ -391,7 +411,7 @@ function SignUpPage(props: SignUpPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'credentials' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
+                  <Alert sx={{ mt: 1, mb: 3 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
@@ -416,8 +436,9 @@ function SignUpPage(props: SignUpPageProps) {
                       error: credentialsResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
-                  <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
+                  <Stack direction="column" spacing={2} sx={{ mb: 0 }}>
                     {slots?.emailField ? (
                       <slots.emailField {...slotProps?.emailField} />
                     ) : (
@@ -449,8 +470,10 @@ function SignUpPage(props: SignUpPageProps) {
                         })}
                       />
                     )}
-                    {slots?.formFields ?? null}
+                    {slots?.formFields ? <slots.formFields {...slotProps?.formFields} /> : null}
                   </Stack>
+                  {slots?.formFields ? <slots.formFields {...slotProps?.formFields} /> : null}
+                  {slots?.formFooter ? <slots?.formFooter {...slotProps?.formFooter} /> : null}
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -473,16 +496,12 @@ function SignUpPage(props: SignUpPageProps) {
                     </LoadingButton>
                   )}
 
-                  {slots?.signInLink ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {slots?.signInLink ? <slots.signInLink {...slotProps?.signInLink} /> : null}
-                    </Box>
-                  ) : null}
+                  {slots?.footer ? <slots.footer {...slotProps?.footer} /> : null}
                 </Box>
               </React.Fragment>
             ) : null}
           </Box>
-        </Box>
+        </Stack>
       </Container>
     </Box>
   );
@@ -523,18 +542,18 @@ SignUpPage.propTypes /* remove-proptypes */ = {
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
     passwordField: PropTypes.object,
-    signInLink: PropTypes.object,
+    footer: PropTypes.object,
     submitButton: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
    * @default {}
-   * @example { signInLink: <Link href="/sign-up">Sign In</Link> }
+   * @example { footer: <Box display="flex" justifyContent="center" /><Link href="/sign-up">Sign In</Link></Box> }
    */
   slots: PropTypes.shape({
     emailField: PropTypes.elementType,
     passwordField: PropTypes.elementType,
-    signInLink: PropTypes.elementType,
+    footer: PropTypes.elementType,
     submitButton: PropTypes.elementType,
     subtitle: PropTypes.elementType,
     title: PropTypes.elementType,

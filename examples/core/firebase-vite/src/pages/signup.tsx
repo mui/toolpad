@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import LinearProgress from '@mui/material/LinearProgress';
 import { SignUpPage } from '@toolpad/core/SignUpPage';
-import { Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation } from 'react-router';
 import { useSession, type Session } from '../SessionContext';
 import {
   signUpWithCredentials,

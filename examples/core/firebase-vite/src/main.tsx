@@ -1,11 +1,12 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router';
 import App from './App';
 import Layout from './layouts/dashboard';
 import DashboardPage from './pages';
 import OrdersPage from './pages/orders';
 import SignInPage from './pages/signin';
+import SignUpPage from './pages/signup';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: '/sign-in',
         Component: SignInPage,
+      },
+      {
+        path: '/sign-up',
+        component: SignUpPage,
       },
     ],
   },

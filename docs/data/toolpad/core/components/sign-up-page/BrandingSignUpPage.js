@@ -1,33 +1,38 @@
 import * as React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { SignUpPage } from '@toolpad/core/SignUpPage';
-import type { AuthProvider } from '@toolpad/core/auth';
+
 import { useTheme } from '@mui/material/styles';
 
+const providers = [{ id: 'credentials', name: 'Credentials' }];
 // preview-start
-const providers = [{ id: 'credentials', name: 'Email and Password' }];
+const BRANDING = {
+  logo: (
+    <img
+      src="https://mui.com/static/logo.svg"
+      alt="MUI logo"
+      style={{ height: 24 }}
+    />
+  ),
+  title: 'MUI',
+};
 // preview-end
 
-const signUp: (provider: AuthProvider, formData: FormData) => void = async (
-  provider,
-  formData,
-) => {
-  const promise = new Promise<void>((resolve) => {
+const signUp = async (provider) => {
+  const promise = new Promise((resolve) => {
     setTimeout(() => {
-      alert(
-        `Signing up with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
-      );
+      console.log(`Sign up with ${provider.id}`);
       resolve();
-    }, 300);
+    }, 500);
   });
   return promise;
 };
 
-export default function CredentialsSignUpPage() {
+export default function BrandingSignInPage() {
   const theme = useTheme();
   return (
     // preview-start
-    <AppProvider theme={theme}>
+    <AppProvider branding={BRANDING} theme={theme}>
       <SignUpPage
         signUp={signUp}
         providers={providers}

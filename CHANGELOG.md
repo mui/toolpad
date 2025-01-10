@@ -6,7 +6,7 @@
 
 _Jan 10, 2025_
 
-A big thanks to the 5 contributors who made this release possible.Here are some highlights ✨:
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
 **BREAKING CHANGE**
 

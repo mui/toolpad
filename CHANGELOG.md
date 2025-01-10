@@ -17,6 +17,8 @@ A big thanks to the 5 contributors who made this release possible.Here are some 
 + import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 ```
 
+Note the change in the path from `react-router-dom` to `react-router`
+
 ```diff
 - import { AppProvider } from '@toolpad/core/nextjs';
 + import { NextAppProvider } from '@toolpad/core/nextjs';

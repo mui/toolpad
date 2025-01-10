@@ -1,6 +1,6 @@
 # Toolpad Core - Vite with React Router and mock authentication
 
-This template provides a minimal setup to get React working in Vite with HMR.
+This example provides a minimal setup to get Toolpad Core working in Vite with HMR, as well as routing with React Router and a mock authentication setup.
 
 ## Clone using `create-toolpad-app`
 
@@ -12,7 +12,22 @@ npx create-toolpad-app@latest --example auth-vite
 pnpm dlx create-toolpad-app@latest --example auth-vite
 ```
 
-Currently, two official plugins are available:
+## Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) with your browser to see the result.
+
+## The source
+
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/core/auth-vite/)

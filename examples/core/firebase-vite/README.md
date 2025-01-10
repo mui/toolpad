@@ -1,6 +1,16 @@
 # Toolpad Core - Vite with React Router and Firebase Auth
 
-This template provides a minimal setup to get React working in Vite with HMR, and authentication with Firebase.
+This example provides a minimal setup to get Toolpad Core working in Vite with HMR, as well as routing with React Router and authentication with Firebase.
+
+## Clone using `create-toolpad-app`
+
+To copy this example and customize it for your needs, run
+
+```bash
+npx create-toolpad-app@latest --example firebase-vite
+# or
+pnpm dlx create-toolpad-app@latest --example firebase-vite
+```
 
 ## Setting up
 
@@ -15,17 +25,22 @@ VITE_FIREBASE_MESSAGE_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 ```
 
-## Clone using `create-toolpad-app`
+## Getting Started
 
-To copy this example and customize it for your needs, run
+First, run the development server:
 
 ```bash
-npx create-toolpad-app@latest --example firebase-vite
+npm run dev
 # or
-pnpm dlx create-toolpad-app@latest --example firebase-vite
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Currently, two official plugins are available:
+Open [http://localhost:5173](http://localhost:5173) with your browser to see the result.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## The source
+
+[Check out the source code](https://github.com/mui/toolpad/tree/master/examples/core/vite/)

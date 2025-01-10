@@ -34,10 +34,10 @@ _(Note the change in the path from `react-router-dom` to `react-router`)_
 ### `@toolpad/core`
 
 - Upgrade Toolpad to React 19 (#4488) @bharatkashyap
-- Fix sidebar CSS transitions for some breakpoints in DashboardLayout (#4522) @gil-obradors
-- Prevent account info overflowing on kebab menu in Account component (#4555) @bharatkashyap
+- Fix sidebar CSS transitions for some breakpoints in `DashboardLayout` (#4522) @gil-obradors
+- Prevent account info overflowing on kebab menu in `Account` component (#4555) @bharatkashyap
 - Use unique names for framework specific `AppProvider`s (#4553) @apedroferreira
-- Allow multiple breadcrumbs that are not links in PageHeader (#4571) @null93
+- Allow multiple breadcrumbs that are not links in `PageHeader`(#4571) @null93
 
 ### CLI
 

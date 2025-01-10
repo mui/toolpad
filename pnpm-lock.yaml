@@ -13,8 +13,8 @@ importers:
   .:
     dependencies:
       '@types/lodash':
-        specifier: 4.17.13
-        version: 4.17.13
+        specifier: 4.17.14
+        version: 4.17.14
       '@vitest/browser':
         specifier: 2.1.8
         version: 2.1.8(@types/node@20.17.12)(playwright@1.48.2)(typescript@5.7.2)(vite@5.4.11(@types/node@20.17.12)(terser@5.36.0))(vitest@2.1.8)
@@ -117,7 +117,7 @@ importers:
         version: 6.6.3
       '@testing-library/react':
         specifier: 16.0.1
-        version: 16.0.1(@testing-library/dom@10.4.0)(@types/react-dom@18.3.1)(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        version: 16.0.1(@testing-library/dom@10.4.0)(@types/react-dom@18.3.5(@types/react@19.0.1))(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@testing-library/user-event':
         specifier: 14.5.2
         version: 14.5.2(@testing-library/dom@10.4.0)
@@ -347,8 +347,8 @@ importers:
         specifier: 0.5.5
         version: 0.5.5(react@19.0.0)
       '@types/lodash':
-        specifier: 4.17.13
-        version: 4.17.13
+        specifier: 4.17.14
+        version: 4.17.14
       '@types/react-router-dom':
         specifier: 5.3.3
         version: 5.3.3
@@ -522,8 +522,8 @@ importers:
         specifier: ^19.0.0
         version: 19.0.0
       '@types/react-swipeable-views':
-        specifier: ^0.13.5
-        version: 0.13.5
+        specifier: ^0.13.6
+        version: 0.13.6
       cpy-cli:
         specifier: 5.0.0
         version: 5.0.0
@@ -645,8 +645,8 @@ importers:
         specifier: 2.2.37
         version: 2.2.37
       '@types/prop-types':
-        specifier: 15.7.13
-        version: 15.7.13
+        specifier: 15.7.14
+        version: 15.7.14
       '@types/react':
         specifier: ^19.0.0
         version: 19.0.1
@@ -971,8 +971,8 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
       '@types/express-serve-static-core':
-        specifier: 5.0.1
-        version: 5.0.1
+        specifier: 5.0.4
+        version: 5.0.4
       '@types/formidable':
         specifier: 3.4.5
         version: 3.4.5
@@ -1271,8 +1271,8 @@ importers:
         specifier: 18.3.18
         version: 18.3.18
       '@types/react-dom':
-        specifier: 18.3.1
-        version: 18.3.1
+        specifier: 18.3.5
+        version: 18.3.5(@types/react@18.3.18)
       eslint-config-next:
         specifier: 15.1.3
         version: 15.1.3(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.96.1(esbuild@0.24.2)))(eslint@8.57.1)(typescript@5.7.2)
@@ -4381,8 +4381,8 @@ packages:
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
-  '@types/express-serve-static-core@5.0.1':
-    resolution: {integrity: sha512-CRICJIl0N5cXDONAdlTv5ShATZ4HEwk6kDDIW2/w9qOWKg+NU/5F8wYRWCrONad0/UKkloNSmmyN/wX4rtpbVA==}
+  '@types/express-serve-static-core@5.0.4':
+    resolution: {integrity: sha512-5kz9ScmzBdzTgB/3susoCgfqNDzBjvLL4taparufgSvlwjdLy6UyUy9T/tCpYd2GIdIilCatC4iSQS0QSYHt0w==}
 
   '@types/express@5.0.0':
     resolution: {integrity: sha512-DvZriSMehGHL1ZNLzi6MidnsDhUZM/x2pRdDIKdwbUNqqwHxMlRdkxtn6/EPKyqKpHqTl/4nRZsRNLpZxZRpPQ==}
@@ -4444,8 +4444,8 @@ packages:
   '@types/lodash-es@4.17.12':
     resolution: {integrity: sha512-0NgftHUcV4v34VhXm8QBSftKVXtbkBG3ViCjs6+eJ5a6y6Mi/jiFGPc1sC7QK+9BFhWrURE3EOggmWaSxL9OzQ==}
 
-  '@types/lodash@4.17.13':
-    resolution: {integrity: sha512-lfx+dftrEZcdBPczf9d0Qv0x+j/rfNCMuC6OcfXmO8gkfeNAY88PgKUbvG56whcN23gc27yenwF6oJZXGFpYxg==}
+  '@types/lodash@4.17.14':
+    resolution: {integrity: sha512-jsxagdikDiDBeIRaPYtArcT8my4tN1og7MtMRquFT3XNA6axxyHDRUemqDz/taRDdOUn0GnGHRCuff4q48sW9A==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -4483,9 +4483,6 @@ packages:
   '@types/pg@8.11.10':
     resolution: {integrity: sha512-LczQUW4dbOQzsH2RQ5qoeJ6qJPdrcM/DcMLoqWQkMLMsq83J5lAX3LXjdkWdpscFy67JSOWDnh7Ny/sPFykmkg==}
 
-  '@types/prop-types@15.7.13':
-    resolution: {integrity: sha512-hCZTSvwbzWGvhqxp/RqVqwU999pBf2vp7hzIjiYOsl8wqOmUxkQ6ddw1cV3l8811+kdUFus/q4d1Y3E3SyEifA==}
-
   '@types/prop-types@15.7.14':
     resolution: {integrity: sha512-gNMvNH49DJ7OJYv+KAKn0Xp45p8PLl6zo2YnvDIbTd4J6MER2BmWN49TG7n9LvkyihINxeKW8+3bfS2yDC9dzQ==}
 
@@ -4498,8 +4495,10 @@ packages:
   '@types/react-dev-utils@9.0.15':
     resolution: {integrity: sha512-JSZZtC8f5FD3FvlT8F6dPojPH6u0f+E/+g9DqXgQo/7GvCdPYiK+Q+mMajZClqH/f5SjyYop7v6uiLyfgnyLQA==}
 
-  '@types/react-dom@18.3.1':
-    resolution: {integrity: sha512-qW1Mfv8taImTthu4KoXgDfLuk4bydU6Q/TkADnDWWHwi4NX4BR+LWfTp2sVmTqRrsHvyDDTelgelxJ+SsejKKQ==}
+  '@types/react-dom@18.3.5':
+    resolution: {integrity: sha512-P4t6saawp+b/dFrUr2cvkVsfvPguwsxtH6dNIYRllMsefqFzkZk5UIjzyDOv5g1dXIPdG4Sp1yCR4Z6RCUsG/Q==}
+    peerDependencies:
+      '@types/react': ^18.0.0
 
   '@types/react-dom@19.0.1':
     resolution: {integrity: sha512-hljHij7MpWPKF6u5vojuyfV0YA4YURsQG7KT6SzV0Zs2BXAtgdTxG6A229Ub/xiWV4w/7JL8fi6aAyjshH4meA==}
@@ -4513,8 +4512,8 @@ packages:
   '@types/react-router@5.1.20':
     resolution: {integrity: sha512-jGjmu/ZqS7FjSH6owMcD5qpq19+1RS9DeVRqfl1FeBMxTDQAGwlMWOcs52NDoXaNKyG3d1cYQFMs9rCrb88o9Q==}
 
-  '@types/react-swipeable-views@0.13.5':
-    resolution: {integrity: sha512-ni6WjO7gBq2xB2Y/ZiRdQOgjGOxIik5ow2s7xKieDq8DxsXTdV46jJslSBVK2yoIJHf6mG3uqNTwxwgzbXRRzg==}
+  '@types/react-swipeable-views@0.13.6':
+    resolution: {integrity: sha512-Pe9TxRRo098Lxi59YQ8KWVuyBOvt9nJK5AtAqGiRsnl+6PXLknuiLhg0+mGuM9Bn+nun+Ed65Kb1Yl171vCdyA==}
 
   '@types/react-transition-group@4.4.12':
     resolution: {integrity: sha512-8TV6R3h2j7a91c+1DXdJi3Syo69zzIZbz7Lg5tORM5LEJG7X/E6a1V3drRyBRZq7/utz7A+c4OgYLiLcYGHG6w==}
@@ -13070,7 +13069,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.26.0
       '@mui/types': 7.2.21(@types/react@19.0.1)
-      '@types/prop-types': 15.7.13
+      '@types/prop-types': 15.7.14
       clsx: 2.1.1
       prop-types: 15.8.1
       react: 19.0.0
@@ -14178,7 +14177,7 @@ snapshots:
       lodash: 4.17.21
       redent: 3.0.0
 
-  '@testing-library/react@16.0.1(@testing-library/dom@10.4.0)(@types/react-dom@18.3.1)(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+  '@testing-library/react@16.0.1(@testing-library/dom@10.4.0)(@types/react-dom@18.3.5(@types/react@19.0.1))(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@babel/runtime': 7.26.0
       '@testing-library/dom': 10.4.0
@@ -14186,7 +14185,7 @@ snapshots:
       react-dom: 19.0.0(react@19.0.0)
     optionalDependencies:
       '@types/react': 19.0.1
-      '@types/react-dom': 18.3.1
+      '@types/react-dom': 18.3.5(@types/react@19.0.1)
 
   '@testing-library/user-event@14.5.2(@testing-library/dom@10.4.0)':
     dependencies:
@@ -14256,7 +14255,7 @@ snapshots:
 
   '@types/connect-history-api-fallback@1.5.4':
     dependencies:
-      '@types/express-serve-static-core': 5.0.1
+      '@types/express-serve-static-core': 5.0.4
       '@types/node': 20.17.12
 
   '@types/connect@3.4.38':
@@ -14313,7 +14312,7 @@ snapshots:
 
   '@types/estree@1.0.6': {}
 
-  '@types/express-serve-static-core@5.0.1':
+  '@types/express-serve-static-core@5.0.4':
     dependencies:
       '@types/node': 20.17.12
       '@types/qs': 6.9.16
@@ -14323,7 +14322,7 @@ snapshots:
   '@types/express@5.0.0':
     dependencies:
       '@types/body-parser': 1.19.5
-      '@types/express-serve-static-core': 5.0.1
+      '@types/express-serve-static-core': 5.0.4
       '@types/qs': 6.9.16
       '@types/serve-static': 1.15.7
 
@@ -14390,9 +14389,9 @@ snapshots:
 
   '@types/lodash-es@4.17.12':
     dependencies:
-      '@types/lodash': 4.17.13
+      '@types/lodash': 4.17.14
 
-  '@types/lodash@4.17.13': {}
+  '@types/lodash@4.17.14': {}
 
   '@types/mdast@4.0.4':
     dependencies:
@@ -14431,8 +14430,6 @@ snapshots:
       pg-protocol: 1.7.0
       pg-types: 4.0.2
 
-  '@types/prop-types@15.7.13': {}
-
   '@types/prop-types@15.7.14': {}
 
   '@types/qs@6.9.16': {}
@@ -14450,9 +14447,14 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  '@types/react-dom@18.3.1':
+  '@types/react-dom@18.3.5(@types/react@18.3.18)':
+    dependencies:
+      '@types/react': 18.3.18
+
+  '@types/react-dom@18.3.5(@types/react@19.0.1)':
     dependencies:
       '@types/react': 19.0.1
+    optional: true
 
   '@types/react-dom@19.0.1':
     dependencies:
@@ -14473,7 +14475,7 @@ snapshots:
       '@types/history': 4.7.11
       '@types/react': 19.0.1
 
-  '@types/react-swipeable-views@0.13.5':
+  '@types/react-swipeable-views@0.13.6':
     dependencies:
       '@types/react': 19.0.1
 
@@ -14487,7 +14489,7 @@ snapshots:
 
   '@types/react@18.3.18':
     dependencies:
-      '@types/prop-types': 15.7.13
+      '@types/prop-types': 15.7.14
       csstype: 3.1.3
 
   '@types/react@19.0.1':

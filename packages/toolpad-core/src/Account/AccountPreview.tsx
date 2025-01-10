@@ -99,9 +99,9 @@ function AccountPreview(props: AccountPreviewProps) {
   if (variant === 'expanded') {
     return (
       <Stack direction="row" justifyContent="space-between" sx={{ py: 1, px: 2, gap: 2, ...sx }}>
-        <Stack direction="row" justifyContent="flex-start" spacing={2}>
+        <Stack direction="row" justifyContent="flex-start" spacing={2} overflow="hidden">
           {avatarContent}
-          <Stack direction="column" justifyContent="space-evenly">
+          <Stack direction="column" justifyContent="space-evenly" overflow="hidden">
             <Typography variant="body2" fontWeight="bolder" noWrap>
               {session.user?.name}
             </Typography>

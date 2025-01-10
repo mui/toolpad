@@ -8,21 +8,26 @@ _Jan 10, 2025_
 
 A big thanks to the 5 contributors who made this release possible.Here are some highlights ✨:
 
+**BREAKING CHANGE**
+
+- We've renamed the framework-specific `AppProvider` exports for clarity:
+
+```diff
+- import { AppProvider } from '@toolpad/core/react-router-dom';
++ import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+```
+
+```diff
+- import { AppProvider } from '@toolpad/core/nextjs';
++ import { NextAppProvider } from '@toolpad/core/nextjs';
+```
+
 - Upgraded Toolpad to React 19
 - Added framework selection to `create-toolpad-app` to support Vite
 - Improved sidebar CSS transitions in `DashboardLayout`
 - Allow multiple breadcrumps that are not links in `PageHeader`
 - Added multiple bug fixes and improvements
 - Fixed various UI and documentation issues
-
-**Deprecated**
-
-- We've renamed the framework-specific `AppProvider` exports for clarity, and while the old imports will continue to be supported, they are deprecated in favour of `NextAppProvider` and `ReactRouterAppProvider` respectively:
-
-```diff
-- import { AppProvider } from '@toolpad/core/react-router';
-+ import { ReactRouterAppProvider } from '@toolpad/core/react-router';
-```
 
 ### `@toolpad/core`
 

@@ -32,6 +32,7 @@ import {
   GridRowModes,
   GridRowModesModel,
   GridToolbarContainer,
+  GridToolbarProps,
 } from '@mui/x-data-grid';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
@@ -204,10 +205,10 @@ export function AppAuthenticationEditor() {
   );
 }
 
-interface RolesToolbarProps extends React.ComponentProps<typeof GridToolbarContainer> {
+type RolesToolbarProps = React.ComponentProps<typeof GridToolbarContainer> & {
   addNewRoleDisabled?: boolean;
   onAddNewRole?: () => void;
-}
+};
 
 function RolesToolbar({ addNewRoleDisabled, onAddNewRole }: RolesToolbarProps) {
   invariant(typeof addNewRoleDisabled === 'boolean', 'addNewRoleDisabled is required in slotProps');
@@ -462,13 +463,14 @@ export function AppRolesEditor({ onRowUpdateError }: { onRowUpdateError: (error:
           return true;
         }}
         slots={{
-          toolbar: RolesToolbar,
+          toolbar:
+            RolesToolbar satisfies React.ComponentType<RolesToolbarProps> as React.ComponentType<GridToolbarProps>,
         }}
         slotProps={{
           toolbar: {
             onAddNewRole: handleAddNewRole,
             addNewRoleDisabled: !!draftRow,
-          },
+          } satisfies RolesToolbarProps as GridToolbarProps,
         }}
         autoHeight
       />

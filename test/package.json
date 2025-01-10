@@ -9,8 +9,8 @@
     "express": "4.21.1",
     "get-port": "7.1.0",
     "invariant": "2.2.4",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "recharts": "^2.15.0"
   },
   "type": "module",

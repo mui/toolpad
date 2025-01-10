@@ -10,7 +10,7 @@ A big thanks to the 5 contributors who made this release possible.Here are some 
 
 **BREAKING CHANGE**
 
-- We've renamed the framework-specific `AppProvider` exports for clarity:
+- Framework-specific `AppProvider` exports have been renamed for clarity:
 
 ```diff
 - import { AppProvider } from '@toolpad/core/react-router-dom';

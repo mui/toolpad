@@ -1,4 +1,4 @@
-import { Template } from '../../types';
+import { Template } from '../../../types';
 
 const rootLayout: Template = (options) => {
   const authEnabled = options.auth;

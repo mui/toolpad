@@ -27,7 +27,7 @@ _(Note the change in the path from `react-router-dom` to `react-router`)_
 - Upgraded Toolpad to React 19
 - Added framework selection to `create-toolpad-app` to support Vite
 - Improved sidebar CSS transitions in `DashboardLayout`
-- Allow multiple breadcrumps that are not links in `PageHeader`
+- Allow multiple breadcrumbs that are not links in `PageHeader`
 - Added multiple bug fixes and improvements
 - Fixed various UI and documentation issues
 

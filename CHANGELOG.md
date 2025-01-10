@@ -12,12 +12,12 @@ A big thanks to the 5 contributors who made this release possible.Here are some 
 
 - Framework-specific `AppProvider` exports have been renamed for clarity:
 
+_(Note the change in the path from `react-router-dom` to `react-router`)_
+
 ```diff
 - import { AppProvider } from '@toolpad/core/react-router-dom';
 + import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 ```
-
-Note the change in the path from `react-router-dom` to `react-router`
 
 ```diff
 - import { AppProvider } from '@toolpad/core/nextjs';

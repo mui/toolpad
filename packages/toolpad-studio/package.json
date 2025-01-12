@@ -113,7 +113,7 @@
     "json5": "2.2.3",
     "latest-version": "9.0.0",
     "lodash-es": "4.17.21",
-    "markdown-to-jsx": "7.7.0",
+    "markdown-to-jsx": "7.7.3",
     "mime": "4.0.4",
     "monaco-editor": "0.52.0",
     "mysql2": "3.11.4",

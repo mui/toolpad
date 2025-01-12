@@ -98,7 +98,7 @@
     "@types/doctrine": "0.0.9",
     "@types/json-schema": "7.0.15",
     "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@types/react-dom": "^19.0.3",
     "@types/react-is": "^19.0.0",
     "@types/react-swipeable-views": "^0.13.6",
     "cpy-cli": "5.0.0",

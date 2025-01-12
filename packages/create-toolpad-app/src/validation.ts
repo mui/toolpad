@@ -1,5 +1,5 @@
 import * as fs from 'fs/promises';
-import { constants as fsConstants, mkdir } from 'fs';
+import { constants as fsConstants } from 'fs';
 import chalk from 'chalk';
 import { errorFrom } from '@toolpad/utils/errors';
 import { bashResolvePath } from '@toolpad/utils/cli';

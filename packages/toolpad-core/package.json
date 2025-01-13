@@ -70,7 +70,7 @@
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.14",
     "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@types/react-dom": "^19.0.3",
     "@types/sinon": "^17.0.3",
     "@vitest/browser": "2.1.8",
     "next": "^15.1.3",

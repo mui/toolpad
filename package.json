@@ -103,7 +103,7 @@
     "markdownlint-cli2": "0.15.0",
     "prettier": "3.4.1",
     "pretty-quick": "4.0.0",
-    "react-docgen": "7.0.3",
+    "react-docgen": "5.4.3",
     "react-inspector": "6.0.2",
     "regenerator-runtime": "0.14.1",
     "remark": "15.0.1",

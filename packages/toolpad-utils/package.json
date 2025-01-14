@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "invariant": "2.2.4",
-    "prettier": "3.3.3",
+    "prettier": "3.4.1",
     "react": "^19.0.0",
     "react-is": "^19.0.0",
     "title": "4.0.1",

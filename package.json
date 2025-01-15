@@ -93,7 +93,7 @@
     "eslint-plugin-react-hooks": "5.1.0",
     "eslint-plugin-testing-library": "^6.5.0",
     "eslint-plugin-typescript-enum": "2.1.0",
-    "execa": "9.5.1",
+    "execa": "9.5.2",
     "fast-glob": "^3.3.2",
     "format-util": "1.0.5",
     "fs-extra": "11.2.0",
@@ -108,7 +108,7 @@
     "regenerator-runtime": "0.14.1",
     "remark": "15.0.1",
     "rimraf": "6.0.1",
-    "typescript": "5.7.2",
+    "typescript": "5.5.4",
     "unist-util-visit": "5.0.0",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.7.1"

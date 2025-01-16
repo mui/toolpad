@@ -65,7 +65,7 @@
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
-    "vm-browserify": "^1.1.2"
+    "vm-browserify": "1.1.2"
   },
   "peerDependenciesMeta": {
     "vm-browserify": {

@@ -6,7 +6,7 @@
     "@toolpad/studio": "workspace:*",
     "@toolpad/utils": "workspace:*",
     "@types/invariant": "2.2.37",
-    "express": "4.21.1",
+    "express": "4.21.2",
     "get-port": "7.1.0",
     "invariant": "2.2.4",
     "react": "^19.0.0",

@@ -24,6 +24,10 @@ export default function OrdersPage() {
     [navigate],
   );
 
+  const handleCreateClick = React.useCallback(() => {
+    navigate('/orders/new');
+  }, [navigate]);
+
   return (
     <List<Order>
       fields={orderFields}
@@ -52,7 +56,7 @@ export default function OrdersPage() {
       }}
       initialPageSize={25}
       onRowClick={handleRowClick}
-      onCreateClick={() => {}}
+      onCreateClick={handleCreateClick}
       onEditClick={() => {}}
     />
   );

@@ -15,6 +15,11 @@ const NAVIGATION: Navigation = [
     icon: <DashboardIcon />,
   },
   {
+    segment: 'orders/new',
+    title: 'New Order',
+    icon: <ShoppingCartIcon />,
+  },
+  {
     segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,

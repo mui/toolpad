@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Account
-components: Account
+components: Account, AccountPreview, AccountPopoverHeader, AccountPopoverFooter, SignInButton, SignOutButton
 ---
 
 # Account
@@ -16,30 +16,61 @@ The `Account` component is a quick and easy way to display an account management
 
 ## States
 
-### Signed In
+### Signed in
 
 If a `session` object is present, the component is rendered as a dropdown containing the user's account details as well as an option to sign out.
 
 {{"demo": "AccountDemoSignedIn.js", "bg": "outlined" }}
 
-### Signed Out
+### Signed out
 
 When signed out, the component renders as an inline sign in button within the dashboard layout.
 
-{{"demo": "AccountDemoSignedOut.js", "bg": "outlined" }}
+{{"demo": "AccountDemoSignedOut.js", "bg": "outlined", "defaultCodeOpen": false }}
 
 ## Customization
 
+The `<Account />` component is composed of multiple subcomponents:
+
+- `<SignInButton />`
+- `<AccountPreview />`
+- `<Popover />`
+- `<SignOutButton />`
+
+You can pass extra props to them through the `slotProps` prop on the `<Account />` component. You may also completely override them by passing your own custom components to `<Account />` through the `slots` prop.
+
+The labels can be customized through the `localeText` prop.
+
 ### Slot Props
 
-The underlying `signInButton`, `signOutButton` and `iconButton` components can be customized by passing in `slotProps` to the `Account` component.
+The `AccountPreview` component has two variants, `condensed` (the default) and `expanded`. You can change the variant used inside `<Account />` by passing in custom props through `slotProps`:
 
-Labels for the sign in and sign out buttons can be customized through the `localeText` prop.
-
-{{"demo": "AccountCustom.js", "bg": "outlined" }}
+{{"demo": "AccountCustomSlotProps.js", "bg": "outlined" }}
 
 ### Slots
 
-You can pass in your own items to the `Account` menu through the `menuItems` slot to add additional menu items in the space between the user's account details and the sign out button, to create larger, more complex menus:
+You can pass in your own components inside the `Account` popover through the `slots` prop.
 
-{{"demo": "AccountSlots.js", "bg": "gradient"}}
+#### Popover Content
+
+You can wrap the default subcomponents – such as `SignOutButton` and `AccountPreview` – and wrap them in `AccountPopoverHeader` and `AccountPopoverFooter` components to create custom account popovers, as shown in the following demos:
+
+##### Account Switcher
+
+You can build advanced menus – such as a tenant switcher – by passing in a component that wraps `AccountPreview` and `SignOutButton` with a custom menu:
+
+{{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
+
+### Labels
+
+You can pass in custom labels – including of different languages – using the `localeText` prop.
+
+{{"demo": "AccountCustomLocaleText.js", "bg": "outlined" }}
+
+### Session
+
+You can use the `useSession` hook to extend the existing session and add additional user details:
+
+{{"demo": "./AccountCustomUserDetails.js", "bg": "outlined", "defaultCodeOpen": false}}
+
+You can find more details on the [`useSession` docs page](/toolpad/core/react-use-session/).

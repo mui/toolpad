@@ -6,7 +6,10 @@
       "default": "null"
     },
     "branding": {
-      "type": { "name": "shape", "description": "{ logo?: node, title?: string }" },
+      "type": {
+        "name": "shape",
+        "description": "{ homeUrl?: string, logo?: node, title?: string }"
+      },
       "default": "null"
     },
     "navigation": {
@@ -36,7 +39,7 @@
   "name": "AppProvider",
   "imports": [
     "import { AppProvider } from '@toolpad/core/AppProvider';",
-    "import { AppProvider } from '@toolpad/core';\nimport { AppProvider } from '@toolpad/core/nextjs'; // Next.js\nimport { AppProvider } from '@toolpad/core/react-router-dom'; // React Router"
+    "import { AppProvider } from '@toolpad/core';\nimport { NextAppProvider } from '@toolpad/core/nextjs'; // Next.js\nimport { ReactRouterAppProvider } from '@toolpad/core/react-router'; // React Router"
   ],
   "classes": [],
   "spread": true,

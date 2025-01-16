@@ -1,0 +1,11 @@
+{
+  "props": { "children": { "type": { "name": "node" } } },
+  "name": "AccountPopoverHeader",
+  "imports": ["import { AccountPopoverHeader } from '@toolpad/core/Account';"],
+  "classes": [],
+  "muiName": "AccountPopoverHeader",
+  "filename": "/packages/toolpad-core/src/Account/AccountPopoverHeader.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-account/\">Account</a></li></ul>",
+  "cssComponent": false
+}

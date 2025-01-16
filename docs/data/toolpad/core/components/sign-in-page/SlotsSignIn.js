@@ -2,11 +2,14 @@ import * as React from 'react';
 import {
   Button,
   FormControl,
+  FormControlLabel,
+  Checkbox,
   InputLabel,
   OutlinedInput,
   TextField,
   InputAdornment,
   Link,
+  Alert,
   IconButton,
 } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
@@ -95,7 +98,7 @@ function CustomButton() {
       fullWidth
       sx={{ my: 2 }}
     >
-      Sign In
+      Log In
     </Button>
   );
 }
@@ -116,6 +119,40 @@ function ForgotPasswordLink() {
   );
 }
 
+function Title() {
+  return <h2 style={{ marginBottom: 8 }}>Login</h2>;
+}
+
+function Subtitle() {
+  return (
+    <Alert sx={{ mb: 2, px: 1, py: 0.25 }} severity="warning">
+      We are investigating an ongoing outage.
+    </Alert>
+  );
+}
+
+function AgreeWithTerms() {
+  return (
+    <FormControlLabel
+      control={
+        <Checkbox
+          name="tandc"
+          value="true"
+          color="primary"
+          sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+        />
+      }
+      slotProps={{
+        typography: {
+          fontSize: 14,
+        },
+      }}
+      color="textSecondary"
+      label="I agree with the T&C"
+    />
+  );
+}
+
 export default function SlotsSignIn() {
   const theme = useTheme();
   return (
@@ -123,14 +160,17 @@ export default function SlotsSignIn() {
       <SignInPage
         signIn={(provider, formData) =>
           alert(
-            `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}`,
+            `Logging in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}, and checkbox value: ${formData.get('tandc')}`,
           )
         }
         slots={{
+          title: Title,
+          subtitle: Subtitle,
           emailField: CustomEmailField,
           passwordField: CustomPasswordField,
           submitButton: CustomButton,
           signUpLink: SignUpLink,
+          rememberMe: AgreeWithTerms,
           forgotPasswordLink: ForgotPasswordLink,
         }}
         providers={providers}

@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Page Container
-components: PageContainer, PageContainerToolbar
+components: PageContainer, PageHeader, PageHeaderToolbar
 ---
 
 # Page Container
@@ -20,7 +20,7 @@ Just like [`DashboardLayout`](/toolpad/core/react-dashboard-layout/), `PageConta
 
 ## Title and Breadcrumbs
 
-The breacrumbs are formed by matching the current pathname with the navigation structure defined in the [`AppProvider`](/toolpad/core/react-app-provider/). The title of the matched segment is used as the page title. You can override the page title with the `title` property.
+The breadcrumbs are formed by matching the current pathname with the navigation structure defined in the [`AppProvider`](/toolpad/core/react-app-provider/). The title of the matched segment is used as the page title. You can override the page title with the `title` property.
 
 For example, under the following navigation structure:
 
@@ -47,7 +47,7 @@ The breadcrumbs contains **ACME / Home / Orders** when you visit the path **/hom
 
 {{"demo": "TitleBreadcrumbsPageContainer.js", "height": 300, "hideToolbar": true}}
 
-## Dynamic Routes
+## Dynamic routes
 
 When you use the `PageContainer` on a dynamic route, you'll likely want to set a title and breadcrumbs belonging to the specific path. You can achieve this with the `title` and `breadcrumbs` property of the `PageContainer`
 
@@ -71,7 +71,7 @@ function useDynamicBreadcrumbs(id: string): Breadcrumb[] {
 }
 ```
 
-For example, under the Next.js app router you would be able to obtain breadcrumbs for a dynamic route as follows:
+For example, under the Next.js App Router you would be able to obtain breadcrumbs for a dynamic route as follows:
 
 ```tsx
 // ./src/app/example/[id]/page.tsx
@@ -100,12 +100,24 @@ export default function Example() {
 }
 ```
 
-## Actions
-
-You can configure additional actions in the area that is reserved on the right. To do so provide the `toolbar` slot to the `PageContainer` component. You can wrap the `PageContainerToolbar` component to create a custom toolbar component, as shown here:
-
-{{"demo": "ActionsPageContainer.js", "height": 300}}
-
 ## Responsiveness
 
 The Page Container component inherits the properties of the Material&nbsp;UI [Container](https://mui.com/material-ui/react-container/) component. You can use its [`maxWidth`](https://mui.com/material-ui/api/container/#container-prop-maxWidth) and [`fixed`](https://mui.com/material-ui/api/container/#container-prop-fixed) properties to control the bounds of the page. Set `maxWidth` to `false` to disable the container altogether and have the content bleed right up to the edges of the page.
+
+## Standalone page header
+
+The `PageHeader` component included in `PageContainer` can be imported and used by itself if you wish to do so, for more freedom of customization.
+
+{{"demo": "PageContainerHeader.js", "height": 300}}
+
+## Actions
+
+You can configure additional actions in the area that is reserved on the right. To do so provide a custom `header` slot to the `PageContainer` component, where you can provide a custom `toolbar` slot to a `PageHeader`. You can wrap the `PageHeaderToolbar` component to create a custom toolbar component, as shown here:
+
+{{"demo": "ActionsPageContainer.js", "height": 300}}
+
+## Full-size content
+
+The content inside the container can take up the full remaining available area with styles such as `flex: 1` or `height: 100%`.
+
+{{"demo": "PageContainerFullScreen.js", "height": 400, "iframe": true}}

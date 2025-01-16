@@ -1,0 +1,13 @@
+resolve({
+  success: 'Check your email for a verification link.',
+});
+
+// ...
+
+<AppProvider theme={theme}>
+  <SignInPage
+    signIn={signIn}
+    providers={providers}
+    slotProps={{ emailField: { autoFocus: false } }}
+  />
+</AppProvider>

@@ -1,5 +1,1 @@
-<AuthenticationContext.Provider value={authentication}>
-  <SessionContext.Provider value={session}>
-    <Account />
-  </SessionContext.Provider>
-</AuthenticationContext.Provider>
+<Account />

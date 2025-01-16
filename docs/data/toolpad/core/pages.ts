@@ -21,16 +21,13 @@ const pages: MuiPage[] = [
         title: 'Base concepts',
       },
       {
-        pathname: '/toolpad/core/introduction/integration',
-        title: 'Integration',
-      },
-      {
         pathname: '/toolpad/core/introduction/tutorial',
         title: 'Tutorial',
       },
       {
         pathname: '/toolpad/core/introduction/examples',
         title: 'Examples',
+        newFeature: true,
       },
       {
         pathname: '/toolpad/core/introduction/roadmap',
@@ -39,6 +36,24 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/core/introduction/support',
         title: 'Support',
+      },
+    ],
+  },
+  {
+    pathname: '/toolpad/core/integrations-group',
+    title: 'Integrations',
+    children: [
+      {
+        pathname: '/toolpad/core/integrations/nextjs-approuter',
+        title: 'Next.js App Router',
+      },
+      {
+        pathname: '/toolpad/core/integrations/nextjs-pagesrouter',
+        title: 'Next.js Pages Router',
+      },
+      {
+        pathname: '/toolpad/core/integrations/react-router',
+        title: 'Vite with React Router',
       },
     ],
   },
@@ -106,7 +121,7 @@ const pages: MuiPage[] = [
         children: [
           {
             pathname: '/toolpad/core/react-crud-page',
-            title: 'CRUD Page',
+            title: 'CRUD',
             planned: true,
           },
           {
@@ -127,6 +142,10 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-use-notifications',
             title: 'useNotifications',
+          },
+          {
+            pathname: '/toolpad/core/react-use-session',
+            title: 'useSession',
           },
           {
             pathname: '/toolpad/core/react-persistent-state',
@@ -160,6 +179,10 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-persistent-state/use-local-storage-state-api',
             title: 'useLocalStorageState',
+          },
+          {
+            pathname: '/toolpad/core/react-use-session/api',
+            title: 'useSession',
           },
           {
             pathname: '/toolpad/core/react-persistent-state/use-session-storage-state-api',

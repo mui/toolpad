@@ -1,133 +1,99 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import { Menu, MenuItem, MenuList, Divider, ListItemIcon } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
+import {
+  MenuItem,
+  MenuList,
+  Button,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Avatar,
+  Stack,
+} from '@mui/material';
+import {
+  AccountPreview,
+  SignOutButton,
+  AccountPopoverFooter,
+} from '@toolpad/core/Account';
 import AddIcon from '@mui/icons-material/Add';
 
-function CustomSettingsMenu(props) {
-  const { open, anchorEl, handleMenuClose, handleEnter, handleLeave } = props;
-
-  return (
-    <Menu
-      anchorEl={anchorEl}
-      open={open}
-      slotProps={{
-        root: {
-          sx: {
-            pointerEvents: 'none',
-          },
-        },
-      }}
-      anchorOrigin={{
-        horizontal: 'right',
-        vertical: 'top',
-      }}
-    >
-      <MenuList
-        dense
-        disablePadding
-        sx={{ pointerEvents: 'auto' }}
-        onMouseEnter={() => {
-          handleEnter();
-        }}
-        onMouseLeave={handleLeave}
-      >
-        <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-        <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-      </MenuList>
-    </Menu>
-  );
-}
-
-CustomSettingsMenu.propTypes = {
-  anchorEl: PropTypes.object,
-  handleEnter: PropTypes.func.isRequired,
-  handleLeave: PropTypes.func.isRequired,
-  handleMenuClose: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired,
-};
+const accounts = [
+  {
+    id: 1,
+    name: 'Bharat Kashyap',
+    email: 'bharatkashyap@outlook.com',
+    image: 'https://avatars.githubusercontent.com/u/19550456',
+  },
+  {
+    id: 2,
+    name: 'Bharat MUI',
+    email: 'bharat@mui.com',
+    color: '#8B4513', // Brown color
+  },
+];
 
 export default function CustomMenu() {
-  const handleMenuNavigation = (route) => () => {
-    console.log(
-      'Toolpad Core Account Demo --- CustomMenuItems --- handleMenuNavigation --- route: ',
-      route,
-    );
-  };
-
-  const mouseOnSubMenu = React.useRef(false);
-
-  const [subMenuAnchorEl, setSubMenuAnchorEl] = React.useState(null);
-  const subMenuOpen = Boolean(subMenuAnchorEl);
-
-  const handleTriggerEnter = React.useCallback((event) => {
-    setSubMenuAnchorEl(event.currentTarget);
-  }, []);
-
-  const handleTriggerLeave = React.useCallback(() => {
-    // Wait for 300ms to see if the mouse has moved to the sub menu
-    setTimeout(() => {
-      if (mouseOnSubMenu.current) {
-        return;
-      }
-      setSubMenuAnchorEl(null);
-    }, 300);
-  }, []);
-
-  const handleSubMenuEnter = React.useCallback(() => {
-    mouseOnSubMenu.current = true;
-  }, []);
-
-  const handleSubMenuLeave = (event) => {
-    mouseOnSubMenu.current = false;
-    if (subMenuAnchorEl?.contains(event.relatedTarget)) {
-      return;
-    }
-    setSubMenuAnchorEl(null);
-  };
-
-  const handleSubMenuClose = React.useCallback(() => {
-    setSubMenuAnchorEl(null);
-  }, []);
-
   return (
-    <MenuList dense disablePadding>
-      <MenuItem
-        onMouseEnter={handleTriggerEnter}
-        onMouseLeave={handleTriggerLeave}
-        component="button"
-        sx={{
-          justifyContent: 'flex-start',
-          width: '100%',
-        }}
-      >
-        <ListItemIcon>
-          <SettingsIcon />
-        </ListItemIcon>
-        Settings
-      </MenuItem>
-      <MenuItem
-        onClick={handleMenuNavigation('/add-account')}
-        component="button"
-        sx={{
-          justifyContent: 'flex-start',
-          width: '100%',
-        }}
-      >
-        <ListItemIcon>
-          <AddIcon />
-        </ListItemIcon>
-        Add another account
-      </MenuItem>
-
+    <Stack direction="column">
+      <AccountPreview variant="expanded" />
       <Divider />
-      <CustomSettingsMenu
-        open={subMenuOpen}
-        anchorEl={subMenuAnchorEl}
-        handleEnter={handleSubMenuEnter}
-        handleLeave={handleSubMenuLeave}
-        handleMenuClose={handleSubMenuClose}
-      />
-    </MenuList>
+      <Typography variant="body2" mx={2} mt={1}>
+        Accounts
+      </Typography>
+      <MenuList>
+        {accounts.map((account) => (
+          <MenuItem
+            key={account.id}
+            component="button"
+            sx={{
+              justifyContent: 'flex-start',
+              width: '100%',
+              columnGap: 2,
+            }}
+          >
+            <ListItemIcon>
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  fontSize: '0.95rem',
+                  bgcolor: account.color,
+                }}
+                src={account.image ?? ''}
+                alt={account.name ?? ''}
+              >
+                {account.name[0]}
+              </Avatar>
+            </ListItemIcon>
+            <ListItemText
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                width: '100%',
+              }}
+              primary={account.name}
+              secondary={account.email}
+              primaryTypographyProps={{ variant: 'body2' }}
+              secondaryTypographyProps={{ variant: 'caption' }}
+            />
+          </MenuItem>
+        ))}
+        <Divider />
+        <Button
+          variant="text"
+          sx={{ textTransform: 'capitalize', display: 'flex', mx: 'auto' }}
+          size="small"
+          startIcon={<AddIcon />}
+          disableElevation
+        >
+          Add new
+        </Button>
+      </MenuList>
+      <Divider />
+      <AccountPopoverFooter>
+        <SignOutButton />
+      </AccountPopoverFooter>
+    </Stack>
   );
 }

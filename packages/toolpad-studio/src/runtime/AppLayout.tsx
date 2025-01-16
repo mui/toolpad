@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Box, useTheme } from '@mui/material';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { AppProvider } from '@toolpad/core/react-router-dom';
+import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { AuthContext } from './useAuth';
 
 const TOOLPAD_DISPLAY_MODE_URL_PARAM = 'toolpad-display';
@@ -52,7 +52,7 @@ export function AppLayout({
 
   const hasLayout = hasLayoutProp && hasShell;
 
-  const { session, signOut } = React.useContext(AuthContext);
+  const { session, signOut, hasAuthentication } = React.useContext(AuthContext);
 
   const navigation = React.useMemo(
     () =>
@@ -63,9 +63,18 @@ export function AppLayout({
     [pages, retainedSearch],
   );
 
-  const signIn = React.useCallback(() => {
-    navigate('/signin');
-  }, [navigate]);
+  const authentication = React.useMemo(
+    () =>
+      hasAuthentication
+        ? {
+            signIn: () => {
+              navigate('/signin');
+            },
+            signOut,
+          }
+        : undefined,
+    [hasAuthentication, navigate, signOut],
+  );
 
   const layoutContent = (
     <Box sx={{ minWidth: 0, flex: 1, position: 'relative', flexDirection: 'column' }}>
@@ -74,16 +83,13 @@ export function AppLayout({
   );
 
   return (
-    <AppProvider
+    <ReactRouterAppProvider
       theme={theme}
       navigation={navigation}
       branding={{
         title: 'Toolpad Studio',
       }}
-      authentication={{
-        signIn,
-        signOut,
-      }}
+      authentication={authentication}
       session={session}
     >
       {hasLayout ? (
@@ -91,6 +97,6 @@ export function AppLayout({
       ) : (
         layoutContent
       )}
-    </AppProvider>
+    </ReactRouterAppProvider>
   );
 }

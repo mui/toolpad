@@ -2,6 +2,7 @@ import * as React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
+
 // preview-start
 const providers = [
   { id: 'github', name: 'GitHub' },
@@ -14,12 +15,14 @@ const providers = [
 // preview-end
 
 const signIn = async (provider) => {
+  // preview-start
   const promise = new Promise((resolve) => {
     setTimeout(() => {
       console.log(`Sign in with ${provider.id}`);
-      resolve();
+      resolve({ error: 'This is a fake error' });
     }, 500);
   });
+  // preview-end
   return promise;
 };
 

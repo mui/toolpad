@@ -6,7 +6,7 @@
 
 To access the list of available Toolpad Studio components, hover your cursor over the vertical bar labeled **Component library** to expand it.
 
-<video controls width="auto" height="100%" style="contain" alt="component-library">
+<video controls width="auto" height="100%" alt="component-library">
   <source src="/static/toolpad/docs/studio/concepts/building-ui/component-library.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

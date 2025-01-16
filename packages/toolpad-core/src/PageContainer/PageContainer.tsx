@@ -1,37 +1,11 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import warnOnce from '@toolpad/utils/warnOnce';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Box from '@mui/material/Box';
 import Container, { ContainerProps } from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import useSlotProps from '@mui/utils/useSlotProps';
-import { styled } from '@mui/material';
-import { Link as ToolpadLink } from '../shared/Link';
-import { PageContainerToolbar, PageContainerToolbarProps } from './PageContainerToolbar';
-import { getItemTitle } from '../shared/navigation';
-import { useActivePage } from '../useActivePage';
-
-const PageContentHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  gap: theme.spacing(2),
-}));
-
-export interface PageContainerSlotProps {
-  toolbar: PageContainerToolbarProps;
-}
-
-export interface PageContainerSlots {
-  /**
-   * The component that renders the actions toolbar.
-   * @default Snackbar
-   */
-  toolbar: React.ElementType;
-}
+import { SxProps } from '@mui/material';
+import { PageHeader, PageHeaderProps } from './PageHeader';
 
 export interface Breadcrumb {
   /**
@@ -41,14 +15,19 @@ export interface Breadcrumb {
   /**
    * The path the breadcrumb links to.
    */
-  path: string;
+  path?: string;
+}
+export interface PageContainerSlotProps {
+  header: PageHeaderProps;
 }
 
-// TODO: Remove in the next major version
-/**
- * @deprecated Use `Breadcrumb` instead.
- */
-export type BreadCrumb = Breadcrumb;
+export interface PageContainerSlots {
+  /**
+   * The component that renders the page header.
+   * @default PageHeader
+   */
+  header: React.ElementType;
+}
 
 export interface PageContainerProps extends ContainerProps {
   children?: React.ReactNode;
@@ -60,11 +39,6 @@ export interface PageContainerProps extends ContainerProps {
    * The breadcrumbs of the page. Leave blank to use the active page breadcrumbs.
    */
   breadcrumbs?: Breadcrumb[];
-  // TODO: Remove in the next major version
-  /**
-   * @deprecated Use `breadcrumbs` instead.
-   */
-  breadCrumbs?: Breadcrumb[];
   /**
    * The components used for each slot inside.
    */
@@ -73,6 +47,10 @@ export interface PageContainerProps extends ContainerProps {
    * The props used for each slot inside.
    */
   slotProps?: PageContainerSlotProps;
+  /**
+   * The system prop that allows defining system overrides as well as additional CSS styles.
+   */
+  sx?: SxProps;
 }
 
 /**
@@ -87,58 +65,15 @@ export interface PageContainerProps extends ContainerProps {
  * - [PageContainer API](https://mui.com/toolpad/core/api/page-container)
  */
 function PageContainer(props: PageContainerProps) {
-  const { children, slots, slotProps, breadcrumbs, breadCrumbs, ...rest } = props;
+  const { children, breadcrumbs, slots, slotProps, title, ...rest } = props;
 
-  if (process.env.NODE_ENV !== 'production' && breadCrumbs) {
-    warnOnce('The PageContainer `breadCrumbs` prop is deprecated. Use `breadcrumbs` instead.');
-  }
-
-  const activePage = useActivePage();
-
-  // TODO: Remove `props.breadCrumbs` in the next major version
-  const resolvedBreadcrumbs = breadcrumbs ?? breadCrumbs ?? activePage?.breadcrumbs ?? [];
-  const title = props.title ?? activePage?.title ?? '';
-
-  const ToolbarComponent = props?.slots?.toolbar ?? PageContainerToolbar;
-  const toolbarSlotProps = useSlotProps({
-    elementType: ToolbarComponent,
-    ownerState: props,
-    externalSlotProps: props?.slotProps?.toolbar,
-    additionalProps: {},
-  });
+  const PageHeaderSlot = slots?.header ?? PageHeader;
 
   return (
-    <Container {...rest}>
-      <Stack sx={{ my: 2 }} spacing={2}>
-        <Stack>
-          <Breadcrumbs aria-label="breadcrumb">
-            {resolvedBreadcrumbs
-              ? resolvedBreadcrumbs.map((item, index) => {
-                  return index < resolvedBreadcrumbs.length - 1 ? (
-                    <Link
-                      key={item.path}
-                      component={ToolpadLink}
-                      underline="hover"
-                      color="inherit"
-                      href={item.path}
-                    >
-                      {getItemTitle(item)}
-                    </Link>
-                  ) : (
-                    <Typography key={item.path} color="text.primary">
-                      {getItemTitle(item)}
-                    </Typography>
-                  );
-                })
-              : null}
-          </Breadcrumbs>
-
-          <PageContentHeader>
-            {title ? <Typography variant="h4">{title}</Typography> : null}
-            <ToolbarComponent {...toolbarSlotProps} />
-          </PageContentHeader>
-        </Stack>
-        <div>{children}</div>
+    <Container {...rest} sx={{ flex: 1, display: 'flex', flexDirection: 'column', ...rest.sx }}>
+      <Stack sx={{ flex: 1, my: 2 }} spacing={2}>
+        <PageHeaderSlot title={title} breadcrumbs={breadcrumbs} {...slotProps?.header} />
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</Box>
       </Stack>
     </Container>
   );
@@ -154,16 +89,7 @@ PageContainer.propTypes /* remove-proptypes */ = {
    */
   breadcrumbs: PropTypes.arrayOf(
     PropTypes.shape({
-      path: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-    }),
-  ),
-  /**
-   * @deprecated Use `breadcrumbs` instead.
-   */
-  breadCrumbs: PropTypes.arrayOf(
-    PropTypes.shape({
-      path: PropTypes.string.isRequired,
+      path: PropTypes.string,
       title: PropTypes.string.isRequired,
     }),
   ),
@@ -175,16 +101,36 @@ PageContainer.propTypes /* remove-proptypes */ = {
    * The props used for each slot inside.
    */
   slotProps: PropTypes.shape({
-    toolbar: PropTypes.shape({
-      children: PropTypes.node,
+    header: PropTypes.shape({
+      breadcrumbs: PropTypes.arrayOf(
+        PropTypes.shape({
+          path: PropTypes.string,
+          title: PropTypes.string.isRequired,
+        }),
+      ),
+      slotProps: PropTypes.shape({
+        toolbar: PropTypes.object.isRequired,
+      }),
+      slots: PropTypes.shape({
+        toolbar: PropTypes.elementType,
+      }),
+      title: PropTypes.string,
     }).isRequired,
   }),
   /**
    * The components used for each slot inside.
    */
   slots: PropTypes.shape({
-    toolbar: PropTypes.elementType,
+    header: PropTypes.elementType,
   }),
+  /**
+   * The system prop that allows defining system overrides as well as additional CSS styles.
+   */
+  sx: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
+    PropTypes.func,
+    PropTypes.object,
+  ]),
   /**
    * The title of the page. Leave blank to use the active page title.
    */

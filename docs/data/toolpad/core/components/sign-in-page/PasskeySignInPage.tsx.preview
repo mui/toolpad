@@ -1,0 +1,11 @@
+const providers = [{ id: 'passkey', name: 'Passkey' }];
+
+// ...
+
+<AppProvider theme={theme}>
+  <SignInPage
+    signIn={signIn}
+    providers={providers}
+    slotProps={{ emailField: { autoFocus: false } }}
+  />
+</AppProvider>

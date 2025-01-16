@@ -1,5 +1,280 @@
 # Changelog
 
+## v0.12.0
+
+<!-- generated comparing v0.11.0..master -->
+
+_Jan 10, 2025_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+**BREAKING CHANGE**
+
+- Framework-specific `AppProvider` exports have been renamed for clarity:
+
+_(Note the change in the path from `react-router-dom` to `react-router`)_
+
+```diff
+- import { AppProvider } from '@toolpad/core/react-router-dom';
++ import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+```
+
+```diff
+- import { AppProvider } from '@toolpad/core/nextjs';
++ import { NextAppProvider } from '@toolpad/core/nextjs';
+```
+
+- Upgraded Toolpad to React 19
+- Added framework selection to `create-toolpad-app` to support Vite
+- Improved sidebar CSS transitions in `DashboardLayout`
+- Allow multiple breadcrumbs that are not links in `PageHeader`
+- Added multiple bug fixes and improvements
+- Fixed various UI and documentation issues
+
+### `@toolpad/core`
+
+- Upgrade Toolpad to React 19 (#4488) @bharatkashyap
+- Fix sidebar CSS transitions for some breakpoints in `DashboardLayout` (#4522) @gil-obradors
+- Prevent account info overflowing on kebab menu in `Account` component (#4555) @bharatkashyap
+- Use unique names for framework specific `AppProvider`s (#4553) @apedroferreira
+- Allow multiple breadcrumbs that are not links in `PageHeader`(#4571) @null93
+
+### CLI
+
+- Add framework selection to support Vite (#4545) @bharatkashyap
+
+### Docs
+
+- Fix featured image (#4561) @bharatkashyap
+- Improve example README files (#4580) @bharatkashyap
+- Link to docs on PRs (#4349) @oliviertassinari
+- Fix layout shift example page (#4350) @oliviertassinari
+- Fix correct use of Page Router and App Router (77a8b87) @oliviertassinari
+- Fix 301 links (#4558) @oliviertassinari
+
+### Core
+
+- Remove lockfile from example (#4577) @bharatkashyap
+- Fix CI failing due to Recharts console error (#4576) @bharatkashyap
+- Fix docs:build to work in docs folder too (a8b74d4) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @gil-obradors, @null93, @oliviertassinari
+
+## v0.11.0
+
+<!-- generated comparing v0.10.0..master -->
+
+_Dec 12, 2024_
+
+A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
+
+- **BREAKING** `toolbar` slot in the `PageContainer` component has been moved to new `PageHeader` component, which can be used in the `header` slot in `PageContainer`. New usage example [here](https://mui.com/toolpad/core/react-page-container/#actions).
+- Add `homeUrl` to `branding` properties, and `appTitle` slot to override layout header branding.
+- Allow full-size content inside `PageContainer`.
+- Add "rememberMe" slot to `SignInPage`.
+- Add `navigation` prop override to `DashboardLayout`.
+- Add Vite example with Firebase authentication.
+
+### `@toolpad/core`
+
+- Add `homeUrl` to `branding` and `appTitle` slot (#4477) @bharatkashyap
+- Allow full-size content in `PageContainer` (#4480) @apedroferreira
+- Add "rememberMe" slot (#4487) @bharatkashyap
+- Add `navigation` prop as override (#4523) @apedroferreira
+- Do not spread `PageContainer` title to child Container (#4504) @christiancookbuzz
+- Wrap App Router `AppProvider` in Suspense (#4526) @bharatkashyap
+- Remove `docs` context from component logic (#4489) @bharatkashyap
+- Make control in rememberMe slot prop optional (#4529) @hmon
+- Do not make text bold in navigation sidebar (#4533) @apedroferreira
+
+### Docs
+
+- Add Vite example with Firebase auth (#4500) @bharatkashyap
+- Upgrade featured example to React 19 (#4517) @bharatkashyap
+- Add pre-requisites to Next integration docs (#4473) @bharatkashyap
+- Correct Tutorial code (#4467) @bharatkashyap
+- Update deployed template link (#4454) @bharatkashyap
+- Update deployed example URL (#4531) @bharatkashyap
+- Handle integration docs 404 (#4475) @prakhargupta1
+- Fix 301 link to Render docs (cdaa9b7) @oliviertassinari
+- Add 'New' badge for examples (#4481) @prakhargupta1
+- Remove the live app link (#4482) @prakhargupta1
+- Improve callout copy for layout override props (#4535) @apedroferreira
+- Update base-concepts.md (#4484) @prakhargupta1
+- Fix missed parenthesis (#4510) @bharatkashyap
+
+### Core
+
+- Remove/update offending deps (#4483) @bharatkashyap
+- Update @mui/monorepo (#4455) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @christiancookbuzz, @hmon, @oliviertassinari, @prakhargupta1
+
+## v0.10.0
+
+<!-- generated comparing v0.9.0..master -->
+
+_Nov 23, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- Upgrade to Next.js 15
+- Add Passkey and Magic Link support inside the CLI
+- Add ability to override labels on `SignInPage`
+- Multiple bug-fixes and small improvements
+- Add a functional dashboard template to the docs!
+
+### `@toolpad/core`
+
+- Fix SignInButton UI (#4421) @bharatkashyap
+- Bump Next.js to 15.0.3 (#4321) @hollandjake
+- Add branding prop as override (#4442) @apedroferreira
+- Fix app bar items alignment (#4437) @bharatkashyap
+- Add width containment on flex container (#4414) @bharatkashyap
+- SignInPage UI tweaks (#4451) @bharatkashyap
+- Allow slotProps to override all labels (#4418) @bharatkashyap
+- Fix missing "Remember Me" state from `formData` (#4404) @bharatkashyap
+
+### `create-toolpad-app`
+
+- Support Magic Link and Passkeys in CLI (#4339) @bharatkashyap
+- Skip path validation for examples (#4434) @bharatkashyap
+
+### Docs
+
+- Add a new section for Integration (#4411) @prakhargupta1
+- Update examples to Next.js 15 (#4435) @bharatkashyap
+- Add Templates listing to examples page (#4449) @bharatkashyap
+- Host themed template under mui.com (#4415) @bharatkashyap
+- Fix 301 in the docs (3ab3b4e) @oliviertassinari
+- Fix 301 redirection in docs (2404ac6) @oliviertassinari
+- Fix missed Vale error (#4419) @bharatkashyap
+- Update SignInPage docs and themed example (#4410) @bharatkashyap
+- Correct version on themed example (#4405) @bharatkashyap
+- Fix 404 link (#4401) @oliviertassinari
+
+### Core
+
+- Update lockfile (#4386) @apedroferreira
+- Simplify OpenSSF badge (b61a32c) @oliviertassinari
+- Update to match with the rest of the codebase (5ceb4f0) @oliviertassinari
+- Remove dead style contain code (#4402) @oliviertassinari
+- Improve bug template for reproductions (a84ba1e) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @hollandjake, @oliviertassinari, @prakhargupta1
+
+## v0.9.0
+
+<!-- generated comparing v0.8.0..master -->
+
+_Nov 8, 2024_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+- Support magic links in `SignInPage`
+- Support placing `Account` component in layout sidebar
+- Improved UI integration with custom themes
+- Improved customizability of `DashboardLayout` header actions
+- Improved documentation, especially around React Router integration
+
+### `@toolpad/core`
+
+- Support magic links in `SignInPage` (#4085) @bharatkashyap
+- Add `<Account />` in `sidebarFooter` (#4255) @bharatkashyap
+- Improve default UI and customisation ability (#4370) @bharatkashyap
+- Allow theme switcher override with slots (#4340) @apedroferreira
+- Left-align header title in mobile viewport (#4346) @apedroferreira
+- Allow changing the width of the drawer in dashboard layout (#4296) @garryxiao
+- Hide layout header and sidebar when printing (#4334) @apedroferreira
+
+### Docs
+
+- Add `SignInPage` Vite + React Router example (#4335) @bharatkashyap
+- Add custom user details example (#4227) @bharatkashyap
+- Update React Router example configs (#4303) @apedroferreira
+- Make Themed example run by default on Codesandbox (#4382) @bharatkashyap
+- Add component as `payload` example to `useDialogs` docs (#4375) @bharatkashyap
+- Add sandbox links for Toolpad Core examples (#4325) @bharatkashyap
+- Separate example folders for Core and Studio (#4301) @bharatkashyap
+- Clean up examples (#4383) @bharatkashyap
+- Fix more 404s on examples page (#4368) @prakhargupta1
+- Fix tool redirection (#4366) @oliviertassinari
+- Fix missing punctuation on descriptions (#4351) @oliviertassinari
+- Sentence case (10dde48) @oliviertassinari
+- Polish to match standard (#4344) @oliviertassinari
+- Move the description to match the other pages (#4348) @oliviertassinari
+- Adjust some casings and sections in component docs (#4306) @apedroferreira
+- Fix "breadcrumbs" spelling (#4297) @bharatkashyap
+- Minor changes (#4372) @prakhargupta1
+- Replace support link from Studio to Core in the GitHub Issue template (#4272) @prakhargupta1
+
+### Core
+
+- Fix Dependabot warning in Next.js example with passkey (#4371) @apedroferreira
+- Fix Vale errors (#4347) @oliviertassinari
+- Fix VS Code reference (0520057) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @garryxiao, @oliviertassinari, @prakhargupta1
+
+## v0.8.0
+
+<!-- generated comparing v0.7.0..master -->
+
+_Oct 19, 2024_
+
+A big thanks to the 8 contributors who made this release possible. Here are some highlights ✨:
+
+- **BREAKING** Replaces the `menuItems` slot on the `Account` component with a more exhaustive `popoverContent` slot
+- Adds a `sidebarFooter` slot and a `hideNavigation` prop to `DashboardLayout`
+- Adds a React-Router integration example for `DashboardLayout`
+- Increased customizability of the `Account` component using new slots `preview` and `popoverContent`
+- Adds `passkey` support to the `SignInPage`, and an integration example to the docs
+- Integrates Toolpad Core components in the Toolpad Studio runtime
+
+### `@toolpad/core`
+
+- Added page-container to all components page also reordered based on the side-nav (#4178) @prakhargupta1
+- New slots and sub-components on the Account component (#4181) @bharatkashyap
+- Fix `auth.ts` file generation (#4237) @bharatkashyap
+- Add `passkey` provider support and example (#4063) @bharatkashyap
+- Support collapsed mini-drawer by default (#4234) @apedroferreira
+- Add `sidebarFooter` slot (#4236) @apedroferreira
+- Add hideNavigation prop (#4231) @vikasgurjar
+- Avoid React invalid props warning for PageContainer (#4189) @Janpot
+- Remove leading slash from patterns for PageContainer (#4191) @Janpot
+- Rename breadCrumbs to breadcrumbs (#4143) @Janpot
+- Toolpad Core website was linking to Toolpad Studio examples (#4238) @prakhargupta1
+
+### `@toolpad/studio`
+
+- Integrate Toolpad Core in Toolpad Studio runtime (#4119) @apedroferreira
+
+### Docs
+
+- Improve tutorial example, docs, CLI installation (#4225) @bharatkashyap
+- Docs/demo cleanup (#4268) @apedroferreira
+- Full documentation for React Router integration (#4185) @apedroferreira
+- Fix integration docs `_app.tsx` (#4239) @bharatkashyap
+- Use production URL to demo production use @oliviertassinari
+- Add placeholders for upcoming features (#4175) @prakhargupta1
+- Update package screenshot in contributing.md (#4230) @prakhargupta1
+- Fix input.label in SlotsSignIn (#4157) @djedu28
+
+### Core
+
+- Update README.md @apedroferreira
+- Move vitest to dev dependency in `@toolpad/utils` (#4267) @Janpot
+- Revert "Bump typescript to 5.6.2" (#4228) @Janpot
+- Lock file maintenance (#4176) @renovate[bot]
+- Remove custom playwright installation steps (#4154) @Janpot
+- remove e identifier (#4152) @Janpot
+- Enable React compiler eslint plugin (#4121) @Janpot
+- Remove <-- from changelog (#4232) @oliviertassinari
+- Make git repo easier to go to from IDE @oliviertassinari
+- Increase the minimum Node.js version support to 14.0.0 (#4171) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @djedu28, @Janpot, @oliviertassinari, @prakhargupta1, @renovate[bot], @vikasgurjar
+
 ## v0.7.0
 
 <!-- generated comparing v0.6.0..master -->
@@ -47,7 +322,7 @@ _Sep 13, 2024_
 
 A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
 
-- Migrate to Material UI v6
+- Migrate to Material UI v6
 - Collapsible sidebar in `DashboardLayout` component with mini drawer variant
 - Support route patterns in navigation
 - Add more OAuth providers to `SignInPage`
@@ -61,7 +336,7 @@ A big thanks to the 6 contributors who made this release possible. Here are some
 - Add more OAuth providers to `SignInPage` (#3933) @bharatkashyap
 - Refactor `<Account />` (#3992) @bharatkashyap
 - Add toolbarActions and toolbarAccount slots to DashboardLayout (#3984)
-- Migrate to Material UI v6 (#3862) @Janpot
+- Migrate to Material UI v6 (#3862) @Janpot
 - Support route patterns in navigation (#3991) @apedroferreira
 
 ### Docs
@@ -142,7 +417,7 @@ _Aug 9, 2024_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
+- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
 - Fix theme switcher in documentation examples
 - Fix DashboardLayout bugs with theming and mobile navigation
 - Fix some file handling restrictions in `@toolpad/studio`
@@ -164,7 +439,7 @@ A big thanks to the 5 contributors who made this release possible. Here are some
 ### Core
 
 - Support `require` (#3908) @bharatkashyap
-- Port fixes from Material UI v6 migration branch (#3910) @Janpot
+- Port fixes from Material UI v6 migration branch (#3910) @Janpot
 - Upgrade monorepo (#3911) @Janpot
 - Clarify security policy @oliviertassinari
 - Update smoke test instructions (#3899) @Janpot
@@ -196,7 +471,7 @@ Please use the `--studio` flag to generate a Toolpad Studio project.
 - Add authentication to Toolpad Core (#3609) @bharatkashyap
 - Make Core the default project (#3868) @bharatkashyap
 - Make navigation item segments optional (#3838) @apedroferreira
-- Ensure Material UI v5 compatibility (#3894) @Janpot
+- Ensure Material UI v5 compatibility (#3894) @Janpot
 - Bring in some fixes from the next update branch (#3866) @Janpot
 
 ### Docs
@@ -353,7 +628,7 @@ First components in @toolpad/core: [DashboardLayout](https://github.com/mui/tool
 
 - Lock file maintenance (#3622) @renovate[bot]
 - Lock file maintenance Examples (#3624) @renovate[bot]
-- Add Next.js app router Toolpad Core playground (#3587) @apedroferreira
+- Add Next.js App Router Toolpad Core playground (#3587) @apedroferreira
 - Isolate api-docs-builder deps @Janpot
 - isolate react-docgen @Janpot
 - Update renovate.json @Janpot
@@ -374,9 +649,9 @@ First components in @toolpad/core: [DashboardLayout](https://github.com/mui/tool
 - [DataProvider] Support custom Id field (#3613) @Janpot
 - [docs] Start Toolpad Core docs (#3383) @bharatkashyap
 - [docs] Add Toolpad core tutorial example (#3617) @bharatkashyap
-- [docs] Add badges like in Material UI @oliviertassinari
-- [docs] Add badges like in Material UI @oliviertassinari
-- [docs] Add badges like in Material UI @oliviertassinari
+- [docs] Add badges like in Material UI @oliviertassinari
+- [docs] Add badges like in Material UI @oliviertassinari
+- [docs] Add badges like in Material UI @oliviertassinari
 - [docs] Update twitter.com to x.com @oliviertassinari
 - [docs] Support demo previews with comments (#3577) @Janpot
 - [docs] Fix demo codesandbox dependencies (#3578) @Janpot
@@ -571,7 +846,7 @@ It will be the last release of @mui/toolpad before we rename the package to @too
 - [DataGrid] fix errors not showing up in the rows area (#3264) @Janpot
 - [docs] Prefer https links @oliviertassinari
 - [docs-infra] Fixes for vale-action with shared config (#3234) @bharatkashyap
-- [docs-infra] Fix Stack Overflow breaking space @oliviertassinari
+- [docs-infra] Fix Stack Overflow breaking space @oliviertassinari
 - [docs-infra] Add vale for style-guide lint on docs (#3178) @bharatkashyap
 - [examples] Hacker News client example (#2170) @Janpot
 

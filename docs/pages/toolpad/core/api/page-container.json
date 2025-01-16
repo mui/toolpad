@@ -1,12 +1,24 @@
 {
   "props": {
     "breadcrumbs": {
-      "type": { "name": "arrayOf", "description": "Array&lt;{ path: string, title: string }&gt;" }
+      "type": { "name": "arrayOf", "description": "Array&lt;{ path?: string, title: string }&gt;" }
     },
-    "slotProps": { "type": { "name": "shape", "description": "{ toolbar: { children?: node } }" } },
+    "slotProps": {
+      "type": {
+        "name": "shape",
+        "description": "{ header: { breadcrumbs?: Array&lt;{ path?: string, title: string }&gt;, slotProps?: { toolbar: object }, slots?: { toolbar?: elementType }, title?: string } }"
+      }
+    },
     "slots": {
-      "type": { "name": "shape", "description": "{ toolbar?: elementType }" },
+      "type": { "name": "shape", "description": "{ header?: elementType }" },
       "additionalInfo": { "slotsApi": true }
+    },
+    "sx": {
+      "type": {
+        "name": "union",
+        "description": "Array&lt;func<br>&#124;&nbsp;object<br>&#124;&nbsp;bool&gt;<br>&#124;&nbsp;func<br>&#124;&nbsp;object"
+      },
+      "additionalInfo": { "sx": true }
     },
     "title": { "type": { "name": "string" } }
   },
@@ -17,9 +29,9 @@
   ],
   "slots": [
     {
-      "name": "toolbar",
-      "description": "The component that renders the actions toolbar.",
-      "default": "Snackbar",
+      "name": "header",
+      "description": "The component that renders the page header.",
+      "default": "PageHeader",
       "class": null
     }
   ],

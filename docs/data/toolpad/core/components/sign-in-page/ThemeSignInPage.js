@@ -3,7 +3,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { SignInPage } from '@toolpad/core/SignInPage';
 import { createTheme } from '@mui/material/styles';
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
-import { getDesignTokens } from './brandingTheme';
+import { getDesignTokens, inputsCustomizations } from './customTheme';
 
 const providers = [
   { id: 'github', name: 'GitHub' },
@@ -15,7 +15,7 @@ const signIn = async (provider) => {
   const promise = new Promise((resolve) => {
     setTimeout(() => {
       console.log(`Sign in with ${provider.id}`);
-      resolve();
+      resolve({ error: 'This is a mock error message.' });
     }, 500);
   });
   return promise;
@@ -32,13 +32,25 @@ export default function ThemeSignInPage() {
       ...brandingDesignTokens.palette,
       mode: calculatedMode,
     },
+    components: {
+      ...inputsCustomizations,
+    },
   });
   // preview-end
 
   return (
     // preview-start
     <AppProvider theme={THEME}>
-      <SignInPage signIn={signIn} providers={providers} />
+      <SignInPage
+        signIn={signIn}
+        providers={providers}
+        sx={{
+          '& form > .MuiStack-root': {
+            marginTop: '2rem',
+            rowGap: '0.5rem',
+          },
+        }}
+      />
     </AppProvider>
     // preview-end
   );

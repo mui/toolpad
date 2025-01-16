@@ -1,16 +1,21 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import Chip from '@mui/material/Chip';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
+import CloudCircleIcon from '@mui/icons-material/CloudCircle';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import {
   DashboardLayout,
+  ThemeSwitcher,
   type SidebarFooterProps,
 } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internal';
@@ -64,9 +69,9 @@ function DemoPageContent({ pathname }: { pathname: string }) {
   );
 }
 
-function Search() {
+function ToolbarActionsSearch() {
   return (
-    <React.Fragment>
+    <Stack direction="row">
       <Tooltip title="Search" enterDelay={1000}>
         <div>
           <IconButton
@@ -96,7 +101,8 @@ function Search() {
         }}
         sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
       />
-    </React.Fragment>
+      <ThemeSwitcher />
+    </Stack>
   );
 }
 
@@ -108,6 +114,19 @@ function SidebarFooter({ mini }: SidebarFooterProps) {
     >
       {mini ? '© MUI' : `© ${new Date().getFullYear()} Made with love by MUI`}
     </Typography>
+  );
+}
+
+function CustomAppTitle() {
+  return (
+    <Stack direction="row" alignItems="center" spacing={2}>
+      <CloudCircleIcon fontSize="large" color="primary" />
+      <Typography variant="h6">My App</Typography>
+      <Chip size="small" label="BETA" color="info" />
+      <Tooltip title="Connected to production">
+        <CheckCircleIcon color="success" fontSize="small" />
+      </Tooltip>
+    </Stack>
   );
 }
 
@@ -135,7 +154,11 @@ export default function DashboardLayoutSlots(props: DemoProps) {
       window={demoWindow}
     >
       <DashboardLayout
-        slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
+        slots={{
+          appTitle: CustomAppTitle,
+          toolbarActions: ToolbarActionsSearch,
+          sidebarFooter: SidebarFooter,
+        }}
       >
         <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>

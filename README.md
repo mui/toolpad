@@ -15,7 +15,7 @@
 [![Renovate status](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)](https://github.com/mui/toolpad/issues/8)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/mui/toolpad.svg)](https://isitmaintained.com/project/mui/toolpad 'Average time to resolve an issue')
 [![Open Collective backers and sponsors](https://img.shields.io/opencollective/all/mui-org)](https://opencollective.com/mui-org)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/6294/badge?v2)](https://www.bestpractices.dev/projects/6294)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/6294/badge)](https://www.bestpractices.dev/projects/6294)
 
 </div>
 
@@ -60,6 +60,12 @@ pnpm create toolpad-app --studio my-toolpad-studio-app
 Check out our [documentation](https://mui.com/toolpad/studio/getting-started/).
 
 ## Examples
+
+### Core
+
+Find a [list of example apps](https://mui.com/toolpad/core/introduction/examples/) on the docs to help you get started with Toolpad Core quickly.
+
+### Studio
 
 Check out our [mui-public](https://tools-public.mui.com/prod/pages/OverviewPage) app to see how a Toolpad Studio app looks in production.
 Our documentation contains more [examples](https://mui.com/toolpad/studio/examples/) to help you get started.

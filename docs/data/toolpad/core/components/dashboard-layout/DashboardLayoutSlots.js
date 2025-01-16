@@ -2,15 +2,19 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
+import Stack from '@mui/material/Stack';
+import Chip from '@mui/material/Chip';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
+import CloudCircleIcon from '@mui/icons-material/CloudCircle';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { DashboardLayout, ThemeSwitcher } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -66,9 +70,9 @@ DemoPageContent.propTypes = {
   pathname: PropTypes.string.isRequired,
 };
 
-function Search() {
+function ToolbarActionsSearch() {
   return (
-    <React.Fragment>
+    <Stack direction="row">
       <Tooltip title="Search" enterDelay={1000}>
         <div>
           <IconButton
@@ -98,7 +102,8 @@ function Search() {
         }}
         sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
       />
-    </React.Fragment>
+      <ThemeSwitcher />
+    </Stack>
   );
 }
 
@@ -117,6 +122,19 @@ SidebarFooter.propTypes = {
   mini: PropTypes.bool.isRequired,
 };
 
+function CustomAppTitle() {
+  return (
+    <Stack direction="row" alignItems="center" spacing={2}>
+      <CloudCircleIcon fontSize="large" color="primary" />
+      <Typography variant="h6">My App</Typography>
+      <Chip size="small" label="BETA" color="info" />
+      <Tooltip title="Connected to production">
+        <CheckCircleIcon color="success" fontSize="small" />
+      </Tooltip>
+    </Stack>
+  );
+}
+
 function DashboardLayoutSlots(props) {
   const { window } = props;
 
@@ -133,7 +151,11 @@ function DashboardLayoutSlots(props) {
       window={demoWindow}
     >
       <DashboardLayout
-        slots={{ toolbarActions: Search, sidebarFooter: SidebarFooter }}
+        slots={{
+          appTitle: CustomAppTitle,
+          toolbarActions: ToolbarActionsSearch,
+          sidebarFooter: SidebarFooter,
+        }}
       >
         <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>

@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Dashboard Layout
-components: AppProvider, DashboardLayout, Account
+components: AppProvider, DashboardLayout, ToolbarActions, ThemeSwitcher, Account
 ---
 
 # Dashboard Layout
@@ -32,9 +32,16 @@ If application [themes](https://mui.com/toolpad/core/react-app-provider/#theming
 
 Some elements of the `DashboardLayout` can be configured to match your personalized brand.
 
-This can be done via the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), which allows for setting a custom `logo` image or `title` text in the page header.
+This can be done via the `branding` prop in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/), which allows for setting a custom `logo` image, a custom `title` text in the page header, and a custom `homeUrl` which the branding component leads to on click.
 
 {{"demo": "DashboardLayoutBranding.js", "height": 400, "iframe": true}}
+
+:::info
+Optionally, you can also pass a specific `branding` object as a prop to the `DashboardLayout` component itself.
+When applied this way, the properties of this object take precedence over the properties of the `branding` prop passed to the `AppProvider`.
+
+You may also override the default branding by passing in your own component to the `appTitle` slot, as shown in the [Slots section](#slots).
+:::
 
 ## Navigation
 
@@ -42,7 +49,12 @@ The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-ap
 
 The flexibility in composing and ordering these different elements allows for a great variety of navigation structures to fit your use case.
 
-### Navigation Links
+:::info
+Optionally, you can also pass a specific `navigation` as a prop to the `DashboardLayout` component itself.
+When applied this way, this `navigation` takes complete precedence over the `navigation` prop passed to the `AppProvider`.
+:::
+
+### Navigation links
 
 Navigation links can be placed in the sidebar as items with the format:
 
@@ -52,7 +64,7 @@ Navigation links can be placed in the sidebar as items with the format:
 
 {{"demo": "DashboardLayoutNavigationLinks.js", "height": 400, "iframe": true}}
 
-### Navigation Headings
+### Navigation headings
 
 Navigation headings can be placed in the sidebar as items with the format:
 
@@ -62,7 +74,7 @@ Navigation headings can be placed in the sidebar as items with the format:
 
 {{"demo": "DashboardLayoutNavigationHeadings.js", "height": 400, "iframe": true}}
 
-### Navigation Dividers
+### Navigation dividers
 
 Dividers can can be placed between items in the sidebar as items with the format:
 
@@ -74,7 +86,7 @@ Dividers can can be placed between items in the sidebar as items with the format
 
 {{"demo": "DashboardLayoutNavigationDividers.js", "height": 400, "iframe": true}}
 
-### Nested Navigation
+### Nested navigation
 
 Nested navigation structures can be placed in the sidebar as items with the format:
 
@@ -84,16 +96,17 @@ Nested navigation structures can be placed in the sidebar as items with the form
 
 {{"demo": "DashboardLayoutNavigationNested.js", "height": 400, "iframe": true}}
 
-### Navigation Actions
+### Navigation actions
 
 Navigation links have an optional `action` prop to render any content on the right-side of the respective list item, such as badges with numbers, or buttons to toggle a popover menu.
 
 {{"demo": "DashboardLayoutNavigationActions.js", "height": 400, "iframe": true}}
 
-### Navigation Pattern Matching
+### Navigation pattern matching
 
 Navigation links have an optional `pattern` prop to define a pattern to be matched for the item to be marked as selected.
-This feature is built on top of the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library. Some examples:
+This feature is built on top of the [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) library.
+Some examples:
 
 - Constant path: `orders`
 - Dynamic segment: `orders/:segment`
@@ -121,7 +134,7 @@ The layout sidebar can be hidden if needed with the `hideNavigation` prop.
 
 {{"demo": "DashboardLayoutSidebarHidden.js", "height": 400, "iframe": true}}
 
-### Full-size content
+## Full-size content
 
 The layout content can take up the full available area with styles such as `flex: 1` or `height: 100%`.
 
@@ -139,10 +152,27 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 
 ## Customization
 
-Some areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
-This allows you to add, for example:
+### Slots
 
-- new items to the toolbar in the header, such as a search bar or button;
-- footer content in the sidebar.
+Certain areas of the layout can be replaced with custom components by using the `slots` and `slotProps` props.
+Some possibly useful slots:
+
+- `appTitle`: allows you to customize the app title section in the layout header.
+
+- `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
+
+- `sidebarFooter`: allows you to add footer content in the sidebar.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
+
+### Examples
+
+#### User account in layout sidebar
+
+{{"demo": "DashboardLayoutAccountSidebar.js", "height": 400, "iframe": true}}
+
+#### Settings menu with custom theme switcher
+
+The `useColorScheme` hook can be used to create a custom theme switcher.
+
+{{"demo": "DashboardLayoutCustomThemeSwitcher.js", "height": 400, "iframe": true}}

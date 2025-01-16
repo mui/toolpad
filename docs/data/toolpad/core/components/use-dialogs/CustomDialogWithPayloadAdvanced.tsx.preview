@@ -1,0 +1,4 @@
+const uuid = await dialogs.open(TransactionDialog, {
+  component: country === 'usa' ? <PayloadUSA /> : <PayloadIndia />,
+  data: csrfToken,
+});

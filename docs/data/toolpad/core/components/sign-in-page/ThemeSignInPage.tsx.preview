@@ -4,10 +4,22 @@ const THEME = createTheme({
     ...brandingDesignTokens.palette,
     mode: calculatedMode,
   },
+  components: {
+    ...inputsCustomizations,
+  },
 });
 
 // ...
 
 <AppProvider theme={THEME}>
-  <SignInPage signIn={signIn} providers={providers} />
+  <SignInPage
+    signIn={signIn}
+    providers={providers}
+    sx={{
+      '& form > .MuiStack-root': {
+        marginTop: '2rem',
+        rowGap: '0.5rem',
+      },
+    }}
+  />
 </AppProvider>

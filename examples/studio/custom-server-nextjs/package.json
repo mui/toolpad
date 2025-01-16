@@ -1,0 +1,21 @@
+{
+  "name": "custom-server-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "NODE_ENV=development node index.mjs",
+    "build": "toolpad-studio build --base /my-toolpad-studio-app && next build",
+    "start": "node index.mjs",
+    "edit": "toolpad-studio editor http://localhost:3001/my-toolpad-studio-app"
+  },
+  "dependencies": {
+    "@toolpad/studio": "0.5.2",
+    "express": "4.20.0",
+    "next": "14.2.10",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0"
+  }
+}

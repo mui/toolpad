@@ -1,0 +1,17 @@
+{
+  "componentDescription": "The AccountPreview component displays user account information.",
+  "propDescriptions": {
+    "handleClick": { "description": "The handler used when the preview is expanded" },
+    "open": { "description": "The state of the Account popover" },
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." },
+    "sx": { "description": "The prop used to customize the styling of the preview" },
+    "variant": { "description": "The type of account details to display." }
+  },
+  "classDescriptions": {},
+  "slotDescriptions": {
+    "avatar": "The component used for the Avatar",
+    "avatarIconButton": "The component used for the avatar icon button in the condensed variant",
+    "moreIconButton": "The component used for the overflow icon button in the expanded variant"
+  }
+}

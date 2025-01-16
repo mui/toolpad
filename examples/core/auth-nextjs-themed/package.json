@@ -1,0 +1,37 @@
+{
+  "name": "auth-nextjs-themed",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/cache": "^11",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
+    "@mui/icons-material": "^6",
+    "@mui/material": "^6",
+    "@mui/material-nextjs": "^6",
+    "@mui/x-charts": "^7",
+    "@mui/x-tree-view": "^7",
+    "@mui/x-data-grid": "^7",
+    "@mui/x-date-pickers": "^7",
+    "dayjs": "^1",
+    "clsx": "^2",
+    "@react-spring/web": "^9",
+    "@toolpad/core": "latest",
+    "next": "^15",
+    "next-auth": "^5.0.0-beta.25",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.12",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^8",
+    "eslint-config-next": "^15",
+    "typescript": "^5"
+  }
+}

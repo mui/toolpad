@@ -15,7 +15,7 @@ The steps below explain how to create and use a custom component in Toolpad Stud
 In case it doesn't open, check [troubleshoot missing editor](https://mui.com/toolpad/studio/how-to-guides/editor-path/).
 :::
 
-<video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
+<video controls width="auto" height="100%" alt="custom-component-creation">
   <source src="/static/toolpad/docs/studio/concepts/custom-components/custom-component-creation.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
@@ -89,7 +89,7 @@ export default createComponent(HelloWorld, {
 
 This component, when dragged to the canvas, has a **msg** property that you can't bind to. But you can now bind to this property from other components.
 
-<video controls width="auto" height="100%" style="contain" alt="custom-component-creation">
+<video controls width="auto" height="100%" alt="custom-component-creation">
   <source src="/static/toolpad/docs/studio/concepts/custom-components/controlled-prop.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>

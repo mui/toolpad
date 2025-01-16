@@ -1,0 +1,29 @@
+{
+  "props": {
+    "breadcrumbs": {
+      "type": { "name": "arrayOf", "description": "Array&lt;{ path?: string, title: string }&gt;" }
+    },
+    "slotProps": { "type": { "name": "shape", "description": "{ toolbar: { children?: node } }" } },
+    "slots": {
+      "type": { "name": "shape", "description": "{ toolbar?: elementType }" },
+      "additionalInfo": { "slotsApi": true }
+    },
+    "title": { "type": { "name": "string" } }
+  },
+  "name": "PageHeader",
+  "imports": ["import { PageHeader } from '@toolpad/core/PageContainer';"],
+  "slots": [
+    {
+      "name": "toolbar",
+      "description": "The component that renders the actions toolbar.",
+      "default": "PageHeaderToolbar",
+      "class": null
+    }
+  ],
+  "classes": [],
+  "muiName": "PageHeader",
+  "filename": "/packages/toolpad-core/src/PageContainer/PageHeader.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-page-container/\">Page Container</a></li></ul>",
+  "cssComponent": false
+}

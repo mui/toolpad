@@ -1,0 +1,27 @@
+const router = React.useMemo(
+  () =>
+    createMemoryRouter([
+      {
+        element: <App window={demoWindow} />, // root layout route
+        children: [
+          {
+            path: '/',
+            Component: Layout,
+            children: [
+              {
+                path: '',
+                Component: DashboardPage,
+              },
+              {
+                path: 'orders',
+                Component: OrdersPage,
+              },
+            ],
+          },
+        ],
+      },
+    ]),
+  [demoWindow],
+);
+
+return <RouterProvider router={router} />;

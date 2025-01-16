@@ -1,0 +1,11 @@
+{
+  "props": {},
+  "name": "ThemeSwitcher",
+  "imports": ["import { ThemeSwitcher } from '@toolpad/core/DashboardLayout';"],
+  "classes": [],
+  "muiName": "ThemeSwitcher",
+  "filename": "/packages/toolpad-core/src/DashboardLayout/ThemeSwitcher.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-dashboard-layout/\">Dashboard Layout</a></li></ul>",
+  "cssComponent": false
+}

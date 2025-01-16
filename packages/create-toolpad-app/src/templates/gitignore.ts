@@ -91,6 +91,9 @@ const gitignore = `
   # Nuxt.js build / generate output
   .nuxt
   dist
+
+  # Vite build output
+  dist-ssr
   
   # Gatsby files
   .cache/
@@ -119,8 +122,21 @@ const gitignore = `
   
   # TernJS port file
   .tern-port
+
+
+  # Editor directories and files
+  .vscode/*
+  !.vscode/extensions.json
+  .idea
+  .DS_Store
+  *.suo
+  *.ntvs*
+  *.njsproj
+  *.sln
+  *.sw?
+
   
-  # Stores VSCode versions used for testing VSCode extensions
+  # Stores VS Code versions used for testing VS Code extensions
   .vscode-test
   
   # yarn v2

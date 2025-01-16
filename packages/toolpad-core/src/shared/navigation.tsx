@@ -71,15 +71,14 @@ function buildItemLookup(navigation: Navigation) {
         console.warn(`Duplicate path in navigation: ${path}`);
       }
 
+      map.set(path, item);
+      if (item.pattern) {
+        const basePath = item.segment ? path.slice(0, -item.segment.length) : path;
+        map.set(pathToRegexp(basePath + item.pattern), item);
+      }
       if (item.children) {
         for (const child of item.children) {
           visit(child);
-        }
-      } else {
-        map.set(path, item);
-        if (item.pattern) {
-          const basePath = item.segment ? path.slice(0, -item.segment.length) : path;
-          map.set(pathToRegexp(basePath + item.pattern), item);
         }
       }
     }

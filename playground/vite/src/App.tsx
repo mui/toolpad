@@ -13,44 +13,6 @@ const NAVIGATION: Navigation = [
   {
     title: 'Dashboard',
     icon: <DashboardIcon />,
-    children: [
-      {
-        title: 'Dashboard',
-        icon: <DashboardIcon />,
-      },
-      {
-        segment: 'orders',
-        title: 'Orders',
-        icon: <ShoppingCartIcon />,
-      },
-    ],
-  },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-    children: [
-      {
-        title: 'Dashboard',
-        icon: <DashboardIcon />,
-      },
-      {
-        segment: 'orders',
-        title: 'Orders',
-        icon: <ShoppingCartIcon />,
-        children: [
-          {
-            title: 'Dashboard',
-            icon: <DashboardIcon />,
-          },
-          {
-            segment: 'orders',
-            title: 'Orders',
-            icon: <ShoppingCartIcon />,
-          },
-        ],
-      },
-    ],
   },
   {
     segment: 'orders',

@@ -80,15 +80,15 @@ export interface DashboardLayoutProps {
    */
   navigation?: Navigation;
   /**
-   * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
-   * @default false
-   */
-  disableCollapsibleSidebar?: boolean;
-  /**
    * Whether the sidebar should start collapsed in desktop size screens.
    * @default false
    */
   defaultSidebarCollapsed?: boolean;
+  /**
+   * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
+   * @default false
+   */
+  disableCollapsibleSidebar?: boolean;
   /**
    * Whether the navigation bar and menu icon should be hidden.
    * @default false
@@ -492,7 +492,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   disableCollapsibleSidebar: PropTypes.bool,
   /**
-   * Whether the navigation bar and menu icon should be hidden
+   * Whether the navigation bar and menu icon should be hidden.
    * @default false
    */
   hideNavigation: PropTypes.bool,

@@ -122,10 +122,10 @@ function DashboardSidebarSubNavigation({
     <List
       sx={{
         padding: 0,
-        mt: isPopover ? 0.5 : 0,
+        mt: isPopover && depth === 1 ? 0.5 : 0,
         mb: depth === 0 && !isPopover ? 4 : 0.5,
-        pl: isPopover ? 0 : 2 * depth,
-        minWidth: isPopover ? 240 : 'auto',
+        pl: (isPopover ? 1 : 2) * (isPopover ? depth - 1 : depth),
+        minWidth: isPopover && depth === 1 ? 240 : 'auto',
       }}
     >
       {subNavigation.map((navigationItem, navigationItemIndex) => {
@@ -189,7 +189,7 @@ function DashboardSidebarSubNavigation({
             fontSize: 18,
             position: 'absolute',
             top: '50%',
-            right: '-2px',
+            right: '-1px',
             transform: 'translateY(-50%) rotate(-90deg)',
           };
         } else if (!isMini && isFullyExpanded) {
@@ -331,6 +331,7 @@ function DashboardSidebarSubNavigation({
                   subNavigation={navigationItem.children}
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
+                  isPopover={isPopover}
                 />
               </Collapse>
             ) : null}

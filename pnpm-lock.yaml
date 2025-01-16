@@ -1165,7 +1165,7 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       react:
-        specifier: ^19.0.0
+        specifier: ^18.0.0 || ^19.0.0
         version: 19.0.0
       react-is:
         specifier: ^19.0.0

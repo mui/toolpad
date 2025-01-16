@@ -1,11 +1,14 @@
 /* eslint-disable no-console */
 import path from 'path';
+import { $ } from 'execa';
 import {
   createPackageFile,
   includeFileInBuild,
   prepend,
   typescriptCopy,
 } from './copyFilesUtils.mjs';
+
+const $$ = $({ stdio: 'inherit' });
 
 const packagePath = process.cwd();
 const buildPath = path.join(packagePath, './build');
@@ -37,13 +40,15 @@ async function addLicense(packageData) {
   );
 }
 
+async function removeBuildArtefacts() {
+  await $$`rimraf --glob ${buildPath}/*.tsbuildinfo`;
+}
+
 async function run() {
   const extraFiles = process.argv.slice(2);
   try {
     // TypeScript
     await typescriptCopy({ from: srcPath, to: buildPath });
-
-    const packageData = await createPackageFile();
 
     await Promise.all(
       ['./README.md', '../../CHANGELOG.md', '../../LICENSE', ...extraFiles].map((file) =>
@@ -51,7 +56,9 @@ async function run() {
       ),
     );
 
+    const packageData = await createPackageFile();
     await addLicense(packageData);
+    await removeBuildArtefacts();
   } catch (err) {
     console.error(err);
     process.exit(1);

@@ -80,17 +80,17 @@ export interface DashboardLayoutProps {
    */
   navigation?: Navigation;
   /**
-   * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
-   * @default false
-   */
-  disableCollapsibleSidebar?: boolean;
-  /**
    * Whether the sidebar should start collapsed in desktop size screens.
    * @default false
    */
   defaultSidebarCollapsed?: boolean;
   /**
-   * Whether the navigation bar and menu icon should be hidden
+   * Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports.
+   * @default false
+   */
+  disableCollapsibleSidebar?: boolean;
+  /**
+   * Whether the navigation bar and menu icon should be hidden.
    * @default false
    */
   hideNavigation?: boolean;
@@ -130,8 +130,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     children,
     branding: brandingProp,
     navigation: navigationProp,
-    disableCollapsibleSidebar = false,
     defaultSidebarCollapsed = false,
+    disableCollapsibleSidebar = false,
     hideNavigation = false,
     sidebarExpandedWidth = 320,
     slots,
@@ -182,6 +182,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const [isNavigationFullyExpanded, setIsNavigationFullyExpanded] =
     React.useState(isNavigationExpanded);
+  const [isNavigationFullyCollapsed, setIsNavigationFullyCollapsed] =
+    React.useState(!isNavigationExpanded);
 
   React.useEffect(() => {
     if (isNavigationExpanded) {
@@ -197,7 +199,19 @@ function DashboardLayout(props: DashboardLayoutProps) {
     return () => {};
   }, [isNavigationExpanded, theme]);
 
-  const selectedItemIdRef = React.useRef('');
+  React.useEffect(() => {
+    if (!isNavigationExpanded) {
+      const drawerWidthTransitionTimeout = setTimeout(() => {
+        setIsNavigationFullyCollapsed(true);
+      }, theme.transitions.duration.leavingScreen);
+
+      return () => clearTimeout(drawerWidthTransitionTimeout);
+    }
+
+    setIsNavigationFullyCollapsed(false);
+
+    return () => {};
+  }, [isNavigationExpanded, theme]);
 
   const handleSetNavigationExpanded = React.useCallback(
     (newExpanded: boolean) => () => {
@@ -211,16 +225,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   }, [isNavigationExpanded, setIsNavigationExpanded]);
 
   const handleNavigationLinkClick = React.useCallback(() => {
-    selectedItemIdRef.current = '';
     setIsMobileNavigationExpanded(false);
   }, [setIsMobileNavigationExpanded]);
-
-  // If useEffect was used, the reset would also happen on the client render after SSR which we don't need
-  React.useMemo(() => {
-    if (navigation) {
-      selectedItemIdRef.current = '';
-    }
-  }, [navigation]);
 
   const isDesktopMini = !disableCollapsibleSidebar && !isDesktopNavigationExpanded;
   const isMobileMini = !disableCollapsibleSidebar && !isMobileNavigationExpanded;
@@ -279,8 +285,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
             onLinkClick={handleNavigationLinkClick}
             isMini={isMini}
             isFullyExpanded={isNavigationFullyExpanded}
+            isFullyCollapsed={isNavigationFullyCollapsed}
             hasDrawerTransitions={hasDrawerTransitions}
-            selectedItemId={selectedItemIdRef.current}
           />
           {SidebarFooterSlot ? (
             <SidebarFooterSlot mini={isMini} {...slotProps?.sidebarFooter} />
@@ -292,6 +298,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       SidebarFooterSlot,
       handleNavigationLinkClick,
       hasDrawerTransitions,
+      isNavigationFullyCollapsed,
       isNavigationFullyExpanded,
       navigation,
       slotProps?.sidebarFooter,
@@ -485,7 +492,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   disableCollapsibleSidebar: PropTypes.bool,
   /**
-   * Whether the navigation bar and menu icon should be hidden
+   * Whether the navigation bar and menu icon should be hidden.
    * @default false
    */
   hideNavigation: PropTypes.bool,

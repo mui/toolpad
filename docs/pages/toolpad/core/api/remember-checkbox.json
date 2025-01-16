@@ -1,0 +1,11 @@
+{
+  "props": {},
+  "name": "RememberCheckbox",
+  "imports": ["import { RememberCheckbox } from '@toolpad/core/SignInPage';"],
+  "classes": [],
+  "muiName": "RememberCheckbox",
+  "filename": "/packages/toolpad-core/src/SignInPage/RememberCheckbox.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign-in Page</a></li></ul>",
+  "cssComponent": false
+}

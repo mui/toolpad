@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Box } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+import { Box, Button } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 export interface QueryInputPanelProps {
@@ -20,14 +19,14 @@ export default function QueryInputPanel({
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'row' }}>
       {actions}
       <Box sx={{ flex: 1, overflow: 'hidden' }}>{children}</Box>
-      <LoadingButton
+      <Button
         startIcon={<PlayArrowIcon />}
         onClick={onRunPreview}
         disabled={previewDisabled}
         variant="outlined"
       >
         Preview
-      </LoadingButton>
+      </Button>
     </Box>
   );
 }

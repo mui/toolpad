@@ -179,6 +179,48 @@
       "isDeprecated": true
     },
     {
+      "key": "loading",
+      "className": "",
+      "description": "Styles applied to the root element if `loading={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "loadingIconPlaceholder",
+      "className": "",
+      "description": "Styles applied to the loadingIconPlaceholder element.",
+      "isGlobal": false
+    },
+    {
+      "key": "loadingIndicator",
+      "className": "",
+      "description": "Styles applied to the loadingIndicator element.",
+      "isGlobal": false
+    },
+    {
+      "key": "loadingPositionCenter",
+      "className": "",
+      "description": "Styles applied to the root element if `loadingPosition=\"center\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "loadingPositionEnd",
+      "className": "",
+      "description": "Styles applied to the root element if `loadingPosition=\"end\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "loadingPositionStart",
+      "className": "",
+      "description": "Styles applied to the root element if `loadingPosition=\"start\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "loadingWrapper",
+      "className": "",
+      "description": "Styles applied to the loadingWrapper element.",
+      "isGlobal": false
+    },
+    {
       "key": "outlined",
       "className": "",
       "description": "Styles applied to the root element if `variant=\"outlined\"`.",

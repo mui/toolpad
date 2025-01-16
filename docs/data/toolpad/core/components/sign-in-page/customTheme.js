@@ -436,18 +436,6 @@ export const inputsCustomizations = {
       }),
     },
   },
-  MuiLoadingButton: {
-    styleOverrides: {
-      root: ({ theme }) => ({
-        '& .MuiLoadingButton-loadingIndicator': {
-          color: gray[400],
-          ...theme.applyStyles('dark', {
-            color: gray[600],
-          }),
-        },
-      }),
-    },
-  },
   MuiCheckbox: {
     defaultProps: {
       disableRipple: true,

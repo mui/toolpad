@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box, BoxProps, Stack, styled } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+import Button from '@mui/material/Button';
 import { useNode } from '@toolpad/studio-runtime';
 import { equalProperties } from '@toolpad/utils/collections';
 import {
@@ -104,16 +104,16 @@ function Form({
                 sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
               >
                 {hasResetButton ? (
-                  <LoadingButton
+                  <Button
                     type="reset"
                     color="secondary"
                     variant="contained"
                     sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
                   >
                     Reset
-                  </LoadingButton>
+                  </Button>
                 ) : null}
-                <LoadingButton
+                <Button
                   type="submit"
                   color="primary"
                   variant="contained"
@@ -121,7 +121,7 @@ function Form({
                   sx={{ flex: formControlsFullWidth ? 1 : '0 1 auto' }}
                 >
                   {submitButtonText}
-                </LoadingButton>
+                </Button>
               </Stack>
             </Box>
           </form>

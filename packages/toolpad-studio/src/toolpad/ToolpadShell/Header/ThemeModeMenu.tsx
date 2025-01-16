@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { IconButton, Menu, MenuItem, ListItemText, ListItemIcon, Tooltip } from '@mui/material';
+import {
+  IconButton,
+  IconButtonProps,
+  Menu,
+  MenuItem,
+  ListItemText,
+  ListItemIcon,
+  Tooltip,
+} from '@mui/material';
 import LightModeOutlined from '@mui/icons-material/LightMode';
 import DarkModeOutlined from '@mui/icons-material/DarkMode';
 import SettingsBrightnessOutlined from '@mui/icons-material/SettingsBrightnessOutlined';
@@ -41,7 +49,7 @@ function ThemeModeMenu({ mode, onChange }: ThemeModeMenuProps) {
   return (
     <React.Fragment>
       <Tooltip title="Change theme">
-        <IconButton {...buttonProps} aria-label="Change theme" color="primary">
+        <IconButton {...(buttonProps as IconButtonProps)} aria-label="Change theme" color="primary">
           {options[mode].icon}
         </IconButton>
       </Tooltip>

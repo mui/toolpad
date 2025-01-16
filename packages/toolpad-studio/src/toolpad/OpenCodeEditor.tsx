@@ -2,6 +2,7 @@ import * as React from 'react';
 import {
   Button,
   IconButton,
+  IconButtonProps,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -13,7 +14,6 @@ import {
   CircularProgress,
 } from '@mui/material';
 import CodeIcon from '@mui/icons-material/Code';
-import { LoadingButton } from '@mui/lab';
 import { useProjectApi } from '../projectApi';
 import { CodeEditorFileType } from '../types';
 
@@ -102,7 +102,12 @@ export default function OpenCodeEditorButton({
     <React.Fragment>
       {iconButton ? (
         <Tooltip title="Open in code editor">
-          <IconButton disabled={disabled || busy} size="small" onClick={handleClick} {...rest}>
+          <IconButton
+            disabled={disabled || busy}
+            size="small"
+            onClick={handleClick}
+            {...(rest as IconButtonProps)}
+          >
             {busy ? (
               <CircularProgress color="inherit" size={16} />
             ) : (
@@ -111,7 +116,7 @@ export default function OpenCodeEditorButton({
           </IconButton>
         </Tooltip>
       ) : (
-        <LoadingButton
+        <Button
           disabled={disabled || busy}
           onClick={handleClick}
           loading={busy}
@@ -121,7 +126,7 @@ export default function OpenCodeEditorButton({
           {...rest}
         >
           {actionText}
-        </LoadingButton>
+        </Button>
       )}
       <MissingEditorDialog open={missingEditorDialog} onClose={setMissingEditorDialog} />
     </React.Fragment>

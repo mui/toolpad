@@ -22,7 +22,6 @@ import {
   inputLabelClasses,
   inputBaseClasses,
 } from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Controller, useForm } from 'react-hook-form';
 import { TabContext, TabList } from '@mui/lab';
@@ -707,7 +706,7 @@ function QueryEditor({
                   <Tab label={'Preview'} value="preview" />
                   <Tab label="Dev Tools" value="devTools" />
                 </TabList>
-                <LoadingButton
+                <Button
                   variant="text"
                   size="small"
                   loading={isLoading}
@@ -716,7 +715,7 @@ function QueryEditor({
                   endIcon={<PlayArrowIcon aria-label="Run preview" onClick={runPreview} />}
                 >
                   Run
-                </LoadingButton>
+                </Button>
               </Box>
               <TabPanel value="preview" disableGutters>
                 <QueryPreview isLoading={currentTab.isPreviewLoading} error={preview?.error}>

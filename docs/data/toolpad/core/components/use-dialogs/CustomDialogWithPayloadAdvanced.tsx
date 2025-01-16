@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { DialogsProvider, useDialogs, DialogProps } from '@toolpad/core/useDialogs';
 import Button from '@mui/material/Button';
-import LoadingButton from '@mui/lab/LoadingButton';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -45,7 +44,7 @@ function TransactionDialog({
       <DialogTitle>Confirm transfer</DialogTitle>
       <DialogContent>{payload.component}</DialogContent>
       <DialogActions>
-        <LoadingButton
+        <Button
           loading={loading}
           disabled={!isValidCsrf}
           onClick={async () => {
@@ -59,7 +58,7 @@ function TransactionDialog({
           }}
         >
           Submit
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );

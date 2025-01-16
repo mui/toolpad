@@ -1,4 +1,3 @@
-import { LoadingButton } from '@mui/lab';
 import {
   Box,
   Button,
@@ -164,7 +163,7 @@ export function ConnectionParamsInput({
         <Button variant="contained" onClick={doSubmit} disabled={isSaveDisabled(formState)}>
           Save
         </Button>
-        <LoadingButton
+        <Button
           variant="outlined"
           onClick={handleTestConnection}
           disabled={!formState.isValid}
@@ -173,7 +172,7 @@ export function ConnectionParamsInput({
           color={statusColor}
         >
           Test connection
-        </LoadingButton>
+        </Button>
       </Toolbar>
       {connectionStatus ? (
         <Typography variant="body2" color="error">

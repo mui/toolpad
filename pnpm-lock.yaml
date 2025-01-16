@@ -1116,8 +1116,8 @@ importers:
         specifier: 1.1.1
         version: 1.1.1
       cookie:
-        specifier: 1.0.1
-        version: 1.0.1
+        specifier: 1.0.2
+        version: 1.0.2
       fractional-indexing:
         specifier: 3.2.0
         version: 3.2.0
@@ -5410,8 +5410,8 @@ packages:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
 
-  cookie@1.0.1:
-    resolution: {integrity: sha512-Xd8lFX4LM9QEEwxQpF9J9NTUh8pmdJO0cyRJhFiDoLTk2eH8FXlRv2IFGYVadZpqI3j8fhNrSdKCeYPxiAhLXw==}
+  cookie@1.0.2:
+    resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
     engines: {node: '>=18'}
 
   copy-anything@3.0.5:
@@ -15387,7 +15387,7 @@ snapshots:
 
   cookie@0.7.2: {}
 
-  cookie@1.0.1: {}
+  cookie@1.0.2: {}
 
   copy-anything@3.0.5:
     dependencies:
@@ -19719,7 +19719,7 @@ snapshots:
   react-router@7.1.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       '@types/cookie': 0.6.0
-      cookie: 1.0.1
+      cookie: 1.0.2
       react: 19.0.0
       set-cookie-parser: 2.7.1
       turbo-stream: 2.4.0

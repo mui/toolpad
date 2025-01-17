@@ -11,6 +11,8 @@ import {
   WindowContext,
 } from '../shared/context';
 import { AppThemeProvider } from './AppThemeProvider';
+import { LocalizationProvider, type LocaleText } from './LocalizationProvider';
+import DEFAULT_LOCALE_TEXT from '../locales/en';
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -104,6 +106,10 @@ export interface AppProviderProps {
    */
   router?: Router;
   /**
+   * Locale text for components
+   */
+  localeText?: Partial<LocaleText>;
+  /**
    * Session info about the current user.
    * @default null
    */
@@ -147,6 +153,7 @@ function AppProvider(props: AppProviderProps) {
     theme = createTheme(),
     branding = null,
     navigation = [],
+    localeText = DEFAULT_LOCALE_TEXT.components.MuiLocalizationProvider.defaultProps.localeText,
     router = null,
     authentication = null,
     session = null,
@@ -163,7 +170,9 @@ function AppProvider(props: AppProviderProps) {
                 <DialogsProvider>
                   <BrandingContext.Provider value={branding}>
                     <NavigationContext.Provider value={navigation}>
-                      {children}
+                      <LocalizationProvider localeText={localeText}>
+                        {children}
+                      </LocalizationProvider>
                     </NavigationContext.Provider>
                   </BrandingContext.Provider>
                 </DialogsProvider>

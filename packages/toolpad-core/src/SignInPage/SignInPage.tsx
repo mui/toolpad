@@ -37,6 +37,7 @@ import KeycloakIcon from './icons/Keycloak';
 import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
 import { BrandingContext, RouterContext } from '../shared/context';
+import { useLocaleText } from '../AppProvider';
 
 const mergeSlotSx = (defaultSx: SxProps<Theme>, slotProps?: { sx?: SxProps<Theme> }) => {
   if (Array.isArray(slotProps?.sx)) {
@@ -277,6 +278,7 @@ function SignInPage(props: SignInPageProps) {
   const theme = useTheme();
   const branding = React.useContext(BrandingContext);
   const router = React.useContext(RouterContext);
+  const localeText = useLocaleText();
   const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const emailProvider = providers?.find((provider) => provider.id === 'nodemailer');
@@ -339,14 +341,15 @@ function SignInPage(props: SignInPageProps) {
                 fontWeight: 600,
               }}
             >
-              Sign in {branding?.title ? `to ${branding.title}` : null}
+              {localeText.signInTitle}{' '}
+              {branding?.title ? `${localeText.to?.toLocaleLowerCase()} ${branding.title}` : null}
             </Typography>
           )}
           {slots?.subtitle ? (
             <slots.subtitle />
           ) : (
             <Typography variant="body2" color="textSecondary" gutterBottom textAlign="center">
-              Welcome, please sign in to continue
+              {localeText?.signInSubtitle}
             </Typography>
           )}
           <Box sx={{ mt: theme.spacing(1), width: '100%' }}>
@@ -391,7 +394,10 @@ function SignInPage(props: SignInPageProps) {
                           textTransform: 'capitalize',
                         }}
                       >
-                        <span>Sign in with {provider.name}</span>
+                        <span>
+                          {localeText.signInTitle} {localeText.with?.toLocaleLowerCase()}{' '}
+                          {provider.name}
+                        </span>
                       </LoadingButton>
                     </form>
                   );
@@ -429,7 +435,7 @@ function SignInPage(props: SignInPageProps) {
                   ) : (
                     <TextField
                       {...getCommonTextFieldProps(theme, {
-                        label: 'Email',
+                        label: localeText.email,
                         placeholder: 'your@email.com',
                         id: 'email-passkey',
                         name: 'email',
@@ -459,7 +465,8 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in with {passkeyProvider.name || 'Passkey'}
+                      {localeText.signInTitle} {localeText.with?.toLocaleLowerCase()}{' '}
+                      {passkeyProvider.name || localeText.passkey}
                     </LoadingButton>
                   )}
                 </Box>
@@ -503,7 +510,7 @@ function SignInPage(props: SignInPageProps) {
                   ) : (
                     <TextField
                       {...getCommonTextFieldProps(theme, {
-                        label: 'Email',
+                        label: localeText.email,
                         placeholder: 'your@email.com',
                         name: 'email',
                         id: 'email-nodemailer',
@@ -533,7 +540,8 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in with Email
+                      {localeText.signInTitle} {localeText.with?.toLocaleLowerCase()}{' '}
+                      {localeText.email}
                     </LoadingButton>
                   )}
                 </Box>
@@ -576,7 +584,7 @@ function SignInPage(props: SignInPageProps) {
                     ) : (
                       <TextField
                         {...getCommonTextFieldProps(theme, {
-                          label: 'Email',
+                          label: localeText.email,
                           placeholder: 'your@email.com',
                           id: 'email',
                           name: 'email',
@@ -594,7 +602,7 @@ function SignInPage(props: SignInPageProps) {
                         {...getCommonTextFieldProps(theme, {
                           name: 'password',
                           type: 'password',
-                          label: 'Password',
+                          label: localeText.password,
                           id: 'password',
                           placeholder: '*****',
                           autoComplete: 'current-password',
@@ -624,7 +632,7 @@ function SignInPage(props: SignInPageProps) {
                             sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
                           />
                         }
-                        label="Remember me"
+                        label={localeText.signInRememberMe}
                         {...slotProps?.rememberMe}
                         slotProps={{
                           typography: {
@@ -657,7 +665,7 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in
+                      {localeText.signInTitle}
                     </LoadingButton>
                   )}
 

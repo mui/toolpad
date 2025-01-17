@@ -19,8 +19,7 @@ import type {
   ShowNotification,
   ShowNotificationOptions,
 } from './useNotifications';
-
-const closeText = 'Close';
+import { useLocaleText } from '../AppProvider';
 
 export interface NotificationsProviderSlotProps {
   snackbar: SnackbarProps;
@@ -45,6 +44,7 @@ interface NotificationProps {
 }
 
 function Notification({ notificationKey, open, message, options, badge }: NotificationProps) {
+  const localeText = useLocaleText();
   const { close } = useNonNullableContext(NotificationsContext);
 
   const { severity, actionText, onAction, autoHideDuration } = options;
@@ -68,8 +68,8 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
       ) : null}
       <IconButton
         size="small"
-        aria-label={closeText}
-        title={closeText}
+        aria-label={localeText?.close}
+        title={localeText?.close}
         color="inherit"
         onClick={handleClose}
       >

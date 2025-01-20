@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { Account } from '@toolpad/core/Account';
 
 const demoSession = {
@@ -31,17 +31,15 @@ export default function AccountCustomLocaleText() {
   }, []);
 
   return (
-    <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={session}>
-        {/* preview-start */}
-        <Account
-          localeText={{
-            signInLabel: 'लॉग इन',
-            signOutLabel: 'लॉग आउट',
-          }}
-        />
-        {/* preview-end */}
-      </SessionContext.Provider>
-    </AuthenticationContext.Provider>
+    <AppProvider authentication={authentication} session={session}>
+      {/* preview-start */}
+      <Account
+        localeText={{
+          accountSignInLabel: 'लॉग इन',
+          accountSignOutLabel: 'लॉग आउट',
+        }}
+      />
+      {/* preview-end */}
+    </AppProvider>
   );
 }

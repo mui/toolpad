@@ -4,6 +4,7 @@
     "authentication": { "description": "Authentication methods." },
     "branding": { "description": "Branding options for the app." },
     "children": { "description": "The content of the app provider." },
+    "localeText": { "description": "Locale text for components" },
     "navigation": { "description": "Navigation definition for the app." },
     "router": { "description": "Router implementation used inside Toolpad components." },
     "session": { "description": "Session info about the current user." },

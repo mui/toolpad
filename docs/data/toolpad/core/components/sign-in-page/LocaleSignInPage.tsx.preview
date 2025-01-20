@@ -1,0 +1,9 @@
+<AppProvider
+  localeText={hiIN.components.MuiLocalizationProvider.defaultProps.localeText}
+>
+  <SignInPage
+    signIn={signIn}
+    providers={providers}
+    localeText={{ signInTitle: 'लॉग इन करें' }}
+  />
+</AppProvider>

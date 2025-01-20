@@ -1,6 +1,7 @@
 {
   "componentDescription": "",
   "propDescriptions": {
+    "localeText": { "description": "The labels for the account component." },
     "providers": { "description": "The list of authentication providers to display." },
     "signIn": {
       "description": "Callback fired when a user signs in.",

@@ -1,9 +1,5 @@
 import * as React from 'react';
-import {
-  AuthenticationContext,
-  SessionContext,
-  type Session,
-} from '@toolpad/core/AppProvider';
+import { AppProvider, type Session } from '@toolpad/core/AppProvider';
 import { Account } from '@toolpad/core/Account';
 
 const demoSession = {
@@ -28,12 +24,10 @@ export default function AccountDemoSignedIn() {
   }, []);
 
   return (
-    <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={session}>
-        {/* preview-start */}
-        <Account />
-        {/* preview-end */}
-      </SessionContext.Provider>
-    </AuthenticationContext.Provider>
+    <AppProvider authentication={authentication} session={session}>
+      {/* preview-start */}
+      <Account />
+      {/* preview-end */}
+    </AppProvider>
   );
 }

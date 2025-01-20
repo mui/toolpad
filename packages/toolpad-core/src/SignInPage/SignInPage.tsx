@@ -311,6 +311,7 @@ function SignInPage(props: SignInPageProps) {
         ...sx,
       }}
     >
+      <title>Sign In</title>
       <Container component="main" maxWidth="xs">
         <Box
           sx={{

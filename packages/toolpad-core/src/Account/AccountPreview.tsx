@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { SessionContext } from '../AppProvider';
-import { AccountLocaleContext } from '../Account';
+import { AccountLocaleContext } from './AccountLocaleContext';
 
 export type AccountPreviewVariant = 'condensed' | 'expanded';
 

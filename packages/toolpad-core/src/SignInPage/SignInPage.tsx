@@ -37,7 +37,7 @@ import KeycloakIcon from './icons/Keycloak';
 import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
 import { BrandingContext, RouterContext } from '../shared/context';
-import { useLocaleText } from '../AppProvider';
+import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 
 const mergeSlotSx = (defaultSx: SxProps<Theme>, slotProps?: { sx?: SxProps<Theme> }) => {
   if (Array.isArray(slotProps?.sx)) {
@@ -261,6 +261,10 @@ export interface SignInPageProps {
    * The prop used to customize the styles on the `SignInPage` container
    */
   sx?: SxProps;
+  /**
+   * The labels for the account component.
+   */
+  localeText?: Partial<LocaleText>;
 }
 
 /**
@@ -274,11 +278,13 @@ export interface SignInPageProps {
  * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
  */
 function SignInPage(props: SignInPageProps) {
-  const { providers, signIn, slots, slotProps, sx } = props;
+  const { providers, signIn, slots, slotProps, sx, localeText: propsLocaleText } = props;
   const theme = useTheme();
   const branding = React.useContext(BrandingContext);
   const router = React.useContext(RouterContext);
-  const localeText = useLocaleText();
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...globalLocaleText, ...propsLocaleText };
+
   const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const emailProvider = providers?.find((provider) => provider.id === 'nodemailer');
@@ -395,7 +401,8 @@ function SignInPage(props: SignInPageProps) {
                         }}
                       >
                         <span>
-                          {localeText.signInTitle} {localeText.with?.toLocaleLowerCase()}{' '}
+                          {localeText.oauthSignInTitle ||
+                            `${localeText.signInTitle} ${localeText.with}`}{' '}
                           {provider.name}
                         </span>
                       </LoadingButton>
@@ -406,7 +413,9 @@ function SignInPage(props: SignInPageProps) {
 
             {passkeyProvider ? (
               <React.Fragment>
-                {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+                {singleProvider ? null : (
+                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                )}
                 {error && selectedProviderId === 'passkey' ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}
@@ -465,7 +474,8 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      {localeText.signInTitle} {localeText.with?.toLocaleLowerCase()}{' '}
+                      {localeText.passkeySignInTitle ||
+                        `${localeText.signInTitle} ${localeText.with}`}
                       {passkeyProvider.name || localeText.passkey}
                     </LoadingButton>
                   )}
@@ -475,7 +485,9 @@ function SignInPage(props: SignInPageProps) {
 
             {emailProvider ? (
               <React.Fragment>
-                {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+                {singleProvider ? null : (
+                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                )}
                 {error && selectedProviderId === 'nodemailer' ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}
@@ -540,7 +552,8 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      {localeText.signInTitle} {localeText.with?.toLocaleLowerCase()}{' '}
+                      {localeText.magicLinkSignInTitle ||
+                        `${localeText.signInTitle} ${localeText.with}`}{' '}
                       {localeText.email}
                     </LoadingButton>
                   )}
@@ -550,7 +563,9 @@ function SignInPage(props: SignInPageProps) {
 
             {credentialsProvider ? (
               <React.Fragment>
-                {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+                {singleProvider ? null : (
+                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                )}
                 {error && selectedProviderId === 'credentials' ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}

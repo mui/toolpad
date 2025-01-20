@@ -105,3 +105,126 @@ In this example:
 
 - The `slots` prop allows you to replace entire parts of the component.
 - The `slotProps` prop lets you pass additional props to specific slots.
+
+## Localization
+
+Toolpad components support translations between languages. You can modify text and translations inside Toolpad components in several ways.
+
+The default locale is English (United States). To use other locales, follow the instructions below.
+
+### Set translations globally
+
+#### Using the theme
+
+To translate all your Toolpad components, you can provide translations through the theme:
+
+```tsx
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import hiIN from '@toolpad/core/locales/hiIN';
+
+const theme = createTheme({
+   {
+    palette: {
+      primary: { main: '#1976d2' },
+    },
+  },
+  hiIN,
+});
+
+ // ...
+ <AppProvider theme={theme}>{children}</AppProvider>;
+
+```
+
+#### Using the `localeText` prop
+
+If you want to pass language translations without using `createTheme`, you can directly provide them through the `localeText` prop on the `AppProvider`:
+
+```tsx
+import { AppProvider } from '@toolpad/core/AppProvider';
+import hiIN from '@toolpad/core/locales/hiIN';
+
+function App({ children }) {
+  return (
+    <AppProvider
+      localeText={hiIN.components.MuiLocalizationProvider.defaultProps.localeText}
+    >
+      {children}
+    </AppProvider>
+  );
+}
+```
+
+If you are not using the `AppProvider` in your app, you can also use the `LocalizationProvider` only:
+
+```tsx
+import { LocalizationProvider } from '@toolpad/core/AppProvider';
+import hiIN from '@toolpad/core/locales/hiIN';
+
+function App({ children }) {
+  return (
+    <LocalizationProvider
+      localeText={hiIN.components.MuiLocalizationProvider.defaultProps.localeText}
+    >
+      {children}
+    </LocalizationProvider>
+  );
+}
+```
+
+### Set translations locally
+
+You can also customize the translations of a single component.
+
+If you want to customize some translations on specific component, you can use the `localeText` prop exposed by all components.
+
+```tsx
+<SignInPage localeText={{ signInTitle: '...' }}></SignInPage>
+```
+
+### Priority order
+
+The localization system follows a specific priority order when applying translations:
+
+1. `localeText` prop provided directly to a specific component (highest priority)
+2. `localeText` prop provided directly to `AppProvider`
+3. Translations provided through the theme
+4. Default English translations (lowest priority)
+
+:::info
+If you pass a localization through the `AppProvider` or the theme, and you provide translation keys through the `localeText` prop of a component at the same time, then the latter keys will be overridden:
+
+&nbsp;
+
+```tsx
+<AppProvider localeText={{ signInTtle: 'Sign In', accountTitle: 'Account' }}>
+  <Account
+    localeText={{
+      accountTitle: 'compte',
+    }}
+  />
+</AppProvider>
+```
+
+&nbsp;
+
+This will produce the following result:
+
+- `SignInPage` title with text **Sign In** taken from the `AppProvider` `localeText` prop
+- `Account` with title **Compte** overridden by the `Account` `localeText` prop
+
+:::
+
+### Access localization keys
+
+You can access your localization keys in custom components using the `useLocaleText()` hook.
+
+```tsx
+import { useLocaleText } from '@toolpad/core/AppProvider';
+
+function CustomMenu() {
+  // ...
+  const localeText = useLocaleText();
+  // ...
+}
+```

@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
-import { useThemeProps } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
+import DEFAULT_LOCALE from '../locales/en';
 
 export type LocaleText = {
   // Account
@@ -13,6 +14,9 @@ export type LocaleText = {
   // SignInPage
   signInTitle: string;
   signInSubtitle: string;
+  oauthSignInTitle: string;
+  passkeySignInTitle: string;
+  magicLinkSignInTitle: string;
   signInRememberMe: string;
 
   // Error messages
@@ -82,20 +86,24 @@ export const LocalizationContext = React.createContext<Partial<LocaleText>>({});
 export const LocalizationProvider = function LocalizationProvider(
   props: LocalizationProviderProps,
 ) {
-  const { localeText: propsLocaleText, ...otherInProps } = props;
+  const { localeText: propsLocaleText, children } = props;
 
-  const themeProps: LocalizationProviderProps = useThemeProps({
-    // We don't want to pass the `localeText` prop to the theme, that way it will always return the theme value,
-    // We will then merge this theme value with our value manually
-    props: otherInProps,
-    name: 'MuiLocalizationProvider',
-  });
+  const theme = useTheme();
+  // @ts-ignore
+  const themeLocaleText = theme?.components?.MuiLocalizationProvider?.defaultProps?.localeText;
 
-  const { children, localeText: themeLocaleText } = themeProps;
+  const defaultLocaleText =
+    DEFAULT_LOCALE.components.MuiLocalizationProvider.defaultProps.localeText;
+
+  /* The order of overrides is:
+   * 1. The `localeText` prop of the `AppProvider` supersedes
+   * 2. The localeText provided as an argument to the `createTheme` function, which supersedes
+   * 3. The default locale text
+   */
 
   const localeText = React.useMemo(
-    () => ({ ...themeLocaleText, ...propsLocaleText }),
-    [themeLocaleText, propsLocaleText],
+    () => ({ ...defaultLocaleText, ...themeLocaleText, ...propsLocaleText }),
+    [defaultLocaleText, themeLocaleText, propsLocaleText],
   );
 
   return <LocalizationContext.Provider value={localeText}>{children}</LocalizationContext.Provider>;

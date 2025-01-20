@@ -11,7 +11,7 @@ import { useNonNullableContext } from '@toolpad/utils/react';
 import invariant from 'invariant';
 import * as React from 'react';
 import { DialogsContext } from './DialogsContext';
-import { useLocaleText } from '../AppProvider';
+import { useLocaleText } from '../AppProvider/LocalizationProvider';
 
 export interface OpenDialogOptions<R> {
   /**

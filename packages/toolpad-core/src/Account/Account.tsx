@@ -10,7 +10,8 @@ import { AccountPreview, AccountPreviewProps } from './AccountPreview';
 import { AccountPopoverHeader } from './AccountPopoverHeader';
 import { AccountPopoverFooter } from './AccountPopoverFooter';
 import { SessionContext, AuthenticationContext } from '../AppProvider/AppProvider';
-import { useLocaleText, type LocaleText } from '../AppProvider';
+import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
+import { AccountLocaleContext } from './AccountLocaleContext';
 
 export interface AccountSlots {
   /**
@@ -58,10 +59,8 @@ export interface AccountProps {
   /**
    * The labels for the account component.
    */
-  localeText?: LocaleText;
+  localeText?: Partial<LocaleText>;
 }
-
-export const AccountLocaleContext = React.createContext<Partial<LocaleText> | null>(null);
 
 /**
  *
@@ -78,7 +77,10 @@ export const AccountLocaleContext = React.createContext<Partial<LocaleText> | nu
 function Account(props: AccountProps) {
   const { localeText: propsLocaleText } = props;
   const globalLocaleText = useLocaleText();
-  const localeText = { ...globalLocaleText, ...propsLocaleText };
+  const localeText = React.useMemo(
+    () => ({ ...globalLocaleText, ...propsLocaleText }),
+    [globalLocaleText, propsLocaleText],
+  );
   const { slots, slotProps } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const session = React.useContext(SessionContext);
@@ -179,7 +181,11 @@ function Account(props: AccountProps) {
     );
   }
 
-  return <AccountLocaleContext value={localeText}>{accountContent}</AccountLocaleContext>;
+  return (
+    <AccountLocaleContext.Provider value={localeText}>
+      {accountContent}
+    </AccountLocaleContext.Provider>
+  );
 }
 
 Account.propTypes /* remove-proptypes */ = {
@@ -191,9 +197,9 @@ Account.propTypes /* remove-proptypes */ = {
    * The labels for the account component.
    */
   localeText: PropTypes.shape({
+    accountSignInLabel: PropTypes.string,
+    accountSignOutLabel: PropTypes.string,
     iconButtonAriaLabel: PropTypes.string,
-    signInLabel: PropTypes.string,
-    signOutLabel: PropTypes.string,
   }),
   /**
    * The props used for each slot inside.

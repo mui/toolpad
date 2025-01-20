@@ -14,6 +14,45 @@ If this is your first time using Toolpad Core, it's recommended to read about th
 
 The `SignInPage` component is a quick way to generate a ready-to-use authentication page with multiple OAuth providers, or a credentials form.
 
+## Basic Usage
+
+```tsx
+import { AppProvider } from '@toolpad/core/AppProvider';
+import { SignInPage } from '@toolpad/core/SignInPage';
+
+export default function App() {
+  return (
+    <AppProvider>
+      <SignInPage
+        providers={[...]}
+        signIn={async (provider) => {
+          // Your sign in logic
+        }}
+      />
+    </AppProvider>
+  );
+}
+```
+
+:::warning
+
+If you're using the component standalone without `AppProvider`, wrap it with `LocalizationProvider` at minimum to get proper labels:
+
+```tsx
+import { LocalizationProvider } from '@toolpad/core/AppProvider';
+import { SignInPage } from '@toolpad/core/SignInPage';
+
+export default function App() {
+  return (
+    <LocalizationProvider>
+      <SignInPage providers={[...]} signIn={...} />
+    </LocalizationProvider>
+  );
+}
+```
+
+:::
+
 ## OAuth
 
 The `SignInPage` component can be set up with an OAuth provider by passing in a list of providers in the `providers` prop, along with a `signIn` function that accepts the `provider` as a parameter.
@@ -263,6 +302,12 @@ To enable deep customization beyond what is possible with custom props, the `Sig
 You can use the `slotProps` prop to pass props to the underlying components of each slot:
 
 {{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 600 }}
+
+### Localization
+
+Beyond the [global localization options](/toolpad/core/introduction/base-concepts/#localization) possible, you can customize the labels of the `SignInPage` using the `localeText` prop:
+
+{{"demo": "LocaleSignInPage.js", "iframe": true, "height": 700 }}
 
 ### 🚧 Layouts
 

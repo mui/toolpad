@@ -12,6 +12,9 @@ const hiINLabels: Partial<LocaleText> = {
 
   // SignInPage
   signInTitle: 'साइन इन करें',
+  oauthSignInTitle: 'साइन इन विकल्प',
+  passkeySignInTitle: 'साइन इन विकल्प',
+  magicLinkSignInTitle: 'साइन इन विकल्प',
   signInSubtitle: 'स्वागत है उपयोगकर्ता, कृपया जारी रखने के लिए साइन इन करें',
   signInRememberMe: 'मुझे याद रखें',
 
@@ -39,4 +42,4 @@ const hiINLabels: Partial<LocaleText> = {
   info: 'जानकारी',
 };
 
-export const hiIN = getLocalization(hiINLabels);
+export default getLocalization(hiINLabels);

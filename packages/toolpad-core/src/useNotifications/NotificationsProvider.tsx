@@ -19,7 +19,7 @@ import type {
   ShowNotification,
   ShowNotificationOptions,
 } from './useNotifications';
-import { useLocaleText } from '../AppProvider';
+import { useLocaleText } from '../AppProvider/LocalizationProvider';
 
 export interface NotificationsProviderSlotProps {
   snackbar: SnackbarProps;

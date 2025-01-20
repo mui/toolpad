@@ -12,29 +12,7 @@ components: Account, AccountPreview, AccountPopoverHeader, AccountPopoverFooter,
 If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
 :::
 
-The `Account` component is a quick and easy way to display an account management menu for authenticated users.
-
-## Basic Usage
-
-`Account` is deeply integrated with the `SignInPage` and `DashboardLayout` components, meaning that it automatically appears in the top navigation bar inside `DashboardLayout` once your users have signed in through the `SignInPage`.
-
-:::warning
-If you are using it standalone without the `AppProvider`, wrap it with `LocalizationProvider` at minimum to get proper labels:
-
-```tsx
-import { LocalizationProvider } from '@toolpad/core/AppProvider';
-import { Account } from '@toolpad/core/Account';
-
-export default function App() {
-  return (
-    <LocalizationProvider>
-      <Account />
-    </LocalizationProvider>
-  );
-}
-```
-
-:::
+The `Account` component is a quick and easy way to display an account management menu for authenticated users. It is deeply integrated with the `SignInPage` and `DashboardLayout` components, meaning that it automatically appears in the top navigation bar inside `DashboardLayout` once your users have signed in through the `SignInPage`.
 
 ## States
 
@@ -83,7 +61,7 @@ You can build advanced menus – such as a tenant switcher – by passing in a c
 
 {{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
 
-### Labels
+### Localization
 
 You can pass in custom labels – including of different languages – using the `localeText` prop.
 

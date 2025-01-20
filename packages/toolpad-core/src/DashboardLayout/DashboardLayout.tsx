@@ -546,9 +546,12 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
     }),
     toolbarAccount: PropTypes.shape({
       localeText: PropTypes.shape({
-        iconButtonAriaLabel: PropTypes.string,
-        signInLabel: PropTypes.string,
-        signOutLabel: PropTypes.string,
+        accountIconButtonLabel: PropTypes.string,
+        accountPreviewEmail: PropTypes.string,
+        accountPreviewName: PropTypes.string,
+        accountPreviewTitle: PropTypes.string,
+        accountSignInLabel: PropTypes.string,
+        accountSignOutLabel: PropTypes.string,
       }),
       slotProps: PropTypes.shape({
         popover: PropTypes.object,

@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { SessionContext } from '../AppProvider';
+import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { AccountLocaleContext } from './AccountLocaleContext';
 
 export type AccountPreviewVariant = 'condensed' | 'expanded';
@@ -79,7 +80,9 @@ export interface AccountPreviewProps {
 function AccountPreview(props: AccountPreviewProps) {
   const { slots, variant = 'condensed', slotProps, open, handleClick, sx } = props;
   const session = React.useContext(SessionContext);
+  const globalLocaleText = useLocaleText();
   const accountLocaleText = React.useContext(AccountLocaleContext);
+  const localeText = { ...globalLocaleText, ...accountLocaleText };
 
   if (!session || !session.user) {
     return null;
@@ -128,14 +131,14 @@ function AccountPreview(props: AccountPreviewProps) {
   }
 
   return (
-    <Tooltip title={session.user.name ?? accountLocaleText?.accountTitle}>
+    <Tooltip title={session.user.name ?? accountLocaleText?.accountPreviewTitle}>
       {slots?.avatarIconButton ? (
         <slots.avatarIconButton {...slotProps?.avatarIconButton} />
       ) : (
         <Stack sx={{ py: 0.5, ...sx }}>
           <IconButton
             onClick={handleClick}
-            aria-label={accountLocaleText?.accountIconButtonLabel}
+            aria-label={localeText?.accountPreviewIconButtonLabel}
             size="small"
             aria-controls={open ? 'account-menu' : undefined}
             aria-haspopup="true"

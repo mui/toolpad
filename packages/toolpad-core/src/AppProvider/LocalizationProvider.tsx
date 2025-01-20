@@ -1,15 +1,19 @@
 'use client';
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import DEFAULT_LOCALE from '../locales/en';
 
-export type LocaleText = {
+export interface LocaleText {
   // Account
   accountSignInLabel: string;
   accountSignOutLabel: string;
+
   // AccountPreview
-  accountTitle: string;
-  accountIconButtonLabel: string;
+  accountPreviewIconButtonLabel: string;
+  accountPreviewTitle: string;
+  accountPreviewEmail: string;
+  accountPreviewName: string;
 
   // SignInPage
   signInTitle: string;
@@ -18,12 +22,6 @@ export type LocaleText = {
   passkeySignInTitle: string;
   magicLinkSignInTitle: string;
   signInRememberMe: string;
-
-  // Error messages
-  errorAccessDenied: string;
-  errorCallbackRoute: string;
-  errorMissingSecret: string;
-  errorAuthentication: string;
 
   // Common authentication labels
   email: string;
@@ -43,35 +41,7 @@ export type LocaleText = {
   alert: string;
   confirm: string;
   loading: string;
-  error: string;
-  success: string;
-  warning: string;
-  info: string;
-
-  // Navigation
-  goBack: string;
-  goHome: string;
-
-  // Form validation
-  required: string;
-  invalid: string;
-
-  // Account Preview
-  accountPreviewTitle: string;
-  accountPreviewEmail: string;
-  accountPreviewName: string;
-
-  // Dashboard Layout
-  dashboardTitle: string;
-  dashboardWelcome: string;
-  dashboardSettings: string;
-  dashboardLogout: string;
-
-  // Error boundaries
-  errorBoundaryTitle: string;
-  errorBoundaryDescription: string;
-  errorBoundaryRetry: string;
-};
+}
 
 export interface LocalizationProviderProps {
   children?: React.ReactNode;
@@ -83,9 +53,7 @@ export interface LocalizationProviderProps {
 
 export const LocalizationContext = React.createContext<Partial<LocaleText>>({});
 
-export const LocalizationProvider = function LocalizationProvider(
-  props: LocalizationProviderProps,
-) {
+const LocalizationProvider = function LocalizationProvider(props: LocalizationProviderProps) {
   const { localeText: propsLocaleText, children } = props;
 
   const theme = useTheme();
@@ -109,6 +77,60 @@ export const LocalizationProvider = function LocalizationProvider(
   return <LocalizationContext.Provider value={localeText}>{children}</LocalizationContext.Provider>;
 };
 
+LocalizationProvider.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * @ignore
+   */
+  children: PropTypes.node,
+  /**
+   * Locale for components texts
+   */
+  localeText: PropTypes.shape({
+    accountIconButtonLabel: PropTypes.string,
+    accountPreviewEmail: PropTypes.string,
+    accountPreviewName: PropTypes.string,
+    accountPreviewTitle: PropTypes.string,
+    accountSignInLabel: PropTypes.string,
+    accountSignOutLabel: PropTypes.string,
+    alert: PropTypes.string,
+    cancel: PropTypes.string,
+    close: PropTypes.string,
+    confirm: PropTypes.string,
+    delete: PropTypes.string,
+    email: PropTypes.string,
+    loading: PropTypes.string,
+    magicLinkSignInTitle: PropTypes.string,
+    oauthSignInTitle: PropTypes.string,
+    ok: PropTypes.string,
+    or: PropTypes.string,
+    passkey: PropTypes.string,
+    passkeySignInTitle: PropTypes.string,
+    password: PropTypes.string,
+    save: PropTypes.string,
+    signInRememberMe: PropTypes.string,
+    signInSubtitle: PropTypes.string,
+    signInTitle: PropTypes.string,
+    to: PropTypes.string,
+    username: PropTypes.string,
+    with: PropTypes.string,
+  }),
+} as any;
+
+export { LocalizationProvider };
+/**
+ *
+ * Demos:
+ *
+ * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ *
+ * API:
+ *
+ * - [LocalizationProvider API](https://mui.com/toolpad/core/api/localization-provider)
+ */
 export function useLocaleText() {
   return React.useContext(LocalizationContext);
 }

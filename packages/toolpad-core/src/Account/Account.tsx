@@ -13,6 +13,15 @@ import { SessionContext, AuthenticationContext } from '../AppProvider/AppProvide
 import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 import { AccountLocaleContext } from './AccountLocaleContext';
 
+interface AccountLocaleText {
+  accountPreviewIconButtonLabel: string;
+  accountPreviewEmail: string;
+  accountPreviewName: string;
+  accountPreviewTitle: string;
+  accountSignInLabel: string;
+  accountSignOutLabel: string;
+}
+
 export interface AccountSlots {
   /**
    * The component used for the account preview
@@ -59,8 +68,17 @@ export interface AccountProps {
   /**
    * The labels for the account component.
    */
-  localeText?: Partial<LocaleText>;
+  localeText?: Partial<AccountLocaleText>;
 }
+
+const defaultAccountLocaleText: Pick<LocaleText, keyof AccountLocaleText> = {
+  accountPreviewIconButtonLabel: 'Current User',
+  accountPreviewEmail: 'Email',
+  accountPreviewName: 'Name',
+  accountPreviewTitle: 'Account',
+  accountSignInLabel: 'Sign in',
+  accountSignOutLabel: 'Sign out',
+};
 
 /**
  *
@@ -78,7 +96,7 @@ function Account(props: AccountProps) {
   const { localeText: propsLocaleText } = props;
   const globalLocaleText = useLocaleText();
   const localeText = React.useMemo(
-    () => ({ ...globalLocaleText, ...propsLocaleText }),
+    () => ({ ...defaultAccountLocaleText, ...globalLocaleText, ...propsLocaleText }),
     [globalLocaleText, propsLocaleText],
   );
   const { slots, slotProps } = props;
@@ -197,9 +215,12 @@ Account.propTypes /* remove-proptypes */ = {
    * The labels for the account component.
    */
   localeText: PropTypes.shape({
+    accountIconButtonLabel: PropTypes.string,
+    accountPreviewEmail: PropTypes.string,
+    accountPreviewName: PropTypes.string,
+    accountPreviewTitle: PropTypes.string,
     accountSignInLabel: PropTypes.string,
     accountSignOutLabel: PropTypes.string,
-    iconButtonAriaLabel: PropTypes.string,
   }),
   /**
    * The props used for each slot inside.

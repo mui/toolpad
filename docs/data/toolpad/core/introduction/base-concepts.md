@@ -155,7 +155,7 @@ function App({ children }) {
 }
 ```
 
-If you are not using the `AppProvider` in your app, you can also use the `LocalizationProvider` only:
+If you are not using the `AppProvider` in your app, you can just use the `LocalizationProvider`:
 
 ```tsx
 import { LocalizationProvider } from '@toolpad/core/AppProvider';
@@ -174,9 +174,7 @@ function App({ children }) {
 
 ### Set translations locally
 
-You can also customize the translations of a single component.
-
-If you want to customize some translations on specific component, you can use the `localeText` prop exposed by all components.
+If you want to customize some translations on a specific component, you can use the `localeText` prop exposed by all components.
 
 ```tsx
 <SignInPage localeText={{ signInTitle: '...' }}></SignInPage>
@@ -192,15 +190,15 @@ The localization system follows a specific priority order when applying translat
 4. Default English translations (lowest priority)
 
 :::info
-If you pass a localization through the `AppProvider` or the theme, and you provide translation keys through the `localeText` prop of a component at the same time, then the latter keys will be overridden:
+If you pass a locale text through the `AppProvider` or the theme, and you provide translation keys through the `localeText` prop of a component at the same time, then the latter will override the former to the extent of the keys which it has available:
 
 &nbsp;
 
 ```tsx
-<AppProvider localeText={{ signInTtle: 'Sign In', accountTitle: 'Account' }}>
+<AppProvider localeText={{ signInTtle: 'Sign In', accountPreviewTitle: 'Account' }}>
   <Account
     localeText={{
-      accountTitle: 'compte',
+      accountPreviewTitle: 'compte',
     }}
   />
 </AppProvider>

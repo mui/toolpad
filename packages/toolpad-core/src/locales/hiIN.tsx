@@ -7,16 +7,18 @@ const hiINLabels: Partial<LocaleText> = {
   accountSignOutLabel: 'साइन आउट करें',
 
   // AccountPreview
-  accountTitle: 'खाता',
-  accountIconButtonLabel: 'वर्तमान उपयोगकर्ता',
+  accountPreviewEmail: 'ईमेल',
+  accountPreviewName: 'उपयोगकर्ता',
+  accountPreviewTitle: 'खाता',
+  accountPreviewIconButtonLabel: 'वर्तमान उपयोगकर्ता',
 
   // SignInPage
   signInTitle: 'साइन इन करें',
+  signInSubtitle: 'स्वागत है उपयोगकर्ता, कृपया जारी रखने के लिए साइन इन करें',
+  signInRememberMe: 'मुझे याद रखें',
   oauthSignInTitle: 'साइन इन विकल्प',
   passkeySignInTitle: 'साइन इन विकल्प',
   magicLinkSignInTitle: 'साइन इन विकल्प',
-  signInSubtitle: 'स्वागत है उपयोगकर्ता, कृपया जारी रखने के लिए साइन इन करें',
-  signInRememberMe: 'मुझे याद रखें',
 
   // Common authentication labels
   email: 'ईमेल',
@@ -36,10 +38,6 @@ const hiINLabels: Partial<LocaleText> = {
   alert: 'सूचना',
   confirm: 'पुष्टि करें',
   loading: 'लोड हो रहा है...',
-  error: 'त्रुटि',
-  success: 'सफल',
-  warning: 'चेतावनी',
-  info: 'जानकारी',
 };
 
 export default getLocalization(hiINLabels);

@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Button, { ButtonProps } from '@mui/material/Button';
 import { AuthenticationContext } from '../AppProvider';
+import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { AccountLocaleContext } from './AccountLocaleContext';
 
 /**
@@ -16,7 +17,9 @@ import { AccountLocaleContext } from './AccountLocaleContext';
  */
 function SignInButton(props: ButtonProps) {
   const authentication = React.useContext(AuthenticationContext);
+  const globalLocaleText = useLocaleText();
   const accountLocaleText = React.useContext(AccountLocaleContext);
+  const localeText = { ...globalLocaleText, ...accountLocaleText };
 
   return (
     <Button
@@ -36,7 +39,7 @@ function SignInButton(props: ButtonProps) {
       }}
       {...props}
     >
-      {accountLocaleText?.accountSignInLabel}
+      {localeText?.accountSignInLabel}
     </Button>
   );
 }

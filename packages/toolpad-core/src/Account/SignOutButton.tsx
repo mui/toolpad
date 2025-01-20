@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Button, { ButtonProps } from '@mui/material/Button';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { AuthenticationContext } from '../AppProvider';
+import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { AccountLocaleContext } from './AccountLocaleContext';
 
 export type SignOutButtonProps = ButtonProps;
@@ -19,7 +20,9 @@ export type SignOutButtonProps = ButtonProps;
  */
 function SignOutButton(props: SignOutButtonProps) {
   const authentication = React.useContext(AuthenticationContext);
+  const globalLocaleText = useLocaleText();
   const accountLocaleText = React.useContext(AccountLocaleContext);
+  const localeText = { ...globalLocaleText, ...accountLocaleText };
 
   return (
     <Button
@@ -40,7 +43,7 @@ function SignOutButton(props: SignOutButtonProps) {
       startIcon={<LogoutIcon />}
       {...props}
     >
-      {accountLocaleText?.accountSignOutLabel}
+      {localeText?.accountSignOutLabel}
     </Button>
   );
 }

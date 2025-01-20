@@ -136,6 +136,18 @@ const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([
   ['fusionauth', <FusionAuthIcon key="fusionauth" />],
 ]);
 
+interface SignInPageLocaleText {
+  signInTitle: string;
+  signInSubtitle: string;
+  signInRememberMe: string;
+  email: string;
+  password: string;
+  or: string;
+  with: string;
+  passkey: string;
+  to: string;
+}
+
 export interface AuthProvider {
   /**
    * The unique identifier of the authentication provider.
@@ -264,8 +276,20 @@ export interface SignInPageProps {
   /**
    * The labels for the account component.
    */
-  localeText?: Partial<LocaleText>;
+  localeText?: Partial<SignInPageLocaleText>;
 }
+
+const defaultLocaleText: Pick<LocaleText, keyof SignInPageLocaleText> = {
+  signInTitle: 'Sign in',
+  signInSubtitle: 'Please sign in to continue',
+  signInRememberMe: 'Remember me',
+  email: 'Email',
+  password: 'Password',
+  or: 'or',
+  with: 'with',
+  passkey: 'Passkey',
+  to: 'to',
+};
 
 /**
  *
@@ -283,7 +307,7 @@ function SignInPage(props: SignInPageProps) {
   const branding = React.useContext(BrandingContext);
   const router = React.useContext(RouterContext);
   const globalLocaleText = useLocaleText();
-  const localeText = { ...globalLocaleText, ...propsLocaleText };
+  const localeText = { ...defaultLocaleText, ...globalLocaleText, ...propsLocaleText };
 
   const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
@@ -475,7 +499,7 @@ function SignInPage(props: SignInPageProps) {
                       {...slotProps?.submitButton}
                     >
                       {localeText.passkeySignInTitle ||
-                        `${localeText.signInTitle} ${localeText.with}`}
+                        `${localeText.signInTitle} ${localeText.with}`}{' '}
                       {passkeyProvider.name || localeText.passkey}
                     </LoadingButton>
                   )}
@@ -704,6 +728,20 @@ SignInPage.propTypes /* remove-proptypes */ = {
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * The labels for the account component.
+   */
+  localeText: PropTypes.shape({
+    email: PropTypes.string,
+    or: PropTypes.string,
+    passkey: PropTypes.string,
+    password: PropTypes.string,
+    signInRememberMe: PropTypes.string,
+    signInSubtitle: PropTypes.string,
+    signInTitle: PropTypes.string,
+    to: PropTypes.string,
+    with: PropTypes.string,
+  }),
   /**
    * The list of authentication providers to display.
    * @default []

@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Sign-in Page
-components: SignInPage, Account, NotificationsProvider
+components: SignInPage, Account, NotificationsProvider, LocalizationProvider
 ---
 
 # Sign-in Page
@@ -33,25 +33,6 @@ export default function App() {
   );
 }
 ```
-
-:::warning
-
-If you're using the component standalone without `AppProvider`, wrap it with `LocalizationProvider` at minimum to get proper labels:
-
-```tsx
-import { LocalizationProvider } from '@toolpad/core/AppProvider';
-import { SignInPage } from '@toolpad/core/SignInPage';
-
-export default function App() {
-  return (
-    <LocalizationProvider>
-      <SignInPage providers={[...]} signIn={...} />
-    </LocalizationProvider>
-  );
-}
-```
-
-:::
 
 ## OAuth
 

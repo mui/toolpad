@@ -1,7 +1,7 @@
 import * as React from 'react';
 import clsx from 'clsx';
 import { NodeId } from '@toolpad/studio-runtime';
-import { Box, Typography, styled, IconButton } from '@mui/material';
+import { Box, Typography, styled, IconButton, IconButtonProps } from '@mui/material';
 import { SimpleTreeView, TreeItem, TreeItemProps, treeItemClasses } from '@mui/x-tree-view';
 import useBoolean from '@toolpad/utils/hooks/useBoolean';
 import * as appDom from '@toolpad/studio-runtime/appDom';
@@ -143,7 +143,7 @@ function CustomTreeItem(props: CustomTreeItemProps) {
                   })}
                   aria-label="Open hierarchy menu"
                   size="small"
-                  {...buttonProps}
+                  {...(buttonProps as IconButtonProps)}
                 >
                   <MoreVertIcon fontSize="inherit" />
                 </IconButton>

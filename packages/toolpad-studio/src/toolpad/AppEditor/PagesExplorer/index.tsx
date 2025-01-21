@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, Box, IconButton, Stack, Tooltip } from '@mui/material';
+import { styled, Box, IconButton, IconButtonProps, Stack, Tooltip } from '@mui/material';
 import { SimpleTreeView, treeItemClasses } from '@mui/x-tree-view';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { NodeId } from '@toolpad/studio-runtime';
@@ -111,7 +111,7 @@ function PagesExplorerTreeItem(props: StyledTreeItemProps) {
                     })}
                     aria-label="Open page explorer menu"
                     size="small"
-                    {...buttonProps}
+                    {...(buttonProps as IconButtonProps)}
                   >
                     <MoreVertIcon fontSize="inherit" />
                   </IconButton>

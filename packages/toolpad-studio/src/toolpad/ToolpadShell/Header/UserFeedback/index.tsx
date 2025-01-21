@@ -4,6 +4,7 @@ import {
   Divider,
   ListItemText,
   IconButton,
+  IconButtonProps,
   Menu,
   MenuItem,
   Tooltip,
@@ -112,7 +113,7 @@ function UserFeedback() {
         </DialogActions>
       </Dialog>
       <Tooltip title="Help and resources">
-        <IconButton {...buttonProps} color="primary">
+        <IconButton {...(buttonProps as IconButtonProps)} color="primary">
           <HelpOutlinedIcon />
         </IconButton>
       </Tooltip>

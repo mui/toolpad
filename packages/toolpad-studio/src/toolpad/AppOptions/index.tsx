@@ -1,5 +1,12 @@
 import * as React from 'react';
-import { Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
+import {
+  Divider,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  IconButtonProps,
+} from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CodeIcon from '@mui/icons-material/Code';
@@ -28,7 +35,7 @@ function AppOptions({ dom }: AppOptionsProps) {
 
   return (
     <React.Fragment>
-      <IconButton {...buttonProps} aria-label="Application menu">
+      <IconButton {...(buttonProps as IconButtonProps)} aria-label="Application menu">
         <MoreVertIcon />
       </IconButton>
       <Menu {...menuProps}>

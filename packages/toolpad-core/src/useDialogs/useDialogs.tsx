@@ -1,5 +1,5 @@
-import { LoadingButton } from '@mui/lab';
 import {
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -198,9 +198,9 @@ export function AlertDialog({ open, payload, onClose }: AlertDialogProps) {
       <DialogTitle>{payload.title ?? 'Alert'}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
-        <LoadingButton disabled={!open} {...okButtonProps}>
+        <Button disabled={!open} {...okButtonProps}>
           {payload.okText ?? 'Ok'}
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );
@@ -220,12 +220,12 @@ export function ConfirmDialog({ open, payload, onClose }: ConfirmDialogProps) {
       <DialogTitle>{payload.title ?? 'Confirm'}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
-        <LoadingButton autoFocus disabled={!open} {...cancelButtonProps}>
+        <Button autoFocus disabled={!open} {...cancelButtonProps}>
           {payload.cancelText ?? 'Cancel'}
-        </LoadingButton>
-        <LoadingButton color={payload.severity} disabled={!open} {...okButtonProps}>
+        </Button>
+        <Button color={payload.severity} disabled={!open} {...okButtonProps}>
           {payload.okText ?? 'Ok'}
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );
@@ -283,12 +283,12 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
         />
       </DialogContent>
       <DialogActions>
-        <LoadingButton disabled={!open} {...cancelButtonProps}>
+        <Button disabled={!open} {...cancelButtonProps}>
           {payload.cancelText ?? 'Cancel'}
-        </LoadingButton>
-        <LoadingButton disabled={!open} loading={loading} type="submit">
+        </Button>
+        <Button disabled={!open} loading={loading} type="submit">
           {payload.okText ?? 'Ok'}
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { LoadingButton as MuiButton, LoadingButtonProps as MuiButtonProps } from '@mui/lab';
+import MuiButton, { ButtonProps as MuiButtonProps } from '@mui/material/Button';
 import createBuiltin from './createBuiltin';
 import { SX_PROP_HELPER_TEXT } from './constants';
 

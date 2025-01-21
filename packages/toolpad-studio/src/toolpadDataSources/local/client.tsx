@@ -1,7 +1,6 @@
 import * as React from 'react';
-import LoadingButton from '@mui/lab/LoadingButton';
 import { BindableAttrEntries } from '@toolpad/studio-runtime';
-import { Alert, Box, Divider, Stack, Tab, Link, Typography } from '@mui/material';
+import { Alert, Box, Divider, Stack, Tab, Link, Typography, Button } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { TabContext, TabList } from '@mui/lab';
 import { useBrowserJsRuntime } from '@toolpad/studio-runtime/jsBrowserRuntime';
@@ -407,7 +406,7 @@ function QueryEditor({
                 >
                   <Tab label="Preview" value="preview" />
                 </TabList>
-                <LoadingButton
+                <Button
                   variant="text"
                   size="small"
                   loading={isLoading}
@@ -416,7 +415,7 @@ function QueryEditor({
                   endIcon={<PlayArrowIcon aria-label="Run preview" onClick={runPreview} />}
                 >
                   Run
-                </LoadingButton>
+                </Button>
               </Box>
               <TabPanel value="preview" disableGutters>
                 <QueryPreview isLoading={currentTab.isPreviewLoading} error={preview?.error}>

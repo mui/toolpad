@@ -13,6 +13,7 @@ import {
   Paper,
   SxProps,
   Link,
+  IconButtonProps,
 } from '@mui/material';
 import { SimpleTreeView, treeItemClasses } from '@mui/x-tree-view';
 import AddIcon from '@mui/icons-material/Add';
@@ -145,7 +146,7 @@ function DataTreeItem(props: StyledTreeItemProps) {
                   })}
                   aria-label="Open hierarchy menu"
                   size="small"
-                  {...buttonProps}
+                  {...(buttonProps as IconButtonProps)}
                 >
                   <MoreVertIcon fontSize="inherit" />
                 </IconButton>

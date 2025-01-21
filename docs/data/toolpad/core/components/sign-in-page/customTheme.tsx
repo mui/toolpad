@@ -465,20 +465,6 @@ export const inputsCustomizations: Components<Theme> = {
       }),
     },
   },
-  // @ts-ignore TODO: MuiLoadingButton is not present in the default `theme`
-  MuiLoadingButton: {
-    styleOverrides: {
-      // @ts-ignore
-      root: ({ theme }) => ({
-        '& .MuiLoadingButton-loadingIndicator': {
-          color: gray[400],
-          ...theme.applyStyles('dark', {
-            color: gray[600],
-          }),
-        },
-      }),
-    },
-  },
   MuiCheckbox: {
     defaultProps: {
       disableRipple: true,

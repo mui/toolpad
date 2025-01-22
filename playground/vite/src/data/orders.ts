@@ -10,7 +10,16 @@ const ordersDataSource: Required<DataSource<Order>> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'name', headerName: 'Name' },
-    { field: 'status', headerName: 'Status' },
+    {
+      field: 'status',
+      headerName: 'Status',
+      type: 'singleSelect',
+      valueOptions: ['pending', 'fulfilled'],
+    },
+    { field: 'itemCount', headerName: 'No. of items', type: 'number' },
+    { field: 'fulfilled', headerName: 'Fulfilled', type: 'boolean' },
+    { field: 'deliveryDate', headerName: 'Delivery Date', type: 'date' },
+    { field: 'deliveryTime', headerName: 'Delivery Time', type: 'dateTime' },
   ],
   getMany: async ({ paginationModel }) => {
     return new Promise<{ items: Order[]; itemCount: number }>((resolve) => {

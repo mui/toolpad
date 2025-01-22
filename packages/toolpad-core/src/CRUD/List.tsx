@@ -25,7 +25,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
-import { CRUDFields, DataModel, DataModelId } from './shared';
+import { DataModel, DataModelId, DataSource } from './shared';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -42,12 +42,6 @@ const ErrorOverlay = styled('div')(({ theme }) => ({
   zIndex: 10,
 }));
 
-interface GetManyParams {
-  paginationModel: GridPaginationModel;
-  sortModel: GridSortModel;
-  filterModel: GridFilterModel;
-}
-
 export interface ListSlotProps {
   dataGrid?: DataGridProps;
 }
@@ -62,16 +56,9 @@ export interface ListSlots {
 
 export interface ListProps<D extends DataModel> {
   /**
-   * Fields to show.
+   * Server-side data source.
    */
-  fields: CRUDFields;
-  /**
-   * Methods to interact with server-side data.
-   */
-  methods: {
-    getMany: (params: GetManyParams) => Promise<{ items: D[]; itemCount: number }>;
-    deleteOne?: (id: DataModelId) => Promise<void>;
-  };
+  dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getMany'>>;
   /**
    * Initial number of rows to show per page.
    * @default 100
@@ -103,8 +90,7 @@ export interface ListProps<D extends DataModel> {
 
 function List<D extends DataModel>(props: ListProps<D>) {
   const {
-    fields,
-    methods,
+    dataSource,
     initialPageSize = 100,
     onRowClick,
     onCreateClick,
@@ -112,6 +98,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
     slots,
     slotProps,
   } = props;
+  const { fields, ...methods } = dataSource;
   const { getMany, deleteOne } = methods;
 
   const dialogs = useDialogs();

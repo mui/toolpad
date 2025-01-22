@@ -13,21 +13,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
-import { CRUDFields, DataModel, DataModelId } from './shared';
+import { DataModel, DataModelId, DataSource } from './shared';
 
 export interface ShowProps<D extends DataModel> {
   id: DataModelId;
   /**
-   * Fields to show.
+   * Server-side data source.
    */
-  fields: CRUDFields;
-  /**
-   * Methods to interact with server-side data.
-   */
-  methods: {
-    getOne: (id: DataModelId) => Promise<D>;
-    deleteOne?: (id: DataModelId) => Promise<void>;
-  };
+  dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getOne'>>;
   /**
    * Callback fired when the "Edit" button is clicked.
    */
@@ -39,7 +32,8 @@ export interface ShowProps<D extends DataModel> {
 }
 
 function Show<D extends DataModel>(props: ShowProps<D>) {
-  const { id, fields, methods, onEditClick, onDelete } = props;
+  const { id, dataSource, onEditClick, onDelete } = props;
+  const { fields, ...methods } = dataSource;
   const { getOne, deleteOne } = methods;
 
   const dialogs = useDialogs();
@@ -122,12 +116,12 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     return data ? (
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
-          {fields.map((field) => (
-            <Grid key={field.field} size={6}>
+          {fields.map(({ field, headerName }) => (
+            <Grid key={field} size={6}>
               <Paper sx={{ px: 2, py: 1 }}>
-                <Typography variant="overline">{field.headerName}</Typography>
+                <Typography variant="overline">{headerName}</Typography>
                 <Typography variant="body1" sx={{ mb: 1 }}>
-                  {String(data[field.field])}
+                  {String(data[field])}
                 </Typography>
               </Paper>
             </Grid>

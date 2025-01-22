@@ -4,36 +4,55 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid2';
 import TextField from '@mui/material/TextField';
-import { CRUDFields, DataModel } from './shared';
+import { useNotifications } from '../useNotifications';
+import { DataModel, DataSource } from './shared';
 
 export interface CreateProps<D extends DataModel> {
   /**
-   * Fields to show.
+   * Server-side data source.
    */
-  fields: CRUDFields;
-  /**
-   * Methods to interact with server-side data.
-   */
-  methods: {
-    createOne: (data: Omit<D, 'id'>) => Promise<D>;
-  };
+  dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>;
 }
 
 function Create<D extends DataModel>(props: CreateProps<D>) {
-  const { fields, methods } = props;
+  const { dataSource } = props;
+  const { fields, ...methods } = dataSource;
   const { createOne } = methods;
 
+  const notifications = useNotifications();
+
+  const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(
+    async (previousState, formData) => {
+      try {
+        await createOne(
+          Object.fromEntries(fields.map(({ field }) => [field, formData.get(field)])) as D,
+        );
+        notifications.show('Item created successfully.', {
+          severity: 'success',
+        });
+      } catch (createError) {
+        notifications.show(`Failed to create item. Reason: ${(createError as Error).message}`, {
+          severity: 'error',
+        });
+        return createError as Error;
+      }
+
+      return null;
+    },
+    null,
+  );
+
   return (
-    <Box component="form" noValidate autoComplete="off">
+    <Box component="form" action={submitAction} noValidate autoComplete="off">
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        {fields.map((field) => (
-          <Grid key={field.field} size={6}>
-            <TextField id={field.field} label={field.headerName} sx={{ width: '100%' }} />
+        {fields.map(({ field, headerName }) => (
+          <Grid key={field} size={6}>
+            <TextField id={field} label={headerName} sx={{ width: '100%' }} />
           </Grid>
         ))}
       </Grid>
-      <Button type="submit" variant="contained">
-        Contained
+      <Button type="submit" variant="contained" loading={isSubmitting}>
+        Create
       </Button>
     </Box>
   );

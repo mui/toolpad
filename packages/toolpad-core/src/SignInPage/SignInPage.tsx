@@ -40,7 +40,7 @@ import { BrandingContext, RouterContext } from '../shared/context';
 
 const mergeSlotSx = (defaultSx: SxProps<Theme>, slotProps?: { sx?: SxProps<Theme> }) => {
   if (Array.isArray(slotProps?.sx)) {
-    return [defaultSx, ...slotProps.sx];
+    return [defaultSx, ...slotProps!.sx];
   }
 
   if (slotProps?.sx) {

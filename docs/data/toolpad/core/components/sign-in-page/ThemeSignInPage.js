@@ -15,7 +15,7 @@ const signIn = async (provider) => {
   const promise = new Promise((resolve) => {
     setTimeout(() => {
       console.log(`Sign in with ${provider.id}`);
-      resolve();
+      resolve({ error: 'This is a mock error message.' });
     }, 500);
   });
   return promise;
@@ -41,7 +41,16 @@ export default function ThemeSignInPage() {
   return (
     // preview-start
     <AppProvider theme={THEME}>
-      <SignInPage signIn={signIn} providers={providers} />
+      <SignInPage
+        signIn={signIn}
+        providers={providers}
+        sx={{
+          '& form > .MuiStack-root': {
+            marginTop: '2rem',
+            rowGap: '0.5rem',
+          },
+        }}
+      />
     </AppProvider>
     // preview-end
   );

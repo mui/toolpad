@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Outlet, useParams } from 'react-router-dom';
+import { Outlet } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 

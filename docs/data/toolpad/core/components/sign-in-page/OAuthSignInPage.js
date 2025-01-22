@@ -15,12 +15,14 @@ const providers = [
 // preview-end
 
 const signIn = async (provider) => {
+  // preview-start
   const promise = new Promise((resolve) => {
     setTimeout(() => {
       console.log(`Sign in with ${provider.id}`);
-      resolve();
+      resolve({ error: 'This is a fake error' });
     }, 500);
   });
+  // preview-end
   return promise;
 };
 

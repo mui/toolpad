@@ -2,12 +2,15 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
+import Chip from '@mui/material/Chip';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
+import CloudCircleIcon from '@mui/icons-material/CloudCircle';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import {
@@ -114,6 +117,19 @@ function SidebarFooter({ mini }: SidebarFooterProps) {
   );
 }
 
+function CustomAppTitle() {
+  return (
+    <Stack direction="row" alignItems="center" spacing={2}>
+      <CloudCircleIcon fontSize="large" color="primary" />
+      <Typography variant="h6">My App</Typography>
+      <Chip size="small" label="BETA" color="info" />
+      <Tooltip title="Connected to production">
+        <CheckCircleIcon color="success" fontSize="small" />
+      </Tooltip>
+    </Stack>
+  );
+}
+
 interface DemoProps {
   /**
    * Injected by the documentation to work in an iframe.
@@ -139,6 +155,7 @@ export default function DashboardLayoutSlots(props: DemoProps) {
     >
       <DashboardLayout
         slots={{
+          appTitle: CustomAppTitle,
           toolbarActions: ToolbarActionsSearch,
           sidebarFooter: SidebarFooter,
         }}

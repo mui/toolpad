@@ -13,7 +13,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { LoadingButton } from '@mui/lab';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { AuthProvider, AuthContext } from './useAuth';
 import productIconDark from '../../public/product-icon-dark.svg';

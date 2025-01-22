@@ -3,6 +3,6 @@ import { PageHeader } from '@toolpad/core/PageContainer';
 // ...
 
 <Container sx={{ my: 2 }}>
-  <PageHeader>Page content</PageHeader>
+  <PageHeader />
   <Box sx={{ mt: 1 }}>Page content</Box>
 </Container>

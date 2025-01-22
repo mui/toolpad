@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { AppProvider } from '@toolpad/core/nextjs';
+import { NextAppProvider } from '@toolpad/core/nextjs';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import type { Navigation } from '@toolpad/core/AppProvider';
 import { SessionProvider, signIn, signOut } from 'next-auth/react';
 import theme from '../theme';
@@ -36,14 +36,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body>
         <SessionProvider session={session}>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <AppProvider
+            <NextAppProvider
               theme={theme}
               navigation={NAVIGATION}
               session={session}
               authentication={AUTHENTICATION}
             >
               {children}
-            </AppProvider>
+            </NextAppProvider>
           </AppRouterCacheProvider>
         </SessionProvider>
       </body>

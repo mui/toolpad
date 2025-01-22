@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { AppProvider } from '@toolpad/core/nextjs';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
+import { NextAppProvider } from '@toolpad/core/nextjs';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import type { Navigation } from '@toolpad/core/AppProvider';
@@ -41,14 +41,14 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <body>
         <SessionProvider session={session}>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <AppProvider
+            <NextAppProvider
               navigation={NAVIGATION}
               branding={BRANDING}
               session={session}
               authentication={AUTHENTICATION}
             >
               {props.children}
-            </AppProvider>
+            </NextAppProvider>
           </AppRouterCacheProvider>
         </SessionProvider>
       </body>

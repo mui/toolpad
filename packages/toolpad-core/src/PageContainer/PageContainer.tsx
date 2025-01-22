@@ -5,8 +5,7 @@ import Box from '@mui/material/Box';
 import Container, { ContainerProps } from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import { SxProps } from '@mui/material';
-import { PageHeaderToolbarProps } from './PageHeaderToolbar';
-import { PageHeader } from './PageHeader';
+import { PageHeader, PageHeaderProps } from './PageHeader';
 
 export interface Breadcrumb {
   /**
@@ -16,7 +15,10 @@ export interface Breadcrumb {
   /**
    * The path the breadcrumb links to.
    */
-  path: string;
+  path?: string;
+}
+export interface PageContainerSlotProps {
+  header: PageHeaderProps;
 }
 export interface PageContainerSlotProps {
   toolbar: PageHeaderToolbarProps;
@@ -24,10 +26,10 @@ export interface PageContainerSlotProps {
 
 export interface PageContainerSlots {
   /**
-   * The component that renders the actions toolbar.
-   * @default PageHeaderToolbar
+   * The component that renders the page header.
+   * @default PageHeader
    */
-  toolbar: React.ElementType;
+  header: React.ElementType;
 }
 
 export interface PageContainerProps extends ContainerProps {
@@ -66,25 +68,14 @@ export interface PageContainerProps extends ContainerProps {
  * - [PageContainer API](https://mui.com/toolpad/core/api/page-container)
  */
 function PageContainer(props: PageContainerProps) {
-  const { children, breadcrumbs, slots, slotProps, ...rest } = props;
+  const { children, breadcrumbs, slots, slotProps, title, ...rest } = props;
+
+  const PageHeaderSlot = slots?.header ?? PageHeader;
 
   return (
     <Container {...rest} sx={{ flex: 1, display: 'flex', flexDirection: 'column', ...rest.sx }}>
       <Stack sx={{ flex: 1, my: 2 }} spacing={2}>
-        <PageHeader
-          title={props.title}
-          breadcrumbs={breadcrumbs}
-          slots={
-            slots && {
-              toolbar: slots.toolbar,
-            }
-          }
-          slotProps={
-            slotProps && {
-              toolbar: slotProps.toolbar,
-            }
-          }
-        />
+        <PageHeaderSlot title={title} breadcrumbs={breadcrumbs} {...slotProps?.header} />
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{children}</Box>
       </Stack>
     </Container>
@@ -101,7 +92,7 @@ PageContainer.propTypes /* remove-proptypes */ = {
    */
   breadcrumbs: PropTypes.arrayOf(
     PropTypes.shape({
-      path: PropTypes.string.isRequired,
+      path: PropTypes.string,
       title: PropTypes.string.isRequired,
     }),
   ),
@@ -113,15 +104,27 @@ PageContainer.propTypes /* remove-proptypes */ = {
    * The props used for each slot inside.
    */
   slotProps: PropTypes.shape({
-    toolbar: PropTypes.shape({
-      children: PropTypes.node,
+    header: PropTypes.shape({
+      breadcrumbs: PropTypes.arrayOf(
+        PropTypes.shape({
+          path: PropTypes.string,
+          title: PropTypes.string.isRequired,
+        }),
+      ),
+      slotProps: PropTypes.shape({
+        toolbar: PropTypes.object.isRequired,
+      }),
+      slots: PropTypes.shape({
+        toolbar: PropTypes.elementType,
+      }),
+      title: PropTypes.string,
     }).isRequired,
   }),
   /**
    * The components used for each slot inside.
    */
   slots: PropTypes.shape({
-    toolbar: PropTypes.elementType,
+    header: PropTypes.elementType,
   }),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.

@@ -1,5 +1,6 @@
 <DashboardLayout
   slots={{
+    appTitle: CustomAppTitle,
     toolbarActions: ToolbarActionsSearch,
     sidebarFooter: SidebarFooter,
   }}

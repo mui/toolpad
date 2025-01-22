@@ -16,7 +16,8 @@ export type SignOutButtonProps = ButtonProps;
  * API:
  *
  * - [SignOutButton API](https://mui.com/toolpad/core/api/sign-out-button)
- */ function SignOutButton(props: SignOutButtonProps) {
+ */
+function SignOutButton(props: SignOutButtonProps) {
   const authentication = React.useContext(AuthenticationContext);
   const localeText = useLocaleText();
 

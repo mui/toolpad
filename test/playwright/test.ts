@@ -26,8 +26,7 @@ export type Options = { ignoreConsoleErrors: RegExp[] };
 
 export const test = base.extend<Options>({
   ignoreConsoleErrors: [[], { option: true }],
-
-  page: async ({ page, ignoreConsoleErrors }, use) => {
+  page: async ({ page, ignoreConsoleErrors }, run) => {
     const entryPromises: Promise<ConsoleEntry>[] = [];
 
     const consoleHandler = (msg: ConsoleMessage) => {
@@ -47,7 +46,7 @@ export const test = base.extend<Options>({
 
     page.on('console', consoleHandler);
 
-    await use(page);
+    await run(page);
 
     page.off('console', consoleHandler);
 

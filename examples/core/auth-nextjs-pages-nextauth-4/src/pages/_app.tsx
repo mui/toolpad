@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AppProvider } from '@toolpad/core/nextjs';
+import { NextAppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -13,7 +13,7 @@ import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import LinearProgress from '@mui/material/LinearProgress';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: React.ReactElement) => React.ReactNode;
+  getLayout?: (page: React.ReactElement<any>) => React.ReactNode;
   requireAuth?: boolean;
 };
 
@@ -46,7 +46,7 @@ const AUTHENTICATION = {
   signOut,
 };
 
-function getDefaultLayout(page: React.ReactElement) {
+function getDefaultLayout(page: React.ReactElement<any>) {
   return <DashboardLayout>{page}</DashboardLayout>;
 }
 
@@ -72,14 +72,14 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <AppProvider
+      <NextAppProvider
         navigation={NAVIGATION}
         branding={BRANDING}
         session={session}
         authentication={AUTHENTICATION}
       >
         {children}
-      </AppProvider>
+      </NextAppProvider>
     </React.Fragment>
   );
 }

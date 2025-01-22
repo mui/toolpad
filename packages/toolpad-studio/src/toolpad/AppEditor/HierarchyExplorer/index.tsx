@@ -31,7 +31,7 @@ const StyledTreeItem = styled(EditableTreeItem)({
 });
 
 interface CustomTreeItemProps extends TreeItemProps, EditableTreeItemProps {
-  ref?: React.RefObject<HTMLLIElement>;
+  ref?: React.RefObject<HTMLLIElement | null>;
   node: appDom.ElementNode;
 }
 

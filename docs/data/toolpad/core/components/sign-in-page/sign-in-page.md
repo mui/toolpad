@@ -18,7 +18,7 @@ The `SignInPage` component is a quick way to generate a ready-to-use authenticat
 
 The `SignInPage` component can be set up with an OAuth provider by passing in a list of providers in the `providers` prop, along with a `signIn` function that accepts the `provider` as a parameter.
 
-{{"demo": "OAuthSignInPage.js", "iframe": true, "height": 500}}
+{{"demo": "OAuthSignInPage.js", "iframe": true, "height": 600}}
 
 :::info
 
@@ -75,7 +75,7 @@ The `SignInPage` component can be set up to use [Passkeys](https://passkeys.dev)
 The [Toolpad Core Passkey example app](https://github.com/mui/mui-toolpad/tree/master/examples/core/auth-nextjs-passkey/) comes with a working app using `next-auth/webauthn`, Prisma and PostgreSQL.
 :::
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next-passkey.png", "srcDark": "/static/toolpad/docs/core/auth-next-passkey-dark.png", "alt": "Auth.js Passkeys & Next.js with Toolpad Core sign-in page", "caption": "Auth.js Passkeys & Next.js app router with Toolpad Core Sign-in page", "zoom": true,  "aspectRatio": "1.428" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next-passkey.png", "srcDark": "/static/toolpad/docs/core/auth-next-passkey-dark.png", "alt": "Auth.js Passkeys & Next.js with Toolpad Core sign-in page", "caption": "Auth.js Passkeys & Next.js App Router with Toolpad Core Sign-in page", "zoom": true,  "aspectRatio": "1.428" }}
 
 ## Credentials
 
@@ -85,7 +85,7 @@ The Credentials provider is not the most secure way to authenticate users. It's 
 
 To render a username password form, pass in a provider with `credentials` as the `id` property. The `signIn` function accepts a `formData` parameter in this case.
 
-{{"demo": "CredentialsSignInPage.js", "iframe": true, "height": 500}}
+{{"demo": "CredentialsSignInPage.js", "iframe": true, "height": 600}}
 
 ### Alerts
 
@@ -108,9 +108,9 @@ This renders an alert with the `error` string as the message.
 
 #### Next.js App Directory and GitHub
 
-The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App router and server actions.
+The component is composable with any authentication library you might want to use. The following is a `SignInPage` with [Auth.js](https://authjs.dev/) using GitHub, Next.js App Router and server actions.
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "srcDark": "/static/toolpad/docs/core/auth-next-dark.png", "alt": "Auth.js & Next.js with Toolpad Core sign-in page", "caption": "Auth.js & Next.js app router with Toolpad Core Sign-in page", "zoom": true, "indent": 1, "aspectRatio": "1.428" }}
+{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/auth-next.png", "srcDark": "/static/toolpad/docs/core/auth-next-dark.png", "alt": "Auth.js & Next.js with Toolpad Core sign-in page", "caption": "Auth.js & Next.js App Router with Toolpad Core Sign-in page", "zoom": true, "indent": 1, "aspectRatio": "1.428" }}
 
 #### Setting up
 
@@ -211,8 +211,29 @@ If you're using the default [Next.js example](https://github.com/mui/toolpad/tre
 If you're not on the Next Auth v5 version yet, see the [example with Next Auth v4](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4/) to get started.
 :::
 
+### Firebase
+
+#### Vite with React Router
+
+##### Setting up
+
+You need to create a `.env` file in the root of your project directory with the following environment variables:
+
+```bash
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGE_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
 :::info
-If you're using Vite with React Router, check out the [example with Vite and React Router](https://github.com/mui/toolpad/tree/master/examples/core/auth-vite/) that showcases how to use `SignInPage` along with any external authentication library of your choice.
+Head to the [Firebase docs](https://firebase.google.com/docs/auth/) for details around configuring authentication with Firebase. You can also find code examples in the [integration docs for Vite & React Router](https://mui.com/toolpad/core/integrations/react-router/).
+:::
+
+:::success
+If you're using [create-toolpad-app](/toolpad/core/introduction/installation/), or the default [Vite with Firebase authentication example](https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite/), the integration code is already provided.
 :::
 
 ## Customization
@@ -230,22 +251,18 @@ Through the `theme` prop in the [AppProvider](https://mui.com/toolpad/core/react
 {{"demo": "ThemeSignInPage.js", "iframe": true, "height": 700 }}
 
 :::info
-Find a full-fledged example using the Next.js App router, Auth.js and this theme [here](https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
+Find a full-fledged example using the Next.js App Router, Auth.js and this theme [here](https://codesandbox.io/p/sandbox/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
 :::
 
 ### Slots
 
-To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs and buttons.
-
-:::warning
-Make sure to pass `email` and `password` as the `name` attribute on custom email and password components, otherwise those values will not be available in the `formData` parameter of the `signIn` prop.
-:::
+To enable deep customization beyond what is possible with custom props, the `SignInPage` component allows bringing your own custom granular components, such as inputs, checkboxes and buttons.
 
 {{"demo": "SlotsSignIn.js", "iframe": true, "height": 540 }}
 
 You can use the `slotProps` prop to pass props to the underlying components of each slot:
 
-{{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 540 }}
+{{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 600 }}
 
 ### 🚧 Layouts
 

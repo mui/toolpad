@@ -1,4 +1,4 @@
-# Create Toolpad App
+# Toolpad Core - Create Toolpad App
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-toolpad-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
@@ -16,7 +16,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Run on CodeSandbox
 
-Run this example on CodeSandbox [here](https://codesandbox.io/s/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
+Run this example on CodeSandbox [here](https://codesandbox.io/p/sandbox/github/mui/toolpad/tree/master/examples/core/auth-nextjs-themed).
 
 ## Clone using `create-toolpad-app`
 
@@ -24,6 +24,8 @@ To copy this example and customize it for your needs, run
 
 ```bash
 npx create-toolpad-app@latest --example auth-nextjs-themed
+# or
+pnpm dlx create-toolpad-app@latest --example auth-nextjs-themed
 ```
 
 and follow the instructions in the terminal.

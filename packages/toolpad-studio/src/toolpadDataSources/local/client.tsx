@@ -34,7 +34,7 @@ interface ResolvedPreviewProps {
   preview: any;
 }
 
-function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement | null {
+function ResolvedPreview({ preview }: ResolvedPreviewProps): React.ReactElement<any> | null {
   if (!preview) {
     return (
       <Alert

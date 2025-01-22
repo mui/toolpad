@@ -21,16 +21,13 @@ const pages: MuiPage[] = [
         title: 'Base concepts',
       },
       {
-        pathname: '/toolpad/core/introduction/integration',
-        title: 'Integration',
-      },
-      {
         pathname: '/toolpad/core/introduction/tutorial',
         title: 'Tutorial',
       },
       {
         pathname: '/toolpad/core/introduction/examples',
         title: 'Examples',
+        newFeature: true,
       },
       {
         pathname: '/toolpad/core/introduction/roadmap',
@@ -39,6 +36,24 @@ const pages: MuiPage[] = [
       {
         pathname: '/toolpad/core/introduction/support',
         title: 'Support',
+      },
+    ],
+  },
+  {
+    pathname: '/toolpad/core/integrations-group',
+    title: 'Integrations',
+    children: [
+      {
+        pathname: '/toolpad/core/integrations/nextjs-approuter',
+        title: 'Next.js App Router',
+      },
+      {
+        pathname: '/toolpad/core/integrations/nextjs-pagesrouter',
+        title: 'Next.js Pages Router',
+      },
+      {
+        pathname: '/toolpad/core/integrations/react-router',
+        title: 'Vite with React Router',
       },
     ],
   },

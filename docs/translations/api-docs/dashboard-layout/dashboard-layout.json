@@ -1,6 +1,7 @@
 {
   "componentDescription": "",
   "propDescriptions": {
+    "branding": { "description": "Branding options for the dashboard." },
     "children": { "description": "The content of the dashboard." },
     "defaultSidebarCollapsed": {
       "description": "Whether the sidebar should start collapsed in desktop size screens."
@@ -11,6 +12,7 @@
     "hideNavigation": {
       "description": "Whether the navigation bar and menu icon should be hidden"
     },
+    "navigation": { "description": "Navigation definition for the dashboard." },
     "sidebarExpandedWidth": { "description": "Width of the sidebar when expanded." },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." },
@@ -20,6 +22,7 @@
   },
   "classDescriptions": {},
   "slotDescriptions": {
+    "appTitle": "The component used for the app title section in the layout header.",
     "sidebarFooter": "Optional footer component used in the layout sidebar.",
     "toolbarAccount": "The toolbar account component used in the layout header.",
     "toolbarActions": "The toolbar actions component used in the layout header."

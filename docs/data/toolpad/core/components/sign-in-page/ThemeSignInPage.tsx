@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
+import {
+  SignInPage,
+  type AuthProvider,
+  type AuthResponse,
+} from '@toolpad/core/SignInPage';
 import { createTheme } from '@mui/material/styles';
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
 import { getDesignTokens, inputsCustomizations } from './customTheme';
@@ -11,11 +15,13 @@ const providers = [
   { id: 'credentials', name: 'Email and Password' },
 ];
 
-const signIn: (provider: AuthProvider) => void = async (provider) => {
-  const promise = new Promise<void>((resolve) => {
+const signIn: (provider: AuthProvider) => void | Promise<AuthResponse> = async (
+  provider,
+) => {
+  const promise = new Promise<AuthResponse>((resolve) => {
     setTimeout(() => {
       console.log(`Sign in with ${provider.id}`);
-      resolve();
+      resolve({ error: 'This is a mock error message.' });
     }, 500);
   });
   return promise;
@@ -41,7 +47,16 @@ export default function ThemeSignInPage() {
   return (
     // preview-start
     <AppProvider theme={THEME}>
-      <SignInPage signIn={signIn} providers={providers} />
+      <SignInPage
+        signIn={signIn}
+        providers={providers}
+        sx={{
+          '& form > .MuiStack-root': {
+            marginTop: '2rem',
+            rowGap: '0.5rem',
+          },
+        }}
+      />
     </AppProvider>
     // preview-end
   );

@@ -10,8 +10,8 @@ import { styled } from '@mui/material';
 import { Link as ToolpadLink } from '../shared/Link';
 import { getItemTitle } from '../shared/navigation';
 import { useActivePage } from '../useActivePage';
-import { PageHeaderToolbar } from './PageHeaderToolbar';
-import type { Breadcrumb, PageContainerSlots, PageContainerSlotProps } from './PageContainer';
+import { PageHeaderToolbar, PageHeaderToolbarProps } from './PageHeaderToolbar';
+import type { Breadcrumb } from './PageContainer';
 
 const PageContentHeader = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -19,6 +19,18 @@ const PageContentHeader = styled('div')(({ theme }) => ({
   justifyContent: 'space-between',
   gap: theme.spacing(2),
 }));
+
+export interface PageHeaderSlotProps {
+  toolbar: PageHeaderToolbarProps;
+}
+
+export interface PageHeaderSlots {
+  /**
+   * The component that renders the actions toolbar.
+   * @default PageHeaderToolbar
+   */
+  toolbar: React.ElementType;
+}
 
 export interface PageHeaderProps {
   /**
@@ -32,11 +44,11 @@ export interface PageHeaderProps {
   /**
    * The components used for each slot inside.
    */
-  slots?: Pick<PageContainerSlots, 'toolbar'>;
+  slots?: PageHeaderSlots;
   /**
    * The props used for each slot inside.
    */
-  slotProps?: Pick<PageContainerSlotProps, 'toolbar'>;
+  slotProps?: PageHeaderSlotProps;
 }
 
 /**
@@ -51,12 +63,12 @@ export interface PageHeaderProps {
  * - [PageHeader API](https://mui.com/toolpad/core/api/page-header)
  */
 function PageHeader(props: PageHeaderProps) {
-  const { breadcrumbs } = props;
+  const { breadcrumbs, title } = props;
 
   const activePage = useActivePage();
 
   const resolvedBreadcrumbs = breadcrumbs ?? activePage?.breadcrumbs ?? [];
-  const title = props.title ?? activePage?.title ?? '';
+  const resolvedTitle = title ?? activePage?.title ?? '';
 
   const ToolbarComponent = props?.slots?.toolbar ?? PageHeaderToolbar;
   const toolbarSlotProps = useSlotProps({
@@ -71,9 +83,9 @@ function PageHeader(props: PageHeaderProps) {
       <Breadcrumbs aria-label="breadcrumb">
         {resolvedBreadcrumbs
           ? resolvedBreadcrumbs.map((item, index) => {
-              return index < resolvedBreadcrumbs.length - 1 ? (
+              return item.path ? (
                 <Link
-                  key={item.path}
+                  key={index}
                   component={ToolpadLink}
                   underline="hover"
                   color="inherit"
@@ -82,7 +94,7 @@ function PageHeader(props: PageHeaderProps) {
                   {getItemTitle(item)}
                 </Link>
               ) : (
-                <Typography key={item.path} color="text.primary">
+                <Typography key={index} color="text.primary">
                   {getItemTitle(item)}
                 </Typography>
               );
@@ -91,7 +103,7 @@ function PageHeader(props: PageHeaderProps) {
       </Breadcrumbs>
 
       <PageContentHeader>
-        {title ? <Typography variant="h4">{title}</Typography> : null}
+        {resolvedTitle ? <Typography variant="h4">{resolvedTitle}</Typography> : null}
         <ToolbarComponent {...toolbarSlotProps} />
       </PageContentHeader>
     </Stack>
@@ -108,7 +120,7 @@ PageHeader.propTypes /* remove-proptypes */ = {
    */
   breadcrumbs: PropTypes.arrayOf(
     PropTypes.shape({
-      path: PropTypes.string.isRequired,
+      path: PropTypes.string,
       title: PropTypes.string.isRequired,
     }),
   ),

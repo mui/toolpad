@@ -8,6 +8,15 @@ const providers = [
 
 // ...
 
+const promise = new Promise<AuthResponse>((resolve) => {
+  setTimeout(() => {
+    console.log(`Sign in with ${provider.id}`);
+    resolve({ error: 'This is a fake error' });
+  }, 500);
+});
+
+// ...
+
 <AppProvider theme={theme}>
   <SignInPage signIn={signIn} providers={providers} />
 </AppProvider>

@@ -71,7 +71,7 @@ function useDynamicBreadcrumbs(id: string): Breadcrumb[] {
 }
 ```
 
-For example, under the Next.js app router you would be able to obtain breadcrumbs for a dynamic route as follows:
+For example, under the Next.js App Router you would be able to obtain breadcrumbs for a dynamic route as follows:
 
 ```tsx
 // ./src/app/example/[id]/page.tsx
@@ -100,21 +100,21 @@ export default function Example() {
 }
 ```
 
-## Actions
-
-You can configure additional actions in the area that is reserved on the right. To do so provide the `toolbar` slot to the `PageContainer` component. You can wrap the `PageHeaderToolbar` component to create a custom toolbar component, as shown here:
-
-{{"demo": "ActionsPageContainer.js", "height": 300}}
-
 ## Responsiveness
 
 The Page Container component inherits the properties of the Material&nbsp;UI [Container](https://mui.com/material-ui/react-container/) component. You can use its [`maxWidth`](https://mui.com/material-ui/api/container/#container-prop-maxWidth) and [`fixed`](https://mui.com/material-ui/api/container/#container-prop-fixed) properties to control the bounds of the page. Set `maxWidth` to `false` to disable the container altogether and have the content bleed right up to the edges of the page.
 
 ## Standalone page header
 
-The `PageHeader` component included in `PageContainer` can be imported and used by itself if you wish to so, for more freedom of customization.
+The `PageHeader` component included in `PageContainer` can be imported and used by itself if you wish to do so, for more freedom of customization.
 
 {{"demo": "PageContainerHeader.js", "height": 300}}
+
+## Actions
+
+You can configure additional actions in the area that is reserved on the right. To do so provide a custom `header` slot to the `PageContainer` component, where you can provide a custom `toolbar` slot to a `PageHeader`. You can wrap the `PageHeaderToolbar` component to create a custom toolbar component, as shown here:
+
+{{"demo": "ActionsPageContainer.js", "height": 300}}
 
 ## Full-size content
 

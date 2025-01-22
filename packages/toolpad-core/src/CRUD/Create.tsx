@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid2';
@@ -57,5 +58,16 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     </Box>
   );
 }
+
+Create.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * Server-side data source.
+   */
+  dataSource: PropTypes.object.isRequired,
+} as any;
 
 export { Create };

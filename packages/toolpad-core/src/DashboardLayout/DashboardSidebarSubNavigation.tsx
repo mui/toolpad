@@ -1,6 +1,5 @@
 'use client';
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { styled } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Collapse from '@mui/material/Collapse';
@@ -271,74 +270,5 @@ function DashboardSidebarSubNavigation({
     </List>
   );
 }
-
-DashboardSidebarSubNavigation.propTypes /* remove-proptypes */ = {
-  // ┌────────────────────────────── Warning ──────────────────────────────┐
-  // │ These PropTypes are generated from the TypeScript type definitions. │
-  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
-  // └─────────────────────────────────────────────────────────────────────┘
-  /**
-   * @ignore
-   */
-  basePath: PropTypes.string,
-  /**
-   * @ignore
-   */
-  depth: PropTypes.number,
-  /**
-   * @ignore
-   */
-  hasDrawerTransitions: PropTypes.bool,
-  /**
-   * @ignore
-   */
-  isFullyExpanded: PropTypes.bool,
-  /**
-   * @ignore
-   */
-  isMini: PropTypes.bool,
-  /**
-   * @ignore
-   */
-  onLinkClick: PropTypes.func.isRequired,
-  /**
-   * @ignore
-   */
-  selectedItemId: PropTypes.string.isRequired,
-  /**
-   * @ignore
-   */
-  subNavigation: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.shape({
-        action: PropTypes.node,
-        children: PropTypes.arrayOf(
-          PropTypes.oneOfType([
-            PropTypes.object,
-            PropTypes.shape({
-              kind: PropTypes.oneOf(['header']).isRequired,
-              title: PropTypes.string.isRequired,
-            }),
-            PropTypes.shape({
-              kind: PropTypes.oneOf(['divider']).isRequired,
-            }),
-          ]).isRequired,
-        ),
-        icon: PropTypes.node,
-        kind: PropTypes.oneOf(['page']),
-        pattern: PropTypes.string,
-        segment: PropTypes.string,
-        title: PropTypes.string,
-      }),
-      PropTypes.shape({
-        kind: PropTypes.oneOf(['header']).isRequired,
-        title: PropTypes.string.isRequired,
-      }),
-      PropTypes.shape({
-        kind: PropTypes.oneOf(['divider']).isRequired,
-      }),
-    ]).isRequired,
-  ).isRequired,
-} as any;
 
 export { DashboardSidebarSubNavigation };

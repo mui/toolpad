@@ -282,27 +282,20 @@ List.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * Fields to show.
+   * Server-side data source.
    */
-  fields: PropTypes.arrayOf(PropTypes.object).isRequired,
+  dataSource: PropTypes.object.isRequired,
   /**
    * Initial number of rows to show per page.
    * @default 100
    */
   initialPageSize: PropTypes.number,
   /**
-   * Methods to interact with server-side data.
-   */
-  methods: PropTypes.shape({
-    deleteOne: PropTypes.func,
-    getMany: PropTypes.func.isRequired,
-  }).isRequired,
-  /**
    * Callback fired when the "Create" button is clicked.
    */
   onCreateClick: PropTypes.func,
   /**
-   * Callback fired when the "Create" button is clicked.
+   * Callback fired when the "Edit" button is clicked.
    */
   onEditClick: PropTypes.func,
   /**
@@ -323,14 +316,6 @@ List.propTypes /* remove-proptypes */ = {
   slots: PropTypes.shape({
     dataGrid: PropTypes.elementType,
   }),
-  /**
-   * The system prop that allows defining system overrides as well as additional CSS styles.
-   */
-  sx: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
-    PropTypes.func,
-    PropTypes.object,
-  ]),
 } as any;
 
 export { List };

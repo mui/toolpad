@@ -59,7 +59,7 @@ async function generateProptypes(
         name.toLowerCase().endsWith('classes') ||
         name === 'theme' ||
         name === 'ownerState' ||
-        name === 'fields' ||
+        name === 'dataSource' ||
         (name.endsWith('Props') && name !== 'componentsProps' && name !== 'slotProps')
       ) {
         return false;

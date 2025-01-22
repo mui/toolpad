@@ -20,9 +20,6 @@ export interface Breadcrumb {
 export interface PageContainerSlotProps {
   header: PageHeaderProps;
 }
-export interface PageContainerSlotProps {
-  toolbar: PageHeaderToolbarProps;
-}
 
 export interface PageContainerSlots {
   /**

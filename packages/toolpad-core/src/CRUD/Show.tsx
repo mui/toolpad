@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button, { ButtonProps } from '@mui/material/Button';
@@ -151,5 +152,28 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
 
   return <Box sx={{ display: 'flex', flex: 1 }}>{renderShow}</Box>;
 }
+
+Show.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * Server-side data source.
+   */
+  dataSource: PropTypes.object.isRequired,
+  /**
+   * @ignore
+   */
+  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  /**
+   * Callback fired when the item is successfully deleted.
+   */
+  onDelete: PropTypes.func,
+  /**
+   * Callback fired when the "Edit" button is clicked.
+   */
+  onEditClick: PropTypes.func,
+} as any;
 
 export { Show };

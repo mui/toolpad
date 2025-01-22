@@ -26,7 +26,11 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     async (previousState, formData) => {
       try {
         await createOne(
-          Object.fromEntries(fields.map(({ field }) => [field, formData.get(field)])) as D,
+          Object.fromEntries(
+            fields
+              .filter(({ field }) => field !== 'id')
+              .map(({ field }) => [field, formData.get(field)]),
+          ) as D,
         );
         notifications.show('Item created successfully.', {
           severity: 'success',
@@ -46,11 +50,13 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   return (
     <Box component="form" action={submitAction} noValidate autoComplete="off">
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        {fields.map(({ field, headerName }) => (
-          <Grid key={field} size={6}>
-            <TextField id={field} label={headerName} sx={{ width: '100%' }} />
-          </Grid>
-        ))}
+        {fields
+          .filter(({ field }) => field !== 'id')
+          .map(({ field, headerName }) => (
+            <Grid key={field} size={6}>
+              <TextField id={field} label={headerName} sx={{ width: '100%' }} />
+            </Grid>
+          ))}
       </Grid>
       <Button type="submit" variant="contained" loading={isSubmitting}>
         Create

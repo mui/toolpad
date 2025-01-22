@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Show } from '@toolpad/core/CRUD';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import ordersDataSource, { Order } from '../data/orders';
 
 export default function OrderPage() {

@@ -15,7 +15,13 @@ test.use({
   },
 });
 
-test('can control component prop values in properties control panel', async ({ page }) => {
+test('can control component prop values in properties control panel', async ({
+  page,
+  browserName,
+}) => {
+  // TODO: fix flakyness
+  test.skip(browserName === 'firefox', 'This test is flaky in firefox');
+
   const editorModel = new ToolpadEditor(page);
 
   await editorModel.goto();

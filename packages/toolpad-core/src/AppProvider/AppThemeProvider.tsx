@@ -1,5 +1,4 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { PaletteMode, Theme, useMediaQuery } from '@mui/material';
 import { ThemeProvider, useColorScheme } from '@mui/material/styles';
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';

@@ -119,10 +119,12 @@ interface NotificationsState {
 }
 
 interface NotificationsProps {
-  state: NotificationsState;
+  subscribe: (cb: () => void) => () => void;
+  getState: () => NotificationsState;
 }
 
-function Notifications({ state }: NotificationsProps) {
+function Notifications({ subscribe, getState }: NotificationsProps) {
+  const state = React.useSyncExternalStore(subscribe, getState, getState);
   const currentNotification = state.queue[0] ?? null;
 
   return currentNotification ? (
@@ -148,55 +150,83 @@ const generateId = () => {
   return id;
 };
 
-/**
- * Provider for Notifications. The subtree of this component can use the `useNotifications` hook to
- * access the notifications API. The notifications are shown in the same order they are requested.
- *
- * Demos:
- *
- * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
- * - [useNotifications](https://mui.com/toolpad/core/react-use-notifications/)
- *
- * API:
- *
- * - [NotificationsProvider API](https://mui.com/toolpad/core/api/notifications-provider)
- */
-function NotificationsProvider(props: NotificationsProviderProps) {
-  const { children } = props;
-  const [state, setState] = React.useState<NotificationsState>({ queue: [] });
-
-  const show = React.useCallback<ShowNotification>((message, options = {}) => {
-    const notificationKey = options.key ?? `::toolpad-internal::notification::${generateId()}`;
-    setState((prev) => {
-      if (prev.queue.some((n) => n.notificationKey === notificationKey)) {
-        // deduplicate by key
-        return prev;
-      }
-      return {
-        ...prev,
-        queue: [...prev.queue, { message, options, notificationKey, open: true }],
-      };
-    });
-    return notificationKey;
-  }, []);
-
-  const close = React.useCallback<CloseNotification>((key) => {
-    setState((prev) => ({
-      ...prev,
-      queue: prev.queue.filter((n) => n.notificationKey !== key),
-    }));
-  }, []);
-
-  const contextValue = React.useMemo(() => ({ show, close }), [show, close]);
-
-  return (
-    <RootPropsContext.Provider value={props}>
-      <NotificationsContext.Provider value={contextValue}>
-        {children}
-        <Notifications state={state} />
-      </NotificationsContext.Provider>
-    </RootPropsContext.Provider>
-  );
+interface NotificationsApi {
+  show: ShowNotification;
+  close: CloseNotification;
+  Provider: React.ComponentType<NotificationsProviderProps>;
 }
 
-export { NotificationsProvider };
+export function createNotifications(): NotificationsApi {
+  let state: NotificationsState = { queue: [] };
+  const listeners = new Set<() => void>();
+
+  const getState = () => state;
+  const subscribeState = (listener: () => void) => {
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  };
+  const fireUpdateEvent = () => {
+    for (const listener of listeners) {
+      listener();
+    }
+  };
+
+  const show: ShowNotification = (message, options = {}) => {
+    const notificationKey = options.key ?? `::toolpad-internal::notification::${generateId()}`;
+    if (!state.queue.some((n) => n.notificationKey === notificationKey)) {
+      state = {
+        ...state,
+        queue: [...state.queue, { message, options, notificationKey, open: true }],
+      };
+      fireUpdateEvent();
+    }
+
+    return notificationKey;
+  };
+
+  const close: CloseNotification = (key) => {
+    state = {
+      ...state,
+      queue: state.queue.filter((n) => n.notificationKey !== key),
+    };
+    fireUpdateEvent();
+  };
+
+  const contextValue = { show, close };
+
+  /**
+   * Provider for Notifications. The subtree of this component can use the `useNotifications` hook to
+   * access the notifications API. The notifications are shown in the same order they are requested.
+   *
+   * Demos:
+   *
+   * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
+   * - [useNotifications](https://mui.com/toolpad/core/react-use-notifications/)
+   *
+   * API:
+   *
+   * - [NotificationsProvider API](https://mui.com/toolpad/core/api/notifications-provider)
+   */
+  function Provider(props: NotificationsProviderProps) {
+    return (
+      <RootPropsContext.Provider value={props}>
+        <NotificationsContext.Provider value={contextValue}>
+          {props.children}
+          <Notifications getState={getState} subscribe={subscribeState} />
+        </NotificationsContext.Provider>
+      </RootPropsContext.Provider>
+    );
+  }
+
+  return {
+    show,
+    close,
+    Provider,
+  };
+}
+
+const { show, close, Provider } = createNotifications();
+
+export { show, close, Provider as NotificationsProvider };

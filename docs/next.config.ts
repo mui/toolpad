@@ -2,7 +2,7 @@
 import * as path from 'path';
 import * as url from 'url';
 import { createRequire } from 'module';
-import { LANGUAGES, LANGUAGES_IGNORE_PAGES, LANGUAGES_IN_PROGRESS } from './config.js';
+import { LANGUAGES, LANGUAGES_IGNORE_PAGES, LANGUAGES_IN_PROGRESS } from './config';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -10,7 +10,6 @@ const require = createRequire(import.meta.url);
 
 const withDocsInfra = require('@mui/monorepo/docs/nextConfigDocsInfra');
 
-const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
 
 const WORKSPACE_ROOT = path.resolve(currentDirectory, '../');
@@ -21,6 +20,8 @@ const MONOREPO_PACKAGES = {
 
 const toolpadCorePkg = require('../packages/toolpad-core/package.json');
 const toolpadStudioPkg = require('../packages/toolpad-studio/package.json');
+
+const mdLoader = require.resolve('@mui/monorepo/packages/markdown/loader');
 
 export default withDocsInfra({
   transpilePackages: [
@@ -53,9 +54,7 @@ export default withDocsInfra({
         ...config.resolveLoader,
         alias: {
           ...config.resolveLoader.alias,
-          '@mui/internal-markdown/loader': require.resolve(
-            '@mui/monorepo/packages/markdown/loader',
-          ),
+          '@mui/internal-markdown/loader': mdLoader,
         },
       },
       resolve: {

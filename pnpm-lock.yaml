@@ -101,8 +101,8 @@ importers:
         specifier: 1.0.32
         version: 1.0.32
       '@mui/monorepo':
-        specifier: github:mui/material-ui#4f872d616e589f10955b84e13122d05e3e89dde1
-        version: https://codeload.github.com/mui/material-ui/tar.gz/4f872d616e589f10955b84e13122d05e3e89dde1(encoding@0.1.13)
+        specifier: github:mui/material-ui#e6c9d992604880c1eb3294f9c96109b519f4d8e9
+        version: https://codeload.github.com/mui/material-ui/tar.gz/e6c9d992604880c1eb3294f9c96109b519f4d8e9(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.23.6
         version: 7.23.6(@emotion/react@11.14.0(@types/react@19.0.1)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.1)(react@19.0.0))(@types/react@19.0.1)(react@19.0.0))(@mui/material@6.3.1(@emotion/react@11.14.0(@types/react@19.0.1)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.1)(react@19.0.0))(@types/react@19.0.1)(react@19.0.0))(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@6.3.1(@emotion/react@11.14.0(@types/react@19.0.1)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.1)(react@19.0.0))(@types/react@19.0.1)(react@19.0.0))(@types/react@19.0.1)(react@19.0.0))(@types/react@19.0.1)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -3101,9 +3101,9 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/4f872d616e589f10955b84e13122d05e3e89dde1':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/4f872d616e589f10955b84e13122d05e3e89dde1}
-    version: 6.4.0
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/e6c9d992604880c1eb3294f9c96109b519f4d8e9':
+    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/e6c9d992604880c1eb3294f9c96109b519f4d8e9}
+    version: 6.4.1
     engines: {pnpm: 9.15.4}
 
   '@mui/private-theming@5.16.12':
@@ -12587,7 +12587,7 @@ snapshots:
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@19.0.1)(react@19.0.0))(@types/react@19.0.1)(react@19.0.0)
       '@types/react': 19.0.1
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/4f872d616e589f10955b84e13122d05e3e89dde1(encoding@0.1.13)':
+  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/e6c9d992604880c1eb3294f9c96109b519f4d8e9(encoding@0.1.13)':
     dependencies:
       '@googleapis/sheets': 9.3.1(encoding@0.1.13)
       '@netlify/functions': 3.0.0

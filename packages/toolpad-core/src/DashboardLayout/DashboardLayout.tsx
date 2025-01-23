@@ -546,8 +546,8 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
     }),
     toolbarAccount: PropTypes.shape({
       localeText: PropTypes.shape({
-        accountIconButtonLabel: PropTypes.string,
         accountPreviewEmail: PropTypes.string,
+        accountPreviewIconButtonLabel: PropTypes.string,
         accountPreviewName: PropTypes.string,
         accountPreviewTitle: PropTypes.string,
         accountSignInLabel: PropTypes.string,

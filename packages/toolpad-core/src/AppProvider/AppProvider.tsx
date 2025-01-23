@@ -214,8 +214,8 @@ AppProvider.propTypes /* remove-proptypes */ = {
    * Locale text for components
    */
   localeText: PropTypes.shape({
-    accountIconButtonLabel: PropTypes.string,
     accountPreviewEmail: PropTypes.string,
+    accountPreviewIconButtonLabel: PropTypes.string,
     accountPreviewName: PropTypes.string,
     accountPreviewTitle: PropTypes.string,
     accountSignInLabel: PropTypes.string,

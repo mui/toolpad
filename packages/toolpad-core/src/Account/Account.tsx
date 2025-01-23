@@ -215,8 +215,8 @@ Account.propTypes /* remove-proptypes */ = {
    * The labels for the account component.
    */
   localeText: PropTypes.shape({
-    accountIconButtonLabel: PropTypes.string,
     accountPreviewEmail: PropTypes.string,
+    accountPreviewIconButtonLabel: PropTypes.string,
     accountPreviewName: PropTypes.string,
     accountPreviewTitle: PropTypes.string,
     accountSignInLabel: PropTypes.string,

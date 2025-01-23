@@ -90,8 +90,8 @@ LocalizationProvider.propTypes /* remove-proptypes */ = {
    * Locale for components texts
    */
   localeText: PropTypes.shape({
-    accountIconButtonLabel: PropTypes.string,
     accountPreviewEmail: PropTypes.string,
+    accountPreviewIconButtonLabel: PropTypes.string,
     accountPreviewName: PropTypes.string,
     accountPreviewTitle: PropTypes.string,
     accountSignInLabel: PropTypes.string,

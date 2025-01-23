@@ -25,7 +25,7 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ appTitle?: { branding?: { homeUrl?: string, logo?: node, title?: string } }, sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: { accountIconButtonLabel?: string, accountPreviewEmail?: string, accountPreviewName?: string, accountPreviewTitle?: string, accountSignInLabel?: string, accountSignOutLabel?: string }, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
+        "description": "{ appTitle?: { branding?: { homeUrl?: string, logo?: node, title?: string } }, sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: { accountPreviewIconButtonLabel?: string, accountPreviewTitle?: string, accountSignInLabel?: string, accountSignOutLabel?: string }, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
       },
       "default": "{}"
     },

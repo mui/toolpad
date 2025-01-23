@@ -12,8 +12,6 @@ export interface LocaleText {
   // AccountPreview
   accountPreviewIconButtonLabel: string;
   accountPreviewTitle: string;
-  accountPreviewEmail: string;
-  accountPreviewName: string;
 
   // SignInPage
   signInTitle: string;
@@ -90,9 +88,7 @@ LocalizationProvider.propTypes /* remove-proptypes */ = {
    * Locale for components texts
    */
   localeText: PropTypes.shape({
-    accountPreviewEmail: PropTypes.string,
     accountPreviewIconButtonLabel: PropTypes.string,
-    accountPreviewName: PropTypes.string,
     accountPreviewTitle: PropTypes.string,
     accountSignInLabel: PropTypes.string,
     accountSignOutLabel: PropTypes.string,

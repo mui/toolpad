@@ -3,7 +3,7 @@
     "localeText": {
       "type": {
         "name": "shape",
-        "description": "{ accountIconButtonLabel?: string, accountPreviewEmail?: string, accountPreviewName?: string, accountPreviewTitle?: string, accountSignInLabel?: string, accountSignOutLabel?: string }"
+        "description": "{ accountPreviewIconButtonLabel?: string, accountPreviewTitle?: string, accountSignInLabel?: string, accountSignOutLabel?: string }"
       }
     },
     "slotProps": {

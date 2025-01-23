@@ -7,8 +7,6 @@ const en: LocaleText = {
   accountSignOutLabel: 'Sign Out',
 
   // AccountPreview
-  accountPreviewEmail: 'Email',
-  accountPreviewName: 'User',
   accountPreviewTitle: 'Account',
   accountPreviewIconButtonLabel: 'Current User',
 

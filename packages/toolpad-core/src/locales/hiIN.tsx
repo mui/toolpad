@@ -7,8 +7,6 @@ const hiINLabels: Partial<LocaleText> = {
   accountSignOutLabel: 'साइन आउट करें',
 
   // AccountPreview
-  accountPreviewEmail: 'ईमेल',
-  accountPreviewName: 'उपयोगकर्ता',
   accountPreviewTitle: 'खाता',
   accountPreviewIconButtonLabel: 'वर्तमान उपयोगकर्ता',
 

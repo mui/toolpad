@@ -14,12 +14,11 @@ import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvi
 import { AccountLocaleContext } from './AccountLocaleContext';
 
 interface AccountLocaleText {
-  accountPreviewIconButtonLabel: string;
-  accountPreviewEmail: string;
-  accountPreviewName: string;
-  accountPreviewTitle: string;
   accountSignInLabel: string;
   accountSignOutLabel: string;
+
+  accountPreviewIconButtonLabel: string;
+  accountPreviewTitle: string;
 }
 
 export interface AccountSlots {
@@ -73,8 +72,6 @@ export interface AccountProps {
 
 const defaultAccountLocaleText: Pick<LocaleText, keyof AccountLocaleText> = {
   accountPreviewIconButtonLabel: 'Current User',
-  accountPreviewEmail: 'Email',
-  accountPreviewName: 'Name',
   accountPreviewTitle: 'Account',
   accountSignInLabel: 'Sign in',
   accountSignOutLabel: 'Sign out',
@@ -215,9 +212,7 @@ Account.propTypes /* remove-proptypes */ = {
    * The labels for the account component.
    */
   localeText: PropTypes.shape({
-    accountPreviewEmail: PropTypes.string,
     accountPreviewIconButtonLabel: PropTypes.string,
-    accountPreviewName: PropTypes.string,
     accountPreviewTitle: PropTypes.string,
     accountSignInLabel: PropTypes.string,
     accountSignOutLabel: PropTypes.string,

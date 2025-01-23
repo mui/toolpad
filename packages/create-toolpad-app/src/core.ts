@@ -3,7 +3,6 @@ import { execa } from 'execa';
 import type { GenerateProjectOptions } from './types';
 import generateProject from './generateProject';
 import writeFiles from './writeFiles';
-import { findCtaPackageJson, getPackageManager } from './package';
 
 export async function scaffoldCoreProject(options: GenerateProjectOptions): Promise<void> {
   // eslint-disable-next-line no-console
@@ -15,12 +14,7 @@ export async function scaffoldCoreProject(options: GenerateProjectOptions): Prom
   // eslint-disable-next-line no-console
   console.log();
 
-  const pkg = await findCtaPackageJson();
-  if (!options.coreVersion) {
-    options.coreVersion = pkg.version;
-  }
-
-  const packageManager = options.packageManager ?? getPackageManager();
+  const packageManager = options.packageManager;
 
   const files = generateProject(options);
   await writeFiles(options.absolutePath, files);

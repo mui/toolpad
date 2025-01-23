@@ -1,6 +1,7 @@
 import path from 'path';
 import * as fs from 'fs/promises';
 import type { PackageManager } from './types';
+import type { PackageJson } from './packageType';
 
 export function getPackageManager(): PackageManager {
   const userAgent = process.env.npm_config_user_agent;
@@ -19,7 +20,7 @@ export function getPackageManager(): PackageManager {
   return 'pnpm';
 }
 
-export async function findCtaPackageJson() {
+export async function findCtaPackageJson(): Promise<PackageJson> {
   const ctaPackageJsonPath = path.resolve(__dirname, '../package.json');
   const content = await fs.readFile(ctaPackageJsonPath, 'utf8');
   const packageJson = JSON.parse(content);

@@ -1,6 +1,5 @@
 import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
-
-import { PackageJson } from './templates/packageType';
+import { PackageJson } from './packageType';
 
 export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';
 export type PackageManager = 'npm' | 'pnpm' | 'yarn';
@@ -21,7 +20,7 @@ export interface GenerateProjectOptions {
   framework?: SupportedFramework;
   coreVersion?: string;
   projectType?: ProjectType;
-  packageManager?: PackageManager;
+  packageManager: PackageManager;
 }
 
 export type Template = (options: GenerateProjectOptions) => string;

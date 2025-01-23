@@ -179,7 +179,7 @@ const run = async () => {
     const options: GenerateProjectOptions = {
       name: path.basename(absolutePath),
       absolutePath,
-      coreVersion: args.coreVersion,
+      coreVersion: args.coreVersion ?? pkgJson.version,
       router: routerOption,
       framework: frameworkOption,
       auth: authFlag,

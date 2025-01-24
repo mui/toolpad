@@ -1,2 +1,2 @@
 export * from './SignInPage';
-export * from './RememberCheckbox';
+export * from './RememberMeCheckbox';

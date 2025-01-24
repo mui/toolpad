@@ -251,6 +251,7 @@ export interface SignInPageProps {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
     submitButton?: LoadingButtonProps;
+    oauthButton?: LoadingButtonProps;
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
     checkbox?: Partial<FormControlLabelProps>;
@@ -391,6 +392,7 @@ function SignInPage(props: SignInPageProps) {
                         sx={{
                           textTransform: 'capitalize',
                         }}
+                        {...slotProps?.oauthButton}
                       >
                         <span>Sign in with {provider.name}</span>
                       </LoadingButton>
@@ -403,7 +405,7 @@ function SignInPage(props: SignInPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'passkey' ? (
-                  <Alert sx={{ mt: 1, mb: 3 }} severity="error">
+                  <Alert sx={{ mt: 1, mb: 2 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
@@ -438,6 +440,7 @@ function SignInPage(props: SignInPageProps) {
                         type: 'email',
                         autoComplete: 'email-webauthn',
                         autoFocus: singleProvider,
+                        sx: { mt: 1 },
                         ...slotProps?.emailField,
                       })}
                     />
@@ -472,12 +475,12 @@ function SignInPage(props: SignInPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'nodemailer' ? (
-                  <Alert sx={{ mt: 1, mb: 2 }} severity="error">
+                  <Alert sx={{ my: 1 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
                 {success && selectedProviderId === 'nodemailer' ? (
-                  <Alert sx={{ mt: 1, mb: 2 }} severity="success">
+                  <Alert sx={{ my: 1 }} severity="success">
                     {success}
                   </Alert>
                 ) : null}
@@ -511,6 +514,7 @@ function SignInPage(props: SignInPageProps) {
                         name: 'email',
                         id: 'email-nodemailer',
                         type: 'email',
+                        sx: { mt: 1 },
                         autoComplete: 'email-nodemailer',
                         autoFocus: singleProvider,
                         ...slotProps?.emailField,
@@ -547,7 +551,7 @@ function SignInPage(props: SignInPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'credentials' ? (
-                  <Alert sx={{ mt: 1, mb: 3 }} severity="error">
+                  <Alert sx={{ mt: 1, mb: 2 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
@@ -574,7 +578,7 @@ function SignInPage(props: SignInPageProps) {
                   }}
                   {...slotProps?.form}
                 >
-                  <Stack direction="column" spacing={2} sx={{ mb: 0 }}>
+                  <Stack direction="column" marginTop={1} spacing={2}>
                     {slots?.emailField ? (
                       <slots.emailField {...slotProps?.emailField} />
                     ) : (
@@ -600,7 +604,7 @@ function SignInPage(props: SignInPageProps) {
                           type: 'password',
                           label: 'Password',
                           id: 'password',
-                          placeholder: '*****',
+                          placeholder: '***** asdasd',
                           autoComplete: 'current-password',
                           ...slotProps?.passwordField,
                         })}
@@ -697,6 +701,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
     form: PropTypes.object,
+    oauthButton: PropTypes.object,
     passwordField: PropTypes.object,
     signUpLink: PropTypes.object,
     submitButton: PropTypes.object,

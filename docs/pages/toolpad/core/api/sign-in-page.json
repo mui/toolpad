@@ -15,7 +15,7 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ checkbox?: object, emailField?: object, forgotPasswordLink?: object, form?: object, passwordField?: object, signUpLink?: object, submitButton?: object }"
+        "description": "{ checkbox?: object, emailField?: object, forgotPasswordLink?: object, form?: object, oauthButton?: object, passwordField?: object, signUpLink?: object, submitButton?: object }"
       },
       "default": "{}"
     },

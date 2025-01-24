@@ -1,13 +1,8 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { FormControlLabel, Checkbox } from '@mui/material';
+import { Checkbox, FormControlLabel, FormControlLabelProps } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-interface RememberCheckboxProps {
-  slotProps?: {
-    typography?: React.ComponentProps<typeof FormControlLabel>['slotProps'];
-  } & Partial<React.ComponentProps<typeof FormControlLabel>>;
-}
 /**
  *
  * Demos:
@@ -16,42 +11,54 @@ interface RememberCheckboxProps {
  *
  * API:
  *
- * - [RememberCheckbox API](https://mui.com/toolpad/core/api/remember-checkbox)
+ * - [RememberMeCheckbox API](https://mui.com/toolpad/core/api/remember-me-checkbox)
  */
-function RememberCheckbox(props: RememberCheckboxProps) {
+function RememberMeCheckbox(props: Partial<FormControlLabelProps>) {
   const theme = useTheme();
   return (
     <FormControlLabel
-      control={
-        <Checkbox
-          name="remember"
-          value="true"
-          color="primary"
-          sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
-        />
-      }
       label="Remember me"
       {...props}
+      control={
+        props.control ? (
+          props.control
+        ) : (
+          <Checkbox
+            name="remember"
+            value="true"
+            color="primary"
+            sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+          />
+        )
+      }
       slotProps={{
+        ...props.slotProps,
         typography: {
           color: 'textSecondary',
           fontSize: theme.typography.pxToRem(14),
+          ...props?.slotProps?.typography,
         },
-        ...props?.slotProps?.typography,
       }}
     />
   );
 }
 
-RememberCheckbox.propTypes /* remove-proptypes */ = {
+RememberMeCheckbox.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * @ignore
+   * A control element. For instance, it can be a `Radio`, a `Switch` or a `Checkbox`.
    */
-  slotProps: PropTypes.object,
+  control: PropTypes.element.isRequired,
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    typography: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
+  }),
 } as any;
 
-export { RememberCheckbox };
+export { RememberMeCheckbox };

@@ -14,7 +14,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage, RememberCheckbox } from '@toolpad/core/SignInPage';
+import { SignInPage, RememberMeCheckbox } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
@@ -146,7 +146,7 @@ export default function SlotsSignIn() {
           passwordField: CustomPasswordField,
           submitButton: CustomButton,
           signUpLink: SignUpLink,
-          checkbox: RememberCheckbox,
+          checkbox: RememberMeCheckbox,
           forgotPasswordLink: ForgotPasswordLink,
         }}
         slotProps={{ form: { noValidate: true } }}

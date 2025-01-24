@@ -1,5 +1,65 @@
 # Changelog
 
+## v0.12.0
+
+<!-- generated comparing v0.11.0..master -->
+
+_Jan 10, 2025_
+
+A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
+
+**BREAKING CHANGE**
+
+- Framework-specific `AppProvider` exports have been renamed for clarity:
+
+_(Note the change in the path from `react-router-dom` to `react-router`)_
+
+```diff
+- import { AppProvider } from '@toolpad/core/react-router-dom';
++ import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+```
+
+```diff
+- import { AppProvider } from '@toolpad/core/nextjs';
++ import { NextAppProvider } from '@toolpad/core/nextjs';
+```
+
+- Upgraded Toolpad to React 19
+- Added framework selection to `create-toolpad-app` to support Vite
+- Improved sidebar CSS transitions in `DashboardLayout`
+- Allow multiple breadcrumbs that are not links in `PageHeader`
+- Added multiple bug fixes and improvements
+- Fixed various UI and documentation issues
+
+### `@toolpad/core`
+
+- Upgrade Toolpad to React 19 (#4488) @bharatkashyap
+- Fix sidebar CSS transitions for some breakpoints in `DashboardLayout` (#4522) @gil-obradors
+- Prevent account info overflowing on kebab menu in `Account` component (#4555) @bharatkashyap
+- Use unique names for framework specific `AppProvider`s (#4553) @apedroferreira
+- Allow multiple breadcrumbs that are not links in `PageHeader`(#4571) @null93
+
+### CLI
+
+- Add framework selection to support Vite (#4545) @bharatkashyap
+
+### Docs
+
+- Fix featured image (#4561) @bharatkashyap
+- Improve example README files (#4580) @bharatkashyap
+- Link to docs on PRs (#4349) @oliviertassinari
+- Fix layout shift example page (#4350) @oliviertassinari
+- Fix correct use of Page Router and App Router (77a8b87) @oliviertassinari
+- Fix 301 links (#4558) @oliviertassinari
+
+### Core
+
+- Remove lockfile from example (#4577) @bharatkashyap
+- Fix CI failing due to Recharts console error (#4576) @bharatkashyap
+- Fix docs:build to work in docs folder too (a8b74d4) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @gil-obradors, @null93, @oliviertassinari
+
 ## v0.11.0
 
 <!-- generated comparing v0.10.0..master -->
@@ -262,7 +322,7 @@ _Sep 13, 2024_
 
 A big thanks to the 6 contributors who made this release possible. Here are some highlights ✨:
 
-- Migrate to Material UI v6
+- Migrate to Material UI v6
 - Collapsible sidebar in `DashboardLayout` component with mini drawer variant
 - Support route patterns in navigation
 - Add more OAuth providers to `SignInPage`
@@ -276,7 +336,7 @@ A big thanks to the 6 contributors who made this release possible. Here are some
 - Add more OAuth providers to `SignInPage` (#3933) @bharatkashyap
 - Refactor `<Account />` (#3992) @bharatkashyap
 - Add toolbarActions and toolbarAccount slots to DashboardLayout (#3984)
-- Migrate to Material UI v6 (#3862) @Janpot
+- Migrate to Material UI v6 (#3862) @Janpot
 - Support route patterns in navigation (#3991) @apedroferreira
 
 ### Docs
@@ -357,7 +417,7 @@ _Aug 9, 2024_
 
 A big thanks to the 5 contributors who made this release possible. Here are some highlights ✨:
 
-- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
+- Support Material UI v5 and v6 in `@toolpad/core`, especially regarding CSS variables themes
 - Fix theme switcher in documentation examples
 - Fix DashboardLayout bugs with theming and mobile navigation
 - Fix some file handling restrictions in `@toolpad/studio`
@@ -379,7 +439,7 @@ A big thanks to the 5 contributors who made this release possible. Here are some
 ### Core
 
 - Support `require` (#3908) @bharatkashyap
-- Port fixes from Material UI v6 migration branch (#3910) @Janpot
+- Port fixes from Material UI v6 migration branch (#3910) @Janpot
 - Upgrade monorepo (#3911) @Janpot
 - Clarify security policy @oliviertassinari
 - Update smoke test instructions (#3899) @Janpot
@@ -411,7 +471,7 @@ Please use the `--studio` flag to generate a Toolpad Studio project.
 - Add authentication to Toolpad Core (#3609) @bharatkashyap
 - Make Core the default project (#3868) @bharatkashyap
 - Make navigation item segments optional (#3838) @apedroferreira
-- Ensure Material UI v5 compatibility (#3894) @Janpot
+- Ensure Material UI v5 compatibility (#3894) @Janpot
 - Bring in some fixes from the next update branch (#3866) @Janpot
 
 ### Docs
@@ -589,9 +649,9 @@ First components in @toolpad/core: [DashboardLayout](https://github.com/mui/tool
 - [DataProvider] Support custom Id field (#3613) @Janpot
 - [docs] Start Toolpad Core docs (#3383) @bharatkashyap
 - [docs] Add Toolpad core tutorial example (#3617) @bharatkashyap
-- [docs] Add badges like in Material UI @oliviertassinari
-- [docs] Add badges like in Material UI @oliviertassinari
-- [docs] Add badges like in Material UI @oliviertassinari
+- [docs] Add badges like in Material UI @oliviertassinari
+- [docs] Add badges like in Material UI @oliviertassinari
+- [docs] Add badges like in Material UI @oliviertassinari
 - [docs] Update twitter.com to x.com @oliviertassinari
 - [docs] Support demo previews with comments (#3577) @Janpot
 - [docs] Fix demo codesandbox dependencies (#3578) @Janpot
@@ -786,7 +846,7 @@ It will be the last release of @mui/toolpad before we rename the package to @too
 - [DataGrid] fix errors not showing up in the rows area (#3264) @Janpot
 - [docs] Prefer https links @oliviertassinari
 - [docs-infra] Fixes for vale-action with shared config (#3234) @bharatkashyap
-- [docs-infra] Fix Stack Overflow breaking space @oliviertassinari
+- [docs-infra] Fix Stack Overflow breaking space @oliviertassinari
 - [docs-infra] Add vale for style-guide lint on docs (#3178) @bharatkashyap
 - [examples] Hacker News client example (#2170) @Janpot
 

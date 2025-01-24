@@ -15,7 +15,7 @@ export interface Breadcrumb {
   /**
    * The path the breadcrumb links to.
    */
-  path: string;
+  path?: string;
 }
 export interface PageContainerSlotProps {
   header: PageHeaderProps;
@@ -89,7 +89,7 @@ PageContainer.propTypes /* remove-proptypes */ = {
    */
   breadcrumbs: PropTypes.arrayOf(
     PropTypes.shape({
-      path: PropTypes.string.isRequired,
+      path: PropTypes.string,
       title: PropTypes.string.isRequired,
     }),
   ),
@@ -104,7 +104,7 @@ PageContainer.propTypes /* remove-proptypes */ = {
     header: PropTypes.shape({
       breadcrumbs: PropTypes.arrayOf(
         PropTypes.shape({
-          path: PropTypes.string.isRequired,
+          path: PropTypes.string,
           title: PropTypes.string.isRequired,
         }),
       ),

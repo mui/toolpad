@@ -1,4 +1,4 @@
-import { Template } from '../../../types';
+import { Template } from '../../../../types';
 
 const signIn: Template = (options) => {
   const { hasCredentialsProvider, hasNodemailerProvider, hasPasskeyProvider } = options;

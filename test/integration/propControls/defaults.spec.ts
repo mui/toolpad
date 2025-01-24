@@ -15,7 +15,10 @@ test.use({
   },
 });
 
-test('changing defaultValue resets controlled value', async ({ page }) => {
+test('changing defaultValue resets controlled value', async ({ page, browserName }) => {
+  // TODO: fix flakyness
+  test.skip(browserName === 'firefox', 'This test is flaky in firefox');
+
   const editorModel = new ToolpadEditor(page);
   await editorModel.goto();
 

@@ -176,30 +176,157 @@ For a full working example, see the [Toolpad Core Vite app with React Router exa
 
 ## (Optional) Set up authentication
 
-You can use the `SignInPage` component to add authentication along with an external authentication provider of your choice. The following code demonstrates the code required to set up authentication with a mock provider.
+You can use the `SignInPage` component to add authentication along with an external authentication provider of your choice. The following code demonstrates the code required to set up authentication with Firebase.
 
 ### Define a `SessionContext` to act as the mock authentication provider
 
 ```tsx title="src/SessionContext.ts"
 import * as React from 'react';
-import type { Session } from '@toolpad/core';
 
-export interface SessionContextValue {
-  session: Session | null;
-  setSession: (session: Session | null) => void;
+export interface Session {
+  user: {
+    name?: string;
+    email?: string;
+    image?: string;
+  };
 }
 
-export const SessionContext = React.createContext<SessionContextValue>({
-  session: {},
+interface SessionContextType {
+  session: Session | null;
+  setSession: (session: Session) => void;
+  loading: boolean;
+}
+
+const SessionContext = React.createContext<SessionContextType>({
+  session: null,
   setSession: () => {},
+  loading: true,
 });
 
-export function useSession() {
-  return React.useContext(SessionContext);
-}
+export default SessionContext;
+
+export const useSession = () => React.useContext(SessionContext);
 ```
 
-### Add the mock authentication and session data to the `AppProvider`
+### Add Firebase authentication
+
+```tsx title="src/firebase/firebaseConfig.ts"
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+
+const app = initializeApp({
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGE_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+});
+
+export const firebaseAuth = getAuth(app);
+export default app;
+```
+
+```tsx title="src/firebase/auth.ts"
+import {
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  signInWithPopup,
+  setPersistence,
+  browserSessionPersistence,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
+import { firebaseAuth } from './firebaseConfig';
+
+const googleProvider = new GoogleAuthProvider();
+const githubProvider = new GithubAuthProvider();
+
+// Sign in with Google functionality
+export const signInWithGoogle = async () => {
+  try {
+    return setPersistence(firebaseAuth, browserSessionPersistence).then(async () => {
+      const result = await signInWithPopup(firebaseAuth, googleProvider);
+      return {
+        success: true,
+        user: result.user,
+        error: null,
+      };
+    });
+  } catch (error: any) {
+    return {
+      success: false,
+      user: null,
+      error: error.message,
+    };
+  }
+};
+
+// Sign in with GitHub functionality
+export const signInWithGithub = async () => {
+  try {
+    return setPersistence(firebaseAuth, browserSessionPersistence).then(async () => {
+      const result = await signInWithPopup(firebaseAuth, githubProvider);
+      return {
+        success: true,
+        user: result.user,
+        error: null,
+      };
+    });
+  } catch (error: any) {
+    return {
+      success: false,
+      user: null,
+      error: error.message,
+    };
+  }
+};
+
+// Sign in with email and password
+
+export async function signInWithCredentials(email: string, password: string) {
+  try {
+    return setPersistence(firebaseAuth, browserSessionPersistence).then(async () => {
+      const userCredential = await signInWithEmailAndPassword(
+        firebaseAuth,
+        email,
+        password,
+      );
+      return {
+        success: true,
+        user: userCredential.user,
+        error: null,
+      };
+    });
+  } catch (error: any) {
+    return {
+      success: false,
+      user: null,
+      error: error.message || 'Failed to sign in with email/password',
+    };
+  }
+}
+
+// Sign out functionality
+export const firebaseSignOut = async () => {
+  try {
+    await signOut(firebaseAuth);
+    return { success: true };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message,
+    };
+  }
+};
+
+// Auth state observer
+export const onAuthStateChanged = (callback: (user: any) => void) => {
+  return firebaseAuth.onAuthStateChanged(callback);
+};
+```
+
+### Add authentication and session data to the `AppProvider`
 
 ```tsx title="src/App.tsx"
 import * as React from 'react';
@@ -208,7 +335,12 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { Outlet, useNavigate } from 'react-router';
 import type { Navigation, Session } from '@toolpad/core';
-import { SessionContext } from './SessionContext';
+import {
+  firebaseSignOut,
+  signInWithGoogle,
+  onAuthStateChanged,
+} from './firebase/auth';
+import SessionContext, { type Session } from './SessionContext';
 
 const NAVIGATION: Navigation = [
   {
@@ -230,35 +362,55 @@ const BRANDING = {
   title: 'My Toolpad Core App',
 };
 
+const AUTHENTICATION: Authentication = {
+  signIn: signInWithGoogle,
+  signOut: firebaseSignOut,
+};
+
 export default function App() {
   const [session, setSession] = React.useState<Session | null>(null);
-  const navigate = useNavigate();
-
-  const signIn = React.useCallback(() => {
-    navigate('/sign-in');
-  }, [navigate]);
-
-  const signOut = React.useCallback(() => {
-    setSession(null);
-    navigate('/sign-in');
-  }, [navigate]);
+  const [loading, setLoading] = React.useState(true);
 
   const sessionContextValue = React.useMemo(
-    () => ({ session, setSession }),
-    [session, setSession],
+    () => ({
+      session,
+      setSession,
+      loading,
+    }),
+    [session, loading],
   );
 
+  React.useEffect(() => {
+    // Returns an `unsubscribe` function to be called during teardown
+    const unsubscribe = onAuthStateChanged((user: User | null) => {
+      if (user) {
+        setSession({
+          user: {
+            name: user.displayName || '',
+            email: user.email || '',
+            image: user.photoURL || '',
+          },
+        });
+      } else {
+        setSession(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
-    <SessionContext.Provider value={sessionContextValue}>
-      <ReactRouterAppProvider
-        navigation={NAVIGATION}
-        branding={BRANDING}
-        session={session}
-        authentication={{ signIn, signOut }}
-      >
+    <ReactRouterAppProvider
+      navigation={NAVIGATION}
+      branding={BRANDING}
+      session={session}
+      authentication={AUTHENTICATION}
+    >
+      <SessionContext.Provider value={sessionContextValue}>
         <Outlet />
-      </ReactRouterAppProvider>
-    </SessionContext.Provider>
+      </SessionContext.Provider>
+    </ReactRouterAppProvider>
   );
 }
 ```
@@ -267,14 +419,23 @@ export default function App() {
 
 ```tsx title="src/layouts/dashboard.tsx"
 import * as React from 'react';
+import LinearProgress from '@mui/material/LinearProgress';
 import { Outlet, Navigate, useLocation } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { useSession } from '../SessionContext';
 
 export default function Layout() {
-  const { session } = useSession();
+  const { session, loading } = useSession();
   const location = useLocation();
+
+  if (loading) {
+    return (
+      <div style={{ width: '100%' }}>
+        <LinearProgress />
+      </div>
+    );
+  }
 
   if (!session) {
     // Add the `callbackUrl` search parameter
@@ -301,48 +462,73 @@ You can protect any page or groups of pages through this mechanism.
 'use client';
 import * as React from 'react';
 import { SignInPage } from '@toolpad/core/SignInPage';
-import type { Session } from '@toolpad/core/AppProvider';
-import { useNavigate } from 'react-router';
-import { useSession } from '../SessionContext';
-
-const fakeAsyncGetSession = async (formData: any): Promise<Session> => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (formData.get('password') === 'password') {
-        resolve({
-          user: {
-            name: 'Bharat Kashyap',
-            email: formData.get('email') || '',
-            image: 'https://avatars.githubusercontent.com/u/19550456',
-          },
-        });
-      }
-      reject(new Error('Incorrect credentials.'));
-    }, 1000);
-  });
-};
+import LinearProgress from '@mui/material/LinearProgress';
+import { Navigate, useNavigate } from 'react-router';
+import { useSession, type Session } from '../SessionContext';
+import {
+  signInWithGoogle,
+  signInWithGithub,
+  signInWithCredentials,
+} from '../firebase/auth';
 
 export default function SignIn() {
-  const { setSession } = useSession();
+  const { session, setSession, loading } = useSession();
   const navigate = useNavigate();
+
+  if (loading) {
+    return <LinearProgress />;
+  }
+
+  if (session) {
+    return <Navigate to="/" />;
+  }
+
   return (
     <SignInPage
-      providers={[{ id: 'credentials', name: 'Credentials' }]}
+      providers={[
+        { id: 'google', name: 'Google' },
+        { id: 'github', name: 'GitHub' },
+        { id: 'credentials', name: 'Credentials' },
+      ]}
       signIn={async (provider, formData, callbackUrl) => {
-        // Demo session
+        let result;
         try {
-          const session = await fakeAsyncGetSession(formData);
-          if (session) {
-            setSession(session);
+          if (provider.id === 'google') {
+            result = await signInWithGoogle();
+          }
+          if (provider.id === 'github') {
+            result = await signInWithGithub();
+          }
+          if (provider.id === 'credentials') {
+            const email = formData?.get('email') as string;
+            const password = formData?.get('password') as string;
+
+            if (!email || !password) {
+              return { error: 'Email and password are required' };
+            }
+
+            result = await signInWithCredentials(email, password);
+          }
+
+          if (result?.success && result?.user) {
+            // Convert Firebase user to Session format
+            const userSession: Session = {
+              user: {
+                name: result.user.displayName || '',
+                email: result.user.email || '',
+                image: result.user.photoURL || '',
+              },
+            };
+            setSession(userSession);
             navigate(callbackUrl || '/', { replace: true });
             return {};
           }
+          return { error: result?.error || 'Failed to sign in' };
         } catch (error) {
           return {
             error: error instanceof Error ? error.message : 'An error occurred',
           };
         }
-        return {};
       }}
     />
   );
@@ -395,5 +581,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 ```
 
 :::info
-For a full working example, see the [Toolpad Core Vite app with React Router and authentication example](https://github.com/mui/toolpad/tree/master/examples/core/auth-vite/)
+For a full working example, see the [Toolpad Core Vite app with React Router and Firebase authentication example](https://github.com/mui/toolpad/tree/master/examples/core/firebase-vite/)
 :::

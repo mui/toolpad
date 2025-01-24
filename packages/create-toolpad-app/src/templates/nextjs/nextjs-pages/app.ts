@@ -1,4 +1,4 @@
-import type { Template } from '../../types';
+import type { Template } from '../../../types';
 
 const app: Template = (options) => {
   const authEnabled = options.auth;

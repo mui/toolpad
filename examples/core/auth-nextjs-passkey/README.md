@@ -40,6 +40,8 @@ To copy this example and customize it for your needs, run
 
 ```bash
 npx create-toolpad-app@latest --example auth-nextjs-passkey
+# or
+pnpm dlx create-toolpad-app@latest --example auth-nextjs-passkey
 ```
 
 and follow the instructions in the terminal.

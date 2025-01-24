@@ -24,6 +24,8 @@ To copy this example and customize it for your needs, run
 
 ```bash
 npx create-toolpad-app@latest --example auth-nextjs-pages-nextauth-4
+# or
+pnpm dlx create-toolpad-app@latest --example auth-nextjs-pages-nextauth-4
 ```
 
 and follow the instructions in the terminal.

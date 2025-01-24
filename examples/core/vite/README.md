@@ -2,6 +2,18 @@
 
 This example provides a minimal setup to get Toolpad Core working in Vite with HMR, as well as routing with React Router.
 
+## Clone using `create-toolpad-app`
+
+To copy this example and customize it for your needs, run
+
+```bash
+npx create-toolpad-app@latest --example vite
+# or
+pnpm dlx create-toolpad-app@latest --example vite
+```
+
+and follow the instructions in the terminal.
+
 ## Getting Started
 
 First, run the development server:

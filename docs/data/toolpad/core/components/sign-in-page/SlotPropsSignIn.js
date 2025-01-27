@@ -4,24 +4,37 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { SignInPage, RememberMeCheckbox } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 
-const providers = [{ id: 'credentials', name: 'Email and Password' }];
+const providers = [
+  { id: 'github', name: 'GitHub' },
+  { id: 'credentials', name: 'Email and Password' },
+];
 
 export default function SlotPropsSignIn() {
   const theme = useTheme();
   return (
     <AppProvider theme={theme}>
       <SignInPage
-        signIn={(provider, formData) =>
-          alert(
-            `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')} and checkbox value: ${formData.get('tandc')}`,
-          )
-        }
+        signIn={(provider, formData) => {
+          if (provider.id === 'credentials') {
+            alert(
+              `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')} and checkbox value: ${formData.get('tandc')}`,
+            );
+          } else {
+            return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                resolve({ error: 'This is a fake error' });
+              }, 1000);
+            });
+          }
+          return;
+        }}
         slots={{ checkbox: RememberMeCheckbox }}
         slotProps={{
           form: { noValidate: true },
           emailField: { variant: 'standard', autoFocus: false },
           passwordField: { variant: 'standard' },
           submitButton: { variant: 'outlined' },
+          oauthButton: { variant: 'contained' },
           checkbox: {
             control: (
               <Checkbox

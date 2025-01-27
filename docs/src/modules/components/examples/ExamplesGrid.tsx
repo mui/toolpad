@@ -4,14 +4,16 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { alpha, useTheme } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import Stack from '@mui/material/Stack';
 import SvgIcon from '@mui/material/SvgIcon';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import ContentCopyRounded from '@mui/icons-material/ContentCopyRounded';
+import CheckRounded from '@mui/icons-material/CheckRounded';
+import copy from 'clipboard-copy';
 import { Example, versionGitHubLink } from './examplesUtils';
 
 interface ExamplesGridProps {
@@ -36,6 +38,13 @@ function CodeSandboxIcon() {
 
 export default function ExamplesGrid(props: ExamplesGridProps) {
   const t = useTranslate();
+  const [copiedId, setCopiedId] = React.useState<string | null>(null);
+
+  const handleCopy = (text: string, id: string) => {
+    copy(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const examples = props.examples.filter((example: Example) => example.featured !== true);
   const docsTheme = useTheme();
@@ -43,6 +52,8 @@ export default function ExamplesGrid(props: ExamplesGridProps) {
   return (
     <Grid container spacing={2} sx={{ pt: 2, pb: 4 }}>
       {examples.map((example) => {
+        const exampleName = example.source.split('/').pop();
+        const installCommand = `pnpm dlx create-toolpad-app@latest --example ${exampleName}`;
         const computedSrc =
           docsTheme?.palette?.mode === 'dark' && example.srcDark ? example.srcDark : example.src;
         return (
@@ -99,45 +110,63 @@ export default function ExamplesGrid(props: ExamplesGridProps) {
                   p: 0,
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'space-between',
+                  justifyContent: 'flex-start',
+                  gap: 1,
                 }}
               >
-                <Button
-                  component="a"
-                  href={versionGitHubLink(example.source)}
-                  size="small"
-                  target="_blank"
-                >
-                  {t('source')}
-                </Button>
-                <Stack direction="row" spacing={1}>
-                  {example.stackBlitz === true ? (
-                    <Tooltip title="Edit in StackBlitz">
-                      <IconButton
-                        component="a"
-                        href={`https://stackblitz.com/github/${example.source.replace('https://github.com/', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        size="small"
-                      >
-                        <StackBlitzIcon />
-                      </IconButton>
-                    </Tooltip>
-                  ) : null}
-                  {example.codeSandbox === true ? (
-                    <Tooltip title="Edit in CodeSandbox">
-                      <IconButton
-                        component="a"
-                        href={`https://codesandbox.io/p/sandbox/github/${example.source.replace('https://github.com/', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        size="small"
-                      >
-                        <CodeSandboxIcon />
-                      </IconButton>
-                    </Tooltip>
-                  ) : null}
-                </Stack>
+                <Tooltip title={t('source')}>
+                  <IconButton
+                    component="a"
+                    href={versionGitHubLink(example.source)}
+                    size="small"
+                    target="_blank"
+                  >
+                    <GitHubIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+
+                {example.stackBlitz === true ? (
+                  <Tooltip title="Edit in StackBlitz">
+                    <IconButton
+                      component="a"
+                      href={`https://stackblitz.com/github/${example.source.replace('https://github.com/', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="small"
+                    >
+                      <StackBlitzIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : null}
+
+                {example.codeSandbox === true ? (
+                  <Tooltip title="Edit in CodeSandbox">
+                    <IconButton
+                      component="a"
+                      href={`https://codesandbox.io/p/sandbox/github/${example.source.replace('https://github.com/', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="small"
+                    >
+                      <CodeSandboxIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : null}
+
+                <Tooltip title={installCommand}>
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      handleCopy(installCommand, example.title);
+                    }}
+                  >
+                    {copiedId === example.title ? (
+                      <CheckRounded fontSize="small" />
+                    ) : (
+                      <ContentCopyRounded fontSize="small" />
+                    )}
+                  </IconButton>
+                </Tooltip>
               </CardActions>
             </Card>
           </Grid>

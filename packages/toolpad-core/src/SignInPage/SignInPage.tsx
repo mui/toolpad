@@ -604,7 +604,7 @@ function SignInPage(props: SignInPageProps) {
                           type: 'password',
                           label: 'Password',
                           id: 'password',
-                          placeholder: '***** asdasd',
+                          placeholder: '*****',
                           autoComplete: 'current-password',
                           ...slotProps?.passwordField,
                         })}

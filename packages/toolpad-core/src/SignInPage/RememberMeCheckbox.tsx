@@ -20,9 +20,7 @@ function RememberMeCheckbox(props: Partial<FormControlLabelProps>) {
       label="Remember me"
       {...props}
       control={
-        props.control ? (
-          props.control
-        ) : (
+        props.control ?? (
           <Checkbox
             name="remember"
             value="true"

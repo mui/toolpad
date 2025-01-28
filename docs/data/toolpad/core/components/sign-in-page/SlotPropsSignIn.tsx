@@ -20,13 +20,13 @@ export default function SlotPropsSignIn() {
               `Signing in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')} and checkbox value: ${formData.get('tandc')}`,
             );
           } else {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
               setTimeout(() => {
                 resolve({ error: 'This is a fake error' });
               }, 1000);
             });
           }
-          return;
+          return undefined;
         }}
         slots={{ checkbox: RememberMeCheckbox }}
         slotProps={{

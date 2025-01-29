@@ -20,132 +20,202 @@ import type { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataSource } from './shared';
 
+interface Form<D extends Omit<DataModel, 'id'>> {
+  value: D;
+  onChange: (name: keyof D, value: string | number | boolean | File | null) => void;
+  onReset: () => void;
+}
+
 export interface CreateProps<D extends DataModel> {
   /**
    * Server-side data source.
    */
   dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>;
+  /**
+   * Form implementation.
+   */
+  form: Form<Omit<D, 'id'>>;
 }
 
 function Create<D extends DataModel>(props: CreateProps<D>) {
-  const { dataSource } = props;
+  const { dataSource, form } = props;
   const { fields, ...methods } = dataSource;
   const { createOne } = methods;
 
   const notifications = useNotifications();
 
-  const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(
-    async (previousState, formData) => {
-      try {
-        await createOne(
-          Object.fromEntries(
-            fields
-              .filter(({ field }) => field !== 'id')
-              .map(({ field }) => [field, formData.get(field)]),
-          ) as D,
-        );
-        notifications.show('Item created successfully.', {
-          severity: 'success',
-        });
-      } catch (createError) {
-        notifications.show(`Failed to create item. Reason: ${(createError as Error).message}`, {
-          severity: 'error',
-        });
-        return createError as Error;
-      }
+  const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(async () => {
+    try {
+      await createOne(form.value);
+      notifications.show('Item created successfully.', {
+        severity: 'success',
+      });
+      form.onReset();
+    } catch (createError) {
+      notifications.show(`Failed to create item. Reason: ${(createError as Error).message}`, {
+        severity: 'error',
+      });
+      return createError as Error;
+    }
 
-      return null;
+    return null;
+  }, null);
+
+  const handleTextFieldChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      form.onChange(event.target.name as keyof Omit<D, 'id'>, event.target.value);
     },
-    null,
+    [form],
   );
 
-  const renderField = React.useCallback((formField: GridColDef) => {
-    const { field, type, headerName } = formField;
+  const handleCheckboxFieldChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+      form.onChange(event.target.name as keyof Omit<D, 'id'>, checked);
+    },
+    [form],
+  );
 
-    let fieldElement = <TextField id={field} label={headerName} fullWidth />;
-    if (type === 'number') {
-      fieldElement = <TextField id={field} type="number" label={headerName} fullWidth />;
-    }
-    if (type === 'boolean') {
-      fieldElement = (
-        <FormControlLabel id={field} control={<Checkbox size="large" />} label={headerName} />
-      );
-    }
-    if (type === 'date') {
-      fieldElement = (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DatePicker
-            label={headerName}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-              },
-            }}
-          />
-        </LocalizationProvider>
-      );
-    }
-    if (type === 'dateTime') {
-      fieldElement = (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DateTimePicker
-            label={headerName}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-              },
-            }}
-          />
-        </LocalizationProvider>
-      );
-    }
-    if (type === 'singleSelect') {
-      const { getOptionValue, getOptionLabel, valueOptions } = formField as GridSingleSelectColDef;
+  const handleDateFieldChange = React.useCallback(() => {}, []);
 
-      if (valueOptions && Array.isArray(valueOptions)) {
-        const labelId = `${field}-label`;
+  const handleSelectFieldChange = React.useCallback(() => {}, []);
 
+  const renderField = React.useCallback(
+    (formField: GridColDef) => {
+      const { field, type, headerName } = formField;
+
+      const fieldValue = form.value[field];
+
+      let fieldElement = (
+        <TextField
+          value={fieldValue}
+          onChange={handleTextFieldChange}
+          name={field}
+          label={headerName}
+          fullWidth
+        />
+      );
+      if (type === 'number') {
         fieldElement = (
-          <FormControl fullWidth>
-            <InputLabel id={labelId}>{headerName}</InputLabel>
-            <Select labelId={labelId} id={field} label={headerName}>
-              {valueOptions.map((option) => {
-                let optionValue: string | number = option as string | number;
-                let optionLabel: string | number = option as string | number;
-                if (typeof option !== 'string' && typeof option !== 'number') {
-                  optionValue = getOptionValue ? getOptionValue(option) : option.value;
-                  optionLabel = getOptionLabel ? getOptionLabel(option) : option.label;
-                }
-
-                return (
-                  <MenuItem key={optionValue} value={optionValue}>
-                    {optionLabel}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
+          <TextField
+            value={fieldValue}
+            onChange={handleTextFieldChange}
+            name={field}
+            type="number"
+            label={headerName}
+            fullWidth
+          />
         );
       }
-    }
+      if (type === 'boolean') {
+        fieldElement = (
+          <FormControlLabel
+            value={fieldValue}
+            onChange={handleCheckboxFieldChange}
+            name={field}
+            control={<Checkbox size="large" />}
+            label={headerName}
+          />
+        );
+      }
+      if (type === 'date') {
+        fieldElement = (
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              value={dayJs(fieldValue)}
+              onChange={handleDateFieldChange}
+              name={field}
+              label={headerName}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                },
+              }}
+            />
+          </LocalizationProvider>
+        );
+      }
+      if (type === 'dateTime') {
+        fieldElement = (
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DateTimePicker
+              value={dayJs(fieldValue)}
+              onChange={handleDateFieldChange}
+              name={field}
+              label={headerName}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                },
+              }}
+            />
+          </LocalizationProvider>
+        );
+      }
+      if (type === 'singleSelect') {
+        const { getOptionValue, getOptionLabel, valueOptions } =
+          formField as GridSingleSelectColDef;
 
-    return (
-      <Grid key={field} size={6} sx={{ display: 'flex', alignItems: 'center' }}>
-        {fieldElement}
-      </Grid>
-    );
-  }, []);
+        if (valueOptions && Array.isArray(valueOptions)) {
+          const labelId = `${field}-label`;
+
+          fieldElement = (
+            <FormControl fullWidth>
+              <InputLabel id={labelId}>{headerName}</InputLabel>
+              <Select
+                value={fieldValue}
+                onChange={handleSelectFieldChange}
+                labelId={labelId}
+                name={field}
+                label={headerName}
+                defaultValue=""
+              >
+                {valueOptions.map((option) => {
+                  let optionValue: string | number = option as string | number;
+                  let optionLabel: string | number = option as string | number;
+                  if (typeof option !== 'string' && typeof option !== 'number') {
+                    optionValue = getOptionValue ? getOptionValue(option) : option.value;
+                    optionLabel = getOptionLabel ? getOptionLabel(option) : option.label;
+                  }
+
+                  return (
+                    <MenuItem key={optionValue} value={optionValue}>
+                      {optionLabel}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          );
+        }
+      }
+
+      return (
+        <Grid key={field} size={6} sx={{ display: 'flex', alignItems: 'center' }}>
+          {fieldElement}
+        </Grid>
+      );
+    },
+    [form.onChange, form.value, handleCheckboxFieldChange, handleTextFieldChange],
+  );
 
   return (
-    <Box component="form" action={submitAction} noValidate autoComplete="off">
+    <Box
+      component="form"
+      action={submitAction}
+      noValidate
+      autoComplete="off"
+      onReset={form.onReset}
+    >
       <FormGroup>
         <Grid container spacing={2} sx={{ mb: 2 }}>
           {fields.filter(({ field }) => field !== 'id').map(renderField)}
         </Grid>
       </FormGroup>
-      <Button type="submit" variant="contained" size="large" loading={isSubmitting}>
-        Create
-      </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Button type="submit" variant="contained" size="large" loading={isSubmitting}>
+          Create
+        </Button>
+      </Box>
     </Box>
   );
 }

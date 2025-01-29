@@ -103,7 +103,9 @@ module.exports = {
     'react-compiler/react-compiler': 'error',
   },
   overrides: [
-    ...baseline.overrides,
+    ...baseline.overrides.filter(
+      (override) => !override.rules['material-ui/disallow-react-api-in-server-components'],
+    ),
     {
       files: ['**/*.test.js', '**/*.test.ts', '**/*.test.tsx'],
       extends: ['plugin:testing-library/react'],
@@ -214,6 +216,13 @@ module.exports = {
             ],
           },
         ],
+      },
+    },
+    {
+      files: ['packages/toolpad-core/src/*/*.?(c|m)[jt]s?(x)'],
+      excludedFiles: ['*.spec.*', '*.test.*'],
+      rules: {
+        'material-ui/disallow-react-api-in-server-components': 'error',
       },
     },
   ],

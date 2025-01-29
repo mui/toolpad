@@ -22,7 +22,7 @@ import { DocsProvider } from '@mui/docs/DocsProvider';
 import { mapTranslations } from '@mui/docs/i18n';
 import toolpadStudioPages from '../data/toolpad/studio/pages';
 import toolpadCorePages from '../data/toolpad/core/pages';
-import config from '../config';
+import * as config from '../config';
 
 // Remove the license warning from demonstration purposes
 LicenseInfo.setLicenseKey(process.env.NEXT_PUBLIC_MUI_LICENSE);

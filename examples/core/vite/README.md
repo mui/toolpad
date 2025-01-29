@@ -9,7 +9,7 @@ To copy this example and customize it for your needs, run
 ```bash
 npx create-toolpad-app@latest --example vite
 # or
-pnpm dlx create-toolpad-app@latest --example vite
+pnpm dlx create-toolpad-app --example vite
 ```
 
 and follow the instructions in the terminal.

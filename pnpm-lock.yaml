@@ -856,8 +856,8 @@ importers:
         specifier: 4.0.6
         version: 4.0.6
       monaco-editor:
-        specifier: 0.52.0
-        version: 0.52.0
+        specifier: 0.52.2
+        version: 0.52.2
       mysql2:
         specifier: 3.11.4
         version: 3.11.4
@@ -8001,8 +8001,8 @@ packages:
     resolution: {integrity: sha512-xV2bxeN6F7oYjZWTe/YPAy6MN2M+sL4u/Rlm2AHCIVGfo2p1yGmBHQ6vHehl4bRTZBdHu3TSkWdYgkwpYzAGSw==}
     engines: {node: '>=0.10.0'}
 
-  monaco-editor@0.52.0:
-    resolution: {integrity: sha512-OeWhNpABLCeTqubfqLMXGsqf6OmPU6pHM85kF3dhy6kq5hnhuVS1p3VrEW/XhWHc71P2tHyS5JFySD8mgs1crw==}
+  monaco-editor@0.52.2:
+    resolution: {integrity: sha512-GEQWEZmfkOGLdd3XK8ryrfWz3AIP8YymVXiPHEdewrUq7mh0qrKrfHLNCXcbB6sTnMLnOZ3ztSiKcciFUkIJwQ==}
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -18600,7 +18600,7 @@ snapshots:
 
   modify-values@1.0.1: {}
 
-  monaco-editor@0.52.0: {}
+  monaco-editor@0.52.2: {}
 
   mri@1.2.0: {}
 

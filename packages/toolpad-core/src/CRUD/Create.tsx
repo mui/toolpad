@@ -46,41 +46,56 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
 
   const notifications = useNotifications();
 
-  const [formValues, setFormValues] = React.useState<Omit<D, 'id'>>(initialValues);
-  const [formErrors, setFormErrors] = React.useState<Partial<Record<keyof D, string>>>({});
+  const [formState, setFormState] = React.useState<{
+    values: Omit<D, 'id'>;
+    errors: Partial<Record<keyof D, string>>;
+  }>({
+    values: initialValues,
+    errors: {},
+  });
+  const formValues = formState.values;
+  const formErrors = formState.errors;
 
-  const validateForm = React.useCallback(
-    async (values: Omit<D, 'id'>) => {
-      const errors = await validate(values);
-      if (Object.keys(errors).length > 0) {
-        setFormErrors(errors);
-        return false;
-      }
-      setFormErrors({});
-      return true;
-    },
-    [validate],
-  );
+  const setFormValues = React.useCallback((newFormValues: Omit<D, 'id'>) => {
+    setFormState((previousState) => ({
+      ...previousState,
+      values: newFormValues,
+    }));
+  }, []);
+
+  const setFormErrors = React.useCallback((newFormErrors: Partial<Record<keyof D, string>>) => {
+    setFormState((previousState) => ({
+      ...previousState,
+      errors: newFormErrors,
+    }));
+  }, []);
 
   const handleFormFieldChange = React.useCallback(
     (name: keyof D, value: string | number | boolean | File | null) => {
+      const validateField = async (values: Omit<D, 'id'>) => {
+        const errors = await validate(values);
+        setFormErrors({ ...formErrors, [name]: errors[name] });
+      };
+
       const newFormValues = { ...formValues, [name]: value };
 
       setFormValues(newFormValues);
-      validateForm(newFormValues);
+      validateField(newFormValues);
     },
-    [formValues, validateForm],
+    [formErrors, formValues, setFormErrors, setFormValues, validate],
   );
 
   const handleFormReset = React.useCallback(() => {
     setFormValues(initialValues);
-  }, [initialValues]);
+  }, [initialValues, setFormValues]);
 
   const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(async () => {
-    const isFormValid = await validateForm(formValues);
-    if (!isFormValid) {
+    const errors = await validate(formValues);
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
       return new Error('Form validation failed');
     }
+    setFormErrors({});
 
     try {
       await createOne(formValues);

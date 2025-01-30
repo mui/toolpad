@@ -18,5 +18,6 @@ export interface DataSource<D extends DataModel> {
   getMany?: (params: GetManyParams) => Promise<{ items: D[]; itemCount: number }>;
   getOne?: (id: DataModelId) => Promise<D>;
   createOne?: (data: Omit<D, 'id'>) => Promise<D>;
+  updateOne?: (data: Omit<D, 'id'>) => Promise<D>;
   deleteOne?: (id: DataModelId) => Promise<void>;
 }

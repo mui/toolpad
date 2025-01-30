@@ -7,6 +7,7 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
+import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid2';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -21,37 +22,73 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataSource } from './shared';
 
-export interface Form<D extends DataModel> {
-  value: Omit<D, 'id'>;
-  onChange: (name: keyof D, value: string | number | boolean | File | null) => void;
-  onReset: () => void;
-}
-
 export interface CreateProps<D extends DataModel> {
   /**
    * Server-side data source.
    */
   dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>;
   /**
-   * Form implementation.
+   * Initial form values.
    */
-  form: Form<D>;
+  initialValues: Omit<D, 'id'>;
+  /**
+   * Function to validate form values. Returns object with error strings for each field.
+   */
+  validate: (
+    formValues: Omit<D, 'id'>,
+  ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
 }
 
 function Create<D extends DataModel>(props: CreateProps<D>) {
-  const { dataSource, form } = props;
+  const { dataSource, initialValues, validate } = props;
   const { fields, ...methods } = dataSource;
   const { createOne } = methods;
 
   const notifications = useNotifications();
 
+  const [formValues, setFormValues] = React.useState<Omit<D, 'id'>>(initialValues);
+  const [formErrors, setFormErrors] = React.useState<Partial<Record<keyof D, string>>>({});
+
+  const validateForm = React.useCallback(
+    async (values: Omit<D, 'id'>) => {
+      const errors = await validate(values);
+      if (Object.keys(errors).length > 0) {
+        setFormErrors(errors);
+        return false;
+      }
+      setFormErrors({});
+      return true;
+    },
+    [validate],
+  );
+
+  const handleFormFieldChange = React.useCallback(
+    (name: keyof D, value: string | number | boolean | File | null) => {
+      const newFormValues = { ...formValues, [name]: value };
+
+      setFormValues(newFormValues);
+      validateForm(newFormValues);
+    },
+    [formValues, validateForm],
+  );
+
+  const handleFormReset = React.useCallback(() => {
+    setFormValues(initialValues);
+  }, [initialValues]);
+
   const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(async () => {
+    const isFormValid = await validateForm(formValues);
+    if (!isFormValid) {
+      return new Error('Form validation failed');
+    }
+
     try {
-      await createOne(form.value);
+      await createOne(formValues);
       notifications.show('Item created successfully.', {
         severity: 'success',
       });
-      form.onReset();
+
+      handleFormReset();
     } catch (createError) {
       notifications.show(`Failed to create item. Reason: ${(createError as Error).message}`, {
         severity: 'error',
@@ -64,51 +101,54 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
 
   const handleTextFieldChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      form.onChange(event.target.name, event.target.value);
+      handleFormFieldChange(event.target.name, event.target.value);
     },
-    [form],
+    [handleFormFieldChange],
   );
 
   const handleNumberFieldChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      form.onChange(event.target.name, Number(event.target.value));
+      handleFormFieldChange(event.target.name, Number(event.target.value));
     },
-    [form],
+    [handleFormFieldChange],
   );
 
   const handleCheckboxFieldChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      form.onChange(event.target.name, checked);
+      handleFormFieldChange(event.target.name, checked);
     },
-    [form],
+    [handleFormFieldChange],
   );
 
   const handleDateFieldChange = React.useCallback(
     (name: string) => (value: Dayjs | null) => {
-      form.onChange(name, value?.toISOString() ?? null);
+      handleFormFieldChange(name, value?.toISOString() ?? null);
     },
-    [form],
+    [handleFormFieldChange],
   );
 
   const handleSelectFieldChange = React.useCallback(
     (event: SelectChangeEvent) => {
-      form.onChange(event.target.name, event.target.value);
+      handleFormFieldChange(event.target.name, event.target.value);
     },
-    [form],
+    [handleFormFieldChange],
   );
 
   const renderField = React.useCallback(
     (formField: GridColDef) => {
       const { field, type, headerName } = formField;
 
-      const fieldValue = form.value[field];
+      const fieldValue = formValues[field];
+      const fieldError = formErrors[field];
 
       let fieldElement = (
         <TextField
-          value={fieldValue}
+          value={fieldValue ?? ''}
           onChange={handleTextFieldChange}
           name={field}
           label={headerName}
+          error={!!fieldError}
+          helperText={fieldError ?? ' '}
           fullWidth
         />
       );
@@ -120,19 +160,24 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
             name={field}
             type="number"
             label={headerName}
+            error={!!fieldError}
+            helperText={fieldError ?? ' '}
             fullWidth
           />
         );
       }
       if (type === 'boolean') {
         fieldElement = (
-          <FormControlLabel
-            name={field}
-            control={
-              <Checkbox size="large" value={fieldValue} onChange={handleCheckboxFieldChange} />
-            }
-            label={headerName}
-          />
+          <FormControl>
+            <FormControlLabel
+              name={field}
+              control={
+                <Checkbox size="large" value={fieldValue} onChange={handleCheckboxFieldChange} />
+              }
+              label={headerName}
+            />
+            <FormHelperText>{fieldError ?? ' '}</FormHelperText>
+          </FormControl>
         );
       }
       if (type === 'date') {
@@ -145,6 +190,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
               label={headerName}
               slotProps={{
                 textField: {
+                  error: !!fieldError,
+                  helperText: fieldError ?? ' ',
                   fullWidth: true,
                 },
               }}
@@ -162,6 +209,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
               label={headerName}
               slotProps={{
                 textField: {
+                  error: !!fieldError,
+                  helperText: fieldError ?? ' ',
                   fullWidth: true,
                 },
               }}
@@ -177,7 +226,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
           const labelId = `${field}-label`;
 
           fieldElement = (
-            <FormControl fullWidth>
+            <FormControl error={!!fieldError} fullWidth>
               <InputLabel id={labelId}>{headerName}</InputLabel>
               <Select
                 value={(fieldValue as string) ?? ''}
@@ -202,6 +251,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
                   );
                 })}
               </Select>
+              <FormHelperText>{fieldError ?? ' '}</FormHelperText>
             </FormControl>
           );
         }
@@ -214,7 +264,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
       );
     },
     [
-      form.value,
+      formErrors,
+      formValues,
       handleCheckboxFieldChange,
       handleDateFieldChange,
       handleNumberFieldChange,
@@ -229,7 +280,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
       action={submitAction}
       noValidate
       autoComplete="off"
-      onReset={form.onReset}
+      onReset={handleFormReset}
     >
       <FormGroup>
         <Grid container spacing={2} sx={{ mb: 2 }}>

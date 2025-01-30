@@ -10,18 +10,19 @@ import FormGroup from '@mui/material/FormGroup';
 import Grid from '@mui/material/Grid2';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import type { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
+import dayjs, { Dayjs } from 'dayjs';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataSource } from './shared';
 
-interface Form<D extends Omit<DataModel, 'id'>> {
-  value: D;
+export interface Form<D extends DataModel> {
+  value: Omit<D, 'id'>;
   onChange: (name: keyof D, value: string | number | boolean | File | null) => void;
   onReset: () => void;
 }
@@ -34,7 +35,7 @@ export interface CreateProps<D extends DataModel> {
   /**
    * Form implementation.
    */
-  form: Form<Omit<D, 'id'>>;
+  form: Form<D>;
 }
 
 function Create<D extends DataModel>(props: CreateProps<D>) {
@@ -63,21 +64,38 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
 
   const handleTextFieldChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      form.onChange(event.target.name as keyof Omit<D, 'id'>, event.target.value);
+      form.onChange(event.target.name, event.target.value);
+    },
+    [form],
+  );
+
+  const handleNumberFieldChange = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      form.onChange(event.target.name, Number(event.target.value));
     },
     [form],
   );
 
   const handleCheckboxFieldChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      form.onChange(event.target.name as keyof Omit<D, 'id'>, checked);
+      form.onChange(event.target.name, checked);
     },
     [form],
   );
 
-  const handleDateFieldChange = React.useCallback(() => {}, []);
+  const handleDateFieldChange = React.useCallback(
+    (name: string) => (value: Dayjs | null) => {
+      form.onChange(name, value?.toISOString() ?? null);
+    },
+    [form],
+  );
 
-  const handleSelectFieldChange = React.useCallback(() => {}, []);
+  const handleSelectFieldChange = React.useCallback(
+    (event: SelectChangeEvent) => {
+      form.onChange(event.target.name, event.target.value);
+    },
+    [form],
+  );
 
   const renderField = React.useCallback(
     (formField: GridColDef) => {
@@ -97,8 +115,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
       if (type === 'number') {
         fieldElement = (
           <TextField
-            value={fieldValue}
-            onChange={handleTextFieldChange}
+            value={fieldValue ?? ''}
+            onChange={handleNumberFieldChange}
             name={field}
             type="number"
             label={headerName}
@@ -109,10 +127,10 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
       if (type === 'boolean') {
         fieldElement = (
           <FormControlLabel
-            value={fieldValue}
-            onChange={handleCheckboxFieldChange}
             name={field}
-            control={<Checkbox size="large" />}
+            control={
+              <Checkbox size="large" value={fieldValue} onChange={handleCheckboxFieldChange} />
+            }
             label={headerName}
           />
         );
@@ -121,8 +139,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
         fieldElement = (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
-              value={dayJs(fieldValue)}
-              onChange={handleDateFieldChange}
+              value={dayjs(fieldValue as string)}
+              onChange={handleDateFieldChange(field)}
               name={field}
               label={headerName}
               slotProps={{
@@ -138,8 +156,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
         fieldElement = (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
-              value={dayJs(fieldValue)}
-              onChange={handleDateFieldChange}
+              value={dayjs(fieldValue as string)}
+              onChange={handleDateFieldChange(field)}
               name={field}
               label={headerName}
               slotProps={{
@@ -162,7 +180,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
             <FormControl fullWidth>
               <InputLabel id={labelId}>{headerName}</InputLabel>
               <Select
-                value={fieldValue}
+                value={(fieldValue as string) ?? ''}
                 onChange={handleSelectFieldChange}
                 labelId={labelId}
                 name={field}
@@ -195,7 +213,14 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
         </Grid>
       );
     },
-    [form.onChange, form.value, handleCheckboxFieldChange, handleTextFieldChange],
+    [
+      form.value,
+      handleCheckboxFieldChange,
+      handleDateFieldChange,
+      handleNumberFieldChange,
+      handleSelectFieldChange,
+      handleTextFieldChange,
+    ],
   );
 
   return (

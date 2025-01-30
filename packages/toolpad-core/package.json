@@ -60,6 +60,7 @@
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",
     "client-only": "^0.0.1",
+    "dayjs": "1.11.13",
     "invariant": "2.2.4",
     "path-to-regexp": "6.3.0",
     "prop-types": "15.8.1"

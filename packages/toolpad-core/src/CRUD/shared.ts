@@ -20,4 +20,10 @@ export interface DataSource<D extends DataModel> {
   createOne?: (data: Omit<D, 'id'>) => Promise<D>;
   updateOne?: (data: Omit<D, 'id'>) => Promise<D>;
   deleteOne?: (id: DataModelId) => Promise<void>;
+  /**
+   * Function to validate form values. Returns object with error strings for each field.
+   */
+  validate: (
+    formValues: Omit<D, 'id'>,
+  ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
 }

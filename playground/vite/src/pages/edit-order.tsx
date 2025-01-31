@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { Edit } from '@toolpad/core/CRUD';
 import { useNavigate, useParams } from 'react-router';
-import { ordersDataSource, orderSchema, Order } from '../data/orders';
-import yupAdapter from '../validationAdapters/yupAdapter';
+import { ordersDataSource, Order } from '../data/orders';
 
 export default function EditOrderPage() {
   const navigate = useNavigate();
@@ -13,11 +12,6 @@ export default function EditOrderPage() {
   }, [navigate]);
 
   return orderId ? (
-    <Edit<Order>
-      id={orderId}
-      dataSource={ordersDataSource}
-      validate={yupAdapter<Order>(orderSchema)}
-      onSubmitSuccess={handleEdit}
-    />
+    <Edit<Order> id={orderId} dataSource={ordersDataSource} onSubmitSuccess={handleEdit} />
   ) : null;
 }

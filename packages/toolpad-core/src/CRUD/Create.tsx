@@ -3,22 +3,17 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { FormPage } from './FormPage';
 import { DataModel, DataSource } from './shared';
+import { CRUDContext } from '../shared/context';
 
 export interface CreateProps<D extends DataModel> {
   /**
    * Server-side data source.
    */
-  dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>;
+  dataSource?: DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>;
   /**
    * Initial form values.
    */
   initialValues: Omit<D, 'id'>;
-  /**
-   * Function to validate form values. Returns object with error strings for each field.
-   */
-  validate: (
-    formValues: Omit<D, 'id'>,
-  ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
   /**
    * Callback fired when the form is successfully submitted.
    */
@@ -26,10 +21,17 @@ export interface CreateProps<D extends DataModel> {
 }
 
 function Create<D extends DataModel>(props: CreateProps<D>) {
+  const { initialValues, onSubmitSuccess } = props;
+
+  const crudContext = React.useContext(CRUDContext);
+  const dataSource = props.dataSource ?? crudContext.dataSource;
+
   return (
     <FormPage
-      {...props}
+      dataSource={dataSource}
+      initialValues={initialValues}
       submitMethodName="createOne"
+      onSubmitSuccess={onSubmitSuccess}
       localeText={{
         submitButtonLabel: 'Create',
         submitSuccessMessage: 'Item created successfully.',

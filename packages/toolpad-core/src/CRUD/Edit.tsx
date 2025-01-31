@@ -6,19 +6,14 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { FormPage } from './FormPage';
 import { DataModel, DataModelId, DataSource } from './shared';
+import { CRUDContext } from '../shared/context';
 
 export interface EditProps<D extends DataModel> {
   id: DataModelId;
   /**
    * Server-side data source.
    */
-  dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getOne' | 'updateOne'>>;
-  /**
-   * Function to validate form values. Returns object with error strings for each field.
-   */
-  validate: (
-    formValues: Omit<D, 'id'>,
-  ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
+  dataSource?: DataSource<D> & Required<Pick<DataSource<D>, 'getOne' | 'updateOne'>>;
   /**
    * Callback fired when the form is successfully submitted.
    */
@@ -26,7 +21,11 @@ export interface EditProps<D extends DataModel> {
 }
 
 function Edit<D extends DataModel>(props: EditProps<D>) {
-  const { id, dataSource, validate, onSubmitSuccess } = props;
+  const { id, onSubmitSuccess } = props;
+
+  const crudContext = React.useContext(CRUDContext);
+  const dataSource = props.dataSource ?? crudContext.dataSource;
+
   const { fields, ...methods } = dataSource;
   const { getOne } = methods;
 
@@ -76,7 +75,6 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
       <FormPage
         dataSource={dataSource}
         initialValues={data}
-        validate={validate}
         submitMethodName="updateOne"
         onSubmitSuccess={onSubmitSuccess}
         localeText={{
@@ -86,7 +84,7 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
         }}
       />
     ) : null;
-  }, [data, dataSource, error, isLoading, onSubmitSuccess, validate]);
+  }, [data, dataSource, error, isLoading, onSubmitSuccess]);
 
   return <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>;
 }

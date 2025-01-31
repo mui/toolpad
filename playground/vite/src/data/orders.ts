@@ -1,5 +1,6 @@
 import { DataSource } from '@toolpad/core/CRUD';
 import * as yup from 'yup';
+import yupAdapter from '../validationAdapters/yupAdapter';
 
 export interface Order extends Record<string, unknown> {
   id: number;
@@ -78,10 +79,11 @@ export const ordersDataSource: Required<DataSource<Order>> = {
       }, 1500);
     });
   },
+  validate: yupAdapter<Order>(
+    yup.object({
+      name: yup.string().required('Name is required'),
+      status: yup.string().required('Status is required'),
+      itemCount: yup.number().min(1, 'Item count must be at least 1'),
+    }),
+  ),
 };
-
-export const orderSchema = yup.object({
-  name: yup.string().required('Name is required'),
-  status: yup.string().required('Status is required'),
-  itemCount: yup.number().min(1, 'Item count must be at least 1'),
-});

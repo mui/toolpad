@@ -15,13 +15,14 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataModelId, DataSource } from './shared';
+import { CRUDContext } from '../shared/context';
 
 export interface ShowProps<D extends DataModel> {
   id: DataModelId;
   /**
    * Server-side data source.
    */
-  dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getOne'>>;
+  dataSource?: DataSource<D> & Required<Pick<DataSource<D>, 'getOne'>>;
   /**
    * Callback fired when the "Edit" button is clicked.
    */
@@ -33,7 +34,11 @@ export interface ShowProps<D extends DataModel> {
 }
 
 function Show<D extends DataModel>(props: ShowProps<D>) {
-  const { id, dataSource, onEditClick, onDelete } = props;
+  const { id, onEditClick, onDelete } = props;
+
+  const crudContext = React.useContext(CRUDContext);
+  const dataSource = props.dataSource ?? crudContext.dataSource;
+
   const { fields, ...methods } = dataSource;
   const { getOne, deleteOne } = methods;
 

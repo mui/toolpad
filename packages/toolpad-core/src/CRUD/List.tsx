@@ -26,6 +26,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataModelId, DataSource } from './shared';
+import { CRUDContext } from '../shared/context';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -58,7 +59,7 @@ export interface ListProps<D extends DataModel> {
   /**
    * Server-side data source.
    */
-  dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getMany'>>;
+  dataSource?: DataSource<D> & Required<Pick<DataSource<D>, 'getMany'>>;
   /**
    * Initial number of rows to show per page.
    * @default 100
@@ -89,15 +90,11 @@ export interface ListProps<D extends DataModel> {
 }
 
 function List<D extends DataModel>(props: ListProps<D>) {
-  const {
-    dataSource,
-    initialPageSize = 100,
-    onRowClick,
-    onCreateClick,
-    onEditClick,
-    slots,
-    slotProps,
-  } = props;
+  const { initialPageSize = 100, onRowClick, onCreateClick, onEditClick, slots, slotProps } = props;
+
+  const crudContext = React.useContext(CRUDContext);
+  const dataSource = props.dataSource ?? crudContext.dataSource;
+
   const { fields, ...methods } = dataSource;
   const { getMany, deleteOne } = methods;
 
@@ -206,17 +203,13 @@ function List<D extends DataModel>(props: ListProps<D>) {
   );
 
   const columns = React.useMemo<GridColDef[]>(() => {
-    const lastField = fields[fields.length - 1];
-
     return [
-      ...fields.slice(0, fields.length - 1),
-      {
-        ...lastField,
-        flex: lastField.flex ?? 1,
-      },
+      ...fields,
       {
         field: 'actions',
         type: 'actions',
+        flex: 1,
+        align: 'right',
         getActions: ({ id }) => [
           ...(onEditClick
             ? [

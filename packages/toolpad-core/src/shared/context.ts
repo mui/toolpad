@@ -1,6 +1,8 @@
 import * as React from 'react';
 import type { PaletteMode } from '@mui/material';
 import type { Branding, Navigation, Router } from '../AppProvider';
+import type { DataModel } from '../CRUD';
+import type { CRUDProps } from '../CRUD/CRUD';
 
 export const BrandingContext = React.createContext<Branding | null>(null);
 
@@ -19,3 +21,9 @@ export const PaletteModeContext = React.createContext<{
 export const RouterContext = React.createContext<Router | null>(null);
 
 export const WindowContext = React.createContext<Window | undefined>(undefined);
+
+export const CRUDContext = React.createContext<{
+  dataSource: CRUDProps<DataModel>['dataSource'] | null;
+}>({
+  dataSource: null,
+});

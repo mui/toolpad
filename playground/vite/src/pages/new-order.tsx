@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { Create } from '@toolpad/core/CRUD';
 import { useNavigate } from 'react-router';
-import { ordersDataSource, orderSchema, Order } from '../data/orders';
-import yupAdapter from '../validationAdapters/yupAdapter';
+import { ordersDataSource, Order } from '../data/orders';
 
 export default function NewOrderPage() {
   const navigate = useNavigate();
@@ -15,7 +14,6 @@ export default function NewOrderPage() {
     <Create<Order>
       dataSource={ordersDataSource}
       initialValues={{ itemCount: 0 }}
-      validate={yupAdapter<Order>(orderSchema)}
       onSubmitSuccess={handleCreate}
     />
   );

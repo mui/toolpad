@@ -33,9 +33,6 @@ export interface FormPageProps<D extends DataModel> {
     | (DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>)
     | (DataSource<D> & Required<Pick<DataSource<D>, 'updateOne'>>);
   initialValues: Omit<D, 'id'>;
-  validate: (
-    formValues: Omit<D, 'id'>,
-  ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
   submitMethodName: 'createOne' | 'updateOne';
   onSubmitSuccess?: () => void;
   localeText: FormPageLocaleText;
@@ -45,9 +42,8 @@ export interface FormPageProps<D extends DataModel> {
  * @ignore - internal component.
  */
 function FormPage<D extends DataModel>(props: FormPageProps<D>) {
-  const { dataSource, initialValues, validate, submitMethodName, onSubmitSuccess, localeText } =
-    props;
-  const { fields, ...methods } = dataSource;
+  const { dataSource, initialValues, submitMethodName, onSubmitSuccess, localeText } = props;
+  const { fields, validate, ...methods } = dataSource;
 
   const submitMethod = methods[submitMethodName] as (data: Omit<D, 'id'>) => Promise<D>;
 

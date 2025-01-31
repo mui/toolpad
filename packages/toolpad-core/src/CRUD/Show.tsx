@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import Button, { ButtonProps } from '@mui/material/Button';
+import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid2';
@@ -25,7 +25,7 @@ export interface ShowProps<D extends DataModel> {
   /**
    * Callback fired when the "Edit" button is clicked.
    */
-  onEditClick?: ButtonProps['onClick'];
+  onEditClick?: (id: DataModelId) => void;
   /**
    * Callback fired when the item is successfully deleted.
    */
@@ -60,37 +60,42 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     loadData();
   }, [loadData]);
 
-  const handleItemDelete = React.useCallback(
-    (itemId: DataModelId) => async () => {
-      const confirmed = await dialogs.confirm(`Do you wish to delete item "${itemId}"?`, {
-        title: 'Delete item?',
-        severity: 'error',
-        okText: 'Delete',
-        cancelText: 'Cancel',
-      });
+  const handleItemEdit = React.useCallback(() => {
+    if (onEditClick) {
+      onEditClick(id);
+    }
+  }, [id, onEditClick]);
 
-      if (confirmed) {
-        setIsLoading(true);
-        try {
-          await deleteOne?.(itemId);
+  const handleItemDelete = React.useCallback(async () => {
+    const confirmed = await dialogs.confirm(`Do you wish to delete item "${id}"?`, {
+      title: 'Delete item?',
+      severity: 'error',
+      okText: 'Delete',
+      cancelText: 'Cancel',
+    });
 
-          if (onDelete) {
-            onDelete(itemId);
-          }
+    if (confirmed) {
+      setIsLoading(true);
+      try {
+        await deleteOne?.(id);
 
-          notifications.show('Item deleted successfully.', {
-            severity: 'success',
-          });
-        } catch (deleteError) {
-          notifications.show(`Failed to delete item. Reason: ${(deleteError as Error).message}`, {
-            severity: 'error',
-          });
+        if (onDelete) {
+          onDelete(id);
         }
-        setIsLoading(false);
+
+        notifications.show('Item deleted successfully.', {
+          severity: 'success',
+          autoHideDuration: 3000,
+        });
+      } catch (deleteError) {
+        notifications.show(`Failed to delete item. Reason: ${(deleteError as Error).message}`, {
+          severity: 'error',
+          autoHideDuration: 3000,
+        });
       }
-    },
-    [deleteOne, dialogs, notifications, onDelete],
-  );
+      setIsLoading(false);
+    }
+  }, [deleteOne, dialogs, id, notifications, onDelete]);
 
   const renderShow = React.useMemo(() => {
     if (isLoading) {
@@ -131,7 +136,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
         <Divider sx={{ my: 3 }} />
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           {onEditClick ? (
-            <Button variant="contained" startIcon={<EditIcon />} onClick={onEditClick}>
+            <Button variant="contained" startIcon={<EditIcon />} onClick={handleItemEdit}>
               Edit
             </Button>
           ) : null}
@@ -140,7 +145,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
               variant="contained"
               color="error"
               startIcon={<DeleteIcon />}
-              onClick={handleItemDelete(id)}
+              onClick={handleItemDelete}
             >
               Delete
             </Button>
@@ -148,7 +153,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
         </Stack>
       </Box>
     ) : null;
-  }, [data, deleteOne, error, fields, handleItemDelete, id, isLoading, onEditClick]);
+  }, [data, deleteOne, error, fields, handleItemDelete, handleItemEdit, isLoading, onEditClick]);
 
   return <Box sx={{ display: 'flex', flex: 1 }}>{renderShow}</Box>;
 }

@@ -1,22 +1,23 @@
 import * as React from 'react';
-import { Create } from '@toolpad/core/CRUD';
-import { useNavigate } from 'react-router';
+import { Edit } from '@toolpad/core/CRUD';
+import { useNavigate, useParams } from 'react-router';
 import { ordersDataSource, orderSchema, Order } from '../data/orders';
 import yupAdapter from '../validationAdapters/yupAdapter';
 
-export default function NewOrderPage() {
+export default function EditOrderPage() {
   const navigate = useNavigate();
+  const { orderId } = useParams();
 
-  const handleCreate = React.useCallback(() => {
+  const handleEdit = React.useCallback(() => {
     navigate('/orders');
   }, [navigate]);
 
-  return (
-    <Create<Order>
+  return orderId ? (
+    <Edit<Order>
+      id={orderId}
       dataSource={ordersDataSource}
-      initialValues={{ itemCount: 0 }}
       validate={yupAdapter<Order>(orderSchema)}
-      onSubmitSuccess={handleCreate}
+      onSubmitSuccess={handleEdit}
     />
-  );
+  ) : null;
 }

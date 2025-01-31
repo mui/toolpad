@@ -1,4 +1,5 @@
 import { DataSource } from '@toolpad/core/CRUD';
+import * as yup from 'yup';
 
 export interface Order extends Record<string, unknown> {
   id: number;
@@ -6,7 +7,7 @@ export interface Order extends Record<string, unknown> {
   status: string;
 }
 
-const ordersDataSource: Required<DataSource<Order>> = {
+export const ordersDataSource: Required<DataSource<Order>> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'name', headerName: 'Name' },
@@ -59,6 +60,17 @@ const ordersDataSource: Required<DataSource<Order>> = {
       }, 1500);
     });
   },
+  updateOne: () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          id: 69,
+          name: 'Order 69',
+          status: 'pending',
+        });
+      }, 1500);
+    });
+  },
   deleteOne: () => {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
@@ -68,4 +80,8 @@ const ordersDataSource: Required<DataSource<Order>> = {
   },
 };
 
-export default ordersDataSource;
+export const orderSchema = yup.object({
+  name: yup.string().required('Name is required'),
+  status: yup.string().required('Status is required'),
+  itemCount: yup.number().min(1, 'Item count must be at least 1'),
+});

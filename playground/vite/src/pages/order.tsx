@@ -1,11 +1,18 @@
 import * as React from 'react';
 import { Show } from '@toolpad/core/CRUD';
 import { useNavigate, useParams } from 'react-router';
-import ordersDataSource, { Order } from '../data/orders';
+import { ordersDataSource, Order } from '../data/orders';
 
 export default function OrderPage() {
   const navigate = useNavigate();
   const { orderId } = useParams();
+
+  const handleEdit = React.useCallback(
+    (id: string | number) => {
+      navigate(`/orders/${String(id)}/edit`);
+    },
+    [navigate],
+  );
 
   const handleDelete = React.useCallback(() => {
     navigate('/orders');
@@ -15,7 +22,7 @@ export default function OrderPage() {
     <Show<Order>
       id={orderId}
       dataSource={ordersDataSource}
-      onEditClick={() => {}}
+      onEditClick={handleEdit}
       onDelete={handleDelete}
     />
   ) : null;

@@ -37,6 +37,7 @@ export interface FormPageProps<D extends DataModel> {
     formValues: Omit<D, 'id'>,
   ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
   submitMethodName: 'createOne' | 'updateOne';
+  onSubmitSuccess?: () => void;
   localeText: FormPageLocaleText;
 }
 
@@ -44,7 +45,8 @@ export interface FormPageProps<D extends DataModel> {
  * @ignore - internal component.
  */
 function FormPage<D extends DataModel>(props: FormPageProps<D>) {
-  const { dataSource, initialValues, validate, submitMethodName, localeText } = props;
+  const { dataSource, initialValues, validate, submitMethodName, onSubmitSuccess, localeText } =
+    props;
   const { fields, ...methods } = dataSource;
 
   const submitMethod = methods[submitMethodName] as (data: Omit<D, 'id'>) => Promise<D>;
@@ -106,12 +108,18 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
       await submitMethod(formValues);
       notifications.show(localeText.submitSuccessMessage, {
         severity: 'success',
+        autoHideDuration: 3000,
       });
 
       handleFormReset();
+
+      if (onSubmitSuccess) {
+        onSubmitSuccess();
+      }
     } catch (createError) {
       notifications.show(`${localeText.submitErrorMessage}\n${(createError as Error).message}`, {
         severity: 'error',
+        autoHideDuration: 3000,
       });
       return createError as Error;
     }

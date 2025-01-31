@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
-import Button, { ButtonProps } from '@mui/material/Button';
+import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
@@ -71,11 +71,11 @@ export interface ListProps<D extends DataModel> {
   /**
    * Callback fired when the "Create" button is clicked.
    */
-  onCreateClick?: ButtonProps['onClick'];
+  onCreateClick?: () => void;
   /**
    * Callback fired when the "Edit" button is clicked.
    */
-  onEditClick?: ButtonProps['onClick'];
+  onEditClick?: (id: DataModelId) => void;
   /**
    * The components used for each slot inside.
    * @default {}
@@ -157,6 +157,15 @@ function List<D extends DataModel>(props: ListProps<D>) {
     [onRowClick],
   );
 
+  const handleItemEdit = React.useCallback(
+    (itemId: DataModelId) => () => {
+      if (onEditClick) {
+        onEditClick(itemId);
+      }
+    },
+    [onEditClick],
+  );
+
   const handleItemDelete = React.useCallback(
     (itemId: DataModelId) => async () => {
       const confirmed = await dialogs.confirm(`Do you wish to delete item "${itemId}"?`, {
@@ -172,11 +181,13 @@ function List<D extends DataModel>(props: ListProps<D>) {
           await deleteOne?.(itemId);
           notifications.show('Item deleted successfully.', {
             severity: 'success',
+            autoHideDuration: 3000,
           });
           loadData();
         } catch (deleteError) {
           notifications.show(`Failed to delete item. Reason: ${(deleteError as Error).message}`, {
             severity: 'error',
+            autoHideDuration: 3000,
           });
         }
         setIsLoading(false);
@@ -213,7 +224,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
                   key="edit-item"
                   icon={<EditIcon />}
                   label="Edit"
-                  onClick={onEditClick}
+                  onClick={handleItemEdit(id)}
                 />,
               ]
             : []),
@@ -230,7 +241,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
         ],
       },
     ];
-  }, [deleteOne, fields, handleItemDelete, onEditClick]);
+  }, [deleteOne, fields, handleItemDelete, handleItemEdit, onEditClick]);
 
   return (
     <Stack sx={{ flex: 1 }}>

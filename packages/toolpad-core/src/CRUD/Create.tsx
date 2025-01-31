@@ -1,8 +1,8 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { DataModel, DataSource } from './shared';
 import { FormPage } from './FormPage';
+import { DataModel, DataSource } from './shared';
 
 export interface CreateProps<D extends DataModel> {
   /**
@@ -19,6 +19,10 @@ export interface CreateProps<D extends DataModel> {
   validate: (
     formValues: Omit<D, 'id'>,
   ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
+  /**
+   * Callback fired when the form is successfully submitted.
+   */
+  onSubmitSuccess?: () => void;
 }
 
 function Create<D extends DataModel>(props: CreateProps<D>) {

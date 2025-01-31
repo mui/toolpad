@@ -62,7 +62,7 @@ export default function generateProject(
     [
       'package.json',
       {
-        content: JSON.stringify(packageJson(options)),
+        content: JSON.stringify(packageJson(options), null, 2),
       },
     ],
   ]);

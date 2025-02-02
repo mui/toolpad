@@ -43,8 +43,8 @@ importers:
         specifier: 7.6.3
         version: 7.6.3
       tsup:
-        specifier: 8.3.5
-        version: 8.3.5(postcss@8.4.49)(tsx@4.19.2)(typescript@5.5.4)(yaml@2.5.1)
+        specifier: 8.3.6
+        version: 8.3.6(postcss@8.4.49)(tsx@4.19.2)(typescript@5.5.4)(yaml@2.5.1)
       tsx:
         specifier: 4.19.2
         version: 4.19.2
@@ -10042,8 +10042,8 @@ packages:
     resolution: {integrity: sha512-LxhtAkPDTkVCMQjt2h6eBVY28KCjikZqZfMcC15YBeNjkgUpdCfBu5HoiOTDu86v6smE8yOjyEktJ8hlbANHQA==}
     engines: {node: '>=0.6.x'}
 
-  tsup@8.3.5:
-    resolution: {integrity: sha512-Tunf6r6m6tnZsG9GYWndg0z8dEV7fD733VBFzFJ5Vcm1FtlXB8xBD/rtrBi2a3YKEV7hHtxiZtW5EAVADoe1pA==}
+  tsup@8.3.6:
+    resolution: {integrity: sha512-XkVtlDV/58S9Ye0JxUUTcrQk4S+EqlOHKzg6Roa62rdjL1nGWNUstG0xgI4vanHdfIpjP448J8vlN0oK6XOJ5g==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -20877,7 +20877,7 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
-  tsup@8.3.5(postcss@8.4.49)(tsx@4.19.2)(typescript@5.5.4)(yaml@2.5.1):
+  tsup@8.3.6(postcss@8.4.49)(tsx@4.19.2)(typescript@5.5.4)(yaml@2.5.1):
     dependencies:
       bundle-require: 5.0.0(esbuild@0.24.2)
       cac: 6.7.14

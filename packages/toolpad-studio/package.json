@@ -125,7 +125,7 @@
     "perf-cascade": "3.0.3",
     "pg": "8.13.1",
     "piscina": "4.7.0",
-    "prettier": "3.4.1",
+    "prettier": "3.4.2",
     "pretty-bytes": "6.1.1",
     "react": "^19.0.0",
     "react-dev-utils": "12.0.1",

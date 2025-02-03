@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataModelId, DataSource } from './shared';
@@ -37,7 +38,11 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
   const { id, onEditClick, onDelete } = props;
 
   const crudContext = React.useContext(CRUDContext);
-  const dataSource = props.dataSource ?? crudContext.dataSource;
+  const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
+    typeof props.dataSource,
+    undefined
+  >;
+  invariant(dataSource, 'No data source found.');
 
   const { fields, ...methods } = dataSource;
   const { getOne, deleteOne } = methods;

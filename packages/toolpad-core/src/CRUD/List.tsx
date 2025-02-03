@@ -23,6 +23,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataModelId, DataSource } from './shared';
@@ -93,7 +94,11 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const { initialPageSize = 100, onRowClick, onCreateClick, onEditClick, slots, slotProps } = props;
 
   const crudContext = React.useContext(CRUDContext);
-  const dataSource = props.dataSource ?? crudContext.dataSource;
+  const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
+    typeof props.dataSource,
+    undefined
+  >;
+  invariant(dataSource, 'No data source found.');
 
   const { fields, ...methods } = dataSource;
   const { getMany, deleteOne } = methods;

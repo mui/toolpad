@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import invariant from 'invariant';
 import { FormPage } from './FormPage';
 import { DataModel, DataModelId, DataSource } from './shared';
 import { CRUDContext } from '../shared/context';
@@ -24,7 +25,11 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
   const { id, onSubmitSuccess } = props;
 
   const crudContext = React.useContext(CRUDContext);
-  const dataSource = props.dataSource ?? crudContext.dataSource;
+  const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
+    typeof props.dataSource,
+    undefined
+  >;
+  invariant(dataSource, 'No data source found.');
 
   const { fields, ...methods } = dataSource;
   const { getOne } = methods;

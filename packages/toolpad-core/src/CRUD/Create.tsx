@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import invariant from 'invariant';
 import { FormPage } from './FormPage';
 import { DataModel, DataSource } from './shared';
 import { CRUDContext } from '../shared/context';
@@ -13,7 +14,7 @@ export interface CreateProps<D extends DataModel> {
   /**
    * Initial form values.
    */
-  initialValues: Omit<D, 'id'>;
+  initialValues?: Omit<D, 'id'>;
   /**
    * Callback fired when the form is successfully submitted.
    */
@@ -24,7 +25,11 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   const { initialValues, onSubmitSuccess } = props;
 
   const crudContext = React.useContext(CRUDContext);
-  const dataSource = props.dataSource ?? crudContext.dataSource;
+  const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
+    typeof props.dataSource,
+    undefined
+  >;
+  invariant(dataSource, 'No data source found.');
 
   return (
     <FormPage

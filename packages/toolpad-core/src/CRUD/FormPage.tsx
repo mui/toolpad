@@ -32,7 +32,7 @@ export interface FormPageProps<D extends DataModel> {
   dataSource:
     | (DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>)
     | (DataSource<D> & Required<Pick<DataSource<D>, 'updateOne'>>);
-  initialValues: Omit<D, 'id'>;
+  initialValues?: Omit<D, 'id'>;
   submitMethodName: 'createOne' | 'updateOne';
   onSubmitSuccess?: () => void;
   localeText: FormPageLocaleText;
@@ -42,7 +42,13 @@ export interface FormPageProps<D extends DataModel> {
  * @ignore - internal component.
  */
 function FormPage<D extends DataModel>(props: FormPageProps<D>) {
-  const { dataSource, initialValues, submitMethodName, onSubmitSuccess, localeText } = props;
+  const {
+    dataSource,
+    initialValues = {} as Omit<D, 'id'>,
+    submitMethodName,
+    onSubmitSuccess,
+    localeText,
+  } = props;
   const { fields, validate, ...methods } = dataSource;
 
   const submitMethod = methods[submitMethodName] as (data: Omit<D, 'id'>) => Promise<D>;

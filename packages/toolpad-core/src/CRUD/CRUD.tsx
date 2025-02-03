@@ -11,10 +11,10 @@ export interface CRUDProps<D extends DataModel> {
   children?: React.ReactNode;
 }
 
-function CRUD(props: CRUDProps<DataModel>) {
+function CRUD<D extends DataModel>(props: CRUDProps<D>) {
   const { dataSource, children } = props;
 
-  return <CRUDContext value={{ dataSource }}>{children}</CRUDContext>;
+  return <CRUDContext value={{ dataSource } as CRUDProps<DataModel>}>{children}</CRUDContext>;
 }
 
 export { CRUD };

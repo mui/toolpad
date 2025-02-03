@@ -25,13 +25,13 @@ export interface CRUDProps<D extends DataModel> {
    */
   initialPageSize?: number;
   /**
-   * Initial form values.
+   * Default form values for a new item.
    */
-  initialValues?: Omit<D, 'id'>;
+  defaultValues?: Omit<D, 'id'>;
 }
 
 function CRUD<D extends DataModel>(props: CRUDProps<D>) {
-  const { dataSource, rootPath, initialPageSize, initialValues } = props;
+  const { dataSource, rootPath, initialPageSize, defaultValues } = props;
 
   const listPath = rootPath;
   const showPath = `${rootPath}/:id`;
@@ -84,7 +84,7 @@ function CRUD<D extends DataModel>(props: CRUDProps<D>) {
       );
     }
     if (match(createPath)(pathname)) {
-      return <Create<D> initialValues={initialValues} onSubmitSuccess={handleCreate} />;
+      return <Create<D> initialValues={defaultValues} onSubmitSuccess={handleCreate} />;
     }
     const showMatch = match<{ id: DataModelId }>(showPath)(pathname);
     if (showMatch) {
@@ -109,7 +109,7 @@ function CRUD<D extends DataModel>(props: CRUDProps<D>) {
     handleEditClick,
     handleRowClick,
     initialPageSize,
-    initialValues,
+    defaultValues,
     listPath,
     routerContext?.pathname,
     showPath,

@@ -2,16 +2,21 @@ import { DataSource } from '@toolpad/core/CRUD';
 import * as yup from 'yup';
 import yupAdapter from '../validationAdapters/yupAdapter';
 
+type OrderStatus = 'pending' | 'sent';
 export interface Order extends Record<string, unknown> {
   id: number;
-  name: string;
-  status: string;
+  title: string;
+  status: OrderStatus;
+  itemCount: number;
+  fastDelivery: boolean;
+  createdAt: string;
+  deliveryTime: string;
 }
 
 export const ordersDataSource: Required<DataSource<Order>> = {
   fields: [
     { field: 'id', headerName: 'ID' },
-    { field: 'name', headerName: 'Name' },
+    { field: 'title', headerName: 'Title' },
     {
       field: 'status',
       headerName: 'Status',
@@ -19,9 +24,9 @@ export const ordersDataSource: Required<DataSource<Order>> = {
       valueOptions: ['pending', 'fulfilled'],
     },
     { field: 'itemCount', headerName: 'No. of items', type: 'number' },
-    { field: 'fulfilled', headerName: 'Fulfilled', type: 'boolean' },
-    { field: 'deliveryDate', headerName: 'Delivery Date', type: 'date' },
-    { field: 'deliveryTime', headerName: 'Delivery Time', type: 'dateTime' },
+    { field: 'fastDelivery', headerName: 'Fast delivery', type: 'boolean' },
+    { field: 'createdAt', headerName: 'Created at', type: 'date' },
+    { field: 'deliveryTime', headerName: 'Delivery time', type: 'dateTime' },
   ],
   getMany: async ({ paginationModel }) => {
     return new Promise<{ items: Order[]; itemCount: number }>((resolve) => {
@@ -29,8 +34,12 @@ export const ordersDataSource: Required<DataSource<Order>> = {
         resolve({
           items: Array.from({ length: paginationModel.pageSize }, (_, i) => ({
             id: paginationModel.page * paginationModel.pageSize + i + 1,
-            name: `Order ${paginationModel.page * paginationModel.pageSize + i + 1}`,
-            status: 'pending',
+            title: `Order ${paginationModel.page * paginationModel.pageSize + i + 1}`,
+            status: 'pending' as OrderStatus,
+            itemCount: 3,
+            fastDelivery: true,
+            createdAt: new Date().toISOString(),
+            deliveryTime: new Date().toISOString(),
           })).slice(0, paginationModel.pageSize),
           itemCount: 300,
         });
@@ -43,32 +52,28 @@ export const ordersDataSource: Required<DataSource<Order>> = {
         return orderId
           ? resolve({
               id: Number(orderId),
-              name: `Order ${orderId}`,
+              title: `Order ${orderId}`,
               status: 'pending',
+              itemCount: 3,
+              fastDelivery: true,
+              createdAt: new Date().toISOString(),
+              deliveryTime: new Date().toISOString(),
             })
           : null;
       }, 1500);
     });
   },
-  createOne: () => {
+  createOne: (data) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve({
-          id: 69,
-          name: 'Order 69',
-          status: 'pending',
-        });
+        resolve({ id: 999, ...data } as Order);
       }, 1500);
     });
   },
-  updateOne: () => {
+  updateOne: (data) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve({
-          id: 69,
-          name: 'Order 69',
-          status: 'pending',
-        });
+        resolve(data);
       }, 1500);
     });
   },
@@ -84,6 +89,7 @@ export const ordersDataSource: Required<DataSource<Order>> = {
       name: yup.string().required('Name is required'),
       status: yup.string().required('Status is required'),
       itemCount: yup.number().min(1, 'Item count must be at least 1'),
+      createdAt: yup.string().required('Creation date is required'),
     }),
   ),
 };

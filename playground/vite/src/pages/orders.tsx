@@ -8,7 +8,7 @@ export default function OrdersCRUDPage() {
       dataSource={ordersDataSource}
       rootPath="/orders"
       initialPageSize={25}
-      initialValues={{ itemCount: 0 }}
+      defaultValues={{ itemCount: 1 }}
     />
   );
 }

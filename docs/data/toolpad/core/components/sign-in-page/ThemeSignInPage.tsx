@@ -50,6 +50,7 @@ export default function ThemeSignInPage() {
       <SignInPage
         signIn={signIn}
         providers={providers}
+        slotProps={{ form: { noValidate: true } }}
         sx={{
           '& form > .MuiStack-root': {
             marginTop: '2rem',

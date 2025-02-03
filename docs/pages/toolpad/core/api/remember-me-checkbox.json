@@ -1,0 +1,72 @@
+{
+  "props": {
+    "control": { "type": { "name": "element" }, "required": true },
+    "slotProps": {
+      "type": { "name": "shape", "description": "{ typography?: func<br>&#124;&nbsp;object }" },
+      "default": "{}"
+    }
+  },
+  "name": "RememberMeCheckbox",
+  "imports": ["import { RememberMeCheckbox } from '@toolpad/core/SignInPage';"],
+  "classes": [
+    {
+      "key": "asterisk",
+      "className": "",
+      "description": "Styles applied to the asterisk element.",
+      "isGlobal": false
+    },
+    {
+      "key": "disabled",
+      "className": "",
+      "description": "State class applied to the root element if `disabled={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "error",
+      "className": "",
+      "description": "State class applied to the root element if `error={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "label",
+      "className": "",
+      "description": "Styles applied to the label's Typography component.",
+      "isGlobal": false
+    },
+    {
+      "key": "labelPlacementBottom",
+      "className": "",
+      "description": "Styles applied to the root element if `labelPlacement=\"bottom\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "labelPlacementStart",
+      "className": "",
+      "description": "Styles applied to the root element if `labelPlacement=\"start\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "labelPlacementTop",
+      "className": "",
+      "description": "Styles applied to the root element if `labelPlacement=\"top\"`.",
+      "isGlobal": false
+    },
+    {
+      "key": "required",
+      "className": "",
+      "description": "State class applied to the root element if `required={true}`.",
+      "isGlobal": false
+    },
+    {
+      "key": "root",
+      "className": "",
+      "description": "Styles applied to the root element.",
+      "isGlobal": false
+    }
+  ],
+  "muiName": "RememberMeCheckbox",
+  "filename": "/packages/toolpad-core/src/SignInPage/RememberMeCheckbox.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign-in Page</a></li></ul>",
+  "cssComponent": false
+}

@@ -5,10 +5,9 @@ import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
+import { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
@@ -209,10 +208,10 @@ export interface SignInPageSlots {
    */
   subtitle?: React.ElementType;
   /**
-   * A component to override the default "Remember me" checkbox in the Credentials form
+   * A custom checkbox placed in the credentials form
    * @default FormControlLabel
    */
-  rememberMe?: React.ElementType;
+  checkbox?: React.ElementType;
 }
 
 export interface SignInPageProps {
@@ -252,9 +251,11 @@ export interface SignInPageProps {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
     submitButton?: LoadingButtonProps;
+    oauthButton?: LoadingButtonProps;
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
-    rememberMe?: Partial<FormControlLabelProps>;
+    checkbox?: Partial<FormControlLabelProps>;
+    form?: Partial<React.FormHTMLAttributes<HTMLFormElement>>;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container
@@ -312,7 +313,7 @@ function SignInPage(props: SignInPageProps) {
       }}
     >
       <Container component="main" maxWidth="xs">
-        <Box
+        <Stack
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -320,6 +321,7 @@ function SignInPage(props: SignInPageProps) {
             bgcolor: 'background.paper',
             borderRadius: 1,
             p: 4,
+            gap: 1,
             border: '1px solid',
             borderColor: alpha(theme.palette.grey[400], 0.4),
             boxShadow: theme.shadows[4],
@@ -334,7 +336,6 @@ function SignInPage(props: SignInPageProps) {
               variant="h5"
               color="textPrimary"
               sx={{
-                my: theme.spacing(1),
                 textAlign: 'center',
                 fontWeight: 600,
               }}
@@ -349,7 +350,7 @@ function SignInPage(props: SignInPageProps) {
               Welcome, please sign in to continue
             </Typography>
           )}
-          <Box sx={{ mt: theme.spacing(1), width: '100%' }}>
+          <Box sx={{ width: '100%' }}>
             <Stack spacing={1}>
               {error && isOauthProvider(selectedProviderId) ? (
                 <Alert severity="error">{error}</Alert>
@@ -374,6 +375,7 @@ function SignInPage(props: SignInPageProps) {
                           error: oauthResponse?.error,
                         }));
                       }}
+                      {...slotProps?.form}
                     >
                       <LoadingButton
                         key={provider.id}
@@ -390,6 +392,7 @@ function SignInPage(props: SignInPageProps) {
                         sx={{
                           textTransform: 'capitalize',
                         }}
+                        {...slotProps?.oauthButton}
                       >
                         <span>Sign in with {provider.name}</span>
                       </LoadingButton>
@@ -402,7 +405,7 @@ function SignInPage(props: SignInPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'passkey' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
+                  <Alert sx={{ mt: 1, mb: 2 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
@@ -423,6 +426,7 @@ function SignInPage(props: SignInPageProps) {
                       error: passkeyResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -436,6 +440,7 @@ function SignInPage(props: SignInPageProps) {
                         type: 'email',
                         autoComplete: 'email-webauthn',
                         autoFocus: singleProvider,
+                        sx: { mt: 1 },
                         ...slotProps?.emailField,
                       })}
                     />
@@ -470,12 +475,12 @@ function SignInPage(props: SignInPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'nodemailer' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
+                  <Alert sx={{ my: 1 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
                 {success && selectedProviderId === 'nodemailer' ? (
-                  <Alert sx={{ my: 2 }} severity="success">
+                  <Alert sx={{ my: 1 }} severity="success">
                     {success}
                   </Alert>
                 ) : null}
@@ -497,6 +502,7 @@ function SignInPage(props: SignInPageProps) {
                       success: emailResponse?.success,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -508,6 +514,7 @@ function SignInPage(props: SignInPageProps) {
                         name: 'email',
                         id: 'email-nodemailer',
                         type: 'email',
+                        sx: { mt: 1 },
                         autoComplete: 'email-nodemailer',
                         autoFocus: singleProvider,
                         ...slotProps?.emailField,
@@ -544,7 +551,7 @@ function SignInPage(props: SignInPageProps) {
               <React.Fragment>
                 {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
                 {error && selectedProviderId === 'credentials' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
+                  <Alert sx={{ mt: 1, mb: 2 }} severity="error">
                     {error}
                   </Alert>
                 ) : null}
@@ -569,8 +576,9 @@ function SignInPage(props: SignInPageProps) {
                       error: credentialsResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
-                  <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
+                  <Stack direction="column" marginTop={1} spacing={2}>
                     {slots?.emailField ? (
                       <slots.emailField {...slotProps?.emailField} />
                     ) : (
@@ -603,42 +611,23 @@ function SignInPage(props: SignInPageProps) {
                       />
                     )}
                   </Stack>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    spacing={1}
-                    sx={{
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    {slots?.rememberMe ? (
-                      <slots.rememberMe {...slotProps?.rememberMe} />
-                    ) : (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            name="remember"
-                            value="true"
-                            color="primary"
-                            sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
-                          />
-                        }
-                        label="Remember me"
-                        {...slotProps?.rememberMe}
-                        slotProps={{
-                          typography: {
-                            color: 'textSecondary',
-                            fontSize: theme.typography.pxToRem(14),
-                          },
-                          ...slotProps?.rememberMe?.slotProps,
-                        }}
-                      />
-                    )}
-                    {slots?.forgotPasswordLink ? (
-                      <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
-                    ) : null}
-                  </Stack>
+                  {slots?.forgotPasswordLink || slots?.checkbox ? (
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      spacing={1}
+                      mt={2}
+                      sx={{
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      {slots?.checkbox ? <slots.checkbox {...slotProps?.checkbox} /> : null}
+                      {slots?.forgotPasswordLink ? (
+                        <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
+                      ) : null}
+                    </Stack>
+                  ) : null}
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
@@ -670,7 +659,7 @@ function SignInPage(props: SignInPageProps) {
               </React.Fragment>
             ) : null}
           </Box>
-        </Box>
+        </Stack>
       </Container>
     </Box>
   );
@@ -708,10 +697,12 @@ SignInPage.propTypes /* remove-proptypes */ = {
    * @example { emailField: { autoFocus: false }, passwordField: { variant: 'outlined' } }
    */
   slotProps: PropTypes.shape({
+    checkbox: PropTypes.object,
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
+    form: PropTypes.object,
+    oauthButton: PropTypes.object,
     passwordField: PropTypes.object,
-    rememberMe: PropTypes.object,
     signUpLink: PropTypes.object,
     submitButton: PropTypes.object,
   }),
@@ -722,10 +713,10 @@ SignInPage.propTypes /* remove-proptypes */ = {
    * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
    */
   slots: PropTypes.shape({
+    checkbox: PropTypes.elementType,
     emailField: PropTypes.elementType,
     forgotPasswordLink: PropTypes.elementType,
     passwordField: PropTypes.elementType,
-    rememberMe: PropTypes.elementType,
     signUpLink: PropTypes.elementType,
     submitButton: PropTypes.elementType,
     subtitle: PropTypes.elementType,

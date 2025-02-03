@@ -73,7 +73,11 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
       );
     }
     if (error) {
-      return <Alert severity="error">{error.message}</Alert>;
+      return (
+        <Box sx={{ flexGrow: 1 }}>
+          <Alert severity="error">{error.message}</Alert>
+        </Box>
+      );
     }
 
     return data ? (

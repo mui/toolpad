@@ -54,6 +54,8 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<Error | null>(null);
 
+  const [hasDeleted, setHasDeleted] = React.useState(false);
+
   const loadData = React.useCallback(async () => {
     setError(null);
     setIsLoading(true);
@@ -97,6 +99,8 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
           severity: 'success',
           autoHideDuration: 3000,
         });
+
+        setHasDeleted(true);
       } catch (deleteError) {
         notifications.show(`Failed to delete item. Reason: ${(deleteError as Error).message}`, {
           severity: 'error',
@@ -126,7 +130,19 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
       );
     }
     if (error) {
-      return <Alert severity="error">{error.message}</Alert>;
+      return (
+        <Box sx={{ flexGrow: 1 }}>
+          <Alert severity="error">{error.message}</Alert>
+        </Box>
+      );
+    }
+
+    if (hasDeleted) {
+      return (
+        <Box sx={{ flexGrow: 1 }}>
+          <Alert severity="error">This item has been deleted.</Alert>
+        </Box>
+      );
     }
 
     return data ? (
@@ -163,7 +179,17 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
         </Stack>
       </Box>
     ) : null;
-  }, [data, deleteOne, error, fields, handleItemDelete, handleItemEdit, isLoading, onEditClick]);
+  }, [
+    data,
+    deleteOne,
+    error,
+    fields,
+    handleItemDelete,
+    handleItemEdit,
+    hasDeleted,
+    isLoading,
+    onEditClick,
+  ]);
 
   return <Box sx={{ display: 'flex', flex: 1 }}>{renderShow}</Box>;
 }

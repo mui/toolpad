@@ -16,21 +16,9 @@ export interface CRUDProps<D extends DataModel> {
    */
   dataSource: DataSource<D>;
   /**
-   * Path to resource list page.
+   * Root path to CRUD pages.
    */
-  list: string;
-  /**
-   * Path to resource show page.
-   */
-  show: string;
-  /**
-   * Path to resource create page.
-   */
-  create: string;
-  /**
-   * Path to resource edit page.
-   */
-  edit: string;
+  rootPath: string;
   /**
    * Initial number of rows to show per page.
    * @default 100
@@ -43,7 +31,12 @@ export interface CRUDProps<D extends DataModel> {
 }
 
 function CRUD<D extends DataModel>(props: CRUDProps<D>) {
-  const { dataSource, list, show, create, edit, initialPageSize, initialValues } = props;
+  const { dataSource, rootPath, initialPageSize, initialValues } = props;
+
+  const listPath = rootPath;
+  const showPath = `${rootPath}/:id`;
+  const createPath = `${rootPath}/new`;
+  const editPath = `${rootPath}/:id/edit`;
 
   const routerContext = React.useContext(RouterContext);
 
@@ -80,7 +73,7 @@ function CRUD<D extends DataModel>(props: CRUDProps<D>) {
   const renderedRoute = React.useMemo(() => {
     const pathname = routerContext?.pathname ?? '';
 
-    if (match(list)(pathname)) {
+    if (match(listPath)(pathname)) {
       return (
         <List<D>
           initialPageSize={initialPageSize}
@@ -90,16 +83,16 @@ function CRUD<D extends DataModel>(props: CRUDProps<D>) {
         />
       );
     }
-    const showMatch = match<{ id: DataModelId }>(show)(pathname);
+    const showMatch = match<{ id: DataModelId }>(showPath)(pathname);
     if (showMatch) {
       const resourceId = showMatch.params.id;
       invariant(resourceId, 'No resource ID present in URL.');
       return <Show<D> id={resourceId} onEditClick={handleEditClick} onDelete={handleDelete} />;
     }
-    if (match(create)(pathname)) {
+    if (match(createPath)(pathname)) {
       return <Create<D> initialValues={initialValues} onSubmitSuccess={handleCreate} />;
     }
-    const editMatch = match<{ id: DataModelId }>(edit)(pathname);
+    const editMatch = match<{ id: DataModelId }>(editPath)(pathname);
     if (editMatch) {
       const resourceId = editMatch.params.id;
       invariant(resourceId, 'No resource ID present in URL.');
@@ -107,19 +100,19 @@ function CRUD<D extends DataModel>(props: CRUDProps<D>) {
     }
     return null;
   }, [
-    routerContext?.pathname,
-    list,
-    show,
-    create,
-    edit,
-    initialPageSize,
-    handleRowClick,
-    handleCreateClick,
-    handleEditClick,
-    handleDelete,
-    initialValues,
+    createPath,
+    editPath,
     handleCreate,
+    handleCreateClick,
+    handleDelete,
     handleEdit,
+    handleEditClick,
+    handleRowClick,
+    initialPageSize,
+    initialValues,
+    listPath,
+    routerContext?.pathname,
+    showPath,
   ]);
 
   return <CRUDProvider<D> dataSource={dataSource}>{renderedRoute}</CRUDProvider>;

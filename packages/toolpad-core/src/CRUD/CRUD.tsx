@@ -83,14 +83,14 @@ function CRUD<D extends DataModel>(props: CRUDProps<D>) {
         />
       );
     }
+    if (match(createPath)(pathname)) {
+      return <Create<D> initialValues={initialValues} onSubmitSuccess={handleCreate} />;
+    }
     const showMatch = match<{ id: DataModelId }>(showPath)(pathname);
     if (showMatch) {
       const resourceId = showMatch.params.id;
       invariant(resourceId, 'No resource ID present in URL.');
       return <Show<D> id={resourceId} onEditClick={handleEditClick} onDelete={handleDelete} />;
-    }
-    if (match(createPath)(pathname)) {
-      return <Create<D> initialValues={initialValues} onSubmitSuccess={handleCreate} />;
     }
     const editMatch = match<{ id: DataModelId }>(editPath)(pathname);
     if (editMatch) {

@@ -8,14 +8,14 @@ export default function Layout() {
   const { orderId } = useParams();
 
   const title = React.useMemo(() => {
+    if (location.pathname === '/orders/new') {
+      return 'New Order';
+    }
     if (matchPath('/orders/:orderId/edit', location.pathname)) {
       return `Order ${orderId} - Edit`;
     }
     if (orderId) {
       return `Order ${orderId}`;
-    }
-    if (location.pathname === '/orders/new') {
-      return 'New Order';
     }
     return undefined;
   }, [location.pathname, orderId]);

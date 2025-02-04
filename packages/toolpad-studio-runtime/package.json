@@ -60,7 +60,7 @@
     "@types/cookie": "0.6.0",
     "@types/express": "5.0.0",
     "@types/invariant": "2.2.37",
-    "@types/react": "^19.0.0",
+    "@types/react": "^19.0.8",
     "@types/react-is": "^19.0.0"
   },
   "peerDependencies": {

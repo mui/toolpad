@@ -510,7 +510,7 @@ importers:
         specifier: 7.0.15
         version: 7.0.15
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.0.8
         version: 19.0.8
       '@types/react-dom':
         specifier: ^19.0.3
@@ -645,7 +645,7 @@ importers:
         specifier: 15.7.14
         version: 15.7.14
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.0.8
         version: 19.0.8
       '@types/react-dom':
         specifier: ^19.0.3
@@ -992,7 +992,7 @@ importers:
         specifier: 8.11.11
         version: 8.11.11
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.0.8
         version: 19.0.8
       '@types/react-dom':
         specifier: ^19.0.3
@@ -1089,7 +1089,7 @@ importers:
         specifier: 2.2.37
         version: 2.2.37
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.0.8
         version: 19.0.8
       react:
         specifier: ^19.0.0
@@ -1150,7 +1150,7 @@ importers:
         specifier: 2.2.37
         version: 2.2.37
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.0.8
         version: 19.0.8
       '@types/react-is':
         specifier: ^19.0.0
@@ -1187,7 +1187,7 @@ importers:
         specifier: 2.2.37
         version: 2.2.37
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.0.8
         version: 19.0.8
       '@types/react-is':
         specifier: ^19.0.0
@@ -1223,7 +1223,7 @@ importers:
         specifier: ^20.17.16
         version: 20.17.16
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.0.8
         version: 19.0.8
       '@types/react-dom':
         specifier: ^19.0.3
@@ -1265,7 +1265,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.0.8
         version: 19.0.8
       '@types/react-dom':
         specifier: ^19.0.3
@@ -1304,7 +1304,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
       '@types/react':
-        specifier: ^19.0.0
+        specifier: ^19.0.8
         version: 19.0.8
       '@types/react-dom':
         specifier: ^19.0.3

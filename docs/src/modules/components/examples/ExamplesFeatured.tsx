@@ -51,7 +51,7 @@ export default function ExamplesFeatured(props: FeaturedExamplesProps) {
               }}
             >
               <Link
-                href={versionGitHubLink(example.href)}
+                href={example.href}
                 target="_blank"
                 sx={{
                   position: 'relative',
@@ -162,7 +162,7 @@ export default function ExamplesFeatured(props: FeaturedExamplesProps) {
                 </Box>
                 <Button
                   component="a"
-                  href={versionGitHubLink(example.href)}
+                  href={example.href}
                   size="small"
                   variant="outlined"
                   color="primary"

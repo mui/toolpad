@@ -149,7 +149,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
           {fields.map(({ field, headerName }) => (
-            <Grid key={field} size={6}>
+            <Grid key={field} size={{ xs: 12, sm: 6 }}>
               <Paper sx={{ px: 2, py: 1 }}>
                 <Typography variant="overline">{headerName}</Typography>
                 <Typography variant="body1" sx={{ mb: 1 }}>

@@ -214,7 +214,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
         fieldElement = (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
-              value={dayjs(fieldValue as string)}
+              value={fieldValue ? dayjs(fieldValue as string) : null}
               onChange={handleDateFieldChange(field)}
               name={field}
               label={headerName}
@@ -233,7 +233,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
         fieldElement = (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
-              value={dayjs(fieldValue as string)}
+              value={fieldValue ? dayjs(fieldValue as string) : null}
               onChange={handleDateFieldChange(field)}
               name={field}
               label={headerName}
@@ -288,7 +288,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
       }
 
       return (
-        <Grid key={field} size={6} sx={{ display: 'flex', alignItems: 'center' }}>
+        <Grid key={field} size={{ xs: 12, sm: 6 }} sx={{ display: 'flex', alignItems: 'center' }}>
           {fieldElement}
         </Grid>
       );

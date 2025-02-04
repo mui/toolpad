@@ -25,8 +25,18 @@ export const ordersDataSource: Required<DataSource<Order>> = {
     },
     { field: 'itemCount', headerName: 'No. of items', type: 'number' },
     { field: 'fastDelivery', headerName: 'Fast delivery', type: 'boolean' },
-    { field: 'createdAt', headerName: 'Created at', type: 'date' },
-    { field: 'deliveryTime', headerName: 'Delivery time', type: 'dateTime' },
+    {
+      field: 'createdAt',
+      headerName: 'Created at',
+      type: 'date',
+      valueGetter: (value: string) => new Date(value),
+    },
+    {
+      field: 'deliveryTime',
+      headerName: 'Delivery time',
+      type: 'dateTime',
+      valueGetter: (value: string) => new Date(value),
+    },
   ],
   getMany: async ({ paginationModel }) => {
     return new Promise<{ items: Order[]; itemCount: number }>((resolve) => {
@@ -86,7 +96,7 @@ export const ordersDataSource: Required<DataSource<Order>> = {
   },
   validate: yupAdapter<Order>(
     yup.object({
-      name: yup.string().required('Name is required'),
+      title: yup.string().required('Title is required'),
       status: yup.string().required('Status is required'),
       itemCount: yup.number().min(1, 'Item count must be at least 1'),
       createdAt: yup.string().required('Creation date is required'),

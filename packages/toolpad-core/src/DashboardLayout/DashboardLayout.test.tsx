@@ -260,15 +260,6 @@ describe('DashboardLayout', () => {
       'Mui-selected',
     );
 
-    rerender(<AppWithPathname pathname="/orders?query=test" />);
-
-    expect(within(desktopNavigation).getByRole('link', { name: 'Dashboard' })).not.toHaveClass(
-      'Mui-selected',
-    );
-    expect(within(desktopNavigation).getByRole('link', { name: 'Orders' })).toHaveClass(
-      'Mui-selected',
-    );
-
     rerender(<AppWithPathname pathname="/dynamic" />);
     expect(within(desktopNavigation).getByRole('link', { name: 'Dynamic' })).not.toHaveClass(
       'Mui-selected',

@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import invariant from 'invariant';
+import type { GridColDef } from '@mui/x-data-grid';
+import dayjs from 'dayjs';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataModelId, DataSource } from './shared';
@@ -111,6 +113,30 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     }
   }, [deleteOne, dialogs, id, notifications, onDelete]);
 
+  const renderField = React.useCallback(
+    (showField: GridColDef) => {
+      if (!data) {
+        return '';
+      }
+
+      const { field, type } = showField;
+      const fieldValue = data[field];
+
+      if (type === 'boolean') {
+        return fieldValue ? 'Yes' : 'No';
+      }
+      if (type === 'date') {
+        return dayjs(fieldValue as string).format('MMMM D, YYYY');
+      }
+      if (type === 'dateTime') {
+        return dayjs(fieldValue as string).format('MMMM D, YYYY h:mm A');
+      }
+
+      return String(fieldValue);
+    },
+    [data],
+  );
+
   const renderShow = React.useMemo(() => {
     if (isLoading) {
       return (
@@ -148,16 +174,20 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     return data ? (
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
-          {fields.map(({ field, headerName }) => (
-            <Grid key={field} size={{ xs: 12, sm: 6 }}>
-              <Paper sx={{ px: 2, py: 1 }}>
-                <Typography variant="overline">{headerName}</Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  {String(data[field])}
-                </Typography>
-              </Paper>
-            </Grid>
-          ))}
+          {fields.map((showField) => {
+            const { field, headerName } = showField;
+
+            return (
+              <Grid key={field} size={{ xs: 12, sm: 6 }}>
+                <Paper sx={{ px: 2, py: 1 }}>
+                  <Typography variant="overline">{headerName}</Typography>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
+                    {renderField(showField)}
+                  </Typography>
+                </Paper>
+              </Grid>
+            );
+          })}
         </Grid>
         <Divider sx={{ my: 3 }} />
         <Stack direction="row" spacing={2} justifyContent="flex-end">
@@ -189,6 +219,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     hasDeleted,
     isLoading,
     onEditClick,
+    renderField,
   ]);
 
   return <Box sx={{ display: 'flex', flex: 1 }}>{renderShow}</Box>;

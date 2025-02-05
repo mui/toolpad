@@ -155,26 +155,30 @@ function List<D extends DataModel>(props: ListProps<D>) {
   }, [paginationModel]);
 
   React.useEffect(() => {
+    const url = new URL(window.location.href);
+
     if (
       filterModel.items.length > 0 ||
       (filterModel.quickFilterValues && filterModel.quickFilterValues.length > 0)
     ) {
-      const url = new URL(window.location.href);
-
       url.searchParams.set('filter', JSON.stringify(filterModel));
-
-      window.history.pushState({}, '', url);
+    } else {
+      url.searchParams.delete('filter');
     }
+
+    window.history.pushState({}, '', url);
   }, [filterModel]);
 
   React.useEffect(() => {
+    const url = new URL(window.location.href);
+
     if (sortModel.length > 0) {
-      const url = new URL(window.location.href);
-
       url.searchParams.set('sort', JSON.stringify(sortModel));
-
-      window.history.pushState({}, '', url);
+    } else {
+      url.searchParams.delete('sort');
     }
+
+    window.history.pushState({}, '', url);
   }, [sortModel]);
 
   const loadData = React.useCallback(async () => {

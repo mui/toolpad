@@ -78,7 +78,7 @@
     "playwright": "^1.47.2",
     "react-router": "7.1.5",
     "sinon": "^19.0.2",
-    "vitest": "2.1.8"
+    "vitest": "2.1.9"
   },
   "peerDependencies": {
     "@mui/icons-material": "5 - 6",

@@ -1,0 +1,19 @@
+{
+  "props": {
+    "dataSource": { "type": { "name": "object" }, "required": true },
+    "rootPath": { "type": { "name": "string" }, "required": true },
+    "defaultValues": { "type": { "name": "object" } },
+    "initialPageSize": { "type": { "name": "number" }, "default": "100" }
+  },
+  "name": "CRUD",
+  "imports": [
+    "import { CRUD } from '@toolpad/core/CRUD';",
+    "import { CRUD } from '@toolpad/core';"
+  ],
+  "classes": [],
+  "muiName": "CRUD",
+  "filename": "/packages/toolpad-core/src/CRUD/CRUD.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "cssComponent": false
+}

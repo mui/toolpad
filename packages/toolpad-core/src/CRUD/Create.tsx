@@ -20,7 +20,16 @@ export interface CreateProps<D extends DataModel> {
    */
   onSubmitSuccess?: () => void;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [CRUD](https://mui.com/toolpad/core/react-crud/)
+ *
+ * API:
+ *
+ * - [Create API](https://mui.com/toolpad/core/api/create)
+ */
 function Create<D extends DataModel>(props: CreateProps<D>) {
   const { initialValues, onSubmitSuccess } = props;
 
@@ -29,6 +38,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     typeof props.dataSource,
     undefined
   >;
+
   invariant(dataSource, 'No data source found.');
 
   return (
@@ -54,7 +64,15 @@ Create.propTypes /* remove-proptypes */ = {
   /**
    * Server-side data source.
    */
-  dataSource: PropTypes.object.isRequired,
+  dataSource: PropTypes.object,
+  /**
+   * Initial form values.
+   */
+  initialValues: PropTypes.object,
+  /**
+   * Callback fired when the form is successfully submitted.
+   */
+  onSubmitSuccess: PropTypes.func,
 } as any;
 
 export { Create };

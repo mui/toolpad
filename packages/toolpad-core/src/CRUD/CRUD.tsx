@@ -1,9 +1,10 @@
 'use client';
 import * as React from 'react';
+import PropTypes from 'prop-types';
 import { match } from 'path-to-regexp';
 import invariant from 'invariant';
 import { DataModel, DataModelId, DataSource } from './shared';
-import { Provider as CRUDProvider } from './Provider';
+import { CRUDProvider } from './CRUDProvider';
 import { RouterContext } from '../shared/context';
 import { List } from './List';
 import { Show } from './Show';
@@ -29,7 +30,16 @@ export interface CRUDProps<D extends DataModel> {
    */
   defaultValues?: Omit<D, 'id'>;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [CRUD](https://mui.com/toolpad/core/react-crud/)
+ *
+ * API:
+ *
+ * - [CRUD API](https://mui.com/toolpad/core/api/crud)
+ */
 function CRUD<D extends DataModel>(props: CRUDProps<D>) {
   const { dataSource, rootPath, initialPageSize, defaultValues } = props;
 
@@ -117,5 +127,29 @@ function CRUD<D extends DataModel>(props: CRUDProps<D>) {
 
   return <CRUDProvider<D> dataSource={dataSource}>{renderedRoute}</CRUDProvider>;
 }
+
+CRUD.propTypes /* remove-proptypes */ = {
+  // ┌────────────────────────────── Warning ──────────────────────────────┐
+  // │ These PropTypes are generated from the TypeScript type definitions. │
+  // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
+  // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * Server-side data source.
+   */
+  dataSource: PropTypes.object.isRequired,
+  /**
+   * Default form values for a new item.
+   */
+  defaultValues: PropTypes.object,
+  /**
+   * Initial number of rows to show per page.
+   * @default 100
+   */
+  initialPageSize: PropTypes.number,
+  /**
+   * Root path to CRUD pages.
+   */
+  rootPath: PropTypes.string.isRequired,
+} as any;
 
 export { CRUD };

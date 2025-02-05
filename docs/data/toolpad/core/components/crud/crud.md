@@ -1,9 +1,10 @@
 ---
 productId: toolpad-core
-title: CRUD Page
+title: CRUD
+components: CRUD, CRUDProvider, List, Show, Create, Edit
 ---
 
-# CRUD Page 🚧
+# CRUD
 
 <p class="description">The CRUD component provides a UI for editable data sources. With deep-linkable, form-based pages.</p>
 

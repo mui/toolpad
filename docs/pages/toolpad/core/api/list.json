@@ -1,0 +1,34 @@
+{
+  "props": {
+    "dataSource": { "type": { "name": "object" } },
+    "initialPageSize": { "type": { "name": "number" }, "default": "100" },
+    "onCreateClick": { "type": { "name": "func" } },
+    "onEditClick": { "type": { "name": "func" } },
+    "onRowClick": { "type": { "name": "func" } },
+    "slotProps": {
+      "type": { "name": "shape", "description": "{ dataGrid?: object }" },
+      "default": "{}"
+    },
+    "slots": {
+      "type": { "name": "shape", "description": "{ dataGrid?: elementType }" },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
+  },
+  "name": "List",
+  "imports": ["import { List } from '@toolpad/core/CRUD';"],
+  "slots": [
+    {
+      "name": "dataGrid",
+      "description": "The DataGrid component used to list the items.",
+      "default": "DataGrid",
+      "class": null
+    }
+  ],
+  "classes": [],
+  "muiName": "List",
+  "filename": "/packages/toolpad-core/src/CRUD/List.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "cssComponent": false
+}

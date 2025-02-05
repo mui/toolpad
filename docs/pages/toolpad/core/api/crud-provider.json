@@ -1,0 +1,11 @@
+{
+  "props": { "dataSource": { "type": { "name": "object" }, "required": true } },
+  "name": "CRUDProvider",
+  "imports": ["import { CRUDProvider } from '@toolpad/core/CRUD';"],
+  "classes": [],
+  "muiName": "CRUDProvider",
+  "filename": "/packages/toolpad-core/src/CRUD/CRUDProvider.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "cssComponent": false
+}

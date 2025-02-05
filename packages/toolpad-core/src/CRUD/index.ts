@@ -3,7 +3,7 @@ export * from './Show';
 export * from './Create';
 export * from './Edit';
 
-export * from './Provider';
+export * from './CRUDProvider';
 
 export * from './CRUD';
 

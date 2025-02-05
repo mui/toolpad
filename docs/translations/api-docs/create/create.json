@@ -1,0 +1,9 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "dataSource": { "description": "Server-side data source." },
+    "initialValues": { "description": "Initial form values." },
+    "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." }
+  },
+  "classDescriptions": {}
+}

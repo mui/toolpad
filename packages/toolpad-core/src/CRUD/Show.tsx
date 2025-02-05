@@ -35,7 +35,16 @@ export interface ShowProps<D extends DataModel> {
    */
   onDelete?: (id: DataModelId) => void;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [CRUD](https://mui.com/toolpad/core/react-crud/)
+ *
+ * API:
+ *
+ * - [Show API](https://mui.com/toolpad/core/api/show)
+ */
 function Show<D extends DataModel>(props: ShowProps<D>) {
   const { id, onEditClick, onDelete } = props;
 
@@ -44,6 +53,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     typeof props.dataSource,
     undefined
   >;
+
   invariant(dataSource, 'No data source found.');
 
   const { fields, ...methods } = dataSource;
@@ -233,7 +243,7 @@ Show.propTypes /* remove-proptypes */ = {
   /**
    * Server-side data source.
    */
-  dataSource: PropTypes.object.isRequired,
+  dataSource: PropTypes.object,
   /**
    * @ignore
    */

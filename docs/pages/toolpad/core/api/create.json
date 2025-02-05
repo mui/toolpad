@@ -1,0 +1,15 @@
+{
+  "props": {
+    "dataSource": { "type": { "name": "object" } },
+    "initialValues": { "type": { "name": "object" } },
+    "onSubmitSuccess": { "type": { "name": "func" } }
+  },
+  "name": "Create",
+  "imports": ["import { Create } from '@toolpad/core/CRUD';"],
+  "classes": [],
+  "muiName": "Create",
+  "filename": "/packages/toolpad-core/src/CRUD/Create.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "cssComponent": false
+}

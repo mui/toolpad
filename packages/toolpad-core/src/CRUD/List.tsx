@@ -89,7 +89,16 @@ export interface ListProps<D extends DataModel> {
    */
   slotProps?: ListSlotProps;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [CRUD](https://mui.com/toolpad/core/react-crud/)
+ *
+ * API:
+ *
+ * - [List API](https://mui.com/toolpad/core/api/list)
+ */
 function List<D extends DataModel>(props: ListProps<D>) {
   const { initialPageSize = 100, onRowClick, onCreateClick, onEditClick, slots, slotProps } = props;
 
@@ -98,6 +107,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
     typeof props.dataSource,
     undefined
   >;
+
   invariant(dataSource, 'No data source found.');
 
   const { fields, ...methods } = dataSource;
@@ -293,7 +303,7 @@ List.propTypes /* remove-proptypes */ = {
   /**
    * Server-side data source.
    */
-  dataSource: PropTypes.object.isRequired,
+  dataSource: PropTypes.object,
   /**
    * Initial number of rows to show per page.
    * @default 100

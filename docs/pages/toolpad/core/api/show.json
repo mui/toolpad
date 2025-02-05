@@ -1,0 +1,15 @@
+{
+  "props": {
+    "dataSource": { "type": { "name": "object" } },
+    "onDelete": { "type": { "name": "func" } },
+    "onEditClick": { "type": { "name": "func" } }
+  },
+  "name": "Show",
+  "imports": ["import { Show } from '@toolpad/core/CRUD';"],
+  "classes": [],
+  "muiName": "Show",
+  "filename": "/packages/toolpad-core/src/CRUD/Show.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "cssComponent": false
+}

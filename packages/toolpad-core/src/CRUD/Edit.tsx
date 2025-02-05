@@ -20,7 +20,16 @@ export interface EditProps<D extends DataModel> {
    */
   onSubmitSuccess?: () => void;
 }
-
+/**
+ *
+ * Demos:
+ *
+ * - [CRUD](https://mui.com/toolpad/core/react-crud/)
+ *
+ * API:
+ *
+ * - [Edit API](https://mui.com/toolpad/core/api/edit)
+ */
 function Edit<D extends DataModel>(props: EditProps<D>) {
   const { id, onSubmitSuccess } = props;
 
@@ -29,6 +38,7 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
     typeof props.dataSource,
     undefined
   >;
+
   invariant(dataSource, 'No data source found.');
 
   const { fields, ...methods } = dataSource;
@@ -106,11 +116,15 @@ Edit.propTypes /* remove-proptypes */ = {
   /**
    * Server-side data source.
    */
-  dataSource: PropTypes.object.isRequired,
+  dataSource: PropTypes.object,
   /**
    * @ignore
    */
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  /**
+   * Callback fired when the form is successfully submitted.
+   */
+  onSubmitSuccess: PropTypes.func,
 } as any;
 
 export { Edit };

@@ -1,0 +1,8 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "dataSource": { "description": "Server-side data source." },
+    "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." }
+  },
+  "classDescriptions": {}
+}

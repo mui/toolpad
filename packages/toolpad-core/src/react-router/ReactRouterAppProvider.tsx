@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { useSearchParams, useLocation, useNavigate } from 'react-router';
+import { useSearchParams, useLocation, useNavigate, Link } from 'react-router';
 import { AppProvider, type AppProviderProps, Navigate, Router } from '../AppProvider/AppProvider';
 
 function ReactRouterAppProvider(props: AppProviderProps) {
@@ -26,6 +26,7 @@ function ReactRouterAppProvider(props: AppProviderProps) {
       pathname,
       searchParams,
       navigate: navigateImpl,
+      Link,
     }),
     [pathname, searchParams, navigateImpl],
   );

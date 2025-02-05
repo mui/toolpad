@@ -28,7 +28,11 @@ export const Link = React.forwardRef(function Link(
     };
   }, [routerContext, onClick, history]);
 
-  return (
+  return routerContext?.Link && href ? (
+    <routerContext.Link href={href} to={href} {...rest} onClick={onClick}>
+      {children}
+    </routerContext.Link>
+  ) : (
     <a ref={ref} href={href} {...rest} onClick={handleLinkClick}>
       {children}
     </a>

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Link from 'next/link';
 import { asArray } from '@toolpad/utils/collections';
 import { useRouter } from 'next/router';
 import { AppProvider } from '../AppProvider';
@@ -41,6 +42,7 @@ export function NextAppProviderPages(props: AppProviderProps) {
       pathname,
       searchParams,
       navigate,
+      Link,
     }),
     [navigate, pathname, searchParams],
   );

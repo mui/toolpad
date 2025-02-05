@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { AppProvider } from '../AppProvider';
 import type { AppProviderProps, Navigate, Router } from '../AppProvider';
@@ -29,6 +30,7 @@ export function NextAppProviderApp(props: AppProviderProps) {
       pathname,
       searchParams,
       navigate,
+      Link,
     }),
     [pathname, navigate, searchParams],
   );

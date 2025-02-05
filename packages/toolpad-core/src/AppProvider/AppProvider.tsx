@@ -11,7 +11,6 @@ import {
   WindowContext,
 } from '../shared/context';
 import { AppThemeProvider } from './AppThemeProvider';
-import { LinkProps } from '../shared/Link';
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -19,6 +18,12 @@ export interface NavigateOptions {
 
 export interface Navigate {
   (url: string | URL, options?: NavigateOptions): void;
+}
+
+interface LinkProps {
+  href: string;
+  children: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 }
 
 /**

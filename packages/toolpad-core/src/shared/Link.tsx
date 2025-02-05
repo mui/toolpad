@@ -5,17 +5,16 @@ import { RouterContext } from './context';
  * @ignore - internal component.
  */
 
-export interface LinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
+export interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   history?: 'auto' | 'push' | 'replace';
   href: string;
-  to: string;
 }
 
 export const Link = React.forwardRef(function Link(
   props: LinkProps,
   ref: React.ForwardedRef<HTMLAnchorElement>,
 ) {
-  const { children, href, onClick, history, to, ...rest } = props;
+  const { children, href, onClick, history, ...rest } = props;
   const routerContext = React.useContext(RouterContext);
 
   const handleLinkClick = React.useMemo(() => {
@@ -31,7 +30,7 @@ export const Link = React.forwardRef(function Link(
   }, [routerContext, onClick, history]);
 
   return routerContext?.Link && href ? (
-    <routerContext.Link href={href} to={to} {...rest} onClick={onClick}>
+    <routerContext.Link href={href} onClick={onClick} {...rest}>
       {children}
     </routerContext.Link>
   ) : (

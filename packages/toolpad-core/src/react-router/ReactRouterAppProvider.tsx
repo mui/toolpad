@@ -1,7 +1,13 @@
 'use client';
 import * as React from 'react';
-import { useSearchParams, useLocation, useNavigate, Link } from 'react-router';
+import { useSearchParams, useLocation, useNavigate, Link as ReactRouterLink } from 'react-router';
 import { AppProvider, type AppProviderProps, Navigate, Router } from '../AppProvider/AppProvider';
+import { LinkProps } from '../shared/Link';
+
+const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
+  const { href, ...rest } = props;
+  return <ReactRouterLink ref={ref} to={href} {...rest} />;
+});
 
 function ReactRouterAppProvider(props: AppProviderProps) {
   const { pathname } = useLocation();

@@ -18,7 +18,7 @@
 
 ## Install step
 
-Install required depdencies via:
+Install required dependencies via:
 
 <codeblock storageKey="package-manager">
 

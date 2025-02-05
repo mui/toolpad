@@ -8,7 +8,7 @@
 
 ### Options
 
-The possible options for the the display mode are:
+The possible options for the display mode are:
 
 - **App shell**: Pages with their display mode set to this value will render within the navigation sidebar on the left, allowing for easy navigation between all pages.
 
@@ -52,7 +52,7 @@ Page parameters allow you to pass external data into the Toolpad Studio page sta
 
 ### Setting parameters
 
-You can set page parameters from the Page tab in the **Inspector panel** on right. You can add multiple parameters along with a default value for each.
+You can set page parameters from the Page tab in the **Inspector panel** on the right. You can add multiple parameters along with a default value for each.
 
 ### Using parameters
 

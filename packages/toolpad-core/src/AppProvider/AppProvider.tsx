@@ -2,8 +2,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { createTheme as createMuiTheme, Theme } from '@mui/material/styles';
-import { LinkProps as ReactRouterLinkProps } from 'react-router';
-import { LinkProps as NextLinkProps } from 'next/link';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
 import {
@@ -13,6 +11,7 @@ import {
   WindowContext,
 } from '../shared/context';
 import { AppThemeProvider } from './AppThemeProvider';
+import { LinkProps } from '../shared/Link';
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -29,7 +28,7 @@ export interface Router {
   pathname: string;
   searchParams: URLSearchParams;
   navigate: Navigate;
-  Link?: React.JSXElementConstructor<NextLinkProps & ReactRouterLinkProps>;
+  Link?: React.JSXElementConstructor<LinkProps>;
 }
 
 export interface Branding {

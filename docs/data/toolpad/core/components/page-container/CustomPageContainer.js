@@ -42,6 +42,7 @@ function Content({ router }) {
 
 Content.propTypes = {
   router: PropTypes.shape({
+    Link: PropTypes.elementType,
     navigate: PropTypes.func.isRequired,
     pathname: PropTypes.string.isRequired,
     searchParams: PropTypes.instanceOf(URLSearchParams).isRequired,

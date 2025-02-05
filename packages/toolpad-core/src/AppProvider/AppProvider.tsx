@@ -244,6 +244,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
    * @default null
    */
   router: PropTypes.shape({
+    Link: PropTypes.func,
     navigate: PropTypes.func.isRequired,
     pathname: PropTypes.string.isRequired,
     searchParams: PropTypes.instanceOf(URLSearchParams).isRequired,

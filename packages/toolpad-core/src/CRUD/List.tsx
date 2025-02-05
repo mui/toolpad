@@ -27,7 +27,7 @@ import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataModelId, DataSource } from './shared';
-import { CRUDContext } from '../shared/context';
+import { CRUDContext, RouterContext } from '../shared/context';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -113,6 +113,8 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const { fields, ...methods } = dataSource;
   const { getMany, deleteOne } = methods;
 
+  const routerContext = React.useContext(RouterContext);
+
   const dialogs = useDialogs();
   const notifications = useNotifications();
 
@@ -122,14 +124,58 @@ function List<D extends DataModel>(props: ListProps<D>) {
   });
 
   const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
-    page: 0,
-    pageSize: initialPageSize,
+    page: routerContext?.searchParams.get('page')
+      ? Number(routerContext?.searchParams.get('page'))
+      : 0,
+    pageSize: routerContext?.searchParams.get('pageSize')
+      ? Number(routerContext?.searchParams.get('pageSize'))
+      : initialPageSize,
   });
-  const [filterModel, setFilterModel] = React.useState<GridFilterModel>({ items: [] });
-  const [sortModel, setSortModel] = React.useState<GridSortModel>([]);
+  const [filterModel, setFilterModel] = React.useState<GridFilterModel>(
+    routerContext?.searchParams.get('filter')
+      ? JSON.parse(routerContext?.searchParams.get('filter') ?? '')
+      : { items: [] },
+  );
+  const [sortModel, setSortModel] = React.useState<GridSortModel>(
+    routerContext?.searchParams.get('sort')
+      ? JSON.parse(routerContext?.searchParams.get('sort') ?? '')
+      : [],
+  );
 
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<Error | null>(null);
+
+  React.useEffect(() => {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set('page', String(paginationModel.page));
+    url.searchParams.set('pageSize', String(paginationModel.pageSize));
+
+    window.history.pushState({}, '', url);
+  }, [paginationModel]);
+
+  React.useEffect(() => {
+    if (
+      filterModel.items.length > 0 ||
+      (filterModel.quickFilterValues && filterModel.quickFilterValues.length > 0)
+    ) {
+      const url = new URL(window.location.href);
+
+      url.searchParams.set('filter', JSON.stringify(filterModel));
+
+      window.history.pushState({}, '', url);
+    }
+  }, [filterModel]);
+
+  React.useEffect(() => {
+    if (sortModel.length > 0) {
+      const url = new URL(window.location.href);
+
+      url.searchParams.set('sort', JSON.stringify(sortModel));
+
+      window.history.pushState({}, '', url);
+    }
+  }, [sortModel]);
 
   const loadData = React.useCallback(async () => {
     setError(null);

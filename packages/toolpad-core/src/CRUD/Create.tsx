@@ -13,6 +13,7 @@ export interface CreateProps<D extends DataModel> {
   dataSource?: DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>;
   /**
    * Initial form values.
+   * @default {}
    */
   initialValues?: Omit<D, 'id'>;
   /**
@@ -67,6 +68,7 @@ Create.propTypes /* remove-proptypes */ = {
   dataSource: PropTypes.object,
   /**
    * Initial form values.
+   * @default {}
    */
   initialValues: PropTypes.object,
   /**

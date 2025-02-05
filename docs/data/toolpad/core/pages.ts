@@ -122,7 +122,6 @@ const pages: MuiPage[] = [
           {
             pathname: '/toolpad/core/react-crud',
             title: 'CRUD',
-            planned: true,
           },
           {
             pathname: '/toolpad/core/react-stat-card',

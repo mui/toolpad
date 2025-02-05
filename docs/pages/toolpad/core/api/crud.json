@@ -2,7 +2,7 @@
   "props": {
     "dataSource": { "type": { "name": "object" }, "required": true },
     "rootPath": { "type": { "name": "string" }, "required": true },
-    "defaultValues": { "type": { "name": "object" } },
+    "defaultValues": { "type": { "name": "object" }, "default": "{}" },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" }
   },
   "name": "CRUD",

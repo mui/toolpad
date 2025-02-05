@@ -126,7 +126,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
   const renderField = React.useCallback(
     (showField: GridColDef) => {
       if (!data) {
-        return '';
+        return '…';
       }
 
       const { field, type } = showField;
@@ -136,13 +136,13 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
         return fieldValue ? 'Yes' : 'No';
       }
       if (type === 'date') {
-        return dayjs(fieldValue as string).format('MMMM D, YYYY');
+        return fieldValue ? dayjs(fieldValue as string).format('MMMM D, YYYY') : '-';
       }
       if (type === 'dateTime') {
-        return dayjs(fieldValue as string).format('MMMM D, YYYY h:mm A');
+        return fieldValue ? dayjs(fieldValue as string).format('MMMM D, YYYY h:mm A') : '-';
       }
 
-      return String(fieldValue);
+      return String(fieldValue) ?? '-';
     },
     [data],
   );

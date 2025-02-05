@@ -1,7 +1,7 @@
 {
   "props": {
     "dataSource": { "type": { "name": "object" } },
-    "initialValues": { "type": { "name": "object" } },
+    "initialValues": { "type": { "name": "object" }, "default": "{}" },
     "onSubmitSuccess": { "type": { "name": "func" } }
   },
   "name": "Create",

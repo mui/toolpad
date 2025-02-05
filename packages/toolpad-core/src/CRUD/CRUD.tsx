@@ -27,6 +27,7 @@ export interface CRUDProps<D extends DataModel> {
   initialPageSize?: number;
   /**
    * Default form values for a new item.
+   * @default {}
    */
   defaultValues?: Omit<D, 'id'>;
 }
@@ -139,6 +140,7 @@ CRUD.propTypes /* remove-proptypes */ = {
   dataSource: PropTypes.object.isRequired,
   /**
    * Default form values for a new item.
+   * @default {}
    */
   defaultValues: PropTypes.object,
   /**

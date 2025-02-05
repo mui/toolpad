@@ -113,11 +113,11 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
         autoHideDuration: 3000,
       });
 
-      handleFormReset();
-
       if (onSubmitSuccess) {
         onSubmitSuccess();
       }
+
+      handleFormReset();
     } catch (createError) {
       notifications.show(`${localeText.submitErrorMessage}\n${(createError as Error).message}`, {
         severity: 'error',

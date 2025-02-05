@@ -10,6 +10,7 @@ import {
   RouterContext,
   WindowContext,
 } from '../shared/context';
+import type { LinkProps } from '../shared/Link';
 import { AppThemeProvider } from './AppThemeProvider';
 
 export interface NavigateOptions {
@@ -20,12 +21,6 @@ export interface Navigate {
   (url: string | URL, options?: NavigateOptions): void;
 }
 
-interface LinkProps {
-  href: string;
-  children: React.ReactNode;
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
-}
-
 /**
  * Abstract router used by Toolpad components.
  */
@@ -33,7 +28,7 @@ export interface Router {
   pathname: string;
   searchParams: URLSearchParams;
   navigate: Navigate;
-  Link?: React.JSXElementConstructor<LinkProps>;
+  Link?: React.ComponentType<LinkProps>;
 }
 
 export interface Branding {

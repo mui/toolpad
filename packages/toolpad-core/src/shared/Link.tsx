@@ -5,13 +5,13 @@ import { RouterContext } from './context';
  * @ignore - internal component.
  */
 
-export interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface DefaultLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   history?: 'auto' | 'push' | 'replace';
   href: string;
 }
 
-export const Link = React.forwardRef(function Link(
-  props: LinkProps,
+export const DefaultLink = React.forwardRef(function Link(
+  props: DefaultLinkProps,
   ref: React.ForwardedRef<HTMLAnchorElement>,
 ) {
   const { children, href, onClick, history, ...rest } = props;
@@ -29,13 +29,29 @@ export const Link = React.forwardRef(function Link(
     };
   }, [routerContext, onClick, history]);
 
-  return routerContext?.Link && href ? (
-    <routerContext.Link href={href} onClick={onClick} {...rest}>
-      {children}
-    </routerContext.Link>
-  ) : (
+  return (
     <a ref={ref} href={href} {...rest} onClick={handleLinkClick}>
       {children}
     </a>
+  );
+});
+
+export interface LinkProps {
+  href: string;
+  children: React.ReactNode;
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+  style?: React.CSSProperties;
+}
+
+export const Link = React.forwardRef(function Link(
+  props: LinkProps,
+  ref: React.ForwardedRef<HTMLAnchorElement>,
+) {
+  const routerContext = React.useContext(RouterContext);
+  const LinkComponent = routerContext?.Link ?? DefaultLink;
+  return (
+    <LinkComponent ref={ref} {...props}>
+      {props.children}
+    </LinkComponent>
   );
 });

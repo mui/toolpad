@@ -22,7 +22,7 @@
     "router": {
       "type": {
         "name": "shape",
-        "description": "{ navigate: func, pathname: string, searchParams: URLSearchParams }"
+        "description": "{ Link?: func, navigate: func, pathname: string, searchParams: URLSearchParams }"
       },
       "default": "null"
     },

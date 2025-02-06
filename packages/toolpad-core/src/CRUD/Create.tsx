@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import invariant from 'invariant';
 import { FormPage } from './FormPage';
-import { DataModel, DataSource } from './shared';
+import { DataModel, DataSource, OmitId } from './shared';
 import { CRUDContext } from '../shared/context';
 
 export interface CreateProps<D extends DataModel> {
@@ -15,7 +15,7 @@ export interface CreateProps<D extends DataModel> {
    * Initial form values.
    * @default {}
    */
-  initialValues?: Omit<D, 'id'>;
+  initialValues?: Partial<OmitId<D>>;
   /**
    * Callback fired when the form is successfully submitted.
    */
@@ -42,11 +42,20 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
 
   invariant(dataSource, 'No data source found.');
 
+  const { createOne } = dataSource;
+
+  const handleCreate = React.useCallback(
+    async (formValues: Partial<OmitId<D>>) => {
+      await createOne(formValues);
+    },
+    [createOne],
+  );
+
   return (
     <FormPage
       dataSource={dataSource}
       initialValues={initialValues}
-      submitMethodName="createOne"
+      onSubmit={handleCreate}
       onSubmitSuccess={onSubmitSuccess}
       localeText={{
         submitButtonLabel: 'Create',

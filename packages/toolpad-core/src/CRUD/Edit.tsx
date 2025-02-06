@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import invariant from 'invariant';
 import { FormPage } from './FormPage';
-import { DataModel, DataModelId, DataSource } from './shared';
+import { DataModel, DataModelId, DataSource, OmitId } from './shared';
 import { CRUDContext } from '../shared/context';
 
 export interface EditProps<D extends DataModel> {
@@ -42,7 +42,14 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
   invariant(dataSource, 'No data source found.');
 
   const { fields, ...methods } = dataSource;
-  const { getOne } = methods;
+  const { getOne, updateOne } = methods;
+
+  const handleEdit = React.useCallback(
+    async (formValues: Partial<OmitId<D>>) => {
+      await updateOne(id, formValues);
+    },
+    [id, updateOne],
+  );
 
   const [data, setData] = React.useState<D | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -94,7 +101,7 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
       <FormPage
         dataSource={dataSource}
         initialValues={data}
-        submitMethodName="updateOne"
+        onSubmit={handleEdit}
         onSubmitSuccess={onSubmitSuccess}
         localeText={{
           submitButtonLabel: 'Edit',
@@ -103,7 +110,7 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
         }}
       />
     ) : null;
-  }, [data, dataSource, error, isLoading, onSubmitSuccess]);
+  }, [data, dataSource, error, handleEdit, isLoading, onSubmitSuccess]);
 
   return <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>;
 }

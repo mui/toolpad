@@ -19,11 +19,7 @@ const router = createBrowserRouter([
             Component: DashboardPage,
           },
           {
-            path: 'orders/*',
-            Component: OrdersCRUDPage,
-          },
-          {
-            path: 'orders/:orderId/*',
+            path: 'orders/:orderId?/*',
             Component: OrdersCRUDPage,
           },
         ],

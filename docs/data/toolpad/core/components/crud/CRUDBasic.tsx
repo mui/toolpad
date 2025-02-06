@@ -1,6 +1,36 @@
-import { DataModel, DataSource } from '@toolpad/core/CRUD';
-import * as yup from 'yup';
-import yupAdapter from '../validationAdapters/yupAdapter';
+import * as React from 'react';
+import { createTheme } from '@mui/material/styles';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import { CRUD, DataModel, DataSource } from '@toolpad/core/CRUD';
+import { useDemoRouter } from '@toolpad/core/internal';
+
+const NAVIGATION: Navigation = [
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+    pattern: 'orders{/:orderId}*',
+  },
+];
+
+const demoTheme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: 'data-toolpad-color-scheme',
+  },
+  colorSchemes: { light: true, dark: true },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 600,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+});
 
 type OrderStatus = 'pending' | 'sent';
 
@@ -14,14 +44,7 @@ export interface Order extends DataModel {
   deliveryTime?: string;
 }
 
-const getOrdersStore = (): Order[] => {
-  const value = localStorage.getItem('orders-store');
-  return value ? JSON.parse(value) : [];
-};
-
-const setOrdersStore = (value: Order[]) => {
-  return localStorage.setItem('orders-store', JSON.stringify(value));
-};
+let ordersStore: Order[] = [];
 
 export const ordersDataSource: DataSource<Order> = {
   fields: [
@@ -51,8 +74,6 @@ export const ordersDataSource: DataSource<Order> = {
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     return new Promise<{ items: Order[]; itemCount: number }>((resolve) => {
       setTimeout(() => {
-        const ordersStore = getOrdersStore();
-
         let filteredOrders = [...ordersStore];
 
         // Apply filters
@@ -67,13 +88,19 @@ export const ordersDataSource: DataSource<Order> = {
 
               switch (operator) {
                 case 'contains':
-                  return String(orderValue).toLowerCase().includes(String(value).toLowerCase());
+                  return String(orderValue)
+                    .toLowerCase()
+                    .includes(String(value).toLowerCase());
                 case 'equals':
                   return orderValue === value;
                 case 'startsWith':
-                  return String(orderValue).toLowerCase().startsWith(String(value).toLowerCase());
+                  return String(orderValue)
+                    .toLowerCase()
+                    .startsWith(String(value).toLowerCase());
                 case 'endsWith':
-                  return String(orderValue).toLowerCase().endsWith(String(value).toLowerCase());
+                  return String(orderValue)
+                    .toLowerCase()
+                    .endsWith(String(value).toLowerCase());
                 case '>':
                   return (orderValue as number) > value;
                 case '<':
@@ -115,9 +142,9 @@ export const ordersDataSource: DataSource<Order> = {
   getOne: (orderId) => {
     return new Promise<Order>((resolve, reject) => {
       setTimeout(() => {
-        const ordersStore = getOrdersStore();
-
-        const orderToShow = ordersStore.find((order) => order.id === Number(orderId));
+        const orderToShow = ordersStore.find(
+          (order) => order.id === Number(orderId),
+        );
 
         if (orderToShow) {
           resolve(orderToShow);
@@ -130,11 +157,9 @@ export const ordersDataSource: DataSource<Order> = {
   createOne: (data) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const ordersStore = getOrdersStore();
-
         const newOrder = { id: ordersStore.length + 1, ...data } as Order;
 
-        setOrdersStore([...ordersStore, newOrder]);
+        ordersStore = [...ordersStore, newOrder];
 
         resolve(newOrder);
       }, 1500);
@@ -143,19 +168,15 @@ export const ordersDataSource: DataSource<Order> = {
   updateOne: (orderId, data) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        const ordersStore = getOrdersStore();
-
         let updatedOrder: Order | null = null;
 
-        setOrdersStore(
-          ordersStore.map((order) => {
-            if (order.id === Number(orderId)) {
-              updatedOrder = { ...order, ...data };
-              return updatedOrder;
-            }
-            return order;
-          }),
-        );
+        ordersStore = ordersStore.map((order) => {
+          if (order.id === Number(orderId)) {
+            updatedOrder = { ...order, ...data };
+            return updatedOrder;
+          }
+          return order;
+        });
 
         if (updatedOrder) {
           resolve(updatedOrder);
@@ -168,28 +189,71 @@ export const ordersDataSource: DataSource<Order> = {
   deleteOne: (id) => {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
-        const ordersStore = getOrdersStore();
-
-        setOrdersStore(ordersStore.filter((order) => order.id !== id));
+        ordersStore = ordersStore.filter((order) => order.id !== id);
 
         resolve();
       }, 1500);
     });
   },
-  validate: yupAdapter<Order>(
-    yup.object({
-      title: yup.string().required('Title is required'),
-      status: yup
-        .string()
-        .oneOf(['pending', 'sent'], 'Status must be "pending" or "sent"')
-        .required('Status is required'),
-      itemCount: yup
-        .number()
-        .required('Item count is required')
-        .min(1, 'Item count must be at least 1'),
-      fastDelivery: yup.boolean().required('Fast delivery is required'),
-      createdAt: yup.string().required('Creation date is required'),
-      deliveryTime: yup.string(),
-    }),
-  ),
+  validate: (formValues) => {
+    const errors: Record<keyof Order, string> = {};
+
+    if (!formValues.title) {
+      errors.title = 'Title is required';
+    }
+    if (!formValues.status) {
+      errors.status = 'Status is required';
+    }
+    if (!formValues.itemCount || formValues.itemCount < 1) {
+      errors.itemCount = 'Item count must be at least 1';
+    }
+    if (!formValues.createdAt) {
+      errors.createdAt = 'Creation date is required';
+    }
+
+    return errors;
+  },
 };
+
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
+
+export default function CRUDBasic(props: DemoProps) {
+  const { window } = props;
+
+  const router = useDemoRouter('/orders');
+
+  // Remove this const when copying and pasting into your project.
+  const demoWindow = window !== undefined ? window() : undefined;
+
+  const title = React.useMemo(() => {
+    return undefined;
+  }, []);
+
+  return (
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={demoTheme}
+      window={demoWindow}
+    >
+      <DashboardLayout defaultSidebarCollapsed>
+        <PageContainer title={title}>
+          {/* preview-start */}
+          <CRUD<Order>
+            dataSource={ordersDataSource}
+            rootPath="/orders"
+            initialPageSize={25}
+            defaultValues={{ itemCount: 1 }}
+          />
+          {/* preview-end */}
+        </PageContainer>
+      </DashboardLayout>
+    </AppProvider>
+  );
+}

@@ -182,8 +182,8 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     }
 
     return data ? (
-      <Box sx={{ flexGrow: 1 }}>
-        <Grid container spacing={2}>
+      <Box sx={{ flexGrow: 1, width: '100%' }}>
+        <Grid container spacing={2} sx={{ width: '100%' }}>
           {fields.map((showField) => {
             const { field, headerName } = showField;
 
@@ -232,7 +232,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     renderField,
   ]);
 
-  return <Box sx={{ display: 'flex', flex: 1 }}>{renderShow}</Box>;
+  return <Box sx={{ display: 'flex', flex: 1, width: '100%' }}>{renderShow}</Box>;
 }
 
 Show.propTypes /* remove-proptypes */ = {

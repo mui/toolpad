@@ -3,7 +3,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { match } from 'path-to-regexp';
 import invariant from 'invariant';
-import { DataModel, DataModelId, DataSource } from './shared';
+import { DataModel, DataModelId, DataSource, OmitId } from './shared';
 import { CRUDProvider } from './CRUDProvider';
 import { RouterContext } from '../shared/context';
 import { List } from './List';
@@ -29,7 +29,7 @@ export interface CRUDProps<D extends DataModel> {
    * Default form values for a new item.
    * @default {}
    */
-  defaultValues?: Omit<D, 'id'>;
+  defaultValues?: Partial<OmitId<D>>;
 }
 /**
  *

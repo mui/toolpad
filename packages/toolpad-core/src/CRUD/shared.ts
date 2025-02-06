@@ -13,17 +13,21 @@ export interface GetManyParams {
   filterModel: GridFilterModel;
 }
 
+type RemappedOmit<T, K extends PropertyKey> = { [P in keyof T as P extends K ? never : P]: T[P] };
+
+export type OmitId<D extends DataModel> = RemappedOmit<D, 'id'>;
+
 export interface DataSource<D extends DataModel> {
   fields: GridColDef[];
   getMany?: (params: GetManyParams) => Promise<{ items: D[]; itemCount: number }>;
   getOne?: (id: DataModelId) => Promise<D>;
-  createOne?: (data: Omit<D, 'id'>) => Promise<D>;
-  updateOne?: (data: D) => Promise<D>;
+  createOne?: (data: Partial<OmitId<D>>) => Promise<D>;
+  updateOne?: (id: DataModelId, data: Partial<OmitId<D>>) => Promise<D>;
   deleteOne?: (id: DataModelId) => Promise<void>;
   /**
    * Function to validate form values. Returns object with error strings for each field.
    */
   validate: (
-    formValues: Omit<D, 'id'>,
+    formValues: Partial<OmitId<D>>,
   ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
 }

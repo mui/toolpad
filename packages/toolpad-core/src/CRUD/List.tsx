@@ -302,7 +302,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
   }, [deleteOne, fields, handleItemDelete, handleItemEdit, onEditClick]);
 
   return (
-    <Stack sx={{ flex: 1 }}>
+    <Stack sx={{ flex: 1, width: '100%' }}>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
         <Tooltip title="Reload data" placement="right" enterDelay={1000}>
           <div>
@@ -317,7 +317,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
           </Button>
         ) : null}
       </Stack>
-      <Box sx={{ flex: 1, position: 'relative' }}>
+      <Box sx={{ flex: 1, position: 'relative', width: '100%' }}>
         <DataGridSlot
           rows={rowsState.rows}
           rowCount={rowsState.rowCount}

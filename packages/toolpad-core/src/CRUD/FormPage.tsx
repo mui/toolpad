@@ -20,7 +20,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import type { GridColDef, GridSingleSelectColDef } from '@mui/x-data-grid';
 import dayjs, { Dayjs } from 'dayjs';
 import { useNotifications } from '../useNotifications';
-import { DataModel, DataSource } from './shared';
+import { DataModel, DataSource, OmitId } from './shared';
 
 interface FormPageLocaleText {
   submitButtonLabel: string;
@@ -32,8 +32,8 @@ export interface FormPageProps<D extends DataModel> {
   dataSource:
     | (DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>)
     | (DataSource<D> & Required<Pick<DataSource<D>, 'updateOne'>>);
-  initialValues?: Omit<D, 'id'>;
-  submitMethodName: 'createOne' | 'updateOne';
+  initialValues?: Partial<OmitId<D>>;
+  onSubmit: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   onSubmitSuccess?: () => void;
   localeText: FormPageLocaleText;
 }
@@ -44,28 +44,34 @@ export interface FormPageProps<D extends DataModel> {
 function FormPage<D extends DataModel>(props: FormPageProps<D>) {
   const {
     dataSource,
-    initialValues = {} as Omit<D, 'id'>,
-    submitMethodName,
+    initialValues = {} as Partial<OmitId<D>>,
+    onSubmit,
     onSubmitSuccess,
     localeText,
   } = props;
-  const { fields, validate, ...methods } = dataSource;
-
-  const submitMethod = methods[submitMethodName] as (data: Omit<D, 'id'>) => Promise<D>;
+  const { fields, validate } = dataSource;
 
   const notifications = useNotifications();
 
   const [formState, setFormState] = React.useState<{
-    values: Omit<D, 'id'>;
+    values: Partial<OmitId<D>>;
     errors: Partial<Record<keyof D, string>>;
   }>({
-    values: initialValues,
+    values: {
+      ...Object.fromEntries(
+        fields.map(({ field, type }) => [
+          field,
+          type === 'boolean' ? (initialValues[field] ?? false) : initialValues[field],
+        ]),
+      ),
+      ...initialValues,
+    },
     errors: {},
   });
   const formValues = formState.values;
   const formErrors = formState.errors;
 
-  const setFormValues = React.useCallback((newFormValues: Omit<D, 'id'>) => {
+  const setFormValues = React.useCallback((newFormValues: Partial<OmitId<D>>) => {
     setFormState((previousState) => ({
       ...previousState,
       values: newFormValues,
@@ -81,7 +87,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
 
   const handleFormFieldChange = React.useCallback(
     (name: keyof D, value: string | number | boolean | File | null) => {
-      const validateField = async (values: Omit<D, 'id'>) => {
+      const validateField = async (values: Partial<OmitId<D>>) => {
         const errors = await validate(values);
         setFormErrors({ ...formErrors, [name]: errors[name] });
       };
@@ -107,7 +113,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
     setFormErrors({});
 
     try {
-      await submitMethod(formValues);
+      await onSubmit(formValues);
       notifications.show(localeText.submitSuccessMessage, {
         severity: 'success',
         autoHideDuration: 3000,
@@ -206,7 +212,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
               }
               label={headerName}
             />
-            <FormHelperText>{fieldError ?? ' '}</FormHelperText>
+            <FormHelperText error={!!fieldError}>{fieldError ?? ' '}</FormHelperText>
           </FormControl>
         );
       }
@@ -265,6 +271,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
                 name={field}
                 label={headerName}
                 defaultValue=""
+                fullWidth
               >
                 {valueOptions.map((option) => {
                   let optionValue: string | number = option as string | number;
@@ -311,9 +318,10 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
       noValidate
       autoComplete="off"
       onReset={handleFormReset}
+      sx={{ width: '100%' }}
     >
       <FormGroup>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid container spacing={2} sx={{ mb: 2, width: '100%' }}>
           {fields.filter(({ field }) => field !== 'id').map(renderField)}
         </Grid>
       </FormGroup>

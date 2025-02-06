@@ -6,11 +6,12 @@ components: CRUD, CRUDProvider, List, Show, Create, Edit
 
 # CRUD
 
-<p class="description">The CRUD component provides a UI for editable data sources. With deep-linkable, form-based pages.</p>
+<p class="description">The CRUD component provides UIs to interact with data from any data source.</p>
 
-:::warning
-The CRUD component isn't available yet, but you can upvote [**this GitHub issue**](https://github.com/mui/toolpad/issues/4146) to see it arrive sooner.
+With the `CRUD` component and its subcomponents you can easily generate pages where items from your data source can be listed in a table, shown individually in detail, or created and edited with forms. All with minimal configuration from a single data source definition.
 
-Don't hesitate to leave a comment there to influence what gets built.
-Especially if you already have a use case for this component, or if you're facing a pain point with your current solution.
-:::
+## Demo
+
+The `CRUD` component automatically generates CRUD pages for your data source no matter which framework is being used.
+
+{{"demo": "CRUDBasic.js", "height": 700, "iframe": true}}

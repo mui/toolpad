@@ -1,12 +1,5 @@
 {
-  "props": {
-    "localeText": {
-      "type": {
-        "name": "shape",
-        "description": "{ accountPreviewIconButtonLabel?: string, accountPreviewTitle?: string, accountSignInLabel?: string, accountSignOutLabel?: string, alert?: string, cancel?: string, close?: string, confirm?: string, delete?: string, email?: string, loading?: string, magicLinkSignInTitle?: string, oauthSignInTitle?: string, ok?: string, or?: string, passkey?: string, passkeySignInTitle?: string, password?: string, save?: string, signInRememberMe?: string, signInSubtitle?: string, signInTitle?: string, to?: string, username?: string, with?: string }"
-      }
-    }
-  },
+  "props": { "localeText": { "type": { "name": "object" } } },
   "name": "LocalizationProvider",
   "imports": ["import { LocalizationProvider } from '@toolpad/core/AppProvider';"],
   "classes": [],

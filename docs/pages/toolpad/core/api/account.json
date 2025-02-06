@@ -1,11 +1,6 @@
 {
   "props": {
-    "localeText": {
-      "type": {
-        "name": "shape",
-        "description": "{ accountPreviewIconButtonLabel?: string, accountPreviewTitle?: string, accountSignInLabel?: string, accountSignOutLabel?: string }"
-      }
-    },
+    "localeText": { "type": { "name": "object" } },
     "slotProps": {
       "type": {
         "name": "shape",

@@ -12,12 +12,7 @@
       },
       "default": "null"
     },
-    "localeText": {
-      "type": {
-        "name": "shape",
-        "description": "{ accountPreviewIconButtonLabel?: string, accountPreviewTitle?: string, accountSignInLabel?: string, accountSignOutLabel?: string, alert?: string, cancel?: string, close?: string, confirm?: string, delete?: string, email?: string, loading?: string, magicLinkSignInTitle?: string, oauthSignInTitle?: string, ok?: string, or?: string, passkey?: string, passkeySignInTitle?: string, password?: string, save?: string, signInRememberMe?: string, signInSubtitle?: string, signInTitle?: string, to?: string, username?: string, with?: string }"
-      }
-    },
+    "localeText": { "type": { "name": "object" } },
     "navigation": {
       "type": {
         "name": "arrayOf",

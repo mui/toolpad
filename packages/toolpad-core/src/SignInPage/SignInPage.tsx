@@ -731,17 +731,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
   /**
    * The labels for the account component.
    */
-  localeText: PropTypes.shape({
-    email: PropTypes.string,
-    or: PropTypes.string,
-    passkey: PropTypes.string,
-    password: PropTypes.string,
-    signInRememberMe: PropTypes.string,
-    signInSubtitle: PropTypes.string,
-    signInTitle: PropTypes.string,
-    to: PropTypes.string,
-    with: PropTypes.string,
-  }),
+  localeText: PropTypes.object,
   /**
    * The list of authentication providers to display.
    * @default []

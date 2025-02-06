@@ -1,11 +1,6 @@
 {
   "props": {
-    "localeText": {
-      "type": {
-        "name": "shape",
-        "description": "{ email?: string, or?: string, passkey?: string, password?: string, signInRememberMe?: string, signInSubtitle?: string, signInTitle?: string, to?: string, with?: string }"
-      }
-    },
+    "localeText": { "type": { "name": "object" } },
     "providers": {
       "type": { "name": "arrayOf", "description": "Array&lt;{ id: string, name: string }&gt;" },
       "default": "[]"

@@ -120,6 +120,7 @@ To translate all your Toolpad components, you can provide translations through t
 
 ```tsx
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { hiIN as coreHiIn } from '@mui/material/locale';
 import hiIN from '@toolpad/core/locales/hiIN';
 
 const theme = createTheme({
@@ -128,6 +129,7 @@ const theme = createTheme({
       primary: { main: '#1976d2' },
     },
   },
+  coreHiIn,
   hiIN,
 });
 

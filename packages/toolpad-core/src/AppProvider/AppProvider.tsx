@@ -213,33 +213,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
   /**
    * Locale text for components
    */
-  localeText: PropTypes.shape({
-    accountPreviewIconButtonLabel: PropTypes.string,
-    accountPreviewTitle: PropTypes.string,
-    accountSignInLabel: PropTypes.string,
-    accountSignOutLabel: PropTypes.string,
-    alert: PropTypes.string,
-    cancel: PropTypes.string,
-    close: PropTypes.string,
-    confirm: PropTypes.string,
-    delete: PropTypes.string,
-    email: PropTypes.string,
-    loading: PropTypes.string,
-    magicLinkSignInTitle: PropTypes.string,
-    oauthSignInTitle: PropTypes.string,
-    ok: PropTypes.string,
-    or: PropTypes.string,
-    passkey: PropTypes.string,
-    passkeySignInTitle: PropTypes.string,
-    password: PropTypes.string,
-    save: PropTypes.string,
-    signInRememberMe: PropTypes.string,
-    signInSubtitle: PropTypes.string,
-    signInTitle: PropTypes.string,
-    to: PropTypes.string,
-    username: PropTypes.string,
-    with: PropTypes.string,
-  }),
+  localeText: PropTypes.object,
   /**
    * Navigation definition for the app.
    * @default []

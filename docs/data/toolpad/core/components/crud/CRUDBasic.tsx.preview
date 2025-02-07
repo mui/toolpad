@@ -1,6 +1,5 @@
 <CRUD<Note>
   dataSource={notesDataSource}
   rootPath="/notes"
-  initialPageSize={25}
-  defaultValues={{ itemCount: 1 }}
+  initialPageSize={10}
 />

@@ -181,7 +181,7 @@ export const notesDataSource: DataSource<Note> = {
       errors.title = 'Title must be at least 3 characters long';
     }
     if (!formValues.text) {
-      errors.status = 'Text is required';
+      errors.text = 'Text is required';
     }
 
     return errors;

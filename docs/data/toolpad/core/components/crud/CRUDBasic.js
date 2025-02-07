@@ -33,7 +33,10 @@ const demoTheme = createTheme({
   },
 });
 
-let notesStore = [];
+let notesStore = [
+  { id: 1, title: 'Grocery List Item', text: 'Buy more coffee.' },
+  { id: 2, title: 'Personal Goal', text: 'Finish reading the book.' },
+];
 
 export const notesDataSource = {
   fields: [
@@ -180,6 +183,12 @@ export const notesDataSource = {
   },
 };
 
+function matchPath(pattern, pathname) {
+  const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
+  const match = pathname.match(regex);
+  return match ? match[1] : null;
+}
+
 function CRUDBasic(props) {
   const { window } = props;
 
@@ -189,8 +198,20 @@ function CRUDBasic(props) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   const title = React.useMemo(() => {
+    if (router.pathname === '/notes/new') {
+      return 'New Note';
+    }
+    const editNoteId = matchPath('/notes/:noteId/edit', router.pathname);
+    if (editNoteId) {
+      return `Note ${editNoteId} - Edit`;
+    }
+    const showNoteId = matchPath('/notes/:noteId', router.pathname);
+    if (showNoteId) {
+      return `Note ${showNoteId}`;
+    }
+
     return undefined;
-  }, []);
+  }, [router.pathname]);
 
   return (
     <AppProvider
@@ -205,8 +226,7 @@ function CRUDBasic(props) {
           <CRUD
             dataSource={notesDataSource}
             rootPath="/notes"
-            initialPageSize={25}
-            defaultValues={{ itemCount: 1 }}
+            initialPageSize={10}
           />
           {/* preview-end */}
         </PageContainer>

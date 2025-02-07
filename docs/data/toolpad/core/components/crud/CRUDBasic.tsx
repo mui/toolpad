@@ -162,10 +162,10 @@ export const notesDataSource: DataSource<Note> = {
       }, 1500);
     });
   },
-  deleteOne: (id) => {
+  deleteOne: (noteId) => {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
-        notesStore = notesStore.filter((note) => note.id !== id);
+        notesStore = notesStore.filter((note) => note.id !== Number(noteId));
 
         resolve();
       }, 1500);
@@ -240,6 +240,7 @@ export default function CRUDBasic(props: DemoProps) {
             dataSource={notesDataSource}
             rootPath="/notes"
             initialPageSize={10}
+            defaultValues={{ title: 'New note' }}
           />
           {/* preview-end */}
         </PageContainer>

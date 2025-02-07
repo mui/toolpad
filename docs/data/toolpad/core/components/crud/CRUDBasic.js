@@ -157,10 +157,10 @@ export const notesDataSource = {
       }, 1500);
     });
   },
-  deleteOne: (id) => {
+  deleteOne: (noteId) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        notesStore = notesStore.filter((note) => note.id !== id);
+        notesStore = notesStore.filter((note) => note.id !== Number(noteId));
 
         resolve();
       }, 1500);
@@ -176,7 +176,7 @@ export const notesDataSource = {
       errors.title = 'Title must be at least 3 characters long';
     }
     if (!formValues.text) {
-      errors.status = 'Text is required';
+      errors.text = 'Text is required';
     }
 
     return errors;
@@ -227,6 +227,7 @@ function CRUDBasic(props) {
             dataSource={notesDataSource}
             rootPath="/notes"
             initialPageSize={10}
+            defaultValues={{ title: 'New note' }}
           />
           {/* preview-end */}
         </PageContainer>

@@ -165,12 +165,12 @@ export const ordersDataSource: DataSource<Order> = {
       }, 1500);
     });
   },
-  deleteOne: (id) => {
+  deleteOne: (orderId) => {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
         const ordersStore = getOrdersStore();
 
-        setOrdersStore(ordersStore.filter((order) => order.id !== id));
+        setOrdersStore(ordersStore.filter((order) => order.id !== Number(orderId)));
 
         resolve();
       }, 1500);

@@ -2,4 +2,5 @@
   dataSource={notesDataSource}
   rootPath="/notes"
   initialPageSize={10}
+  defaultValues={{ title: 'New note' }}
 />

@@ -27,7 +27,7 @@ import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { DataModel, DataModelId, DataSource } from './shared';
-import { CRUDContext, RouterContext } from '../shared/context';
+import { CRUDContext, RouterContext, WindowContext } from '../shared/context';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -114,6 +114,9 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const { getMany, deleteOne } = methods;
 
   const routerContext = React.useContext(RouterContext);
+  const appWindowContext = React.useContext(WindowContext);
+
+  const appWindow = appWindowContext ?? window;
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
@@ -146,16 +149,18 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const [error, setError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
-    const url = new URL(window.location.href);
+    const url = new URL(appWindow.location.href);
 
     url.searchParams.set('page', String(paginationModel.page));
     url.searchParams.set('pageSize', String(paginationModel.pageSize));
 
-    window.history.pushState({}, '', url);
-  }, [paginationModel]);
+    if (!appWindow.frameElement) {
+      appWindow.history.pushState({}, '', url);
+    }
+  }, [appWindow, paginationModel.page, paginationModel.pageSize]);
 
   React.useEffect(() => {
-    const url = new URL(window.location.href);
+    const url = new URL(appWindow.location.href);
 
     if (
       filterModel.items.length > 0 ||
@@ -166,11 +171,13 @@ function List<D extends DataModel>(props: ListProps<D>) {
       url.searchParams.delete('filter');
     }
 
-    window.history.pushState({}, '', url);
-  }, [filterModel]);
+    if (!appWindow.frameElement) {
+      appWindow.history.pushState({}, '', url);
+    }
+  }, [appWindow, filterModel]);
 
   React.useEffect(() => {
-    const url = new URL(window.location.href);
+    const url = new URL(appWindow.location.href);
 
     if (sortModel.length > 0) {
       url.searchParams.set('sort', JSON.stringify(sortModel));
@@ -178,8 +185,10 @@ function List<D extends DataModel>(props: ListProps<D>) {
       url.searchParams.delete('sort');
     }
 
-    window.history.pushState({}, '', url);
-  }, [sortModel]);
+    if (!appWindow.frameElement) {
+      appWindow.history.pushState({}, '', url);
+    }
+  }, [appWindow, sortModel]);
 
   const loadData = React.useCallback(async () => {
     setError(null);

@@ -53,33 +53,33 @@ function CRUD<D extends DataModel>(props: CRUDProps<D>) {
 
   const handleRowClick = React.useCallback(
     (id: string | number) => {
-      routerContext?.navigate(`/orders/${String(id)}`);
+      routerContext?.navigate(`${rootPath}/${String(id)}`);
     },
-    [routerContext],
+    [rootPath, routerContext],
   );
 
   const handleCreateClick = React.useCallback(() => {
-    routerContext?.navigate('/orders/new');
-  }, [routerContext]);
+    routerContext?.navigate(`${rootPath}/new`);
+  }, [rootPath, routerContext]);
 
   const handleEditClick = React.useCallback(
     (id: string | number) => {
-      routerContext?.navigate(`/orders/${String(id)}/edit`);
+      routerContext?.navigate(`${rootPath}/${String(id)}/edit`);
     },
-    [routerContext],
+    [rootPath, routerContext],
   );
 
   const handleCreate = React.useCallback(() => {
-    routerContext?.navigate('/orders');
-  }, [routerContext]);
+    routerContext?.navigate(rootPath);
+  }, [rootPath, routerContext]);
 
   const handleEdit = React.useCallback(() => {
-    routerContext?.navigate('/orders');
-  }, [routerContext]);
+    routerContext?.navigate(rootPath);
+  }, [rootPath, routerContext]);
 
   const handleDelete = React.useCallback(() => {
-    routerContext?.navigate('/orders');
-  }, [routerContext]);
+    routerContext?.navigate(rootPath);
+  }, [rootPath, routerContext]);
 
   const renderedRoute = React.useMemo(() => {
     const pathname = routerContext?.pathname ?? '';

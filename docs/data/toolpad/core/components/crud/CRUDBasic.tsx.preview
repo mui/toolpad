@@ -1,6 +1,6 @@
-<CRUD<Order>
-  dataSource={ordersDataSource}
-  rootPath="/orders"
+<CRUD<Note>
+  dataSource={notesDataSource}
+  rootPath="/notes"
   initialPageSize={25}
   defaultValues={{ itemCount: 1 }}
 />

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createTheme } from '@mui/material/styles';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -9,10 +9,10 @@ import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-    pattern: 'orders{/:orderId}*',
+    segment: 'notes',
+    title: 'Notes',
+    icon: <StickyNote2Icon />,
+    pattern: 'notes{/:noteId}*',
   },
 ];
 
@@ -32,49 +32,27 @@ const demoTheme = createTheme({
   },
 });
 
-type OrderStatus = 'pending' | 'sent';
-
-export interface Order extends DataModel {
+export interface Note extends DataModel {
   id: number;
   title: string;
-  status: OrderStatus;
-  itemCount: number;
-  fastDelivery: boolean;
-  createdAt: string;
-  deliveryTime?: string;
+  text: string;
 }
 
-let ordersStore: Order[] = [];
+let notesStore: Note[] = [
+  { id: 1, title: 'Grocery List Item', text: 'Buy more coffee.' },
+  { id: 2, title: 'Personal Goal', text: 'Finish reading the book.' },
+];
 
-export const ordersDataSource: DataSource<Order> = {
+export const notesDataSource: DataSource<Note> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title' },
-    {
-      field: 'status',
-      headerName: 'Status',
-      type: 'singleSelect',
-      valueOptions: ['pending', 'sent'],
-    },
-    { field: 'itemCount', headerName: 'No. of items', type: 'number' },
-    { field: 'fastDelivery', headerName: 'Fast delivery', type: 'boolean' },
-    {
-      field: 'createdAt',
-      headerName: 'Created at',
-      type: 'date',
-      valueGetter: (value: string) => value && new Date(value),
-    },
-    {
-      field: 'deliveryTime',
-      headerName: 'Delivery time',
-      type: 'dateTime',
-      valueGetter: (value: string) => value && new Date(value),
-    },
+    { field: 'text', headerName: 'Text' },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
-    return new Promise<{ items: Order[]; itemCount: number }>((resolve) => {
+    return new Promise<{ items: Note[]; itemCount: number }>((resolve) => {
       setTimeout(() => {
-        let filteredOrders = [...ordersStore];
+        let filteredNotes = [...notesStore];
 
         // Apply filters
         if (filterModel?.items?.length) {
@@ -83,28 +61,28 @@ export const ordersDataSource: DataSource<Order> = {
               return;
             }
 
-            filteredOrders = filteredOrders.filter((order) => {
-              const orderValue = order[field];
+            filteredNotes = filteredNotes.filter((note) => {
+              const noteValue = note[field];
 
               switch (operator) {
                 case 'contains':
-                  return String(orderValue)
+                  return String(noteValue)
                     .toLowerCase()
                     .includes(String(value).toLowerCase());
                 case 'equals':
-                  return orderValue === value;
+                  return noteValue === value;
                 case 'startsWith':
-                  return String(orderValue)
+                  return String(noteValue)
                     .toLowerCase()
                     .startsWith(String(value).toLowerCase());
                 case 'endsWith':
-                  return String(orderValue)
+                  return String(noteValue)
                     .toLowerCase()
                     .endsWith(String(value).toLowerCase());
                 case '>':
-                  return (orderValue as number) > value;
+                  return (noteValue as number) > value;
                 case '<':
-                  return (orderValue as number) < value;
+                  return (noteValue as number) < value;
                 default:
                   return true;
               }
@@ -114,7 +92,7 @@ export const ordersDataSource: DataSource<Order> = {
 
         // Apply sorting
         if (sortModel?.length) {
-          filteredOrders.sort((a, b) => {
+          filteredNotes.sort((a, b) => {
             for (const { field, sort } of sortModel) {
               if ((a[field] as number) < (b[field] as number)) {
                 return sort === 'asc' ? -1 : 1;
@@ -130,26 +108,24 @@ export const ordersDataSource: DataSource<Order> = {
         // Apply pagination
         const start = paginationModel.page * paginationModel.pageSize;
         const end = start + paginationModel.pageSize;
-        const paginatedOrders = filteredOrders.slice(start, end);
+        const paginatedNotes = filteredNotes.slice(start, end);
 
         resolve({
-          items: paginatedOrders,
-          itemCount: filteredOrders.length,
+          items: paginatedNotes,
+          itemCount: filteredNotes.length,
         });
       }, 1500);
     });
   },
-  getOne: (orderId) => {
-    return new Promise<Order>((resolve, reject) => {
+  getOne: (noteId) => {
+    return new Promise<Note>((resolve, reject) => {
       setTimeout(() => {
-        const orderToShow = ordersStore.find(
-          (order) => order.id === Number(orderId),
-        );
+        const noteToShow = notesStore.find((note) => note.id === Number(noteId));
 
-        if (orderToShow) {
-          resolve(orderToShow);
+        if (noteToShow) {
+          resolve(noteToShow);
         } else {
-          reject(new Error('Order not found'));
+          reject(new Error('Note not found'));
         }
       }, 1500);
     });
@@ -157,31 +133,31 @@ export const ordersDataSource: DataSource<Order> = {
   createOne: (data) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const newOrder = { id: ordersStore.length + 1, ...data } as Order;
+        const newNote = { id: notesStore.length + 1, ...data } as Note;
 
-        ordersStore = [...ordersStore, newOrder];
+        notesStore = [...notesStore, newNote];
 
-        resolve(newOrder);
+        resolve(newNote);
       }, 1500);
     });
   },
-  updateOne: (orderId, data) => {
+  updateOne: (noteId, data) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        let updatedOrder: Order | null = null;
+        let updatedNote: Note | null = null;
 
-        ordersStore = ordersStore.map((order) => {
-          if (order.id === Number(orderId)) {
-            updatedOrder = { ...order, ...data };
-            return updatedOrder;
+        notesStore = notesStore.map((note) => {
+          if (note.id === Number(noteId)) {
+            updatedNote = { ...note, ...data };
+            return updatedNote;
           }
-          return order;
+          return note;
         });
 
-        if (updatedOrder) {
-          resolve(updatedOrder);
+        if (updatedNote) {
+          resolve(updatedNote);
         } else {
-          reject(new Error('Order not found'));
+          reject(new Error('Note not found'));
         }
       }, 1500);
     });
@@ -189,31 +165,34 @@ export const ordersDataSource: DataSource<Order> = {
   deleteOne: (id) => {
     return new Promise<void>((resolve) => {
       setTimeout(() => {
-        ordersStore = ordersStore.filter((order) => order.id !== id);
+        notesStore = notesStore.filter((note) => note.id !== id);
 
         resolve();
       }, 1500);
     });
   },
   validate: (formValues) => {
-    const errors: Record<keyof Order, string> = {};
+    const errors: Record<keyof Note, string> = {};
 
     if (!formValues.title) {
       errors.title = 'Title is required';
     }
-    if (!formValues.status) {
-      errors.status = 'Status is required';
+    if (formValues.title && formValues.title.length < 3) {
+      errors.title = 'Title must be at least 3 characters long';
     }
-    if (!formValues.itemCount || formValues.itemCount < 1) {
-      errors.itemCount = 'Item count must be at least 1';
-    }
-    if (!formValues.createdAt) {
-      errors.createdAt = 'Creation date is required';
+    if (!formValues.text) {
+      errors.status = 'Text is required';
     }
 
     return errors;
   },
 };
+
+function matchPath(pattern: string, pathname: string): string | null {
+  const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
+  const match = pathname.match(regex);
+  return match ? match[1] : null;
+}
 
 interface DemoProps {
   /**
@@ -226,14 +205,26 @@ interface DemoProps {
 export default function CRUDBasic(props: DemoProps) {
   const { window } = props;
 
-  const router = useDemoRouter('/orders');
+  const router = useDemoRouter('/notes');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
   const title = React.useMemo(() => {
+    if (router.pathname === '/notes/new') {
+      return 'New Note';
+    }
+    const editNoteId = matchPath('/notes/:noteId/edit', router.pathname);
+    if (editNoteId) {
+      return `Note ${editNoteId} - Edit`;
+    }
+    const showNoteId = matchPath('/notes/:noteId', router.pathname);
+    if (showNoteId) {
+      return `Note ${showNoteId}`;
+    }
+
     return undefined;
-  }, []);
+  }, [router.pathname]);
 
   return (
     <AppProvider
@@ -245,11 +236,10 @@ export default function CRUDBasic(props: DemoProps) {
       <DashboardLayout defaultSidebarCollapsed>
         <PageContainer title={title}>
           {/* preview-start */}
-          <CRUD<Order>
-            dataSource={ordersDataSource}
-            rootPath="/orders"
-            initialPageSize={25}
-            defaultValues={{ itemCount: 1 }}
+          <CRUD<Note>
+            dataSource={notesDataSource}
+            rootPath="/notes"
+            initialPageSize={10}
           />
           {/* preview-end */}
         </PageContainer>

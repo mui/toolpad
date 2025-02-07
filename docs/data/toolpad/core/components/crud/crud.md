@@ -27,7 +27,7 @@ It includes:
 - Properties for methods to interact with data such as `getMany`, `getOne`, `createOne`, `updateOne` and `deleteOne`.
 - A `validate` function for form validation when creating or editing data, which returns validation errors for each field.
 
-Here is a simple example of a data source:
+Here is a simple example of a data source definition:
 
 ```tsx
 const notesDataSource: DataSource<Note> = {
@@ -90,3 +90,19 @@ const notesDataSource: DataSource<Note> = {
 ```
 
 ## Listing data
+
+### `getMany`
+
+### `List` component
+
+## Showing data details
+
+## Creating data
+
+## Editing data
+
+## Advanced configuration
+
+// show composability usage
+
+### External schema libraries

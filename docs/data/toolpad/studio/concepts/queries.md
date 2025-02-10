@@ -24,7 +24,7 @@ Queries allow you to bring backend data to your Toolpad Studio page. They are ca
 
   You can use this option to enable or disable the query from running
 
-Queries may be programatically re-fetched via the `refetch` function available on these query objects. For example, for a query named `getOrders`, you can add
+Queries may be programmatically re-fetched via the `refetch` function available on these query objects. For example, for a query named `getOrders`, you can add
 
 ```js
 getOrders.refetch();
@@ -34,7 +34,7 @@ in the `onClick` binding of a Button component.
 
 ## Actions
 
-Actions allow performing updates to remote data sources (edit, update, delete) on a user interaction. Actions are not automatically called, they must be programtically called a JavaScript expression in a binding. For example, for a query named `createCustomer`, we can add
+Actions allow performing updates to remote data sources (edit, update, delete) on a user interaction. Actions are not automatically called, they must be programmatically called a JavaScript expression in a binding. For example, for a query named `createCustomer`, we can add
 
 ```js
 createCustomer.call();

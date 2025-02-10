@@ -20,7 +20,7 @@ docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgre
 npx prisma migrate dev --schema=./src/prisma/schema.prisma
 ```
 
-5. You also need to supply the following enviroment variables for the email server to work:
+5. You also need to supply the following environment variables for the email server to work:
 
 ```bash
 EMAIL_SERVER_HOST=
@@ -51,7 +51,7 @@ To copy this example and customize it for your needs, run
 ```bash
 npx create-toolpad-app@latest --example auth-nextjs-email
 # or
-pnpm dlx create-toolpad-app@latest --example auth-nextjs-email
+pnpm dlx create-toolpad-app --example auth-nextjs-email
 ```
 
 and follow the instructions in the terminal.

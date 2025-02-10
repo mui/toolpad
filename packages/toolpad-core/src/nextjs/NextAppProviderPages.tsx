@@ -8,7 +8,7 @@ import type { AppProviderProps, Navigate, Router } from '../AppProvider';
  * @ignore - internal component.
  */
 export function NextAppProviderPages(props: AppProviderProps) {
-  const { push, replace, asPath, query } = useRouter();
+  const { push, replace, pathname, query } = useRouter();
 
   const search = React.useMemo(() => {
     const params = new URLSearchParams();
@@ -38,11 +38,11 @@ export function NextAppProviderPages(props: AppProviderProps) {
 
   const routerImpl = React.useMemo<Router>(
     () => ({
-      pathname: asPath,
+      pathname,
       searchParams,
       navigate,
     }),
-    [asPath, navigate, searchParams],
+    [navigate, pathname, searchParams],
   );
 
   return <AppProvider router={routerImpl} {...props} />;

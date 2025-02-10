@@ -70,7 +70,7 @@ export default function ExamplesGrid(props: ExamplesGridProps) {
                 component="a"
                 image={computedSrc}
                 title={example.description}
-                href={versionGitHubLink(example.href || example.source)}
+                href={example.href || versionGitHubLink(example.source)}
                 rel="nofollow"
                 sx={(theme) => ({
                   height: 0,

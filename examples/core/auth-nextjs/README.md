@@ -35,7 +35,7 @@ GITHUB_CLIENT_SECRET=
 ```bash
 npx auth secret
 # or
-pnpm dlx create-toolpad-app@latest --example auth-nextjs
+pnpm dlx create-toolpad-app --example auth-nextjs
 ```
 
 ### GitHub configuration

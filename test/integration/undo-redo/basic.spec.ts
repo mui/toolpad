@@ -77,6 +77,6 @@ test('test batching text input actions into single undo entry', async ({ page })
   // Undo changes
   await page.keyboard.press('Control+Z');
 
-  // Asssert that batched changes were reverted
+  // Assert that batched changes were reverted
   await expect(input).toHaveValue('some value');
 });

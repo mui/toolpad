@@ -5,8 +5,8 @@ import { AppProvider, type AppProviderProps, Navigate, Router } from '../AppProv
 import { LinkProps } from '../shared/Link';
 
 const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
-  const { href, ...rest } = props;
-  return <ReactRouterLink ref={ref} to={href} {...rest} />;
+  const { href, history, ...rest } = props;
+  return <ReactRouterLink ref={ref} to={href} replace={history === 'replace'} {...rest} />;
 });
 
 function ReactRouterAppProvider(props: AppProviderProps) {

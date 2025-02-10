@@ -5,13 +5,18 @@ import { RouterContext } from './context';
  * @ignore - internal component.
  */
 
-export interface DefaultLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface LinkProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  /*
+   * "replace" will replace the history stack with the URL being navigated to
+   * "push" will push the URL being navigated to as a new entry onto the history stack
+   * "auto" is the default and the mimics the "push" behaviour
+   */
   history?: 'auto' | 'push' | 'replace';
   href: string;
 }
 
 export const DefaultLink = React.forwardRef(function Link(
-  props: DefaultLinkProps,
+  props: LinkProps,
   ref: React.ForwardedRef<HTMLAnchorElement>,
 ) {
   const { children, href, onClick, history, ...rest } = props;
@@ -35,13 +40,6 @@ export const DefaultLink = React.forwardRef(function Link(
     </a>
   );
 });
-
-export interface LinkProps {
-  href: string;
-  children: React.ReactNode;
-  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
-  style?: React.CSSProperties;
-}
 
 export const Link = React.forwardRef(function Link(
   props: LinkProps,

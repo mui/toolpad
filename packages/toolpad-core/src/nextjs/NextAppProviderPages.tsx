@@ -1,9 +1,15 @@
 import * as React from 'react';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { asArray } from '@toolpad/utils/collections';
 import { useRouter } from 'next/router';
+import { LinkProps } from '../shared/Link';
 import { AppProvider } from '../AppProvider';
 import type { AppProviderProps, Navigate, Router } from '../AppProvider';
+
+const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
+  const { href, history, ...rest } = props;
+  return <NextLink ref={ref} href={href} replace={history === 'replace'} {...rest} />;
+});
 
 /**
  * @ignore - internal component.

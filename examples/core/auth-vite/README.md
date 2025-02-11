@@ -9,7 +9,7 @@ To copy this example and customize it for your needs, run
 ```bash
 npx create-toolpad-app@latest --example auth-vite
 # or
-pnpm dlx create-toolpad-app@latest --example auth-vite
+pnpm create toolpad-app --example auth-vite
 ```
 
 ## Getting Started

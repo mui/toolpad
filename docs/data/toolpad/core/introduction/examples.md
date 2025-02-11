@@ -14,11 +14,11 @@ You can create a new project based on any of these examples using the `create-to
 <codeblock storageKey="package-manager">
 
 ```bash npm
-npx create-toolpad-app --example "example-name"
+npx create-toolpad-app@latest --example "example-name"
 ```
 
 ```bash pnpm
-pnpm dlx create-toolpad-app --example "example-name"
+pnpm create toolpad-app --example "example-name"
 ```
 
 ```bash yarn

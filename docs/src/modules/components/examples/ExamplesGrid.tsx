@@ -53,7 +53,7 @@ export default function ExamplesGrid(props: ExamplesGridProps) {
     <Grid container spacing={2} sx={{ pt: 2, pb: 4 }}>
       {examples.map((example) => {
         const exampleName = example.source.split('/').pop();
-        const installCommand = `pnpm dlx create-toolpad-app@latest --example ${exampleName}`;
+        const installCommand = `pnpm create toolpad-app --example ${exampleName}`;
         const computedSrc =
           docsTheme?.palette?.mode === 'dark' && example.srcDark ? example.srcDark : example.src;
         return (

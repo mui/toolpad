@@ -43,7 +43,7 @@ export default function ExamplesFeatured(props: FeaturedExamplesProps) {
         const computedSrc =
           docsTheme?.palette?.mode === 'dark' && example.srcDark ? example.srcDark : example.src;
         const exampleName = example.source.split('/').pop();
-        const installCommand = `pnpm dlx create-toolpad-app@latest --example ${exampleName}`;
+        const installCommand = `pnpm create toolpad-app --example ${exampleName}`;
 
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }} key={example.title}>

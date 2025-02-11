@@ -332,6 +332,7 @@ function SignInPage(props: SignInPageProps) {
           ) : (
             <Typography
               variant="h5"
+              component="h1"
               color="textPrimary"
               sx={{
                 my: theme.spacing(1),

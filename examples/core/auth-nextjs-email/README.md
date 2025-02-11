@@ -20,7 +20,7 @@ docker run --name postgres -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgre
 npx prisma migrate dev --schema=./src/prisma/schema.prisma
 ```
 
-5. You also need to supply the following enviroment variables for the email server to work:
+5. You also need to supply the following environment variables for the email server to work:
 
 ```bash
 EMAIL_SERVER_HOST=

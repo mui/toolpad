@@ -255,7 +255,7 @@ Here's an example using `yup`:
 ```tsx
 import * as yup from 'yup';
 
-const yupAdapter = async (formValues) => {
+const yupAdapter = (schema) => async (formValues) => {
   try {
     // Validate form values against the provided schema
     await schema.validate(formValues, { abortEarly: false });

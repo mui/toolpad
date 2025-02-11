@@ -35,7 +35,7 @@ export interface DataSource<D extends DataModel> {
   /**
    * Function to validate form values. Returns object with error strings for each field.
    */
-  validate: (
+  validate?: (
     formValues: Partial<OmitId<D>>,
   ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
 }

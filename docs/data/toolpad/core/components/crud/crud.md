@@ -221,6 +221,68 @@ This method does not need to return anything in specific.
 
 ### Form validation
 
+Optionally, a `validate` function can be included in the data source in order to do form validation.
+
+This function takes an object with field values for a given item, and must return the corresponding errors for each field as strings, as shown in the example:
+
+```tsx
+{
+  //...
+  validate: (formValues) => {
+    const errors = {};
+
+    if (!formValues.name) {
+      errors.name = 'Name is required';
+    }
+    if (formValues.age < 18) {
+      errors.age = 'Age must be higher than 18';
+    }
+
+    return errors;
+  },
+  // ...
+}
+```
+
+This function will run automatically against the current values when the user tries to submit a form inside the `Crud` component, or changes any of its fields.
+
+#### Integration with external schema libraries
+
+The `validate` function can easily be integrated with schema validation libraries such as [`yup`](https://github.com/jquense/yup) or [`zod`](https://github.com/colinhacks/zod).
+
+Here's an example using `yup`:
+
+```tsx
+import * as yup from 'yup';
+
+const yupAdapter = async (formValues) => {
+  try {
+    // Validate form values against the provided schema
+    await schema.validate(formValues, { abortEarly: false });
+    return {};
+  } catch (error) {
+    // Return field errors in the expected shape
+    return error.inner.reduce((acc, curr) => {
+      if (curr.path) {
+        acc[curr.path] = curr.message;
+      }
+      return acc;
+    }, {});
+  }
+};
+
+const dataSource = {
+  // ...
+  validate: yupAdapter(
+    yup.object({
+      name: yup.string().required('Name is required'),
+      age: yup.number().min(18, 'Age must be higher than 18'),
+    }),
+  ),
+  // ...
+};
+```
+
 ## Advanced configuration
 
 // show composability usage

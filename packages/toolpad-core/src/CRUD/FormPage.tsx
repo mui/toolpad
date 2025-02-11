@@ -88,8 +88,10 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
   const handleFormFieldChange = React.useCallback(
     (name: keyof D, value: string | number | boolean | File | null) => {
       const validateField = async (values: Partial<OmitId<D>>) => {
-        const errors = await validate(values);
-        setFormErrors({ ...formErrors, [name]: errors[name] });
+        if (validate) {
+          const errors = await validate(values);
+          setFormErrors({ ...formErrors, [name]: errors[name] });
+        }
       };
 
       const newFormValues = { ...formValues, [name]: value };
@@ -105,10 +107,12 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
   }, [initialValues, setFormValues]);
 
   const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(async () => {
-    const errors = await validate(formValues);
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      return new Error('Form validation failed');
+    if (validate) {
+      const errors = await validate(formValues);
+      if (Object.keys(errors).length > 0) {
+        setFormErrors(errors);
+        return new Error('Form validation failed');
+      }
     }
     setFormErrors({});
 

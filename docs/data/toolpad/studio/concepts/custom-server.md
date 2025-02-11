@@ -33,7 +33,7 @@ app.use('/my-app', handler);
 app.listen(3001);
 ```
 
-To run the custom server you'll have to update the scripts in your your package.json
+To run the custom server you'll have to update the scripts in your package.json
 
 ```json
 {

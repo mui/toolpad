@@ -57,7 +57,7 @@
     "@mui/internal-markdown": "1.0.24",
     "@mui/internal-scripts": "1.0.32",
     "@mui/monorepo": "github:mui/material-ui#dd69cf07e7aace1efad91e5b8e733c7efcf6c02c",
-    "@mui/x-charts": "7.24.1",
+    "@mui/x-charts": "7.25.0",
     "@next/eslint-plugin-next": "14.2.23",
     "@playwright/test": "1.47.2",
     "@testing-library/jest-dom": "^6.6.3",
@@ -115,7 +115,7 @@
   },
   "dependencies": {
     "@types/lodash": "4.17.15",
-    "@vitest/browser": "2.1.8",
+    "@vitest/browser": "2.1.9",
     "archiver": "7.0.1",
     "cross-env": "7.0.3",
     "dotenv-cli": "7.4.4",
@@ -126,7 +126,7 @@
     "semver": "7.6.3",
     "tsup": "8.3.6",
     "tsx": "4.19.2",
-    "vitest": "2.1.8",
+    "vitest": "2.1.9",
     "yargs": "17.7.2",
     "zod": "3.23.8",
     "zod-to-json-schema": "3.23.5"

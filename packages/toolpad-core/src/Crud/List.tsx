@@ -18,6 +18,7 @@ import {
   GridPaginationModel,
   GridSortModel,
   GridEventListener,
+  gridClasses,
 } from '@mui/x-data-grid';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -345,6 +346,18 @@ function List<D extends DataModel>(props: ListProps<D>) {
           initialState={initialState}
           slots={{ toolbar: GridToolbar }}
           {...slotProps?.dataGrid}
+          sx={{
+            [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
+              outline: 'transparent',
+            },
+            [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]: {
+              outline: 'none',
+            },
+            [`& .${gridClasses.row}:hover`]: {
+              cursor: 'pointer',
+            },
+            ...slotProps?.dataGrid?.sx,
+          }}
         />
         {error && (
           <ErrorOverlay>

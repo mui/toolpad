@@ -114,7 +114,7 @@ export const notesDataSource: DataSource<Note> = {
           items: paginatedNotes,
           itemCount: processedNotes.length,
         });
-      }, 1500);
+      }, 750);
     });
   },
   getOne: (noteId) => {
@@ -127,7 +127,7 @@ export const notesDataSource: DataSource<Note> = {
         } else {
           reject(new Error('Note not found'));
         }
-      }, 1500);
+      }, 750);
     });
   },
   createOne: (data) => {
@@ -138,7 +138,7 @@ export const notesDataSource: DataSource<Note> = {
         notesStore = [...notesStore, newNote];
 
         resolve(newNote);
-      }, 1500);
+      }, 750);
     });
   },
   updateOne: (noteId, data) => {
@@ -159,7 +159,7 @@ export const notesDataSource: DataSource<Note> = {
         } else {
           reject(new Error('Note not found'));
         }
-      }, 1500);
+      }, 750);
     });
   },
   deleteOne: (noteId) => {
@@ -168,7 +168,7 @@ export const notesDataSource: DataSource<Note> = {
         notesStore = notesStore.filter((note) => note.id !== Number(noteId));
 
         resolve();
-      }, 1500);
+      }, 750);
     });
   },
   validate: (formValues) => {

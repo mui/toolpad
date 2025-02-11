@@ -4,11 +4,11 @@
     "onSubmitSuccess": { "type": { "name": "func" } }
   },
   "name": "Edit",
-  "imports": ["import { Edit } from '@toolpad/core/CRUD';"],
+  "imports": ["import { Edit } from '@toolpad/core/Crud';"],
   "classes": [],
   "muiName": "Edit",
-  "filename": "/packages/toolpad-core/src/CRUD/Edit.tsx",
+  "filename": "/packages/toolpad-core/src/Crud/Edit.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">Crud</a></li></ul>",
   "cssComponent": false
 }

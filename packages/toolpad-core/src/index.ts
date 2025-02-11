@@ -8,7 +8,7 @@ export * from './Account';
 
 export * from './PageContainer';
 
-export * from './CRUD';
+export * from './Crud';
 
 export * from './useActivePage';
 

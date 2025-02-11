@@ -5,11 +5,11 @@
     "onEditClick": { "type": { "name": "func" } }
   },
   "name": "Show",
-  "imports": ["import { Show } from '@toolpad/core/CRUD';"],
+  "imports": ["import { Show } from '@toolpad/core/Crud';"],
   "classes": [],
   "muiName": "Show",
-  "filename": "/packages/toolpad-core/src/CRUD/Show.tsx",
+  "filename": "/packages/toolpad-core/src/Crud/Show.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">Crud</a></li></ul>",
   "cssComponent": false
 }

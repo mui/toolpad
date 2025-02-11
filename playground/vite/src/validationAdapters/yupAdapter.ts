@@ -1,4 +1,4 @@
-import { DataModel, DataSource, OmitId } from '@toolpad/core/CRUD';
+import { DataModel, DataSource, OmitId } from '@toolpad/core/Crud';
 import * as yup from 'yup';
 
 const yupAdapter =

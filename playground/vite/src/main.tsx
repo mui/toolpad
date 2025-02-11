@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import App from './App';
 import Layout from './layouts/dashboard';
 import DashboardPage from './pages';
-import OrdersCRUDPage from './pages/orders';
+import OrdersCrudPage from './pages/orders';
 
 const router = createBrowserRouter([
   {
@@ -20,7 +20,7 @@ const router = createBrowserRouter([
           },
           {
             path: 'orders/:orderId?/*',
-            Component: OrdersCRUDPage,
+            Component: OrdersCrudPage,
           },
         ],
       },

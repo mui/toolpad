@@ -4,7 +4,7 @@
 
 - [Account](/toolpad/core/react-account/)
 - [App Provider](/toolpad/core/react-app-provider/)
-- [CRUD](/toolpad/core/react-crud/)
+- [Crud](/toolpad/core/react-crud/)
 - [Dashboard Layout](/toolpad/core/react-dashboard-layout/)
 - [Page Container](/toolpad/core/react-page-container/)
 - [Sign-in Page](/toolpad/core/react-sign-in-page/)

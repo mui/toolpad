@@ -1,4 +1,4 @@
-import { DataModel, DataSource } from '@toolpad/core/CRUD';
+import { DataModel, DataSource } from '@toolpad/core/Crud';
 import * as yup from 'yup';
 import yupAdapter from '../validationAdapters/yupAdapter';
 
@@ -7,6 +7,7 @@ type OrderStatus = 'pending' | 'sent';
 export interface Order extends DataModel {
   id: number;
   title: string;
+  description?: string;
   status: OrderStatus;
   itemCount: number;
   fastDelivery: boolean;
@@ -27,6 +28,7 @@ export const ordersDataSource: DataSource<Order> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title' },
+    { field: 'description', headerName: 'Description', type: 'longString' },
     {
       field: 'status',
       headerName: 'Status',
@@ -55,7 +57,7 @@ export const ordersDataSource: DataSource<Order> = {
 
         let filteredOrders = [...ordersStore];
 
-        // Apply filters
+        // Apply filters (example only)
         if (filterModel?.items?.length) {
           filterModel.items.forEach(({ field, value, operator }) => {
             if (!field || value == null) {
@@ -179,6 +181,7 @@ export const ordersDataSource: DataSource<Order> = {
   validate: yupAdapter<Order>(
     yup.object({
       title: yup.string().required('Title is required'),
+      description: yup.string(),
       status: yup
         .string()
         .oneOf(['pending', 'sent'], 'Status must be "pending" or "sent"')

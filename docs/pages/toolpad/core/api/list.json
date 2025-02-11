@@ -16,7 +16,7 @@
     }
   },
   "name": "List",
-  "imports": ["import { List } from '@toolpad/core/CRUD';"],
+  "imports": ["import { List } from '@toolpad/core/Crud';"],
   "slots": [
     {
       "name": "dataGrid",
@@ -27,8 +27,8 @@
   ],
   "classes": [],
   "muiName": "List",
-  "filename": "/packages/toolpad-core/src/CRUD/List.tsx",
+  "filename": "/packages/toolpad-core/src/Crud/List.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">Crud</a></li></ul>",
   "cssComponent": false
 }

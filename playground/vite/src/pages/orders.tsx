@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { CRUD } from '@toolpad/core/CRUD';
+import { Crud } from '@toolpad/core/Crud';
 import { ordersDataSource, Order } from '../data/orders';
 
-export default function OrdersCRUDPage() {
+export default function OrdersCrudPage() {
   return (
-    <CRUD<Order>
+    <Crud<Order>
       dataSource={ordersDataSource}
       rootPath="/orders"
       initialPageSize={25}

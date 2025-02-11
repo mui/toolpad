@@ -5,15 +5,15 @@
     "defaultValues": { "type": { "name": "object" }, "default": "{}" },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" }
   },
-  "name": "CRUD",
+  "name": "Crud",
   "imports": [
-    "import { CRUD } from '@toolpad/core/CRUD';",
-    "import { CRUD } from '@toolpad/core';"
+    "import { Crud } from '@toolpad/core/Crud';",
+    "import { Crud } from '@toolpad/core';"
   ],
   "classes": [],
-  "muiName": "CRUD",
-  "filename": "/packages/toolpad-core/src/CRUD/CRUD.tsx",
+  "muiName": "Crud",
+  "filename": "/packages/toolpad-core/src/Crud/Crud.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">Crud</a></li></ul>",
   "cssComponent": false
 }

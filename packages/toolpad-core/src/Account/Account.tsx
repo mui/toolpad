@@ -10,7 +10,16 @@ import { AccountPreview, AccountPreviewProps } from './AccountPreview';
 import { AccountPopoverHeader } from './AccountPopoverHeader';
 import { AccountPopoverFooter } from './AccountPopoverFooter';
 import { SessionContext, AuthenticationContext } from '../AppProvider/AppProvider';
-import { LocaleProvider, useLocaleText } from '../shared/locales/LocaleContext';
+import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
+import { AccountLocaleContext } from './AccountLocaleContext';
+
+interface AccountLocaleText {
+  accountSignInLabel: string;
+  accountSignOutLabel: string;
+
+  accountPreviewIconButtonLabel: string;
+  accountPreviewTitle: string;
+}
 
 export interface AccountSlots {
   /**
@@ -58,8 +67,15 @@ export interface AccountProps {
   /**
    * The labels for the account component.
    */
-  localeText?: Partial<ReturnType<typeof useLocaleText>>;
+  localeText?: Partial<AccountLocaleText>;
 }
+
+const defaultAccountLocaleText: Pick<LocaleText, keyof AccountLocaleText> = {
+  accountPreviewIconButtonLabel: 'Current User',
+  accountPreviewTitle: 'Account',
+  accountSignInLabel: 'Sign in',
+  accountSignOutLabel: 'Sign out',
+};
 
 /**
  *
@@ -74,7 +90,12 @@ export interface AccountProps {
  * - [Account API](https://mui.com/toolpad/core/api/account)
  */
 function Account(props: AccountProps) {
-  const { localeText } = props;
+  const { localeText: propsLocaleText } = props;
+  const globalLocaleText = useLocaleText();
+  const localeText = React.useMemo(
+    () => ({ ...defaultAccountLocaleText, ...globalLocaleText, ...propsLocaleText }),
+    [globalLocaleText, propsLocaleText],
+  );
   const { slots, slotProps } = props;
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const session = React.useContext(SessionContext);
@@ -93,88 +114,92 @@ function Account(props: AccountProps) {
     return null;
   }
 
+  let accountContent = null;
+
   if (!session?.user) {
-    return (
-      <LocaleProvider localeText={localeText}>
-        {slots?.signInButton ? (
-          <slots.signInButton onClick={authentication.signIn} />
+    accountContent = slots?.signInButton ? (
+      <slots.signInButton onClick={authentication.signIn} />
+    ) : (
+      <SignInButton {...slotProps?.signInButton} />
+    );
+  } else {
+    accountContent = (
+      <React.Fragment>
+        {slots?.preview ? (
+          <slots.preview handleClick={handleClick} open={open} />
         ) : (
-          <SignInButton {...slotProps?.signInButton} />
+          <AccountPreview
+            variant="condensed"
+            handleClick={handleClick}
+            open={open}
+            {...slotProps?.preview}
+          />
         )}
-      </LocaleProvider>
+        {slots?.popover ? (
+          <slots.popover
+            open={open}
+            onClick={handleClick}
+            onClose={handleClose}
+            {...slotProps?.popover}
+          />
+        ) : (
+          <Popover
+            anchorEl={anchorEl}
+            id="account-menu"
+            open={open}
+            onClose={handleClose}
+            onClick={handleClose}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            {...slotProps?.popover}
+            slotProps={{
+              paper: {
+                elevation: 0,
+                sx: {
+                  overflow: 'visible',
+                  filter: (theme) =>
+                    `drop-shadow(0px 2px 8px ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.32)'})`,
+                  mt: 1,
+                  '&::before': {
+                    content: '""',
+                    display: 'block',
+                    position: 'absolute',
+                    top: 0,
+                    right: 14,
+                    width: 10,
+                    height: 10,
+                    bgcolor: 'background.paper',
+                    transform: 'translateY(-50%) rotate(45deg)',
+                    zIndex: 0,
+                  },
+                },
+              },
+              ...slotProps?.popover?.slotProps,
+            }}
+          >
+            {slots?.popoverContent ? (
+              <slots.popoverContent {...slotProps?.popoverContent} />
+            ) : (
+              <Stack direction="column" {...slotProps?.popoverContent}>
+                <AccountPopoverHeader>
+                  <AccountPreview variant="expanded" />
+                </AccountPopoverHeader>
+                <Divider />
+                <AccountPopoverFooter>
+                  <SignOutButton {...slotProps?.signOutButton} />
+                </AccountPopoverFooter>
+              </Stack>
+            )}
+          </Popover>
+        )}
+      </React.Fragment>
     );
   }
 
   return (
-    <LocaleProvider localeText={localeText}>
-      {slots?.preview ? (
-        <slots.preview handleClick={handleClick} open={open} />
-      ) : (
-        <AccountPreview
-          variant="condensed"
-          handleClick={handleClick}
-          open={open}
-          {...slotProps?.preview}
-        />
-      )}
-      {slots?.popover ? (
-        <slots.popover
-          open={open}
-          onClick={handleClick}
-          onClose={handleClose}
-          {...slotProps?.popover}
-        />
-      ) : (
-        <Popover
-          anchorEl={anchorEl}
-          id="account-menu"
-          open={open}
-          onClose={handleClose}
-          onClick={handleClose}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-          {...slotProps?.popover}
-          slotProps={{
-            paper: {
-              elevation: 0,
-              sx: {
-                overflow: 'visible',
-                filter: (theme) =>
-                  `drop-shadow(0px 2px 8px ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.32)'})`,
-                mt: 1,
-                '&::before': {
-                  content: '""',
-                  display: 'block',
-                  position: 'absolute',
-                  top: 0,
-                  right: 14,
-                  width: 10,
-                  height: 10,
-                  bgcolor: 'background.paper',
-                  transform: 'translateY(-50%) rotate(45deg)',
-                  zIndex: 0,
-                },
-              },
-            },
-            ...slotProps?.popover?.slotProps,
-          }}
-        >
-          {slots?.popoverContent ? (
-            <slots.popoverContent {...slotProps?.popoverContent} />
-          ) : (
-            <Stack direction="column" {...slotProps?.popoverContent}>
-              <AccountPopoverHeader>
-                <AccountPreview variant="expanded" />
-              </AccountPopoverHeader>
-              <Divider />
-              <AccountPopoverFooter>
-                <SignOutButton {...slotProps?.signOutButton} />
-              </AccountPopoverFooter>
-            </Stack>
-          )}
-        </Popover>
-      )}
-    </LocaleProvider>
+    <AccountLocaleContext.Provider value={localeText}>
+      {accountContent}
+    </AccountLocaleContext.Provider>
   );
 }
 
@@ -186,11 +211,7 @@ Account.propTypes /* remove-proptypes */ = {
   /**
    * The labels for the account component.
    */
-  localeText: PropTypes.shape({
-    iconButtonAriaLabel: PropTypes.string,
-    signInLabel: PropTypes.string,
-    signOutLabel: PropTypes.string,
-  }),
+  localeText: PropTypes.object,
   /**
    * The props used for each slot inside.
    */

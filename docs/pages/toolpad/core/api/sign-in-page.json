@@ -1,5 +1,6 @@
 {
   "props": {
+    "localeText": { "type": { "name": "object" } },
     "providers": {
       "type": { "name": "arrayOf", "description": "Array&lt;{ id: string, name: string }&gt;" },
       "default": "[]"

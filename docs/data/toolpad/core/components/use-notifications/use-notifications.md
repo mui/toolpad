@@ -75,6 +75,20 @@ Notification providers can be nested. That way you can scope the notifications t
 
 {{"demo": "ScopedNotification.js"}}
 
+## Customization
+
+If you want to customize the notification experience, such as the position of the notification, you can provide a custom [`Snackbar`](https://mui.com/material-ui/react-snackbar/) configuration to the `NotificationsProvider`. Applying these configurations at the provider level will globally set the behavior of all notifications in your application.
+
+```js
+<NotificationsProvider
+  slotProps={{
+    snackbar: {
+      anchorOrigin: { vertical: 'bottom', horizontal: 'right' },
+    },
+  }}
+>
+```
+
 ## 🚧 Notification center
 
 When multiple notifications are available, click the badge to open the notification center to show a scrollable list of all available notifications. This feature is not available yet.

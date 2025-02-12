@@ -19,6 +19,10 @@
 
 </div>
 
+<div align="center">
+  <a href="https://trendshift.io/repositories/12027" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12027" alt="mui%2Ftoolpad | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+</div>
+
 ## Product walkthrough
 
 - [Toolpad Core](https://mui.com/toolpad/core/introduction/) is a set of high level React components that abstract common concepts such as layout navigation and routing. It aims at helping you build and maintain dashboards and internal tooling faster. It's built on top of [Material UI](http://github.com/mui/material-ui/).

@@ -718,6 +718,8 @@ SignInPage.propTypes /* remove-proptypes */ = {
   slotProps: PropTypes.shape({
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
+    form: PropTypes.object,
+    oAuthButton: PropTypes.object,
     passwordField: PropTypes.object,
     rememberMe: PropTypes.object,
     signUpLink: PropTypes.object,

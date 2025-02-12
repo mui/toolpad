@@ -25,7 +25,7 @@ To copy this example and customize it for your needs, run
 ```bash
 npx create-toolpad-app@latest --example tutorial
 # or
-pnpm dlx create-toolpad-app --example tutorial
+pnpm create toolpad-app --example tutorial
 ```
 
 and follow the instructions in the terminal.

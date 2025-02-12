@@ -146,7 +146,7 @@ export default function SlotsSignIn() {
           passwordField: CustomPasswordField,
           submitButton: CustomButton,
           signUpLink: SignUpLink,
-          checkbox: RememberMeCheckbox,
+          rememberMe: RememberMeCheckbox,
           forgotPasswordLink: ForgotPasswordLink,
         }}
         slotProps={{ form: { noValidate: true } }}

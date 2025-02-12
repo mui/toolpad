@@ -28,14 +28,14 @@ export default function SlotPropsSignIn() {
           }
           return undefined;
         }}
-        slots={{ checkbox: RememberMeCheckbox }}
+        slots={{ rememberMe: RememberMeCheckbox }}
         slotProps={{
           form: { noValidate: true },
           emailField: { variant: 'standard', autoFocus: false },
           passwordField: { variant: 'standard' },
           submitButton: { variant: 'outlined' },
           oauthButton: { variant: 'contained' },
-          checkbox: {
+          rememberMe: {
             control: (
               <Checkbox
                 name="tandc"

@@ -1,0 +1,15 @@
+<List<Person>
+  dataSource={peopleDataSource}
+  initialPageSize={4}
+  onRowClick={handleRowClick}
+  onCreateClick={handleCreateClick}
+  onEditClick={handleEditClick}
+  slots={{
+    dataGrid: DataGridPro,
+  }}
+  slotProps={{
+    dataGrid: {
+      checkboxSelection: true,
+    },
+  }}
+/>

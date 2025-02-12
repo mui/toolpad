@@ -110,7 +110,7 @@ const notesDataSource: DataSource<Note> = {
 
 The `getMany` method in a data source can be used for retrieving paginated, sorted and filtered items to be displayed as a list, usually in a table.
 
-Pagination, sorting and filtering can be integrated with your data fetching via the `paginationModel`, `filterModel` and `sortModel` arguments. These arguments follow the same shape as the models for [pagination](https://mui.com/x/react-data-grid/pagination/#pagination-model), [sorting](https://mui.com/x/react-data-grid/sorting/#structure-of-the-model) and [filtering](https://mui.com/x/react-data-grid/filtering/#structure-of-the-model) used by the **MUI X Data Grid**.
+Pagination, sorting and filtering can be integrated with your data fetching via the `paginationModel`, `filterModel` and `sortModel` arguments. These arguments follow the same shape as the models for [pagination](https://mui.com/x/react-data-grid/pagination/#pagination-model), [sorting](https://mui.com/x/react-data-grid/sorting/#structure-of-the-model) and [filtering](https://mui.com/x/react-data-grid/filtering/#structure-of-the-model) used by the MUI X Data Grid.
 
 This method must return an array of objects with the items to be displayed.
 
@@ -204,7 +204,7 @@ This method must return an object corresponding to the new item that has been up
 
 The `deleteOne` method in a data source can be used for deleting an existing item.
 
-This method does not need to return anything in specific.
+This method does not need to return anything.
 
 ```tsx
 {
@@ -285,9 +285,27 @@ const dataSource = {
 
 ## Advanced configuration
 
-// show composability usage
+For more flexibility of customization, and especially if you want full control over where to place the different CRUD pages, you can use the `List`, `Show`, `Create` and `Edit` subcomponents instead of the all-in-one `Crud` component.
+
+{{"demo": "CrudAdvanced.js", "height": 600, "iframe": true}}
+
+The `CrudProvider` component is optional, but it can be used to easily pass a single `dataSource` to the CRUD page components inside it as context. Alternatively, each of those components can take its own `dataSource` as a prop.
 
 ### `List` component
+
+Displays a [Data Grid](https://mui.com/x/react-data-grid/) listing items from a data source, with support for pagination, sorting and filtering, along with some useful controls such as refreshing data.
+
+If props are passed for `onCreateClick` or `onEditClick`, buttons are shown for triggering those callbacks.
+
+If the data source includes `deleteOne`, it is possible to delete items directly from their respective rows.
+
+{{"demo": "CrudList.js", "height": 600, "iframe": true}}
+
+#### Integration with MUI X Data Grid
+
+The `dataGrid` slot and slot props can be used to replace the standard Data Grid with any of its [commercially licensed versions](https://mui.com/x/react-data-grid/#commercial-licenses).
+
+{{"demo": "CrudListDataGrid.js", "height": 600, "iframe": true}}
 
 ### `Show` component
 

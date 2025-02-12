@@ -1,0 +1,7 @@
+<List<Person>
+  dataSource={peopleDataSource}
+  initialPageSize={4}
+  onRowClick={handleRowClick}
+  onCreateClick={handleCreateClick}
+  onEditClick={handleEditClick}
+/>

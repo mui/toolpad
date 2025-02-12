@@ -41,15 +41,15 @@ let notesStore = [
 export const notesDataSource = {
   fields: [
     { field: 'id', headerName: 'ID' },
-    { field: 'title', headerName: 'Title' },
-    { field: 'text', headerName: 'Text' },
+    { field: 'title', headerName: 'Title', flex: 1 },
+    { field: 'text', headerName: 'Text', type: 'longString', flex: 1 },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         let processedNotes = [...notesStore];
 
-        // Apply filters
+        // Apply filters (demo only)
         if (filterModel?.items?.length) {
           filterModel.items.forEach(({ field, value, operator }) => {
             if (!field || value == null) {
@@ -109,7 +109,7 @@ export const notesDataSource = {
           items: paginatedNotes,
           itemCount: processedNotes.length,
         });
-      }, 1500);
+      }, 750);
     });
   },
   getOne: (noteId) => {
@@ -122,7 +122,7 @@ export const notesDataSource = {
         } else {
           reject(new Error('Note not found'));
         }
-      }, 1500);
+      }, 750);
     });
   },
   createOne: (data) => {
@@ -133,7 +133,7 @@ export const notesDataSource = {
         notesStore = [...notesStore, newNote];
 
         resolve(newNote);
-      }, 1500);
+      }, 750);
     });
   },
   updateOne: (noteId, data) => {
@@ -154,7 +154,7 @@ export const notesDataSource = {
         } else {
           reject(new Error('Note not found'));
         }
-      }, 1500);
+      }, 750);
     });
   },
   deleteOne: (noteId) => {
@@ -163,7 +163,7 @@ export const notesDataSource = {
         notesStore = notesStore.filter((note) => note.id !== Number(noteId));
 
         resolve();
-      }, 1500);
+      }, 750);
     });
   },
   validate: (formValues) => {

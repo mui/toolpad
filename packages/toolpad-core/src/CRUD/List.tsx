@@ -20,6 +20,8 @@ import {
   GridEventListener,
   gridClasses,
 } from '@mui/x-data-grid';
+import type { DataGridProProps } from '@mui/x-data-grid-pro';
+import type { DataGridPremiumProps } from '@mui/x-data-grid-premium';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
@@ -46,7 +48,7 @@ const ErrorOverlay = styled('div')(({ theme }) => ({
 }));
 
 export interface ListSlotProps {
-  dataGrid?: DataGridProps;
+  dataGrid?: Partial<DataGridProps | DataGridProProps | DataGridPremiumProps>;
 }
 
 export interface ListSlots {
@@ -54,7 +56,10 @@ export interface ListSlots {
    * The DataGrid component used to list the items.
    * @default DataGrid
    */
-  dataGrid?: React.JSXElementConstructor<DataGridProps>;
+  dataGrid?:
+    | React.JSXElementConstructor<DataGridProps>
+    | React.JSXElementConstructor<DataGridProProps>
+    | React.JSXElementConstructor<DataGridPremiumProps>;
 }
 
 export interface ListProps<D extends DataModel> {
@@ -345,7 +350,8 @@ function List<D extends DataModel>(props: ListProps<D>) {
           loading={isLoading}
           initialState={initialState}
           slots={{ toolbar: GridToolbar }}
-          {...slotProps?.dataGrid}
+          // Prevent type conflicts if slotProps don't match DataGrid used for dataGrid slot
+          {...(slotProps?.dataGrid as Record<string, unknown>)}
           sx={{
             [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
               outline: 'transparent',

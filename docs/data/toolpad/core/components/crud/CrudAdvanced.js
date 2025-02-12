@@ -5,7 +5,7 @@ import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Crud } from '@toolpad/core/Crud';
+import { Create, CrudProvider, Edit, List, Show } from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -189,29 +189,69 @@ function matchPath(pattern, pathname) {
   return match ? match[1] : null;
 }
 
-function CrudBasic(props) {
+function CrudAdvanced(props) {
   const { window } = props;
-
-  const router = useDemoRouter('/notes');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
+  const rootPath = '/notes';
+
+  const router = useDemoRouter(rootPath);
+
+  const listPath = rootPath;
+  const showPath = `${rootPath}/:noteId`;
+  const createPath = `${rootPath}/new`;
+  const editPath = `${rootPath}/:noteId/edit`;
+
   const title = React.useMemo(() => {
-    if (router.pathname === '/notes/new') {
+    if (router.pathname === createPath) {
       return 'New Note';
     }
-    const editNoteId = matchPath('/notes/:noteId/edit', router.pathname);
+    const editNoteId = matchPath(editPath, router.pathname);
     if (editNoteId) {
       return `Note ${editNoteId} - Edit`;
     }
-    const showNoteId = matchPath('/notes/:noteId', router.pathname);
+    const showNoteId = matchPath(showPath, router.pathname);
     if (showNoteId) {
       return `Note ${showNoteId}`;
     }
 
     return undefined;
-  }, [router.pathname]);
+  }, [createPath, editPath, router.pathname, showPath]);
+
+  const handleRowClick = React.useCallback(
+    (noteId) => {
+      router.navigate(`${rootPath}/${String(noteId)}`);
+    },
+    [router],
+  );
+
+  const handleCreateClick = React.useCallback(() => {
+    router.navigate(createPath);
+  }, [createPath, router]);
+
+  const handleEditClick = React.useCallback(
+    (noteId) => {
+      router.navigate(`${rootPath}/${String(noteId)}/edit`);
+    },
+    [router],
+  );
+
+  const handleCreate = React.useCallback(() => {
+    router.navigate(listPath);
+  }, [listPath, router]);
+
+  const handleEdit = React.useCallback(() => {
+    router.navigate(listPath);
+  }, [listPath, router]);
+
+  const handleDelete = React.useCallback(() => {
+    router.navigate(listPath);
+  }, [listPath, router]);
+
+  const showNoteId = matchPath(showPath, router.pathname);
+  const editNoteId = matchPath(editPath, router.pathname);
 
   return (
     <AppProvider
@@ -223,12 +263,32 @@ function CrudBasic(props) {
       <DashboardLayout defaultSidebarCollapsed>
         <PageContainer title={title}>
           {/* preview-start */}
-          <Crud
-            dataSource={notesDataSource}
-            rootPath="/notes"
-            initialPageSize={10}
-            defaultValues={{ title: 'New note' }}
-          />
+          <CrudProvider dataSource={notesDataSource}>
+            {router.pathname === listPath ? (
+              <List
+                initialPageSize={10}
+                onRowClick={handleRowClick}
+                onCreateClick={handleCreateClick}
+                onEditClick={handleEditClick}
+              />
+            ) : null}
+            {router.pathname === createPath ? (
+              <Create
+                initialValues={{ title: 'New note' }}
+                onSubmitSuccess={handleCreate}
+              />
+            ) : null}
+            {router.pathname !== createPath && showNoteId ? (
+              <Show
+                id={showNoteId}
+                onEditClick={handleEditClick}
+                onDelete={handleDelete}
+              />
+            ) : null}
+            {editNoteId ? (
+              <Edit id={editNoteId} onSubmitSuccess={handleEdit} />
+            ) : null}
+          </CrudProvider>
           {/* preview-end */}
         </PageContainer>
       </DashboardLayout>
@@ -236,7 +296,7 @@ function CrudBasic(props) {
   );
 }
 
-CrudBasic.propTypes = {
+CrudAdvanced.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -244,4 +304,4 @@ CrudBasic.propTypes = {
   window: PropTypes.func,
 };
 
-export default CrudBasic;
+export default CrudAdvanced;

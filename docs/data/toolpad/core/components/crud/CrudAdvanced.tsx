@@ -1,14 +1,21 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { createTheme } from '@mui/material/styles';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
-import { AppProvider } from '@toolpad/core/AppProvider';
+import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Crud } from '@toolpad/core/Crud';
+import {
+  Create,
+  CrudProvider,
+  DataModel,
+  DataSource,
+  Edit,
+  List,
+  Show,
+} from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
-const NAVIGATION = [
+const NAVIGATION: Navigation = [
   {
     segment: 'notes',
     title: 'Notes',
@@ -33,19 +40,25 @@ const demoTheme = createTheme({
   },
 });
 
-let notesStore = [
+export interface Note extends DataModel {
+  id: number;
+  title: string;
+  text: string;
+}
+
+let notesStore: Note[] = [
   { id: 1, title: 'Grocery List Item', text: 'Buy more coffee.' },
   { id: 2, title: 'Personal Goal', text: 'Finish reading the book.' },
 ];
 
-export const notesDataSource = {
+export const notesDataSource: DataSource<Note> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'text', headerName: 'Text', type: 'longString', flex: 1 },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
-    return new Promise((resolve) => {
+    return new Promise<{ items: Note[]; itemCount: number }>((resolve) => {
       setTimeout(() => {
         let processedNotes = [...notesStore];
 
@@ -75,9 +88,9 @@ export const notesDataSource = {
                     .toLowerCase()
                     .endsWith(String(value).toLowerCase());
                 case '>':
-                  return noteValue > value;
+                  return (noteValue as number) > value;
                 case '<':
-                  return noteValue < value;
+                  return (noteValue as number) < value;
                 default:
                   return true;
               }
@@ -89,10 +102,10 @@ export const notesDataSource = {
         if (sortModel?.length) {
           processedNotes.sort((a, b) => {
             for (const { field, sort } of sortModel) {
-              if (a[field] < b[field]) {
+              if ((a[field] as number) < (b[field] as number)) {
                 return sort === 'asc' ? -1 : 1;
               }
-              if (a[field] > b[field]) {
+              if ((a[field] as number) > (b[field] as number)) {
                 return sort === 'asc' ? 1 : -1;
               }
             }
@@ -113,7 +126,7 @@ export const notesDataSource = {
     });
   },
   getOne: (noteId) => {
-    return new Promise((resolve, reject) => {
+    return new Promise<Note>((resolve, reject) => {
       setTimeout(() => {
         const noteToShow = notesStore.find((note) => note.id === Number(noteId));
 
@@ -128,7 +141,7 @@ export const notesDataSource = {
   createOne: (data) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        const newNote = { id: notesStore.length + 1, ...data };
+        const newNote = { id: notesStore.length + 1, ...data } as Note;
 
         notesStore = [...notesStore, newNote];
 
@@ -139,7 +152,7 @@ export const notesDataSource = {
   updateOne: (noteId, data) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        let updatedNote = null;
+        let updatedNote: Note | null = null;
 
         notesStore = notesStore.map((note) => {
           if (note.id === Number(noteId)) {
@@ -158,7 +171,7 @@ export const notesDataSource = {
     });
   },
   deleteOne: (noteId) => {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
       setTimeout(() => {
         notesStore = notesStore.filter((note) => note.id !== Number(noteId));
 
@@ -167,7 +180,7 @@ export const notesDataSource = {
     });
   },
   validate: (formValues) => {
-    const errors = {};
+    const errors: Record<keyof Note, string> = {};
 
     if (!formValues.title) {
       errors.title = 'Title is required';
@@ -183,35 +196,83 @@ export const notesDataSource = {
   },
 };
 
-function matchPath(pattern, pathname) {
+function matchPath(pattern: string, pathname: string): string | null {
   const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
   const match = pathname.match(regex);
   return match ? match[1] : null;
 }
 
-function CrudBasic(props) {
-  const { window } = props;
+interface DemoProps {
+  /**
+   * Injected by the documentation to work in an iframe.
+   * Remove this when copying and pasting into your project.
+   */
+  window?: () => Window;
+}
 
-  const router = useDemoRouter('/notes');
+export default function CrudAdvanced(props: DemoProps) {
+  const { window } = props;
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
+  const rootPath = '/notes';
+
+  const router = useDemoRouter(rootPath);
+
+  const listPath = rootPath;
+  const showPath = `${rootPath}/:noteId`;
+  const createPath = `${rootPath}/new`;
+  const editPath = `${rootPath}/:noteId/edit`;
+
   const title = React.useMemo(() => {
-    if (router.pathname === '/notes/new') {
+    if (router.pathname === createPath) {
       return 'New Note';
     }
-    const editNoteId = matchPath('/notes/:noteId/edit', router.pathname);
+    const editNoteId = matchPath(editPath, router.pathname);
     if (editNoteId) {
       return `Note ${editNoteId} - Edit`;
     }
-    const showNoteId = matchPath('/notes/:noteId', router.pathname);
+    const showNoteId = matchPath(showPath, router.pathname);
     if (showNoteId) {
       return `Note ${showNoteId}`;
     }
 
     return undefined;
-  }, [router.pathname]);
+  }, [createPath, editPath, router.pathname, showPath]);
+
+  const handleRowClick = React.useCallback(
+    (noteId: string | number) => {
+      router.navigate(`${rootPath}/${String(noteId)}`);
+    },
+    [router],
+  );
+
+  const handleCreateClick = React.useCallback(() => {
+    router.navigate(createPath);
+  }, [createPath, router]);
+
+  const handleEditClick = React.useCallback(
+    (noteId: string | number) => {
+      router.navigate(`${rootPath}/${String(noteId)}/edit`);
+    },
+    [router],
+  );
+
+  const handleCreate = React.useCallback(() => {
+    router.navigate(listPath);
+  }, [listPath, router]);
+
+  const handleEdit = React.useCallback(() => {
+    router.navigate(listPath);
+  }, [listPath, router]);
+
+  const handleDelete = React.useCallback(() => {
+    router.navigate(listPath);
+  }, [listPath, router]);
+
+  const showNoteId = matchPath(showPath, router.pathname);
+  const editNoteId = matchPath(editPath, router.pathname);
 
   return (
     <AppProvider
@@ -223,25 +284,35 @@ function CrudBasic(props) {
       <DashboardLayout defaultSidebarCollapsed>
         <PageContainer title={title}>
           {/* preview-start */}
-          <Crud
-            dataSource={notesDataSource}
-            rootPath="/notes"
-            initialPageSize={10}
-            defaultValues={{ title: 'New note' }}
-          />
+          <CrudProvider<Note> dataSource={notesDataSource}>
+            {router.pathname === listPath ? (
+              <List<Note>
+                initialPageSize={10}
+                onRowClick={handleRowClick}
+                onCreateClick={handleCreateClick}
+                onEditClick={handleEditClick}
+              />
+            ) : null}
+            {router.pathname === createPath ? (
+              <Create<Note>
+                initialValues={{ title: 'New note' }}
+                onSubmitSuccess={handleCreate}
+              />
+            ) : null}
+            {router.pathname !== createPath && showNoteId ? (
+              <Show<Note>
+                id={showNoteId}
+                onEditClick={handleEditClick}
+                onDelete={handleDelete}
+              />
+            ) : null}
+            {editNoteId ? (
+              <Edit<Note> id={editNoteId} onSubmitSuccess={handleEdit} />
+            ) : null}
+          </CrudProvider>
           {/* preview-end */}
         </PageContainer>
       </DashboardLayout>
     </AppProvider>
   );
 }
-
-CrudBasic.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
-  window: PropTypes.func,
-};
-
-export default CrudBasic;

@@ -1,0 +1,26 @@
+<CrudProvider<Note> dataSource={notesDataSource}>
+  {router.pathname === listPath ? (
+    <List<Note>
+      initialPageSize={10}
+      onRowClick={handleRowClick}
+      onCreateClick={handleCreateClick}
+      onEditClick={handleEditClick}
+    />
+  ) : null}
+  {router.pathname === createPath ? (
+    <Create<Note>
+      initialValues={{ title: 'New note' }}
+      onSubmitSuccess={handleCreate}
+    />
+  ) : null}
+  {router.pathname !== createPath && showNoteId ? (
+    <Show<Note>
+      id={showNoteId}
+      onEditClick={handleEditClick}
+      onDelete={handleDelete}
+    />
+  ) : null}
+  {editNoteId ? (
+    <Edit<Note> id={editNoteId} onSubmitSuccess={handleEdit} />
+  ) : null}
+</CrudProvider>

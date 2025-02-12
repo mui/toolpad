@@ -59,8 +59,8 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
   );
 
   const handleCreateClick = React.useCallback(() => {
-    routerContext?.navigate(`${rootPath}/new`);
-  }, [rootPath, routerContext]);
+    routerContext?.navigate(createPath);
+  }, [createPath, routerContext]);
 
   const handleEditClick = React.useCallback(
     (id: string | number) => {
@@ -70,16 +70,16 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
   );
 
   const handleCreate = React.useCallback(() => {
-    routerContext?.navigate(rootPath);
-  }, [rootPath, routerContext]);
+    routerContext?.navigate(listPath);
+  }, [listPath, routerContext]);
 
   const handleEdit = React.useCallback(() => {
-    routerContext?.navigate(rootPath);
-  }, [rootPath, routerContext]);
+    routerContext?.navigate(listPath);
+  }, [listPath, routerContext]);
 
   const handleDelete = React.useCallback(() => {
-    routerContext?.navigate(rootPath);
-  }, [rootPath, routerContext]);
+    routerContext?.navigate(listPath);
+  }, [listPath, routerContext]);
 
   const renderedRoute = React.useMemo(() => {
     const pathname = routerContext?.pathname ?? '';

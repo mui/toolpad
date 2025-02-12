@@ -255,6 +255,8 @@ export interface SignInPageProps {
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
     rememberMe?: Partial<FormControlLabelProps>;
+    form?: Partial<React.FormHTMLAttributes<HTMLFormElement>>;
+    oAuthButton?: LoadingButtonProps;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container
@@ -375,6 +377,7 @@ function SignInPage(props: SignInPageProps) {
                           error: oauthResponse?.error,
                         }));
                       }}
+                      {...slotProps?.form}
                     >
                       <LoadingButton
                         key={provider.id}
@@ -391,6 +394,7 @@ function SignInPage(props: SignInPageProps) {
                         sx={{
                           textTransform: 'capitalize',
                         }}
+                        {...slotProps?.oAuthButton}
                       >
                         <span>Sign in with {provider.name}</span>
                       </LoadingButton>
@@ -424,6 +428,7 @@ function SignInPage(props: SignInPageProps) {
                       error: passkeyResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -498,6 +503,7 @@ function SignInPage(props: SignInPageProps) {
                       success: emailResponse?.success,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -570,6 +576,7 @@ function SignInPage(props: SignInPageProps) {
                       error: credentialsResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
                     {slots?.emailField ? (

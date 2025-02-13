@@ -175,6 +175,10 @@ export default function CrudListDataGrid(props: DemoProps) {
     console.log(`Edit click with id ${personId}`);
   }, []);
 
+  const handleDelete = React.useCallback((personId: string | number) => {
+    console.log(`Person with id ${personId} deleted`);
+  }, []);
+
   return (
     <AppProvider
       navigation={NAVIGATION}
@@ -191,6 +195,7 @@ export default function CrudListDataGrid(props: DemoProps) {
             onRowClick={handleRowClick}
             onCreateClick={handleCreateClick}
             onEditClick={handleEditClick}
+            onDelete={handleDelete}
             slots={{
               dataGrid: DataGridPro,
             }}

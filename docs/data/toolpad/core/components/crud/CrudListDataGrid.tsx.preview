@@ -4,6 +4,7 @@
   onRowClick={handleRowClick}
   onCreateClick={handleCreateClick}
   onEditClick={handleEditClick}
+  onDelete={handleDelete}
   slots={{
     dataGrid: DataGridPro,
   }}

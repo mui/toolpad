@@ -309,6 +309,28 @@ The `dataGrid` slot and slot props can be used to replace the standard Data Grid
 
 ### `Show` component
 
+Displays details for an item with a given `id` retrieved from a data source.
+
+If a props is passed for `onEditClick`, a button is shown for triggering that callback.
+
+If the data source includes `deleteOne`, it is possible to delete items directly from this view.
+
+{{"demo": "CrudShow.js", "height": 600, "iframe": true}}
+
 ### `Create` component
 
+Displays a form for creating a new item for a data source, automatically generated from the given `fields` and field `type`s.
+
+The supported field types are `string`, `longString`, `number`, `boolean`, `date`, `dateTime` and `singleSelect`.
+
+Form validation integrates automatically with the `validate` function in the data source.
+
+{{"demo": "CrudCreate.js", "height": 600, "iframe": true}}
+
 ### `Edit` component
+
+Displays a form for editing an item with a given `id` retrieved from a data source, similarly to the `Create` component.
+
+The form fields are prepopulated with the item's attributes.
+
+{{"demo": "CrudEdit.js", "height": 600, "iframe": true}}

@@ -4,7 +4,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { DataModel, DataSource, List } from '@toolpad/core/Crud';
+import { DataModel, DataSource, Show } from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
@@ -50,7 +50,7 @@ let people: Person[] = [
 ];
 
 export const peopleDataSource: DataSource<Person> &
-  Required<Pick<DataSource<Person>, 'getMany'>> = {
+  Required<Pick<DataSource<Person>, 'getOne'>> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     {
@@ -67,71 +67,16 @@ export const peopleDataSource: DataSource<Person> &
       type: 'number',
     },
   ],
-  getMany: async ({ paginationModel, filterModel, sortModel }) => {
-    return new Promise<{ items: Person[]; itemCount: number }>((resolve) => {
+  getOne: (personId) => {
+    return new Promise<Person>((resolve, reject) => {
       setTimeout(() => {
-        let processedPeople = [...people];
+        const personToShow = people.find((person) => person.id === Number(personId));
 
-        // Apply filters (demo only)
-        if (filterModel?.items?.length) {
-          filterModel.items.forEach(({ field, value, operator }) => {
-            if (!field || value == null) {
-              return;
-            }
-
-            processedPeople = processedPeople.filter((person) => {
-              const personValue = person[field];
-
-              switch (operator) {
-                case 'contains':
-                  return String(personValue)
-                    .toLowerCase()
-                    .includes(String(value).toLowerCase());
-                case 'equals':
-                  return personValue === value;
-                case 'startsWith':
-                  return String(personValue)
-                    .toLowerCase()
-                    .startsWith(String(value).toLowerCase());
-                case 'endsWith':
-                  return String(personValue)
-                    .toLowerCase()
-                    .endsWith(String(value).toLowerCase());
-                case '>':
-                  return (personValue as number) > value;
-                case '<':
-                  return (personValue as number) < value;
-                default:
-                  return true;
-              }
-            });
-          });
+        if (personToShow) {
+          resolve(personToShow);
+        } else {
+          reject(new Error('Person not found'));
         }
-
-        // Apply sorting
-        if (sortModel?.length) {
-          processedPeople.sort((a, b) => {
-            for (const { field, sort } of sortModel) {
-              if ((a[field] as number) < (b[field] as number)) {
-                return sort === 'asc' ? -1 : 1;
-              }
-              if ((a[field] as number) > (b[field] as number)) {
-                return sort === 'asc' ? 1 : -1;
-              }
-            }
-            return 0;
-          });
-        }
-
-        // Apply pagination
-        const start = paginationModel.page * paginationModel.pageSize;
-        const end = start + paginationModel.pageSize;
-        const paginatedPeople = processedPeople.slice(start, end);
-
-        resolve({
-          items: paginatedPeople,
-          itemCount: processedPeople.length,
-        });
       }, 750);
     });
   },
@@ -154,21 +99,13 @@ interface DemoProps {
   window?: () => Window;
 }
 
-export default function CrudList(props: DemoProps) {
+export default function CrudShow(props: DemoProps) {
   const { window } = props;
 
-  const router = useDemoRouter('/people');
+  const router = useDemoRouter('/people/1');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
-
-  const handleRowClick = React.useCallback((personId: string | number) => {
-    console.log(`Row click with id ${personId}`);
-  }, []);
-
-  const handleCreateClick = React.useCallback(() => {
-    console.log('Create click');
-  }, []);
 
   const handleEditClick = React.useCallback((personId: string | number) => {
     console.log(`Edit click with id ${personId}`);
@@ -186,13 +123,11 @@ export default function CrudList(props: DemoProps) {
       window={demoWindow}
     >
       <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer>
+        <PageContainer title="Person">
           {/* preview-start */}
-          <List<Person>
+          <Show<Person>
+            id={1}
             dataSource={peopleDataSource}
-            initialPageSize={4}
-            onRowClick={handleRowClick}
-            onCreateClick={handleCreateClick}
             onEditClick={handleEditClick}
             onDelete={handleDelete}
           />

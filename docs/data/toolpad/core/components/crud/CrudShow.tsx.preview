@@ -1,0 +1,6 @@
+<Show<Person>
+  id={1}
+  dataSource={peopleDataSource}
+  onEditClick={handleEditClick}
+  onDelete={handleDelete}
+/>

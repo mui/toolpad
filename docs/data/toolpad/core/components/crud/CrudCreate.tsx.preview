@@ -1,0 +1,5 @@
+<Create<Person>
+  dataSource={peopleDataSource}
+  initialValues={{ age: 18 }}
+  onSubmitSuccess={handleSubmitSuccess}
+/>

@@ -1,0 +1,5 @@
+<Edit<Person>
+  id={1}
+  dataSource={peopleDataSource}
+  onSubmitSuccess={handleSubmitSuccess}
+/>

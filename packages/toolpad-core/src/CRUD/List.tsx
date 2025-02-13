@@ -85,6 +85,10 @@ export interface ListProps<D extends DataModel> {
    */
   onEditClick?: (id: DataModelId) => void;
   /**
+   * Callback fired when the item is successfully deleted.
+   */
+  onDelete?: (id: DataModelId) => void;
+  /**
    * The components used for each slot inside.
    * @default {}
    */
@@ -106,7 +110,15 @@ export interface ListProps<D extends DataModel> {
  * - [List API](https://mui.com/toolpad/core/api/list)
  */
 function List<D extends DataModel>(props: ListProps<D>) {
-  const { initialPageSize = 100, onRowClick, onCreateClick, onEditClick, slots, slotProps } = props;
+  const {
+    initialPageSize = 100,
+    onRowClick,
+    onCreateClick,
+    onEditClick,
+    onDelete,
+    slots,
+    slotProps,
+  } = props;
 
   const crudContext = React.useContext(CrudContext);
   const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
@@ -256,6 +268,11 @@ function List<D extends DataModel>(props: ListProps<D>) {
         setIsLoading(true);
         try {
           await deleteOne?.(itemId);
+
+          if (onDelete) {
+            onDelete(itemId);
+          }
+
           notifications.show('Item deleted successfully.', {
             severity: 'success',
             autoHideDuration: 3000,
@@ -270,7 +287,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
         setIsLoading(false);
       }
     },
-    [deleteOne, dialogs, loadData, notifications],
+    [deleteOne, dialogs, loadData, notifications, onDelete],
   );
 
   const DataGridSlot = slots?.dataGrid ?? DataGrid;

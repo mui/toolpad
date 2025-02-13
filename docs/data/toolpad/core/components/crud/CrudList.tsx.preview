@@ -4,4 +4,5 @@
   onRowClick={handleRowClick}
   onCreateClick={handleCreateClick}
   onEditClick={handleEditClick}
+  onDelete={handleDelete}
 />

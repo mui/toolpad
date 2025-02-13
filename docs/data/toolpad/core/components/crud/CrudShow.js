@@ -5,7 +5,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { List } from '@toolpad/core/Crud';
+import { Show } from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -60,71 +60,16 @@ export const peopleDataSource = {
       type: 'number',
     },
   ],
-  getMany: async ({ paginationModel, filterModel, sortModel }) => {
-    return new Promise((resolve) => {
+  getOne: (personId) => {
+    return new Promise((resolve, reject) => {
       setTimeout(() => {
-        let processedPeople = [...people];
+        const personToShow = people.find((person) => person.id === Number(personId));
 
-        // Apply filters (demo only)
-        if (filterModel?.items?.length) {
-          filterModel.items.forEach(({ field, value, operator }) => {
-            if (!field || value == null) {
-              return;
-            }
-
-            processedPeople = processedPeople.filter((person) => {
-              const personValue = person[field];
-
-              switch (operator) {
-                case 'contains':
-                  return String(personValue)
-                    .toLowerCase()
-                    .includes(String(value).toLowerCase());
-                case 'equals':
-                  return personValue === value;
-                case 'startsWith':
-                  return String(personValue)
-                    .toLowerCase()
-                    .startsWith(String(value).toLowerCase());
-                case 'endsWith':
-                  return String(personValue)
-                    .toLowerCase()
-                    .endsWith(String(value).toLowerCase());
-                case '>':
-                  return personValue > value;
-                case '<':
-                  return personValue < value;
-                default:
-                  return true;
-              }
-            });
-          });
+        if (personToShow) {
+          resolve(personToShow);
+        } else {
+          reject(new Error('Person not found'));
         }
-
-        // Apply sorting
-        if (sortModel?.length) {
-          processedPeople.sort((a, b) => {
-            for (const { field, sort } of sortModel) {
-              if (a[field] < b[field]) {
-                return sort === 'asc' ? -1 : 1;
-              }
-              if (a[field] > b[field]) {
-                return sort === 'asc' ? 1 : -1;
-              }
-            }
-            return 0;
-          });
-        }
-
-        // Apply pagination
-        const start = paginationModel.page * paginationModel.pageSize;
-        const end = start + paginationModel.pageSize;
-        const paginatedPeople = processedPeople.slice(start, end);
-
-        resolve({
-          items: paginatedPeople,
-          itemCount: processedPeople.length,
-        });
       }, 750);
     });
   },
@@ -139,21 +84,13 @@ export const peopleDataSource = {
   },
 };
 
-function CrudList(props) {
+function CrudShow(props) {
   const { window } = props;
 
-  const router = useDemoRouter('/people');
+  const router = useDemoRouter('/people/1');
 
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
-
-  const handleRowClick = React.useCallback((personId) => {
-    console.log(`Row click with id ${personId}`);
-  }, []);
-
-  const handleCreateClick = React.useCallback(() => {
-    console.log('Create click');
-  }, []);
 
   const handleEditClick = React.useCallback((personId) => {
     console.log(`Edit click with id ${personId}`);
@@ -171,13 +108,11 @@ function CrudList(props) {
       window={demoWindow}
     >
       <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer>
+        <PageContainer title="Person">
           {/* preview-start */}
-          <List
+          <Show
+            id={1}
             dataSource={peopleDataSource}
-            initialPageSize={4}
-            onRowClick={handleRowClick}
-            onCreateClick={handleCreateClick}
             onEditClick={handleEditClick}
             onDelete={handleDelete}
           />
@@ -188,7 +123,7 @@ function CrudList(props) {
   );
 }
 
-CrudList.propTypes = {
+CrudShow.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -196,4 +131,4 @@ CrudList.propTypes = {
   window: PropTypes.func,
 };
 
-export default CrudList;
+export default CrudShow;

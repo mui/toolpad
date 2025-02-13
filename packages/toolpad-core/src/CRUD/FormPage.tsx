@@ -162,9 +162,13 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
 
   const handleDateFieldChange = React.useCallback(
     (name: string) => (value: Dayjs | null) => {
-      handleFormFieldChange(name, value?.toISOString() ?? null);
+      if (value?.isValid()) {
+        handleFormFieldChange(name, value.toISOString() ?? null);
+      } else if (formValues[name]) {
+        handleFormFieldChange(name, null);
+      }
     },
-    [handleFormFieldChange],
+    [formValues, handleFormFieldChange],
   );
 
   const handleSelectFieldChange = React.useCallback(
@@ -193,6 +197,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
             helperText={fieldError ?? ' '}
             fullWidth
             multiline={type === 'longString'}
+            minRows={type === 'longString' ? 2 : undefined}
           />
         );
       }

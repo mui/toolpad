@@ -141,7 +141,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
         return fieldValue ? dayjs(fieldValue as string).format('MMMM D, YYYY h:mm A') : '-';
       }
 
-      return String(fieldValue) ?? '-';
+      return fieldValue ? String(fieldValue) : '-';
     },
     [data],
   );

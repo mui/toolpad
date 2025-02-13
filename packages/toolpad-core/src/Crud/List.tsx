@@ -134,7 +134,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const routerContext = React.useContext(RouterContext);
   const appWindowContext = React.useContext(WindowContext);
 
-  const appWindow = appWindowContext ?? window;
+  const appWindow = appWindowContext ?? (typeof window !== 'undefined' ? window : null);
 
   const dialogs = useDialogs();
   const notifications = useNotifications();
@@ -167,44 +167,50 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const [error, setError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
-    const url = new URL(appWindow.location.href);
+    if (appWindow) {
+      const url = new URL(appWindow.location.href);
 
-    url.searchParams.set('page', String(paginationModel.page));
-    url.searchParams.set('pageSize', String(paginationModel.pageSize));
+      url.searchParams.set('page', String(paginationModel.page));
+      url.searchParams.set('pageSize', String(paginationModel.pageSize));
 
-    if (!appWindow.frameElement) {
-      appWindow.history.pushState({}, '', url);
+      if (!appWindow.frameElement) {
+        appWindow.history.pushState({}, '', url);
+      }
     }
   }, [appWindow, paginationModel.page, paginationModel.pageSize]);
 
   React.useEffect(() => {
-    const url = new URL(appWindow.location.href);
+    if (appWindow) {
+      const url = new URL(appWindow.location.href);
 
-    if (
-      filterModel.items.length > 0 ||
-      (filterModel.quickFilterValues && filterModel.quickFilterValues.length > 0)
-    ) {
-      url.searchParams.set('filter', JSON.stringify(filterModel));
-    } else {
-      url.searchParams.delete('filter');
-    }
+      if (
+        filterModel.items.length > 0 ||
+        (filterModel.quickFilterValues && filterModel.quickFilterValues.length > 0)
+      ) {
+        url.searchParams.set('filter', JSON.stringify(filterModel));
+      } else {
+        url.searchParams.delete('filter');
+      }
 
-    if (!appWindow.frameElement) {
-      appWindow.history.pushState({}, '', url);
+      if (!appWindow.frameElement) {
+        appWindow.history.pushState({}, '', url);
+      }
     }
   }, [appWindow, filterModel]);
 
   React.useEffect(() => {
-    const url = new URL(appWindow.location.href);
+    if (appWindow) {
+      const url = new URL(appWindow.location.href);
 
-    if (sortModel.length > 0) {
-      url.searchParams.set('sort', JSON.stringify(sortModel));
-    } else {
-      url.searchParams.delete('sort');
-    }
+      if (sortModel.length > 0) {
+        url.searchParams.set('sort', JSON.stringify(sortModel));
+      } else {
+        url.searchParams.delete('sort');
+      }
 
-    if (!appWindow.frameElement) {
-      appWindow.history.pushState({}, '', url);
+      if (!appWindow.frameElement) {
+        appWindow.history.pushState({}, '', url);
+      }
     }
   }, [appWindow, sortModel]);
 
@@ -360,8 +366,11 @@ function List<D extends DataModel>(props: ListProps<D>) {
           sortingMode="server"
           filterMode="server"
           paginationMode="server"
+          paginationModel={paginationModel}
           onPaginationModelChange={setPaginationModel}
+          sortModel={sortModel}
           onSortModelChange={setSortModel}
+          filterModel={filterModel}
           onFilterModelChange={setFilterModel}
           onRowClick={handleRowClick}
           loading={isLoading}

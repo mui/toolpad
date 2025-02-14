@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: page
 spec:
-  title: Prisma data source Crud example
+  title: Prisma data source CRUD example
   content:
     - component: Text
       name: text

@@ -311,7 +311,7 @@ The `dataGrid` slot and slot props can be used to replace the standard Data Grid
 
 Displays details for an item with a given `id` retrieved from a data source.
 
-If a props is passed for `onEditClick`, a button is shown for triggering that callback.
+If a prop is passed for `onEditClick`, a button is shown for triggering that callback.
 
 If the data source includes `deleteOne`, it is possible to delete items directly from this view.
 

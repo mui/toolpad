@@ -35,6 +35,7 @@ export interface FormPageProps<D extends DataModel> {
   initialValues?: Partial<OmitId<D>>;
   onSubmit: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   onSubmitSuccess?: () => void;
+  resetOnSubmit?: boolean;
   localeText: FormPageLocaleText;
 }
 
@@ -47,6 +48,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
     initialValues = {} as Partial<OmitId<D>>,
     onSubmit,
     onSubmitSuccess,
+    resetOnSubmit = true,
     localeText,
   } = props;
   const { fields, validate } = dataSource;
@@ -129,7 +131,9 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
 
       if (onSubmitSuccess) {
         onSubmitSuccess();
-      } else {
+      }
+
+      if (resetOnSubmit) {
         handleFormReset();
       }
 
@@ -349,7 +353,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
           type="submit"
           variant="contained"
           size="large"
-          loading={isSubmitting || (hasSubmittedSuccessfully && !!onSubmitSuccess)}
+          loading={isSubmitting || (hasSubmittedSuccessfully && !resetOnSubmit)}
         >
           {localeText.submitButtonLabel}
         </Button>

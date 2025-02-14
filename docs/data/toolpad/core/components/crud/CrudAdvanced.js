@@ -276,6 +276,7 @@ function CrudAdvanced(props) {
               <Create
                 initialValues={{ title: 'New note' }}
                 onSubmitSuccess={handleCreate}
+                resetOnSubmit={false}
               />
             ) : null}
             {router.pathname !== createPath && showNoteId ? (
@@ -286,7 +287,11 @@ function CrudAdvanced(props) {
               />
             ) : null}
             {editNoteId ? (
-              <Edit id={editNoteId} onSubmitSuccess={handleEdit} />
+              <Edit
+                id={editNoteId}
+                onSubmitSuccess={handleEdit}
+                resetOnSubmit={false}
+              />
             ) : null}
           </CrudProvider>
           {/* preview-end */}

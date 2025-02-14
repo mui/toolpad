@@ -20,6 +20,10 @@ export interface CreateProps<D extends DataModel> {
    * Callback fired when the form is successfully submitted.
    */
   onSubmitSuccess?: () => void;
+  /**
+   * Whether the form fields should reset after the form is submitted.
+   */
+  resetOnSubmit?: boolean;
 }
 /**
  *
@@ -32,7 +36,7 @@ export interface CreateProps<D extends DataModel> {
  * - [Create API](https://mui.com/toolpad/core/api/create)
  */
 function Create<D extends DataModel>(props: CreateProps<D>) {
-  const { initialValues, onSubmitSuccess } = props;
+  const { initialValues, onSubmitSuccess, resetOnSubmit } = props;
 
   const crudContext = React.useContext(CrudContext);
   const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
@@ -57,6 +61,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
       initialValues={initialValues}
       onSubmit={handleCreate}
       onSubmitSuccess={onSubmitSuccess}
+      resetOnSubmit={resetOnSubmit}
       localeText={{
         submitButtonLabel: 'Create',
         submitSuccessMessage: 'Item created successfully.',
@@ -84,6 +89,10 @@ Create.propTypes /* remove-proptypes */ = {
    * Callback fired when the form is successfully submitted.
    */
   onSubmitSuccess: PropTypes.func,
+  /**
+   * Whether the form fields should reset after the form is submitted.
+   */
+  resetOnSubmit: PropTypes.bool,
 } as any;
 
 export { Create };

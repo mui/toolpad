@@ -19,6 +19,10 @@ export interface EditProps<D extends DataModel> {
    * Callback fired when the form is successfully submitted.
    */
   onSubmitSuccess?: () => void;
+  /**
+   * Whether the form fields should reset after the form is submitted.
+   */
+  resetOnSubmit?: boolean;
 }
 /**
  *
@@ -31,7 +35,7 @@ export interface EditProps<D extends DataModel> {
  * - [Edit API](https://mui.com/toolpad/core/api/edit)
  */
 function Edit<D extends DataModel>(props: EditProps<D>) {
-  const { id, onSubmitSuccess } = props;
+  const { id, onSubmitSuccess, resetOnSubmit } = props;
 
   const crudContext = React.useContext(CrudContext);
   const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
@@ -103,6 +107,7 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
         initialValues={data}
         onSubmit={handleEdit}
         onSubmitSuccess={onSubmitSuccess}
+        resetOnSubmit={resetOnSubmit}
         localeText={{
           submitButtonLabel: 'Edit',
           submitSuccessMessage: 'Item edited successfully.',
@@ -110,7 +115,7 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
         }}
       />
     ) : null;
-  }, [data, dataSource, error, handleEdit, isLoading, onSubmitSuccess]);
+  }, [data, dataSource, error, handleEdit, isLoading, onSubmitSuccess, resetOnSubmit]);
 
   return <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>;
 }
@@ -132,6 +137,10 @@ Edit.propTypes /* remove-proptypes */ = {
    * Callback fired when the form is successfully submitted.
    */
   onSubmitSuccess: PropTypes.func,
+  /**
+   * Whether the form fields should reset after the form is submitted.
+   */
+  resetOnSubmit: PropTypes.bool,
 } as any;
 
 export { Edit };

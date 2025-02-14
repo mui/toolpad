@@ -95,7 +95,13 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
       );
     }
     if (match(createPath)(pathname)) {
-      return <Create<D> initialValues={defaultValues} onSubmitSuccess={handleCreate} />;
+      return (
+        <Create<D>
+          initialValues={defaultValues}
+          onSubmitSuccess={handleCreate}
+          resetOnSubmit={false}
+        />
+      );
     }
     const showMatch = match<{ id: DataModelId }>(showPath)(pathname);
     if (showMatch) {
@@ -107,7 +113,7 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     if (editMatch) {
       const resourceId = editMatch.params.id;
       invariant(resourceId, 'No resource ID present in URL.');
-      return <Edit<D> id={resourceId} onSubmitSuccess={handleEdit} />;
+      return <Edit<D> id={resourceId} onSubmitSuccess={handleEdit} resetOnSubmit={false} />;
     }
     return null;
   }, [

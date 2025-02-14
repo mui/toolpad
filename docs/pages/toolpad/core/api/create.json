@@ -2,7 +2,8 @@
   "props": {
     "dataSource": { "type": { "name": "object" } },
     "initialValues": { "type": { "name": "object" }, "default": "{}" },
-    "onSubmitSuccess": { "type": { "name": "func" } }
+    "onSubmitSuccess": { "type": { "name": "func" } },
+    "resetOnSubmit": { "type": { "name": "bool" } }
   },
   "name": "Create",
   "imports": ["import { Create } from '@toolpad/core/Crud';"],

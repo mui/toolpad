@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {
   AuthenticationContext,
+  LocalizationProvider,
   SessionContext,
   type Session,
 } from '@toolpad/core/AppProvider';
@@ -28,10 +29,14 @@ export default function AccountDemoSignedOut() {
   }, []);
 
   return (
-    <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={session}>
-        <Account />
-      </SessionContext.Provider>
-    </AuthenticationContext.Provider>
+    // preview-start
+    <LocalizationProvider>
+      <AuthenticationContext.Provider value={authentication}>
+        <SessionContext.Provider value={session}>
+          <Account />
+        </SessionContext.Provider>
+      </AuthenticationContext.Provider>
+    </LocalizationProvider>
+    // preview-end
   );
 }

@@ -1,11 +1,6 @@
 {
   "props": {
-    "localeText": {
-      "type": {
-        "name": "shape",
-        "description": "{ iconButtonAriaLabel?: string, signInLabel?: string, signOutLabel?: string }"
-      }
-    },
+    "localeText": { "type": { "name": "object" } },
     "slotProps": {
       "type": {
         "name": "shape",

@@ -55,6 +55,10 @@ async function generateProptypes(
     filePath: tsFile,
     project,
     shouldResolveObject: ({ name }) => {
+      const propsToNotResolve = ['localeText'];
+      if (propsToNotResolve.includes(name)) {
+        return false;
+      }
       if (
         name.toLowerCase().endsWith('classes') ||
         name === 'theme' ||

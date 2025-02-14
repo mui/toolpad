@@ -545,11 +545,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
       mini: PropTypes.bool.isRequired,
     }),
     toolbarAccount: PropTypes.shape({
-      localeText: PropTypes.shape({
-        iconButtonAriaLabel: PropTypes.string,
-        signInLabel: PropTypes.string,
-        signOutLabel: PropTypes.string,
-      }),
+      localeText: PropTypes.object,
       slotProps: PropTypes.shape({
         popover: PropTypes.object,
         popoverContent: PropTypes.object,

@@ -12,6 +12,7 @@
       },
       "default": "null"
     },
+    "localeText": { "type": { "name": "object" } },
     "navigation": {
       "type": {
         "name": "arrayOf",

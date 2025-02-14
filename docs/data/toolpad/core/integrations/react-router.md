@@ -334,7 +334,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { Outlet, useNavigate } from 'react-router';
-import type { Navigation, Session } from '@toolpad/core';
+import type { Navigation } from '@toolpad/core';
 import {
   firebaseSignOut,
   signInWithGoogle,

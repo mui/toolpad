@@ -77,13 +77,13 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@types/sinon": "^17.0.3",
-    "@vitest/browser": "2.1.8",
+    "@vitest/browser": "2.1.9",
     "next": "^15.1.6",
     "next-router-mock": "^0.9.13",
     "playwright": "^1.47.2",
     "react-router": "7.1.5",
     "sinon": "^19.0.2",
-    "vitest": "2.1.8"
+    "vitest": "2.1.9"
   },
   "peerDependencies": {
     "@mui/icons-material": "5 - 6",

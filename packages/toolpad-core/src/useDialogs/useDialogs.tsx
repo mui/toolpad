@@ -12,6 +12,21 @@ import invariant from 'invariant';
 import * as React from 'react';
 import { DialogsContext } from './DialogsContext';
 import { WindowContext } from '../shared/context';
+import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
+
+interface DialogsProviderLocaleText {
+  alert: string;
+  confirm: string;
+  cancel: string;
+  ok: string;
+}
+
+const defaultLocaleText: Pick<LocaleText, keyof DialogsProviderLocaleText> = {
+  alert: 'Alert',
+  confirm: 'Confirm',
+  cancel: 'Cancel',
+  ok: 'Ok',
+};
 
 export interface OpenDialogOptions<R> {
   /**
@@ -195,6 +210,8 @@ export interface AlertDialogProps extends DialogProps<AlertDialogPayload, void> 
 export function AlertDialog({ open, payload, onClose }: AlertDialogProps) {
   const appWindowContext = React.useContext(WindowContext);
 
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const okButtonProps = useDialogLoadingButton(() => onClose());
   return (
     <Dialog
@@ -204,11 +221,11 @@ export function AlertDialog({ open, payload, onClose }: AlertDialogProps) {
       onClose={() => onClose()}
       container={appWindowContext?.document.body}
     >
-      <DialogTitle>{payload.title ?? 'Alert'}</DialogTitle>
+      <DialogTitle>{payload.title ?? localeText.alert}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
         <LoadingButton disabled={!open} {...okButtonProps}>
-          {payload.okText ?? 'Ok'}
+          {payload.okText ?? localeText.ok}
         </LoadingButton>
       </DialogActions>
     </Dialog>
@@ -224,6 +241,8 @@ export interface ConfirmDialogProps extends DialogProps<ConfirmDialogPayload, bo
 export function ConfirmDialog({ open, payload, onClose }: ConfirmDialogProps) {
   const appWindowContext = React.useContext(WindowContext);
 
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const cancelButtonProps = useDialogLoadingButton(() => onClose(false));
   const okButtonProps = useDialogLoadingButton(() => onClose(true));
   return (
@@ -234,14 +253,14 @@ export function ConfirmDialog({ open, payload, onClose }: ConfirmDialogProps) {
       onClose={() => onClose(false)}
       container={appWindowContext?.document.body}
     >
-      <DialogTitle>{payload.title ?? 'Confirm'}</DialogTitle>
+      <DialogTitle>{payload.title ?? localeText.confirm}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
         <LoadingButton autoFocus disabled={!open} {...cancelButtonProps}>
-          {payload.cancelText ?? 'Cancel'}
+          {payload.cancelText ?? localeText.cancel}
         </LoadingButton>
         <LoadingButton color={payload.severity} disabled={!open} {...okButtonProps}>
-          {payload.okText ?? 'Ok'}
+          {payload.okText ?? localeText.ok}
         </LoadingButton>
       </DialogActions>
     </Dialog>
@@ -257,6 +276,8 @@ export interface PromptDialogProps extends DialogProps<PromptDialogPayload, stri
 export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
   const appWindowContext = React.useContext(WindowContext);
 
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const [input, setInput] = React.useState('');
   const cancelButtonProps = useDialogLoadingButton(() => onClose(null));
 
@@ -286,7 +307,7 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
       }}
       container={appWindowContext?.document.body}
     >
-      <DialogTitle>{payload.title ?? 'Confirm'}</DialogTitle>
+      <DialogTitle>{payload.title ?? localeText.confirm}</DialogTitle>
       <DialogContent>
         <DialogContentText>{payload.msg} </DialogContentText>
         <TextField
@@ -304,10 +325,10 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
       </DialogContent>
       <DialogActions>
         <LoadingButton disabled={!open} {...cancelButtonProps}>
-          {payload.cancelText ?? 'Cancel'}
+          {payload.cancelText ?? localeText.cancel}
         </LoadingButton>
         <LoadingButton disabled={!open} loading={loading} type="submit">
-          {payload.okText ?? 'Ok'}
+          {payload.okText ?? localeText.ok}
         </LoadingButton>
       </DialogActions>
     </Dialog>

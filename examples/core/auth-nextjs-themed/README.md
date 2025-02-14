@@ -25,7 +25,7 @@ To copy this example and customize it for your needs, run
 ```bash
 npx create-toolpad-app@latest --example auth-nextjs-themed
 # or
-pnpm dlx create-toolpad-app --example auth-nextjs-themed
+pnpm create toolpad-app --example auth-nextjs-themed
 ```
 
 and follow the instructions in the terminal.

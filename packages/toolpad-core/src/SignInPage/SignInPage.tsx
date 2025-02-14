@@ -37,6 +37,7 @@ import KeycloakIcon from './icons/Keycloak';
 import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
 import { BrandingContext, RouterContext } from '../shared/context';
+import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 
 const mergeSlotSx = (defaultSx: SxProps<Theme>, slotProps?: { sx?: SxProps<Theme> }) => {
   if (Array.isArray(slotProps?.sx)) {
@@ -134,6 +135,18 @@ const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([
   ['okta', <OktaIcon key="okta" />],
   ['fusionauth', <FusionAuthIcon key="fusionauth" />],
 ]);
+
+interface SignInPageLocaleText {
+  signInTitle: string;
+  signInSubtitle: string;
+  signInRememberMe: string;
+  email: string;
+  password: string;
+  or: string;
+  with: string;
+  passkey: string;
+  to: string;
+}
 
 export interface AuthProvider {
   /**
@@ -260,7 +273,23 @@ export interface SignInPageProps {
    * The prop used to customize the styles on the `SignInPage` container
    */
   sx?: SxProps;
+  /**
+   * The labels for the account component.
+   */
+  localeText?: Partial<SignInPageLocaleText>;
 }
+
+const defaultLocaleText: Pick<LocaleText, keyof SignInPageLocaleText> = {
+  signInTitle: 'Sign in',
+  signInSubtitle: 'Please sign in to continue',
+  signInRememberMe: 'Remember me',
+  email: 'Email',
+  password: 'Password',
+  or: 'or',
+  with: 'with',
+  passkey: 'Passkey',
+  to: 'to',
+};
 
 /**
  *
@@ -273,10 +302,13 @@ export interface SignInPageProps {
  * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
  */
 function SignInPage(props: SignInPageProps) {
-  const { providers, signIn, slots, slotProps, sx } = props;
+  const { providers, signIn, slots, slotProps, sx, localeText: propsLocaleText } = props;
   const theme = useTheme();
   const branding = React.useContext(BrandingContext);
   const router = React.useContext(RouterContext);
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...defaultLocaleText, ...globalLocaleText, ...propsLocaleText };
+
   const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const emailProvider = providers?.find((provider) => provider.id === 'nodemailer');
@@ -332,6 +364,7 @@ function SignInPage(props: SignInPageProps) {
           ) : (
             <Typography
               variant="h5"
+              component="h1"
               color="textPrimary"
               sx={{
                 my: theme.spacing(1),
@@ -339,14 +372,15 @@ function SignInPage(props: SignInPageProps) {
                 fontWeight: 600,
               }}
             >
-              Sign in {branding?.title ? `to ${branding.title}` : null}
+              {localeText.signInTitle}{' '}
+              {branding?.title ? `${localeText.to?.toLocaleLowerCase()} ${branding.title}` : null}
             </Typography>
           )}
           {slots?.subtitle ? (
             <slots.subtitle />
           ) : (
             <Typography variant="body2" color="textSecondary" gutterBottom textAlign="center">
-              Welcome, please sign in to continue
+              {localeText?.signInSubtitle}
             </Typography>
           )}
           <Box sx={{ mt: theme.spacing(1), width: '100%' }}>
@@ -391,7 +425,11 @@ function SignInPage(props: SignInPageProps) {
                           textTransform: 'capitalize',
                         }}
                       >
-                        <span>Sign in with {provider.name}</span>
+                        <span>
+                          {localeText.oauthSignInTitle ||
+                            `${localeText.signInTitle} ${localeText.with}`}{' '}
+                          {provider.name}
+                        </span>
                       </LoadingButton>
                     </form>
                   );
@@ -400,7 +438,9 @@ function SignInPage(props: SignInPageProps) {
 
             {passkeyProvider ? (
               <React.Fragment>
-                {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+                {singleProvider ? null : (
+                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                )}
                 {error && selectedProviderId === 'passkey' ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}
@@ -429,7 +469,7 @@ function SignInPage(props: SignInPageProps) {
                   ) : (
                     <TextField
                       {...getCommonTextFieldProps(theme, {
-                        label: 'Email',
+                        label: localeText.email,
                         placeholder: 'your@email.com',
                         id: 'email-passkey',
                         name: 'email',
@@ -459,7 +499,9 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in with {passkeyProvider.name || 'Passkey'}
+                      {localeText.passkeySignInTitle ||
+                        `${localeText.signInTitle} ${localeText.with}`}{' '}
+                      {passkeyProvider.name || localeText.passkey}
                     </LoadingButton>
                   )}
                 </Box>
@@ -468,7 +510,9 @@ function SignInPage(props: SignInPageProps) {
 
             {emailProvider ? (
               <React.Fragment>
-                {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+                {singleProvider ? null : (
+                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                )}
                 {error && selectedProviderId === 'nodemailer' ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}
@@ -503,7 +547,7 @@ function SignInPage(props: SignInPageProps) {
                   ) : (
                     <TextField
                       {...getCommonTextFieldProps(theme, {
-                        label: 'Email',
+                        label: localeText.email,
                         placeholder: 'your@email.com',
                         name: 'email',
                         id: 'email-nodemailer',
@@ -533,7 +577,9 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in with Email
+                      {localeText.magicLinkSignInTitle ||
+                        `${localeText.signInTitle} ${localeText.with}`}{' '}
+                      {localeText.email}
                     </LoadingButton>
                   )}
                 </Box>
@@ -542,7 +588,9 @@ function SignInPage(props: SignInPageProps) {
 
             {credentialsProvider ? (
               <React.Fragment>
-                {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+                {singleProvider ? null : (
+                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                )}
                 {error && selectedProviderId === 'credentials' ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}
@@ -576,7 +624,7 @@ function SignInPage(props: SignInPageProps) {
                     ) : (
                       <TextField
                         {...getCommonTextFieldProps(theme, {
-                          label: 'Email',
+                          label: localeText.email,
                           placeholder: 'your@email.com',
                           id: 'email',
                           name: 'email',
@@ -594,7 +642,7 @@ function SignInPage(props: SignInPageProps) {
                         {...getCommonTextFieldProps(theme, {
                           name: 'password',
                           type: 'password',
-                          label: 'Password',
+                          label: localeText.password,
                           id: 'password',
                           placeholder: '*****',
                           autoComplete: 'current-password',
@@ -624,7 +672,7 @@ function SignInPage(props: SignInPageProps) {
                             sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
                           />
                         }
-                        label="Remember me"
+                        label={localeText.signInRememberMe}
                         {...slotProps?.rememberMe}
                         slotProps={{
                           typography: {
@@ -657,7 +705,7 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in
+                      {localeText.signInTitle}
                     </LoadingButton>
                   )}
 
@@ -681,6 +729,10 @@ SignInPage.propTypes /* remove-proptypes */ = {
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * The labels for the account component.
+   */
+  localeText: PropTypes.object,
   /**
    * The list of authentication providers to display.
    * @default []

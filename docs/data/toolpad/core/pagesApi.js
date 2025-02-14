@@ -11,6 +11,7 @@ module.exports = [
   { pathname: '/toolpad/core/api/dialogs-provider' },
   { pathname: '/toolpad/core/api/edit' },
   { pathname: '/toolpad/core/api/list' },
+  { pathname: '/toolpad/core/api/localization-provider' },
   { pathname: '/toolpad/core/api/notifications-provider' },
   { pathname: '/toolpad/core/api/page-container' },
   { pathname: '/toolpad/core/api/page-header' },

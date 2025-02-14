@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Logout from '@mui/icons-material/Logout';
 import { Account } from '@toolpad/core/Account';
-import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
+import { AppProvider } from '@toolpad/core/AppProvider';
 
 const demoSession = {
   user: {
@@ -32,36 +32,34 @@ export default function AccountCustomSlotProps() {
   }, []);
 
   return (
-    <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={session}>
-        {/* preview-start */}
-        <Account
-          slotProps={{
-            signInButton: {
-              color: 'success',
-            },
-            signOutButton: {
-              color: 'success',
-              startIcon: <Logout />,
-            },
-            preview: {
-              variant: 'expanded',
-              slotProps: {
-                avatarIconButton: {
-                  sx: {
-                    width: 'fit-content',
-                    margin: 'auto',
-                  },
-                },
-                avatar: {
-                  variant: 'rounded',
+    <AppProvider authentication={authentication} session={session}>
+      {/* preview-start */}
+      <Account
+        slotProps={{
+          signInButton: {
+            color: 'success',
+          },
+          signOutButton: {
+            color: 'success',
+            startIcon: <Logout />,
+          },
+          preview: {
+            variant: 'expanded',
+            slotProps: {
+              avatarIconButton: {
+                sx: {
+                  width: 'fit-content',
+                  margin: 'auto',
                 },
               },
+              avatar: {
+                variant: 'rounded',
+              },
             },
-          }}
-        />
-        {/* preview-end */}
-      </SessionContext.Provider>
-    </AuthenticationContext.Provider>
+          },
+        }}
+      />
+      {/* preview-end */}
+    </AppProvider>
   );
 }

@@ -2,7 +2,7 @@ import { DataModel, DataSource } from '@toolpad/core/Crud';
 import * as yup from 'yup';
 import yupAdapter from '../validationAdapters/yupAdapter';
 
-type OrderStatus = 'pending' | 'sent';
+type OrderStatus = 'Pending' | 'Sent';
 
 export interface Order extends DataModel {
   id: number;
@@ -33,7 +33,7 @@ export const ordersDataSource: DataSource<Order> = {
       field: 'status',
       headerName: 'Status',
       type: 'singleSelect',
-      valueOptions: ['pending', 'sent'],
+      valueOptions: ['Pending', 'Sent'],
     },
     { field: 'itemCount', headerName: 'No. of items', type: 'number' },
     { field: 'fastDelivery', headerName: 'Fast delivery', type: 'boolean' },
@@ -184,7 +184,7 @@ export const ordersDataSource: DataSource<Order> = {
       description: yup.string(),
       status: yup
         .string()
-        .oneOf(['pending', 'sent'], 'Status must be "pending" or "sent"')
+        .oneOf(['Pending', 'Sent'], 'Status must be "Pending" or "Sent"')
         .required('Status is required'),
       itemCount: yup
         .number()

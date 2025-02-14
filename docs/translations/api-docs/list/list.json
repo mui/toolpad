@@ -6,6 +6,7 @@
     "onCreateClick": {
       "description": "Callback fired when the &quot;Create&quot; button is clicked."
     },
+    "onDelete": { "description": "Callback fired when the item is successfully deleted." },
     "onEditClick": { "description": "Callback fired when the &quot;Edit&quot; button is clicked." },
     "onRowClick": {
       "description": "Callback fired when a row is clicked. Not called if the target clicked is an interactive element added by the built-in columns."

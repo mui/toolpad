@@ -420,6 +420,10 @@ List.propTypes /* remove-proptypes */ = {
    */
   onCreateClick: PropTypes.func,
   /**
+   * Callback fired when the item is successfully deleted.
+   */
+  onDelete: PropTypes.func,
+  /**
    * Callback fired when the "Edit" button is clicked.
    */
   onEditClick: PropTypes.func,
@@ -439,7 +443,7 @@ List.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slots: PropTypes.shape({
-    dataGrid: PropTypes.elementType,
+    dataGrid: PropTypes.func,
   }),
 } as any;
 

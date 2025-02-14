@@ -59,10 +59,12 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
   }>({
     values: {
       ...Object.fromEntries(
-        fields.map(({ field, type }) => [
-          field,
-          type === 'boolean' ? (initialValues[field] ?? false) : initialValues[field],
-        ]),
+        fields
+          .filter(({ field }) => field !== 'id')
+          .map(({ field, type }) => [
+            field,
+            type === 'boolean' ? (initialValues[field] ?? false) : initialValues[field],
+          ]),
       ),
       ...initialValues,
     },
@@ -106,6 +108,8 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
     setFormValues(initialValues);
   }, [initialValues, setFormValues]);
 
+  const [hasSubmittedSuccessfully, setHasSubmittedSuccessfully] = React.useState(false);
+
   const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(async () => {
     if (validate) {
       const errors = await validate(formValues);
@@ -125,9 +129,11 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
 
       if (onSubmitSuccess) {
         onSubmitSuccess();
+      } else {
+        handleFormReset();
       }
 
-      handleFormReset();
+      setHasSubmittedSuccessfully(true);
     } catch (createError) {
       notifications.show(`${localeText.submitErrorMessage}\n${(createError as Error).message}`, {
         severity: 'error',
@@ -339,7 +345,12 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
         </Grid>
       </FormGroup>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button type="submit" variant="contained" size="large" loading={isSubmitting}>
+        <Button
+          type="submit"
+          variant="contained"
+          size="large"
+          loading={isSubmitting || (hasSubmittedSuccessfully && !!onSubmitSuccess)}
+        >
           {localeText.submitButtonLabel}
         </Button>
       </Box>

@@ -3,6 +3,7 @@
     "dataSource": { "type": { "name": "object" } },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" },
     "onCreateClick": { "type": { "name": "func" } },
+    "onDelete": { "type": { "name": "func" } },
     "onEditClick": { "type": { "name": "func" } },
     "onRowClick": { "type": { "name": "func" } },
     "slotProps": {
@@ -10,7 +11,7 @@
       "default": "{}"
     },
     "slots": {
-      "type": { "name": "shape", "description": "{ dataGrid?: elementType }" },
+      "type": { "name": "shape", "description": "{ dataGrid?: func }" },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
     }

@@ -16,7 +16,7 @@ const pages: MuiPage[] = [
         children: [
           { pathname: '/toolpad/studio/examples', title: 'Overview' },
           { pathname: '/toolpad/studio/examples/npm-stats', title: 'npm stats' },
-          { pathname: '/toolpad/studio/examples/basic-crud-app', title: 'Basic Crud application' },
+          { pathname: '/toolpad/studio/examples/basic-crud-app', title: 'Basic CRUD application' },
           { pathname: '/toolpad/studio/examples/qr-generator', title: 'QR Code generator' },
         ],
       },

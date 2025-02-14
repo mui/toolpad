@@ -3,7 +3,7 @@
 <p class="description">You can add a delete functionality to the data grid in minutes.</p>
 
 :::info
-Toolpad Studio now supports [Data Providers](/toolpad/studio/concepts/data-providers/) as an improved way to manage Crud operations in a data grids. With data providers you can set up [row deletion](/toolpad/studio/concepts/data-providers/#deleting-rows) just by supplying a backend function that performs the action.
+Toolpad Studio now supports [Data Providers](/toolpad/studio/concepts/data-providers/) as an improved way to manage CRUD operations in a data grids. With data providers you can set up [row deletion](/toolpad/studio/concepts/data-providers/#deleting-rows) just by supplying a backend function that performs the action.
 :::
 
 You can add a delete button to a data grid connected to any REST API, like so:

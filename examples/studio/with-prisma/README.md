@@ -28,6 +28,6 @@ This app demonstrates the following capabilities of Toolpad Studio:
 
 1. Reusing your models in Toolpad Studio UI.
 2. Using a Data Grid, Button and a text input component.
-3. Using Crud operations from [Prisma Client API](https://www.prisma.io/docs/concepts/components/prisma-client/crud).
+3. Using CRUD operations from [Prisma Client API](https://www.prisma.io/docs/concepts/components/prisma-client/crud).
 
 [Check out the source code](https://github.com/mui/toolpad/tree/master/examples/studio/with-prisma)

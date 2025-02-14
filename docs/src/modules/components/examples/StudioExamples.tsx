@@ -13,8 +13,8 @@ const examples = [
     source: 'https://github.com/mui/toolpad/tree/master/examples/studio/npm-stats/',
   },
   {
-    title: 'Basic Crud application',
-    description: 'An admin application to showcase how Crud operations work in Toolpad Studio.',
+    title: 'Basic CRUD application',
+    description: 'An admin application to showcase how CRUD operations work in Toolpad Studio.',
     src: '/static/toolpad/docs/studio/examples/basic-crud-app.png',
     srcDark: '/static/toolpad/docs/studio/examples/basic-crud-app.png', // TODO fix
     href: 'https://mui.com/toolpad/studio/examples/basic-crud-app/',

@@ -54,17 +54,17 @@ function DefaultLayout(page: React.ReactElement<any>) {
   const [orderId] = segments;
 
   const title = React.useMemo(() => {
-    if (router.pathname === '/orders/new') {
+    if (router.asPath.split('?')[0] === '/orders/new') {
       return 'New Order';
     }
-    if (orderId && router.pathname.includes('/edit')) {
+    if (orderId && router.asPath.includes('/edit')) {
       return `Order ${orderId} - Edit`;
     }
     if (orderId) {
       return `Order ${orderId}`;
     }
     return undefined;
-  }, [orderId, router.pathname]);
+  }, [orderId, router.asPath]);
 
   return (
     <DashboardLayout>

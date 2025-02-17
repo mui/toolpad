@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import invariant from 'invariant';
-import { FormPage } from './FormPage';
+import { CrudForm } from './CrudForm';
 import { DataModel, DataSource, OmitId } from './shared';
 import { CrudContext } from '../shared/context';
 
@@ -56,7 +56,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   );
 
   return (
-    <FormPage
+    <CrudForm
       dataSource={dataSource}
       initialValues={initialValues}
       onSubmit={handleCreate}

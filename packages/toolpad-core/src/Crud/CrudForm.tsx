@@ -22,13 +22,13 @@ import dayjs, { Dayjs } from 'dayjs';
 import { useNotifications } from '../useNotifications';
 import { DataField, DataModel, DataSource, OmitId } from './shared';
 
-interface FormPageLocaleText {
+interface CrudFormLocaleText {
   submitButtonLabel: string;
   submitSuccessMessage: string;
   submitErrorMessage: string;
 }
 
-export interface FormPageProps<D extends DataModel> {
+export interface CrudFormProps<D extends DataModel> {
   dataSource:
     | (DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>)
     | (DataSource<D> & Required<Pick<DataSource<D>, 'updateOne'>>);
@@ -36,13 +36,13 @@ export interface FormPageProps<D extends DataModel> {
   onSubmit: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   onSubmitSuccess?: () => void;
   resetOnSubmit?: boolean;
-  localeText: FormPageLocaleText;
+  localeText: CrudFormLocaleText;
 }
 
 /**
  * @ignore - internal component.
  */
-function FormPage<D extends DataModel>(props: FormPageProps<D>) {
+function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
   const {
     dataSource,
     initialValues = {} as Partial<OmitId<D>>,
@@ -362,7 +362,7 @@ function FormPage<D extends DataModel>(props: FormPageProps<D>) {
   );
 }
 
-FormPage.propTypes /* remove-proptypes */ = {
+CrudForm.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
@@ -373,4 +373,4 @@ FormPage.propTypes /* remove-proptypes */ = {
   dataSource: PropTypes.object.isRequired,
 } as any;
 
-export { FormPage };
+export { CrudForm };

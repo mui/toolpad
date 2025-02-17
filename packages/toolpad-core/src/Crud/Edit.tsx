@@ -5,7 +5,7 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import invariant from 'invariant';
-import { FormPage } from './FormPage';
+import { CrudForm } from './CrudForm';
 import { DataModel, DataModelId, DataSource, OmitId } from './shared';
 import { CrudContext } from '../shared/context';
 
@@ -102,7 +102,7 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
     }
 
     return data ? (
-      <FormPage
+      <CrudForm
         dataSource={dataSource}
         initialValues={data}
         onSubmit={handleEdit}

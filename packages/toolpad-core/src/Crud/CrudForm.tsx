@@ -36,7 +36,7 @@ export interface CrudFormProps<D extends DataModel> {
   /**
    * Server-side data source.
    */
-  dataSource: DataSource<D>;
+  dataSource?: DataSource<D>;
   /**
    * Form state object, including field values and errors.
    */
@@ -90,7 +90,7 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
 
   const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(async () => {
     try {
-      await onSubmit(formState.values);
+      await onSubmit(formValues);
     } catch (error) {
       return error as Error;
     }
@@ -284,9 +284,9 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
 
   const handleReset = React.useCallback(async () => {
     if (onReset) {
-      await onReset(formState.values);
+      await onReset(formValues);
     }
-  }, [formState.values, onReset]);
+  }, [formValues, onReset]);
 
   return (
     <Box

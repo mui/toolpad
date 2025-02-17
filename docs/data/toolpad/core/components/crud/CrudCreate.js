@@ -116,6 +116,7 @@ function CrudCreate(props) {
             dataSource={peopleDataSource}
             initialValues={{ age: 18 }}
             onSubmitSuccess={handleSubmitSuccess}
+            resetOnSubmit
           />
           {/* preview-end */}
         </PageContainer>

@@ -131,6 +131,7 @@ export default function CrudCreate(props: DemoProps) {
             dataSource={peopleDataSource}
             initialValues={{ age: 18 }}
             onSubmitSuccess={handleSubmitSuccess}
+            resetOnSubmit
           />
           {/* preview-end */}
         </PageContainer>

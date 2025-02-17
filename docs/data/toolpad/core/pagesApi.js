@@ -6,6 +6,7 @@ module.exports = [
   { pathname: '/toolpad/core/api/app-provider' },
   { pathname: '/toolpad/core/api/create' },
   { pathname: '/toolpad/core/api/crud' },
+  { pathname: '/toolpad/core/api/crud-form' },
   { pathname: '/toolpad/core/api/crud-provider' },
   { pathname: '/toolpad/core/api/dashboard-layout' },
   { pathname: '/toolpad/core/api/dialogs-provider' },

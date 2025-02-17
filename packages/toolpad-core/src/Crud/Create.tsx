@@ -23,6 +23,7 @@ export interface CreateProps<D extends DataModel> {
   onSubmitSuccess?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   /**
    * Whether the form fields should reset after the form is submitted.
+   * @default false
    */
   resetOnSubmit?: boolean;
 }
@@ -37,7 +38,11 @@ export interface CreateProps<D extends DataModel> {
  * - [Create API](https://mui.com/toolpad/core/api/create)
  */
 function Create<D extends DataModel>(props: CreateProps<D>) {
-  const { initialValues = {} as Partial<OmitId<D>>, onSubmitSuccess, resetOnSubmit } = props;
+  const {
+    initialValues = {} as Partial<OmitId<D>>,
+    onSubmitSuccess,
+    resetOnSubmit = false,
+  } = props;
 
   const crudContext = React.useContext(CrudContext);
   const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
@@ -182,6 +187,7 @@ Create.propTypes /* remove-proptypes */ = {
   onSubmitSuccess: PropTypes.func,
   /**
    * Whether the form fields should reset after the form is submitted.
+   * @default false
    */
   resetOnSubmit: PropTypes.bool,
 } as any;

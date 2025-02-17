@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Crud
-components: Crud, CrudProvider, List, Show, Create, Edit
+components: Crud, CrudProvider, List, Show, Create, Edit, CrudForm
 ---
 
 # Crud

@@ -33,21 +33,45 @@ interface CrudFormLocaleText {
 }
 
 export interface CrudFormProps<D extends DataModel> {
+  /**
+   * Server-side data source.
+   */
   dataSource:
     | (DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>)
     | (DataSource<D> & Required<Pick<DataSource<D>, 'updateOne'>>);
+  /**
+   * Form state object, including field values and errors.
+   */
   formState: CrudFormState<D>;
+  /**
+   * Callback fired when a form field is changed.
+   */
   onFieldChange: (
     name: keyof D,
     value: string | number | boolean | File | null,
   ) => void | Promise<void>;
+  /**
+   * Callback fired when the form is submitted.
+   */
   onSubmit: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
+  /**
+   * Callback fired when the form is reset.
+   */
   onReset?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
+  /**
+   * Locale text for CRUD form component.
+   */
   localeText: CrudFormLocaleText;
 }
-
 /**
- * @ignore - internal component.
+ *
+ * Demos:
+ *
+ * - [Crud](https://mui.com/toolpad/core/react-crud/)
+ *
+ * API:
+ *
+ * - [CrudForm API](https://mui.com/toolpad/core/api/crud-form)
  */
 function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
   const { formState, onFieldChange, onSubmit, onReset, localeText } = props;
@@ -297,6 +321,29 @@ CrudForm.propTypes /* remove-proptypes */ = {
    * Server-side data source.
    */
   dataSource: PropTypes.object.isRequired,
+  /**
+   * Form state object, including field values and errors.
+   */
+  formState: PropTypes.shape({
+    errors: PropTypes.object.isRequired,
+    values: PropTypes.object.isRequired,
+  }).isRequired,
+  /**
+   * Locale text for CRUD form component.
+   */
+  localeText: PropTypes.object.isRequired,
+  /**
+   * Callback fired when a form field is changed.
+   */
+  onFieldChange: PropTypes.func.isRequired,
+  /**
+   * Callback fired when the form is reset.
+   */
+  onReset: PropTypes.func,
+  /**
+   * Callback fired when the form is submitted.
+   */
+  onSubmit: PropTypes.func.isRequired,
 } as any;
 
 export { CrudForm };

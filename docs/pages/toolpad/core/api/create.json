@@ -3,7 +3,7 @@
     "dataSource": { "type": { "name": "object" } },
     "initialValues": { "type": { "name": "object" }, "default": "{}" },
     "onSubmitSuccess": { "type": { "name": "func" } },
-    "resetOnSubmit": { "type": { "name": "bool" } }
+    "resetOnSubmit": { "type": { "name": "bool" }, "default": "false" }
   },
   "name": "Create",
   "imports": ["import { Create } from '@toolpad/core/Crud';"],

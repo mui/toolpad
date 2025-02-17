@@ -1,6 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
+import invariant from 'invariant';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -19,23 +20,29 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import type { GridSingleSelectColDef } from '@mui/x-data-grid';
 import dayjs, { Dayjs } from 'dayjs';
-import { useNotifications } from '../useNotifications';
+import { CrudContext } from '../shared/context';
 import { DataField, DataModel, DataSource, OmitId } from './shared';
+
+interface CrudFormState<D extends DataModel> {
+  values: Partial<OmitId<D>>;
+  errors: Partial<Record<keyof D, string>>;
+}
 
 interface CrudFormLocaleText {
   submitButtonLabel: string;
-  submitSuccessMessage: string;
-  submitErrorMessage: string;
 }
 
 export interface CrudFormProps<D extends DataModel> {
   dataSource:
     | (DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>)
     | (DataSource<D> & Required<Pick<DataSource<D>, 'updateOne'>>);
-  initialValues?: Partial<OmitId<D>>;
+  formState: CrudFormState<D>;
+  onFieldChange: (
+    name: keyof D,
+    value: string | number | boolean | File | null,
+  ) => void | Promise<void>;
   onSubmit: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
-  onSubmitSuccess?: () => void;
-  resetOnSubmit?: boolean;
+  onReset?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   localeText: CrudFormLocaleText;
 }
 
@@ -43,149 +50,67 @@ export interface CrudFormProps<D extends DataModel> {
  * @ignore - internal component.
  */
 function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
-  const {
-    dataSource,
-    initialValues = {} as Partial<OmitId<D>>,
-    onSubmit,
-    onSubmitSuccess,
-    resetOnSubmit = true,
-    localeText,
-  } = props;
-  const { fields, validate } = dataSource;
+  const { formState, onFieldChange, onSubmit, onReset, localeText } = props;
 
-  const notifications = useNotifications();
-
-  const [formState, setFormState] = React.useState<{
-    values: Partial<OmitId<D>>;
-    errors: Partial<Record<keyof D, string>>;
-  }>({
-    values: {
-      ...Object.fromEntries(
-        fields
-          .filter(({ field }) => field !== 'id')
-          .map(({ field, type }) => [
-            field,
-            type === 'boolean' ? (initialValues[field] ?? false) : initialValues[field],
-          ]),
-      ),
-      ...initialValues,
-    },
-    errors: {},
-  });
   const formValues = formState.values;
   const formErrors = formState.errors;
 
-  const setFormValues = React.useCallback((newFormValues: Partial<OmitId<D>>) => {
-    setFormState((previousState) => ({
-      ...previousState,
-      values: newFormValues,
-    }));
-  }, []);
+  const crudContext = React.useContext(CrudContext);
+  const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
+    typeof props.dataSource,
+    undefined
+  >;
 
-  const setFormErrors = React.useCallback((newFormErrors: Partial<Record<keyof D, string>>) => {
-    setFormState((previousState) => ({
-      ...previousState,
-      errors: newFormErrors,
-    }));
-  }, []);
+  invariant(dataSource, 'No data source found.');
 
-  const handleFormFieldChange = React.useCallback(
-    (name: keyof D, value: string | number | boolean | File | null) => {
-      const validateField = async (values: Partial<OmitId<D>>) => {
-        if (validate) {
-          const errors = await validate(values);
-          setFormErrors({ ...formErrors, [name]: errors[name] });
-        }
-      };
-
-      const newFormValues = { ...formValues, [name]: value };
-
-      setFormValues(newFormValues);
-      validateField(newFormValues);
-    },
-    [formErrors, formValues, setFormErrors, setFormValues, validate],
-  );
-
-  const handleFormReset = React.useCallback(() => {
-    setFormValues(initialValues);
-  }, [initialValues, setFormValues]);
-
-  const [hasSubmittedSuccessfully, setHasSubmittedSuccessfully] = React.useState(false);
+  const { fields } = dataSource;
 
   const [, submitAction, isSubmitting] = React.useActionState<null | Error, FormData>(async () => {
-    if (validate) {
-      const errors = await validate(formValues);
-      if (Object.keys(errors).length > 0) {
-        setFormErrors(errors);
-        return new Error('Form validation failed');
-      }
-    }
-    setFormErrors({});
-
     try {
-      await onSubmit(formValues);
-      notifications.show(localeText.submitSuccessMessage, {
-        severity: 'success',
-        autoHideDuration: 3000,
-      });
-
-      if (onSubmitSuccess) {
-        onSubmitSuccess();
-      }
-
-      if (resetOnSubmit) {
-        handleFormReset();
-      }
-
-      setHasSubmittedSuccessfully(true);
-    } catch (createError) {
-      notifications.show(`${localeText.submitErrorMessage}\n${(createError as Error).message}`, {
-        severity: 'error',
-        autoHideDuration: 3000,
-      });
-      return createError as Error;
+      await onSubmit(formState.values);
+    } catch (error) {
+      return error as Error;
     }
-
     return null;
   }, null);
 
   const handleTextFieldChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      handleFormFieldChange(event.target.name, event.target.value);
+      onFieldChange(event.target.name, event.target.value);
     },
-    [handleFormFieldChange],
+    [onFieldChange],
   );
 
   const handleNumberFieldChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      handleFormFieldChange(event.target.name, Number(event.target.value));
+      onFieldChange(event.target.name, Number(event.target.value));
     },
-    [handleFormFieldChange],
+    [onFieldChange],
   );
 
   const handleCheckboxFieldChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      handleFormFieldChange(event.target.name, checked);
+      onFieldChange(event.target.name, checked);
     },
-    [handleFormFieldChange],
+    [onFieldChange],
   );
 
   const handleDateFieldChange = React.useCallback(
     (name: string) => (value: Dayjs | null) => {
       if (value?.isValid()) {
-        handleFormFieldChange(name, value.toISOString() ?? null);
+        onFieldChange(name, value.toISOString() ?? null);
       } else if (formValues[name]) {
-        handleFormFieldChange(name, null);
+        onFieldChange(name, null);
       }
     },
-    [formValues, handleFormFieldChange],
+    [formValues, onFieldChange],
   );
 
   const handleSelectFieldChange = React.useCallback(
     (event: SelectChangeEvent) => {
-      handleFormFieldChange(event.target.name, event.target.value);
+      onFieldChange(event.target.name, event.target.value);
     },
-    [handleFormFieldChange],
+    [onFieldChange],
   );
 
   const renderField = React.useCallback(
@@ -334,13 +259,19 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
     ],
   );
 
+  const handleReset = React.useCallback(async () => {
+    if (onReset) {
+      await onReset(formState.values);
+    }
+  }, [formState.values, onReset]);
+
   return (
     <Box
       component="form"
       action={submitAction}
       noValidate
       autoComplete="off"
-      onReset={handleFormReset}
+      onReset={handleReset}
       sx={{ width: '100%' }}
     >
       <FormGroup>
@@ -349,12 +280,7 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
         </Grid>
       </FormGroup>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          type="submit"
-          variant="contained"
-          size="large"
-          loading={isSubmitting || (hasSubmittedSuccessfully && !resetOnSubmit)}
-        >
+        <Button type="submit" variant="contained" size="large" loading={isSubmitting}>
           {localeText.submitButtonLabel}
         </Button>
       </Box>

@@ -1,8 +1,7 @@
 {
   "props": {
     "dataSource": { "type": { "name": "object" } },
-    "onSubmitSuccess": { "type": { "name": "func" } },
-    "resetOnSubmit": { "type": { "name": "bool" } }
+    "onSubmitSuccess": { "type": { "name": "func" } }
   },
   "name": "Edit",
   "imports": ["import { Edit } from '@toolpad/core/Crud';"],

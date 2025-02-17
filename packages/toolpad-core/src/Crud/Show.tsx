@@ -55,7 +55,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
 
   invariant(dataSource, 'No data source found.');
 
-  const { fields, ...methods } = dataSource;
+  const { fields, validate, ...methods } = dataSource;
   const { getOne, deleteOne } = methods;
 
   const dialogs = useDialogs();

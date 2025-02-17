@@ -128,7 +128,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   invariant(dataSource, 'No data source found.');
 
-  const { fields, ...methods } = dataSource;
+  const { fields, validate, ...methods } = dataSource;
   const { getMany, deleteOne } = methods;
 
   const routerContext = React.useContext(RouterContext);

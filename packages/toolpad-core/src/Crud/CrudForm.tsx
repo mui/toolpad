@@ -36,9 +36,7 @@ export interface CrudFormProps<D extends DataModel> {
   /**
    * Server-side data source.
    */
-  dataSource:
-    | (DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>)
-    | (DataSource<D> & Required<Pick<DataSource<D>, 'updateOne'>>);
+  dataSource: DataSource<D>;
   /**
    * Form state object, including field values and errors.
    */

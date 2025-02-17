@@ -289,7 +289,7 @@ For more flexibility of customization, and especially if you want full control o
 
 {{"demo": "CrudAdvanced.js", "height": 600, "iframe": true}}
 
-The `CrudProvider` component is optional, but it can be used to easily pass a single `dataSource` to the CRUD page components inside it as context. Alternatively, each of those components can take its own `dataSource` as a prop.
+The `CrudProvider` component is optional, but it can be used to easily pass a single `dataSource` to the CRUD subcomponents inside it as context. Alternatively, each of those components can take its own `dataSource` as a prop.
 
 ### `List` component
 

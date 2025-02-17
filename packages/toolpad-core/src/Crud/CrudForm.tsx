@@ -61,6 +61,7 @@ export interface CrudFormProps<D extends DataModel> {
    */
   localeText: CrudFormLocaleText;
 }
+
 /**
  *
  * Demos:

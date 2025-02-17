@@ -113,7 +113,7 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     if (editMatch) {
       const resourceId = editMatch.params.id;
       invariant(resourceId, 'No resource ID present in URL.');
-      return <Edit<D> id={resourceId} onSubmitSuccess={handleEdit} resetOnSubmit={false} />;
+      return <Edit<D> id={resourceId} onSubmitSuccess={handleEdit} />;
     }
     return null;
   }, [

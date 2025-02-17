@@ -29,8 +29,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
-import { DataModel, DataModelId, DataSource } from './shared';
 import { CrudContext, RouterContext, WindowContext } from '../shared/context';
+import type { DataModel, DataModelId, DataSource } from './types';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -99,6 +99,7 @@ export interface ListProps<D extends DataModel> {
    */
   slotProps?: ListSlotProps;
 }
+
 /**
  *
  * Demos:

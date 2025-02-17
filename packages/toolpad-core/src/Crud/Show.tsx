@@ -16,8 +16,8 @@ import invariant from 'invariant';
 import dayjs from 'dayjs';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
-import { DataField, DataModel, DataModelId, DataSource } from './shared';
 import { CrudContext } from '../shared/context';
+import type { DataField, DataModel, DataModelId, DataSource } from './types';
 
 export interface ShowProps<D extends DataModel> {
   id: DataModelId;
@@ -44,6 +44,7 @@ export interface ShowProps<D extends DataModel> {
  *
  * - [Show API](https://mui.com/toolpad/core/api/show)
  */
+
 function Show<D extends DataModel>(props: ShowProps<D>) {
   const { id, onEditClick, onDelete } = props;
 

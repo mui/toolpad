@@ -2,10 +2,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import invariant from 'invariant';
-import { CrudForm } from './CrudForm';
 import { useNotifications } from '../useNotifications';
 import { CrudContext } from '../shared/context';
-import { DataModel, DataSource, OmitId } from './shared';
+import { CrudForm } from './CrudForm';
+import type { DataModel, DataSource, OmitId } from './types';
 
 export interface CreateProps<D extends DataModel> {
   /**

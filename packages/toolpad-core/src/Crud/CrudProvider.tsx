@@ -1,8 +1,8 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { DataModel, DataSource } from './shared';
 import { CrudContext } from '../shared/context';
+import type { DataModel, DataSource } from './types';
 
 export interface CrudProviderProps<D extends DataModel> {
   /**

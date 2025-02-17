@@ -13,12 +13,6 @@ export interface DataModel {
   [key: string]: unknown;
 }
 
-export interface GetManyParams {
-  paginationModel: GridPaginationModel;
-  sortModel: GridSortModel;
-  filterModel: GridFilterModel;
-}
-
 type RemappedOmit<T, K extends PropertyKey> = { [P in keyof T as P extends K ? never : P]: T[P] };
 
 export type OmitId<D extends DataModel> = RemappedOmit<D, 'id'>;
@@ -27,7 +21,11 @@ export type DataField = RemappedOmit<GridColDef, 'type'> & { type?: GridColType 
 
 export interface DataSource<D extends DataModel> {
   fields: DataField[];
-  getMany?: (params: GetManyParams) => Promise<{ items: D[]; itemCount: number }>;
+  getMany?: (params: {
+    paginationModel: GridPaginationModel;
+    sortModel: GridSortModel;
+    filterModel: GridFilterModel;
+  }) => Promise<{ items: D[]; itemCount: number }>;
   getOne?: (id: DataModelId) => Promise<D>;
   createOne?: (data: Partial<OmitId<D>>) => Promise<D>;
   updateOne?: (id: DataModelId, data: Partial<OmitId<D>>) => Promise<D>;

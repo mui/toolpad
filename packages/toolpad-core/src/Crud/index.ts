@@ -9,4 +9,4 @@ export * from './CrudProvider';
 
 export * from './Crud';
 
-export * from './shared';
+export type * from './types';

@@ -21,7 +21,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import type { GridSingleSelectColDef } from '@mui/x-data-grid';
 import dayjs, { Dayjs } from 'dayjs';
 import { CrudContext } from '../shared/context';
-import { DataField, DataModel, DataSource, OmitId } from './shared';
+import type { DataField, DataModel, DataSource, OmitId } from './types';
 
 interface CrudFormState<D extends DataModel> {
   values: Partial<OmitId<D>>;

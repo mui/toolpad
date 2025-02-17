@@ -8,7 +8,7 @@ import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
 import { CrudContext } from '../shared/context';
 import { CrudForm } from './CrudForm';
-import { DataModel, DataModelId, DataSource, OmitId } from './shared';
+import type { DataModel, DataModelId, DataSource, OmitId } from './types';
 
 interface EditFormProps<D extends DataModel> {
   dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getOne' | 'updateOne'>>;

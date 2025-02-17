@@ -3,13 +3,13 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { match } from 'path-to-regexp';
 import invariant from 'invariant';
-import { DataModel, DataModelId, DataSource, OmitId } from './shared';
-import { CrudProvider } from './CrudProvider';
 import { RouterContext } from '../shared/context';
+import { CrudProvider } from './CrudProvider';
 import { List } from './List';
 import { Show } from './Show';
 import { Create } from './Create';
 import { Edit } from './Edit';
+import type { DataModel, DataModelId, DataSource, OmitId } from './types';
 
 export interface CrudProps<D extends DataModel> {
   /**

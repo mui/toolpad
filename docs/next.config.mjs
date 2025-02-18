@@ -2,7 +2,7 @@
 import * as path from 'path';
 import * as url from 'url';
 import { createRequire } from 'module';
-import { LANGUAGES, LANGUAGES_IGNORE_PAGES, LANGUAGES_IN_PROGRESS } from './config.js';
+import { LANGUAGES, LANGUAGES_IGNORE_PAGES, LANGUAGES_IN_PROGRESS } from './config';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 

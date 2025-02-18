@@ -1,3 +1,4 @@
+'use client';
 import { fromHar } from 'perf-cascade';
 import * as React from 'react';
 import type { Har } from 'har-format';

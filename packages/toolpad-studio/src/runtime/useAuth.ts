@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import * as appDom from '@toolpad/studio-runtime/appDom';
 import { useLocation, useNavigate } from 'react-router';

@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import { queryClient } from '@toolpad/studio-runtime';
 // TODO: move this rpc logic to @mui/utils

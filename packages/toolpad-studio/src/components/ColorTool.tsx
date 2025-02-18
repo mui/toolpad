@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import { SxProps, rgbToHex, useTheme } from '@mui/material/styles';
 import * as colors from '@mui/material/colors';

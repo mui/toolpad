@@ -1,3 +1,4 @@
+'use client';
 import { Box, IconButton, InputAdornment, Popover, TextField } from '@mui/material';
 import * as React from 'react';
 import ColorTool from './ColorTool';

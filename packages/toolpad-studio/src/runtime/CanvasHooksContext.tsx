@@ -1,3 +1,4 @@
+'use client';
 import { ComponentConfig, NodeHashes } from '@toolpad/studio-runtime';
 import * as React from 'react';
 import * as appDom from '@toolpad/studio-runtime/appDom';

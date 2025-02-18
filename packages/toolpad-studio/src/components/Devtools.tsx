@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import { TabPanel, TabContext, TabList } from '@mui/lab';
 import { Box, IconButton, LinearProgress, styled, SxProps, Tab } from '@mui/material';

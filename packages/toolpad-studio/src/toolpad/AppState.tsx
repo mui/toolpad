@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import { NodeHashes, NodeId } from '@toolpad/studio-runtime';
 import { createProvidedContext } from '@toolpad/utils/react';

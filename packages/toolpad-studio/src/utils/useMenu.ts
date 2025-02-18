@@ -1,3 +1,4 @@
+'use client';
 import { ButtonProps, MenuProps } from '@mui/material';
 import * as React from 'react';
 

@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import { SxProps, styled, IconButton, Tooltip, Snackbar } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';

@@ -1,3 +1,4 @@
+'use client';
 import { LoadingButton, LoadingButtonProps } from '@mui/lab';
 import {
   Dialog,

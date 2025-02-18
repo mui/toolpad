@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+'use client';
+
 /**
  * NOTE: This file can't SSR (use lazyComponent to load it)
  */

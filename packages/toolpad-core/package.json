@@ -55,8 +55,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.26.0",
-    "@mui/lab": "6.0.0-beta.22",
-    "@mui/utils": "6.3.1",
+    "@mui/lab": "6.0.0-beta.22 || ^7.0.0-alpha",
+    "@mui/utils": "^6.0.0 || ^7.0.0-alpha",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",
     "client-only": "^0.0.1",
@@ -81,8 +81,8 @@
     "vitest": "2.1.9"
   },
   "peerDependencies": {
-    "@mui/icons-material": "5 - 6",
-    "@mui/material": "5 - 6",
+    "@mui/icons-material": "^5.16.6 || ^6.0.0 || ^7.0.0-alpha",
+    "@mui/material": "^5.16.6 || ^6.0.0 || ^7.0.0-alpha",
     "next": "^14 || ^15",
     "react": "^18 || ^19",
     "react-router": "^7"

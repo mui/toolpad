@@ -37,7 +37,7 @@
     "build:types": "tsx ../../scripts/buildTypes.mts",
     "predev": "pnpm clean",
     "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch --preserveWatchOutput\" \"pnpm build:copy-files\"",
-    "check-types": "pnpm build:types && tsc --noEmit",
+    "check-types": "pnpm build:stable && pnpm build:types && tsc --noEmit",
     "test": "vitest run --coverage",
     "test:dev": "vitest",
     "test:browser": "vitest run --browser.enabled",

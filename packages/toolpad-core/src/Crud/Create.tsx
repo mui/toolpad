@@ -5,6 +5,8 @@ import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
 import { CrudContext } from '../shared/context';
 import { CrudForm } from './CrudForm';
+import { DataSourceCache } from './cache';
+import { useCachedDataSource } from './useCachedDataSource';
 import type { DataModel, DataSource, OmitId } from './types';
 
 export interface CreateProps<D extends DataModel> {
@@ -26,6 +28,10 @@ export interface CreateProps<D extends DataModel> {
    * @default false
    */
   resetOnSubmit?: boolean;
+  /**
+   * Cache for the data source.
+   */
+  dataSourceCache?: DataSourceCache;
 }
 
 /**
@@ -43,19 +49,24 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     initialValues = {} as Partial<OmitId<D>>,
     onSubmitSuccess,
     resetOnSubmit = false,
+    dataSourceCache,
   } = props;
 
   const crudContext = React.useContext(CrudContext);
-  const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
-    typeof props.dataSource,
-    undefined
+  const dataSource = (props.dataSource ?? crudContext.dataSource) as NonNullable<
+    typeof props.dataSource
   >;
 
   const notifications = useNotifications();
 
   invariant(dataSource, 'No data source found.');
 
-  const { fields, createOne, validate } = dataSource;
+  const cache = dataSourceCache ?? crudContext.dataSourceCache ?? new DataSourceCache();
+  const cachedDataSource = useCachedDataSource<D>(dataSource, cache) as NonNullable<
+    typeof props.dataSource
+  >;
+
+  const { fields, createOne, validate } = cachedDataSource;
 
   const [formState, setFormState] = React.useState<{
     values: Partial<OmitId<D>>;

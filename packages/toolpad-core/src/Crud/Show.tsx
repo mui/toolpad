@@ -17,6 +17,8 @@ import dayjs from 'dayjs';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { CrudContext } from '../shared/context';
+import { DataSourceCache } from './cache';
+import { useCachedDataSource } from './useCachedDataSource';
 import type { DataField, DataModel, DataModelId, DataSource } from './types';
 
 export interface ShowProps<D extends DataModel> {
@@ -33,7 +35,12 @@ export interface ShowProps<D extends DataModel> {
    * Callback fired when the item is successfully deleted.
    */
   onDelete?: (id: DataModelId) => void;
+  /**
+   * Cache for the data source.
+   */
+  dataSourceCache?: DataSourceCache;
 }
+
 /**
  *
  * Demos:
@@ -44,19 +51,22 @@ export interface ShowProps<D extends DataModel> {
  *
  * - [Show API](https://mui.com/toolpad/core/api/show)
  */
-
 function Show<D extends DataModel>(props: ShowProps<D>) {
-  const { id, onEditClick, onDelete } = props;
+  const { id, onEditClick, onDelete, dataSourceCache } = props;
 
   const crudContext = React.useContext(CrudContext);
-  const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
-    typeof props.dataSource,
-    undefined
+  const dataSource = (props.dataSource ?? crudContext.dataSource) as NonNullable<
+    typeof props.dataSource
   >;
 
   invariant(dataSource, 'No data source found.');
 
-  const { fields, validate, ...methods } = dataSource;
+  const cache = dataSourceCache ?? crudContext.dataSourceCache ?? new DataSourceCache();
+  const cachedDataSource = useCachedDataSource<D>(dataSource, cache) as NonNullable<
+    typeof props.dataSource
+  >;
+
+  const { fields, validate, ...methods } = cachedDataSource;
   const { getOne, deleteOne } = methods;
 
   const dialogs = useDialogs();

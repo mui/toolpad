@@ -2,6 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { CrudContext } from '../shared/context';
+import { DataSourceCache } from './cache';
 import type { DataModel, DataSource } from './types';
 
 export interface CrudProviderProps<D extends DataModel> {
@@ -9,6 +10,10 @@ export interface CrudProviderProps<D extends DataModel> {
    * Server-side data source.
    */
   dataSource: DataSource<D>;
+  /**
+   * Cache for the data source.
+   */
+  dataSourceCache?: DataSourceCache;
   children?: React.ReactNode;
 }
 /**
@@ -22,10 +27,19 @@ export interface CrudProviderProps<D extends DataModel> {
  * - [CrudProvider API](https://mui.com/toolpad/core/api/crud-provider)
  */
 function CrudProvider<D extends DataModel>(props: CrudProviderProps<D>) {
-  const { dataSource, children } = props;
+  const { dataSource, dataSourceCache, children } = props;
+
+  const cache = dataSourceCache ?? new DataSourceCache();
 
   return (
-    <CrudContext value={{ dataSource } as CrudProviderProps<DataModel>}>{children}</CrudContext>
+    <CrudContext
+      value={{
+        dataSource: dataSource as CrudProviderProps<DataModel>['dataSource'],
+        dataSourceCache: cache,
+      }}
+    >
+      {children}
+    </CrudContext>
   );
 }
 

@@ -8,6 +8,8 @@ import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
 import { CrudContext } from '../shared/context';
 import { CrudForm } from './CrudForm';
+import { DataSourceCache } from './cache';
+import { useCachedDataSource } from './useCachedDataSource';
 import type { DataModel, DataModelId, DataSource, OmitId } from './types';
 
 interface EditFormProps<D extends DataModel> {
@@ -142,6 +144,10 @@ export interface EditProps<D extends DataModel> {
    * Callback fired when the form is successfully submitted.
    */
   onSubmitSuccess?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
+  /**
+   * Cache for the data source.
+   */
+  dataSourceCache?: DataSourceCache;
 }
 
 /**
@@ -155,17 +161,21 @@ export interface EditProps<D extends DataModel> {
  * - [Edit API](https://mui.com/toolpad/core/api/edit)
  */
 function Edit<D extends DataModel>(props: EditProps<D>) {
-  const { id, onSubmitSuccess } = props;
+  const { id, onSubmitSuccess, dataSourceCache } = props;
 
   const crudContext = React.useContext(CrudContext);
-  const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
-    typeof props.dataSource,
-    undefined
+  const dataSource = (props.dataSource ?? crudContext.dataSource) as NonNullable<
+    typeof props.dataSource
   >;
 
   invariant(dataSource, 'No data source found.');
 
-  const { fields, validate, ...methods } = dataSource;
+  const cache = dataSourceCache ?? crudContext.dataSourceCache ?? new DataSourceCache();
+  const cachedDataSource = useCachedDataSource<D>(dataSource, cache) as NonNullable<
+    typeof props.dataSource
+  >;
+
+  const { fields, validate, ...methods } = cachedDataSource;
   const { getOne, updateOne } = methods;
 
   const [data, setData] = React.useState<D | null>(null);

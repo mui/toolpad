@@ -79,9 +79,8 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
   const formErrors = formState.errors;
 
   const crudContext = React.useContext(CrudContext);
-  const dataSource = (props.dataSource ?? crudContext.dataSource) as Exclude<
-    typeof props.dataSource,
-    undefined
+  const dataSource = (props.dataSource ?? crudContext.dataSource) as NonNullable<
+    typeof props.dataSource
   >;
 
   invariant(dataSource, 'No data source found.');

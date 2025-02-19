@@ -9,6 +9,7 @@ import { List } from './List';
 import { Show } from './Show';
 import { Create } from './Create';
 import { Edit } from './Edit';
+import { DataSourceCache } from './cache';
 import type { DataModel, DataModelId, DataSource, OmitId } from './types';
 
 export interface CrudProps<D extends DataModel> {
@@ -30,6 +31,10 @@ export interface CrudProps<D extends DataModel> {
    * @default {}
    */
   defaultValues?: Partial<OmitId<D>>;
+  /**
+   * Cache for the data source.
+   */
+  dataSourceCache?: DataSourceCache;
 }
 /**
  *
@@ -42,7 +47,7 @@ export interface CrudProps<D extends DataModel> {
  * - [Crud API](https://mui.com/toolpad/core/api/crud)
  */
 function Crud<D extends DataModel>(props: CrudProps<D>) {
-  const { dataSource, rootPath, initialPageSize, defaultValues } = props;
+  const { dataSource, rootPath, initialPageSize, defaultValues, dataSourceCache } = props;
 
   const listPath = rootPath;
   const showPath = `${rootPath}/:id`;
@@ -117,22 +122,26 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     }
     return null;
   }, [
+    routerContext?.pathname,
+    listPath,
     createPath,
+    showPath,
     editPath,
-    handleCreate,
+    initialPageSize,
+    handleRowClick,
     handleCreateClick,
+    handleEditClick,
+    defaultValues,
+    handleCreate,
     handleDelete,
     handleEdit,
-    handleEditClick,
-    handleRowClick,
-    initialPageSize,
-    defaultValues,
-    listPath,
-    routerContext?.pathname,
-    showPath,
   ]);
 
-  return <CrudProvider<D> dataSource={dataSource}>{renderedRoute}</CrudProvider>;
+  return (
+    <CrudProvider<D> dataSource={dataSource} dataSourceCache={dataSourceCache}>
+      {renderedRoute}
+    </CrudProvider>
+  );
 }
 
 Crud.propTypes /* remove-proptypes */ = {

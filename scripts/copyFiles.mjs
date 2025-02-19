@@ -1,15 +1,10 @@
 /* eslint-disable no-console */
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import {
-  createPackageFile,
-  includeFileInBuild,
-  typescriptCopy,
-} from '@mui/monorepo/scripts/copyFilesUtils.mjs';
+import { createPackageFile, includeFileInBuild } from '@mui/monorepo/scripts/copyFilesUtils.mjs';
 
 const packagePath = process.cwd();
 const buildPath = path.join(packagePath, './build');
-const srcPath = path.join(packagePath, './src');
 
 async function prepend(file, string) {
   const data = await fs.readFile(file, 'utf8');

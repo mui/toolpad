@@ -13,11 +13,6 @@
     "./*": "./src/*.ts",
     "./hooks/*": "./src/hooks/*.ts"
   },
-  "files": [
-    "build",
-    "server",
-    "browser"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mui/toolpad.git",

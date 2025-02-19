@@ -1,3 +1,4 @@
+'use client';
 import invariant from 'invariant';
 import * as React from 'react';
 import { DialogsContext } from './DialogsContext';

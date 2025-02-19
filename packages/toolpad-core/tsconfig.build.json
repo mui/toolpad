@@ -5,7 +5,8 @@
   "compilerOptions": {
     "declaration": true,
     "noEmit": false,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "outDir": "build/esm"
   },
   "exclude": ["src/**/*.spec.ts*", "src/**/*.test.ts*"]
 }

@@ -6,17 +6,7 @@
   "main": "./node/index.js",
   "module": "./index.js",
   "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js",
-      "require": "./node/index.js"
-    },
-    "./*": {
-      "types": "./*/index.d.ts",
-      "import": "./*/index.js",
-      "require": "./node/*/index.js"
-    }
+    "./package.json": "./package.json"
   },
   "keywords": [
     "react",
@@ -44,7 +34,7 @@
     "build:node": "node ../../scripts/build.mjs node",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
-    "build:types": "tsc -b tsconfig.build.json",
+    "build:types": "tsx ../../scripts/buildTypes.mts",
     "predev": "pnpm clean",
     "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch --preserveWatchOutput\" \"pnpm build:copy-files\"",
     "check-types": "pnpm build:types && tsc --noEmit",

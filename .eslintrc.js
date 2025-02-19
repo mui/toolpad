@@ -101,9 +101,18 @@ module.exports = {
     ],
     'material-ui/no-hardcoded-labels': 'off', // We are not really translating the docs/website anymore
     'react-compiler/react-compiler': 'error',
+    'material-ui/disallow-react-api-in-server-components': 'off',
   },
   overrides: [
-    ...baseline.overrides,
+    ...baseline.overrides.map((override) => {
+      if (override.rules['material-ui/disallow-react-api-in-server-components']) {
+        return {
+          ...override,
+          files: ['packages/toolpad-core/src/*/*.?(c|m)[jt]s?(x)'],
+        };
+      }
+      return override;
+    }),
     {
       files: ['**/*.test.js', '**/*.test.ts', '**/*.test.tsx'],
       extends: ['plugin:testing-library/react'],

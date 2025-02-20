@@ -1,3 +1,5 @@
+export * from './cache';
+
 export * from './CrudForm';
 
 export * from './List';

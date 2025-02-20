@@ -318,7 +318,7 @@ CrudForm.propTypes /* remove-proptypes */ = {
   /**
    * Server-side data source.
    */
-  dataSource: PropTypes.object.isRequired,
+  dataSource: PropTypes.object,
   /**
    * Form state object, including field values and errors.
    */

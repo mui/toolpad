@@ -2,6 +2,7 @@
   "componentDescription": "",
   "propDescriptions": {
     "dataSource": { "description": "Server-side data source." },
+    "dataSourceCache": { "description": "Cache for the data source." },
     "onDelete": { "description": "Callback fired when the item is successfully deleted." },
     "onEditClick": { "description": "Callback fired when the &quot;Edit&quot; button is clicked." }
   },

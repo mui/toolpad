@@ -2,6 +2,7 @@
   "componentDescription": "",
   "propDescriptions": {
     "dataSource": { "description": "Server-side data source." },
+    "dataSourceCache": { "description": "Cache for the data source." },
     "initialValues": { "description": "Initial form values." },
     "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." },
     "resetOnSubmit": {

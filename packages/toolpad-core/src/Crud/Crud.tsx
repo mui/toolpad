@@ -154,6 +154,16 @@ Crud.propTypes /* remove-proptypes */ = {
    */
   dataSource: PropTypes.object.isRequired,
   /**
+   * Cache for the data source.
+   */
+  dataSourceCache: PropTypes.shape({
+    cache: PropTypes.object.isRequired,
+    clear: PropTypes.func.isRequired,
+    get: PropTypes.func.isRequired,
+    set: PropTypes.func.isRequired,
+    ttl: PropTypes.number.isRequired,
+  }),
+  /**
    * Default form values for a new item.
    * @default {}
    */

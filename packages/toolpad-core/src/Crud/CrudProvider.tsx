@@ -29,7 +29,7 @@ export interface CrudProviderProps<D extends DataModel> {
 function CrudProvider<D extends DataModel>(props: CrudProviderProps<D>) {
   const { dataSource, dataSourceCache, children } = props;
 
-  const cache = dataSourceCache ?? new DataSourceCache();
+  const cache = React.useMemo(() => dataSourceCache ?? new DataSourceCache(), [dataSourceCache]);
 
   return (
     <CrudContext
@@ -56,6 +56,16 @@ CrudProvider.propTypes /* remove-proptypes */ = {
    * Server-side data source.
    */
   dataSource: PropTypes.object.isRequired,
+  /**
+   * Cache for the data source.
+   */
+  dataSourceCache: PropTypes.shape({
+    cache: PropTypes.object.isRequired,
+    clear: PropTypes.func.isRequired,
+    get: PropTypes.func.isRequired,
+    set: PropTypes.func.isRequired,
+    ttl: PropTypes.number.isRequired,
+  }),
 } as any;
 
 export { CrudProvider };

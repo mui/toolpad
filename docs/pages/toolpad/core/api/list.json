@@ -1,6 +1,12 @@
 {
   "props": {
     "dataSource": { "type": { "name": "object" } },
+    "dataSourceCache": {
+      "type": {
+        "name": "shape",
+        "description": "{ cache: object, clear: func, get: func, set: func, ttl: number }"
+      }
+    },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" },
     "onCreateClick": { "type": { "name": "func" } },
     "onDelete": { "type": { "name": "func" } },

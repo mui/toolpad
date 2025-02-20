@@ -1,6 +1,5 @@
 {
   "props": {
-    "dataSource": { "type": { "name": "object" }, "required": true },
     "formState": {
       "type": { "name": "shape", "description": "{ errors: object, values: object }" },
       "required": true
@@ -8,6 +7,7 @@
     "localeText": { "type": { "name": "object" }, "required": true },
     "onFieldChange": { "type": { "name": "func" }, "required": true },
     "onSubmit": { "type": { "name": "func" }, "required": true },
+    "dataSource": { "type": { "name": "object" } },
     "onReset": { "type": { "name": "func" } }
   },
   "name": "CrudForm",

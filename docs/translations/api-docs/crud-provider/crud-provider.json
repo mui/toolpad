@@ -1,5 +1,8 @@
 {
   "componentDescription": "",
-  "propDescriptions": { "dataSource": { "description": "Server-side data source." } },
+  "propDescriptions": {
+    "dataSource": { "description": "Server-side data source." },
+    "dataSourceCache": { "description": "Cache for the data source." }
+  },
   "classDescriptions": {}
 }

@@ -1,5 +1,13 @@
 {
-  "props": { "dataSource": { "type": { "name": "object" }, "required": true } },
+  "props": {
+    "dataSource": { "type": { "name": "object" }, "required": true },
+    "dataSourceCache": {
+      "type": {
+        "name": "shape",
+        "description": "{ cache: object, clear: func, get: func, set: func, ttl: number }"
+      }
+    }
+  },
   "name": "CrudProvider",
   "imports": ["import { CrudProvider } from '@toolpad/core/Crud';"],
   "classes": [],

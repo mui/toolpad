@@ -1,6 +1,12 @@
 {
   "props": {
     "dataSource": { "type": { "name": "object" } },
+    "dataSourceCache": {
+      "type": {
+        "name": "shape",
+        "description": "{ cache: object, clear: func, get: func, set: func, ttl: number }"
+      }
+    },
     "onSubmitSuccess": { "type": { "name": "func" } }
   },
   "name": "Edit",

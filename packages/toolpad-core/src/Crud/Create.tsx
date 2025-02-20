@@ -61,7 +61,10 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
 
   invariant(dataSource, 'No data source found.');
 
-  const cache = dataSourceCache ?? crudContext.dataSourceCache ?? new DataSourceCache();
+  const cache = React.useMemo(
+    () => dataSourceCache ?? crudContext.dataSourceCache ?? new DataSourceCache(),
+    [crudContext.dataSourceCache, dataSourceCache],
+  );
   const cachedDataSource = useCachedDataSource<D>(dataSource, cache) as NonNullable<
     typeof props.dataSource
   >;
@@ -188,6 +191,16 @@ Create.propTypes /* remove-proptypes */ = {
    * Server-side data source.
    */
   dataSource: PropTypes.object,
+  /**
+   * Cache for the data source.
+   */
+  dataSourceCache: PropTypes.shape({
+    cache: PropTypes.object.isRequired,
+    clear: PropTypes.func.isRequired,
+    get: PropTypes.func.isRequired,
+    set: PropTypes.func.isRequired,
+    ttl: PropTypes.number.isRequired,
+  }),
   /**
    * Initial form values.
    * @default {}

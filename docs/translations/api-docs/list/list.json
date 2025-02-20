@@ -2,6 +2,7 @@
   "componentDescription": "",
   "propDescriptions": {
     "dataSource": { "description": "Server-side data source." },
+    "dataSourceCache": { "description": "Cache for the data source." },
     "initialPageSize": { "description": "Initial number of rows to show per page." },
     "onCreateClick": {
       "description": "Callback fired when the &quot;Create&quot; button is clicked."

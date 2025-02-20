@@ -2,6 +2,7 @@
   "componentDescription": "",
   "propDescriptions": {
     "dataSource": { "description": "Server-side data source." },
+    "dataSourceCache": { "description": "Cache for the data source." },
     "defaultValues": { "description": "Default form values for a new item." },
     "initialPageSize": { "description": "Initial number of rows to show per page." },
     "rootPath": { "description": "Root path to CRUD pages." }

@@ -48,7 +48,7 @@ const AUTHENTICATION = {
   signOut,
 };
 
-function DefaultLayout(page: React.ReactElement<any>) {
+function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
   const router = useRouter();
   const { segments = [] } = router.query;
   const [orderId] = segments;
@@ -74,7 +74,7 @@ function DefaultLayout(page: React.ReactElement<any>) {
 }
 
 function getDefaultLayout(page: React.ReactElement<any>) {
-  return <DefaultLayout {...page} />;
+  return <DefaultLayout page={page} />;
 }
 
 function RequireAuth({ children }: { children: React.ReactNode }) {

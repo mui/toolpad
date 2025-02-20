@@ -1,4 +1,4 @@
-import { DataModel, DataSource } from '@toolpad/core/Crud';
+import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
 import * as yup from 'yup';
 import yupAdapter from '../validationAdapters/yupAdapter';
 
@@ -196,3 +196,5 @@ export const ordersDataSource: DataSource<Order> = {
     }),
   ),
 };
+
+export const ordersCache = new DataSourceCache();

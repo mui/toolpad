@@ -1,6 +1,12 @@
 {
   "props": {
     "dataSource": { "type": { "name": "object" } },
+    "dataSourceCache": {
+      "type": {
+        "name": "shape",
+        "description": "{ cache: object, clear: func, get: func, set: func, ttl: number }"
+      }
+    },
     "initialValues": { "type": { "name": "object" }, "default": "{}" },
     "onSubmitSuccess": { "type": { "name": "func" } },
     "resetOnSubmit": { "type": { "name": "bool" }, "default": "false" }

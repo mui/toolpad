@@ -16,7 +16,7 @@ module.exports = function getBabelConfig(api) {
       '@babel/preset-env',
       {
         bugfixes: true,
-        browserslistEnv: process.env.BABEL_ENV || process.env.NODE_ENV,
+        browserslistEnv: api.env() || process.env.NODE_ENV,
         debug: process.env.MUI_BUILD_VERBOSE === 'true',
         modules: useESModules ? false : 'commonjs',
       },
@@ -30,7 +30,9 @@ module.exports = function getBabelConfig(api) {
     '@babel/preset-typescript',
   ];
 
-  const outFileExtension = '.js';
+  // Essentially only replace in production builds.
+  // When aliasing we want to keep the original extension
+  const outFileExtension = process.env.MUI_OUT_FILE_EXTENSION || null;
 
   /** @type {babel.PluginItem[]} */
   const plugins = [

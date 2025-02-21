@@ -57,7 +57,7 @@
     {
       "name": "submitButton",
       "description": "The custom submit button component used in the credentials form.",
-      "default": "LoadingButton",
+      "default": "Button",
       "class": null
     },
     {

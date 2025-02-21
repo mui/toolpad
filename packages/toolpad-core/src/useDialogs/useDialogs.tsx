@@ -1,12 +1,11 @@
-import { LoadingButton } from '@mui/lab';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  DialogContentText,
-} from '@mui/material';
+'use client';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import DialogContentText from '@mui/material/DialogContentText';
 import { useNonNullableContext } from '@toolpad/utils/react';
 import invariant from 'invariant';
 import * as React from 'react';
@@ -215,9 +214,9 @@ export function AlertDialog({ open, payload, onClose }: AlertDialogProps) {
       <DialogTitle>{payload.title ?? localeText.alert}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
-        <LoadingButton disabled={!open} {...okButtonProps}>
+        <Button disabled={!open} {...okButtonProps}>
           {payload.okText ?? localeText.ok}
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );
@@ -239,12 +238,12 @@ export function ConfirmDialog({ open, payload, onClose }: ConfirmDialogProps) {
       <DialogTitle>{payload.title ?? localeText.confirm}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
-        <LoadingButton autoFocus disabled={!open} {...cancelButtonProps}>
+        <Button autoFocus disabled={!open} {...cancelButtonProps}>
           {payload.cancelText ?? localeText.cancel}
-        </LoadingButton>
-        <LoadingButton color={payload.severity} disabled={!open} {...okButtonProps}>
+        </Button>
+        <Button color={payload.severity} disabled={!open} {...okButtonProps}>
           {payload.okText ?? localeText.ok}
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );
@@ -304,12 +303,12 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
         />
       </DialogContent>
       <DialogActions>
-        <LoadingButton disabled={!open} {...cancelButtonProps}>
+        <Button disabled={!open} {...cancelButtonProps}>
           {payload.cancelText ?? localeText.cancel}
-        </LoadingButton>
-        <LoadingButton disabled={!open} loading={loading} type="submit">
+        </Button>
+        <Button disabled={!open} loading={loading} type="submit">
           {payload.okText ?? localeText.ok}
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );

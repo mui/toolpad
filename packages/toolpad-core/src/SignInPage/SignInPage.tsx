@@ -11,13 +11,13 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import AppleIcon from '@mui/icons-material/Apple';
 import { alpha, useTheme, SxProps, type Theme } from '@mui/material/styles';
 import { LinkProps } from '@mui/material/Link';
+import Button, { ButtonProps } from '@mui/material/Button';
 import GoogleIcon from './icons/Google';
 import FacebookIcon from './icons/Facebook';
 import TwitterIcon from './icons/Twitter';
@@ -198,9 +198,9 @@ export interface SignInPageSlots {
   passwordField?: React.JSXElementConstructor<TextFieldProps>;
   /**
    * The custom submit button component used in the credentials form.
-   * @default LoadingButton
+   * @default Button
    */
-  submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
+  submitButton?: React.JSXElementConstructor<ButtonProps>;
   /**
    * The custom forgot password link component used in the credentials form.
    * @default Link
@@ -264,7 +264,7 @@ export interface SignInPageProps {
   slotProps?: {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
-    submitButton?: LoadingButtonProps;
+    submitButton?: ButtonProps;
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
     rememberMe?: Partial<FormControlLabelProps>;
@@ -409,7 +409,7 @@ function SignInPage(props: SignInPageProps) {
                         }));
                       }}
                     >
-                      <LoadingButton
+                      <Button
                         key={provider.id}
                         variant="outlined"
                         type="submit"
@@ -430,7 +430,7 @@ function SignInPage(props: SignInPageProps) {
                             `${localeText.signInTitle} ${localeText.with}`}{' '}
                           {provider.name}
                         </span>
-                      </LoadingButton>
+                      </Button>
                     </form>
                   );
                 })}
@@ -483,7 +483,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
-                    <LoadingButton
+                    <Button
                       type="submit"
                       fullWidth
                       size="large"
@@ -502,7 +502,7 @@ function SignInPage(props: SignInPageProps) {
                       {localeText.passkeySignInTitle ||
                         `${localeText.signInTitle} ${localeText.with}`}{' '}
                       {passkeyProvider.name || localeText.passkey}
-                    </LoadingButton>
+                    </Button>
                   )}
                 </Box>
               </React.Fragment>
@@ -561,7 +561,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
-                    <LoadingButton
+                    <Button
                       type="submit"
                       fullWidth
                       size="large"
@@ -580,7 +580,7 @@ function SignInPage(props: SignInPageProps) {
                       {localeText.magicLinkSignInTitle ||
                         `${localeText.signInTitle} ${localeText.with}`}{' '}
                       {localeText.email}
-                    </LoadingButton>
+                    </Button>
                   )}
                 </Box>
               </React.Fragment>
@@ -690,7 +690,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
-                    <LoadingButton
+                    <Button
                       type="submit"
                       fullWidth
                       size="large"
@@ -706,7 +706,7 @@ function SignInPage(props: SignInPageProps) {
                       {...slotProps?.submitButton}
                     >
                       {localeText.signInTitle}
-                    </LoadingButton>
+                    </Button>
                   )}
 
                   {slots?.signUpLink ? (

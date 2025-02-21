@@ -21,7 +21,9 @@ export class Emitter<T extends EventHandlers = {}> {
    * Add a listener for an event
    */
   on(name: '*', handler: AllEventsHandler<T>): void;
+
   on<K extends keyof T>(name: K, handler: EventHandler<T, K>): void;
+
   on<K extends keyof T>(name: K | '*', handler: EventHandler<T, K> | AllEventsHandler<T>): void {
     let eventHandlers = this.handlers.get(name);
     if (!eventHandlers) {

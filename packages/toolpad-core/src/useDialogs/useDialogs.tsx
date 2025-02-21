@@ -11,6 +11,7 @@ import { useNonNullableContext } from '@toolpad/utils/react';
 import invariant from 'invariant';
 import * as React from 'react';
 import { DialogsContext } from './DialogsContext';
+import { WindowContext } from '../shared/context';
 import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 
 interface DialogsProviderLocaleText {
@@ -207,11 +208,19 @@ export interface AlertDialogPayload extends AlertOptions {
 export interface AlertDialogProps extends DialogProps<AlertDialogPayload, void> {}
 
 export function AlertDialog({ open, payload, onClose }: AlertDialogProps) {
+  const appWindowContext = React.useContext(WindowContext);
+
   const globalLocaleText = useLocaleText();
   const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const okButtonProps = useDialogLoadingButton(() => onClose());
   return (
-    <Dialog maxWidth="xs" fullWidth open={open} onClose={() => onClose()}>
+    <Dialog
+      maxWidth="xs"
+      fullWidth
+      open={open}
+      onClose={() => onClose()}
+      container={appWindowContext?.document.body}
+    >
       <DialogTitle>{payload.title ?? localeText.alert}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
@@ -230,12 +239,20 @@ export interface ConfirmDialogPayload extends ConfirmOptions {
 export interface ConfirmDialogProps extends DialogProps<ConfirmDialogPayload, boolean> {}
 
 export function ConfirmDialog({ open, payload, onClose }: ConfirmDialogProps) {
+  const appWindowContext = React.useContext(WindowContext);
+
   const globalLocaleText = useLocaleText();
   const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const cancelButtonProps = useDialogLoadingButton(() => onClose(false));
   const okButtonProps = useDialogLoadingButton(() => onClose(true));
   return (
-    <Dialog maxWidth="xs" fullWidth open={open} onClose={() => onClose(false)}>
+    <Dialog
+      maxWidth="xs"
+      fullWidth
+      open={open}
+      onClose={() => onClose(false)}
+      container={appWindowContext?.document.body}
+    >
       <DialogTitle>{payload.title ?? localeText.confirm}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
@@ -257,6 +274,8 @@ export interface PromptDialogPayload extends PromptOptions {
 export interface PromptDialogProps extends DialogProps<PromptDialogPayload, string | null> {}
 
 export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
+  const appWindowContext = React.useContext(WindowContext);
+
   const globalLocaleText = useLocaleText();
   const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const [input, setInput] = React.useState('');
@@ -286,6 +305,7 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
           }
         },
       }}
+      container={appWindowContext?.document.body}
     >
       <DialogTitle>{payload.title ?? localeText.confirm}</DialogTitle>
       <DialogContent>

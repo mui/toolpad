@@ -8,6 +8,8 @@ export * from './Account';
 
 export * from './PageContainer';
 
+export * from './Crud';
+
 export * from './useActivePage';
 
 export * from './useDialogs';

@@ -1,0 +1,12 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "dataSource": { "description": "Server-side data source." },
+    "formState": { "description": "Form state object, including field values and errors." },
+    "localeText": { "description": "Locale text for CRUD form component." },
+    "onFieldChange": { "description": "Callback fired when a form field is changed." },
+    "onReset": { "description": "Callback fired when the form is reset." },
+    "onSubmit": { "description": "Callback fired when the form is submitted." }
+  },
+  "classDescriptions": {}
+}

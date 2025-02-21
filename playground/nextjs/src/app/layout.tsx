@@ -13,7 +13,6 @@ const NAVIGATION: Navigation = [
     title: 'Main items',
   },
   {
-    segment: '',
     title: 'Dashboard',
     icon: <DashboardIcon />,
   },
@@ -21,6 +20,7 @@ const NAVIGATION: Navigation = [
     segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
+    pattern: 'orders{/:orderId}*',
   },
 ];
 

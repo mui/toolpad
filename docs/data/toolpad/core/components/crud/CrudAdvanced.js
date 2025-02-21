@@ -5,7 +5,14 @@ import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Create, CrudProvider, Edit, List, Show } from '@toolpad/core/Crud';
+import {
+  Create,
+  CrudProvider,
+  DataSourceCache,
+  Edit,
+  List,
+  Show,
+} from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -183,6 +190,8 @@ export const notesDataSource = {
   },
 };
 
+const notesCache = new DataSourceCache();
+
 function matchPath(pattern, pathname) {
   const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
   const match = pathname.match(regex);
@@ -263,7 +272,7 @@ function CrudAdvanced(props) {
       <DashboardLayout defaultSidebarCollapsed>
         <PageContainer title={title}>
           {/* preview-start */}
-          <CrudProvider dataSource={notesDataSource}>
+          <CrudProvider dataSource={notesDataSource} dataSourceCache={notesCache}>
             {router.pathname === listPath ? (
               <List
                 initialPageSize={10}
@@ -287,11 +296,7 @@ function CrudAdvanced(props) {
               />
             ) : null}
             {editNoteId ? (
-              <Edit
-                id={editNoteId}
-                onSubmitSuccess={handleEdit}
-                resetOnSubmit={false}
-              />
+              <Edit id={editNoteId} onSubmitSuccess={handleEdit} />
             ) : null}
           </CrudProvider>
           {/* preview-end */}

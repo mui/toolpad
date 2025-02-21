@@ -38,7 +38,7 @@ export interface ShowProps<D extends DataModel> {
   /**
    * Cache for the data source.
    */
-  dataSourceCache?: DataSourceCache;
+  dataSourceCache?: DataSourceCache | null;
 }
 
 /**
@@ -61,10 +61,10 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
 
   invariant(dataSource, 'No data source found.');
 
-  const cache = React.useMemo(
-    () => dataSourceCache ?? crudContext.dataSourceCache ?? new DataSourceCache(),
-    [crudContext.dataSourceCache, dataSourceCache],
-  );
+  const cache = React.useMemo(() => {
+    const manualCache = dataSourceCache ?? crudContext.dataSourceCache;
+    return typeof manualCache !== 'undefined' ? manualCache : new DataSourceCache();
+  }, [crudContext.dataSourceCache, dataSourceCache]);
   const cachedDataSource = useCachedDataSource<D>(dataSource, cache) as NonNullable<
     typeof props.dataSource
   >;

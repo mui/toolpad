@@ -1,5 +1,6 @@
 <Create<Person>
   dataSource={peopleDataSource}
+  dataSourceCache={peopleCache}
   initialValues={{ age: 18 }}
   onSubmitSuccess={handleSubmitSuccess}
   resetOnSubmit

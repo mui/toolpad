@@ -4,7 +4,7 @@ import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Crud, DataModel, DataSource } from '@toolpad/core/Crud';
+import { Crud, DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
@@ -188,6 +188,8 @@ export const notesDataSource: DataSource<Note> = {
   },
 };
 
+const notesCache = new DataSourceCache();
+
 function matchPath(pattern: string, pathname: string): string | null {
   const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
   const match = pathname.match(regex);
@@ -238,6 +240,7 @@ export default function CrudBasic(props: DemoProps) {
           {/* preview-start */}
           <Crud<Note>
             dataSource={notesDataSource}
+            dataSourceCache={notesCache}
             rootPath="/notes"
             initialPageSize={10}
             defaultValues={{ title: 'New note' }}

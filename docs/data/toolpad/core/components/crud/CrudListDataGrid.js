@@ -6,7 +6,7 @@ import { DataGridPro } from '@mui/x-data-grid-pro';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { List } from '@toolpad/core/Crud';
+import { DataSourceCache, List } from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -140,6 +140,8 @@ export const peopleDataSource = {
   },
 };
 
+const peopleCache = new DataSourceCache();
+
 function CrudListDataGrid(props) {
   const { window } = props;
 
@@ -176,6 +178,7 @@ function CrudListDataGrid(props) {
           {/* preview-start */}
           <List
             dataSource={peopleDataSource}
+            dataSourceCache={peopleCache}
             initialPageSize={4}
             onRowClick={handleRowClick}
             onCreateClick={handleCreateClick}

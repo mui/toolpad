@@ -25,6 +25,8 @@ The pages will be present in the following routes:
 
 These default paths and other out-of-the-box settings can be overriden and configured in more detail by following the [advanced configuration](https://mui.com/toolpad/core/react-crud/#advanced-configuration) below.
 
+It is recommended to include the `dataSourceCache` prop in order to properly cache results from the data source query methods. See more in the section about [data caching](#data-caching) below.
+
 Optionally, additional configuration options can be provided such as `initialPageSize` for the paginated list of items, or `defaultValues` to set the initial form values when using a form to create new items.
 
 :::info
@@ -283,13 +285,30 @@ const dataSource = {
 };
 ```
 
+## Data caching
+
+Data sources cache fetched data by default. This means that if the user queries data that has already been fetched, query methods such as `getMany` and `getOne` will not be called again to avoid unnecessary calls to the server.
+
+Successfully calling mutation methods such as `createOne`, `updateOne` or `deleteOne` automatically clears the cache for all queries in the same data source.
+
+It is recommended to always pass an instance of `DataSourceCache` to the `dataSourceCache` prop in order to cache data, as seen in the [demo above](#demo), otherwise by default the cache will be scoped to the component being used. `DataSourceCache` is a simple in-memory cache that stores the data in a plain object.
+
+Each data source should have its own single cache instance across the whole application.
+
+### Disable cache
+
+To disable the data source cache, pass `null` to the `dataSourceCache` prop.
+
+{{"demo": "CrudNoCache.js", "height": 600, "iframe": true}}
+
 ## Advanced configuration
 
 For more flexibility of customization, and especially if you want full control over where to place the different CRUD pages, you can use the `List`, `Show`, `Create` and `Edit` subcomponents instead of the all-in-one `Crud` component.
 
 {{"demo": "CrudAdvanced.js", "height": 600, "iframe": true}}
 
-The `CrudProvider` component is optional, but it can be used to easily pass a single `dataSource` to the CRUD subcomponents inside it as context. Alternatively, each of those components can take its own `dataSource` as a prop.
+The `CrudProvider` component is optional, but it can be used to easily pass a single `dataSource` and `dataSourceCache` to the CRUD subcomponents inside it as context.
+Alternatively, each of those components can take its own `dataSource` and `dataSourceCache` as props.
 
 ### `List` component
 

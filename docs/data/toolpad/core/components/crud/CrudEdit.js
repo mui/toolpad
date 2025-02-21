@@ -5,7 +5,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Edit } from '@toolpad/core/Crud';
+import { DataSourceCache, Edit } from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -113,6 +113,8 @@ export const peopleDataSource = {
   },
 };
 
+const peopleCache = new DataSourceCache();
+
 function CrudEdit(props) {
   const { window } = props;
 
@@ -138,6 +140,7 @@ function CrudEdit(props) {
           <Edit
             id={1}
             dataSource={peopleDataSource}
+            dataSourceCache={peopleCache}
             onSubmitSuccess={handleSubmitSuccess}
           />
           {/* preview-end */}

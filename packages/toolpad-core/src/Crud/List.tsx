@@ -93,7 +93,7 @@ export interface ListProps<D extends DataModel> {
   /**
    * Cache for the data source.
    */
-  dataSourceCache?: DataSourceCache;
+  dataSourceCache?: DataSourceCache | null;
   /**
    * The components used for each slot inside.
    * @default {}
@@ -135,10 +135,10 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   invariant(dataSource, 'No data source found.');
 
-  const cache = React.useMemo(
-    () => dataSourceCache ?? crudContext.dataSourceCache ?? new DataSourceCache(),
-    [crudContext.dataSourceCache, dataSourceCache],
-  );
+  const cache = React.useMemo(() => {
+    const manualCache = dataSourceCache ?? crudContext.dataSourceCache;
+    return typeof manualCache !== 'undefined' ? manualCache : new DataSourceCache();
+  }, [crudContext.dataSourceCache, dataSourceCache]);
   const cachedDataSource = useCachedDataSource<D>(dataSource, cache) as NonNullable<
     typeof props.dataSource
   >;

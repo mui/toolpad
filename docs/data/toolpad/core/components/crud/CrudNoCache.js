@@ -5,7 +5,7 @@ import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Crud, DataSourceCache } from '@toolpad/core/Crud';
+import { Crud } from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
@@ -183,15 +183,13 @@ export const notesDataSource = {
   },
 };
 
-const notesCache = new DataSourceCache();
-
 function matchPath(pattern, pathname) {
   const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
   const match = pathname.match(regex);
   return match ? match[1] : null;
 }
 
-function CrudBasic(props) {
+function CrudNoCache(props) {
   const { window } = props;
 
   const router = useDemoRouter('/notes');
@@ -227,7 +225,7 @@ function CrudBasic(props) {
           {/* preview-start */}
           <Crud
             dataSource={notesDataSource}
-            dataSourceCache={notesCache}
+            dataSourceCache={null}
             rootPath="/notes"
             initialPageSize={10}
             defaultValues={{ title: 'New note' }}
@@ -239,7 +237,7 @@ function CrudBasic(props) {
   );
 }
 
-CrudBasic.propTypes = {
+CrudNoCache.propTypes = {
   /**
    * Injected by the documentation to work in an iframe.
    * Remove this when copying and pasting into your project.
@@ -247,4 +245,4 @@ CrudBasic.propTypes = {
   window: PropTypes.func,
 };
 
-export default CrudBasic;
+export default CrudNoCache;

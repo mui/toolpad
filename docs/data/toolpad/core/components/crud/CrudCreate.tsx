@@ -4,7 +4,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { DataModel, DataSource, Create } from '@toolpad/core/Crud';
+import { DataModel, DataSource, Create, DataSourceCache } from '@toolpad/core/Crud';
 import { useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
@@ -97,6 +97,8 @@ export const peopleDataSource: DataSource<Person> &
   },
 };
 
+const peopleCache = new DataSourceCache();
+
 interface DemoProps {
   /**
    * Injected by the documentation to work in an iframe.
@@ -129,6 +131,7 @@ export default function CrudCreate(props: DemoProps) {
           {/* preview-start */}
           <Create<Person>
             dataSource={peopleDataSource}
+            dataSourceCache={peopleCache}
             initialValues={{ age: 18 }}
             onSubmitSuccess={handleSubmitSuccess}
             resetOnSubmit

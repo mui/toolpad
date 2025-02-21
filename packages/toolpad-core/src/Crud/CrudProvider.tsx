@@ -13,7 +13,7 @@ export interface CrudProviderProps<D extends DataModel> {
   /**
    * Cache for the data source.
    */
-  dataSourceCache?: DataSourceCache;
+  dataSourceCache?: DataSourceCache | null;
   children?: React.ReactNode;
 }
 /**
@@ -29,7 +29,10 @@ export interface CrudProviderProps<D extends DataModel> {
 function CrudProvider<D extends DataModel>(props: CrudProviderProps<D>) {
   const { dataSource, dataSourceCache, children } = props;
 
-  const cache = React.useMemo(() => dataSourceCache ?? new DataSourceCache(), [dataSourceCache]);
+  const cache = React.useMemo(
+    () => (typeof dataSourceCache !== 'undefined' ? dataSourceCache : new DataSourceCache()),
+    [dataSourceCache],
+  );
 
   return (
     <CrudContext

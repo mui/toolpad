@@ -9,6 +9,7 @@ import {
   CrudProvider,
   DataModel,
   DataSource,
+  DataSourceCache,
   Edit,
   List,
   Show,
@@ -196,6 +197,8 @@ export const notesDataSource: DataSource<Note> = {
   },
 };
 
+const notesCache = new DataSourceCache();
+
 function matchPath(pattern: string, pathname: string): string | null {
   const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
   const match = pathname.match(regex);
@@ -284,7 +287,10 @@ export default function CrudAdvanced(props: DemoProps) {
       <DashboardLayout defaultSidebarCollapsed>
         <PageContainer title={title}>
           {/* preview-start */}
-          <CrudProvider<Note> dataSource={notesDataSource}>
+          <CrudProvider<Note>
+            dataSource={notesDataSource}
+            dataSourceCache={notesCache}
+          >
             {router.pathname === listPath ? (
               <List<Note>
                 initialPageSize={10}
@@ -308,11 +314,7 @@ export default function CrudAdvanced(props: DemoProps) {
               />
             ) : null}
             {editNoteId ? (
-              <Edit<Note>
-                id={editNoteId}
-                onSubmitSuccess={handleEdit}
-                resetOnSubmit={false}
-              />
+              <Edit<Note> id={editNoteId} onSubmitSuccess={handleEdit} />
             ) : null}
           </CrudProvider>
           {/* preview-end */}

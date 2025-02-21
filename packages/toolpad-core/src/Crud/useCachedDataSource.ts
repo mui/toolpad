@@ -4,9 +4,13 @@ import type { DataModel, DataSource } from './types';
 
 function useCachedDataSource<D extends DataModel>(
   dataSource: DataSource<D>,
-  cache: DataSourceCache,
+  cache: DataSourceCache | null,
 ): DataSource<D> {
   return React.useMemo(() => {
+    if (!cache) {
+      return dataSource;
+    }
+
     const { getMany, getOne, createOne, updateOne, deleteOne, ...rest } = dataSource;
 
     return {

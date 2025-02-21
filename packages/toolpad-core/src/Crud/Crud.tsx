@@ -34,7 +34,7 @@ export interface CrudProps<D extends DataModel> {
   /**
    * Cache for the data source.
    */
-  dataSourceCache?: DataSourceCache;
+  dataSourceCache?: DataSourceCache | null;
 }
 /**
  *

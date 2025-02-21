@@ -1,4 +1,7 @@
-<CrudProvider<Note> dataSource={notesDataSource}>
+<CrudProvider<Note>
+  dataSource={notesDataSource}
+  dataSourceCache={notesCache}
+>
   {router.pathname === listPath ? (
     <List<Note>
       initialPageSize={10}
@@ -22,10 +25,6 @@
     />
   ) : null}
   {editNoteId ? (
-    <Edit<Note>
-      id={editNoteId}
-      onSubmitSuccess={handleEdit}
-      resetOnSubmit={false}
-    />
+    <Edit<Note> id={editNoteId} onSubmitSuccess={handleEdit} />
   ) : null}
 </CrudProvider>

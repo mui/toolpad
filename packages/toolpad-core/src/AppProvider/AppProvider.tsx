@@ -10,6 +10,7 @@ import {
   RouterContext,
   WindowContext,
 } from '../shared/context';
+import type { LinkProps } from '../shared/Link';
 import { AppThemeProvider } from './AppThemeProvider';
 import { LocalizationProvider, type LocaleText } from './LocalizationProvider';
 
@@ -28,6 +29,7 @@ export interface Router {
   pathname: string;
   searchParams: URLSearchParams;
   navigate: Navigate;
+  Link?: React.ComponentType<LinkProps>;
 }
 
 export interface Branding {
@@ -254,6 +256,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
    * @default null
    */
   router: PropTypes.shape({
+    Link: PropTypes.func,
     navigate: PropTypes.func.isRequired,
     pathname: PropTypes.string.isRequired,
     searchParams: PropTypes.instanceOf(URLSearchParams).isRequired,

@@ -24,6 +24,8 @@ vi.mock('next/router', () => ({ useRouter: () => null }));
 
 vi.mock('next/compat/router', () => ({ useRouter: () => null }));
 
+vi.mock('next/link', () => ({ default: () => null }));
+
 interface RouterTestProps {
   children: React.ReactNode;
 }

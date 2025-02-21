@@ -254,9 +254,10 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   const handleRefresh = React.useCallback(() => {
     if (!isLoading) {
+      cache?.clear();
       loadData();
     }
-  }, [isLoading, loadData]);
+  }, [cache, isLoading, loadData]);
 
   const handleRowClick = React.useCallback<GridEventListener<'rowClick'>>(
     ({ row }) => {

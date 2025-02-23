@@ -53,7 +53,7 @@
     "@toolpad/utils": "workspace:*",
     "dayjs": "1.11.13",
     "invariant": "2.2.4",
-    "markdown-to-jsx": "7.7.3",
+    "markdown-to-jsx": "7.7.4",
     "react-error-boundary": "4.0.13",
     "react-hook-form": "7.53.2"
   },

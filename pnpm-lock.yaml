@@ -278,8 +278,8 @@ importers:
         specifier: 7.26.0
         version: 7.26.0
       '@date-io/date-fns-jalali':
-        specifier: 3.1.1
-        version: 3.1.1(date-fns-jalali@2.29.3-0)
+        specifier: 3.2.0
+        version: 3.2.0(date-fns-jalali@2.29.3-0)
       '@docsearch/react':
         specifier: 3.9.0
         version: 3.9.0(@algolia/client-search@5.18.0)(@types/react@19.0.8)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(search-insights@2.17.2)
@@ -2105,11 +2105,11 @@ packages:
   '@bundled-es-modules/tough-cookie@0.1.6':
     resolution: {integrity: sha512-dvMHbL464C0zI+Yqxbz6kZ5TOEp7GLW+pry/RWndAR8MJQAXZ2rPmIs8tziTZjeIyhSNZgZbCePtfSbdWqStJw==}
 
-  '@date-io/core@3.0.0':
-    resolution: {integrity: sha512-S3j+IAQVBYNkQzchVVhX40eBkGDreBpScy9RXwTS5j2+k07+62pMVPisQ44Gq76Rqy5AOG/EZXCwBpY/jbemvA==}
+  '@date-io/core@3.2.0':
+    resolution: {integrity: sha512-hqwXvY8/YBsT9RwQITG868ZNb1MVFFkF7W1Ecv4P472j/ZWa7EFcgSmxy8PUElNVZfvhdvfv+a8j6NWJqOX5mA==}
 
-  '@date-io/date-fns-jalali@3.1.1':
-    resolution: {integrity: sha512-VK0QmbelDLEqgGNYYn+8iHTdf91b28leg/vbR5dvYYcEjXsRW/zs5ZWUPtLq6M9vxbMY6fqiIkqt2o7FqhMmsw==}
+  '@date-io/date-fns-jalali@3.2.0':
+    resolution: {integrity: sha512-KyWZK/z1H7phH7WjLI05CN4EqfvUvfWaK4oyzUEfvpydnH+O8cgv68hjGgU0k/Ibl2Owu2uYDyR2oFcZQQZ4hw==}
     peerDependencies:
       date-fns-jalali: ^3.2.0-0
     peerDependenciesMeta:
@@ -11750,11 +11750,11 @@ snapshots:
       '@types/tough-cookie': 4.0.5
       tough-cookie: 4.1.4
 
-  '@date-io/core@3.0.0': {}
+  '@date-io/core@3.2.0': {}
 
-  '@date-io/date-fns-jalali@3.1.1(date-fns-jalali@2.29.3-0)':
+  '@date-io/date-fns-jalali@3.2.0(date-fns-jalali@2.29.3-0)':
     dependencies:
-      '@date-io/core': 3.0.0
+      '@date-io/core': 3.2.0
     optionalDependencies:
       date-fns-jalali: 2.29.3-0
 

@@ -54,7 +54,7 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "6.4.0",
+    "@mui/icons-material": "6.4.5",
     "@mui/material": "6.4.5",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.14",

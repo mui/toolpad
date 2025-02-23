@@ -59,7 +59,7 @@
     "doctrine": "3.0.0",
     "exceljs": "4.4.0",
     "fg-loadcss": "3.1.0",
-    "fs-extra": "11.2.0",
+    "fs-extra": "11.3.0",
     "invariant": "2.2.4",
     "jss": "^10.10.0",
     "jss-rtl": "0.3.0",

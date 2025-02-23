@@ -90,7 +90,7 @@
     "@webcontainer/env": "1.1.1",
     "abort-controller": "3.0.0",
     "basic-auth": "2.0.1",
-    "chalk": "5.3.0",
+    "chalk": "5.4.1",
     "chokidar": "3.6.0",
     "clsx": "2.1.1",
     "compression": "^1.7.5",

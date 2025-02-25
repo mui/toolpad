@@ -1,8 +1,9 @@
 // @ts-check
+import * as fs from 'fs';
 import * as path from 'path';
 import * as url from 'url';
 import { createRequire } from 'module';
-import { LANGUAGES, LANGUAGES_IGNORE_PAGES, LANGUAGES_IN_PROGRESS } from './config.js';
+import { LANGUAGES, LANGUAGES_IGNORE_PAGES, LANGUAGES_IN_PROGRESS } from './config';
 
 const currentDirectory = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -10,7 +11,6 @@ const require = createRequire(import.meta.url);
 
 const withDocsInfra = require('@mui/monorepo/docs/nextConfigDocsInfra');
 
-const pkg = require('../package.json');
 const { findPages } = require('./src/modules/utils/find');
 
 const WORKSPACE_ROOT = path.resolve(currentDirectory, '../');
@@ -19,8 +19,13 @@ const MONOREPO_PACKAGES = {
   '@mui/docs': path.resolve(MONOREPO_PATH, './packages/mui-docs/src'),
 };
 
-const toolpadCorePkg = require('../packages/toolpad-core/package.json');
-const toolpadStudioPkg = require('../packages/toolpad-studio/package.json');
+function loadPkg(pkgPath: string): { version: string } {
+  const pkgContent = fs.readFileSync(path.resolve(WORKSPACE_ROOT, pkgPath, 'package.json'), 'utf8');
+  return JSON.parse(pkgContent);
+}
+
+const toolpadCorePkg = loadPkg('./packages/toolpad-core');
+const toolpadStudioPkg = loadPkg('./packages/toolpad-studio');
 
 export default withDocsInfra({
   transpilePackages: [
@@ -47,17 +52,6 @@ export default withDocsInfra({
   webpack: (config, options) => {
     return {
       ...config,
-      // TODO, this shouldn't be needed in the first place
-      // Migrate everything from @mui/monorepo to @mui/docs and embed @mui/internal-markdown in @mui/docs
-      resolveLoader: {
-        ...config.resolveLoader,
-        alias: {
-          ...config.resolveLoader.alias,
-          '@mui/internal-markdown/loader': require.resolve(
-            '@mui/monorepo/packages/markdown/loader',
-          ),
-        },
-      },
       resolve: {
         ...config.resolve,
         alias: {

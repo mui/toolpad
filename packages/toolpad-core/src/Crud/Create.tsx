@@ -74,7 +74,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   const [formState, setFormState] = React.useState<{
     values: Partial<OmitId<D>>;
     errors: Partial<Record<keyof D, string>>;
-  }>({
+  }>(() => ({
     values: {
       ...Object.fromEntries(
         fields
@@ -87,7 +87,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
       ...initialValues,
     },
     errors: {},
-  });
+  }));
   const formValues = formState.values;
   const formErrors = formState.errors;
 

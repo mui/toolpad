@@ -292,10 +292,9 @@ Data sources cache fetched data by default. This means that if the user queries 
 Successfully calling mutation methods such as `createOne`, `updateOne` or `deleteOne` automatically clears the cache for all queries in the same data source.
 
 It is recommended to always include the `dataSourceCache` prop in order to cache data at the scope of whole application, otherwise by default the cache will only be scoped to the component being used.
+Each data source should have its own single cache instance across the whole application.
 
 An instance of `DataSourceCache` may be used for caching as seen in the [demo above](#demo). `DataSourceCache` is a simple in-memory cache that stores the data in a plain object.
-
-Each data source should have its own single cache instance across the whole application.
 
 ### Disable cache
 

@@ -44,7 +44,7 @@
     "test:browser:dev": "vitest --browser.enabled"
   },
   "dependencies": {
-    "@babel/runtime": "^7.26.0",
+    "@babel/runtime": "^7.26.9",
     "@mui/utils": "7.0.0-alpha.2",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",

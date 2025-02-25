@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NodeId } from '@toolpad/studio-runtime';
-import { Stack, Chip, Tab, IconButton, LinearProgress } from '@mui/material';
-import { LoadingButton, TabList, TabContext, TabPanel } from '@mui/lab';
+import { Button, Stack, Chip, Tab, IconButton, LinearProgress } from '@mui/material';
+import { TabList, TabContext, TabPanel } from '@mui/lab';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import CircleIcon from '@mui/icons-material/Circle';
 import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
@@ -251,7 +251,7 @@ export default function QueryEditor() {
             ))}
           </TabList>
           <div>
-            <LoadingButton
+            <Button
               disabled={saveDisabled}
               onClick={handleSave}
               variant="contained"
@@ -260,7 +260,7 @@ export default function QueryEditor() {
             >
               Save &nbsp;
               <SaveShortcutIndicator />
-            </LoadingButton>
+            </Button>
             <IconButton size="small" disableRipple onClick={handleClosePanel}>
               <CancelPresentationIcon
                 sx={{

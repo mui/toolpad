@@ -102,8 +102,8 @@
     "@types/react-is": "^19.0.0",
     "@types/react-swipeable-views": "^0.13.6",
     "cpy-cli": "5.0.0",
-    "cross-fetch": "4.0.0",
-    "typescript": "5.5.4",
+    "cross-fetch": "4.1.0",
+    "typescript": "5.7.3",
     "typescript-to-proptypes": "2.2.1"
   }
 }

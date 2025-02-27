@@ -25,11 +25,11 @@ export interface DataSource<D extends DataModel> {
     paginationModel: GridPaginationModel;
     sortModel: GridSortModel;
     filterModel: GridFilterModel;
-  }) => Promise<{ items: D[]; itemCount: number }>;
-  getOne?: (id: DataModelId) => Promise<D>;
-  createOne?: (data: Partial<OmitId<D>>) => Promise<D>;
-  updateOne?: (id: DataModelId, data: Partial<OmitId<D>>) => Promise<D>;
-  deleteOne?: (id: DataModelId) => Promise<void>;
+  }) => { items: D[]; itemCount: number } | Promise<{ items: D[]; itemCount: number }>;
+  getOne?: (id: DataModelId) => D | Promise<D>;
+  createOne?: (data: Partial<OmitId<D>>) => D | Promise<D>;
+  updateOne?: (id: DataModelId, data: Partial<OmitId<D>>) => D | Promise<D>;
+  deleteOne?: (id: DataModelId) => void | Promise<void>;
   /**
    * Function to validate form values. Returns object with error strings for each field.
    */

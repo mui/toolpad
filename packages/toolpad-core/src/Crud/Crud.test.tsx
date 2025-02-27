@@ -3,10 +3,11 @@
  */
 
 import * as React from 'react';
-import { expect, describe, test, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { expect, describe, test } from 'vitest';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
-import { AppProvider } from '../AppProvider';
+import { AppProvider, Router } from '../AppProvider';
 import { Crud } from './Crud';
 import type { DataModel, DataSource } from './types';
 
@@ -44,9 +45,9 @@ let ordersStore: Order[] = [
   },
   {
     id: 3,
-    title: 'Order 2',
+    title: 'Order 3',
     description: 'I am the third order',
-    status: 'Pending',
+    status: 'Sent',
     itemCount: 3,
     fastDelivery: true,
     createdAt: new Date().toISOString(),
@@ -79,74 +80,51 @@ export const ordersDataSource: DataSource<Order> = {
       valueGetter: (value: string) => value && new Date(value),
     },
   ],
-  getMany: async ({ paginationModel }) => {
-    return new Promise<{ items: Order[]; itemCount: number }>((resolve) => {
-      setTimeout(() => {
-        // Apply pagination
-        const start = paginationModel.page * paginationModel.pageSize;
-        const end = start + paginationModel.pageSize;
-        const paginatedOrders = ordersStore.slice(start, end);
+  getMany: ({ paginationModel }) => {
+    // Apply pagination
+    const start = paginationModel.page * paginationModel.pageSize;
+    const end = start + paginationModel.pageSize;
+    const paginatedOrders = ordersStore.slice(start, end);
 
-        resolve({
-          items: paginatedOrders,
-          itemCount: ordersStore.length,
-        });
-      }, 1500);
-    });
+    return {
+      items: paginatedOrders,
+      itemCount: ordersStore.length,
+    };
   },
   getOne: (orderId) => {
-    return new Promise<Order>((resolve, reject) => {
-      setTimeout(() => {
-        const orderToShow = ordersStore.find((order) => order.id === Number(orderId));
+    const orderToShow = ordersStore.find((order) => order.id === Number(orderId));
 
-        if (orderToShow) {
-          resolve(orderToShow);
-        } else {
-          reject(new Error('Order not found'));
-        }
-      }, 1500);
-    });
+    if (!orderToShow) {
+      throw new Error('Order not found');
+    }
+    return orderToShow;
   },
   createOne: (data) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newOrder = { id: ordersStore.length + 1, ...data } as Order;
+    const newOrder = { id: ordersStore.length + 1, ...data } as Order;
 
-        ordersStore = [...ordersStore, newOrder];
+    ordersStore = [...ordersStore, newOrder];
 
-        resolve(newOrder);
-      }, 1500);
-    });
+    return newOrder;
   },
   updateOne: (orderId, data) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        let updatedOrder: Order | null = null;
+    let updatedOrder: Order | null = null;
 
-        ordersStore = ordersStore.map((order) => {
-          if (order.id === Number(orderId)) {
-            updatedOrder = { ...order, ...data };
-            return updatedOrder;
-          }
-          return order;
-        });
-
-        if (updatedOrder) {
-          resolve(updatedOrder);
-        } else {
-          reject(new Error('Order not found'));
-        }
-      }, 1500);
+    ordersStore = ordersStore.map((order) => {
+      if (order.id === Number(orderId)) {
+        updatedOrder = { ...order, ...data };
+        return updatedOrder;
+      }
+      return order;
     });
+
+    if (!updatedOrder) {
+      throw new Error('Order not found');
+    }
+
+    return updatedOrder;
   },
   deleteOne: (orderId) => {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        ordersStore = ordersStore.filter((order) => order.id !== Number(orderId));
-
-        resolve();
-      }, 1500);
-    });
+    ordersStore = ordersStore.filter((order) => order.id !== Number(orderId));
   },
   validate: (formValues) => {
     const errors: Record<keyof Order, string> = {};
@@ -165,20 +143,153 @@ export const ordersDataSource: DataSource<Order> = {
   },
 };
 
+function AppWithRouter({ initialPath = '/' }: { initialPath: string }) {
+  const [url, setUrl] = React.useState(() => new URL(initialPath, window.location.origin));
+
+  const router = React.useMemo<Router>(() => {
+    return {
+      pathname: url.pathname,
+      searchParams: url.searchParams,
+      navigate: (newUrl) => {
+        const nextUrl = new URL(newUrl, window.location.origin);
+        if (nextUrl.pathname !== url.pathname || nextUrl.search !== url.search) {
+          setUrl(nextUrl);
+        }
+      },
+    };
+  }, [url.pathname, url.search, url.searchParams]);
+
+  return (
+    <AppProvider
+      navigation={[{ segment: 'orders', title: 'Orders', pattern: 'orders{/:orderId}*' }]}
+      router={router}
+    >
+      <Crud
+        dataSource={ordersDataSource}
+        rootPath="/orders"
+        defaultValues={{ title: 'New Order' }}
+      />
+    </AppProvider>
+  );
+}
+
 describe('Crud', () => {
   test('renders list items correctly', async () => {
-    const router = { pathname: '/orders', searchParams: new URLSearchParams(), navigate: vi.fn() };
+    render(<AppWithRouter initialPath="/orders" />);
 
-    render(
-      <AppProvider navigation={[{ segment: 'orders', title: 'Orders' }]} router={router}>
-        <Crud
-          dataSource={ordersDataSource}
-          rootPath="/orders"
-          defaultValues={{ title: 'New order' }}
-        />
-      </AppProvider>,
-    );
+    await waitFor(() => {
+      expect(screen.getByText('Order 1')).toBeInTheDocument();
+    });
 
-    expect(screen.getByText('Order 1')).toBeTruthy();
+    const renderedRows = await screen.findAllByRole('row');
+
+    const dataRows = renderedRows.slice(1);
+
+    expect(within(dataRows[0]).getByText('I am the first order')).toBeInTheDocument();
+    expect(within(dataRows[0]).getByText('Pending')).toBeInTheDocument();
+    expect(within(dataRows[0]).getByText('yes')).toBeInTheDocument();
+
+    expect(within(dataRows[1]).getByText('Order 2')).toBeInTheDocument();
+    expect(within(dataRows[1]).getByText('I am the second order')).toBeInTheDocument();
+    expect(within(dataRows[1]).getByText('Pending')).toBeInTheDocument();
+    expect(within(dataRows[1]).getByText('no')).toBeInTheDocument();
+
+    expect(within(dataRows[2]).getByText('Order 3')).toBeInTheDocument();
+    expect(within(dataRows[2]).getByText('I am the third order')).toBeInTheDocument();
+    expect(within(dataRows[2]).getByText('Sent')).toBeInTheDocument();
+    expect(within(dataRows[2]).getByText('yes')).toBeInTheDocument();
+  });
+
+  test('shows item details correctly', async () => {
+    const { unmount } = render(<AppWithRouter initialPath="/orders/1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Order 1')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('I am the first order')).toBeInTheDocument();
+    expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByText('Yes')).toBeInTheDocument();
+
+    expect(screen.queryByText('Order 2')).not.toBeInTheDocument();
+
+    unmount();
+    render(<AppWithRouter initialPath="/orders/2" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Order 2')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('I am the second order')).toBeInTheDocument();
+    expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByText('No')).toBeInTheDocument();
+
+    expect(screen.queryByText('Order 1')).not.toBeInTheDocument();
+  });
+
+  test('creates new items', async () => {
+    render(<AppWithRouter initialPath="/orders/new" />);
+
+    await userEvent.type(screen.getByLabelText('Description'), 'I am a new order');
+
+    await userEvent.click(screen.getByLabelText('Status'));
+    await userEvent.click(await screen.findByRole('option', { name: 'Sent' }));
+
+    await userEvent.click(screen.getByLabelText('Fast delivery'));
+
+    await userEvent.click(screen.getByRole('button', { name: 'Create' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Order 1')).toBeInTheDocument();
+    });
+
+    const renderedRows = await screen.findAllByRole('row');
+
+    const dataRows = renderedRows.slice(1);
+
+    expect(within(dataRows[3]).getByText('New Order')).toBeInTheDocument();
+    expect(within(dataRows[3]).getByText('I am a new order')).toBeInTheDocument();
+    expect(within(dataRows[3]).getByText('Sent')).toBeInTheDocument();
+    expect(within(dataRows[3]).getByText('yes')).toBeInTheDocument();
+  });
+
+  test('edits existing items', async () => {
+    render(<AppWithRouter initialPath="/orders/1/edit" />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Title')).toHaveValue('Order 1');
+    });
+
+    expect(screen.getByLabelText('Description')).toHaveValue('I am the first order');
+    expect(screen.getByLabelText('Status')).toHaveTextContent('Pending');
+    expect(screen.getByLabelText('Fast delivery')).toHaveProperty('value', 'true');
+
+    await userEvent.clear(screen.getByLabelText('Title'));
+    await userEvent.type(screen.getByLabelText('Title'), 'Edited Order');
+
+    await userEvent.clear(screen.getByLabelText('Description'));
+    await userEvent.type(screen.getByLabelText('Description'), 'I am an edited order');
+
+    await userEvent.click(screen.getByLabelText('Status'));
+    await userEvent.click(await screen.findByRole('option', { name: 'Sent' }));
+
+    await userEvent.click(screen.getByLabelText('Fast delivery'));
+
+    await userEvent.click(screen.getByRole('button', { name: 'Edit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Order 2')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Order 1')).not.toBeInTheDocument();
+
+    const renderedRows = await screen.findAllByRole('row');
+
+    const dataRows = renderedRows.slice(1);
+
+    expect(within(dataRows[0]).getByText('Edited Order')).toBeInTheDocument();
+    expect(within(dataRows[0]).getByText('I am an edited order')).toBeInTheDocument();
+    expect(within(dataRows[0]).getByText('Sent')).toBeInTheDocument();
+    expect(within(dataRows[0]).getByText('no')).toBeInTheDocument();
   });
 });

@@ -214,7 +214,7 @@ describe('useDialogs', () => {
 
       expect(within(dialog).getByText('Hello')).toBeTruthy();
 
-      await result.current.close(theDialog);
+      await result.current.close(theDialog, null);
 
       rerender();
 

@@ -1,6 +1,7 @@
 'use client';
 import invariant from 'invariant';
 import * as React from 'react';
+import useEventCallback from '@mui/utils/useEventCallback';
 import { DialogsContext } from './DialogsContext';
 import type { DialogComponent, OpenDialog, OpenDialogOptions } from './useDialogs';
 
@@ -37,7 +38,7 @@ function DialogsProvider(props: DialogProviderProps) {
   const keyPrefix = React.useId();
   const nextId = React.useRef(0);
 
-  const requestDialog = React.useCallback<OpenDialog>(
+  const requestDialog = useEventCallback<OpenDialog>(
     function open<P, R>(
       Component: DialogComponent<P, R>,
       payload: P,
@@ -65,11 +66,10 @@ function DialogsProvider(props: DialogProviderProps) {
 
       setStack((prevStack) => [...prevStack, newEntry]);
       return promise;
-    },
-    [keyPrefix],
+    }
   );
 
-  const closeDialogUi = React.useCallback(
+  const closeDialogUi = useEventCallback(
     function closeDialogUi<R>(dialog: Promise<R>) {
       setStack((prevStack) =>
         prevStack.map((entry) => (entry.promise === dialog ? { ...entry, open: false } : entry)),
@@ -78,11 +78,11 @@ function DialogsProvider(props: DialogProviderProps) {
         // wait for closing animation
         setStack((prevStack) => prevStack.filter((entry) => entry.promise !== dialog));
       }, unmountAfter);
-    },
-    [unmountAfter],
+    }
   );
 
-  const closeDialog = React.useCallback(
+
+  const closeDialog = useEventCallback(
     async function closeDialog<R>(dialog: Promise<R>, result: R) {
       const entryToClose = stack.find((entry) => entry.promise === dialog);
       invariant(entryToClose, 'dialog not found');
@@ -91,7 +91,6 @@ function DialogsProvider(props: DialogProviderProps) {
       closeDialogUi(dialog);
       return dialog;
     },
-    [stack, closeDialogUi],
   );
 
   const contextValue = React.useMemo(

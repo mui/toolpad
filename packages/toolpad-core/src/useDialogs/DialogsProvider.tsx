@@ -1,6 +1,7 @@
 'use client';
 import invariant from 'invariant';
 import * as React from 'react';
+import useEventCallback from '@mui/utils/useEventCallback';
 import { DialogsContext } from './DialogsContext';
 import type { DialogComponent, OpenDialog, OpenDialogOptions } from './useDialogs';
 
@@ -37,62 +38,56 @@ function DialogsProvider(props: DialogProviderProps) {
   const keyPrefix = React.useId();
   const nextId = React.useRef(0);
 
-  const requestDialog = React.useCallback<OpenDialog>(
-    function open<P, R>(
-      Component: DialogComponent<P, R>,
-      payload: P,
-      options: OpenDialogOptions<R> = {},
-    ) {
-      const { onClose = async () => {} } = options;
-      let resolve: ((result: R) => void) | undefined;
-      const promise = new Promise<R>((resolveImpl) => {
-        resolve = resolveImpl;
-      });
-      invariant(resolve, 'resolve not set');
+  const requestDialog = useEventCallback<OpenDialog>(function open<P, R>(
+    Component: DialogComponent<P, R>,
+    payload: P,
+    options: OpenDialogOptions<R> = {},
+  ) {
+    const { onClose = async () => {} } = options;
+    let resolve: ((result: R) => void) | undefined;
+    const promise = new Promise<R>((resolveImpl) => {
+      resolve = resolveImpl;
+    });
+    invariant(resolve, 'resolve not set');
 
-      const key = `${keyPrefix}-${nextId.current}`;
-      nextId.current += 1;
+    const key = `${keyPrefix}-${nextId.current}`;
+    nextId.current += 1;
 
-      const newEntry: DialogStackEntry<P, R> = {
-        key,
-        open: true,
-        promise,
-        Component,
-        payload,
-        onClose,
-        resolve,
-      };
+    const newEntry: DialogStackEntry<P, R> = {
+      key,
+      open: true,
+      promise,
+      Component,
+      payload,
+      onClose,
+      resolve,
+    };
 
-      setStack((prevStack) => [...prevStack, newEntry]);
-      return promise;
-    },
-    [keyPrefix],
-  );
+    setStack((prevStack) => [...prevStack, newEntry]);
+    return promise;
+  });
 
-  const closeDialogUi = React.useCallback(
-    function closeDialogUi<R>(dialog: Promise<R>) {
-      setStack((prevStack) =>
-        prevStack.map((entry) => (entry.promise === dialog ? { ...entry, open: false } : entry)),
-      );
-      setTimeout(() => {
-        // wait for closing animation
-        setStack((prevStack) => prevStack.filter((entry) => entry.promise !== dialog));
-      }, unmountAfter);
-    },
-    [unmountAfter],
-  );
+  const closeDialogUi = useEventCallback(function closeDialogUi<R>(dialog: Promise<R>) {
+    setStack((prevStack) =>
+      prevStack.map((entry) => (entry.promise === dialog ? { ...entry, open: false } : entry)),
+    );
+    setTimeout(() => {
+      // wait for closing animation
+      setStack((prevStack) => prevStack.filter((entry) => entry.promise !== dialog));
+    }, unmountAfter);
+  });
 
-  const closeDialog = React.useCallback(
-    async function closeDialog<R>(dialog: Promise<R>, result: R) {
-      const entryToClose = stack.find((entry) => entry.promise === dialog);
-      invariant(entryToClose, 'dialog not found');
-      await entryToClose.onClose(result);
-      entryToClose.resolve(result);
-      closeDialogUi(dialog);
-      return dialog;
-    },
-    [stack, closeDialogUi],
-  );
+  const closeDialog = useEventCallback(async function closeDialog<R>(
+    dialog: Promise<R>,
+    result: R,
+  ) {
+    const entryToClose = stack.find((entry) => entry.promise === dialog);
+    invariant(entryToClose, 'dialog not found');
+    await entryToClose.onClose(result);
+    entryToClose.resolve(result);
+    closeDialogUi(dialog);
+    return dialog;
+  });
 
   const contextValue = React.useMemo(
     () => ({ open: requestDialog, close: closeDialog }),

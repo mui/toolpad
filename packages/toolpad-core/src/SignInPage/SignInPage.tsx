@@ -3,6 +3,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
+import Button, { ButtonProps } from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Checkbox from '@mui/material/Checkbox';
@@ -17,7 +18,6 @@ import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import AppleIcon from '@mui/icons-material/Apple';
 import { alpha, useTheme, SxProps, type Theme } from '@mui/material/styles';
 import { LinkProps } from '@mui/material/Link';
-import Button, { ButtonProps } from '@mui/material/Button';
 import GoogleIcon from './icons/Google';
 import FacebookIcon from './icons/Facebook';
 import TwitterIcon from './icons/Twitter';
@@ -269,7 +269,7 @@ export interface SignInPageProps {
     signUpLink?: LinkProps;
     rememberMe?: Partial<FormControlLabelProps>;
     form?: Partial<React.FormHTMLAttributes<HTMLFormElement>>;
-    oAuthButton?: LoadingButtonProps;
+    oAuthButton?: ButtonProps;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container

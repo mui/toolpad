@@ -195,5 +195,30 @@ describe('useDialogs', () => {
 
       expect(await dialogResult).toBe('I am result');
     });
+
+    test('can close imperatively', async () => {
+      function CustomDialog({ open, onClose }: DialogProps) {
+        return open ? (
+          <div role="dialog">
+            Hello <button onClick={() => onClose()}>Close me</button>
+          </div>
+        ) : null;
+      }
+      const { result, rerender } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const theDialog = result.current.open(CustomDialog);
+
+      const dialog = await screen.findByRole('dialog');
+
+      rerender();
+
+      expect(within(dialog).getByText('Hello')).toBeTruthy();
+
+      await result.current.close(theDialog, null);
+
+      rerender();
+
+      expect(screen.queryByRole('dialog')).toBeFalsy();
+    });
   });
 });

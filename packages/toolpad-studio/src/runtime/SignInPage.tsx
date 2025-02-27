@@ -12,7 +12,6 @@ import {
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { LoadingButton } from '@mui/lab';
 import { useSearchParams } from 'react-router';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { AuthProvider, AuthContext } from './useAuth';
@@ -165,7 +164,7 @@ export default function SignInPage() {
                       />
                     )}
                   />
-                  <LoadingButton
+                  <Button
                     variant="contained"
                     type="submit"
                     loading={isSigningIn && latestSelectedProvider === 'credentials'}
@@ -174,14 +173,14 @@ export default function SignInPage() {
                     fullWidth
                   >
                     Sign in
-                  </LoadingButton>
+                  </Button>
                 </Stack>
               </form>
             </React.Fragment>
           ) : (
             <React.Fragment>
               {authProviders.includes('github') ? (
-                <LoadingButton
+                <Button
                   variant="contained"
                   onClick={handleSignIn('github')}
                   startIcon={<GitHubIcon />}
@@ -195,10 +194,10 @@ export default function SignInPage() {
                   }}
                 >
                   Sign in with GitHub
-                </LoadingButton>
+                </Button>
               ) : null}
               {authProviders.includes('google') ? (
-                <LoadingButton
+                <Button
                   variant="contained"
                   onClick={handleSignIn('google')}
                   startIcon={
@@ -225,10 +224,10 @@ export default function SignInPage() {
                   }}
                 >
                   Sign in with Google
-                </LoadingButton>
+                </Button>
               ) : null}
               {authProviders.includes('azure-ad') ? (
-                <LoadingButton
+                <Button
                   variant="contained"
                   onClick={handleSignIn('azure-ad')}
                   startIcon={azureIconSvg}
@@ -242,7 +241,7 @@ export default function SignInPage() {
                   }}
                 >
                   Sign in with Azure AD
-                </LoadingButton>
+                </Button>
               ) : null}
               {authProviders.includes('credentials') ? (
                 <React.Fragment>
@@ -251,7 +250,7 @@ export default function SignInPage() {
                       <Typography variant="caption">OR</Typography>
                     </Divider>
                   ) : null}
-                  <LoadingButton
+                  <Button
                     variant="contained"
                     onClick={handleCredentialsSignIn}
                     startIcon={<PasswordIcon />}
@@ -262,7 +261,7 @@ export default function SignInPage() {
                     fullWidth
                   >
                     Sign in with credentials
-                  </LoadingButton>
+                  </Button>
                 </React.Fragment>
               ) : null}
             </React.Fragment>

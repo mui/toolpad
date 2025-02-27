@@ -44,7 +44,7 @@
     "test:browser:dev": "vitest --browser.enabled"
   },
   "dependencies": {
-    "@babel/runtime": "^7.26.0",
+    "@babel/runtime": "^7.26.9",
     "@mui/utils": "7.0.0-alpha.2",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",
@@ -55,8 +55,8 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "6.4.5",
-    "@mui/material": "6.4.5",
+    "@mui/icons-material": "6.4.6",
+    "@mui/material": "6.4.6",
     "@mui/x-data-grid": "7.26.0",
     "@mui/x-data-grid-premium": "7.26.0",
     "@mui/x-data-grid-pro": "7.26.0",

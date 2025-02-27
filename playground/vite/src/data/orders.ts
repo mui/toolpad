@@ -49,7 +49,7 @@ export const ordersDataSource: DataSource<Order> = {
       valueGetter: (value: string) => value && new Date(value),
     },
   ],
-  getMany: async ({ paginationModel, filterModel, sortModel }) => {
+  getMany: ({ paginationModel, filterModel, sortModel }) => {
     return new Promise<{ items: Order[]; itemCount: number }>((resolve) => {
       setTimeout(() => {
         const ordersStore = getOrdersStore();

@@ -3,7 +3,7 @@
  */
 
 import * as React from 'react';
-import { expect, describe, test } from 'vitest';
+import { expect, describe, test, afterEach } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
@@ -24,7 +24,7 @@ interface Order extends DataModel {
   deliveryTime?: string;
 }
 
-let ordersStore: Order[] = [
+const INITIAL_ORDERS: Order[] = [
   {
     id: 1,
     title: 'Order 1',
@@ -54,7 +54,13 @@ let ordersStore: Order[] = [
   },
 ];
 
-export const ordersDataSource: DataSource<Order> = {
+let ordersStore: Order[] = INITIAL_ORDERS;
+
+function resetOrdersStore() {
+  ordersStore = INITIAL_ORDERS;
+}
+
+const ordersDataSource: DataSource<Order> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title' },
@@ -174,6 +180,10 @@ function AppWithRouter({ initialPath = '/' }: { initialPath: string }) {
 }
 
 describe('Crud', () => {
+  afterEach(() => {
+    resetOrdersStore();
+  });
+
   test('renders list items correctly', async () => {
     render(<AppWithRouter initialPath="/orders" />);
 
@@ -262,7 +272,7 @@ describe('Crud', () => {
 
     expect(screen.getByLabelText('Description')).toHaveValue('I am the first order');
     expect(screen.getByLabelText('Status')).toHaveTextContent('Pending');
-    expect(screen.getByLabelText('Fast delivery')).toHaveProperty('value', 'true');
+    expect(screen.getByLabelText('Fast delivery')).toBeChecked();
 
     await userEvent.clear(screen.getByLabelText('Title'));
     await userEvent.type(screen.getByLabelText('Title'), 'Edited Order');
@@ -291,5 +301,46 @@ describe('Crud', () => {
     expect(within(dataRows[0]).getByText('I am an edited order')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('Sent')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('no')).toBeInTheDocument();
+  });
+
+  test('deletes items from list view', async () => {
+    render(<AppWithRouter initialPath="/orders" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Order 1')).toBeInTheDocument();
+    });
+
+    const renderedRows = await screen.findAllByRole('row');
+    const dataRows = renderedRows.slice(1);
+
+    expect(dataRows).toHaveLength(3);
+
+    await userEvent.click(within(dataRows[0]).getByLabelText('Delete'));
+    await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+    expect(screen.queryByText('Order 1')).not.toBeInTheDocument();
+
+    const updatedRenderedRows = await screen.findAllByRole('row');
+    const updatedDataRows = updatedRenderedRows.slice(1);
+
+    expect(updatedDataRows).toHaveLength(2);
+  });
+
+  test('deletes items from detail view', async () => {
+    render(<AppWithRouter initialPath="/orders/1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Order 1')).toBeInTheDocument();
+    });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
+
+    expect(screen.queryByText('Order 1')).not.toBeInTheDocument();
+
+    const updatedRenderedRows = await screen.findAllByRole('row');
+    const updatedDataRows = updatedRenderedRows.slice(1);
+
+    expect(updatedDataRows).toHaveLength(2);
   });
 });

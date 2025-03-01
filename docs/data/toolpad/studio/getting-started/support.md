@@ -38,5 +38,5 @@ You can use it to share what you're working on and connect with other developers
 Toolpad Studio is also present on Discord, you can connect with other Toolpad Studio users and get help from the community. To join, simply click on this [Discord server](https://mui.com/r/discord/) and follow the instructions. Looking forward to seeing you there!
 
 :::warning
-Please note that there is a single Discord server for all MUI products and you should post in the Toolpad Studio channel.
+Please note that there is a single Discord server for all MUI products and you should post in the "toolpad‑studio" channel.
 :::

@@ -47,5 +47,5 @@ We have a [Discord Server](https://mui.com/r/discord/) to bring the Toolpad comm
 Looking forward to seeing you there!
 
 :::warning
-Please note that there is a single Discord server for all MUI's company products, so you should post in the Toolpad channel.
+Please note that there is a single Discord server for all MUI's company products, so you should post in the "toolpad‑core" channel.
 :::

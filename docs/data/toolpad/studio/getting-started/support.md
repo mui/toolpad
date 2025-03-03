@@ -24,7 +24,7 @@ If you think you've found a bug, or you have a new feature idea:
 ### Bug reproductions
 
 We require bug reports to be accompanied by a **minimal reproduction**.
-It significantly increases the odds of fixing the problem.
+This significantly increases the odds of fixing the problem.
 
 ## Community
 
@@ -35,8 +35,10 @@ You can use it to share what you're working on and connect with other developers
 
 ### Discord
 
-Toolpad Studio is also present on Discord, you can connect with other Toolpad Studio users and get help from the community. To join, simply click on this [Discord server](https://mui.com/r/discord/) and follow the instructions. Looking forward to seeing you there!
+Toolpad Studio is also present on Discord, where you can connect with other users and get help from the community. 
+To join, head to the [MUI Discord server](https://mui.com/r/discord/) and follow the instructions provided. 
+Looking forward to seeing you there!
 
 :::warning
-Please note that there is a single Discord server for all MUI products and you should post in the "toolpad‑studio" channel.
+Please note that Toolpad's community is part of the larger MUI Discord server—look for the "toolpad-studio" channel once you're in.
 :::

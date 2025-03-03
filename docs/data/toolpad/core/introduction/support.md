@@ -24,13 +24,13 @@ If you think you've found a bug, or you have a new feature idea:
 ### Bug reproductions
 
 We require bug reports to be accompanied by a **minimal reproduction**.
-It significantly increases the odds of fixing the problem.
+This significantly increases the odds of fixing the problem.
 
 ## Stack Overflow
 
 We use Stack Overflow for how-to questions. Answers are crowdsourced from expert developers in the Toolpad community as well as Toolpad maintainers.
 
-You can search through existing questions and answers to see if someone has asked a similar question using the [toolpad tags](https://stackoverflow.com/questions/tagged/toolpad):
+You can search through existing questions and answers to see if someone has asked a similar question using the [toolpad tags](https://stackoverflow.com/questions/tagged/toolpad).
 
 If you can't find your answer, [ask a new question](https://stackoverflow.com/questions/ask?tags=reactjs%20toolpad) using the relevant tags.
 
@@ -43,9 +43,9 @@ You can use it to share what you're working on and connect with other developers
 
 ### Discord
 
-We have a [Discord Server](https://mui.com/r/discord/) to bring the Toolpad community together.
+We have a [Discord server](https://mui.com/r/discord/) to bring the Toolpad community together.
 Looking forward to seeing you there!
 
 :::warning
-Please note that there is a single Discord server for all MUI's company products, so you should post in the "toolpad‑core" channel.
+Please note that Toolpad's community is part of the larger MUI Discord server—look for the "toolpad-core" channel once you're in.
 :::

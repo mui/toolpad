@@ -18,6 +18,7 @@ const NAVIGATION: Navigation = [
     segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
+    pattern: 'orders{/:orderId}*',
   },
 ];
 

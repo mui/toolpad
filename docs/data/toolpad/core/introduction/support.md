@@ -46,6 +46,6 @@ You can use it to share what you're working on and connect with other developers
 We have a [Discord server](https://mui.com/r/discord/) to bring the Toolpad community together.
 Looking forward to seeing you there!
 
-:::warning
+:::info
 Please note that Toolpad's community is part of the larger MUI Discord server—look for the "toolpad-core" channel once you're in.
 :::

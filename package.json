@@ -114,7 +114,7 @@
     "vitest-fail-on-console": "0.7.1"
   },
   "dependencies": {
-    "@types/lodash": "4.17.15",
+    "@types/lodash": "4.17.16",
     "@vitest/browser": "2.1.9",
     "archiver": "7.0.1",
     "cross-env": "7.0.3",

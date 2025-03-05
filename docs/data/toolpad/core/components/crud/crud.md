@@ -51,7 +51,7 @@ const notesDataSource: DataSource<Note> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title' },
-    { field: 'text', headerName: 'Text', type: 'longString' },
+    { field: 'text', headerName: 'Text' },
   ],
   getMany: async ({ paginationModel }) => {
     const start = paginationModel.page * paginationModel.pageSize;
@@ -337,7 +337,7 @@ If the data source includes `deleteOne`, it is possible to delete items directly
 
 Displays a form for creating a new item for a data source, automatically generated from the given `fields` and field `type`s.
 
-The supported field types are `string`, `longString`, `number`, `boolean`, `date`, `dateTime` and `singleSelect`.
+The supported field types are `string`, `number`, `boolean`, `date`, `dateTime` and `singleSelect`.
 
 Form validation integrates automatically with the `validate` function in the data source.
 

@@ -3,6 +3,7 @@
   "propDescriptions": {
     "dataSource": { "description": "Server-side data source." },
     "dataSourceCache": { "description": "Cache for the data source." },
+    "localeText": { "description": "Locale text for CRUD Edit component." },
     "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." }
   },
   "classDescriptions": {}

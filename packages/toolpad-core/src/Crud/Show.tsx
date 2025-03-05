@@ -293,6 +293,10 @@ Show.propTypes /* remove-proptypes */ = {
    */
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   /**
+   * Locale text for CRUD Show component.
+   */
+  localeText: PropTypes.object,
+  /**
    * Callback fired when the item is successfully deleted.
    */
   onDelete: PropTypes.func,

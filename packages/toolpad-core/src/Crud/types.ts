@@ -17,7 +17,7 @@ type RemappedOmit<T, K extends PropertyKey> = { [P in keyof T as P extends K ? n
 
 export type OmitId<D extends DataModel> = RemappedOmit<D, 'id'>;
 
-export type DataField = RemappedOmit<GridColDef, 'type'> & { type?: GridColType | 'longString' };
+export type DataField = RemappedOmit<GridColDef, 'type'> & { type?: GridColType };
 
 export interface DataSource<D extends DataModel> {
   fields: DataField[];

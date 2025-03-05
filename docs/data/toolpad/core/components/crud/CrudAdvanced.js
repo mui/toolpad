@@ -49,7 +49,7 @@ export const notesDataSource = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title', flex: 1 },
-    { field: 'text', headerName: 'Text', type: 'longString', flex: 1 },
+    { field: 'text', headerName: 'Text', flex: 1 },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     return new Promise((resolve) => {

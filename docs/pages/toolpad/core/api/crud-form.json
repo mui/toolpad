@@ -4,14 +4,31 @@
       "type": { "name": "shape", "description": "{ errors: object, values: object }" },
       "required": true
     },
-    "localeText": { "type": { "name": "object" }, "required": true },
     "onFieldChange": { "type": { "name": "func" }, "required": true },
     "onSubmit": { "type": { "name": "func" }, "required": true },
+    "submitButtonLabel": { "type": { "name": "string" }, "required": true },
     "dataSource": { "type": { "name": "object" } },
-    "onReset": { "type": { "name": "func" } }
+    "onReset": { "type": { "name": "func" } },
+    "slotProps": {
+      "type": { "name": "shape", "description": "{ textField?: object }" },
+      "default": "{}"
+    },
+    "slots": {
+      "type": { "name": "shape", "description": "{ textField?: elementType }" },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
   },
   "name": "CrudForm",
   "imports": ["import { CrudForm } from '@toolpad/core/Crud';"],
+  "slots": [
+    {
+      "name": "textField",
+      "description": "The TextField component used in the form.",
+      "default": "TextField",
+      "class": null
+    }
+  ],
   "classes": [],
   "muiName": "CrudForm",
   "filename": "/packages/toolpad-core/src/Crud/CrudForm.tsx",

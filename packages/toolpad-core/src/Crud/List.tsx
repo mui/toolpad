@@ -343,9 +343,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   const columns = React.useMemo<GridColDef[]>(() => {
     return [
-      ...(fields.map((field) =>
-        field.type === 'longString' ? { ...field, type: 'string' } : field,
-      ) as GridColDef[]),
+      ...fields,
       {
         field: 'actions',
         type: 'actions',
@@ -461,6 +459,10 @@ List.propTypes /* remove-proptypes */ = {
    * @default 100
    */
   initialPageSize: PropTypes.number,
+  /**
+   * Locale text for CRUD List component.
+   */
+  localeText: PropTypes.object,
   /**
    * Callback fired when the "Create" button is clicked.
    */

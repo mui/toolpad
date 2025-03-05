@@ -8,6 +8,7 @@
       }
     },
     "initialValues": { "type": { "name": "object" }, "default": "{}" },
+    "localeText": { "type": { "name": "object" } },
     "onSubmitSuccess": { "type": { "name": "func" } },
     "resetOnSubmit": { "type": { "name": "bool" }, "default": "false" }
   },

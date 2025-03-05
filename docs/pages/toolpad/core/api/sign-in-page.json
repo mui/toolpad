@@ -16,7 +16,7 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: object, forgotPasswordLink?: object, form?: object, oAuthButton?: object, passwordField?: object, rememberMe?: object, signUpLink?: object, submitButton?: object }"
+        "description": "{ emailField?: object, forgotPasswordLink?: object, form?: object, oAuthButton?: any, passwordField?: object, rememberMe?: object, signUpLink?: object, submitButton?: object }"
       },
       "default": "{}"
     },

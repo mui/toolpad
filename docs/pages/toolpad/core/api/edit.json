@@ -7,6 +7,7 @@
         "description": "{ cache: object, clear: func, get: func, set: func, ttl: number }"
       }
     },
+    "localeText": { "type": { "name": "object" } },
     "onSubmitSuccess": { "type": { "name": "func" } }
   },
   "name": "Edit",

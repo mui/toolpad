@@ -350,10 +350,6 @@ CrudForm.propTypes /* remove-proptypes */ = {
     values: PropTypes.object.isRequired,
   }).isRequired,
   /**
-   * Locale text for CRUD form component.
-   */
-  localeText: PropTypes.object.isRequired,
-  /**
    * Callback fired when a form field is changed.
    */
   onFieldChange: PropTypes.func.isRequired,
@@ -365,6 +361,24 @@ CrudForm.propTypes /* remove-proptypes */ = {
    * Callback fired when the form is submitted.
    */
   onSubmit: PropTypes.func.isRequired,
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    textField: PropTypes.object,
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots: PropTypes.shape({
+    textField: PropTypes.elementType,
+  }),
+  /**
+   * Text for form submit button.
+   */
+  submitButtonLabel: PropTypes.string.isRequired,
 } as any;
 
 export { CrudForm };

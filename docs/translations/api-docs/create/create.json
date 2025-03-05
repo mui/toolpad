@@ -4,6 +4,7 @@
     "dataSource": { "description": "Server-side data source." },
     "dataSourceCache": { "description": "Cache for the data source." },
     "initialValues": { "description": "Initial form values." },
+    "localeText": { "description": "Locale text for CRUD Create component." },
     "onSubmitSuccess": { "description": "Callback fired when the form is successfully submitted." },
     "resetOnSubmit": {
       "description": "Whether the form fields should reset after the form is submitted."

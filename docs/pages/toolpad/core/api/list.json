@@ -8,6 +8,7 @@
       }
     },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" },
+    "localeText": { "type": { "name": "object" } },
     "onCreateClick": { "type": { "name": "func" } },
     "onDelete": { "type": { "name": "func" } },
     "onEditClick": { "type": { "name": "func" } },

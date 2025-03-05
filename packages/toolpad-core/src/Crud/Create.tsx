@@ -217,6 +217,10 @@ Create.propTypes /* remove-proptypes */ = {
    */
   initialValues: PropTypes.object,
   /**
+   * Locale text for CRUD Create component.
+   */
+  localeText: PropTypes.object,
+  /**
    * Callback fired when the form is successfully submitted.
    */
   onSubmitSuccess: PropTypes.func,

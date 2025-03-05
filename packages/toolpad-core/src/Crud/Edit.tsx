@@ -140,6 +140,7 @@ EditForm.propTypes /* remove-proptypes */ = {
   // └─────────────────────────────────────────────────────────────────────┘
   dataSource: PropTypes.object.isRequired,
   initialValues: PropTypes.object.isRequired,
+  localeText: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func,
 } as any;
@@ -299,6 +300,10 @@ Edit.propTypes /* remove-proptypes */ = {
    * @ignore
    */
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  /**
+   * Locale text for CRUD Edit component.
+   */
+  localeText: PropTypes.object,
   /**
    * Callback fired when the form is successfully submitted.
    */

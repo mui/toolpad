@@ -30,7 +30,7 @@ export const ordersDataSource: DataSource<Order> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title' },
-    { field: 'description', headerName: 'Description', type: 'longString' },
+    { field: 'description', headerName: 'Description' },
     {
       field: 'status',
       headerName: 'Status',

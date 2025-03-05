@@ -28,10 +28,6 @@ interface CrudFormState<D extends DataModel> {
   errors: Partial<Record<keyof D, string>>;
 }
 
-interface CrudFormLocaleText {
-  submitButtonLabel: string;
-}
-
 export interface CrudFormProps<D extends DataModel> {
   /**
    * Server-side data source.
@@ -57,9 +53,9 @@ export interface CrudFormProps<D extends DataModel> {
    */
   onReset?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   /**
-   * Locale text for CRUD form component.
+   * Text for form submit button.
    */
-  localeText: CrudFormLocaleText;
+  submitButtonLabel: string;
 }
 
 /**
@@ -73,7 +69,7 @@ export interface CrudFormProps<D extends DataModel> {
  * - [CrudForm API](https://mui.com/toolpad/core/api/crud-form)
  */
 function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
-  const { formState, onFieldChange, onSubmit, onReset, localeText } = props;
+  const { formState, onFieldChange, onSubmit, onReset, submitButtonLabel } = props;
 
   const formValues = formState.values;
   const formErrors = formState.errors;
@@ -303,7 +299,7 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
       </FormGroup>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button type="submit" variant="contained" size="large" loading={isSubmitting}>
-          {localeText.submitButtonLabel}
+          {submitButtonLabel}
         </Button>
       </Box>
     </Box>

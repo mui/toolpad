@@ -30,9 +30,11 @@ import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
 import { CrudContext, RouterContext, WindowContext } from '../shared/context';
+import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import type { DataModel, DataModelId, DataSource } from './types';
+import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 
 const ErrorOverlay = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -104,6 +106,10 @@ export interface ListProps<D extends DataModel> {
    * @default {}
    */
   slotProps?: ListSlotProps;
+  /**
+   * Locale text for CRUD List component.
+   */
+  localeText?: CRUDLocaleText;
 }
 
 /**
@@ -126,7 +132,11 @@ function List<D extends DataModel>(props: ListProps<D>) {
     dataSourceCache,
     slots,
     slotProps,
+    localeText: propsLocaleText,
   } = props;
+
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...CRUD_DEFAULT_LOCALE_TEXT, ...globalLocaleText, ...propsLocaleText };
 
   const crudContext = React.useContext(CrudContext);
   const dataSource = (props.dataSource ?? crudContext.dataSource) as NonNullable<
@@ -279,8 +289,8 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   const handleItemDelete = React.useCallback(
     (itemId: DataModelId) => async () => {
-      const confirmed = await dialogs.confirm(`Do you wish to delete item "${itemId}"?`, {
-        title: 'Delete item?',
+      const confirmed = await dialogs.confirm(localeText.deleteConfirmMessage, {
+        title: localeText.deleteConfirmTitle,
         severity: 'error',
         okText: 'Delete',
         cancelText: 'Cancel',
@@ -295,13 +305,13 @@ function List<D extends DataModel>(props: ListProps<D>) {
             onDelete(itemId);
           }
 
-          notifications.show('Item deleted successfully.', {
+          notifications.show(localeText.deleteSuccessMessage, {
             severity: 'success',
             autoHideDuration: 3000,
           });
           loadData();
         } catch (deleteError) {
-          notifications.show(`Failed to delete item. Reason: ${(deleteError as Error).message}`, {
+          notifications.show(`${localeText.deleteErrorMessage} ${(deleteError as Error).message}`, {
             severity: 'error',
             autoHideDuration: 3000,
           });
@@ -309,7 +319,17 @@ function List<D extends DataModel>(props: ListProps<D>) {
         setIsLoading(false);
       }
     },
-    [deleteOne, dialogs, loadData, notifications, onDelete],
+    [
+      deleteOne,
+      dialogs,
+      loadData,
+      localeText.deleteConfirmMessage,
+      localeText.deleteConfirmTitle,
+      localeText.deleteErrorMessage,
+      localeText.deleteSuccessMessage,
+      notifications,
+      onDelete,
+    ],
   );
 
   const DataGridSlot = slots?.dataGrid ?? DataGrid;

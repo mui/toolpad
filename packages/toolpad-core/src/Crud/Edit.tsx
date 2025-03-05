@@ -7,9 +7,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
 import { CrudContext } from '../shared/context';
+import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { CrudForm } from './CrudForm';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
+import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 import type { DataModel, DataModelId, DataSource, OmitId } from './types';
 
 interface EditFormProps<D extends DataModel> {
@@ -17,10 +19,11 @@ interface EditFormProps<D extends DataModel> {
   initialValues: Partial<OmitId<D>>;
   onSubmit: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   onSubmitSuccess?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
+  localeText: CRUDLocaleText;
 }
 
 function EditForm<D extends DataModel>(props: EditFormProps<D>) {
-  const { dataSource, initialValues, onSubmit, onSubmitSuccess } = props;
+  const { dataSource, initialValues, onSubmit, onSubmitSuccess, localeText } = props;
   const { fields, validate } = dataSource;
 
   const notifications = useNotifications();
@@ -92,7 +95,7 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
 
     try {
       await onSubmit(formValues);
-      notifications.show('Item edited successfully.', {
+      notifications.show(localeText.editSuccessMessage, {
         severity: 'success',
         autoHideDuration: 3000,
       });
@@ -101,13 +104,22 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
         await onSubmitSuccess(formValues);
       }
     } catch (editError) {
-      notifications.show(`Failed to edit item.\n${(editError as Error).message}`, {
+      notifications.show(`${localeText.editErrorMessage} ${(editError as Error).message}`, {
         severity: 'error',
         autoHideDuration: 3000,
       });
       throw editError;
     }
-  }, [formValues, notifications, onSubmit, onSubmitSuccess, setFormErrors, validate]);
+  }, [
+    formValues,
+    localeText.editErrorMessage,
+    localeText.editSuccessMessage,
+    notifications,
+    onSubmit,
+    onSubmitSuccess,
+    setFormErrors,
+    validate,
+  ]);
 
   return (
     <CrudForm
@@ -116,9 +128,7 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
       onFieldChange={handleFormFieldChange}
       onSubmit={handleFormSubmit}
       onReset={handleFormReset}
-      localeText={{
-        submitButtonLabel: 'Edit',
-      }}
+      submitButtonLabel="Edit"
     />
   );
 }
@@ -148,6 +158,10 @@ export interface EditProps<D extends DataModel> {
    * Cache for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
+  /**
+   * Locale text for CRUD Edit component.
+   */
+  localeText?: CRUDLocaleText;
 }
 
 /**
@@ -161,7 +175,9 @@ export interface EditProps<D extends DataModel> {
  * - [Edit API](https://mui.com/toolpad/core/api/edit)
  */
 function Edit<D extends DataModel>(props: EditProps<D>) {
-  const { id, onSubmitSuccess, dataSourceCache } = props;
+  const { id, onSubmitSuccess, dataSourceCache, localeText: propsLocaleText } = props;
+
+  const globalLocaleText = useLocaleText();
 
   const crudContext = React.useContext(CrudContext);
   const dataSource = (props.dataSource ?? crudContext.dataSource) as NonNullable<
@@ -235,15 +251,27 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
       );
     }
 
+    const localeText = { ...CRUD_DEFAULT_LOCALE_TEXT, ...globalLocaleText, ...propsLocaleText };
+
     return data ? (
       <EditForm
         dataSource={dataSource}
         initialValues={data}
         onSubmit={handleSubmit}
         onSubmitSuccess={onSubmitSuccess}
+        localeText={localeText}
       />
     ) : null;
-  }, [data, dataSource, error, handleSubmit, isLoading, onSubmitSuccess]);
+  }, [
+    data,
+    dataSource,
+    error,
+    globalLocaleText,
+    handleSubmit,
+    isLoading,
+    onSubmitSuccess,
+    propsLocaleText,
+  ]);
 
   return <Box sx={{ display: 'flex', flex: 1 }}>{renderEdit}</Box>;
 }

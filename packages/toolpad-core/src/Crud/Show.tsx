@@ -16,10 +16,12 @@ import invariant from 'invariant';
 import dayjs from 'dayjs';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
+import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { CrudContext } from '../shared/context';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import type { DataField, DataModel, DataModelId, DataSource } from './types';
+import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 
 export interface ShowProps<D extends DataModel> {
   id: DataModelId;
@@ -39,6 +41,10 @@ export interface ShowProps<D extends DataModel> {
    * Cache for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
+  /**
+   * Locale text for CRUD Show component.
+   */
+  localeText?: CRUDLocaleText;
 }
 
 /**
@@ -52,7 +58,10 @@ export interface ShowProps<D extends DataModel> {
  * - [Show API](https://mui.com/toolpad/core/api/show)
  */
 function Show<D extends DataModel>(props: ShowProps<D>) {
-  const { id, onEditClick, onDelete, dataSourceCache } = props;
+  const { id, onEditClick, onDelete, dataSourceCache, localeText: propsLocaleText } = props;
+
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...CRUD_DEFAULT_LOCALE_TEXT, ...globalLocaleText, ...propsLocaleText };
 
   const crudContext = React.useContext(CrudContext);
   const dataSource = (props.dataSource ?? crudContext.dataSource) as NonNullable<
@@ -104,8 +113,8 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
   }, [id, onEditClick]);
 
   const handleItemDelete = React.useCallback(async () => {
-    const confirmed = await dialogs.confirm(`Do you wish to delete item "${id}"?`, {
-      title: 'Delete item?',
+    const confirmed = await dialogs.confirm(localeText.deleteConfirmMessage, {
+      title: localeText.deleteConfirmTitle,
       severity: 'error',
       okText: 'Delete',
       cancelText: 'Cancel',
@@ -120,21 +129,31 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
           onDelete(id);
         }
 
-        notifications.show('Item deleted successfully.', {
+        notifications.show(localeText.deleteSuccessMessage, {
           severity: 'success',
           autoHideDuration: 3000,
         });
 
         setHasDeleted(true);
       } catch (deleteError) {
-        notifications.show(`Failed to delete item. Reason: ${(deleteError as Error).message}`, {
+        notifications.show(`${localeText.deleteErrorMessage} ${(deleteError as Error).message}`, {
           severity: 'error',
           autoHideDuration: 3000,
         });
       }
       setIsLoading(false);
     }
-  }, [deleteOne, dialogs, id, notifications, onDelete]);
+  }, [
+    deleteOne,
+    dialogs,
+    id,
+    localeText.deleteConfirmMessage,
+    localeText.deleteConfirmTitle,
+    localeText.deleteErrorMessage,
+    localeText.deleteSuccessMessage,
+    notifications,
+    onDelete,
+  ]);
 
   const renderField = React.useCallback(
     (showField: DataField) => {

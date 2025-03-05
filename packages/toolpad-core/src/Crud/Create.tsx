@@ -4,9 +4,11 @@ import PropTypes from 'prop-types';
 import invariant from 'invariant';
 import { useNotifications } from '../useNotifications';
 import { CrudContext } from '../shared/context';
+import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { CrudForm } from './CrudForm';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
+import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 import type { DataModel, DataSource, OmitId } from './types';
 
 export interface CreateProps<D extends DataModel> {
@@ -32,6 +34,10 @@ export interface CreateProps<D extends DataModel> {
    * Cache for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
+  /**
+   * Locale text for CRUD Create component.
+   */
+  localeText?: CRUDLocaleText;
 }
 
 /**
@@ -50,7 +56,11 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     onSubmitSuccess,
     resetOnSubmit = false,
     dataSourceCache,
+    localeText: propsLocaleText,
   } = props;
+
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...CRUD_DEFAULT_LOCALE_TEXT, ...globalLocaleText, ...propsLocaleText };
 
   const crudContext = React.useContext(CrudContext);
   const dataSource = (props.dataSource ?? crudContext.dataSource) as NonNullable<
@@ -138,7 +148,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
 
     try {
       await createOne(formValues);
-      notifications.show('Item created successfully.', {
+      notifications.show(localeText.createSuccessMessage, {
         severity: 'success',
         autoHideDuration: 3000,
       });
@@ -151,7 +161,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
         handleFormReset();
       }
     } catch (createError) {
-      notifications.show(`Failed to create item.\n${(createError as Error).message}`, {
+      notifications.show(`${localeText.createErrorMessage} ${(createError as Error).message}`, {
         severity: 'error',
         autoHideDuration: 3000,
       });
@@ -161,6 +171,8 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     createOne,
     formValues,
     handleFormReset,
+    localeText.createErrorMessage,
+    localeText.createSuccessMessage,
     notifications,
     onSubmitSuccess,
     resetOnSubmit,
@@ -175,9 +187,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
       onFieldChange={handleFormFieldChange}
       onSubmit={handleFormSubmit}
       onReset={handleFormReset}
-      localeText={{
-        submitButtonLabel: 'Create',
-      }}
+      submitButtonLabel="Create"
     />
   );
 }

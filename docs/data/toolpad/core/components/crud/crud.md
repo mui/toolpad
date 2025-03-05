@@ -38,11 +38,7 @@ Take a look at our examples for [Next.js](https://github.com/mui/toolpad/tree/ma
 A **data source** is an object with a particular shape that must be used to configure the `Crud` component or its subcomponents.
 It includes:
 
-- A `fields` property, which extends the [MUI X Data Grid column definition](https://mui.com/x/react-data-grid/column-definition/) where different fields, header names and field types, among others, can be specified for your data.
-
-  An `id` field (string or number) is mandatory so that individual items can be identified.
-
-  An additional type `longString` is provided for multiline form fields.
+- A `fields` property, which extends the [MUI X Data Grid column definition](https://mui.com/x/react-data-grid/column-definition/) where different fields, header names and field types, among others, can be specified for your data. An `id` field (string or number) is mandatory so that individual items can be identified.
 
 - Properties for methods to interact with data such as `getMany`, `getOne`, `createOne`, `updateOne` and `deleteOne`.
 

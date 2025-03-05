@@ -39,6 +39,16 @@ export interface LocaleText {
   alert: string;
   confirm: string;
   loading: string;
+
+  // CRUD
+  createSuccessMessage: string;
+  createErrorMessage: string;
+  editSuccessMessage: string;
+  editErrorMessage: string;
+  deleteConfirmTitle: string;
+  deleteConfirmMessage: string;
+  deleteSuccessMessage: string;
+  deleteErrorMessage: string;
 }
 
 export interface LocalizationProviderProps {

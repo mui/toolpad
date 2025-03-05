@@ -467,8 +467,8 @@ importers:
         specifier: 4.4.5
         version: 4.4.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       recast:
-        specifier: 0.23.9
-        version: 0.23.9
+        specifier: 0.23.11
+        version: 0.23.11
       rimraf:
         specifier: 6.0.1
         version: 6.0.1
@@ -9286,8 +9286,8 @@ packages:
     resolution: {integrity: sha512-gNva8/6UAe8QYepIQH/jQ2qn91Qj0B9sYjMBBs3QOB8F2CXcKgLxQaJRP76sWVRQt+QU+8fAkCbCvjjMFu7Ycw==}
     engines: {node: '>= 0.8.0'}
 
-  recast@0.23.9:
-    resolution: {integrity: sha512-Hx/BGIbwj+Des3+xy5uAtAbdCyqK9y9wbBcDFDYanLS9JnMqf7OeF87HQwUimE87OEc72mr6tkKUKMBBL+hF9Q==}
+  recast@0.23.11:
+    resolution: {integrity: sha512-YTUo+Flmw4ZXiWfQKGcwwc11KnoRAYgzAE2E7mXKCjSviTKShtxBsN6YUUBB2gtaBzKzeKunxhUwNHQuRryhWA==}
     engines: {node: '>= 4'}
 
   recharts-scale@0.4.5:
@@ -19994,7 +19994,7 @@ snapshots:
 
   readline-sync@1.4.10: {}
 
-  recast@0.23.9:
+  recast@0.23.11:
     dependencies:
       ast-types: 0.16.1
       esprima: 4.0.1

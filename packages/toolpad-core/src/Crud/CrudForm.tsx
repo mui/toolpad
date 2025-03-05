@@ -13,7 +13,7 @@ import Grid from '@mui/material/Grid2';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import TextField from '@mui/material/TextField';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -26,6 +26,18 @@ import type { DataField, DataModel, DataSource, OmitId } from './types';
 interface CrudFormState<D extends DataModel> {
   values: Partial<OmitId<D>>;
   errors: Partial<Record<keyof D, string>>;
+}
+
+export interface CrudFormSlotProps {
+  textField?: TextFieldProps;
+}
+
+export interface CrudFormSlots {
+  /**
+   * The TextField component used in the form.
+   * @default TextField
+   */
+  textField?: React.JSXElementConstructor<TextFieldProps>;
 }
 
 export interface CrudFormProps<D extends DataModel> {
@@ -53,6 +65,16 @@ export interface CrudFormProps<D extends DataModel> {
    */
   onReset?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots?: CrudFormSlots;
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps?: CrudFormSlotProps;
+  /**
    * Text for form submit button.
    */
   submitButtonLabel: string;
@@ -69,7 +91,8 @@ export interface CrudFormProps<D extends DataModel> {
  * - [CrudForm API](https://mui.com/toolpad/core/api/crud-form)
  */
 function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
-  const { formState, onFieldChange, onSubmit, onReset, submitButtonLabel } = props;
+  const { formState, onFieldChange, onSubmit, onReset, submitButtonLabel, slots, slotProps } =
+    props;
 
   const formValues = formState.values;
   const formErrors = formState.errors;
@@ -139,9 +162,12 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
       const fieldError = formErrors[field];
 
       let fieldElement: React.ReactNode = null;
-      if (!type || type === 'string' || type === 'longString') {
+
+      if (!type || type === 'string') {
+        const TextFieldComponent = slots?.textField ?? TextField;
+
         fieldElement = (
-          <TextField
+          <TextFieldComponent
             value={fieldValue ?? ''}
             onChange={handleTextFieldChange}
             name={field}
@@ -149,8 +175,7 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
             error={!!fieldError}
             helperText={fieldError ?? ' '}
             fullWidth
-            multiline={type === 'longString'}
-            minRows={type === 'longString' ? 2 : undefined}
+            {...slotProps?.textField}
           />
         );
       }
@@ -274,6 +299,8 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
       handleNumberFieldChange,
       handleSelectFieldChange,
       handleTextFieldChange,
+      slotProps?.textField,
+      slots,
     ],
   );
 

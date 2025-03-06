@@ -199,7 +199,11 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
             <FormControlLabel
               name={field}
               control={
-                <Checkbox size="large" value={fieldValue} onChange={handleCheckboxFieldChange} />
+                <Checkbox
+                  size="large"
+                  checked={fieldValue as boolean}
+                  onChange={handleCheckboxFieldChange}
+                />
               }
               label={headerName}
             />

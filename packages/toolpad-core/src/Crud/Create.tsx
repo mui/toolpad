@@ -142,7 +142,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   const handleFormSubmit = React.useCallback(async () => {
     if (validate) {
       const { issues } = await validate(formValues);
-      if (issues) {
+      if (issues && issues.length > 0) {
         setFormErrors(Object.fromEntries(issues.map((issue) => [issue.path?.[0], issue.message])));
         throw new Error('Form validation failed');
       }

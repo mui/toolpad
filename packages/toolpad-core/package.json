@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/core",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "author": "Toolpad Team",
   "description": "Dashboard framework powered by MUI.",
   "main": "./node/index.js",
@@ -44,8 +44,8 @@
     "test:browser:dev": "vitest --browser.enabled"
   },
   "dependencies": {
-    "@babel/runtime": "^7.26.0",
-    "@mui/utils": "7.0.0-alpha.2",
+    "@babel/runtime": "^7.26.9",
+    "@mui/utils": "7.0.0-beta.3",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",
     "client-only": "^0.0.1",
@@ -55,8 +55,8 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "6.4.5",
-    "@mui/material": "6.4.5",
+    "@mui/icons-material": "6.4.7",
+    "@mui/material": "6.4.7",
     "@mui/x-data-grid": "7.26.0",
     "@mui/x-data-grid-premium": "7.26.0",
     "@mui/x-data-grid-pro": "7.26.0",
@@ -67,7 +67,7 @@
     "@types/react-dom": "^19.0.4",
     "@types/sinon": "^17.0.4",
     "@vitest/browser": "2.1.9",
-    "next": "^15.1.7",
+    "next": "^15.2.1",
     "next-router-mock": "^0.9.13",
     "playwright": "^1.47.2",
     "react-router": "7.1.5",

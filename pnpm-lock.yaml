@@ -186,7 +186,7 @@ importers:
         version: 1.3.2(eslint@8.57.1)
       eslint-plugin-import:
         specifier: 2.31.0
-        version: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)
+        version: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)
       eslint-plugin-jsx-a11y:
         specifier: 6.10.2
         version: 6.10.2(eslint@8.57.1)
@@ -1044,7 +1044,7 @@ importers:
         version: 9.1.0(eslint@8.57.1)
       eslint-plugin-import:
         specifier: 2.31.0
-        version: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)
+        version: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)
       formidable:
         specifier: 3.5.2
         version: 3.5.2
@@ -16417,7 +16417,7 @@ snapshots:
     dependencies:
       confusing-browser-globals: 1.0.11
       eslint: 8.57.1
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)
       object.assign: 4.1.7
       object.entries: 1.1.8
       semver: 6.3.1
@@ -16426,7 +16426,7 @@ snapshots:
     dependencies:
       eslint: 8.57.1
       eslint-config-airbnb-base: 15.0.0(eslint-plugin-import@2.31.0)(eslint@8.57.1)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.4(eslint@8.57.1)
       eslint-plugin-react-hooks: 5.2.0(eslint@8.57.1)
@@ -16460,7 +16460,7 @@ snapshots:
   eslint-import-resolver-exports@1.0.0-beta.5(eslint-plugin-import@2.31.0)(eslint@8.57.1):
     dependencies:
       eslint: 8.57.1
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)
       resolve.exports: 2.0.2
 
   eslint-import-resolver-node@0.3.9:
@@ -16494,7 +16494,7 @@ snapshots:
     dependencies:
       debug: 3.2.7
       enhanced-resolve: 0.9.1
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)
       find-root: 1.1.0
       hasown: 2.0.2
       interpret: 1.4.0
@@ -16528,35 +16528,6 @@ snapshots:
       lodash.upperfirst: 4.3.1
 
   eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-typescript@3.6.3)(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1):
-    dependencies:
-      '@rtsao/scc': 1.1.0
-      array-includes: 3.1.8
-      array.prototype.findlastindex: 1.2.5
-      array.prototype.flat: 1.3.2
-      array.prototype.flatmap: 1.3.3
-      debug: 3.2.7
-      doctrine: 2.1.0
-      eslint: 8.57.1
-      eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.3)(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)
-      hasown: 2.0.2
-      is-core-module: 2.16.0
-      is-glob: 4.0.3
-      minimatch: 3.1.2
-      object.fromentries: 2.0.8
-      object.groupby: 1.0.3
-      object.values: 1.2.1
-      semver: 6.3.1
-      string.prototype.trimend: 1.0.9
-      tsconfig-paths: 3.15.0
-    optionalDependencies:
-      '@typescript-eslint/parser': 8.26.0(eslint@8.57.1)(typescript@5.7.3)
-    transitivePeerDependencies:
-      - eslint-import-resolver-typescript
-      - eslint-import-resolver-webpack
-      - supports-color
-
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.7.3))(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8

@@ -246,7 +246,7 @@ This function will run automatically against the current values when the user tr
 
 #### Integration with external schema libraries
 
-The `validate` function can easily be integrated with any schema libaries that follow the [Standard Schema] spec, such as [`zod`](https://github.com/colinhacks/zod).
+The `validate` function can easily be integrated with any schema libaries that follow the [Standard Schema](https://standardschema.dev/) spec, such as [`zod`](https://github.com/colinhacks/zod).
 
 Here's an example using `zod`:
 

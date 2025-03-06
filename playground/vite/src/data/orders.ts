@@ -178,19 +178,18 @@ export const ordersDataSource: DataSource<Order> = {
     });
   },
   validate: z.object({
-    title: z.string().min(1, 'Title is required'),
+    title: z.string({ required_error: 'Title is required' }).nonempty('Title is required'),
     description: z.string().optional(),
-    status: z
-      .enum(['Pending', 'Sent'], {
-        errorMap: () => ({ message: 'Status must be "Pending" or "Sent"' }),
-      })
-      .refine((value) => ['Pending', 'Sent'].includes(value), 'Status is required'),
+    status: z.enum(['Pending', 'Sent'], {
+      errorMap: () => ({ message: 'Status must be "Pending" or "Sent"' }),
+    }),
     itemCount: z
-      .number()
-      .min(1, 'Item count must be at least 1')
-      .refine((value) => value >= 1, 'Item count is required'),
-    fastDelivery: z.boolean().refine((value) => value !== undefined, 'Fast delivery is required'),
-    createdAt: z.string().min(1, 'Creation date is required'),
+      .number({ required_error: 'Item count is required' })
+      .min(1, 'Item count must be at least 1'),
+    fastDelivery: z.boolean({ required_error: 'Fast delivery is required' }),
+    createdAt: z
+      .string({ required_error: 'Creation date is required' })
+      .nonempty('Creation date is required'),
     deliveryTime: z.string().optional(),
   })['~standard'].validate,
 };

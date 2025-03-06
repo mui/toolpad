@@ -256,8 +256,12 @@ import { z } from 'zod';
 const dataSource = {
   // ...
   validate: z.object({
-    name: z.string().min(1, 'Name is required'), // Equivalent to required
-    age: z.number().min(18, 'Age must be higher than 18'),
+    name: z
+      .string({ required_error: 'Name is required' })
+      .nonempty('Name is required'),
+    age: z
+      .number({ required_error: 'Age is required' })
+      .min(18, 'Age must be higher than 18'),
   })['~standard'].validate,
   // ...
 };

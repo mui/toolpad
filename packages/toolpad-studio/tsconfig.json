@@ -19,7 +19,6 @@
     "jsx": "react",
     "noUnusedLocals": true,
     "pretty": true,
-    "preserveWatchOutput": true,
     "incremental": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "cli/**/*.ts", "cli/**/*.tsx", "typings/**/*.d.ts"],

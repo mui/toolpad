@@ -5,6 +5,7 @@ import {
   GridPaginationModel,
   GridSortModel,
 } from '@mui/x-data-grid';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
 
 export type DataModelId = string | number;
 
@@ -18,18 +19,6 @@ type RemappedOmit<T, K extends PropertyKey> = { [P in keyof T as P extends K ? n
 export type OmitId<D extends DataModel> = RemappedOmit<D, 'id'>;
 
 export type DataField = RemappedOmit<GridColDef, 'type'> & { type?: GridColType };
-
-interface ValidationIssue<D extends DataModel> {
-  /** The error message of the issue. */
-  readonly message: string;
-  /** The path of the issue, if any. */
-  readonly path: [keyof D];
-}
-
-export interface ValidationResult<D extends DataModel> {
-  /** The issues of failed validation. */
-  readonly issues: ReadonlyArray<ValidationIssue<D>>;
-}
 
 export interface DataSource<D extends DataModel> {
   fields: DataField[];
@@ -45,5 +34,5 @@ export interface DataSource<D extends DataModel> {
   /**
    * Function to validate form values. Follows the Standard Schema `validate` function format (https://standardschema.dev/).
    */
-  validate?: (value: Partial<OmitId<D>>) => ValidationResult<D> | Promise<ValidationResult<D>>;
+  validate?: StandardSchemaV1<Partial<OmitId<D>>>['~standard']['validate'];
 }

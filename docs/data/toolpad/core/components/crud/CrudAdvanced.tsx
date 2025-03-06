@@ -181,19 +181,25 @@ export const notesDataSource: DataSource<Note> = {
     });
   },
   validate: (formValues) => {
-    const errors: Record<keyof Note, string> = {};
+    let issues: { message: string; path: [keyof Note] }[] = [];
 
     if (!formValues.title) {
-      errors.title = 'Title is required';
+      issues = [...issues, { message: 'Title is required', path: ['title'] }];
     }
     if (formValues.title && formValues.title.length < 3) {
-      errors.title = 'Title must be at least 3 characters long';
+      issues = [
+        ...issues,
+        {
+          message: 'Title must be at least 3 characters long',
+          path: ['title'],
+        },
+      ];
     }
     if (!formValues.text) {
-      errors.text = 'Text is required';
+      issues = [...issues, { message: 'Text is required', path: ['text'] }];
     }
 
-    return errors;
+    return { issues };
   },
 };
 

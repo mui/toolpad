@@ -1,6 +1,5 @@
 import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
-import * as yup from 'yup';
-import yupAdapter from '../validationAdapters/yupAdapter';
+import { z } from 'zod';
 
 type OrderStatus = 'Pending' | 'Sent';
 
@@ -178,23 +177,22 @@ export const ordersDataSource: DataSource<Order> = {
       }, 1500);
     });
   },
-  validate: yupAdapter<Order>(
-    yup.object({
-      title: yup.string().required('Title is required'),
-      description: yup.string(),
-      status: yup
-        .string()
-        .oneOf(['Pending', 'Sent'], 'Status must be "Pending" or "Sent"')
-        .required('Status is required'),
-      itemCount: yup
-        .number()
-        .required('Item count is required')
-        .min(1, 'Item count must be at least 1'),
-      fastDelivery: yup.boolean().required('Fast delivery is required'),
-      createdAt: yup.string().required('Creation date is required'),
-      deliveryTime: yup.string(),
-    }),
-  ),
+  validate: z.object({
+    title: z.string().min(1, 'Title is required'),
+    description: z.string().optional(),
+    status: z
+      .enum(['Pending', 'Sent'], {
+        errorMap: () => ({ message: 'Status must be "Pending" or "Sent"' }),
+      })
+      .refine((value) => ['Pending', 'Sent'].includes(value), 'Status is required'),
+    itemCount: z
+      .number()
+      .min(1, 'Item count must be at least 1')
+      .refine((value) => value >= 1, 'Item count is required'),
+    fastDelivery: z.boolean().refine((value) => value !== undefined, 'Fast delivery is required'),
+    createdAt: z.string().min(1, 'Creation date is required'),
+    deliveryTime: z.string().optional(),
+  })['~standard'].validate,
 };
 
 export const ordersCache = new DataSourceCache();

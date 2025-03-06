@@ -66,8 +66,11 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
     (name: keyof D, value: string | number | boolean | File | null) => {
       const validateField = async (values: Partial<OmitId<D>>) => {
         if (validate) {
-          const errors = await validate(values);
-          setFormErrors({ ...formErrors, [name]: errors[name] });
+          const { issues } = await validate(values);
+          setFormErrors({
+            ...formErrors,
+            [name]: issues?.find((issue) => issue.path?.[0] === name)?.message,
+          });
         }
       };
 
@@ -85,9 +88,9 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
 
   const handleFormSubmit = React.useCallback(async () => {
     if (validate) {
-      const errors = await validate(formValues);
-      if (Object.keys(errors).length > 0) {
-        setFormErrors(errors);
+      const { issues } = await validate(formValues);
+      if (issues) {
+        setFormErrors(Object.fromEntries(issues.map((issue) => [issue.path?.[0], issue.message])));
         throw new Error('Form validation failed');
       }
     }

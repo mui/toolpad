@@ -95,21 +95,27 @@ export const peopleDataSource = {
     });
   },
   validate: (formValues) => {
-    const errors = {};
+    let issues = [];
 
     if (!formValues.firstName) {
-      errors.firstName = 'First name is required';
+      issues = [
+        ...issues,
+        { message: 'First name is required', path: ['firstName'] },
+      ];
     }
     if (!formValues.lastName) {
-      errors.lastName = 'Last name is required';
+      issues = [...issues, { message: 'Last name is required', path: ['lastName'] }];
     }
     if (!formValues.age) {
-      errors.age = 'Age is required';
+      issues = [...issues, { message: 'Age is required', path: ['age'] }];
     } else if (formValues.age <= 0) {
-      errors.age = 'Must be at least 1 year old';
+      issues = [
+        ...issues,
+        { message: 'Must be at least 1 year old', path: ['age'] },
+      ];
     }
 
-    return errors;
+    return { issues };
   },
 };
 

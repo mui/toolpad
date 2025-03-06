@@ -90,16 +90,16 @@ const notesDataSource: DataSource<Note> = {
     notesStore = notesStore.filter((note) => note.id !== noteId);
   },
   validate: (formValues) => {
-    const errors: Record<keyof Note, string> = {};
+    let issues: { message: string; path: [keyof Note] }[] = [];
 
     if (!formValues.title) {
-      errors.title = 'Title is required';
+      issues = [...issues, { message: 'Title is required', path: ['title'] }];
     }
     if (!formValues.text) {
-      errors.text = 'Text is required';
+      issues = [...issues, { message: 'Text is required', path: ['text'] }];
     }
 
-    return errors;
+    return { issues };
   },
 };
 ```
@@ -221,22 +221,22 @@ This method does not need to return anything.
 
 Optionally, a `validate` function can be included in the data source in order to do form validation.
 
-This function takes an object with field values for a given item, and must return the corresponding errors for each field as strings, as shown in the example:
+This function follows the [Standard Schema](https://standardschema.dev/), so it takes an object with field values for a given item and must return the corresponding errors for each field, as shown in the example:
 
 ```tsx
 {
   //...
   validate: (formValues) => {
-    const errors = {};
+    let issues = [];
 
     if (!formValues.name) {
-      errors.name = 'Name is required';
+      issues = [...issues, { message: 'Name is required', path: ['name'] }];
     }
     if (formValues.age < 18) {
-      errors.age = 'Age must be higher than 18';
+      issues = [...issues, { message: 'Age must be higher than 18', path: ['age'] }];
     }
 
-    return errors;
+    return { issues };
   },
   // ...
 }
@@ -246,37 +246,19 @@ This function will run automatically against the current values when the user tr
 
 #### Integration with external schema libraries
 
-The `validate` function can easily be integrated with schema validation libraries such as [`yup`](https://github.com/jquense/yup) or [`zod`](https://github.com/colinhacks/zod).
+The `validate` function can easily be integrated with any schema libaries that follow the [Standard Schema] spec, such as [`zod`](https://github.com/colinhacks/zod).
 
-Here's an example using `yup`:
+Here's an example using `zod`:
 
 ```tsx
-import * as yup from 'yup';
-
-const yupAdapter = (schema) => async (formValues) => {
-  try {
-    // Validate form values against the provided schema
-    await schema.validate(formValues, { abortEarly: false });
-    return {};
-  } catch (error) {
-    // Return field errors in the expected shape
-    return error.inner.reduce((acc, curr) => {
-      if (curr.path) {
-        acc[curr.path] = curr.message;
-      }
-      return acc;
-    }, {});
-  }
-};
+import { z } from 'zod';
 
 const dataSource = {
   // ...
-  validate: yupAdapter(
-    yup.object({
-      name: yup.string().required('Name is required'),
-      age: yup.number().min(18, 'Age must be higher than 18'),
-    }),
-  ),
+  validate: z.object({
+    name: z.string().min(1, 'Name is required'), // Equivalent to required
+    age: z.number().min(18, 'Age must be higher than 18'),
+  })['~standard'].validate,
   // ...
 };
 ```

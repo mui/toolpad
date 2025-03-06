@@ -10,7 +10,7 @@ export type DataModelId = string | number;
 
 export interface DataModel {
   id: DataModelId;
-  [key: string]: unknown;
+  [key: PropertyKey]: unknown;
 }
 
 type RemappedOmit<T, K extends PropertyKey> = { [P in keyof T as P extends K ? never : P]: T[P] };
@@ -18,6 +18,18 @@ type RemappedOmit<T, K extends PropertyKey> = { [P in keyof T as P extends K ? n
 export type OmitId<D extends DataModel> = RemappedOmit<D, 'id'>;
 
 export type DataField = RemappedOmit<GridColDef, 'type'> & { type?: GridColType };
+
+interface ValidationIssue<D extends DataModel> {
+  /** The error message of the issue. */
+  readonly message: string;
+  /** The path of the issue, if any. */
+  readonly path: [keyof D];
+}
+
+export interface ValidationResult<D extends DataModel> {
+  /** The issues of failed validation. */
+  readonly issues: ReadonlyArray<ValidationIssue<D>>;
+}
 
 export interface DataSource<D extends DataModel> {
   fields: DataField[];
@@ -31,9 +43,7 @@ export interface DataSource<D extends DataModel> {
   updateOne?: (id: DataModelId, data: Partial<OmitId<D>>) => Promise<D>;
   deleteOne?: (id: DataModelId) => Promise<void>;
   /**
-   * Function to validate form values. Returns object with error strings for each field.
+   * Function to validate form values. Follows the Standard Schema validate function format (https://standardschema.dev/).
    */
-  validate?: (
-    formValues: Partial<OmitId<D>>,
-  ) => Partial<Record<keyof D, string>> | Promise<Partial<Record<keyof D, string>>>;
+  validate?: (value: Partial<OmitId<D>>) => ValidationResult<D> | Promise<ValidationResult<D>>;
 }

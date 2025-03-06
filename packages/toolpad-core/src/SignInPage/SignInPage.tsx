@@ -770,7 +770,7 @@ SignInPage.propTypes /* remove-proptypes */ = {
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
     form: PropTypes.object,
-    oAuthButton: PropTypes.any,
+    oAuthButton: PropTypes.object,
     passwordField: PropTypes.object,
     rememberMe: PropTypes.object,
     signUpLink: PropTypes.object,

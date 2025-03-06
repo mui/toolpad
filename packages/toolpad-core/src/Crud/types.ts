@@ -34,5 +34,7 @@ export interface DataSource<D extends DataModel> {
   /**
    * Function to validate form values. Follows the Standard Schema `validate` function format (https://standardschema.dev/).
    */
-  validate?: StandardSchemaV1<Partial<OmitId<D>>>['~standard']['validate'];
+  validate?: (
+    value: Partial<OmitId<D>>,
+  ) => ReturnType<StandardSchemaV1<Partial<OmitId<D>>>['~standard']['validate']>;
 }

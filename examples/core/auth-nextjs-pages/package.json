@@ -13,7 +13,7 @@
     "@mui/icons-material": "^6",
     "@mui/material": "^6",
     "@mui/material-nextjs": "^6",
-    "@toolpad/core": "https://pkg.csb.dev/mui/toolpad/commit/94f029e8/@toolpad/core",
+    "@toolpad/core": "^0.13.0",
     "cookies-next": "^5.1.0",
     "next": "^15",
     "next-auth": "5.0.0-beta.25",

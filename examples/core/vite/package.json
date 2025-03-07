@@ -12,7 +12,7 @@
     "@emotion/styled": "^11",
     "@mui/icons-material": "^6",
     "@mui/material": "^6",
-    "@toolpad/core": "https://pkg.csb.dev/mui/toolpad/commit/94f029e8/@toolpad/core",
+    "@toolpad/core": "^0.13.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router": "^7",

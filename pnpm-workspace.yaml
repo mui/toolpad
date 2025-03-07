@@ -3,6 +3,3 @@ packages:
   - 'playground/*'
   - 'docs'
   - 'test'
-  - 'examples/core/vite'
-  - 'examples/core/auth-nextjs'
-  - 'examples/core/auth-nextjs-pages'

@@ -14,10 +14,12 @@
     "@mui/material": "^6",
     "@mui/material-nextjs": "^6",
     "@toolpad/core": "https://pkg.csb.dev/mui/toolpad/commit/94f029e8/@toolpad/core",
+    "cookies-next": "^5.1.0",
     "next": "^15",
     "next-auth": "5.0.0-beta.25",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "typescript": "^5",

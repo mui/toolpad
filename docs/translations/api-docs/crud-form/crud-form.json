@@ -13,5 +13,5 @@
     "submitButtonLabel": { "description": "Text for form submit button." }
   },
   "classDescriptions": {},
-  "slotDescriptions": { "textField": "The TextField component used in the form." }
+  "slotDescriptions": { "textField": "The text field component used in the form." }
 }

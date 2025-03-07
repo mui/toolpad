@@ -99,11 +99,11 @@ These great services sponsor MUI's core infrastructure:
 
 [<img loading="lazy" alt="GitHub" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Logo.png" height="25">](https://github.com/)
 
-GitHub allows us to host the Git repository and coordinate contributions.
+[GitHub](https://github.com/) allows us to host the Git repository and coordinate contributions.
 
 [<img loading="lazy" alt="Netlify" src="https://cdn.netlify.com/15ecf59b59c9d04b88097c6b5d2c7e8a7d1302d0/1b6d6/img/press/logos/full-logo-light.svg" height="30">](https://www.netlify.com/)
 
-Netlify allows us to distribute the documentation.
+[Netlify](https://www.netlify.com/) allows us to distribute the documentation.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://mui.com/static/readme/browserstack-darkmode.svg">
@@ -111,8 +111,8 @@ Netlify allows us to distribute the documentation.
   <img alt="BrowserStack logo" src="https://mui.com/static/readme/browserstack-lightmode.svg" width="140" height="25">
 </picture>
 
-BrowserStack allows us to test in real browsers.
+[BrowserStack](https://www.browserstack.com/) allows us to test in real browsers.
 
 [<img loading="lazy" alt="CodeCov" src="https://github.com/codecov.png?size=70" width="35" height="35">](https://codecov.io/)
 
-CodeCov allows us to monitor the test coverage.
+[CodeCov](https://about.codecov.io/) allows us to monitor the test coverage.

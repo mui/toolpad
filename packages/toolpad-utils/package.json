@@ -27,7 +27,7 @@
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
     "build:types": "tsx ../../scripts/buildTypes.mts",
     "predev": "pnpm clean",
-    "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch --preserveWatchOutput\" \"pnpm build:copy-files\"",
+    "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch\" \"pnpm build:copy-files\"",
     "check-types": "pnpm build:stable && pnpm build:types && tsc --noEmit",
     "test": "vitest run --coverage"
   },

@@ -35,6 +35,7 @@
     "@mui/styles": "6.4.7",
     "@mui/system": "6.4.7",
     "@mui/utils": "6.4.6",
+    "@mui/x-data-grid-pro": "7.26.0",
     "@mui/x-date-pickers": "7.27.1",
     "@mui/x-date-pickers-pro": "7.27.1",
     "@mui/x-license": "7.26.0",

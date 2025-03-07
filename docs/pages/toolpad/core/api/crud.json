@@ -1,0 +1,25 @@
+{
+  "props": {
+    "dataSource": { "type": { "name": "object" }, "required": true },
+    "rootPath": { "type": { "name": "string" }, "required": true },
+    "dataSourceCache": {
+      "type": {
+        "name": "shape",
+        "description": "{ cache: object, clear: func, get: func, set: func, ttl: number }"
+      }
+    },
+    "defaultValues": { "type": { "name": "object" }, "default": "{}" },
+    "initialPageSize": { "type": { "name": "number" }, "default": "100" }
+  },
+  "name": "Crud",
+  "imports": [
+    "import { Crud } from '@toolpad/core/Crud';",
+    "import { Crud } from '@toolpad/core';"
+  ],
+  "classes": [],
+  "muiName": "Crud",
+  "filename": "/packages/toolpad-core/src/Crud/Crud.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">Crud</a></li></ul>",
+  "cssComponent": false
+}

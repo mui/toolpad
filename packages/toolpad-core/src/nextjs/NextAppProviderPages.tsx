@@ -15,7 +15,7 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
  * @ignore - internal component.
  */
 export function NextAppProviderPages(props: AppProviderProps) {
-  const { push, replace, pathname, query } = useRouter();
+  const { push, replace, asPath, query } = useRouter();
 
   const search = React.useMemo(() => {
     const params = new URLSearchParams();
@@ -45,12 +45,12 @@ export function NextAppProviderPages(props: AppProviderProps) {
 
   const routerImpl = React.useMemo<Router>(
     () => ({
-      pathname,
+      pathname: asPath.split('?')[0],
       searchParams,
       navigate,
       Link,
     }),
-    [navigate, pathname, searchParams],
+    [asPath, navigate, searchParams],
   );
 
   return <AppProvider router={routerImpl} {...props} />;

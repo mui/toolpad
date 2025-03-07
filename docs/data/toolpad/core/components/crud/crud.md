@@ -16,7 +16,7 @@ The `Crud` component automatically generates CRUD pages for your data source, au
 
 {{"demo": "CrudBasic.js", "height": 600, "iframe": true}}
 
-The pages will be present in the following routes:
+The pages are in the following routes:
 
 - **List**: `/${rootPath}`
 - **Show**: `/${rootPath}/:id`
@@ -29,16 +29,16 @@ It is recommended to include the `dataSourceCache` prop in order to properly cac
 
 Optionally, additional configuration options can be provided such as `initialPageSize` for the paginated list of items, or `defaultValues` to set the initial form values when using a form to create new items.
 
-:::info
-Take a look at our examples for [Next.js](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/) and [Vite](https://github.com/mui/toolpad/tree/master/examples/core/vite/) for possible implementations on how the `Crud` component can be integrated with different routing solutions.
-:::
+<!-- :::info
+Take a look at the examples for [Next.js](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/) and [Vite](https://github.com/mui/toolpad/tree/master/examples/core/vite/) for possible implementations on how the `Crud` component can be integrated with different routing solutions.
+::: -->
 
 ## Data sources
 
 A **data source** is an object with a particular shape that must be used to configure the `Crud` component or its subcomponents.
 It includes:
 
-- A `fields` property, which extends the [MUI X Data Grid column definition](https://mui.com/x/react-data-grid/column-definition/) where different fields, header names and field types, among others, can be specified for your data. An `id` field (string or number) is mandatory so that individual items can be identified.
+- A `fields` property, which extends the [Data Grid column definition](https://mui.com/x/react-data-grid/column-definition/) where different fields, header names and field types, among others, can be specified for your data. An `id` field (string or number) is mandatory so that individual items can be identified.
 
 - Properties for methods to interact with data such as `getMany`, `getOne`, `createOne`, `updateOne` and `deleteOne`.
 
@@ -108,7 +108,7 @@ const notesDataSource: DataSource<Note> = {
 
 The `getMany` method in a data source can be used for retrieving paginated, sorted and filtered items to be displayed as a list, usually in a table.
 
-Pagination, sorting and filtering can be integrated with your data fetching via the `paginationModel`, `filterModel` and `sortModel` arguments. These arguments follow the same shape as the models for [pagination](https://mui.com/x/react-data-grid/pagination/#pagination-model), [sorting](https://mui.com/x/react-data-grid/sorting/#structure-of-the-model) and [filtering](https://mui.com/x/react-data-grid/filtering/#structure-of-the-model) used by the MUI X Data Grid.
+Pagination, sorting, and filtering can be integrated with your data fetching via the `paginationModel`, `filterModel` and `sortModel` arguments. These arguments follow the same shape as the models for [pagination](https://mui.com/x/react-data-grid/pagination/#pagination-model), [sorting](https://mui.com/x/react-data-grid/sorting/#structure-of-the-model) and [filtering](https://mui.com/x/react-data-grid/filtering/#structure-of-the-model) used by the Data Grid.
 
 This method must return an array of objects with the items to be displayed.
 
@@ -242,7 +242,7 @@ This function follows the [Standard Schema](https://standardschema.dev/), so it 
 }
 ```
 
-This function will run automatically against the current values when the user tries to submit a form inside the `Crud` component, or changes any of its fields.
+This function runs automatically against the current values when the user tries to submit a form inside the `Crud` component, or changes any of its fields.
 
 #### Integration with external schema libraries
 
@@ -269,11 +269,11 @@ const dataSource = {
 
 ## Data caching
 
-Data sources cache fetched data by default. This means that if the user queries data that has already been fetched, query methods such as `getMany` and `getOne` will not be called again to avoid unnecessary calls to the server.
+Data sources cache fetched data by default. This means that if the user queries data that has already been fetched, query methods such as `getMany` and `getOne` are not called again to avoid unnecessary calls to the server.
 
 Successfully calling mutation methods such as `createOne`, `updateOne` or `deleteOne` automatically clears the cache for all queries in the same data source.
 
-It is recommended to always include the `dataSourceCache` prop in order to cache data at the scope of whole application, otherwise by default the cache will only be scoped to the component being used.
+It is recommended to always include the `dataSourceCache` prop in order to cache data at the scope of whole application, otherwise by default the cache is only scoped to the component being used.
 Each data source should have its own single cache instance across the whole application.
 
 An instance of `DataSourceCache` may be used for caching as seen in the [demo above](#demo). `DataSourceCache` is a simple in-memory cache that stores the data in a plain object.
@@ -303,7 +303,7 @@ If the data source includes `deleteOne`, it is possible to delete items directly
 
 {{"demo": "CrudList.js", "height": 600, "iframe": true}}
 
-#### Integration with MUI X Data Grid
+#### Integration with Data Grid
 
 The `dataGrid` slot and slot props can be used to replace the standard Data Grid with any of its [commercially licensed versions](https://mui.com/x/react-data-grid/#commercial-licenses).
 

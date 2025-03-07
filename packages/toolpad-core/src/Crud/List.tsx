@@ -429,9 +429,13 @@ function List<D extends DataModel>(props: ListProps<D>) {
             [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]: {
               outline: 'none',
             },
-            [`& .${gridClasses.row}:hover`]: {
-              cursor: 'pointer',
-            },
+            ...(onRowClick
+              ? {
+                  [`& .${gridClasses.row}:hover`]: {
+                    cursor: 'pointer',
+                  },
+                }
+              : {}),
             ...slotProps?.dataGrid?.sx,
           }}
         />

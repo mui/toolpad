@@ -41,14 +41,22 @@ export interface LocaleText {
   loading: string;
 
   // CRUD
+  createNewButtonLabel: string;
+  reloadButtonLabel: string;
+  createLabel: string;
   createSuccessMessage: string;
   createErrorMessage: string;
+  editLabel: string;
   editSuccessMessage: string;
   editErrorMessage: string;
+  deleteLabel: string;
   deleteConfirmTitle: string;
   deleteConfirmMessage: string;
+  deleteConfirmLabel: string;
+  deleteCancelLabel: string;
   deleteSuccessMessage: string;
   deleteErrorMessage: string;
+  deletedItemMessage: string;
 }
 
 export interface LocalizationProviderProps {

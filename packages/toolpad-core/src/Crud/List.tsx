@@ -292,8 +292,8 @@ function List<D extends DataModel>(props: ListProps<D>) {
       const confirmed = await dialogs.confirm(localeText.deleteConfirmMessage, {
         title: localeText.deleteConfirmTitle,
         severity: 'error',
-        okText: 'Delete',
-        cancelText: 'Cancel',
+        okText: localeText.deleteConfirmLabel,
+        cancelText: localeText.deleteCancelLabel,
       });
 
       if (confirmed) {
@@ -323,6 +323,8 @@ function List<D extends DataModel>(props: ListProps<D>) {
       deleteOne,
       dialogs,
       loadData,
+      localeText.deleteCancelLabel,
+      localeText.deleteConfirmLabel,
       localeText.deleteConfirmMessage,
       localeText.deleteConfirmTitle,
       localeText.deleteErrorMessage,
@@ -355,7 +357,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
                 <GridActionsCellItem
                   key="edit-item"
                   icon={<EditIcon />}
-                  label="Edit"
+                  label={localeText.editLabel}
                   onClick={handleItemEdit(id)}
                 />,
               ]
@@ -365,7 +367,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
                 <GridActionsCellItem
                   key="delete-item"
                   icon={<DeleteIcon />}
-                  label="Delete"
+                  label={localeText.deleteLabel}
                   onClick={handleItemDelete(id)}
                 />,
               ]
@@ -373,12 +375,20 @@ function List<D extends DataModel>(props: ListProps<D>) {
         ],
       },
     ];
-  }, [deleteOne, fields, handleItemDelete, handleItemEdit, onEditClick]);
+  }, [
+    deleteOne,
+    fields,
+    handleItemDelete,
+    handleItemEdit,
+    localeText.deleteLabel,
+    localeText.editLabel,
+    onEditClick,
+  ]);
 
   return (
     <Stack sx={{ flex: 1, width: '100%' }}>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-        <Tooltip title="Reload data" placement="right" enterDelay={1000}>
+        <Tooltip title={localeText.reloadButtonLabel} placement="right" enterDelay={1000}>
           <div>
             <IconButton aria-label="refresh" onClick={handleRefresh}>
               <RefreshIcon />
@@ -387,7 +397,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
         </Tooltip>
         {onCreateClick ? (
           <Button variant="contained" onClick={onCreateClick} startIcon={<AddIcon />}>
-            Create New
+            {localeText.createNewButtonLabel}
           </Button>
         ) : null}
       </Stack>

@@ -116,8 +116,8 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     const confirmed = await dialogs.confirm(localeText.deleteConfirmMessage, {
       title: localeText.deleteConfirmTitle,
       severity: 'error',
-      okText: 'Delete',
-      cancelText: 'Cancel',
+      okText: localeText.deleteConfirmLabel,
+      cancelText: localeText.deleteCancelLabel,
     });
 
     if (confirmed) {
@@ -147,6 +147,8 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     deleteOne,
     dialogs,
     id,
+    localeText.deleteCancelLabel,
+    localeText.deleteConfirmLabel,
     localeText.deleteConfirmMessage,
     localeText.deleteConfirmTitle,
     localeText.deleteErrorMessage,
@@ -208,7 +210,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     if (hasDeleted) {
       return (
         <Box sx={{ flexGrow: 1 }}>
-          <Alert severity="error">This item has been deleted.</Alert>
+          <Alert severity="error">{localeText.deletedItemMessage}</Alert>
         </Box>
       );
     }
@@ -237,7 +239,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           {onEditClick ? (
             <Button variant="contained" startIcon={<EditIcon />} onClick={handleItemEdit}>
-              Edit
+              {localeText.editLabel}
             </Button>
           ) : null}
           {deleteOne ? (
@@ -247,7 +249,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
               startIcon={<DeleteIcon />}
               onClick={handleItemDelete}
             >
-              Delete
+              {localeText.deleteLabel}
             </Button>
           ) : null}
         </Stack>
@@ -262,6 +264,9 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
     handleItemEdit,
     hasDeleted,
     isLoading,
+    localeText.deleteLabel,
+    localeText.deletedItemMessage,
+    localeText.editLabel,
     onEditClick,
     renderField,
   ]);

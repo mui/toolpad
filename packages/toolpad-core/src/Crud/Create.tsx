@@ -190,7 +190,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
       onFieldChange={handleFormFieldChange}
       onSubmit={handleFormSubmit}
       onReset={handleFormReset}
-      submitButtonLabel="Create"
+      submitButtonLabel={localeText.createLabel}
     />
   );
 }

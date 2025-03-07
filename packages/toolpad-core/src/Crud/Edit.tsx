@@ -131,7 +131,7 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
       onFieldChange={handleFormFieldChange}
       onSubmit={handleFormSubmit}
       onReset={handleFormReset}
-      submitButtonLabel="Edit"
+      submitButtonLabel={localeText.editLabel}
     />
   );
 }

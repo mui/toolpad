@@ -10,7 +10,7 @@
       "description": "Whether the sidebar should not be collapsible to a mini variant in desktop and tablet viewports."
     },
     "hideNavigation": {
-      "description": "Whether the navigation bar and menu icon should be hidden"
+      "description": "Whether the navigation bar and menu icon should be hidden."
     },
     "navigation": { "description": "Navigation definition for the dashboard." },
     "sidebarExpandedWidth": { "description": "Width of the sidebar when expanded." },

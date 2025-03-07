@@ -68,7 +68,7 @@ export interface ListSlots {
 
 export interface ListProps<D extends DataModel> {
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource?: DataSource<D> & Required<Pick<DataSource<D>, 'getMany'>>;
   /**
@@ -93,7 +93,7 @@ export interface ListProps<D extends DataModel> {
    */
   onDelete?: (id: DataModelId) => void;
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
   /**
@@ -107,7 +107,7 @@ export interface ListProps<D extends DataModel> {
    */
   slotProps?: ListSlotProps;
   /**
-   * Locale text for CRUD List component.
+   * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
 }
@@ -451,11 +451,11 @@ List.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource: PropTypes.object,
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache: PropTypes.shape({
     cache: PropTypes.object.isRequired,
@@ -470,7 +470,7 @@ List.propTypes /* remove-proptypes */ = {
    */
   initialPageSize: PropTypes.number,
   /**
-   * Locale text for CRUD List component.
+   * Locale text for the component.
    */
   localeText: PropTypes.object,
   /**

@@ -1,9 +1,13 @@
 {
   "componentDescription": "",
   "propDescriptions": {
-    "dataSource": { "description": "Server-side data source." },
-    "dataSourceCache": { "description": "Cache for the data source." },
-    "localeText": { "description": "Locale text for CRUD Show component." },
+    "dataSource": {
+      "description": "Server-side <a href=\"https://mui.com/toolpad/core/react-crud/#data-sources\">data source</a>."
+    },
+    "dataSourceCache": {
+      "description": "<a href=\"https://mui.com/toolpad/core/react-crud/#data-caching\">Cache</a> for the data source."
+    },
+    "localeText": { "description": "Locale text for the component." },
     "onDelete": { "description": "Callback fired when the item is successfully deleted." },
     "onEditClick": { "description": "Callback fired when the &quot;Edit&quot; button is clicked." }
   },

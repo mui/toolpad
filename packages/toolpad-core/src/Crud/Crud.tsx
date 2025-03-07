@@ -14,7 +14,7 @@ import type { DataModel, DataModelId, DataSource, OmitId } from './types';
 
 export interface CrudProps<D extends DataModel> {
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource: DataSource<D>;
   /**
@@ -32,7 +32,7 @@ export interface CrudProps<D extends DataModel> {
    */
   defaultValues?: Partial<OmitId<D>>;
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
 }
@@ -150,11 +150,11 @@ Crud.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource: PropTypes.object.isRequired,
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache: PropTypes.shape({
     cache: PropTypes.object.isRequired,

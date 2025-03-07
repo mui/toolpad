@@ -13,7 +13,7 @@ import type { DataModel, DataSource, OmitId } from './types';
 
 export interface CreateProps<D extends DataModel> {
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource?: DataSource<D> & Required<Pick<DataSource<D>, 'createOne'>>;
   /**
@@ -31,11 +31,11 @@ export interface CreateProps<D extends DataModel> {
    */
   resetOnSubmit?: boolean;
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
   /**
-   * Locale text for CRUD Create component.
+   * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
 }
@@ -201,11 +201,11 @@ Create.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource: PropTypes.object,
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache: PropTypes.shape({
     cache: PropTypes.object.isRequired,
@@ -220,7 +220,7 @@ Create.propTypes /* remove-proptypes */ = {
    */
   initialValues: PropTypes.object,
   /**
-   * Locale text for CRUD Create component.
+   * Locale text for the component.
    */
   localeText: PropTypes.object,
   /**

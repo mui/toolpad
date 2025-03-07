@@ -151,7 +151,7 @@ EditForm.propTypes /* remove-proptypes */ = {
 export interface EditProps<D extends DataModel> {
   id: DataModelId;
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource?: DataSource<D> & Required<Pick<DataSource<D>, 'getOne' | 'updateOne'>>;
   /**
@@ -159,11 +159,11 @@ export interface EditProps<D extends DataModel> {
    */
   onSubmitSuccess?: (formValues: Partial<OmitId<D>>) => void | Promise<void>;
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
   /**
-   * Locale text for CRUD Edit component.
+   * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
 }
@@ -286,11 +286,11 @@ Edit.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource: PropTypes.object,
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache: PropTypes.shape({
     cache: PropTypes.object.isRequired,
@@ -304,7 +304,7 @@ Edit.propTypes /* remove-proptypes */ = {
    */
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   /**
-   * Locale text for CRUD Edit component.
+   * Locale text for the component.
    */
   localeText: PropTypes.object,
   /**

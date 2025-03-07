@@ -1,10 +1,14 @@
 {
   "componentDescription": "",
   "propDescriptions": {
-    "dataSource": { "description": "Server-side data source." },
-    "dataSourceCache": { "description": "Cache for the data source." },
+    "dataSource": {
+      "description": "Server-side <a href=\"https://mui.com/toolpad/core/react-crud/#data-sources\">data source</a>."
+    },
+    "dataSourceCache": {
+      "description": "<a href=\"https://mui.com/toolpad/core/react-crud/#data-caching\">Cache</a> for the data source."
+    },
     "initialPageSize": { "description": "Initial number of rows to show per page." },
-    "localeText": { "description": "Locale text for CRUD List component." },
+    "localeText": { "description": "Locale text for the component." },
     "onCreateClick": {
       "description": "Callback fired when the &quot;Create&quot; button is clicked."
     },

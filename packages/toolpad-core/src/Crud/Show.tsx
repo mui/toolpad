@@ -26,7 +26,7 @@ import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
 export interface ShowProps<D extends DataModel> {
   id: DataModelId;
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource?: DataSource<D> & Required<Pick<DataSource<D>, 'getOne'>>;
   /**
@@ -38,11 +38,11 @@ export interface ShowProps<D extends DataModel> {
    */
   onDelete?: (id: DataModelId) => void;
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
   /**
-   * Locale text for CRUD Show component.
+   * Locale text for the component.
    */
   localeText?: CRUDLocaleText;
 }
@@ -280,11 +280,11 @@ Show.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource: PropTypes.object,
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache: PropTypes.shape({
     cache: PropTypes.object.isRequired,
@@ -298,7 +298,7 @@ Show.propTypes /* remove-proptypes */ = {
    */
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   /**
-   * Locale text for CRUD Show component.
+   * Locale text for the component.
    */
   localeText: PropTypes.object,
   /**

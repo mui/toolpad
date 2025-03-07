@@ -1,7 +1,9 @@
 {
   "componentDescription": "",
   "propDescriptions": {
-    "dataSource": { "description": "Server-side data source." },
+    "dataSource": {
+      "description": "Server-side <a href=\"https://mui.com/toolpad/core/react-crud/#data-sources\">data source</a>."
+    },
     "formState": { "description": "Form state object, including field values and errors." },
     "onFieldChange": { "description": "Callback fired when a form field is changed." },
     "onReset": { "description": "Callback fired when the form is reset." },

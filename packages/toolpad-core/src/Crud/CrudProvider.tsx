@@ -7,11 +7,11 @@ import type { DataModel, DataSource } from './types';
 
 export interface CrudProviderProps<D extends DataModel> {
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource: DataSource<D>;
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
   children?: React.ReactNode;
@@ -56,11 +56,11 @@ CrudProvider.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * Server-side data source.
+   * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
    */
   dataSource: PropTypes.object.isRequired,
   /**
-   * Cache for the data source.
+   * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache: PropTypes.shape({
     cache: PropTypes.object.isRequired,

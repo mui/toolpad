@@ -889,8 +889,8 @@ importers:
         specifier: 1.0.1
         version: 1.0.1(node-fetch@2.7.0(encoding@0.1.13))
       open-editor:
-        specifier: 5.0.0
-        version: 5.0.0
+        specifier: 5.1.0
+        version: 5.1.0
       path-to-regexp:
         specifier: 6.3.0
         version: 6.3.0
@@ -8494,8 +8494,8 @@ packages:
     resolution: {integrity: sha512-1FlR+gjXK7X+AsAHso35MnyN5KqGwJRi/31ft6x0M194ht7S+rWAvd7PHss9xSKMzE0asv1pyIHaJYq+BbacAQ==}
     engines: {node: '>=12'}
 
-  open-editor@5.0.0:
-    resolution: {integrity: sha512-fRHi4my03WQSbWfqChs9AdFfSp6SLalB3zadfwfYIojoKanLDBfv2uAdiZCfzdvom7TBdlXu2UeiiydBc56/EQ==}
+  open-editor@5.1.0:
+    resolution: {integrity: sha512-KkNqM6FdoegD6WhY2YXmWcovOux45NV+zBped2+G3+V74zkDPkIl4cqh6hte2zNDojtwO2nBOV8U+sgziWfPrg==}
     engines: {node: '>=18'}
 
   open@10.1.0:
@@ -19205,7 +19205,7 @@ snapshots:
     dependencies:
       mimic-fn: 4.0.0
 
-  open-editor@5.0.0:
+  open-editor@5.1.0:
     dependencies:
       env-editor: 1.1.0
       execa: 9.5.2

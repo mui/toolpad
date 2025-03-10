@@ -61,7 +61,7 @@ export const peopleDataSource = {
       type: 'number',
     },
   ],
-  getMany: async ({ paginationModel, filterModel, sortModel }) => {
+  getMany: ({ paginationModel, filterModel, sortModel }) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         let processedPeople = [...people];

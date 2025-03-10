@@ -17,6 +17,8 @@
     "import { Crud } from '@toolpad/core';"
   ],
   "classes": [],
+  "spread": true,
+  "themeDefaultProps": null,
   "muiName": "Crud",
   "filename": "/packages/toolpad-core/src/Crud/Crud.tsx",
   "inheritance": null,

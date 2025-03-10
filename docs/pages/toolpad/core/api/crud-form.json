@@ -24,7 +24,7 @@
   "slots": [
     {
       "name": "textField",
-      "description": "The TextField component used in the form.",
+      "description": "The text field component used in the form.",
       "default": "TextField",
       "class": null
     }

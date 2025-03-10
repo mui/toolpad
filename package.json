@@ -56,7 +56,7 @@
     "@mui/internal-docs-utils": "1.0.16",
     "@mui/internal-markdown": "1.0.25",
     "@mui/internal-scripts": "1.0.33",
-    "@mui/monorepo": "github:mui/material-ui#04f9116e16948bf8f8343d04108dd4ebad035ddc",
+    "@mui/monorepo": "github:mui/material-ui#7087c35e317a534d0ef0555307664192489e9c99",
     "@mui/x-charts": "7.27.1",
     "@next/eslint-plugin-next": "14.2.24",
     "@playwright/test": "1.47.2",
@@ -67,10 +67,10 @@
     "@types/fs-extra": "11.0.4",
     "@types/gtag.js": "0.0.20",
     "@types/invariant": "2.2.37",
-    "@types/node": "^20.17.19",
+    "@types/node": "^20.17.23",
     "@types/yargs": "17.0.33",
-    "@typescript-eslint/eslint-plugin": "^8.24.1",
-    "@typescript-eslint/parser": "^8.24.1",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
     "@vitest/coverage-v8": "2.1.9",
     "babel-plugin-react-remove-properties": "0.3.0",
     "babel-plugin-transform-react-remove-prop-types": "0.4.24",
@@ -90,7 +90,7 @@
     "eslint-plugin-mocha": "10.5.0",
     "eslint-plugin-react": "7.37.4",
     "eslint-plugin-react-compiler": "latest",
-    "eslint-plugin-react-hooks": "5.1.0",
+    "eslint-plugin-react-hooks": "5.2.0",
     "eslint-plugin-testing-library": "^6.5.0",
     "eslint-plugin-typescript-enum": "2.1.0",
     "execa": "9.5.2",
@@ -114,7 +114,7 @@
     "vitest-fail-on-console": "0.7.1"
   },
   "dependencies": {
-    "@types/lodash": "4.17.15",
+    "@types/lodash": "4.17.16",
     "@vitest/browser": "2.1.9",
     "archiver": "7.0.1",
     "cross-env": "7.0.3",
@@ -137,7 +137,7 @@
   },
   "resolutions": {
     "google-auth-library": "*",
-    "@types/node": "^20.17.19"
+    "@types/node": "^20.17.23"
   },
   "packageManager": "pnpm@9.12.3"
 }

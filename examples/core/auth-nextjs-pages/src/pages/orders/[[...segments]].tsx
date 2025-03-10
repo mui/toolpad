@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Crud } from '@toolpad/core/Crud';
-import { ordersDataSource, Order, ordersCache } from '../data/orders';
+import { ordersDataSource, Order, ordersCache } from '../../data/orders';
 
 export default function OrdersCrudPage() {
   return (

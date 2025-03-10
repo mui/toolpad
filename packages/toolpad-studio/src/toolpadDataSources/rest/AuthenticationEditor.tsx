@@ -109,7 +109,7 @@ export default function AuthenticationEditor({
 
   return (
     <Grid container spacing={1}>
-      <Grid size={{ xs: 4 }}>
+      <Grid item xs={4}>
         <TextField
           disabled={disabled}
           select
@@ -124,7 +124,7 @@ export default function AuthenticationEditor({
           <MenuItem value="apiKey">API key</MenuItem>
         </TextField>
       </Grid>
-      <Grid size={{ xs: 4 }}>
+      <Grid item xs={4}>
         {value ? (
           <AuthenticationDetailsEditor disabled={disabled} value={value} onChange={onChange} />
         ) : null}

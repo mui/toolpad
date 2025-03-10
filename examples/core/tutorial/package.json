@@ -12,9 +12,9 @@
     "react-dom": "^19.0.0",
     "next": "^15",
     "@toolpad/core": "^0.12.0",
-    "@mui/material": "^6",
-    "@mui/material-nextjs": "^6",
-    "@mui/icons-material": "^6",
+    "@mui/material": "^7.0.0-beta || ^7.0.0",
+    "@mui/material-nextjs": "^7.0.0-beta || ^7.0.0",
+    "@mui/icons-material": "^7.0.0-beta || ^7.0.0",
     "@emotion/react": "^11",
     "@emotion/styled": "^11"
   },

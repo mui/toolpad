@@ -8,7 +8,7 @@
     "start": "toolpad-studio start"
   },
   "dependencies": {
-    "@mui/material": "5.15.21",
+    "@mui/material": "^7.0.0-beta || ^7.0.0",
     "@toolpad/studio": "0.5.2",
     "@mui/x-data-grid": "7.8.0",
     "@tanstack/react-query": "5.49.2"

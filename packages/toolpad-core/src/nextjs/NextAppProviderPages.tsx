@@ -1,7 +1,7 @@
 import * as React from 'react';
-import NextLink from 'next/link';
+import NextLink from 'next/link.js';
 import { asArray } from '@toolpad/utils/collections';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/router.js';
 import { LinkProps } from '../shared/Link';
 import { AppProvider } from '../AppProvider';
 import type { AppProviderProps, Navigate, Router } from '../AppProvider';

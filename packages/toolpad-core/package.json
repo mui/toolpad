@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@mui/icons-material": "6.4.7",
-    "@mui/material": "6.4.7",
+    "@mui/material": "^7.0.0 || ^7.0.0-beta",
     "@mui/x-data-grid": "7.27.3",
     "@mui/x-data-grid-premium": "7.27.3",
     "@mui/x-data-grid-pro": "7.27.3",

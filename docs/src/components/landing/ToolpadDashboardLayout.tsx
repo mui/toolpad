@@ -11,7 +11,7 @@ import { AppProvider, type Navigation, type Router } from '@toolpad/core/AppProv
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import DemoSandbox from 'docs/src/modules/components/DemoSandbox';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import { styled } from '@mui/material/styles';
 import Frame from '../../modules/components/Frame';
 

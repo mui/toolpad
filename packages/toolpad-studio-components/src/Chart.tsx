@@ -13,7 +13,7 @@ import {
   ScatterSeriesType,
   ScaleName,
 } from '@mui/x-charts';
-import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer';
+import { ChartContainer } from '@mui/x-charts/ChartContainer';
 import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
 import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
 import { ChartsLegend } from '@mui/x-charts/ChartsLegend';
@@ -45,7 +45,7 @@ export interface ChartDataSeries<D = Record<string, string | number>> {
 
 export type ChartData = ChartDataSeries[];
 
-function hasOnlyNumbers(array: unknown[]): boolean {
+function hasOnlyNumbers(array: readonly unknown[]): boolean {
   return array.every((item) => typeof item === 'number');
 }
 
@@ -192,7 +192,7 @@ function Chart({ data = [], loading, error, sx }: ChartProps) {
         </div>
       ) : null}
       {isDataVisible ? (
-        <ResponsiveChartContainer
+        <ChartContainer
           series={chartSeries}
           xAxis={[
             {
@@ -201,18 +201,21 @@ function Chart({ data = [], loading, error, sx }: ChartProps) {
               scaleType: xScaleType,
               min: hasOnlyNumberXValues ? Math.min(...(xValues as number[])) : undefined,
               max: hasOnlyNumberXValues ? Math.max(...(xValues as number[])) : undefined,
+              position: 'bottom',
             },
           ]}
           yAxis={
             firstDataSeries
               ? chartSeries.map((dataSeries) => ({
-                  id: dataSeries?.yAxisKey || 'y',
+                  id: dataSeries?.yAxisId || 'y',
                   scaleType: 'linear',
+                  position: 'left',
                 }))
               : [
                   {
                     id: 'y',
                     scaleType: 'linear',
+                    position: 'left',
                   },
                 ]
           }
@@ -223,11 +226,10 @@ function Chart({ data = [], loading, error, sx }: ChartProps) {
             },
           }}
         >
-          <ChartsXAxis position="bottom" axisId="x" />
+          <ChartsXAxis axisId="x" />
           <ChartsYAxis
-            key={firstDataSeries?.yAxisKey || 'y'}
-            position="left"
-            axisId={firstDataSeries?.yAxisKey || 'y'}
+            key={firstDataSeries?.yAxisId || 'y'}
+            axisId={firstDataSeries?.yAxisId || 'y'}
           />
           {hasBarCharts ? <BarPlot /> : null}
           {hasAreaCharts ? <AreaPlot /> : null}
@@ -245,7 +247,7 @@ function Chart({ data = [], loading, error, sx }: ChartProps) {
               <ChartsAxisHighlight x={hasBarCharts ? 'band' : 'line'} />
             </React.Fragment>
           ) : null}
-        </ResponsiveChartContainer>
+        </ChartContainer>
       ) : null}
     </ChartRoot>
   );

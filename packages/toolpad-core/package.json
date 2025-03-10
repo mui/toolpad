@@ -76,8 +76,8 @@
     "vitest": "2.1.9"
   },
   "peerDependencies": {
-    "@mui/icons-material": "^5.16.6 || ^6.4.0 || ^7.0.0-alpha",
-    "@mui/material": "^5.16.6 || ^6.4.0 || ^7.0.0-alpha",
+    "@mui/icons-material": "^7.0.0-beta || ^7.0.0",
+    "@mui/material": "^7.0.0-beta || ^7.0.0",
     "@mui/x-data-grid": "^7",
     "@mui/x-data-grid-premium": "^7",
     "@mui/x-data-grid-pro": "^7",

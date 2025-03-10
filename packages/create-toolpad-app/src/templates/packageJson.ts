@@ -31,9 +31,9 @@ const packageJson: PackageJsonTemplate = (options) => {
     react: '^19',
     'react-dom': '^19',
     '@toolpad/core': coreVersion ?? 'latest',
-    '@mui/material': '^6',
-    '@mui/material-nextjs': '^6',
-    '@mui/icons-material': '^6',
+    '@mui/material': '^7.0.0-beta || ^7.0.0',
+    '@mui/material-nextjs': '^7.0.0-beta || ^7.0.0',
+    '@mui/icons-material': '^7.0.0-beta || ^7.0.0',
     '@emotion/react': '^11',
     '@emotion/styled': '^11',
   };

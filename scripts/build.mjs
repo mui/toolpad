@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { promisify } from 'util';
 import yargs from 'yargs';
-import { cjsCopy } from '@mui/monorepo/scripts/copyFilesUtils.mjs';
 import { getWorkspaceRoot } from './utils.mjs';
+import glob from 'fast-glob';
 
 const exec = promisify(childProcess.exec);
 
@@ -16,7 +16,7 @@ const validBundles = [
 ];
 
 async function run(argv) {
-  const { bundle, largeFiles, outDir: outDirBase, watch, verbose } = argv;
+  const { bundle, largeFiles, outDir: relativeOutDir, watch, verbose } = argv;
 
   if (validBundles.indexOf(bundle) === -1) {
     throw new TypeError(
@@ -42,13 +42,28 @@ async function run(argv) {
 
   const outFileExtension = '.js';
 
-  const relativeOutDir = {
-    node: './',
-    modern: './modern',
-    stable: './esm',
-  }[bundle];
+  const topLevelNonIndexFiles = glob
+    .sync(`*{${extensions.join(',')}}`, { cwd: srcDir, ignore })
+    .filter((file) => {
+      return path.basename(file, path.extname(file)) !== 'index';
+    });
+  const topLevelPathImportsCanBePackages = topLevelNonIndexFiles.length === 0;
 
-  const outDir = path.resolve(outDirBase, relativeOutDir);
+  const outDir = path.resolve(
+    relativeOutDir,
+    // We generally support top level path imports e.g.
+    // 1. `import ArrowDownIcon from '@mui/icons-material/ArrowDown'`.
+    // 2. `import Typography from '@mui/material/Typography'`.
+    // The first case resolves to a file while the second case resolves to a package first i.e. a package.json
+    // This means that only in the second case the bundler can decide whether it uses ES modules or CommonJS modules.
+    // Different extensions are not viable yet since they require additional bundler config for users and additional transpilation steps in our repo.
+    // Switch to `exports` field in v6.
+    {
+      node: topLevelPathImportsCanBePackages ? './node' : './',
+      modern: './modern',
+      stable: topLevelPathImportsCanBePackages ? './' : './esm',
+    }[bundle],
+  );
 
   const env = {
     NODE_ENV: 'production',
@@ -72,10 +87,6 @@ async function run(argv) {
     ...(watch ? ['--watch'] : []),
   ];
 
-  if (outFileExtension !== '.js') {
-    babelArgs.push('--out-file-extension', outFileExtension);
-  }
-
   if (largeFiles) {
     babelArgs.push('--compact false');
   }
@@ -90,20 +101,6 @@ async function run(argv) {
   const { stderr, stdout } = await exec(command, { env: { ...process.env, ...env } });
   if (stderr) {
     throw new Error(`'${command}' failed with \n${stderr}`);
-  }
-
-  // cjs for reexporting from commons only modules.
-  // If we need to rely more on this we can think about setting up a separate commonjs => commonjs build for .cjs files to .cjs
-  // `--extensions-.cjs --out-file-extension .cjs`
-  await cjsCopy({ from: srcDir, to: outDir });
-
-  const isEsm = bundle === 'modern' || bundle === 'stable';
-  if (isEsm) {
-    const rootBundlePackageJson = path.join(outDir, 'package.json');
-    await fs.writeFile(
-      rootBundlePackageJson,
-      JSON.stringify({ type: 'module', sideEffects: false }),
-    );
   }
 
   if (verbose) {

@@ -1,10 +1,16 @@
 /* eslint-disable no-console */
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { createPackageFile, includeFileInBuild } from '@mui/monorepo/scripts/copyFilesUtils.mjs';
+import {
+  includeFileInBuild,
+  createModulePackages,
+  typescriptCopy,
+  createPackageFile,
+} from '@mui/monorepo/scripts/copyFilesUtils.mjs';
 
 const packagePath = process.cwd();
 const buildPath = path.join(packagePath, './build');
+const srcPath = path.join(packagePath, './src');
 
 async function prepend(file, string) {
   const data = await fs.readFile(file, 'utf8');
@@ -44,7 +50,7 @@ async function addLicense(packageData) {
 async function run() {
   const extraFiles = process.argv.slice(2);
   try {
-    const packageData = await createPackageFile(true);
+    const packageData = await createPackageFile();
 
     await Promise.all(
       ['./README.md', '../../CHANGELOG.md', '../../LICENSE', ...extraFiles].map((file) =>
@@ -53,6 +59,11 @@ async function run() {
     );
 
     await addLicense(packageData);
+
+    // TypeScript
+    await typescriptCopy({ from: srcPath, to: buildPath });
+
+    await createModulePackages({ from: srcPath, to: buildPath });
   } catch (err) {
     console.error(err);
     process.exit(1);

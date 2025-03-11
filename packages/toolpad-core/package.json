@@ -34,7 +34,7 @@
     "build:node": "node ../../scripts/build.mjs node",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
-    "build:types": "tsx ../../scripts/buildTypes.mts",
+    "build:types": "node ../../scripts/buildTypes.mjs",
     "predev": "pnpm clean",
     "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch\" \"pnpm build:copy-files\"",
     "check-types": "pnpm build:stable && pnpm build:types && tsc --noEmit",
@@ -76,8 +76,8 @@
     "vitest": "2.1.9"
   },
   "peerDependencies": {
-    "@mui/icons-material": "^7.0.0-beta || ^7.0.0",
-    "@mui/material": "^7.0.0-beta || ^7.0.0",
+    "@mui/icons-material": "^6.4.0 || ^7.0.0 || ^7.0.0-beta",
+    "@mui/material": "^6.4.0 || ^7.0.0 || ^7.0.0-beta",
     "@mui/x-data-grid": "^7",
     "@mui/x-data-grid-premium": "^7",
     "@mui/x-data-grid-pro": "^7",

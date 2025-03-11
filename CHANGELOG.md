@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.13.0
+
+<!-- generated comparing v0.12.1..master -->
+
+_Mar 11, 2025_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add new [Crud](https://next.mui.com/toolpad/core/react-crud/) component: this new component provides UIs to interact with data from any data source (create, read, update and delete), with minimal configuration from a single data source definition. Try it out and let us know if you find any issues!
+
+### `@toolpad/core`
+
+- Add CRUD component (#4486) @apedroferreira
+- Adjust CRUD types and documentation (#4751) @apedroferreira
+- Add "new" label to CRUD item (#4750) @apedroferreira
+
+### Core
+
+- Revert ESM update for toolpad-core (#4745) @Janpot
+- Remove email as a way to get support (#4716) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @oliviertassinari
+
 ## v0.12.1
 
 <!-- generated comparing v0.12.0..master -->

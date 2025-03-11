@@ -48,9 +48,11 @@ async function addLicense(packageData) {
 }
 
 async function run() {
-  const extraFiles = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const extraFiles = args.filter((arg) => !arg.startsWith('--'));
+  const useExports = args.includes('--use-exports');
   try {
-    const packageData = await createPackageFile();
+    const packageData = await createPackageFile(useExports);
 
     await Promise.all(
       ['./README.md', '../../CHANGELOG.md', '../../LICENSE', ...extraFiles].map((file) =>
@@ -60,10 +62,12 @@ async function run() {
 
     await addLicense(packageData);
 
-    // TypeScript
-    await typescriptCopy({ from: srcPath, to: buildPath });
+    if (!useExports) {
+      // TypeScript
+      await typescriptCopy({ from: srcPath, to: buildPath });
 
-    await createModulePackages({ from: srcPath, to: buildPath });
+      await createModulePackages({ from: srcPath, to: buildPath });
+    }
   } catch (err) {
     console.error(err);
     process.exit(1);

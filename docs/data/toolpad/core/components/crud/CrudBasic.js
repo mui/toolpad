@@ -44,7 +44,7 @@ export const notesDataSource = {
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'text', headerName: 'Text', flex: 1 },
   ],
-  getMany: async ({ paginationModel, filterModel, sortModel }) => {
+  getMany: ({ paginationModel, filterModel, sortModel }) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         let processedNotes = [...notesStore];

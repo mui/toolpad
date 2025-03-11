@@ -64,7 +64,7 @@ const ordersDataSource: DataSource<Order> = {
   fields: [
     { field: 'id', headerName: 'ID' },
     { field: 'title', headerName: 'Title' },
-    { field: 'description', headerName: 'Description', type: 'longString' },
+    { field: 'description', headerName: 'Description' },
     {
       field: 'status',
       headerName: 'Status',
@@ -133,19 +133,25 @@ const ordersDataSource: DataSource<Order> = {
     ordersStore = ordersStore.filter((order) => order.id !== Number(orderId));
   },
   validate: (formValues) => {
-    const errors: Record<keyof Order, string> = {};
+    let issues: { message: string; path: [keyof Order] }[] = [];
 
     if (!formValues.title) {
-      errors.title = 'Title is required';
+      issues = [...issues, { message: 'Title is required', path: ['title'] }];
     }
     if (formValues.title && formValues.title.length < 3) {
-      errors.title = 'Title must be at least 3 characters long';
+      issues = [
+        ...issues,
+        {
+          message: 'Title must be at least 3 characters long',
+          path: ['title'],
+        },
+      ];
     }
     if (!formValues.description) {
-      errors.description = 'Description is required';
+      issues = [...issues, { message: 'Description is required', path: ['description'] }];
     }
 
-    return errors;
+    return { issues };
   },
 };
 

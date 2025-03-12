@@ -6,6 +6,9 @@ pnpm-lock.yaml
 /packages/**/dist
 /packages/toolpad-studio/.next
 /packages/toolpad-studio/public
+/packages/toolpad-studio/
+/packages/toolpad-studio-runtime/
+/packages/toolpad-studio-components/
 
 build
 dist

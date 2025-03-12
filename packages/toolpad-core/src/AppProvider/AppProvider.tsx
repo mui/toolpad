@@ -97,7 +97,7 @@ export interface AppProviderProps {
    */
   branding?: Branding | null;
   /**
-   * Navigation definition for the app.
+   * Navigation definition for the app. [Find out more](https://mui.com/toolpad/core/react-app-provider/#navigation).
    * @default []
    */
   navigation?: Navigation;
@@ -217,7 +217,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
    */
   localeText: PropTypes.object,
   /**
-   * Navigation definition for the app.
+   * Navigation definition for the app. [Find out more](https://mui.com/toolpad/core/react-app-provider/#navigation).
    * @default []
    */
   navigation: PropTypes.arrayOf(

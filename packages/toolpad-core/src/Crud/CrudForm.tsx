@@ -34,7 +34,7 @@ export interface CrudFormSlotProps {
 
 export interface CrudFormSlots {
   /**
-   * The TextField component used in the form.
+   * The text field component used in the form.
    * @default TextField
    */
   textField?: React.JSXElementConstructor<TextFieldProps>;

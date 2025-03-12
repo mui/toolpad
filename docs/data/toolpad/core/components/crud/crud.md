@@ -53,7 +53,7 @@ const notesDataSource: DataSource<Note> = {
     { field: 'title', headerName: 'Title' },
     { field: 'text', headerName: 'Text' },
   ],
-  getMany: async ({ paginationModel }) => {
+  getMany: ({ paginationModel }) => {
     const start = paginationModel.page * paginationModel.pageSize;
     const end = start + paginationModel.pageSize;
     const paginatedNotes = notesStore.slice(start, end);
@@ -142,7 +142,7 @@ This method must return an object corresponding to the item to be displayed.
 ```tsx
 {
   //...
-  getOne: (id) => {
+  getOne: async (id) => {
     // Fetch record from server
     const record = await fetch(`https://my-api.com/data/${id}`, {
       method: 'GET',
@@ -163,7 +163,7 @@ This method must return an object corresponding to the new item that has been cr
 ```tsx
 {
   //...
-  createOne: (data) => {
+  createOne: async (data) => {
     // Create record in the server
     const record = await fetch('https://my-api.com/data', {
       method: 'POST',
@@ -185,7 +185,7 @@ This method must return an object corresponding to the new item that has been up
 ```tsx
 {
   //...
-  updateOne: (id, data) => {
+  updateOne: async (id, data) => {
     // Update record in the server
     const record = await fetch(`https://my-api.com/data/${id}`, {
       method: 'PUT',
@@ -207,7 +207,7 @@ This method does not need to return anything.
 ```tsx
 {
   //...
-  deleteOne: (id) => {
+  deleteOne: async (id) => {
     // Delete record in the server
     await fetch(`https://my-api.com/data/${id}`, {
       method: 'DELETE',

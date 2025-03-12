@@ -56,7 +56,7 @@
     "@mui/internal-docs-utils": "1.0.16",
     "@mui/internal-markdown": "1.0.25",
     "@mui/internal-scripts": "1.0.33",
-    "@mui/monorepo": "github:mui/material-ui#7087c35e317a534d0ef0555307664192489e9c99",
+    "@mui/monorepo": "github:mui/material-ui#5b215468a033289bfd3133f07421d5a57e568f9a",
     "@mui/x-charts": "7.27.1",
     "@next/eslint-plugin-next": "14.2.24",
     "@playwright/test": "1.47.2",
@@ -67,7 +67,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/gtag.js": "0.0.20",
     "@types/invariant": "2.2.37",
-    "@types/node": "^20.17.23",
+    "@types/node": "^20.17.24",
     "@types/yargs": "17.0.33",
     "@typescript-eslint/eslint-plugin": "^8.26.0",
     "@typescript-eslint/parser": "^8.26.0",
@@ -99,16 +99,16 @@
     "fs-extra": "11.3.0",
     "globby": "14.1.0",
     "jsdom": "25.0.1",
-    "lerna": "8.2.0",
+    "lerna": "8.2.1",
     "markdownlint-cli2": "0.17.2",
-    "prettier": "3.5.2",
-    "pretty-quick": "4.0.0",
+    "prettier": "3.5.3",
+    "pretty-quick": "4.1.1",
     "react-docgen": "5.4.3",
     "react-inspector": "6.0.2",
     "regenerator-runtime": "0.14.1",
     "remark": "15.0.1",
     "rimraf": "6.0.1",
-    "typescript": "5.7.3",
+    "typescript": "5.8.2",
     "unist-util-visit": "5.0.0",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.7.1"
@@ -137,7 +137,7 @@
   },
   "resolutions": {
     "google-auth-library": "*",
-    "@types/node": "^20.17.23"
+    "@types/node": "^20.17.24"
   },
   "packageManager": "pnpm@9.12.3"
 }

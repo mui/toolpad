@@ -1,6 +1,6 @@
 {
   "name": "docs",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "private": true,
   "author": "MUI Toolpad",
   "license": "MIT",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@babel/plugin-transform-object-assign": "7.25.9",
-    "@babel/runtime-corejs2": "7.26.9",
+    "@babel/runtime-corejs2": "7.26.10",
     "@date-io/date-fns-jalali": "3.2.0",
     "@docsearch/react": "3.9.0",
     "@emotion/cache": "11.14.0",
@@ -70,7 +70,7 @@
     "next": "^15.2.1",
     "nprogress": "0.2.0",
     "postcss": "8.4.49",
-    "prismjs": "1.29.0",
+    "prismjs": "1.30.0",
     "prop-types": "15.8.1",
     "react": "^19.0.0",
     "react-docgen": "5.4.3",
@@ -104,7 +104,7 @@
     "@types/react-swipeable-views": "^0.13.6",
     "cpy-cli": "5.0.0",
     "cross-fetch": "4.1.0",
-    "typescript": "5.7.3",
+    "typescript": "5.8.2",
     "typescript-to-proptypes": "2.2.1"
   }
 }

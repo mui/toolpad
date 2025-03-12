@@ -1,6 +1,6 @@
 {
   "name": "playground-nextjs",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,7 +13,7 @@
     "@mui/material": "6.4.7",
     "@mui/material-nextjs": "6.4.3",
     "@toolpad/core": "workspace:*",
-    "@types/node": "^20.17.23",
+    "@types/node": "^20.17.24",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "cookies-next": "^5.1.0",

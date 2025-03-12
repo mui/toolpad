@@ -6,7 +6,7 @@
     "declaration": true,
     "noEmit": false,
     "emitDeclarationOnly": true,
-    "outDir": "build/esm"
+    "outDir": "build"
   },
   "exclude": ["src/**/*.spec.ts*", "src/**/*.test.ts*"]
 }

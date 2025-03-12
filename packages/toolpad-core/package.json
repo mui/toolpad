@@ -5,9 +5,6 @@
   "description": "Dashboard framework powered by MUI.",
   "main": "./node/index.js",
   "module": "./index.js",
-  "exports": {
-    "./package.json": "./package.json"
-  },
   "keywords": [
     "react",
     "mui",
@@ -34,7 +31,7 @@
     "build:node": "node ../../scripts/build.mjs node",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
-    "build:types": "tsx ../../scripts/buildTypes.mts",
+    "build:types": "node ../../scripts/buildTypes.mjs",
     "predev": "pnpm clean",
     "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch\" \"pnpm build:copy-files\"",
     "check-types": "pnpm build:stable && pnpm build:types && tsc --noEmit",

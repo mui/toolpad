@@ -1,5 +1,5 @@
 diff --git a/esm/runtime/sender.js b/esm/runtime/sender.js
-index 2f72a4bc29ab17e426ee303264543ec626d99e29..302743847f782ae7a3f4dd8bd5134f80264a6fb9 100644
+index 2f72a4bc29ab17e426ee303264543ec626d99e29..0a3920c77a824403a5ab23ebf488123f447fe917 100644
 --- a/esm/runtime/sender.js
 +++ b/esm/runtime/sender.js
 @@ -1,7 +1,7 @@
@@ -7,12 +7,12 @@ index 2f72a4bc29ab17e426ee303264543ec626d99e29..302743847f782ae7a3f4dd8bd5134f80
  import { getTelemetryEnvConfigValue } from "./config.js";
  import { fetchWithRetry } from "./fetcher.js";
 -import packageJson from "../../package.json";
-+import packageJson from "@mui/x-telemetry/package.json";
++import packageJson from "@mui/x-telemetry/package.json" with { type: "json" };
  function shouldSendTelemetry(telemetryContext) {
    // Priority to the config (e.g. in code, env)
    const envIsCollecting = getTelemetryEnvConfigValue('IS_COLLECTING');
 diff --git a/modern/runtime/sender.js b/modern/runtime/sender.js
-index 2f72a4bc29ab17e426ee303264543ec626d99e29..302743847f782ae7a3f4dd8bd5134f80264a6fb9 100644
+index 2f72a4bc29ab17e426ee303264543ec626d99e29..0a3920c77a824403a5ab23ebf488123f447fe917 100644
 --- a/modern/runtime/sender.js
 +++ b/modern/runtime/sender.js
 @@ -1,7 +1,7 @@
@@ -20,7 +20,7 @@ index 2f72a4bc29ab17e426ee303264543ec626d99e29..302743847f782ae7a3f4dd8bd5134f80
  import { getTelemetryEnvConfigValue } from "./config.js";
  import { fetchWithRetry } from "./fetcher.js";
 -import packageJson from "../../package.json";
-+import packageJson from "@mui/x-telemetry/package.json";
++import packageJson from "@mui/x-telemetry/package.json" with { type: "json" };
  function shouldSendTelemetry(telemetryContext) {
    // Priority to the config (e.g. in code, env)
    const envIsCollecting = getTelemetryEnvConfigValue('IS_COLLECTING');

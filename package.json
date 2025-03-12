@@ -146,7 +146,14 @@
   "packageManager": "pnpm@9.12.3",
   "pnpm": {
     "patchedDependencies": {
-      "@mui/x-telemetry": "patches/@mui__x-telemetry.patch"
+      "@mui/x-telemetry": "patches/@mui__x-telemetry.patch",
+      "jss-plugin-rule-value-function": "patches/jss-plugin-rule-value-function.patch",
+      "jss-plugin-global": "patches/jss-plugin-global.patch",
+      "jss-plugin-nested": "patches/jss-plugin-nested.patch",
+      "jss-plugin-camel-case": "patches/jss-plugin-camel-case.patch",
+      "jss-plugin-default-unit": "patches/jss-plugin-default-unit.patch",
+      "jss-plugin-vendor-prefixer": "patches/jss-plugin-vendor-prefixer.patch",
+      "jss-plugin-props-sort": "patches/jss-plugin-props-sort.patch"
     }
   }
 }

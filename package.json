@@ -56,7 +56,7 @@
     "@mui/internal-docs-utils": "1.0.16",
     "@mui/internal-markdown": "1.0.25",
     "@mui/internal-scripts": "1.0.33",
-    "@mui/monorepo": "github:mui/material-ui#5b215468a033289bfd3133f07421d5a57e568f9a",
+    "@mui/monorepo": "github:mui/material-ui#ee94ae89a4ff50a54f768677ee259722b94f0bd8",
     "@mui/x-charts": "^8.0.0 || ^8.0.0-beta || ^8.0.0-alpha",
     "@next/eslint-plugin-next": "14.2.24",
     "@playwright/test": "1.47.2",
@@ -137,7 +137,16 @@
   },
   "resolutions": {
     "google-auth-library": "*",
-    "@types/node": "^20.17.24"
+    "@types/node": "^20.17.24",
+    "@mui/x-telemetry>@mui/utils": "^7.0.0 || ^7.0.0-beta",
+    "@mui/lab>@mui/utils": "^7.0.0 || ^7.0.0-beta",
+    "@mui/lab>@mui/system": "^7.0.0 || ^7.0.0-beta",
+    "@mui/base>@mui/utils": "^7.0.0 || ^7.0.0-beta"
   },
-  "packageManager": "pnpm@9.12.3"
+  "packageManager": "pnpm@9.12.3",
+  "pnpm": {
+    "patchedDependencies": {
+      "@mui/x-telemetry": "patches/@mui__x-telemetry.patch"
+    }
+  }
 }

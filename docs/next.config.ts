@@ -35,6 +35,9 @@ export default withDocsInfra({
     // Fix trailingSlash support https://github.com/mui/toolpad/pull/3301#issuecomment-2054213837
     // Migrate everything from @mui/monorepo to @mui/docs
     '@mui/docs',
+    '@mui/utils',
+    '@mui/system',
+    '@emotion/styled',
   ],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',

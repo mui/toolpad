@@ -23,7 +23,6 @@ import {
   GridSortModel,
   GridNoRowsOverlay,
   GridRowModes,
-  GridApiPro,
   GridRowModesModel,
   GridRowModel,
   GridToolbarContainer,
@@ -39,6 +38,7 @@ import {
   GridToolbarProps,
   GridColType,
   GridPinnedColumnFields,
+  GridApi,
 } from '@mui/x-data-grid-premium';
 import {
   Unstable_LicenseInfoProvider as LicenseInfoProvider,
@@ -662,7 +662,7 @@ interface DataProviderDataGridProps extends Partial<DataGridPremiumProps> {
 function useDataProviderDataGridProps(
   dataProviderId: string | null | undefined,
   idField: string,
-  apiRef: React.MutableRefObject<GridApiPro>,
+  apiRef: React.RefObject<GridApi | null>,
   setActionResult: (result: ActionResult) => void,
 ): DataProviderDataGridProps {
   const useDataProvider = useNonNullableContext(UseDataProviderContext);
@@ -1008,7 +1008,7 @@ function useDataProviderDataGridProps(
             ...oldModel,
             [draftRowId]: { mode: GridRowModes.Edit, fieldToFocus },
           }));
-          apiRef.current.scrollToIndexes({ rowIndex: 0, colIndex });
+          apiRef.current?.scrollToIndexes({ rowIndex: 0, colIndex });
         },
       } satisfies EditToolbarProps as GridToolbarProps,
     },
@@ -1032,10 +1032,11 @@ function NoRowsOverlay(props: NoRowsOverlayPropsX) {
 interface ActionResultOverlayProps {
   result: ActionResult | null;
   onClose: () => void;
-  apiRef: React.MutableRefObject<GridApiPro>;
+  apiRef: React.RefObject<GridApi | null>;
 }
 
 function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayProps) {
+  invariant(apiRef.current, 'apiRef must be defined');
   const open = !!result;
   const actionError = result?.error;
 
@@ -1066,6 +1067,7 @@ function ActionResultOverlay({ result, onClose, apiRef }: ActionResultOverlayPro
                 color="inherit"
                 onClick={(event) => {
                   event.preventDefault();
+                  invariant(apiRef.current, 'apiRef must be defined');
                   apiRef.current.scrollToIndexes({ rowIndex: index, colIndex: 0 });
                   apiRef.current.setCellFocus(lastResult.id, fieldToFocus);
                 }}
@@ -1241,14 +1243,17 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   const onSelectionModelChange = React.useCallback(
-    (ids: GridRowSelectionModel) => {
-      onSelectionChange?.(ids.length > 0 ? rows.find((row) => row.id === ids[0]) : null);
+    (model: GridRowSelectionModel) => {
+      onSelectionChange?.(model.ids.size > 0 ? rows.find((row) => model.ids.has(row.id)) : null);
     },
     [rows, onSelectionChange],
   );
 
-  const selectionModel = React.useMemo(
-    () => (selection?.id ? [selection.id] : []),
+  const selectionModel = React.useMemo<GridRowSelectionModel>(
+    () =>
+      selection?.id
+        ? { type: 'include', ids: new Set([selection.id]) }
+        : { type: 'include', ids: new Set() },
     [selection?.id],
   );
 
@@ -1258,7 +1263,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
   );
 
   React.useEffect(() => {
-    apiRef.current.updateColumns(columns);
+    apiRef.current?.updateColumns(columns);
   }, [apiRef, columns]);
 
   // The grid doesn't update when the getRowId property changes, so it needs to be remounted
@@ -1326,7 +1331,7 @@ const DataGridComponent = React.forwardRef(function DataGridComponent(
                 ...dataProviderSlots,
                 loadingOverlay: SkeletonLoadingOverlay,
                 noRowsOverlay: NoRowsOverlay,
-                toolbar: hideToolbar ? null : dataProviderSlots?.toolbar,
+                toolbar: hideToolbar ? undefined : dataProviderSlots?.toolbar,
               }}
               slotProps={{
                 noRowsOverlay: {

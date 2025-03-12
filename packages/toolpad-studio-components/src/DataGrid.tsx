@@ -23,7 +23,6 @@ import {
   GridSortModel,
   GridNoRowsOverlay,
   GridRowModes,
-  GridApiPro,
   GridRowModesModel,
   GridRowModel,
   GridToolbarContainer,

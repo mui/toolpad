@@ -11214,7 +11214,7 @@ snapshots:
       '@babel/runtime': 7.26.10
       '@floating-ui/react-dom': 2.1.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@mui/types': 7.2.21(@types/react@19.0.10)
-      '@mui/utils': 7.0.0-beta.3(@types/react@19.0.10)(react@19.0.0)
+      '@mui/utils': 6.4.6(@types/react@19.0.10)(react@19.0.0)
       '@popperjs/core': 2.11.8
       clsx: 2.1.1
       prop-types: 15.8.1

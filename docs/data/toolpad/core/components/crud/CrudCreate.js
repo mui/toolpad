@@ -60,16 +60,17 @@ export const peopleDataSource = {
       type: 'number',
     },
   ],
-  createOne: (data) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newPerson = { id: people.length + 1, ...data };
-
-        people = [...people, newPerson];
-
-        resolve(newPerson);
-      }, 750);
+  createOne: async (data) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    const newPerson = { id: people.length + 1, ...data };
+
+    people = [...people, newPerson];
+
+    return newPerson;
   },
   validate: (formValues) => {
     let issues = [];

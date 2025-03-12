@@ -1,5 +1,7 @@
 packages:
-  - 'packages/*'
+  - 'packages/create-toolpad-app'
+  - 'packages/toolpad-core'
+  - 'packages/toolpad-utils'
+  - 'packages/eslint-plugin-material-ui'
   - 'playground/*'
   - 'docs'
-  - 'test'

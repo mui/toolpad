@@ -205,7 +205,7 @@ function DashboardSidebarSubNavigation({
           };
         }
 
-        // Show as selected in mini sidebar if any of the children matches path, otherwise show as selected if item is matches path
+        // Show as selected in mini sidebar if any of the children matches path, otherwise show as selected if item matches path
         const isSelected =
           activePage && navigationItem.children && isMini
             ? hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path)
@@ -329,7 +329,7 @@ function DashboardSidebarSubNavigation({
                     sx={{
                       pt: 0.5,
                       pb: 0.5,
-                      transform: (theme) => `translateY(calc(50% - ${theme.spacing(4)}))`,
+                      transform: 'translateY(calc(50% - 30px))',
                     }}
                   >
                     <DashboardSidebarSubNavigation

@@ -16,48 +16,6 @@ export const getItemTitle = (item: NavigationPageItem | NavigationSubheaderItem)
   return isPageItem(item) ? (item.title ?? item.segment ?? '') : item.title;
 };
 
-export function getPageItemFullPath(basePath: string, navigationItem: NavigationPageItem) {
-  return `${basePath}${basePath && !navigationItem.segment ? '' : '/'}${navigationItem.segment ?? ''}`;
-}
-
-export function isPageItemSelected(
-  navigationItem: NavigationPageItem,
-  basePath: string,
-  pathname: string,
-) {
-  return navigationItem.pattern
-    ? pathToRegexp(`${basePath}/${navigationItem.pattern}`).test(pathname)
-    : getPageItemFullPath(basePath, navigationItem) === pathname;
-}
-
-export function hasSelectedNavigationChildren(
-  navigationItem: NavigationItem,
-  basePath: string,
-  pathname: string,
-): boolean {
-  if (isPageItem(navigationItem) && navigationItem.children) {
-    const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
-
-    return navigationItem.children.some((nestedNavigationItem) => {
-      if (!isPageItem(nestedNavigationItem)) {
-        return false;
-      }
-
-      if (nestedNavigationItem.children) {
-        return hasSelectedNavigationChildren(
-          nestedNavigationItem,
-          navigationItemFullPath,
-          pathname,
-        );
-      }
-
-      return isPageItemSelected(nestedNavigationItem, navigationItemFullPath, pathname);
-    });
-  }
-
-  return false;
-}
-
 /**
  * Builds a map of navigation page items to their respective paths. This map is used to quickly
  * lookup the path of a navigation item. It will be cached for the lifetime of the navigation.
@@ -67,7 +25,10 @@ function buildItemToPathMap(navigation: Navigation): Map<NavigationPageItem, str
 
   const visit = (item: NavigationItem, base: string) => {
     if (isPageItem(item)) {
-      const path = `${base}${item.segment ? `/${item.segment}` : ''}` || '/';
+      // Append segment to base path. Make sure to always have an initial slash, and slashes between segments.
+      const path =
+        `${base.startsWith('/') ? base : `/${base}`}${base && base !== '/' && item.segment ? '/' : ''}${item.segment || ''}` ||
+        '/';
       map.set(item, path);
       if (item.children) {
         for (const child of item.children) {
@@ -110,6 +71,7 @@ function buildItemLookup(navigation: Navigation) {
       if (map.has(path)) {
         console.warn(`Duplicate path in navigation: ${path}`);
       }
+
       map.set(path, item);
       if (item.pattern) {
         const basePath = item.segment ? path.slice(0, -item.segment.length) : path;
@@ -164,4 +126,29 @@ export function getItemPath(navigation: Navigation, item: NavigationPageItem): s
   const path = map.get(item);
   invariant(path, `Item not found in navigation: ${item.title}`);
   return path;
+}
+
+/**
+ * Checks if a specific navigation page item has the active page as a child item.
+ */
+export function hasSelectedNavigationChildren(
+  navigation: Navigation,
+  item: NavigationPageItem,
+  activePagePath: string,
+): boolean {
+  if (item.children) {
+    return item.children.some((nestedItem) => {
+      if (!isPageItem(nestedItem)) {
+        return false;
+      }
+
+      if (nestedItem.children) {
+        return hasSelectedNavigationChildren(navigation, nestedItem, activePagePath);
+      }
+
+      return activePagePath === getItemPath(navigation, nestedItem);
+    });
+  }
+
+  return false;
 }

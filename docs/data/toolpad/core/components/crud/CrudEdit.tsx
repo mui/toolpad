@@ -67,39 +67,39 @@ export const peopleDataSource: DataSource<Person> &
       type: 'number',
     },
   ],
-  getOne: (personId) => {
-    return new Promise<Person>((resolve, reject) => {
-      setTimeout(() => {
-        const personToShow = people.find((person) => person.id === Number(personId));
-
-        if (personToShow) {
-          resolve(personToShow);
-        } else {
-          reject(new Error('Person not found'));
-        }
-      }, 750);
+  getOne: async (personId) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    const personToShow = people.find((person) => person.id === Number(personId));
+
+    if (!personToShow) {
+      throw new Error('Person not found');
+    }
+    return personToShow;
   },
-  updateOne: (personId, data) => {
-    return new Promise<Person>((resolve, reject) => {
-      setTimeout(() => {
-        let updatedPerson: Person | null = null;
-
-        people = people.map((person) => {
-          if (person.id === Number(personId)) {
-            updatedPerson = { ...person, ...data };
-            return updatedPerson;
-          }
-          return person;
-        });
-
-        if (updatedPerson) {
-          resolve(updatedPerson);
-        } else {
-          reject(new Error('Note not found'));
-        }
-      }, 750);
+  updateOne: async (personId, data) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    let updatedPerson: Person | null = null;
+
+    people = people.map((person) => {
+      if (person.id === Number(personId)) {
+        updatedPerson = { ...person, ...data };
+        return updatedPerson;
+      }
+      return person;
+    });
+
+    if (!updatedPerson) {
+      throw new Error('Person not found');
+    }
+    return updatedPerson;
   },
   validate: (formValues) => {
     let issues: { message: string; path: [keyof Person] }[] = [];

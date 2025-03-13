@@ -76,7 +76,7 @@ export interface DashboardLayoutProps {
    */
   branding?: Branding | null;
   /**
-   * Navigation definition for the dashboard.
+   * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
    */
   navigation?: Navigation;
@@ -498,7 +498,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   hideNavigation: PropTypes.bool,
   /**
-   * Navigation definition for the dashboard.
+   * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
    */
   navigation: PropTypes.arrayOf(
@@ -553,11 +553,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
       mini: PropTypes.bool.isRequired,
     }),
     toolbarAccount: PropTypes.shape({
-      localeText: PropTypes.shape({
-        iconButtonAriaLabel: PropTypes.string,
-        signInLabel: PropTypes.string,
-        signOutLabel: PropTypes.string,
-      }),
+      localeText: PropTypes.object,
       slotProps: PropTypes.shape({
         popover: PropTypes.object,
         popoverContent: PropTypes.object,

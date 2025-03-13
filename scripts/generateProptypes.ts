@@ -55,10 +55,15 @@ async function generateProptypes(
     filePath: tsFile,
     project,
     shouldResolveObject: ({ name }) => {
+      const propsToNotResolve = ['localeText'];
+      if (propsToNotResolve.includes(name)) {
+        return false;
+      }
       if (
         name.toLowerCase().endsWith('classes') ||
         name === 'theme' ||
         name === 'ownerState' ||
+        name === 'dataSource' ||
         (name.endsWith('Props') && name !== 'componentsProps' && name !== 'slotProps')
       ) {
         return false;

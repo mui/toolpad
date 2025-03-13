@@ -23,7 +23,6 @@ import {
 import { errorFrom } from '@toolpad/utils/errors';
 import AddIcon from '@mui/icons-material/Add';
 import { useMutation } from '@tanstack/react-query';
-import { LoadingButton } from '@mui/lab';
 import { generateUniqueString } from '@toolpad/utils/strings';
 import { PaginationMode } from '@toolpad/studio-runtime';
 import { EditorProps } from '../../types';
@@ -182,13 +181,13 @@ function CreateNewDataProviderDialog({
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <LoadingButton
+          <Button
             type="submit"
             disabled={!newName || !!errorMessage}
             loading={createProviderMutation.isPending}
           >
             Create
-          </LoadingButton>
+          </Button>
         </DialogActions>
       </form>
     </Dialog>

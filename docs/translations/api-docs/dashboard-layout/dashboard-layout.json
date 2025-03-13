@@ -12,7 +12,9 @@
     "hideNavigation": {
       "description": "Whether the navigation bar and menu icon should be hidden."
     },
-    "navigation": { "description": "Navigation definition for the dashboard." },
+    "navigation": {
+      "description": "Navigation definition for the dashboard. <a href=\"https://mui.com/toolpad/core/react-dashboard-layout/#navigation\">Find out more</a>."
+    },
     "sidebarExpandedWidth": { "description": "Width of the sidebar when expanded." },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." },

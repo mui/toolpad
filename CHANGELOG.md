@@ -1,5 +1,76 @@
 # Changelog
 
+## v0.13.0
+
+<!-- generated comparing v0.12.1..master -->
+
+_Mar 11, 2025_
+
+A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
+
+Add new [Crud](https://next.mui.com/toolpad/core/react-crud/) component: this new component provides UIs to interact with data from any data source (create, read, update and delete), with minimal configuration from a single data source definition. Try it out and let us know if you find any issues!
+
+### `@toolpad/core`
+
+- Add CRUD component (#4486) @apedroferreira
+- Adjust CRUD types and documentation (#4751) @apedroferreira
+- Add "new" label to CRUD item (#4750) @apedroferreira
+
+### Core
+
+- Revert ESM update for toolpad-core (#4745) @Janpot
+- Remove email as a way to get support (#4716) @oliviertassinari
+
+All contributors of this release in alphabetical order: @apedroferreira, @Janpot, @oliviertassinari
+
+## v0.12.1
+
+<!-- generated comparing v0.12.0..master -->
+
+_Feb 28, 2025_
+
+A big thanks to the 10 contributors who made this release possible. Here are some highlights ✨:
+
+- Added form and OAuth button slot props for enhanced customization
+- Improved framework support with router-specific Link components
+- Added LocalizationProvider for better internationalization support
+- Updated package layout for ESM support
+
+### `@toolpad/core`
+
+- Fix dialogs close behavior (#4707) @Janpot
+- Add router-specific Link components (#4661) @bharatkashyap
+- Add LocalizationProvider support (#4620) @bharatkashyap
+- Fix Next.js Pages Router pathname in AppProvider (#4657) @apedroferreira
+- Add form and oauthButton slot props (#4674) @bharatkashyap
+- Link line-height to font-size in AppTitle (#4648) @gil-obradors
+- Remove React dependency from utils (#4605) @bharatkashyap
+
+### Docs
+
+- Add customization section to notifications (#4672) @Firgrep
+- Add Trending badge (#4670) @bharatkashyap
+- Add CLI install instructions (#4639) @bharatkashyap
+- Improve installation instructions (#4633) @bharatkashyap
+- Remove planned components (#4667) @prakhargupta1
+- Fix typos in documentation (#4666) @maximevtush
+- Fix redirection to GitHub example view (#4642) @oliviertassinari
+- Fix build errors with Next.js 14 (#4594) @bharatkashyap
+
+## CLI
+
+- Refactor CLI setup (#4597) @bharatkashyap
+- Fix package.json pretty print (#4644) @rkristelijn
+- Fix .gitignore formatting (#4622) @rkristelijn
+
+### Core
+
+- Update package layout for ESM (#4686) @Janpot
+- Fix semver mismatches (#4600) @Janpot
+- Use precise version in examples (#4606) @apedroferreira
+- Fix pnpm in Circle CI (#4656) @apedroferreira
+- Conditionally skip flaky tests (#4627) @Janpot
+
 ## v0.12.0
 
 <!-- generated comparing v0.11.0..master -->
@@ -1576,7 +1647,7 @@ Chart component improvements, add scrolling to pages in app sidebar, Windows fix
 - Remove some Next.js leftovers around monaco-editor (#2437) @Janpot
 - Improve rest test flakyness (#2438) @Janpot
 - Remove logging of RPC errors (#2410) @Janpot
-- Scope MUI X license to builtin components only (#2427) @Janpot
+- Scope MUI X license to builtin components only (#2427) @Janpot
 - Clean up worker communication with devserver (#2418) @Janpot
 - Add note about why we need usePolling (#2426) @Janpot
 - Adjust timeout and import node-fetch in create-toolpad-app test (#2414) (#2419) @Kirera-Wainaina
@@ -2861,7 +2932,7 @@ Fixes and improvements all around, banner prompting to upgrade Toolpad
 - Fix naive content-type sniffing implementation (#940) @Janpot
 - Format function source on save (#942) @Janpot
 - Allow recreating data grid columns from existing data (#914) @apedroferreira
-- Port MUI X renovate.json (#933) @Janpot
+- Port MUI X renovate.json (#933) @Janpot
 - Run yarn upgrade (#923) @apedroferreira
 - Try enabling renovate again (#913) @Janpot
 - Make sure to always assign the overlayroot (#915) @Janpot

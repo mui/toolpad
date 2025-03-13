@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Account } from '@toolpad/core/Account';
-import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { UserOrg, CustomSession } from '../UserOrg';
 
 const demoSession: CustomSession = {
@@ -32,16 +32,14 @@ export default function AccountCustomUserDetails() {
   }, []);
 
   return (
-    <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={customSession}>
-        {/* preview-start */}
-        <Account
-          slots={{
-            popoverContent: UserOrg,
-          }}
-        />
-        {/* preview-end */}
-      </SessionContext.Provider>
-    </AuthenticationContext.Provider>
+    <AppProvider authentication={authentication} session={customSession}>
+      {/* preview-start */}
+      <Account
+        slots={{
+          popoverContent: UserOrg,
+        }}
+      />
+      {/* preview-end */}
+    </AppProvider>
   );
 }

@@ -1,6 +1,6 @@
 <Account
   localeText={{
-    signInLabel: 'लॉग इन',
-    signOutLabel: 'लॉग आउट',
+    accountSignInLabel: 'लॉग इन',
+    accountSignOutLabel: 'लॉग आउट',
   }}
 />

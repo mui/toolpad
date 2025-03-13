@@ -15,6 +15,9 @@ import CodeRoundedIcon from '@mui/icons-material/CodeRounded';
 import OpenInNewRoundedIcon from '@mui/icons-material/OpenInNewRounded';
 import { useTheme } from '@mui/material/styles';
 import { sxChip } from 'docs/src/modules/components/AppNavDrawerItem';
+import ContentCopyRounded from '@mui/icons-material/ContentCopyRounded';
+import CheckRounded from '@mui/icons-material/CheckRounded';
+import copy from 'clipboard-copy';
 import { Example, versionGitHubLink } from './examplesUtils';
 
 interface FeaturedExamplesProps {
@@ -23,6 +26,13 @@ interface FeaturedExamplesProps {
 
 export default function ExamplesFeatured(props: FeaturedExamplesProps) {
   const t = useTranslate();
+  const [copiedId, setCopiedId] = React.useState<string | null>(null);
+
+  const handleCopy = React.useCallback((text: string, id: string) => {
+    copy(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  }, []);
 
   const examples = props.examples.filter((example: Example) => example.featured === true);
   const docsTheme = useTheme();
@@ -32,6 +42,9 @@ export default function ExamplesFeatured(props: FeaturedExamplesProps) {
       {examples.map((example: Example) => {
         const computedSrc =
           docsTheme?.palette?.mode === 'dark' && example.srcDark ? example.srcDark : example.src;
+        const exampleName = example.source.split('/').pop();
+        const installCommand = `pnpm create toolpad-app --example ${exampleName}`;
+
         return (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }} key={example.title}>
             <Typography component="h3" variant="h6" sx={{ fontWeight: 'semiBold' }}>
@@ -51,7 +64,7 @@ export default function ExamplesFeatured(props: FeaturedExamplesProps) {
               }}
             >
               <Link
-                href={versionGitHubLink(example.href)}
+                href={example.href}
                 target="_blank"
                 sx={{
                   position: 'relative',
@@ -160,9 +173,25 @@ export default function ExamplesFeatured(props: FeaturedExamplesProps) {
                     </IconButton>
                   </Tooltip>
                 </Box>
+
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={() => handleCopy(installCommand, example.title)}
+                  startIcon={
+                    copiedId === example.title ? (
+                      <CheckRounded fontSize="small" />
+                    ) : (
+                      <ContentCopyRounded fontSize="small" />
+                    )
+                  }
+                >
+                  {installCommand}
+                </Button>
+
                 <Button
                   component="a"
-                  href={versionGitHubLink(example.href)}
+                  href={example.href}
                   size="small"
                   variant="outlined"
                   color="primary"

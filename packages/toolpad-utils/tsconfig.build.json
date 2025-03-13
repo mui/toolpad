@@ -1,0 +1,12 @@
+{
+  // This config is for emitting declarations (.d.ts) only
+  // Actual .ts source files are transpiled via babel
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "outDir": "build/esm"
+  },
+  "exclude": ["src/**/*.spec.ts*", "src/**/*.test.ts*"]
+}

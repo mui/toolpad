@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AuthenticationContext, SessionContext } from '@toolpad/core/AppProvider';
+import { AppProvider } from '@toolpad/core/AppProvider';
 import { Account } from '@toolpad/core/Account';
 import CustomMenu from './CustomMenu';
 
@@ -25,16 +25,14 @@ export default function AccountSlotsAccountSwitcher() {
   }, []);
 
   return (
-    <AuthenticationContext.Provider value={authentication}>
-      <SessionContext.Provider value={session}>
-        {/* preview-start */}
-        <Account
-          slots={{
-            popoverContent: CustomMenu,
-          }}
-        />
-        {/* preview-end */}
-      </SessionContext.Provider>
-    </AuthenticationContext.Provider>
+    <AppProvider authentication={authentication} session={session}>
+      {/* preview-start */}
+      <Account
+        slots={{
+          popoverContent: CustomMenu,
+        }}
+      />
+      {/* preview-end */}
+    </AppProvider>
   );
 }

@@ -37,6 +37,7 @@ export function AppTitle(props: AppTitleProps) {
             fontWeight: '700',
             ml: 1,
             whiteSpace: 'nowrap',
+            lineHeight: 1,
           }}
         >
           {title}

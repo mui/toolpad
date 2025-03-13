@@ -1,8 +1,15 @@
 import * as React from 'react';
+import NextLink from 'next/link.js';
 import { asArray } from '@toolpad/utils/collections';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/router.js';
+import { LinkProps } from '../shared/Link';
 import { AppProvider } from '../AppProvider';
 import type { AppProviderProps, Navigate, Router } from '../AppProvider';
+
+const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
+  const { href, history, ...rest } = props;
+  return <NextLink ref={ref} href={href} replace={history === 'replace'} {...rest} />;
+});
 
 /**
  * @ignore - internal component.
@@ -38,9 +45,10 @@ export function NextAppProviderPages(props: AppProviderProps) {
 
   const routerImpl = React.useMemo<Router>(
     () => ({
-      pathname: asPath,
+      pathname: asPath.split('?')[0],
       searchParams,
       navigate,
+      Link,
     }),
     [asPath, navigate, searchParams],
   );

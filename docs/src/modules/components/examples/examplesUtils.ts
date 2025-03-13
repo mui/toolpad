@@ -13,7 +13,7 @@ export function versionGitHubLink(href: string) {
 
   return href.replace(
     `${process.env.SOURCE_CODE_REPO}/tree/master`,
-    `${process.env.SOURCE_CODE_REPO}/blob/v${process.env.LIB_VERSION}`,
+    `${process.env.SOURCE_CODE_REPO}/tree/v${process.env.LIB_VERSION}`,
   );
 }
 

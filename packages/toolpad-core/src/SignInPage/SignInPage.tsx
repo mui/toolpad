@@ -3,6 +3,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
+import Button, { ButtonProps } from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Checkbox from '@mui/material/Checkbox';
@@ -11,7 +12,6 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
@@ -37,6 +37,7 @@ import KeycloakIcon from './icons/Keycloak';
 import OktaIcon from './icons/Okta';
 import FusionAuthIcon from './icons/FusionAuth';
 import { BrandingContext, RouterContext } from '../shared/context';
+import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 
 const mergeSlotSx = (defaultSx: SxProps<Theme>, slotProps?: { sx?: SxProps<Theme> }) => {
   if (Array.isArray(slotProps?.sx)) {
@@ -135,6 +136,18 @@ const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([
   ['fusionauth', <FusionAuthIcon key="fusionauth" />],
 ]);
 
+interface SignInPageLocaleText {
+  signInTitle: string;
+  signInSubtitle: string;
+  signInRememberMe: string;
+  email: string;
+  password: string;
+  or: string;
+  with: string;
+  passkey: string;
+  to: string;
+}
+
 export interface AuthProvider {
   /**
    * The unique identifier of the authentication provider.
@@ -185,9 +198,9 @@ export interface SignInPageSlots {
   passwordField?: React.JSXElementConstructor<TextFieldProps>;
   /**
    * The custom submit button component used in the credentials form.
-   * @default LoadingButton
+   * @default Button
    */
-  submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
+  submitButton?: React.JSXElementConstructor<ButtonProps>;
   /**
    * The custom forgot password link component used in the credentials form.
    * @default Link
@@ -251,16 +264,34 @@ export interface SignInPageProps {
   slotProps?: {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
-    submitButton?: LoadingButtonProps;
+    submitButton?: ButtonProps;
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
     rememberMe?: Partial<FormControlLabelProps>;
+    form?: Partial<React.FormHTMLAttributes<HTMLFormElement>>;
+    oAuthButton?: ButtonProps;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container
    */
   sx?: SxProps;
+  /**
+   * The labels for the account component.
+   */
+  localeText?: Partial<SignInPageLocaleText>;
 }
+
+const defaultLocaleText: Pick<LocaleText, keyof SignInPageLocaleText> = {
+  signInTitle: 'Sign in',
+  signInSubtitle: 'Please sign in to continue',
+  signInRememberMe: 'Remember me',
+  email: 'Email',
+  password: 'Password',
+  or: 'or',
+  with: 'with',
+  passkey: 'Passkey',
+  to: 'to',
+};
 
 /**
  *
@@ -273,10 +304,13 @@ export interface SignInPageProps {
  * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
  */
 function SignInPage(props: SignInPageProps) {
-  const { providers, signIn, slots, slotProps, sx } = props;
+  const { providers, signIn, slots, slotProps, sx, localeText: propsLocaleText } = props;
   const theme = useTheme();
   const branding = React.useContext(BrandingContext);
   const router = React.useContext(RouterContext);
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...defaultLocaleText, ...globalLocaleText, ...propsLocaleText };
+
   const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
   const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
   const emailProvider = providers?.find((provider) => provider.id === 'nodemailer');
@@ -332,6 +366,7 @@ function SignInPage(props: SignInPageProps) {
           ) : (
             <Typography
               variant="h5"
+              component="h1"
               color="textPrimary"
               sx={{
                 my: theme.spacing(1),
@@ -339,14 +374,15 @@ function SignInPage(props: SignInPageProps) {
                 fontWeight: 600,
               }}
             >
-              Sign in {branding?.title ? `to ${branding.title}` : null}
+              {localeText.signInTitle}{' '}
+              {branding?.title ? `${localeText.to?.toLocaleLowerCase()} ${branding.title}` : null}
             </Typography>
           )}
           {slots?.subtitle ? (
             <slots.subtitle />
           ) : (
             <Typography variant="body2" color="textSecondary" gutterBottom textAlign="center">
-              Welcome, please sign in to continue
+              {localeText?.signInSubtitle}
             </Typography>
           )}
           <Box sx={{ mt: theme.spacing(1), width: '100%' }}>
@@ -374,8 +410,9 @@ function SignInPage(props: SignInPageProps) {
                           error: oauthResponse?.error,
                         }));
                       }}
+                      {...slotProps?.form}
                     >
-                      <LoadingButton
+                      <Button
                         key={provider.id}
                         variant="outlined"
                         type="submit"
@@ -390,9 +427,14 @@ function SignInPage(props: SignInPageProps) {
                         sx={{
                           textTransform: 'capitalize',
                         }}
+                        {...slotProps?.oAuthButton}
                       >
-                        <span>Sign in with {provider.name}</span>
-                      </LoadingButton>
+                        <span>
+                          {localeText.oauthSignInTitle ||
+                            `${localeText.signInTitle} ${localeText.with}`}{' '}
+                          {provider.name}
+                        </span>
+                      </Button>
                     </form>
                   );
                 })}
@@ -400,7 +442,9 @@ function SignInPage(props: SignInPageProps) {
 
             {passkeyProvider ? (
               <React.Fragment>
-                {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+                {singleProvider ? null : (
+                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                )}
                 {error && selectedProviderId === 'passkey' ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}
@@ -423,13 +467,14 @@ function SignInPage(props: SignInPageProps) {
                       error: passkeyResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
                   ) : (
                     <TextField
                       {...getCommonTextFieldProps(theme, {
-                        label: 'Email',
+                        label: localeText.email,
                         placeholder: 'your@email.com',
                         id: 'email-passkey',
                         name: 'email',
@@ -443,7 +488,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
-                    <LoadingButton
+                    <Button
                       type="submit"
                       fullWidth
                       size="large"
@@ -459,8 +504,10 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in with {passkeyProvider.name || 'Passkey'}
-                    </LoadingButton>
+                      {localeText.passkeySignInTitle ||
+                        `${localeText.signInTitle} ${localeText.with}`}{' '}
+                      {passkeyProvider.name || localeText.passkey}
+                    </Button>
                   )}
                 </Box>
               </React.Fragment>
@@ -468,7 +515,9 @@ function SignInPage(props: SignInPageProps) {
 
             {emailProvider ? (
               <React.Fragment>
-                {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+                {singleProvider ? null : (
+                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                )}
                 {error && selectedProviderId === 'nodemailer' ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}
@@ -497,13 +546,14 @@ function SignInPage(props: SignInPageProps) {
                       success: emailResponse?.success,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
                   ) : (
                     <TextField
                       {...getCommonTextFieldProps(theme, {
-                        label: 'Email',
+                        label: localeText.email,
                         placeholder: 'your@email.com',
                         name: 'email',
                         id: 'email-nodemailer',
@@ -517,7 +567,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
-                    <LoadingButton
+                    <Button
                       type="submit"
                       fullWidth
                       size="large"
@@ -533,8 +583,10 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in with Email
-                    </LoadingButton>
+                      {localeText.magicLinkSignInTitle ||
+                        `${localeText.signInTitle} ${localeText.with}`}{' '}
+                      {localeText.email}
+                    </Button>
                   )}
                 </Box>
               </React.Fragment>
@@ -542,7 +594,9 @@ function SignInPage(props: SignInPageProps) {
 
             {credentialsProvider ? (
               <React.Fragment>
-                {singleProvider ? null : <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>or</Divider>}
+                {singleProvider ? null : (
+                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                )}
                 {error && selectedProviderId === 'credentials' ? (
                   <Alert sx={{ my: 2 }} severity="error">
                     {error}
@@ -569,6 +623,7 @@ function SignInPage(props: SignInPageProps) {
                       error: credentialsResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
                     {slots?.emailField ? (
@@ -576,7 +631,7 @@ function SignInPage(props: SignInPageProps) {
                     ) : (
                       <TextField
                         {...getCommonTextFieldProps(theme, {
-                          label: 'Email',
+                          label: localeText.email,
                           placeholder: 'your@email.com',
                           id: 'email',
                           name: 'email',
@@ -594,7 +649,7 @@ function SignInPage(props: SignInPageProps) {
                         {...getCommonTextFieldProps(theme, {
                           name: 'password',
                           type: 'password',
-                          label: 'Password',
+                          label: localeText.password,
                           id: 'password',
                           placeholder: '*****',
                           autoComplete: 'current-password',
@@ -624,7 +679,7 @@ function SignInPage(props: SignInPageProps) {
                             sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
                           />
                         }
-                        label="Remember me"
+                        label={localeText.signInRememberMe}
                         {...slotProps?.rememberMe}
                         slotProps={{
                           typography: {
@@ -642,7 +697,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
-                    <LoadingButton
+                    <Button
                       type="submit"
                       fullWidth
                       size="large"
@@ -657,8 +712,8 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      Sign in
-                    </LoadingButton>
+                      {localeText.signInTitle}
+                    </Button>
                   )}
 
                   {slots?.signUpLink ? (
@@ -681,6 +736,10 @@ SignInPage.propTypes /* remove-proptypes */ = {
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
+  /**
+   * The labels for the account component.
+   */
+  localeText: PropTypes.object,
   /**
    * The list of authentication providers to display.
    * @default []
@@ -710,6 +769,8 @@ SignInPage.propTypes /* remove-proptypes */ = {
   slotProps: PropTypes.shape({
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
+    form: PropTypes.object,
+    oAuthButton: PropTypes.object,
     passwordField: PropTypes.object,
     rememberMe: PropTypes.object,
     signUpLink: PropTypes.object,

@@ -19,6 +19,7 @@ import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
 import { AppTitle, AppTitleProps } from './AppTitle';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
+import { MINI_DRAWER_WIDTH } from './shared';
 import type { Branding, Navigation } from '../AppProvider';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
@@ -307,7 +308,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const getDrawerSharedSx = React.useCallback(
     (isMini: boolean, isTemporary: boolean) => {
-      const drawerWidth = isMini ? 64 : sidebarExpandedWidth;
+      const drawerWidth = isMini ? MINI_DRAWER_WIDTH : sidebarExpandedWidth;
 
       return {
         displayPrint: 'none',
@@ -342,7 +343,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       }}
     >
       <AppBar color="inherit" position="absolute" sx={{ displayPrint: 'none' }}>
-        <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1.5 } }}>
+        <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1 } }}>
           <Stack
             direction="row"
             justifyContent="space-between"

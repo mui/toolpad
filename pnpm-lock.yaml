@@ -201,7 +201,7 @@ importers:
         version: 7.37.3(eslint@8.57.1)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 19.0.0-beta-e552027-20250112(eslint@8.57.1)
+        version: 19.0.0-beta-bafa41b-20250307(eslint@8.57.1)
       eslint-plugin-react-hooks:
         specifier: 5.1.0
         version: 5.1.0(eslint@8.57.1)
@@ -2958,6 +2958,7 @@ packages:
   '@mui/base@5.0.0-beta.40-0':
     resolution: {integrity: sha512-hG3atoDUxlvEy+0mqdMpWd04wca8HKr2IHjW/fAjlkCHQolSLazhZM46vnHjOf15M4ESu25mV/3PgjczyjVM4w==}
     engines: {node: '>=12.0.0'}
+    deprecated: This package has been replaced by @base-ui-components/react
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -2969,6 +2970,7 @@ packages:
   '@mui/base@5.0.0-beta.68':
     resolution: {integrity: sha512-F1JMNeLS9Qhjj3wN86JUQYBtJoXyQvknxlzwNl6eS0ZABo1MiohMONj3/WQzYPSXIKC2bS/ZbyBzdHhi2GnEpA==}
     engines: {node: '>=14.0.0'}
+    deprecated: This package has been replaced by @base-ui-components/react
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -6090,8 +6092,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@19.0.0-beta-e552027-20250112:
-    resolution: {integrity: sha512-VjkIXHouCYyJHgk5HmZ1LH+fAK5CX+ULRX9iNYtwYJ+ljbivFhIT+JJyxNT/USQpCeS2Dt5ahjFeeMv0RRwTww==}
+  eslint-plugin-react-compiler@19.0.0-beta-bafa41b-20250307:
+    resolution: {integrity: sha512-6q5FGhEh52dM2f6aqZcPWj1tlsc+3V2V1DrIxLiqJ0r3I2aivVXDf/TBZ3Bsqe6YDvdpaVDCg+bX9lv0QMn5PQ==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -7542,6 +7544,7 @@ packages:
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.groupby@4.6.0:
     resolution: {integrity: sha512-5dcWxm23+VAoz+awKmBaiBvzox8+RqMgFhi7UvX9DHZr2HdxHXM/Wrf8cfKpsW37RNrvtPn6hSwNqurSILbmJw==}
@@ -7554,6 +7557,7 @@ packages:
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.isfunction@3.0.9:
     resolution: {integrity: sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw==}
@@ -7599,6 +7603,7 @@ packages:
 
   lodash.omit@4.5.0:
     resolution: {integrity: sha512-XeqSp49hNGmlkj2EJlfrQFIzQ6lXdNro9sddtQzcJY8QaoC2GO0DT7xaIokHeyM+mIT0mPMlPvkYzg2xCuHdZg==}
+    deprecated: This package is deprecated. Use destructuring assignment syntax instead.
 
   lodash.once@4.1.1:
     resolution: {integrity: sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==}
@@ -16276,7 +16281,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@19.0.0-beta-e552027-20250112(eslint@8.57.1):
+  eslint-plugin-react-compiler@19.0.0-beta-bafa41b-20250307(eslint@8.57.1):
     dependencies:
       '@babel/core': 7.26.0
       '@babel/parser': 7.26.2

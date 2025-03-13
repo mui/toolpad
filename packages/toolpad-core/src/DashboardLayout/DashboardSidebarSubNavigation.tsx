@@ -13,7 +13,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import Paper from '@mui/material/Paper';
-import Tooltip from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from '../shared/Link';
@@ -26,6 +26,7 @@ import {
   isPageItem,
 } from '../shared/navigation';
 import { getDrawerSxTransitionMixin } from './utils';
+import { MINI_DRAWER_WIDTH } from './shared';
 import { useActivePage } from '../useActivePage';
 
 const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
@@ -35,7 +36,7 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
       color: (theme.vars ?? theme).palette.primary.dark,
     },
     '& .MuiTypography-root': {
-      color: (theme.vars ?? theme).palette.text.primary,
+      color: (theme.vars ?? theme).palette.primary.dark,
     },
     '& .MuiSvgIcon-root': {
       color: (theme.vars ?? theme).palette.primary.dark,
@@ -188,12 +189,13 @@ function DashboardSidebarSubNavigation({
           nestedNavigationCollapseSx = {
             fontSize: 18,
             position: 'absolute',
-            top: '50%',
-            right: '-1px',
+            top: '41.5%',
+            right: '2px',
             transform: 'translateY(-50%) rotate(-90deg)',
           };
         } else if (!isMini && isFullyExpanded) {
           nestedNavigationCollapseSx = {
+            ml: 0.5,
             transform: `rotate(${isNestedNavigationExpanded ? 0 : -90}deg)`,
             transition: (theme: Theme) =>
               theme.transitions.create('transform', {
@@ -202,6 +204,12 @@ function DashboardSidebarSubNavigation({
               }),
           };
         }
+
+        // Show as selected in mini sidebar if any of the children matches path, otherwise show as selected if item is matches path
+        const isSelected =
+          activePage && navigationItem.children && isMini
+            ? hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path)
+            : isActive && !navigationItem.children;
 
         const listItem = (
           <ListItem
@@ -222,18 +230,10 @@ function DashboardSidebarSubNavigation({
             }}
           >
             <NavigationListItemButton
-              selected={
-                activePage && navigationItem.children && isMini
-                  ? hasSelectedNavigationChildren(
-                      navigationContext,
-                      navigationItem,
-                      activePage.path,
-                    )
-                  : isActive && !navigationItem.children
-              }
+              selected={isSelected}
               sx={{
                 px: 1.4,
-                height: 48,
+                height: isMini ? 60 : 48,
               }}
               {...(navigationItem.children && !isMini
                 ? {
@@ -249,37 +249,70 @@ function DashboardSidebarSubNavigation({
                 : {})}
             >
               {navigationItem.icon || isMini ? (
-                <ListItemIcon
+                <Box
                   sx={{
-                    minWidth: listItemIconSize,
-                    mr: 1.2,
+                    position: 'relative',
+                    top: isMini ? -6 : 0,
+                    left: isMini ? 5 : 0,
                   }}
                 >
-                  {navigationItem.icon ?? null}
-                  {!navigationItem.icon && isMini ? (
-                    <Avatar
+                  <ListItemIcon
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: listItemIconSize,
+                    }}
+                  >
+                    {navigationItem.icon ?? null}
+                    {!navigationItem.icon && isMini ? (
+                      <Avatar
+                        sx={{
+                          width: listItemIconSize - 7,
+                          height: listItemIconSize - 7,
+                          fontSize: 12,
+                          ml: '-2px',
+                        }}
+                      >
+                        {navigationItemTitle
+                          .split(' ')
+                          .slice(0, 2)
+                          .map((itemTitleWord) => itemTitleWord.charAt(0).toUpperCase())}
+                      </Avatar>
+                    ) : null}
+                  </ListItemIcon>
+                  {isMini ? (
+                    <Typography
+                      variant="caption"
                       sx={{
-                        width: listItemIconSize - 7,
-                        height: listItemIconSize - 7,
-                        fontSize: 12,
-                        ml: '-2px',
+                        position: 'absolute',
+                        bottom: -18,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        fontSize: 10,
+                        fontWeight: 500,
+                        textAlign: 'center',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        width: MINI_DRAWER_WIDTH - 28,
                       }}
                     >
-                      {navigationItemTitle
-                        .split(' ')
-                        .slice(0, 2)
-                        .map((itemTitleWord) => itemTitleWord.charAt(0).toUpperCase())}
-                    </Avatar>
+                      {navigationItemTitle}
+                    </Typography>
                   ) : null}
-                </ListItemIcon>
+                </Box>
               ) : null}
-              <ListItemText
-                primary={navigationItemTitle}
-                sx={{
-                  whiteSpace: 'nowrap',
-                  zIndex: 1,
-                }}
-              />
+              {!isMini ? (
+                <ListItemText
+                  primary={navigationItemTitle}
+                  sx={{
+                    ml: 1.2,
+                    whiteSpace: 'nowrap',
+                    zIndex: 1,
+                  }}
+                />
+              ) : null}
               {navigationItem.action && !isMini && isFullyExpanded ? navigationItem.action : null}
               {navigationItem.children ? <ExpandMoreIcon sx={nestedNavigationCollapseSx} /> : null}
             </NavigationListItemButton>
@@ -288,7 +321,7 @@ function DashboardSidebarSubNavigation({
                 <Box
                   sx={{
                     position: 'fixed',
-                    left: 62,
+                    left: MINI_DRAWER_WIDTH - 2,
                     pl: '6px',
                   }}
                 >
@@ -296,7 +329,7 @@ function DashboardSidebarSubNavigation({
                     sx={{
                       pt: 0.5,
                       pb: 0.5,
-                      transform: (theme) => `translateY(calc(50% + ${theme.spacing(1)}))`,
+                      transform: (theme) => `translateY(calc(50% - ${theme.spacing(4)}))`,
                     }}
                   >
                     <DashboardSidebarSubNavigation
@@ -314,17 +347,7 @@ function DashboardSidebarSubNavigation({
 
         return (
           <React.Fragment key={navigationItemId}>
-            {isMini ? (
-              <Tooltip
-                title={navigationItemTitle}
-                placement={navigationItem.children ? 'right-start' : 'right'}
-              >
-                {listItem}
-              </Tooltip>
-            ) : (
-              listItem
-            )}
-
+            {listItem}
             {navigationItem.children && !isMini ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation

@@ -4,6 +4,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Outlet } from 'react-router';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import type { Navigation } from '@toolpad/core/AppProvider';
+import Chip from '@mui/material/Chip';
 
 const NAVIGATION: Navigation = [
   {
@@ -13,11 +14,108 @@ const NAVIGATION: Navigation = [
   {
     title: 'Dashboard',
     icon: <DashboardIcon />,
+    children: [
+      {
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        segment: 'orders',
+        title: 'Orders',
+        icon: <ShoppingCartIcon />,
+      },
+    ],
   },
   {
     segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
+    children: [
+      {
+        kind: 'header',
+        title: 'Main items',
+      },
+      {
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        segment: 'orders',
+        title: 'Orders',
+        icon: <ShoppingCartIcon />,
+      },
+    ],
+  },
+  {
+    title: 'Dashboard',
+    icon: <DashboardIcon />,
+    action: <Chip label={7} color="primary" size="small" />,
+    children: [
+      {
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        segment: 'orders',
+        title: 'Orders',
+        icon: <ShoppingCartIcon />,
+      },
+    ],
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+    children: [
+      {
+        kind: 'header',
+        title: 'Main items',
+      },
+      {
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        segment: 'orders',
+        title: 'Orders',
+        icon: <ShoppingCartIcon />,
+      },
+    ],
+  },
+  {
+    title: 'Dashboard with long title',
+    icon: <DashboardIcon />,
+    children: [
+      {
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        segment: 'orders',
+        title: 'Orders',
+        icon: <ShoppingCartIcon />,
+      },
+    ],
+  },
+  {
+    segment: 'orders',
+    title: 'Orders',
+    icon: <ShoppingCartIcon />,
+    children: [
+      {
+        kind: 'header',
+        title: 'Main items',
+      },
+      {
+        title: 'Dashboard',
+        icon: <DashboardIcon />,
+      },
+      {
+        segment: 'orders',
+        title: 'Orders',
+        icon: <ShoppingCartIcon />,
+      },
+    ],
   },
 ];
 

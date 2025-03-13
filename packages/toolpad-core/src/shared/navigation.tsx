@@ -25,6 +25,7 @@ function buildItemToPathMap(navigation: Navigation): Map<NavigationPageItem, str
 
   const visit = (item: NavigationItem, base: string) => {
     if (isPageItem(item)) {
+      // Append segment to base path. Make sure to always have an initial slash, and slashes between segments.
       const path =
         `${base.startsWith('/') ? base : `/${base}`}${base && base !== '/' && item.segment ? '/' : ''}${item.segment || ''}` ||
         '/';

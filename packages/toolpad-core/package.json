@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.26.9",
-    "@mui/utils": "7.0.0-beta.3",
+    "@mui/utils": "7.0.0-beta.4",
     "@standard-schema/spec": "^1.0.0",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",

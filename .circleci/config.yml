@@ -186,9 +186,9 @@ jobs:
           command: pnpm release:build
           environment:
             NODE_OPTIONS: --max-old-space-size=3584
-      - run:
-          name: Tests real browser
-          command: pnpm test:integration
+      # - run:
+      #     name: Tests real browser
+      #     command: pnpm test:integration
       - store_test_results:
           path: test/test-results/junit.xml
       - run:

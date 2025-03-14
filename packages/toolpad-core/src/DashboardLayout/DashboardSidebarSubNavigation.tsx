@@ -141,6 +141,7 @@ function DashboardSidebarSubNavigation({
 
           return (
             <Divider
+              component="li"
               key={`divider-${depth}-${navigationItemIndex}`}
               sx={{
                 borderBottomWidth: 2,

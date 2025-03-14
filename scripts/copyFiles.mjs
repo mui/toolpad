@@ -1,15 +1,21 @@
 /* eslint-disable no-console */
-import path from 'path';
+import * as path from 'path';
+import * as fs from 'fs/promises';
 import {
-  createPackageFile,
   includeFileInBuild,
-  prepend,
+  createModulePackages,
   typescriptCopy,
-} from './copyFilesUtils.mjs';
+  createPackageFile,
+} from '@mui/monorepo/scripts/copyFilesUtils.mjs';
 
 const packagePath = process.cwd();
 const buildPath = path.join(packagePath, './build');
 const srcPath = path.join(packagePath, './src');
+
+async function prepend(file, string) {
+  const data = await fs.readFile(file, 'utf8');
+  await fs.writeFile(file, string + data, 'utf8');
+}
 
 async function addLicense(packageData) {
   const license = `/**
@@ -21,29 +27,32 @@ async function addLicense(packageData) {
  */
 `;
   await Promise.all(
-    ['./index.js', './legacy/index.js', './modern/index.js', './node/index.js'].map(
-      async (file) => {
-        try {
-          await prepend(path.resolve(buildPath, file), license);
-        } catch (err) {
-          if (err.code === 'ENOENT') {
-            console.log(`Skipped license for ${file}`);
-          } else {
-            throw err;
-          }
+    [
+      './index.js',
+      './legacy/index.js',
+      './modern/index.js',
+      './esm/index.js',
+      './node/index.js',
+    ].map(async (file) => {
+      try {
+        await prepend(path.resolve(buildPath, file), license);
+      } catch (err) {
+        if (err.code === 'ENOENT') {
+          console.log(`Skipped license for ${file}`);
+        } else {
+          throw err;
         }
-      },
-    ),
+      }
+    }),
   );
 }
 
 async function run() {
-  const extraFiles = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const extraFiles = args.filter((arg) => !arg.startsWith('--'));
+  const useExports = args.includes('--use-exports');
   try {
-    // TypeScript
-    await typescriptCopy({ from: srcPath, to: buildPath });
-
-    const packageData = await createPackageFile();
+    const packageData = await createPackageFile(useExports);
 
     await Promise.all(
       ['./README.md', '../../CHANGELOG.md', '../../LICENSE', ...extraFiles].map((file) =>
@@ -52,6 +61,13 @@ async function run() {
     );
 
     await addLicense(packageData);
+
+    if (!useExports) {
+      // TypeScript
+      await typescriptCopy({ from: srcPath, to: buildPath });
+
+      await createModulePackages({ from: srcPath, to: buildPath });
+    }
   } catch (err) {
     console.error(err);
     process.exit(1);

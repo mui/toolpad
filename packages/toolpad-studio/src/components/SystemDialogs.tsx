@@ -1,4 +1,3 @@
-import { LoadingButton, LoadingButtonProps } from '@mui/lab';
 import {
   Dialog,
   DialogTitle,
@@ -21,11 +20,11 @@ const SystemDialogCancelButton = React.forwardRef<HTMLButtonElement, ButtonProps
     </Button>
   ),
 );
-const SystemDialogOkButton = React.forwardRef<HTMLButtonElement, LoadingButtonProps>(
+const SystemDialogOkButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children = 'ok', ...props }, ref) => (
-    <LoadingButton ref={ref} {...props}>
+    <Button ref={ref} {...props}>
       {children}
-    </LoadingButton>
+    </Button>
   ),
 );
 

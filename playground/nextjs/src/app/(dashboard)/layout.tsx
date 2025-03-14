@@ -1,5 +1,6 @@
 'use client';
 import * as React from 'react';
+import { usePathname, useParams } from 'next/navigation';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MenuList from '@mui/material/MenuList';
@@ -157,9 +158,26 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
 }
 
 export default function DashboardPagesLayout(props: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const params = useParams();
+  const [orderId] = params.segments ?? [];
+
+  const title = React.useMemo(() => {
+    if (pathname === '/orders/new') {
+      return 'New Order';
+    }
+    if (orderId && pathname.includes('/edit')) {
+      return `Order ${orderId} - Edit`;
+    }
+    if (orderId) {
+      return `Order ${orderId}`;
+    }
+    return undefined;
+  }, [orderId, pathname]);
+
   return (
     <DashboardLayout slots={{ sidebarFooter: SidebarFooterAccount, toolbarAccount: () => null }}>
-      <PageContainer>{props.children}</PageContainer>
+      <PageContainer title={title}>{props.children}</PageContainer>
     </DashboardLayout>
   );
 }

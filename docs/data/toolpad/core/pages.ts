@@ -105,9 +105,9 @@ const pages: MuiPage[] = [
         subheader: 'Data',
         children: [
           {
-            pathname: '/toolpad/core/react-crud-page',
-            title: 'CRUD',
-            planned: true,
+            pathname: '/toolpad/core/react-crud',
+            title: 'Crud',
+            newFeature: true,
           },
         ],
       },

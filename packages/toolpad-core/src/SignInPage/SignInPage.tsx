@@ -3,6 +3,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import Alert from '@mui/material/Alert';
+import Button, { ButtonProps } from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Checkbox from '@mui/material/Checkbox';
@@ -11,7 +12,6 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import LoadingButton, { LoadingButtonProps } from '@mui/lab/LoadingButton';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import PasswordIcon from '@mui/icons-material/Password';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
@@ -198,9 +198,9 @@ export interface SignInPageSlots {
   passwordField?: React.JSXElementConstructor<TextFieldProps>;
   /**
    * The custom submit button component used in the credentials form.
-   * @default LoadingButton
+   * @default Button
    */
-  submitButton?: React.JSXElementConstructor<LoadingButtonProps>;
+  submitButton?: React.JSXElementConstructor<ButtonProps>;
   /**
    * The custom forgot password link component used in the credentials form.
    * @default Link
@@ -264,10 +264,12 @@ export interface SignInPageProps {
   slotProps?: {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
-    submitButton?: LoadingButtonProps;
+    submitButton?: ButtonProps;
     forgotPasswordLink?: LinkProps;
     signUpLink?: LinkProps;
     rememberMe?: Partial<FormControlLabelProps>;
+    form?: Partial<React.FormHTMLAttributes<HTMLFormElement>>;
+    oAuthButton?: ButtonProps;
   };
   /**
    * The prop used to customize the styles on the `SignInPage` container
@@ -408,8 +410,9 @@ function SignInPage(props: SignInPageProps) {
                           error: oauthResponse?.error,
                         }));
                       }}
+                      {...slotProps?.form}
                     >
-                      <LoadingButton
+                      <Button
                         key={provider.id}
                         variant="outlined"
                         type="submit"
@@ -424,13 +427,14 @@ function SignInPage(props: SignInPageProps) {
                         sx={{
                           textTransform: 'capitalize',
                         }}
+                        {...slotProps?.oAuthButton}
                       >
                         <span>
                           {localeText.oauthSignInTitle ||
                             `${localeText.signInTitle} ${localeText.with}`}{' '}
                           {provider.name}
                         </span>
-                      </LoadingButton>
+                      </Button>
                     </form>
                   );
                 })}
@@ -463,6 +467,7 @@ function SignInPage(props: SignInPageProps) {
                       error: passkeyResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -483,7 +488,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
-                    <LoadingButton
+                    <Button
                       type="submit"
                       fullWidth
                       size="large"
@@ -502,7 +507,7 @@ function SignInPage(props: SignInPageProps) {
                       {localeText.passkeySignInTitle ||
                         `${localeText.signInTitle} ${localeText.with}`}{' '}
                       {passkeyProvider.name || localeText.passkey}
-                    </LoadingButton>
+                    </Button>
                   )}
                 </Box>
               </React.Fragment>
@@ -541,6 +546,7 @@ function SignInPage(props: SignInPageProps) {
                       success: emailResponse?.success,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   {slots?.emailField ? (
                     <slots.emailField {...slotProps?.emailField} />
@@ -561,7 +567,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
-                    <LoadingButton
+                    <Button
                       type="submit"
                       fullWidth
                       size="large"
@@ -580,7 +586,7 @@ function SignInPage(props: SignInPageProps) {
                       {localeText.magicLinkSignInTitle ||
                         `${localeText.signInTitle} ${localeText.with}`}{' '}
                       {localeText.email}
-                    </LoadingButton>
+                    </Button>
                   )}
                 </Box>
               </React.Fragment>
@@ -617,6 +623,7 @@ function SignInPage(props: SignInPageProps) {
                       error: credentialsResponse?.error,
                     }));
                   }}
+                  {...slotProps?.form}
                 >
                   <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
                     {slots?.emailField ? (
@@ -690,7 +697,7 @@ function SignInPage(props: SignInPageProps) {
                   {slots?.submitButton ? (
                     <slots.submitButton {...slotProps?.submitButton} />
                   ) : (
-                    <LoadingButton
+                    <Button
                       type="submit"
                       fullWidth
                       size="large"
@@ -706,7 +713,7 @@ function SignInPage(props: SignInPageProps) {
                       {...slotProps?.submitButton}
                     >
                       {localeText.signInTitle}
-                    </LoadingButton>
+                    </Button>
                   )}
 
                   {slots?.signUpLink ? (
@@ -762,6 +769,8 @@ SignInPage.propTypes /* remove-proptypes */ = {
   slotProps: PropTypes.shape({
     emailField: PropTypes.object,
     forgotPasswordLink: PropTypes.object,
+    form: PropTypes.object,
+    oAuthButton: PropTypes.object,
     passwordField: PropTypes.object,
     rememberMe: PropTypes.object,
     signUpLink: PropTypes.object,

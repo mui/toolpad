@@ -75,7 +75,7 @@ export interface DashboardLayoutProps {
    */
   branding?: Branding | null;
   /**
-   * Navigation definition for the dashboard.
+   * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
    */
   navigation?: Navigation;
@@ -490,7 +490,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   hideNavigation: PropTypes.bool,
   /**
-   * Navigation definition for the dashboard.
+   * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
    */
   navigation: PropTypes.arrayOf(

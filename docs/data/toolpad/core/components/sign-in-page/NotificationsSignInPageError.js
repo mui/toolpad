@@ -32,7 +32,7 @@ export default function NotificationsSignInPageError() {
       <SignInPage
         signIn={signIn}
         providers={providers}
-        slotProps={{ emailField: { autoFocus: false } }}
+        slotProps={{ emailField: { autoFocus: false }, form: { noValidate: true } }}
       />
     </AppProvider>
     // preview-end

@@ -1,0 +1,17 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "dataSource": {
+      "description": "Server-side <a href=\"https://mui.com/toolpad/core/react-crud/#data-sources\">data source</a>."
+    },
+    "formState": { "description": "Form state object, including field values and errors." },
+    "onFieldChange": { "description": "Callback fired when a form field is changed." },
+    "onReset": { "description": "Callback fired when the form is reset." },
+    "onSubmit": { "description": "Callback fired when the form is submitted." },
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." },
+    "submitButtonLabel": { "description": "Text for form submit button." }
+  },
+  "classDescriptions": {},
+  "slotDescriptions": { "textField": "The text field component used in the form." }
+}

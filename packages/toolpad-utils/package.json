@@ -1,51 +1,35 @@
 {
   "name": "@toolpad/utils",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Shared utilities used by Toolpad packages.",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/toolpad#readme",
   "license": "MIT",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
+  "main": "./build/index.cjs",
+  "module": "./build/index.js",
+  "types": "./build/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
-    "./events": {
-      "types": "./dist/events.d.ts",
-      "require": "./dist/events.cjs",
-      "default": "./dist/events.js"
-    },
-    "./*": {
-      "types": "./dist/*.d.ts",
-      "require": "./dist/*.cjs",
-      "default": "./dist/*.js"
-    },
-    "./hooks/useBoolean": {
-      "types": "./dist/hooks/useBoolean.d.ts",
-      "require": "./dist/hooks/useBoolean.cjs",
-      "default": "./dist/hooks/useBoolean.js"
-    },
-    "./hooks/*": {
-      "types": "./dist/hooks/*.d.ts",
-      "require": "./dist/hooks/*.cjs",
-      "default": "./dist/hooks/*.js"
-    }
+    "./*": "./src/*.ts",
+    "./hooks/*": "./src/hooks/*.ts"
   },
-  "files": [
-    "dist",
-    "server",
-    "browser"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mui/toolpad.git",
     "directory": "packages/toolpad-studio-utils"
   },
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "check-types": "tsup && tsc --noEmit",
+    "clean": "rimraf build",
+    "prebuild": "pnpm clean",
+    "build": "pnpm build:node && pnpm build:stable && pnpm build:modern && pnpm build:types && pnpm build:copy-files",
+    "build:node": "node ../../scripts/build.mjs node --use-exports",
+    "build:modern": "node ../../scripts/build.mjs modern --use-exports",
+    "build:stable": "node ../../scripts/build.mjs stable --use-exports",
+    "build:copy-files": "node ../../scripts/copyFiles.mjs --use-exports",
+    "build:types": "tsx ../../scripts/buildTypes.mts",
+    "predev": "pnpm clean",
+    "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch\" \"pnpm build:copy-files\"",
+    "check-types": "pnpm build:stable && pnpm build:types && tsc --noEmit",
     "test": "vitest run --coverage"
   },
   "bugs": {
@@ -53,9 +37,6 @@
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"
-  },
-  "publishConfig": {
-    "access": "public"
   },
   "dependencies": {
     "invariant": "2.2.4",
@@ -68,9 +49,13 @@
   "devDependencies": {
     "@types/express": "5.0.0",
     "@types/invariant": "2.2.37",
-    "@types/react": "^19.0.8",
+    "@types/react": "^19.0.10",
     "@types/react-is": "^19.0.0",
     "@types/title": "3.4.3",
     "vitest": "2.1.9"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "build"
   }
 }

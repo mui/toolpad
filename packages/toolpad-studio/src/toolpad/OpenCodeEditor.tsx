@@ -13,7 +13,6 @@ import {
   CircularProgress,
 } from '@mui/material';
 import CodeIcon from '@mui/icons-material/Code';
-import { LoadingButton } from '@mui/lab';
 import { useProjectApi } from '../projectApi';
 import { CodeEditorFileType } from '../types';
 
@@ -111,7 +110,7 @@ export default function OpenCodeEditorButton({
           </IconButton>
         </Tooltip>
       ) : (
-        <LoadingButton
+        <Button
           disabled={disabled || busy}
           onClick={handleClick}
           loading={busy}
@@ -121,7 +120,7 @@ export default function OpenCodeEditorButton({
           {...rest}
         >
           {actionText}
-        </LoadingButton>
+        </Button>
       )}
       <MissingEditorDialog open={missingEditorDialog} onClose={setMissingEditorDialog} />
     </React.Fragment>

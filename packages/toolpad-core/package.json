@@ -1,23 +1,10 @@
 {
   "name": "@toolpad/core",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "author": "Toolpad Team",
   "description": "Dashboard framework powered by MUI.",
   "main": "./node/index.js",
   "module": "./index.js",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js",
-      "require": "./node/index.js"
-    },
-    "./*": {
-      "types": "./*/index.d.ts",
-      "import": "./*/index.js",
-      "require": "./node/*/index.js"
-    }
-  },
   "keywords": [
     "react",
     "mui",
@@ -44,36 +31,41 @@
     "build:node": "node ../../scripts/build.mjs node",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
-    "build:types": "tsc -b tsconfig.build.json",
+    "build:types": "node ../../scripts/buildTypes.mjs",
     "predev": "pnpm clean",
-    "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch --preserveWatchOutput\" \"pnpm build:copy-files\"",
-    "check-types": "pnpm build:types && tsc --noEmit",
+    "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch\" \"pnpm build:copy-files\"",
+    "check-types": "pnpm build:stable && pnpm build:types && tsc --noEmit",
     "test": "vitest run --coverage",
     "test:dev": "vitest",
     "test:browser": "vitest run --browser.enabled",
     "test:browser:dev": "vitest --browser.enabled"
   },
   "dependencies": {
-    "@babel/runtime": "^7.26.0",
-    "@mui/lab": "6.0.0-beta.22",
-    "@mui/utils": "6.3.1",
+    "@babel/runtime": "^7.26.9",
+    "@mui/utils": "7.0.0-beta.4",
+    "@standard-schema/spec": "^1.0.0",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",
     "client-only": "^0.0.1",
+    "dayjs": "1.11.13",
     "invariant": "2.2.4",
     "path-to-regexp": "6.3.0",
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "6.3.1",
-    "@mui/material": "6.3.1",
+    "@mui/icons-material": "6.4.7",
+    "@mui/material": "6.4.7",
+    "@mui/x-data-grid": "7.27.3",
+    "@mui/x-data-grid-premium": "7.27.3",
+    "@mui/x-data-grid-pro": "7.27.3",
+    "@mui/x-date-pickers": "7.27.3",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.14",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
-    "@types/sinon": "^17.0.3",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/sinon": "^17.0.4",
     "@vitest/browser": "2.1.9",
-    "next": "^15.1.6",
+    "next": "^15.2.1",
     "next-router-mock": "^0.9.13",
     "playwright": "^1.47.2",
     "react-router": "7.1.5",
@@ -81,8 +73,12 @@
     "vitest": "2.1.9"
   },
   "peerDependencies": {
-    "@mui/icons-material": "5 - 6",
-    "@mui/material": "5 - 6",
+    "@mui/icons-material": "^6.4.0 || ^7.0.0 || ^7.0.0-beta",
+    "@mui/material": "^6.4.0 || ^7.0.0 || ^7.0.0-beta",
+    "@mui/x-data-grid": "^7",
+    "@mui/x-data-grid-premium": "^7",
+    "@mui/x-data-grid-pro": "^7",
+    "@mui/x-date-pickers": "^7",
     "next": "^14 || ^15",
     "react": "^18 || ^19",
     "react-router": "^7"

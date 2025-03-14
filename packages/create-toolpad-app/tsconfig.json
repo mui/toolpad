@@ -15,7 +15,6 @@
     "outDir": "./dist",
     "pretty": true,
     "rootDir": "src",
-    "preserveWatchOutput": true,
     "types": ["node"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"]

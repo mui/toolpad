@@ -1,16 +1,16 @@
-import { LoadingButton } from '@mui/lab';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  DialogContentText,
-} from '@mui/material';
+'use client';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import TextField from '@mui/material/TextField';
+import DialogContentText from '@mui/material/DialogContentText';
 import { useNonNullableContext } from '@toolpad/utils/react';
 import invariant from 'invariant';
 import * as React from 'react';
 import { DialogsContext } from './DialogsContext';
+import { WindowContext } from '../shared/context';
 import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 
 interface DialogsProviderLocaleText {
@@ -207,17 +207,25 @@ export interface AlertDialogPayload extends AlertOptions {
 export interface AlertDialogProps extends DialogProps<AlertDialogPayload, void> {}
 
 export function AlertDialog({ open, payload, onClose }: AlertDialogProps) {
+  const appWindowContext = React.useContext(WindowContext);
+
   const globalLocaleText = useLocaleText();
   const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const okButtonProps = useDialogLoadingButton(() => onClose());
   return (
-    <Dialog maxWidth="xs" fullWidth open={open} onClose={() => onClose()}>
+    <Dialog
+      maxWidth="xs"
+      fullWidth
+      open={open}
+      onClose={() => onClose()}
+      container={appWindowContext?.document.body}
+    >
       <DialogTitle>{payload.title ?? localeText.alert}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
-        <LoadingButton disabled={!open} {...okButtonProps}>
+        <Button disabled={!open} {...okButtonProps}>
           {payload.okText ?? localeText.ok}
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );
@@ -230,21 +238,29 @@ export interface ConfirmDialogPayload extends ConfirmOptions {
 export interface ConfirmDialogProps extends DialogProps<ConfirmDialogPayload, boolean> {}
 
 export function ConfirmDialog({ open, payload, onClose }: ConfirmDialogProps) {
+  const appWindowContext = React.useContext(WindowContext);
+
   const globalLocaleText = useLocaleText();
   const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const cancelButtonProps = useDialogLoadingButton(() => onClose(false));
   const okButtonProps = useDialogLoadingButton(() => onClose(true));
   return (
-    <Dialog maxWidth="xs" fullWidth open={open} onClose={() => onClose(false)}>
+    <Dialog
+      maxWidth="xs"
+      fullWidth
+      open={open}
+      onClose={() => onClose(false)}
+      container={appWindowContext?.document.body}
+    >
       <DialogTitle>{payload.title ?? localeText.confirm}</DialogTitle>
       <DialogContent>{payload.msg}</DialogContent>
       <DialogActions>
-        <LoadingButton autoFocus disabled={!open} {...cancelButtonProps}>
+        <Button autoFocus disabled={!open} {...cancelButtonProps}>
           {payload.cancelText ?? localeText.cancel}
-        </LoadingButton>
-        <LoadingButton color={payload.severity} disabled={!open} {...okButtonProps}>
+        </Button>
+        <Button color={payload.severity} disabled={!open} {...okButtonProps}>
           {payload.okText ?? localeText.ok}
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );
@@ -257,6 +273,8 @@ export interface PromptDialogPayload extends PromptOptions {
 export interface PromptDialogProps extends DialogProps<PromptDialogPayload, string | null> {}
 
 export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
+  const appWindowContext = React.useContext(WindowContext);
+
   const globalLocaleText = useLocaleText();
   const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const [input, setInput] = React.useState('');
@@ -286,6 +304,7 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
           }
         },
       }}
+      container={appWindowContext?.document.body}
     >
       <DialogTitle>{payload.title ?? localeText.confirm}</DialogTitle>
       <DialogContent>
@@ -304,12 +323,12 @@ export function PromptDialog({ open, payload, onClose }: PromptDialogProps) {
         />
       </DialogContent>
       <DialogActions>
-        <LoadingButton disabled={!open} {...cancelButtonProps}>
+        <Button disabled={!open} {...cancelButtonProps}>
           {payload.cancelText ?? localeText.cancel}
-        </LoadingButton>
-        <LoadingButton disabled={!open} loading={loading} type="submit">
+        </Button>
+        <Button disabled={!open} loading={loading} type="submit">
           {payload.okText ?? localeText.ok}
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   );

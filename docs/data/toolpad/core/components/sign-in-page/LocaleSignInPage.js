@@ -28,7 +28,9 @@ export default function LocaleSignInPage() {
       <SignInPage
         signIn={signIn}
         providers={providers}
-        localeText={{ signInTitle: 'लॉग इन करें' }}
+        localeText={{
+          providerSignInTitle: (provider) => `${provider} से साइन इन करें`,
+        }}
       />
     </AppProvider>
     // preview-end

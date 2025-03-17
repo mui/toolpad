@@ -6,6 +6,11 @@ import {
   documentGetInitialProps,
 } from '@mui/material-nextjs/v14-pagesRouter';
 
+export const metadeta = {
+  title: 'My Toolpad Core Next.js App',
+  description: 'This is a sample app built with Toolpad Core and Next.js',
+};
+
 export default function Document(props: DocumentProps & DocumentHeadTagsProps) {
   return (
     <Html lang="en" data-toolpad-color-scheme="light">

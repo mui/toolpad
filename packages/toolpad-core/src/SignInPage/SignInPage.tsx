@@ -710,7 +710,9 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      {localeText.providerSignInTitle(localeText.password.toLocaleLowerCase())}
+                      {localeText.providerSignInTitle(
+                        (credentialsProvider.name || localeText.password).toLocaleLowerCase(),
+                      )}
                     </Button>
                   )}
 

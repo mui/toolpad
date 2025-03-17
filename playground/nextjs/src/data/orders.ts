@@ -1,6 +1,5 @@
 'use client';
 import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
-import { getCookie, setCookie } from 'cookies-next';
 import { z } from 'zod';
 
 type OrderStatus = 'Pending' | 'Sent';
@@ -16,13 +15,13 @@ export interface Order extends DataModel {
   deliveryTime?: string;
 }
 
-const getOrdersStore = async (): Promise<Order[]> => {
-  const value = await getCookie('orders-store');
+const getOrdersStore = (): Order[] => {
+  const value = localStorage.getItem('orders-store');
   return value ? JSON.parse(value) : [];
 };
 
-const setOrdersStore = async (value: Order[]) => {
-  await setCookie('orders-store', JSON.stringify(value));
+const setOrdersStore = (value: Order[]) => {
+  return localStorage.setItem('orders-store', JSON.stringify(value));
 };
 
 export const ordersDataSource: DataSource<Order> = {
@@ -54,7 +53,7 @@ export const ordersDataSource: DataSource<Order> = {
   getMany: ({ paginationModel, filterModel, sortModel }) => {
     return new Promise<{ items: Order[]; itemCount: number }>((resolve) => {
       setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
+        const ordersStore = getOrdersStore();
 
         let filteredOrders = [...ordersStore];
 
@@ -118,7 +117,7 @@ export const ordersDataSource: DataSource<Order> = {
   getOne: (orderId) => {
     return new Promise<Order>((resolve, reject) => {
       setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
+        const ordersStore = getOrdersStore();
 
         const orderToShow = ordersStore.find((order) => order.id === Number(orderId));
 
@@ -133,7 +132,7 @@ export const ordersDataSource: DataSource<Order> = {
   createOne: (data) => {
     return new Promise((resolve) => {
       setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
+        const ordersStore = getOrdersStore();
 
         const newOrder = { id: ordersStore.length + 1, ...data } as Order;
 
@@ -146,7 +145,7 @@ export const ordersDataSource: DataSource<Order> = {
   updateOne: (orderId, data) => {
     return new Promise((resolve, reject) => {
       setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
+        const ordersStore = getOrdersStore();
 
         let updatedOrder: Order | null = null;
 
@@ -171,7 +170,7 @@ export const ordersDataSource: DataSource<Order> = {
   deleteOne: (orderId) => {
     return new Promise<void>((resolve) => {
       setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
+        const ordersStore = getOrdersStore();
 
         setOrdersStore(ordersStore.filter((order) => order.id !== Number(orderId)));
 

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { useRouter } from 'next/router';
 import { NextAppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
@@ -35,7 +34,6 @@ const NAVIGATION: Navigation = [
     segment: 'orders',
     title: 'Orders',
     icon: <ShoppingCartIcon />,
-    pattern: 'orders{/:orderId}*',
   },
 ];
 
@@ -48,33 +46,12 @@ const AUTHENTICATION = {
   signOut,
 };
 
-function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
-  const router = useRouter();
-  const { segments = [] } = router.query;
-  const [orderId] = segments;
-
-  const title = React.useMemo(() => {
-    if (router.asPath.split('?')[0] === '/orders/new') {
-      return 'New Order';
-    }
-    if (orderId && router.asPath.includes('/edit')) {
-      return `Order ${orderId} - Edit`;
-    }
-    if (orderId) {
-      return `Order ${orderId}`;
-    }
-    return undefined;
-  }, [orderId, router.asPath]);
-
+function getDefaultLayout(page: React.ReactElement<any>) {
   return (
     <DashboardLayout>
-      <PageContainer title={title}>{page}</PageContainer>
+      <PageContainer>{page}</PageContainer>
     </DashboardLayout>
   );
-}
-
-function getDefaultLayout(page: React.ReactElement<any>) {
-  return <DefaultLayout page={page} />;
 }
 
 function RequireAuth({ children }: { children: React.ReactNode }) {

@@ -498,7 +498,7 @@ List.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
-    dataGrid: PropTypes.object,
+    dataGrid: PropTypes.any,
   }),
   /**
    * The components used for each slot inside.

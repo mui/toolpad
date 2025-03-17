@@ -137,9 +137,10 @@ const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([
 ]);
 
 interface SignInPageLocaleText {
-  signInTitle: string;
+  signInTitle: string | ((brandingTitle?: string) => string);
   signInSubtitle: string;
   signInRememberMe: string;
+  providerSignInTitle: (provider: string) => string;
   email: string;
   password: string;
   or: string;
@@ -282,8 +283,10 @@ export interface SignInPageProps {
 }
 
 const defaultLocaleText: Pick<LocaleText, keyof SignInPageLocaleText> = {
-  signInTitle: 'Sign in',
+  signInTitle: (brandingTitle?: string) =>
+    brandingTitle ? `Sign in to ${brandingTitle}` : 'Sign in',
   signInSubtitle: 'Please sign in to continue',
+  providerSignInTitle: (provider: string) => `Sign in with ${provider}`,
   signInRememberMe: 'Remember me',
   email: 'Email',
   password: 'Password',
@@ -374,8 +377,9 @@ function SignInPage(props: SignInPageProps) {
                 fontWeight: 600,
               }}
             >
-              {localeText.signInTitle}{' '}
-              {branding?.title ? `${localeText.to?.toLocaleLowerCase()} ${branding.title}` : null}
+              {typeof localeText.signInTitle === 'string'
+                ? localeText.signInTitle
+                : localeText.signInTitle(branding?.title)}
             </Typography>
           )}
           {slots?.subtitle ? (
@@ -429,11 +433,7 @@ function SignInPage(props: SignInPageProps) {
                         }}
                         {...slotProps?.oAuthButton}
                       >
-                        <span>
-                          {localeText.oauthSignInTitle ||
-                            `${localeText.signInTitle} ${localeText.with}`}{' '}
-                          {provider.name}
-                        </span>
+                        <span>{localeText.providerSignInTitle(provider.name)}</span>
                       </Button>
                     </form>
                   );
@@ -504,9 +504,7 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      {localeText.passkeySignInTitle ||
-                        `${localeText.signInTitle} ${localeText.with}`}{' '}
-                      {passkeyProvider.name || localeText.passkey}
+                      {localeText.providerSignInTitle(passkeyProvider.name || localeText.passkey)}
                     </Button>
                   )}
                 </Box>
@@ -583,9 +581,9 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      {localeText.magicLinkSignInTitle ||
-                        `${localeText.signInTitle} ${localeText.with}`}{' '}
-                      {localeText.email}
+                      {localeText.providerSignInTitle(
+                        (emailProvider.name || localeText.email).toLocaleLowerCase(),
+                      )}
                     </Button>
                   )}
                 </Box>
@@ -712,7 +710,7 @@ function SignInPage(props: SignInPageProps) {
                       }}
                       {...slotProps?.submitButton}
                     >
-                      {localeText.signInTitle}
+                      {localeText.providerSignInTitle(localeText.password.toLocaleLowerCase())}
                     </Button>
                   )}
 

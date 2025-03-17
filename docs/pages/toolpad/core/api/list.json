@@ -14,7 +14,7 @@
     "onEditClick": { "type": { "name": "func" } },
     "onRowClick": { "type": { "name": "func" } },
     "slotProps": {
-      "type": { "name": "shape", "description": "{ dataGrid?: object }" },
+      "type": { "name": "shape", "description": "{ dataGrid?: any }" },
       "default": "{}"
     },
     "slots": {

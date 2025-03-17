@@ -14,11 +14,9 @@ export interface LocaleText {
   accountPreviewTitle: string;
 
   // SignInPage
-  signInTitle: string;
+  signInTitle: string | ((brandingTitle?: string) => string);
   signInSubtitle: string;
-  oauthSignInTitle: string;
-  passkeySignInTitle: string;
-  magicLinkSignInTitle: string;
+  providerSignInTitle: (provider: string) => string;
   signInRememberMe: string;
 
   // Common authentication labels
@@ -105,7 +103,47 @@ LocalizationProvider.propTypes /* remove-proptypes */ = {
   /**
    * Locale for components texts
    */
-  localeText: PropTypes.object,
+  localeText: PropTypes.shape({
+    accountPreviewIconButtonLabel: PropTypes.string,
+    accountPreviewTitle: PropTypes.string,
+    accountSignInLabel: PropTypes.string,
+    accountSignOutLabel: PropTypes.string,
+    alert: PropTypes.string,
+    cancel: PropTypes.string,
+    close: PropTypes.string,
+    confirm: PropTypes.string,
+    createErrorMessage: PropTypes.string,
+    createLabel: PropTypes.string,
+    createNewButtonLabel: PropTypes.string,
+    createSuccessMessage: PropTypes.string,
+    delete: PropTypes.string,
+    deleteCancelLabel: PropTypes.string,
+    deleteConfirmLabel: PropTypes.string,
+    deleteConfirmMessage: PropTypes.string,
+    deleteConfirmTitle: PropTypes.string,
+    deletedItemMessage: PropTypes.string,
+    deleteErrorMessage: PropTypes.string,
+    deleteLabel: PropTypes.string,
+    deleteSuccessMessage: PropTypes.string,
+    editErrorMessage: PropTypes.string,
+    editLabel: PropTypes.string,
+    editSuccessMessage: PropTypes.string,
+    email: PropTypes.string,
+    loading: PropTypes.string,
+    ok: PropTypes.string,
+    or: PropTypes.string,
+    passkey: PropTypes.string,
+    password: PropTypes.string,
+    providerSignInTitle: PropTypes.func,
+    reloadButtonLabel: PropTypes.string,
+    save: PropTypes.string,
+    signInRememberMe: PropTypes.string,
+    signInSubtitle: PropTypes.string,
+    signInTitle: PropTypes.oneOfType([PropTypes.func, PropTypes.string]),
+    to: PropTypes.string,
+    username: PropTypes.string,
+    with: PropTypes.string,
+  }),
 } as any;
 
 export { LocalizationProvider };

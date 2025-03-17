@@ -56,7 +56,8 @@ async function generateProptypes(
     project,
     shouldResolveObject: ({ name }) => {
       const propsToNotResolve = ['localeText'];
-      if (propsToNotResolve.includes(name)) {
+
+      if (!sourceFile.match(/LocalizationProvider/) && propsToNotResolve.includes(name)) {
         return false;
       }
       if (

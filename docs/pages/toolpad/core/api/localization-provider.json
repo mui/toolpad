@@ -1,5 +1,12 @@
 {
-  "props": { "localeText": { "type": { "name": "object" } } },
+  "props": {
+    "localeText": {
+      "type": {
+        "name": "shape",
+        "description": "{ accountPreviewIconButtonLabel?: string, accountPreviewTitle?: string, accountSignInLabel?: string, accountSignOutLabel?: string, alert?: string, cancel?: string, close?: string, confirm?: string, createErrorMessage?: string, createLabel?: string, createNewButtonLabel?: string, createSuccessMessage?: string, delete?: string, deleteCancelLabel?: string, deleteConfirmLabel?: string, deleteConfirmMessage?: string, deleteConfirmTitle?: string, deletedItemMessage?: string, deleteErrorMessage?: string, deleteLabel?: string, deleteSuccessMessage?: string, editErrorMessage?: string, editLabel?: string, editSuccessMessage?: string, email?: string, loading?: string, ok?: string, or?: string, passkey?: string, password?: string, providerSignInTitle?: func, reloadButtonLabel?: string, save?: string, signInRememberMe?: string, signInSubtitle?: string, signInTitle?: func<br>&#124;&nbsp;string, to?: string, username?: string, with?: string }"
+      }
+    }
+  },
   "name": "LocalizationProvider",
   "imports": ["import { LocalizationProvider } from '@toolpad/core/AppProvider';"],
   "classes": [],

@@ -5,20 +5,20 @@ import { PageContainer } from '@toolpad/core/PageContainer';
 
 export default function Layout() {
   const location = useLocation();
-  const { orderId } = useParams();
+  const { employeeId } = useParams();
 
   const title = React.useMemo(() => {
-    if (location.pathname === '/orders/new') {
-      return 'New Order';
+    if (location.pathname === '/employees/new') {
+      return 'New Employee';
     }
-    if (matchPath('/orders/:orderId/edit', location.pathname)) {
-      return `Order ${orderId} - Edit`;
+    if (matchPath('/employees/:employeeId/edit', location.pathname)) {
+      return `Employee ${employeeId} - Edit`;
     }
-    if (orderId) {
-      return `Order ${orderId}`;
+    if (employeeId) {
+      return `Employee ${employeeId}`;
     }
     return undefined;
-  }, [location.pathname, orderId]);
+  }, [location.pathname, employeeId]);
 
   return (
     <DashboardLayout>

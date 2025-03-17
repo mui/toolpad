@@ -15,10 +15,10 @@ const NAVIGATION: Navigation = [
     icon: <DashboardIcon />,
   },
   {
-    segment: 'orders',
-    title: 'Orders',
+    segment: 'employees',
+    title: 'Employees',
     icon: <ShoppingCartIcon />,
-    pattern: 'orders{/:orderId}*',
+    pattern: 'employees{/:employeeId}*',
   },
 ];
 

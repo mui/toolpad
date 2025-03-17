@@ -1,4 +1,4 @@
-# Toolpad Core - Vite with React Router
+# Toolpad Core - CRUD in Vite with React Router
 
 This example provides a CRUD setup integrated with Vite and React Router.
 

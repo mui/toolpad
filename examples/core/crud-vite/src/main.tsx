@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import App from './App';
 import Layout from './layouts/dashboard';
 import DashboardPage from './pages';
-import OrdersCrudPage from './pages/orders';
+import EmployeesCrudPage from './pages/employees';
 
 const router = createBrowserRouter([
   {
@@ -19,8 +19,8 @@ const router = createBrowserRouter([
             Component: DashboardPage,
           },
           {
-            path: 'orders/:orderId?/*',
-            Component: OrdersCrudPage,
+            path: 'employees/:employeeId?/*',
+            Component: EmployeesCrudPage,
           },
         ],
       },

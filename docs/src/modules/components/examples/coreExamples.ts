@@ -102,6 +102,33 @@ const coreExamples = [
     stackBlitz: true,
   },
   {
+    title: ' CRUD in Next.js App Router',
+    description: 'This example provides a CRUD setup integrated with the Next.js App Router.',
+    src: '/static/toolpad/docs/core/crud-next.png',
+    srcDark: '/static/toolpad/docs/core/crud-next-dark.png',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/crud-nextjs',
+    codeSandbox: true,
+    stackBlitz: true,
+  },
+  {
+    title: ' CRUD in Vite with React Router',
+    description: 'This example provides a CRUD setup integrated with Vite and React Router.',
+    src: '/static/toolpad/docs/core/crud-vite.png',
+    srcDark: '/static/toolpad/docs/core/crud-next-vite.png',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/crud-vite',
+    codeSandbox: true,
+    stackBlitz: true,
+  },
+  {
+    title: ' CRUD in Next.js Pages Router',
+    description: 'This example provides a CRUD setup integrated with the Next.js Pages Router.',
+    src: '/static/toolpad/docs/core/crud-next-pages.png',
+    srcDark: '/static/toolpad/docs/core/crud-next-pages-dark.png',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/crud-nextjs-pages',
+    codeSandbox: true,
+    stackBlitz: true,
+  },
+  {
     title: 'Tutorial app',
     description:
       'This app shows you to get started with Toolpad Core and use basic layout and navigation features.',

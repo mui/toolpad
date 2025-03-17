@@ -7,20 +7,20 @@ import { PageContainer } from '@toolpad/core/PageContainer';
 export default function DashboardPagesLayout(props: { children: React.ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
-  const [orderId] = params.segments ?? [];
+  const [employeeId] = params.segments ?? [];
 
   const title = React.useMemo(() => {
-    if (pathname === '/orders/new') {
-      return 'New Order';
+    if (pathname === '/employees/new') {
+      return 'New Employee';
     }
-    if (orderId && pathname.includes('/edit')) {
-      return `Order ${orderId} - Edit`;
+    if (employeeId && pathname.includes('/edit')) {
+      return `Employee ${employeeId} - Edit`;
     }
-    if (orderId) {
-      return `Order ${orderId}`;
+    if (employeeId) {
+      return `Employee ${employeeId}`;
     }
     return undefined;
-  }, [orderId, pathname]);
+  }, [employeeId, pathname]);
 
   return (
     <DashboardLayout>

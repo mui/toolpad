@@ -29,10 +29,10 @@ const NAVIGATION: Navigation = [
     icon: <DashboardIcon />,
   },
   {
-    segment: 'orders',
-    title: 'Orders',
+    segment: 'employees',
+    title: 'Employees',
     icon: <ShoppingCartIcon />,
-    pattern: 'orders{/:orderId}*',
+    pattern: 'employees{/:employeeId}*',
   },
 ];
 
@@ -43,20 +43,20 @@ const BRANDING = {
 function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
   const router = useRouter();
   const { segments = [] } = router.query;
-  const [orderId] = segments;
+  const [employeeId] = segments;
 
   const title = React.useMemo(() => {
-    if (router.asPath.split('?')[0] === '/orders/new') {
-      return 'New Order';
+    if (router.asPath.split('?')[0] === '/employees/new') {
+      return 'New Employee';
     }
-    if (orderId && router.asPath.includes('/edit')) {
-      return `Order ${orderId} - Edit`;
+    if (employeeId && router.asPath.includes('/edit')) {
+      return `Employee ${employeeId} - Edit`;
     }
-    if (orderId) {
-      return `Order ${orderId}`;
+    if (employeeId) {
+      return `Employee ${employeeId}`;
     }
     return undefined;
-  }, [orderId, router.asPath]);
+  }, [employeeId, router.asPath]);
 
   return (
     <DashboardLayout>

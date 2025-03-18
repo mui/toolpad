@@ -107,8 +107,8 @@ importers:
         specifier: 7.27.1
         version: 7.27.1(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@mui/material@6.4.7(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@6.4.7(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@next/eslint-plugin-next':
-        specifier: 14.2.24
-        version: 14.2.24
+        specifier: 14.2.25
+        version: 14.2.25
       '@playwright/test':
         specifier: 1.47.2
         version: 1.47.2
@@ -201,7 +201,7 @@ importers:
         version: 7.37.4(eslint@8.57.1)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 19.0.0-beta-bafa41b-20250307(eslint@8.57.1)
+        version: 19.0.0-beta-3229e95-20250315(eslint@8.57.1)
       eslint-plugin-react-hooks:
         specifier: 5.2.0
         version: 5.2.0(eslint@8.57.1)
@@ -300,7 +300,7 @@ importers:
         version: 5.0.0-beta.69(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@mui/docs':
         specifier: 6.4.7
-        version: 6.4.7(aeh7zmsxneq24t3foqd5cr4zre)
+        version: 6.4.7(2hufeg552qxmxuqz7dy2z7kblq)
       '@mui/icons-material':
         specifier: 6.4.7
         version: 6.4.7(@mui/material@6.4.7(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.10)(react@19.0.0)
@@ -318,7 +318,7 @@ importers:
         version: 6.4.7(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@mui/material-nextjs':
         specifier: 6.4.3
-        version: 6.4.3(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.10)(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 6.4.3(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.10)(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       '@mui/styles':
         specifier: 6.4.7
         version: 6.4.7(@types/react@19.0.10)(react@19.0.0)
@@ -425,8 +425,8 @@ importers:
         specifier: 7.7.4
         version: 7.7.4(react@19.0.0)
       next:
-        specifier: ^15.2.1
-        version: 15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^15.2.3
+        version: 15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       nprogress:
         specifier: 0.2.0
         version: 0.2.0
@@ -675,11 +675,11 @@ importers:
         specifier: 2.1.9
         version: 2.1.9(@types/node@20.17.24)(playwright@1.48.2)(typescript@5.8.2)(vite@5.4.14(@types/node@20.17.24)(terser@5.36.0))(vitest@2.1.9)
       next:
-        specifier: ^15.2.1
-        version: 15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^15.2.3
+        version: 15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       next-router-mock:
         specifier: ^0.9.13
-        version: 0.9.13(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 0.9.13(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       playwright:
         specifier: ^1.47.2
         version: 1.48.2
@@ -1234,7 +1234,7 @@ importers:
         version: 6.4.7(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@mui/material-nextjs':
         specifier: 6.4.3
-        version: 6.4.3(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.10)(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 6.4.3(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.10)(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
@@ -1249,16 +1249,16 @@ importers:
         version: 19.0.4(@types/react@19.0.10)
       cookies-next:
         specifier: ^5.1.0
-        version: 5.1.0(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 5.1.0(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       eslint-config-next:
-        specifier: 15.2.1
-        version: 15.2.1(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)(typescript@5.8.2)
+        specifier: 15.2.3
+        version: 15.2.3(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)(typescript@5.8.2)
       next:
-        specifier: ^15.2.1
-        version: 15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^15.2.3
+        version: 15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       next-auth:
         specifier: 5.0.0-beta.25
-        version: 5.0.0-beta.25(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 5.0.0-beta.25(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -1285,7 +1285,7 @@ importers:
         version: 6.4.7(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@mui/material-nextjs':
         specifier: 6.4.3
-        version: 6.4.3(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.10)(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 6.4.3(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.10)(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
@@ -1297,16 +1297,16 @@ importers:
         version: 19.0.4(@types/react@19.0.10)
       cookies-next:
         specifier: ^5.1.0
-        version: 5.1.0(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 5.1.0(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       eslint-config-next:
-        specifier: 15.2.1
-        version: 15.2.1(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)(typescript@5.8.2)
+        specifier: 15.2.3
+        version: 15.2.3(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)(typescript@5.8.2)
       next:
-        specifier: ^15.2.1
-        version: 15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^15.2.3
+        version: 15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       next-auth:
         specifier: 5.0.0-beta.25
-        version: 5.0.0-beta.25(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+        version: 5.0.0-beta.25(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -3554,59 +3554,59 @@ packages:
     resolution: {integrity: sha512-BH9eF3s7bUbqkcEUMR7dne/iCXSpZD10KVkGcs53eDrON5pKxsMdXvrdAx/q0HD24vJgHXGXObGSr5sjPllGEA==}
     engines: {node: '>=18.0.0'}
 
-  '@next/env@15.2.1':
-    resolution: {integrity: sha512-JmY0qvnPuS2NCWOz2bbby3Pe0VzdAQ7XpEB6uLIHmtXNfAsAO0KLQLkuAoc42Bxbo3/jMC3dcn9cdf+piCcG2Q==}
+  '@next/env@15.2.3':
+    resolution: {integrity: sha512-a26KnbW9DFEUsSxAxKBORR/uD9THoYoKbkpFywMN/AFvboTt94b8+g/07T8J6ACsdLag8/PDU60ov4rPxRAixw==}
 
-  '@next/eslint-plugin-next@14.2.24':
-    resolution: {integrity: sha512-FDL3qs+5DML0AJz56DCVr+KnFYivxeAX73En8QbPw9GjJZ6zbfvqDy+HrarHFzbsIASn7y8y5ySJ/lllSruNVQ==}
+  '@next/eslint-plugin-next@14.2.25':
+    resolution: {integrity: sha512-L2jcdEEa0bTv1DhE67Cdx1kLLkL0iLL9ILdBYx0j7noi2AUJM7bwcqmcN8awGg+8uyKGAGof/OkFom50x+ZyZg==}
 
-  '@next/eslint-plugin-next@15.2.1':
-    resolution: {integrity: sha512-6ppeToFd02z38SllzWxayLxjjNfzvc7Wm07gQOKSLjyASvKcXjNStZrLXMHuaWkhjqxe+cnhb2uzfWXm1VEj/Q==}
+  '@next/eslint-plugin-next@15.2.3':
+    resolution: {integrity: sha512-eNSOIMJtjs+dp4Ms1tB1PPPJUQHP3uZK+OQ7iFY9qXpGO6ojT6imCL+KcUOqE/GXGidWbBZJzYdgAdPHqeCEPA==}
 
-  '@next/swc-darwin-arm64@15.2.1':
-    resolution: {integrity: sha512-aWXT+5KEREoy3K5AKtiKwioeblmOvFFjd+F3dVleLvvLiQ/mD//jOOuUcx5hzcO9ISSw4lrqtUPntTpK32uXXQ==}
+  '@next/swc-darwin-arm64@15.2.3':
+    resolution: {integrity: sha512-uaBhA8aLbXLqwjnsHSkxs353WrRgQgiFjduDpc7YXEU0B54IKx3vU+cxQlYwPCyC8uYEEX7THhtQQsfHnvv8dw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
 
-  '@next/swc-darwin-x64@15.2.1':
-    resolution: {integrity: sha512-E/w8ervu4fcG5SkLhvn1NE/2POuDCDEy5gFbfhmnYXkyONZR68qbUlJlZwuN82o7BrBVAw+tkR8nTIjGiMW1jQ==}
+  '@next/swc-darwin-x64@15.2.3':
+    resolution: {integrity: sha512-pVwKvJ4Zk7h+4hwhqOUuMx7Ib02u3gDX3HXPKIShBi9JlYllI0nU6TWLbPT94dt7FSi6mSBhfc2JrHViwqbOdw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
 
-  '@next/swc-linux-arm64-gnu@15.2.1':
-    resolution: {integrity: sha512-gXDX5lIboebbjhiMT6kFgu4svQyjoSed6dHyjx5uZsjlvTwOAnZpn13w9XDaIMFFHw7K8CpBK7HfDKw0VZvUXQ==}
+  '@next/swc-linux-arm64-gnu@15.2.3':
+    resolution: {integrity: sha512-50ibWdn2RuFFkOEUmo9NCcQbbV9ViQOrUfG48zHBCONciHjaUKtHcYFiCwBVuzD08fzvzkWuuZkd4AqbvKO7UQ==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@next/swc-linux-arm64-musl@15.2.1':
-    resolution: {integrity: sha512-3v0pF/adKZkBWfUffmB/ROa+QcNTrnmYG4/SS+r52HPwAK479XcWoES2I+7F7lcbqc7mTeVXrIvb4h6rR/iDKg==}
+  '@next/swc-linux-arm64-musl@15.2.3':
+    resolution: {integrity: sha512-2gAPA7P652D3HzR4cLyAuVYwYqjG0mt/3pHSWTCyKZq/N/dJcUAEoNQMyUmwTZWCJRKofB+JPuDVP2aD8w2J6Q==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
 
-  '@next/swc-linux-x64-gnu@15.2.1':
-    resolution: {integrity: sha512-RbsVq2iB6KFJRZ2cHrU67jLVLKeuOIhnQB05ygu5fCNgg8oTewxweJE8XlLV+Ii6Y6u4EHwETdUiRNXIAfpBww==}
+  '@next/swc-linux-x64-gnu@15.2.3':
+    resolution: {integrity: sha512-ODSKvrdMgAJOVU4qElflYy1KSZRM3M45JVbeZu42TINCMG3anp7YCBn80RkISV6bhzKwcUqLBAmOiWkaGtBA9w==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-linux-x64-musl@15.2.1':
-    resolution: {integrity: sha512-QHsMLAyAIu6/fWjHmkN/F78EFPKmhQlyX5C8pRIS2RwVA7z+t9cTb0IaYWC3EHLOTjsU7MNQW+n2xGXr11QPpg==}
+  '@next/swc-linux-x64-musl@15.2.3':
+    resolution: {integrity: sha512-ZR9kLwCWrlYxwEoytqPi1jhPd1TlsSJWAc+H/CJHmHkf2nD92MQpSRIURR1iNgA/kuFSdxB8xIPt4p/T78kwsg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
 
-  '@next/swc-win32-arm64-msvc@15.2.1':
-    resolution: {integrity: sha512-Gk42XZXo1cE89i3hPLa/9KZ8OuupTjkDmhLaMKFohjf9brOeZVEa3BQy1J9s9TWUqPhgAEbwv6B2+ciGfe54Vw==}
+  '@next/swc-win32-arm64-msvc@15.2.3':
+    resolution: {integrity: sha512-+G2FrDcfm2YDbhDiObDU/qPriWeiz/9cRR0yMWJeTLGGX6/x8oryO3tt7HhodA1vZ8r2ddJPCjtLcpaVl7TE2Q==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
 
-  '@next/swc-win32-x64-msvc@15.2.1':
-    resolution: {integrity: sha512-YjqXCl8QGhVlMR8uBftWk0iTmvtntr41PhG1kvzGp0sUP/5ehTM+cwx25hKE54J0CRnHYjSGjSH3gkHEaHIN9g==}
+  '@next/swc-win32-x64-msvc@15.2.3':
+    resolution: {integrity: sha512-gHYS9tc+G2W0ZC8rBL+H6RdtXIyk40uLiaos0yj5US85FNhbFEndMA2nW3z47nzOWiSvXTZ5kBClc3rD0zJg0w==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
@@ -6113,8 +6113,8 @@ packages:
       eslint-plugin-react: ^7.28.0
       eslint-plugin-react-hooks: ^4.3.0
 
-  eslint-config-next@15.2.1:
-    resolution: {integrity: sha512-mhsprz7l0no8X+PdDnVHF4dZKu9YBJp2Rf6ztWbXBLJ4h6gxmW//owbbGJMBVUU+PibGJDAqZhW4pt8SC8HSow==}
+  eslint-config-next@15.2.3:
+    resolution: {integrity: sha512-VDQwbajhNMFmrhLWVyUXCqsGPN+zz5G8Ys/QwFubfsxTIrkqdx3N3x3QPW+pERz8bzGPP0IgEm8cNbZcd8PFRQ==}
     peerDependencies:
       eslint: ^7.23.0 || ^8.0.0 || ^9.0.0
       typescript: '>=3.3.1'
@@ -6205,8 +6205,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@19.0.0-beta-bafa41b-20250307:
-    resolution: {integrity: sha512-6q5FGhEh52dM2f6aqZcPWj1tlsc+3V2V1DrIxLiqJ0r3I2aivVXDf/TBZ3Bsqe6YDvdpaVDCg+bX9lv0QMn5PQ==}
+  eslint-plugin-react-compiler@19.0.0-beta-3229e95-20250315:
+    resolution: {integrity: sha512-cJL+A3P3nIBAugbZ/RroaixQ6ygnKYMVM1sRnAE26dqHZRVRfqT8+PCyGtB2tgLmQWZhv6glQ+PRoiXqLMcRug==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -8267,8 +8267,8 @@ packages:
       next: '>=10.0.0'
       react: '>=17.0.0'
 
-  next@15.2.1:
-    resolution: {integrity: sha512-zxbsdQv3OqWXybK5tMkPCBKyhIz63RstJ+NvlfkaLMc/m5MwXgz2e92k+hSKcyBpyADhMk2C31RIiaDjUZae7g==}
+  next@15.2.3:
+    resolution: {integrity: sha512-x6eDkZxk2rPpu46E1ZVUWIBhYCLszmUY6fvHBFcbzJ9dD+qRX6vcHusaqqDlnY+VngKzKbAiG2iRCkPbmi8f7w==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
     hasBin: true
     peerDependencies:
@@ -12617,7 +12617,7 @@ snapshots:
 
   '@mui/core-downloads-tracker@6.4.7': {}
 
-  '@mui/docs@6.4.7(aeh7zmsxneq24t3foqd5cr4zre)':
+  '@mui/docs@6.4.7(2hufeg552qxmxuqz7dy2z7kblq)':
     dependencies:
       '@babel/runtime': 7.26.10
       '@mui/base': 5.0.0-beta.69(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -12629,7 +12629,7 @@ snapshots:
       clipboard-copy: 4.0.1
       clsx: 2.1.1
       csstype: 3.1.3
-      next: 15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       nprogress: 0.2.0
       prop-types: 15.8.1
       react: 19.0.0
@@ -12710,11 +12710,11 @@ snapshots:
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0)
       '@types/react': 19.0.10
 
-  '@mui/material-nextjs@6.4.3(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.10)(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
+  '@mui/material-nextjs@6.4.3(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.10)(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)':
     dependencies:
       '@babel/runtime': 7.26.10
       '@emotion/react': 11.14.0(@types/react@19.0.10)(react@19.0.0)
-      next: 15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
     optionalDependencies:
       '@emotion/cache': 11.14.0
@@ -13162,38 +13162,38 @@ snapshots:
 
   '@netlify/serverless-functions-api@1.35.0': {}
 
-  '@next/env@15.2.1': {}
+  '@next/env@15.2.3': {}
 
-  '@next/eslint-plugin-next@14.2.24':
+  '@next/eslint-plugin-next@14.2.25':
     dependencies:
       glob: 10.3.10
 
-  '@next/eslint-plugin-next@15.2.1':
+  '@next/eslint-plugin-next@15.2.3':
     dependencies:
       fast-glob: 3.3.1
 
-  '@next/swc-darwin-arm64@15.2.1':
+  '@next/swc-darwin-arm64@15.2.3':
     optional: true
 
-  '@next/swc-darwin-x64@15.2.1':
+  '@next/swc-darwin-x64@15.2.3':
     optional: true
 
-  '@next/swc-linux-arm64-gnu@15.2.1':
+  '@next/swc-linux-arm64-gnu@15.2.3':
     optional: true
 
-  '@next/swc-linux-arm64-musl@15.2.1':
+  '@next/swc-linux-arm64-musl@15.2.3':
     optional: true
 
-  '@next/swc-linux-x64-gnu@15.2.1':
+  '@next/swc-linux-x64-gnu@15.2.3':
     optional: true
 
-  '@next/swc-linux-x64-musl@15.2.1':
+  '@next/swc-linux-x64-musl@15.2.3':
     optional: true
 
-  '@next/swc-win32-arm64-msvc@15.2.1':
+  '@next/swc-win32-arm64-msvc@15.2.3':
     optional: true
 
-  '@next/swc-win32-x64-msvc@15.2.1':
+  '@next/swc-win32-x64-msvc@15.2.3':
     optional: true
 
   '@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents.3':
@@ -15519,10 +15519,10 @@ snapshots:
 
   cookie@1.0.2: {}
 
-  cookies-next@5.1.0(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0):
+  cookies-next@5.1.0(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0):
     dependencies:
       cookie: 1.0.2
-      next: 15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
 
   copy-anything@3.0.5:
@@ -16215,9 +16215,9 @@ snapshots:
       object.assign: 4.1.7
       object.entries: 1.1.8
 
-  eslint-config-next@15.2.1(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)(typescript@5.8.2):
+  eslint-config-next@15.2.3(eslint-import-resolver-webpack@0.13.10(eslint-plugin-import@2.31.0)(webpack@5.98.0(esbuild@0.24.2)))(eslint@8.57.1)(typescript@5.8.2):
     dependencies:
-      '@next/eslint-plugin-next': 15.2.1
+      '@next/eslint-plugin-next': 15.2.3
       '@rushstack/eslint-patch': 1.10.4
       '@typescript-eslint/eslint-plugin': 8.26.0(@typescript-eslint/parser@8.26.0(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(typescript@5.8.2)
       '@typescript-eslint/parser': 8.26.0(eslint@8.57.1)(typescript@5.8.2)
@@ -16364,7 +16364,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@19.0.0-beta-bafa41b-20250307(eslint@8.57.1):
+  eslint-plugin-react-compiler@19.0.0-beta-3229e95-20250315(eslint@8.57.1):
     dependencies:
       '@babel/core': 7.26.9
       '@babel/parser': 7.26.9
@@ -18850,20 +18850,20 @@ snapshots:
 
   nested-error-stacks@2.1.1: {}
 
-  next-auth@5.0.0-beta.25(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0):
+  next-auth@5.0.0-beta.25(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0):
     dependencies:
       '@auth/core': 0.37.2
-      next: 15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
 
-  next-router-mock@0.9.13(next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0):
+  next-router-mock@0.9.13(next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0):
     dependencies:
-      next: 15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next: 15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
 
-  next@15.2.1(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  next@15.2.3(@babel/core@7.26.9)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
-      '@next/env': 15.2.1
+      '@next/env': 15.2.3
       '@swc/counter': 0.1.3
       '@swc/helpers': 0.5.15
       busboy: 1.6.0
@@ -18873,14 +18873,14 @@ snapshots:
       react-dom: 19.0.0(react@19.0.0)
       styled-jsx: 5.1.6(@babel/core@7.26.9)(babel-plugin-macros@3.1.0)(react@19.0.0)
     optionalDependencies:
-      '@next/swc-darwin-arm64': 15.2.1
-      '@next/swc-darwin-x64': 15.2.1
-      '@next/swc-linux-arm64-gnu': 15.2.1
-      '@next/swc-linux-arm64-musl': 15.2.1
-      '@next/swc-linux-x64-gnu': 15.2.1
-      '@next/swc-linux-x64-musl': 15.2.1
-      '@next/swc-win32-arm64-msvc': 15.2.1
-      '@next/swc-win32-x64-msvc': 15.2.1
+      '@next/swc-darwin-arm64': 15.2.3
+      '@next/swc-darwin-x64': 15.2.3
+      '@next/swc-linux-arm64-gnu': 15.2.3
+      '@next/swc-linux-arm64-musl': 15.2.3
+      '@next/swc-linux-x64-gnu': 15.2.3
+      '@next/swc-linux-x64-musl': 15.2.3
+      '@next/swc-win32-arm64-msvc': 15.2.3
+      '@next/swc-win32-x64-msvc': 15.2.3
       '@playwright/test': 1.47.2
       sharp: 0.33.5
     transitivePeerDependencies:

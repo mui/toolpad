@@ -167,6 +167,9 @@ jobs:
       - run:
           name: Tests real browser
           command: pnpm test:browser
+      - run:
+          name: Upload screenshots to Argos CI
+          command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} pnpm test:argos
 
   test_integration:
     <<: *default-job
@@ -189,14 +192,14 @@ jobs:
       # - run:
       #     name: Tests real browser
       #     command: pnpm test:integration
-      - store_test_results:
-          path: test/test-results/junit.xml
-      - run:
-          name: Upload screenshots to Argos CI
-          command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} pnpm test:argos
-      - store_artifacts:
-          path: test/test-results
-          destination: playwright-test-results
+      # - store_test_results:
+      #     path: test/test-results/junit.xml
+      # - run:
+      #     name: Upload screenshots to Argos CI
+      #     command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} pnpm test:argos
+      # - store_artifacts:
+      #     path: test/test-results
+      #     destination: playwright-test-results
 
   test_bundle_size_monitor:
     <<: *default-job

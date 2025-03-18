@@ -102,7 +102,7 @@ importers:
         version: 1.0.33
       '@mui/monorepo':
         specifier: github:mui/material-ui#5b215468a033289bfd3133f07421d5a57e568f9a
-        version: https://codeload.github.com/mui/material-ui/tar.gz/5b215468a033289bfd3133f07421d5a57e568f9a(@babel/core@7.26.10)(@types/express@5.0.0)(encoding@0.1.13)
+        version: git+https://git@github.com:mui/material-ui.git#5b215468a033289bfd3133f07421d5a57e568f9a(@babel/core@7.26.10)(@types/express@5.0.0)(encoding@0.1.13)
       '@mui/x-charts':
         specifier: 7.27.1
         version: 7.27.1(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@mui/material@6.4.7(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@6.4.7(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -880,8 +880,8 @@ importers:
         specifier: 3.13.0
         version: 3.13.0
       nanoid:
-        specifier: 5.1.3
-        version: 5.1.3
+        specifier: 5.1.4
+        version: 5.1.4
       node-fetch:
         specifier: 2.7.0
         version: 2.7.0(encoding@0.1.13)
@@ -1143,8 +1143,8 @@ importers:
         specifier: 2.2.4
         version: 2.2.4
       nanoid:
-        specifier: 5.1.3
-        version: 5.1.3
+        specifier: 5.1.4
+        version: 5.1.4
       react:
         specifier: ^18.0.0 || ^19.0.0
         version: 19.0.0
@@ -3135,8 +3135,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/5b215468a033289bfd3133f07421d5a57e568f9a':
-    resolution: {tarball: https://codeload.github.com/mui/material-ui/tar.gz/5b215468a033289bfd3133f07421d5a57e568f9a}
+  '@mui/monorepo@git+https://git@github.com:mui/material-ui.git#5b215468a033289bfd3133f07421d5a57e568f9a':
+    resolution: {commit: 5b215468a033289bfd3133f07421d5a57e568f9a, repo: git@github.com:mui/material-ui.git, type: git}
     version: 7.0.0-beta.3
     engines: {pnpm: 9.15.4}
 
@@ -8209,13 +8209,18 @@ packages:
   nanoid@2.1.11:
     resolution: {integrity: sha512-s/snB+WGm6uwi0WjsZdaVcuf3KJXlfGl2LcxgwkEwJF0D/BWzVWAZW/XY4bFaiR7s0Jk3FPvlnepg1H1b1UwlA==}
 
+  nanoid@3.3.10:
+    resolution: {integrity: sha512-vSJJTG+t/dIKAUhUDw/dLdZ9s//5OxcHqLaDWWrW4Cdq7o6tdLIczUkMXt2MBNmk6sJRZBZRXVixs7URY1CmIg==}
+    engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
+    hasBin: true
+
   nanoid@3.3.7:
     resolution: {integrity: sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.3:
-    resolution: {integrity: sha512-zAbEOEr7u2CbxwoMRlz/pNSpRP0FdAU4pRaYunCdEezWohXFs+a0Xw7RfkKaezMsmSM1vttcLthJtwRnVtOfHQ==}
+  nanoid@5.1.4:
+    resolution: {integrity: sha512-GTFcMIDgR7tqji/LpSY8rtg464VnJl/j6ypoehYnuGb+Y8qZUdtKB8WVCXon0UEZgFDbuUxpIl//6FHLHgXSNA==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -12737,7 +12742,7 @@ snapshots:
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0)
       '@types/react': 19.0.10
 
-  '@mui/monorepo@https://codeload.github.com/mui/material-ui/tar.gz/5b215468a033289bfd3133f07421d5a57e568f9a(@babel/core@7.26.10)(@types/express@5.0.0)(encoding@0.1.13)':
+  '@mui/monorepo@git+https://git@github.com:mui/material-ui.git#5b215468a033289bfd3133f07421d5a57e568f9a(@babel/core@7.26.10)(@types/express@5.0.0)(encoding@0.1.13)':
     dependencies:
       '@googleapis/sheets': 9.4.0(encoding@0.1.13)
       '@netlify/functions': 3.0.1
@@ -18821,9 +18826,11 @@ snapshots:
 
   nanoid@2.1.11: {}
 
+  nanoid@3.3.10: {}
+
   nanoid@3.3.7: {}
 
-  nanoid@5.1.3: {}
+  nanoid@5.1.4: {}
 
   natural-compare@1.4.0: {}
 
@@ -19568,7 +19575,7 @@ snapshots:
 
   postcss@8.4.31:
     dependencies:
-      nanoid: 3.3.7
+      nanoid: 3.3.10
       picocolors: 1.1.1
       source-map-js: 1.2.1
 

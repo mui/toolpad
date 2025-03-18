@@ -1,5 +1,7 @@
 # Why Toolpad Studio?
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Learn how Toolpad Studio approaches building internal tools, and how it can be useful to you.</p>
 
 ## TL;DR

@@ -1,5 +1,7 @@
 # Installation
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Setup Toolpad Studio to run on your own machine.</p>
 
 ## Create a Toolpad Studio app

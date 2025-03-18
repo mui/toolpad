@@ -1,5 +1,7 @@
 # Delete a data grid row
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">You can add a delete functionality to the data grid in minutes.</p>
 
 :::info

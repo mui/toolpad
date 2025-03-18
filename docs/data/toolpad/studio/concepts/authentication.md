@@ -1,5 +1,7 @@
 # Authentication
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Restrict a Toolpad Studio application to authenticated users only, under certain authentication providers.</p>
 
 You can configure a Toolpad Studio application so that users have to sign in with specific authentication providers in order to access it.

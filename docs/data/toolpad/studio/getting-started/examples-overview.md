@@ -5,6 +5,8 @@ title: Examples
 
 # Overview
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Browse a collection of Toolpad Studio examples that help you familiarise with Toolpad Studio concepts.</p>
 
 This collection includes apps that showcase connecting to APIs, adding custom components, adding secrets, adding authentication, working with ORMs and more.

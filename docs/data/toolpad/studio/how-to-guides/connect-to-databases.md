@@ -1,5 +1,7 @@
 # Connecting to databases
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Toolpad Studio allows you to connect to any database, fast.</p>
 
 You can write a custom function to connect to any database that you need to.

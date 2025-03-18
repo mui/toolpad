@@ -1,5 +1,7 @@
 # Data Grid
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Learn about how to use data grids in Toolpad Studio.</p>
 
 ## Demo

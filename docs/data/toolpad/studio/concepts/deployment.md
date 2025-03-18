@@ -1,5 +1,7 @@
 # Deployment
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Deploying a Toolpad Studio app is like deploying any other React/Node application.</p>
 
 ## Pre-requisites

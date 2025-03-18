@@ -1,5 +1,7 @@
 # Page properties
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 ## Display mode
 
 <p class="description">Toolpad Studio apps allow for a display mode configurable per-page.</p>

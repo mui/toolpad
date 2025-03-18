@@ -1,5 +1,7 @@
 # Embedding Toolpad Studio pages
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Toolpad Studio pages can be embedded anywhere you want to use them.</p>
 
 ## Using an `iframe`

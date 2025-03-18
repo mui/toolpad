@@ -1,5 +1,7 @@
 # Create a 3D cube component
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">You can extend Toolpad Studio with custom code components, including from external packages.</p>
 
 You can use any package available on `npm` to extend your Toolpad Studio application. This guide will render a cube using [`@react-three/fiber`](https://www.npmjs.com/package/@react-three/fiber):

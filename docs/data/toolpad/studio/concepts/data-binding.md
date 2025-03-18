@@ -1,5 +1,7 @@
 # Data binding
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">You can use bindings to make your components reactive to data on the page.</p>
 
 Each property of component that may be bound to data present on the page is surrounded by a **Binding** button, which you can click to initiate data binding.

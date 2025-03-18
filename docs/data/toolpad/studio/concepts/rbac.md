@@ -1,5 +1,7 @@
 # Role-based access control
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Restrict pages in Toolpad Studio application to users with certain roles only.</p>
 
 :::warning

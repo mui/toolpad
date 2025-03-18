@@ -1,5 +1,7 @@
 # Custom server
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Run Toolpad Studio applications programmatically in existing node.js servers.</p>
 
 :::warning

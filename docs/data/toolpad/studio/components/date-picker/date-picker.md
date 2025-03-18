@@ -1,5 +1,7 @@
 # Date Picker
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Learn about the datepicker component and its usage in Toolpad Studio.</p>
 
 ## Demo

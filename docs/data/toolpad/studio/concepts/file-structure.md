@@ -1,5 +1,7 @@
 # File structure
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Toolpad Studio's accessibility to the file-system makes it powerful. Here's how.</p>
 
 Toolpad Studio is file-system based, which means that an app's entire configuration is stored in files within your project. You can inspect and edit them from your IDE. You'll also use your own tools to author custom functions and components. This is how the project structure looks like in the file-system:

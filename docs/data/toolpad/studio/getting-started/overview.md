@@ -1,5 +1,7 @@
 # Overview
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">A general, high-level description of Toolpad Studio and its capabilites.</p>
 
 ## Introduction

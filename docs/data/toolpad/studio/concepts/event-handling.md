@@ -1,5 +1,7 @@
 # Event Handling
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">User actions create events that are handled in two ways in Toolpad Studio.</p>
 
 ## JS expression actions

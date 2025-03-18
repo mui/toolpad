@@ -1,5 +1,7 @@
 # Build your first app
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Learn the fundamentals of building with Toolpad Studio by creating a small application.</p>
 
 This guide will walk you through the process of creating a small Toolpad Studio application.

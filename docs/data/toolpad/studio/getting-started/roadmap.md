@@ -1,5 +1,7 @@
 # Roadmap
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Find out about the plans for Toolpad Studio.</p>
 
 ## Toolpad Studio roadmap

@@ -1,5 +1,7 @@
 # Connecting to data
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Be it a database table or an external API, Toolpad Studio offers mechanisms to read to – and write from – server-side data.</p>
 
 :::info

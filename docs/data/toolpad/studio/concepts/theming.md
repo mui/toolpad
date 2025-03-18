@@ -1,5 +1,7 @@
 # Theming
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Toolpad Studio allows you to add your custom theme to your app, or customize individual component styles.</p>
 
 ## Adding a global theme

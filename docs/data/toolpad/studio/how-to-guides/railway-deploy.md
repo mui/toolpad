@@ -1,5 +1,7 @@
 # Deploy to Railway
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">You can host and share your Toolpad Studio apps on Railway in a few minutes, for free.</p>
 
 This guide walks you through the deployment of a Toolpad Studio app from a GitHub repository.

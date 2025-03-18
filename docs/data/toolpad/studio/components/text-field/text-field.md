@@ -1,5 +1,7 @@
 # Text Field
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Learn about the textfield component and its usage in Toolpad Studio.</p>
 
 ## Demo

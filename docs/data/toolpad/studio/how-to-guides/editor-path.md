@@ -1,5 +1,7 @@
 # Troubleshoot missing editor
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">How to troubleshoot a missing editor error on Toolpad Studio.</p>
 
 ## When using Visual Studio Code

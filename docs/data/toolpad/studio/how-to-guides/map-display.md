@@ -1,5 +1,7 @@
 # Create a map component
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">You can extend Toolpad Studio with custom code components.</p>
 
 You can create a custom component to display any geographical map, like so:

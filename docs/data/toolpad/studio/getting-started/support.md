@@ -1,5 +1,7 @@
 # Support
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Learn how to get support for Toolpad Studio, including feature requests, bug fixes, and technical support from the team.</p>
 
 ## GitHub

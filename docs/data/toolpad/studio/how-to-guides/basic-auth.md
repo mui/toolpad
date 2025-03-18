@@ -1,5 +1,7 @@
 # Enable basic authentication
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Add basic authentication to your Toolpad Studio application.</p>
 
 You can integrate [basic auth](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#basic_authentication_scheme) into your Toolpad Studio applications using a simple environment variable configuration

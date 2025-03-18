@@ -1,5 +1,7 @@
 # Button
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">Learn about the button component and it's usage in Toolpad Studio.</p>
 
 ## Demo

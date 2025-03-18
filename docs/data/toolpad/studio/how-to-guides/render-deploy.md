@@ -1,5 +1,7 @@
 # Deploy to Render
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">You can host and share your Toolpad Studio apps on Render in a few minutes, for free.</p>
 
 ## Prerequisites

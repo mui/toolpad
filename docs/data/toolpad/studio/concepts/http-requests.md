@@ -1,5 +1,7 @@
 # HTTP requests
 
+{{"component": "modules/components/DeprecationNotice.tsx"}}
+
 <p class="description">These offer a fast way to load external data from REST APIs, via a configurable interface.</p>
 
 {{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/studio/concepts/connecting-to-data/query-1.png", "alt": "Add HTTP request", "caption": "Adding a query via the HTTP Request panel" }}

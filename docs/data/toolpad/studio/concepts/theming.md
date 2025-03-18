@@ -1,6 +1,8 @@
 # Theming
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">Toolpad Studio allows you to add your custom theme to your app, or customize individual component styles.</p>
 

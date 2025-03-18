@@ -5,7 +5,9 @@ title: Examples
 
 # Overview
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">Browse a collection of Toolpad Studio examples that help you familiarise with Toolpad Studio concepts.</p>
 

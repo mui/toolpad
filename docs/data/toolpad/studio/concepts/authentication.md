@@ -1,6 +1,8 @@
 # Authentication
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">Restrict a Toolpad Studio application to authenticated users only, under certain authentication providers.</p>
 

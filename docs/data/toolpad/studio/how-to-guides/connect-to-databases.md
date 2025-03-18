@@ -1,6 +1,8 @@
 # Connecting to databases
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">Toolpad Studio allows you to connect to any database, fast.</p>
 

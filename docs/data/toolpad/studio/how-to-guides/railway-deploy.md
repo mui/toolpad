@@ -1,6 +1,8 @@
 # Deploy to Railway
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">You can host and share your Toolpad Studio apps on Railway in a few minutes, for free.</p>
 

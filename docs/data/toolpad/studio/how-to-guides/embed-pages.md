@@ -1,6 +1,8 @@
 # Embedding Toolpad Studio pages
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">Toolpad Studio pages can be embedded anywhere you want to use them.</p>
 

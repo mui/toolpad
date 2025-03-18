@@ -1,6 +1,8 @@
 # File structure
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">Toolpad Studio's accessibility to the file-system makes it powerful. Here's how.</p>
 

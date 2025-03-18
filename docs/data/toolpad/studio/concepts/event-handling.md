@@ -1,6 +1,8 @@
 # Event Handling
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">User actions create events that are handled in two ways in Toolpad Studio.</p>
 

@@ -1,6 +1,8 @@
 # Deployment
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">Deploying a Toolpad Studio app is like deploying any other React/Node application.</p>
 

@@ -1,6 +1,8 @@
 # Create a map component
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">You can extend Toolpad Studio with custom code components.</p>
 

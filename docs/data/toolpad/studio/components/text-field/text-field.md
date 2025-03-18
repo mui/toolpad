@@ -1,6 +1,8 @@
 # Text Field
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">Learn about the textfield component and its usage in Toolpad Studio.</p>
 

@@ -1,6 +1,8 @@
 # Connecting to data
 
-{{"component": "modules/components/DeprecationNotice.tsx"}}
+:::warning
+Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+:::
 
 <p class="description">Be it a database table or an external API, Toolpad Studio offers mechanisms to read to – and write from – server-side data.</p>
 

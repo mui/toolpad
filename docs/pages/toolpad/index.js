@@ -10,7 +10,6 @@ import Examples from '../../src/components/landing/Examples';
 import Hero from '../../src/components/landing/Hero';
 import Features from '../../src/components/landing/Features';
 import BuiltWith from '../../src/components/landing/BuiltWith';
-import StudioIntro from '../../src/components/landing/StudioIntro';
 
 export default function Home() {
   return (
@@ -30,7 +29,6 @@ export default function Home() {
         <BuiltWith />
         <Divider />
         <Examples />
-        <StudioIntro />
       </main>
       <AppFooter />
     </BrandingCssVarsProvider>

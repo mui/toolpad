@@ -51,133 +51,134 @@ export const ordersDataSource: DataSource<Order> = {
       valueGetter: (value: string) => value && new Date(value),
     },
   ],
-  getMany: ({ paginationModel, filterModel, sortModel }) => {
-    return new Promise<{ items: Order[]; itemCount: number }>((resolve) => {
-      setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
+  getMany: async ({ paginationModel, filterModel, sortModel }) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
+    });
 
-        let filteredOrders = [...ordersStore];
+    const ordersStore = await getOrdersStore();
 
-        // Apply filters (example only)
-        if (filterModel?.items?.length) {
-          filterModel.items.forEach(({ field, value, operator }) => {
-            if (!field || value == null) {
-              return;
-            }
+    let filteredOrders = [...ordersStore];
 
-            filteredOrders = filteredOrders.filter((order) => {
-              const orderValue = order[field];
-
-              switch (operator) {
-                case 'contains':
-                  return String(orderValue).toLowerCase().includes(String(value).toLowerCase());
-                case 'equals':
-                  return orderValue === value;
-                case 'startsWith':
-                  return String(orderValue).toLowerCase().startsWith(String(value).toLowerCase());
-                case 'endsWith':
-                  return String(orderValue).toLowerCase().endsWith(String(value).toLowerCase());
-                case '>':
-                  return (orderValue as number) > value;
-                case '<':
-                  return (orderValue as number) < value;
-                default:
-                  return true;
-              }
-            });
-          });
+    // Apply filters (example only)
+    if (filterModel?.items?.length) {
+      filterModel.items.forEach(({ field, value, operator }) => {
+        if (!field || value == null) {
+          return;
         }
 
-        // Apply sorting
-        if (sortModel?.length) {
-          filteredOrders.sort((a, b) => {
-            for (const { field, sort } of sortModel) {
-              if ((a[field] as number) < (b[field] as number)) {
-                return sort === 'asc' ? -1 : 1;
-              }
-              if ((a[field] as number) > (b[field] as number)) {
-                return sort === 'asc' ? 1 : -1;
-              }
-            }
-            return 0;
-          });
-        }
+        filteredOrders = filteredOrders.filter((order) => {
+          const orderValue = order[field];
 
-        // Apply pagination
-        const start = paginationModel.page * paginationModel.pageSize;
-        const end = start + paginationModel.pageSize;
-        const paginatedOrders = filteredOrders.slice(start, end);
-
-        resolve({
-          items: paginatedOrders,
-          itemCount: filteredOrders.length,
+          switch (operator) {
+            case 'contains':
+              return String(orderValue).toLowerCase().includes(String(value).toLowerCase());
+            case 'equals':
+              return orderValue === value;
+            case 'startsWith':
+              return String(orderValue).toLowerCase().startsWith(String(value).toLowerCase());
+            case 'endsWith':
+              return String(orderValue).toLowerCase().endsWith(String(value).toLowerCase());
+            case '>':
+              return (orderValue as number) > value;
+            case '<':
+              return (orderValue as number) < value;
+            default:
+              return true;
+          }
         });
-      }, 1500);
-    });
-  },
-  getOne: (orderId) => {
-    return new Promise<Order>((resolve, reject) => {
-      setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
+      });
+    }
 
-        const orderToShow = ordersStore.find((order) => order.id === Number(orderId));
-
-        if (orderToShow) {
-          resolve(orderToShow);
-        } else {
-          reject(new Error('Order not found'));
+    // Apply sorting
+    if (sortModel?.length) {
+      filteredOrders.sort((a, b) => {
+        for (const { field, sort } of sortModel) {
+          if ((a[field] as number) < (b[field] as number)) {
+            return sort === 'asc' ? -1 : 1;
+          }
+          if ((a[field] as number) > (b[field] as number)) {
+            return sort === 'asc' ? 1 : -1;
+          }
         }
-      }, 1500);
-    });
+        return 0;
+      });
+    }
+
+    // Apply pagination
+    const start = paginationModel.page * paginationModel.pageSize;
+    const end = start + paginationModel.pageSize;
+    const paginatedOrders = filteredOrders.slice(start, end);
+
+    return {
+      items: paginatedOrders,
+      itemCount: filteredOrders.length,
+    };
   },
-  createOne: (data) => {
-    return new Promise((resolve) => {
-      setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
-
-        const newOrder = { id: ordersStore.length + 1, ...data } as Order;
-
-        setOrdersStore([...ordersStore, newOrder]);
-
-        resolve(newOrder);
-      }, 1500);
+  getOne: async (orderId) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    const ordersStore = await getOrdersStore();
+
+    const orderToShow = ordersStore.find((order) => order.id === Number(orderId));
+
+    if (!orderToShow) {
+      throw new Error('Order not found');
+    }
+    return orderToShow;
   },
-  updateOne: (orderId, data) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
+  createOne: async (data) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
+    });
 
-        let updatedOrder: Order | null = null;
+    const ordersStore = await getOrdersStore();
 
-        setOrdersStore(
-          ordersStore.map((order) => {
-            if (order.id === Number(orderId)) {
-              updatedOrder = { ...order, ...data };
-              return updatedOrder;
-            }
-            return order;
-          }),
-        );
+    const newOrder = { id: ordersStore.length + 1, ...data } as Order;
 
-        if (updatedOrder) {
-          resolve(updatedOrder);
-        } else {
-          reject(new Error('Order not found'));
+    await setOrdersStore([...ordersStore, newOrder]);
+
+    return newOrder;
+  },
+  updateOne: async (orderId, data) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
+    });
+
+    const ordersStore = await getOrdersStore();
+
+    let updatedOrder: Order | null = null;
+
+    await setOrdersStore(
+      ordersStore.map((order) => {
+        if (order.id === Number(orderId)) {
+          updatedOrder = { ...order, ...data };
+          return updatedOrder;
         }
-      }, 1500);
-    });
+        return order;
+      }),
+    );
+
+    if (!updatedOrder) {
+      throw new Error('Order not found');
+    }
+    return updatedOrder;
   },
-  deleteOne: (orderId) => {
-    return new Promise<void>((resolve) => {
-      setTimeout(async () => {
-        const ordersStore = await getOrdersStore();
-
-        setOrdersStore(ordersStore.filter((order) => order.id !== Number(orderId)));
-
-        resolve();
-      }, 1500);
+  deleteOne: async (orderId) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    const ordersStore = await getOrdersStore();
+
+    await setOrdersStore(ordersStore.filter((order) => order.id !== Number(orderId)));
   },
   validate: z.object({
     title: z.string({ required_error: 'Title is required' }).nonempty('Title is required'),

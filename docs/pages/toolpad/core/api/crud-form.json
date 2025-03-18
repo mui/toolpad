@@ -33,6 +33,6 @@
   "muiName": "CrudForm",
   "filename": "/packages/toolpad-core/src/Crud/CrudForm.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">Crud</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
   "cssComponent": false
 }

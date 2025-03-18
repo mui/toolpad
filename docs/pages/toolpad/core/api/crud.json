@@ -22,6 +22,6 @@
   "muiName": "Crud",
   "filename": "/packages/toolpad-core/src/Crud/Crud.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">Crud</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
   "cssComponent": false
 }

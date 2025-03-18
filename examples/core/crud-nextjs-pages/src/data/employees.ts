@@ -1,6 +1,5 @@
 'use client';
 import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
-import { getCookie, setCookie } from 'cookies-next';
 import { z } from 'zod';
 
 type EmployeeRole = 'Market' | 'Finance' | 'Development';
@@ -37,13 +36,13 @@ const INITIAL_EMPLOYEES_STORE: Employee[] = [
   },
 ];
 
-const getEmployeesStore = async (): Promise<Employee[]> => {
-  const value = await getCookie('employees-store');
+const getEmployeesStore = (): Employee[] => {
+  const value = localStorage.getItem('employees-store');
   return value ? JSON.parse(value) : INITIAL_EMPLOYEES_STORE;
 };
 
-const setEmployeesStore = async (value: Employee[]) => {
-  await setCookie('employees-store', JSON.stringify(value));
+const setEmployeesStore = (value: Employee[]) => {
+  return localStorage.setItem('employees-store', JSON.stringify(value));
 };
 
 export const employeesDataSource: DataSource<Employee> = {
@@ -72,7 +71,7 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = await getEmployeesStore();
+    const employeesStore = getEmployeesStore();
 
     let filteredEmployees = [...employeesStore];
 
@@ -137,7 +136,7 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = await getEmployeesStore();
+    const employeesStore = getEmployeesStore();
 
     const employeeToShow = employeesStore.find((employee) => employee.id === Number(employeeId));
 
@@ -152,11 +151,11 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = await getEmployeesStore();
+    const employeesStore = getEmployeesStore();
 
     const newEmployee = { id: employeesStore.length + 1, ...data } as Employee;
 
-    await setEmployeesStore([...employeesStore, newEmployee]);
+    setEmployeesStore([...employeesStore, newEmployee]);
 
     return newEmployee;
   },
@@ -166,11 +165,11 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = await getEmployeesStore();
+    const employeesStore = getEmployeesStore();
 
     let updatedEmployee: Employee | null = null;
 
-    await setEmployeesStore(
+    setEmployeesStore(
       employeesStore.map((employee) => {
         if (employee.id === Number(employeeId)) {
           updatedEmployee = { ...employee, ...data };
@@ -191,11 +190,9 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = await getEmployeesStore();
+    const employeesStore = getEmployeesStore();
 
-    await setEmployeesStore(
-      employeesStore.filter((employee) => employee.id !== Number(employeeId)),
-    );
+    setEmployeesStore(employeesStore.filter((employee) => employee.id !== Number(employeeId)));
   },
   validate: z.object({
     name: z.string({ required_error: 'Name is required' }).nonempty('Name is required'),

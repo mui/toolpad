@@ -104,8 +104,8 @@ const coreExamples = [
   {
     title: ' CRUD in Next.js App Router',
     description: 'This example provides a CRUD setup integrated with the Next.js App Router.',
-    src: '/static/toolpad/docs/core/crud-next.png',
-    srcDark: '/static/toolpad/docs/core/crud-next-dark.png',
+    src: '/static/toolpad/docs/core/crud.png',
+    srcDark: '/static/toolpad/docs/core/crud-dark.png',
     source: 'https://github.com/mui/toolpad/tree/master/examples/core/crud-nextjs',
     codeSandbox: true,
     stackBlitz: true,
@@ -113,8 +113,8 @@ const coreExamples = [
   {
     title: ' CRUD in Vite with React Router',
     description: 'This example provides a CRUD setup integrated with Vite and React Router.',
-    src: '/static/toolpad/docs/core/crud-vite.png',
-    srcDark: '/static/toolpad/docs/core/crud-next-vite.png',
+    src: '/static/toolpad/docs/core/crud.png',
+    srcDark: '/static/toolpad/docs/core/crud-dark.png',
     source: 'https://github.com/mui/toolpad/tree/master/examples/core/crud-vite',
     codeSandbox: true,
     stackBlitz: true,
@@ -122,8 +122,8 @@ const coreExamples = [
   {
     title: ' CRUD in Next.js Pages Router',
     description: 'This example provides a CRUD setup integrated with the Next.js Pages Router.',
-    src: '/static/toolpad/docs/core/crud-next-pages.png',
-    srcDark: '/static/toolpad/docs/core/crud-next-pages-dark.png',
+    src: '/static/toolpad/docs/core/crud.png',
+    srcDark: '/static/toolpad/docs/core/crud-dark.png',
     source: 'https://github.com/mui/toolpad/tree/master/examples/core/crud-nextjs-pages',
     codeSandbox: true,
     stackBlitz: true,

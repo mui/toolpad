@@ -6,7 +6,7 @@ import { PageContainer } from '@toolpad/core/PageContainer';
 import Head from 'next/head';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PersonIcon from '@mui/icons-material/Person';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core/AppProvider';
@@ -31,7 +31,7 @@ const NAVIGATION: Navigation = [
   {
     segment: 'employees',
     title: 'Employees',
-    icon: <ShoppingCartIcon />,
+    icon: <PersonIcon />,
     pattern: 'employees{/:employeeId}*',
   },
 ];

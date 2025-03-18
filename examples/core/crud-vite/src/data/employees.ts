@@ -11,9 +11,33 @@ export interface Employee extends DataModel {
   role: EmployeeRole;
 }
 
+const INITIAL_EMPLOYEES_STORE: Employee[] = [
+  {
+    id: 1,
+    name: 'Edward Perry',
+    age: 25,
+    joinDate: new Date().toISOString(),
+    role: 'Finance',
+  },
+  {
+    id: 2,
+    name: 'Josephine Drake',
+    age: 36,
+    joinDate: new Date().toISOString(),
+    role: 'Market',
+  },
+  {
+    id: 3,
+    name: 'Cody Phillips',
+    age: 19,
+    joinDate: new Date().toISOString(),
+    role: 'Development',
+  },
+];
+
 const getEmployeesStore = (): Employee[] => {
   const value = localStorage.getItem('employees-store');
-  return value ? JSON.parse(value) : [];
+  return value ? JSON.parse(value) : INITIAL_EMPLOYEES_STORE;
 };
 
 const setEmployeesStore = (value: Employee[]) => {
@@ -23,19 +47,21 @@ const setEmployeesStore = (value: Employee[]) => {
 export const employeesDataSource: DataSource<Employee> = {
   fields: [
     { field: 'id', headerName: 'ID' },
-    { field: 'name', headerName: 'Name' },
+    { field: 'name', headerName: 'Name', width: 140 },
     { field: 'age', headerName: 'Age', type: 'number' },
     {
       field: 'joinDate',
       headerName: 'Join date',
       type: 'date',
       valueGetter: (value: string) => value && new Date(value),
+      width: 140,
     },
     {
       field: 'role',
       headerName: 'Department',
       type: 'singleSelect',
       valueOptions: ['Market', 'Finance', 'Development'],
+      width: 160,
     },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {

@@ -1,4 +1,6 @@
+'use client';
 import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
+import { getCookie, setCookie } from 'cookies-next';
 import { z } from 'zod';
 
 type EmployeeRole = 'Market' | 'Finance' | 'Development';
@@ -11,31 +13,57 @@ export interface Employee extends DataModel {
   role: EmployeeRole;
 }
 
-const getEmployeesStore = (): Employee[] => {
-  const value = localStorage.getItem('employees-store');
-  return value ? JSON.parse(value) : [];
+const INITIAL_EMPLOYEES_STORE: Employee[] = [
+  {
+    id: 1,
+    name: 'Edward Perry',
+    age: 25,
+    joinDate: new Date().toISOString(),
+    role: 'Finance',
+  },
+  {
+    id: 2,
+    name: 'Josephine Drake',
+    age: 36,
+    joinDate: new Date().toISOString(),
+    role: 'Market',
+  },
+  {
+    id: 3,
+    name: 'Cody Phillips',
+    age: 19,
+    joinDate: new Date().toISOString(),
+    role: 'Development',
+  },
+];
+
+const getEmployeesStore = async (): Promise<Employee[]> => {
+  const value = await getCookie('employees-store');
+  return value ? JSON.parse(value) : INITIAL_EMPLOYEES_STORE;
 };
 
-const setEmployeesStore = (value: Employee[]) => {
-  return localStorage.setItem('employees-store', JSON.stringify(value));
+const setEmployeesStore = async (value: Employee[]) => {
+  await setCookie('employees-store', JSON.stringify(value));
 };
 
 export const employeesDataSource: DataSource<Employee> = {
   fields: [
     { field: 'id', headerName: 'ID' },
-    { field: 'name', headerName: 'Name' },
+    { field: 'name', headerName: 'Name', width: 140 },
     { field: 'age', headerName: 'Age', type: 'number' },
     {
       field: 'joinDate',
       headerName: 'Join date',
       type: 'date',
       valueGetter: (value: string) => value && new Date(value),
+      width: 140,
     },
     {
       field: 'role',
       headerName: 'Department',
       type: 'singleSelect',
       valueOptions: ['Market', 'Finance', 'Development'],
+      width: 160,
     },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
@@ -44,7 +72,7 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = getEmployeesStore();
+    const employeesStore = await getEmployeesStore();
 
     let filteredEmployees = [...employeesStore];
 
@@ -109,7 +137,7 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = getEmployeesStore();
+    const employeesStore = await getEmployeesStore();
 
     const employeeToShow = employeesStore.find((employee) => employee.id === Number(employeeId));
 
@@ -124,11 +152,11 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = getEmployeesStore();
+    const employeesStore = await getEmployeesStore();
 
     const newEmployee = { id: employeesStore.length + 1, ...data } as Employee;
 
-    setEmployeesStore([...employeesStore, newEmployee]);
+    await setEmployeesStore([...employeesStore, newEmployee]);
 
     return newEmployee;
   },
@@ -138,11 +166,11 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = getEmployeesStore();
+    const employeesStore = await getEmployeesStore();
 
     let updatedEmployee: Employee | null = null;
 
-    setEmployeesStore(
+    await setEmployeesStore(
       employeesStore.map((employee) => {
         if (employee.id === Number(employeeId)) {
           updatedEmployee = { ...employee, ...data };
@@ -163,9 +191,11 @@ export const employeesDataSource: DataSource<Employee> = {
       setTimeout(resolve, 750);
     });
 
-    const employeesStore = getEmployeesStore();
+    const employeesStore = await getEmployeesStore();
 
-    setEmployeesStore(employeesStore.filter((employee) => employee.id !== Number(employeeId)));
+    await setEmployeesStore(
+      employeesStore.filter((employee) => employee.id !== Number(employeeId)),
+    );
   },
   validate: z.object({
     name: z.string({ required_error: 'Name is required' }).nonempty('Name is required'),

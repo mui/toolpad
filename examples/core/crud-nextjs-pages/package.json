@@ -1,5 +1,5 @@
 {
-  "name": "core-auth-nextjs-pages",
+  "name": "crud-nextjs-pages",
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
@@ -14,6 +14,7 @@
     "@mui/material": "^6",
     "@mui/material-nextjs": "^6",
     "@toolpad/core": "^0.13.0",
+    "cookies-next": "^5.1.0",
     "next": "^15",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

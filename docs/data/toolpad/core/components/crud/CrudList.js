@@ -60,82 +60,82 @@ export const peopleDataSource = {
       type: 'number',
     },
   ],
-  getMany: ({ paginationModel, filterModel, sortModel }) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        let processedPeople = [...people];
+  getMany: async ({ paginationModel, filterModel, sortModel }) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
+    });
 
-        // Apply filters (demo only)
-        if (filterModel?.items?.length) {
-          filterModel.items.forEach(({ field, value, operator }) => {
-            if (!field || value == null) {
-              return;
-            }
+    let processedPeople = [...people];
 
-            processedPeople = processedPeople.filter((person) => {
-              const personValue = person[field];
-
-              switch (operator) {
-                case 'contains':
-                  return String(personValue)
-                    .toLowerCase()
-                    .includes(String(value).toLowerCase());
-                case 'equals':
-                  return personValue === value;
-                case 'startsWith':
-                  return String(personValue)
-                    .toLowerCase()
-                    .startsWith(String(value).toLowerCase());
-                case 'endsWith':
-                  return String(personValue)
-                    .toLowerCase()
-                    .endsWith(String(value).toLowerCase());
-                case '>':
-                  return personValue > value;
-                case '<':
-                  return personValue < value;
-                default:
-                  return true;
-              }
-            });
-          });
+    // Apply filters (demo only)
+    if (filterModel?.items?.length) {
+      filterModel.items.forEach(({ field, value, operator }) => {
+        if (!field || value == null) {
+          return;
         }
 
-        // Apply sorting
-        if (sortModel?.length) {
-          processedPeople.sort((a, b) => {
-            for (const { field, sort } of sortModel) {
-              if (a[field] < b[field]) {
-                return sort === 'asc' ? -1 : 1;
-              }
-              if (a[field] > b[field]) {
-                return sort === 'asc' ? 1 : -1;
-              }
-            }
-            return 0;
-          });
-        }
+        processedPeople = processedPeople.filter((person) => {
+          const personValue = person[field];
 
-        // Apply pagination
-        const start = paginationModel.page * paginationModel.pageSize;
-        const end = start + paginationModel.pageSize;
-        const paginatedPeople = processedPeople.slice(start, end);
-
-        resolve({
-          items: paginatedPeople,
-          itemCount: processedPeople.length,
+          switch (operator) {
+            case 'contains':
+              return String(personValue)
+                .toLowerCase()
+                .includes(String(value).toLowerCase());
+            case 'equals':
+              return personValue === value;
+            case 'startsWith':
+              return String(personValue)
+                .toLowerCase()
+                .startsWith(String(value).toLowerCase());
+            case 'endsWith':
+              return String(personValue)
+                .toLowerCase()
+                .endsWith(String(value).toLowerCase());
+            case '>':
+              return personValue > value;
+            case '<':
+              return personValue < value;
+            default:
+              return true;
+          }
         });
-      }, 750);
-    });
-  },
-  deleteOne: (personId) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        people = people.filter((person) => person.id !== Number(personId));
+      });
+    }
 
-        resolve();
-      }, 750);
+    // Apply sorting
+    if (sortModel?.length) {
+      processedPeople.sort((a, b) => {
+        for (const { field, sort } of sortModel) {
+          if (a[field] < b[field]) {
+            return sort === 'asc' ? -1 : 1;
+          }
+          if (a[field] > b[field]) {
+            return sort === 'asc' ? 1 : -1;
+          }
+        }
+        return 0;
+      });
+    }
+
+    // Apply pagination
+    const start = paginationModel.page * paginationModel.pageSize;
+    const end = start + paginationModel.pageSize;
+    const paginatedPeople = processedPeople.slice(start, end);
+
+    return {
+      items: paginatedPeople,
+      itemCount: processedPeople.length,
+    };
+  },
+  deleteOne: async (personId) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    people = people.filter((person) => person.id !== Number(personId));
   },
 };
 

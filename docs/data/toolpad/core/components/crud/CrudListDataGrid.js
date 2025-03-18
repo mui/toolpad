@@ -19,19 +19,9 @@ const NAVIGATION = [
 ];
 
 const demoTheme = createTheme({
-  cssVariables: {
-    colorSchemeSelector: 'data-toolpad-color-scheme',
-  },
+  cssVariables: { colorSchemeSelector: 'data-toolpad-color-scheme' },
   colorSchemes: { light: true, dark: true },
-  breakpoints: {
-    values: {
-      xs: 0,
-      sm: 600,
-      md: 600,
-      lg: 1200,
-      xl: 1536,
-    },
-  },
+  breakpoints: { values: { xs: 0, sm: 600, md: 600, lg: 1200, xl: 1536 } },
 });
 
 let people = [
@@ -47,96 +37,78 @@ let people = [
 export const peopleDataSource = {
   fields: [
     { field: 'id', headerName: 'ID' },
-    {
-      field: 'firstName',
-      headerName: 'First name',
-    },
-    {
-      field: 'lastName',
-      headerName: 'Last name',
-    },
-    {
-      field: 'age',
-      headerName: 'Age',
-      type: 'number',
-    },
+    { field: 'firstName', headerName: 'First name' },
+    { field: 'lastName', headerName: 'Last name' },
+    { field: 'age', headerName: 'Age', type: 'number' },
   ],
-  getMany: ({ paginationModel, filterModel, sortModel }) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        let processedPeople = [...people];
+  getMany: async ({ paginationModel, filterModel, sortModel }) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
+    });
 
-        // Apply filters (demo only)
-        if (filterModel?.items?.length) {
-          filterModel.items.forEach(({ field, value, operator }) => {
-            if (!field || value == null) {
-              return;
-            }
+    let processedPeople = [...people];
 
-            processedPeople = processedPeople.filter((person) => {
-              const personValue = person[field];
-
-              switch (operator) {
-                case 'contains':
-                  return String(personValue)
-                    .toLowerCase()
-                    .includes(String(value).toLowerCase());
-                case 'equals':
-                  return personValue === value;
-                case 'startsWith':
-                  return String(personValue)
-                    .toLowerCase()
-                    .startsWith(String(value).toLowerCase());
-                case 'endsWith':
-                  return String(personValue)
-                    .toLowerCase()
-                    .endsWith(String(value).toLowerCase());
-                case '>':
-                  return personValue > value;
-                case '<':
-                  return personValue < value;
-                default:
-                  return true;
-              }
-            });
-          });
+    if (filterModel?.items?.length) {
+      filterModel.items.forEach(({ field, value, operator }) => {
+        if (!field || value == null) {
+          return;
         }
-
-        // Apply sorting
-        if (sortModel?.length) {
-          processedPeople.sort((a, b) => {
-            for (const { field, sort } of sortModel) {
-              if (a[field] < b[field]) {
-                return sort === 'asc' ? -1 : 1;
-              }
-              if (a[field] > b[field]) {
-                return sort === 'asc' ? 1 : -1;
-              }
-            }
-            return 0;
-          });
-        }
-
-        // Apply pagination
-        const start = paginationModel.page * paginationModel.pageSize;
-        const end = start + paginationModel.pageSize;
-        const paginatedPeople = processedPeople.slice(start, end);
-
-        resolve({
-          items: paginatedPeople,
-          itemCount: processedPeople.length,
+        processedPeople = processedPeople.filter((person) => {
+          const personValue = person[field];
+          switch (operator) {
+            case 'contains':
+              return String(personValue)
+                .toLowerCase()
+                .includes(String(value).toLowerCase());
+            case 'equals':
+              return personValue === value;
+            case 'startsWith':
+              return String(personValue)
+                .toLowerCase()
+                .startsWith(String(value).toLowerCase());
+            case 'endsWith':
+              return String(personValue)
+                .toLowerCase()
+                .endsWith(String(value).toLowerCase());
+            case '>':
+              return personValue > value;
+            case '<':
+              return personValue < value;
+            default:
+              return true;
+          }
         });
-      }, 750);
-    });
-  },
-  deleteOne: (personId) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        people = people.filter((person) => person.id !== Number(personId));
+      });
+    }
 
-        resolve();
-      }, 750);
+    if (sortModel?.length) {
+      processedPeople.sort((a, b) => {
+        for (const { field, sort } of sortModel) {
+          if (a[field] < b[field]) {
+            return sort === 'asc' ? -1 : 1;
+          }
+          if (a[field] > b[field]) {
+            return sort === 'asc' ? 1 : -1;
+          }
+        }
+        return 0;
+      });
+    }
+
+    const start = paginationModel.page * paginationModel.pageSize;
+    const end = start + paginationModel.pageSize;
+    const paginatedPeople = processedPeople.slice(start, end);
+
+    return { items: paginatedPeople, itemCount: processedPeople.length };
+  },
+  deleteOne: async (personId) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    people = people.filter((person) => person.id !== Number(personId));
   },
 };
 
@@ -144,10 +116,7 @@ const peopleCache = new DataSourceCache();
 
 function CrudListDataGrid(props) {
   const { window } = props;
-
   const router = useDemoRouter('/people');
-
-  // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
   const handleRowClick = React.useCallback((personId) => {
@@ -184,13 +153,9 @@ function CrudListDataGrid(props) {
             onCreateClick={handleCreateClick}
             onEditClick={handleEditClick}
             onDelete={handleDelete}
-            slots={{
-              dataGrid: DataGridPro,
-            }}
+            slots={{ dataGrid: DataGridPro }}
             slotProps={{
-              dataGrid: {
-                checkboxSelection: true,
-              },
+              dataGrid: { checkboxSelection: true },
             }}
           />
           {/* preview-end */}
@@ -201,10 +166,6 @@ function CrudListDataGrid(props) {
 }
 
 CrudListDataGrid.propTypes = {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
   window: PropTypes.func,
 };
 

@@ -7,7 +7,7 @@ export default defineConfig({
 
   test: {
     ...base.test,
-    include: ['**/*.{test,spec}(.browser)?.?(c|m)[jt]s?(x)'],
+    include: ['**/*(.browser)?.{test,spec}.?(c|m)[jt]s?(x)'],
     browser: {
       enabled: true,
       name: 'chromium',

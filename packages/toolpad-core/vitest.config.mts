@@ -6,6 +6,7 @@ export default defineConfig({
 
   test: {
     setupFiles: ['../../test/setupVitest.ts', '@testing-library/jest-dom/vitest'],
+    exclude: ['**/*.browser.test.*'],
     coverage: {
       exclude: ['./build/**'],
       reportsDirectory: './.coverage',

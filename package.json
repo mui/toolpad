@@ -146,7 +146,6 @@
   "packageManager": "pnpm@9.12.3",
   "pnpm": {
     "patchedDependencies": {
-      "@mui/x-telemetry": "patches/@mui__x-telemetry.patch",
       "jss-plugin-rule-value-function": "patches/jss-plugin-rule-value-function.patch",
       "jss-plugin-global": "patches/jss-plugin-global.patch",
       "jss-plugin-nested": "patches/jss-plugin-nested.patch",

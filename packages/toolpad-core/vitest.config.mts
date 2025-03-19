@@ -1,16 +1,16 @@
-import { defineConfig, configDefaults } from 'vitest/config';
-import react from '@vitejs/plugin-react';
+import { defineConfig, mergeConfig } from 'vitest/config';
+import baseConfig from './vitest.config.base.mts';
 
-export default defineConfig({
-  plugins: [react()],
-
-  test: {
-    setupFiles: ['../../test/setupVitest.ts', '@testing-library/jest-dom/vitest'],
-    include: ['**/*[!.browser].{test,spec}.?(c|m)[jt]s?(x)'],
-    coverage: {
-      exclude: ['./build/**'],
-      reportsDirectory: './.coverage',
-      reporter: ['text', 'lcov'],
+export default mergeConfig(
+  baseConfig,
+  defineConfig({
+    test: {
+      include: ['**/*[!.browser].{test,spec}.?(c|m)[jt]s?(x)'],
+      coverage: {
+        exclude: ['./build/**'],
+        reportsDirectory: './.coverage',
+        reporter: ['text', 'lcov'],
+      },
     },
-  },
-});
+  }),
+);

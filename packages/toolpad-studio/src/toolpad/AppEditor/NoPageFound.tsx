@@ -19,10 +19,10 @@ export default function NoPageFound() {
       alignItems="center"
       direction="column"
     >
-      <Grid>
+      <Grid item>
         <Typography variant="h6">No pages in this app.</Typography>
       </Grid>
-      <Grid>
+      <Grid item>
         <Button variant="outlined" color="inherit" onClick={handleCreatePageDialogOpen}>
           Create new
         </Button>

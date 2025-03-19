@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 import invariant from 'invariant';
 import { usePageEditorState } from '../PageEditorProvider';
 import { useAppState } from '../../../AppState';

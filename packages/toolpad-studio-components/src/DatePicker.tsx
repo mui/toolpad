@@ -68,7 +68,7 @@ function getSnapshot() {
 }
 
 export interface DatePickerProps
-  extends Omit<DesktopDatePickerProps, 'value' | 'onChange' | 'defaultValue' | 'name'>,
+  extends Omit<DesktopDatePickerProps<dayjs.Dayjs>, 'value' | 'onChange' | 'defaultValue' | 'name'>,
     Pick<FormInputComponentProps, 'name' | 'isRequired'> {
   value?: string;
   onChange?: (newValue: string | null) => void;
@@ -131,7 +131,7 @@ function DatePicker({
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={adapterLocale}>
       {renderFormInput(
-        <DesktopDatePicker
+        <DesktopDatePicker<dayjs.Dayjs>
           {...rest}
           format={format || 'L'}
           value={value || null}

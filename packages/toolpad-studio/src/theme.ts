@@ -7,7 +7,7 @@ import type {} from '@mui/x-tree-view/themeAugmentation';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-declare module '@mui/material/styles' {
+declare module '@mui/material/styles/createPalette' {
   interface ColorRange {
     50: string;
     100: string;
@@ -26,14 +26,16 @@ declare module '@mui/material/styles' {
   interface Palette {
     primaryDark: PaletteColor;
   }
+}
 
-  interface TypographyVariantsOptions {
+declare module '@mui/material/styles/createTypography' {
+  interface TypographyOptions {
     fontWeightSemiBold?: number;
     fontWeightExtraBold?: number;
     fontFamilyCode?: string;
   }
 
-  interface TypographyVariants {
+  interface Typography {
     fontWeightSemiBold: number;
     fontWeightExtraBold: number;
     fontFamilyCode: string;

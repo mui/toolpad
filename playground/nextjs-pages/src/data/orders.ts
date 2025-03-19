@@ -1,6 +1,5 @@
 'use client';
 import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
-import { getCookie, setCookie } from 'cookies-next';
 import { z } from 'zod';
 
 type OrderStatus = 'Pending' | 'Sent';
@@ -16,13 +15,13 @@ export interface Order extends DataModel {
   deliveryTime?: string;
 }
 
-const getOrdersStore = async (): Promise<Order[]> => {
-  const value = await getCookie('orders-store');
+const getOrdersStore = (): Order[] => {
+  const value = localStorage.getItem('orders-store');
   return value ? JSON.parse(value) : [];
 };
 
-const setOrdersStore = async (value: Order[]) => {
-  await setCookie('orders-store', JSON.stringify(value));
+const setOrdersStore = (value: Order[]) => {
+  return localStorage.setItem('orders-store', JSON.stringify(value));
 };
 
 export const ordersDataSource: DataSource<Order> = {
@@ -57,7 +56,7 @@ export const ordersDataSource: DataSource<Order> = {
       setTimeout(resolve, 750);
     });
 
-    const ordersStore = await getOrdersStore();
+    const ordersStore = getOrdersStore();
 
     let filteredOrders = [...ordersStore];
 
@@ -122,7 +121,7 @@ export const ordersDataSource: DataSource<Order> = {
       setTimeout(resolve, 750);
     });
 
-    const ordersStore = await getOrdersStore();
+    const ordersStore = getOrdersStore();
 
     const orderToShow = ordersStore.find((order) => order.id === Number(orderId));
 
@@ -137,11 +136,11 @@ export const ordersDataSource: DataSource<Order> = {
       setTimeout(resolve, 750);
     });
 
-    const ordersStore = await getOrdersStore();
+    const ordersStore = getOrdersStore();
 
     const newOrder = { id: ordersStore.length + 1, ...data } as Order;
 
-    await setOrdersStore([...ordersStore, newOrder]);
+    setOrdersStore([...ordersStore, newOrder]);
 
     return newOrder;
   },
@@ -151,11 +150,11 @@ export const ordersDataSource: DataSource<Order> = {
       setTimeout(resolve, 750);
     });
 
-    const ordersStore = await getOrdersStore();
+    const ordersStore = getOrdersStore();
 
     let updatedOrder: Order | null = null;
 
-    await setOrdersStore(
+    setOrdersStore(
       ordersStore.map((order) => {
         if (order.id === Number(orderId)) {
           updatedOrder = { ...order, ...data };
@@ -176,9 +175,9 @@ export const ordersDataSource: DataSource<Order> = {
       setTimeout(resolve, 750);
     });
 
-    const ordersStore = await getOrdersStore();
+    const ordersStore = getOrdersStore();
 
-    await setOrdersStore(ordersStore.filter((order) => order.id !== Number(orderId)));
+    setOrdersStore(ordersStore.filter((order) => order.id !== Number(orderId)));
   },
   validate: z.object({
     title: z.string({ required_error: 'Title is required' }).nonempty('Title is required'),

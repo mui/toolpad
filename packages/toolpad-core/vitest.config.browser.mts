@@ -14,7 +14,7 @@ export default defineConfig({
       headless: !!process.env.CI,
       screenshotDirectory: path.resolve(
         import.meta.dirname,
-        '../../test/regressions/screenshots/toolpad-core',
+        '../../test/regressions/screenshots/chrome/toolpad-core',
       ),
       viewport: {
         width: 1024,

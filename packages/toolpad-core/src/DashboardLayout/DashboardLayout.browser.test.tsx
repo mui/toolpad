@@ -1,7 +1,3 @@
-/**
- * @vitest-environment browser
- */
-
 import * as React from 'react';
 import { describe, test } from 'vitest';
 import { render } from 'vitest-browser-react';

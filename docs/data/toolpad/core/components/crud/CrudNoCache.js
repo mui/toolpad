@@ -44,127 +44,128 @@ export const notesDataSource = {
     { field: 'title', headerName: 'Title', flex: 1 },
     { field: 'text', headerName: 'Text', flex: 1 },
   ],
-  getMany: ({ paginationModel, filterModel, sortModel }) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        let processedNotes = [...notesStore];
+  getMany: async ({ paginationModel, filterModel, sortModel }) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
+    });
 
-        // Apply filters (demo only)
-        if (filterModel?.items?.length) {
-          filterModel.items.forEach(({ field, value, operator }) => {
-            if (!field || value == null) {
-              return;
-            }
+    let processedNotes = [...notesStore];
 
-            processedNotes = processedNotes.filter((note) => {
-              const noteValue = note[field];
-
-              switch (operator) {
-                case 'contains':
-                  return String(noteValue)
-                    .toLowerCase()
-                    .includes(String(value).toLowerCase());
-                case 'equals':
-                  return noteValue === value;
-                case 'startsWith':
-                  return String(noteValue)
-                    .toLowerCase()
-                    .startsWith(String(value).toLowerCase());
-                case 'endsWith':
-                  return String(noteValue)
-                    .toLowerCase()
-                    .endsWith(String(value).toLowerCase());
-                case '>':
-                  return noteValue > value;
-                case '<':
-                  return noteValue < value;
-                default:
-                  return true;
-              }
-            });
-          });
+    // Apply filters (demo only)
+    if (filterModel?.items?.length) {
+      filterModel.items.forEach(({ field, value, operator }) => {
+        if (!field || value == null) {
+          return;
         }
 
-        // Apply sorting
-        if (sortModel?.length) {
-          processedNotes.sort((a, b) => {
-            for (const { field, sort } of sortModel) {
-              if (a[field] < b[field]) {
-                return sort === 'asc' ? -1 : 1;
-              }
-              if (a[field] > b[field]) {
-                return sort === 'asc' ? 1 : -1;
-              }
-            }
-            return 0;
-          });
-        }
+        processedNotes = processedNotes.filter((note) => {
+          const noteValue = note[field];
 
-        // Apply pagination
-        const start = paginationModel.page * paginationModel.pageSize;
-        const end = start + paginationModel.pageSize;
-        const paginatedNotes = processedNotes.slice(start, end);
-
-        resolve({
-          items: paginatedNotes,
-          itemCount: processedNotes.length,
-        });
-      }, 750);
-    });
-  },
-  getOne: (noteId) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const noteToShow = notesStore.find((note) => note.id === Number(noteId));
-
-        if (noteToShow) {
-          resolve(noteToShow);
-        } else {
-          reject(new Error('Note not found'));
-        }
-      }, 750);
-    });
-  },
-  createOne: (data) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newNote = { id: notesStore.length + 1, ...data };
-
-        notesStore = [...notesStore, newNote];
-
-        resolve(newNote);
-      }, 750);
-    });
-  },
-  updateOne: (noteId, data) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        let updatedNote = null;
-
-        notesStore = notesStore.map((note) => {
-          if (note.id === Number(noteId)) {
-            updatedNote = { ...note, ...data };
-            return updatedNote;
+          switch (operator) {
+            case 'contains':
+              return String(noteValue)
+                .toLowerCase()
+                .includes(String(value).toLowerCase());
+            case 'equals':
+              return noteValue === value;
+            case 'startsWith':
+              return String(noteValue)
+                .toLowerCase()
+                .startsWith(String(value).toLowerCase());
+            case 'endsWith':
+              return String(noteValue)
+                .toLowerCase()
+                .endsWith(String(value).toLowerCase());
+            case '>':
+              return noteValue > value;
+            case '<':
+              return noteValue < value;
+            default:
+              return true;
           }
-          return note;
         });
+      });
+    }
 
-        if (updatedNote) {
-          resolve(updatedNote);
-        } else {
-          reject(new Error('Note not found'));
+    // Apply sorting
+    if (sortModel?.length) {
+      processedNotes.sort((a, b) => {
+        for (const { field, sort } of sortModel) {
+          if (a[field] < b[field]) {
+            return sort === 'asc' ? -1 : 1;
+          }
+          if (a[field] > b[field]) {
+            return sort === 'asc' ? 1 : -1;
+          }
         }
-      }, 750);
-    });
-  },
-  deleteOne: (noteId) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        notesStore = notesStore.filter((note) => note.id !== Number(noteId));
+        return 0;
+      });
+    }
 
-        resolve();
-      }, 750);
+    // Apply pagination
+    const start = paginationModel.page * paginationModel.pageSize;
+    const end = start + paginationModel.pageSize;
+    const paginatedNotes = processedNotes.slice(start, end);
+
+    return {
+      items: paginatedNotes,
+      itemCount: processedNotes.length,
+    };
+  },
+  getOne: async (noteId) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    const noteToShow = notesStore.find((note) => note.id === Number(noteId));
+
+    if (noteToShow) {
+      return noteToShow;
+    }
+    throw new Error('Note not found');
+  },
+  createOne: async (data) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
+    });
+
+    const newNote = { id: notesStore.length + 1, ...data };
+
+    notesStore = [...notesStore, newNote];
+
+    return newNote;
+  },
+  updateOne: async (noteId, data) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
+    });
+
+    let updatedNote = null;
+
+    notesStore = notesStore.map((note) => {
+      if (note.id === Number(noteId)) {
+        updatedNote = { ...note, ...data };
+        return updatedNote;
+      }
+      return note;
+    });
+
+    if (!updatedNote) {
+      throw new Error('Note not found');
+    }
+    return updatedNote;
+  },
+  deleteOne: async (noteId) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
+    });
+
+    notesStore = notesStore.filter((note) => note.id !== Number(noteId));
   },
   validate: (formValues) => {
     let issues = [];

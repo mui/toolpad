@@ -6,12 +6,8 @@
   onCreateClick={handleCreateClick}
   onEditClick={handleEditClick}
   onDelete={handleDelete}
-  slots={{
-    dataGrid: DataGridPro,
-  }}
+  slots={{ dataGrid: DataGridPro }}
   slotProps={{
-    dataGrid: {
-      checkboxSelection: true,
-    },
+    dataGrid: { checkboxSelection: true },
   }}
 />

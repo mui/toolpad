@@ -60,27 +60,26 @@ export const peopleDataSource = {
       type: 'number',
     },
   ],
-  getOne: (personId) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const personToShow = people.find((person) => person.id === Number(personId));
-
-        if (personToShow) {
-          resolve(personToShow);
-        } else {
-          reject(new Error('Person not found'));
-        }
-      }, 750);
+  getOne: async (personId) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    const personToShow = people.find((person) => person.id === Number(personId));
+
+    if (!personToShow) {
+      throw new Error('Person not found');
+    }
+    return personToShow;
   },
-  deleteOne: (personId) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        people = people.filter((person) => person.id !== Number(personId));
-
-        resolve();
-      }, 750);
+  deleteOne: async (personId) => {
+    // Simulate loading delay
+    await new Promise((resolve) => {
+      setTimeout(resolve, 750);
     });
+
+    people = people.filter((person) => person.id !== Number(personId));
   },
 };
 

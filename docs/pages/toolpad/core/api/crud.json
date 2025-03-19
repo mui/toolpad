@@ -9,12 +9,29 @@
       }
     },
     "defaultValues": { "type": { "name": "object" }, "default": "{}" },
-    "initialPageSize": { "type": { "name": "number" }, "default": "100" }
+    "initialPageSize": { "type": { "name": "number" }, "default": "100" },
+    "slotProps": {
+      "type": { "name": "shape", "description": "{ dataGrid?: object }" },
+      "default": "{}"
+    },
+    "slots": {
+      "type": { "name": "shape", "description": "{ dataGrid?: func }" },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
   },
   "name": "Crud",
   "imports": [
     "import { Crud } from '@toolpad/core/Crud';",
     "import { Crud } from '@toolpad/core';"
+  ],
+  "slots": [
+    {
+      "name": "dataGrid",
+      "description": "The DataGrid component used to list the items.",
+      "default": "DataGrid",
+      "class": null
+    }
   ],
   "classes": [],
   "spread": true,

@@ -134,7 +134,6 @@ function DashboardSidebarSubNavigation({
           return (
             <ListSubheader
               key={`subheader-${depth}-${navigationItemIndex}`}
-              component="div"
               sx={{
                 fontSize: 12,
                 fontWeight: '700',
@@ -160,6 +159,7 @@ function DashboardSidebarSubNavigation({
           return (
             <Divider
               key={`divider-${depth}-${navigationItemIndex}`}
+              component="li"
               sx={{
                 borderBottomWidth: 2,
                 mx: 1,

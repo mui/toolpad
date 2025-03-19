@@ -1,14 +1,21 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { columns, rows } from '../mocks/gridOrdersData';
 
-export default function CustomizedDataGrid() {
+export default function CustomizedDataGrid({
+  rows,
+  columns,
+  ...rest
+}: {
+  rows?: any;
+  columns?: any;
+}) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <DataGrid
-        checkboxSelection
         rows={rows}
         columns={columns}
+        {...rest}
+        checkboxSelection
         getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd')}
         initialState={{
           pagination: { paginationModel: { pageSize: 20 } },
@@ -26,6 +33,12 @@ export default function CustomizedDataGrid() {
         density="compact"
         slotProps={{
           filterPanel: {
+            sx: {
+              '& .MuiDataGrid-filterForm': {
+                columnGap: 1.5,
+                marginTop: 2,
+              },
+            },
             filterFormProps: {
               logicOperatorInputProps: {
                 variant: 'outlined',

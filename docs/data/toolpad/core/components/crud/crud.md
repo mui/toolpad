@@ -29,9 +29,9 @@ It is recommended to include the `dataSourceCache` prop in order to properly cac
 
 Optionally, additional configuration options can be provided such as `initialPageSize` for the paginated list of items, or `defaultValues` to set the initial form values when using a form to create new items.
 
-<!-- :::info
-Take a look at the examples for [Next.js](https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/) and [Vite](https://github.com/mui/toolpad/tree/master/examples/core/vite/) for possible implementations on how the `Crud` component can be integrated with different routing solutions.
-::: -->
+:::info
+Take a look at the CRUD examples for [Next.js](https://github.com/mui/toolpad/tree/master/examples/core/crud-nextjs/) and [Vite](https://github.com/mui/toolpad/tree/master/examples/core/crud-vite/) for possible implementations on how the `Crud` component can be integrated with different routing solutions.
+:::
 
 ## Data sources
 

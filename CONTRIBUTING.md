@@ -21,7 +21,18 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 ### Prerequisites
 
 - git
-- node.js
+- node.js (run `npm pkg get engines.node` for the right version)
+
+### pnpm
+
+This project uses pnpm. There is no need to install this globally, when you prefix pnpm with npx it uses the installed version per developer dependency.
+
+```bash
+# running
+npx pnpm --version
+# will be the same as
+npm pkg get devDependencies.pnpm
+```
 
 ### Developing on Toolpad Core
 
@@ -32,13 +43,13 @@ Some application examples for different JavaScript frameworks (such as Next.js, 
 1. Install dependencies:
 
    ```bash
-   pnpm install
+   npx pnpm install
    ```
 
 2. Run the built-in watch mode
 
    ```bash
-   pnpm dev
+   npx pnpm dev
    ```
 
 3. Run any application in the `playground` folder in development mode, such as `nextjs`
@@ -48,7 +59,7 @@ Some application examples for different JavaScript frameworks (such as Next.js, 
    ```
 
    ```bash
-   pnpm dev
+   npx pnpm dev
    ```
 
 ### Testing the example apps
@@ -68,17 +79,17 @@ You can also test the example apps to make sure they work as expected.
 2. Run Toolpad Core locally
 
    ```bash
-   pnpm --filter @toolpad/core dev
+   npx pnpm --filter @toolpad/core dev
    ```
 
 3. Install then run the example app
 
    ```bash
-   pnpm --filter core-nextjs install
+   npx pnpm --filter core-nextjs install
    ```
 
    ```bash
-   pnpm --filter core-nextjs dev
+   npx pnpm --filter core-nextjs dev
    ```
 
 ### Running Toolpad Studio apps inside the monorepo (recommended)
@@ -90,19 +101,19 @@ You may even decide to temporarily move your app into the mono-repository.
 1. Install dependencies:
 
    ```bash
-   pnpm install
+   npx pnpm install
    ```
 
 1. Run the built-in watch mode
 
    ```bash
-   pnpm dev
+   npx pnpm dev
    ```
 
 1. Run Toolpad Studio
 
    ```bash
-   pnpm toolpad-studio dev test/integration/backend-basic/fixture/toolpad --dev
+   npx pnpm toolpad-studio dev test/integration/backend-basic/fixture/toolpad --dev
    ```
 
    **Note:** It's important to note the difference between `pnpm toolpad-studio dev` and the `--dev` parameter. The first instruction runs Toolpad Studio in dev mode. The `--dev` parameter is one for contributors only and runs the underlying next.js app that powers the editor in dev mode. The latter makes sure the development build of React is being used and the editor frontend application runs in watch mode.
@@ -123,19 +134,19 @@ If your application has dependencies other than `@toolpad/studio`, you have to t
    You should also run `pnpm dev` as follows to avoid the dev scripts from kicking in
 
    ```bash
-   pnpm dev --ignore qr-generator
+   npx pnpm dev --ignore qr-generator
    ```
 
 1. Run
 
    ```bash
-   pnpm install
+   npx pnpm install
    ```
 
 1. Make sure to start the build in watch mode again and the run the app with
 
    ```bash
-   pnpm toolpad-studio dev examples/qr-generator/toolpad --dev
+   npx pnpm toolpad-studio dev examples/qr-generator/toolpad --dev
    ```
 
 ### Linking Toolpad Studio in a folder on your system (advanced)
@@ -147,17 +158,17 @@ In some cases you may want to link local Toolpad Studio app into a project on yo
 
 1. Install dependencies:
 
-```bash
-pnpm install
-```
+   ```bash
+   npx pnpm install
+   ```
 
 1. Run the build in watch mode
 
    ```bash
-   pnpm dev
+   npx pnpm dev
    ```
 
-2. In another folder, start a Toolpad Studio project using:
+1. In another folder, start a Toolpad Studio project using:
 
    ```json
    {
@@ -201,7 +212,7 @@ pnpm install
       yarn install
       ```
 
-3. Run start toolpad-studio in dev mode:
+1. Run start toolpad-studio in dev mode:
 
    ```bash
    yarn dev
@@ -216,14 +227,14 @@ The playwright tests can be run in one of two modes:
 1. Build the production target, then run the integration tests in production mode:
 
    ```bash
-   pnpm release:build
-   pnpm test:integration --project chromium
+   npx pnpm release:build
+   npx pnpm test:integration --project chromium
    ```
 
 2. Start Toolpad Studio in dev watchmode and run the integration tests in dev mode with the `TOOLPAD_NEXT_DEV` environment variable (slower)
 
    ```bash
-   pnpm dev
+   npx pnpm dev
    TOOLPAD_NEXT_DEV=1 pnpm test:integration --project chromium
    ```
 
@@ -234,13 +245,13 @@ Use the `--ui` flag to run the tests interactively.
 1. If you haven't already, install the project dependencies using
 
    ```bash
-   pnpm install
+   npx pnpm install
    ```
 
 1. To start the documentation application in dev mode run
 
    ```bash
-   pnpm docs:dev
+   npx pnpm docs:dev
    ```
 
    If all goes well it should print
@@ -257,13 +268,13 @@ Use the `--ui` flag to run the tests interactively.
 - Run to build the project
 
   ```bash
-  pnpm && pnpm release:build
+  npx pnpm && pnpm release:build
   ```
 
 - Run it on your project of choice
 
   ```bash
-  pnpm toolpad-studio dev /path/to/my/toolpad/studio/project
+  npx pnpm toolpad-studio dev /path/to/my/toolpad/studio/project
   ```
 
 ## Using CodeSandbox CI
@@ -289,7 +300,7 @@ Each pull request is built on [CodeSandbox CI](https://codesandbox.io/docs/learn
 5. Run
 
    ```bash
-   pnpm --force
+   npx pnpm --force
    ```
 
 You'll now be able to explore your project with the Toolpad Studio version from the GitHub PR.

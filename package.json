@@ -101,6 +101,7 @@
     "jsdom": "25.0.1",
     "lerna": "8.2.1",
     "markdownlint-cli2": "0.17.2",
+    "pnpm": "9.12.3",
     "prettier": "3.5.3",
     "pretty-quick": "4.1.1",
     "react-docgen": "5.4.3",

@@ -1,12 +1,12 @@
 ---
 productId: toolpad-core
-title: Crud
+title: CRUD
 components: Crud, CrudProvider, List, Show, Create, Edit, CrudForm
 ---
 
-# Crud
+# CRUD
 
-<p class="description">The Crud component provides UIs to interact with data from any data source.</p>
+<p class="description">The CRUD component provides UIs to interact with data from any data source.</p>
 
 With the `Crud` component and its subcomponents you can easily generate pages where items from your data source can be listed in a table, shown individually in detail, or created and edited with forms. All with minimal configuration from a single data source definition.
 

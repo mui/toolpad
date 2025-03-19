@@ -6,11 +6,6 @@ export default mergeConfig(
   defineConfig({
     test: {
       include: ['**/*[!.browser].{test,spec}.?(c|m)[jt]s?(x)'],
-      coverage: {
-        exclude: ['./build/**'],
-        reportsDirectory: './.coverage',
-        reporter: ['text', 'lcov'],
-      },
     },
   }),
 );

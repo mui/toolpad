@@ -4,9 +4,9 @@ import { SignInPage } from '@toolpad/core/SignInPage';
 import hiIN from '@toolpad/core/locales/hiIN';
 
 const providers = [
-  { id: 'github', name: 'GitHub' },
-  { id: 'google', name: 'Google' },
-  { id: 'credentials', name: 'Email and Password' },
+  { id: 'github', name: 'गिटहब' },
+  { id: 'google', name: 'गूगल' },
+  { id: 'credentials', name: 'ईमेल और पासवर्ड' },
 ];
 
 const signIn = async (provider) => {

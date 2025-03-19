@@ -1,7 +1,7 @@
 # Connecting to databases
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">Toolpad Studio allows you to connect to any database, fast.</p>

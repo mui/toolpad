@@ -1,7 +1,7 @@
 # Overview
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">A general, high-level description of Toolpad Studio and its capabilites.</p>

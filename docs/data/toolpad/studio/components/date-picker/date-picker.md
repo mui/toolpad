@@ -1,7 +1,7 @@
 # Date Picker
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">Learn about the datepicker component and its usage in Toolpad Studio.</p>

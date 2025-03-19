@@ -1,7 +1,7 @@
 # Delete a data grid row
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">You can add a delete functionality to the data grid in minutes.</p>

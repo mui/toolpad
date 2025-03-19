@@ -1,7 +1,7 @@
 # Create a 3D cube component
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">You can extend Toolpad Studio with custom code components, including from external packages.</p>

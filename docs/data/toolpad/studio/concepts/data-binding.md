@@ -1,7 +1,7 @@
 # Data binding
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">You can use bindings to make your components reactive to data on the page.</p>

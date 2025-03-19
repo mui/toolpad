@@ -1,7 +1,7 @@
 # Custom components
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">You can bring your own custom components inside the Toolpad Studio editor.</p>

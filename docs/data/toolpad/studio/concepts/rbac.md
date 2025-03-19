@@ -1,7 +1,7 @@
 # Role-based access control
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">Restrict pages in Toolpad Studio application to users with certain roles only.</p>

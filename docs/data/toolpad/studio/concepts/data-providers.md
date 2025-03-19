@@ -1,7 +1,7 @@
 # Data providers
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">Bring tabular data to the frontend with server-side pagination and filtering.</p>

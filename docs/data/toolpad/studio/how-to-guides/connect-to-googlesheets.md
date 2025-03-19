@@ -1,7 +1,7 @@
 # Google Sheets
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">Quickly fetch data from Google Sheets to build a Toolpad Studio app.</p>

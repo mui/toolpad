@@ -6,7 +6,7 @@ title: Examples
 # Overview
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">Browse a collection of Toolpad Studio examples that help you familiarise with Toolpad Studio concepts.</p>

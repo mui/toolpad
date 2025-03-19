@@ -1,7 +1,7 @@
 # Connecting to data
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">Be it a database table or an external API, Toolpad Studio offers mechanisms to read to – and write from – server-side data.</p>

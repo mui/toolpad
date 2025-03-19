@@ -1,7 +1,7 @@
 # Custom server
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">Run Toolpad Studio applications programmatically in existing node.js servers.</p>

@@ -1,7 +1,7 @@
 # Building UI
 
 :::warning
-Toolpad Studio has been deprecated. Please use [Toopad Core](/toolpad/) instead.
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
 :::
 
 <p class="description">Toolpad Studio allows you to build your frontends fast so you can concentrate on writing logic.</p>

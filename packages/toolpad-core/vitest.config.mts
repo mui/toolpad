@@ -1,11 +1,11 @@
-import { defineConfig, mergeConfig } from 'vitest/config';
+import { defaultExclude, defineConfig, mergeConfig } from 'vitest/config';
 import baseConfig from './vitest.config.base.mts';
 
 export default mergeConfig(
   baseConfig,
   defineConfig({
     test: {
-      include: ['**/*[!.browser].{test,spec}.?(c|m)[jt]s?(x)'],
+      exclude: [...defaultExclude, '**/*.browser.{test,spec}.*'],
     },
   }),
 );

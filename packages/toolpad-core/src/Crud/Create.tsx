@@ -44,7 +44,7 @@ export interface CreateProps<D extends DataModel> {
  *
  * Demos:
  *
- * - [Crud](https://mui.com/toolpad/core/react-crud/)
+ * - [CRUD](https://mui.com/toolpad/core/react-crud/)
  *
  * API:
  *

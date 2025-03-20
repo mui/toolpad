@@ -1,8 +1,8 @@
-"use client";
-import { DataModel, DataSource, DataSourceCache } from "@toolpad/core/Crud";
-import { z } from "zod";
+'use client';
+import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
+import { z } from 'zod';
 
-type EmployeeRole = "Market" | "Finance" | "Development";
+type EmployeeRole = 'Market' | 'Finance' | 'Development';
 
 export interface Employee extends DataModel {
   id: number;
@@ -15,53 +15,53 @@ export interface Employee extends DataModel {
 const INITIAL_EMPLOYEES_STORE: Employee[] = [
   {
     id: 1,
-    name: "Edward Perry",
+    name: 'Edward Perry',
     age: 25,
     joinDate: new Date().toISOString(),
-    role: "Finance",
+    role: 'Finance',
   },
   {
     id: 2,
-    name: "Josephine Drake",
+    name: 'Josephine Drake',
     age: 36,
     joinDate: new Date().toISOString(),
-    role: "Market",
+    role: 'Market',
   },
   {
     id: 3,
-    name: "Cody Phillips",
+    name: 'Cody Phillips',
     age: 19,
     joinDate: new Date().toISOString(),
-    role: "Development",
+    role: 'Development',
   },
 ];
 
 const getEmployeesStore = (): Employee[] => {
-  const value = localStorage.getItem("employees-store");
+  const value = localStorage.getItem('employees-store');
   return value ? JSON.parse(value) : INITIAL_EMPLOYEES_STORE;
 };
 
 const setEmployeesStore = (value: Employee[]) => {
-  return localStorage.setItem("employees-store", JSON.stringify(value));
+  return localStorage.setItem('employees-store', JSON.stringify(value));
 };
 
 export const employeesDataSource: DataSource<Employee> = {
   fields: [
-    { field: "id", headerName: "ID" },
-    { field: "name", headerName: "Name", width: 140 },
-    { field: "age", headerName: "Age", type: "number" },
+    { field: 'id', headerName: 'ID' },
+    { field: 'name', headerName: 'Name', width: 140 },
+    { field: 'age', headerName: 'Age', type: 'number' },
     {
-      field: "joinDate",
-      headerName: "Join date",
-      type: "date",
+      field: 'joinDate',
+      headerName: 'Join date',
+      type: 'date',
       valueGetter: (value: string) => value && new Date(value),
       width: 140,
     },
     {
-      field: "role",
-      headerName: "Department",
-      type: "singleSelect",
-      valueOptions: ["Market", "Finance", "Development"],
+      field: 'role',
+      headerName: 'Department',
+      type: 'singleSelect',
+      valueOptions: ['Market', 'Finance', 'Development'],
       width: 160,
     },
   ],
@@ -86,23 +86,17 @@ export const employeesDataSource: DataSource<Employee> = {
           const employeeValue = employee[field];
 
           switch (operator) {
-            case "contains":
-              return String(employeeValue)
-                .toLowerCase()
-                .includes(String(value).toLowerCase());
-            case "equals":
+            case 'contains':
+              return String(employeeValue).toLowerCase().includes(String(value).toLowerCase());
+            case 'equals':
               return employeeValue === value;
-            case "startsWith":
-              return String(employeeValue)
-                .toLowerCase()
-                .startsWith(String(value).toLowerCase());
-            case "endsWith":
-              return String(employeeValue)
-                .toLowerCase()
-                .endsWith(String(value).toLowerCase());
-            case ">":
+            case 'startsWith':
+              return String(employeeValue).toLowerCase().startsWith(String(value).toLowerCase());
+            case 'endsWith':
+              return String(employeeValue).toLowerCase().endsWith(String(value).toLowerCase());
+            case '>':
               return (employeeValue as number) > value;
-            case "<":
+            case '<':
               return (employeeValue as number) < value;
             default:
               return true;
@@ -116,10 +110,10 @@ export const employeesDataSource: DataSource<Employee> = {
       filteredEmployees.sort((a, b) => {
         for (const { field, sort } of sortModel) {
           if ((a[field] as number) < (b[field] as number)) {
-            return sort === "asc" ? -1 : 1;
+            return sort === 'asc' ? -1 : 1;
           }
           if ((a[field] as number) > (b[field] as number)) {
-            return sort === "asc" ? 1 : -1;
+            return sort === 'asc' ? 1 : -1;
           }
         }
         return 0;
@@ -144,12 +138,10 @@ export const employeesDataSource: DataSource<Employee> = {
 
     const employeesStore = getEmployeesStore();
 
-    const employeeToShow = employeesStore.find(
-      (employee) => employee.id === Number(employeeId)
-    );
+    const employeeToShow = employeesStore.find((employee) => employee.id === Number(employeeId));
 
     if (!employeeToShow) {
-      throw new Error("Employee not found");
+      throw new Error('Employee not found');
     }
     return employeeToShow;
   },
@@ -184,11 +176,11 @@ export const employeesDataSource: DataSource<Employee> = {
           return updatedEmployee;
         }
         return employee;
-      })
+      }),
     );
 
     if (!updatedEmployee) {
-      throw new Error("Employee not found");
+      throw new Error('Employee not found');
     }
     return updatedEmployee;
   },
@@ -200,26 +192,20 @@ export const employeesDataSource: DataSource<Employee> = {
 
     const employeesStore = getEmployeesStore();
 
-    setEmployeesStore(
-      employeesStore.filter((employee) => employee.id !== Number(employeeId))
-    );
+    setEmployeesStore(employeesStore.filter((employee) => employee.id !== Number(employeeId)));
   },
   validate: z.object({
-    name: z
-      .string({ required_error: "Name is required" })
-      .nonempty("Name is required"),
-    age: z
-      .number({ required_error: "Age is required" })
-      .min(18, "Age must be at least 18"),
+    name: z.string({ required_error: 'Name is required' }).nonempty('Name is required'),
+    age: z.number({ required_error: 'Age is required' }).min(18, 'Age must be at least 18'),
     joinDate: z
-      .string({ required_error: "Join date is required" })
-      .nonempty("Join date is required"),
-    role: z.enum(["Market", "Finance", "Development"], {
+      .string({ required_error: 'Join date is required' })
+      .nonempty('Join date is required'),
+    role: z.enum(['Market', 'Finance', 'Development'], {
       errorMap: () => ({
         message: 'Role must be "Market", "Finance" or "Development"',
       }),
     }),
-  })["~standard"].validate,
+  })['~standard'].validate,
 };
 
 export const employeesCache = new DataSourceCache();

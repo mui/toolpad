@@ -22,6 +22,5 @@
     "incremental": true
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "cli/**/*.ts", "cli/**/*.tsx", "typings/**/*.d.ts"],
-  "exclude": ["node_modules", "./scripts", "./public"],
-  "references": [{ "path": "../toolpad-utils" }, { "path": "../toolpad-studio-runtime" }]
+  "exclude": ["node_modules", "./scripts", "./public"]
 }

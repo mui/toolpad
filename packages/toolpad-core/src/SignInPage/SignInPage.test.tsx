@@ -33,7 +33,7 @@ describe('SignInPage', () => {
 
     const emailField = screen.getByRole('textbox', { name: 'Email' });
     const passwordField = screen.getByLabelText(/Password/);
-    const signInButton = screen.getByRole('button', { name: 'Sign in' });
+    const signInButton = screen.getByRole('button', { name: 'Sign in with credentials' });
 
     await userEvent.type(emailField, 'john@example.com');
     await userEvent.type(passwordField, 'thepassword');
@@ -55,7 +55,7 @@ describe('SignInPage', () => {
     render(<SignInPage signIn={signIn} providers={[{ id: 'nodemailer', name: 'Email' }]} />);
 
     const emailField = screen.getByRole('textbox', { name: 'Email' });
-    const signInButton = screen.getByRole('button', { name: 'Sign in with Email' });
+    const signInButton = screen.getByRole('button', { name: 'Sign in with email' });
 
     await userEvent.type(emailField, 'john@example.com');
     await userEvent.click(signInButton);

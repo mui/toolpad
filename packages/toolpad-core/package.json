@@ -38,8 +38,8 @@
     "check-types": "pnpm build:stable && pnpm build:types && tsc --noEmit",
     "test": "vitest run --coverage",
     "test:dev": "vitest",
-    "test:browser": "vitest run --browser.enabled",
-    "test:browser:dev": "vitest --browser.enabled"
+    "test:browser": "vitest run -c vitest.config.browser.mts",
+    "test:browser:dev": "vitest -c vitest.config.browser.mts"
   },
   "dependencies": {
     "@babel/runtime": "^7.26.10",

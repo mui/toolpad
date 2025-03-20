@@ -21,7 +21,10 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 ### Prerequisites
 
 - git
-- node.js
+- node.js (run `npm pkg get engines.node` for the right version)
+- pnpm
+  - globally installed `npm i pnpm -g`
+  - running `corepack enable`, to enable corepack, a tool that ships with Node.js to manage package managers
 
 ### Developing on Toolpad Core
 

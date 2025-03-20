@@ -39,7 +39,7 @@
     "@mui/x-date-pickers": "7.28.0",
     "@mui/x-date-pickers-pro": "7.28.0",
     "@mui/x-license": "7.28.0",
-    "@toolpad/core": "workspace:*",
+    "@toolpad/core": "0.13.0",
     "@toolpad/studio": "workspace:*",
     "@trendmicro/react-interpolate": "0.5.5",
     "@types/lodash": "4.17.16",

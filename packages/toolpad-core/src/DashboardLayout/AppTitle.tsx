@@ -10,6 +10,8 @@ import { useApplicationTitle } from '../shared/branding';
 const LogoContainer = styled('div')({
   position: 'relative',
   height: 40,
+  display: 'flex',
+  alignItems: 'center',
   '& img': {
     maxHeight: 40,
   },

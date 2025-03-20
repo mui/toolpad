@@ -1,9 +1,5 @@
 # Google Sheets
 
-:::warning
-Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
-:::
-
 <p class="description">Quickly fetch data from Google Sheets to build a Toolpad Studio app.</p>
 
 You can write a custom function to read or write data from a Google sheet. We'll use [google-auth-library](https://www.npmjs.com/package/google-auth-library) and [googleapis](https://www.npmjs.com/package/googleapis) packages for this.

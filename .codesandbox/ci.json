@@ -2,10 +2,20 @@
   "installCommand": "install:codesandbox",
   "buildCommand": "release:build",
   "node": "20",
-  "packages": ["packages/create-toolpad-app", "packages/toolpad-core", "packages/toolpad-utils"],
+  "packages": [
+    "packages/create-toolpad-app",
+    "packages/toolpad-core",
+    "packages/toolpad-studio",
+    "packages/toolpad-studio-components",
+    "packages/toolpad-studio-runtime",
+    "packages/toolpad-utils"
+  ],
   "publishDirectory": {
     "create-toolpad-app": "packages/create-toolpad-app",
     "@toolpad/core": "packages/toolpad-core/build",
+    "@toolpad/studio": "packages/toolpad-studio",
+    "@toolpad/studio-components": "packages/toolpad-studio-components",
+    "@toolpad/studio-runtime": "packages/toolpad-studio-runtime",
     "@toolpad/utils": "packages/toolpad-utils/build"
   },
   "silent": true

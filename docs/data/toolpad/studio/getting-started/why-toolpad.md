@@ -1,9 +1,5 @@
 # Why Toolpad Studio?
 
-:::warning
-Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
-:::
-
 <p class="description">Learn how Toolpad Studio approaches building internal tools, and how it can be useful to you.</p>
 
 ## TL;DR

@@ -20,7 +20,7 @@
     "docs:build": "pnpm --filter docs build",
     "docs:build:api:core": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildCoreApiDocs/index.ts",
     "docs:build:api:studio": "tsx --tsconfig ./scripts/tsconfig.json ./scripts/docs/buildStudioApi.ts",
-    "docs:build:api": "concurrently \"pnpm docs:build:api:core\"",
+    "docs:build:api": "concurrently \"pnpm docs:build:api:core\" \"pnpm docs:build:api:studio\"",
     "docs:typescript:formatted": "tsx ./docs/scripts/formattedTSDemos",
     "eslint": "eslint . --report-unused-disable-directives --ext .js,.ts,.tsx",
     "jsonlint": "node ./scripts/jsonlint.mjs",
@@ -110,7 +110,6 @@
     "rimraf": "6.0.1",
     "typescript": "5.8.2",
     "unist-util-visit": "5.0.0",
-    "vitest-browser-react": "^0.1.1",
     "vitest-dom": "0.1.1",
     "vitest-fail-on-console": "0.7.1"
   },

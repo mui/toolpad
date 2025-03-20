@@ -1,9 +1,5 @@
 # Deploy to GCP
 
-:::warning
-Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
-:::
-
 <p class="description">You can host and share your Toolpad Studio apps on Google Cloud Platform (GCP) in a few minutes, for free.</p>
 
 GCP offers an ecosystem of products to help you build, manage, and scale any web service. This guide uses [Cloud Run](https://cloud.google.com/run) and [Cloud Build](https://cloud.google.com/build) to deploy a Toolpad Studio app from a GitHub repository.

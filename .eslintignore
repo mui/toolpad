@@ -4,6 +4,8 @@ pnpm-lock.yaml
 /docs/export
 /docs/schemas
 /packages/**/dist
+/packages/toolpad-studio/.next
+/packages/toolpad-studio/public
 
 build
 dist
@@ -18,9 +20,3 @@ dist
 
 .coverage
 .tsup
-
-# deprecated Toolpad Studio:
-test
-/packages/toolpad-studio/
-/packages/toolpad-studio-runtime/
-/packages/toolpad-studio-components/

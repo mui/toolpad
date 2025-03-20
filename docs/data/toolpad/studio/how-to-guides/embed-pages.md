@@ -1,9 +1,5 @@
 # Embedding Toolpad Studio pages
 
-:::warning
-Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
-:::
-
 <p class="description">Toolpad Studio pages can be embedded anywhere you want to use them.</p>
 
 ## Using an `iframe`

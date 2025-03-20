@@ -1,9 +1,5 @@
 # Data Grid
 
-:::warning
-Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
-:::
-
 <p class="description">Learn about how to use data grids in Toolpad Studio.</p>
 
 ## Demo

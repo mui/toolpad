@@ -1,9 +1,5 @@
 # Customize data grids
 
-:::warning
-Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
-:::
-
 <p class="description">Toolpad Studio is built to allow extensibility as a first-class citizen.</p>
 
 ## Default behavior

@@ -1,9 +1,5 @@
 # Button
 
-:::warning
-Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
-:::
-
 <p class="description">Learn about the button component and it's usage in Toolpad Studio.</p>
 
 ## Demo

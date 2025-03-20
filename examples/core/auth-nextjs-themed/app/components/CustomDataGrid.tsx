@@ -30,7 +30,6 @@ export default function CustomizedDataGrid({
         })}
         pageSizeOptions={[10, 20, 50]}
         disableColumnResize
-        density="compact"
         slotProps={{
           filterPanel: {
             sx: {

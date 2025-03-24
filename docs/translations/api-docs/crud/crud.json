@@ -13,6 +13,5 @@
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." }
   },
-  "classDescriptions": {},
-  "slotDescriptions": { "dataGrid": "The DataGrid component used to list the items." }
+  "classDescriptions": {}
 }

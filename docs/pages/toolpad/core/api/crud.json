@@ -11,11 +11,11 @@
     "defaultValues": { "type": { "name": "object" }, "default": "{}" },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" },
     "slotProps": {
-      "type": { "name": "shape", "description": "{ dataGrid?: object }" },
+      "type": { "name": "shape", "description": "{ list: { dataGrid?: object } }" },
       "default": "{}"
     },
     "slots": {
-      "type": { "name": "shape", "description": "{ dataGrid?: func }" },
+      "type": { "name": "shape", "description": "{ list: { dataGrid?: func } }" },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
     }
@@ -24,14 +24,6 @@
   "imports": [
     "import { Crud } from '@toolpad/core/Crud';",
     "import { Crud } from '@toolpad/core';"
-  ],
-  "slots": [
-    {
-      "name": "dataGrid",
-      "description": "The DataGrid component used to list the items.",
-      "default": "DataGrid",
-      "class": null
-    }
   ],
   "classes": [],
   "spread": true,

@@ -12,10 +12,6 @@ import { Edit } from './Edit';
 import { DataSourceCache } from './cache';
 import type { DataModel, DataModelId, DataSource, OmitId } from './types';
 
-export type CrudSlotProps = ListSlotProps;
-
-export type CrudSlots = ListSlots;
-
 export interface CrudProps<D extends DataModel> {
   /**
    * Server-side [data source](https://mui.com/toolpad/core/react-crud/#data-sources).
@@ -43,12 +39,16 @@ export interface CrudProps<D extends DataModel> {
    * The components used for each slot inside.
    * @default {}
    */
-  slots?: CrudSlots;
+  slots?: {
+    list: ListSlots;
+  };
   /**
    * The props used for each slot inside.
    * @default {}
    */
-  slotProps?: CrudSlotProps;
+  slotProps?: {
+    list: ListSlotProps;
+  };
 }
 /**
  *
@@ -118,8 +118,8 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           onRowClick={handleRowClick}
           onCreateClick={handleCreateClick}
           onEditClick={handleEditClick}
-          slots={slots}
-          slotProps={slotProps}
+          slots={slots?.list}
+          slotProps={slotProps?.list}
         />
       );
     }
@@ -208,14 +208,18 @@ Crud.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
-    dataGrid: PropTypes.object,
+    list: PropTypes.shape({
+      dataGrid: PropTypes.object,
+    }).isRequired,
   }),
   /**
    * The components used for each slot inside.
    * @default {}
    */
   slots: PropTypes.shape({
-    dataGrid: PropTypes.func,
+    list: PropTypes.shape({
+      dataGrid: PropTypes.func,
+    }).isRequired,
   }),
 } as any;
 

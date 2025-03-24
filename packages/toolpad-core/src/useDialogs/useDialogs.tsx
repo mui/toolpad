@@ -338,20 +338,17 @@ export function useDialogs(): DialogHook {
   const { open, close } = useNonNullableContext(DialogsContext);
 
   const alert = React.useCallback<OpenAlertDialog>(
-    async (msg, { onClose, ...options } = {}) =>
-      open(AlertDialog, { ...options, msg }, { onClose }),
+    (msg, { onClose, ...options } = {}) => open(AlertDialog, { ...options, msg }, { onClose }),
     [open],
   );
 
   const confirm = React.useCallback<OpenConfirmDialog>(
-    async (msg, { onClose, ...options } = {}) =>
-      open(ConfirmDialog, { ...options, msg }, { onClose }),
+    (msg, { onClose, ...options } = {}) => open(ConfirmDialog, { ...options, msg }, { onClose }),
     [open],
   );
 
   const prompt = React.useCallback<OpenPromptDialog>(
-    async (msg, { onClose, ...options } = {}) =>
-      open(PromptDialog, { ...options, msg }, { onClose }),
+    (msg, { onClose, ...options } = {}) => open(PromptDialog, { ...options, msg }, { onClose }),
     [open],
   );
 

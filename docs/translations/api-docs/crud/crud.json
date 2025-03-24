@@ -9,7 +9,9 @@
     },
     "defaultValues": { "description": "Default form values for a new item." },
     "initialPageSize": { "description": "Initial number of rows to show per page." },
-    "rootPath": { "description": "Root path to CRUD pages." }
+    "rootPath": { "description": "Root path to CRUD pages." },
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." }
   },
   "classDescriptions": {}
 }

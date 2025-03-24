@@ -35,6 +35,8 @@ export default withDocsInfra({
     // Fix trailingSlash support https://github.com/mui/toolpad/pull/3301#issuecomment-2054213837
     // Migrate everything from @mui/monorepo to @mui/docs
     '@mui/docs',
+    '@toolpad/studio-runtime',
+    '@toolpad/studio-components',
   ],
   // Avoid conflicts with the other Next.js apps hosted under https://mui.com/
   assetPrefix: process.env.DEPLOY_ENV === 'development' ? undefined : '/toolpad',
@@ -59,14 +61,6 @@ export default withDocsInfra({
           docs: path.resolve(MONOREPO_PATH, './docs'),
           'docs-toolpad': path.resolve(WORKSPACE_ROOT, './docs'),
           ...MONOREPO_PACKAGES,
-          '@toolpad/studio-components': path.resolve(
-            WORKSPACE_ROOT,
-            './packages/toolpad-studio-components/src',
-          ),
-          '@toolpad/studio-runtime': path.resolve(
-            WORKSPACE_ROOT,
-            './packages/toolpad-studio-runtime/src',
-          ),
           '@toolpad/utils': path.resolve(WORKSPACE_ROOT, './packages/toolpad-utils/src'),
           '@toolpad/core': path.resolve(WORKSPACE_ROOT, './packages/toolpad-core/src'),
         },

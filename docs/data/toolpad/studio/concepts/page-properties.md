@@ -1,5 +1,9 @@
 # Page properties
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 ## Display mode
 
 <p class="description">Toolpad Studio apps allow for a display mode configurable per-page.</p>

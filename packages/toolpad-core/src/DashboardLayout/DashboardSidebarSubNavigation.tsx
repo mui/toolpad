@@ -1,29 +1,33 @@
 'use client';
 import * as React from 'react';
-import { styled } from '@mui/material';
+import { styled, type Theme, SxProps } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
+import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import Divider from '@mui/material/Divider';
+import Grow from '@mui/material/Grow';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
-import Tooltip from '@mui/material/Tooltip';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from '../shared/Link';
-import { RouterContext } from '../shared/context';
+import { NavigationContext } from '../shared/context';
 import type { Navigation } from '../AppProvider';
 import {
+  getItemPath,
   getItemTitle,
-  getPageItemFullPath,
   hasSelectedNavigationChildren,
-  isPageItemSelected,
+  isPageItem,
 } from '../shared/navigation';
 import { getDrawerSxTransitionMixin } from './utils';
+import { MINI_DRAWER_WIDTH } from './shared';
+import { useActivePage } from '../useActivePage';
 
 const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: 8,
@@ -32,7 +36,7 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
       color: (theme.vars ?? theme).palette.primary.dark,
     },
     '& .MuiTypography-root': {
-      color: (theme.vars ?? theme).palette.text.primary,
+      color: (theme.vars ?? theme).palette.primary.dark,
     },
     '& .MuiSvgIcon-root': {
       color: (theme.vars ?? theme).palette.primary.dark,
@@ -54,13 +58,13 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
-  basePath?: string;
   depth?: number;
   onLinkClick: () => void;
   isMini?: boolean;
+  isPopover?: boolean;
   isFullyExpanded?: boolean;
+  isFullyCollapsed?: boolean;
   hasDrawerTransitions?: boolean;
-  selectedItemId: string;
 }
 
 /**
@@ -68,17 +72,17 @@ interface DashboardSidebarSubNavigationProps {
  */
 function DashboardSidebarSubNavigation({
   subNavigation,
-  basePath = '',
   depth = 0,
   onLinkClick,
   isMini = false,
+  isPopover = false,
   isFullyExpanded = true,
+  isFullyCollapsed = false,
   hasDrawerTransitions = false,
-  selectedItemId,
 }: DashboardSidebarSubNavigationProps) {
-  const routerContext = React.useContext(RouterContext);
+  const navigationContext = React.useContext(NavigationContext);
 
-  const pathname = routerContext?.pathname ?? '/';
+  const activePage = useActivePage();
 
   const initialExpandedSidebarItemIds = React.useMemo(
     () =>
@@ -87,15 +91,21 @@ function DashboardSidebarSubNavigation({
           navigationItem,
           originalIndex: navigationItemIndex,
         }))
-        .filter(({ navigationItem }) =>
-          hasSelectedNavigationChildren(navigationItem, basePath, pathname),
+        .filter(
+          ({ navigationItem }) =>
+            isPageItem(navigationItem) &&
+            !!activePage &&
+            hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path),
         )
         .map(({ originalIndex }) => `${depth}-${originalIndex}`),
-    [basePath, depth, pathname, subNavigation],
+    [activePage, depth, navigationContext, subNavigation],
   );
 
   const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState(
     initialExpandedSidebarItemIds,
+  );
+  const [hoveredMiniSidebarItemId, setHoveredMiniSidebarItemId] = React.useState<string | null>(
+    null,
   );
 
   const handleOpenFolderClick = React.useCallback(
@@ -110,13 +120,20 @@ function DashboardSidebarSubNavigation({
   );
 
   return (
-    <List sx={{ padding: 0, mb: depth === 0 ? 4 : 1, pl: 2 * depth }}>
+    <List
+      sx={{
+        padding: 0,
+        mt: isPopover && depth === 1 ? 0.5 : 0,
+        mb: depth === 0 && !isPopover ? 4 : 0.5,
+        pl: (isPopover ? 1 : 2) * (isPopover ? depth - 1 : depth),
+        minWidth: isPopover && depth === 1 ? 240 : 'auto',
+      }}
+    >
       {subNavigation.map((navigationItem, navigationItemIndex) => {
         if (navigationItem.kind === 'header') {
           return (
             <ListSubheader
               key={`subheader-${depth}-${navigationItemIndex}`}
-              component="div"
               sx={{
                 fontSize: 12,
                 fontWeight: '700',
@@ -142,6 +159,7 @@ function DashboardSidebarSubNavigation({
           return (
             <Divider
               key={`divider-${depth}-${navigationItemIndex}`}
+              component="li"
               sx={{
                 borderBottomWidth: 2,
                 mx: 1,
@@ -155,32 +173,56 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const navigationItemFullPath = getPageItemFullPath(basePath, navigationItem);
+        const navigationItemFullPath = getItemPath(navigationContext, navigationItem);
         const navigationItemId = `${depth}-${navigationItemIndex}`;
         const navigationItemTitle = getItemTitle(navigationItem);
 
         const isNestedNavigationExpanded = expandedSidebarItemIds.includes(navigationItemId);
 
-        const nestedNavigationCollapseIcon = isNestedNavigationExpanded ? (
-          <ExpandLessIcon />
-        ) : (
-          <ExpandMoreIcon />
-        );
-
         const listItemIconSize = 34;
 
-        const isSelected = isPageItemSelected(navigationItem, basePath, pathname);
+        const isActive =
+          !!activePage && activePage.path === getItemPath(navigationContext, navigationItem);
 
-        if (process.env.NODE_ENV !== 'production' && isSelected && selectedItemId) {
-          console.warn(`Duplicate selected path in navigation: ${navigationItemFullPath}`);
+        let nestedNavigationCollapseSx: SxProps<Theme> = { display: 'none' };
+        if (isMini && isFullyCollapsed) {
+          nestedNavigationCollapseSx = {
+            fontSize: 18,
+            position: 'absolute',
+            top: '41.5%',
+            right: '2px',
+            transform: 'translateY(-50%) rotate(-90deg)',
+          };
+        } else if (!isMini && isFullyExpanded) {
+          nestedNavigationCollapseSx = {
+            ml: 0.5,
+            transform: `rotate(${isNestedNavigationExpanded ? 0 : -90}deg)`,
+            transition: (theme: Theme) =>
+              theme.transitions.create('transform', {
+                easing: theme.transitions.easing.sharp,
+                duration: 100,
+              }),
+          };
         }
 
-        if (isSelected && !selectedItemId) {
-          selectedItemId = navigationItemId;
-        }
+        // Show as selected in mini sidebar if any of the children matches path, otherwise show as selected if item matches path
+        const isSelected =
+          activePage && navigationItem.children && isMini
+            ? hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path)
+            : isActive && !navigationItem.children;
 
         const listItem = (
           <ListItem
+            {...(navigationItem.children && isMini
+              ? {
+                  onMouseEnter: () => {
+                    setHoveredMiniSidebarItemId(navigationItemId);
+                  },
+                  onMouseLeave: () => {
+                    setHoveredMiniSidebarItemId(null);
+                  },
+                }
+              : {})}
             sx={{
               py: 0,
               px: 1,
@@ -188,79 +230,131 @@ function DashboardSidebarSubNavigation({
             }}
           >
             <NavigationListItemButton
-              selected={isSelected && (!navigationItem.children || isMini)}
+              selected={isSelected}
               sx={{
                 px: 1.4,
-                height: 48,
+                height: isMini ? 60 : 48,
               }}
               {...(navigationItem.children && !isMini
                 ? {
                     onClick: handleOpenFolderClick(navigationItemId),
                   }
-                : {
+                : {})}
+              {...(!navigationItem.children
+                ? {
                     LinkComponent: Link,
                     href: navigationItemFullPath,
                     onClick: onLinkClick,
-                  })}
+                  }
+                : {})}
             >
               {navigationItem.icon || isMini ? (
-                <ListItemIcon
+                <Box
                   sx={{
-                    minWidth: listItemIconSize,
-                    mr: 1.2,
+                    position: 'relative',
+                    top: isMini ? -6 : 0,
+                    left: isMini ? 5 : 0,
                   }}
                 >
-                  {navigationItem.icon ?? null}
-                  {!navigationItem.icon && isMini ? (
-                    <Avatar
+                  <ListItemIcon
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: listItemIconSize,
+                    }}
+                  >
+                    {navigationItem.icon ?? null}
+                    {!navigationItem.icon && isMini ? (
+                      <Avatar
+                        sx={{
+                          width: listItemIconSize - 7,
+                          height: listItemIconSize - 7,
+                          fontSize: 12,
+                          ml: '-2px',
+                        }}
+                      >
+                        {navigationItemTitle
+                          .split(' ')
+                          .slice(0, 2)
+                          .map((itemTitleWord) => itemTitleWord.charAt(0).toUpperCase())}
+                      </Avatar>
+                    ) : null}
+                  </ListItemIcon>
+                  {isMini ? (
+                    <Typography
+                      variant="caption"
                       sx={{
-                        width: listItemIconSize - 7,
-                        height: listItemIconSize - 7,
-                        fontSize: 12,
-                        ml: '-2px',
+                        position: 'absolute',
+                        bottom: -18,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        fontSize: 10,
+                        fontWeight: 500,
+                        textAlign: 'center',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        width: MINI_DRAWER_WIDTH - 28,
                       }}
                     >
-                      {navigationItemTitle
-                        .split(' ')
-                        .slice(0, 2)
-                        .map((itemTitleWord) => itemTitleWord.charAt(0).toUpperCase())}
-                    </Avatar>
+                      {navigationItemTitle}
+                    </Typography>
                   ) : null}
-                </ListItemIcon>
+                </Box>
               ) : null}
-              <ListItemText
-                primary={navigationItemTitle}
-                sx={{
-                  whiteSpace: 'nowrap',
-                  zIndex: 1,
-                }}
-              />
+              {!isMini ? (
+                <ListItemText
+                  primary={navigationItemTitle}
+                  sx={{
+                    ml: 1.2,
+                    whiteSpace: 'nowrap',
+                    zIndex: 1,
+                  }}
+                />
+              ) : null}
               {navigationItem.action && !isMini && isFullyExpanded ? navigationItem.action : null}
-              {navigationItem.children && !isMini && isFullyExpanded
-                ? nestedNavigationCollapseIcon
-                : null}
+              {navigationItem.children ? <ExpandMoreIcon sx={nestedNavigationCollapseSx} /> : null}
             </NavigationListItemButton>
+            {navigationItem.children && isMini ? (
+              <Grow in={navigationItemId === hoveredMiniSidebarItemId}>
+                <Box
+                  sx={{
+                    position: 'fixed',
+                    left: MINI_DRAWER_WIDTH - 2,
+                    pl: '6px',
+                  }}
+                >
+                  <Paper
+                    sx={{
+                      pt: 0.5,
+                      pb: 0.5,
+                      transform: 'translateY(calc(50% - 30px))',
+                    }}
+                  >
+                    <DashboardSidebarSubNavigation
+                      subNavigation={navigationItem.children}
+                      depth={depth + 1}
+                      onLinkClick={onLinkClick}
+                      isPopover
+                    />
+                  </Paper>
+                </Box>
+              </Grow>
+            ) : null}
           </ListItem>
         );
 
         return (
           <React.Fragment key={navigationItemId}>
-            {isMini ? (
-              <Tooltip title={navigationItemTitle} placement="right">
-                {listItem}
-              </Tooltip>
-            ) : (
-              listItem
-            )}
-
+            {listItem}
             {navigationItem.children && !isMini ? (
               <Collapse in={isNestedNavigationExpanded} timeout="auto" unmountOnExit>
                 <DashboardSidebarSubNavigation
                   subNavigation={navigationItem.children}
-                  basePath={navigationItemFullPath}
                   depth={depth + 1}
                   onLinkClick={onLinkClick}
-                  selectedItemId={selectedItemId}
+                  isPopover={isPopover}
                 />
               </Collapse>
             ) : null}

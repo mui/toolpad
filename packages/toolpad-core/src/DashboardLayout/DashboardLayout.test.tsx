@@ -207,13 +207,18 @@ describe('DashboardLayout', () => {
         icon: <ShoppingCartIcon />,
       },
       {
-        segment: 'dynamic',
+        segment: 'dynamic/override',
+        title: 'Dynamic Override',
+        icon: <BarChartIcon />,
+      },
+      {
+        segment: 'dynamicMoreOnly',
         title: 'Dynamic',
         icon: <BarChartIcon />,
         pattern: 'dynamic/:dynamicId',
       },
       {
-        segment: 'optional',
+        segment: 'optionalMoreOnly',
         title: 'Optional',
         pattern: 'optional{/:optionalId}?',
       },
@@ -268,7 +273,19 @@ describe('DashboardLayout', () => {
     expect(within(desktopNavigation).getByRole('link', { name: 'Dynamic' })).toHaveClass(
       'Mui-selected',
     );
+    expect(
+      within(desktopNavigation).getByRole('link', { name: 'Dynamic Override' }),
+    ).not.toHaveClass('Mui-selected');
     rerender(<AppWithPathname pathname="/dynamic/123/456" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Dynamic' })).not.toHaveClass(
+      'Mui-selected',
+    );
+
+    // Does not show multiple selected items if a dynamic segment is overridden by a more specific segment
+    rerender(<AppWithPathname pathname="/dynamic/override" />);
+    expect(within(desktopNavigation).getByRole('link', { name: 'Dynamic Override' })).toHaveClass(
+      'Mui-selected',
+    );
     expect(within(desktopNavigation).getByRole('link', { name: 'Dynamic' })).not.toHaveClass(
       'Mui-selected',
     );

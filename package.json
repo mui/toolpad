@@ -139,21 +139,10 @@
   "resolutions": {
     "google-auth-library": "*",
     "@types/node": "^20.17.24",
-    "@mui/x-telemetry>@mui/utils": "^7.0.0 || ^7.0.0-beta",
-    "@mui/lab>@mui/utils": "^7.0.0 || ^7.0.0-beta",
-    "@mui/lab>@mui/system": "^7.0.0 || ^7.0.0-beta",
-    "@mui/base>@mui/utils": "^7.0.0 || ^7.0.0-beta"
+    "@mui/x-telemetry>@mui/utils": "^7.0.0",
+    "@mui/lab>@mui/utils": "^7.0.0",
+    "@mui/lab>@mui/system": "^7.0.0",
+    "@mui/base>@mui/utils": "^7.0.0"
   },
-  "packageManager": "pnpm@9.12.3",
-  "pnpm": {
-    "patchedDependencies": {
-      "jss-plugin-rule-value-function": "patches/jss-plugin-rule-value-function.patch",
-      "jss-plugin-global": "patches/jss-plugin-global.patch",
-      "jss-plugin-nested": "patches/jss-plugin-nested.patch",
-      "jss-plugin-camel-case": "patches/jss-plugin-camel-case.patch",
-      "jss-plugin-default-unit": "patches/jss-plugin-default-unit.patch",
-      "jss-plugin-vendor-prefixer": "patches/jss-plugin-vendor-prefixer.patch",
-      "jss-plugin-props-sort": "patches/jss-plugin-props-sort.patch"
-    }
-  }
+  "packageManager": "pnpm@9.12.3"
 }

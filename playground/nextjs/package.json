@@ -9,9 +9,9 @@
   "devDependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.0",
-    "@mui/icons-material": "^7.0.0 || ^7.0.0-beta",
-    "@mui/material": "^7.0.0 || ^7.0.0-beta",
-    "@mui/material-nextjs": "^7.0.0 || ^7.0.0-beta",
+    "@mui/icons-material": "^7.0.0",
+    "@mui/material": "^7.0.0",
+    "@mui/material-nextjs": "^7.0.0",
     "@toolpad/core": "workspace:*",
     "@types/node": "^20.17.24",
     "@types/react": "^19.0.10",

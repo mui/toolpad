@@ -235,11 +235,9 @@ export const dataDisplayCustomizations: Components<Theme> = {
       },
     },
   },
-  // @ts-expect-error
   MuiDataGrid: {
     styleOverrides: {
       root: () => ({
-        // ... existing code ...
         '&.MuiDataGrid-root--densityCompact .MuiDataGrid-actionsCell button': {
           width: '28px',
           height: '28px',

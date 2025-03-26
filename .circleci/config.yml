@@ -147,7 +147,7 @@ jobs:
       - run:
           name: Tests fake browser
           command: pnpm test
-      - codecov/upload
+      # - codecov/upload
 
   test_unit_browser:
     <<: *default-job

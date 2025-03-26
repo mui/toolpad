@@ -1,5 +1,9 @@
 # Installation
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">Setup Toolpad Studio to run on your own machine.</p>
 
 ## Create a Toolpad Studio app

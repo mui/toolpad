@@ -1,5 +1,9 @@
 # Troubleshoot missing editor
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">How to troubleshoot a missing editor error on Toolpad Studio.</p>
 
 ## When using Visual Studio Code

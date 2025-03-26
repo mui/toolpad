@@ -1,5 +1,9 @@
 # Build your first app
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">Learn the fundamentals of building with Toolpad Studio by creating a small application.</p>
 
 This guide will walk you through the process of creating a small Toolpad Studio application.

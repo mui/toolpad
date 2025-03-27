@@ -2,6 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { createTheme as createMuiTheme, Theme } from '@mui/material/styles';
+import { GridRenderCellParams } from '@mui/x-data-grid';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
 import {
@@ -13,6 +14,7 @@ import {
 import type { LinkProps } from '../shared/Link';
 import { AppThemeProvider } from './AppThemeProvider';
 import { LocalizationProvider, type LocaleText } from './LocalizationProvider';
+import { DashboardSidebarPageItemProps } from '../DashboardLayout';
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -45,6 +47,7 @@ export interface NavigationPageItem {
   icon?: React.ReactNode;
   pattern?: string;
   action?: React.ReactNode;
+  renderItem?: (defaultProps: DashboardSidebarPageItemProps) => React.ReactNode;
   children?: Navigation;
 }
 
@@ -239,6 +242,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
         icon: PropTypes.node,
         kind: PropTypes.oneOf(['page']),
         pattern: PropTypes.string,
+        renderItem: PropTypes.func,
         segment: PropTypes.string,
         title: PropTypes.string,
       }),

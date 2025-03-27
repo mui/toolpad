@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Dashboard Layout
-components: AppProvider, DashboardLayout, ToolbarActions, ThemeSwitcher, Account
+components: AppProvider, DashboardLayout, ToolbarActions, ThemeSwitcher, Account, DashboardSidebarPageItem
 ---
 
 # Dashboard Layout

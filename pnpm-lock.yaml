@@ -345,7 +345,7 @@ importers:
         version: 7.28.0(@types/react@19.0.10)(react@19.0.0)
       '@toolpad/core':
         specifier: 0.13.0
-        version: 0.13.0(2dguzq4wydin55jjtdn4mbxf54)
+        version: 0.13.0(bmfgrlon2n5kkedhl54ikegvye)
       '@toolpad/studio':
         specifier: workspace:*
         version: link:../packages/toolpad-studio
@@ -623,7 +623,7 @@ importers:
         version: 5.69.0(@tanstack/react-query@5.69.0(react@19.0.0))(react@19.0.0)
       '@toolpad/core':
         specifier: 0.13.0
-        version: 0.13.0(2dguzq4wydin55jjtdn4mbxf54)
+        version: 0.13.0(bmfgrlon2n5kkedhl54ikegvye)
       '@toolpad/studio-components':
         specifier: workspace:*
         version: link:../toolpad-studio-components
@@ -13280,7 +13280,7 @@ snapshots:
     dependencies:
       '@testing-library/dom': 10.4.0
 
-  '@toolpad/core@0.13.0(2dguzq4wydin55jjtdn4mbxf54)':
+  '@toolpad/core@0.13.0(bmfgrlon2n5kkedhl54ikegvye)':
     dependencies:
       '@babel/runtime': 7.26.10
       '@mui/icons-material': 6.4.7(@mui/material@6.4.7(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react@19.0.0))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.10)(react@19.0.0)

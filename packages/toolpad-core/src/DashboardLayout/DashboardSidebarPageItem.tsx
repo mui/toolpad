@@ -16,7 +16,7 @@ import type {} from '@mui/material/themeCssVarsAugmentation';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from '../shared/Link';
 import { MINI_DRAWER_WIDTH } from './shared';
-import type { NavigationPageItem } from '../AppProvider';
+import type { Navigation, NavigationPageItem } from '../AppProvider';
 
 const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   borderRadius: 8,
@@ -46,19 +46,65 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
 }));
 
 export interface DashboardSidebarPageItemProps {
+  /**
+   * A string that uniquely identifies the item.
+   */
   id: string;
+  /**
+   * Navigation item definition.
+   */
   item: NavigationPageItem;
+  /**
+   * Callback fired when the item is clicked.
+   */
   onClick: (itemId: string, item: NavigationPageItem) => void;
+  /**
+   * Item title.
+   */
   title: string;
+  /**
+   * Link `href` for when the item is rendered as a link.
+   */
   href: string;
+  /**
+   * The component used to render the item as a link.
+   * @default Link
+   */
   Link?: React.ElementType;
+  /**
+   * If `true`, expands any nested navigation in the item, otherwise collapse it.
+   * @default false
+   */
   expanded?: boolean;
+  /**
+   * If `true`, the containing sidebar is in mini mode.
+   * @default false
+   */
   mini?: boolean;
+  /**
+   * Use to apply selected styling.
+   * @default false
+   */
   selected?: boolean;
+  /**
+   * If `true`, the item is disabled.
+   * @default false
+   */
   disabled?: boolean;
+  /**
+   * If `true`, the containing sidebar is fully expanded.
+   * @default true
+   */
   isSidebarFullyExpanded?: boolean;
+  /**
+   * If `true`, the containing sidebar is fully collapsed.
+   * @default false
+   */
   isSidebarFullyCollapsed?: boolean;
-  nestedNavigation: React.ReactNode;
+  /**
+   * Override the component rendered as nested navigation for this item.
+   */
+  renderNestedNavigation: (subNavigation: Navigation) => React.ReactNode;
 }
 
 const LIST_ITEM_ICON_SIZE = 34;
@@ -85,7 +131,7 @@ function DashboardSidebarPageItem({
   disabled = false,
   isSidebarFullyExpanded = true,
   isSidebarFullyCollapsed = false,
-  nestedNavigation,
+  renderNestedNavigation,
 }: DashboardSidebarPageItemProps) {
   const [hoveredMiniSidebarItemId, setHoveredMiniSidebarItemId] = React.useState<string | null>(
     null,
@@ -238,7 +284,7 @@ function DashboardSidebarPageItem({
                 transform: 'translateY(calc(50% - 30px))',
               }}
             >
-              {nestedNavigation}
+              {renderNestedNavigation(item.children)}
             </Paper>
           </Box>
         </Grow>
@@ -251,7 +297,7 @@ function DashboardSidebarPageItem({
       {listItem}
       {item.children && !mini ? (
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          {nestedNavigation}
+          {renderNestedNavigation(item.children)}
         </Collapse>
       ) : null}
     </React.Fragment>
@@ -264,31 +310,35 @@ DashboardSidebarPageItem.propTypes /* remove-proptypes */ = {
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
   // └─────────────────────────────────────────────────────────────────────┘
   /**
-   * @ignore
+   * If `true`, the item is disabled.
+   * @default false
    */
   disabled: PropTypes.bool,
   /**
-   * @ignore
+   * If `true`, expands any nested navigation in the item, otherwise collapse it.
+   * @default false
    */
   expanded: PropTypes.bool,
   /**
-   * @ignore
+   * Link `href` for when the item is rendered as a link.
    */
   href: PropTypes.string.isRequired,
   /**
-   * @ignore
+   * A string that uniquely identifies the item.
    */
   id: PropTypes.string.isRequired,
   /**
-   * @ignore
+   * If `true`, the containing sidebar is fully collapsed.
+   * @default false
    */
   isSidebarFullyCollapsed: PropTypes.bool,
   /**
-   * @ignore
+   * If `true`, the containing sidebar is fully expanded.
+   * @default true
    */
   isSidebarFullyExpanded: PropTypes.bool,
   /**
-   * @ignore
+   * Navigation item definition.
    */
   item: PropTypes.shape({
     action: PropTypes.node,
@@ -312,27 +362,30 @@ DashboardSidebarPageItem.propTypes /* remove-proptypes */ = {
     title: PropTypes.string,
   }).isRequired,
   /**
-   * @ignore
+   * The component used to render the item as a link.
+   * @default Link
    */
   Link: PropTypes.elementType,
   /**
-   * @ignore
+   * If `true`, the containing sidebar is in mini mode.
+   * @default false
    */
   mini: PropTypes.bool,
   /**
-   * @ignore
-   */
-  nestedNavigation: PropTypes.node,
-  /**
-   * @ignore
+   * Callback fired when the item is clicked.
    */
   onClick: PropTypes.func.isRequired,
   /**
-   * @ignore
+   * Override the component rendered as nested navigation for this item.
+   */
+  renderNestedNavigation: PropTypes.func.isRequired,
+  /**
+   * Use to apply selected styling.
+   * @default false
    */
   selected: PropTypes.bool,
   /**
-   * @ignore
+   * Item title.
    */
   title: PropTypes.string.isRequired,
 } as any;

@@ -1,5 +1,25 @@
 {
-  "props": {},
+  "props": {
+    "href": { "type": { "name": "string" }, "required": true },
+    "id": { "type": { "name": "string" }, "required": true },
+    "item": {
+      "type": {
+        "name": "shape",
+        "description": "{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', pattern?: string, renderItem?: func, segment?: string, title?: string }"
+      },
+      "required": true
+    },
+    "onClick": { "type": { "name": "func" }, "required": true },
+    "renderNestedNavigation": { "type": { "name": "func" }, "required": true },
+    "title": { "type": { "name": "string" }, "required": true },
+    "disabled": { "type": { "name": "bool" }, "default": "false" },
+    "expanded": { "type": { "name": "bool" }, "default": "false" },
+    "isSidebarFullyCollapsed": { "type": { "name": "bool" }, "default": "false" },
+    "isSidebarFullyExpanded": { "type": { "name": "bool" }, "default": "true" },
+    "Link": { "type": { "name": "elementType" }, "default": "Link" },
+    "mini": { "type": { "name": "bool" }, "default": "false" },
+    "selected": { "type": { "name": "bool" }, "default": "false" }
+  },
   "name": "DashboardSidebarPageItem",
   "imports": ["import { DashboardSidebarPageItem } from '@toolpad/core/DashboardLayout';"],
   "classes": [],

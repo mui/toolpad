@@ -156,7 +156,7 @@ function DashboardSidebarSubNavigation({
           selected: isSelected,
           isSidebarFullyExpanded: isFullyExpanded,
           isSidebarFullyCollapsed: isFullyCollapsed,
-          nestedNavigation: (
+          renderNestedNavigation: () => (
             <DashboardSidebarSubNavigation
               subNavigation={navigationItem.children ?? []}
               depth={depth + 1}

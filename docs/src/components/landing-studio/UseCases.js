@@ -12,7 +12,7 @@ import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 
 const ImageContainer = styled(Link)(({ theme }) => [
   {

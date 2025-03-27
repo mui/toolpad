@@ -143,40 +143,33 @@ function DashboardSidebarSubNavigation({
             ? hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path)
             : isActive && !navigationItem.children;
 
-        const navigationItemFullPath = getItemPath(navigationContext, navigationItem);
         const navigationItemId = `${depth}-${navigationItemIndex}`;
-        const navigationItemTitle = getItemTitle(navigationItem);
+
+        const navigationItemDefaultProps = {
+          id: navigationItemId,
+          item: navigationItem,
+          onClick: handlePageItemClick,
+          title: getItemTitle(navigationItem),
+          href: getItemPath(navigationContext, navigationItem),
+          expanded: expandedSidebarItemIds.includes(navigationItemId),
+          mini: isMini,
+          selected: isSelected,
+          isSidebarFullyExpanded: isFullyExpanded,
+          isSidebarFullyCollapsed: isFullyCollapsed,
+          nestedNavigation: (
+            <DashboardSidebarSubNavigation
+              subNavigation={navigationItem.children ?? []}
+              depth={depth + 1}
+              onLinkClick={onLinkClick}
+              isPopover={isMini}
+            />
+          ),
+        };
 
         return navigationItem.renderItem ? (
-          navigationItem.renderItem({
-            id: navigationItemId,
-            item: navigationItem,
-            mini: isMini,
-            isSidebarFullyExpanded: isFullyExpanded,
-            isSidebarFullyCollapsed: isFullyCollapsed,
-          })
+          navigationItem.renderItem(navigationItemDefaultProps)
         ) : (
-          <DashboardSidebarPageItem
-            key={navigationItemId}
-            id={navigationItemId}
-            item={navigationItem}
-            onClick={handlePageItemClick}
-            title={navigationItemTitle}
-            href={navigationItemFullPath}
-            expanded={expandedSidebarItemIds.includes(navigationItemId)}
-            mini={isMini}
-            selected={isSelected}
-            isSidebarFullyExpanded={isFullyExpanded}
-            isSidebarFullyCollapsed={isFullyCollapsed}
-            nestedNavigation={
-              <DashboardSidebarSubNavigation
-                subNavigation={navigationItem.children ?? []}
-                depth={depth + 1}
-                onLinkClick={onLinkClick}
-                isPopover={isMini}
-              />
-            }
-          />
+          <DashboardSidebarPageItem key={navigationItemId} {...navigationItemDefaultProps} />
         );
       })}
     </List>

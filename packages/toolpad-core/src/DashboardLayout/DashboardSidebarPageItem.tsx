@@ -45,12 +45,13 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
   },
 }));
 
-interface DashboardSidebarPageItemProps {
+export interface DashboardSidebarPageItemProps {
   id: string;
   item: NavigationPageItem;
   onClick: (itemId: string, item: NavigationPageItem) => void;
   title: string;
   href: string;
+  Link?: React.ElementType;
   expanded?: boolean;
   mini?: boolean;
   selected?: boolean;
@@ -77,6 +78,7 @@ function DashboardSidebarPageItem({
   onClick,
   title,
   href,
+  Link: LinkProp = Link,
   expanded = false,
   mini = false,
   selected = false,
@@ -146,7 +148,7 @@ function DashboardSidebarPageItem({
           : {})}
         {...(!item.children
           ? {
-              LinkComponent: Link,
+              LinkComponent: LinkProp,
               href,
               onClick: handleClick,
             }
@@ -309,6 +311,10 @@ DashboardSidebarPageItem.propTypes /* remove-proptypes */ = {
     segment: PropTypes.string,
     title: PropTypes.string,
   }).isRequired,
+  /**
+   * @ignore
+   */
+  Link: PropTypes.elementType,
   /**
    * @ignore
    */

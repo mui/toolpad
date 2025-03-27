@@ -14,6 +14,7 @@ import {
 import type { LinkProps } from '../shared/Link';
 import { AppThemeProvider } from './AppThemeProvider';
 import { LocalizationProvider, type LocaleText } from './LocalizationProvider';
+import { DashboardSidebarPageItemProps } from '../DashboardLayout';
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -39,14 +40,6 @@ export interface Branding {
   homeUrl?: string;
 }
 
-interface NavigationPageRenderItemParams {
-  id: string;
-  item: NavigationPageItem;
-  mini: boolean;
-  isSidebarFullyExpanded: boolean;
-  isSidebarFullyCollapsed: boolean;
-}
-
 export interface NavigationPageItem {
   kind?: 'page';
   segment?: string;
@@ -54,7 +47,7 @@ export interface NavigationPageItem {
   icon?: React.ReactNode;
   pattern?: string;
   action?: React.ReactNode;
-  renderItem?: (params: NavigationPageRenderItemParams) => React.ReactNode;
+  renderItem?: (defaultProps: DashboardSidebarPageItemProps) => React.ReactNode;
   children?: Navigation;
 }
 

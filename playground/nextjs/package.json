@@ -12,6 +12,8 @@
     "@mui/icons-material": "6.4.7",
     "@mui/material": "6.4.7",
     "@mui/material-nextjs": "6.4.3",
+    "@mui/x-data-grid": "7.28.0",
+    "@mui/x-date-pickers": "7.28.0",
     "@toolpad/core": "workspace:*",
     "@types/node": "^20.17.24",
     "@types/react": "^19.0.10",

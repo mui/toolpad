@@ -75,6 +75,22 @@ export const dataDisplayCustomizations: Components<Theme> = {
       },
     },
   },
+  MuiPaper: {
+    styleOverrides: {
+      root: ({ theme }) => ({
+        backgroundImage: 'none',
+        backgroundColor: theme.palette.background.paper,
+        border: '1px solid',
+        borderColor: theme.palette.divider,
+        ...theme.applyStyles('dark', {
+          backgroundImage: 'none',
+          backgroundColor: theme.palette.background.paper,
+          borderColor: theme.palette.divider,
+        }),
+        boxShadow: 'none',
+      }),
+    },
+  },
   MuiChip: {
     defaultProps: {
       size: 'small',
@@ -217,6 +233,17 @@ export const dataDisplayCustomizations: Components<Theme> = {
           },
         ],
       },
+    },
+  },
+  MuiDataGrid: {
+    styleOverrides: {
+      root: () => ({
+        '&.MuiDataGrid-root--densityCompact .MuiDataGrid-actionsCell button': {
+          width: '28px',
+          height: '28px',
+          padding: '2px',
+        },
+      }),
     },
   },
 };

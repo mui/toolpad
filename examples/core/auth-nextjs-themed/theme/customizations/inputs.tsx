@@ -370,6 +370,7 @@ export const inputsCustomizations: Components<Theme> = {
     styleOverrides: {
       root: {
         border: 'none',
+        marginTop: 6,
       },
       input: {
         '&::placeholder': {
@@ -451,7 +452,6 @@ export const inputsCustomizations: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         typography: theme.typography.caption,
-        marginBottom: 8,
       }),
     },
   },

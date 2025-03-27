@@ -11,12 +11,11 @@ const en: LocaleText = {
   accountPreviewIconButtonLabel: 'Current User',
 
   // SignInPage
-  signInTitle: 'Sign In',
+  signInTitle: (brandingTitle?: string) =>
+    brandingTitle ? `Sign in to ${brandingTitle}` : 'Sign in',
   signInSubtitle: 'Welcome user, please sign in to continue',
   signInRememberMe: 'Remember Me',
-  oauthSignInTitle: 'Sign in with OAuth',
-  passkeySignInTitle: 'Sign in with Passkey',
-  magicLinkSignInTitle: 'Sign in with Magic Link',
+  providerSignInTitle: (provider: string) => `Sign in with ${provider}`,
 
   // Common authentication labels
   email: 'Email',

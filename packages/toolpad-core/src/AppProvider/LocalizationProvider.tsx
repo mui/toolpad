@@ -14,11 +14,9 @@ export interface LocaleText {
   accountPreviewTitle: string;
 
   // SignInPage
-  signInTitle: string;
+  signInTitle: string | ((brandingTitle?: string) => string);
   signInSubtitle: string;
-  oauthSignInTitle: string;
-  passkeySignInTitle: string;
-  magicLinkSignInTitle: string;
+  providerSignInTitle: (provider: string) => string;
   signInRememberMe: string;
 
   // Common authentication labels

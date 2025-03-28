@@ -40,6 +40,7 @@ export interface DashboardLayoutSlotProps {
   toolbarActions?: {};
   toolbarAccount?: AccountProps;
   sidebarFooter?: SidebarFooterProps;
+  toolbar?: {};
 }
 
 export interface DashboardLayoutSlots {
@@ -63,6 +64,10 @@ export interface DashboardLayoutSlots {
    * @default null
    */
   sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
+  /**
+   * Optional toolbar component used in the layout header instead of the default.
+   */
+  toolbar?: React.JSXElementConstructor<{}>;
 }
 
 export interface DashboardLayoutProps {
@@ -385,10 +390,15 @@ function DashboardLayout(props: DashboardLayoutProps) {
                 <AppTitle branding={branding} {...slotProps?.appTitle} />
               )}
             </Stack>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
-              <ToolbarActionsSlot {...slotProps?.toolbarActions} />
-              <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
-            </Stack>
+            {/* show slots.toolbar if provided, else the stack */}
+            {slots?.toolbar ? (
+              <slots.toolbar {...slotProps?.toolbar} />
+            ) : (
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
+                <ToolbarActionsSlot {...slotProps?.toolbarActions} />
+                <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+              </Stack>
+            )}
           </Stack>
         </Toolbar>
       </AppBar>

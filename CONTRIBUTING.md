@@ -20,11 +20,13 @@ _If you're looking into contributing to the docs, follow the [instructions](#bui
 
 ### Prerequisites
 
-- git
-- node.js (run `npm pkg get engines.node` for the right version)
-- pnpm
-  - globally installed `npm i pnpm -g`
-  - running `corepack enable`, to enable corepack, a tool that ships with Node.js to manage package managers
+- `git`
+- `node.js` (use `npm pkg get engines.node` to get the required version)
+- [`pnpm`](https://pnpm.io/installation)
+  - Run `corepack enable` to enable [`corepack`](https://nodejs.org/api/corepack.html) (\*)
+  - Or install globally: `npm i -g pnpm`
+
+(\*) `corepack` is still experimental in some Node.js versions. Choose one method to avoid conflicts.
 
 ### Developing on Toolpad Core
 

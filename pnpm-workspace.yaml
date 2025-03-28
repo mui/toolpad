@@ -2,4 +2,7 @@ packages:
   - 'packages/*'
   - 'playground/*'
   - 'docs'
-  - 'test'
+  # deprecated Toolpad Studio:
+  - '!packages/toolpad-studio'
+  - '!packages/toolpad-studio-runtime'
+  - '!packages/toolpad-studio-components'

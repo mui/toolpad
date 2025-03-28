@@ -1,5 +1,9 @@
 # Custom Functions
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">These offer a fast way to bring your existing functions to a Toolpad Studio page.</p>
 
 The most powerful way of bringing data into Toolpad Studio is through your own code. You can define functions inside `toolpad/resources` and use them when creating a query of this type. The following video shows how you can use this feature to read data from PostgreSQL.

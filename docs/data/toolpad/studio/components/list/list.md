@@ -1,5 +1,9 @@
 # List
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">Learn about the list component and its usage in Toolpad Studio.</p>
 
 ## Usage

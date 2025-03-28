@@ -1,5 +1,9 @@
 # Support
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">Learn how to get support for Toolpad Studio, including feature requests, bug fixes, and technical support from the team.</p>
 
 ## GitHub

@@ -328,11 +328,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [isNavigationExpanded, sidebarExpandedWidth],
   );
 
-  const layoutRef = React.useRef<Element | null>(null);
-
   return (
     <Box
-      ref={layoutRef}
       sx={{
         position: 'relative',
         display: 'flex',
@@ -396,7 +393,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       {!hideNavigation ? (
         <React.Fragment>
           <Drawer
-            container={layoutRef.current}
+            container={appWindowContext?.document.body}
             variant="temporary"
             open={isMobileNavigationExpanded}
             onClose={handleSetNavigationExpanded(false)}

@@ -56,7 +56,7 @@
     "@mui/internal-docs-utils": "1.0.16",
     "@mui/internal-markdown": "1.0.25",
     "@mui/internal-scripts": "1.0.33",
-    "@mui/monorepo": "github:mui/material-ui#ae19b3bf8f5f14a47fc2232ddc38eaef7621dbe3",
+    "@mui/monorepo": "github:mui/material-ui#abd8f63bc0b8d681b3bfbe47486508c94ea23609",
     "@mui/x-charts": "^8.0.0 || ^8.0.0-beta",
     "@next/eslint-plugin-next": "14.2.25",
     "@playwright/test": "1.47.2",
@@ -67,7 +67,7 @@
     "@types/fs-extra": "11.0.4",
     "@types/gtag.js": "0.0.20",
     "@types/invariant": "2.2.37",
-    "@types/node": "^20.17.24",
+    "@types/node": "^20.17.28",
     "@types/yargs": "17.0.33",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
@@ -138,11 +138,7 @@
   },
   "resolutions": {
     "google-auth-library": "*",
-    "@types/node": "^20.17.24",
-    "@mui/x-telemetry>@mui/utils": "^7.0.0",
-    "@mui/lab>@mui/utils": "^7.0.0",
-    "@mui/lab>@mui/system": "^7.0.0",
-    "@mui/base>@mui/utils": "^7.0.0"
+    "@types/node": "^20.17.28"
   },
   "packageManager": "pnpm@9.12.3"
 }

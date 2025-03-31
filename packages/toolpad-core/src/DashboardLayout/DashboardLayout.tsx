@@ -13,6 +13,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
 import { Account, type AccountProps } from '../Account';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
@@ -59,6 +60,11 @@ export interface DashboardLayoutSlots {
    * @default Account
    */
   toolbarAccount?: React.JSXElementConstructor<AccountProps>;
+  /**
+   * Optional footer component used in the layout sidebar.
+   * @default null
+   */
+  toolbarCart?: React.JSXElementConstructor<{}>;
   /**
    * Optional footer component used in the layout sidebar.
    * @default null
@@ -265,6 +271,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
+  const ToolbarCartSlot = slots?.toolbarCart ?? React.Fragment;
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
 
   const getDrawerContent = React.useCallback(
@@ -397,6 +404,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
               <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
                 <ToolbarActionsSlot {...slotProps?.toolbarActions} />
                 <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+                <ToolbarCartSlot />
               </Stack>
             )}
           </Stack>

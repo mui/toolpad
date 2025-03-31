@@ -42,7 +42,7 @@
     "test:browser:dev": "vitest -c vitest.config.browser.mts"
   },
   "dependencies": {
-    "@babel/runtime": "^7.26.10",
+    "@babel/runtime": "^7.27.0",
     "@mui/utils": "^7.0.0",
     "@standard-schema/spec": "^1.0.0",
     "@toolpad/utils": "workspace:*",

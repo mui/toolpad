@@ -58,12 +58,11 @@ function SearchBar() {
       elevation={0}
       sx={{
         alignItems: 'center',
-        width: 600,
+        width: { xl: 600, lg: 400, md: 'auto' },
         height: 40,
         px: 1.5,
         borderRadius: 2,
         backgroundColor: (theme) => theme.palette.action.hover,
-        display: { xs: 'none', sm: 'flex' },
       }}
     >
       <IconButton type="submit" sx={{ p: '10px' }} aria-label="search" disableRipple>

@@ -1,0 +1,3 @@
+<DashboardLayout renderPageItem={renderPageItem}>
+  <DemoPageContent pathname={router.pathname} />
+</DashboardLayout>

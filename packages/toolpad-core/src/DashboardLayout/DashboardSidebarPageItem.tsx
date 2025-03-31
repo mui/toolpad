@@ -68,7 +68,6 @@ export interface DashboardSidebarPageItemProps {
   href: string;
   /**
    * The component used to render the item as a link.
-   * @default Link
    */
   Link?: React.ElementType;
   /**
@@ -124,7 +123,7 @@ function DashboardSidebarPageItem({
   onClick,
   title,
   href,
-  Link: LinkProp = Link,
+  Link: LinkProp,
   expanded = false,
   mini = false,
   selected = false,
@@ -162,6 +161,10 @@ function DashboardSidebarPageItem({
     };
   }
 
+  const hasExternalHref = href.startsWith('http://') || href.startsWith('https://');
+
+  const LinkComponent = LinkProp ?? (hasExternalHref ? 'a' : Link);
+
   const listItem = (
     <ListItem
       {...(item.children && mini
@@ -194,7 +197,13 @@ function DashboardSidebarPageItem({
           : {})}
         {...(!item.children
           ? {
-              LinkComponent: LinkProp,
+              LinkComponent,
+              ...(hasExternalHref
+                ? {
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                  }
+                : {}),
               href,
               onClick: handleClick,
             }
@@ -357,13 +366,11 @@ DashboardSidebarPageItem.propTypes /* remove-proptypes */ = {
     icon: PropTypes.node,
     kind: PropTypes.oneOf(['page']),
     pattern: PropTypes.string,
-    renderItem: PropTypes.func,
     segment: PropTypes.string,
     title: PropTypes.string,
   }).isRequired,
   /**
    * The component used to render the item as a link.
-   * @default Link
    */
   Link: PropTypes.elementType,
   /**

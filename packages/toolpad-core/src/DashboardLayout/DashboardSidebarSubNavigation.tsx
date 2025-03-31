@@ -14,7 +14,10 @@ import {
 } from '../shared/navigation';
 import { getDrawerSxTransitionMixin } from './utils';
 import { useActivePage } from '../useActivePage';
-import { DashboardSidebarPageItem } from './DashboardSidebarPageItem';
+import {
+  DashboardSidebarPageItem,
+  DashboardSidebarPageItemProps,
+} from './DashboardSidebarPageItem';
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
@@ -25,6 +28,7 @@ interface DashboardSidebarSubNavigationProps {
   isFullyExpanded?: boolean;
   isFullyCollapsed?: boolean;
   hasDrawerTransitions?: boolean;
+  renderPageItem?: (defaultProps: DashboardSidebarPageItemProps) => React.ReactNode;
 }
 
 /**
@@ -39,6 +43,7 @@ function DashboardSidebarSubNavigation({
   isFullyExpanded = true,
   isFullyCollapsed = false,
   hasDrawerTransitions = false,
+  renderPageItem,
 }: DashboardSidebarSubNavigationProps) {
   const navigationContext = React.useContext(NavigationContext);
 
@@ -143,7 +148,7 @@ function DashboardSidebarSubNavigation({
             ? hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path)
             : isActive && !navigationItem.children;
 
-        const navigationItemId = `${depth}-${navigationItemIndex}`;
+        const navigationItemId = `item-${depth}-${navigationItemIndex}`;
 
         const navigationItemDefaultProps = {
           id: navigationItemId,
@@ -166,8 +171,8 @@ function DashboardSidebarSubNavigation({
           ),
         };
 
-        return navigationItem.renderItem ? (
-          navigationItem.renderItem(navigationItemDefaultProps)
+        return renderPageItem ? (
+          renderPageItem(navigationItemDefaultProps)
         ) : (
           <DashboardSidebarPageItem key={navigationItemId} {...navigationItemDefaultProps} />
         );

@@ -5,7 +5,7 @@
     "item": {
       "type": {
         "name": "shape",
-        "description": "{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', pattern?: string, renderItem?: func, segment?: string, title?: string }"
+        "description": "{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', pattern?: string, segment?: string, title?: string }"
       },
       "required": true
     },
@@ -16,7 +16,7 @@
     "expanded": { "type": { "name": "bool" }, "default": "false" },
     "isSidebarFullyCollapsed": { "type": { "name": "bool" }, "default": "false" },
     "isSidebarFullyExpanded": { "type": { "name": "bool" }, "default": "true" },
-    "Link": { "type": { "name": "elementType" }, "default": "Link" },
+    "Link": { "type": { "name": "elementType" } },
     "mini": { "type": { "name": "bool" }, "default": "false" },
     "selected": { "type": { "name": "bool" }, "default": "false" }
   },

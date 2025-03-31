@@ -14,9 +14,13 @@
     "navigation": {
       "type": {
         "name": "arrayOf",
-        "description": "Array&lt;{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', pattern?: string, renderItem?: func, segment?: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
+        "description": "Array&lt;{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', pattern?: string, segment?: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
       },
       "default": "[]"
+    },
+    "renderPageItem": {
+      "type": { "name": "func" },
+      "signature": { "type": "function(defaultProps: object) => ReactNode", "describedArgs": [] }
     },
     "sidebarExpandedWidth": {
       "type": { "name": "union", "description": "number<br>&#124;&nbsp;string" },

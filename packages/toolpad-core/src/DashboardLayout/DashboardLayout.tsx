@@ -104,7 +104,7 @@ export interface DashboardLayoutProps {
   /**
    * Render each page item.
    *
-   * @param {object} defaultProps
+   * @param {DashboardSidebarPageItemProps} defaultProps
    * @returns {ReactNode}
    */
   renderPageItem?: (defaultProps: DashboardSidebarPageItemProps) => React.ReactNode;
@@ -543,7 +543,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   /**
    * Render each page item.
    *
-   * @param {object} defaultProps
+   * @param {DashboardSidebarPageItemProps} defaultProps
    * @returns {ReactNode}
    */
   renderPageItem: PropTypes.func,

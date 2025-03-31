@@ -20,7 +20,10 @@
     },
     "renderPageItem": {
       "type": { "name": "func" },
-      "signature": { "type": "function(defaultProps: object) => ReactNode", "describedArgs": [] }
+      "signature": {
+        "type": "function(defaultProps: DashboardSidebarPageItemProps) => ReactNode",
+        "describedArgs": []
+      }
     },
     "sidebarExpandedWidth": {
       "type": { "name": "union", "description": "number<br>&#124;&nbsp;string" },

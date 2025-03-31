@@ -156,7 +156,7 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 
 The `renderPageItem` prop can be used to override the rendering of any page item in the sidebar in order to modify it or completely replace it.
 
-When simply modifying the default page item component, `DashboardSidebarPageItem` can be imported, and its default props can be spread out.
+When simply modifying the default page item component, `DashboardSidebarPageItem` can be imported and its default props can be spread out.
 
 You can find some basic examples of usage and common use cases in the demo below:
 

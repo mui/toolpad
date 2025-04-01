@@ -49,7 +49,7 @@ function DashboardSidebarSubNavigation({
 
   const activePage = useActivePage();
 
-  const initialExpandedSidebarItemIds = React.useMemo(
+  const initialExpandedItemIds = React.useMemo(
     () =>
       subNavigation
         .map((navigationItem, navigationItemIndex) => ({
@@ -66,14 +66,12 @@ function DashboardSidebarSubNavigation({
     [activePage, depth, navigationContext, subNavigation],
   );
 
-  const [expandedSidebarItemIds, setExpandedSidebarItemIds] = React.useState(
-    initialExpandedSidebarItemIds,
-  );
+  const [expandedItemIds, setExpandedItemIds] = React.useState(initialExpandedItemIds);
 
   const handlePageItemClick = React.useCallback(
     (itemId: string, item: NavigationPageItem) => {
       if (item.children && !isMini) {
-        setExpandedSidebarItemIds((previousValue) =>
+        setExpandedItemIds((previousValue) =>
           previousValue.includes(itemId)
             ? previousValue.filter((previousValueItemId) => previousValueItemId !== itemId)
             : [...previousValue, itemId],
@@ -156,7 +154,7 @@ function DashboardSidebarSubNavigation({
           onClick: handlePageItemClick,
           title: getItemTitle(navigationItem),
           href: getItemPath(navigationContext, navigationItem),
-          expanded: expandedSidebarItemIds.includes(pageItemId),
+          expanded: expandedItemIds.includes(pageItemId),
           mini: isMini,
           selected: isSelected,
           isSidebarFullyExpanded: isFullyExpanded,

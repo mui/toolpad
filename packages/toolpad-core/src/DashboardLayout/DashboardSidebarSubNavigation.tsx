@@ -62,7 +62,7 @@ function DashboardSidebarSubNavigation({
             !!activePage &&
             hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path),
         )
-        .map(({ originalIndex }) => `${depth}-${originalIndex}`),
+        .map(({ originalIndex }) => `page-${depth}-${originalIndex}`),
     [activePage, depth, navigationContext, subNavigation],
   );
 
@@ -148,7 +148,7 @@ function DashboardSidebarSubNavigation({
             ? hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path)
             : isActive && !navigationItem.children;
 
-        const navigationItemId = `item-${depth}-${navigationItemIndex}`;
+        const navigationItemId = `page-${depth}-${navigationItemIndex}`;
 
         const navigationItemDefaultProps = {
           id: navigationItemId,

@@ -328,6 +328,9 @@ importers:
       '@mui/utils':
         specifier: ^7.0.0
         version: 7.0.0(@types/react@19.0.12)(react@19.0.0)
+      '@mui/x-data-grid':
+        specifier: ^8.0.0 || ^8.0.0-beta
+        version: 8.0.0-beta.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@mui/x-data-grid-pro':
         specifier: ^8.0.0 || ^8.0.0-beta
         version: 8.0.0-beta.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -758,6 +761,12 @@ importers:
       '@mui/material-nextjs':
         specifier: ^7.0.0
         version: 7.0.0(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.12)(next@15.2.3(@babel/core@7.26.10)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+      '@mui/x-data-grid':
+        specifier: ^8.0.0 || ^8.0.0-beta
+        version: 8.0.0-beta.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@mui/x-date-pickers':
+        specifier: ^8.0.0 || ^8.0.0-beta
+        version: 8.0.0-beta.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(date-fns-jalali@2.29.3-0)(dayjs@1.11.13)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
@@ -806,6 +815,12 @@ importers:
       '@mui/material-nextjs':
         specifier: ^7.0.0
         version: 7.0.0(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/server@11.11.0)(@types/react@19.0.12)(next@15.2.3(@babel/core@7.26.10)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
+      '@mui/x-data-grid':
+        specifier: ^8.0.0 || ^8.0.0-beta
+        version: 8.0.0-beta.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@mui/x-date-pickers':
+        specifier: ^8.0.0 || ^8.0.0-beta
+        version: 8.0.0-beta.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(date-fns-jalali@2.29.3-0)(dayjs@1.11.13)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build
@@ -848,6 +863,12 @@ importers:
       '@mui/material':
         specifier: ^7.0.0
         version: 7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@mui/x-data-grid':
+        specifier: ^8.0.0 || ^8.0.0-beta
+        version: 8.0.0-beta.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      '@mui/x-date-pickers':
+        specifier: ^8.0.0 || ^8.0.0-beta
+        version: 8.0.0-beta.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(date-fns-jalali@2.29.3-0)(dayjs@1.11.13)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@toolpad/core':
         specifier: workspace:*
         version: link:../../packages/toolpad-core/build

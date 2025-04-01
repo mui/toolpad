@@ -34,6 +34,7 @@
     "@mui/material-nextjs": "^7.0.0",
     "@mui/system": "^7.0.0",
     "@mui/utils": "^7.0.0",
+    "@mui/x-data-grid": "^8.0.0 || ^8.0.0-beta",
     "@mui/x-data-grid-pro": "^8.0.0 || ^8.0.0-beta",
     "@mui/x-date-pickers": "^8.0.0 || ^8.0.0-beta",
     "@mui/x-date-pickers-pro": "^8.0.0 || ^8.0.0-beta",

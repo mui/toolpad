@@ -59,7 +59,7 @@ export default function EmployeesCrudPage() {
     <CrudProvider<Employee> dataSource={employeesDataSource} dataSourceCache={employeesCache}>
       {pathname === listPath ? (
         <List<Employee>
-          initialPageSize={25}
+          initialPageSize={20}
           onRowClick={handleRowClick}
           onCreateClick={handleCreateClick}
           onEditClick={handleEditClick}

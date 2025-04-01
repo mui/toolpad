@@ -8,7 +8,7 @@ _Mar 11, 2025_
 
 A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
 
-Add new [Crud](https://next.mui.com/toolpad/core/react-crud/) component: this new component provides UIs to interact with data from any data source (create, read, update and delete), with minimal configuration from a single data source definition. Try it out and let us know if you find any issues!
+Add new [Crud](https://mui.com/toolpad/core/react-crud/) component: this new component provides UIs to interact with data from any data source (create, read, update and delete), with minimal configuration from a single data source definition. Try it out and let us know if you find any issues!
 
 ### `@toolpad/core`
 

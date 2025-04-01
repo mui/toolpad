@@ -148,15 +148,15 @@ function DashboardSidebarSubNavigation({
             ? hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path)
             : isActive && !navigationItem.children;
 
-        const navigationItemId = `page-${depth}-${navigationItemIndex}`;
+        const pageItemId = `page-${depth}-${navigationItemIndex}`;
 
-        const navigationItemDefaultProps = {
-          id: navigationItemId,
+        const pageItemDefaultProps = {
+          id: pageItemId,
           item: navigationItem,
           onClick: handlePageItemClick,
           title: getItemTitle(navigationItem),
           href: getItemPath(navigationContext, navigationItem),
-          expanded: expandedSidebarItemIds.includes(navigationItemId),
+          expanded: expandedSidebarItemIds.includes(pageItemId),
           mini: isMini,
           selected: isSelected,
           isSidebarFullyExpanded: isFullyExpanded,
@@ -172,9 +172,9 @@ function DashboardSidebarSubNavigation({
         };
 
         return renderPageItem ? (
-          renderPageItem(navigationItemDefaultProps)
+          renderPageItem(pageItemDefaultProps)
         ) : (
-          <DashboardSidebarPageItem key={navigationItemId} {...navigationItemDefaultProps} />
+          <DashboardSidebarPageItem key={pageItemId} {...pageItemDefaultProps} />
         );
       })}
     </List>

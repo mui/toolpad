@@ -109,7 +109,7 @@ export default function generateProject(
         case 'nextjs-pages': {
           const nextJsPagesRouterStarter = new Map([
             ['pages/index.tsx', { content: indexPage(options) }],
-            ['pages/employees/index.tsx', { content: employeesPage(options) }],
+            ['pages/employees/[[...segments]].tsx', { content: employeesPage(options) }],
             ['pages/_document.tsx', { content: document }],
             ['pages/_app.tsx', { content: app(options) }],
           ]);

@@ -57,7 +57,6 @@ export default function EmployeesCrudPage() {
 
   return (
     <CrudProvider<Employee> dataSource={employeesDataSource} dataSourceCache={employeesCache}>
-      {/* TODO: Use <Crud /> component instead once it has a slot for dataGrid */}
       {pathname === listPath ? (
         <List<Employee>
           initialPageSize={20}

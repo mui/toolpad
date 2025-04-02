@@ -48,12 +48,19 @@ export interface SidebarFooterProps {
   mini: boolean;
 }
 
+export interface ToolbarProps {
+  menuIcon: React.ReactElement;
+}
+
 export interface DashboardLayoutSlotProps {
   appTitle?: AppTitleProps;
   toolbarActions?: {};
   toolbarAccount?: AccountProps;
   sidebarFooter?: SidebarFooterProps;
   toolbar?: {};
+  toolbarLeft?: {};
+  toolbarMiddle?: {};
+  toolbarRight?: {};
 }
 
 export interface DashboardLayoutSlots {
@@ -131,22 +138,22 @@ export interface DashboardLayoutSlots {
    * }
    * ```
    */
-  toolbar?: React.JSXElementConstructor<{}>;
+  toolbar?: React.JSXElementConstructor<ToolbarProps>;
 
   /** Use this slot to replace the left of the default toolbar.
    * @default null
    */
-  toolbarLeft?: React.JSXElementConstructor<{}>;
+  toolbarLeft?: React.JSXElementConstructor<ToolbarProps>;
 
   /** Use this slot to replace the center of the default toolbar.
    * @default null
    */
-  toolbarCenter?: React.JSXElementConstructor<{}>;
+  toolbarMiddle?: React.JSXElementConstructor<ToolbarProps>;
 
   /** Use this slot to replace the right of the default toolbar.
    * @default null
    */
-  toolbarRight?: React.JSXElementConstructor<{}>;
+  toolbarRight?: React.JSXElementConstructor<ToolbarProps>;
 }
 
 export interface DashboardLayoutProps {
@@ -414,6 +421,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const layoutRef = React.useRef<Element | null>(null);
 
+  const toolbarSlotProps: ToolbarProps = {
+    ...slotProps?.toolbar,
+    menuIcon: getMenuIcon(isMobileNavigationExpanded),
+  };
+
   return (
     <Box
       ref={layoutRef}
@@ -429,7 +441,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       <AppBar color="inherit" position="absolute" sx={{ displayPrint: 'none' }}>
         <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1 } }}>
           {slots?.toolbar ? (
-            <slots.toolbar {...slotProps?.toolbar} />
+            <slots.toolbar {...toolbarSlotProps} />
           ) : (
             <Stack
               direction="row"
@@ -442,7 +454,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             >
               {/* Toolbar Left section */}
               {slots?.toolbarLeft ? (
-                <slots.toolbarLeft />
+                <slots.toolbarLeft {...toolbarSlotProps} />
               ) : (
                 <Stack direction="row">
                   {!hideNavigation ? (
@@ -479,11 +491,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
               )}
 
               {/* Toolbar Center section */}
-              {slots?.toolbarCenter ? <slots.toolbarCenter /> : null}
+              {slots?.toolbarMiddle ? <slots.toolbarMiddle {...toolbarSlotProps} /> : null}
 
               {/* Toolbar Right section */}
               {slots?.toolbarRight ? (
-                <slots.toolbarRight />
+                <slots.toolbarRight {...toolbarSlotProps} />
               ) : (
                 <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
                   <ToolbarActionsSlot {...slotProps?.toolbarActions} />

@@ -155,7 +155,10 @@ export default function generateProject(
             ['app/(dashboard)/layout.tsx', { content: dashboardLayout }],
             ['app/layout.tsx', { content: rootLayout(options) }],
             ['app/(dashboard)/page.tsx', { content: indexPage(options) }],
-            ['app/(dashboard)/employees/page.tsx', { content: employeesPage(options) }],
+            [
+              'app/(dashboard)/employees/[...segments]/page.tsx',
+              { content: employeesPage(options) },
+            ],
           ]);
           if (options.auth) {
             const authFiles = new Map([

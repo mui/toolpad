@@ -3,7 +3,8 @@ import theme from './templates/theme';
 import eslintConfig from './templates/eslintConfig';
 import readme from './templates/readme';
 import gitignore from './templates/gitignore';
-import ordersPage from './templates/ordersPage';
+import employeesPage from './templates/employeesPage';
+import employeesData from './templates/employeesData';
 import packageJson from './templates/packageJson';
 import indexPage from './templates/indexPage';
 
@@ -75,7 +76,8 @@ export default function generateProject(
         ['src/layouts/dashboard.tsx', { content: viteDashboardLayout(options) }],
         ['src/App.tsx', { content: viteApp(options) }],
         ['src/pages/index.tsx', { content: indexPage(options) }],
-        ['src/pages/orders.tsx', { content: ordersPage(options) }],
+        ['src/pages/employees.tsx', { content: employeesPage(options) }],
+        ['src/data/employees.ts', { content: employeesData(options) }],
         ['index.html', { content: viteHtml }],
       ]);
 
@@ -100,13 +102,14 @@ export default function generateProject(
         ['tsconfig.json', { content: tsConfig }],
         ['next-env.d.ts', { content: nextTypes }],
         ['next.config.mjs', { content: nextConfig(options) }],
+        ['src/data/employees.ts', { content: employeesData(options) }],
       ]);
 
       switch (options.router) {
         case 'nextjs-pages': {
           const nextJsPagesRouterStarter = new Map([
             ['pages/index.tsx', { content: indexPage(options) }],
-            ['pages/orders/index.tsx', { content: ordersPage(options) }],
+            ['pages/employees/index.tsx', { content: employeesPage(options) }],
             ['pages/_document.tsx', { content: document }],
             ['pages/_app.tsx', { content: app(options) }],
           ]);
@@ -152,7 +155,7 @@ export default function generateProject(
             ['app/(dashboard)/layout.tsx', { content: dashboardLayout }],
             ['app/layout.tsx', { content: rootLayout(options) }],
             ['app/(dashboard)/page.tsx', { content: indexPage(options) }],
-            ['app/(dashboard)/orders/page.tsx', { content: ordersPage(options) }],
+            ['app/(dashboard)/employees/page.tsx', { content: employeesPage(options) }],
           ]);
           if (options.auth) {
             const authFiles = new Map([

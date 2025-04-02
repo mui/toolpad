@@ -92,51 +92,6 @@ export interface DashboardLayoutSlots {
    * You can still use the built-in `<AppTitle />`, `<ToolbarActions />` and `<Account />` components inside.
    *
    * @default null
-   * @see https://mui.com/toolpad/core/api/dashboard-layout
-   * @example
-   * ```tsx
-   * import { Stack, IconButton, Box, InputBase, Button } from '@mui/material';
-   * import { MenuOpen, Search, ShoppingCart } from '@mui/icons-material';
-   * import { Account } from '@toolpad/core/Account';
-   * import { DashboardLayout, ToolbarActions } from '@toolpad/core/DashboardLayout';
-   *
-   * function CustomToolbar() {
-   *   return (
-   *     <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ flexGrow: 1, width: '100%' }}>
-   *       <Stack direction="row" alignItems="center" spacing={1}>
-   *         <IconButton size="small" aria-label="Menu"><MenuOpen /></IconButton>
-   *         <Box component="img" src="https://mui.com/static/logo.png" alt="MUI logo" sx={{ height: 24 }} />
-   *       </Stack>
-   *
-   *       <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-   *         <Box sx={{ maxWidth: 400, width: '100%' }}>
-   *           <InputBase
-   *             sx={{
-   *               pl: 4, pr: 2, py: 0.5,
-   *               flex: 1, borderRadius: 2,
-   *               minWidth: 300,
-   *               backgroundColor: (theme) => theme.palette.action.hover,
-   *             }}
-   *             placeholder="Search"
-   *             inputProps={{ 'aria-label': 'search' }}
-   *             startAdornment={<Search sx={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)' }} />}
-   *           />
-   *         </Box>
-   *       </Box>
-   *
-   *       <Stack direction="row" spacing={1} alignItems="center">
-   *         <ToolbarActions />
-   *         <Account />
-   *         <Button color="primary" aria-label="Cart"><ShoppingCart /></Button>
-   *       </Stack>
-   *     </Stack>
-   *   );
-   * }
-   *
-   * export default function CustomDashboardLayout() {
-   *  return <DashboardLayout slots={{ toolbar: CustomToolbar }} />;
-   * }
-   * ```
    */
   toolbar?: React.JSXElementConstructor<ToolbarProps>;
 

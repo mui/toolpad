@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useRouter } from 'next/router';
 import { NextAppProvider } from '@toolpad/core/nextjs';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { DashboardLayout, ToolbarActions } from '@toolpad/core/DashboardLayout';
+import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import Head from 'next/head';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -12,9 +12,6 @@ import type { AppProps } from 'next/app';
 import type { Navigation } from '@toolpad/core/AppProvider';
 import { SessionProvider, signIn, signOut, useSession } from 'next-auth/react';
 import LinearProgress from '@mui/material/LinearProgress';
-import { Box, Button, IconButton, InputBase, Paper, Stack } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { Account } from '@toolpad/core/Account';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: React.ReactElement<any>) => React.ReactNode;
@@ -51,69 +48,6 @@ const AUTHENTICATION = {
   signOut,
 };
 
-function SearchBar() {
-  return (
-    <Paper
-      component="form"
-      elevation={0}
-      sx={{
-        alignItems: 'center',
-        width: { xl: 600, lg: 400, md: 'auto' },
-        height: 40,
-        px: 1.5,
-        borderRadius: 2,
-        backgroundColor: (theme) => theme.palette.action.hover,
-      }}
-    >
-      <IconButton type="submit" sx={{ p: '10px' }} aria-label="search" disableRipple>
-        <SearchIcon />
-      </IconButton>
-      <InputBase
-        sx={{ ml: 1, flex: 1 }}
-        placeholder="Search"
-        inputProps={{ 'aria-label': 'search' }}
-      />
-    </Paper>
-  );
-}
-
-function CustomToolbar() {
-  return (
-    <Stack
-      direction="row"
-      spacing={2}
-      alignItems="center"
-      justifyContent="space-between"
-      className="custom-toolbar"
-      sx={{
-        flexGrow: 1,
-        px: 2,
-        py: 1,
-      }}
-    >
-      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-        <Box sx={{ maxWidth: 400, width: '100%' }}>
-          <SearchBar />
-        </Box>
-      </Box>
-
-      <Stack direction="row" spacing={1} alignItems="center">
-        <ToolbarActions />
-        <Account />
-        <ToolbarCart />
-      </Stack>
-    </Stack>
-  );
-}
-
-function ToolbarCart() {
-  return (
-    <Button color="primary" aria-label="Shopping Cart">
-      <ShoppingCartIcon />
-    </Button>
-  );
-}
-
 function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
   const router = useRouter();
   const { segments = [] } = router.query;
@@ -133,7 +67,7 @@ function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
   }, [orderId, router.asPath]);
 
   return (
-    <DashboardLayout slots={{ toolbar: CustomToolbar }}>
+    <DashboardLayout>
       <PageContainer title={title}>{page}</PageContainer>
     </DashboardLayout>
   );

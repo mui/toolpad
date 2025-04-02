@@ -3,7 +3,6 @@
   "version": "0.13.0",
   "private": true,
   "scripts": {
-    "predev": "[ ! -f .env.local ] && cp .env.example .env.local && echo \"AUTH_SECRET=\"$(openssl rand -base64 32)\"\" >> .env.local || echo '.env.local already exists'",
     "dev": "next dev",
     "lint": "next lint"
   },

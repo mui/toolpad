@@ -1,6 +1,5 @@
 'use client';
-
-import React from 'react';
+import * as React from 'react';
 import { usePathname, useParams } from 'next/navigation';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
@@ -17,11 +16,8 @@ import {
   SignOutButton,
   AccountPreviewProps,
 } from '@toolpad/core/Account';
-import { DashboardLayout, SidebarFooterProps, ToolbarActions } from '@toolpad/core/DashboardLayout';
+import { DashboardLayout, SidebarFooterProps } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { Box, Button, IconButton, InputBase, Paper } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 const accounts = [
   {
@@ -161,69 +157,6 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
   );
 }
 
-function SearchBar() {
-  return (
-    <Paper
-      component="form"
-      elevation={0}
-      sx={{
-        alignItems: 'center',
-        height: 40,
-        px: 1.5,
-        borderRadius: 2,
-        backgroundColor: (theme) => theme.palette.action.hover,
-        width: { xl: 600, lg: 400, md: 'auto' },
-      }}
-    >
-      <IconButton type="submit" sx={{ p: '10px' }} aria-label="search" disableRipple>
-        <SearchIcon />
-      </IconButton>
-      <InputBase
-        sx={{ ml: 1, flex: 1 }}
-        placeholder="Search"
-        inputProps={{ 'aria-label': 'search' }}
-      />
-    </Paper>
-  );
-}
-
-function CustomToolbar() {
-  return (
-    <Stack
-      direction="row"
-      spacing={2}
-      alignItems="center"
-      justifyContent="space-between"
-      className="custom-toolbar"
-      sx={{
-        flexGrow: 1,
-        px: 2,
-        py: 1,
-      }}
-    >
-      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-        <Box sx={{ maxWidth: 400, width: '100%' }}>
-          <SearchBar />
-        </Box>
-      </Box>
-
-      <Stack direction="row" spacing={1} alignItems="center">
-        <ToolbarActions />
-        <Account />
-        <ToolbarCart />
-      </Stack>
-    </Stack>
-  );
-}
-
-function ToolbarCart() {
-  return (
-    <Button color="primary" aria-label="Shopping Cart">
-      <ShoppingCartIcon />
-    </Button>
-  );
-}
-
 export default function DashboardPagesLayout(props: { children: React.ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
@@ -243,12 +176,7 @@ export default function DashboardPagesLayout(props: { children: React.ReactNode 
   }, [orderId, pathname]);
 
   return (
-    <DashboardLayout
-      slots={{
-        sidebarFooter: SidebarFooterAccount,
-        toolbar: CustomToolbar,
-      }}
-    >
+    <DashboardLayout slots={{ sidebarFooter: SidebarFooterAccount, toolbarAccount: () => null }}>
       <PageContainer title={title}>{props.children}</PageContainer>
     </DashboardLayout>
   );

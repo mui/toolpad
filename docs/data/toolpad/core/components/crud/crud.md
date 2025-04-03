@@ -116,18 +116,27 @@ This method must return an array of objects with the items to be displayed.
 {
   //...
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
-    // Fetch data from server
-    const data = await fetch('https://my-api.com/data', {
-      method: 'GET',
-      body: JSON.stringify({
-        page: paginationModel.page,
-        pageSize: paginationModel.pageSize,
-        sortModel,
-        filterModel,
-      }),
-    });
+    const queryParams = new URLSearchParams();
 
-    return data
+    queryParams.append('page', paginationModel.page.toString());
+    queryParams.append('pageSize', paginationModel.pageSize.toString());
+    if (sortModel?.length) {
+      queryParams.append('sort', JSON.stringify(sortModel));
+    }
+    if (filterModel?.items?.length) {
+      queryParams.append('filter', JSON.stringify(filterModel.items));
+    }
+
+    // Fetch data from server
+    const res = await fetch(`https://my-api.com/data?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+    const resJson = await res.json();
+
+    if (!res.ok) {
+      throw new Error(resJson.error);
+    }
+    return resJson;
   },
   // ...
 }
@@ -144,11 +153,15 @@ This method must return an object corresponding to the item to be displayed.
   //...
   getOne: async (id) => {
     // Fetch record from server
-    const record = await fetch(`https://my-api.com/data/${id}`, {
+    const res = await fetch(`https://my-api.com/data/${id}`, {
       method: 'GET',
     });
+    const resJson = await res.json();
 
-    return record;
+    if (!res.ok) {
+      throw new Error(resJson.error);
+    }
+    return resJson;
   },
   // ...
 }
@@ -165,12 +178,17 @@ This method must return an object corresponding to the new item that has been cr
   //...
   createOne: async (data) => {
     // Create record in the server
-    const record = await fetch('https://my-api.com/data', {
+    const res = await fetch('https://my-api.com/data', {
       method: 'POST',
       body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' },
     });
+    const resJson = await res.json();
 
-    return record;
+    if (!res.ok) {
+      throw new Error(resJson.error);
+    }
+    return resJson;
   },
   // ...
 }
@@ -187,12 +205,17 @@ This method must return an object corresponding to the new item that has been up
   //...
   updateOne: async (id, data) => {
     // Update record in the server
-    const record = await fetch(`https://my-api.com/data/${id}`, {
+    const res = await fetch(`https://my-api.com/data/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' },
     });
+    const resJson = await res.json();
 
-    return record;
+    if (!res.ok) {
+      throw new Error(resJson.error);
+    }
+    return resJson;
   },
   // ...
 }
@@ -209,9 +232,13 @@ This method does not need to return anything.
   //...
   deleteOne: async (id) => {
     // Delete record in the server
-    await fetch(`https://my-api.com/data/${id}`, {
+    const res = await fetch(`https://my-api.com/data/${id}`, {
       method: 'DELETE',
     });
+
+    if (!res.ok) {
+      throw new Error(resJson.error);
+    }
   },
   // ...
 }

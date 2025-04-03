@@ -3,8 +3,8 @@ import { getEmployeesStore, setEmployeesStore } from '../../../../employeesStore
 import type { Employee } from '../../../../data/employees';
 import type { OmitId } from '@toolpad/core/Crud';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id: employeeId } = params;
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: employeeId } = await params;
 
   const employeesStore = getEmployeesStore();
 
@@ -16,9 +16,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(employeeToShow);
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const body: Partial<OmitId<Employee>> = await req.json();
-  const { id: employeeId } = params;
+  const { id: employeeId } = await params;
 
   const employeesStore = getEmployeesStore();
 
@@ -40,8 +40,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(updatedEmployee);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id: employeeId } = params;
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id: employeeId } = await params;
 
   const employeesStore = getEmployeesStore();
 

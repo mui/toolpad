@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmployeesStore, setEmployeesStore } from '../../../../employeesStore';
-import type { Employee } from '../../../../data/employees';
+import { getEmployeesStore, setEmployeesStore } from '../../../employeesStore';
+import type { Employee } from '../../../data/employees';
 import type { OmitId } from '@toolpad/core/Crud';
 
 export async function getEmployee(req: NextApiRequest, res: NextApiResponse) {

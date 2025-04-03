@@ -2,6 +2,8 @@ packages:
   - 'packages/*'
   - 'playground/*'
   - 'docs'
+  - 'examples/core/crud-nextjs'
+  - 'examples/core/crud-nextjs-pages'
   # deprecated Toolpad Studio:
   - '!packages/toolpad-studio'
   - '!packages/toolpad-studio-runtime'

@@ -5,6 +5,7 @@ const ordersPage: Template = (options) => {
   const routerType = options.router;
 
   let imports = `import * as React from 'react';
+${routerType === 'nextjs-pages' ? `import { useRouter } from 'next/router';` : ``}
 import { Crud } from '@toolpad/core/Crud';
 import { employeesDataSource, Employee, employeesCache } from '${routerType === 'nextjs-app' ? `../../../` : ``}${routerType === 'nextjs-pages' ? `../` : ``}../data/employees';`;
 
@@ -39,6 +40,7 @@ import { employeesDataSource, Employee, employeesCache } from '${routerType === 
 
 
 export default ${isAsync}function EmployeesCrudPage() {
+  ${routerType === 'nextjs-pages' ? `const router = useRouter();\n` : ``}
   ${sessionHandling}
 
   return ${routerType === 'nextjs-pages' ? `router.isReady ? ` : ``}(

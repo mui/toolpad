@@ -165,7 +165,7 @@ export default function generateProject(
             ['app/layout.tsx', { content: rootLayout(options) }],
             ['app/(dashboard)/page.tsx', { content: indexPage(options) }],
             [
-              'app/(dashboard)/employees/[...segments]/page.tsx',
+              'app/(dashboard)/employees/[[...segments]]/page.tsx',
               { content: employeesPage(options) },
             ],
             ['app/api/employees/route.ts', { content: employeesApiAppRoute }],

@@ -4,7 +4,8 @@ const employeesData: Template = () => {
   const imports = `import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
 import { z } from 'zod';`;
 
-  return `${imports}
+  return `'use client';
+${imports}
 
 type EmployeeRole = 'Market' | 'Finance' | 'Development';
 

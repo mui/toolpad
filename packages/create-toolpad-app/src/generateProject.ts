@@ -4,7 +4,9 @@ import eslintConfig from './templates/eslintConfig';
 import readme from './templates/readme';
 import gitignore from './templates/gitignore';
 import employeesPage from './templates/employeesPage';
-import employeesData from './templates/employeesData';
+import employeesDataLocalStorage from './templates/employeesDataLocalStorage';
+import employeesDataRest from './templates/employeesDataRest';
+import employeesStore from './templates/nextjs/employeesStore';
 import packageJson from './templates/packageJson';
 import indexPage from './templates/indexPage';
 
@@ -28,6 +30,8 @@ import nextTypes from './templates/nextTypes';
 // App router specific files
 import rootLayout from './templates/nextjs/nextjs-app/rootLayout';
 import dashboardLayout from './templates/nextjs/nextjs-app/dashboardLayout';
+import employeesApiRoute from './templates/nextjs/nextjs-app/employeesRoute';
+import employeeApiRoute from './templates/nextjs/nextjs-app/employeeRoute';
 
 // Pages router specific files
 import app from './templates/nextjs/nextjs-pages/app';
@@ -37,7 +41,7 @@ import document from './templates/nextjs/nextjs-pages/document';
 import auth from './templates/nextjs/auth/auth';
 import envLocal from './templates/nextjs/auth/envLocal';
 import middleware from './templates/nextjs/auth/middleware';
-import routeHandler from './templates/nextjs/auth/route';
+import authApiRoute from './templates/nextjs/auth/route';
 import prisma from './templates/nextjs/auth/prisma';
 import env from './templates/nextjs/auth/env';
 import schemaPrisma from './templates/nextjs/auth/schemaPrisma';
@@ -77,7 +81,7 @@ export default function generateProject(
         ['src/App.tsx', { content: viteApp(options) }],
         ['src/pages/index.tsx', { content: indexPage(options) }],
         ['src/pages/employees.tsx', { content: employeesPage(options) }],
-        ['src/data/employees.ts', { content: employeesData(options) }],
+        ['src/data/employees.ts', { content: employeesDataLocalStorage(options) }],
         ['index.html', { content: viteHtml }],
       ]);
 
@@ -102,7 +106,8 @@ export default function generateProject(
         ['tsconfig.json', { content: tsConfig }],
         ['next-env.d.ts', { content: nextTypes }],
         ['next.config.mjs', { content: nextConfig(options) }],
-        ['src/data/employees.ts', { content: employeesData(options) }],
+        ['src/data/employees.ts', { content: employeesDataRest(options) }],
+        ['src/employeesStore.ts', { content: employeesStore(options) }],
       ]);
 
       switch (options.router) {
@@ -121,7 +126,7 @@ export default function generateProject(
               // next-auth v5 does not provide an API route, so this file must be in the app router
               // even if the rest of the app is using pages router
               // https://authjs.dev/getting-started/installation#configure
-              ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
+              ['app/api/auth/[...nextAuth]/route.ts', { content: authApiRoute }],
               ['pages/auth/signin.tsx', { content: signInPagePagesRouter(options) }],
             ]);
             if (options.hasNodemailerProvider || options.hasPasskeyProvider) {
@@ -165,7 +170,9 @@ export default function generateProject(
               ['auth.ts', { content: auth(options) }],
               ['.env.local', { content: envLocal(options) }],
               ['middleware.ts', { content: middleware }],
-              ['app/api/auth/[...nextAuth]/route.ts', { content: routeHandler }],
+              ['app/api/auth/[...nextAuth]/route.ts', { content: authApiRoute }],
+              ['app/api/employees/route.ts', { content: employeesApiRoute }],
+              ['app/api/employees/[id]/route.ts', { content: employeeApiRoute }],
               ['app/auth/signin/page.tsx', { content: signInPage(options) }],
               ['app/auth/signin/actions.ts', { content: signInAction(options) }],
             ]);

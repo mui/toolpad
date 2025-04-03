@@ -77,7 +77,10 @@ export async function createEmployee(req: NextApiRequest, res: NextApiResponse) 
 
   const employeesStore = getEmployeesStore();
 
-  const newEmployee = { id: employeesStore.length + 1, ...body } as Employee;
+  const newEmployee = {
+    id: employeesStore.reduce((max, employee) => Math.max(max, employee.id), 0) + 1,
+    ...body,
+  } as Employee;
 
   setEmployeesStore([...employeesStore, newEmployee]);
 

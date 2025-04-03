@@ -67,7 +67,10 @@ const notesDataSource: DataSource<Note> = {
     return notesStore.find((note) => note.id === noteId) ?? null;
   },
   createOne: (data) => {
-    const newNote = { id: notesStore.length + 1, ...data } as Note;
+    const newNote = {
+      id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
+      ...data,
+    } as Note;
 
     notesStore = [...notesStore, newNote];
 

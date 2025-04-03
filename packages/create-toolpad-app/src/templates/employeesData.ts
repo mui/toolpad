@@ -142,7 +142,10 @@ export const employeesDataSource: DataSource<Employee> = {
   createOne: async (data) => {
     const employeesStore = getEmployeesStore();
 
-    const newEmployee = { id: employeesStore.length + 1, ...data } as Employee;
+    const newEmployee = {
+      id: employeesStore.reduce((max, employee) => Math.max(max, employee.id), 0) + 1,
+      ...data,
+    } as Employee;
 
     setEmployeesStore([...employeesStore, newEmployee]);
 

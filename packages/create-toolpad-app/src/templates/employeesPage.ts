@@ -5,9 +5,8 @@ const ordersPage: Template = (options) => {
   const routerType = options.router;
 
   let imports = `import * as React from 'react';
-import Typography from '@mui/material/Typography';
 import { Crud } from '@toolpad/core/Crud';
-import { employeesDataSource, Employee, employeesCache } from '../data/employees';`;
+import { employeesDataSource, Employee, employeesCache } from '${routerType === 'nextjs-app' ? `../../../` : ``}${routerType === 'nextjs-pages' ? `../` : ``}../data/employees';`;
 
   let sessionHandling = '';
 

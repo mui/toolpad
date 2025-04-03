@@ -108,8 +108,8 @@ export default function generateProject(
         ['tsconfig.json', { content: tsConfig }],
         ['next-env.d.ts', { content: nextTypes }],
         ['next.config.mjs', { content: nextConfig(options) }],
-        ['src/data/employees.ts', { content: employeesDataRest(options) }],
-        ['src/employeesStore.ts', { content: employeesStore(options) }],
+        ['data/employees.ts', { content: employeesDataRest(options) }],
+        ['employeesStore.ts', { content: employeesStore(options) }],
       ]);
 
       switch (options.router) {

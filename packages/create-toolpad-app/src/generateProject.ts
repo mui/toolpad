@@ -30,12 +30,14 @@ import nextTypes from './templates/nextTypes';
 // App router specific files
 import rootLayout from './templates/nextjs/nextjs-app/rootLayout';
 import dashboardLayout from './templates/nextjs/nextjs-app/dashboardLayout';
-import employeesApiRoute from './templates/nextjs/nextjs-app/employeesRoute';
-import employeeApiRoute from './templates/nextjs/nextjs-app/employeeRoute';
+import employeesApiAppRoute from './templates/nextjs/nextjs-app/employeesRoute';
+import employeeApiAppRoute from './templates/nextjs/nextjs-app/employeeRoute';
 
 // Pages router specific files
 import app from './templates/nextjs/nextjs-pages/app';
 import document from './templates/nextjs/nextjs-pages/document';
+import employeesApiPagesRoute from './templates/nextjs/nextjs-pages/employeesRoute';
+import employeeApiPagesRoute from './templates/nextjs/nextjs-pages/employeeRoute';
 
 // Auth specific files for all apps
 import auth from './templates/nextjs/auth/auth';
@@ -117,6 +119,8 @@ export default function generateProject(
             ['pages/employees/[[...segments]].tsx', { content: employeesPage(options) }],
             ['pages/_document.tsx', { content: document }],
             ['pages/_app.tsx', { content: app(options) }],
+            ['pages/api/employees/index.ts', { content: employeesApiPagesRoute }],
+            ['pages/api/employees/[id].ts', { content: employeeApiPagesRoute }],
           ]);
           if (options.auth) {
             const authFiles = new Map([
@@ -164,6 +168,8 @@ export default function generateProject(
               'app/(dashboard)/employees/[...segments]/page.tsx',
               { content: employeesPage(options) },
             ],
+            ['app/api/employees/route.ts', { content: employeesApiAppRoute }],
+            ['app/api/employees/[id]/route.ts', { content: employeeApiAppRoute }],
           ]);
           if (options.auth) {
             const authFiles = new Map([
@@ -171,8 +177,6 @@ export default function generateProject(
               ['.env.local', { content: envLocal(options) }],
               ['middleware.ts', { content: middleware }],
               ['app/api/auth/[...nextAuth]/route.ts', { content: authApiRoute }],
-              ['app/api/employees/route.ts', { content: employeesApiRoute }],
-              ['app/api/employees/[id]/route.ts', { content: employeeApiRoute }],
               ['app/auth/signin/page.tsx', { content: signInPage(options) }],
               ['app/auth/signin/actions.ts', { content: signInAction(options) }],
             ]);

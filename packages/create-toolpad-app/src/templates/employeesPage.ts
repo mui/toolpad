@@ -42,7 +42,7 @@ import { employeesDataSource, Employee, employeesCache } from '../data/employees
 export default ${isAsync}function EmployeesCrudPage() {
   ${sessionHandling}
 
-  return (
+  return ${routerType === 'nextjs-pages' ? `router.isReady ? ` : ``}(
     <Crud<Employee>
       dataSource={employeesDataSource}
       dataSourceCache={employeesCache}
@@ -50,7 +50,7 @@ export default ${isAsync}function EmployeesCrudPage() {
       initialPageSize={25}
       defaultValues={{ itemCount: 1 }}
     />
-  );
+  )${routerType === 'nextjs-pages' ? ` : null` : ``};
 }${requireAuth}
 `;
 };

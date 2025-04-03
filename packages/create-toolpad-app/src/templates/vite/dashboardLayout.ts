@@ -3,13 +3,8 @@ import { Template } from '../../types';
 const dashboardTemplate: Template = (options) => {
   const { auth } = options;
 
-  return `import * as React from 'react';
-${
-  auth
-    ? `import LinearProgress from '@mui/material/LinearProgress';
-import { Outlet, useLocation, useParams, matchPath } from 'react-router';`
-    : `import { Outlet, useLocation, useParams, matchPath } from 'react-router';`
-}
+  return `import * as React from 'react';${auth ? `\nimport LinearProgress from '@mui/material/LinearProgress';` : ``}
+import { Outlet, useLocation, useParams, matchPath } from 'react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 ${

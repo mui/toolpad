@@ -1,5 +1,6 @@
 export const tsconfig = `{
     "compilerOptions": {
+      "target": "ES2017",
       "lib": ["dom", "dom.iterable", "esnext"],
       "allowJs": true,
       "skipLibCheck": true,
@@ -9,7 +10,6 @@ export const tsconfig = `{
       "module": "esnext",
       "moduleResolution": "bundler",
       "resolveJsonModule": true,
-      "target": "ES2017",
       "isolatedModules": true,
       "jsx": "preserve",
       "incremental": true,

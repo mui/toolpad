@@ -1,24 +1,24 @@
-const route = `import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmployeesStore, setEmployeesStore } from '../../../employeesStore';
-import type { Employee } from '../../../data/employees';
+const route = `import { NextRequest, NextResponse } from 'next/server';
+import { getEmployeesStore, setEmployeesStore } from '../../../../employeesStore';
+import type { Employee } from '../../../../data/employees';
 import type { OmitId } from '@toolpad/core/Crud';
 
-export async function getEmployee(req: NextApiRequest, res: NextApiResponse) {
-  const { id: employeeId } = req.query;
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  const { id: employeeId } = params;
 
   const employeesStore = getEmployeesStore();
 
   const employeeToShow = employeesStore.find((employee) => employee.id === Number(employeeId));
 
   if (!employeeToShow) {
-    return res.status(404).json({ error: 'Employee not found' });
+    return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
   }
-  return res.status(200).json(employeeToShow);
+  return NextResponse.json(employeeToShow);
 }
 
-export async function updateEmployee(req: NextApiRequest, res: NextApiResponse) {
-  const body: Partial<OmitId<Employee>> = req.body;
-  const { id: employeeId } = req.query;
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const body: Partial<OmitId<Employee>> = await req.json();
+  const { id: employeeId } = params;
 
   const employeesStore = getEmployeesStore();
 
@@ -35,35 +35,19 @@ export async function updateEmployee(req: NextApiRequest, res: NextApiResponse) 
   );
 
   if (!updatedEmployee) {
-    return res.status(404).json({ error: 'Employee not found' });
+    return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
   }
-  return res.status(200).json(updatedEmployee);
+  return NextResponse.json(updatedEmployee);
 }
 
-export async function deleteEmployee(req: NextApiRequest, res: NextApiResponse) {
-  const { id: employeeId } = req.query;
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const { id: employeeId } = params;
 
   const employeesStore = getEmployeesStore();
 
   setEmployeesStore(employeesStore.filter((employee) => employee.id !== Number(employeeId)));
 
-  return res.status(200).json({ success: true });
-}
-
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'GET') {
-    return getEmployee(req, res);
-  }
-
-  if (req.method === 'PUT') {
-    return updateEmployee(req, res);
-  }
-
-  if (req.method === 'DELETE') {
-    return deleteEmployee(req, res);
-  }
-
-  return res.status(405).json({ message: 'Method Not Allowed' });
+  return NextResponse.json({ success: true });
 }
 `;
 

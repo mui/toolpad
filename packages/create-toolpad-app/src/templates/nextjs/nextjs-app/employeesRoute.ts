@@ -1,19 +1,15 @@
-const route = `import { NextRequest, NextResponse } from 'next/server';
+const route = `import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmployeesStore, setEmployeesStore } from '../../../employeesStore';
 import type { Employee } from '../../../data/employees';
 import type { GridFilterModel, GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 import type { OmitId } from '@toolpad/core/Crud';
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-
-  const page: GridPaginationModel['page'] = Number(searchParams.get('page')) || 0;
-  const pageSize: GridPaginationModel['pageSize'] = Number(searchParams.get('pageSize')) || 10;
-  const sortModel: GridSortModel = searchParams.get('sort')
-    ? JSON.parse(searchParams.get('sort')!)
-    : [];
-  const filterModel: GridFilterModel = searchParams.get('filter')
-    ? JSON.parse(searchParams.get('filter')!)
+export async function getEmployees(req: NextApiRequest, res: NextApiResponse) {
+  const page: GridPaginationModel['page'] = parseInt(req.query.page as string, 10);
+  const pageSize: GridPaginationModel['pageSize'] = parseInt(req.query.pageSize as string, 10);
+  const sortModel: GridSortModel = req.query.sort ? JSON.parse(req.query.sort as string) : [];
+  const filterModel: GridFilterModel = req.query.filter
+    ? JSON.parse(req.query.filter as string)
     : [];
 
   const employeesStore = getEmployeesStore();
@@ -70,14 +66,14 @@ export async function GET(req: NextRequest) {
   const end = start + pageSize;
   const paginatedEmployees = filteredEmployees.slice(start, end);
 
-  return NextResponse.json({
+  return res.status(200).json({
     items: paginatedEmployees,
     itemCount: filteredEmployees.length,
   });
 }
 
-export async function POST(req: NextRequest) {
-  const body: Partial<OmitId<Employee>> = await req.json();
+export async function createEmployee(req: NextApiRequest, res: NextApiResponse) {
+  const body: Partial<OmitId<Employee>> = req.body;
 
   const employeesStore = getEmployeesStore();
 
@@ -88,7 +84,19 @@ export async function POST(req: NextRequest) {
 
   setEmployeesStore([...employeesStore, newEmployee]);
 
-  return NextResponse.json(newEmployee, { status: 201 });
+  return res.status(201).json(newEmployee);
+}
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'GET') {
+    return getEmployees(req, res);
+  }
+
+  if (req.method === 'POST') {
+    return createEmployee(req, res);
+  }
+
+  return res.status(405).json({ message: 'Method Not Allowed' });
 }
 `;
 

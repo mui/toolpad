@@ -9,6 +9,7 @@ export const tsconfig = `{
       "module": "esnext",
       "moduleResolution": "bundler",
       "resolveJsonModule": true,
+      "target": "ES2017",
       "isolatedModules": true,
       "jsx": "preserve",
       "incremental": true,

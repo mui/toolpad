@@ -40,8 +40,7 @@ import { employeesDataSource, Employee, employeesCache } from '${routerType === 
 
 
 export default ${isAsync}function EmployeesCrudPage() {
-  ${routerType === 'nextjs-pages' ? `const router = useRouter();\n` : ``}
-  ${sessionHandling}
+  ${routerType === 'nextjs-pages' ? `const router = useRouter();\n` : `\n`}${sessionHandling}
 
   return ${routerType === 'nextjs-pages' ? `router.isReady ? ` : ``}(
     <Crud<Employee>

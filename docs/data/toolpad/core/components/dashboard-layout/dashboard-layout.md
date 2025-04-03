@@ -159,20 +159,30 @@ Some possibly useful slots:
 
 - `appTitle`: allows you to customize the app title section in the layout header.
 
-- `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
+- `toolbarAccount`: (deprecated, use toolbar) allows you to replace the default `Account` slot in the header.
+
+- `toolbarActions`: (deprecated, use toolbar) allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
 
 - `sidebarFooter`: allows you to add footer content in the sidebar.
 
+- `toolbar`: This component will completely override the internal layout of the top bar and allows full control over the toolbar. The default `ToolbarActions` component, menuIcon and `Account` can be imported and used if you wish to do so, as shown in the example below.
+
+### sidebarFooter
+
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
 
-### Examples
-
-#### User account in layout sidebar
+### User account in layout sidebar
 
 {{"demo": "DashboardLayoutAccountSidebar.js", "height": 400, "iframe": true}}
 
-#### Settings menu with custom theme switcher
+### Settings menu with custom theme switcher
 
 The `useColorScheme` hook can be used to create a custom theme switcher.
 
 {{"demo": "DashboardLayoutCustomThemeSwitcher.js", "height": 400, "iframe": true}}
+
+### Replaced the full toolbar with a custom one
+
+The `toolbar` slot can be replaced with a custom component, that in turn reuses the out of the box `Account`, `menuIcon`, `AppTitle`and `ToolbarActions` components, giving full control on their order, appearance and behavior.
+
+{{"demo": "DashboardLayoutCustomToolbar.js", "height": 400, "iframe": true}}

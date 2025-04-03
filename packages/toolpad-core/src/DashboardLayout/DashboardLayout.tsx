@@ -58,9 +58,6 @@ export interface DashboardLayoutSlotProps {
   toolbarAccount?: AccountProps;
   sidebarFooter?: SidebarFooterProps;
   toolbar?: {};
-  toolbarLeft?: {};
-  toolbarMiddle?: {};
-  toolbarRight?: {};
 }
 
 export interface DashboardLayoutSlots {
@@ -72,6 +69,8 @@ export interface DashboardLayoutSlots {
   /**
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
+   * @deprecated Use `slots.toolbar` instead.
+   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
   toolbarActions?: React.JSXElementConstructor<{}>;
   /**
@@ -82,6 +81,8 @@ export interface DashboardLayoutSlots {
   /**
    * Optional footer component used in the layout sidebar.
    * @default null
+   * @deprecated Use `slots.toolbar` instead.
+   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
   sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
 
@@ -92,23 +93,9 @@ export interface DashboardLayoutSlots {
    * You can still use the built-in `<AppTitle />`, `<ToolbarActions />` and `<Account />` components inside.
    *
    * @default null
+   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
   toolbar?: React.JSXElementConstructor<ToolbarProps>;
-
-  /** Use this slot to replace the left of the default toolbar.
-   * @default null
-   */
-  toolbarLeft?: React.JSXElementConstructor<ToolbarProps>;
-
-  /** Use this slot to replace the center of the default toolbar.
-   * @default null
-   */
-  toolbarMiddle?: React.JSXElementConstructor<ToolbarProps>;
-
-  /** Use this slot to replace the right of the default toolbar.
-   * @default null
-   */
-  toolbarRight?: React.JSXElementConstructor<ToolbarProps>;
 }
 
 export interface DashboardLayoutProps {
@@ -408,55 +395,44 @@ function DashboardLayout(props: DashboardLayoutProps) {
               }}
             >
               {/* Toolbar Left section */}
-              {slots?.toolbarLeft ? (
-                <slots.toolbarLeft {...toolbarSlotProps} />
-              ) : (
-                <Stack direction="row">
-                  {!hideNavigation ? (
-                    <React.Fragment>
-                      <Box
-                        sx={{
-                          mr: { sm: disableCollapsibleSidebar ? 0 : 1 },
-                          display: { md: 'none' },
-                        }}
-                      >
-                        {getMenuIcon(isMobileNavigationExpanded)}
-                      </Box>
-                      <Box
-                        sx={{
-                          display: { xs: 'none', md: disableCollapsibleSidebar ? 'none' : 'block' },
-                          mr: disableCollapsibleSidebar ? 0 : 1,
-                        }}
-                      >
-                        {getMenuIcon(isDesktopNavigationExpanded)}
-                      </Box>
-                    </React.Fragment>
-                  ) : null}
-                  {slots?.appTitle ? (
-                    <slots.appTitle {...slotProps?.appTitle} />
-                  ) : (
-                    /* Hierarchy of application of `branding`
-                     * 1. Branding prop passed in the `slotProps.appTitle`
-                     * 2. Branding prop passed to the `DashboardLayout`
-                     * 3. Branding prop passed to the `AppProvider`
-                     */
-                    <AppTitle branding={branding} {...slotProps?.appTitle} />
-                  )}
-                </Stack>
-              )}
-
-              {/* Toolbar Center section */}
-              {slots?.toolbarMiddle ? <slots.toolbarMiddle {...toolbarSlotProps} /> : null}
+              <Stack direction="row">
+                {!hideNavigation ? (
+                  <React.Fragment>
+                    <Box
+                      sx={{
+                        mr: { sm: disableCollapsibleSidebar ? 0 : 1 },
+                        display: { md: 'none' },
+                      }}
+                    >
+                      {getMenuIcon(isMobileNavigationExpanded)}
+                    </Box>
+                    <Box
+                      sx={{
+                        display: { xs: 'none', md: disableCollapsibleSidebar ? 'none' : 'block' },
+                        mr: disableCollapsibleSidebar ? 0 : 1,
+                      }}
+                    >
+                      {getMenuIcon(isDesktopNavigationExpanded)}
+                    </Box>
+                  </React.Fragment>
+                ) : null}
+                {slots?.appTitle ? (
+                  <slots.appTitle {...slotProps?.appTitle} />
+                ) : (
+                  /* Hierarchy of application of `branding`
+                   * 1. Branding prop passed in the `slotProps.appTitle`
+                   * 2. Branding prop passed to the `DashboardLayout`
+                   * 3. Branding prop passed to the `AppProvider`
+                   */
+                  <AppTitle branding={branding} {...slotProps?.appTitle} />
+                )}
+              </Stack>
 
               {/* Toolbar Right section */}
-              {slots?.toolbarRight ? (
-                <slots.toolbarRight {...toolbarSlotProps} />
-              ) : (
-                <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
-                  <ToolbarActionsSlot {...slotProps?.toolbarActions} />
-                  <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
-                </Stack>
-              )}
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
+                <ToolbarActionsSlot {...slotProps?.toolbarActions} />
+                <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
+              </Stack>
             </Stack>
           )}
         </Toolbar>

@@ -66,23 +66,30 @@ export interface DashboardLayoutSlots {
    * @default Link
    */
   appTitle?: React.ElementType;
+
   /**
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
    * @deprecated Use `slots.toolbar` instead.
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
+   *
+   * TODO: Remove this deprecated prop in the next major version.
    */
   toolbarActions?: React.JSXElementConstructor<{}>;
+
   /**
    * The toolbar account component used in the layout header.
    * @default Account
+   * @deprecated Use `slots.toolbar` instead.
+   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
+   *
+   * TODO: Remove this deprecated prop in the next major version.
    */
   toolbarAccount?: React.JSXElementConstructor<AccountProps>;
+
   /**
    * Optional footer component used in the layout sidebar.
    * @default null
-   * @deprecated Use `slots.toolbar` instead.
-   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
   sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
 

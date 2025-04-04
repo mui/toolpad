@@ -5,7 +5,9 @@ const ordersPage: Template = (options) => {
   const routerType = options.router;
 
   let imports = `import * as React from 'react';
-import Typography from '@mui/material/Typography';`;
+${routerType === 'nextjs-pages' ? `import { useRouter } from 'next/router';` : ``}
+import { Crud } from '@toolpad/core/Crud';
+import { employeesDataSource, Employee, employeesCache } from '${routerType === 'nextjs-app' ? `../../../` : ``}${routerType === 'nextjs-pages' ? `../` : ``}../data/employees';`;
 
   let sessionHandling = '';
 
@@ -31,20 +33,24 @@ import Typography from '@mui/material/Typography';`;
 
   let requireAuth = '';
   if (authEnabled && routerType === 'nextjs-pages') {
-    requireAuth = `\n\nOrdersPage.requireAuth = true;`;
+    requireAuth = `\n\nEmployeesCrudPage.requireAuth = true;`;
   }
 
   return `${imports}
 
 
-export default ${isAsync}function OrdersPage() {
-  ${sessionHandling}
+export default ${isAsync}function EmployeesCrudPage() {
+  ${routerType === 'nextjs-pages' ? `const router = useRouter();\n` : ``}${sessionHandling}
 
-  return (
-    <Typography>
-      Welcome to the Toolpad orders!
-    </Typography>
-  );
+  return ${routerType === 'nextjs-pages' ? `router.isReady ? ` : ``}(
+    <Crud<Employee>
+      dataSource={employeesDataSource}
+      dataSourceCache={employeesCache}
+      rootPath="/employees"
+      initialPageSize={25}
+      defaultValues={{ itemCount: 1 }}
+    />
+  )${routerType === 'nextjs-pages' ? ` : null` : ``};
 }${requireAuth}
 `;
 };

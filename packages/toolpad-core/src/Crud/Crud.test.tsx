@@ -106,7 +106,10 @@ const ordersDataSource: DataSource<Order> = {
     return orderToShow;
   },
   createOne: (data) => {
-    const newOrder = { id: ordersStore.length + 1, ...data } as Order;
+    const newOrder = {
+      id: ordersStore.reduce((max, order) => Math.max(max, order.id), 0) + 1,
+      ...data,
+    } as Order;
 
     ordersStore = [...ordersStore, newOrder];
 

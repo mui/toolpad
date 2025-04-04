@@ -39,7 +39,7 @@ export interface Person extends DataModel {
   age: number;
 }
 
-let people: Person[] = [
+let peopleStore: Person[] = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
@@ -73,7 +73,7 @@ export const peopleDataSource: DataSource<Person> &
       setTimeout(resolve, 750);
     });
 
-    let processedPeople = [...people];
+    let processedPeople = [...peopleStore];
 
     // Apply filters (demo only)
     if (filterModel?.items?.length) {
@@ -142,7 +142,7 @@ export const peopleDataSource: DataSource<Person> &
       setTimeout(resolve, 750);
     });
 
-    people = people.filter((person) => person.id !== Number(personId));
+    peopleStore = peopleStore.filter((person) => person.id !== Number(personId));
   },
 };
 

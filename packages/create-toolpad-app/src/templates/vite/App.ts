@@ -3,7 +3,7 @@ import { Template } from '../../types';
 const appTemplate: Template = (options) => {
   return `import * as React from 'react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PersonIcon from '@mui/icons-material/Person';
 import { Outlet } from 'react-router';
 ${
   options.auth
@@ -24,9 +24,10 @@ const NAVIGATION: Navigation = [
     icon: <DashboardIcon />,
   },
   {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
+    segment: 'employees',
+    title: 'Employees',
+    icon: <PersonIcon />,
+    pattern: 'employees{/:employeeId}*',
   },
 ];
 

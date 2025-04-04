@@ -137,7 +137,10 @@ export const ordersDataSource: DataSource<Order> = {
 
     const ordersStore = getOrdersStore();
 
-    const newOrder = { id: ordersStore.length + 1, ...data } as Order;
+    const newOrder = {
+      id: ordersStore.reduce((max, order) => Math.max(max, order.id), 0) + 1,
+      ...data,
+    } as Order;
 
     setOrdersStore([...ordersStore, newOrder]);
 

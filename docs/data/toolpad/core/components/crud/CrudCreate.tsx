@@ -39,7 +39,7 @@ export interface Person extends DataModel {
   age: number;
 }
 
-let people: Person[] = [
+let peopleStore: Person[] = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
@@ -73,9 +73,12 @@ export const peopleDataSource: DataSource<Person> &
       setTimeout(resolve, 750);
     });
 
-    const newPerson = { id: people.length + 1, ...data } as Person;
+    const newPerson = {
+      id: peopleStore.reduce((max, person) => Math.max(max, person.id), 0) + 1,
+      ...data,
+    } as Person;
 
-    people = [...people, newPerson];
+    peopleStore = [...peopleStore, newPerson];
 
     return newPerson;
   },

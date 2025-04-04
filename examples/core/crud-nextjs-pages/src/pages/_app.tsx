@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useRouter } from 'next/router';
 import { NextAppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { AppCacheProvider } from '@mui/material-nextjs/v14-pagesRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';

@@ -1,5 +1,11 @@
-import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
-import { z } from 'zod';
+import { Template } from '../types';
+
+const employeesData: Template = () => {
+  const imports = `import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
+import { z } from 'zod';`;
+
+  return `'use client';
+${imports}
 
 type EmployeeRole = 'Market' | 'Finance' | 'Development';
 
@@ -65,11 +71,6 @@ export const employeesDataSource: DataSource<Employee> = {
     },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
-
     const employeesStore = getEmployeesStore();
 
     let filteredEmployees = [...employeesStore];
@@ -130,11 +131,6 @@ export const employeesDataSource: DataSource<Employee> = {
     };
   },
   getOne: async (employeeId) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
-
     const employeesStore = getEmployeesStore();
 
     const employeeToShow = employeesStore.find((employee) => employee.id === Number(employeeId));
@@ -145,11 +141,6 @@ export const employeesDataSource: DataSource<Employee> = {
     return employeeToShow;
   },
   createOne: async (data) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
-
     const employeesStore = getEmployeesStore();
 
     const newEmployee = {
@@ -162,11 +153,6 @@ export const employeesDataSource: DataSource<Employee> = {
     return newEmployee;
   },
   updateOne: async (employeeId, data) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
-
     const employeesStore = getEmployeesStore();
 
     let updatedEmployee: Employee | null = null;
@@ -187,11 +173,6 @@ export const employeesDataSource: DataSource<Employee> = {
     return updatedEmployee;
   },
   deleteOne: async (employeeId) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
-
     const employeesStore = getEmployeesStore();
 
     setEmployeesStore(employeesStore.filter((employee) => employee.id !== Number(employeeId)));
@@ -209,3 +190,7 @@ export const employeesDataSource: DataSource<Employee> = {
 };
 
 export const employeesCache = new DataSourceCache();
+`;
+};
+
+export default employeesData;

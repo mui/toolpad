@@ -66,7 +66,10 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    const newPerson = { id: people.length + 1, ...data };
+    const newPerson = {
+      id: people.reduce((max, person) => Math.max(max, person.id), 0) + 1,
+      ...data,
+    };
 
     people = [...people, newPerson];
 

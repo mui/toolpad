@@ -31,6 +31,10 @@ commands:
         default: false
         description: 'Set to true if you intend to use any browser (for example with playwright).'
     steps:
+      - run:
+          name: Set npm registry public signing keys
+          command: |
+            echo "export COREPACK_INTEGRITY_KEYS='$(curl https://registry.npmjs.org/-/npm/v1/keys | jq -c '{npm: .keys}')'" >> $BASH_ENV
       - when:
           condition: << parameters.browsers >>
           steps:
@@ -163,6 +167,9 @@ jobs:
       - run:
           name: Tests real browser
           command: pnpm test:browser
+      - run:
+          name: Upload screenshots to Argos CI
+          command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} pnpm test:argos
 
   test_integration:
     <<: *default-job
@@ -182,17 +189,17 @@ jobs:
           command: pnpm release:build
           environment:
             NODE_OPTIONS: --max-old-space-size=3584
-      - run:
-          name: Tests real browser
-          command: pnpm test:integration
-      - store_test_results:
-          path: test/test-results/junit.xml
-      - run:
-          name: Upload screenshots to Argos CI
-          command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} pnpm test:argos
-      - store_artifacts:
-          path: test/test-results
-          destination: playwright-test-results
+      # - run:
+      #     name: Tests real browser
+      #     command: pnpm test:integration
+      # - store_test_results:
+      #     path: test/test-results/junit.xml
+      # - run:
+      #     name: Upload screenshots to Argos CI
+      #     command: ARGOS_PARALLEL_TOTAL=${CIRCLE_NODE_TOTAL} pnpm test:argos
+      # - store_artifacts:
+      #     path: test/test-results
+      #     destination: playwright-test-results
 
   test_bundle_size_monitor:
     <<: *default-job

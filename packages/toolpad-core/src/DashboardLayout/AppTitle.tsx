@@ -10,6 +10,8 @@ import { useApplicationTitle } from '../shared/branding';
 const LogoContainer = styled('div')({
   position: 'relative',
   height: 40,
+  display: 'flex',
+  alignItems: 'center',
   '& img': {
     maxHeight: 40,
   },
@@ -37,6 +39,7 @@ export function AppTitle(props: AppTitleProps) {
             fontWeight: '700',
             ml: 1,
             whiteSpace: 'nowrap',
+            lineHeight: 1,
           }}
         >
           {title}

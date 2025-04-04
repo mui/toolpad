@@ -1410,7 +1410,7 @@ const pagesManifestEntrySchema: z.ZodType<PagesManifestEntry> = basePagesManifes
   },
 );
 
-const pagesManifestSchema = z.object({
+export const pagesManifestSchema = z.object({
   pages: z.array(pagesManifestEntrySchema),
 });
 

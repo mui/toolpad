@@ -1,6 +1,6 @@
 'use client';
 import * as React from 'react';
-import { useRouter } from 'next/compat/router';
+import { useRouter } from 'next/compat/router.js';
 import { NextAppProviderApp } from './NextAppProviderApp';
 import { NextAppProviderPages } from './NextAppProviderPages';
 import type { AppProviderProps } from '../AppProvider';
@@ -11,9 +11,4 @@ function NextAppProvider(props: AppProviderProps) {
   return <AppProvider {...props} />;
 }
 
-export {
-  NextAppProvider,
-  /** TODO: Old usage, remove export from v0.14.0 */
-  /** @deprecated Import `NextAppProvider` instead. */
-  NextAppProvider as AppProvider,
-};
+export { NextAppProvider };

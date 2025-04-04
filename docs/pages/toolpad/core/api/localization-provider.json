@@ -1,0 +1,11 @@
+{
+  "props": { "localeText": { "type": { "name": "object" } } },
+  "name": "LocalizationProvider",
+  "imports": ["import { LocalizationProvider } from '@toolpad/core/AppProvider';"],
+  "classes": [],
+  "muiName": "LocalizationProvider",
+  "filename": "/packages/toolpad-core/src/AppProvider/LocalizationProvider.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign-in Page</a></li></ul>",
+  "cssComponent": false
+}

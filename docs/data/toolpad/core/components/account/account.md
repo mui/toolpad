@@ -26,7 +26,7 @@ If a `session` object is present, the component is rendered as a dropdown contai
 
 When signed out, the component renders as an inline sign in button within the dashboard layout.
 
-{{"demo": "AccountDemoSignedOut.js", "bg": "outlined", "defaultCodeOpen": false }}
+{{"demo": "AccountDemoSignedOut.js", "bg": "outlined", "defaultCodeOpen": false}}
 
 ## Customization
 
@@ -61,7 +61,7 @@ You can build advanced menus – such as a tenant switcher – by passing in a c
 
 {{"demo": "AccountSlotsAccountSwitcher.js", "bg": "outlined"}}
 
-### Labels
+### Localization
 
 You can pass in custom labels – including of different languages – using the `localeText` prop.
 

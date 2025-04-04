@@ -1,5 +1,6 @@
 {
   "props": {
+    "localeText": { "type": { "name": "object" } },
     "providers": {
       "type": { "name": "arrayOf", "description": "Array&lt;{ id: string, name: string }&gt;" },
       "default": "[]"
@@ -15,7 +16,7 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: object, forgotPasswordLink?: object, form?: object, oauthButton?: object, passwordField?: object, rememberMe?: object, signUpLink?: object, submitButton?: object }"
+        "description": "{ emailField?: object, forgotPasswordLink?: object, form?: object, oAuthButton?: object, passwordField?: object, rememberMe?: object, signUpLink?: object, submitButton?: object }"
       },
       "default": "{}"
     },
@@ -56,7 +57,7 @@
     {
       "name": "submitButton",
       "description": "The custom submit button component used in the credentials form.",
-      "default": "LoadingButton",
+      "default": "Button",
       "class": null
     },
     {

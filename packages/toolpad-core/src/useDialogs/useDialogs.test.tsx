@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { describe, test, expect } from 'vitest';
-import { renderHook, within, screen } from '@testing-library/react';
+import { renderHook, within, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { DialogProps, useDialogs } from './useDialogs';
 import { DialogsProvider } from './DialogsProvider';
@@ -37,6 +37,20 @@ describe('useDialogs', () => {
       expect(await dialogResult).toBeUndefined();
 
       expect(screen.queryByRole('dialog')).toBeFalsy();
+    });
+
+    test('can close imperatively', async () => {
+      const { result } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const theDialog = result.current.alert('Hello');
+
+      const dialog = await screen.findByRole('dialog');
+
+      await waitFor(() => expect(within(dialog).getByText('Hello')).toBeTruthy());
+
+      await result.current.close(theDialog, undefined);
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
     });
   });
 
@@ -79,6 +93,20 @@ describe('useDialogs', () => {
       expect(await dialogResult).toBe(false);
 
       expect(screen.queryByRole('dialog')).toBeFalsy();
+    });
+
+    test('can close imperatively', async () => {
+      const { result } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const theDialog = result.current.confirm('Hello');
+
+      const dialog = await screen.findByRole('dialog');
+
+      await waitFor(() => expect(within(dialog).getByText('Hello')).toBeTruthy());
+
+      await result.current.close(theDialog, true);
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
     });
   });
 
@@ -125,6 +153,20 @@ describe('useDialogs', () => {
       expect(await dialogResult).toBe(null);
 
       expect(screen.queryByRole('dialog')).toBeFalsy();
+    });
+
+    test('can close imperatively', async () => {
+      const { result } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const theDialog = result.current.prompt('Hello');
+
+      const dialog = await screen.findByRole('dialog');
+
+      await waitFor(() => expect(within(dialog).getByText('Hello')).toBeTruthy());
+
+      await result.current.close(theDialog, 'goodbye');
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
     });
   });
 
@@ -194,6 +236,27 @@ describe('useDialogs', () => {
       rerender();
 
       expect(await dialogResult).toBe('I am result');
+    });
+
+    test('can close imperatively', async () => {
+      function CustomDialog({ open, onClose }: DialogProps) {
+        return open ? (
+          <div role="dialog">
+            Hello <button onClick={() => onClose()}>Close me</button>
+          </div>
+        ) : null;
+      }
+      const { result } = renderHook(() => useDialogs(), { wrapper: TestWrapper });
+
+      const theDialog = result.current.open(CustomDialog);
+
+      const dialog = await screen.findByRole('dialog');
+
+      await waitFor(() => expect(within(dialog).getByText('Hello')).toBeTruthy());
+
+      await result.current.close(theDialog, null);
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeFalsy());
     });
   });
 });

@@ -1,0 +1,23 @@
+{
+  "props": {
+    "dataSource": { "type": { "name": "object" } },
+    "dataSourceCache": {
+      "type": {
+        "name": "shape",
+        "description": "{ cache: object, clear: func, get: func, set: func, ttl: number }"
+      }
+    },
+    "initialValues": { "type": { "name": "object" }, "default": "{}" },
+    "localeText": { "type": { "name": "object" } },
+    "onSubmitSuccess": { "type": { "name": "func" } },
+    "resetOnSubmit": { "type": { "name": "bool" }, "default": "false" }
+  },
+  "name": "Create",
+  "imports": ["import { Create } from '@toolpad/core/Crud';"],
+  "classes": [],
+  "muiName": "Create",
+  "filename": "/packages/toolpad-core/src/Crud/Create.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
+  "cssComponent": false
+}

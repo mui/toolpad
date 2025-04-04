@@ -1,13 +1,37 @@
 import * as React from 'react';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage, RememberMeCheckbox } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 
 const providers = [
   { id: 'github', name: 'GitHub' },
   { id: 'credentials', name: 'Email and Password' },
 ];
+
+function RememberMeCheckbox() {
+  const theme = useTheme();
+  return (
+    <FormControlLabel
+      label="Remember me"
+      control={
+        <Checkbox
+          name="remember"
+          value="true"
+          color="primary"
+          sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+        />
+      }
+      slotProps={{
+        typography: {
+          color: 'textSecondary',
+          fontSize: theme.typography.pxToRem(14),
+        },
+      }}
+    />
+  );
+}
 
 export default function SlotPropsSignIn() {
   const theme = useTheme();
@@ -34,7 +58,7 @@ export default function SlotPropsSignIn() {
           emailField: { variant: 'standard', autoFocus: false },
           passwordField: { variant: 'standard' },
           submitButton: { variant: 'outlined' },
-          oauthButton: { variant: 'contained' },
+          oAuthButton: { variant: 'contained' },
           rememberMe: {
             control: (
               <Checkbox

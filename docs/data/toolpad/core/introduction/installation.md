@@ -64,7 +64,7 @@ yarn create toolpad-app
 
 </codeblock>
 
-2. Follow the instructions presented. Once the installation ends, run:
+2. You will be asked to choose amongst your preferred frameworks (Next.js/Vite), routers and authentication providers. Once the installation ends, run:
 
 <codeblock storageKey="package-manager">
 
@@ -87,28 +87,55 @@ yarn dev
 
 3. Visit **http://localhost:3000/** in your browser to open the application.
 
-4. The CLI bootstraps the following directory:
+4. A sample directory structure with the Next.js App router will look like this:
+
+   **Without Authentication:**
 
    ```bash
-    ├── app
-    │ ├── auth
-    │ ├──── [...path]
-    │ └────── page.tsx
-    │ ├── api
-    │ ├──── auth
-    │ ├────── [...nextAuth]
-    │ └───────── route.tsx
-    │ ├── (dashboard)
-    | ├──── layout.tsx
-    │ ├──── page
-    │ └────── page.tsx
-    ├──── layout.tsx
-    └──── page.tsx
-
+   ├── app
+   │   ├── (dashboard)
+   │   │   ├── layout.tsx
+   │   │   ├── page.tsx
+   │   │   └── orders
+   │   │       └── page.tsx
+   │   └── layout.tsx
+   ├── .env
+   ├── .env.local
+   ├── .eslintrc.json
+   ├── .gitignore
+   ├── next.config.js
+   ├── package.json
+   ├── README.md
+   └── tsconfig.json
    ```
 
-   and the following page appears when you run the project locally:
+   **With Authentication:**
 
-{{"component": "modules/components/DocsImage.tsx", "src": "/static/toolpad/docs/core/bootstrap.png", "srcDark": "/static/toolpad/docs/core/bootstrap-dark.png","alt": "Toolpad Core entry point", "caption": "Starting with Toolpad Core", "zoom": true, "indent": 1 }}
+   ```bash
+   ├── app
+   │   ├── auth
+   │   │   └── signin
+   │   │       └── page.tsx
+   │   ├── api
+   │   │   └── auth
+   │   │       └── [...nextauth]
+   │   │           └── route.ts
+   │   ├── (dashboard)
+   │   │   ├── layout.tsx
+   │   │   ├── page.tsx
+   │   │   └── orders
+   │   │       └── page.tsx
+   │   └── layout.tsx
+   ├── .env
+   ├── .env.local
+   ├── .eslintrc.json
+   ├── .gitignore
+   ├── next.config.js
+   ├── package.json
+   ├── README.md
+   └── tsconfig.json
+   ```
 
-5. Installation is complete! Begin building your project by making edits to `(dashboard)/page/page.tsx`. To understand how to leverage Toolpad Core to build dashboards quickly, [see the detailed tutorial](/toolpad/core/introduction/tutorial/).
+5. Installation is complete! Begin building your project by making edits to `(dashboard)/page.tsx`. To understand how to leverage Toolpad Core to build dashboards quickly, [see the detailed tutorial](/toolpad/core/introduction/tutorial/).
+
+6. If you selected authentication, you will need to provide values to the `.env` files that have been created. See more information on the [usage with authentication libraries section](https://mui.com/toolpad/core/react-sign-in-page/#usage-with-authentication-libraries).

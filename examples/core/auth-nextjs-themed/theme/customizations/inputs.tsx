@@ -217,15 +217,7 @@ export const inputsCustomizations: Components<Theme> = {
             },
           },
         ],
-      }),
-    },
-  },
-  // @ts-ignore TODO: MuiLoadingButton is not present in the default `theme`
-  MuiLoadingButton: {
-    styleOverrides: {
-      // @ts-ignore
-      root: ({ theme }) => ({
-        '& .MuiLoadingButton-loadingIndicator': {
+        '& .MuiButton-loadingIndicator': {
           color: gray[400],
           ...theme.applyStyles('dark', {
             color: gray[600],
@@ -378,6 +370,7 @@ export const inputsCustomizations: Components<Theme> = {
     styleOverrides: {
       root: {
         border: 'none',
+        marginTop: 6,
       },
       input: {
         '&::placeholder': {
@@ -459,7 +452,6 @@ export const inputsCustomizations: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         typography: theme.typography.caption,
-        marginBottom: 8,
       }),
     },
   },

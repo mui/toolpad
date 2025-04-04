@@ -19,7 +19,7 @@ npx create-toolpad-app@latest --example tutorial
 ```
 
 ```bash pnpm
-pnpm dlx create toolpad-app --example tutorial
+pnpm create toolpad-app --example tutorial
 ```
 
 ```bash yarn

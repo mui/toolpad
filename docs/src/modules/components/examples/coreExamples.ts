@@ -15,6 +15,33 @@ const coreExamples = [
     stackBlitz: true,
   },
   {
+    title: ' CRUD in Next.js App Router',
+    description: 'This example provides a CRUD setup integrated with the Next.js App Router.',
+    src: '/static/toolpad/docs/core/crud.png',
+    srcDark: '/static/toolpad/docs/core/crud-dark.png',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/crud-nextjs',
+    codeSandbox: true,
+    stackBlitz: true,
+  },
+  {
+    title: ' CRUD in Vite with React Router',
+    description: 'This example provides a CRUD setup integrated with Vite and React Router.',
+    src: '/static/toolpad/docs/core/crud.png',
+    srcDark: '/static/toolpad/docs/core/crud-dark.png',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/crud-vite',
+    codeSandbox: true,
+    stackBlitz: true,
+  },
+  {
+    title: ' CRUD in Next.js Pages Router',
+    description: 'This example provides a CRUD setup integrated with the Next.js Pages Router.',
+    src: '/static/toolpad/docs/core/crud.png',
+    srcDark: '/static/toolpad/docs/core/crud-dark.png',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/crud-nextjs-pages',
+    codeSandbox: true,
+    stackBlitz: true,
+  },
+  {
     title: 'Vite with React Router and Firebase Auth',
     description:
       'This app shows you to how to get started using Toolpad Core with Vite, React Router, and authentication using Firebase.',
@@ -42,7 +69,7 @@ const coreExamples = [
       'This app shows you to how to get started using Toolpad Core with Auth.js Passkeys and the Next.js App Router.',
     src: '/static/toolpad/docs/core/auth-next-passkey.png',
     srcDark: '/static/toolpad/docs/core/auth-next-passkey-dark.png',
-    source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-passkey/',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-passkey',
     // Crash with Prisma
     codeSandbox: false,
     stackBlitz: false,
@@ -53,8 +80,7 @@ const coreExamples = [
       'This app shows you to how to get started using Toolpad Core with Auth.js v4 and the Next.js Pages router.',
     src: '/static/toolpad/docs/core/auth-next.png',
     srcDark: '/static/toolpad/docs/core/auth-next-dark.png',
-    source:
-      'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4/',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages-nextauth-4',
     codeSandbox: true,
     // Show nothing
     stackBlitz: false,
@@ -65,7 +91,7 @@ const coreExamples = [
       'This app shows you to how to get started using Toolpad Core with Vite and React Router.',
     src: '/static/toolpad/docs/core/vite-react-router.png',
     srcDark: '/static/toolpad/docs/core/vite-react-router.png', // TODO Fix
-    source: 'https://github.com/mui/toolpad/tree/master/examples/core/vite/',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/vite',
     codeSandbox: true,
     // Show nothing
     stackBlitz: false,
@@ -87,7 +113,7 @@ const coreExamples = [
       'This app shows you to how to get started using Toolpad Core with Auth.js and the Next.js Pages router.',
     src: '/static/toolpad/docs/core/auth-next.png',
     srcDark: '/static/toolpad/docs/core/auth-next-dark.png',
-    source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages/',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs-pages',
     // infinite redirection
     codeSandbox: false,
     stackBlitz: false,
@@ -98,7 +124,7 @@ const coreExamples = [
       'This app shows you to how to get started using Toolpad Core with Auth.js and the Next.js App Router.',
     src: '/static/toolpad/docs/core/auth-next.png',
     srcDark: '/static/toolpad/docs/core/auth-next-dark.png',
-    source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs/',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/auth-nextjs',
     codeSandbox: true,
     stackBlitz: true,
   },
@@ -109,7 +135,7 @@ const coreExamples = [
     src: '/static/toolpad/docs/core/tutorial-1.png',
     srcDark: '/static/toolpad/docs/core/tutorial-1.png', // TODO Fix
     href: 'https://mui.com/toolpad/core/introduction/tutorial/',
-    source: 'https://github.com/mui/toolpad/tree/master/examples/core/tutorial/',
+    source: 'https://github.com/mui/toolpad/tree/master/examples/core/tutorial',
     codeSandbox: true,
     stackBlitz: true,
   },

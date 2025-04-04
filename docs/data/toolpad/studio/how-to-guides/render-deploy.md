@@ -1,5 +1,9 @@
 # Deploy to Render
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">You can host and share your Toolpad Studio apps on Render in a few minutes, for free.</p>
 
 ## Prerequisites

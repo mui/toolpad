@@ -1,8 +1,14 @@
 import * as React from 'react';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
+import NextLink from 'next/link.js';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation.js';
+import { LinkProps } from '../shared/Link';
 import { AppProvider } from '../AppProvider';
 import type { AppProviderProps, Navigate, Router } from '../AppProvider';
 
+const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
+  const { href, history, ...rest } = props;
+  return <NextLink ref={ref} href={href} replace={history === 'replace'} {...rest} />;
+});
 /**
  * @ignore - internal component.
  */
@@ -29,6 +35,7 @@ export function NextAppProviderApp(props: AppProviderProps) {
       pathname,
       searchParams,
       navigate,
+      Link,
     }),
     [pathname, navigate, searchParams],
   );

@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import {
   Alert,
@@ -19,8 +20,7 @@ import type {
   ShowNotification,
   ShowNotificationOptions,
 } from './useNotifications';
-
-const closeText = 'Close';
+import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
 
 export interface NotificationsProviderSlotProps {
   snackbar: SnackbarProps;
@@ -36,6 +36,14 @@ export interface NotificationsProviderSlots {
 
 const RootPropsContext = React.createContext<NotificationsProviderProps | null>(null);
 
+interface NotificationsProviderLocaleText {
+  close: string;
+}
+
+const defaultLocaleText: Pick<LocaleText, keyof NotificationsProviderLocaleText> = {
+  close: 'Close',
+};
+
 interface NotificationProps {
   notificationKey: string;
   badge: string | null;
@@ -45,6 +53,8 @@ interface NotificationProps {
 }
 
 function Notification({ notificationKey, open, message, options, badge }: NotificationProps) {
+  const globalLocaleText = useLocaleText();
+  const localeText = { ...defaultLocaleText, ...globalLocaleText };
   const { close } = useNonNullableContext(NotificationsContext);
 
   const { severity, actionText, onAction, autoHideDuration } = options;
@@ -68,8 +78,8 @@ function Notification({ notificationKey, open, message, options, badge }: Notifi
       ) : null}
       <IconButton
         size="small"
-        aria-label={closeText}
-        title={closeText}
+        aria-label={localeText?.close}
+        title={localeText?.close}
         color="inherit"
         onClick={handleClose}
       >

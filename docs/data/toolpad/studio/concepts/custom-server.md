@@ -1,5 +1,9 @@
 # Custom server
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">Run Toolpad Studio applications programmatically in existing node.js servers.</p>
 
 :::warning
@@ -33,7 +37,7 @@ app.use('/my-app', handler);
 app.listen(3001);
 ```
 
-To run the custom server you'll have to update the scripts in your your package.json
+To run the custom server you'll have to update the scripts in your package.json
 
 ```json
 {

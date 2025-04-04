@@ -10,7 +10,9 @@ import {
   RouterContext,
   WindowContext,
 } from '../shared/context';
+import type { LinkProps } from '../shared/Link';
 import { AppThemeProvider } from './AppThemeProvider';
+import { LocalizationProvider, type LocaleText } from './LocalizationProvider';
 
 export interface NavigateOptions {
   history?: 'auto' | 'push' | 'replace';
@@ -27,6 +29,7 @@ export interface Router {
   pathname: string;
   searchParams: URLSearchParams;
   navigate: Navigate;
+  Link?: React.ComponentType<LinkProps>;
 }
 
 export interface Branding {
@@ -94,7 +97,7 @@ export interface AppProviderProps {
    */
   branding?: Branding | null;
   /**
-   * Navigation definition for the app.
+   * Navigation definition for the app. [Find out more](https://mui.com/toolpad/core/react-app-provider/#navigation).
    * @default []
    */
   navigation?: Navigation;
@@ -103,6 +106,10 @@ export interface AppProviderProps {
    * @default null
    */
   router?: Router;
+  /**
+   * Locale text for components
+   */
+  localeText?: Partial<LocaleText>;
   /**
    * Session info about the current user.
    * @default null
@@ -147,6 +154,7 @@ function AppProvider(props: AppProviderProps) {
     theme = createTheme(),
     branding = null,
     navigation = [],
+    localeText,
     router = null,
     authentication = null,
     session = null,
@@ -159,15 +167,17 @@ function AppProvider(props: AppProviderProps) {
         <SessionContext.Provider value={session}>
           <RouterContext.Provider value={router}>
             <AppThemeProvider theme={theme} window={appWindow}>
-              <NotificationsProvider>
-                <DialogsProvider>
-                  <BrandingContext.Provider value={branding}>
-                    <NavigationContext.Provider value={navigation}>
-                      {children}
-                    </NavigationContext.Provider>
-                  </BrandingContext.Provider>
-                </DialogsProvider>
-              </NotificationsProvider>
+              <LocalizationProvider localeText={localeText}>
+                <NotificationsProvider>
+                  <DialogsProvider>
+                    <BrandingContext.Provider value={branding}>
+                      <NavigationContext.Provider value={navigation}>
+                        {children}
+                      </NavigationContext.Provider>
+                    </BrandingContext.Provider>
+                  </DialogsProvider>
+                </NotificationsProvider>
+              </LocalizationProvider>
             </AppThemeProvider>
           </RouterContext.Provider>
         </SessionContext.Provider>
@@ -203,7 +213,11 @@ AppProvider.propTypes /* remove-proptypes */ = {
    */
   children: PropTypes.node,
   /**
-   * Navigation definition for the app.
+   * Locale text for components
+   */
+  localeText: PropTypes.object,
+  /**
+   * Navigation definition for the app. [Find out more](https://mui.com/toolpad/core/react-app-provider/#navigation).
    * @default []
    */
   navigation: PropTypes.arrayOf(
@@ -242,6 +256,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
    * @default null
    */
   router: PropTypes.shape({
+    Link: PropTypes.func,
     navigate: PropTypes.func.isRequired,
     pathname: PropTypes.string.isRequired,
     searchParams: PropTypes.instanceOf(URLSearchParams).isRequired,

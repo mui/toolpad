@@ -2,6 +2,8 @@ import * as React from 'react';
 import {
   Button,
   FormControl,
+  Checkbox,
+  FormControlLabel,
   InputLabel,
   OutlinedInput,
   TextField,
@@ -14,7 +16,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage, RememberMeCheckbox } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/SignInPage';
 import { useTheme } from '@mui/material/styles';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];
@@ -126,6 +128,29 @@ function Subtitle() {
     <Alert sx={{ mb: 2, px: 1, py: 0.25, width: '100%' }} severity="warning">
       We are investigating an ongoing outage.
     </Alert>
+  );
+}
+
+function RememberMeCheckbox() {
+  const theme = useTheme();
+  return (
+    <FormControlLabel
+      label="Remember me"
+      control={
+        <Checkbox
+          name="remember"
+          value="true"
+          color="primary"
+          sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+        />
+      }
+      slotProps={{
+        typography: {
+          color: 'textSecondary',
+          fontSize: theme.typography.pxToRem(14),
+        },
+      }}
+    />
   );
 }
 

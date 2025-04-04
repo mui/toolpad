@@ -38,9 +38,7 @@ function DemoPageContent({ pathname, navigate }) {
         textAlign: 'center',
       }}
     >
-      <Typography>
-        <p>Dashboard content for {pathname}</p>
-      </Typography>
+      <Typography>Dashboard content for {pathname}</Typography>
       {pathname.startsWith('/orders') ? (
         <Stack direction="row" spacing={1} sx={{ pt: 1 }}>
           <Button

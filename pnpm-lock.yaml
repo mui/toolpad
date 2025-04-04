@@ -95,11 +95,11 @@ importers:
         specifier: 1.0.16
         version: 1.0.16
       '@mui/internal-markdown':
-        specifier: 1.0.25
-        version: 1.0.25
+        specifier: 2.0.3
+        version: 2.0.3
       '@mui/internal-scripts':
-        specifier: 1.0.33
-        version: 1.0.33
+        specifier: 2.0.6
+        version: 2.0.6
       '@mui/monorepo':
         specifier: github:mui/material-ui#abd8f63bc0b8d681b3bfbe47486508c94ea23609
         version: https://codeload.github.com/mui/material-ui/tar.gz/abd8f63bc0b8d681b3bfbe47486508c94ea23609(@babel/core@7.26.10)(@types/express@5.0.1)(encoding@0.1.13)
@@ -308,8 +308,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.12)(react@19.0.0)
       '@mui/internal-markdown':
-        specifier: 1.0.25
-        version: 1.0.25
+        specifier: 2.0.3
+        version: 2.0.3
       '@mui/joy':
         specifier: 5.0.0-beta.51
         version: 5.0.0-beta.51(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -2571,14 +2571,14 @@ packages:
   '@mui/internal-docs-utils@1.0.16':
     resolution: {integrity: sha512-GEq4dG9+10WGlQVrmXUfCWNe1FiWoMr2KXbgn2/00Da5hdvp4nIa3PXYYZF08Wh+FtnBbLHKGkPmZ7iw9WKtjQ==}
 
-  '@mui/internal-markdown@1.0.25':
-    resolution: {integrity: sha512-9A+IrU2gxUd+1JInu7C2hAPsWA0kD1Z2ytme4SfCs95d03MamfFRBDuXt659Dxemb/IHXumxcDuuT8zzLXzUwg==}
+  '@mui/internal-docs-utils@2.0.0':
+    resolution: {integrity: sha512-RBRywDnwCDEhRcEXuLbXiIieCwx7yRBZTHvPX7xttEwncc8aWJsZvZgl2B+CkwHWWInJNARjnk7/77rdgnOykQ==}
 
   '@mui/internal-markdown@2.0.3':
     resolution: {integrity: sha512-CjjV4s5XpFvXOa6wBZc+7Df6fg2xK0rxku5pvbJs35YbmNvHKG54tlrXHwFoGbyZ22QXQ7a7fHdBB1P+6v3/vQ==}
 
-  '@mui/internal-scripts@1.0.33':
-    resolution: {integrity: sha512-brWhduXmwbqHPb6wI67vjq4T+pEwgD0dI3z8r37vyBPWlpOWTiD6WRD/RkX5GYZ47LaLLLGvV4ctJEP5R4rOGg==}
+  '@mui/internal-scripts@2.0.6':
+    resolution: {integrity: sha512-ZE26/4oR/jNW/S/KD/fMtaTeJ0ksDjCG42qJT3NGwhKSKypj633wfp1JNwoQo0aG2PCoxLwoKLaBtji6ePGPEw==}
 
   '@mui/joy@5.0.0-beta.51':
     resolution: {integrity: sha512-0M+aSSm291CnVLIdQP1di538zD/kekRYSzm+5hWattpGiXvUAYRQMKV4XFcs/dCsr0tkMpVT3dIdmbu6YP2r7g==}
@@ -11569,12 +11569,10 @@ snapshots:
       rimraf: 6.0.1
       typescript: 5.8.2
 
-  '@mui/internal-markdown@1.0.25':
+  '@mui/internal-docs-utils@2.0.0':
     dependencies:
-      '@babel/runtime': 7.27.0
-      lodash: 4.17.21
-      marked: 15.0.7
-      prismjs: 1.30.0
+      rimraf: 6.0.1
+      typescript: 5.8.2
 
   '@mui/internal-markdown@2.0.3':
     dependencies:
@@ -11583,14 +11581,14 @@ snapshots:
       marked: 15.0.7
       prismjs: 1.30.0
 
-  '@mui/internal-scripts@1.0.33':
+  '@mui/internal-scripts@2.0.6':
     dependencies:
       '@babel/core': 7.26.10
       '@babel/plugin-syntax-class-properties': 7.12.13(@babel/core@7.26.10)
       '@babel/plugin-syntax-jsx': 7.25.9(@babel/core@7.26.10)
       '@babel/plugin-syntax-typescript': 7.25.9(@babel/core@7.26.10)
       '@babel/types': 7.27.0
-      '@mui/internal-docs-utils': 1.0.16
+      '@mui/internal-docs-utils': 2.0.0
       doctrine: 3.0.0
       lodash: 4.17.21
       typescript: 5.8.2

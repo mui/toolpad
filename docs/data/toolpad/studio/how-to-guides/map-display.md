@@ -1,5 +1,9 @@
 # Create a map component
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">You can extend Toolpad Studio with custom code components.</p>
 
 You can create a custom component to display any geographical map, like so:

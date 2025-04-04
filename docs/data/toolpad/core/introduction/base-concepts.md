@@ -197,7 +197,12 @@ If you pass a locale text through the `AppProvider` or the theme, and you provid
 &nbsp;
 
 ```tsx
-<AppProvider localeText={{ signInTtle: 'Sign In', accountPreviewTitle: 'Account' }}>
+<AppProvider
+  localeText={{
+    signInTtle: (brandingTitle: string) => `Sign In with ${brandingTitle}`,
+    accountPreviewTitle: 'Account',
+  }}
+>
   <Account
     localeText={{
       accountPreviewTitle: 'compte',
@@ -227,4 +232,18 @@ function CustomMenu() {
   const localeText = useLocaleText();
   // ...
 }
+```
+
+### Interpolation
+
+Some [localization keys](https://github.com/mui/toolpad/blob/v0.13.0/packages/toolpad-core/src/AppProvider/LocalizationProvider.tsx#L7) allow interpolation:
+
+```tsx
+<SignInPage
+  signIn={signIn}
+  providers={providers}
+  localeText={{
+    providerSignInTitle: (provider: string) => `${provider} से साइन इन करें`,
+  }}
+/>
 ```

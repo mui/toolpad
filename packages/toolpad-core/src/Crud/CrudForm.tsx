@@ -9,7 +9,7 @@ import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import FormHelperText from '@mui/material/FormHelperText';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -84,7 +84,7 @@ export interface CrudFormProps<D extends DataModel> {
  *
  * Demos:
  *
- * - [Crud](https://mui.com/toolpad/core/react-crud/)
+ * - [CRUD](https://mui.com/toolpad/core/react-crud/)
  *
  * API:
  *

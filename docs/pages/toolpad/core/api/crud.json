@@ -9,7 +9,16 @@
       }
     },
     "defaultValues": { "type": { "name": "object" }, "default": "{}" },
-    "initialPageSize": { "type": { "name": "number" }, "default": "100" }
+    "initialPageSize": { "type": { "name": "number" }, "default": "100" },
+    "slotProps": {
+      "type": { "name": "shape", "description": "{ list: { dataGrid?: object } }" },
+      "default": "{}"
+    },
+    "slots": {
+      "type": { "name": "shape", "description": "{ list: { dataGrid?: func } }" },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
   },
   "name": "Crud",
   "imports": [
@@ -22,6 +31,6 @@
   "muiName": "Crud",
   "filename": "/packages/toolpad-core/src/Crud/Crud.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">Crud</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-crud/\">CRUD</a></li></ul>",
   "cssComponent": false
 }

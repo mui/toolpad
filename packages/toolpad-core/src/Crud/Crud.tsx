@@ -5,7 +5,7 @@ import { match } from 'path-to-regexp';
 import invariant from 'invariant';
 import { RouterContext } from '../shared/context';
 import { CrudProvider } from './CrudProvider';
-import { List } from './List';
+import { List, type ListSlots, ListSlotProps } from './List';
 import { Show } from './Show';
 import { Create } from './Create';
 import { Edit } from './Edit';
@@ -35,19 +35,41 @@ export interface CrudProps<D extends DataModel> {
    * [Cache](https://mui.com/toolpad/core/react-crud/#data-caching) for the data source.
    */
   dataSourceCache?: DataSourceCache | null;
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots?: {
+    list: ListSlots;
+  };
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps?: {
+    list: ListSlotProps;
+  };
 }
 /**
  *
  * Demos:
  *
- * - [Crud](https://mui.com/toolpad/core/react-crud/)
+ * - [CRUD](https://mui.com/toolpad/core/react-crud/)
  *
  * API:
  *
  * - [Crud API](https://mui.com/toolpad/core/api/crud)
  */
 function Crud<D extends DataModel>(props: CrudProps<D>) {
-  const { dataSource, rootPath, initialPageSize, defaultValues, dataSourceCache } = props;
+  const {
+    dataSource,
+    rootPath,
+    initialPageSize,
+    defaultValues,
+    dataSourceCache,
+    slots,
+    slotProps,
+  } = props;
 
   const listPath = rootPath;
   const showPath = `${rootPath}/:id`;
@@ -96,6 +118,8 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
           onRowClick={handleRowClick}
           onCreateClick={handleCreateClick}
           onEditClick={handleEditClick}
+          slots={slots?.list}
+          slotProps={slotProps?.list}
         />
       );
     }
@@ -122,19 +146,21 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     }
     return null;
   }, [
-    routerContext?.pathname,
-    listPath,
     createPath,
-    showPath,
-    editPath,
-    initialPageSize,
-    handleRowClick,
-    handleCreateClick,
-    handleEditClick,
     defaultValues,
+    editPath,
     handleCreate,
+    handleCreateClick,
     handleDelete,
     handleEdit,
+    handleEditClick,
+    handleRowClick,
+    initialPageSize,
+    listPath,
+    routerContext?.pathname,
+    showPath,
+    slotProps,
+    slots,
   ]);
 
   return (
@@ -177,6 +203,24 @@ Crud.propTypes /* remove-proptypes */ = {
    * Root path to CRUD pages.
    */
   rootPath: PropTypes.string.isRequired,
+  /**
+   * The props used for each slot inside.
+   * @default {}
+   */
+  slotProps: PropTypes.shape({
+    list: PropTypes.shape({
+      dataGrid: PropTypes.object,
+    }).isRequired,
+  }),
+  /**
+   * The components used for each slot inside.
+   * @default {}
+   */
+  slots: PropTypes.shape({
+    list: PropTypes.shape({
+      dataGrid: PropTypes.func,
+    }).isRequired,
+  }),
 } as any;
 
 export { Crud };

@@ -11,12 +11,11 @@ const hiINLabels: Partial<LocaleText> = {
   accountPreviewIconButtonLabel: 'वर्तमान उपयोगकर्ता',
 
   // SignInPage
-  signInTitle: 'साइन इन करें',
+  signInTitle: (brandingTitle?: string) =>
+    brandingTitle ? `${brandingTitle} में साइन इन करें ` : `साइन इन करें`,
   signInSubtitle: 'स्वागत है उपयोगकर्ता, कृपया जारी रखने के लिए साइन इन करें',
   signInRememberMe: 'मुझे याद रखें',
-  oauthSignInTitle: 'साइन इन विकल्प',
-  passkeySignInTitle: 'साइन इन विकल्प',
-  magicLinkSignInTitle: 'साइन इन विकल्प',
+  providerSignInTitle: (provider: string) => `${provider} से साइन इन करें`,
 
   // Common authentication labels
   email: 'ईमेल',

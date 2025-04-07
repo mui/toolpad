@@ -1,5 +1,9 @@
 # Deployment
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">Deploying a Toolpad Studio app is like deploying any other React/Node application.</p>
 
 ## Pre-requisites

@@ -3,9 +3,8 @@ import * as path from 'path';
 import * as fs from 'fs/promises';
 import { promisify } from 'util';
 import yargs from 'yargs';
-import { getWorkspaceRoot } from './utils.mjs';
-import glob from 'fast-glob';
 import { cjsCopy } from '@mui/monorepo/scripts/copyFilesUtils.mjs';
+import { getWorkspaceRoot } from './utils.mjs';
 
 const exec = promisify(childProcess.exec);
 
@@ -19,7 +18,7 @@ const validBundles = [
 ];
 
 async function run(argv) {
-  const { bundle, largeFiles, outDir: outDirBase, watch, verbose, useExports } = argv;
+  const { bundle, largeFiles, outDir: outDirBase, watch, verbose } = argv;
 
   if (validBundles.indexOf(bundle) === -1) {
     throw new TypeError(
@@ -45,37 +44,12 @@ async function run(argv) {
 
   const outFileExtension = '.js';
 
-  const topLevelNonIndexFiles = glob
-    .sync(`*{${extensions.join(',')}}`, { cwd: srcDir, ignore })
-    .filter((file) => {
-      return path.basename(file, path.extname(file)) !== 'index';
-    });
-  const topLevelPathImportsCanBePackages = topLevelNonIndexFiles.length === 0;
-
-  let outDir = path.resolve(
-    outDirBase,
-    // We generally support top level path imports e.g.
-    // 1. `import ArrowDownIcon from '@mui/icons-material/ArrowDown'`.
-    // 2. `import Typography from '@mui/material/Typography'`.
-    // The first case resolves to a file while the second case resolves to a package first i.e. a package.json
-    // This means that only in the second case the bundler can decide whether it uses ES modules or CommonJS modules.
-    // Different extensions are not viable yet since they require additional bundler config for users and additional transpilation steps in our repo.
-    // Switch to `exports` field in v6.
-    {
-      node: topLevelPathImportsCanBePackages ? './node' : './',
-      modern: './modern',
-      stable: topLevelPathImportsCanBePackages ? './' : './esm',
-    }[bundle],
-  );
-
-  if (useExports) {
-    const relativeOutDir = {
-      node: './',
-      modern: './modern',
-      stable: './esm',
-    }[bundle];
-    outDir = path.resolve(outDirBase, relativeOutDir);
-  }
+  const relativeOutDir = {
+    node: './',
+    modern: './modern',
+    stable: './esm',
+  }[bundle];
+  const outDir = path.resolve(outDirBase, relativeOutDir);
 
   const env = {
     NODE_ENV: 'production',
@@ -119,20 +93,18 @@ async function run(argv) {
     throw new Error(`'${command}' failed with \n${stderr}`);
   }
 
-  if (useExports) {
-    // cjs for reexporting from commons only modules.
-    // If we need to rely more on this we can think about setting up a separate commonjs => commonjs build for .cjs files to .cjs
-    // `--extensions-.cjs --out-file-extension .cjs`
-    await cjsCopy({ from: srcDir, to: outDir });
+  // cjs for reexporting from commons only modules.
+  // If we need to rely more on this we can think about setting up a separate commonjs => commonjs build for .cjs files to .cjs
+  // `--extensions-.cjs --out-file-extension .cjs`
+  await cjsCopy({ from: srcDir, to: outDir });
 
-    const isEsm = bundle === 'modern' || bundle === 'stable';
-    if (isEsm) {
-      const rootBundlePackageJson = path.join(outDir, 'package.json');
-      await fs.writeFile(
-        rootBundlePackageJson,
-        JSON.stringify({ type: 'module', sideEffects: false }),
-      );
-    }
+  const isEsm = bundle === 'modern' || bundle === 'stable';
+  if (isEsm) {
+    const rootBundlePackageJson = path.join(outDir, 'package.json');
+    await fs.writeFile(
+      rootBundlePackageJson,
+      JSON.stringify({ type: 'module', sideEffects: false }),
+    );
   }
 
   if (verbose) {
@@ -158,7 +130,6 @@ yargs(process.argv.slice(2))
         })
         .option('out-dir', { default: './build', type: 'string' })
         .option('watch', { type: 'boolean' })
-        .option('use-exports', { type: 'boolean' })
         .option('verbose', { type: 'boolean' });
     },
     handler: run,

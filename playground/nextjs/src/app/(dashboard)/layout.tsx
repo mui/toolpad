@@ -16,8 +16,14 @@ import {
   SignOutButton,
   AccountPreviewProps,
 } from '@toolpad/core/Account';
-import { DashboardLayout, SidebarFooterProps } from '@toolpad/core/DashboardLayout';
+import { DashboardLayout, SidebarFooterProps, ToolbarProps } from '@toolpad/core/DashboardLayout';
+import { ToolbarActions } from '@toolpad/core/DashboardLayout/ToolbarActions';
+import { AppTitle } from '@toolpad/core/DashboardLayout/AppTitle';
 import { PageContainer } from '@toolpad/core/PageContainer';
+import { Button, IconButton, InputBase, Paper, Theme } from '@mui/material';
+import ShoppingCart from '@mui/icons-material/ShoppingCart';
+import Link from 'next/link';
+import SearchIcon from '@mui/icons-material/Search';
 
 const accounts = [
   {
@@ -40,6 +46,33 @@ const accounts = [
     projects: [{ id: 4, title: 'Project A' }],
   },
 ];
+
+function SearchBar() {
+  return (
+    <Paper
+      component="form"
+      elevation={0}
+      sx={{
+        alignItems: 'center',
+        width: 600,
+        height: 40,
+        px: 1.5,
+        borderRadius: 2,
+        backgroundColor: (theme) => theme.palette.action.hover,
+        display: { xs: 'none', sm: 'flex' },
+      }}
+    >
+      <IconButton type="submit" sx={{ p: '10px' }} aria-label="search" disableRipple>
+        <SearchIcon />
+      </IconButton>
+      <InputBase
+        sx={{ ml: 1, flex: 1 }}
+        placeholder="Search"
+        inputProps={{ 'aria-label': 'search' }}
+      />
+    </Paper>
+  );
+}
 
 function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
   const { handleClick, open, mini } = props;
@@ -133,7 +166,7 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
               elevation: 0,
               sx: {
                 overflow: 'visible',
-                filter: (theme) =>
+                filter: (theme: Theme) =>
                   `drop-shadow(0px 2px 8px ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.32)'})`,
                 mt: 1,
                 '&::before': {
@@ -157,6 +190,57 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
   );
 }
 
+function Left({ menuIcon }: ToolbarProps) {
+  return (
+    <Stack direction="row" spacing={2} alignItems="center">
+      {menuIcon}
+      <AppTitle />
+    </Stack>
+  );
+}
+
+function Middle() {
+  return (
+    <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+      <SearchBar />
+    </Stack>
+  );
+}
+
+function Right() {
+  return (
+    <Stack direction="row" spacing={2} alignItems="center">
+      <ToolbarActions />
+      <Account />
+
+      <Link href="/orders">
+        <Button color="primary" aria-label="Cart">
+          <ShoppingCart />
+        </Button>
+      </Link>
+    </Stack>
+  );
+}
+
+function CustomToolbar(props: ToolbarProps) {
+  return (
+    <Stack
+      direction="row"
+      spacing={2}
+      alignItems="center"
+      justifyContent={'space-between'}
+      sx={{
+        flexWrap: 'wrap',
+        width: '100%',
+      }}
+    >
+      <Left {...props} />
+      <Middle />
+      <Right />
+    </Stack>
+  );
+}
+
 export default function DashboardPagesLayout(props: { children: React.ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
@@ -176,7 +260,12 @@ export default function DashboardPagesLayout(props: { children: React.ReactNode 
   }, [orderId, pathname]);
 
   return (
-    <DashboardLayout slots={{ sidebarFooter: SidebarFooterAccount, toolbarAccount: () => null }}>
+    <DashboardLayout
+      slots={{
+        sidebarFooter: SidebarFooterAccount,
+        toolbar: CustomToolbar,
+      }}
+    >
       <PageContainer title={title}>{props.children}</PageContainer>
     </DashboardLayout>
   );

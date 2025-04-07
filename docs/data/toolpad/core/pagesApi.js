@@ -1,4 +1,4 @@
-module.exports = [
+export default [
   { pathname: '/toolpad/core/api/account' },
   { pathname: '/toolpad/core/api/account-popover-footer' },
   { pathname: '/toolpad/core/api/account-popover-header' },

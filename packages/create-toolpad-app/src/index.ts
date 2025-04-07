@@ -44,11 +44,6 @@ const run = async () => {
       type: 'string',
       describe: 'The path where the Toolpad project directory will be created',
     })
-    .option('studio', {
-      type: 'boolean',
-      describe: 'Create a new project with Toolpad Studio',
-      default: false,
-    })
     .option('install', {
       type: 'boolean',
       describe: 'Install dependencies',

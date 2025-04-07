@@ -22,10 +22,10 @@
     "clean": "rimraf build",
     "prebuild": "pnpm clean",
     "build": "pnpm build:node && pnpm build:stable && pnpm build:modern && pnpm build:types && pnpm build:copy-files",
-    "build:node": "node ../../scripts/build.mjs node --use-exports",
-    "build:modern": "node ../../scripts/build.mjs modern --use-exports",
-    "build:stable": "node ../../scripts/build.mjs stable --use-exports",
-    "build:copy-files": "node ../../scripts/copyFiles.mjs --use-exports",
+    "build:node": "node ../../scripts/build.mjs node",
+    "build:modern": "node ../../scripts/build.mjs modern",
+    "build:stable": "node ../../scripts/build.mjs stable",
+    "build:copy-files": "node ../../scripts/copyFiles.mjs",
     "build:types": "tsx ../../scripts/buildTypes.mts",
     "predev": "pnpm clean",
     "dev": "mkdir -p build && concurrently \"pnpm build:stable --watch\" \"pnpm build:types --watch\" \"pnpm build:copy-files\"",
@@ -47,9 +47,9 @@
     "yaml-diff-patch": "2.0.0"
   },
   "devDependencies": {
-    "@types/express": "5.0.0",
+    "@types/express": "5.0.1",
     "@types/invariant": "2.2.37",
-    "@types/react": "^19.0.10",
+    "@types/react": "^19.0.12",
     "@types/react-is": "^19.0.0",
     "@types/title": "3.4.3",
     "vitest": "2.1.9"

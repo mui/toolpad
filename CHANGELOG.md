@@ -8,7 +8,7 @@ _Mar 11, 2025_
 
 A big thanks to the 3 contributors who made this release possible. Here are some highlights ✨:
 
-Add new [Crud](https://next.mui.com/toolpad/core/react-crud/) component: this new component provides UIs to interact with data from any data source (create, read, update and delete), with minimal configuration from a single data source definition. Try it out and let us know if you find any issues!
+Add new [Crud](https://mui.com/toolpad/core/react-crud/) component: this new component provides UIs to interact with data from any data source (create, read, update and delete), with minimal configuration from a single data source definition. Try it out and let us know if you find any issues!
 
 ### `@toolpad/core`
 
@@ -57,7 +57,7 @@ A big thanks to the 10 contributors who made this release possible. Here are som
 - Fix redirection to GitHub example view (#4642) @oliviertassinari
 - Fix build errors with Next.js 14 (#4594) @bharatkashyap
 
-## CLI
+### CLI
 
 - Refactor CLI setup (#4597) @bharatkashyap
 - Fix package.json pretty print (#4644) @rkristelijn

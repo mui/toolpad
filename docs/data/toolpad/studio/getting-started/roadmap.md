@@ -1,5 +1,9 @@
 # Roadmap
 
+:::warning
+Toolpad Studio has been deprecated. Please use [Toolpad Core](/toolpad/) instead.
+:::
+
 <p class="description">Find out about the plans for Toolpad Studio.</p>
 
 ## Toolpad Studio roadmap

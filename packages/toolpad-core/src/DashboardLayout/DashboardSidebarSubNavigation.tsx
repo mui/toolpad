@@ -157,19 +157,18 @@ function DashboardSidebarSubNavigation({
           const nextItem = subNavigation[navigationItemIndex + 1];
 
           return (
-            <li key={`divider-${depth}-${navigationItemIndex}`}>
-              <Divider
-                sx={{
-                  borderBottomWidth: 2,
-                  mx: 1,
-                  mt: 1,
-                  mb: nextItem?.kind === 'header' && !isMini ? 0 : 1,
-                  ...(hasDrawerTransitions
-                    ? getDrawerSxTransitionMixin(isFullyExpanded, 'margin')
-                    : {}),
-                }}
-              />
-            </li>
+            <Divider
+              key={`divider-${depth}-${navigationItemIndex}`}
+              sx={{
+                borderBottomWidth: 2,
+                mx: 1,
+                mt: 1,
+                mb: nextItem?.kind === 'header' && !isMini ? 0 : 1,
+                ...(hasDrawerTransitions
+                  ? getDrawerSxTransitionMixin(isFullyExpanded, 'margin')
+                  : {}),
+              }}
+            />
           );
         }
 

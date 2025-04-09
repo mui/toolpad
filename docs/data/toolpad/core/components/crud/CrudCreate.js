@@ -33,7 +33,7 @@ const demoTheme = createTheme({
   },
 });
 
-let people = [
+let peopleStore = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
@@ -67,11 +67,11 @@ export const peopleDataSource = {
     });
 
     const newPerson = {
-      id: people.reduce((max, person) => Math.max(max, person.id), 0) + 1,
+      id: peopleStore.reduce((max, person) => Math.max(max, person.id), 0) + 1,
       ...data,
     };
 
-    people = [...people, newPerson];
+    peopleStore = [...peopleStore, newPerson];
 
     return newPerson;
   },

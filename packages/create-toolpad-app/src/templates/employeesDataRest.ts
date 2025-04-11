@@ -1,6 +1,11 @@
-'use client';
-import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
-import { z } from 'zod';
+import { Template } from '../types';
+
+const employeesData: Template = () => {
+  const imports = `import { DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
+import { z } from 'zod';`;
+
+  return `'use client';
+${imports}
 
 type EmployeeRole = 'Market' | 'Finance' | 'Development';
 
@@ -46,7 +51,7 @@ export const employeesDataSource: DataSource<Employee> = {
       queryParams.append('filter', JSON.stringify(filterModel.items));
     }
 
-    const res = await fetch(`${API_URL}?${queryParams.toString()}`, {
+    const res = await fetch(\`\${API_URL}?\${queryParams.toString()}\`, {
       method: 'GET',
     });
     const resJson = await res.json();
@@ -57,7 +62,7 @@ export const employeesDataSource: DataSource<Employee> = {
     return resJson;
   },
   getOne: async (employeeId) => {
-    const res = await fetch(`${API_URL}/${employeeId}`);
+    const res = await fetch(\`\${API_URL}/\${employeeId}\`);
     const resJson = await res.json();
 
     if (!res.ok) {
@@ -79,7 +84,7 @@ export const employeesDataSource: DataSource<Employee> = {
     return resJson;
   },
   updateOne: async (employeeId, data) => {
-    const res = await fetch(`${API_URL}/${employeeId}`, {
+    const res = await fetch(\`\${API_URL}/\${employeeId}\`, {
       method: 'PUT',
       body: JSON.stringify(data),
       headers: { 'Content-Type': 'application/json' },
@@ -92,7 +97,7 @@ export const employeesDataSource: DataSource<Employee> = {
     return resJson;
   },
   deleteOne: async (employeeId) => {
-    const res = await fetch(`${API_URL}/${employeeId}`, { method: 'DELETE' });
+    const res = await fetch(\`\${API_URL}/\${employeeId}\`, { method: 'DELETE' });
     const resJson = await res.json();
 
     if (!res.ok) {
@@ -113,3 +118,7 @@ export const employeesDataSource: DataSource<Employee> = {
 };
 
 export const employeesCache = new DataSourceCache();
+`;
+};
+
+export default employeesData;

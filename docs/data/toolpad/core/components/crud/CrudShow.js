@@ -33,7 +33,7 @@ const demoTheme = createTheme({
   },
 });
 
-let people = [
+let peopleStore = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
@@ -66,7 +66,9 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    const personToShow = people.find((person) => person.id === Number(personId));
+    const personToShow = peopleStore.find(
+      (person) => person.id === Number(personId),
+    );
 
     if (!personToShow) {
       throw new Error('Person not found');
@@ -79,7 +81,7 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    people = people.filter((person) => person.id !== Number(personId));
+    peopleStore = peopleStore.filter((person) => person.id !== Number(personId));
   },
 };
 

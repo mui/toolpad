@@ -139,7 +139,10 @@ export const notesDataSource = {
       setTimeout(resolve, 750);
     });
 
-    const newNote = { id: notesStore.length + 1, ...data };
+    const newNote = {
+      id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
+      ...data,
+    };
 
     notesStore = [...notesStore, newNote];
 

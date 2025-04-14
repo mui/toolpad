@@ -76,10 +76,10 @@
   "peerDependencies": {
     "@mui/icons-material": "^7.0.0-beta || ^7.0.0",
     "@mui/material": "^7.0.0-beta || ^7.0.0",
-    "@mui/x-data-grid": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-data-grid-premium": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-data-grid-pro": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-date-pickers": "^8.0.0 || ^8.0.0-beta",
+    "@mui/x-data-grid": "^7.0.0 || ^8.0.0 || ^8.0.0-beta",
+    "@mui/x-data-grid-premium": "^7.0.0 || ^8.0.0 || ^8.0.0-beta",
+    "@mui/x-data-grid-pro": "^7.0.0 || ^8.0.0 || ^8.0.0-beta",
+    "@mui/x-date-pickers": "^7.0.0 || ^8.0.0 || ^8.0.0-beta",
     "next": "^14 || ^15",
     "react": "^18 || ^19",
     "react-router": "^7"

@@ -253,7 +253,7 @@ function DashboardSidebarSubNavigation({
                   sx={{
                     position: 'relative',
                     top: isMini ? -6 : 0,
-                    left: isMini ? 5 : 0,
+                    left: 0,
                   }}
                 >
                   <ListItemIcon
@@ -287,9 +287,9 @@ function DashboardSidebarSubNavigation({
                       sx={{
                         position: 'absolute',
                         bottom: -18,
-                        left: '50%',
+                        left: '45%',
                         transform: 'translateX(-50%)',
-                        fontSize: 10,
+                        fontSize: 9,
                         fontWeight: 500,
                         textAlign: 'center',
                         whiteSpace: 'nowrap',

@@ -107,8 +107,8 @@ importers:
         specifier: ^8.0.0 || ^8.0.0-beta
         version: 8.0.0-beta.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@mui/system@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@next/eslint-plugin-next':
-        specifier: 14.2.25
-        version: 14.2.25
+        specifier: 14.2.28
+        version: 14.2.28
       '@playwright/test':
         specifier: 1.47.2
         version: 1.47.2
@@ -780,8 +780,8 @@ importers:
         specifier: ^19.0.4
         version: 19.0.4(@types/react@19.0.12)
       eslint-config-next:
-        specifier: 15.2.3
-        version: 15.2.3(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)(typescript@5.8.2)
+        specifier: 15.3.0
+        version: 15.3.0(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)(typescript@5.8.2)
       next:
         specifier: ^15.2.3
         version: 15.2.3(@babel/core@7.26.10)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -831,8 +831,8 @@ importers:
         specifier: ^19.0.4
         version: 19.0.4(@types/react@19.0.12)
       eslint-config-next:
-        specifier: 15.2.3
-        version: 15.2.3(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)(typescript@5.8.2)
+        specifier: 15.3.0
+        version: 15.3.0(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)(typescript@5.8.2)
       next:
         specifier: ^15.2.3
         version: 15.2.3(@babel/core@7.26.10)(@playwright/test@1.47.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -3123,11 +3123,11 @@ packages:
   '@next/env@15.2.3':
     resolution: {integrity: sha512-a26KnbW9DFEUsSxAxKBORR/uD9THoYoKbkpFywMN/AFvboTt94b8+g/07T8J6ACsdLag8/PDU60ov4rPxRAixw==}
 
-  '@next/eslint-plugin-next@14.2.25':
-    resolution: {integrity: sha512-L2jcdEEa0bTv1DhE67Cdx1kLLkL0iLL9ILdBYx0j7noi2AUJM7bwcqmcN8awGg+8uyKGAGof/OkFom50x+ZyZg==}
+  '@next/eslint-plugin-next@14.2.28':
+    resolution: {integrity: sha512-GQUPA1bTZy5qZdPV5MOHB18465azzhg8xm5o2SqxMF+h1rWNjB43y6xmIPHG5OV2OiU3WxuINpusXom49DdaIQ==}
 
-  '@next/eslint-plugin-next@15.2.3':
-    resolution: {integrity: sha512-eNSOIMJtjs+dp4Ms1tB1PPPJUQHP3uZK+OQ7iFY9qXpGO6ojT6imCL+KcUOqE/GXGidWbBZJzYdgAdPHqeCEPA==}
+  '@next/eslint-plugin-next@15.3.0':
+    resolution: {integrity: sha512-511UUcpWw5GWTyKfzW58U2F/bYJyjLE9e3SlnGK/zSXq7RqLlqFO8B9bitJjumLpj317fycC96KZ2RZsjGNfBw==}
 
   '@next/swc-darwin-arm64@15.2.3':
     resolution: {integrity: sha512-uaBhA8aLbXLqwjnsHSkxs353WrRgQgiFjduDpc7YXEU0B54IKx3vU+cxQlYwPCyC8uYEEX7THhtQQsfHnvv8dw==}
@@ -5458,8 +5458,8 @@ packages:
       eslint-plugin-react: ^7.28.0
       eslint-plugin-react-hooks: ^4.3.0
 
-  eslint-config-next@15.2.3:
-    resolution: {integrity: sha512-VDQwbajhNMFmrhLWVyUXCqsGPN+zz5G8Ys/QwFubfsxTIrkqdx3N3x3QPW+pERz8bzGPP0IgEm8cNbZcd8PFRQ==}
+  eslint-config-next@15.3.0:
+    resolution: {integrity: sha512-+Z3M1W9MnJjX3W4vI9CHfKlEyhTWOUHvc5dB89FyRnzPsUkJlLWZOi8+1pInuVcSztSM4MwBFB0hIHf4Rbwu4g==}
     peerDependencies:
       eslint: ^7.23.0 || ^8.0.0 || ^9.0.0
       typescript: '>=3.3.1'
@@ -12204,11 +12204,11 @@ snapshots:
 
   '@next/env@15.2.3': {}
 
-  '@next/eslint-plugin-next@14.2.25':
+  '@next/eslint-plugin-next@14.2.28':
     dependencies:
       glob: 10.3.10
 
-  '@next/eslint-plugin-next@15.2.3':
+  '@next/eslint-plugin-next@15.3.0':
     dependencies:
       fast-glob: 3.3.1
 
@@ -15043,9 +15043,9 @@ snapshots:
       object.assign: 4.1.7
       object.entries: 1.1.8
 
-  eslint-config-next@15.2.3(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)(typescript@5.8.2):
+  eslint-config-next@15.3.0(eslint-import-resolver-webpack@0.13.10)(eslint@8.57.1)(typescript@5.8.2):
     dependencies:
-      '@next/eslint-plugin-next': 15.2.3
+      '@next/eslint-plugin-next': 15.3.0
       '@rushstack/eslint-patch': 1.10.4
       '@typescript-eslint/eslint-plugin': 8.26.1(@typescript-eslint/parser@8.26.1(eslint@8.57.1)(typescript@5.8.2))(eslint@8.57.1)(typescript@5.8.2)
       '@typescript-eslint/parser': 8.26.1(eslint@8.57.1)(typescript@5.8.2)

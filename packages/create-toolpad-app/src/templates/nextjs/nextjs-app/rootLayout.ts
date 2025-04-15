@@ -18,7 +18,7 @@ import { auth } from '../auth';`
 }
 import theme from '../theme';
 
-export const metadeta = {
+export const metadata = {
   title: 'My Toolpad Core Next.js App',
   description: 'This is a sample app built with Toolpad Core and Next.js',
 };

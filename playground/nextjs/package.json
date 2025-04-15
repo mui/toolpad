@@ -15,7 +15,7 @@
     "@mui/x-data-grid": "^8.0.0 || ^8.0.0-beta",
     "@mui/x-date-pickers": "^8.0.0 || ^8.0.0-beta",
     "@toolpad/core": "workspace:*",
-    "@types/node": "^20.17.28",
+    "@types/node": "^20.17.30",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
     "eslint-config-next": "15.2.3",

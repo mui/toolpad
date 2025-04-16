@@ -165,7 +165,7 @@ export default function CrudListDataGrid(props: DemoProps) {
             onDelete={handleDelete}
             slots={{ dataGrid: DataGridPro }}
             slotProps={{
-              dataGrid: { initialState: { pinnedColumns: { left: ['id'] } } },
+              dataGrid: { initialState: { pinnedColumns: { right: ['actions'] } } },
             }}
           />
           {/* preview-end */}

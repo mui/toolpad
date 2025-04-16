@@ -303,7 +303,7 @@ importers:
         version: 5.0.0-beta.70(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@mui/docs':
         specifier: ^7.0.2
-        version: 7.0.2(eptrbbqdi6ql5kzfnlvwp7ksmm)
+        version: 7.0.2(4014d8aa565d4220c9bd7f0066d3d077)
       '@mui/icons-material':
         specifier: ^7.0.2
         version: 7.0.2(@mui/material@7.0.2(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.12)(react@19.0.0)
@@ -11607,7 +11607,7 @@ snapshots:
 
   '@mui/core-downloads-tracker@7.0.2': {}
 
-  '@mui/docs@7.0.2(eptrbbqdi6ql5kzfnlvwp7ksmm)':
+  '@mui/docs@7.0.2(4014d8aa565d4220c9bd7f0066d3d077)':
     dependencies:
       '@babel/runtime': 7.27.0
       '@mui/base': 5.0.0-beta.70(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)

@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.27.0",
-    "@mui/utils": "^7.0.0",
+    "@mui/utils": "^7.0.2",
     "@standard-schema/spec": "^1.0.0",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",
@@ -53,8 +53,8 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "^7.0.0",
-    "@mui/material": "^7.0.0",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
     "@mui/x-data-grid": "^8.0.0 || ^8.0.0-beta",
     "@mui/x-data-grid-premium": "^8.0.0 || ^8.0.0-beta",
     "@mui/x-data-grid-pro": "^8.0.0 || ^8.0.0-beta",

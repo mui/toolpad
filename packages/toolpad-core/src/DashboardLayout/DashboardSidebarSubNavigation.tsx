@@ -127,6 +127,7 @@ function DashboardSidebarSubNavigation({
         mb: depth === 0 && !isPopover ? 4 : 0.5,
         pl: (isPopover ? 1 : 2) * (isPopover ? depth - 1 : depth),
         minWidth: isPopover && depth === 1 ? 240 : 'auto',
+        width: isMini ? MINI_DRAWER_WIDTH : 'auto',
       }}
     >
       {subNavigation.map((navigationItem, navigationItemIndex) => {
@@ -253,7 +254,7 @@ function DashboardSidebarSubNavigation({
                   sx={{
                     position: 'relative',
                     top: isMini ? -6 : 0,
-                    left: 0,
+                    left: isMini ? 5 : 0,
                   }}
                 >
                   <ListItemIcon
@@ -287,9 +288,9 @@ function DashboardSidebarSubNavigation({
                       sx={{
                         position: 'absolute',
                         bottom: -18,
-                        left: '45%',
+                        left: '50%',
                         transform: 'translateX(-50%)',
-                        fontSize: 9,
+                        fontSize: 10,
                         fontWeight: 500,
                         textAlign: 'center',
                         whiteSpace: 'nowrap',

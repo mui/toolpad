@@ -76,3 +76,7 @@ test-results
 .github/styles/Google
 .github/styles/MUI
 .github/styles/.vale-config
+
+
+# playground/auth-vite
+playground/auth-vite

@@ -744,49 +744,6 @@ importers:
         version: 2.1.9(@types/node@20.17.28)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.17.28)(typescript@5.8.2))(terser@5.36.0)
     publishDirectory: build
 
-  playground/auth-vite:
-    dependencies:
-      '@emotion/react':
-        specifier: ^11
-        version: 11.14.0(@types/react@19.0.12)(react@19.0.0)
-      '@emotion/styled':
-        specifier: ^11
-        version: 11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0)
-      '@mui/icons-material':
-        specifier: ^7
-        version: 7.0.0(@mui/material@7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.12)(react@19.0.0)
-      '@mui/material':
-        specifier: ^7
-        version: 7.0.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react@19.0.0))(@types/react@19.0.12)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@toolpad/core':
-        specifier: workspace:*
-        version: link:../../packages/toolpad-core/build
-      react:
-        specifier: ^19.0.0
-        version: 19.0.0
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.0.0(react@19.0.0)
-      react-router:
-        specifier: ^7
-        version: 7.1.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-    devDependencies:
-      '@types/react':
-        specifier: ^19.0.0
-        version: 19.0.12
-      '@types/react-dom':
-        specifier: ^19.0.0
-        version: 19.0.4(@types/react@19.0.12)
-      '@vitejs/plugin-react':
-        specifier: ^4.3.2
-        version: 4.3.4(vite@5.4.14(@types/node@20.17.28)(terser@5.36.0))
-      typescript:
-        specifier: ^5
-        version: 5.8.2
-      vite:
-        specifier: ^5.4.8
-        version: 5.4.14(@types/node@20.17.28)(terser@5.36.0)
-
   playground/nextjs:
     devDependencies:
       '@emotion/react':

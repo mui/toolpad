@@ -6,7 +6,7 @@ import {
   documentGetInitialProps,
 } from '@mui/material-nextjs/v14-pagesRouter';
 
-export const metadeta = {
+export const metadata = {
   title: 'My Toolpad Core Next.js App',
   description: 'This is a sample app built with Toolpad Core and Next.js',
 };

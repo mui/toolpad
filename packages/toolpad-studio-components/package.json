@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@mui/icons-material": "7.0.2",
-    "@mui/lab": "6.0.0-beta.30",
+    "@mui/lab": "6.0.0-dev.240424162023-9968b4889d",
     "@mui/material": "7.0.2",
     "@mui/x-charts": "7.28.0",
     "@mui/x-data-grid-premium": "7.28.3",

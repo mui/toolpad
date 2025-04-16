@@ -134,11 +134,11 @@
   },
   "engines": {
     "node": ">=20",
-    "pnpm": "9.12.3"
+    "pnpm": "10.8.1"
   },
   "resolutions": {
     "google-auth-library": "*",
     "@types/node": "^20.17.30"
   },
-  "packageManager": "pnpm@9.12.3"
+  "packageManager": "pnpm@10.8.1"
 }

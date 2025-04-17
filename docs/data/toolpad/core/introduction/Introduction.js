@@ -316,7 +316,7 @@ function Introduction(props) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout>
+      <DashboardLayout defaultSidebarCollapsed>
         <PageContainer title={title}>
           <DemoPageContent pathname={router.pathname} />
         </PageContainer>

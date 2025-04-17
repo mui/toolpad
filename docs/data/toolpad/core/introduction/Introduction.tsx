@@ -329,7 +329,7 @@ export default function Introduction(props: DemoProps) {
       theme={demoTheme}
       window={demoWindow}
     >
-      <DashboardLayout>
+      <DashboardLayout defaultSidebarCollapsed>
         <PageContainer title={title}>
           <DemoPageContent pathname={router.pathname} />
         </PageContainer>

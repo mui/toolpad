@@ -15,11 +15,14 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import FolderIcon from '@mui/icons-material/Folder';
 import DescriptionIcon from '@mui/icons-material/Description';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
+import {
+  AppProvider,
+  type Navigation,
+  NavigationPageItem,
+} from '@toolpad/core/AppProvider';
 import {
   DashboardLayout,
   DashboardSidebarPageItem,
-  DashboardSidebarPageItemProps,
 } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internal';
 
@@ -76,10 +79,15 @@ const NAVIGATION: Navigation = [
   },
 ];
 
-function CustomPageItem({ id, mini }: DashboardSidebarPageItemProps) {
+function CustomPageItem({
+  item,
+  mini,
+}: {
+  item: NavigationPageItem;
+  mini: boolean;
+}) {
   return (
     <ListItem
-      key={id}
       sx={(theme) => ({
         color: theme.palette.secondary.main,
         overflowX: 'hidden',
@@ -104,7 +112,7 @@ function CustomPageItem({ id, mini }: DashboardSidebarPageItemProps) {
             <AutoAwesomeIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Custom Item"
+            primary={item.title}
             sx={{
               whiteSpace: 'nowrap',
             }}
@@ -164,51 +172,29 @@ export default function DashboardLayoutCustomPageItems(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   const renderPageItem = React.useCallback(
-    (defaultProps: DashboardSidebarPageItemProps) => {
-      if (defaultProps.title === 'External Link') {
+    (item: NavigationPageItem, { mini }: { mini: boolean }) => {
+      if (item.title === 'External Link') {
         return (
-          <DashboardSidebarPageItem
-            key={defaultProps.id}
-            {...defaultProps}
-            href="https://www.mui.com/toolpad"
-          />
+          <DashboardSidebarPageItem item={item} href="https://www.mui.com/toolpad" />
         );
       }
-      if (defaultProps.title === 'Selected Item') {
-        return (
-          <DashboardSidebarPageItem
-            key={defaultProps.id}
-            {...defaultProps}
-            selected
-          />
-        );
+      if (item.title === 'Selected Item') {
+        return <DashboardSidebarPageItem item={item} selected />;
       }
-      if (defaultProps.title === 'Disabled Item') {
-        return (
-          <DashboardSidebarPageItem
-            key={defaultProps.id}
-            {...defaultProps}
-            disabled
-          />
-        );
+      if (item.title === 'Disabled Item') {
+        return <DashboardSidebarPageItem item={item} disabled />;
       }
-      if (defaultProps.title === 'Hidden Item') {
+      if (item.title === 'Hidden Item') {
         return null;
       }
-      if (defaultProps.title === 'Expanded Folder') {
-        return (
-          <DashboardSidebarPageItem
-            key={defaultProps.id}
-            {...defaultProps}
-            expanded
-          />
-        );
+      if (item.title === 'Expanded Folder') {
+        return <DashboardSidebarPageItem item={item} expanded />;
       }
-      if (defaultProps.title === 'Custom Item') {
-        return <CustomPageItem key={defaultProps.id} {...defaultProps} />;
+      if (item.title === 'Custom Item') {
+        return <CustomPageItem item={item} mini={mini} />;
       }
 
-      return <DashboardSidebarPageItem key={defaultProps.id} {...defaultProps} />;
+      return <DashboardSidebarPageItem item={item} />;
     },
     [],
   );

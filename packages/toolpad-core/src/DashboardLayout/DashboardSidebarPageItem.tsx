@@ -14,7 +14,9 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import invariant from 'invariant';
 import { Link } from '../shared/Link';
+import { DashboardSidebarPageItemContext } from '../shared/context';
 import { MINI_DRAWER_WIDTH } from './shared';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 
@@ -47,39 +49,18 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
 
 export interface DashboardSidebarPageItemProps {
   /**
-   * A string that uniquely identifies the item.
-   */
-  id: string;
-  /**
    * Navigation item definition.
    */
   item: NavigationPageItem;
   /**
-   * Callback fired when the item is clicked.
-   */
-  onClick: (itemId: string, item: NavigationPageItem) => void;
-  /**
-   * Item title.
-   */
-  title: string;
-  /**
    * Link `href` for when the item is rendered as a link.
    */
-  href: string;
-  /**
-   * The component used to render the item as a link.
-   */
-  Link?: React.ElementType;
+  href?: string;
   /**
    * If `true`, expands any nested navigation in the item, otherwise collapse it.
    * @default false
    */
   expanded?: boolean;
-  /**
-   * If `true`, the containing sidebar is in mini mode.
-   * @default false
-   */
-  mini?: boolean;
   /**
    * Use to apply selected styling.
    * @default false
@@ -90,19 +71,16 @@ export interface DashboardSidebarPageItemProps {
    * @default false
    */
   disabled?: boolean;
-  /**
-   * If `true`, the containing sidebar is fully expanded.
-   * @default true
-   */
+}
+
+export interface DashboardSidebarPageItemContextProps extends DashboardSidebarPageItemProps {
+  id: string;
+  onClick: (itemId: string, item: NavigationPageItem) => void;
+  title: string;
+  href: string;
+  isMini?: boolean;
   isSidebarFullyExpanded?: boolean;
-  /**
-   * If `true`, the containing sidebar is fully collapsed.
-   * @default false
-   */
   isSidebarFullyCollapsed?: boolean;
-  /**
-   * Override the component rendered as nested navigation for this item.
-   */
   renderNestedNavigation: (subNavigation: Navigation) => React.ReactNode;
 }
 
@@ -117,21 +95,31 @@ const LIST_ITEM_ICON_SIZE = 34;
  *
  * - [DashboardSidebarPageItem API](https://mui.com/toolpad/core/api/dashboard-sidebar-page-item)
  */
-function DashboardSidebarPageItem({
-  id,
-  item,
-  onClick,
-  title,
-  href,
-  Link: LinkProp,
-  expanded = false,
-  mini = false,
-  selected = false,
-  disabled = false,
-  isSidebarFullyExpanded = true,
-  isSidebarFullyCollapsed = false,
-  renderNestedNavigation,
-}: DashboardSidebarPageItemProps) {
+function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
+  const pageItemContext = React.useContext(DashboardSidebarPageItemContext);
+
+  invariant(pageItemContext, 'No navigation page item context provided.');
+
+  const contextAwareProps = {
+    ...pageItemContext,
+    ...props,
+  };
+
+  const {
+    id,
+    item,
+    onClick,
+    title,
+    href,
+    expanded = false,
+    isMini = false,
+    selected = false,
+    disabled = false,
+    isSidebarFullyExpanded = true,
+    isSidebarFullyCollapsed = false,
+    renderNestedNavigation,
+  } = contextAwareProps;
+
   const [hoveredMiniSidebarItemId, setHoveredMiniSidebarItemId] = React.useState<string | null>(
     null,
   );
@@ -141,7 +129,7 @@ function DashboardSidebarPageItem({
   }, [id, item, onClick]);
 
   let nestedNavigationCollapseSx: SxProps<Theme> = { display: 'none' };
-  if (mini && isSidebarFullyCollapsed) {
+  if (isMini && isSidebarFullyCollapsed) {
     nestedNavigationCollapseSx = {
       fontSize: 18,
       position: 'absolute',
@@ -149,7 +137,7 @@ function DashboardSidebarPageItem({
       right: '2px',
       transform: 'translateY(-50%) rotate(-90deg)',
     };
-  } else if (!mini && isSidebarFullyExpanded) {
+  } else if (!isMini && isSidebarFullyExpanded) {
     nestedNavigationCollapseSx = {
       ml: 0.5,
       transform: `rotate(${expanded ? 0 : -90}deg)`,
@@ -163,11 +151,11 @@ function DashboardSidebarPageItem({
 
   const hasExternalHref = href.startsWith('http://') || href.startsWith('https://');
 
-  const LinkComponent = LinkProp ?? (hasExternalHref ? 'a' : Link);
+  const LinkComponent = hasExternalHref ? 'a' : Link;
 
   const listItem = (
     <ListItem
-      {...(item.children && mini
+      {...(item.children && isMini
         ? {
             onMouseEnter: () => {
               setHoveredMiniSidebarItemId(id);
@@ -188,9 +176,9 @@ function DashboardSidebarPageItem({
         disabled={disabled}
         sx={{
           px: 1.4,
-          height: mini ? 60 : 48,
+          height: isMini ? 60 : 48,
         }}
-        {...(item.children && !mini
+        {...(item.children && !isMini
           ? {
               onClick: handleClick,
             }
@@ -209,12 +197,12 @@ function DashboardSidebarPageItem({
             }
           : {})}
       >
-        {item.icon || mini ? (
+        {item.icon || isMini ? (
           <Box
             sx={{
               position: 'relative',
-              top: mini ? -6 : 0,
-              left: mini ? 5 : 0,
+              top: isMini ? -6 : 0,
+              left: isMini ? 5 : 0,
             }}
           >
             <ListItemIcon
@@ -226,7 +214,7 @@ function DashboardSidebarPageItem({
               }}
             >
               {item.icon ?? null}
-              {!item.icon && mini ? (
+              {!item.icon && isMini ? (
                 <Avatar
                   sx={{
                     width: LIST_ITEM_ICON_SIZE - 7,
@@ -242,7 +230,7 @@ function DashboardSidebarPageItem({
                 </Avatar>
               ) : null}
             </ListItemIcon>
-            {mini ? (
+            {isMini ? (
               <Typography
                 variant="caption"
                 sx={{
@@ -264,9 +252,9 @@ function DashboardSidebarPageItem({
             ) : null}
           </Box>
         ) : null}
-        {!mini ? (
+        {!isMini ? (
           <ListItemText
-            primary={title}
+            primary={isMini}
             sx={{
               ml: 1.2,
               whiteSpace: 'nowrap',
@@ -274,10 +262,10 @@ function DashboardSidebarPageItem({
             }}
           />
         ) : null}
-        {item.action && !mini && isSidebarFullyExpanded ? item.action : null}
+        {item.action && !isMini && isSidebarFullyExpanded ? item.action : null}
         {item.children ? <ExpandMoreIcon sx={nestedNavigationCollapseSx} /> : null}
       </NavigationListItemButton>
-      {item.children && mini ? (
+      {item.children && isMini ? (
         <Grow in={id === hoveredMiniSidebarItemId}>
           <Box
             sx={{
@@ -304,7 +292,7 @@ function DashboardSidebarPageItem({
   return (
     <React.Fragment key={id}>
       {listItem}
-      {item.children && !mini ? (
+      {item.children && !isMini ? (
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           {renderNestedNavigation(item.children)}
         </Collapse>

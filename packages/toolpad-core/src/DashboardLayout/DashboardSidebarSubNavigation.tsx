@@ -4,7 +4,6 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ListSubheader from '@mui/material/ListSubheader';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import { NavigationContext } from '../shared/context';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 import {
   getItemPath,
@@ -12,12 +11,100 @@ import {
   hasSelectedNavigationChildren,
   isPageItem,
 } from '../shared/navigation';
+import { DashboardSidebarPageItemContext, NavigationContext } from '../shared/context';
 import { getDrawerSxTransitionMixin } from './utils';
 import { useActivePage } from '../useActivePage';
 import {
   DashboardSidebarPageItem,
-  DashboardSidebarPageItemProps,
+  DashboardSidebarPageItemContextProps,
 } from './DashboardSidebarPageItem';
+
+interface DashboardSidebarSubNavigationPageItemProps {
+  id: string;
+  item: NavigationPageItem;
+  isExpanded: boolean;
+  onClick: (itemId: string, item: NavigationPageItem) => void;
+  depth: number;
+  onLinkClick: () => void;
+  isMini: boolean;
+  isFullyExpanded: boolean;
+  isFullyCollapsed: boolean;
+  renderPageItem?: (item: NavigationPageItem, params: { mini: boolean }) => React.ReactNode;
+}
+
+/**
+ * @ignore - internal component.
+ */
+function DashboardSidebarSubNavigationPageItem({
+  id,
+  item,
+  isExpanded,
+  onClick,
+  depth,
+  onLinkClick,
+  isMini,
+  isFullyExpanded,
+  isFullyCollapsed,
+  renderPageItem,
+}: DashboardSidebarSubNavigationPageItemProps) {
+  const navigationContext = React.useContext(NavigationContext);
+
+  const activePage = useActivePage();
+
+  const isActive = !!activePage && activePage.path === getItemPath(navigationContext, item);
+
+  // Show as selected in mini sidebar if any of the children matches path, otherwise show as selected if item matches path
+  const isSelected =
+    activePage && item.children && isMini
+      ? hasSelectedNavigationChildren(navigationContext, item, activePage.path)
+      : isActive && !item.children;
+
+  const pageItemContext: DashboardSidebarPageItemContextProps = React.useMemo(
+    () => ({
+      id,
+      item,
+      onClick,
+      title: getItemTitle(item),
+      href: getItemPath(navigationContext, item),
+      expanded: isExpanded,
+      isMini,
+      selected: isSelected,
+      isSidebarFullyExpanded: isFullyExpanded,
+      isSidebarFullyCollapsed: isFullyCollapsed,
+      renderNestedNavigation: () => (
+        <DashboardSidebarSubNavigation
+          subNavigation={item.children ?? []}
+          depth={depth + 1}
+          onLinkClick={onLinkClick}
+          isPopover={isMini}
+        />
+      ),
+    }),
+    [
+      depth,
+      id,
+      isExpanded,
+      isFullyCollapsed,
+      isFullyExpanded,
+      isMini,
+      isSelected,
+      item,
+      navigationContext,
+      onClick,
+      onLinkClick,
+    ],
+  );
+
+  return (
+    <DashboardSidebarPageItemContext.Provider value={pageItemContext}>
+      {renderPageItem ? (
+        renderPageItem(item, { mini: isMini })
+      ) : (
+        <DashboardSidebarPageItem item={item} />
+      )}
+    </DashboardSidebarPageItemContext.Provider>
+  );
+}
 
 interface DashboardSidebarSubNavigationProps {
   subNavigation: Navigation;
@@ -28,11 +115,8 @@ interface DashboardSidebarSubNavigationProps {
   isFullyExpanded?: boolean;
   isFullyCollapsed?: boolean;
   hasDrawerTransitions?: boolean;
-  renderPageItem?: (item: NavigationPageItem) => React.ReactNode;
+  renderPageItem?: (item: NavigationPageItem, params: { mini: boolean }) => React.ReactNode;
 }
-
-export const DashboardSidebarPageItemContext =
-  React.createContext<DashboardSidebarPageItemProps | null>(null);
 
 /**
  * @ignore - internal component.
@@ -84,63 +168,6 @@ function DashboardSidebarSubNavigation({
       }
     },
     [isMini, onLinkClick],
-  );
-
-  const renderNavigationPageItem = React.useCallback(
-    (item: NavigationPageItem, itemIndex: number) => {
-      const isActive = !!activePage && activePage.path === getItemPath(navigationContext, item);
-
-      // Show as selected in mini sidebar if any of the children matches path, otherwise show as selected if item matches path
-      const isSelected =
-        activePage && item.children && isMini
-          ? hasSelectedNavigationChildren(navigationContext, item, activePage.path)
-          : isActive && !item.children;
-
-      const pageItemId = `page-${depth}-${itemIndex}`;
-
-      const pageItemDefaultProps = {
-        id: pageItemId,
-        item,
-        onClick: handlePageItemClick,
-        title: getItemTitle(item),
-        href: getItemPath(navigationContext, item),
-        expanded: expandedItemIds.includes(pageItemId),
-        mini: isMini,
-        selected: isSelected,
-        isSidebarFullyExpanded: isFullyExpanded,
-        isSidebarFullyCollapsed: isFullyCollapsed,
-        renderNestedNavigation: () => (
-          <DashboardSidebarSubNavigation
-            subNavigation={item.children ?? []}
-            depth={depth + 1}
-            onLinkClick={onLinkClick}
-            isPopover={isMini}
-          />
-        ),
-      };
-
-      return (
-        <DashboardSidebarPageItemContext.Provider key={pageItemId} value={pageItemDefaultProps}>
-          {renderPageItem ? (
-            renderPageItem(item)
-          ) : (
-            <DashboardSidebarPageItem {...pageItemDefaultProps} />
-          )}
-        </DashboardSidebarPageItemContext.Provider>
-      );
-    },
-    [
-      activePage,
-      depth,
-      expandedItemIds,
-      handlePageItemClick,
-      isFullyCollapsed,
-      isFullyExpanded,
-      isMini,
-      navigationContext,
-      onLinkClick,
-      renderPageItem,
-    ],
   );
 
   return (
@@ -197,7 +224,23 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        return renderNavigationPageItem(navigationItem, navigationItemIndex);
+        const pageItemId = `page-${depth}-${navigationItemIndex}`;
+
+        return (
+          <DashboardSidebarSubNavigationPageItem
+            key={pageItemId}
+            id={pageItemId}
+            item={navigationItem}
+            isExpanded={expandedItemIds.includes(pageItemId)}
+            onClick={handlePageItemClick}
+            depth={depth}
+            onLinkClick={onLinkClick}
+            isMini={isMini}
+            isFullyExpanded={isFullyExpanded}
+            isFullyCollapsed={isFullyCollapsed}
+            renderPageItem={renderPageItem}
+          />
+        );
       })}
     </List>
   );

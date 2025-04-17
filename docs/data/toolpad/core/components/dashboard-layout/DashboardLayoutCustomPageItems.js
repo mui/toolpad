@@ -76,10 +76,9 @@ const NAVIGATION = [
   },
 ];
 
-function CustomPageItem({ id, mini }) {
+function CustomPageItem({ item, mini }) {
   return (
     <ListItem
-      key={id}
       sx={(theme) => ({
         color: theme.palette.secondary.main,
         overflowX: 'hidden',
@@ -104,7 +103,7 @@ function CustomPageItem({ id, mini }) {
             <AutoAwesomeIcon />
           </ListItemIcon>
           <ListItemText
-            primary="Custom Item"
+            primary={item.title}
             sx={{
               whiteSpace: 'nowrap',
             }}
@@ -116,15 +115,27 @@ function CustomPageItem({ id, mini }) {
 }
 
 CustomPageItem.propTypes = {
-  /**
-   * A string that uniquely identifies the item.
-   */
-  id: PropTypes.string.isRequired,
-  /**
-   * If `true`, the containing sidebar is in mini mode.
-   * @default false
-   */
-  mini: PropTypes.bool,
+  item: PropTypes.shape({
+    action: PropTypes.node,
+    children: PropTypes.arrayOf(
+      PropTypes.oneOfType([
+        PropTypes.object,
+        PropTypes.shape({
+          kind: PropTypes.oneOf(['header']).isRequired,
+          title: PropTypes.string.isRequired,
+        }),
+        PropTypes.shape({
+          kind: PropTypes.oneOf(['divider']).isRequired,
+        }),
+      ]).isRequired,
+    ),
+    icon: PropTypes.node,
+    kind: PropTypes.oneOf(['page']),
+    pattern: PropTypes.string,
+    segment: PropTypes.string,
+    title: PropTypes.string,
+  }).isRequired,
+  mini: PropTypes.bool.isRequired,
 };
 
 const demoTheme = createTheme({
@@ -171,39 +182,29 @@ function DashboardLayoutCustomPageItems(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const renderPageItem = React.useCallback((defaultProps) => {
-    if (defaultProps.title === 'External Link') {
+  const renderPageItem = React.useCallback((item, { mini }) => {
+    if (item.title === 'External Link') {
       return (
-        <DashboardSidebarPageItem
-          key={defaultProps.id}
-          {...defaultProps}
-          href="https://www.mui.com/toolpad"
-        />
+        <DashboardSidebarPageItem item={item} href="https://www.mui.com/toolpad" />
       );
     }
-    if (defaultProps.title === 'Selected Item') {
-      return (
-        <DashboardSidebarPageItem key={defaultProps.id} {...defaultProps} selected />
-      );
+    if (item.title === 'Selected Item') {
+      return <DashboardSidebarPageItem item={item} selected />;
     }
-    if (defaultProps.title === 'Disabled Item') {
-      return (
-        <DashboardSidebarPageItem key={defaultProps.id} {...defaultProps} disabled />
-      );
+    if (item.title === 'Disabled Item') {
+      return <DashboardSidebarPageItem item={item} disabled />;
     }
-    if (defaultProps.title === 'Hidden Item') {
+    if (item.title === 'Hidden Item') {
       return null;
     }
-    if (defaultProps.title === 'Expanded Folder') {
-      return (
-        <DashboardSidebarPageItem key={defaultProps.id} {...defaultProps} expanded />
-      );
+    if (item.title === 'Expanded Folder') {
+      return <DashboardSidebarPageItem item={item} expanded />;
     }
-    if (defaultProps.title === 'Custom Item') {
-      return <CustomPageItem key={defaultProps.id} {...defaultProps} />;
+    if (item.title === 'Custom Item') {
+      return <CustomPageItem item={item} mini={mini} />;
     }
 
-    return <DashboardSidebarPageItem key={defaultProps.id} {...defaultProps} />;
+    return <DashboardSidebarPageItem item={item} />;
   }, []);
 
   return (

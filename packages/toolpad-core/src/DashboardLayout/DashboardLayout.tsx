@@ -20,8 +20,7 @@ import { ToolbarActions } from './ToolbarActions';
 import { AppTitle, AppTitleProps } from './AppTitle';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 import { MINI_DRAWER_WIDTH } from './shared';
-import type { Branding, Navigation } from '../AppProvider';
-import type { DashboardSidebarPageItemProps } from './DashboardSidebarPageItem';
+import type { Branding, Navigation, NavigationPageItem } from '../AppProvider';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -104,10 +103,11 @@ export interface DashboardLayoutProps {
   /**
    * Render each page item.
    *
-   * @param {DashboardSidebarPageItemProps} defaultProps
+   * @param {NavigationPageItem} item
+   * @param {{ mini: boolean }} params
    * @returns {ReactNode}
    */
-  renderPageItem?: (defaultProps: DashboardSidebarPageItemProps) => React.ReactNode;
+  renderPageItem?: (item: NavigationPageItem, params: { mini: boolean }) => React.ReactNode;
   /**
    * The components used for each slot inside.
    * @default {}

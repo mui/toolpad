@@ -254,7 +254,7 @@ function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
         ) : null}
         {!isMini ? (
           <ListItemText
-            primary={isMini}
+            primary={title}
             sx={{
               ml: 1.2,
               whiteSpace: 'nowrap',

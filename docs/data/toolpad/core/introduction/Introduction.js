@@ -236,7 +236,7 @@ function DemoPageContent({ pathname }) {
         dataSource={peopleDataSource}
         dataSourceCache={peopleCache}
         rootPath="/people"
-        initialPageSize={10}
+        initialPageSize={4}
         defaultValues={{ age: 18 }}
       />
     );

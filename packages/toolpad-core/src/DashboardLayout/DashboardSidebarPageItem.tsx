@@ -62,7 +62,7 @@ export interface DashboardSidebarPageItemProps {
    * The component used to render the item as a link.
    * @default Link
    */
-  Link?: React.ElementType;
+  LinkComponent?: React.ElementType;
   /**
    * If `true`, expands any nested navigation in the item, otherwise collapse it.
    * @default false
@@ -106,7 +106,7 @@ function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
   const {
     item,
     href = getItemPath(navigationContext, item),
-    Link: LinkProp,
+    LinkComponent: LinkComponentProp,
     expanded = false,
     selected = false,
     disabled = false,
@@ -156,7 +156,7 @@ function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
 
   const hasExternalHref = href.startsWith('http://') || href.startsWith('https://');
 
-  const LinkComponent = LinkProp ?? (hasExternalHref ? 'a' : Link);
+  const LinkComponent = LinkComponentProp ?? (hasExternalHref ? 'a' : Link);
 
   const title = getItemTitle(item);
 
@@ -355,7 +355,7 @@ DashboardSidebarPageItem.propTypes /* remove-proptypes */ = {
    * The component used to render the item as a link.
    * @default Link
    */
-  Link: PropTypes.elementType,
+  LinkComponent: PropTypes.elementType,
   /**
    * Use to apply selected styling.
    * @default false

@@ -1,7 +1,5 @@
 {
   "props": {
-    "href": { "type": { "name": "string" }, "required": true },
-    "id": { "type": { "name": "string" }, "required": true },
     "item": {
       "type": {
         "name": "shape",
@@ -9,15 +7,9 @@
       },
       "required": true
     },
-    "onClick": { "type": { "name": "func" }, "required": true },
-    "renderNestedNavigation": { "type": { "name": "func" }, "required": true },
-    "title": { "type": { "name": "string" }, "required": true },
     "disabled": { "type": { "name": "bool" }, "default": "false" },
     "expanded": { "type": { "name": "bool" }, "default": "false" },
-    "isSidebarFullyCollapsed": { "type": { "name": "bool" }, "default": "false" },
-    "isSidebarFullyExpanded": { "type": { "name": "bool" }, "default": "true" },
-    "Link": { "type": { "name": "elementType" } },
-    "mini": { "type": { "name": "bool" }, "default": "false" },
+    "href": { "type": { "name": "string" } },
     "selected": { "type": { "name": "bool" }, "default": "false" }
   },
   "name": "DashboardSidebarPageItem",

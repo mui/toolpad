@@ -543,7 +543,8 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   /**
    * Render each page item.
    *
-   * @param {DashboardSidebarPageItemProps} defaultProps
+   * @param {NavigationPageItem} item
+   * @param {{ mini: boolean }} params
    * @returns {ReactNode}
    */
   renderPageItem: PropTypes.func,

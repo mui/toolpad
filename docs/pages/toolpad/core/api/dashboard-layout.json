@@ -21,7 +21,7 @@
     "renderPageItem": {
       "type": { "name": "func" },
       "signature": {
-        "type": "function(defaultProps: DashboardSidebarPageItemProps) => ReactNode",
+        "type": "function(item: NavigationPageItem, params: { mini: boolean }) => ReactNode",
         "describedArgs": []
       }
     },

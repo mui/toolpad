@@ -6,22 +6,8 @@
       "description": "If <code>true</code>, expands any nested navigation in the item, otherwise collapse it."
     },
     "href": { "description": "Link <code>href</code> for when the item is rendered as a link." },
-    "id": { "description": "A string that uniquely identifies the item." },
-    "isSidebarFullyCollapsed": {
-      "description": "If <code>true</code>, the containing sidebar is fully collapsed."
-    },
-    "isSidebarFullyExpanded": {
-      "description": "If <code>true</code>, the containing sidebar is fully expanded."
-    },
     "item": { "description": "Navigation item definition." },
-    "Link": { "description": "The component used to render the item as a link." },
-    "mini": { "description": "If <code>true</code>, the containing sidebar is in mini mode." },
-    "onClick": { "description": "Callback fired when the item is clicked." },
-    "renderNestedNavigation": {
-      "description": "Override the component rendered as nested navigation for this item."
-    },
-    "selected": { "description": "Use to apply selected styling." },
-    "title": { "description": "Item title." }
+    "selected": { "description": "Use to apply selected styling." }
   },
   "classDescriptions": {}
 }

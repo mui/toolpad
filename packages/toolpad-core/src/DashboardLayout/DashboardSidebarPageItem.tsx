@@ -319,21 +319,7 @@ DashboardSidebarPageItem.propTypes /* remove-proptypes */ = {
   /**
    * Link `href` for when the item is rendered as a link.
    */
-  href: PropTypes.string.isRequired,
-  /**
-   * A string that uniquely identifies the item.
-   */
-  id: PropTypes.string.isRequired,
-  /**
-   * If `true`, the containing sidebar is fully collapsed.
-   * @default false
-   */
-  isSidebarFullyCollapsed: PropTypes.bool,
-  /**
-   * If `true`, the containing sidebar is fully expanded.
-   * @default true
-   */
-  isSidebarFullyExpanded: PropTypes.bool,
+  href: PropTypes.string,
   /**
    * Navigation item definition.
    */
@@ -358,31 +344,10 @@ DashboardSidebarPageItem.propTypes /* remove-proptypes */ = {
     title: PropTypes.string,
   }).isRequired,
   /**
-   * The component used to render the item as a link.
-   */
-  Link: PropTypes.elementType,
-  /**
-   * If `true`, the containing sidebar is in mini mode.
-   * @default false
-   */
-  mini: PropTypes.bool,
-  /**
-   * Callback fired when the item is clicked.
-   */
-  onClick: PropTypes.func.isRequired,
-  /**
-   * Override the component rendered as nested navigation for this item.
-   */
-  renderNestedNavigation: PropTypes.func.isRequired,
-  /**
    * Use to apply selected styling.
    * @default false
    */
   selected: PropTypes.bool,
-  /**
-   * Item title.
-   */
-  title: PropTypes.string.isRequired,
 } as any;
 
 export { DashboardSidebarPageItem };

@@ -141,7 +141,7 @@ export const notesDataSource: DataSource<Note> = {
     });
 
     const newNote = {
-      id: notesStore.length + 1,
+      id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
       ...data,
     } as Note;
 

@@ -33,7 +33,7 @@ const demoTheme = createTheme({
   },
 });
 
-let people = [
+let peopleStore = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
@@ -66,7 +66,7 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    let processedPeople = [...people];
+    let processedPeople = [...peopleStore];
 
     // Apply filters (demo only)
     if (filterModel?.items?.length) {
@@ -135,7 +135,7 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    people = people.filter((person) => person.id !== Number(personId));
+    peopleStore = peopleStore.filter((person) => person.id !== Number(personId));
   },
 };
 

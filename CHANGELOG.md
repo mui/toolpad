@@ -1,5 +1,57 @@
 # Changelog
 
+## 0.14.0
+
+<!-- generated comparing v0.13.0..master -->
+
+_Apr 11, 2025_
+
+A big thanks to the 9 contributors who made this release possible. Here are some highlights ✨:
+
+- Support building with the latest Material UI v7
+- Added title for accessibility
+- Fixed dialog promises to enable closing dialogs imperatively
+- CRUD improvements: new sub-component slots, examples, and added to CLI default output
+- Added interpolation to translation keys
+- Multiple bug fixes and improvements
+
+### `@toolpad/core`
+
+- Fix: Unwarp Dialog promises created by confirm, prompt, and alert to enable closing these dialogs imperatively (#4801) @DizWARE
+- Fix: render divider and header as li in menu (#4763) @rkristelijn
+- Feature: add title for accessibility (#4761) @rkristelijn
+- Expose subcomponent slots to top-level CRUD component (#4786) @apedroferreira
+- Styling: Align logo smaller than 40 px vertically with title (#4784) @jakobmerrild
+- Add basic CRUD tests (#4709) @apedroferreira
+- Show nested navigation in mini-drawer (#4276) @apedroferreira
+
+### CLI
+
+- Add CRUD to generated projects (#4826) @apedroferreira
+
+### Docs
+
+- Corrected 'Returns' section grammer (#4831) @mohamedAbdulhamed
+- Add CRUD to themed example (#4785) @bharatkashyap
+- Add missing peer dependencies from Toolpad CRUD to docs, examples and playgrounds (#4807) @apedroferreira
+- Fix 301 link (b107099) @oliviertassinari
+- Fix URL domain in changelog (fbbe1e2) @oliviertassinari
+- Fix blank space issue in Material UI Drawer docs (#4805) @apedroferreira
+- Fix CRUD usage in docs (#4783) @apedroferreira
+- Add CRUD examples (#4713) @apedroferreira
+- Added links to sites (#4708) @Ocheretovich
+- Mention pnpm usage (#4793) @rkristelijn
+
+### Core
+
+- Move @toolpad/core to ESM (#4755) @Janpot
+- Add interpolation to translation keys (#4773) @bharatkashyap
+- Upgrade monorepo (#4819) @oliviertassinari
+- Sync scorecards.yml across codebase (10a52dd) @oliviertassinari
+- Remove studio workspaces (#4756) @Janpot
+
+All contributors of this release in alphabetical order: @apedroferreira, @bharatkashyap, @DizWARE, @jakobmerrild, @Janpot, @mohamedAbdulhamed, @Ocheretovich, @oliviertassinari, @rkristelijn
+
 ## v0.13.0
 
 <!-- generated comparing v0.12.1..master -->
@@ -57,7 +109,7 @@ A big thanks to the 10 contributors who made this release possible. Here are som
 - Fix redirection to GitHub example view (#4642) @oliviertassinari
 - Fix build errors with Next.js 14 (#4594) @bharatkashyap
 
-## CLI
+### CLI
 
 - Refactor CLI setup (#4597) @bharatkashyap
 - Fix package.json pretty print (#4644) @rkristelijn

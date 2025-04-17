@@ -284,6 +284,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             flexDirection: 'column',
             justifyContent: 'space-between',
             overflow: 'auto',
+            scrollbarGutter: isMini ? 'stable' : 'auto',
             pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
             ...(hasDrawerTransitions
               ? getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')

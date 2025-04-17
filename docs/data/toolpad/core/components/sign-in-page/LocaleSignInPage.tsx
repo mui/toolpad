@@ -8,9 +8,9 @@ import {
 import hiIN from '@toolpad/core/locales/hiIN';
 
 const providers = [
-  { id: 'github', name: 'GitHub' },
-  { id: 'google', name: 'Google' },
-  { id: 'credentials', name: 'Email and Password' },
+  { id: 'github', name: 'गिटहब' },
+  { id: 'google', name: 'गूगल' },
+  { id: 'credentials', name: 'ईमेल और पासवर्ड' },
 ];
 
 const signIn: (provider: AuthProvider) => void | Promise<AuthResponse> = async (
@@ -34,7 +34,9 @@ export default function LocaleSignInPage() {
       <SignInPage
         signIn={signIn}
         providers={providers}
-        localeText={{ signInTitle: 'लॉग इन करें' }}
+        localeText={{
+          providerSignInTitle: (provider: string) => `${provider} से साइन इन करें`,
+        }}
       />
     </AppProvider>
     // preview-end

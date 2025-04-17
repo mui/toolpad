@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/utils",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Shared utilities used by Toolpad packages.",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/toolpad#readme",
@@ -21,9 +21,8 @@
   "scripts": {
     "clean": "rimraf build",
     "prebuild": "pnpm clean",
-    "build": "pnpm build:node && pnpm build:stable && pnpm build:modern && pnpm build:types && pnpm build:copy-files",
+    "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
     "build:node": "node ../../scripts/build.mjs node",
-    "build:modern": "node ../../scripts/build.mjs modern",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
     "build:types": "tsx ../../scripts/buildTypes.mts",

@@ -1,5 +1,6 @@
 export const tsconfig = `{
     "compilerOptions": {
+      "target": "ES2017",
       "lib": ["dom", "dom.iterable", "esnext"],
       "allowJs": true,
       "skipLibCheck": true,

@@ -7,7 +7,7 @@ const rootLayout: Template = (options) => {
 import { NextAppProvider } from '@toolpad/core/nextjs';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PersonIcon from '@mui/icons-material/Person';
 ${authEnabled ? '' : `import LinearProgress from '@mui/material/LinearProgress'`}
 import type { Navigation } from '@toolpad/core/AppProvider';
 ${
@@ -17,6 +17,11 @@ import { auth } from '../auth';`
     : ''
 }
 import theme from '../theme';
+
+export const metadata = {
+  title: 'My Toolpad Core Next.js App',
+  description: 'This is a sample app built with Toolpad Core and Next.js',
+};
 
 const NAVIGATION: Navigation = [
   {
@@ -29,9 +34,10 @@ const NAVIGATION: Navigation = [
     icon: <DashboardIcon />,
   },
   {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
+    segment: 'employees',
+    title: 'Employees',
+    icon: <PersonIcon />,
+    pattern: 'employees{/:employeeId}*',
   },
 ];
 

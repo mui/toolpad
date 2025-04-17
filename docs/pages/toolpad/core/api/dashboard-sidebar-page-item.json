@@ -10,6 +10,7 @@
     "disabled": { "type": { "name": "bool" }, "default": "false" },
     "expanded": { "type": { "name": "bool" }, "default": "false" },
     "href": { "type": { "name": "string" } },
+    "Link": { "type": { "name": "elementType" }, "default": "Link" },
     "selected": { "type": { "name": "bool" }, "default": "false" }
   },
   "name": "DashboardSidebarPageItem",

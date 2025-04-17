@@ -28,8 +28,11 @@ interface DashboardSidebarSubNavigationProps {
   isFullyExpanded?: boolean;
   isFullyCollapsed?: boolean;
   hasDrawerTransitions?: boolean;
-  renderPageItem?: (defaultProps: DashboardSidebarPageItemProps) => React.ReactNode;
+  renderPageItem?: (item: NavigationPageItem) => React.ReactNode;
 }
+
+export const DashboardSidebarPageItemContext =
+  React.createContext<DashboardSidebarPageItemProps | null>(null);
 
 /**
  * @ignore - internal component.
@@ -81,6 +84,63 @@ function DashboardSidebarSubNavigation({
       }
     },
     [isMini, onLinkClick],
+  );
+
+  const renderNavigationPageItem = React.useCallback(
+    (item: NavigationPageItem, itemIndex: number) => {
+      const isActive = !!activePage && activePage.path === getItemPath(navigationContext, item);
+
+      // Show as selected in mini sidebar if any of the children matches path, otherwise show as selected if item matches path
+      const isSelected =
+        activePage && item.children && isMini
+          ? hasSelectedNavigationChildren(navigationContext, item, activePage.path)
+          : isActive && !item.children;
+
+      const pageItemId = `page-${depth}-${itemIndex}`;
+
+      const pageItemDefaultProps = {
+        id: pageItemId,
+        item,
+        onClick: handlePageItemClick,
+        title: getItemTitle(item),
+        href: getItemPath(navigationContext, item),
+        expanded: expandedItemIds.includes(pageItemId),
+        mini: isMini,
+        selected: isSelected,
+        isSidebarFullyExpanded: isFullyExpanded,
+        isSidebarFullyCollapsed: isFullyCollapsed,
+        renderNestedNavigation: () => (
+          <DashboardSidebarSubNavigation
+            subNavigation={item.children ?? []}
+            depth={depth + 1}
+            onLinkClick={onLinkClick}
+            isPopover={isMini}
+          />
+        ),
+      };
+
+      return (
+        <DashboardSidebarPageItemContext.Provider key={pageItemId} value={pageItemDefaultProps}>
+          {renderPageItem ? (
+            renderPageItem(item)
+          ) : (
+            <DashboardSidebarPageItem {...pageItemDefaultProps} />
+          )}
+        </DashboardSidebarPageItemContext.Provider>
+      );
+    },
+    [
+      activePage,
+      depth,
+      expandedItemIds,
+      handlePageItemClick,
+      isFullyCollapsed,
+      isFullyExpanded,
+      isMini,
+      navigationContext,
+      onLinkClick,
+      renderPageItem,
+    ],
   );
 
   return (
@@ -137,43 +197,7 @@ function DashboardSidebarSubNavigation({
           );
         }
 
-        const isActive =
-          !!activePage && activePage.path === getItemPath(navigationContext, navigationItem);
-
-        // Show as selected in mini sidebar if any of the children matches path, otherwise show as selected if item matches path
-        const isSelected =
-          activePage && navigationItem.children && isMini
-            ? hasSelectedNavigationChildren(navigationContext, navigationItem, activePage.path)
-            : isActive && !navigationItem.children;
-
-        const pageItemId = `page-${depth}-${navigationItemIndex}`;
-
-        const pageItemDefaultProps = {
-          id: pageItemId,
-          item: navigationItem,
-          onClick: handlePageItemClick,
-          title: getItemTitle(navigationItem),
-          href: getItemPath(navigationContext, navigationItem),
-          expanded: expandedItemIds.includes(pageItemId),
-          mini: isMini,
-          selected: isSelected,
-          isSidebarFullyExpanded: isFullyExpanded,
-          isSidebarFullyCollapsed: isFullyCollapsed,
-          renderNestedNavigation: () => (
-            <DashboardSidebarSubNavigation
-              subNavigation={navigationItem.children ?? []}
-              depth={depth + 1}
-              onLinkClick={onLinkClick}
-              isPopover={isMini}
-            />
-          ),
-        };
-
-        return renderPageItem ? (
-          renderPageItem(pageItemDefaultProps)
-        ) : (
-          <DashboardSidebarPageItem key={pageItemId} {...pageItemDefaultProps} />
-        );
+        return renderNavigationPageItem(navigationItem, navigationItemIndex);
       })}
     </List>
   );

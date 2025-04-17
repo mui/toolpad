@@ -18,6 +18,7 @@ import {
   DashboardSidebarPageItem,
   DashboardSidebarPageItemContextProps,
 } from './DashboardSidebarPageItem';
+import { MINI_DRAWER_WIDTH } from './shared';
 
 interface DashboardSidebarSubNavigationPageItemProps {
   id: string;

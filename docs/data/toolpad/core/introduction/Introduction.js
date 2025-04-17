@@ -18,10 +18,10 @@ const NAVIGATION = [
     icon: <DescriptionIcon />,
   },
   {
-    segment: 'employees',
-    title: 'Employees',
+    segment: 'people',
+    title: 'People',
     icon: <PersonIcon />,
-    pattern: 'employees{/:employeeId}*',
+    pattern: 'people{/:personId}*',
   },
 ];
 
@@ -41,48 +41,31 @@ const demoTheme = createTheme({
   },
 });
 
-let employeesStore = [
-  {
-    id: 1,
-    name: 'Edward Perry',
-    age: 25,
-    joinDate: new Date().toISOString(),
-    role: 'Finance',
-  },
-  {
-    id: 2,
-    name: 'Josephine Drake',
-    age: 36,
-    joinDate: new Date().toISOString(),
-    role: 'Market',
-  },
-  {
-    id: 3,
-    name: 'Cody Phillips',
-    age: 19,
-    joinDate: new Date().toISOString(),
-    role: 'Development',
-  },
+let peopleStore = [
+  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
+  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
+  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
+  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 11 },
+  { id: 5, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
+  { id: 6, lastName: 'Frances', firstName: 'Rossini', age: 36 },
+  { id: 7, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
 ];
 
-export const employeesDataSource = {
+export const peopleDataSource = {
   fields: [
     { field: 'id', headerName: 'ID' },
-    { field: 'name', headerName: 'Name', width: 140 },
-    { field: 'age', headerName: 'Age', type: 'number' },
     {
-      field: 'joinDate',
-      headerName: 'Join date',
-      type: 'date',
-      valueGetter: (value) => value && new Date(value),
-      width: 140,
+      field: 'firstName',
+      headerName: 'First name',
     },
     {
-      field: 'role',
-      headerName: 'Department',
-      type: 'singleSelect',
-      valueOptions: ['Market', 'Finance', 'Development'],
-      width: 160,
+      field: 'lastName',
+      headerName: 'Last name',
+    },
+    {
+      field: 'age',
+      headerName: 'Age',
+      type: 'number',
     },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
@@ -91,37 +74,37 @@ export const employeesDataSource = {
       setTimeout(resolve, 750);
     });
 
-    let filteredEmployees = [...employeesStore];
+    let processedPeople = [...peopleStore];
 
-    // Apply filters (example only)
+    // Apply filters (demo only)
     if (filterModel?.items?.length) {
       filterModel.items.forEach(({ field, value, operator }) => {
         if (!field || value == null) {
           return;
         }
 
-        filteredEmployees = filteredEmployees.filter((employee) => {
-          const employeeValue = employee[field];
+        processedPeople = processedPeople.filter((person) => {
+          const personValue = person[field];
 
           switch (operator) {
             case 'contains':
-              return String(employeeValue)
+              return String(personValue)
                 .toLowerCase()
                 .includes(String(value).toLowerCase());
             case 'equals':
-              return employeeValue === value;
+              return personValue === value;
             case 'startsWith':
-              return String(employeeValue)
+              return String(personValue)
                 .toLowerCase()
                 .startsWith(String(value).toLowerCase());
             case 'endsWith':
-              return String(employeeValue)
+              return String(personValue)
                 .toLowerCase()
                 .endsWith(String(value).toLowerCase());
             case '>':
-              return employeeValue > value;
+              return personValue > value;
             case '<':
-              return employeeValue < value;
+              return personValue < value;
             default:
               return true;
           }
@@ -131,7 +114,7 @@ export const employeesDataSource = {
 
     // Apply sorting
     if (sortModel?.length) {
-      filteredEmployees.sort((a, b) => {
+      processedPeople.sort((a, b) => {
         for (const { field, sort } of sortModel) {
           if (a[field] < b[field]) {
             return sort === 'asc' ? -1 : 1;
@@ -147,27 +130,27 @@ export const employeesDataSource = {
     // Apply pagination
     const start = paginationModel.page * paginationModel.pageSize;
     const end = start + paginationModel.pageSize;
-    const paginatedEmployees = filteredEmployees.slice(start, end);
+    const paginatedPeople = processedPeople.slice(start, end);
 
     return {
-      items: paginatedEmployees,
-      itemCount: filteredEmployees.length,
+      items: paginatedPeople,
+      itemCount: processedPeople.length,
     };
   },
-  getOne: async (employeeId) => {
+  getOne: async (personId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    const employeeToShow = employeesStore.find(
-      (employee) => employee.id === Number(employeeId),
+    const personToShow = peopleStore.find(
+      (person) => person.id === Number(personId),
     );
 
-    if (!employeeToShow) {
-      throw new Error('Employee not found');
+    if (!personToShow) {
+      throw new Error('Person not found');
     }
-    return employeeToShow;
+    return personToShow;
   },
   createOne: async (data) => {
     // Simulate loading delay
@@ -175,77 +158,70 @@ export const employeesDataSource = {
       setTimeout(resolve, 750);
     });
 
-    const newEmployee = {
-      id:
-        employeesStore.reduce((max, employee) => Math.max(max, employee.id), 0) + 1,
+    const newPerson = {
+      id: peopleStore.reduce((max, person) => Math.max(max, person.id), 0) + 1,
       ...data,
     };
 
-    employeesStore = [...employeesStore, newEmployee];
+    peopleStore = [...peopleStore, newPerson];
 
-    return newEmployee;
+    return newPerson;
   },
-  updateOne: async (employeeId, data) => {
+  updateOne: async (personId, data) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    let updatedEmployee = null;
+    let updatedPerson = null;
 
-    employeesStore = employeesStore.map((employee) => {
-      if (employee.id === Number(employeeId)) {
-        updatedEmployee = { ...employee, ...data };
-        return updatedEmployee;
+    peopleStore = peopleStore.map((person) => {
+      if (person.id === Number(personId)) {
+        updatedPerson = { ...person, ...data };
+        return updatedPerson;
       }
-      return employee;
+      return person;
     });
 
-    if (!updatedEmployee) {
-      throw new Error('Employee not found');
+    if (!updatedPerson) {
+      throw new Error('Person not found');
     }
-    return updatedEmployee;
+    return updatedPerson;
   },
-  deleteOne: async (employeeId) => {
+  deleteOne: async (personId) => {
     // Simulate loading delay
     await new Promise((resolve) => {
       setTimeout(resolve, 750);
     });
 
-    employeesStore = employeesStore.filter(
-      (employee) => employee.id !== Number(employeeId),
-    );
+    peopleStore = peopleStore.filter((person) => person.id !== Number(personId));
   },
   validate: (formValues) => {
-    const issues = [];
+    let issues = [];
 
-    if (!formValues.name) {
-      issues.push({ message: 'Name is required', path: ['name'] });
+    if (!formValues.firstName) {
+      issues = [
+        ...issues,
+        { message: 'First name is required', path: ['firstName'] },
+      ];
     }
-
+    if (!formValues.lastName) {
+      issues = [...issues, { message: 'Last name is required', path: ['lastName'] }];
+    }
     if (!formValues.age) {
-      issues.push({ message: 'Age is required', path: ['age'] });
-    } else if (formValues.age < 18) {
-      issues.push({ message: 'Age must be at least 18', path: ['age'] });
-    }
-
-    if (!formValues.joinDate) {
-      issues.push({ message: 'Join date is required', path: ['joinDate'] });
-    }
-
-    const validRoles = ['Market', 'Finance', 'Development'];
-    if (!formValues.role || !validRoles.includes(formValues.role)) {
-      issues.push({
-        message: 'Role must be "Market", "Finance" or "Development"',
-        path: ['role'],
-      });
+      issues = [...issues, { message: 'Age is required', path: ['age'] }];
+    } else if (formValues.age <= 0) {
+      issues = [
+        ...issues,
+        { message: 'Must be at least 1 year old', path: ['age'] },
+      ];
     }
 
     return { issues };
   },
 };
 
-export const employeesCache = new DataSourceCache();
+const peopleCache = new DataSourceCache();
 
 function matchPath(pattern, pathname) {
   const regex = new RegExp(`^${pattern.replace(/:[^/]+/g, '([^/]+)')}$`);
@@ -254,13 +230,14 @@ function matchPath(pattern, pathname) {
 }
 
 function DemoPageContent({ pathname }) {
-  if (pathname.includes('/employees')) {
+  if (pathname.includes('/people')) {
     return (
       <Crud
-        dataSource={employeesDataSource}
-        dataSourceCache={employeesCache}
-        rootPath="/employees"
+        dataSource={peopleDataSource}
+        dataSourceCache={peopleCache}
+        rootPath="/people"
         initialPageSize={10}
+        defaultValues={{ age: 18 }}
       />
     );
   }
@@ -293,16 +270,16 @@ function Introduction(props) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   const title = React.useMemo(() => {
-    if (router.pathname === '/employees/new') {
-      return 'New Employee';
+    if (router.pathname === '/people/new') {
+      return 'New Person';
     }
-    const editEmployeeId = matchPath('/employees/:employeeId/edit', router.pathname);
-    if (editEmployeeId) {
-      return `Employee ${editEmployeeId} - Edit`;
+    const editPersonId = matchPath('/people/:peopleId/edit', router.pathname);
+    if (editPersonId) {
+      return `Person ${editPersonId} - Edit`;
     }
-    const showEmployeeId = matchPath('/employees/:employeeId', router.pathname);
-    if (showEmployeeId) {
-      return `Employee ${showEmployeeId}`;
+    const showPersonId = matchPath('/people/:peopleId', router.pathname);
+    if (showPersonId) {
+      return `Person ${showPersonId}`;
     }
 
     return undefined;

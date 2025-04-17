@@ -16,7 +16,8 @@ import type {} from '@mui/material/themeCssVarsAugmentation';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import invariant from 'invariant';
 import { Link } from '../shared/Link';
-import { DashboardSidebarPageItemContext } from '../shared/context';
+import { DashboardSidebarPageItemContext, NavigationContext } from '../shared/context';
+import { getItemPath, getItemTitle } from '../shared/navigation';
 import { MINI_DRAWER_WIDTH } from './shared';
 import type { Navigation, NavigationPageItem } from '../AppProvider';
 
@@ -54,6 +55,7 @@ export interface DashboardSidebarPageItemProps {
   item: NavigationPageItem;
   /**
    * Link `href` for when the item is rendered as a link.
+   * @default getItemPath(navigationContext, item)
    */
   href?: string;
   /**
@@ -78,11 +80,9 @@ export interface DashboardSidebarPageItemProps {
   disabled?: boolean;
 }
 
-export interface DashboardSidebarPageItemContextProps extends DashboardSidebarPageItemProps {
+export interface DashboardSidebarPageItemContextProps {
   id: string;
   onClick: (itemId: string, item: NavigationPageItem) => void;
-  title: string;
-  href: string;
   isMini?: boolean;
   isSidebarFullyExpanded?: boolean;
   isSidebarFullyCollapsed?: boolean;
@@ -101,30 +101,29 @@ const LIST_ITEM_ICON_SIZE = 34;
  * - [DashboardSidebarPageItem API](https://mui.com/toolpad/core/api/dashboard-sidebar-page-item)
  */
 function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
-  const pageItemContext = React.useContext(DashboardSidebarPageItemContext);
+  const navigationContext = React.useContext(NavigationContext);
 
-  invariant(pageItemContext, 'No navigation page item context provided.');
+  const {
+    item,
+    href = getItemPath(navigationContext, item),
+    Link: LinkProp,
+    expanded = false,
+    selected = false,
+    disabled = false,
+  } = props;
 
-  const contextAwareProps = {
-    ...pageItemContext,
-    ...props,
-  };
+  const pageItemContextProps = React.useContext(DashboardSidebarPageItemContext);
+
+  invariant(pageItemContextProps, 'No navigation page item context provided.');
 
   const {
     id,
-    item,
     onClick,
-    title,
-    href,
-    Link: LinkProp,
-    expanded = false,
     isMini = false,
-    selected = false,
-    disabled = false,
     isSidebarFullyExpanded = true,
     isSidebarFullyCollapsed = false,
     renderNestedNavigation,
-  } = contextAwareProps;
+  } = pageItemContextProps;
 
   const [hoveredMiniSidebarItemId, setHoveredMiniSidebarItemId] = React.useState<string | null>(
     null,
@@ -158,6 +157,8 @@ function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
   const hasExternalHref = href.startsWith('http://') || href.startsWith('https://');
 
   const LinkComponent = LinkProp ?? (hasExternalHref ? 'a' : Link);
+
+  const title = getItemTitle(item);
 
   const listItem = (
     <ListItem
@@ -324,6 +325,7 @@ DashboardSidebarPageItem.propTypes /* remove-proptypes */ = {
   expanded: PropTypes.bool,
   /**
    * Link `href` for when the item is rendered as a link.
+   * @default getItemPath(navigationContext, item)
    */
   href: PropTypes.string,
   /**

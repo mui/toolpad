@@ -60,16 +60,11 @@ function DashboardSidebarSubNavigationPageItem({
       ? hasSelectedNavigationChildren(navigationContext, item, activePage.path)
       : isActive && !item.children;
 
-  const pageItemContext: DashboardSidebarPageItemContextProps = React.useMemo(
+  const pageItemContextProps: DashboardSidebarPageItemContextProps = React.useMemo(
     () => ({
       id,
-      item,
       onClick,
-      title: getItemTitle(item),
-      href: getItemPath(navigationContext, item),
-      expanded: isExpanded,
       isMini,
-      selected: isSelected,
       isSidebarFullyExpanded: isFullyExpanded,
       isSidebarFullyCollapsed: isFullyCollapsed,
       renderNestedNavigation: () => (
@@ -81,27 +76,15 @@ function DashboardSidebarSubNavigationPageItem({
         />
       ),
     }),
-    [
-      depth,
-      id,
-      isExpanded,
-      isFullyCollapsed,
-      isFullyExpanded,
-      isMini,
-      isSelected,
-      item,
-      navigationContext,
-      onClick,
-      onLinkClick,
-    ],
+    [depth, id, isFullyCollapsed, isFullyExpanded, isMini, item.children, onClick, onLinkClick],
   );
 
   return (
-    <DashboardSidebarPageItemContext.Provider value={pageItemContext}>
+    <DashboardSidebarPageItemContext.Provider value={pageItemContextProps}>
       {renderPageItem ? (
         renderPageItem(item, { mini: isMini })
       ) : (
-        <DashboardSidebarPageItem item={item} />
+        <DashboardSidebarPageItem item={item} expanded={isExpanded} selected={isSelected} />
       )}
     </DashboardSidebarPageItemContext.Provider>
   );

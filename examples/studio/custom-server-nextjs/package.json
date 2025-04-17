@@ -11,7 +11,7 @@
   "dependencies": {
     "@toolpad/studio": "0.5.2",
     "express": "4.20.0",
-    "next": "14.2.25",
+    "next": "14.2.26",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

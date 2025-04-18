@@ -11,7 +11,7 @@ import {
   WindowContext,
 } from '../shared/context';
 import type { LinkProps } from '../shared/Link';
-import { AppThemeProvider } from './AppThemeProvider';
+import { AppThemeProvider, COLOR_SCHEME_ATTRIBUTE } from './AppThemeProvider';
 import { LocalizationProvider, type LocaleText } from './LocalizationProvider';
 
 export interface NavigateOptions {
@@ -131,7 +131,7 @@ export interface AppProviderProps {
 function createTheme(): Theme {
   return createMuiTheme({
     cssVariables: {
-      colorSchemeSelector: 'data-toolpad-color-scheme',
+      colorSchemeSelector: COLOR_SCHEME_ATTRIBUTE,
     },
     colorSchemes: { dark: true },
   });

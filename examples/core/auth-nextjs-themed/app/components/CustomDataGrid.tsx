@@ -6,7 +6,6 @@ export default function CustomizedDataGrid(props: DataGridProps) {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <DataGrid
         {...props}
-        checkboxSelection
         getRowClassName={(params) => (params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd')}
         initialState={{
           pagination: { paginationModel: { pageSize: 20 } },

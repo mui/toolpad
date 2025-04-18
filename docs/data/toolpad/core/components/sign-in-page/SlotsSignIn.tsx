@@ -2,8 +2,8 @@ import * as React from 'react';
 import {
   Button,
   FormControl,
-  FormControlLabel,
   Checkbox,
+  FormControlLabel,
   InputLabel,
   OutlinedInput,
   TextField,
@@ -125,18 +125,20 @@ function Title() {
 
 function Subtitle() {
   return (
-    <Alert sx={{ mb: 2, px: 1, py: 0.25 }} severity="warning">
+    <Alert sx={{ mb: 2, px: 1, py: 0.25, width: '100%' }} severity="warning">
       We are investigating an ongoing outage.
     </Alert>
   );
 }
 
-function AgreeWithTerms() {
+function RememberMeCheckbox() {
+  const theme = useTheme();
   return (
     <FormControlLabel
+      label="Remember me"
       control={
         <Checkbox
-          name="tandc"
+          name="remember"
           value="true"
           color="primary"
           sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
@@ -144,11 +146,10 @@ function AgreeWithTerms() {
       }
       slotProps={{
         typography: {
-          fontSize: 14,
+          color: 'textSecondary',
+          fontSize: theme.typography.pxToRem(14),
         },
       }}
-      color="textSecondary"
-      label="I agree with the T&C"
     />
   );
 }
@@ -160,7 +161,7 @@ export default function SlotsSignIn() {
       <SignInPage
         signIn={(provider, formData) =>
           alert(
-            `Logging in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}, and checkbox value: ${formData.get('tandc')}`,
+            `Logging in with "${provider.name}" and credentials: ${formData.get('email')}, ${formData.get('password')}, and checkbox value: ${formData.get('remember')}`,
           )
         }
         slots={{
@@ -170,9 +171,10 @@ export default function SlotsSignIn() {
           passwordField: CustomPasswordField,
           submitButton: CustomButton,
           signUpLink: SignUpLink,
-          rememberMe: AgreeWithTerms,
+          rememberMe: RememberMeCheckbox,
           forgotPasswordLink: ForgotPasswordLink,
         }}
+        slotProps={{ form: { noValidate: true } }}
         providers={providers}
       />
     </AppProvider>

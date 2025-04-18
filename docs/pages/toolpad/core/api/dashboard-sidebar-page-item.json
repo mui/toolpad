@@ -1,0 +1,24 @@
+{
+  "props": {
+    "item": {
+      "type": {
+        "name": "shape",
+        "description": "{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', pattern?: string, segment?: string, title?: string }"
+      },
+      "required": true
+    },
+    "disabled": { "type": { "name": "bool" }, "default": "false" },
+    "expanded": { "type": { "name": "bool" }, "default": "false" },
+    "href": { "type": { "name": "string" }, "default": "getItemPath(navigationContext, item)" },
+    "LinkComponent": { "type": { "name": "elementType" }, "default": "Link" },
+    "selected": { "type": { "name": "bool" }, "default": "false" }
+  },
+  "name": "DashboardSidebarPageItem",
+  "imports": ["import { DashboardSidebarPageItem } from '@toolpad/core/DashboardLayout';"],
+  "classes": [],
+  "muiName": "DashboardSidebarPageItem",
+  "filename": "/packages/toolpad-core/src/DashboardLayout/DashboardSidebarPageItem.tsx",
+  "inheritance": null,
+  "demos": "<ul><li><a href=\"/toolpad/core/react-dashboard-layout/\">Dashboard Layout</a></li></ul>",
+  "cssComponent": false
+}

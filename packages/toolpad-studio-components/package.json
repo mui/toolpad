@@ -59,8 +59,8 @@
   },
   "devDependencies": {
     "@types/invariant": "2.2.37",
-    "@types/react": "^19.0.12",
-    "react": "^19.0.0"
+    "@types/react": "^19.1.2",
+    "react": "^19.1.0"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0"

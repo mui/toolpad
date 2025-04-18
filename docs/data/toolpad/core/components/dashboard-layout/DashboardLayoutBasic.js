@@ -8,6 +8,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { useDemoRouter } from '@toolpad/core/internal';
@@ -99,22 +101,32 @@ function DashboardLayoutBasic(props) {
 
   const router = useDemoRouter('/dashboard');
 
-  // Remove this const when copying and pasting into your project.
+  // Remove these variables when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
+  const demoEmotionCache = React.useMemo(
+    () =>
+      createCache({
+        key: 'toolpad-demo-app',
+        container: demoWindow?.document.head,
+      }),
+    [demoWindow?.document.head],
+  );
 
   return (
-    // preview-start
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout>
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-    </AppProvider>
-    // preview-end
+    <CacheProvider value={demoEmotionCache}>
+      {/* preview-start */}
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout>
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+      </AppProvider>
+      {/* preview-end */}
+    </CacheProvider>
   );
 }
 

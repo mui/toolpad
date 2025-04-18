@@ -127,7 +127,7 @@ function DashboardSidebarSubNavigation({
         mb: depth === 0 && !isPopover ? 4 : 0.5,
         pl: (isPopover ? 1 : 2) * (isPopover ? depth - 1 : depth),
         minWidth: isPopover && depth === 1 ? 240 : 'auto',
-        width: isMini ? MINI_DRAWER_WIDTH : 'auto',
+        width: isMini ? MINI_DRAWER_WIDTH - 2 : 'auto',
       }}
     >
       {subNavigation.map((navigationItem, navigationItemIndex) => {

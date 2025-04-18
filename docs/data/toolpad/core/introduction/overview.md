@@ -8,7 +8,7 @@ title: Toolpad Overview
 
 Toolpad Core is a set of full-stack react components that leverages existing MUI components, and ties them with the commonly-used backend integrations to help you create responsive dashboards and internal tools. It comes with the guarantee of MUI's enterprise-tested components, and the Toolpad team's focus on using the latest stable libraries, and prioritising razor-sharp performance.
 
-{{"demo": "../components/dashboard-layout/DashboardLayoutNavigationLinks.js", "height": 500, "iframe": true, "hideToolbar": true}}
+{{"demo": "./Introduction.js", "height": 600, "iframe": true, "hideToolbar": true}}
 
 ## Overview
 
@@ -26,6 +26,7 @@ It follows the open-core model, with some features being available under the MIT
 - High performance 🚀
 - [Layout and Navigation](/toolpad/core/react-dashboard-layout/)
 - [Page Container](/toolpad/core/react-page-container/)
+- [CRUD](/toolpad/core/react-crud/)
 - [Authentication](/toolpad/core/react-sign-in-page/)
 - [Dialogs](/toolpad/core/react-use-dialogs/)
 - [Notifications](/toolpad/core/react-use-notifications/)

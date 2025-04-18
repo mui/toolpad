@@ -80,7 +80,8 @@ export interface DashboardSidebarPageItemProps {
   disabled?: boolean;
 }
 
-export interface DashboardSidebarPageItemContextProps {
+export interface DashboardSidebarPageItemContextProps
+  extends Partial<DashboardSidebarPageItemProps> {
   id: string;
   onClick: (itemId: string, item: NavigationPageItem) => void;
   isMini?: boolean;
@@ -102,6 +103,14 @@ const LIST_ITEM_ICON_SIZE = 34;
  */
 function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
   const navigationContext = React.useContext(NavigationContext);
+  const pageItemContextProps = React.useContext(DashboardSidebarPageItemContext);
+
+  invariant(pageItemContextProps, 'No navigation page item context provided.');
+
+  const contextAwareProps = {
+    ...pageItemContextProps,
+    ...props,
+  };
 
   const {
     item,
@@ -110,20 +119,13 @@ function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
     expanded = false,
     selected = false,
     disabled = false,
-  } = props;
-
-  const pageItemContextProps = React.useContext(DashboardSidebarPageItemContext);
-
-  invariant(pageItemContextProps, 'No navigation page item context provided.');
-
-  const {
     id,
     onClick,
     isMini = false,
     isSidebarFullyExpanded = true,
     isSidebarFullyCollapsed = false,
     renderNestedNavigation,
-  } = pageItemContextProps;
+  } = contextAwareProps;
 
   const [hoveredMiniSidebarItemId, setHoveredMiniSidebarItemId] = React.useState<string | null>(
     null,

@@ -62,6 +62,8 @@ function DashboardSidebarSubNavigationPageItem({
 
   const pageItemContextProps: DashboardSidebarPageItemContextProps = React.useMemo(
     () => ({
+      expanded: isExpanded,
+      selected: isSelected,
       id,
       onClick,
       isMini,
@@ -76,7 +78,18 @@ function DashboardSidebarSubNavigationPageItem({
         />
       ),
     }),
-    [depth, id, isFullyCollapsed, isFullyExpanded, isMini, item.children, onClick, onLinkClick],
+    [
+      depth,
+      id,
+      isExpanded,
+      isFullyCollapsed,
+      isFullyExpanded,
+      isMini,
+      isSelected,
+      item.children,
+      onClick,
+      onLinkClick,
+    ],
   );
 
   return (
@@ -84,7 +97,7 @@ function DashboardSidebarSubNavigationPageItem({
       {renderPageItem ? (
         renderPageItem(item, { mini: isMini })
       ) : (
-        <DashboardSidebarPageItem item={item} expanded={isExpanded} selected={isSelected} />
+        <DashboardSidebarPageItem item={item} />
       )}
     </DashboardSidebarPageItemContext.Provider>
   );

@@ -314,9 +314,6 @@ function SignInPage(props: SignInPageProps) {
   const globalLocaleText = useLocaleText();
   const localeText = { ...defaultLocaleText, ...globalLocaleText, ...propsLocaleText };
 
-  const passkeyProvider = providers?.find((provider) => provider.id === 'passkey');
-  const credentialsProvider = providers?.find((provider) => provider.id === 'credentials');
-  const emailProvider = providers?.find((provider) => provider.id === 'nodemailer');
   const [{ loading, selectedProviderId, error, success }, setFormStatus] = React.useState<{
     loading: boolean;
     selectedProviderId?: SupportedAuthProvider;
@@ -331,9 +328,29 @@ function SignInPage(props: SignInPageProps) {
 
   const callbackUrl = router?.searchParams.get('callbackUrl') ?? '/';
   const singleProvider = React.useMemo(() => providers?.length === 1, [providers]);
+
   const isOauthProvider = React.useCallback(
     (provider?: SupportedAuthProvider) =>
       provider && provider !== 'credentials' && provider !== 'nodemailer' && provider !== 'passkey',
+    [],
+  );
+  const hasOauthProvider = React.useMemo(
+    () => providers?.some((provider) => isOauthProvider(provider.id)),
+    [isOauthProvider, providers],
+  );
+
+  const isPasskeyProvider = React.useCallback(
+    (provider?: SupportedAuthProvider) => provider && provider === 'passkey',
+    [],
+  );
+
+  const isEmailProvider = React.useCallback(
+    (provider?: SupportedAuthProvider) => provider && provider === 'nodemailer',
+    [],
+  );
+
+  const isCredentialsProvider = React.useCallback(
+    (provider?: SupportedAuthProvider) => provider && provider === 'credentials',
     [],
   );
 
@@ -440,290 +457,300 @@ function SignInPage(props: SignInPageProps) {
                 })}
             </Stack>
 
-            {passkeyProvider ? (
-              <React.Fragment>
-                {singleProvider ? null : (
-                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
-                )}
-                {error && selectedProviderId === 'passkey' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
-                    {error}
-                  </Alert>
-                ) : null}
-                <Box
-                  component="form"
-                  onSubmit={async (event) => {
-                    setFormStatus({
-                      error: '',
-                      selectedProviderId: passkeyProvider.id,
-                      loading: true,
-                    });
-                    event.preventDefault();
-                    const formData = new FormData(event.currentTarget);
-                    const passkeyResponse = await signIn?.(passkeyProvider, formData, callbackUrl);
-                    setFormStatus((prev) => ({
-                      ...prev,
-                      loading: false,
-                      error: passkeyResponse?.error,
-                    }));
-                  }}
-                  {...slotProps?.form}
-                >
-                  {slots?.emailField ? (
-                    <slots.emailField {...slotProps?.emailField} />
-                  ) : (
-                    <TextField
-                      {...getCommonTextFieldProps(theme, {
-                        label: localeText.email,
-                        placeholder: 'your@email.com',
-                        id: 'email-passkey',
-                        name: 'email',
-                        type: 'email',
-                        autoComplete: 'email-webauthn',
-                        autoFocus: singleProvider,
-                        ...slotProps?.emailField,
-                      })}
-                    />
-                  )}
-                  {slots?.submitButton ? (
-                    <slots.submitButton {...slotProps?.submitButton} />
-                  ) : (
-                    <Button
-                      type="submit"
-                      fullWidth
-                      size="large"
-                      variant="outlined"
-                      disableElevation
-                      startIcon={IconProviderMap.get(passkeyProvider.id)}
-                      color="inherit"
-                      loading={loading && selectedProviderId === passkeyProvider.id}
-                      sx={{
-                        mt: 3,
-                        mb: 2,
-                        textTransform: 'capitalize',
-                      }}
-                      {...slotProps?.submitButton}
-                    >
-                      {localeText.providerSignInTitle(passkeyProvider.name || localeText.passkey)}
-                    </Button>
-                  )}
-                </Box>
-              </React.Fragment>
-            ) : null}
-
-            {emailProvider ? (
-              <React.Fragment>
-                {singleProvider ? null : (
-                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
-                )}
-                {error && selectedProviderId === 'nodemailer' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
-                    {error}
-                  </Alert>
-                ) : null}
-                {success && selectedProviderId === 'nodemailer' ? (
-                  <Alert sx={{ my: 2 }} severity="success">
-                    {success}
-                  </Alert>
-                ) : null}
-                <Box
-                  component="form"
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    setFormStatus({
-                      error: '',
-                      selectedProviderId: emailProvider.id,
-                      loading: true,
-                    });
-                    const formData = new FormData(event.currentTarget);
-                    const emailResponse = await signIn?.(emailProvider, formData, callbackUrl);
-                    setFormStatus((prev) => ({
-                      ...prev,
-                      loading: false,
-                      error: emailResponse?.error,
-                      success: emailResponse?.success,
-                    }));
-                  }}
-                  {...slotProps?.form}
-                >
-                  {slots?.emailField ? (
-                    <slots.emailField {...slotProps?.emailField} />
-                  ) : (
-                    <TextField
-                      {...getCommonTextFieldProps(theme, {
-                        label: localeText.email,
-                        placeholder: 'your@email.com',
-                        name: 'email',
-                        id: 'email-nodemailer',
-                        type: 'email',
-                        autoComplete: 'email-nodemailer',
-                        autoFocus: singleProvider,
-                        ...slotProps?.emailField,
-                      })}
-                    />
-                  )}
-                  {slots?.submitButton ? (
-                    <slots.submitButton {...slotProps?.submitButton} />
-                  ) : (
-                    <Button
-                      type="submit"
-                      fullWidth
-                      size="large"
-                      variant="outlined"
-                      disableElevation
-                      id="submit-nodemailer"
-                      color="inherit"
-                      loading={loading && selectedProviderId === emailProvider.id}
-                      sx={{
-                        mt: 3,
-                        mb: 2,
-                        textTransform: 'capitalize',
-                      }}
-                      {...slotProps?.submitButton}
-                    >
-                      {localeText.providerSignInTitle(
-                        (emailProvider.name || localeText.email).toLocaleLowerCase(),
-                      )}
-                    </Button>
-                  )}
-                </Box>
-              </React.Fragment>
-            ) : null}
-
-            {credentialsProvider ? (
-              <React.Fragment>
-                {singleProvider ? null : (
-                  <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
-                )}
-                {error && selectedProviderId === 'credentials' ? (
-                  <Alert sx={{ my: 2 }} severity="error">
-                    {error}
-                  </Alert>
-                ) : null}
-                <Box
-                  component="form"
-                  onSubmit={async (event) => {
-                    setFormStatus({
-                      error: '',
-                      selectedProviderId: credentialsProvider.id,
-                      loading: true,
-                    });
-                    event.preventDefault();
-                    const formData = new FormData(event.currentTarget);
-                    const credentialsResponse = await signIn?.(
-                      credentialsProvider,
-                      formData,
-                      callbackUrl,
-                    );
-                    setFormStatus((prev) => ({
-                      ...prev,
-                      loading: false,
-                      error: credentialsResponse?.error,
-                    }));
-                  }}
-                  {...slotProps?.form}
-                >
-                  <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
-                    {slots?.emailField ? (
-                      <slots.emailField {...slotProps?.emailField} />
-                    ) : (
-                      <TextField
-                        {...getCommonTextFieldProps(theme, {
-                          label: localeText.email,
-                          placeholder: 'your@email.com',
-                          id: 'email',
-                          name: 'email',
-                          type: 'email',
-                          autoComplete: 'email',
-                          autoFocus: singleProvider,
-                          ...slotProps?.emailField,
-                        })}
-                      />
-                    )}
-                    {slots?.passwordField ? (
-                      <slots.passwordField {...slotProps?.passwordField} />
-                    ) : (
-                      <TextField
-                        {...getCommonTextFieldProps(theme, {
-                          name: 'password',
-                          type: 'password',
-                          label: localeText.password,
-                          id: 'password',
-                          placeholder: '*****',
-                          autoComplete: 'current-password',
-                          ...slotProps?.passwordField,
-                        })}
-                      />
-                    )}
-                  </Stack>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    spacing={1}
-                    sx={{
-                      justifyContent: 'space-between',
-                    }}
-                  >
-                    {slots?.rememberMe ? (
-                      <slots.rememberMe {...slotProps?.rememberMe} />
-                    ) : (
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            name="remember"
-                            value="true"
-                            color="primary"
-                            sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
-                          />
-                        }
-                        label={localeText.signInRememberMe}
-                        {...slotProps?.rememberMe}
-                        slotProps={{
-                          typography: {
-                            color: 'textSecondary',
-                            fontSize: theme.typography.pxToRem(14),
-                          },
-                          ...slotProps?.rememberMe?.slotProps,
-                        }}
-                      />
-                    )}
-                    {slots?.forgotPasswordLink ? (
-                      <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
+            {Object.values(providers ?? {})
+              .filter((provider) => !isOauthProvider(provider.id))
+              .map((provider: AuthProvider, index: number) => {
+                return (
+                  <React.Fragment key={provider.id}>
+                    {isPasskeyProvider(provider.id) ? (
+                      <React.Fragment>
+                        {hasOauthProvider || index > 0 ? (
+                          <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                        ) : null}
+                        {error && selectedProviderId === 'passkey' ? (
+                          <Alert sx={{ my: 2 }} severity="error">
+                            {error}
+                          </Alert>
+                        ) : null}
+                        <Box
+                          component="form"
+                          onSubmit={async (event) => {
+                            setFormStatus({
+                              error: '',
+                              selectedProviderId: provider.id,
+                              loading: true,
+                            });
+                            event.preventDefault();
+                            const formData = new FormData(event.currentTarget);
+                            const passkeyResponse = await signIn?.(provider, formData, callbackUrl);
+                            setFormStatus((prev) => ({
+                              ...prev,
+                              loading: false,
+                              error: passkeyResponse?.error,
+                            }));
+                          }}
+                          {...slotProps?.form}
+                        >
+                          {slots?.emailField ? (
+                            <slots.emailField {...slotProps?.emailField} />
+                          ) : (
+                            <TextField
+                              {...getCommonTextFieldProps(theme, {
+                                label: localeText.email,
+                                placeholder: 'your@email.com',
+                                id: 'email-passkey',
+                                name: 'email',
+                                type: 'email',
+                                autoComplete: 'email-webauthn',
+                                autoFocus: singleProvider,
+                                ...slotProps?.emailField,
+                              })}
+                            />
+                          )}
+                          {slots?.submitButton ? (
+                            <slots.submitButton {...slotProps?.submitButton} />
+                          ) : (
+                            <Button
+                              type="submit"
+                              fullWidth
+                              size="large"
+                              variant="outlined"
+                              disableElevation
+                              startIcon={IconProviderMap.get(provider.id)}
+                              color="inherit"
+                              loading={loading && selectedProviderId === provider.id}
+                              sx={{
+                                mt: 3,
+                                mb: 2,
+                                textTransform: 'capitalize',
+                              }}
+                              {...slotProps?.submitButton}
+                            >
+                              {localeText.providerSignInTitle(provider.name || localeText.passkey)}
+                            </Button>
+                          )}
+                        </Box>
+                      </React.Fragment>
                     ) : null}
-                  </Stack>
-                  {slots?.submitButton ? (
-                    <slots.submitButton {...slotProps?.submitButton} />
-                  ) : (
-                    <Button
-                      type="submit"
-                      fullWidth
-                      size="large"
-                      variant="contained"
-                      disableElevation
-                      color="primary"
-                      loading={loading && selectedProviderId === credentialsProvider.id}
-                      sx={{
-                        mt: 3,
-                        mb: 2,
-                        textTransform: 'capitalize',
-                      }}
-                      {...slotProps?.submitButton}
-                    >
-                      {localeText.providerSignInTitle(
-                        (credentialsProvider.name || localeText.password).toLocaleLowerCase(),
-                      )}
-                    </Button>
-                  )}
 
-                  {slots?.signUpLink ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                      {slots?.signUpLink ? <slots.signUpLink {...slotProps?.signUpLink} /> : null}
-                    </Box>
-                  ) : null}
-                </Box>
-              </React.Fragment>
-            ) : null}
+                    {isEmailProvider(provider.id) ? (
+                      <React.Fragment>
+                        {hasOauthProvider || index > 0 ? (
+                          <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                        ) : null}
+                        {error && selectedProviderId === 'nodemailer' ? (
+                          <Alert sx={{ my: 2 }} severity="error">
+                            {error}
+                          </Alert>
+                        ) : null}
+                        {success && selectedProviderId === 'nodemailer' ? (
+                          <Alert sx={{ my: 2 }} severity="success">
+                            {success}
+                          </Alert>
+                        ) : null}
+                        <Box
+                          component="form"
+                          onSubmit={async (event) => {
+                            event.preventDefault();
+                            setFormStatus({
+                              error: '',
+                              selectedProviderId: provider.id,
+                              loading: true,
+                            });
+                            const formData = new FormData(event.currentTarget);
+                            const emailResponse = await signIn?.(provider, formData, callbackUrl);
+                            setFormStatus((prev) => ({
+                              ...prev,
+                              loading: false,
+                              error: emailResponse?.error,
+                              success: emailResponse?.success,
+                            }));
+                          }}
+                          {...slotProps?.form}
+                        >
+                          {slots?.emailField ? (
+                            <slots.emailField {...slotProps?.emailField} />
+                          ) : (
+                            <TextField
+                              {...getCommonTextFieldProps(theme, {
+                                label: localeText.email,
+                                placeholder: 'your@email.com',
+                                name: 'email',
+                                id: 'email-nodemailer',
+                                type: 'email',
+                                autoComplete: 'email-nodemailer',
+                                autoFocus: singleProvider,
+                                ...slotProps?.emailField,
+                              })}
+                            />
+                          )}
+                          {slots?.submitButton ? (
+                            <slots.submitButton {...slotProps?.submitButton} />
+                          ) : (
+                            <Button
+                              type="submit"
+                              fullWidth
+                              size="large"
+                              variant="outlined"
+                              disableElevation
+                              id="submit-nodemailer"
+                              color="inherit"
+                              loading={loading && selectedProviderId === provider.id}
+                              sx={{
+                                mt: 3,
+                                mb: 2,
+                                textTransform: 'capitalize',
+                              }}
+                              {...slotProps?.submitButton}
+                            >
+                              {localeText.providerSignInTitle(
+                                (provider.name || localeText.email).toLocaleLowerCase(),
+                              )}
+                            </Button>
+                          )}
+                        </Box>
+                      </React.Fragment>
+                    ) : null}
+
+                    {isCredentialsProvider(provider.id) ? (
+                      <React.Fragment>
+                        {hasOauthProvider || index > 0 ? (
+                          <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
+                        ) : null}
+                        {error && selectedProviderId === 'credentials' ? (
+                          <Alert sx={{ my: 2 }} severity="error">
+                            {error}
+                          </Alert>
+                        ) : null}
+                        <Box
+                          component="form"
+                          onSubmit={async (event) => {
+                            setFormStatus({
+                              error: '',
+                              selectedProviderId: provider.id,
+                              loading: true,
+                            });
+                            event.preventDefault();
+                            const formData = new FormData(event.currentTarget);
+                            const credentialsResponse = await signIn?.(
+                              provider,
+                              formData,
+                              callbackUrl,
+                            );
+                            setFormStatus((prev) => ({
+                              ...prev,
+                              loading: false,
+                              error: credentialsResponse?.error,
+                            }));
+                          }}
+                          {...slotProps?.form}
+                        >
+                          <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
+                            {slots?.emailField ? (
+                              <slots.emailField {...slotProps?.emailField} />
+                            ) : (
+                              <TextField
+                                {...getCommonTextFieldProps(theme, {
+                                  label: localeText.email,
+                                  placeholder: 'your@email.com',
+                                  id: 'email',
+                                  name: 'email',
+                                  type: 'email',
+                                  autoComplete: 'email',
+                                  autoFocus: singleProvider,
+                                  ...slotProps?.emailField,
+                                })}
+                              />
+                            )}
+                            {slots?.passwordField ? (
+                              <slots.passwordField {...slotProps?.passwordField} />
+                            ) : (
+                              <TextField
+                                {...getCommonTextFieldProps(theme, {
+                                  name: 'password',
+                                  type: 'password',
+                                  label: localeText.password,
+                                  id: 'password',
+                                  placeholder: '*****',
+                                  autoComplete: 'current-password',
+                                  ...slotProps?.passwordField,
+                                })}
+                              />
+                            )}
+                          </Stack>
+                          <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            spacing={1}
+                            sx={{
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            {slots?.rememberMe ? (
+                              <slots.rememberMe {...slotProps?.rememberMe} />
+                            ) : (
+                              <FormControlLabel
+                                control={
+                                  <Checkbox
+                                    name="remember"
+                                    value="true"
+                                    color="primary"
+                                    sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
+                                  />
+                                }
+                                label={localeText.signInRememberMe}
+                                {...slotProps?.rememberMe}
+                                slotProps={{
+                                  typography: {
+                                    color: 'textSecondary',
+                                    fontSize: theme.typography.pxToRem(14),
+                                  },
+                                  ...slotProps?.rememberMe?.slotProps,
+                                }}
+                              />
+                            )}
+                            {slots?.forgotPasswordLink ? (
+                              <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
+                            ) : null}
+                          </Stack>
+                          {slots?.submitButton ? (
+                            <slots.submitButton {...slotProps?.submitButton} />
+                          ) : (
+                            <Button
+                              type="submit"
+                              fullWidth
+                              size="large"
+                              variant="outlined"
+                              disableElevation
+                              color="inherit"
+                              loading={loading && selectedProviderId === provider.id}
+                              sx={{
+                                mt: 3,
+                                mb: 2,
+                                textTransform: 'capitalize',
+                              }}
+                              {...slotProps?.submitButton}
+                            >
+                              {localeText.providerSignInTitle(
+                                (provider.name || localeText.password).toLocaleLowerCase(),
+                              )}
+                            </Button>
+                          )}
+
+                          {slots?.signUpLink ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                              {slots?.signUpLink ? (
+                                <slots.signUpLink {...slotProps?.signUpLink} />
+                              ) : null}
+                            </Box>
+                          ) : null}
+                        </Box>
+                      </React.Fragment>
+                    ) : null}
+                  </React.Fragment>
+                );
+              })}
           </Box>
         </Box>
       </Container>

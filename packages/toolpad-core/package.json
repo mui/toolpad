@@ -27,9 +27,8 @@
   "scripts": {
     "clean": "rimraf build",
     "prebuild": "pnpm clean",
-    "build": "pnpm build:node && pnpm build:modern && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
+    "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
     "build:node": "node ../../scripts/build.mjs node",
-    "build:modern": "node ../../scripts/build.mjs modern",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
     "build:types": "tsx ../../scripts/buildTypes.mts",
@@ -43,7 +42,9 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.27.0",
-    "@mui/utils": "^7.0.0",
+    "@mui/x-data-grid": "^8.0.0 || ^8.0.0-beta",
+    "@mui/x-date-pickers": "^8.0.0 || ^8.0.0-beta",
+    "@mui/utils": "^7.0.2",
     "@standard-schema/spec": "^1.0.0",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.3.4",
@@ -54,12 +55,10 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
-    "@mui/icons-material": "^7.0.0",
-    "@mui/material": "^7.0.0",
-    "@mui/x-data-grid": "^8.0.0 || ^8.0.0-beta",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
     "@mui/x-data-grid-premium": "^8.0.0 || ^8.0.0-beta",
     "@mui/x-data-grid-pro": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-date-pickers": "^8.0.0 || ^8.0.0-beta",
     "@types/invariant": "2.2.37",
     "@types/prop-types": "15.7.14",
     "@types/react": "^19.0.12",
@@ -76,10 +75,6 @@
   "peerDependencies": {
     "@mui/icons-material": "^7.0.0-beta || ^7.0.0",
     "@mui/material": "^7.0.0-beta || ^7.0.0",
-    "@mui/x-data-grid": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-data-grid-premium": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-data-grid-pro": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-date-pickers": "^8.0.0 || ^8.0.0-beta",
     "next": "^14 || ^15",
     "react": "^18 || ^19",
     "react-router": "^7"

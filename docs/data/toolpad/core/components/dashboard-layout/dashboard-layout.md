@@ -171,11 +171,11 @@ Some possibly useful slots:
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
 
-### User account in layout sidebar
+#### User account in layout sidebar
 
 {{"demo": "DashboardLayoutAccountSidebar.js", "height": 400, "iframe": true}}
 
-### Settings menu with custom theme switcher
+#### Settings menu with custom theme switcher
 
 The `useColorScheme` hook can be used to create a custom theme switcher.
 

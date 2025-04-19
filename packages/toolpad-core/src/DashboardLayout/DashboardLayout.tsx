@@ -2,13 +2,9 @@
 
 import * as React from 'react';
 import PropTypes from 'prop-types';
-
-// MUI: Styles & Theme
 import { styled, useTheme, SxProps } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-
-// MUI: Components
 import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -16,21 +12,13 @@ import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
 import Tooltip from '@mui/material/Tooltip';
-
-// MUI: Icons
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-
-// Toolpad: Context
 import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
-
-// Toolpad: Components
 import { Account, type AccountProps } from '../Account';
 import { AppTitle, type AppTitleProps } from './AppTitle';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
-
-// Toolpad: Utils & Constants
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 import { MINI_DRAWER_WIDTH } from './shared';
 import type { Branding, Navigation } from '../AppProvider';
@@ -70,20 +58,16 @@ export interface DashboardLayoutSlots {
   /**
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
-   * @deprecated Use `slots.toolbar` instead.
+   * @deprecated Use `slots.toolbar` instead for full customization of the toolbar.
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
-   *
-   * TODO: Remove this deprecated prop in the next major version.
    */
   toolbarActions?: React.JSXElementConstructor<{}>;
 
   /**
    * The toolbar account component used in the layout header.
    * @default Account
-   * @deprecated Use `slots.toolbar` instead.
+   * @deprecated Use `slots.toolbar` instead for full customization of the toolbar.
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
-   *
-   * TODO: Remove this deprecated prop in the next major version.
    */
   toolbarAccount?: React.JSXElementConstructor<AccountProps>;
 
@@ -95,10 +79,8 @@ export interface DashboardLayoutSlots {
 
   /**
    * Use this slot to replace the full default toolbar.
-   *
    * This component will completely override the internal layout of the top bar.
    * You can still use the built-in `<AppTitle />`, `<ToolbarActions />` and `<Account />` components inside.
-   *
    * @default null
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
@@ -619,6 +601,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
       }),
     }),
     toolbarActions: PropTypes.object,
+    toolbar: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -629,6 +612,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,
+    toolbar: PropTypes.elementType,
   }),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.

@@ -159,13 +159,13 @@ Some possibly useful slots:
 
 - `appTitle`: allows you to customize the app title section in the layout header.
 
-- `toolbarAccount`: (deprecated, use toolbar) allows you to replace the default `Account` slot in the header.
+- `toolbarActions`: (deprecated) allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
 
-- `toolbarActions`: (deprecated, use toolbar) allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
+- `toolbarAccount`: (deprecated) allows you to replace the default `Account` slot in the header.
 
-- `sidebarFooter`: allows you to add footer content in the sidebar.
+- `toolbar`: allows you to completely customize the toolbar layout. This slot gives you full control over the toolbar's structure while still allowing you to use the built-in components like `AppTitle`, `ToolbarActions`, and `Account`.
 
-- `toolbar`: This component will completely override the internal layout of the top bar and allows full control over the toolbar. The default `ToolbarActions` component, menuIcon and `Account` can be imported and used if you wish to do so, as shown in the example below.
+- `sidebarFooter`: allows you to add a footer to the sidebar.
 
 ### sidebarFooter
 
@@ -180,9 +180,3 @@ Some possibly useful slots:
 The `useColorScheme` hook can be used to create a custom theme switcher.
 
 {{"demo": "DashboardLayoutCustomThemeSwitcher.js", "height": 400, "iframe": true}}
-
-### Replaced the full toolbar with a custom one
-
-The `toolbar` slot can be replaced with a custom component, that in turn reuses the out of the box `Account`, `menuIcon`, `AppTitle`and `ToolbarActions` components, giving full control on their order, appearance and behavior.
-
-{{"demo": "DashboardLayoutCustomToolbar.js", "height": 400, "iframe": true}}

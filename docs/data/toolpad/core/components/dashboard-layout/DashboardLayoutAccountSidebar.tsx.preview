@@ -1,5 +1,16 @@
-<DashboardLayout
-  slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
->
-  <DemoPageContent pathname={pathname} />
-</DashboardLayout>
+<DemoProvider window={demoWindow}>
+  <AppProvider
+    navigation={NAVIGATION}
+    router={router}
+    theme={demoTheme}
+    window={demoWindow}
+    authentication={authentication}
+    session={session}
+  >
+    <DashboardLayout
+      slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
+    >
+      <DemoPageContent pathname={pathname} />
+    </DashboardLayout>
+  </AppProvider>
+</DemoProvider>

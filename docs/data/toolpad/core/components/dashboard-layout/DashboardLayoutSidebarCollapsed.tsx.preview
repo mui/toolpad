@@ -1,3 +1,12 @@
-<DashboardLayout defaultSidebarCollapsed>
-  <DemoPageContent pathname={pathname} />
-</DashboardLayout>
+<DemoProvider window={demoWindow}>
+  <AppProvider
+    navigation={NAVIGATION}
+    router={router}
+    theme={demoTheme}
+    window={demoWindow}
+  >
+    <DashboardLayout defaultSidebarCollapsed>
+      <DemoPageContent pathname={pathname} />
+    </DashboardLayout>
+  </AppProvider>
+</DemoProvider>

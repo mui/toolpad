@@ -8,11 +8,9 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
-import createCache from '@emotion/cache';
-import { CacheProvider } from '@emotion/react';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -101,19 +99,12 @@ function DashboardLayoutBasic(props) {
 
   const router = useDemoRouter('/dashboard');
 
-  // Remove these variables when copying and pasting into your project.
+  // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
-  const demoEmotionCache = React.useMemo(
-    () =>
-      createCache({
-        key: 'toolpad-demo-app',
-        container: demoWindow?.document.head,
-      }),
-    [demoWindow?.document.head],
-  );
 
   return (
-    <CacheProvider value={demoEmotionCache}>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
       {/* preview-start */}
       <AppProvider
         navigation={NAVIGATION}
@@ -126,7 +117,7 @@ function DashboardLayoutBasic(props) {
         </DashboardLayout>
       </AppProvider>
       {/* preview-end */}
-    </CacheProvider>
+    </DemoProvider>
   );
 }
 

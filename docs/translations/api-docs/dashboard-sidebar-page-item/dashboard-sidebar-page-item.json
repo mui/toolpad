@@ -6,7 +6,7 @@
       "description": "If <code>true</code>, expands any nested navigation in the item, otherwise collapse it."
     },
     "href": { "description": "Link <code>href</code> for when the item is rendered as a link." },
-    "item": { "description": "Navigation item definition." },
+    "item": { "description": "Navigation page item definition." },
     "LinkComponent": { "description": "The component used to render the item as a link." },
     "selected": { "description": "Use to apply selected styling." }
   },

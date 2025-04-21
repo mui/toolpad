@@ -50,7 +50,7 @@ const NavigationListItemButton = styled(ListItemButton)(({ theme }) => ({
 
 export interface DashboardSidebarPageItemProps {
   /**
-   * Navigation item definition.
+   * Navigation page item definition.
    */
   item: NavigationPageItem;
   /**
@@ -331,7 +331,7 @@ DashboardSidebarPageItem.propTypes /* remove-proptypes */ = {
    */
   href: PropTypes.string,
   /**
-   * Navigation item definition.
+   * Navigation page item definition.
    */
   item: PropTypes.shape({
     action: PropTypes.node,

@@ -171,6 +171,7 @@ export default function DashboardLayoutCustomPageItems(props: DemoProps) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
+  // preview-start
   const renderPageItem = React.useCallback(
     (item: NavigationPageItem, { mini }: { mini: boolean }) => {
       if (item.title === 'External Link') {
@@ -198,6 +199,7 @@ export default function DashboardLayoutCustomPageItems(props: DemoProps) {
     },
     [],
   );
+  // preview-end
 
   return (
     <AppProvider
@@ -206,9 +208,11 @@ export default function DashboardLayoutCustomPageItems(props: DemoProps) {
       theme={demoTheme}
       window={demoWindow}
     >
+      {/* preview-start */}
       <DashboardLayout renderPageItem={renderPageItem}>
         <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
+      {/* preview-end */}
     </AppProvider>
   );
 }

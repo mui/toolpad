@@ -182,6 +182,7 @@ function DashboardLayoutCustomPageItems(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
+  // preview-start
   const renderPageItem = React.useCallback((item, { mini }) => {
     if (item.title === 'External Link') {
       return (
@@ -206,6 +207,7 @@ function DashboardLayoutCustomPageItems(props) {
 
     return <DashboardSidebarPageItem item={item} />;
   }, []);
+  // preview-end
 
   return (
     <AppProvider
@@ -214,9 +216,11 @@ function DashboardLayoutCustomPageItems(props) {
       theme={demoTheme}
       window={demoWindow}
     >
+      {/* preview-start */}
       <DashboardLayout renderPageItem={renderPageItem}>
         <DemoPageContent pathname={router.pathname} />
       </DashboardLayout>
+      {/* preview-end */}
     </AppProvider>
   );
 }

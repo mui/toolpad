@@ -6,17 +6,19 @@ import CustomDataGrid from '../../../components/CustomDataGrid';
 
 export default function EmployeesCrudPage() {
   return (
-    <Crud<Employee>
-      dataSource={employeesDataSource}
-      dataSourceCache={employeesCache}
-      rootPath="/employees"
-      initialPageSize={20}
-      defaultValues={{ title: 'New Employee' }}
-      slots={{
-        list: {
-          dataGrid: CustomDataGrid,
-        },
-      }}
-    />
+    <div className="employee-edit-container">
+      <Crud<Employee>
+        dataSource={employeesDataSource}
+        dataSourceCache={employeesCache}
+        rootPath="/employees"
+        initialPageSize={20}
+        defaultValues={{ title: 'New Employee' }}
+        slots={{
+          list: {
+            dataGrid: CustomDataGrid,
+          },
+        }}
+      />
+    </div>
   );
 }

@@ -11,7 +11,7 @@ import {
   type Navigation,
 } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {

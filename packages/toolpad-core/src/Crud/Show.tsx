@@ -12,6 +12,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import type { GridSingleSelectColDef } from '@mui/x-data-grid';
 import invariant from 'invariant';
 import dayjs from 'dayjs';
 import { useDialogs } from '../useDialogs';
@@ -174,6 +175,36 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
       }
       if (type === 'dateTime') {
         return fieldValue ? dayjs(fieldValue as string).format('MMMM D, YYYY h:mm A') : '-';
+      }
+      if (type === 'singleSelect') {
+        const { getOptionValue, getOptionLabel, valueOptions } =
+          showField as GridSingleSelectColDef;
+
+        if (valueOptions && Array.isArray(valueOptions)) {
+          const selectedOption = valueOptions.find((option) => {
+            let optionValue: string | number = option as string | number;
+            if (typeof option !== 'string' && typeof option !== 'number') {
+              optionValue = getOptionValue ? getOptionValue(option) : option.value;
+            }
+
+            return optionValue === fieldValue;
+          });
+
+          if (selectedOption) {
+            let selectedOptionLabel: string | number = selectedOption as string | number;
+            if (
+              selectedOption &&
+              typeof selectedOption !== 'string' &&
+              typeof selectedOption !== 'number'
+            ) {
+              selectedOptionLabel = getOptionLabel
+                ? getOptionLabel(selectedOption)
+                : selectedOption.label;
+            }
+
+            return selectedOptionLabel ? String(selectedOptionLabel) : '-';
+          }
+        }
       }
 
       return fieldValue ? String(fieldValue) : '-';

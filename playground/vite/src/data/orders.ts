@@ -32,7 +32,10 @@ export const ordersDataSource: DataSource<Order> = {
       field: 'status',
       headerName: 'Status',
       type: 'singleSelect',
-      valueOptions: ['Pending', 'Sent'],
+      valueOptions: [
+        { value: '1', label: 'Pending' },
+        { value: '2', label: 'Sent' },
+      ],
     },
     { field: 'itemCount', headerName: 'No. of items', type: 'number' },
     { field: 'fastDelivery', headerName: 'Fast delivery', type: 'boolean' },
@@ -184,9 +187,6 @@ export const ordersDataSource: DataSource<Order> = {
   validate: z.object({
     title: z.string({ required_error: 'Title is required' }).nonempty('Title is required'),
     description: z.string().optional(),
-    status: z.enum(['Pending', 'Sent'], {
-      errorMap: () => ({ message: 'Status must be "Pending" or "Sent"' }),
-    }),
     itemCount: z
       .number({ required_error: 'Item count is required' })
       .min(1, 'Item count must be at least 1'),

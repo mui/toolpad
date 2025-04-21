@@ -192,11 +192,7 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
 
           if (selectedOption) {
             let selectedOptionLabel: string | number = selectedOption as string | number;
-            if (
-              selectedOption &&
-              typeof selectedOption !== 'string' &&
-              typeof selectedOption !== 'number'
-            ) {
+            if (typeof selectedOption !== 'string' && typeof selectedOption !== 'number') {
               selectedOptionLabel = getOptionLabel
                 ? getOptionLabel(selectedOption)
                 : selectedOption.label;

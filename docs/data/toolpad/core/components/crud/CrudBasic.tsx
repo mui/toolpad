@@ -249,7 +249,6 @@ export default function CrudBasic(props: DemoProps) {
   return (
     // Remove this provider when copying and pasting into your project.
     <DemoProvider window={demoWindow}>
-      {/* preview-start */}
       <AppProvider
         navigation={NAVIGATION}
         router={router}
@@ -258,6 +257,7 @@ export default function CrudBasic(props: DemoProps) {
       >
         <DashboardLayout defaultSidebarCollapsed>
           <PageContainer title={title}>
+            {/* preview-start */}
             <Crud<Note>
               dataSource={notesDataSource}
               dataSourceCache={notesCache}
@@ -265,10 +265,10 @@ export default function CrudBasic(props: DemoProps) {
               initialPageSize={10}
               defaultValues={{ title: 'New note' }}
             />
+            {/* preview-end */}
           </PageContainer>
         </DashboardLayout>
       </AppProvider>
-      {/* preview-end */}
     </DemoProvider>
   );
 }

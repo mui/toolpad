@@ -132,7 +132,6 @@ export default function CrudCreate(props: DemoProps) {
   return (
     // Remove this provider when copying and pasting into your project.
     <DemoProvider window={demoWindow}>
-      {/* preview-start */}
       <AppProvider
         navigation={NAVIGATION}
         router={router}
@@ -141,6 +140,7 @@ export default function CrudCreate(props: DemoProps) {
       >
         <DashboardLayout defaultSidebarCollapsed>
           <PageContainer title="New Person">
+            {/* preview-start */}
             <Create<Person>
               dataSource={peopleDataSource}
               dataSourceCache={peopleCache}
@@ -148,10 +148,10 @@ export default function CrudCreate(props: DemoProps) {
               onSubmitSuccess={handleSubmitSuccess}
               resetOnSubmit
             />
+            {/* preview-end */}
           </PageContainer>
         </DashboardLayout>
       </AppProvider>
-      {/* preview-end */}
     </DemoProvider>
   );
 }

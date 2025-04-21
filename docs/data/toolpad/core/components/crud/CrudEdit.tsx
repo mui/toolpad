@@ -153,7 +153,6 @@ export default function CrudEdit(props: DemoProps) {
   return (
     // Remove this provider when copying and pasting into your project.
     <DemoProvider window={demoWindow}>
-      {/* preview-start */}
       <AppProvider
         navigation={NAVIGATION}
         router={router}
@@ -162,16 +161,17 @@ export default function CrudEdit(props: DemoProps) {
       >
         <DashboardLayout defaultSidebarCollapsed>
           <PageContainer title="Edit Person">
+            {/* preview-start */}
             <Edit<Person>
               id={1}
               dataSource={peopleDataSource}
               dataSourceCache={peopleCache}
               onSubmitSuccess={handleSubmitSuccess}
             />
+            {/* preview-end */}
           </PageContainer>
         </DashboardLayout>
       </AppProvider>
-      {/* preview-end */}
     </DemoProvider>
   );
 }

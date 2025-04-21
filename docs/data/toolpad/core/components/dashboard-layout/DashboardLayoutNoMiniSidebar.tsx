@@ -78,7 +78,6 @@ export default function DashboardLayoutNoMiniSidebar(props: DemoProps) {
   return (
     // Remove this provider when copying and pasting into your project.
     <DemoProvider window={demoWindow}>
-      {/* preview-start */}
       <AppProvider
         navigation={NAVIGATION}
         router={router}
@@ -89,7 +88,6 @@ export default function DashboardLayoutNoMiniSidebar(props: DemoProps) {
           <DemoPageContent pathname={router.pathname} />
         </DashboardLayout>
       </AppProvider>
-      {/* preview-end */}
     </DemoProvider>
   );
 }

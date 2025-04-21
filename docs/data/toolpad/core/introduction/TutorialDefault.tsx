@@ -73,9 +73,11 @@ export default function TutorialDefault(props: DemoProps) {
         theme={demoTheme}
         window={demoWindow}
       >
+        {/* preview-start */}
         <DashboardLayout>
           <DemoPageContent pathname={demoRouter.pathname} />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

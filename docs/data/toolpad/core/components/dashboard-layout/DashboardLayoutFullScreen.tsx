@@ -54,6 +54,7 @@ export default function DashboardLayoutFullScreen(props: DemoProps) {
         theme={demoTheme}
         window={demoWindow}
       >
+        {/* preview-start */}
         <DashboardLayout>
           <iframe
             title="Google Map"
@@ -63,6 +64,7 @@ export default function DashboardLayoutFullScreen(props: DemoProps) {
             loading="lazy"
           />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

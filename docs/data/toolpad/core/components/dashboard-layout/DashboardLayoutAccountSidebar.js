@@ -279,11 +279,13 @@ function DashboardLayoutAccountSidebar(props) {
         authentication={authentication}
         session={session}
       >
+        {/* preview-start */}
         <DashboardLayout
           slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
         >
           <DemoPageContent pathname={pathname} />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

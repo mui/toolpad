@@ -55,9 +55,11 @@ function DashboardLayoutSidebarHidden(props) {
     // Remove this provider when copying and pasting into your project.
     <DemoProvider window={demoWindow}>
       <AppProvider router={router} theme={demoTheme} window={demoWindow}>
+        {/* preview-start */}
         <DashboardLayout hideNavigation>
           <DemoPageContent pathname={router.pathname} />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

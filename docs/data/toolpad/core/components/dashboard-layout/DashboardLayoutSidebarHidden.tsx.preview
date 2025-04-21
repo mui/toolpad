@@ -1,5 +1,3 @@
-<AppProvider router={router} theme={demoTheme} window={demoWindow}>
-  <DashboardLayout hideNavigation>
-    <DemoPageContent pathname={router.pathname} />
-  </DashboardLayout>
-</AppProvider>
+<DashboardLayout hideNavigation>
+  <DemoPageContent pathname={router.pathname} />
+</DashboardLayout>

@@ -1,14 +1,7 @@
-<AppProvider
-  navigation={NAVIGATION}
-  router={router}
-  theme={demoTheme}
-  window={demoWindow}
+<DashboardLayout
+  slots={{
+    toolbarActions: CustomThemeSwitcher,
+  }}
 >
-  <DashboardLayout
-    slots={{
-      toolbarActions: CustomThemeSwitcher,
-    }}
-  >
-    <DemoPageContent pathname={router.pathname} />
-  </DashboardLayout>
-</AppProvider>
+  <DemoPageContent pathname={router.pathname} />
+</DashboardLayout>

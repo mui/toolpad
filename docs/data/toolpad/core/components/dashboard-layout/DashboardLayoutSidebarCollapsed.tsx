@@ -96,9 +96,11 @@ export default function DashboardLayoutSidebarCollapsed(props: DemoProps) {
         theme={demoTheme}
         window={demoWindow}
       >
+        {/* preview-start */}
         <DashboardLayout defaultSidebarCollapsed>
           <DemoPageContent pathname={pathname} />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

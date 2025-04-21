@@ -88,9 +88,11 @@ function TutorialPages(props) {
         theme={demoTheme}
         window={demoWindow}
       >
+        {/* preview-start */}
         <DashboardLayout>
           <DemoPageContent pathname={demoRouter.pathname} />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

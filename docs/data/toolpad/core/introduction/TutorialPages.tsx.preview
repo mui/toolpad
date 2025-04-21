@@ -1,10 +1,3 @@
-<AppProvider
-  navigation={NAVIGATION}
-  router={demoRouter}
-  theme={demoTheme}
-  window={demoWindow}
->
-  <DashboardLayout>
-    <DemoPageContent pathname={demoRouter.pathname} />
-  </DashboardLayout>
-</AppProvider>
+<DashboardLayout>
+  <DemoPageContent pathname={demoRouter.pathname} />
+</DashboardLayout>

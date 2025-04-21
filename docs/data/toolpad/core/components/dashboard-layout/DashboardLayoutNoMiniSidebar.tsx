@@ -84,9 +84,11 @@ export default function DashboardLayoutNoMiniSidebar(props: DemoProps) {
         theme={demoTheme}
         window={demoWindow}
       >
+        {/* preview-start */}
         <DashboardLayout disableCollapsibleSidebar>
           <DemoPageContent pathname={router.pathname} />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

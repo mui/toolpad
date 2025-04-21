@@ -155,6 +155,7 @@ export default function DashboardLayoutSlots(props: DemoProps) {
         theme={demoTheme}
         window={demoWindow}
       >
+        {/* preview-start */}
         <DashboardLayout
           slots={{
             appTitle: CustomAppTitle,
@@ -164,6 +165,7 @@ export default function DashboardLayoutSlots(props: DemoProps) {
         >
           <DemoPageContent pathname={router.pathname} />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

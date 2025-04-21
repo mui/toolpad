@@ -151,6 +151,7 @@ export default function DashboardLayoutCustomThemeSwitcher(props: DemoProps) {
         theme={demoTheme}
         window={demoWindow}
       >
+        {/* preview-start */}
         <DashboardLayout
           slots={{
             toolbarActions: CustomThemeSwitcher,
@@ -158,6 +159,7 @@ export default function DashboardLayoutCustomThemeSwitcher(props: DemoProps) {
         >
           <DemoPageContent pathname={router.pathname} />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

@@ -47,6 +47,7 @@ function DashboardLayoutFullScreen(props) {
         theme={demoTheme}
         window={demoWindow}
       >
+        {/* preview-start */}
         <DashboardLayout>
           <iframe
             title="Google Map"
@@ -56,6 +57,7 @@ function DashboardLayoutFullScreen(props) {
             loading="lazy"
           />
         </DashboardLayout>
+        {/* preview-end */}
       </AppProvider>
     </DemoProvider>
   );

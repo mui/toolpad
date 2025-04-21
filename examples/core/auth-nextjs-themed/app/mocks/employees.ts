@@ -12,38 +12,7 @@ export interface Employee extends DataModel {
   role: EmployeeRole;
 }
 
-const INITIAL_EMPLOYEES_STORE: Employee[] = [
-  {
-    id: 1,
-    name: 'Edward Perry',
-    age: 25,
-    joinDate: new Date().toISOString(),
-    role: 'Finance',
-  },
-  {
-    id: 2,
-    name: 'Josephine Drake',
-    age: 36,
-    joinDate: new Date().toISOString(),
-    role: 'Market',
-  },
-  {
-    id: 3,
-    name: 'Cody Phillips',
-    age: 19,
-    joinDate: new Date().toISOString(),
-    role: 'Development',
-  },
-];
-
-const getEmployeesStore = (): Employee[] => {
-  const value = localStorage.getItem('employees-store');
-  return value ? JSON.parse(value) : INITIAL_EMPLOYEES_STORE;
-};
-
-const setEmployeesStore = (value: Employee[]) => {
-  return localStorage.setItem('employees-store', JSON.stringify(value));
-};
+const API_URL = '/api/employees';
 
 export const employeesDataSource: DataSource<Employee> = {
   fields: [
@@ -66,136 +35,70 @@ export const employeesDataSource: DataSource<Employee> = {
     },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
+    const queryParams = new URLSearchParams();
 
-    const employeesStore = getEmployeesStore();
-
-    let filteredEmployees = [...employeesStore];
-
-    // Apply filters (example only)
-    if (filterModel?.items?.length) {
-      filterModel.items.forEach(({ field, value, operator }) => {
-        if (!field || value == null) {
-          return;
-        }
-
-        filteredEmployees = filteredEmployees.filter((employee) => {
-          const employeeValue = employee[field];
-
-          switch (operator) {
-            case 'contains':
-              return String(employeeValue).toLowerCase().includes(String(value).toLowerCase());
-            case 'equals':
-              return employeeValue === value;
-            case 'startsWith':
-              return String(employeeValue).toLowerCase().startsWith(String(value).toLowerCase());
-            case 'endsWith':
-              return String(employeeValue).toLowerCase().endsWith(String(value).toLowerCase());
-            case '>':
-              return (employeeValue as number) > value;
-            case '<':
-              return (employeeValue as number) < value;
-            default:
-              return true;
-          }
-        });
-      });
-    }
-
-    // Apply sorting
+    queryParams.append('page', paginationModel.page.toString());
+    queryParams.append('pageSize', paginationModel.pageSize.toString());
     if (sortModel?.length) {
-      filteredEmployees.sort((a, b) => {
-        for (const { field, sort } of sortModel) {
-          if ((a[field] as number) < (b[field] as number)) {
-            return sort === 'asc' ? -1 : 1;
-          }
-          if ((a[field] as number) > (b[field] as number)) {
-            return sort === 'asc' ? 1 : -1;
-          }
-        }
-        return 0;
-      });
+      queryParams.append('sort', JSON.stringify(sortModel));
+    }
+    if (filterModel?.items?.length) {
+      queryParams.append('filter', JSON.stringify(filterModel.items));
     }
 
-    // Apply pagination
-    const start = paginationModel.page * paginationModel.pageSize;
-    const end = start + paginationModel.pageSize;
-    const paginatedEmployees = filteredEmployees.slice(start, end);
+    const res = await fetch(`${API_URL}?${queryParams.toString()}`, {
+      method: 'GET',
+    });
+    const resJson = await res.json();
 
-    return {
-      items: paginatedEmployees,
-      itemCount: filteredEmployees.length,
-    };
+    if (!res.ok) {
+      throw new Error(resJson.error);
+    }
+    return resJson;
   },
   getOne: async (employeeId) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
+    const res = await fetch(`${API_URL}/${employeeId}`);
+    const resJson = await res.json();
 
-    const employeesStore = getEmployeesStore();
-
-    const employeeToShow = employeesStore.find((employee) => employee.id === Number(employeeId));
-
-    if (!employeeToShow) {
-      throw new Error('Employee not found');
+    if (!res.ok) {
+      throw new Error(resJson.error);
     }
-    return employeeToShow;
+    return resJson;
   },
   createOne: async (data) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' },
     });
+    const resJson = await res.json();
 
-    const employeesStore = getEmployeesStore();
-
-    const newEmployee = {
-      id: employeesStore.reduce((max, employee) => Math.max(max, employee.id), 0) + 1,
-      ...data,
-    } as Employee;
-
-    setEmployeesStore([...employeesStore, newEmployee]);
-
-    return newEmployee;
+    if (!res.ok) {
+      throw new Error(resJson.error);
+    }
+    return resJson;
   },
   updateOne: async (employeeId, data) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
+    const res = await fetch(`${API_URL}/${employeeId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: { 'Content-Type': 'application/json' },
     });
+    const resJson = await res.json();
 
-    const employeesStore = getEmployeesStore();
-
-    let updatedEmployee: Employee | null = null;
-
-    setEmployeesStore(
-      employeesStore.map((employee) => {
-        if (employee.id === Number(employeeId)) {
-          updatedEmployee = { ...employee, ...data };
-          return updatedEmployee;
-        }
-        return employee;
-      }),
-    );
-
-    if (!updatedEmployee) {
-      throw new Error('Employee not found');
+    if (!res.ok) {
+      throw new Error(resJson.error);
     }
-    return updatedEmployee;
+    return resJson;
   },
   deleteOne: async (employeeId) => {
-    // Simulate loading delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 750);
-    });
+    const res = await fetch(`${API_URL}/${employeeId}`, { method: 'DELETE' });
+    const resJson = await res.json();
 
-    const employeesStore = getEmployeesStore();
-
-    setEmployeesStore(employeesStore.filter((employee) => employee.id !== Number(employeeId)));
+    if (!res.ok) {
+      throw new Error(resJson.error);
+    }
+    return resJson;
   },
   validate: z.object({
     name: z.string({ required_error: 'Name is required' }).nonempty('Name is required'),
@@ -204,9 +107,7 @@ export const employeesDataSource: DataSource<Employee> = {
       .string({ required_error: 'Join date is required' })
       .nonempty('Join date is required'),
     role: z.enum(['Market', 'Finance', 'Development'], {
-      errorMap: () => ({
-        message: 'Role must be "Market", "Finance" or "Development"',
-      }),
+      errorMap: () => ({ message: 'Role must be "Market", "Finance" or "Development"' }),
     }),
   })['~standard'].validate,
 };

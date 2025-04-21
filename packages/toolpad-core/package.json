@@ -55,6 +55,8 @@
     "prop-types": "15.8.1"
   },
   "devDependencies": {
+    "@emotion/cache": "11.14.0",
+    "@emotion/react": "11.14.0",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
     "@mui/x-data-grid-premium": "^8.0.0 || ^8.0.0-beta",
@@ -73,6 +75,8 @@
     "vitest": "2.1.9"
   },
   "peerDependencies": {
+    "@emotion/cache": "^11",
+    "@emotion/react": "^11",
     "@mui/icons-material": "^7.0.0-beta || ^7.0.0",
     "@mui/material": "^7.0.0-beta || ^7.0.0",
     "next": "^14 || ^15",

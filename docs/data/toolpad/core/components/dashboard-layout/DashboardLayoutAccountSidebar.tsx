@@ -21,6 +21,7 @@ import {
   AccountPreviewProps,
 } from '@toolpad/core/Account';
 import type { Navigation, Router, Session } from '@toolpad/core/AppProvider';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
@@ -254,19 +255,22 @@ export default function DashboardLayoutAccountSidebar(props: DemoProps) {
   }, []);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-      authentication={authentication}
-      session={session}
-    >
-      <DashboardLayout
-        slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+        authentication={authentication}
+        session={session}
       >
-        <DemoPageContent pathname={pathname} />
-      </DashboardLayout>
-    </AppProvider>
+        <DashboardLayout
+          slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
+        >
+          <DemoPageContent pathname={pathname} />
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }

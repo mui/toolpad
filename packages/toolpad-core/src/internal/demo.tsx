@@ -1,11 +1,35 @@
 'use client';
 import * as React from 'react';
+import createCache from '@emotion/cache';
+import { CacheProvider } from '@emotion/react';
 import { Router } from '../AppProvider';
 
 /**
  * Internal utility for demos
  * @ignore - internal component.
  */
+
+interface DemoProviderProps {
+  /**
+   * The window where the application is rendered.
+   * @default window
+   */
+  window?: Window;
+  children: React.ReactNode;
+}
+
+export function DemoProvider({ window, children }: DemoProviderProps) {
+  const demoEmotionCache = React.useMemo(
+    () =>
+      createCache({
+        key: 'toolpad-demo-app',
+        container: window?.document.head,
+      }),
+    [window?.document.head],
+  );
+
+  return <CacheProvider value={demoEmotionCache}>{children}</CacheProvider>;
+}
 
 const DUMMY_BASE = 'https://example.com';
 

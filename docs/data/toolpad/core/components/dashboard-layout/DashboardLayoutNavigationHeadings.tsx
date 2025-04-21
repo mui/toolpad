@@ -5,7 +5,7 @@ import { createTheme } from '@mui/material/styles';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -56,36 +56,39 @@ export default function DashboardLayoutNavigationHeadings(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    // preview-start
-    <AppProvider
-      navigation={[
-        {
-          kind: 'header',
-          title: 'Animals',
-        },
-        {
-          segment: 'lion',
-          title: 'Lion',
-          icon: <DescriptionIcon />,
-        },
-        {
-          kind: 'header',
-          title: 'Movies',
-        },
-        {
-          segment: 'lord-of-the-rings',
-          title: 'Lord of the Rings',
-          icon: <DescriptionIcon />,
-        },
-      ]}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout>
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-    </AppProvider>
-    // preview-end
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      {/* preview-start */}
+      <AppProvider
+        navigation={[
+          {
+            kind: 'header',
+            title: 'Animals',
+          },
+          {
+            segment: 'lion',
+            title: 'Lion',
+            icon: <DescriptionIcon />,
+          },
+          {
+            kind: 'header',
+            title: 'Movies',
+          },
+          {
+            segment: 'lord-of-the-rings',
+            title: 'Lord of the Rings',
+            icon: <DescriptionIcon />,
+          },
+        ]}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout>
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+      </AppProvider>
+      {/* preview-end */}
+    </DemoProvider>
   );
 }

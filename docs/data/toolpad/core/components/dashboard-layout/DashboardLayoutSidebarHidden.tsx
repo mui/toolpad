@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme } from '@mui/material/styles';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -55,10 +55,13 @@ export default function DashboardLayoutSidebarHidden(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <AppProvider router={router} theme={demoTheme} window={demoWindow}>
-      <DashboardLayout hideNavigation>
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider router={router} theme={demoTheme} window={demoWindow}>
+        <DashboardLayout hideNavigation>
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }

@@ -11,6 +11,7 @@ import {
   type Navigation,
 } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
@@ -87,15 +88,18 @@ export default function DashboardLayoutSidebarCollapsed(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <DemoPageContent pathname={pathname} />
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <DemoPageContent pathname={pathname} />
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }

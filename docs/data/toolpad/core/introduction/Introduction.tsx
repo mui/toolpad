@@ -8,7 +8,7 @@ import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { Crud, DataModel, DataSource, DataSourceCache } from '@toolpad/core/Crud';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
@@ -296,19 +296,22 @@ export default function Introduction(props: DemoProps) {
   }, [router.pathname]);
 
   return (
-    // preview-start
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer title={title}>
-          <DemoPageContent pathname={router.pathname} />
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
-    // preview-end
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      {/* preview-start */}
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <PageContainer title={title}>
+            <DemoPageContent pathname={router.pathname} />
+          </PageContainer>
+        </DashboardLayout>
+      </AppProvider>
+      {/* preview-end */}
+    </DemoProvider>
   );
 }

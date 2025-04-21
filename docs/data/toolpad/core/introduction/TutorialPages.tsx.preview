@@ -1,12 +1,10 @@
-<DemoProvider window={demoWindow}>
-  <AppProvider
-    navigation={NAVIGATION}
-    router={demoRouter}
-    theme={demoTheme}
-    window={demoWindow}
-  >
-    <DashboardLayout>
-      <DemoPageContent pathname={demoRouter.pathname} />
-    </DashboardLayout>
-  </AppProvider>
-</DemoProvider>
+<AppProvider
+  navigation={NAVIGATION}
+  router={demoRouter}
+  theme={demoTheme}
+  window={demoWindow}
+>
+  <DashboardLayout>
+    <DemoPageContent pathname={demoRouter.pathname} />
+  </DashboardLayout>
+</AppProvider>

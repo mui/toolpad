@@ -8,6 +8,7 @@ import CheckBoxOutlineBlankRoundedIcon from '@mui/icons-material/CheckBoxOutline
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import RemoveRoundedIcon from '@mui/icons-material/RemoveRounded';
 import { gray, brand } from '../themePrimitives';
+import theme from '../../theme';
 
 export const inputsCustomizations: Components<Theme> = {
   MuiButtonBase: {
@@ -442,27 +443,8 @@ export const inputsCustomizations: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         color: theme.palette.grey[500],
-        '.employee-edit-container & .MuiIconButton-root': {
-          border: 'none',
-          '&:hover': {
-            backgroundColor: 'rgba(0, 0, 0, 0.04)',
-            border: 'none',
-          },
-          '&:active': {
-            border: 'none',
-          },
-        },
         ...theme.applyStyles('dark', {
           color: theme.palette.grey[400],
-          '.employee-edit-container & .MuiIconButton-root': {
-            backgroundColor: 'transparent',
-            border: 'none',
-            height: 24,
-            '&:hover': {
-              backgroundColor: theme.palette.grey[900],
-              border: 'none',
-            },
-          },
         }),
       }),
     },
@@ -471,6 +453,24 @@ export const inputsCustomizations: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         typography: theme.typography.caption,
+      }),
+    },
+  },
+  MuiPickersInputBase: {
+    styleOverrides: {
+      // @ts-expect-error
+      root: ({ theme }) => ({
+        marginTop: '6px',
+        border: `1px solid ${theme.palette.divider}`,
+        ' .MuiPickersInputBase-sectionsContainer': {
+          padding: '10px 0',
+        },
+        ' .MuiPickersOutlinedInput-notchedOutline': {
+          border: 0,
+        },
+        ' .MuiIconButton-root': {
+          border: 0,
+        },
       }),
     },
   },

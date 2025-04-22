@@ -1,0 +1,33 @@
+const renderPageItem = React.useCallback(
+  (item: NavigationPageItem, { mini }: { mini: boolean }) => {
+    if (item.title === 'External Link') {
+      return (
+        <DashboardSidebarPageItem item={item} href="https://www.mui.com/toolpad" />
+      );
+    }
+    if (item.title === 'Selected Item') {
+      return <DashboardSidebarPageItem item={item} selected />;
+    }
+    if (item.title === 'Disabled Item') {
+      return <DashboardSidebarPageItem item={item} disabled />;
+    }
+    if (item.title === 'Hidden Item') {
+      return null;
+    }
+    if (item.title === 'Expanded Folder') {
+      return <DashboardSidebarPageItem item={item} expanded />;
+    }
+    if (item.title === 'Custom Item') {
+      return <CustomPageItem item={item} mini={mini} />;
+    }
+
+    return <DashboardSidebarPageItem item={item} />;
+  },
+  [],
+);
+
+// ...
+
+<DashboardLayout renderPageItem={renderPageItem}>
+  <DemoPageContent pathname={router.pathname} />
+</DashboardLayout>

@@ -33,16 +33,16 @@ interface DemoProviderProps {
   children: React.ReactNode;
 }
 // Wrapper for demo applications in the documentation
-export function DemoProvider({ window: appWindow, children }: DemoProviderProps) {
+export function DemoProvider({ window, children }: DemoProviderProps) {
   useExternalProductionWarning({ featureName: 'DemoProvider' });
 
   const demoEmotionCache = React.useMemo(
     () =>
       createCache({
         key: 'toolpad-demo-app',
-        container: appWindow?.document.head,
+        container: window?.document.head,
       }),
-    [appWindow?.document.head],
+    [window?.document.head],
   );
 
   return <CacheProvider value={demoEmotionCache}>{children}</CacheProvider>;

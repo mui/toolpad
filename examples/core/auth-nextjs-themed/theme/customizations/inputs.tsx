@@ -455,4 +455,22 @@ export const inputsCustomizations: Components<Theme> = {
       }),
     },
   },
+  MuiPickersInputBase: {
+    styleOverrides: {
+      // @ts-expect-error
+      root: ({ theme }) => ({
+        marginTop: '6px',
+        border: `1px solid ${theme.palette.divider}`,
+        ' .MuiPickersInputBase-sectionsContainer': {
+          padding: '10px 0',
+        },
+        ' .MuiPickersOutlinedInput-notchedOutline': {
+          border: 0,
+        },
+        ' .MuiIconButton-root': {
+          border: 0,
+        },
+      }),
+    },
+  },
 };

@@ -629,8 +629,8 @@ importers:
         specifier: workspace:*
         version: link:../toolpad-utils/build
       '@vitejs/plugin-react':
-        specifier: 4.3.4
-        version: 4.3.4(vite@5.4.18(@types/node@20.17.30)(terser@5.39.0))
+        specifier: 4.4.1
+        version: 4.4.1(vite@5.4.18(@types/node@20.17.30)(terser@5.39.0))
       client-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -4122,6 +4122,12 @@ packages:
 
   '@vitejs/plugin-react@4.3.4':
     resolution: {integrity: sha512-SCCPBJtYLdE8PX/7ZQAs1QAZ8Jqwih+0VBLum1EGqmCCQal+MIUqLCzj3ZUy8ufbC0cAM4LRlSTm7IQJwWT4ug==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: ^4.2.0 || ^5.0.0 || ^6.0.0
+
+  '@vitejs/plugin-react@4.4.1':
+    resolution: {integrity: sha512-IpEm5ZmeXAP/osiBXVVP5KjFMzbWOonMs0NaQQl+xYnUAcq4oHUBsF2+p4MgKWG4YMmFYJU8A6sxRPuowllm6w==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0
@@ -8250,6 +8256,10 @@ packages:
 
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
+    engines: {node: '>=0.10.0'}
+
+  react-refresh@0.17.0:
+    resolution: {integrity: sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==}
     engines: {node: '>=0.10.0'}
 
   react-router@7.1.5:
@@ -13516,6 +13526,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@vitejs/plugin-react@4.4.1(vite@5.4.18(@types/node@20.17.30)(terser@5.39.0))':
+    dependencies:
+      '@babel/core': 7.26.10
+      '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.10)
+      '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.10)
+      '@types/babel__core': 7.20.5
+      react-refresh: 0.17.0
+      vite: 5.4.18(@types/node@20.17.30)(terser@5.39.0)
+    transitivePeerDependencies:
+      - supports-color
+
   '@vitest/browser@2.1.9(@types/node@20.17.30)(playwright@1.48.2)(typescript@5.8.2)(vite@5.4.18(@types/node@20.17.30)(terser@5.39.0))(vitest@2.1.9)':
     dependencies:
       '@testing-library/dom': 10.4.0
@@ -18493,6 +18514,8 @@ snapshots:
   react-is@19.1.0: {}
 
   react-refresh@0.14.2: {}
+
+  react-refresh@0.17.0: {}
 
   react-router@7.1.5(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:

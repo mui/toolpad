@@ -47,7 +47,7 @@
     "@mui/utils": "^7.0.2",
     "@standard-schema/spec": "^1.0.0",
     "@toolpad/utils": "workspace:*",
-    "@vitejs/plugin-react": "4.3.4",
+    "@vitejs/plugin-react": "4.4.1",
     "client-only": "^0.0.1",
     "dayjs": "1.11.13",
     "invariant": "2.2.4",

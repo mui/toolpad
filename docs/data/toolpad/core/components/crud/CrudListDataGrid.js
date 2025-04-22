@@ -157,7 +157,9 @@ function CrudListDataGrid(props) {
               onDelete={handleDelete}
               slots={{ dataGrid: DataGridPro }}
               slotProps={{
-                dataGrid: { checkboxSelection: true },
+                dataGrid: {
+                  initialState: { pinnedColumns: { right: ['actions'] } },
+                },
               }}
             />
             {/* preview-end */}

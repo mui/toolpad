@@ -78,7 +78,11 @@ export default function EmployeesCrudPage() {
       {pathname !== createPath && showEmployeeId ? (
         <Show<Employee> id={showEmployeeId} onEditClick={handleEditClick} onDelete={handleDelete} />
       ) : null}
-      {editEmployeeId ? <Edit<Employee> id={editEmployeeId} onSubmitSuccess={handleEdit} /> : null}
+      {editEmployeeId ? (
+        <div className="employee-edit-container">
+          <Edit<Employee> id={editEmployeeId} onSubmitSuccess={handleEdit} />
+        </div>
+      ) : null}
     </CrudProvider>
   );
 }

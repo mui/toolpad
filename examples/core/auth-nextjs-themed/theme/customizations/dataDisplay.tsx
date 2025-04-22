@@ -17,6 +17,13 @@ export const dataDisplayCustomizations: Components<Theme> = {
       },
     },
   },
+  MuiListSubheader: {
+    styleOverrides: {
+      root: {
+        backgroundColor: 'transparent',
+      },
+    },
+  },
   MuiListItem: {
     styleOverrides: {
       root: ({ theme }) => ({

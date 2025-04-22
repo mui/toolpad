@@ -6,5 +6,8 @@ declare module '@mui/material/styles' {
       defaultProps?: Partial<GridComponentsPropsOverrides>;
       styleOverrides?: Record<string, any>;
     };
+    MuiPickersInputBase?: {
+      styleOverrides?: Record<string, any>;
+    };
   }
 }

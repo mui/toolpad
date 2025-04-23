@@ -75,9 +75,11 @@ export interface DashboardLayoutProps {
    * @default null
    */
   branding?: Branding | null;
+  // @TODO: Remove deprecated prop from v0.16.0 onwards
   /**
    * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
+   * @deprecated Set the navigation in the `AppProvider` instead.
    */
   navigation?: Navigation;
   /**
@@ -510,6 +512,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   /**
    * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
+   * @deprecated Set the navigation in the `AppProvider` instead.
    */
   navigation: PropTypes.arrayOf(
     PropTypes.oneOfType([

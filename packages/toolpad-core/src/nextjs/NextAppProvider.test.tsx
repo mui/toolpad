@@ -8,7 +8,7 @@ import { render, screen } from '@testing-library/react';
 import { NextAppProvider } from './NextAppProvider';
 import { Router } from '../AppProvider';
 
-vi.mock('next/navigation.js', () => {
+vi.mock('next/navigation', () => {
   const searchParams = new URLSearchParams();
   const push = () => {};
   const replace = () => {};

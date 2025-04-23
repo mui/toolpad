@@ -9,7 +9,7 @@ import { Router } from '../AppProvider';
  * @ignore - internal component.
  */
 
-function useExternalProductionWarning({ featureName }: { featureName?: string }) {
+function useExternalProductionWarning({ featureName }: { featureName: string }) {
   const isExternalProduction =
     typeof window !== 'undefined' &&
     window.location.hostname !== 'mui.com' &&

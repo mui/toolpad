@@ -20,11 +20,11 @@ vi.mock('next/navigation.js', () => {
   };
 });
 
-vi.mock('next/router.js', () => ({ useRouter: () => null }));
+vi.mock('next/router', () => ({ useRouter: () => null }));
 
-vi.mock('next/compat/router.js', () => ({ useRouter: () => null }));
+vi.mock('next/compat/router', () => ({ useRouter: () => null }));
 
-vi.mock('next/link.js', () => ({ default: () => null }));
+vi.mock('next/link', () => ({ default: () => null }));
 
 interface RouterTestProps {
   children: React.ReactNode;

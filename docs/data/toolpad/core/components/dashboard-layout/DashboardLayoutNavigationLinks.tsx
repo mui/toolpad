@@ -5,7 +5,7 @@ import { createTheme } from '@mui/material/styles';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -56,28 +56,31 @@ export default function DashboardLayoutNavigationLinks(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    // preview-start
-    <AppProvider
-      navigation={[
-        {
-          segment: 'home',
-          title: 'Home',
-          icon: <DescriptionIcon />,
-        },
-        {
-          segment: 'about',
-          title: 'About Us',
-          icon: <DescriptionIcon />,
-        },
-      ]}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout>
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-    </AppProvider>
-    // preview-end
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      {/* preview-start */}
+      <AppProvider
+        navigation={[
+          {
+            segment: 'home',
+            title: 'Home',
+            icon: <DescriptionIcon />,
+          },
+          {
+            segment: 'about',
+            title: 'About Us',
+            icon: <DescriptionIcon />,
+          },
+        ]}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout>
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+      </AppProvider>
+      {/* preview-end */}
+    </DemoProvider>
   );
 }

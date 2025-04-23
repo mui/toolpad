@@ -18,7 +18,7 @@ import {
   ThemeSwitcher,
   type SidebarFooterProps,
 } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
@@ -147,21 +147,26 @@ export default function DashboardLayoutSlots(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout
-        slots={{
-          appTitle: CustomAppTitle,
-          toolbarActions: ToolbarActionsSearch,
-          sidebarFooter: SidebarFooter,
-        }}
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
       >
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-    </AppProvider>
+        {/* preview-start */}
+        <DashboardLayout
+          slots={{
+            appTitle: CustomAppTitle,
+            toolbarActions: ToolbarActionsSearch,
+            sidebarFooter: SidebarFooter,
+          }}
+        >
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+        {/* preview-end */}
+      </AppProvider>
+    </DemoProvider>
   );
 }

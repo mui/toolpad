@@ -13,7 +13,7 @@ import CallMadeIcon from '@mui/icons-material/CallMade';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -118,31 +118,34 @@ export default function DashboardLayoutNavigationActions(props: DemoProps) {
   );
 
   return (
-    // preview-start
-    <AppProvider
-      navigation={[
-        {
-          segment: 'contacts',
-          title: 'Contacts',
-          icon: <PersonIcon />,
-          action: <Chip label={7} color="primary" size="small" />,
-        },
-        {
-          segment: 'calls',
-          title: 'Calls',
-          icon: <CallIcon />,
-          action: popoverMenuAction,
-          children: CALLS_NAVIGATION,
-        },
-      ]}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout>
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-    </AppProvider>
-    // preview-end
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      {/* preview-start */}
+      <AppProvider
+        navigation={[
+          {
+            segment: 'contacts',
+            title: 'Contacts',
+            icon: <PersonIcon />,
+            action: <Chip label={7} color="primary" size="small" />,
+          },
+          {
+            segment: 'calls',
+            title: 'Calls',
+            icon: <CallIcon />,
+            action: popoverMenuAction,
+            children: CALLS_NAVIGATION,
+          },
+        ]}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout>
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+      </AppProvider>
+      {/* preview-end */}
+    </DemoProvider>
   );
 }

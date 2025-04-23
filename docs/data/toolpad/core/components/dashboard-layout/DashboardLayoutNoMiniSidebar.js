@@ -8,7 +8,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -73,16 +73,21 @@ function DashboardLayoutNoMiniSidebar(props) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout disableCollapsibleSidebar>
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        {/* preview-start */}
+        <DashboardLayout disableCollapsibleSidebar>
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+        {/* preview-end */}
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

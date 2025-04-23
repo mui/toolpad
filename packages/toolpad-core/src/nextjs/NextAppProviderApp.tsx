@@ -1,6 +1,6 @@
 import * as React from 'react';
-import NextLink from 'next/link.js';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation.js';
+import NextLink from 'next/link';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { LinkProps } from '../shared/Link';
 import { AppProvider } from '../AppProvider';
 import type { AppProviderProps, Navigate, Router } from '../AppProvider';

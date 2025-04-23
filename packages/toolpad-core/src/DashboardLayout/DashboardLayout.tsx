@@ -79,7 +79,7 @@ export interface DashboardLayoutProps {
   /**
    * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
-   * @deprecated Set the navigation in the `AppProvider` instead.
+   * @deprecated Set the navigation in the [AppProvider](https://mui.com/toolpad/core/react-app-provider) instead.
    */
   navigation?: Navigation;
   /**
@@ -512,7 +512,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   /**
    * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
-   * @deprecated Set the navigation in the `AppProvider` instead.
+   * @deprecated Set the navigation in the [AppProvider](https://mui.com/toolpad/core/react-app-provider) instead.
    */
   navigation: PropTypes.arrayOf(
     PropTypes.oneOfType([

@@ -16,8 +16,15 @@ import {
   SignOutButton,
   AccountPreviewProps,
 } from '@toolpad/core/Account';
-import { DashboardLayout, SidebarFooterProps } from '@toolpad/core/DashboardLayout';
+import { DashboardLayout, SidebarFooterProps, ThemeSwitcher } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
+import MuiAppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import InputBase from '@mui/material/InputBase';
+import MenuIcon from '@mui/icons-material/Menu';
+import SearchIcon from '@mui/icons-material/Search';
+import { styled, alpha } from '@mui/material/styles';
 
 const accounts = [
   {
@@ -40,6 +47,45 @@ const accounts = [
     projects: [{ id: 4, title: 'Project A' }],
   },
 ];
+
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(3),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '20ch',
+    },
+  },
+}));
 
 function AccountSidebarPreview(props: AccountPreviewProps & { mini: boolean }) {
   const { handleClick, open, mini } = props;
@@ -157,6 +203,32 @@ function SidebarFooterAccount({ mini }: SidebarFooterProps) {
   );
 }
 
+function CustomAppBar(props: { menuIcon: React.ReactElement }) {
+  return (
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+      sx={{
+        flexWrap: 'wrap',
+        width: '100%',
+      }}
+    >
+      {props.menuIcon}
+      <Search>
+        <SearchIconWrapper>
+          <SearchIcon />
+        </SearchIconWrapper>
+        <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
+      </Search>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <ThemeSwitcher />
+        <Account />
+      </Stack>
+    </Stack>
+  );
+}
+
 export default function DashboardPagesLayout(props: { children: React.ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
@@ -176,7 +248,7 @@ export default function DashboardPagesLayout(props: { children: React.ReactNode 
   }, [orderId, pathname]);
 
   return (
-    <DashboardLayout slots={{ sidebarFooter: SidebarFooterAccount, toolbarAccount: () => null }}>
+    <DashboardLayout slots={{ appBar: CustomAppBar }}>
       <PageContainer title={title}>{props.children}</PageContainer>
     </DashboardLayout>
   );

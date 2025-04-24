@@ -45,7 +45,7 @@ export interface DashboardLayoutSlotProps {
   toolbarActions?: {};
   toolbarAccount?: AccountProps;
   sidebarFooter?: SidebarFooterProps;
-  toolbar?: {};
+  appBar?: {};
 }
 
 export interface DashboardLayoutSlots {
@@ -56,17 +56,16 @@ export interface DashboardLayoutSlots {
   appTitle?: React.ElementType;
 
   /**
-   * The toolbar actions component used in the layout header.
+   * The ToolbarActions component used in the layout header.
    * @default ToolbarActions
-   * @deprecated Use `slots.toolbar` instead for full customization of the toolbar.
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
-  toolbarActions?: React.JSXElementConstructor<{}>;
+  appBarActions?: React.JSXElementConstructor<{}>;
 
   /**
-   * The toolbar account component used in the layout header.
+   * The toolbarAccount component used in the layout header.
    * @default Account
-   * @deprecated Use `slots.toolbar` instead for full customization of the toolbar.
+   * @deprecated it is moved to the toolbarActions component by default
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
   toolbarAccount?: React.JSXElementConstructor<AccountProps>;
@@ -84,7 +83,7 @@ export interface DashboardLayoutSlots {
    * @default null
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
-  toolbar?: React.JSXElementConstructor<ToolbarProps>;
+  appBar?: React.JSXElementConstructor<ToolbarProps>;
 }
 
 export interface DashboardLayoutProps {
@@ -289,8 +288,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const hasDrawerTransitions = isOverSmViewport && (!disableCollapsibleSidebar || isOverMdViewport);
 
-  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
-  const ToolbarAccountSlot = slots?.toolbarAccount ?? Account;
+  const ToolbarActionsSlot = slots?.appBarActions ?? ToolbarActions;
+  const ToolbarAccountSlot = slots?.toolbarAccount ?? (() => null);
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
 
   const getDrawerContent = React.useCallback(
@@ -363,8 +362,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [isNavigationExpanded, sidebarExpandedWidth],
   );
 
-  const toolbarSlotProps: ToolbarProps = {
-    ...slotProps?.toolbar,
+  const appBarSlotProps: ToolbarProps = {
+    ...slotProps?.appBar,
     menuIcon: getMenuIcon(isMobileNavigationExpanded),
   };
 
@@ -381,8 +380,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
     >
       <AppBar color="inherit" position="absolute" sx={{ displayPrint: 'none' }}>
         <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1 } }}>
-          {slots?.toolbar ? (
-            <slots.toolbar {...toolbarSlotProps} />
+          {slots?.appBar ? (
+            <slots.appBar {...appBarSlotProps} />
           ) : (
             <Stack
               direction="row"
@@ -622,7 +621,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
       }),
     }),
     toolbarActions: PropTypes.object,
-    toolbar: PropTypes.object,
+    appBar: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
@@ -633,7 +632,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,
-    toolbar: PropTypes.elementType,
+    appBar: PropTypes.elementType,
   }),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.

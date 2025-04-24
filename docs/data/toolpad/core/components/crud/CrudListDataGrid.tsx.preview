@@ -8,6 +8,8 @@
   onDelete={handleDelete}
   slots={{ dataGrid: DataGridPro }}
   slotProps={{
-    dataGrid: { initialState: { pinnedColumns: { right: ['actions'] } } },
+    dataGrid: {
+      initialState: { pinnedColumns: { right: ['actions'] } },
+    },
   }}
 />

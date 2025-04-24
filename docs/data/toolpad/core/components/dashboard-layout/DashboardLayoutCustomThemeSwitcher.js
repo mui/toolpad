@@ -16,7 +16,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -140,20 +140,25 @@ function DashboardLayoutCustomThemeSwitcher(props) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout
-        slots={{
-          toolbarActions: CustomThemeSwitcher,
-        }}
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
       >
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-    </AppProvider>
+        {/* preview-start */}
+        <DashboardLayout
+          slots={{
+            toolbarActions: CustomThemeSwitcher,
+          }}
+        >
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+        {/* preview-end */}
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

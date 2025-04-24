@@ -9,7 +9,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LayersIcon from '@mui/icons-material/Layers';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
@@ -106,17 +106,20 @@ export default function DashboardLayoutBasic(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    // preview-start
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout>
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-    </AppProvider>
-    // preview-end
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      {/* preview-start */}
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout>
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+      </AppProvider>
+      {/* preview-end */}
+    </DemoProvider>
   );
 }

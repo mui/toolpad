@@ -8,7 +8,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const demoTheme = createTheme({
   cssVariables: {
@@ -90,29 +90,32 @@ export default function DashboardLayoutPattern(props: DemoProps) {
   const demoWindow = window !== undefined ? window() : undefined;
 
   return (
-    // preview-start
-    <AppProvider
-      navigation={[
-        {
-          segment: 'dashboard',
-          title: 'Dashboard',
-          icon: <DashboardIcon />,
-        },
-        {
-          segment: 'orders',
-          title: 'Orders',
-          icon: <ShoppingCartIcon />,
-          pattern: 'orders{/:orderId}*',
-        },
-      ]}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout>
-        <DemoPageContent pathname={router.pathname} navigate={router.navigate} />
-      </DashboardLayout>
-    </AppProvider>
-    // preview-end
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      {/* preview-start */}
+      <AppProvider
+        navigation={[
+          {
+            segment: 'dashboard',
+            title: 'Dashboard',
+            icon: <DashboardIcon />,
+          },
+          {
+            segment: 'orders',
+            title: 'Orders',
+            icon: <ShoppingCartIcon />,
+            pattern: 'orders{/:orderId}*',
+          },
+        ]}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout>
+          <DemoPageContent pathname={router.pathname} navigate={router.navigate} />
+        </DashboardLayout>
+      </AppProvider>
+      {/* preview-end */}
+    </DemoProvider>
   );
 }

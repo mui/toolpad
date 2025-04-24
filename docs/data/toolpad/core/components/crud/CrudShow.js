@@ -6,7 +6,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { DataSourceCache, Show } from '@toolpad/core/Crud';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -104,26 +104,29 @@ function CrudShow(props) {
   }, []);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer title="Person">
-          {/* preview-start */}
-          <Show
-            id={1}
-            dataSource={peopleDataSource}
-            dataSourceCache={peopleCache}
-            onEditClick={handleEditClick}
-            onDelete={handleDelete}
-          />
-          {/* preview-end */}
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <PageContainer title="Person">
+            {/* preview-start */}
+            <Show
+              id={1}
+              dataSource={peopleDataSource}
+              dataSourceCache={peopleCache}
+              onEditClick={handleEditClick}
+              onDelete={handleDelete}
+            />
+            {/* preview-end */}
+          </PageContainer>
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

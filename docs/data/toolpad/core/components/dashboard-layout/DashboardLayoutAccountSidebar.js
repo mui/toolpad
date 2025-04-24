@@ -21,6 +21,8 @@ import {
   SignOutButton,
 } from '@toolpad/core/Account';
 
+import { DemoProvider } from '@toolpad/core/internal';
+
 const NAVIGATION = [
   {
     kind: 'header',
@@ -267,20 +269,25 @@ function DashboardLayoutAccountSidebar(props) {
   }, []);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-      authentication={authentication}
-      session={session}
-    >
-      <DashboardLayout
-        slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+        authentication={authentication}
+        session={session}
       >
-        <DemoPageContent pathname={pathname} />
-      </DashboardLayout>
-    </AppProvider>
+        {/* preview-start */}
+        <DashboardLayout
+          slots={{ toolbarAccount: () => null, sidebarFooter: SidebarFooterAccount }}
+        >
+          <DemoPageContent pathname={pathname} />
+        </DashboardLayout>
+        {/* preview-end */}
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

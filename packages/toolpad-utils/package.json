@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/utils",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Shared utilities used by Toolpad packages.",
   "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/toolpad#readme",
@@ -21,9 +21,8 @@
   "scripts": {
     "clean": "rimraf build",
     "prebuild": "pnpm clean",
-    "build": "pnpm build:node && pnpm build:stable && pnpm build:modern && pnpm build:types && pnpm build:copy-files",
+    "build": "pnpm build:node && pnpm build:stable && pnpm build:types && pnpm build:copy-files",
     "build:node": "node ../../scripts/build.mjs node",
-    "build:modern": "node ../../scripts/build.mjs modern",
     "build:stable": "node ../../scripts/build.mjs stable",
     "build:copy-files": "node ../../scripts/copyFiles.mjs",
     "build:types": "tsx ../../scripts/buildTypes.mts",
@@ -41,7 +40,7 @@
   "dependencies": {
     "invariant": "2.2.4",
     "prettier": "3.4.2",
-    "react-is": "^19.0.0",
+    "react-is": "^19.1.0",
     "title": "4.0.1",
     "yaml": "2.5.1",
     "yaml-diff-patch": "2.0.0"
@@ -49,7 +48,7 @@
   "devDependencies": {
     "@types/express": "5.0.1",
     "@types/invariant": "2.2.37",
-    "@types/react": "^19.0.12",
+    "@types/react": "^19.1.2",
     "@types/react-is": "^19.0.0",
     "@types/title": "3.4.3",
     "vitest": "2.1.9"

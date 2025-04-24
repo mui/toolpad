@@ -8,6 +8,7 @@ import { createMemoryRouter, RouterProvider, Outlet } from 'react-router';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
+import { DemoProvider } from '@toolpad/core/internal';
 
 function Layout() {
   return (
@@ -67,14 +68,17 @@ function App(props) {
   const { window } = props;
 
   return (
-    <ReactRouterAppProvider
-      navigation={NAVIGATION}
-      branding={BRANDING}
-      theme={demoTheme}
-      window={window}
-    >
-      <Outlet />
-    </ReactRouterAppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={window}>
+      <ReactRouterAppProvider
+        navigation={NAVIGATION}
+        branding={BRANDING}
+        theme={demoTheme}
+        window={window}
+      >
+        <Outlet />
+      </ReactRouterAppProvider>
+    </DemoProvider>
   );
 }
 

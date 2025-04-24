@@ -5,7 +5,7 @@ import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { DataModel, DataSource, DataSourceCache, Edit } from '@toolpad/core/Crud';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
@@ -39,7 +39,7 @@ export interface Person extends DataModel {
   age: number;
 }
 
-let people: Person[] = [
+let peopleStore: Person[] = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
@@ -73,7 +73,9 @@ export const peopleDataSource: DataSource<Person> &
       setTimeout(resolve, 750);
     });
 
-    const personToShow = people.find((person) => person.id === Number(personId));
+    const personToShow = peopleStore.find(
+      (person) => person.id === Number(personId),
+    );
 
     if (!personToShow) {
       throw new Error('Person not found');
@@ -88,7 +90,7 @@ export const peopleDataSource: DataSource<Person> &
 
     let updatedPerson: Person | null = null;
 
-    people = people.map((person) => {
+    peopleStore = peopleStore.map((person) => {
       if (person.id === Number(personId)) {
         updatedPerson = { ...person, ...data };
         return updatedPerson;
@@ -149,24 +151,27 @@ export default function CrudEdit(props: DemoProps) {
   }, []);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer title="Edit Person">
-          {/* preview-start */}
-          <Edit<Person>
-            id={1}
-            dataSource={peopleDataSource}
-            dataSourceCache={peopleCache}
-            onSubmitSuccess={handleSubmitSuccess}
-          />
-          {/* preview-end */}
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <PageContainer title="Edit Person">
+            {/* preview-start */}
+            <Edit<Person>
+              id={1}
+              dataSource={peopleDataSource}
+              dataSourceCache={peopleCache}
+              onSubmitSuccess={handleSubmitSuccess}
+            />
+            {/* preview-end */}
+          </PageContainer>
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }

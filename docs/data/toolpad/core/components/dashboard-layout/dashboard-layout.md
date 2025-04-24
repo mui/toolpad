@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Dashboard Layout
-components: AppProvider, DashboardLayout, ToolbarActions, ThemeSwitcher, Account
+components: AppProvider, DashboardLayout, ToolbarActions, ThemeSwitcher, Account, DashboardSidebarPageItem
 ---
 
 # Dashboard Layout
@@ -151,6 +151,16 @@ The use of an `iframe` may cause some spacing issues in the following demo.
 {{"demo": "DashboardLayoutAccount.js", "height": 400, "iframe": true}}
 
 ## Customization
+
+### Custom page items
+
+The `renderPageItem` prop can be used to override the rendering of any page item in the sidebar in order to modify it or completely replace it.
+
+When simply modifying a default page item, the `DashboardSidebarPageItem` component can be imported and some useful props for common behaviors can be set.
+
+You can find some basic examples of usage and common use cases in the demo below:
+
+{{"demo": "DashboardLayoutCustomPageItems.js", "height": 600, "iframe": true}}
 
 ### Slots
 

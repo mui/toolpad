@@ -6,7 +6,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { Crud } from '@toolpad/core/Crud';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -132,7 +132,10 @@ export const notesDataSource = {
       setTimeout(resolve, 750);
     });
 
-    const newNote = { id: notesStore.length + 1, ...data };
+    const newNote = {
+      id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
+      ...data,
+    };
 
     notesStore = [...notesStore, newNote];
 
@@ -221,26 +224,29 @@ function CrudNoCache(props) {
   }, [router.pathname]);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer title={title}>
-          {/* preview-start */}
-          <Crud
-            dataSource={notesDataSource}
-            dataSourceCache={null}
-            rootPath="/notes"
-            initialPageSize={10}
-            defaultValues={{ title: 'New note' }}
-          />
-          {/* preview-end */}
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <PageContainer title={title}>
+            {/* preview-start */}
+            <Crud
+              dataSource={notesDataSource}
+              dataSourceCache={null}
+              rootPath="/notes"
+              initialPageSize={10}
+              defaultValues={{ title: 'New note' }}
+            />
+            {/* preview-end */}
+          </PageContainer>
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

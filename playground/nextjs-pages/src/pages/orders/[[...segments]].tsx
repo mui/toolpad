@@ -1,9 +1,12 @@
 import * as React from 'react';
+import { useRouter } from 'next/router';
 import { Crud } from '@toolpad/core/Crud';
 import { ordersDataSource, Order, ordersCache } from '../../data/orders';
 
 export default function OrdersCrudPage() {
-  return (
+  const router = useRouter();
+
+  return router.isReady ? (
     <Crud<Order>
       dataSource={ordersDataSource}
       dataSourceCache={ordersCache}
@@ -11,5 +14,5 @@ export default function OrdersCrudPage() {
       initialPageSize={25}
       defaultValues={{ itemCount: 1 }}
     />
-  );
+  ) : null;
 }

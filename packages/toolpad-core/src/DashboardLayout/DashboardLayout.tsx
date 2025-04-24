@@ -21,7 +21,7 @@ import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 import { MINI_DRAWER_WIDTH } from './shared';
-import type { Branding, Navigation } from '../AppProvider';
+import type { Branding, Navigation, NavigationPageItem } from '../AppProvider';
 
 const AppBar = styled(MuiAppBar)(({ theme }) => ({
   borderWidth: 0,
@@ -123,6 +123,14 @@ export interface DashboardLayoutProps {
    */
   sidebarExpandedWidth?: number | string;
   /**
+   * Render each page item.
+   *
+   * @param {NavigationPageItem} item
+   * @param {{ mini: boolean }} params
+   * @returns {ReactNode}
+   */
+  renderPageItem?: (item: NavigationPageItem, params: { mini: boolean }) => React.ReactNode;
+  /**
    * The components used for each slot inside.
    * @default {}
    */
@@ -157,6 +165,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     disableCollapsibleSidebar = false,
     hideNavigation = false,
     sidebarExpandedWidth = 320,
+    renderPageItem,
     slots,
     slotProps,
     sx,
@@ -297,6 +306,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
             flexDirection: 'column',
             justifyContent: 'space-between',
             overflow: 'auto',
+            scrollbarGutter: isMini ? 'stable' : 'auto',
+            overflowX: 'hidden',
             pt: navigation[0]?.kind === 'header' && !isMini ? 0 : 2,
             ...(hasDrawerTransitions
               ? getDrawerSxTransitionMixin(isNavigationFullyExpanded, 'padding')
@@ -310,6 +321,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             isFullyExpanded={isNavigationFullyExpanded}
             isFullyCollapsed={isNavigationFullyCollapsed}
             hasDrawerTransitions={hasDrawerTransitions}
+            renderPageItem={renderPageItem}
           />
           {SidebarFooterSlot ? (
             <SidebarFooterSlot mini={isMini} {...slotProps?.sidebarFooter} />
@@ -324,6 +336,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       isNavigationFullyCollapsed,
       isNavigationFullyExpanded,
       navigation,
+      renderPageItem,
       slotProps?.sidebarFooter,
     ],
   );
@@ -563,6 +576,14 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
       }),
     ]).isRequired,
   ),
+  /**
+   * Render each page item.
+   *
+   * @param {NavigationPageItem} item
+   * @param {{ mini: boolean }} params
+   * @returns {ReactNode}
+   */
+  renderPageItem: PropTypes.func,
   /**
    * Width of the sidebar when expanded.
    * @default 320

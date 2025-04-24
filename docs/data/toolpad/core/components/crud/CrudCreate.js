@@ -6,7 +6,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { Create, DataSourceCache } from '@toolpad/core/Crud';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -33,7 +33,7 @@ const demoTheme = createTheme({
   },
 });
 
-let people = [
+let peopleStore = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
@@ -66,9 +66,12 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    const newPerson = { id: people.length + 1, ...data };
+    const newPerson = {
+      id: peopleStore.reduce((max, person) => Math.max(max, person.id), 0) + 1,
+      ...data,
+    };
 
-    people = [...people, newPerson];
+    peopleStore = [...peopleStore, newPerson];
 
     return newPerson;
   },
@@ -112,26 +115,29 @@ function CrudCreate(props) {
   }, []);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer title="New Person">
-          {/* preview-start */}
-          <Create
-            dataSource={peopleDataSource}
-            dataSourceCache={peopleCache}
-            initialValues={{ age: 18 }}
-            onSubmitSuccess={handleSubmitSuccess}
-            resetOnSubmit
-          />
-          {/* preview-end */}
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <PageContainer title="New Person">
+            {/* preview-start */}
+            <Create
+              dataSource={peopleDataSource}
+              dataSourceCache={peopleCache}
+              initialValues={{ age: 18 }}
+              onSubmitSuccess={handleSubmitSuccess}
+              resetOnSubmit
+            />
+            {/* preview-end */}
+          </PageContainer>
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

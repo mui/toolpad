@@ -31,11 +31,12 @@ const packageJson: PackageJsonTemplate = (options) => {
     react: '^19',
     'react-dom': '^19',
     '@toolpad/core': coreVersion ?? 'latest',
-    '@mui/material': '^6',
-    '@mui/material-nextjs': '^6',
-    '@mui/icons-material': '^6',
+    '@mui/material': '^7',
+    '@mui/material-nextjs': '^7',
+    '@mui/icons-material': '^7',
     '@emotion/react': '^11',
     '@emotion/styled': '^11',
+    zod: '^3.24.2',
   };
 
   const devDependencies: Record<string, string> = {

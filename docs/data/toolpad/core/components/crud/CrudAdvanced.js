@@ -13,7 +13,7 @@ import {
   List,
   Show,
 } from '@toolpad/core/Crud';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -139,7 +139,10 @@ export const notesDataSource = {
       setTimeout(resolve, 750);
     });
 
-    const newNote = { id: notesStore.length + 1, ...data };
+    const newNote = {
+      id: notesStore.reduce((max, note) => Math.max(max, note.id), 0) + 1,
+      ...data,
+    };
 
     notesStore = [...notesStore, newNote];
 
@@ -270,46 +273,49 @@ function CrudAdvanced(props) {
   const editNoteId = matchPath(editPath, router.pathname);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer title={title}>
-          {/* preview-start */}
-          <CrudProvider dataSource={notesDataSource} dataSourceCache={notesCache}>
-            {router.pathname === listPath ? (
-              <List
-                initialPageSize={10}
-                onRowClick={handleRowClick}
-                onCreateClick={handleCreateClick}
-                onEditClick={handleEditClick}
-              />
-            ) : null}
-            {router.pathname === createPath ? (
-              <Create
-                initialValues={{ title: 'New note' }}
-                onSubmitSuccess={handleCreate}
-                resetOnSubmit={false}
-              />
-            ) : null}
-            {router.pathname !== createPath && showNoteId ? (
-              <Show
-                id={showNoteId}
-                onEditClick={handleEditClick}
-                onDelete={handleDelete}
-              />
-            ) : null}
-            {editNoteId ? (
-              <Edit id={editNoteId} onSubmitSuccess={handleEdit} />
-            ) : null}
-          </CrudProvider>
-          {/* preview-end */}
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <PageContainer title={title}>
+            {/* preview-start */}
+            <CrudProvider dataSource={notesDataSource} dataSourceCache={notesCache}>
+              {router.pathname === listPath ? (
+                <List
+                  initialPageSize={10}
+                  onRowClick={handleRowClick}
+                  onCreateClick={handleCreateClick}
+                  onEditClick={handleEditClick}
+                />
+              ) : null}
+              {router.pathname === createPath ? (
+                <Create
+                  initialValues={{ title: 'New note' }}
+                  onSubmitSuccess={handleCreate}
+                  resetOnSubmit={false}
+                />
+              ) : null}
+              {router.pathname !== createPath && showNoteId ? (
+                <Show
+                  id={showNoteId}
+                  onEditClick={handleEditClick}
+                  onDelete={handleDelete}
+                />
+              ) : null}
+              {editNoteId ? (
+                <Edit id={editNoteId} onSubmitSuccess={handleEdit} />
+              ) : null}
+            </CrudProvider>
+            {/* preview-end */}
+          </PageContainer>
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

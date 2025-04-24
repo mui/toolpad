@@ -1,7 +1,7 @@
 {
   "name": "playground-vite",
   "private": true,
-  "version": "0.13.0",
+  "version": "0.14.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,18 +10,18 @@
   "devDependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.0",
-    "@mui/icons-material": "^7.0.0",
-    "@mui/material": "^7.0.0",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
     "@mui/x-data-grid": "^8.0.0 || ^8.0.0-beta",
     "@mui/x-date-pickers": "^8.0.0 || ^8.0.0-beta",
     "@toolpad/core": "workspace:*",
-    "@types/react": "^19.0.12",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "4.3.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "react-router": "7.1.5",
-    "vite": "5.4.14",
-    "zod": "3.24.2"
+    "vite": "5.4.18",
+    "zod": "3.24.3"
   }
 }

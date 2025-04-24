@@ -7,7 +7,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { DataSourceCache, List } from '@toolpad/core/Crud';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -24,7 +24,7 @@ const demoTheme = createTheme({
   breakpoints: { values: { xs: 0, sm: 600, md: 600, lg: 1200, xl: 1536 } },
 });
 
-let people = [
+let peopleStore = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
@@ -47,7 +47,7 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    let processedPeople = [...people];
+    let processedPeople = [...peopleStore];
 
     if (filterModel?.items?.length) {
       filterModel.items.forEach(({ field, value, operator }) => {
@@ -108,7 +108,7 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    people = people.filter((person) => person.id !== Number(personId));
+    peopleStore = peopleStore.filter((person) => person.id !== Number(personId));
   },
 };
 
@@ -136,32 +136,37 @@ function CrudListDataGrid(props) {
   }, []);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer>
-          {/* preview-start */}
-          <List
-            dataSource={peopleDataSource}
-            dataSourceCache={peopleCache}
-            initialPageSize={4}
-            onRowClick={handleRowClick}
-            onCreateClick={handleCreateClick}
-            onEditClick={handleEditClick}
-            onDelete={handleDelete}
-            slots={{ dataGrid: DataGridPro }}
-            slotProps={{
-              dataGrid: { checkboxSelection: true },
-            }}
-          />
-          {/* preview-end */}
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <PageContainer>
+            {/* preview-start */}
+            <List
+              dataSource={peopleDataSource}
+              dataSourceCache={peopleCache}
+              initialPageSize={4}
+              onRowClick={handleRowClick}
+              onCreateClick={handleCreateClick}
+              onEditClick={handleEditClick}
+              onDelete={handleDelete}
+              slots={{ dataGrid: DataGridPro }}
+              slotProps={{
+                dataGrid: {
+                  initialState: { pinnedColumns: { right: ['actions'] } },
+                },
+              }}
+            />
+            {/* preview-end */}
+          </PageContainer>
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

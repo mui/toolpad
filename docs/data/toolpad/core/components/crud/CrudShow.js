@@ -6,7 +6,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { DataSourceCache, Show } from '@toolpad/core/Crud';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -33,7 +33,7 @@ const demoTheme = createTheme({
   },
 });
 
-let people = [
+let peopleStore = [
   { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
   { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
   { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
@@ -66,7 +66,9 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    const personToShow = people.find((person) => person.id === Number(personId));
+    const personToShow = peopleStore.find(
+      (person) => person.id === Number(personId),
+    );
 
     if (!personToShow) {
       throw new Error('Person not found');
@@ -79,7 +81,7 @@ export const peopleDataSource = {
       setTimeout(resolve, 750);
     });
 
-    people = people.filter((person) => person.id !== Number(personId));
+    peopleStore = peopleStore.filter((person) => person.id !== Number(personId));
   },
 };
 
@@ -102,26 +104,29 @@ function CrudShow(props) {
   }, []);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer title="Person">
-          {/* preview-start */}
-          <Show
-            id={1}
-            dataSource={peopleDataSource}
-            dataSourceCache={peopleCache}
-            onEditClick={handleEditClick}
-            onDelete={handleDelete}
-          />
-          {/* preview-end */}
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <PageContainer title="Person">
+            {/* preview-start */}
+            <Show
+              id={1}
+              dataSource={peopleDataSource}
+              dataSourceCache={peopleCache}
+              onEditClick={handleEditClick}
+              onDelete={handleDelete}
+            />
+            {/* preview-end */}
+          </PageContainer>
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

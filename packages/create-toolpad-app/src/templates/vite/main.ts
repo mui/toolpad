@@ -9,7 +9,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router';
 import App from './App';
 import Layout from './layouts/dashboard';
 import DashboardPage from './pages';
-import OrdersPage from './pages/orders';
+import EmployeesCrudPage from './pages/employees';
 ${auth ? `import SignInPage from './pages/signin';` : ''}
 
 const router = createBrowserRouter([
@@ -25,8 +25,8 @@ const router = createBrowserRouter([
             Component: DashboardPage,
           },
           {
-            path: 'orders',
-            Component: OrdersPage,
+            path: 'employees/:employeeId?/*',
+            Component: EmployeesCrudPage,
           },
         ],
       },${

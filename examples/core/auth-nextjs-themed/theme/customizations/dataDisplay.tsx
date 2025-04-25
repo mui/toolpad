@@ -47,6 +47,9 @@ export const dataDisplayCustomizations: Components<Theme> = {
             [`& .${svgIconClasses.root}`]: {
               color: theme.palette.text.primary,
             },
+            [`& .${typographyClasses.root}`]: {
+              color: theme.palette.text.primary,
+            },
             '&:focus-visible': {
               backgroundColor: alpha(theme.palette.action.selected, 0.3),
             },
@@ -82,6 +85,7 @@ export const dataDisplayCustomizations: Components<Theme> = {
       },
     },
   },
+
   MuiPaper: {
     styleOverrides: {
       root: ({ theme }) => ({

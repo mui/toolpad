@@ -6,7 +6,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -61,16 +61,21 @@ function TutorialDefault(props) {
   const demoRouter = useDemoRouter('/page');
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={demoRouter}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout>
-        <DemoPageContent pathname={demoRouter.pathname} />
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={demoRouter}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        {/* preview-start */}
+        <DashboardLayout>
+          <DemoPageContent pathname={demoRouter.pathname} />
+        </DashboardLayout>
+        {/* preview-end */}
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

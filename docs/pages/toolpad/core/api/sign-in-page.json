@@ -86,7 +86,7 @@
     },
     {
       "name": "rememberMe",
-      "description": "A component to override the default \"Remember me\" checkbox in the Credentials form",
+      "description": "A custom checkbox placed in the credentials form",
       "default": "FormControlLabel",
       "class": null
     }

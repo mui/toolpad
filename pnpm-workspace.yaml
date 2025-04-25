@@ -2,7 +2,6 @@ packages:
   - 'packages/*'
   - 'playground/*'
   - 'docs'
-  - 'examples/core/auth-nextjs-themed'
   # deprecated Toolpad Studio:
   - '!packages/toolpad-studio'
   - '!packages/toolpad-studio-runtime'

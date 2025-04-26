@@ -60,7 +60,7 @@ export interface DashboardLayoutSlots {
    * @default ToolbarActions
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
-  appBarActions?: React.JSXElementConstructor<{}>;
+  toolbarActions?: React.JSXElementConstructor<{}>;
 
   /**
    * The toolbar actions component used in the layout header.
@@ -320,7 +320,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const hasDrawerTransitions = isOverSmViewport && (!disableCollapsibleSidebar || isOverMdViewport);
 
-  const ToolbarActionsSlot = slots?.appBarActions ?? ToolbarActions;
+  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
   const ToolbarAccountSlot = slots?.toolbarAccount ?? (() => null);
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
 
@@ -625,6 +625,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
+    appBar: PropTypes.object,
     appTitle: PropTypes.shape({
       branding: PropTypes.shape({
         homeUrl: PropTypes.string,
@@ -653,18 +654,17 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
       }),
     }),
     toolbarActions: PropTypes.object,
-    appBar: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
    * @default {}
    */
   slots: PropTypes.shape({
+    appBar: PropTypes.elementType,
     appTitle: PropTypes.elementType,
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,
-    appBar: PropTypes.elementType,
   }),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.

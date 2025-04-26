@@ -6,10 +6,9 @@ import Alert from '@mui/material/Alert';
 import Button, { ButtonProps } from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Checkbox from '@mui/material/Checkbox';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import FormControlLabel, { FormControlLabelProps } from '@mui/material/FormControlLabel';
+import { FormControlLabelProps } from '@mui/material/FormControlLabel';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -223,7 +222,7 @@ export interface SignInPageSlots {
    */
   subtitle?: React.ElementType;
   /**
-   * A component to override the default "Remember me" checkbox in the Credentials form
+   * A custom checkbox placed in the credentials form
    * @default FormControlLabel
    */
   rememberMe?: React.ElementType;
@@ -366,7 +365,7 @@ function SignInPage(props: SignInPageProps) {
       }}
     >
       <Container component="main" maxWidth="xs">
-        <Box
+        <Stack
           sx={{
             display: 'flex',
             flexDirection: 'column',
@@ -374,6 +373,7 @@ function SignInPage(props: SignInPageProps) {
             bgcolor: 'background.paper',
             borderRadius: 1,
             p: 4,
+            gap: 1,
             border: '1px solid',
             borderColor: alpha(theme.palette.grey[400], 0.4),
             boxShadow: theme.shadows[4],
@@ -389,7 +389,6 @@ function SignInPage(props: SignInPageProps) {
               component="h1"
               color="textPrimary"
               sx={{
-                my: theme.spacing(1),
                 textAlign: 'center',
                 fontWeight: 600,
               }}
@@ -406,7 +405,7 @@ function SignInPage(props: SignInPageProps) {
               {localeText?.signInSubtitle}
             </Typography>
           )}
-          <Box sx={{ mt: theme.spacing(1), width: '100%' }}>
+          <Box sx={{ width: '100%' }}>
             <Stack spacing={1}>
               {error && isOauthProvider(selectedProviderId) ? (
                 <Alert severity="error">{error}</Alert>
@@ -468,7 +467,7 @@ function SignInPage(props: SignInPageProps) {
                           <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
                         ) : null}
                         {error && selectedProviderId === 'passkey' ? (
-                          <Alert sx={{ my: 2 }} severity="error">
+                          <Alert sx={{ mt: 1, mb: 2 }} severity="error">
                             {error}
                           </Alert>
                         ) : null}
@@ -503,6 +502,7 @@ function SignInPage(props: SignInPageProps) {
                                 type: 'email',
                                 autoComplete: 'email-webauthn',
                                 autoFocus: singleProvider,
+                                sx: { mt: 1 },
                                 ...slotProps?.emailField,
                               })}
                             />
@@ -539,12 +539,12 @@ function SignInPage(props: SignInPageProps) {
                           <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
                         ) : null}
                         {error && selectedProviderId === 'nodemailer' ? (
-                          <Alert sx={{ my: 2 }} severity="error">
+                          <Alert sx={{ my: 1 }} severity="error">
                             {error}
                           </Alert>
                         ) : null}
                         {success && selectedProviderId === 'nodemailer' ? (
-                          <Alert sx={{ my: 2 }} severity="success">
+                          <Alert sx={{ my: 1 }} severity="success">
                             {success}
                           </Alert>
                         ) : null}
@@ -580,6 +580,7 @@ function SignInPage(props: SignInPageProps) {
                                 type: 'email',
                                 autoComplete: 'email-nodemailer',
                                 autoFocus: singleProvider,
+                                sx: { mt: 1 },
                                 ...slotProps?.emailField,
                               })}
                             />
@@ -618,7 +619,7 @@ function SignInPage(props: SignInPageProps) {
                           <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
                         ) : null}
                         {error && selectedProviderId === 'credentials' ? (
-                          <Alert sx={{ my: 2 }} severity="error">
+                          <Alert sx={{ mt: 1, mb: 2 }} severity="error">
                             {error}
                           </Alert>
                         ) : null}
@@ -645,7 +646,7 @@ function SignInPage(props: SignInPageProps) {
                           }}
                           {...slotProps?.form}
                         >
-                          <Stack direction="column" spacing={2} sx={{ mb: 2 }}>
+                          <Stack direction="column" spacing={2} marginTop={1}>
                             {slots?.emailField ? (
                               <slots.emailField {...slotProps?.emailField} />
                             ) : (
@@ -678,42 +679,25 @@ function SignInPage(props: SignInPageProps) {
                               />
                             )}
                           </Stack>
-                          <Stack
-                            direction="row"
-                            justifyContent="space-between"
-                            alignItems="center"
-                            spacing={1}
-                            sx={{
-                              justifyContent: 'space-between',
-                            }}
-                          >
-                            {slots?.rememberMe ? (
-                              <slots.rememberMe {...slotProps?.rememberMe} />
-                            ) : (
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    name="remember"
-                                    value="true"
-                                    color="primary"
-                                    sx={{ padding: 0.5, '& .MuiSvgIcon-root': { fontSize: 20 } }}
-                                  />
-                                }
-                                label={localeText.signInRememberMe}
-                                {...slotProps?.rememberMe}
-                                slotProps={{
-                                  typography: {
-                                    color: 'textSecondary',
-                                    fontSize: theme.typography.pxToRem(14),
-                                  },
-                                  ...slotProps?.rememberMe?.slotProps,
-                                }}
-                              />
-                            )}
-                            {slots?.forgotPasswordLink ? (
-                              <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
-                            ) : null}
-                          </Stack>
+                          {slots?.forgotPasswordLink || slots?.rememberMe ? (
+                            <Stack
+                              direction="row"
+                              justifyContent="space-between"
+                              alignItems="center"
+                              spacing={1}
+                              mt={2}
+                              sx={{
+                                justifyContent: 'space-between',
+                              }}
+                            >
+                              {slots?.rememberMe ? (
+                                <slots.rememberMe {...slotProps?.rememberMe} />
+                              ) : null}
+                              {slots?.forgotPasswordLink ? (
+                                <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
+                              ) : null}
+                            </Stack>
+                          ) : null}
                           {slots?.submitButton ? (
                             <slots.submitButton {...slotProps?.submitButton} />
                           ) : (
@@ -752,7 +736,7 @@ function SignInPage(props: SignInPageProps) {
                 );
               })}
           </Box>
-        </Box>
+        </Stack>
       </Container>
     </Box>
   );

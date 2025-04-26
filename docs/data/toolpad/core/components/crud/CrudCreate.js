@@ -6,7 +6,7 @@ import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { Create, DataSourceCache } from '@toolpad/core/Crud';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION = [
   {
@@ -115,26 +115,29 @@ function CrudCreate(props) {
   }, []);
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      <DashboardLayout defaultSidebarCollapsed>
-        <PageContainer title="New Person">
-          {/* preview-start */}
-          <Create
-            dataSource={peopleDataSource}
-            dataSourceCache={peopleCache}
-            initialValues={{ age: 18 }}
-            onSubmitSuccess={handleSubmitSuccess}
-            resetOnSubmit
-          />
-          {/* preview-end */}
-        </PageContainer>
-      </DashboardLayout>
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        <DashboardLayout defaultSidebarCollapsed>
+          <PageContainer title="New Person">
+            {/* preview-start */}
+            <Create
+              dataSource={peopleDataSource}
+              dataSourceCache={peopleCache}
+              initialValues={{ age: 18 }}
+              onSubmitSuccess={handleSubmitSuccess}
+              resetOnSubmit
+            />
+            {/* preview-end */}
+          </PageContainer>
+        </DashboardLayout>
+      </AppProvider>
+    </DemoProvider>
   );
 }
 

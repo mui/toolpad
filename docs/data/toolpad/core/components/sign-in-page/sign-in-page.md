@@ -280,7 +280,7 @@ To enable deep customization beyond what is possible with custom props, the `Sig
 
 {{"demo": "SlotsSignIn.js", "iframe": true, "height": 540 }}
 
-You can use the `slotProps` prop to pass props to the underlying components of each slot:
+You can use the `slotProps` prop to pass props to the underlying components of each slot, and also to the `form` element:
 
 {{"demo": "SlotPropsSignIn.js", "iframe": true, "height": 600 }}
 

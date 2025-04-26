@@ -30,6 +30,7 @@ const INITIAL_ORDERS: Order[] = [
     title: 'Order 1',
     description: 'I am the first order',
     status: 'Pending',
+    priority: 1,
     itemCount: 1,
     fastDelivery: true,
     createdAt: new Date().toISOString(),
@@ -39,6 +40,7 @@ const INITIAL_ORDERS: Order[] = [
     title: 'Order 2',
     description: 'I am the second order',
     status: 'Pending',
+    priority: 2,
     itemCount: 2,
     fastDelivery: false,
     createdAt: new Date().toISOString(),
@@ -48,6 +50,7 @@ const INITIAL_ORDERS: Order[] = [
     title: 'Order 3',
     description: 'I am the third order',
     status: 'Sent',
+    priority: 3,
     itemCount: 3,
     fastDelivery: true,
     createdAt: new Date().toISOString(),
@@ -70,6 +73,16 @@ const ordersDataSource: DataSource<Order> = {
       headerName: 'Status',
       type: 'singleSelect',
       valueOptions: ['Pending', 'Sent'],
+    },
+    {
+      field: 'priority',
+      headerName: 'Priority',
+      type: 'singleSelect',
+      valueOptions: [
+        { value: 1, label: 'Low' },
+        { value: 2, label: 'Medium' },
+        { value: 3, label: 'High' },
+      ],
     },
     { field: 'itemCount', headerName: 'No. of items', type: 'number' },
     { field: 'fastDelivery', headerName: 'Fast delivery', type: 'boolean' },
@@ -206,16 +219,19 @@ describe('Crud', () => {
 
     expect(within(dataRows[0]).getByText('I am the first order')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('Pending')).toBeInTheDocument();
+    expect(within(dataRows[0]).getByText('Low')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('yes')).toBeInTheDocument();
 
     expect(within(dataRows[1]).getByText('Order 2')).toBeInTheDocument();
     expect(within(dataRows[1]).getByText('I am the second order')).toBeInTheDocument();
     expect(within(dataRows[1]).getByText('Pending')).toBeInTheDocument();
+    expect(within(dataRows[1]).getByText('Medium')).toBeInTheDocument();
     expect(within(dataRows[1]).getByText('no')).toBeInTheDocument();
 
     expect(within(dataRows[2]).getByText('Order 3')).toBeInTheDocument();
     expect(within(dataRows[2]).getByText('I am the third order')).toBeInTheDocument();
     expect(within(dataRows[2]).getByText('Sent')).toBeInTheDocument();
+    expect(within(dataRows[2]).getByText('High')).toBeInTheDocument();
     expect(within(dataRows[2]).getByText('yes')).toBeInTheDocument();
   });
 
@@ -228,6 +244,7 @@ describe('Crud', () => {
 
     expect(screen.getByText('I am the first order')).toBeInTheDocument();
     expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByText('Low')).toBeInTheDocument();
     expect(screen.getByText('Yes')).toBeInTheDocument();
 
     expect(screen.queryByText('Order 2')).not.toBeInTheDocument();
@@ -241,6 +258,7 @@ describe('Crud', () => {
 
     expect(screen.getByText('I am the second order')).toBeInTheDocument();
     expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByText('Medium')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
 
     expect(screen.queryByText('Order 1')).not.toBeInTheDocument();
@@ -253,6 +271,9 @@ describe('Crud', () => {
 
     await userEvent.click(screen.getByLabelText('Status'));
     await userEvent.click(await screen.findByRole('option', { name: 'Sent' }));
+
+    await userEvent.click(screen.getByLabelText('Priority'));
+    await userEvent.click(await screen.findByRole('option', { name: 'High' }));
 
     await userEvent.click(screen.getByLabelText('Fast delivery'));
 
@@ -269,6 +290,7 @@ describe('Crud', () => {
     expect(within(dataRows[3]).getByText('New Order')).toBeInTheDocument();
     expect(within(dataRows[3]).getByText('I am a new order')).toBeInTheDocument();
     expect(within(dataRows[3]).getByText('Sent')).toBeInTheDocument();
+    expect(within(dataRows[3]).getByText('High')).toBeInTheDocument();
     expect(within(dataRows[3]).getByText('yes')).toBeInTheDocument();
   });
 
@@ -281,6 +303,7 @@ describe('Crud', () => {
 
     expect(screen.getByLabelText('Description')).toHaveValue('I am the first order');
     expect(screen.getByLabelText('Status')).toHaveTextContent('Pending');
+    expect(screen.getByLabelText('Priority')).toHaveTextContent('Low');
     expect(screen.getByLabelText('Fast delivery')).toBeChecked();
 
     await userEvent.clear(screen.getByLabelText('Title'));
@@ -291,6 +314,9 @@ describe('Crud', () => {
 
     await userEvent.click(screen.getByLabelText('Status'));
     await userEvent.click(await screen.findByRole('option', { name: 'Sent' }));
+
+    await userEvent.click(screen.getByLabelText('Priority'));
+    await userEvent.click(await screen.findByRole('option', { name: 'Medium' }));
 
     await userEvent.click(screen.getByLabelText('Fast delivery'));
 
@@ -309,6 +335,7 @@ describe('Crud', () => {
     expect(within(dataRows[0]).getByText('Edited Order')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('I am an edited order')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('Sent')).toBeInTheDocument();
+    expect(within(dataRows[0]).getByText('Medium')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('no')).toBeInTheDocument();
   });
 

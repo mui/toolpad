@@ -30,6 +30,7 @@ interface DashboardSidebarSubNavigationPageItemProps {
   isMini: boolean;
   isFullyExpanded: boolean;
   isFullyCollapsed: boolean;
+  sidebarExpandedWidth: number | string;
   renderPageItem?: (item: NavigationPageItem, params: { mini: boolean }) => React.ReactNode;
 }
 
@@ -46,6 +47,7 @@ function DashboardSidebarSubNavigationPageItem({
   isMini,
   isFullyExpanded,
   isFullyCollapsed,
+  sidebarExpandedWidth,
   renderPageItem,
 }: DashboardSidebarSubNavigationPageItemProps) {
   const navigationContext = React.useContext(NavigationContext);
@@ -75,6 +77,7 @@ function DashboardSidebarSubNavigationPageItem({
           depth={depth + 1}
           onLinkClick={onLinkClick}
           isPopover={isMini}
+          sidebarExpandedWidth={sidebarExpandedWidth}
         />
       ),
     }),
@@ -89,6 +92,7 @@ function DashboardSidebarSubNavigationPageItem({
       item.children,
       onClick,
       onLinkClick,
+      sidebarExpandedWidth,
     ],
   );
 
@@ -112,6 +116,7 @@ interface DashboardSidebarSubNavigationProps {
   isFullyExpanded?: boolean;
   isFullyCollapsed?: boolean;
   hasDrawerTransitions?: boolean;
+  sidebarExpandedWidth: number | string;
   renderPageItem?: (item: NavigationPageItem, params: { mini: boolean }) => React.ReactNode;
 }
 
@@ -127,6 +132,7 @@ function DashboardSidebarSubNavigation({
   isFullyExpanded = true,
   isFullyCollapsed = false,
   hasDrawerTransitions = false,
+  sidebarExpandedWidth,
   renderPageItem,
 }: DashboardSidebarSubNavigationProps) {
   const navigationContext = React.useContext(NavigationContext);
@@ -191,6 +197,7 @@ function DashboardSidebarSubNavigation({
                   ? getDrawerSxTransitionMixin(isFullyExpanded, 'height')
                   : {}),
                 px: 2,
+                minWidth: sidebarExpandedWidth,
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -236,6 +243,7 @@ function DashboardSidebarSubNavigation({
             isMini={isMini}
             isFullyExpanded={isFullyExpanded}
             isFullyCollapsed={isFullyCollapsed}
+            sidebarExpandedWidth={sidebarExpandedWidth}
             renderPageItem={renderPageItem}
           />
         );

@@ -174,9 +174,9 @@
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-import": "2.31.0",
-    "formidable": "3.5.2",
+    "formidable": "3.5.4",
     "react-transition-group": "4.4.5",
-    "webpack": "5.98.0"
+    "webpack": "5.99.7"
   },
   "typings": "./index.d.ts",
   "publishConfig": {

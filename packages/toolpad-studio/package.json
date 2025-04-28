@@ -161,7 +161,7 @@
     "@types/invariant": "2.2.37",
     "@types/lodash-es": "4.17.12",
     "@types/node-fetch": "2.6.12",
-    "@types/pg": "8.11.13",
+    "@types/pg": "8.11.14",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@types/react-is": "^19.0.0",

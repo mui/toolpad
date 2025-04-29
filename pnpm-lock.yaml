@@ -649,6 +649,9 @@ importers:
       react:
         specifier: ^18 || ^19
         version: 19.1.0
+      react-dom:
+        specifier: ^18 || ^19
+        version: 19.1.0(react@19.1.0)
     devDependencies:
       '@emotion/cache':
         specifier: 11.14.0

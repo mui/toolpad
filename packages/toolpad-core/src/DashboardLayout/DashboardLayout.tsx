@@ -79,7 +79,7 @@ export interface DashboardLayoutProps {
   /**
    * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
-   * @deprecated Set the navigation in the [AppProvider](https://mui.com/toolpad/core/react-app-provider) instead.
+   * @deprecated Set the navigation in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/#navigation) instead.
    */
   navigation?: Navigation;
   /**
@@ -150,6 +150,14 @@ function DashboardLayout(props: DashboardLayoutProps) {
     slotProps,
     sx,
   } = props;
+
+  React.useEffect(() => {
+    if (navigationProp) {
+      console.warn(
+        'The navigation prop in the DashboardLayout component is deprecated and will eventually be removed. Set the navigation prop in the AppProvider instead (https://mui.com/toolpad/core/react-app-provider/#navigation).',
+      );
+    }
+  }, [navigationProp]);
 
   const theme = useTheme();
 
@@ -512,7 +520,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   /**
    * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
-   * @deprecated Set the navigation in the [AppProvider](https://mui.com/toolpad/core/react-app-provider) instead.
+   * @deprecated Set the navigation in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/#navigation) instead.
    */
   navigation: PropTypes.arrayOf(
     PropTypes.oneOfType([

@@ -18,7 +18,7 @@
       },
       "default": "[]",
       "deprecated": true,
-      "deprecationInfo": "Set the navigation in the <a href=\"https://mui.com/toolpad/core/react-app-provider\">AppProvider</a> instead."
+      "deprecationInfo": "Set the navigation in the <a href=\"https://mui.com/toolpad/core/react-app-provider/#navigation\">AppProvider</a> instead."
     },
     "renderPageItem": {
       "type": { "name": "func" },

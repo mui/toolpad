@@ -85,7 +85,6 @@ export const dataDisplayCustomizations: Components<Theme> = {
       },
     },
   },
-
   MuiPaper: {
     styleOverrides: {
       root: ({ theme }) => ({

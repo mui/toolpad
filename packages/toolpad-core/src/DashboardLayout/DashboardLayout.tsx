@@ -309,6 +309,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
             isFullyExpanded={isNavigationFullyExpanded}
             isFullyCollapsed={isNavigationFullyCollapsed}
             hasDrawerTransitions={hasDrawerTransitions}
+            sidebarExpandedWidth={sidebarExpandedWidth}
             renderPageItem={renderPageItem}
           />
           {SidebarFooterSlot ? (
@@ -324,6 +325,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
       isNavigationFullyCollapsed,
       isNavigationFullyExpanded,
       navigation,
+      sidebarExpandedWidth,
       renderPageItem,
       slotProps?.sidebarFooter,
     ],

@@ -1,7 +1,6 @@
 'use client';
 import * as React from 'react';
 import clsx from 'clsx';
-import { animated, useSpring } from '@react-spring/web';
 import { TransitionProps } from '@mui/material/transitions';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -81,17 +80,25 @@ function DotIcon({ color }: { color: string }) {
   );
 }
 
-const AnimatedCollapse = animated(Collapse);
-
 function TransitionComponent(props: TransitionProps) {
-  const style = useSpring({
-    to: {
-      opacity: props.in ? 1 : 0,
-      transform: `translate3d(0,${props.in ? 0 : 20}px,0)`,
-    },
-  });
+  const { in: inProp, children, ...rest } = props;
 
-  return <AnimatedCollapse style={style} {...props} />;
+  return (
+    <Collapse
+      {...rest}
+      in={inProp}
+      timeout={300}
+      sx={{
+        '& .collapse-content': {
+          opacity: inProp ? 1 : 0,
+          transform: `translateY(${inProp ? 0 : 20}px)`,
+          transition: 'opacity 300ms ease, transform 300ms ease',
+        },
+      }}
+    >
+      <Box className="collapse-content">{children}</Box>
+    </Collapse>
+  );
 }
 
 interface CustomLabelProps {

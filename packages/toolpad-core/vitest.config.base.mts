@@ -11,5 +11,8 @@ export default defineConfig({
       reportsDirectory: './.coverage',
       reporter: ['text', 'lcov'],
     },
+    deps: {
+      inline: ['@mui/x-data-grid'], // Fix CSS imports https://github.com/mui/mui-x/issues/17427
+    },
   },
 });

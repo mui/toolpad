@@ -13,6 +13,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
+import warnOnce from '@toolpad/utils/warnOnce';
 import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
 import { Account, type AccountProps } from '../Account';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
@@ -151,13 +152,11 @@ function DashboardLayout(props: DashboardLayoutProps) {
     sx,
   } = props;
 
-  React.useEffect(() => {
-    if (navigationProp) {
-      console.warn(
-        'The navigation prop in the DashboardLayout component is deprecated and will eventually be removed. Set the navigation prop in the AppProvider instead (https://mui.com/toolpad/core/react-app-provider/#navigation).',
-      );
-    }
-  }, [navigationProp]);
+  if (navigationProp && process.env.NODE_ENV === 'development') {
+    warnOnce(
+      'The navigation prop in the DashboardLayout component is deprecated and will eventually be removed. Set the navigation prop in the AppProvider instead (https://mui.com/toolpad/core/react-app-provider/#navigation).',
+    );
+  }
 
   const theme = useTheme();
 

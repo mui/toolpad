@@ -16,7 +16,9 @@
         "name": "arrayOf",
         "description": "Array&lt;{ action?: node, children?: Array&lt;object<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;, icon?: node, kind?: 'page', pattern?: string, segment?: string, title?: string }<br>&#124;&nbsp;{ kind: 'header', title: string }<br>&#124;&nbsp;{ kind: 'divider' }&gt;"
       },
-      "default": "[]"
+      "default": "[]",
+      "deprecated": true,
+      "deprecationInfo": "Set the navigation in the <a href=\"https://mui.com/toolpad/core/react-app-provider/#navigation\">AppProvider</a> instead."
     },
     "renderPageItem": {
       "type": { "name": "func" },

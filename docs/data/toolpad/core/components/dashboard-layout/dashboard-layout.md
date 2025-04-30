@@ -49,11 +49,6 @@ The `navigation` prop in the [AppProvider](https://mui.com/toolpad/core/react-ap
 
 The flexibility in composing and ordering these different elements allows for a great variety of navigation structures to fit your use case.
 
-:::info
-Optionally, you can also pass a specific `navigation` as a prop to the `DashboardLayout` component itself.
-When applied this way, this `navigation` takes complete precedence over the `navigation` prop passed to the `AppProvider`.
-:::
-
 ### Navigation links
 
 Navigation links can be placed in the sidebar as items with the format:

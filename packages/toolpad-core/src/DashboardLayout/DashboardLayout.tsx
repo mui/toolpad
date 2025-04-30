@@ -152,7 +152,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
     sx,
   } = props;
 
-  if (navigationProp && process.env.NODE_ENV === 'development') {
+  if (navigationProp && process.env.NODE_ENV !== 'production') {
     warnOnce(
       'The navigation prop in the DashboardLayout component is deprecated and will eventually be removed. Set the navigation prop in the AppProvider instead (https://mui.com/toolpad/core/react-app-provider/#navigation).',
     );

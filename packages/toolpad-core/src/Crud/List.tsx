@@ -29,6 +29,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
+import { NoSsr } from '../shared/NoSsr';
 import { CrudContext, RouterContext, WindowContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
 import { DataSourceCache } from './cache';
@@ -402,43 +403,47 @@ function List<D extends DataModel>(props: ListProps<D>) {
         ) : null}
       </Stack>
       <Box sx={{ flex: 1, position: 'relative', width: '100%' }}>
-        <DataGridSlot
-          rows={rowsState.rows}
-          rowCount={rowsState.rowCount}
-          columns={columns}
-          pagination
-          sortingMode="server"
-          filterMode="server"
-          paginationMode="server"
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          sortModel={sortModel}
-          onSortModelChange={setSortModel}
-          filterModel={filterModel}
-          onFilterModelChange={setFilterModel}
-          onRowClick={handleRowClick}
-          loading={isLoading}
-          initialState={initialState}
-          slots={{ toolbar: GridToolbar }}
-          // Prevent type conflicts if slotProps don't match DataGrid used for dataGrid slot
-          {...(slotProps?.dataGrid as Record<string, unknown>)}
-          sx={{
-            [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
-              outline: 'transparent',
-            },
-            [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]: {
-              outline: 'none',
-            },
-            ...(onRowClick
-              ? {
-                  [`& .${gridClasses.row}:hover`]: {
-                    cursor: 'pointer',
-                  },
-                }
-              : {}),
-            ...slotProps?.dataGrid?.sx,
-          }}
-        />
+        {/* Use NoSsr to prevent issue https://github.com/mui/mui-x/issues/17077 as DataGrid has no SSR support */}
+        <NoSsr>
+          <DataGridSlot
+            rows={rowsState.rows}
+            rowCount={rowsState.rowCount}
+            columns={columns}
+            pagination
+            sortingMode="server"
+            filterMode="server"
+            paginationMode="server"
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            sortModel={sortModel}
+            onSortModelChange={setSortModel}
+            filterModel={filterModel}
+            onFilterModelChange={setFilterModel}
+            onRowClick={handleRowClick}
+            loading={isLoading}
+            initialState={initialState}
+            slots={{ toolbar: GridToolbar }}
+            // Prevent type conflicts if slotProps don't match DataGrid used for dataGrid slot
+            {...(slotProps?.dataGrid as Record<string, unknown>)}
+            sx={{
+              [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
+                outline: 'transparent',
+              },
+              [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
+                {
+                  outline: 'none',
+                },
+              ...(onRowClick
+                ? {
+                    [`& .${gridClasses.row}:hover`]: {
+                      cursor: 'pointer',
+                    },
+                  }
+                : {}),
+              ...slotProps?.dataGrid?.sx,
+            }}
+          />
+        </NoSsr>
         {error && (
           <ErrorOverlay>
             <Typography variant="body1">{error.message}</Typography>

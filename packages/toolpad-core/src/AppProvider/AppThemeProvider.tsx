@@ -8,9 +8,8 @@ import { useLocalStorageState } from '../useLocalStorageState';
 import { PaletteModeContext } from '../shared/context';
 import type { AppTheme } from './AppProvider';
 
-export const COLOR_SCHEME_ATTRIBUTE = 'data-toolpad-color-scheme';
-export const COLOR_SCHEME_STORAGE_KEY = 'toolpad-color-scheme';
-export const MODE_STORAGE_KEY = 'toolpad-mode';
+const COLOR_SCHEME_STORAGE_KEY = 'toolpad-color-scheme';
+const MODE_STORAGE_KEY = 'toolpad-mode';
 
 function usePreferredMode(window?: Window) {
   const prefersDarkMode = useMediaQuery(
@@ -127,7 +126,7 @@ function CssVarsThemeProvider(props: CssVarsThemeProviderProps) {
       modeStorageKey={MODE_STORAGE_KEY}
     >
       <InitColorSchemeScript
-        attribute={COLOR_SCHEME_ATTRIBUTE}
+        attribute={theme.colorSchemeSelector}
         colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
         modeStorageKey={MODE_STORAGE_KEY}
       />

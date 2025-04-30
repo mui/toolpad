@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { createTheme as createMuiTheme, Theme } from '@mui/material/styles';
+import { createTheme, Theme } from '@mui/material/styles';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
 import {
@@ -129,7 +129,7 @@ export interface AppProviderProps {
 }
 
 function createDefaultTheme(): Theme {
-  return createMuiTheme({
+  return createTheme({
     cssVariables: {
       colorSchemeSelector: 'data-toolpad-color-scheme',
     },

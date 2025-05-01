@@ -325,7 +325,9 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
     >
       <FormGroup>
         <Grid container spacing={2} sx={{ mb: 2, width: '100%' }}>
-          {fields.filter(({ field }) => field !== 'id').map(renderField)}
+          {fields
+            .filter(({ field, editable }) => field !== 'id' && editable !== false)
+            .map(renderField)}
         </Grid>
       </FormGroup>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>

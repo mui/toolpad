@@ -22,7 +22,7 @@ describe('AppProvider', () => {
   });
 
   test('renders nonce correctly on color scheme script', async () => {
-    const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
+    const nonce = btoa(crypto.randomUUID());
 
     render(<AppProvider nonce={nonce}>Hello world</AppProvider>);
 

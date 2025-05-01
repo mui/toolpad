@@ -128,7 +128,6 @@ export interface AppProviderProps {
   window?: Window;
   /**
    * The nonce to be used for inline scripts.
-   * @default undefined
    */
   nonce?: string;
 }
@@ -257,6 +256,10 @@ AppProvider.propTypes /* remove-proptypes */ = {
       }),
     ]).isRequired,
   ),
+  /**
+   * The nonce to be used for inline scripts.
+   */
+  nonce: PropTypes.string,
   /**
    * Router implementation used inside Toolpad components.
    * @default null

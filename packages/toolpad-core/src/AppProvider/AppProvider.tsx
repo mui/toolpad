@@ -126,6 +126,11 @@ export interface AppProviderProps {
    * @default window
    */
   window?: Window;
+  /**
+   * The nonce to be used for inline scripts.
+   * @default undefined
+   */
+  nonce?: string;
 }
 
 function createDefaultTheme(): Theme {
@@ -159,6 +164,7 @@ function AppProvider(props: AppProviderProps) {
     authentication = null,
     session = null,
     window: appWindow,
+    nonce,
   } = props;
 
   return (
@@ -166,7 +172,7 @@ function AppProvider(props: AppProviderProps) {
       <AuthenticationContext.Provider value={authentication}>
         <SessionContext.Provider value={session}>
           <RouterContext.Provider value={router}>
-            <AppThemeProvider theme={theme} window={appWindow}>
+            <AppThemeProvider theme={theme} window={appWindow} nonce={nonce}>
               <LocalizationProvider localeText={localeText}>
                 <NotificationsProvider>
                   <DialogsProvider>

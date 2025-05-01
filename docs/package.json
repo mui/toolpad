@@ -2,7 +2,6 @@
   "name": "docs",
   "version": "0.14.0",
   "private": true,
-  "author": "MUI Toolpad",
   "license": "MIT",
   "scripts": {
     "build": "rimraf ./export && cross-env NODE_ENV=production next build --profile && pnpm build-sw",

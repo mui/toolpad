@@ -1,18 +1,18 @@
 {
   "name": "create-toolpad-app",
   "version": "0.14.0",
+  "author": "MUI Team",
+  "description": "Create Toolpad apps with one command",
   "keywords": [
     "react",
     "toolpad",
     "mui"
   ],
-  "description": "Create Toolpad apps with one command",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mui/toolpad.git",
     "directory": "packages/create-toolpad-app"
   },
-  "author": "Toolpad Team",
   "license": "MIT",
   "bin": {
     "create-toolpad-app": "./dist/index.js"

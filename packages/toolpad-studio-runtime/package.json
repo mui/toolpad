@@ -2,7 +2,7 @@
   "name": "@toolpad/studio-runtime",
   "version": "0.13.0",
   "author": "MUI Team",
-  "description": "Build MUI apps quickly.",
+  "description": "Build Material UI apps quickly.",
   "homepage": "https://github.com/mui/toolpad#readme",
   "license": "MIT",
   "module": "./dist/index.js",

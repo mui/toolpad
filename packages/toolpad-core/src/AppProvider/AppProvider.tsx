@@ -126,6 +126,10 @@ export interface AppProviderProps {
    * @default window
    */
   window?: Window;
+  /**
+   * The nonce to be used for inline scripts.
+   */
+  nonce?: string;
 }
 
 function createDefaultTheme(): Theme {
@@ -159,6 +163,7 @@ function AppProvider(props: AppProviderProps) {
     authentication = null,
     session = null,
     window: appWindow,
+    nonce,
   } = props;
 
   return (
@@ -166,7 +171,7 @@ function AppProvider(props: AppProviderProps) {
       <AuthenticationContext.Provider value={authentication}>
         <SessionContext.Provider value={session}>
           <RouterContext.Provider value={router}>
-            <AppThemeProvider theme={theme} window={appWindow}>
+            <AppThemeProvider theme={theme} window={appWindow} nonce={nonce}>
               <LocalizationProvider localeText={localeText}>
                 <NotificationsProvider>
                   <DialogsProvider>
@@ -251,6 +256,10 @@ AppProvider.propTypes /* remove-proptypes */ = {
       }),
     ]).isRequired,
   ),
+  /**
+   * The nonce to be used for inline scripts.
+   */
+  nonce: PropTypes.string,
   /**
    * Router implementation used inside Toolpad components.
    * @default null

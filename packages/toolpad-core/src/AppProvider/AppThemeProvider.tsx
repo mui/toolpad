@@ -110,10 +110,11 @@ interface CssVarsThemeProviderProps {
   children: React.ReactNode;
   theme: Theme;
   window?: Window;
+  nonce?: string;
 }
 
 function CssVarsThemeProvider(props: CssVarsThemeProviderProps) {
-  const { children, theme, window: appWindow } = props;
+  const { children, theme, window: appWindow, nonce } = props;
   invariant(isCssVarsTheme(theme), 'This provider only accepts CSS vars themes.');
 
   return (
@@ -129,6 +130,7 @@ function CssVarsThemeProvider(props: CssVarsThemeProviderProps) {
         attribute={theme.colorSchemeSelector}
         colorSchemeStorageKey={COLOR_SCHEME_STORAGE_KEY}
         modeStorageKey={MODE_STORAGE_KEY}
+        nonce={nonce}
       />
       <CssVarsPaletteModeProvider window={appWindow}>
         <CssBaseline enableColorScheme />
@@ -142,6 +144,7 @@ interface AppThemeProviderProps {
   children: React.ReactNode;
   theme: AppTheme;
   window?: Window;
+  nonce?: string;
 }
 
 /**

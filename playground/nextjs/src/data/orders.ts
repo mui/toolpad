@@ -202,7 +202,7 @@ export const ordersDataSource: DataSource<Order> = {
     fastDelivery: z.boolean({ required_error: 'Fast delivery is required' }),
     maxReturnDate: z
       .string({ required_error: 'Max. return date is required' })
-      .nonempty('Max. return date date is required'),
+      .nonempty('Max. return date is required'),
     deliveryTime: z.string().optional(),
   })['~standard'].validate,
 };

@@ -132,13 +132,13 @@
     "zod": "3.24.3",
     "zod-to-json-schema": "3.24.5"
   },
-  "engines": {
-    "node": ">=20",
-    "pnpm": "10.8.1"
-  },
   "resolutions": {
     "google-auth-library": "*",
     "@types/node": "^20.17.32"
   },
-  "packageManager": "pnpm@10.8.1"
+  "packageManager": "pnpm@10.8.1",
+  "engines": {
+    "node": ">=20",
+    "pnpm": "10.8.1"
+  }
 }

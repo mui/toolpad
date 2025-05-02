@@ -63,9 +63,9 @@ export interface DashboardLayoutSlots {
   toolbarActions?: React.JSXElementConstructor<{}>;
 
   /**
-   * The toolbar actions component used in the layout header.
+   * The toolbar account component used in the layout header.
    * @default Account
-   * @deprecated it is moved to the toolbarActions component
+   * @deprecated Place your custom component on the right in the `toolbarActions` slot instead.
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
   toolbarAccount?: React.JSXElementConstructor<AccountProps>;

@@ -169,9 +169,9 @@ Some possibly useful slots:
 
 - `appTitle`: allows you to customize the app title section in the layout header.
 
-- `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` and `Account` component can be imported and used if you wish to do so, as shown in the example below.
+- `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` and `Account` components can be imported and used if you wish to do so, as shown in the example below.
 
-- `appBar`: allows you to fully replace the layout header. This slot gives you full control over the toolbar's structure while still allowing you to use the built-in components like `AppTitle`, `ToolbarActions`, and `Account`.
+- `appBar`: allows you to fully replace the layout header.
 
 - `sidebarFooter`: allows you to add a footer to the sidebar.
 

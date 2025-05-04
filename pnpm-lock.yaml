@@ -44,10 +44,10 @@ importers:
         version: 7.6.3
       tsup:
         specifier: 8.3.6
-        version: 8.3.6(postcss@8.4.49)(tsx@4.19.3)(typescript@5.8.3)(yaml@2.5.1)
+        version: 8.3.6(postcss@8.4.49)(tsx@4.19.4)(typescript@5.8.3)(yaml@2.5.1)
       tsx:
-        specifier: 4.19.3
-        version: 4.19.3
+        specifier: 4.19.4
+        version: 4.19.4
       vitest:
         specifier: 2.1.9
         version: 2.1.9(@types/node@20.17.32)(@vitest/browser@2.1.9)(jsdom@25.0.1)(msw@2.6.5(@types/node@20.17.32)(typescript@5.8.3))(terser@5.39.0)
@@ -9801,8 +9801,8 @@ packages:
     peerDependencies:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
 
-  tsx@4.19.3:
-    resolution: {integrity: sha512-4H8vUNGNjQ4V2EOoGw005+c+dGuPSnhpPBPHBtsZdGZBk/iJb4kguGlPWaZTZ3q5nMtFOEsY0nRDlh9PJyd6SQ==}
+  tsx@4.19.4:
+    resolution: {integrity: sha512-gK5GVzDkJK1SI1zwHf32Mqxf2tSJkNx+eYcNly5+nHvWqXUJYUkWBQtKauoESz3ymezAI++ZwT855x5p5eop+Q==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -19383,12 +19383,12 @@ snapshots:
 
   possible-typed-array-names@1.0.0: {}
 
-  postcss-load-config@6.0.1(postcss@8.4.49)(tsx@4.19.3)(yaml@2.5.1):
+  postcss-load-config@6.0.1(postcss@8.4.49)(tsx@4.19.4)(yaml@2.5.1):
     dependencies:
       lilconfig: 3.1.2
     optionalDependencies:
       postcss: 8.4.49
-      tsx: 4.19.3
+      tsx: 4.19.4
       yaml: 2.5.1
 
   postcss-selector-parser@6.1.2:
@@ -20692,7 +20692,7 @@ snapshots:
 
   tsscmp@1.0.6: {}
 
-  tsup@8.3.6(postcss@8.4.49)(tsx@4.19.3)(typescript@5.8.3)(yaml@2.5.1):
+  tsup@8.3.6(postcss@8.4.49)(tsx@4.19.4)(typescript@5.8.3)(yaml@2.5.1):
     dependencies:
       bundle-require: 5.0.0(esbuild@0.24.2)
       cac: 6.7.14
@@ -20702,7 +20702,7 @@ snapshots:
       esbuild: 0.24.2
       joycon: 3.1.1
       picocolors: 1.1.1
-      postcss-load-config: 6.0.1(postcss@8.4.49)(tsx@4.19.3)(yaml@2.5.1)
+      postcss-load-config: 6.0.1(postcss@8.4.49)(tsx@4.19.4)(yaml@2.5.1)
       resolve-from: 5.0.0
       rollup: 4.24.3
       source-map: 0.8.0-beta.0
@@ -20724,7 +20724,7 @@ snapshots:
       tslib: 1.14.1
       typescript: 5.8.3
 
-  tsx@4.19.3:
+  tsx@4.19.4:
     dependencies:
       esbuild: 0.25.1
       get-tsconfig: 4.8.1

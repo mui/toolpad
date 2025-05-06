@@ -41,7 +41,7 @@
     "test:browser:dev": "vitest -c vitest.config.browser.mts"
   },
   "dependencies": {
-    "@babel/runtime": "^7.27.0",
+    "@babel/runtime": "^7.27.1",
     "@mui/x-data-grid": "^8.2.0",
     "@mui/x-date-pickers": "^8.2.0",
     "@mui/utils": "^7.0.2",

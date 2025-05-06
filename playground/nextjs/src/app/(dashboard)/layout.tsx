@@ -15,11 +15,9 @@ import {
   AccountPopoverFooter,
   SignOutButton,
   AccountPreviewProps,
-  DashboardLayout,
-  SidebarFooterProps,
-  DefaultAppBar,
-  PageContainer,
-} from '@toolpad/core';
+} from '@toolpad/core/Account';
+import { DashboardLayout, SidebarFooterProps } from '@toolpad/core/DashboardLayout';
+import { PageContainer } from '@toolpad/core/PageContainer';
 
 const accounts = [
   {
@@ -178,7 +176,7 @@ export default function DashboardPagesLayout(props: { children: React.ReactNode 
   }, [orderId, pathname]);
 
   return (
-    <DashboardLayout slots={{ sidebarFooter: SidebarFooterAccount, appBar: DefaultAppBar }}>
+    <DashboardLayout slots={{ sidebarFooter: SidebarFooterAccount, toolbarAccount: () => null }}>
       <PageContainer title={title}>{props.children}</PageContainer>
     </DashboardLayout>
   );

@@ -15,7 +15,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
-import { Account, type AccountProps } from '../Account';
+import { type AccountProps } from '../Account';
 import { AppTitle, type AppTitleProps } from './AppTitle';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
 import { ToolbarActions } from './ToolbarActions';
@@ -77,40 +77,15 @@ export interface DashboardLayoutSlots {
   sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
 
   /**
-   * This component will completely override the internal layout of the top bar.
+   * This component is used for the layout header.
    * You can still use the built-in `<AppTitle />`, `<ThemeSwitcher />` and `<Account />` components inside.
    * @default null
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    * @example
    * ```tsx
-   * function CustomAppBar(props: { menuIcon: React.ReactElement }) {
-   *   return (
-   *     <AppBar color="inherit" position="absolute" sx={{ displayPrint: 'none' }}>
-   *       <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1 } }}>
-   *         <Stack
-   *           direction="row"
-   *           justifyContent="space-between"
-   *           alignItems="center"
-   *           sx={{ width: '100%' }}
-   *         >
-   *           {props.menuIcon}
-   *           <Search>
-   *             <SearchIconWrapper>
-   *               <SearchIcon />
-   *             </SearchIconWrapper>
-   *             <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
-   *           </Search>
-   *           <Stack direction="row" alignItems="center" spacing={1}>
-   *             <ThemeSwitcher />
-   *             <Account />
-   *           </Stack>
-   *         </Stack>
-   *       </Toolbar>
-   *     </AppBar>
-   *   );
-   * }
+   * import { DefaultAppBar } from './DefaultAppBar';
    *
-   * <DashboardLayout slots={{ appBar: CustomAppBar }}>
+   * <DashboardLayout slots={{ appBar: DefaultAppBar }}>
    *   <PageContainer>{children}</PageContainer>
    * </DashboardLayout>
    * ```
@@ -398,7 +373,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const appBarSlotProps: ToolbarProps = {
     ...slotProps?.appBar,
-    menuIcon: getMenuIcon(isMobileNavigationExpanded),
+    menuIcon: isOverMdViewport
+      ? getMenuIcon(isDesktopNavigationExpanded)
+      : getMenuIcon(isMobileNavigationExpanded),
   };
 
   return (

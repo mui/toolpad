@@ -12,10 +12,10 @@ export default function Layout(props: { children: React.ReactNode }) {
   const [employeeId] = params.segments ?? [];
 
   const title = React.useMemo(() => {
-    if (pathname === '/employees/new') {
+    if (pathname.endsWith('/employees/new')) {
       return 'New Employee';
     }
-    if (employeeId && pathname.includes('/edit')) {
+    if (employeeId && pathname.endsWith('/edit')) {
       return `Employee ${employeeId} - Edit`;
     }
     if (employeeId) {

@@ -20,6 +20,7 @@
       },
       "default": "[]"
     },
+    "nonce": { "type": { "name": "string" } },
     "router": {
       "type": {
         "name": "shape",

@@ -1,8 +1,8 @@
 {
   "name": "@toolpad/core",
   "version": "0.14.0",
-  "author": "Toolpad Team",
-  "description": "Dashboard framework powered by MUI.",
+  "author": "MUI Team",
+  "description": "Dashboard framework powered by Material UI.",
   "main": "./node/index.js",
   "module": "./index.js",
   "keywords": [

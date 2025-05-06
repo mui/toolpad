@@ -1,8 +1,8 @@
 {
   "name": "@toolpad/utils",
   "version": "0.14.0",
+  "author": "MUI Team",
   "description": "Shared utilities used by Toolpad packages.",
-  "author": "MUI Toolpad team",
   "homepage": "https://github.com/mui/toolpad#readme",
   "license": "MIT",
   "main": "./build/index.cjs",

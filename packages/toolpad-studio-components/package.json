@@ -1,8 +1,8 @@
 {
   "name": "@toolpad/studio-components",
   "version": "0.13.0",
-  "description": "Build MUI apps quickly",
-  "author": "MUI Toolpad team",
+  "author": "MUI Team",
+  "description": "Build Material UI apps quickly.",
   "homepage": "https://github.com/mui/toolpad#readme",
   "license": "MIT",
   "module": "./dist/index.js",

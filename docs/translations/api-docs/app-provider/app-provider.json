@@ -8,6 +8,7 @@
     "navigation": {
       "description": "Navigation definition for the app. <a href=\"https://mui.com/toolpad/core/react-app-provider/#navigation\">Find out more</a>."
     },
+    "nonce": { "description": "The nonce to be used for inline scripts." },
     "router": { "description": "Router implementation used inside Toolpad components." },
     "session": { "description": "Session info about the current user." },
     "theme": {

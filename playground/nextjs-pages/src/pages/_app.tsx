@@ -59,7 +59,7 @@ function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
     if (pathname.endsWith('/orders/new')) {
       return 'New Order';
     }
-    if (orderId && pathname.endsWith('/edit')) {
+    if (orderId && pathname.endsWith('/orders/edit')) {
       return `Order ${orderId} - Edit`;
     }
     if (orderId) {

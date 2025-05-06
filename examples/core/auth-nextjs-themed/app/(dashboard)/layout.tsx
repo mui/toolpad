@@ -15,7 +15,7 @@ export default function Layout(props: { children: React.ReactNode }) {
     if (pathname.endsWith('/employees/new')) {
       return 'New Employee';
     }
-    if (employeeId && pathname.endsWith('/edit')) {
+    if (employeeId && pathname.endsWith('/employees/edit')) {
       return `Employee ${employeeId} - Edit`;
     }
     if (employeeId) {

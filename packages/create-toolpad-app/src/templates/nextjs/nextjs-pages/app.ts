@@ -102,7 +102,7 @@ function DefaultLayout({ page }: { page: React.ReactElement<any> }) {
     if (pathname.endsWith('/employees/new')) {
       return 'New Employee';
     }
-    if (employeeId && pathname.endsWith('/edit')) {
+    if (employeeId && pathname.endsWith('/employees/edit')) {
       return \`Employee \${employeeId} - Edit\`;
     }
     if (employeeId) {

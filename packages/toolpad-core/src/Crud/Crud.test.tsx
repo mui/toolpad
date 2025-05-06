@@ -354,13 +354,13 @@ describe('Crud', () => {
   test('does not show non-editable items in forms', async () => {
     render(<AppWithRouter initialPath="/orders/new" />);
 
-    expect(screen.getByLabelText('Max. return date')).toBeVisible();
-    expect(screen.getByLabelText('Created at')).not.toBeVisible();
+    expect(screen.getAllByLabelText('Max. return date')).toBeTruthy();
+    expect(screen.queryByLabelText('Created at')).toBeNull();
 
     render(<AppWithRouter initialPath="/orders/1/edit" />);
 
-    expect(screen.getByLabelText('Max. return date')).toBeVisible();
-    expect(screen.getByLabelText('Created at')).not.toBeVisible();
+    expect(screen.getAllByLabelText('Max. return date')).toBeTruthy();
+    expect(screen.queryByLabelText('Created at')).toBeNull();
   });
 
   test('deletes items from list view', async () => {

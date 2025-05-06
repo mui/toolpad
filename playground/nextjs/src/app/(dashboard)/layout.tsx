@@ -163,10 +163,10 @@ export default function DashboardPagesLayout(props: { children: React.ReactNode 
   const [orderId] = params.segments ?? [];
 
   const title = React.useMemo(() => {
-    if (pathname === '/orders/new') {
+    if (pathname.endsWith('/orders/new')) {
       return 'New Order';
     }
-    if (orderId && pathname.includes('/edit')) {
+    if (orderId && pathname.endsWith('/edit')) {
       return `Order ${orderId} - Edit`;
     }
     if (orderId) {

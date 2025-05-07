@@ -32,14 +32,14 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ appBar?: { branding?: { homeUrl?: string, logo?: node, title?: string }, hideMenuButton?: bool, menuOpen: bool, onToggleMenu: func, slotProps?: { appTitle?: object, toolbarAccount?: object, toolbarActions?: object }, slots?: { appTitle?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType } }, appTitle?: { branding?: { homeUrl?: string, logo?: node, title?: string } }, sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: object, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
+        "description": "{ appTitle?: { branding?: { homeUrl?: string, logo?: node, title?: string } }, header?: { branding?: { homeUrl?: string, logo?: node, title?: string }, hideMenuButton?: bool, menuOpen: bool, onToggleMenu: func, slotProps?: { appTitle?: object, toolbarAccount?: object, toolbarActions?: object }, slots?: { appTitle?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType } }, sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: object, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
       },
       "default": "{}"
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ appBar?: elementType, appTitle?: elementType, sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
+        "description": "{ appTitle?: elementType, header?: elementType, sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -77,7 +77,7 @@
       "class": null
     },
     {
-      "name": "appBar",
+      "name": "header",
       "description": "The component used for the layout header.",
       "default": "DashboardHeader",
       "class": null

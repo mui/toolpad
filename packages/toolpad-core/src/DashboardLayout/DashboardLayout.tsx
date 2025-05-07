@@ -515,7 +515,14 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
-    appBar: PropTypes.shape({
+    appTitle: PropTypes.shape({
+      branding: PropTypes.shape({
+        homeUrl: PropTypes.string,
+        logo: PropTypes.node,
+        title: PropTypes.string,
+      }),
+    }),
+    header: PropTypes.shape({
       branding: PropTypes.shape({
         homeUrl: PropTypes.string,
         logo: PropTypes.node,
@@ -533,13 +540,6 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
         appTitle: PropTypes.elementType,
         toolbarAccount: PropTypes.elementType,
         toolbarActions: PropTypes.elementType,
-      }),
-    }),
-    appTitle: PropTypes.shape({
-      branding: PropTypes.shape({
-        homeUrl: PropTypes.string,
-        logo: PropTypes.node,
-        title: PropTypes.string,
       }),
     }),
     sidebarFooter: PropTypes.shape({
@@ -569,8 +569,8 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slots: PropTypes.shape({
-    appBar: PropTypes.elementType,
     appTitle: PropTypes.elementType,
+    header: PropTypes.elementType,
     sidebarFooter: PropTypes.elementType,
     toolbarAccount: PropTypes.elementType,
     toolbarActions: PropTypes.elementType,

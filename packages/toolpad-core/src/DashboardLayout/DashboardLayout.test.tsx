@@ -395,8 +395,7 @@ describe('DashboardLayout', () => {
     );
 
     const desktopNavigation = screen.queryByRole('navigation', { name: 'Desktop' });
-    const navigationToggle =
-      desktopNavigation && within(desktopNavigation).queryByLabelText('Collapse menu');
+    const navigationToggle = screen.queryByLabelText('Collapse menu');
 
     // Expect that navigation and menu button are not rendered
     expect(desktopNavigation).toBeNull();

@@ -150,22 +150,26 @@ function DashboardHeader(props: DashboardHeaderProps) {
           }}
         >
           <Stack direction="row">
-            <Box
-              sx={{
-                display: { xs: hideMenuButton ? 'none' : 'block', md: 'none' },
-                mr: { sm: 1 },
-              }}
-            >
-              {getMenuIcon(menuOpen)}
-            </Box>
-            <Box
-              sx={{
-                display: { xs: 'none', md: hideMenuButton ? 'none' : 'block' },
-                mr: 1,
-              }}
-            >
-              {getMenuIcon(menuOpen)}
-            </Box>
+            {!hideMenuButton ? (
+              <React.Fragment>
+                <Box
+                  sx={{
+                    display: { xs: 'block', md: 'none' },
+                    mr: { sm: 1 },
+                  }}
+                >
+                  {getMenuIcon(menuOpen)}
+                </Box>
+                <Box
+                  sx={{
+                    display: { xs: 'none', md: 'block' },
+                    mr: 1,
+                  }}
+                >
+                  {getMenuIcon(menuOpen)}
+                </Box>
+              </React.Fragment>
+            ) : null}
             {slots?.appTitle ? (
               <slots.appTitle {...slotProps?.appTitle} />
             ) : (

@@ -28,7 +28,7 @@ export interface DashboardLayoutSlotProps {
   toolbarActions?: DashboardHeaderSlotProps['toolbarActions'];
   toolbarAccount?: DashboardHeaderSlotProps['toolbarAccount'];
   sidebarFooter?: SidebarFooterProps;
-  appBar?: DashboardHeaderProps;
+  header?: DashboardHeaderProps;
 }
 
 export interface DashboardLayoutSlots {
@@ -55,7 +55,7 @@ export interface DashboardLayoutSlots {
    * The component used for the layout header.
    * @default DashboardHeader
    */
-  appBar?: React.JSXElementConstructor<DashboardHeaderProps>;
+  header?: React.JSXElementConstructor<DashboardHeaderProps>;
   /**
    * Optional footer component used in the layout sidebar.
    * @default null
@@ -243,9 +243,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const hasDrawerTransitions = isOverSmViewport && (!disableCollapsibleSidebar || isOverMdViewport);
 
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
-  const AppBarSlot = slots?.appBar ?? DashboardHeader;
+  const HeaderSlot = slots?.header ?? DashboardHeader;
 
-  const appBarSlotProps: DashboardHeaderProps = React.useMemo(
+  const headerSlotProps: DashboardHeaderProps = React.useMemo(
     () => ({
       branding,
       menuOpen: isNavigationExpanded,
@@ -357,7 +357,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         ...sx,
       }}
     >
-      <AppBarSlot {...appBarSlotProps} />
+      <HeaderSlot {...headerSlotProps} />
       {!hideNavigation ? (
         <React.Fragment>
           <Drawer

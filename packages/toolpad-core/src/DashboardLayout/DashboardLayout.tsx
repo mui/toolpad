@@ -32,6 +32,8 @@ export interface DashboardLayoutSlotProps {
   header?: DashboardHeaderProps;
 }
 
+// @TODO: Deprecate `appTitle` and `toolbarActions` slots so that they must be used in DashboardHeader component only. Update docs accordingly.
+
 export interface DashboardLayoutSlots {
   /**
    * The component used for the app title section in the layout header.

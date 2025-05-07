@@ -15,8 +15,8 @@
     "typescript:transpile:dev": "cross-env BABEL_ENV=development babel-node --extensions \".tsx,.ts,.js\" scripts/formattedTSDemos --watch"
   },
   "dependencies": {
-    "@babel/plugin-transform-object-assign": "7.25.9",
-    "@babel/runtime-corejs2": "7.27.0",
+    "@babel/plugin-transform-object-assign": "7.27.1",
+    "@babel/runtime-corejs2": "7.27.1",
     "@date-io/date-fns-jalali": "3.2.0",
     "@docsearch/react": "3.9.0",
     "@emotion/cache": "11.14.0",
@@ -92,9 +92,9 @@
     "zod": "3.24.3"
   },
   "devDependencies": {
-    "@babel/core": "7.26.10",
-    "@babel/plugin-transform-react-constant-elements": "7.25.9",
-    "@babel/preset-typescript": "7.27.0",
+    "@babel/core": "7.27.1",
+    "@babel/plugin-transform-react-constant-elements": "7.27.1",
+    "@babel/preset-typescript": "7.27.1",
     "@types/babel__core": "^7.20.5",
     "@types/doctrine": "0.0.9",
     "@types/json-schema": "7.0.15",

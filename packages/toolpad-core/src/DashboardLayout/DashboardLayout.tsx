@@ -270,6 +270,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         toolbarActions: slotProps?.toolbarActions,
         toolbarAccount: slotProps?.toolbarAccount,
       },
+      ...slotProps?.header,
     }),
     [
       branding,

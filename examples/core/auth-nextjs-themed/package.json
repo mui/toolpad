@@ -18,7 +18,6 @@
     "@mui/x-data-grid": "^8",
     "dayjs": "^1",
     "clsx": "^2",
-    "@react-spring/web": "^9",
     "@toolpad/core": "^0.14.0",
     "next": "^15",
     "next-auth": "^5.0.0-beta.25",
@@ -27,7 +26,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@types/node": "^20.17.30",
+    "@types/node": "^20.17.32",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "eslint": "^8",

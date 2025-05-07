@@ -208,11 +208,16 @@ function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
       >
         {item.icon || isMini ? (
           <Box
-            sx={{
-              position: 'relative',
-              top: isMini ? -6 : 0,
-              left: isMini ? 5 : 0,
-            }}
+            sx={
+              isMini
+                ? {
+                    position: 'absolute',
+                    left: '50%',
+                    top: 'calc(50% - 6px)',
+                    transform: 'translate(-50%, -50%)',
+                  }
+                : {}
+            }
           >
             <ListItemIcon
               sx={{
@@ -229,7 +234,6 @@ function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
                     width: LIST_ITEM_ICON_SIZE - 7,
                     height: LIST_ITEM_ICON_SIZE - 7,
                     fontSize: 12,
-                    ml: '-2px',
                   }}
                 >
                   {title
@@ -253,7 +257,7 @@ function DashboardSidebarPageItem(props: DashboardSidebarPageItemProps) {
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  width: MINI_DRAWER_WIDTH - 28,
+                  maxWidth: MINI_DRAWER_WIDTH - 28,
                 }}
               >
                 {title}

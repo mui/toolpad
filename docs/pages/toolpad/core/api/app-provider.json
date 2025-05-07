@@ -20,6 +20,7 @@
       },
       "default": "[]"
     },
+    "nonce": { "type": { "name": "string" } },
     "router": {
       "type": {
         "name": "shape",
@@ -34,7 +35,7 @@
       },
       "default": "null"
     },
-    "theme": { "type": { "name": "object" }, "default": "createTheme()" },
+    "theme": { "type": { "name": "object" }, "default": "createDefaultTheme()" },
     "window": { "type": { "name": "object" }, "default": "window" }
   },
   "name": "AppProvider",

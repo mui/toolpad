@@ -2,6 +2,7 @@
 import * as React from 'react';
 import createCache from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
+import warnOnce from '@toolpad/utils/warnOnce';
 import { Router } from '../AppProvider';
 
 /**
@@ -15,13 +16,11 @@ function useExternalProductionWarning({ featureName }: { featureName: string }) 
     window.location.hostname !== 'mui.com' &&
     process.env.NODE_ENV === 'production';
 
-  React.useEffect(() => {
-    if (isExternalProduction) {
-      console.warn(
-        `${featureName} is an internal feature of Toolpad Core. This feature is not meant for general usage in production.`,
-      );
-    }
-  }, [featureName, isExternalProduction]);
+  if (isExternalProduction) {
+    warnOnce(
+      `${featureName} is an internal feature of Toolpad Core. This feature is not meant for general usage in production.`,
+    );
+  }
 }
 
 interface DemoProviderProps {

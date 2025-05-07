@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { createTheme as createMuiTheme, Theme } from '@mui/material/styles';
+import { createTheme, Theme } from '@mui/material/styles';
 import { NotificationsProvider } from '../useNotifications';
 import { DialogsProvider } from '../useDialogs';
 import {
@@ -11,7 +11,7 @@ import {
   WindowContext,
 } from '../shared/context';
 import type { LinkProps } from '../shared/Link';
-import { AppThemeProvider, COLOR_SCHEME_ATTRIBUTE } from './AppThemeProvider';
+import { AppThemeProvider } from './AppThemeProvider';
 import { LocalizationProvider, type LocaleText } from './LocalizationProvider';
 
 export interface NavigateOptions {
@@ -88,7 +88,7 @@ export interface AppProviderProps {
   children: React.ReactNode;
   /**
    * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/customization/css-theme-variables/overview/) is recommended.
-   * @default createTheme()
+   * @default createDefaultTheme()
    */
   theme?: AppTheme;
   /**
@@ -126,12 +126,16 @@ export interface AppProviderProps {
    * @default window
    */
   window?: Window;
+  /**
+   * The nonce to be used for inline scripts.
+   */
+  nonce?: string;
 }
 
-function createTheme(): Theme {
-  return createMuiTheme({
+function createDefaultTheme(): Theme {
+  return createTheme({
     cssVariables: {
-      colorSchemeSelector: COLOR_SCHEME_ATTRIBUTE,
+      colorSchemeSelector: 'data-toolpad-color-scheme',
     },
     colorSchemes: { dark: true },
   });
@@ -151,7 +155,7 @@ function createTheme(): Theme {
 function AppProvider(props: AppProviderProps) {
   const {
     children,
-    theme = createTheme(),
+    theme = createDefaultTheme(),
     branding = null,
     navigation = [],
     localeText,
@@ -159,6 +163,7 @@ function AppProvider(props: AppProviderProps) {
     authentication = null,
     session = null,
     window: appWindow,
+    nonce,
   } = props;
 
   return (
@@ -166,7 +171,7 @@ function AppProvider(props: AppProviderProps) {
       <AuthenticationContext.Provider value={authentication}>
         <SessionContext.Provider value={session}>
           <RouterContext.Provider value={router}>
-            <AppThemeProvider theme={theme} window={appWindow}>
+            <AppThemeProvider theme={theme} window={appWindow} nonce={nonce}>
               <LocalizationProvider localeText={localeText}>
                 <NotificationsProvider>
                   <DialogsProvider>
@@ -252,6 +257,10 @@ AppProvider.propTypes /* remove-proptypes */ = {
     ]).isRequired,
   ),
   /**
+   * The nonce to be used for inline scripts.
+   */
+  nonce: PropTypes.string,
+  /**
    * Router implementation used inside Toolpad components.
    * @default null
    */
@@ -275,7 +284,7 @@ AppProvider.propTypes /* remove-proptypes */ = {
   }),
   /**
    * [Theme or themes](https://mui.com/toolpad/core/react-app-provider/#theming) to be used by the app in light/dark mode. A [CSS variables theme](https://mui.com/material-ui/customization/css-theme-variables/overview/) is recommended.
-   * @default createTheme()
+   * @default createDefaultTheme()
    */
   theme: PropTypes.object,
   /**

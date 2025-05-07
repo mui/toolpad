@@ -2,7 +2,6 @@
   "name": "docs",
   "version": "0.14.0",
   "private": true,
-  "author": "MUI Toolpad",
   "license": "MIT",
   "scripts": {
     "build": "rimraf ./export && cross-env NODE_ENV=production next build --profile && pnpm build-sw",
@@ -34,11 +33,11 @@
     "@mui/material-nextjs": "^7.0.2",
     "@mui/system": "^7.0.2",
     "@mui/utils": "^7.0.2",
-    "@mui/x-data-grid": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-data-grid-pro": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-date-pickers": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-date-pickers-pro": "^8.0.0 || ^8.0.0-beta",
-    "@mui/x-license": "^8.0.0 || ^8.0.0-beta",
+    "@mui/x-data-grid": "^8.2.0",
+    "@mui/x-data-grid-pro": "^8.2.0",
+    "@mui/x-date-pickers": "^8.2.0",
+    "@mui/x-date-pickers-pro": "^8.2.0",
+    "@mui/x-license": "^8.2.0",
     "@toolpad/core": "workspace:*",
     "@toolpad/studio-components": "^0.13.0",
     "@toolpad/studio-runtime": "^0.13.0",
@@ -67,7 +66,7 @@
     "jss-rtl": "0.3.0",
     "lodash": "4.17.21",
     "lz-string": "1.5.0",
-    "markdown-to-jsx": "7.7.4",
+    "markdown-to-jsx": "7.7.6",
     "next": "^15.2.3",
     "nprogress": "0.2.0",
     "postcss": "8.4.49",
@@ -105,7 +104,7 @@
     "@types/react-swipeable-views": "^0.13.6",
     "cpy-cli": "5.0.0",
     "cross-fetch": "4.1.0",
-    "typescript": "5.8.2",
+    "typescript": "5.8.3",
     "typescript-to-proptypes": "2.2.1"
   }
 }

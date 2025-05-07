@@ -7,6 +7,7 @@ import type {} from '@mui/material/themeCssVarsAugmentation';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Toolbar from '@mui/material/Toolbar';
+import warnOnce from '@toolpad/utils/warnOnce';
 import { NavigationContext, WindowContext } from '../shared/context';
 import type { Branding, Navigation, NavigationPageItem } from '../AppProvider';
 import type { AccountProps } from '../Account';
@@ -73,9 +74,11 @@ export interface DashboardLayoutProps {
    * @default null
    */
   branding?: Branding | null;
+  // @TODO: Remove deprecated prop from v0.16.0 onwards
   /**
    * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
+   * @deprecated Set the navigation in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/#navigation) instead.
    */
   navigation?: Navigation;
   /**
@@ -146,6 +149,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
     slotProps,
     sx,
   } = props;
+
+  if (navigationProp && process.env.NODE_ENV !== 'production') {
+    warnOnce(
+      'The navigation prop in the DashboardLayout component is deprecated and will eventually be removed. Set the navigation prop in the AppProvider instead (https://mui.com/toolpad/core/react-app-provider/#navigation).',
+    );
+  }
 
   const theme = useTheme();
 
@@ -465,6 +474,7 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
   /**
    * Navigation definition for the dashboard. [Find out more](https://mui.com/toolpad/core/react-dashboard-layout/#navigation).
    * @default []
+   * @deprecated Set the navigation in the [AppProvider](https://mui.com/toolpad/core/react-app-provider/#navigation) instead.
    */
   navigation: PropTypes.arrayOf(
     PropTypes.oneOfType([

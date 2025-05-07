@@ -9,10 +9,10 @@ import Drawer from '@mui/material/Drawer';
 import Toolbar from '@mui/material/Toolbar';
 import { NavigationContext, WindowContext } from '../shared/context';
 import type { Branding, Navigation, NavigationPageItem } from '../AppProvider';
+import type { AccountProps } from '../Account';
 import {
   DashboardHeader,
   type DashboardHeaderProps,
-  type DashboardHeaderSlots,
   type DashboardHeaderSlotProps,
 } from './DashboardHeader';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
@@ -37,20 +37,20 @@ export interface DashboardLayoutSlots {
    * @default Link
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
-  appTitle?: DashboardHeaderSlots['appTitle'];
+  appTitle?: React.ElementType;
   /**
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
-  toolbarActions?: DashboardHeaderSlots['toolbarActions'];
+  toolbarActions?: React.JSXElementConstructor<{}>;
   /**
    * The toolbar account component used in the layout header.
    * @default Account
    * @deprecated Place your custom component on the right in the `toolbarActions` slot instead.
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
-  toolbarAccount?: DashboardHeaderSlots['toolbarAccount'];
+  toolbarAccount?: React.JSXElementConstructor<AccountProps>;
   /**
    * The component used for the layout header.
    * @default DashboardHeader
@@ -243,6 +243,36 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const hasDrawerTransitions = isOverSmViewport && (!disableCollapsibleSidebar || isOverMdViewport);
 
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
+  const AppBarSlot = slots?.appBar ?? DashboardHeader;
+
+  const appBarSlotProps: DashboardHeaderProps = React.useMemo(
+    () => ({
+      branding,
+      menuOpen: isNavigationExpanded,
+      onToggleMenu: handleToggleHeaderMenu,
+      hideMenuButton: hideNavigation || (isOverMdViewport && disableCollapsibleSidebar),
+      slots: {
+        appTitle: slots?.appTitle,
+        toolbarActions: slots?.toolbarActions,
+        toolbarAccount: slots?.toolbarAccount,
+      },
+      slotProps: {
+        appTitle: slotProps?.appTitle,
+        toolbarActions: slotProps?.toolbarActions,
+        toolbarAccount: slotProps?.toolbarAccount,
+      },
+    }),
+    [
+      branding,
+      isNavigationExpanded,
+      handleToggleHeaderMenu,
+      hideNavigation,
+      isOverMdViewport,
+      disableCollapsibleSidebar,
+      slotProps,
+      slots,
+    ],
+  );
 
   const getDrawerContent = React.useCallback(
     (isMini: boolean, viewport: 'phone' | 'tablet' | 'desktop') => (
@@ -314,37 +344,6 @@ function DashboardLayout(props: DashboardLayoutProps) {
       };
     },
     [isNavigationExpanded, sidebarExpandedWidth],
-  );
-
-  const AppBarSlot = slots?.appBar ?? DashboardHeader;
-
-  const appBarSlotProps: DashboardHeaderProps = React.useMemo(
-    () => ({
-      branding,
-      menuOpen: isNavigationExpanded,
-      onToggleMenu: handleToggleHeaderMenu,
-      hideMenuButton: hideNavigation || (isOverMdViewport && disableCollapsibleSidebar),
-      slots: {
-        appTitle: slots?.appTitle,
-        toolbarActions: slots?.toolbarActions,
-        toolbarAccount: slots?.toolbarAccount,
-      },
-      slotProps: {
-        appTitle: slotProps?.appTitle,
-        toolbarActions: slotProps?.toolbarActions,
-        toolbarAccount: slotProps?.toolbarAccount,
-      },
-    }),
-    [
-      branding,
-      isNavigationExpanded,
-      handleToggleHeaderMenu,
-      hideNavigation,
-      isOverMdViewport,
-      disableCollapsibleSidebar,
-      slotProps,
-      slots,
-    ],
   );
 
   return (
@@ -571,192 +570,10 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   slots: PropTypes.shape({
     appBar: PropTypes.elementType,
-    appTitle: PropTypes.oneOfType([
-      PropTypes.oneOf([
-        'a',
-        'abbr',
-        'address',
-        'animate',
-        'animateMotion',
-        'animateTransform',
-        'area',
-        'article',
-        'aside',
-        'audio',
-        'b',
-        'base',
-        'bdi',
-        'bdo',
-        'big',
-        'blockquote',
-        'body',
-        'br',
-        'button',
-        'canvas',
-        'caption',
-        'center',
-        'circle',
-        'cite',
-        'clipPath',
-        'code',
-        'col',
-        'colgroup',
-        'data',
-        'datalist',
-        'dd',
-        'defs',
-        'del',
-        'desc',
-        'details',
-        'dfn',
-        'dialog',
-        'div',
-        'dl',
-        'dt',
-        'ellipse',
-        'em',
-        'embed',
-        'feBlend',
-        'feColorMatrix',
-        'feComponentTransfer',
-        'feComposite',
-        'feConvolveMatrix',
-        'feDiffuseLighting',
-        'feDisplacementMap',
-        'feDistantLight',
-        'feDropShadow',
-        'feFlood',
-        'feFuncA',
-        'feFuncB',
-        'feFuncG',
-        'feFuncR',
-        'feGaussianBlur',
-        'feImage',
-        'feMerge',
-        'feMergeNode',
-        'feMorphology',
-        'feOffset',
-        'fePointLight',
-        'feSpecularLighting',
-        'feSpotLight',
-        'feTile',
-        'feTurbulence',
-        'fieldset',
-        'figcaption',
-        'figure',
-        'filter',
-        'footer',
-        'foreignObject',
-        'form',
-        'g',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'head',
-        'header',
-        'hgroup',
-        'hr',
-        'html',
-        'i',
-        'iframe',
-        'image',
-        'img',
-        'input',
-        'ins',
-        'kbd',
-        'keygen',
-        'label',
-        'legend',
-        'li',
-        'line',
-        'linearGradient',
-        'link',
-        'main',
-        'map',
-        'mark',
-        'marker',
-        'mask',
-        'menu',
-        'menuitem',
-        'meta',
-        'metadata',
-        'meter',
-        'mpath',
-        'nav',
-        'noindex',
-        'noscript',
-        'object',
-        'ol',
-        'optgroup',
-        'option',
-        'output',
-        'p',
-        'param',
-        'path',
-        'pattern',
-        'picture',
-        'polygon',
-        'polyline',
-        'pre',
-        'progress',
-        'q',
-        'radialGradient',
-        'rect',
-        'rp',
-        'rt',
-        'ruby',
-        's',
-        'samp',
-        'script',
-        'search',
-        'section',
-        'select',
-        'set',
-        'slot',
-        'small',
-        'source',
-        'span',
-        'stop',
-        'strong',
-        'style',
-        'sub',
-        'summary',
-        'sup',
-        'svg',
-        'switch',
-        'symbol',
-        'table',
-        'tbody',
-        'td',
-        'template',
-        'text',
-        'textarea',
-        'textPath',
-        'tfoot',
-        'th',
-        'thead',
-        'time',
-        'title',
-        'tr',
-        'track',
-        'tspan',
-        'u',
-        'ul',
-        'use',
-        'var',
-        'video',
-        'view',
-        'wbr',
-        'webview',
-      ]),
-      PropTypes.func,
-    ]),
+    appTitle: PropTypes.elementType,
     sidebarFooter: PropTypes.elementType,
-    toolbarAccount: PropTypes.func,
-    toolbarActions: PropTypes.func,
+    toolbarAccount: PropTypes.elementType,
+    toolbarActions: PropTypes.elementType,
   }),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.

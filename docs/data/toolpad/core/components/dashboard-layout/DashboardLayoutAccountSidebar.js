@@ -290,7 +290,7 @@ function DashboardLayoutAccountSidebar(props) {
         {/* preview-start */}
         <DashboardLayout
           slots={{
-            toolbarAccount: CustomToolbarActions,
+            toolbarActions: CustomToolbarActions,
             sidebarFooter: SidebarFooterAccount,
           }}
         >

@@ -280,7 +280,7 @@ export default function DashboardLayoutAccountSidebar(props: DemoProps) {
         {/* preview-start */}
         <DashboardLayout
           slots={{
-            toolbarAccount: CustomToolbarActions,
+            toolbarActions: CustomToolbarActions,
             sidebarFooter: SidebarFooterAccount,
           }}
         >

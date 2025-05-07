@@ -1,6 +1,6 @@
 <DashboardLayout
   slots={{
-    toolbarAccount: CustomToolbarActions,
+    toolbarActions: CustomToolbarActions,
     sidebarFooter: SidebarFooterAccount,
   }}
 >

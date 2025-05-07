@@ -25,6 +25,7 @@
   },
   "classDescriptions": {},
   "slotDescriptions": {
+    "appBar": "The component used for the layout header.",
     "appTitle": "The component used for the app title section in the layout header.",
     "sidebarFooter": "Optional footer component used in the layout sidebar.",
     "toolbarAccount": "The toolbar account component used in the layout header.",

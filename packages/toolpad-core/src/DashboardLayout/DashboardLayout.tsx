@@ -1,96 +1,66 @@
 'use client';
-
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme, SxProps } from '@mui/material/styles';
+import { useTheme, SxProps } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import MuiAppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
 import Toolbar from '@mui/material/Toolbar';
-import Tooltip from '@mui/material/Tooltip';
-import MenuIcon from '@mui/icons-material/Menu';
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import { BrandingContext, NavigationContext, WindowContext } from '../shared/context';
-import { type AccountProps } from '../Account';
-import { AppTitle, type AppTitleProps } from './AppTitle';
+import { NavigationContext, WindowContext } from '../shared/context';
+import type { Branding, Navigation, NavigationPageItem } from '../AppProvider';
+import {
+  DashboardHeader,
+  type DashboardHeaderProps,
+  type DashboardHeaderSlots,
+  type DashboardHeaderSlotProps,
+} from './DashboardHeader';
 import { DashboardSidebarSubNavigation } from './DashboardSidebarSubNavigation';
-import { ToolbarActions } from './ToolbarActions';
 import { getDrawerSxTransitionMixin, getDrawerWidthTransitionMixin } from './utils';
 import { MINI_DRAWER_WIDTH } from './shared';
-import type { Branding, Navigation, NavigationPageItem } from '../AppProvider';
-
-const AppBar = styled(MuiAppBar)(({ theme }) => ({
-  borderWidth: 0,
-  borderBottomWidth: 1,
-  borderStyle: 'solid',
-  borderColor: (theme.vars ?? theme).palette.divider,
-  boxShadow: 'none',
-  zIndex: theme.zIndex.drawer + 1,
-}));
 
 export interface SidebarFooterProps {
   mini: boolean;
 }
 
-export interface ToolbarProps {
-  menuIcon: React.ReactElement;
-}
-
 export interface DashboardLayoutSlotProps {
-  appTitle?: AppTitleProps;
-  toolbarActions?: {};
-  toolbarAccount?: AccountProps;
+  appTitle?: DashboardHeaderSlotProps['appTitle'];
+  toolbarActions?: DashboardHeaderSlotProps['toolbarActions'];
+  toolbarAccount?: DashboardHeaderSlotProps['toolbarAccount'];
   sidebarFooter?: SidebarFooterProps;
-  appBar?: {};
+  appBar?: DashboardHeaderProps;
 }
 
 export interface DashboardLayoutSlots {
   /**
    * The component used for the app title section in the layout header.
    * @default Link
+   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
-  appTitle?: React.ElementType;
-
+  appTitle?: DashboardHeaderSlots['appTitle'];
   /**
    * The toolbar actions component used in the layout header.
    * @default ToolbarActions
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
-  toolbarActions?: React.JSXElementConstructor<{}>;
-
+  toolbarActions?: DashboardHeaderSlots['toolbarActions'];
   /**
    * The toolbar account component used in the layout header.
    * @default Account
    * @deprecated Place your custom component on the right in the `toolbarActions` slot instead.
    * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
    */
-  toolbarAccount?: React.JSXElementConstructor<AccountProps>;
-
+  toolbarAccount?: DashboardHeaderSlots['toolbarAccount'];
+  /**
+   * The component used for the layout header.
+   * @default DashboardHeader
+   */
+  appBar?: React.JSXElementConstructor<DashboardHeaderProps>;
   /**
    * Optional footer component used in the layout sidebar.
    * @default null
    */
   sidebarFooter?: React.JSXElementConstructor<SidebarFooterProps>;
-
-  /**
-   * This component is used for the layout header.
-   * You can still use the built-in `<AppTitle />`, `<ThemeSwitcher />` and `<Account />` components inside.
-   * @default null
-   * @see [DashboardLayout#slots](https://mui.com/toolpad/core/react-dashboard-layout/#slots)
-   * @example
-   * ```tsx
-   * import { DefaultAppBar } from './DefaultAppBar';
-   *
-   * <DashboardLayout slots={{ appBar: DefaultAppBar }}>
-   *   <PageContainer>{children}</PageContainer>
-   * </DashboardLayout>
-   * ```
-   */
-  appBar?: React.JSXElementConstructor<ToolbarProps>;
 }
 
 export interface DashboardLayoutProps {
@@ -165,7 +135,7 @@ export interface DashboardLayoutProps {
 function DashboardLayout(props: DashboardLayoutProps) {
   const {
     children,
-    branding: brandingProp,
+    branding,
     navigation: navigationProp,
     defaultSidebarCollapsed = false,
     disableCollapsibleSidebar = false,
@@ -179,11 +149,9 @@ function DashboardLayout(props: DashboardLayoutProps) {
 
   const theme = useTheme();
 
-  const brandingContext = React.useContext(BrandingContext);
   const navigationContext = React.useContext(NavigationContext);
   const appWindowContext = React.useContext(WindowContext);
 
-  const branding = { ...brandingContext, ...brandingProp };
   const navigation = navigationProp ?? navigationContext;
 
   const [isDesktopNavigationExpanded, setIsDesktopNavigationExpanded] =
@@ -258,9 +226,12 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [setIsNavigationExpanded],
   );
 
-  const toggleNavigationExpanded = React.useCallback(() => {
-    setIsNavigationExpanded(!isNavigationExpanded);
-  }, [isNavigationExpanded, setIsNavigationExpanded]);
+  const handleToggleHeaderMenu = React.useCallback(
+    (isExpanded: boolean) => {
+      setIsNavigationExpanded(isExpanded);
+    },
+    [setIsNavigationExpanded],
+  );
 
   const handleNavigationLinkClick = React.useCallback(() => {
     setIsMobileNavigationExpanded(false);
@@ -269,34 +240,8 @@ function DashboardLayout(props: DashboardLayoutProps) {
   const isDesktopMini = !disableCollapsibleSidebar && !isDesktopNavigationExpanded;
   const isMobileMini = !disableCollapsibleSidebar && !isMobileNavigationExpanded;
 
-  const getMenuIcon = React.useCallback(
-    (isExpanded: boolean) => {
-      const expandMenuActionText = 'Expand';
-      const collapseMenuActionText = 'Collapse';
-
-      return (
-        <Tooltip
-          title={`${isExpanded ? collapseMenuActionText : expandMenuActionText} menu`}
-          enterDelay={1000}
-        >
-          <div>
-            <IconButton
-              aria-label={`${isExpanded ? collapseMenuActionText : expandMenuActionText} navigation menu`}
-              onClick={toggleNavigationExpanded}
-            >
-              {isExpanded ? <MenuOpenIcon /> : <MenuIcon />}
-            </IconButton>
-          </div>
-        </Tooltip>
-      );
-    },
-    [toggleNavigationExpanded],
-  );
-
   const hasDrawerTransitions = isOverSmViewport && (!disableCollapsibleSidebar || isOverMdViewport);
 
-  const ToolbarActionsSlot = slots?.toolbarActions ?? ToolbarActions;
-  const ToolbarAccountSlot = slots?.toolbarAccount ?? (() => null);
   const SidebarFooterSlot = slots?.sidebarFooter ?? null;
 
   const getDrawerContent = React.useCallback(
@@ -371,12 +316,36 @@ function DashboardLayout(props: DashboardLayoutProps) {
     [isNavigationExpanded, sidebarExpandedWidth],
   );
 
-  const appBarSlotProps: ToolbarProps = {
-    ...slotProps?.appBar,
-    menuIcon: isOverMdViewport
-      ? getMenuIcon(isDesktopNavigationExpanded)
-      : getMenuIcon(isMobileNavigationExpanded),
-  };
+  const AppBarSlot = slots?.appBar ?? DashboardHeader;
+
+  const appBarSlotProps: DashboardHeaderProps = React.useMemo(
+    () => ({
+      branding,
+      menuOpen: isNavigationExpanded,
+      onToggleMenu: handleToggleHeaderMenu,
+      hideMenuButton: hideNavigation || (isOverMdViewport && disableCollapsibleSidebar),
+      slots: {
+        appTitle: slots?.appTitle,
+        toolbarActions: slots?.toolbarActions,
+        toolbarAccount: slots?.toolbarAccount,
+      },
+      slotProps: {
+        appTitle: slotProps?.appTitle,
+        toolbarActions: slotProps?.toolbarActions,
+        toolbarAccount: slotProps?.toolbarAccount,
+      },
+    }),
+    [
+      branding,
+      isNavigationExpanded,
+      handleToggleHeaderMenu,
+      hideNavigation,
+      isOverMdViewport,
+      disableCollapsibleSidebar,
+      slotProps,
+      slots,
+    ],
+  );
 
   return (
     <Box
@@ -389,64 +358,7 @@ function DashboardLayout(props: DashboardLayoutProps) {
         ...sx,
       }}
     >
-      {slots?.appBar ? (
-        <slots.appBar {...appBarSlotProps} />
-      ) : (
-        <AppBar color="inherit" position="absolute" sx={{ displayPrint: 'none' }}>
-          <Toolbar sx={{ backgroundColor: 'inherit', mx: { xs: -0.75, sm: -1 } }}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{
-                flexWrap: 'wrap',
-                width: '100%',
-              }}
-            >
-              {/* Toolbar Left section */}
-              <Stack direction="row">
-                {!hideNavigation ? (
-                  <React.Fragment>
-                    <Box
-                      sx={{
-                        mr: { sm: disableCollapsibleSidebar ? 0 : 1 },
-                        display: { md: 'none' },
-                      }}
-                    >
-                      {getMenuIcon(isMobileNavigationExpanded)}
-                    </Box>
-                    <Box
-                      sx={{
-                        display: { xs: 'none', md: disableCollapsibleSidebar ? 'none' : 'block' },
-                        mr: disableCollapsibleSidebar ? 0 : 1,
-                      }}
-                    >
-                      {getMenuIcon(isDesktopNavigationExpanded)}
-                    </Box>
-                  </React.Fragment>
-                ) : null}
-                {slots?.appTitle ? (
-                  <slots.appTitle {...slotProps?.appTitle} />
-                ) : (
-                  /* Hierarchy of application of `branding`
-                   * 1. Branding prop passed in the `slotProps.appTitle`
-                   * 2. Branding prop passed to the `DashboardLayout`
-                   * 3. Branding prop passed to the `AppProvider`
-                   */
-                  <AppTitle branding={branding} {...slotProps?.appTitle} />
-                )}
-              </Stack>
-
-              {/* Toolbar Right section */}
-              <Stack direction="row" alignItems="center" spacing={1} sx={{ marginLeft: 'auto' }}>
-                <ToolbarActionsSlot {...slotProps?.toolbarActions} />
-                <ToolbarAccountSlot {...slotProps?.toolbarAccount} />
-              </Stack>
-            </Stack>
-          </Toolbar>
-        </AppBar>
-      )}
-
+      <AppBarSlot {...appBarSlotProps} />
       {!hideNavigation ? (
         <React.Fragment>
           <Drawer
@@ -604,7 +516,26 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
-    appBar: PropTypes.object,
+    appBar: PropTypes.shape({
+      branding: PropTypes.shape({
+        homeUrl: PropTypes.string,
+        logo: PropTypes.node,
+        title: PropTypes.string,
+      }),
+      hideMenuButton: PropTypes.bool,
+      menuOpen: PropTypes.bool.isRequired,
+      onToggleMenu: PropTypes.func.isRequired,
+      slotProps: PropTypes.shape({
+        appTitle: PropTypes.object,
+        toolbarAccount: PropTypes.object,
+        toolbarActions: PropTypes.object,
+      }),
+      slots: PropTypes.shape({
+        appTitle: PropTypes.elementType,
+        toolbarAccount: PropTypes.elementType,
+        toolbarActions: PropTypes.elementType,
+      }),
+    }),
     appTitle: PropTypes.shape({
       branding: PropTypes.shape({
         homeUrl: PropTypes.string,
@@ -640,10 +571,192 @@ DashboardLayout.propTypes /* remove-proptypes */ = {
    */
   slots: PropTypes.shape({
     appBar: PropTypes.elementType,
-    appTitle: PropTypes.elementType,
+    appTitle: PropTypes.oneOfType([
+      PropTypes.oneOf([
+        'a',
+        'abbr',
+        'address',
+        'animate',
+        'animateMotion',
+        'animateTransform',
+        'area',
+        'article',
+        'aside',
+        'audio',
+        'b',
+        'base',
+        'bdi',
+        'bdo',
+        'big',
+        'blockquote',
+        'body',
+        'br',
+        'button',
+        'canvas',
+        'caption',
+        'center',
+        'circle',
+        'cite',
+        'clipPath',
+        'code',
+        'col',
+        'colgroup',
+        'data',
+        'datalist',
+        'dd',
+        'defs',
+        'del',
+        'desc',
+        'details',
+        'dfn',
+        'dialog',
+        'div',
+        'dl',
+        'dt',
+        'ellipse',
+        'em',
+        'embed',
+        'feBlend',
+        'feColorMatrix',
+        'feComponentTransfer',
+        'feComposite',
+        'feConvolveMatrix',
+        'feDiffuseLighting',
+        'feDisplacementMap',
+        'feDistantLight',
+        'feDropShadow',
+        'feFlood',
+        'feFuncA',
+        'feFuncB',
+        'feFuncG',
+        'feFuncR',
+        'feGaussianBlur',
+        'feImage',
+        'feMerge',
+        'feMergeNode',
+        'feMorphology',
+        'feOffset',
+        'fePointLight',
+        'feSpecularLighting',
+        'feSpotLight',
+        'feTile',
+        'feTurbulence',
+        'fieldset',
+        'figcaption',
+        'figure',
+        'filter',
+        'footer',
+        'foreignObject',
+        'form',
+        'g',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'head',
+        'header',
+        'hgroup',
+        'hr',
+        'html',
+        'i',
+        'iframe',
+        'image',
+        'img',
+        'input',
+        'ins',
+        'kbd',
+        'keygen',
+        'label',
+        'legend',
+        'li',
+        'line',
+        'linearGradient',
+        'link',
+        'main',
+        'map',
+        'mark',
+        'marker',
+        'mask',
+        'menu',
+        'menuitem',
+        'meta',
+        'metadata',
+        'meter',
+        'mpath',
+        'nav',
+        'noindex',
+        'noscript',
+        'object',
+        'ol',
+        'optgroup',
+        'option',
+        'output',
+        'p',
+        'param',
+        'path',
+        'pattern',
+        'picture',
+        'polygon',
+        'polyline',
+        'pre',
+        'progress',
+        'q',
+        'radialGradient',
+        'rect',
+        'rp',
+        'rt',
+        'ruby',
+        's',
+        'samp',
+        'script',
+        'search',
+        'section',
+        'select',
+        'set',
+        'slot',
+        'small',
+        'source',
+        'span',
+        'stop',
+        'strong',
+        'style',
+        'sub',
+        'summary',
+        'sup',
+        'svg',
+        'switch',
+        'symbol',
+        'table',
+        'tbody',
+        'td',
+        'template',
+        'text',
+        'textarea',
+        'textPath',
+        'tfoot',
+        'th',
+        'thead',
+        'time',
+        'title',
+        'tr',
+        'track',
+        'tspan',
+        'u',
+        'ul',
+        'use',
+        'var',
+        'video',
+        'view',
+        'wbr',
+        'webview',
+      ]),
+      PropTypes.func,
+    ]),
     sidebarFooter: PropTypes.elementType,
-    toolbarAccount: PropTypes.elementType,
-    toolbarActions: PropTypes.elementType,
+    toolbarAccount: PropTypes.func,
+    toolbarActions: PropTypes.func,
   }),
   /**
    * The system prop that allows defining system overrides as well as additional CSS styles.

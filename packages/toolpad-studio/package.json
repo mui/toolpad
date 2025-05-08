@@ -116,7 +116,7 @@
     "markdown-to-jsx": "7.7.6",
     "mime": "4.0.7",
     "monaco-editor": "0.52.2",
-    "mysql2": "3.13.0",
+    "mysql2": "3.14.1",
     "nanoid": "5.1.5",
     "node-fetch": "2.7.0",
     "node-fetch-har": "1.0.1",

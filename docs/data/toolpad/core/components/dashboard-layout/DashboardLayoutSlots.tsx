@@ -18,6 +18,7 @@ import {
   ThemeSwitcher,
   type SidebarFooterProps,
 } from '@toolpad/core/DashboardLayout';
+import { Account } from '@toolpad/core/Account';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
@@ -102,6 +103,7 @@ function ToolbarActionsSearch() {
         sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
       />
       <ThemeSwitcher />
+      <Account />
     </Stack>
   );
 }

@@ -165,11 +165,6 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const dialogs = useDialogs();
   const notifications = useNotifications();
 
-  const [rowsState, setRowsState] = React.useState<{ rows: D[]; rowCount: number }>({
-    rows: [],
-    rowCount: 0,
-  });
-
   const [paginationModel, setPaginationModel] = React.useState<GridPaginationModel>({
     page: routerContext?.searchParams.get('page')
       ? Number(routerContext?.searchParams.get('page'))
@@ -189,7 +184,30 @@ function List<D extends DataModel>(props: ListProps<D>) {
       : [],
   );
 
-  const [isLoading, setIsLoading] = React.useState(true);
+  const cachedData = React.useMemo(
+    () =>
+      cache &&
+      (cache.get(
+        JSON.stringify([
+          'getMany',
+          {
+            paginationModel,
+            sortModel,
+            filterModel,
+          },
+        ]),
+      ) as {
+        items: D[];
+        itemCount: number;
+      }),
+    [cache, filterModel, paginationModel, sortModel],
+  );
+
+  const [rowsState, setRowsState] = React.useState<{ rows: D[]; rowCount: number }>({
+    rows: cachedData?.items ?? [],
+    rowCount: cachedData?.itemCount ?? 0,
+  });
+  const [isLoading, setIsLoading] = React.useState(!cachedData);
   const [error, setError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
@@ -261,7 +279,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   React.useEffect(() => {
     loadData();
-  }, [filterModel, getMany, loadData, paginationModel, sortModel]);
+  }, [loadData]);
 
   const handleRefresh = React.useCallback(() => {
     if (!isLoading) {

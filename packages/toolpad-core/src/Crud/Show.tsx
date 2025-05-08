@@ -85,8 +85,13 @@ function Show<D extends DataModel>(props: ShowProps<D>) {
   const dialogs = useDialogs();
   const notifications = useNotifications();
 
-  const [data, setData] = React.useState<D | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const cachedData = React.useMemo(
+    () => cache && (cache.get(JSON.stringify(['getOne', id])) as D),
+    [cache, id],
+  );
+
+  const [data, setData] = React.useState<D | null>(cachedData);
+  const [isLoading, setIsLoading] = React.useState(!cachedData);
   const [error, setError] = React.useState<Error | null>(null);
 
   const [hasDeleted, setHasDeleted] = React.useState(false);

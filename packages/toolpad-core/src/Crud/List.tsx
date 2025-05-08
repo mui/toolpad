@@ -184,7 +184,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
       : [],
   );
 
-  const initialData = React.useMemo(
+  const cachedData = React.useMemo(
     () =>
       cache &&
       (cache.get(
@@ -204,10 +204,10 @@ function List<D extends DataModel>(props: ListProps<D>) {
   );
 
   const [rowsState, setRowsState] = React.useState<{ rows: D[]; rowCount: number }>({
-    rows: initialData?.items ?? [],
-    rowCount: initialData?.itemCount ?? 0,
+    rows: cachedData?.items ?? [],
+    rowCount: cachedData?.itemCount ?? 0,
   });
-  const [isLoading, setIsLoading] = React.useState(!initialData);
+  const [isLoading, setIsLoading] = React.useState(!cachedData);
   const [error, setError] = React.useState<Error | null>(null);
 
   React.useEffect(() => {
@@ -279,7 +279,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   React.useEffect(() => {
     loadData();
-  }, [filterModel, getMany, loadData, paginationModel, sortModel]);
+  }, [loadData]);
 
   const handleRefresh = React.useCallback(() => {
     if (!isLoading) {

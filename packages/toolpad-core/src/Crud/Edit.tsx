@@ -212,15 +212,23 @@ function Edit<D extends DataModel>(props: EditProps<D>) {
 
   const loadData = React.useCallback(async () => {
     setError(null);
-    setIsLoading(true);
-    try {
-      const showData = await getOne(id);
+
+    let showData = cachedData;
+    if (!showData) {
+      setIsLoading(true);
+
+      try {
+        showData = await getOne(id);
+      } catch (showDataError) {
+        setError(showDataError as Error);
+      }
+    }
+
+    if (showData) {
       setData(showData);
-    } catch (showDataError) {
-      setError(showDataError as Error);
     }
     setIsLoading(false);
-  }, [getOne, id]);
+  }, [cachedData, getOne, id]);
 
   React.useEffect(() => {
     loadData();

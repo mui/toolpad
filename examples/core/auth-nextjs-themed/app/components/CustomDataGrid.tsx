@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { DataGrid, DataGridProps } from '@mui/x-data-grid';
 
-export default function CustomizedDataGrid(props: DataGridProps) {
+export default function CustomDataGrid(props: DataGridProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <DataGrid

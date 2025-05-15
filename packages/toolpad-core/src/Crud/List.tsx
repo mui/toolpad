@@ -394,7 +394,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
             : []),
         ],
       },
-    ] as GridColDef[];
+    ];
   }, [
     deleteOne,
     fields,

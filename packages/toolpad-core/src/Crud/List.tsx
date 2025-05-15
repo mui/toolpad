@@ -340,31 +340,35 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   const columns = React.useMemo<GridColDef[]>(() => {
     return [
-      ...fields.map((column) => ({
-        ...column,
-        renderCell:
-          column.renderCell ??
-          (({ id, field, formattedValue }) =>
-            field === 'id' && getRowIdLinkPath ? (
-              <Link
-                href={getRowIdLinkPath(id)}
-                component={ToolpadLink}
-                underline="hover"
-                color="primary"
-              >
-                <Box
-                  sx={{
-                    flex: 1,
-                  }}
-                >
-                  {formattedValue}
-                  <OpenInNewIcon sx={{ fontSize: 'inherit' }} />
-                </Box>
-              </Link>
-            ) : (
-              formattedValue
-            )),
-      })),
+      ...fields.map((column) =>
+        column.field === 'id'
+          ? {
+              ...column,
+              renderCell:
+                column.renderCell ??
+                (({ id, formattedValue }) =>
+                  getRowIdLinkPath ? (
+                    <Link
+                      href={getRowIdLinkPath(id)}
+                      component={ToolpadLink}
+                      underline="hover"
+                      color="primary"
+                    >
+                      <Box
+                        sx={{
+                          flex: 1,
+                        }}
+                      >
+                        {formattedValue}
+                        <OpenInNewIcon sx={{ fontSize: 'inherit' }} />
+                      </Box>
+                    </Link>
+                  ) : (
+                    formattedValue
+                  )),
+            }
+          : column,
+      ),
       {
         field: 'actions',
         type: 'actions',

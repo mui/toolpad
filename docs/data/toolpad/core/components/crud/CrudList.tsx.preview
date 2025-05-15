@@ -2,7 +2,7 @@
   dataSource={peopleDataSource}
   dataSourceCache={peopleCache}
   initialPageSize={4}
-  onRowClick={handleRowClick}
+  getRowIdLinkPath={null}
   onCreateClick={handleCreateClick}
   onEditClick={handleEditClick}
   onDelete={handleDelete}

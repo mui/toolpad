@@ -239,13 +239,6 @@ function CrudAdvanced(props) {
     return undefined;
   }, [createPath, editPath, router.pathname, showPath]);
 
-  const handleRowClick = React.useCallback(
-    (noteId) => {
-      router.navigate(`${rootPath}/${String(noteId)}`);
-    },
-    [router],
-  );
-
   const handleCreateClick = React.useCallback(() => {
     router.navigate(createPath);
   }, [createPath, router]);
@@ -288,7 +281,6 @@ function CrudAdvanced(props) {
               {router.pathname === listPath ? (
                 <List
                   initialPageSize={10}
-                  onRowClick={handleRowClick}
                   onCreateClick={handleCreateClick}
                   onEditClick={handleEditClick}
                 />

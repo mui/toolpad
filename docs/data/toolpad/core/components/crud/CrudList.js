@@ -149,10 +149,6 @@ function CrudList(props) {
   // Remove this const when copying and pasting into your project.
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const handleRowClick = React.useCallback((personId) => {
-    console.log(`Row click with id ${personId}`);
-  }, []);
-
   const handleCreateClick = React.useCallback(() => {
     console.log('Create click');
   }, []);
@@ -181,7 +177,7 @@ function CrudList(props) {
               dataSource={peopleDataSource}
               dataSourceCache={peopleCache}
               initialPageSize={4}
-              onRowClick={handleRowClick}
+              getRowIdLinkPath={null}
               onCreateClick={handleCreateClick}
               onEditClick={handleEditClick}
               onDelete={handleDelete}

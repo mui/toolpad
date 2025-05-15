@@ -129,10 +129,6 @@ export default function CrudListDataGrid(props: DemoProps) {
   const router = useDemoRouter('/people');
   const demoWindow = window !== undefined ? window() : undefined;
 
-  const handleRowClick = React.useCallback((personId: string | number) => {
-    console.log(`Row click with id ${personId}`);
-  }, []);
-
   const handleCreateClick = React.useCallback(() => {
     console.log('Create click');
   }, []);
@@ -161,7 +157,7 @@ export default function CrudListDataGrid(props: DemoProps) {
               dataSource={peopleDataSource}
               dataSourceCache={peopleCache}
               initialPageSize={4}
-              onRowClick={handleRowClick}
+              getRowIdLinkPath={null}
               onCreateClick={handleCreateClick}
               onEditClick={handleEditClick}
               onDelete={handleDelete}

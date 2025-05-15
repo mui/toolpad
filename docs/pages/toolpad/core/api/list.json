@@ -7,12 +7,12 @@
         "description": "{ cache: object, clear: func, get: func, set: func, ttl: number }"
       }
     },
+    "getRowIdLinkPath": { "type": { "name": "func" }, "default": "(id) => `${String(id)}`" },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" },
     "localeText": { "type": { "name": "object" } },
     "onCreateClick": { "type": { "name": "func" } },
     "onDelete": { "type": { "name": "func" } },
     "onEditClick": { "type": { "name": "func" } },
-    "onRowClick": { "type": { "name": "func" } },
     "slotProps": {
       "type": { "name": "shape", "description": "{ dataGrid?: object }" },
       "default": "{}"

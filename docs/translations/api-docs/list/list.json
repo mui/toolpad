@@ -7,6 +7,9 @@
     "dataSourceCache": {
       "description": "<a href=\"https://mui.com/toolpad/core/react-crud/#data-caching\">Cache</a> for the data source."
     },
+    "getRowIdLinkPath": {
+      "description": "Function that returns the path that each row links to from the <code>id</code> cell."
+    },
     "initialPageSize": { "description": "Initial number of rows to show per page." },
     "localeText": { "description": "Locale text for the component." },
     "onCreateClick": {
@@ -14,9 +17,6 @@
     },
     "onDelete": { "description": "Callback fired when the item is successfully deleted." },
     "onEditClick": { "description": "Callback fired when the &quot;Edit&quot; button is clicked." },
-    "onRowClick": {
-      "description": "Callback fired when a row is clicked. Not called if the target clicked is an interactive element added by the built-in columns."
-    },
     "slotProps": { "description": "The props used for each slot inside." },
     "slots": { "description": "The components used for each slot inside." }
   },

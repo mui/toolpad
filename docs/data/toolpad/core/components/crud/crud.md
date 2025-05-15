@@ -331,7 +331,7 @@ If props are passed for `onCreateClick` or `onEditClick`, buttons are shown for 
 
 If the data source includes `deleteOne`, it is possible to delete items directly from their respective rows.
 
-The `getRowIdLinkPath` prop can be used to set the path that each item row links to from the `id` cell. By default, the link goes to `/${itemId}`. Use `null` if you don't want these cells to work as links.
+The `getRowIdHref` prop can be used to set the path that each item row links to from the `id` cell. By default, the link goes to `/${itemId}`. Use `null` if you don't want these cells to work as links.
 
 {{"demo": "CrudList.js", "height": 600, "iframe": true}}
 

@@ -192,7 +192,7 @@ export default function CrudList(props: DemoProps) {
               dataSource={peopleDataSource}
               dataSourceCache={peopleCache}
               initialPageSize={4}
-              getRowIdLinkPath={null}
+              getRowIdHref={null}
               onCreateClick={handleCreateClick}
               onEditClick={handleEditClick}
               onDelete={handleDelete}

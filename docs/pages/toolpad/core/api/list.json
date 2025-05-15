@@ -7,7 +7,7 @@
         "description": "{ cache: object, clear: func, get: func, set: func, ttl: number }"
       }
     },
-    "getRowIdLinkPath": { "type": { "name": "func" }, "default": "(id) => `${String(id)}`" },
+    "getRowIdHref": { "type": { "name": "func" }, "default": "(id) => `${String(id)}`" },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" },
     "localeText": { "type": { "name": "object" } },
     "onCreateClick": { "type": { "name": "func" } },

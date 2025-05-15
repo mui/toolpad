@@ -83,7 +83,7 @@ export interface ListProps<D extends DataModel> {
    * Function that returns the path that each row links to from the `id` cell.
    * @default (id) => `${String(id)}`
    */
-  getRowIdLinkPath?: ((id: DataModelId) => string) | null;
+  getRowIdHref?: ((id: DataModelId) => string) | null;
   /**
    * Callback fired when the "Create" button is clicked.
    */
@@ -129,7 +129,7 @@ export interface ListProps<D extends DataModel> {
 function List<D extends DataModel>(props: ListProps<D>) {
   const {
     initialPageSize = 100,
-    getRowIdLinkPath = (id) => `${String(id)}`,
+    getRowIdHref = (id) => `${String(id)}`,
     onCreateClick,
     onEditClick,
     onDelete,
@@ -347,9 +347,9 @@ function List<D extends DataModel>(props: ListProps<D>) {
               renderCell:
                 column.renderCell ??
                 (({ id, formattedValue }) =>
-                  getRowIdLinkPath ? (
+                  getRowIdHref ? (
                     <Link
-                      href={getRowIdLinkPath(id)}
+                      href={getRowIdHref(id)}
                       component={ToolpadLink}
                       underline="hover"
                       color="primary"
@@ -401,7 +401,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
   }, [
     deleteOne,
     fields,
-    getRowIdLinkPath,
+    getRowIdHref,
     handleItemDelete,
     handleItemEdit,
     localeText.deleteLabel,
@@ -493,7 +493,7 @@ List.propTypes /* remove-proptypes */ = {
    * Function that returns the path that each row links to from the `id` cell.
    * @default (id) => `${String(id)}`
    */
-  getRowIdLinkPath: PropTypes.func,
+  getRowIdHref: PropTypes.func,
   /**
    * Initial number of rows to show per page.
    * @default 100

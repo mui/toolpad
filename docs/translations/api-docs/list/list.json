@@ -7,7 +7,7 @@
     "dataSourceCache": {
       "description": "<a href=\"https://mui.com/toolpad/core/react-crud/#data-caching\">Cache</a> for the data source."
     },
-    "getRowIdLinkPath": {
+    "getRowIdHref": {
       "description": "Function that returns the path that each row links to from the <code>id</code> cell."
     },
     "initialPageSize": { "description": "Initial number of rows to show per page." },

@@ -5,6 +5,7 @@ import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
+import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
@@ -17,7 +18,6 @@ import {
   GridFilterModel,
   GridPaginationModel,
   GridSortModel,
-  GridEventListener,
   gridClasses,
 } from '@mui/x-data-grid';
 import type { DataGridProProps } from '@mui/x-data-grid-pro';
@@ -26,9 +26,11 @@ import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import invariant from 'invariant';
 import { useDialogs } from '../useDialogs';
 import { useNotifications } from '../useNotifications';
+import { Link as ToolpadLink } from '../shared/Link';
 import { NoSsr } from '../shared/NoSsr';
 import { CrudContext, RouterContext, WindowContext } from '../shared/context';
 import { useLocaleText } from '../AppProvider/LocalizationProvider';
@@ -78,9 +80,10 @@ export interface ListProps<D extends DataModel> {
    */
   initialPageSize?: number;
   /**
-   * Callback fired when a row is clicked. Not called if the target clicked is an interactive element added by the built-in columns.
+   * Function that returns the path that each row links to from the `id` cell.
+   * @default (id) => `${String(id)}`
    */
-  onRowClick?: (id: DataModelId) => void;
+  getRowIdLinkPath?: ((id: DataModelId) => string) | null;
   /**
    * Callback fired when the "Create" button is clicked.
    */
@@ -126,7 +129,7 @@ export interface ListProps<D extends DataModel> {
 function List<D extends DataModel>(props: ListProps<D>) {
   const {
     initialPageSize = 100,
-    onRowClick,
+    getRowIdLinkPath = (id) => `${String(id)}`,
     onCreateClick,
     onEditClick,
     onDelete,
@@ -270,15 +273,6 @@ function List<D extends DataModel>(props: ListProps<D>) {
     }
   }, [cache, isLoading, loadData]);
 
-  const handleRowClick = React.useCallback<GridEventListener<'rowClick'>>(
-    ({ row }) => {
-      if (onRowClick) {
-        onRowClick(row.id);
-      }
-    },
-    [onRowClick],
-  );
-
   const handleItemEdit = React.useCallback(
     (itemId: DataModelId) => () => {
       if (onEditClick) {
@@ -346,7 +340,31 @@ function List<D extends DataModel>(props: ListProps<D>) {
 
   const columns = React.useMemo<GridColDef[]>(() => {
     return [
-      ...fields,
+      ...fields.map((column) => ({
+        ...column,
+        renderCell:
+          column.renderCell ??
+          (({ id, field, formattedValue }) =>
+            field === 'id' && getRowIdLinkPath ? (
+              <Link
+                href={getRowIdLinkPath(id)}
+                component={ToolpadLink}
+                underline="hover"
+                color="primary"
+              >
+                <Box
+                  sx={{
+                    flex: 1,
+                  }}
+                >
+                  {formattedValue}
+                  <OpenInNewIcon sx={{ fontSize: 'inherit' }} />
+                </Box>
+              </Link>
+            ) : (
+              formattedValue
+            )),
+      })),
       {
         field: 'actions',
         type: 'actions',
@@ -375,10 +393,11 @@ function List<D extends DataModel>(props: ListProps<D>) {
             : []),
         ],
       },
-    ];
+    ] as GridColDef[];
   }, [
     deleteOne,
     fields,
+    getRowIdLinkPath,
     handleItemDelete,
     handleItemEdit,
     localeText.deleteLabel,
@@ -419,7 +438,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
             onSortModelChange={setSortModel}
             filterModel={filterModel}
             onFilterModelChange={setFilterModel}
-            onRowClick={handleRowClick}
+            disableRowSelectionOnClick
             loading={isLoading}
             initialState={initialState}
             slots={{ toolbar: GridToolbar }}
@@ -433,13 +452,6 @@ function List<D extends DataModel>(props: ListProps<D>) {
                 {
                   outline: 'none',
                 },
-              ...(onRowClick
-                ? {
-                    [`& .${gridClasses.row}:hover`]: {
-                      cursor: 'pointer',
-                    },
-                  }
-                : {}),
               ...slotProps?.dataGrid?.sx,
             }}
           />
@@ -474,6 +486,11 @@ List.propTypes /* remove-proptypes */ = {
     ttl: PropTypes.number.isRequired,
   }),
   /**
+   * Function that returns the path that each row links to from the `id` cell.
+   * @default (id) => `${String(id)}`
+   */
+  getRowIdLinkPath: PropTypes.func,
+  /**
    * Initial number of rows to show per page.
    * @default 100
    */
@@ -494,10 +511,6 @@ List.propTypes /* remove-proptypes */ = {
    * Callback fired when the "Edit" button is clicked.
    */
   onEditClick: PropTypes.func,
-  /**
-   * Callback fired when a row is clicked. Not called if the target clicked is an interactive element added by the built-in columns.
-   */
-  onRowClick: PropTypes.func,
   /**
    * The props used for each slot inside.
    * @default {}

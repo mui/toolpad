@@ -78,13 +78,6 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
 
   const routerContext = React.useContext(RouterContext);
 
-  const handleRowClick = React.useCallback(
-    (id: string | number) => {
-      routerContext?.navigate(`${rootPath}/${String(id)}`);
-    },
-    [rootPath, routerContext],
-  );
-
   const handleCreateClick = React.useCallback(() => {
     routerContext?.navigate(createPath);
   }, [createPath, routerContext]);
@@ -115,7 +108,6 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
       return (
         <List<D>
           initialPageSize={initialPageSize}
-          onRowClick={handleRowClick}
           onCreateClick={handleCreateClick}
           onEditClick={handleEditClick}
           slots={slots?.list}
@@ -154,13 +146,12 @@ function Crud<D extends DataModel>(props: CrudProps<D>) {
     handleDelete,
     handleEdit,
     handleEditClick,
-    handleRowClick,
     initialPageSize,
     listPath,
     routerContext?.pathname,
     showPath,
-    slotProps,
-    slots,
+    slotProps?.list,
+    slots?.list,
   ]);
 
   return (

@@ -341,31 +341,28 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const columns = React.useMemo<GridColDef[]>(() => {
     return [
       ...fields.map((column) =>
-        column.field === 'id'
+        column.field === 'id' && getRowIdHref
           ? {
               ...column,
               renderCell:
                 column.renderCell ??
-                (({ id, formattedValue }) =>
-                  getRowIdHref ? (
-                    <Link
-                      href={getRowIdHref(id)}
-                      component={ToolpadLink}
-                      underline="hover"
-                      color="primary"
+                (({ id, formattedValue }) => (
+                  <Link
+                    href={getRowIdHref(id)}
+                    component={ToolpadLink}
+                    underline="hover"
+                    color="primary"
+                  >
+                    <Box
+                      sx={{
+                        flex: 1,
+                      }}
                     >
-                      <Box
-                        sx={{
-                          flex: 1,
-                        }}
-                      >
-                        {formattedValue}
-                        <OpenInNewIcon sx={{ fontSize: 'inherit' }} />
-                      </Box>
-                    </Link>
-                  ) : (
-                    formattedValue
-                  )),
+                      {formattedValue}
+                      <OpenInNewIcon sx={{ fontSize: 'inherit' }} />
+                    </Box>
+                  </Link>
+                )),
             }
           : column,
       ),

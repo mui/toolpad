@@ -8,7 +8,7 @@ pnpm-lock.yaml
 build
 dist
 
-/examples/*/toolpad.yml
+/examples/*
 
 /test/integration/*/fixture*/
 /test/visual/*/fixture*/

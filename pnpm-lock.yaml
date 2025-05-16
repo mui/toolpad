@@ -201,7 +201,7 @@ importers:
         version: 7.37.5(eslint@8.57.1)
       eslint-plugin-react-compiler:
         specifier: latest
-        version: 19.1.0-rc.1(eslint@8.57.1)
+        version: 19.1.0-rc.2(eslint@8.57.1)
       eslint-plugin-react-hooks:
         specifier: 5.2.0
         version: 5.2.0(eslint@8.57.1)
@@ -6039,8 +6039,8 @@ packages:
     peerDependencies:
       eslint: '>=7.0.0'
 
-  eslint-plugin-react-compiler@19.1.0-rc.1:
-    resolution: {integrity: sha512-3umw5eqZXapBl7aQGmvcjheKhUbsElb9jTETxRZg371e1LG4EPs/zCHt2JzP+wNcdaZWzjU/R730zPUJblY2zw==}
+  eslint-plugin-react-compiler@19.1.0-rc.2:
+    resolution: {integrity: sha512-oKalwDGcD+RX9mf3NEO4zOoUMeLvjSvcbbEOpquzmzqEEM2MQdp7/FY/Hx9NzmUwFzH1W9SKTz5fihfMldpEYw==}
     engines: {node: ^14.17.0 || ^16.0.0 || >= 18.0.0}
     peerDependencies:
       eslint: '>=7'
@@ -16639,7 +16639,7 @@ snapshots:
       globals: 13.24.0
       rambda: 7.5.0
 
-  eslint-plugin-react-compiler@19.1.0-rc.1(eslint@8.57.1):
+  eslint-plugin-react-compiler@19.1.0-rc.2(eslint@8.57.1):
     dependencies:
       '@babel/core': 7.27.1
       '@babel/parser': 7.27.2

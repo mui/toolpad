@@ -1,5 +1,57 @@
 # Changelog
 
+## v0.15.0
+
+<!-- generated comparing v0.14.0..master -->
+
+_May 8, 2025_
+
+A big thanks to the 4 contributors who made this release possible. Here are some highlights ✨:
+
+- Allow custom navigation page items
+- Show correct single-select values in "Show" UI
+- Pass nonce to color scheme script through AppProvider
+- Improve and fix project dependencies
+- General UI improvements and fixes
+- Improved documentation with CRUD examples and CRUD REST API
+
+### `@toolpad/core`
+
+- Allow custom navigation page items (#4809) @apedroferreira
+- Show correct single-select values in "Show" UI (#4876) @apedroferreira
+- Stop CRUD List DataGrid from rendering with SSR (#4907) @apedroferreira
+- Remove default `RememberMe` (#4574) @bharatkashyap
+- Small refactor for "or" divider (#4855) @bharatkashyap
+- Remove `DashboardLayout` navigation prop (#4881) @apedroferreira
+- Fix mini-sidebar alignment (#4909) @apedroferreira
+- Pass nonce to color scheme script through AppProvider (#4917) @a88zach
+- Make theming not require specific HTML attribute name (#4910) @apedroferreira
+- Prevent horizontal scrollbars by adding tolerance (#4861) @bharatkashyap
+- Highlight and text alignment for mini (#4844) @bharatkashyap
+
+### Docs
+
+- Upgrade themed example for X v8 (#4893) @bharatkashyap
+- Use REST API for CRUD in themed example (#4834) @bharatkashyap
+- Remove React Spring from themed example (#4890) @apedroferreira
+- Update themed example according to latest dependencies (#4877) @apedroferreira
+- Fix theme switcher in docs demos (#4864) @apedroferreira
+- Add CRUD to docs introduction page (#4851) @apedroferreira
+- Don't use `checkboxSelection` in CRUD examples (#4843) @bharatkashyap
+
+### Core
+
+- Update dependencies in `create-toolpad-app` and examples (#4863) @apedroferreira
+- Remove MUI X libraries as peer dependencies (#4854) @apedroferreira
+- Keep 'engines' close to 'packageManager' (9fabc9e) @oliviertassinari
+- Normalize author package in org (6bbd998) @oliviertassinari
+- Fix package description (187c3c1) @oliviertassinari
+- Normalize netlify.toml in org (030a7c5) @oliviertassinari
+- Update MUI X to 8.1.0 (#4891) @apedroferreira
+- Fix typo (#4847) @bharatkashyap
+
+All contributors of this release in alphabetical order: @a88zach, @apedroferreira, @bharatkashyap, @oliviertassinari
+
 ## 0.14.0
 
 <!-- generated comparing v0.13.0..master -->

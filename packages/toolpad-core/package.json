@@ -1,6 +1,6 @@
 {
   "name": "@toolpad/core",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "author": "MUI Team",
   "description": "Dashboard framework powered by Material UI.",
   "main": "./node/index.js",
@@ -42,9 +42,9 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.27.1",
+    "@mui/utils": "^7.0.2",
     "@mui/x-data-grid": "^8.2.0",
     "@mui/x-date-pickers": "^8.2.0",
-    "@mui/utils": "^7.0.2",
     "@standard-schema/spec": "^1.0.0",
     "@toolpad/utils": "workspace:*",
     "@vitejs/plugin-react": "4.4.1",
@@ -69,7 +69,7 @@
     "@vitest/browser": "2.1.9",
     "next": "^15.2.3",
     "next-router-mock": "^0.9.13",
-    "playwright": "^1.47.2",
+    "playwright": "1.52.0",
     "react-router": "7.5.2",
     "sinon": "^19.0.5",
     "vitest": "2.1.9"

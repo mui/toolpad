@@ -1,19 +1,23 @@
 import * as React from 'react';
 import LinearProgress from '@mui/material/LinearProgress';
+import Stack from '@mui/material/Stack';
 import { Outlet, Navigate, useLocation } from 'react-router';
-import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { DashboardLayout, ThemeSwitcher } from '@toolpad/core/DashboardLayout';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { Account } from '@toolpad/core/Account';
 
 import { useSession } from '../SessionContext';
 
-function CustomAccount() {
+function CustomActions() {
   return (
-    <Account
-      slotProps={{
-        preview: { slotProps: { avatarIconButton: { sx: { border: '0' } } } },
-      }}
-    />
+    <Stack direction="row" alignItems="center">
+      <ThemeSwitcher />
+      <Account
+        slotProps={{
+          preview: { slotProps: { avatarIconButton: { sx: { border: '0' } } } },
+        }}
+      />
+    </Stack>
   );
 }
 
@@ -37,7 +41,7 @@ export default function Layout() {
   }
 
   return (
-    <DashboardLayout slots={{ toolbarAccount: CustomAccount }}>
+    <DashboardLayout slots={{ toolbarActions: CustomActions }}>
       <PageContainer>
         <Outlet />
       </PageContainer>

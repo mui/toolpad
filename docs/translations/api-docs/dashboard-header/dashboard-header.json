@@ -1,0 +1,19 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "branding": { "description": "Branding options for the header." },
+    "hideMenuButton": { "description": "Whether the menu icon should always be hidden." },
+    "menuOpen": {
+      "description": "If <code>true</code>, show menu button as if menu is expanded, otherwise show it as if menu is collapsed."
+    },
+    "onToggleMenu": { "description": "Callback fired when the menu button is clicked." },
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." }
+  },
+  "classDescriptions": {},
+  "slotDescriptions": {
+    "appTitle": "The component used for the app title section.",
+    "toolbarAccount": "The toolbar account component to be used.",
+    "toolbarActions": "The toolbar actions component to be used."
+  }
+}

@@ -1,7 +1,7 @@
 ---
 productId: toolpad-core
 title: Dashboard Layout
-components: AppProvider, DashboardLayout, ToolbarActions, ThemeSwitcher, Account, DashboardSidebarPageItem
+components: AppProvider, DashboardLayout, DashboardHeader, ToolbarActions, ThemeSwitcher, Account, DashboardSidebarPageItem
 ---
 
 # Dashboard Layout
@@ -164,9 +164,11 @@ Some possibly useful slots:
 
 - `appTitle`: allows you to customize the app title section in the layout header.
 
-- `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` component can be imported and used if you wish to do so, as shown in the example below.
+- `toolbarActions`: allows you to add new items to the toolbar in the header, such as a search bar or button. The default `ThemeSwitcher` and `Account` components can be imported and used if you wish to do so, as shown in the example below.
 
-- `sidebarFooter`: allows you to add footer content in the sidebar.
+- `header`: allows you to fully replace and customize the layout header.
+
+- `sidebarFooter`: allows you to add a footer to the sidebar.
 
 {{"demo": "DashboardLayoutSlots.js", "height": 400, "iframe": true}}
 

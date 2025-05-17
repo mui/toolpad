@@ -55,4 +55,4 @@ const enLabels: LocaleText = {
   deletedItemMessage: 'This item has been deleted.',
 };
 
-export const en = getLocalization(enLabels);
+export default getLocalization(enLabels);

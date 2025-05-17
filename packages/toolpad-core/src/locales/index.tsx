@@ -1,2 +1,2 @@
-export * from './hiIN';
-export * from './en';
+export { default as hiIN } from './hiIN';
+export { default as en } from './en';

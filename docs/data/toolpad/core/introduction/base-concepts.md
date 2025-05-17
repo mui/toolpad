@@ -121,7 +121,7 @@ To translate all your Toolpad components, you can provide translations through t
 ```tsx
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { hiIN as coreHiIn } from '@mui/material/locale';
-import hiIN from '@toolpad/core/locales/hiIN';
+import { hiIN } from '@toolpad/core/locales';
 
 const theme = createTheme({
    {
@@ -144,7 +144,7 @@ If you want to pass language translations without using `createTheme`, you can d
 
 ```tsx
 import { AppProvider } from '@toolpad/core/AppProvider';
-import hiIN from '@toolpad/core/locales/hiIN';
+import { hiIN } from '@toolpad/core/locales';
 
 function App({ children }) {
   return (

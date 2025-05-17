@@ -23,3 +23,5 @@ export * from './useSession';
 export * from './useSessionStorageState';
 
 export * from './persistence/codec';
+
+export * from './locales';

@@ -193,8 +193,15 @@ function NotificationsProvider(props: NotificationsProviderProps) {
   const close = React.useCallback<CloseNotification>((key) => {
     setState((prev) => ({
       ...prev,
-      queue: prev.queue.filter((n) => n.notificationKey !== key),
+      queue: prev.queue.map((n) => (n.notificationKey === key ? { ...n, open: false } : n)),
     }));
+
+    setTimeout(() => {
+      setState((prev) => ({
+        ...prev,
+        queue: prev.queue.filter((n) => n.open),
+      }));
+    }, 100);
   }, []);
 
   const contextValue = React.useMemo(() => ({ show, close }), [show, close]);

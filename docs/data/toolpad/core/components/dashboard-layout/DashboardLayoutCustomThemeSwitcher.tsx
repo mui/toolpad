@@ -7,6 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import Popover from '@mui/material/Popover';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
+import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { createTheme, useColorScheme } from '@mui/material/styles';
@@ -15,6 +16,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { AppProvider, type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
+import { Account } from '@toolpad/core/Account';
 import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
@@ -126,6 +128,15 @@ function CustomThemeSwitcher() {
   );
 }
 
+function CustomToolbarActions() {
+  return (
+    <Stack direction="row" alignItems="center">
+      <CustomThemeSwitcher />
+      <Account />
+    </Stack>
+  );
+}
+
 interface DemoProps {
   /**
    * Injected by the documentation to work in an iframe.
@@ -154,7 +165,7 @@ export default function DashboardLayoutCustomThemeSwitcher(props: DemoProps) {
         {/* preview-start */}
         <DashboardLayout
           slots={{
-            toolbarActions: CustomThemeSwitcher,
+            toolbarActions: CustomToolbarActions,
           }}
         >
           <DemoPageContent pathname={router.pathname} />

@@ -34,14 +34,14 @@
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ appTitle?: { branding?: { homeUrl?: string, logo?: node, title?: string } }, sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: object, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
+        "description": "{ appTitle?: { branding?: { homeUrl?: string, logo?: node, title?: string } }, header?: { branding?: { homeUrl?: string, logo?: node, title?: string }, hideMenuButton?: bool, menuOpen: bool, onToggleMenu: func, slotProps?: { appTitle?: object, toolbarAccount?: object, toolbarActions?: object }, slots?: { appTitle?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType } }, sidebarFooter?: { mini: bool }, toolbarAccount?: { localeText?: object, slotProps?: { popover?: object, popoverContent?: object, preview?: object, signInButton?: object, signOutButton?: object }, slots?: { popover?: elementType, popoverContent?: elementType, preview?: elementType, signInButton?: elementType, signOutButton?: elementType } }, toolbarActions?: object }"
       },
       "default": "{}"
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ appTitle?: elementType, sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
+        "description": "{ appTitle?: elementType, header?: elementType, sidebarFooter?: elementType, toolbarAccount?: elementType, toolbarActions?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -76,6 +76,12 @@
       "name": "toolbarAccount",
       "description": "The toolbar account component used in the layout header.",
       "default": "Account",
+      "class": null
+    },
+    {
+      "name": "header",
+      "description": "The component used for the layout header.",
+      "default": "DashboardHeader",
       "class": null
     },
     {

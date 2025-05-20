@@ -152,7 +152,7 @@ jobs:
   test_unit_browser:
     <<: *default-job
     docker:
-      - image: mcr.microsoft.com/playwright:v1.48.2-focal
+      - image: mcr.microsoft.com/playwright:v1.52.0-noble
         environment:
           NODE_ENV: test
     steps:
@@ -176,7 +176,7 @@ jobs:
     resource_class: 'large'
     parallelism: 2
     docker:
-      - image: mcr.microsoft.com/playwright:v1.47.2-focal
+      - image: mcr.microsoft.com/playwright:v1.52.0-noble
         environment:
           NODE_ENV: test
           TOOLPAD_TEST_RETRIES: 1

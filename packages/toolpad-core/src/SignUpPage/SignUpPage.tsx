@@ -171,19 +171,14 @@ export interface AuthProvider {
 
 export interface SignUpActionResponse {
   /**
-   * The error message if the sign-in failed.
+   * The error message if the sign-up failed.
    * @default ''
    */
   error?: string;
   /**
-   * The type of error if the sign-in failed.
+   * The success notification if the sign-up was successful.
    * @default ''
-   */
-  type?: string;
-  /**
-   * The success notification if the sign-in was successful.
-   * @default ''
-   * Only used for magic link sign-in.
+   * Only used for magic link sign-up.
    * @example 'Check your email for a magic link.'
    */
   success?: string;
@@ -303,11 +298,11 @@ const defaultLocaleText: Pick<LocaleText, keyof SignUpPageLocaleText> = {
  *
  * Demos:
  *
- * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ * - [Sign-up Page](https://mui.com/toolpad/core/react-sign-up-page/)
  *
  * API:
  *
- * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
+ * - [SignUpPage API](https://mui.com/toolpad/core/api/sign-up-page)
  */
 function SignUpPage(props: SignUpPageProps) {
   const { providers, signUp, slots, slotProps, sx, localeText: propsLocaleText } = props;
@@ -739,11 +734,11 @@ SignUpPage.propTypes /* remove-proptypes */ = {
    * Callback fired when a user signs in.
    * @param {AuthProvider} provider The authentication provider.
    * @param {FormData} formData The form data if the provider id is 'credentials'.\
-   * @param {string} callbackUrl The URL to redirect to after signing in.
+   * @param {string} callbackUrl The URL to redirect to after signing up.
    * @returns {void|Promise<SignUpActionResponse>}
    * @default undefined
    */
-  signIn: PropTypes.func,
+  signUp: PropTypes.func,
   /**
    * The props used for each slot inside.
    * @default {}
@@ -778,7 +773,7 @@ SignUpPage.propTypes /* remove-proptypes */ = {
     title: PropTypes.elementType,
   }),
   /**
-   * The prop used to customize the styles on the `SignInPage` container
+   * The prop used to customize the styles on the `SignUpPage` container
    */
   sx: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),

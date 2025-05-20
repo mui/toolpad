@@ -81,7 +81,7 @@ export interface ListProps<D extends DataModel> {
   initialPageSize?: number;
   /**
    * Function that returns the path that each row links to from the `id` cell.
-   * @default (id) => `${String(id)}`
+   * @default (id) => `${routerContext?.pathname ?? ''}/${String(id)}`
    */
   getRowIdHref?: ((id: DataModelId) => string) | null;
   /**
@@ -127,9 +127,11 @@ export interface ListProps<D extends DataModel> {
  * - [List API](https://mui.com/toolpad/core/api/list)
  */
 function List<D extends DataModel>(props: ListProps<D>) {
+  const routerContext = React.useContext(RouterContext);
+
   const {
     initialPageSize = 100,
-    getRowIdHref = (id) => `${String(id)}`,
+    getRowIdHref = (id) => `${routerContext?.pathname ?? ''}/${String(id)}`,
     onCreateClick,
     onEditClick,
     onDelete,
@@ -160,9 +162,7 @@ function List<D extends DataModel>(props: ListProps<D>) {
   const { fields, validate, ...methods } = cachedDataSource;
   const { getMany, deleteOne } = methods;
 
-  const routerContext = React.useContext(RouterContext);
   const appWindowContext = React.useContext(WindowContext);
-
   const appWindow = appWindowContext ?? (typeof window !== 'undefined' ? window : null);
 
   const dialogs = useDialogs();

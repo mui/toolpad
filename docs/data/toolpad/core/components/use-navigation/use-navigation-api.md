@@ -23,7 +23,7 @@ Learn about the difference by reading this [guide](https://mui.com/material-ui/g
 
 You can access the current value of the `NavigationContext` by invoking the hook inside your components:
 
-```js
+```tsx
 import { useNavigation } from '@toolpad/core/useNavigation';
 
 function MyComponent() {

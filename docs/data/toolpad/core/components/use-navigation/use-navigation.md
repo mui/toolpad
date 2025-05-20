@@ -15,13 +15,13 @@ If this is your first time using Toolpad Core, it's recommended to read about th
 
 When a navigation is set in Toolpad Core, a `NavigationContext` is used to share navigation information among all Toolpad Core components, with the value from the `navigation` prop of the `AppProvider`:
 
-```js
+```tsx
 <AppProvider navigation={navigation}>{props.children}</AppProvider>
 ```
 
 You can access the current value of the `NavigationContext` by invoking the hook inside your components:
 
-```js
+```tsx
 import { useNavigation } from '@toolpad/core/useNavigation';
 
 function MyComponent() {

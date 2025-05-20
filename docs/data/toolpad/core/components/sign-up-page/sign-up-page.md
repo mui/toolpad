@@ -12,6 +12,10 @@ components: SignUpPage
 If this is your first time using Toolpad Core, it's recommended to read about the [basic concepts](/toolpad/core/introduction/base-concepts/) first.
 :::
 
+:::warning
+This feature is currently experimental and may change in future releases.
+:::
+
 The `SignUpPage` component is a quick way to generate a ready-to-use registration page with multiple OAuth providers, or a credentials from.
 
 ## Basic Usage

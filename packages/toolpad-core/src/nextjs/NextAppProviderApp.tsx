@@ -1,12 +1,11 @@
 import * as React from 'react';
-import type NextLinkType from 'next/link';
 import { LinkProps } from '../shared/Link';
 import { AppProvider } from '../AppProvider';
 import type { AppProviderProps, Navigate, Router } from '../AppProvider';
 import { usePathname, useSearchParams, useRouter } from './nextNavigation.cjs';
-import NextLinkUntyped from './nextLink.cjs';
+import nextLink from './nextLink.cjs';
 
-const NextLink = NextLinkUntyped as unknown as typeof NextLinkType;
+const NextLink = nextLink.default || nextLink;
 
 const Link = React.forwardRef<HTMLAnchorElement, LinkProps>((props, ref) => {
   const { href, history, ...rest } = props;

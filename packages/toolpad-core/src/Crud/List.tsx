@@ -488,7 +488,7 @@ List.propTypes /* remove-proptypes */ = {
   }),
   /**
    * Function that returns the path that each row links to from the `id` cell.
-   * @default (id) => `${String(id)}`
+   * @default (id) => `${routerContext?.pathname ?? ''}/${String(id)}`
    */
   getRowIdHref: PropTypes.func,
   /**

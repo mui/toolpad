@@ -17,6 +17,17 @@ const en: LocaleText = {
   signInRememberMe: 'Remember Me',
   providerSignInTitle: (provider: string) => `Sign in with ${provider}`,
 
+  // SignUpPage
+  signUpTitle: (brandingTitle?: string) =>
+    brandingTitle ? `Sign up to ${brandingTitle}` : 'Sign up',
+  signUpSubtitle: 'Welcome user, please sign up to continue',
+  providerSignUpTitle: (provider: string) => `Sign up with ${provider}`,
+  passwordsDoNotMatch: 'Passwords do not match',
+  confirmPassword: 'Confirm Password',
+  terms: 'Terms of Service',
+  privacy: 'Privacy Policy',
+  agree: 'I agree to the',
+
   // Common authentication labels
   email: 'Email',
   password: 'Password',
@@ -35,6 +46,7 @@ const en: LocaleText = {
   alert: 'Alert',
   confirm: 'Confirm',
   loading: 'Loading...',
+  and: 'And',
 
   // CRUD
   createNewButtonLabel: 'Create new',

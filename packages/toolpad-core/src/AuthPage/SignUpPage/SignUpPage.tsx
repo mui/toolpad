@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import { FormControlLabelProps } from '@mui/material/FormControlLabel';
+import Link, { LinkProps } from '@mui/material/Link';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -16,27 +16,27 @@ import PasswordIcon from '@mui/icons-material/Password';
 import FingerprintIcon from '@mui/icons-material/Fingerprint';
 import AppleIcon from '@mui/icons-material/Apple';
 import { alpha, useTheme, SxProps, type Theme } from '@mui/material/styles';
-import { LinkProps } from '@mui/material/Link';
-import GoogleIcon from '../shared/icons/Google';
-import FacebookIcon from '../shared/icons/Facebook';
-import TwitterIcon from '../shared/icons/Twitter';
-import InstagramIcon from '../shared/icons/Instagram';
-import TikTokIcon from '../shared/icons/TikTok';
-import LinkedInIcon from '../shared/icons/LinkedIn';
-import SlackIcon from '../shared/icons/Slack';
-import SpotifyIcon from '../shared/icons/Spotify';
-import TwitchIcon from '../shared/icons/Twitch';
-import DiscordIcon from '../shared/icons/Discord';
-import LineIcon from '../shared/icons/Line';
-import Auth0Icon from '../shared/icons/Auth0';
-import MicrosoftEntraIdIcon from '../shared/icons/MicrosoftEntra';
-import CognitoIcon from '../shared/icons/Cognito';
-import GitLabIcon from '../shared/icons/GitLab';
-import KeycloakIcon from '../shared/icons/Keycloak';
-import OktaIcon from '../shared/icons/Okta';
-import FusionAuthIcon from '../shared/icons/FusionAuth';
-import { BrandingContext, RouterContext } from '../shared/context';
-import { useLocaleText, type LocaleText } from '../AppProvider/LocalizationProvider';
+import GoogleIcon from '../../shared/icons/Google';
+import FacebookIcon from '../../shared/icons/Facebook';
+import TwitterIcon from '../../shared/icons/Twitter';
+import InstagramIcon from '../../shared/icons/Instagram';
+import TikTokIcon from '../../shared/icons/TikTok';
+import LinkedInIcon from '../../shared/icons/LinkedIn';
+import SlackIcon from '../../shared/icons/Slack';
+import SpotifyIcon from '../../shared/icons/Spotify';
+import TwitchIcon from '../../shared/icons/Twitch';
+import DiscordIcon from '../../shared/icons/Discord';
+import LineIcon from '../../shared/icons/Line';
+import Auth0Icon from '../../shared/icons/Auth0';
+import MicrosoftEntraIdIcon from '../../shared/icons/MicrosoftEntra';
+import CognitoIcon from '../../shared/icons/Cognito';
+import GitLabIcon from '../../shared/icons/GitLab';
+import KeycloakIcon from '../../shared/icons/Keycloak';
+import OktaIcon from '../../shared/icons/Okta';
+import FusionAuthIcon from '../../shared/icons/FusionAuth';
+import { BrandingContext, RouterContext } from '../../shared/context';
+import { LocaleText, useLocaleText } from '../../AppProvider/LocalizationProvider';
+import { SupportedAuthProvider, AuthProvider } from '../authTypes';
 
 const mergeSlotSx = (defaultSx: SxProps<Theme>, slotProps?: { sx?: SxProps<Theme> }) => {
   if (Array.isArray(slotProps?.sx)) {
@@ -81,35 +81,6 @@ const getCommonTextFieldProps = (theme: Theme, baseProps: TextFieldProps = {}): 
   },
 });
 
-type SupportedOAuthProvider =
-  | 'github'
-  | 'google'
-  | 'facebook'
-  | 'gitlab'
-  | 'twitter'
-  | 'apple'
-  | 'instagram'
-  | 'tiktok'
-  | 'linkedin'
-  | 'slack'
-  | 'spotify'
-  | 'twitch'
-  | 'discord'
-  | 'line'
-  | 'auth0'
-  | 'cognito'
-  | 'keycloak'
-  | 'okta'
-  | 'fusionauth'
-  | 'microsoft-entra-id';
-
-export type SupportedAuthProvider =
-  | SupportedOAuthProvider
-  | 'credentials'
-  | 'passkey'
-  | 'nodemailer'
-  | string;
-
 const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([
   ['github', <GitHubIcon key="github" />],
   ['credentials', <PasswordIcon key="credentials" />],
@@ -135,57 +106,40 @@ const IconProviderMap = new Map<SupportedAuthProvider, React.ReactNode>([
   ['fusionauth', <FusionAuthIcon key="fusionauth" />],
 ]);
 
-interface SignInPageLocaleText {
-  signInTitle: string | ((brandingTitle?: string) => string);
-  signInSubtitle: string;
-  signInRememberMe: string;
-  providerSignInTitle: (provider: string) => string;
+interface SignUpPageLocaleText {
+  signUpTitle: string | ((brandingTitle?: string) => string);
+  signUpSubtitle: string;
+  providerSignUpTitle: (provider: string) => string;
   email: string;
   password: string;
+  confirmPassword: string;
   or: string;
   with: string;
   passkey: string;
   to: string;
+  terms: string;
+  privacy: string;
+  agree: string;
+  and: string;
+  passwordsDoNotMatch: string;
 }
 
-export interface AuthProvider {
+export interface SignUpActionResponse {
   /**
-   * The unique identifier of the authentication provider.
-   * @default undefined
-   * @example 'google'
-   * @example 'github'
-   */
-  id: SupportedAuthProvider;
-  /**
-   * The name of the authentication provider.
-   * @default ''
-   * @example 'Google'
-   * @example 'GitHub'
-   */
-  name: string;
-}
-
-export interface AuthResponse {
-  /**
-   * The error message if the sign-in failed.
+   * The error message if the sign-up failed.
    * @default ''
    */
   error?: string;
   /**
-   * The type of error if the sign-in failed.
+   * The success notification if the sign-up was successful.
    * @default ''
-   */
-  type?: string;
-  /**
-   * The success notification if the sign-in was successful.
-   * @default ''
-   * Only used for magic link sign-in.
+   * Only used for magic link sign-up.
    * @example 'Check your email for a magic link.'
    */
   success?: string;
 }
 
-export interface SignInPageSlots {
+export interface SignUpPageSlots {
   /**
    * The custom email field component used in the credentials form.
    * @default TextField
@@ -197,20 +151,25 @@ export interface SignInPageSlots {
    */
   passwordField?: React.JSXElementConstructor<TextFieldProps>;
   /**
+   * The custom confirm password field component used in the credentials form.
+   * @default TextField
+   */
+  confirmPasswordField?: React.JSXElementConstructor<TextFieldProps>;
+  /**
    * The custom submit button component used in the credentials form.
    * @default Button
    */
   submitButton?: React.JSXElementConstructor<ButtonProps>;
   /**
-   * The custom forgot password link component used in the credentials form.
+   * The custom terms and conditions link component.
    * @default Link
    */
-  forgotPasswordLink?: React.JSXElementConstructor<LinkProps>;
+  termsLink?: string;
   /**
-   * The custom sign up link component used in the credentials form.
+   * The custom privacy policy link component.
    * @default Link
    */
-  signUpLink?: React.JSXElementConstructor<LinkProps>;
+  privacyLink?: string;
   /**
    * A component to override the default title section
    * @default Typography
@@ -221,92 +180,87 @@ export interface SignInPageSlots {
    * @default Typography
    */
   subtitle?: React.ElementType;
-  /**
-   * A custom checkbox placed in the credentials form
-   * @default FormControlLabel
-   */
-  rememberMe?: React.ElementType;
 }
 
-export interface SignInPageProps {
+export interface SignUpPageProps {
   /**
    * The list of authentication providers to display.
    * @default []
    */
   providers?: AuthProvider[];
   /**
-   * Callback fired when a user signs in.
+   * Callback fired when a user signs up.
    * @param {AuthProvider} provider The authentication provider.
    * @param {FormData} formData The form data if the provider id is 'credentials'.\
-   * @param {string} callbackUrl The URL to redirect to after signing in.
-   * @returns {void|Promise<AuthResponse>}
+   * @param {string} callbackUrl The URL to redirect to after signing up.
+   * @returns {void|Promise<SignUpActionResponse>}
    * @default undefined
    */
-  signIn?: (
+  signUp?: (
     provider: AuthProvider,
     formData?: any,
     callbackUrl?: string,
-  ) => void | Promise<AuthResponse> | undefined;
+  ) => void | Promise<SignUpActionResponse> | undefined;
   /**
    * The components used for each slot inside.
    * @default {}
-   * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
-   * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
    */
-  slots?: SignInPageSlots;
+  slots?: SignUpPageSlots;
   /**
    * The props used for each slot inside.
    * @default {}
-   * @example { emailField: { autoFocus: false } }
-   * @example { passwordField: { variant: 'outlined' } }
-   * @example { emailField: { autoFocus: false }, passwordField: { variant: 'outlined' } }
    */
   slotProps?: {
     emailField?: TextFieldProps;
     passwordField?: TextFieldProps;
+    confirmPasswordField?: TextFieldProps;
     submitButton?: ButtonProps;
-    forgotPasswordLink?: LinkProps;
-    signUpLink?: LinkProps;
-    rememberMe?: Partial<FormControlLabelProps>;
+    termsLink?: LinkProps;
+    privacyLink?: LinkProps;
     form?: Partial<React.FormHTMLAttributes<HTMLFormElement>>;
     oAuthButton?: ButtonProps;
   };
   /**
-   * The prop used to customize the styles on the `SignInPage` container
+   * The prop used to customize the styles on the `SignUpPage` container
    */
   sx?: SxProps;
   /**
    * The labels for the account component.
    */
-  localeText?: Partial<SignInPageLocaleText>;
+  localeText?: Partial<SignUpPageLocaleText>;
 }
 
-const defaultLocaleText: Pick<LocaleText, keyof SignInPageLocaleText> = {
-  signInTitle: (brandingTitle?: string) =>
-    brandingTitle ? `Sign in to ${brandingTitle}` : 'Sign in',
-  signInSubtitle: 'Please sign in to continue',
-  providerSignInTitle: (provider: string) => `Sign in with ${provider}`,
-  signInRememberMe: 'Remember me',
+const defaultLocaleText: Pick<LocaleText, keyof SignUpPageLocaleText> = {
+  signUpTitle: (brandingTitle?: string) =>
+    brandingTitle ? `Sign up to ${brandingTitle}` : 'Sign up',
+  signUpSubtitle: 'Create your account',
+  providerSignUpTitle: (provider: string) => `Sign up with ${provider}`,
   email: 'Email',
   password: 'Password',
+  confirmPassword: 'Confirm Password',
   or: 'or',
   with: 'with',
   passkey: 'Passkey',
   to: 'to',
+  terms: 'Terms and Conditions',
+  privacy: 'Privacy Policy',
+  agree: 'I agree to the',
+  and: 'and',
+  passwordsDoNotMatch: 'Passwords do not match',
 };
 
 /**
  *
  * Demos:
  *
- * - [Sign-in Page](https://mui.com/toolpad/core/react-sign-in-page/)
+ * - [Sign-up Page 🚧](https://mui.com/toolpad/core/react-sign-up-page/)
  *
  * API:
  *
- * - [SignInPage API](https://mui.com/toolpad/core/api/sign-in-page)
+ * - [SignUpPage API](https://mui.com/toolpad/core/api/sign-up-page)
  */
-function SignInPage(props: SignInPageProps) {
-  const { providers, signIn, slots, slotProps, sx, localeText: propsLocaleText } = props;
+function SignUpPage(props: SignUpPageProps) {
+  const { providers, signUp, slots, slotProps, sx, localeText: propsLocaleText } = props;
   const theme = useTheme();
   const branding = React.useContext(BrandingContext);
   const router = React.useContext(RouterContext);
@@ -324,7 +278,6 @@ function SignInPage(props: SignInPageProps) {
     error: '',
     success: '',
   });
-
   const callbackUrl = router?.searchParams.get('callbackUrl') ?? '/';
   const singleProvider = React.useMemo(() => providers?.length === 1, [providers]);
 
@@ -338,11 +291,6 @@ function SignInPage(props: SignInPageProps) {
     [isOauthProvider, providers],
   );
 
-  const isPasskeyProvider = React.useCallback(
-    (provider?: SupportedAuthProvider) => provider && provider === 'passkey',
-    [],
-  );
-
   const isEmailProvider = React.useCallback(
     (provider?: SupportedAuthProvider) => provider && provider === 'nodemailer',
     [],
@@ -352,6 +300,9 @@ function SignInPage(props: SignInPageProps) {
     (provider?: SupportedAuthProvider) => provider && provider === 'credentials',
     [],
   );
+
+  const [currentInputedPassword, setPassword] = React.useState<string>();
+  const [currentInputedConfirmedPassword, setConfirmPassword] = React.useState<string>();
 
   return (
     <Box
@@ -393,16 +344,16 @@ function SignInPage(props: SignInPageProps) {
                 fontWeight: 600,
               }}
             >
-              {typeof localeText.signInTitle === 'string'
-                ? localeText.signInTitle
-                : localeText.signInTitle(branding?.title)}
+              {typeof localeText.signUpTitle === 'string'
+                ? localeText.signUpTitle
+                : localeText.signUpTitle(branding?.title)}
             </Typography>
           )}
           {slots?.subtitle ? (
             <slots.subtitle />
           ) : (
             <Typography variant="body2" color="textSecondary" gutterBottom textAlign="center">
-              {localeText?.signInSubtitle}
+              {localeText?.signUpSubtitle}
             </Typography>
           )}
           <Box sx={{ width: '100%' }}>
@@ -423,7 +374,9 @@ function SignInPage(props: SignInPageProps) {
                           selectedProviderId: provider.id,
                           loading: true,
                         });
-                        const oauthResponse = await signIn?.(provider, undefined, callbackUrl);
+                        const oauthResponse = signUp
+                          ? await signUp(provider, undefined, callbackUrl)
+                          : { error: 'No signUp function provided' };
                         setFormStatus((prev) => ({
                           ...prev,
                           loading: oauthResponse?.error ? false : prev.loading,
@@ -449,7 +402,7 @@ function SignInPage(props: SignInPageProps) {
                         }}
                         {...slotProps?.oAuthButton}
                       >
-                        <span>{localeText.providerSignInTitle(provider.name)}</span>
+                        <span>{localeText.providerSignUpTitle(provider.name)}</span>
                       </Button>
                     </form>
                   );
@@ -461,78 +414,6 @@ function SignInPage(props: SignInPageProps) {
               .map((provider: AuthProvider, index: number) => {
                 return (
                   <React.Fragment key={provider.id}>
-                    {isPasskeyProvider(provider.id) ? (
-                      <React.Fragment>
-                        {hasOauthProvider || index > 0 ? (
-                          <Divider sx={{ mt: 2, mx: 0, mb: 1 }}>{localeText.or}</Divider>
-                        ) : null}
-                        {error && selectedProviderId === 'passkey' ? (
-                          <Alert sx={{ mt: 1, mb: 2 }} severity="error">
-                            {error}
-                          </Alert>
-                        ) : null}
-                        <Box
-                          component="form"
-                          onSubmit={async (event) => {
-                            setFormStatus({
-                              error: '',
-                              selectedProviderId: provider.id,
-                              loading: true,
-                            });
-                            event.preventDefault();
-                            const formData = new FormData(event.currentTarget);
-                            const passkeyResponse = await signIn?.(provider, formData, callbackUrl);
-                            setFormStatus((prev) => ({
-                              ...prev,
-                              loading: false,
-                              error: passkeyResponse?.error,
-                            }));
-                          }}
-                          {...slotProps?.form}
-                        >
-                          {slots?.emailField ? (
-                            <slots.emailField {...slotProps?.emailField} />
-                          ) : (
-                            <TextField
-                              {...getCommonTextFieldProps(theme, {
-                                label: localeText.email,
-                                placeholder: 'your@email.com',
-                                id: 'email-passkey',
-                                name: 'email',
-                                type: 'email',
-                                autoComplete: 'email-webauthn',
-                                autoFocus: singleProvider,
-                                sx: { mt: 1 },
-                                ...slotProps?.emailField,
-                              })}
-                            />
-                          )}
-                          {slots?.submitButton ? (
-                            <slots.submitButton {...slotProps?.submitButton} />
-                          ) : (
-                            <Button
-                              type="submit"
-                              fullWidth
-                              size="large"
-                              variant="outlined"
-                              disableElevation
-                              startIcon={IconProviderMap.get(provider.id)}
-                              color="inherit"
-                              loading={loading && selectedProviderId === provider.id}
-                              sx={{
-                                mt: 3,
-                                mb: 2,
-                                textTransform: 'capitalize',
-                              }}
-                              {...slotProps?.submitButton}
-                            >
-                              {localeText.providerSignInTitle(provider.name || localeText.passkey)}
-                            </Button>
-                          )}
-                        </Box>
-                      </React.Fragment>
-                    ) : null}
-
                     {isEmailProvider(provider.id) ? (
                       <React.Fragment>
                         {hasOauthProvider || index > 0 ? (
@@ -558,7 +439,7 @@ function SignInPage(props: SignInPageProps) {
                               loading: true,
                             });
                             const formData = new FormData(event.currentTarget);
-                            const emailResponse = await signIn?.(provider, formData, callbackUrl);
+                            const emailResponse = await signUp?.(provider, formData, callbackUrl);
                             setFormStatus((prev) => ({
                               ...prev,
                               loading: false,
@@ -604,7 +485,7 @@ function SignInPage(props: SignInPageProps) {
                               }}
                               {...slotProps?.submitButton}
                             >
-                              {localeText.providerSignInTitle(
+                              {localeText.providerSignUpTitle(
                                 (provider.name || localeText.email).toLocaleLowerCase(),
                               )}
                             </Button>
@@ -633,7 +514,7 @@ function SignInPage(props: SignInPageProps) {
                             });
                             event.preventDefault();
                             const formData = new FormData(event.currentTarget);
-                            const credentialsResponse = await signIn?.(
+                            const credentialsResponse = await signUp?.(
                               provider,
                               formData,
                               callbackUrl,
@@ -667,37 +548,84 @@ function SignInPage(props: SignInPageProps) {
                               <slots.passwordField {...slotProps?.passwordField} />
                             ) : (
                               <TextField
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                  setPassword(event.target.value);
+                                }}
                                 {...getCommonTextFieldProps(theme, {
                                   name: 'password',
                                   type: 'password',
                                   label: localeText.password,
                                   id: 'password',
                                   placeholder: '*****',
-                                  autoComplete: 'current-password',
+                                  autoComplete: 'new-password',
                                   ...slotProps?.passwordField,
                                 })}
                               />
                             )}
+                            {slots?.confirmPasswordField ? (
+                              <slots.confirmPasswordField {...slotProps?.confirmPasswordField} />
+                            ) : (
+                              <TextField
+                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                  setConfirmPassword(event.target.value);
+                                }}
+                                error={currentInputedConfirmedPassword !== currentInputedPassword}
+                                helperText={
+                                  currentInputedConfirmedPassword !== currentInputedPassword
+                                    ? localeText.passwordsDoNotMatch
+                                    : undefined
+                                }
+                                {...getCommonTextFieldProps(theme, {
+                                  name: 'confirmPassword',
+                                  type: 'password',
+                                  label: localeText.confirmPassword,
+                                  id: 'confirm-password',
+                                  placeholder: '*****',
+                                  autoComplete: 'new-password',
+                                  ...slotProps?.confirmPasswordField,
+                                })}
+                                {...getCommonTextFieldProps(theme, {
+                                  name: 'confirmPassword',
+                                  type: 'password',
+                                  label: localeText.confirmPassword,
+                                  id: 'confirm-password',
+                                  placeholder: '*****',
+                                  autoComplete: 'new-password',
+                                  ...slotProps?.confirmPasswordField,
+                                })}
+                              />
+                            )}
+
+                            {slots?.termsLink || slots?.privacyLink ? (
+                              <Box sx={{ mt: 2 }}>
+                                <Stack
+                                  direction="row"
+                                  alignItems="center"
+                                  flexWrap="wrap"
+                                  gap={0.5}
+                                >
+                                  <Typography variant="body2" color="text.secondary">
+                                    {localeText.agree}
+                                  </Typography>
+                                  {slots?.termsLink ? (
+                                    <Link href={slots?.termsLink} color="primary" variant="body2">
+                                      {localeText.terms}
+                                    </Link>
+                                  ) : null}
+                                  {slots?.termsLink && slots?.privacyLink ? (
+                                    <Typography variant="body2" color="text.secondary">
+                                      {localeText.and}
+                                    </Typography>
+                                  ) : null}
+                                  {slots?.privacyLink ? (
+                                    <Link href={slots?.privacyLink} color="primary" variant="body2">
+                                      {localeText.privacy}
+                                    </Link>
+                                  ) : null}
+                                </Stack>
+                              </Box>
+                            ) : null}
                           </Stack>
-                          {slots?.forgotPasswordLink || slots?.rememberMe ? (
-                            <Stack
-                              direction="row"
-                              justifyContent="space-between"
-                              alignItems="center"
-                              spacing={1}
-                              mt={2}
-                              sx={{
-                                justifyContent: 'space-between',
-                              }}
-                            >
-                              {slots?.rememberMe ? (
-                                <slots.rememberMe {...slotProps?.rememberMe} />
-                              ) : null}
-                              {slots?.forgotPasswordLink ? (
-                                <slots.forgotPasswordLink {...slotProps?.forgotPasswordLink} />
-                              ) : null}
-                            </Stack>
-                          ) : null}
                           {slots?.submitButton ? (
                             <slots.submitButton {...slotProps?.submitButton} />
                           ) : (
@@ -714,21 +642,17 @@ function SignInPage(props: SignInPageProps) {
                                 mb: 2,
                                 textTransform: 'capitalize',
                               }}
+                              disabled={
+                                currentInputedConfirmedPassword !== currentInputedPassword ||
+                                currentInputedConfirmedPassword === undefined
+                              }
                               {...slotProps?.submitButton}
                             >
-                              {localeText.providerSignInTitle(
+                              {localeText.providerSignUpTitle(
                                 (provider.name || localeText.password).toLocaleLowerCase(),
                               )}
                             </Button>
                           )}
-
-                          {slots?.signUpLink ? (
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                              {slots?.signUpLink ? (
-                                <slots.signUpLink {...slotProps?.signUpLink} />
-                              ) : null}
-                            </Box>
-                          ) : null}
                         </Box>
                       </React.Fragment>
                     ) : null}
@@ -742,7 +666,7 @@ function SignInPage(props: SignInPageProps) {
   );
 }
 
-SignInPage.propTypes /* remove-proptypes */ = {
+SignUpPage.propTypes /* remove-proptypes */ = {
   // ┌────────────────────────────── Warning ──────────────────────────────┐
   // │ These PropTypes are generated from the TypeScript type definitions. │
   // │ To update them, edit the TypeScript types and run `pnpm proptypes`. │
@@ -762,49 +686,44 @@ SignInPage.propTypes /* remove-proptypes */ = {
     }),
   ),
   /**
-   * Callback fired when a user signs in.
+   * Callback fired when a user signs up.
    * @param {AuthProvider} provider The authentication provider.
    * @param {FormData} formData The form data if the provider id is 'credentials'.\
-   * @param {string} callbackUrl The URL to redirect to after signing in.
-   * @returns {void|Promise<AuthResponse>}
+   * @param {string} callbackUrl The URL to redirect to after signing up.
+   * @returns {void|Promise<SignUpActionResponse>}
    * @default undefined
    */
-  signIn: PropTypes.func,
+  signUp: PropTypes.func,
   /**
    * The props used for each slot inside.
    * @default {}
-   * @example { emailField: { autoFocus: false } }
-   * @example { passwordField: { variant: 'outlined' } }
-   * @example { emailField: { autoFocus: false }, passwordField: { variant: 'outlined' } }
    */
   slotProps: PropTypes.shape({
+    confirmPasswordField: PropTypes.object,
     emailField: PropTypes.object,
-    forgotPasswordLink: PropTypes.object,
     form: PropTypes.object,
     oAuthButton: PropTypes.object,
     passwordField: PropTypes.object,
-    rememberMe: PropTypes.object,
-    signUpLink: PropTypes.object,
+    privacyLink: PropTypes.object,
     submitButton: PropTypes.object,
+    termsLink: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
    * @default {}
-   * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
-   * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
    */
   slots: PropTypes.shape({
+    confirmPasswordField: PropTypes.elementType,
     emailField: PropTypes.elementType,
-    forgotPasswordLink: PropTypes.elementType,
     passwordField: PropTypes.elementType,
-    rememberMe: PropTypes.elementType,
-    signUpLink: PropTypes.elementType,
+    privacyLink: PropTypes.string,
     submitButton: PropTypes.elementType,
     subtitle: PropTypes.elementType,
+    termsLink: PropTypes.string,
     title: PropTypes.elementType,
   }),
   /**
-   * The prop used to customize the styles on the `SignInPage` container
+   * The prop used to customize the styles on the `SignUpPage` container
    */
   sx: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.func, PropTypes.object, PropTypes.bool])),
@@ -813,4 +732,4 @@ SignInPage.propTypes /* remove-proptypes */ = {
   ]),
 } as any;
 
-export { SignInPage };
+export { SignUpPage };

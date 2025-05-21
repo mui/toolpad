@@ -5,25 +5,25 @@
       "type": { "name": "arrayOf", "description": "Array&lt;{ id: string, name: string }&gt;" },
       "default": "[]"
     },
-    "signIn": {
+    "signUp": {
       "type": { "name": "func" },
       "default": "undefined",
       "signature": {
-        "type": "function(provider: AuthProvider, formData: FormData, callbackUrl: string) => void | Promise<AuthResponse>",
+        "type": "function(provider: AuthProvider, formData: FormData, callbackUrl: string) => void | Promise<SignUpActionResponse>",
         "describedArgs": ["provider", "formData", "callbackUrl"]
       }
     },
     "slotProps": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: object, forgotPasswordLink?: object, form?: object, oAuthButton?: object, passwordField?: object, rememberMe?: object, signUpLink?: object, submitButton?: object }"
+        "description": "{ confirmPasswordField?: object, emailField?: object, form?: object, oAuthButton?: object, passwordField?: object, privacyLink?: object, submitButton?: object, termsLink?: object }"
       },
       "default": "{}"
     },
     "slots": {
       "type": {
         "name": "shape",
-        "description": "{ emailField?: elementType, forgotPasswordLink?: elementType, passwordField?: elementType, rememberMe?: elementType, signUpLink?: elementType, submitButton?: elementType, subtitle?: elementType, title?: elementType }"
+        "description": "{ confirmPasswordField?: elementType, emailField?: elementType, passwordField?: elementType, privacyLink?: string, submitButton?: elementType, subtitle?: elementType, termsLink?: string, title?: elementType }"
       },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
@@ -36,8 +36,11 @@
       "additionalInfo": { "sx": true }
     }
   },
-  "name": "SignInPage",
-  "imports": ["import { SignInPage } from '@toolpad/core/AuthPage';"],
+  "name": "SignUpPage",
+  "imports": [
+    "import { SignUpPage } from '@toolpad/core/SignUpPage';",
+    "import { SignUpPage } from '@toolpad/core';"
+  ],
   "slots": [
     {
       "name": "emailField",
@@ -52,20 +55,26 @@
       "class": null
     },
     {
+      "name": "confirmPasswordField",
+      "description": "The custom confirm password field component used in the credentials form.",
+      "default": "TextField",
+      "class": null
+    },
+    {
       "name": "submitButton",
       "description": "The custom submit button component used in the credentials form.",
       "default": "Button",
       "class": null
     },
     {
-      "name": "forgotPasswordLink",
-      "description": "The custom forgot password link component used in the credentials form.",
+      "name": "termsLink",
+      "description": "The custom terms and conditions link component.",
       "default": "Link",
       "class": null
     },
     {
-      "name": "signUpLink",
-      "description": "The custom sign up link component used in the credentials form.",
+      "name": "privacyLink",
+      "description": "The custom privacy policy link component.",
       "default": "Link",
       "class": null
     },
@@ -80,20 +89,12 @@
       "description": "A component to override the default subtitle section",
       "default": "Typography",
       "class": null
-    },
-    {
-      "name": "rememberMe",
-      "description": "A custom checkbox placed in the credentials form",
-      "default": "FormControlLabel",
-      "class": null
     }
   ],
   "classes": [],
-  "spread": true,
-  "themeDefaultProps": false,
-  "muiName": "SignInPage",
-  "filename": "/packages/toolpad-core/src/AuthPage/SignInPage/SignInPage.tsx",
+  "muiName": "SignUpPage",
+  "filename": "/packages/toolpad-core/src/SignUpPage/SignUpPage.tsx",
   "inheritance": null,
-  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-in-page/\">Sign-in Page</a></li></ul>",
+  "demos": "<ul><li><a href=\"/toolpad/core/react-sign-up-page/\">Sign-up Page 🚧</a></li></ul>",
   "cssComponent": false
 }

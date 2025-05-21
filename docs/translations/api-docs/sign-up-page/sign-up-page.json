@@ -1,0 +1,31 @@
+{
+  "componentDescription": "",
+  "propDescriptions": {
+    "localeText": { "description": "The labels for the account component." },
+    "providers": { "description": "The list of authentication providers to display." },
+    "signUp": {
+      "description": "Callback fired when a user signs up.",
+      "typeDescriptions": {
+        "provider": "The authentication provider.",
+        "formData": "The form data if the provider id is &#39;credentials&#39;.\\",
+        "callbackUrl": "The URL to redirect to after signing up."
+      }
+    },
+    "slotProps": { "description": "The props used for each slot inside." },
+    "slots": { "description": "The components used for each slot inside." },
+    "sx": {
+      "description": "The prop used to customize the styles on the <code>SignUpPage</code> container"
+    }
+  },
+  "classDescriptions": {},
+  "slotDescriptions": {
+    "confirmPasswordField": "The custom confirm password field component used in the credentials form.",
+    "emailField": "The custom email field component used in the credentials form.",
+    "passwordField": "The custom password field component used in the credentials form.",
+    "privacyLink": "The custom privacy policy link component.",
+    "submitButton": "The custom submit button component used in the credentials form.",
+    "subtitle": "A component to override the default subtitle section",
+    "termsLink": "The custom terms and conditions link component.",
+    "title": "A component to override the default title section"
+  }
+}

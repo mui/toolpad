@@ -18,6 +18,8 @@ export * from './useNotifications';
 
 export * from './useLocalStorageState';
 
+export * from './useNavigation';
+
 export * from './useSession';
 
 export * from './useSessionStorageState';

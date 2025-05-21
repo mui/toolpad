@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import invariant from 'invariant';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
+import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
@@ -12,16 +12,16 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select, { SelectChangeEvent, SelectProps } from '@mui/material/Select';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { DatePicker, DatePickerProps } from '@mui/x-date-pickers/DatePicker';
+import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import type { GridSingleSelectColDef } from '@mui/x-data-grid';
 import dayjs, { Dayjs } from 'dayjs';
 import { CrudContext } from '../shared/context';
-import type { DataField, DataModel, DataSource, OmitId } from './types';
+import type { DataField, DataFieldFormValue, DataModel, DataSource, OmitId } from './types';
 
 interface CrudFormState<D extends DataModel> {
   values: Partial<OmitId<D>>;
@@ -30,6 +30,10 @@ interface CrudFormState<D extends DataModel> {
 
 export interface CrudFormSlotProps {
   textField?: TextFieldProps;
+  checkbox?: CheckboxProps;
+  datePicker?: DatePickerProps;
+  dateTimePicker?: DateTimePickerProps;
+  select?: SelectProps;
 }
 
 export interface CrudFormSlots {
@@ -38,6 +42,26 @@ export interface CrudFormSlots {
    * @default TextField
    */
   textField?: React.JSXElementConstructor<TextFieldProps>;
+  /**
+   * The checkbox component used in the form.
+   * @default TextField
+   */
+  checkbox?: React.JSXElementConstructor<CheckboxProps>;
+  /**
+   * The date picker component used in the form.
+   * @default DatePicker
+   */
+  datePicker?: React.JSXElementConstructor<DatePickerProps>;
+  /**
+   * The date and time picker component used in the form.
+   * @default DatePicker
+   */
+  dateTimePicker?: React.JSXElementConstructor<DateTimePickerProps>;
+  /**
+   * The select component used in the form.
+   * @default Select
+   */
+  select: React.JSXElementConstructor<SelectProps>;
 }
 
 export interface CrudFormProps<D extends DataModel> {
@@ -52,10 +76,7 @@ export interface CrudFormProps<D extends DataModel> {
   /**
    * Callback fired when a form field is changed.
    */
-  onFieldChange: (
-    name: keyof D,
-    value: string | number | boolean | File | null,
-  ) => void | Promise<void>;
+  onFieldChange: (name: keyof D, value: DataFieldFormValue) => void | Promise<void>;
   /**
    * Callback fired when the form is submitted.
    */
@@ -163,14 +184,20 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
 
   const renderField = React.useCallback(
     (formField: DataField) => {
-      const { field, type, headerName } = formField;
+      const { field, type, headerName, renderFormField } = formField;
 
       const fieldValue = formValues[field];
       const fieldError = formErrors[field];
 
       let fieldElement: React.ReactNode = null;
 
-      if (!type || type === 'string') {
+      if (renderFormField) {
+        fieldElement = renderFormField({
+          value: (fieldValue ?? null) as DataFieldFormValue,
+          onChange: (value) => onFieldChange(field, value),
+          error: fieldError,
+        });
+      } else if (!type || type === 'string') {
         const TextFieldComponent = slots?.textField ?? TextField;
 
         fieldElement = (
@@ -185,10 +212,11 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
             {...slotProps?.textField}
           />
         );
-      }
-      if (type === 'number') {
+      } else if (type === 'number') {
+        const TextFieldComponent = slots?.textField ?? TextField;
+
         fieldElement = (
-          <TextField
+          <TextFieldComponent
             value={fieldValue ?? ''}
             onChange={handleNumberFieldChange}
             name={field}
@@ -197,19 +225,22 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
             error={!!fieldError}
             helperText={fieldError ?? ' '}
             fullWidth
+            {...slotProps?.textField}
           />
         );
-      }
-      if (type === 'boolean') {
+      } else if (type === 'boolean') {
+        const CheckBoxComponent = slots?.checkbox ?? Checkbox;
+
         fieldElement = (
           <FormControl>
             <FormControlLabel
               name={field}
               control={
-                <Checkbox
+                <CheckBoxComponent
                   size="large"
                   checked={fieldValue as boolean}
                   onChange={handleCheckboxFieldChange}
+                  {...slotProps?.checkbox}
                 />
               }
               label={headerName}
@@ -217,11 +248,12 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
             <FormHelperText error={!!fieldError}>{fieldError ?? ' '}</FormHelperText>
           </FormControl>
         );
-      }
-      if (type === 'date') {
+      } else if (type === 'date') {
+        const DatePickerComponent = slots?.datePicker ?? DatePicker;
+
         fieldElement = (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
+            <DatePickerComponent
               value={fieldValue ? dayjs(fieldValue as string) : null}
               onChange={handleDateFieldChange(field)}
               name={field}
@@ -233,14 +265,16 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
                   fullWidth: true,
                 },
               }}
+              {...slotProps?.datePicker}
             />
           </LocalizationProvider>
         );
-      }
-      if (type === 'dateTime') {
+      } else if (type === 'dateTime') {
+        const DateTimePickerComponent = slots?.dateTimePicker ?? DateTimePicker;
+
         fieldElement = (
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DateTimePicker
+            <DateTimePickerComponent
               value={fieldValue ? dayjs(fieldValue as string) : null}
               onChange={handleDateFieldChange(field)}
               name={field}
@@ -252,11 +286,13 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
                   fullWidth: true,
                 },
               }}
+              {...slotProps?.dateTimePicker}
             />
           </LocalizationProvider>
         );
-      }
-      if (type === 'singleSelect') {
+      } else if (type === 'singleSelect') {
+        const SelectComponent = slots?.select ?? Select;
+
         const { getOptionValue, getOptionLabel, valueOptions } =
           formField as GridSingleSelectColDef;
 
@@ -266,14 +302,15 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
           fieldElement = (
             <FormControl error={!!fieldError} fullWidth>
               <InputLabel id={labelId}>{headerName}</InputLabel>
-              <Select
+              <SelectComponent
                 value={(fieldValue as string) ?? ''}
-                onChange={handleSelectFieldChange}
+                onChange={handleSelectFieldChange as SelectProps['onChange']}
                 labelId={labelId}
                 name={field}
                 label={headerName}
                 defaultValue=""
                 fullWidth
+                {...slotProps?.select}
               >
                 {valueOptions.map((option) => {
                   let optionValue: string | number = option as string | number;
@@ -289,7 +326,7 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
                     </MenuItem>
                   );
                 })}
-              </Select>
+              </SelectComponent>
               <FormHelperText>{fieldError ?? ' '}</FormHelperText>
             </FormControl>
           );
@@ -310,7 +347,8 @@ function CrudForm<D extends DataModel>(props: CrudFormProps<D>) {
       handleNumberFieldChange,
       handleSelectFieldChange,
       handleTextFieldChange,
-      slotProps?.textField,
+      onFieldChange,
+      slotProps,
       slots,
     ],
   );
@@ -377,6 +415,10 @@ CrudForm.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slotProps: PropTypes.shape({
+    checkbox: PropTypes.object,
+    datePicker: PropTypes.object,
+    dateTimePicker: PropTypes.object,
+    select: PropTypes.object,
     textField: PropTypes.object,
   }),
   /**
@@ -384,6 +426,10 @@ CrudForm.propTypes /* remove-proptypes */ = {
    * @default {}
    */
   slots: PropTypes.shape({
+    checkbox: PropTypes.elementType,
+    datePicker: PropTypes.elementType,
+    dateTimePicker: PropTypes.elementType,
+    select: PropTypes.elementType,
     textField: PropTypes.elementType,
   }),
   /**

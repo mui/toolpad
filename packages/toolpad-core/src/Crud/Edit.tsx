@@ -12,7 +12,7 @@ import { CrudForm } from './CrudForm';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
-import type { DataModel, DataModelId, DataSource, OmitId } from './types';
+import type { DataFieldFormValue, DataModel, DataModelId, DataSource, OmitId } from './types';
 
 interface EditFormProps<D extends DataModel> {
   dataSource: DataSource<D> & Required<Pick<DataSource<D>, 'getOne' | 'updateOne'>>;
@@ -63,7 +63,7 @@ function EditForm<D extends DataModel>(props: EditFormProps<D>) {
   }, []);
 
   const handleFormFieldChange = React.useCallback(
-    (name: keyof D, value: string | number | boolean | File | null) => {
+    (name: keyof D, value: DataFieldFormValue) => {
       const validateField = async (values: Partial<OmitId<D>>) => {
         if (validate) {
           const { issues } = await validate(values);

@@ -9,7 +9,7 @@ import { CrudForm } from './CrudForm';
 import { DataSourceCache } from './cache';
 import { useCachedDataSource } from './useCachedDataSource';
 import { CRUD_DEFAULT_LOCALE_TEXT, type CRUDLocaleText } from './localeText';
-import type { DataModel, DataSource, OmitId } from './types';
+import type { DataFieldFormValue, DataModel, DataSource, OmitId } from './types';
 
 export interface CreateProps<D extends DataModel> {
   /**
@@ -116,7 +116,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
   }, []);
 
   const handleFormFieldChange = React.useCallback(
-    (name: keyof D, value: string | number | boolean | File | null) => {
+    (name: keyof D, value: DataFieldFormValue) => {
       const validateField = async (values: Partial<OmitId<D>>) => {
         if (validate) {
           const { issues } = await validate(values);

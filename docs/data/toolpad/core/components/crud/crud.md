@@ -314,6 +314,14 @@ To disable the data source cache, pass `null` to the `dataSourceCache` prop.
 
 {{"demo": "CrudNoCache.js", "height": 600, "iframe": true}}
 
+## Custom form fields
+
+You can customize form fields by using the `renderFormField` property in the data source fields definition.
+
+This function receives `value`, `onChange` and `error` as arguments for the respective field, allowing you to create your own custom logic inside the form.
+
+{{"demo": "CrudCustomFormField.js", "height": 600, "iframe": true}}
+
 ## Advanced configuration
 
 For more flexibility of customization, and especially if you want full control over where to place the different CRUD pages, you can use the `List`, `Show`, `Create` and `Edit` subcomponents instead of the all-in-one `Crud` component.

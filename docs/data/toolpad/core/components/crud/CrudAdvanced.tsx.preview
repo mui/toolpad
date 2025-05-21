@@ -5,7 +5,6 @@
   {router.pathname === listPath ? (
     <List<Note>
       initialPageSize={10}
-      onRowClick={handleRowClick}
       onCreateClick={handleCreateClick}
       onEditClick={handleEditClick}
     />

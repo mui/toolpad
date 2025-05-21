@@ -1,10 +1,6 @@
 import * as React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import {
-  AuthResponse,
-  SignInPage,
-  type AuthProvider,
-} from '@toolpad/core/SignInPage';
+import { AuthResponse, SignInPage, type AuthProvider } from '@toolpad/core/AuthPage';
 import { useTheme } from '@mui/material/styles';
 
 // preview-start

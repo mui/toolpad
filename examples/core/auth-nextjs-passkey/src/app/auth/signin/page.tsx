@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import type { AuthProvider } from '@toolpad/core';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 import { signIn as webauthnSignIn } from 'next-auth/webauthn';
 import { providerMap } from '../../../auth';
 import serverSignIn from './actions';

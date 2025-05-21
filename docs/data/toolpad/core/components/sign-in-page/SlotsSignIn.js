@@ -16,7 +16,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 import { useTheme } from '@mui/material/styles';
 
 const providers = [{ id: 'credentials', name: 'Email and Password' }];

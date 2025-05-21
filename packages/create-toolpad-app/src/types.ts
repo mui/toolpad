@@ -1,4 +1,4 @@
-import type { SupportedAuthProvider } from '@toolpad/core/SignInPage';
+import type { SupportedAuthProvider } from '@toolpad/core/AuthPage';
 import { PackageJson } from './packageType';
 
 export type SupportedRouter = 'nextjs-app' | 'nextjs-pages';

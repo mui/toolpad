@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 import { createTheme } from '@mui/material/styles';
 import { useColorSchemeShim } from 'docs/src/modules/components/ThemeContext';
 import { getDesignTokens, inputsCustomizations } from './customTheme';

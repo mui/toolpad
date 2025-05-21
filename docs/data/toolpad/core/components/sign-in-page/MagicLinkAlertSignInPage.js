@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { useTheme } from '@mui/material/styles';
 

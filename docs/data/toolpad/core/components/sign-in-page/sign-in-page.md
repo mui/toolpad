@@ -18,7 +18,7 @@ The `SignInPage` component is a quick way to generate a ready-to-use authenticat
 
 ```tsx
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignInPage } from '@toolpad/core/SignInPage';
+import { SignInPage } from '@toolpad/core/AuthPage';
 
 export default function App() {
   return (
@@ -183,7 +183,7 @@ To have a fully built "Sign in with GitHub" page appear at the `/auth/signin` ro
 ```tsx title="./app/auth/signin/page.tsx"
 // ...
 import * as React from 'react';
-import { SignInPage, type AuthProvider } from '@toolpad/core/SignInPage';
+import { SignInPage, type AuthProvider } from '@toolpad/core/AuthPage';
 import { AuthError } from 'next-auth';
 import { providerMap, signIn } from '../../../auth';
 

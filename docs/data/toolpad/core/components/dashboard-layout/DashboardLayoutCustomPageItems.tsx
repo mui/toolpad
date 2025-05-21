@@ -24,7 +24,7 @@ import {
   DashboardLayout,
   DashboardSidebarPageItem,
 } from '@toolpad/core/DashboardLayout';
-import { useDemoRouter } from '@toolpad/core/internal';
+import { DemoProvider, useDemoRouter } from '@toolpad/core/internal';
 
 const NAVIGATION: Navigation = [
   {
@@ -202,17 +202,20 @@ export default function DashboardLayoutCustomPageItems(props: DemoProps) {
   // preview-end
 
   return (
-    <AppProvider
-      navigation={NAVIGATION}
-      router={router}
-      theme={demoTheme}
-      window={demoWindow}
-    >
-      {/* preview-start */}
-      <DashboardLayout renderPageItem={renderPageItem}>
-        <DemoPageContent pathname={router.pathname} />
-      </DashboardLayout>
-      {/* preview-end */}
-    </AppProvider>
+    // Remove this provider when copying and pasting into your project.
+    <DemoProvider window={demoWindow}>
+      <AppProvider
+        navigation={NAVIGATION}
+        router={router}
+        theme={demoTheme}
+        window={demoWindow}
+      >
+        {/* preview-start */}
+        <DashboardLayout renderPageItem={renderPageItem}>
+          <DemoPageContent pathname={router.pathname} />
+        </DashboardLayout>
+        {/* preview-end */}
+      </AppProvider>
+    </DemoProvider>
   );
 }

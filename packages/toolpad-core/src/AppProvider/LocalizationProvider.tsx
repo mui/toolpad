@@ -2,7 +2,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
-import DEFAULT_LOCALE from '../locales/en';
+import { en as DEFAULT_LOCALE } from '../locales';
 
 export interface LocaleText {
   // Account

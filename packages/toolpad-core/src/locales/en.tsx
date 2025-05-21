@@ -1,7 +1,7 @@
 import type { LocaleText } from '../AppProvider';
 import { getLocalization } from './getLocalization';
 
-const en: LocaleText = {
+const enLabels: LocaleText = {
   // Account
   accountSignInLabel: 'Sign In',
   accountSignOutLabel: 'Sign Out',
@@ -67,4 +67,4 @@ const en: LocaleText = {
   deletedItemMessage: 'This item has been deleted.',
 };
 
-export default getLocalization(en);
+export default getLocalization(enLabels);

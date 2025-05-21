@@ -56,7 +56,7 @@ function TagsFormField({
       <InputLabel id={labelId}>{label}</InputLabel>
       <Select
         multiple
-        value={value}
+        value={value ?? []}
         onChange={handleChange}
         labelId={labelId}
         name="tags"

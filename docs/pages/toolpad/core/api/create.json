@@ -10,7 +10,22 @@
     "initialValues": { "type": { "name": "object" }, "default": "{}" },
     "localeText": { "type": { "name": "object" } },
     "onSubmitSuccess": { "type": { "name": "func" } },
-    "resetOnSubmit": { "type": { "name": "bool" }, "default": "false" }
+    "resetOnSubmit": { "type": { "name": "bool" }, "default": "false" },
+    "slotProps": {
+      "type": {
+        "name": "shape",
+        "description": "{ form: { checkbox?: object, datePicker?: object, dateTimePicker?: object, select?: object, textField?: object } }"
+      },
+      "default": "{}"
+    },
+    "slots": {
+      "type": {
+        "name": "shape",
+        "description": "{ form: { checkbox?: elementType, datePicker?: elementType, dateTimePicker?: elementType, select?: elementType, textField?: elementType } }"
+      },
+      "default": "{}",
+      "additionalInfo": { "slotsApi": true }
+    }
   },
   "name": "Create",
   "imports": ["import { Create } from '@toolpad/core/Crud';"],

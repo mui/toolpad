@@ -11,11 +11,17 @@
     "defaultValues": { "type": { "name": "object" }, "default": "{}" },
     "initialPageSize": { "type": { "name": "number" }, "default": "100" },
     "slotProps": {
-      "type": { "name": "shape", "description": "{ list: { dataGrid?: object } }" },
+      "type": {
+        "name": "shape",
+        "description": "{ form: { checkbox?: object, datePicker?: object, dateTimePicker?: object, select?: object, textField?: object }, list: { dataGrid?: object } }"
+      },
       "default": "{}"
     },
     "slots": {
-      "type": { "name": "shape", "description": "{ list: { dataGrid?: func } }" },
+      "type": {
+        "name": "shape",
+        "description": "{ form: { checkbox?: elementType, datePicker?: elementType, dateTimePicker?: elementType, select?: elementType, textField?: elementType }, list: { dataGrid?: func } }"
+      },
       "default": "{}",
       "additionalInfo": { "slotsApi": true }
     }

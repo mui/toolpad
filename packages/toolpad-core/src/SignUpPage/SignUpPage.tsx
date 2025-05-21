@@ -731,7 +731,7 @@ SignUpPage.propTypes /* remove-proptypes */ = {
     }),
   ),
   /**
-   * Callback fired when a user signs in.
+   * Callback fired when a user signs up.
    * @param {AuthProvider} provider The authentication provider.
    * @param {FormData} formData The form data if the provider id is 'credentials'.\
    * @param {string} callbackUrl The URL to redirect to after signing up.
@@ -742,34 +742,29 @@ SignUpPage.propTypes /* remove-proptypes */ = {
   /**
    * The props used for each slot inside.
    * @default {}
-   * @example { emailField: { autoFocus: false } }
-   * @example { passwordField: { variant: 'outlined' } }
-   * @example { emailField: { autoFocus: false }, passwordField: { variant: 'outlined' } }
    */
   slotProps: PropTypes.shape({
+    confirmPasswordField: PropTypes.object,
     emailField: PropTypes.object,
-    forgotPasswordLink: PropTypes.object,
     form: PropTypes.object,
     oAuthButton: PropTypes.object,
     passwordField: PropTypes.object,
-    rememberMe: PropTypes.object,
-    signUpLink: PropTypes.object,
+    privacyLink: PropTypes.object,
     submitButton: PropTypes.object,
+    termsLink: PropTypes.object,
   }),
   /**
    * The components used for each slot inside.
    * @default {}
-   * @example { forgotPasswordLink: <Link href="/forgot-password">Forgot password?</Link> }
-   * @example { signUpLink: <Link href="/sign-up">Sign up</Link> }
    */
   slots: PropTypes.shape({
+    confirmPasswordField: PropTypes.elementType,
     emailField: PropTypes.elementType,
-    forgotPasswordLink: PropTypes.elementType,
     passwordField: PropTypes.elementType,
-    rememberMe: PropTypes.elementType,
-    signUpLink: PropTypes.elementType,
+    privacyLink: PropTypes.string,
     submitButton: PropTypes.elementType,
     subtitle: PropTypes.elementType,
+    termsLink: PropTypes.string,
     title: PropTypes.elementType,
   }),
   /**

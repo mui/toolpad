@@ -401,7 +401,7 @@ describe('Crud', () => {
 
     await userEvent.click(screen.getByLabelText('Tags'));
     await userEvent.click(await screen.findByRole('option', { name: 'Fragile' }));
-    await userEvent.blur(screen.getByLabelText('Tags'));
+    await userEvent.keyboard('{Escape}');
 
     await userEvent.click(screen.getByRole('button', { name: 'Edit' }));
 

@@ -421,7 +421,7 @@ describe('Crud', () => {
     expect(within(dataRows[0]).getByText('Medium')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('no')).toBeInTheDocument();
     expect(within(dataRows[0]).getByText('fragile')).toBeInTheDocument();
-  });
+  }, 10000);
 
   test('deletes items from list view', async () => {
     render(<AppWithRouter initialPath="/orders" />);

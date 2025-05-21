@@ -4,7 +4,7 @@ import {
   SignUpPage,
   type AuthProvider,
   type SignUpActionResponse,
-} from '@toolpad/core/SignUpPage';
+} from '@toolpad/core/AuthPage';
 import { useTheme } from '@mui/material/styles';
 
 const providers = [{ id: 'credentials', name: 'Email and password' }];

@@ -22,7 +22,7 @@ The `SignUpPage` component is a quick way to generate a ready-to-use registratio
 
 ```tsx
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignUpPage } from '@toolpad/core/SignUpPage';
+import { SignUpPage } from '@toolpad/core/AuthPage';
 
 export default function App() {
   return (

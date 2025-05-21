@@ -4,7 +4,7 @@ import {
   AuthProvider,
   SignUpActionResponse,
   SignUpPage,
-} from '@toolpad/core/SignUpPage';
+} from '@toolpad/core/AuthPage';
 import { useTheme } from '@mui/material/styles';
 
 // preview-start

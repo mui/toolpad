@@ -1,6 +1,6 @@
 'use server';
 
-import { AuthProvider, SignUpActionResponse } from '@toolpad/core/SignUpPage';
+import { AuthProvider, SignUpActionResponse } from '@toolpad/core/AuthPage';
 
 const signupAction = async (
   provider: AuthProvider,

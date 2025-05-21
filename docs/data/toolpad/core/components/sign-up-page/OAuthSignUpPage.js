@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
-import { SignUpPage } from '@toolpad/core/SignUpPage';
+import { SignUpPage } from '@toolpad/core/AuthPage';
 import { useTheme } from '@mui/material/styles';
 
 // preview-start

@@ -38,7 +38,7 @@
   },
   "name": "SignUpPage",
   "imports": [
-    "import { SignUpPage } from '@toolpad/core/SignUpPage';",
+    "import { SignUpPage } from '@toolpad/core/AuthPage';",
     "import { SignUpPage } from '@toolpad/core';"
   ],
   "slots": [

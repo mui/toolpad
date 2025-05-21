@@ -87,7 +87,7 @@ function TagsFormField({
       <InputLabel id={labelId}>{label}</InputLabel>
       <Select
         multiple
-        value={(value as NoteTag[]) || []}
+        value={value}
         onChange={handleChange}
         labelId={labelId}
         name="tags"
@@ -122,11 +122,7 @@ export const notesDataSource: DataSource<Note> = {
         return value && (value as string[]).join(', ');
       },
       renderFormField: ({ value, onChange, error }) => (
-        <TagsFormField
-          value={value as NoteTag[]}
-          onChange={onChange}
-          error={error}
-        />
+        <TagsFormField value={value} onChange={onChange} error={error} />
       ),
     },
   ],

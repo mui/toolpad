@@ -104,7 +104,7 @@ function Create<D extends DataModel>(props: CreateProps<D>) {
     values: {
       ...Object.fromEntries(
         fields
-          .filter(({ field }) => field !== 'id')
+          .filter(({ field, editable }) => field !== 'id' && editable !== false)
           .map(({ field, type }) => [
             field,
             type === 'boolean' ? (initialValues[field] ?? false) : initialValues[field],

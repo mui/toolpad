@@ -216,6 +216,7 @@ export const ordersDataSource: DataSource<Order> = {
     const newOrder = {
       id: ordersStore.reduce((max, order) => Math.max(max, order.id), 0) + 1,
       ...data,
+      createdAt: new Date().toISOString(),
     } as Order;
 
     setOrdersStore([...ordersStore, newOrder]);

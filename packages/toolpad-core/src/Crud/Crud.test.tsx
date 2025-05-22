@@ -202,8 +202,8 @@ const ordersDataSource: DataSource<Order> = {
   createOne: (data) => {
     const newOrder = {
       id: ordersStore.reduce((max, order) => Math.max(max, order.id), 0) + 1,
-      createdAt: new Date().toISOString(),
       ...data,
+      createdAt: new Date().toISOString(),
     } as Order;
 
     ordersStore = [...ordersStore, newOrder];
